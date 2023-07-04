@@ -1,5 +1,7 @@
 {
   "Twitch Category": "Категория Twitch",
   "Twitch Tags": "Теги для Twitch",
-  "Warning! Editing tags in Streamlabs will overwrite tags in Twitch. To use Twitch's new custom tags, you must edit your tags in the Twitch dashboard directly until Twitch provides third parties access to editing the new custom tags.": "Предупреждение! При редактировании тегов в Streamlabs перезапишутся теги в Twitch. Чтобы использовать новые пользовательские теги Twitch, их нужно редактировать непосредственно на панели управления Twitch, потому что Twitch еще не предоставил сторонним приложениям доступ к редактированию."
+  "You need to re-login to access Twitch tags": "Авторизуйтесь повторно, чтобы получить доступ к тегам Twitch",
+  "Do not include special characters or spaces in your tag": "Не добавляйте в теги специальные символы и пробелы",
+  "For example: \"Speedrunning\" or \"FirstPlaythrough\"": "Например: «Скоростноепрохождение» или «Первоепрохождение»"
 }

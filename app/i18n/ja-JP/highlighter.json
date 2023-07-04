@@ -90,5 +90,12 @@
   "An error occurred while reading %{file}": "%{file} の読み込み中にエラーが発生しました",
   "An error occurred while reading audio from %{file}": "%{file} からのオーディオ読み込み中にエラーが発生しました",
   "An error occurred while mixing audio": "オーディオのミキシング中にエラーが発生しました",
-  "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "Streamlabs 内蔵の無料エディタ Highlighter でリプレイを編集しましょう。"
+  "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "Streamlabs 内蔵の無料エディタ Highlighter でリプレイを編集しましょう。",
+  "Upload To": "Upload To",
+  "Upload": "Upload",
+  "This feature requires a Streamlabs ID": "This feature requires a Streamlabs ID",
+  "Sign up for Streamlabs ID": "Sign up for Streamlabs ID",
+  "Add subtitles, transcribe, and more": "Add subtitles, transcribe, and more",
+  "Convert to mobile-friendly short video": "Convert to mobile-friendly short video",
+  "YouTube (private video)": "YouTube (private video)"
 }

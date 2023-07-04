@@ -1,12 +1,12 @@
-import { useSpectron, test, TExecutionContext } from '../../helpers/spectron';
+import { useWebdriver, test, TExecutionContext } from '../../helpers/webdriver';
 import { getApiClient } from '../../helpers/api-client';
 import { makeScreenshots, useScreentest } from '../screenshoter';
 import { SettingsService } from '../../../app/services/settings';
-import { logIn, logOut } from '../../helpers/spectron/user';
+import { logIn, logOut } from '../../helpers/webdriver/user';
 import { sleep } from '../../helpers/sleep';
 import { closeWindow, focusChild } from '../../helpers/modules/core';
 
-useSpectron({ restartAppAfterEachTest: false });
+useWebdriver({ restartAppAfterEachTest: false });
 useScreentest();
 
 test('Settings General', async t => {

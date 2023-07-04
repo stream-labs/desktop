@@ -22,7 +22,7 @@ export default function AppsNav(p: IAppsNav) {
     navigateApp: NavigationService.actions.navigateApp,
     enabledApps: PlatformAppsService.views.enabledApps
       .filter(app => {
-        return !!app.manifest.pages.find(page => {
+        return !!app?.manifest?.pages.find(page => {
           return page.slot === EAppPageSlot.TopNav;
         });
       })
@@ -89,6 +89,8 @@ export default function AppsNav(p: IAppsNav) {
               onClick={() => app?.id && navigateApp(app?.id)}
               type="app"
               onContextMenu={e => showContextMenu(e, app?.id)}
+              draggable
+              onDragEnd={() => popOut(app?.id)}
             >
               {app?.name}
             </MenuItem>
@@ -110,6 +112,8 @@ export default function AppsNav(p: IAppsNav) {
               onClick={() => app?.id && navigateApp(app?.id, `sub-${app?.id}`)}
               type="submenu"
               onContextMenu={e => showContextMenu(e, app?.id)}
+              draggable
+              onDragEnd={() => popOut(app?.id)}
             >
               {app.manifest?.name}
             </MenuItem>

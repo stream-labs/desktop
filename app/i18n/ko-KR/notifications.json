@@ -19,5 +19,13 @@
   "Streamlabs Desktop has updated! Click here to see what changed.": "Streamlabs Desktop이 업데이트되었습니다! 여기를 클릭하여 변경 사항을 확인하세요.",
   "Notifications & News": "알림 및 새로운 소식",
   "News": "새로운 소식",
-  "Notifications": "알림"
+  "Notifications": "알림",
+  "A new Recording has been completed. Click for more info": "새로운 녹화가 완료되었습니다. 자세한 정보를 보려면 클릭",
+  "Recording History": "녹화 정보",
+  "Show in folder": "폴더에 표시",
+  "Recordings": "녹화",
+  "Marker %{label} added at %{timestamp}": "%{timestamp}에 마커 %{label} 추가 완료",
+  "File is too large to upload": "File is too large to upload",
+  "File type %{extension} is not supported": "File type %{extension} is not supported",
+  "Upload already in progress": "Upload already in progress"
 }

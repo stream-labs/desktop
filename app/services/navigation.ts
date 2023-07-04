@@ -39,7 +39,7 @@ export class NavigationService extends StatefulService<INavigationState> {
   }
 
   navigateApp(appId: string, key?: string) {
-    this.NAVIGATE('PlatformAppMainPage', { appId });
+    this.navigate('PlatformAppMainPage', { appId });
     this.sideNavService.setCurrentMenuItem(key ?? appId);
   }
 

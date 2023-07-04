@@ -10,7 +10,7 @@ import Scrollable from 'components-react/shared/Scrollable';
 import UltraIcon from 'components-react/shared/UltraIcon';
 import { Services } from 'components-react/service-provider';
 import { useSubscription } from 'components-react/hooks/useSubscription';
-import { useVuex } from 'components-react/hooks';
+import { useChildWindowParams, useVuex } from 'components-react/hooks';
 import { confirmAsync } from 'components-react/modals';
 import styles from './MediaGallery.m.less';
 
@@ -56,8 +56,8 @@ export default function MediaGallery() {
   const audio = useRef(new Audio());
 
   const typeMap = getTypeMap();
-  const promiseId = WindowsService.state.child.queryParams?.promiseId;
-  const filter = WindowsService.state.child.queryParams?.filter;
+  const promiseId = useChildWindowParams('promiseId');
+  const filter = useChildWindowParams('filter');
 
   useEffect(() => {
     fetchGalleryInfo();

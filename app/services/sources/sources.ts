@@ -741,10 +741,10 @@ export class SourcesService extends StatefulService<ISourcesState> {
       // StarsGoal
       // SubGoal
       // SubscriberGoal
-      // ChatBox
+      'ChatBox',
       // ChatHighlight
       // Credits
-      // 'DonationTicker',
+      'DonationTicker',
       'EmoteWall',
       // EventList
       // MediaShare

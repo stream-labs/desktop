@@ -1,6 +1,7 @@
 <template>
   <div class="hotkey" :data-test-id="description.replace(/\s+/, '_')">
-    <div class="Hotkey-description">{{ description }}</div>
+    <text-input v-if="hotkey.isMarker" class="Hotkey-description" v-model="markerValue" />
+    <div v-else class="Hotkey-description">{{ description }}</div>
     <div class="Hotkey-bindings">
       <div v-for="(binding, index) in bindings" :key="binding.key" class="hotkey-bindings__binding">
         <input

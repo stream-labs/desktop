@@ -59,11 +59,13 @@ export { RecordingModeService } from 'services/recording-mode';
 export { SideNavService } from 'services/side-nav';
 export { VideoSettingsService } from 'services/settings-v2/video';
 export { SettingsManagerService } from 'services/settings-manager';
+export { MarkersService } from 'services/markers';
 
 // ONLINE SERVICES
 export { UserService } from './services/user';
 export { YoutubeService } from 'services/platforms/youtube';
 export { TwitchService } from 'services/platforms/twitch';
+export { TwitchTagsService } from 'services/platforms/twitch/index';
 export { FacebookService } from 'services/platforms/facebook';
 export { TiktokService } from 'services/platforms/tiktok';
 export { TrovoService } from 'services/platforms/trovo';
@@ -71,6 +73,7 @@ export { RestreamService } from 'services/restream';
 export { TwitterService } from 'services/integrations/twitter';
 export { UsageStatisticsService } from './services/usage-statistics';
 export { GameOverlayService } from 'services/game-overlay';
+export { SharedStorageService } from 'services/integrations/shared-storage';
 
 export { MediaGalleryService } from 'services/media-gallery';
 export { MediaBackupService } from 'services/media-backup';
@@ -92,11 +95,11 @@ export { RecentEventsService } from 'services/recent-events';
 export { MagicLinkService } from 'services/magic-link';
 export { GrowService } from 'services/grow/grow';
 export { GuestCamService } from 'services/guest-cam';
+export { GreenService } from 'services/green';
 
 // WIDGETS
 export { WidgetSource, WidgetsService } from './services/widgets';
 export { BitGoalService } from 'services/widgets/settings/bit-goal';
-export { ChatBoxService } from 'services/widgets/settings/chat-box';
 export { DonationGoalService } from 'services/widgets/settings/donation-goal';
 export { FollowerGoalService } from 'services/widgets/settings/follower-goal';
 export { StarsGoalService } from 'services/widgets/settings/stars-goal';
@@ -135,6 +138,7 @@ import { TwitterService } from './services/integrations/twitter';
 import { SettingsService } from './services/settings';
 import { UserService } from './services/user';
 import { TwitchService } from './services/platforms/twitch';
+import { TwitchTagsService } from './services/platforms/twitch/index';
 import { TrovoService } from './services/platforms/trovo';
 import { YoutubeService } from './services/platforms/youtube';
 import { FacebookService } from './services/platforms/facebook';
@@ -183,6 +187,9 @@ import { GuestCamService } from 'services/guest-cam';
 import { SideNavService } from './services/side-nav';
 import { VideoSettingsService } from 'services/settings-v2/video';
 import { SettingsManagerService } from 'services/settings-manager';
+import { MarkersService } from 'services/markers';
+import { GreenService } from 'services/green';
+import { SharedStorageService } from 'services/integrations/shared-storage';
 
 export const AppServices = {
   AppService,
@@ -210,6 +217,7 @@ export const AppServices = {
   FacebookService,
   UserService,
   TwitchService,
+  TwitchTagsService,
   TrovoService,
   DismissablesService,
   HighlighterService,
@@ -251,4 +259,7 @@ export const AppServices = {
   SideNavService,
   VideoSettingsService,
   SettingsManagerService,
+  MarkersService,
+  GreenService,
+  SharedStorageService,
 };

@@ -12,6 +12,10 @@ interface ILoginTokenResponse {
   expires_at: number;
 }
 
+interface ILoginError {
+  status: number;
+}
+
 export class MagicLinkService extends Service {
   @Inject() userService: UserService;
   @Inject() hostsService: HostsService;
@@ -45,6 +49,11 @@ export class MagicLinkService extends Service {
    * @param refl a referral tag for analytics
    */
   async linkToPrime(refl: string) {
+    if (!this.userService.views.isLoggedIn) {
+      return remote.shell.openExternal(
+        `https://${this.hostsService.streamlabs}/ultra?refl=${refl}`,
+      );
+    }
     try {
       const link = await this.getDashboardMagicLink('prime', refl);
       remote.shell.openExternal(link);

@@ -1,7 +1,7 @@
-import { useSpectron, test } from '../helpers/spectron';
+import { useWebdriver, test } from '../helpers/webdriver';
 import { clickSceneTransitions, addScene } from '../helpers/modules/scenes';
-import { getFormInput } from '../helpers/spectron/forms';
-import { dismissModal } from '../helpers/spectron/modals';
+import { getFormInput } from '../helpers/webdriver/forms';
+import { dismissModal } from '../helpers/webdriver/modals';
 import { FormMonkey } from '../helpers/form-monkey';
 import {
   click,
@@ -12,7 +12,7 @@ import {
 } from '../helpers/modules/core';
 import { setInputValue } from '../helpers/modules/forms';
 
-useSpectron({
+useWebdriver({
   restartAppAfterEachTest: false,
   clearCollectionAfterEachTest: true,
 });

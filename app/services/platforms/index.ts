@@ -2,14 +2,13 @@ import { ITwitchStartStreamOptions, TwitchService } from './twitch';
 import { IYoutubeStartStreamOptions, YoutubeService } from './youtube';
 import { FacebookService, IFacebookStartStreamOptions } from './facebook';
 import { ITiktokStartStreamOptions, TiktokService } from './tiktok';
-import { TTwitchTag } from './twitch/tags';
-import { TTwitchOAuthScope } from './twitch/scopes';
+import { TTwitchOAuthScope } from './twitch/index';
 import { IGoLiveSettings } from 'services/streaming';
 import { WidgetType } from '../widgets';
 import { ITrovoStartStreamOptions, TrovoService } from './trovo';
-import { Partial } from 'lodash-decorators';
+import { TDisplayType } from 'services/settings-v2/video';
 
-export type Tag = TTwitchTag;
+export type Tag = string;
 export interface IGame {
   id: string;
   name: string;
@@ -77,7 +76,6 @@ interface IPlatformCapabilityDescription {
 }
 
 interface IPlatformCapabilityTags {
-  getAllTags: () => Promise<Tag[]>;
   getStreamTags: () => Promise<Tag[]>;
   setStreamTags: () => Promise<any>;
 }
@@ -172,7 +170,7 @@ export interface IPlatformService {
   /**
    * Sets up the stream key and live broadcast info required to go live.
    */
-  beforeGoLive: (options?: IGoLiveSettings) => Promise<void>;
+  beforeGoLive: (options?: IGoLiveSettings, context?: TDisplayType) => Promise<void>;
 
   afterGoLive: () => Promise<void>;
 
@@ -188,6 +186,8 @@ export interface IPlatformService {
     req: IPlatformRequest,
     useToken?: boolean | string,
   ) => Dictionary<string | undefined>;
+
+  setPlatformContext?: (platform: TPlatform) => void;
 
   liveDockEnabled: boolean;
 
@@ -220,7 +220,7 @@ export interface IUserInfo {
   username?: string;
 }
 
-export type TPlatform = 'twitch' | 'youtube' | 'facebook' | 'tiktok' | 'trovo';
+export type TPlatform = 'twitch' | 'facebook' | 'youtube' | 'tiktok' | 'trovo';
 
 export function getPlatformService(platform: TPlatform): IPlatformService {
   return {

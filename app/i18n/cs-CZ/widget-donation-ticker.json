@@ -14,5 +14,10 @@
   "Manage List": "Spravovat seznam",
   "Font Settings": "Nastavení písma",
   "A hex color for the text of the": "Hexadecimální hodnota barvy textu pro",
-  "token": "token"
+  "token": "token",
+  "Each donation that shows in the donation ticker will be in this format. Available tokens:": "Každý dar, který se zobrazí v tickeru darů bude v tomto formátu. Dostupné tokeny:",
+  "The maximum amount of donations to show in the ticker. Must be a number greater than 0.": "Maximální počet darů k zobrazení v tickeru. Musí být číslo větší než 0.",
+  "How fast the ticker should scroll between 1 (fastest) and 10 (slowest). Set to 0 for no scrolling.": "Jak rychle by se měl ticker pohybovat mezi 1 (nejrychlejší) a 10 (nejpomalejší).  Nastavit na 0 pro žádné rolování.",
+  "The font size in pixels. Reasonable size typically ranges between 24px and 48px.": "Velikost písma v pixelech. Přijatelná velikost se obvykle pohybuje mezi 24 a 48 pixely.",
+  "How thick to make the font. The value should range between 300 (thinnest) and 900 (thickest)": "Jak tučné písmo udělat. Hodnota by se měla pohybovat mezi 300 (nejtenčí) a 900 (nejsilnější)"
 }

@@ -1,5 +1,7 @@
 {
   "Twitch Category": "Twitch Kategorisi",
   "Twitch Tags": "Twitch Etiketleri",
-  "Warning! Editing tags in Streamlabs will overwrite tags in Twitch. To use Twitch's new custom tags, you must edit your tags in the Twitch dashboard directly until Twitch provides third parties access to editing the new custom tags.": "Uyarı! Etiketler Streamlabs içinde düzenlendiğinde Twitch'teki etiketlerin üzerine yazılır. Twitch'in yeni özel etiketlerini kullanmak için Twitch tarafından üçüncü taraflara düzenleme erişimi sağlanana kadar etiketlerinizi doğrudan Twitch panelinden düzenlemelisiniz."
+  "You need to re-login to access Twitch tags": "Twitch etiketlerine erişmek için yeniden oturum açmanız gerekir",
+  "Do not include special characters or spaces in your tag": "Etiketinize özel karakter veya boşluk eklemeyin",
+  "For example: \"Speedrunning\" or \"FirstPlaythrough\"": "Örneğin: \"HızlıBitirme\" veya \"İlkOynanış\""
 }

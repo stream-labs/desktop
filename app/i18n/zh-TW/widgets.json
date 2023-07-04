@@ -23,7 +23,7 @@
   "Donation": "捐贈",
   "Bits": "小奇點",
   "Host": "主機",
-  "The Google Font to use for the text. Visit http://google.com/fonts to find one! Popular Fonts include: Open Sans, Roboto, Oswald, Lato, and Droid Sans.": "要使用於文字的 Google 字型。請造訪 http://google.com/fonts 尋找一個字型！常用的字名包括：Open Sans、Roboto、Oswald、Lato、和 Droid Sans。",
+  "The Google Font to use for the text. Visit http://google.com/fonts to find one! Popular Fonts include: Open Sans, Roboto, Oswald, Lato, and Droid Sans.": "要使用於文字的 Google 字型。請造訪 http://google.com/fonts 尋找一個字型！常用的字型包括：Open Sans、Roboto、Oswald、Lato、和 Droid Sans。",
   "A hex code for the base text color.": "基本文字顏色的十六進制代碼。",
   "A hex code for the widget background. This is for preview purposes only. It will not be shown in your stream.": "小程式背景的十六進制代碼。這僅用於預覽用途。不會顯示在您的直播中。",
   "Note: This background color is for preview purposes only. It will not be shown in your stream.": "注意：此背景顏色僅用於預覽用途。不會顯示在您的直播中。",
@@ -104,7 +104,7 @@
   "Overkill Min Health": "超殺最低血量",
   "Min. Sparks": "最小 Spark",
   "Min. Embers": "最小 Ember",
-  "The smallest amount of bits a cheer must have for an event to be shown. Setting this to 0 will make every cheer trigger an event.": "觸發事件紀錄最小奇點數量。 將其設置為0將使任何數量的小奇點都被觸發。",
+  "The smallest amount of bits a cheer must have for an event to be shown. Setting this to 0 will make every cheer trigger an event.": "觸發事件的 Cheer 必須要有的最少小奇點數量。將其設定為 0 會使每個 Cheer 都會觸發事件。",
   "Bounce In": "彈跳進入",
   "Bounce In Down": "向下彈入",
   "Bounce In Left": "向左彈入",
@@ -183,10 +183,10 @@
   "Play Alert": "播放提醒",
   "Browser Settings": "瀏覽器設定",
   "Custom Code": "自訂代碼",
-  "font_family_tooltip": "要使用於文字的 Google 字型。請造訪 https://fonts.google.com 尋找一個字型！常用的字型包括：Open Sans、Roboto、Oswald、Lato 和 Droid Sans。",
+  "font_family_tooltip": "要使用於文字的 Google 字型。請造訪 https://fonts.google.com 尋找一個字型！常用字型︰Open Sans, Roboto, Oswald, Lato, Droid Sans.",
   "Something went wrong while applying settings": "套用錯誤時發生某些錯誤",
   "Superchat Goal": "超級聊天室目標",
   "YouTube Superchats": "YouTube 超級聊天室",
-  "Custom Widget": "Custom Widget",
-  "Use HTML, CSS, and JavaScript to create a widget with custom functionality": "Use HTML, CSS, and JavaScript to create a widget with custom functionality"
+  "Custom Widget": "自訂小工具",
+  "Use HTML, CSS, and JavaScript to create a widget with custom functionality": "使用 HTML、CSS 以及 JavaScript 來建立具有自訂功能的小工具"
 }

@@ -51,6 +51,7 @@ function ExtraSettings() {
     WindowsService,
     StreamlabelsService,
     RecordingModeService,
+    SettingsService,
   } = Services;
   const isLoggedIn = UserService.isLoggedIn;
   const isTwitch = isLoggedIn && getDefined(UserService.platform).type === 'twitch';
@@ -64,7 +65,9 @@ function ExtraSettings() {
     recordingMode: RecordingModeService.views.isRecordingModeEnabled,
     updateStreamInfoOnLive: CustomizationService.state.updateStreamInfoOnLive,
   }));
-  const canRunOptimizer = isTwitch && !isRecordingOrStreaming && protectedMode;
+  const canRunOptimizer =
+    // HDR Settings are not compliant with the auto-optimizer
+    !SettingsService.views.hasHDRSettings && isTwitch && !isRecordingOrStreaming && protectedMode;
 
   function restartStreamlabelsSession() {
     StreamlabelsService.restartSession().then(result => {

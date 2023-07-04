@@ -4,16 +4,29 @@ import styles from './UltraComparison.m.less';
 import cx from 'classnames';
 import { Services } from 'components-react/service-provider';
 import UltraIcon from 'components-react/shared/UltraIcon';
+import { Tooltip } from 'antd';
+
+interface ITableHeader {
+  text: string;
+  icon: string;
+  tooltip?: string;
+  whisper?: string;
+}
 
 interface IUltraComparisonProps {
   onSkip?: () => void;
   condensed?: boolean;
+  tableHeaders?: ITableHeader[];
+  tableData?: {
+    standard: { text: string; key?: string }[];
+    prime: { text: string; key?: string }[];
+  };
   refl: string;
 }
 
 export function UltraComparison(p: IUltraComparisonProps) {
   const { MagicLinkService } = Services;
-  const tableHeaders = [
+  const tableHeaders = p.tableHeaders || [
     { text: $t('Themes and Overlays'), icon: 'icon-themes' },
     { text: $t('Alerts and Widgets'), icon: 'icon-alert-box' },
     { text: $t('Streamlabs Desktop'), icon: 'icon-desktop' },
@@ -26,10 +39,10 @@ export function UltraComparison(p: IUltraComparisonProps) {
     {
       text: $t('All Streamlabs Pro Tools'),
       icon: 'icon-streamlabs',
-      whisper: $t('Console, Crossclip, Oslo, Willow & Melon'),
+      whisper: 'Console, Cross Clip, Video Editor, & Podcast Editor',
     },
   ];
-  const primeMetadata = {
+  const tableData = p.tableData || {
     standard: [
       { text: $t('Access to Free Overlays and Themes') },
       { text: '✓', key: 'check1' },
@@ -51,7 +64,7 @@ export function UltraComparison(p: IUltraComparisonProps) {
       { text: '✓', key: 'check1' },
       { text: '✓', key: 'check2' },
       { text: '✓', key: 'check3' },
-      { text: $t('Add Up To 4 Guests or Cameras') },
+      { text: $t('Add Up To 11 Guests or Cameras') },
       { text: $t('Access Full App Library (%{appNumber})', { appNumber: '60+' }) },
       { text: $t('Custom Tip Page and Domain') },
       { text: '10GB' },
@@ -73,13 +86,14 @@ export function UltraComparison(p: IUltraComparisonProps) {
         fontSize: p.condensed ? '10px' : undefined,
       }}
     >
-      <div className={cx(styles.headersContainer, { [styles.condensed]: p.condensed })}>
+      <div
+        className={cx(styles.headersContainer, {
+          [styles.condensed]: p.condensed,
+          [styles.custom]: p.tableHeaders,
+        })}
+      >
         {tableHeaders.map(header => (
-          <div className={styles.tableHeader} key={header.text}>
-            <i className={header.icon} />
-            <span>{header.text}</span>
-            {header.whisper && <div className={styles.whisper}>{header.whisper}</div>}
-          </div>
+          <TableHeader header={header} key={header.text} />
         ))}
       </div>
       <div
@@ -91,18 +105,19 @@ export function UltraComparison(p: IUltraComparisonProps) {
             <i className="icon-streamlabs" />
             {$t('Starter')}
           </h1>
+          <h2>{$t('Free')}</h2>
           <span style={{ marginBottom: 8, display: 'inline-block' }}>
             {p.condensed
               ? $t('Always and forever free')
               : $t('Everything you need to go live. Always and forever free.')}
           </span>
+          <div className={styles.button}>{$t('Choose Starter')}</div>
         </div>
-        {primeMetadata.standard.map(data => (
+        {tableData.standard.map(data => (
           <div className={styles.row} key={data.key || data.text}>
             <span>{data.text}</span>
           </div>
         ))}
-        <div className={styles.button}>{$t('Current Plan')}</div>
       </div>
       <div
         className={cx(styles.cardContainer, styles.primeCardContainer, {
@@ -116,19 +131,46 @@ export function UltraComparison(p: IUltraComparisonProps) {
             <UltraIcon type="night" style={{ marginRight: '5px' }} />
             Ultra
           </h1>
+          <h2>
+            {$t('%{monthlyPrice}/mo or %{yearlyPrice}/year', {
+              monthlyPrice: '$19',
+              yearlyPrice: '$149',
+            })}
+          </h2>
           <span style={{ marginBottom: 8, display: 'inline-block' }}>
             {p.condensed
               ? $t('Everything in Starter plus:')
               : $t('Includes everything in Starter plus:')}
           </span>
+          <div className={cx(styles.button, styles.primeButton)}>{$t('Choose Ultra')}</div>
         </div>
-        {primeMetadata.prime.map(data => (
+        {tableData.prime.map(data => (
           <div className={cx(styles.row, styles.primeRow)} key={data.key || data.text}>
             <span>{data.text}</span>
           </div>
         ))}
-        <div className={cx(styles.button, styles.primeButton)}>{$t('Choose Ultra')}</div>
       </div>
     </div>
   );
+}
+
+function TableHeader(p: { header: ITableHeader }) {
+  const cell = (
+    <div className={styles.tableHeader} key={p.header.text}>
+      <i className={p.header.icon} />
+      <span style={{ display: 'flex', flexDirection: 'column' }}>
+        {p.header.text}
+        {p.header.whisper && <div className={styles.whisper}>{p.header.whisper}</div>}
+      </span>
+      {p.header.tooltip && <i className="icon-question" />}
+    </div>
+  );
+
+  if (p.header.tooltip) {
+    return (
+      <Tooltip title={p.header.tooltip} placement="right">
+        {cell}
+      </Tooltip>
+    );
+  } else return cell;
 }

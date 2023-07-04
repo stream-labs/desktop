@@ -53,6 +53,7 @@ export interface ISettingsValues {
     RecRB?: boolean;
     RecRBTime?: number;
     RecFormat: string;
+    RecFilePath: string;
     RecTracks?: number;
     RecEncoder?: string;
     RecQuality?: string;
@@ -136,6 +137,10 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
     return this.values.Output.RecFormat;
   }
 
+  get recPath() {
+    return this.values.Output.RecFilePath;
+  }
+
   get recordingTracks() {
     if (!this.isAdvancedOutput) return [0];
     const bitArray = Utils.numberToBinnaryArray(this.values.Output.RecTracks, 6).reverse();
@@ -163,6 +168,12 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
 
   get advancedAudioSettings() {
     return this.state.Advanced.formData.find(data => data.nameSubCategory === 'Audio');
+  }
+
+  get hasHDRSettings() {
+    const advVideo = this.state.Advanced.formData.find(data => data.nameSubCategory === 'Video');
+    const colorSetting = advVideo.parameters.find(data => data.name === 'ColorFormat');
+    return ['P010', 'I010'].includes(colorSetting.value as string);
   }
 }
 

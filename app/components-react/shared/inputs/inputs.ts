@@ -32,7 +32,8 @@ export type TInputType =
   | 'slider'
   | 'image'
   | 'time'
-  | 'file';
+  | 'file'
+  | 'checkboxGroup';
 
 export type TInputLayout = 'horizontal' | 'vertical' | 'inline';
 

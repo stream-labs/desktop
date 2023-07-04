@@ -35,18 +35,6 @@ export function TwitchEditStreamInfo(p: IPlatformComponentParams<'twitch'>) {
         requiredFields={<GameSelector key="required" platform={'twitch'} {...bind.game} />}
         optionalFields={<TwitchTagsInput key="optional" label={$t('Twitch Tags')} {...bind.tags} />}
       />
-      {p.layoutMode !== 'multiplatformSimple' && (
-        <Row style={{ paddingBottom: '12px' }}>
-          <Col span={8}></Col>
-          <Col span={16} style={{ whiteSpace: 'normal', fontSize: '12px' }}>
-            <Message type="info">
-              {$t(
-                "Warning! Editing tags in Streamlabs will overwrite tags in Twitch. To use Twitch's new custom tags, you must edit your tags in the Twitch dashboard directly until Twitch provides third parties access to editing the new custom tags.",
-              )}
-            </Message>
-          </Col>
-        </Row>
-      )}
     </Form>
   );
 }

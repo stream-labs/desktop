@@ -158,6 +158,10 @@ class PlatformAppsViews extends ViewHandler<IPlatformAppServiceState> {
     return this.state.loadedApps.filter(app => app.enabled);
   }
 
+  get productionApps() {
+    return this.state.loadedApps.filter(app => !app.unpacked);
+  }
+
   getDelisted(appId: string) {
     return this.getApp(appId).delisted;
   }

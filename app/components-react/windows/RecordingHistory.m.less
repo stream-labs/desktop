@@ -16,6 +16,18 @@
   }
 }
 
+.menu {
+  border: 1px solid var(--border) !important;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.upload-button {
+  display: flex !important;
+  align-items: center;
+  padding-right: 0 !important;
+}
+
 .filename {
   text-align: right;
   white-space: nowrap;
@@ -25,10 +37,21 @@
   margin-right: 8px;
   overflow: hidden;
   direction: rtl;
+  opacity: 0.7;
+  font-style: italic;
 
   &:hover {
     cursor: pointer;
     text-decoration: underline;
+  }
+}
+
+.upload-form {
+  width: 200px;
+  margin-left: 16px !important;
+
+  :global(.ant-form-item) {
+    margin-bottom: 0;
   }
 }
 

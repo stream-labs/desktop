@@ -2,6 +2,9 @@ import { Component } from 'vue-property-decorator';
 import { IHotkey, IBinding } from 'services/hotkeys';
 import TsxComponent, { createProps } from 'components/tsx-component';
 import { byOS, OS } from 'util/operating-systems';
+import TextInput from './inputs/TextInput';
+import { Inject } from 'services';
+import { MarkersService } from 'app-services';
 
 /**
  * Represents a binding that has a unique key for CSS animations
@@ -15,8 +18,10 @@ class HotkeyProps {
   hotkey: IHotkey = {} as IHotkey;
 }
 
-@Component({ props: createProps(HotkeyProps) })
+@Component({ props: createProps(HotkeyProps), components: { TextInput } })
 export default class HotkeyComponent extends TsxComponent<HotkeyProps> {
+  @Inject() markersService: MarkersService;
+
   description: string;
   bindings: IKeyedBinding[] = [];
 
@@ -162,5 +167,15 @@ export default class HotkeyComponent extends TsxComponent<HotkeyProps> {
     keys.push(key);
 
     return keys.join('+');
+  }
+
+  get markerValue() {
+    if (!this.hotkey.isMarker) return '';
+    return this.markersService.views.getLabel(this.hotkey.actionName);
+  }
+
+  set markerValue(value: string) {
+    if (!this.hotkey.isMarker) return;
+    this.markersService.actions.setMarkerName(this.hotkey.actionName, value);
   }
 }

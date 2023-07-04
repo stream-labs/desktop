@@ -10,6 +10,7 @@ import { Modal, Button, Form, Tooltip } from 'antd';
 import { CheckboxInput } from 'components-react/shared/inputs';
 import { Source } from 'services/sources';
 import * as remote from '@electron/remote';
+import { useChildWindowParams } from 'components-react/hooks';
 
 interface ICapturableOption {
   description: string;
@@ -120,7 +121,7 @@ function useCaptureSource(sourceId: string): ICaptureSourceApi {
 
 export default function ScreenCaptureProperties() {
   const { WindowsService } = Services;
-  const sourceId = useMemo(() => WindowsService.getChildWindowQueryParams().sourceId, []);
+  const sourceId = useChildWindowParams('sourceId');
   const sourceApi = useCaptureSource(sourceId);
   const [modal, setModal] = useState(false);
 

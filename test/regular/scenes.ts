@@ -1,4 +1,4 @@
-import { useSpectron, test } from '../helpers/spectron';
+import { useWebdriver, test } from '../helpers/webdriver';
 import { addSource, sourceIsExisting } from '../helpers/modules/sources';
 import {
   addScene,
@@ -12,7 +12,7 @@ import { SceneCollectionsService } from 'app-services';
 import { clickButton, focusMain, select, waitForDisplayed } from '../helpers/modules/core';
 import { useForm } from '../helpers/modules/forms';
 
-useSpectron();
+useWebdriver();
 
 // Checks for the default audio sources
 async function checkDefaultSources() {

@@ -17,7 +17,7 @@ export function MultistreamingSettings() {
   }));
 
   async function upgradeToPrime() {
-    MagicLinkService.linkToPrime('slobs-multistream');
+    MagicLinkService.actions.linkToPrime('slobs-multistream');
   }
 
   const shouldShowPrime = isLoggedIn && !isPrime;
@@ -38,11 +38,7 @@ export function MultistreamingSettings() {
                 <UltraIcon
                   type="simple"
                   style={{
-                    fill: '#09161D',
-                    display: 'inline-block',
-                    height: '12px',
-                    width: '12px',
-                    marginRight: '5px',
+                    marginRight: '8px',
                   }}
                 />
               }

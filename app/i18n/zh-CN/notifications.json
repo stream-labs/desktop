@@ -19,5 +19,13 @@
   "Streamlabs Desktop has updated! Click here to see what changed.": "Streamlabs Desktop 已更新！点击此处查看更改的内容。",
   "Notifications & News": "通知和新闻",
   "News": "新闻",
-  "Notifications": "通知"
+  "Notifications": "通知",
+  "A new Recording has been completed. Click for more info": "一个新的录制已完成。点击了解更多信息",
+  "Recording History": "录制历史",
+  "Show in folder": "在文件夹中显示",
+  "Recordings": "录制",
+  "Marker %{label} added at %{timestamp}": "标记 %{label} 添加于 %{timestamp}",
+  "File is too large to upload": "File is too large to upload",
+  "File type %{extension} is not supported": "File type %{extension} is not supported",
+  "Upload already in progress": "Upload already in progress"
 }

@@ -1,3 +1,6 @@
+import moment from 'moment';
+import flatten from 'lodash/flatten';
+import * as remote from '@electron/remote';
 import { mutation, InheritMutations, ViewHandler } from '../core/stateful-service';
 import { IPlatformService, IGame, TPlatformCapability, IPlatformRequest, IPlatformState } from '.';
 import { HostsService } from 'services/hosts';
@@ -10,9 +13,8 @@ import { throwStreamError } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
 import { WindowsService } from '../windows';
 import { assertIsDefined, getDefined } from '../../util/properties-type-guards';
-import { flatten } from 'lodash';
-import * as remote from '@electron/remote';
-
+import { TDisplayType } from 'services/settings-v2';
+import { TOutputOrientation } from 'services/restream';
 interface IFacebookPage {
   access_token: string;
   name: string;
@@ -29,19 +31,29 @@ interface IFacebookGroup {
   administrator: boolean;
 }
 
+interface IFacebookEvent {
+  description: string;
+  name: string;
+  start_time: string;
+  id: string;
+}
+
+type TFacebookStatus = 'UNPUBLISHED' | 'SCHEDULED_UNPUBLISHED' | 'LIVE_STOPPED' | 'LIVE';
+
 export interface IFacebookLiveVideo {
-  status: 'UNPUBLISHED' | 'SCHEDULED_UNPUBLISHED' | 'LIVE_STOPPED' | 'LIVE';
+  status: TFacebookStatus;
   id: string;
   stream_url: string;
   title: string;
+  /** @deprecated: doesn't exist on their API docs  */
   game: string;
   description: string;
   permalink_url: string;
-  planned_start_time: string;
+  video: { id: string };
   broadcast_start_time: string;
-  video: {
-    id: string;
-  };
+  planned_start_time?: string;
+  /** custom fields we've created */
+  event_params: { start_time?: number; cover?: string; status?: TFacebookStatus };
 }
 
 /**
@@ -80,7 +92,8 @@ export interface IFacebookStartStreamOptions {
   description?: string;
   liveVideoId?: string;
   privacy?: { value: TFacebookStreamPrivacy };
-  plannedStartTime?: number;
+  mode?: TOutputOrientation;
+  event_params: { start_time?: number; cover?: string; status?: TFacebookStatus };
 }
 
 export type TDestinationType = 'me' | 'page' | 'group' | '';
@@ -107,6 +120,8 @@ const initialState: IFacebookServiceState = {
     title: '',
     description: '',
     game: '',
+    mode: undefined,
+    event_params: {},
     privacy: { value: 'EVERYONE' },
   },
 };
@@ -221,7 +236,7 @@ export class FacebookService
     return this.state.streamDashboardUrl;
   }
 
-  async beforeGoLive(options: IGoLiveSettings) {
+  async beforeGoLive(options: IGoLiveSettings, context?: TDisplayType) {
     const fbOptions = getDefined(options.platforms.facebook);
 
     let liveVideo: IFacebookLiveVideo;
@@ -241,12 +256,15 @@ export class FacebookService
     const streamUrl = liveVideo.stream_url;
     const streamKey = streamUrl.slice(streamUrl.lastIndexOf('/') + 1);
     if (!this.streamingService.views.isMultiplatformMode) {
-      this.streamSettingsService.setSettings({
-        key: streamKey,
-        platform: 'facebook',
-        streamType: 'rtmp_common',
-        server: 'rtmps://rtmp-api.facebook.com:443/rtmp/',
-      });
+      this.streamSettingsService.setSettings(
+        {
+          key: streamKey,
+          platform: 'facebook',
+          streamType: 'rtmp_common',
+          server: 'rtmps://rtmp-api.facebook.com:443/rtmp/',
+        },
+        context,
+      );
     }
     this.SET_STREAM_KEY(streamKey);
     this.SET_STREAM_PAGE_URL(`https://facebook.com/${liveVideo.permalink_url}`);
@@ -259,6 +277,8 @@ export class FacebookService
       assertIsDefined(fbOptions.pageId);
       await this.postPage(fbOptions.pageId);
     }
+
+    this.setPlatformContext('facebook');
   }
 
   /**
@@ -279,16 +299,22 @@ export class FacebookService
     options: IFacebookUpdateVideoOptions,
     switchToLive = false,
   ): Promise<IFacebookLiveVideo> {
-    const { title, description, game, privacy, plannedStartTime } = options;
+    const { title, description, game, privacy, event_params } = options;
     const data: Dictionary<any> = { title, description };
+
     if (game) data.game_specs = { name: game };
 
-    if (plannedStartTime) {
+    if (Object.keys(event_params).length) {
+      data.event_params = event_params;
+    }
+
+    if (event_params.start_time) {
       // convert plannedStartTime from milliseconds to seconds
-      data.planned_start_time = Math.round(new Date(plannedStartTime).getTime() / 1000);
+      data.event_params.start_time = Math.round(new Date(event_params.start_time).getTime() / 1000);
     }
     if (switchToLive) {
       data.status = 'LIVE_NOW';
+      data.event_params.status = 'LIVE_NOW';
     }
     const destinationId = this.views.getDestinationId(options);
     const token = this.views.getDestinationToken(options.destinationType, destinationId);
@@ -467,8 +493,10 @@ export class FacebookService
     const data: Dictionary<any> = {
       title,
       description,
-      planned_start_time: Math.round(new Date(scheduledStartTime).getTime() / 1000),
-      status: 'SCHEDULED_UNPUBLISHED',
+      event_params: {
+        start_time: Math.round(new Date(scheduledStartTime).getTime() / 1000),
+        status: 'SCHEDULED_UNPUBLISHED',
+      },
     };
     if (game) data.game_specs = { name: game };
     const body = JSON.stringify(data);
@@ -483,8 +511,6 @@ export class FacebookService
     const timeRange = 1000 * 60 * 60 * 24;
     const maxDate = Date.now() + timeRange;
     const minDate = Date.now() - timeRange;
-    const maxDateUnix = Math.floor(maxDate / 1000);
-    const minDateUnix = Math.floor(minDate / 1000);
     const token = this.views.getDestinationToken(destinationType, destinationId);
     let sourceParam = '';
     if (destinationType === 'page' || destinationType === 'me') {
@@ -494,8 +520,8 @@ export class FacebookService
     }
 
     let videos = (
-      await this.requestFacebook<{ data: IFacebookLiveVideo[] }>(
-        `${this.apiBase}/${destinationId}/live_videos?broadcast_status=["UNPUBLISHED","SCHEDULED_UNPUBLISHED"]&fields=title,description,status,planned_start_time,permalink_url,from${sourceParam}&since=${minDateUnix}&until=${maxDateUnix}`,
+      await this.requestFacebook<{ data: IFacebookEvent[] }>(
+        `${this.apiBase}/${destinationId}/events`,
         token,
       )
     ).data;
@@ -503,13 +529,27 @@ export class FacebookService
     if (onlyUpcoming) {
       videos = videos.filter(v => {
         // some videos created in the new Live Producer don't have `planned_start_time`
-        if (!v.planned_start_time) return true;
+        if (!v.start_time) return true;
 
-        const videoDate = new Date(v.planned_start_time).valueOf();
+        const videoDate = new Date(v.start_time).valueOf();
         return videoDate >= minDate && videoDate <= maxDate;
       });
     }
-    return videos;
+    return videos.map(v => ({
+      id: v.id,
+      title: v.name,
+      stream_url: '',
+      permalink_url: '',
+      event_params: {
+        start_time: moment(v.start_time).unix(),
+        status: 'SCHEDULED_UNPUBLISHED',
+      },
+      description: v.description,
+      status: 'SCHEDULED_UNPUBLISHED',
+      game: '',
+      video: { id: v.id },
+      broadcast_start_time: v.start_time,
+    }));
   }
 
   /**
@@ -518,38 +558,6 @@ export class FacebookService
   async fetchAllVideos(onlyUpcoming = false): Promise<IFacebookLiveVideoExtended[]> {
     // perform all requests simultaneously
     const requests: Promise<IFacebookLiveVideoExtended[]>[] = [];
-
-    // fetch videos from the timeline and groups
-    if (this.state.grantedPermissions.includes('publish_video')) {
-      const destinationType = 'me';
-      const destinationId = 'me';
-      requests.push(
-        this.fetchScheduledVideos(destinationType, destinationId, onlyUpcoming).then(videos =>
-          videos.map(video => ({
-            ...video,
-            destinationType,
-            destinationId,
-          })),
-        ),
-      );
-    }
-
-    // fetch videos from group
-    if (this.state.grantedPermissions.includes('publish_to_groups')) {
-      const destinationType = 'group';
-      this.state.facebookGroups.forEach(group => {
-        const destinationId = group.id;
-        requests.push(
-          this.fetchScheduledVideos(destinationType, destinationId, onlyUpcoming).then(videos =>
-            videos.map(video => ({
-              ...video,
-              destinationType,
-              destinationId,
-            })),
-          ),
-        );
-      });
-    }
 
     // fetch videos from pages
     this.state.facebookPages.forEach(page => {
@@ -603,6 +611,7 @@ export class FacebookService
       description: video.description,
       pageId: destinationId,
       groupId: destinationId,
+      event_params: video.event_params,
     };
   }
 

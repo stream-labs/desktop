@@ -67,6 +67,9 @@ import NewBadge from './shared/NewBadge';
 import RecordingHistory from './windows/RecordingHistory';
 import ConnectionSettings from './windows/scene-transitions/ConnectionSettings';
 import UltraIcon from './shared/UltraIcon';
+import EditTransform from './windows/EditTransform';
+import InstalledApps from './windows/settings/InstalledApps';
+import Hotkeys from './windows/settings/Hotkeys';
 
 // list of React components to be used inside Vue components
 export const components = {
@@ -87,7 +90,7 @@ export const components = {
   Display,
   TitleBar,
   Chat,
-  Highlighter,
+  Highlighter: createRoot(Highlighter),
   Grow,
   Loader,
   PlatformLogo,
@@ -136,6 +139,9 @@ export const components = {
   PlatformAppPopOut,
   NewBadge,
   UltraIcon,
+  EditTransform,
+  InstalledApps,
   Blank,
   ConnectionSettings,
+  Hotkeys,
 };

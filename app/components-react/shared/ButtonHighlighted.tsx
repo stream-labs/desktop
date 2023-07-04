@@ -6,6 +6,7 @@ import styles from './ButtonHighlighted.m.less';
 interface IButtonHighlighted {
   icon?: SVGProps<SVGElement> | HTMLDivElement;
   className?: string;
+  disabled?: boolean;
   style?: CSSProperties;
   filled?: boolean;
   text: string;
@@ -15,6 +16,7 @@ interface IButtonHighlighted {
 export default function ButtonHighlighted({
   icon,
   className,
+  disabled,
   style,
   filled,
   text,
@@ -25,6 +27,7 @@ export default function ButtonHighlighted({
       className={cx(styles.highlighted, className, filled && styles.filled)}
       style={style}
       onClick={onClick}
+      disabled={disabled}
     >
       {icon}
       {text}

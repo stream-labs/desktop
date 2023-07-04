@@ -105,6 +105,14 @@ export class EditStreamWindow extends ReactComponent {}
 
 @Component({
   props: {
+    name: { default: 'EditTransform' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class EditTransform extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'GoLiveWindow' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
   },
@@ -148,6 +156,14 @@ export class Loader extends ReactComponent {}
   },
 })
 export class IconLibraryProperties extends ReactComponent {}
+
+@Component({
+  props: {
+    name: { default: 'InstalledApps' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class InstalledApps extends ReactComponent {}
 
 @Component({
   props: {
@@ -470,4 +486,22 @@ export class NewBadge extends ReactComponent {}
 export class UltraIcon extends ReactComponent<{
   type?: string;
   className?: string;
+}> {}
+
+@Component({
+  props: {
+    name: { default: 'Hotkeys' },
+    componentProps: {
+      default: () => ({
+        globalSearchStr: '',
+        highlightSearch: () => {},
+        scanning: false,
+      }),
+    },
+  },
+})
+export class Hotkeys extends ReactComponent<{
+  globalSearchStr: string;
+  highlightSearch: (searchStr: string) => void;
+  scanning: boolean;
 }> {}

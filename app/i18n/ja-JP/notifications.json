@@ -19,5 +19,13 @@
   "Streamlabs Desktop has updated! Click here to see what changed.": "Streamlabs Desktop が更新されました！こちらをクリックして、変更点をご覧ください。",
   "Notifications & News": "通知 & ニュース",
   "News": "ニュース",
-  "Notifications": "通知"
+  "Notifications": "通知",
+  "A new Recording has been completed. Click for more info": "新しい録画が完了しました。詳細はこちらをクリック",
+  "Recording History": "録画履歴",
+  "Show in folder": "フォルダーに表示",
+  "Recordings": "録画",
+  "Marker %{label} added at %{timestamp}": "マーカー %{label} が %{timestamp} に追加されました",
+  "File is too large to upload": "File is too large to upload",
+  "File type %{extension} is not supported": "File type %{extension} is not supported",
+  "Upload already in progress": "Upload already in progress"
 }

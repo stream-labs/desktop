@@ -1,7 +1,7 @@
-import { useSpectron, test } from '../helpers/spectron';
+import { useWebdriver, test } from '../helpers/webdriver';
 import { click, focusChild, select, waitForDisplayed } from '../helpers/modules/core';
 
-useSpectron();
+useWebdriver();
 
 test('Performance metrics', async t => {
   await click('.metrics-icon');

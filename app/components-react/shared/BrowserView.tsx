@@ -43,7 +43,12 @@ export default function BrowserView(p: BrowserViewProps) {
 
     if (p.enableGuestApi) {
       opts.webPreferences.contextIsolation = true;
-      opts.webPreferences.preload = path.resolve(remote.app.getAppPath(), 'bundles', 'guest-api');
+      opts.webPreferences.preload = path.resolve(
+        remote.app.getAppPath(),
+        'bundles',
+        'guest-api.js',
+      );
+      opts.webPreferences.sandbox = false;
     }
     return opts;
   }, [p.options]);

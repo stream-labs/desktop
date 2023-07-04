@@ -19,5 +19,13 @@
   "Streamlabs Desktop has updated! Click here to see what changed.": "O Streamlabs Desktop foi atualizado! Clique aqui para ver as novidades.",
   "Notifications & News": "Notificações e notícias",
   "News": "Notícias",
-  "Notifications": "Notificações"
+  "Notifications": "Notificações",
+  "A new Recording has been completed. Click for more info": "Foi concluída uma nova gravação. Clique para obter mais informações",
+  "Recording History": "Histórico de gravação",
+  "Show in folder": "Mostrar numa pasta",
+  "Recordings": "Gravações",
+  "Marker %{label} added at %{timestamp}": "Marcador %{label} adicionado em %{timestamp}",
+  "File is too large to upload": "File is too large to upload",
+  "File type %{extension} is not supported": "File type %{extension} is not supported",
+  "Upload already in progress": "Upload already in progress"
 }

@@ -90,5 +90,12 @@
   "An error occurred while reading %{file}": "Une erreur est survenue lors de la lecture de %{file}",
   "An error occurred while reading audio from %{file}": "Une erreur est survenue lors de la lecture de l’audio de %{file}",
   "An error occurred while mixing audio": "Une erreur est survenue lors du mixage de l’audio",
-  "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "Modifiez vos rediffusions avec Highlighter, un éditeur gratuit intégré à Streamlabs."
+  "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "Modifiez vos rediffusions avec Highlighter, un éditeur gratuit intégré à Streamlabs.",
+  "Upload To": "Upload To",
+  "Upload": "Upload",
+  "This feature requires a Streamlabs ID": "This feature requires a Streamlabs ID",
+  "Sign up for Streamlabs ID": "Sign up for Streamlabs ID",
+  "Add subtitles, transcribe, and more": "Add subtitles, transcribe, and more",
+  "Convert to mobile-friendly short video": "Convert to mobile-friendly short video",
+  "YouTube (private video)": "YouTube (private video)"
 }

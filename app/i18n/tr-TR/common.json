@@ -117,7 +117,7 @@
   "Very High": "Çok Yüksek",
   "Apps": "Uygulamalar",
   "Finish": "Bitir",
-  "Get Prime": "Prime Üyeliği Al",
+  "Get Ultra": "Ultra’ya Geçin",
   "System error message:": "Sistem hata mesajı:",
   "List is empty": "Liste boş",
   "Not selected": "Seçilmedi",
@@ -139,5 +139,18 @@
   "Click here": "Buraya tıklayın",
   "More Info": "Daha Fazla Bilgi",
   "Revert Changes": "Değişiklikleri Geri Al",
-  "Animations": "Animasyonlar"
+  "Animations": "Animasyonlar",
+  "Multistreaming": "Çoklu Yayın",
+  "Alert Box": "Uyarı kutusu",
+  "Widget": "Pencere ögesi",
+  "Creator Sites": "İçerik Oluşturucu Siteleri",
+  "Apps Manager": "Uygulama Yöneticisi",
+  "Theme Audit": "Tema Denetimi",
+  "Login": "Giriş Yap",
+  "Tip Settings": "Bahşiş Ayarları",
+  "Apps Store Home": "Uygulama Mağazası Ana Sayfa",
+  "Dashboard Home": "Gösterge Paneli Ana Sayfa",
+  "Alert Box Library": "Uyarı Kutusu Kütüphanesi",
+  "Alert Box Settings": "Uyarı Kutusu Seçenekleri",
+  "Upgrade to Ultra": "Ultra’ya yükseltin"
 }

@@ -13,7 +13,7 @@ import { useWidgetRoot, WidgetModule } from './useWidget';
 // StarsGoal
 // SubGoal
 // SubscriberGoal
-// ChatBox
+import { ChatBox, ChatBoxModule } from '../ChatBox';
 // ChatHighlight
 // Credits
 import { DonationTicker, DonationTickerModule } from '../DonationTicker';
@@ -29,11 +29,11 @@ import { GameWidget, GameWidgetModule } from '../GameWidget';
 import { ViewerCount, ViewerCountModule } from '../ViewerCount';
 import { CustomWidget, CustomWidgetModule } from '../CustomWidget';
 import { useSubscription } from '../../hooks/useSubscription';
+import { useChildWindowParams } from 'components-react/hooks';
 
 // define list of Widget components and modules
 export const components = {
   AlertBox: [AlertBox, AlertBoxModule],
-  // TODO: define other widgets here to avoid merge conflicts
   // BitGoal
   // DonationGoal
   // CharityGoal
@@ -41,7 +41,7 @@ export const components = {
   // StarsGoal
   // SubGoal
   // SubscriberGoal
-  // ChatBox
+  ChatBox: [ChatBox, ChatBoxModule],
   // ChatHighlight
   // Credits
   DonationTicker: [DonationTicker, DonationTickerModule],
@@ -62,11 +62,11 @@ export const components = {
  * Renders a widget window by given sourceId from window's query params
  */
 export function WidgetWindow() {
-  const { WindowsService, WidgetsService } = Services;
+  const { WidgetsService } = Services;
+  const { sourceId, widgetType } = useChildWindowParams();
 
   // take the source id and widget's component from the window's params
-  const { sourceId, Module, WidgetSettingsComponent } = useOnCreate(() => {
-    const { sourceId, widgetType } = WindowsService.getChildWindowQueryParams();
+  const { Module, WidgetSettingsComponent } = useOnCreate(() => {
     const [WidgetSettingsComponent, Module] = components[widgetType];
     return { sourceId, Module, WidgetSettingsComponent };
   });

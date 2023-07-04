@@ -46,5 +46,6 @@
   "Stop Sharing": "Прекратить делиться",
   "Collab Cam requires a source": "Нужен источник для Collab Cam",
   "At least one Collab Cam source is required to use Collab Cam. Would you like to add one now?": "Чтобы воспользоваться Collab Cam, нужен хотя бы один источник. Добавить его сейчас?",
-  "You now have access to Collab Cam!": "Теперь у вас есть доступ к Collab Cam!"
+  "You now have access to Collab Cam!": "Теперь у вас есть доступ к Collab Cam!",
+  "You must be logged in to use Collab Cam.": "You must be logged in to use Collab Cam."
 }

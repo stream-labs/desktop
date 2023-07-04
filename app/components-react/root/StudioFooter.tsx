@@ -18,7 +18,6 @@ export default function StudioFooterComponent() {
   const {
     StreamingService,
     WindowsService,
-    YoutubeService,
     UsageStatisticsService,
     NavigationService,
     RecordingModeService,
@@ -26,19 +25,15 @@ export default function StudioFooterComponent() {
 
   const {
     streamingStatus,
-    platform,
     streamQuality,
     isLoggedIn,
     canSchedule,
     replayBufferOffline,
     replayBufferStopping,
     replayBufferSaving,
-    youtubeEnabled,
     recordingModeEnabled,
     replayBufferEnabled,
   } = useModule(FooterModule);
-
-  useEffect(confirmYoutubeEnabled, [platform]);
 
   function performanceIconClassName() {
     if (!streamingStatus || streamingStatus === EStreamingState.Offline) {
@@ -54,16 +49,6 @@ export default function StudioFooterComponent() {
     }
 
     return 'success';
-  }
-
-  function confirmYoutubeEnabled() {
-    if (platform === 'youtube') {
-      YoutubeService.actions.prepopulateInfo();
-    }
-  }
-
-  function openYoutubeEnable() {
-    YoutubeService.actions.openYoutubeEnable();
   }
 
   function openScheduleStream() {
@@ -117,20 +102,6 @@ export default function StudioFooterComponent() {
   return (
     <div className={cx('footer', styles.footer)}>
       <div className={cx('flex flex--center flex--grow flex--justify-start', styles.footerLeft)}>
-        {isLoggedIn && platform === 'youtube' && !youtubeEnabled && (
-          <div className={styles.errorWrapper}>
-            <div className={styles.platformError}>
-              <i className="fa fa-exclamation-triangle" />
-              <span>{$t('YouTube account not enabled for live streaming')}</span>
-              <button className="button alert-button" onClick={openYoutubeEnable}>
-                {$t('Fix')}
-              </button>
-              <button className="button alert-button" onClick={confirmYoutubeEnabled}>
-                {$t("I'm set up")}
-              </button>
-            </div>
-          </div>
-        )}
         <Tooltip placement="left" title={$t('Open Performance Window')}>
           <i
             className={cx(
@@ -280,10 +251,6 @@ class FooterModule {
     return Services.StreamingService.views.streamingStatus;
   }
 
-  get platform() {
-    return Services.UserService.views.platform?.type;
-  }
-
   get streamQuality() {
     return Services.PerformanceService.views.streamQuality;
   }
@@ -309,10 +276,6 @@ class FooterModule {
 
   get replayBufferSaving() {
     return Services.StreamingService.state.replayBufferStatus === EReplayBufferState.Saving;
-  }
-
-  get youtubeEnabled() {
-    return Services.YoutubeService.state.liveStreamingEnabled;
   }
 
   get recordingModeEnabled() {

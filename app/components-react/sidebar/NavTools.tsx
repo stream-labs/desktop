@@ -79,12 +79,18 @@ export default function SideNav() {
 
   function openHelp() {
     UsageStatisticsService.actions.recordClick('SideNav2', 'help');
-    remote.shell.openExternal('https://howto.streamlabs.com/');
+    remote.shell.openExternal(
+      'https://streamlabs.com/content-hub/support/support-streamlabs-desktop',
+    );
   }
 
   async function upgradeToPrime() {
     UsageStatisticsService.actions.recordClick('SideNav2', 'prime');
-    MagicLinkService.linkToPrime('slobs-side-nav');
+    if (isLoggedIn) {
+      MagicLinkService.linkToPrime('slobs-side-nav');
+    } else {
+      remote.shell.openExternal('https://streamlabs.com/ultra?checkout=1&refl=slobs-side-nav');
+    }
   }
 
   const handleAuth = () => {
@@ -114,7 +120,7 @@ export default function SideNav() {
         {menuItems.map((menuItem: IParentMenuItem) => {
           if (isDevMode && menuItem.key === EMenuItemKey.DevTools) {
             return <NavToolsItem key={menuItem.key} menuItem={menuItem} onClick={openDevTools} />;
-          } else if (isLoggedIn && !isPrime && menuItem.key === EMenuItemKey.GetPrime) {
+          } else if (!isPrime && menuItem.key === EMenuItemKey.GetPrime) {
             return (
               <NavToolsItem
                 key={menuItem.key}

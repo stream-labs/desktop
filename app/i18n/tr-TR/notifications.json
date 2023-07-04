@@ -19,5 +19,13 @@
   "Streamlabs Desktop has updated! Click here to see what changed.": "Streamlabs Desktop güncellendi! Değişiklikleri görmek için buraya tıklayın.",
   "Notifications & News": "Bildirimler ve Haberler",
   "News": "Haberler",
-  "Notifications": "Bildirimler"
+  "Notifications": "Bildirimler",
+  "A new Recording has been completed. Click for more info": "Bir yeni Kayıt tamamlandı. Daha fazla bilgi için tıklayın",
+  "Recording History": "Kayıt Geçmişi",
+  "Show in folder": "Klasörde göster",
+  "Recordings": "Kayıtlar",
+  "Marker %{label} added at %{timestamp}": "%{label} İşareti %{timestamp} itibariyle eklendi",
+  "File is too large to upload": "File is too large to upload",
+  "File type %{extension} is not supported": "File type %{extension} is not supported",
+  "Upload already in progress": "Upload already in progress"
 }

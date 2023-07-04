@@ -126,7 +126,7 @@
   "Plays an alert when a viewer likes your stream": "Plays an alert when a viewer likes your stream",
   "How many seconds to show this alert before hiding it": "Hány másodpercig legyen látható a az értesítés, mielőtt eltűnik",
   "When a donation alert shows up, this will be the format of the message.": "When a donation alert shows up, this will be the format of the message.",
-  "Available Tokens: ": "Rendelkezésre Álló Tokenek: ",
+  "Available Tokens: ": "Rendelkezésre álló tokenek: ",
   "The name of the donator": "Az adományozó neve",
   "Looking for the old AlertBox settings?": "Looking for the old AlertBox settings?",
   "Need to set up tipping?": "Need to set up tipping?",

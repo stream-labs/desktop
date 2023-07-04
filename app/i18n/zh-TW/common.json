@@ -117,7 +117,7 @@
   "Very High": "非常高",
   "Apps": "應用程式",
   "Finish": "完成",
-  "Get Prime": "取得 Prime",
+  "Get Ultra": "取得 Ultra",
   "System error message:": "系統錯誤訊息：",
   "List is empty": "清單是空的",
   "Not selected": "未選取",
@@ -139,5 +139,18 @@
   "Click here": "點這",
   "More Info": "更多資訊",
   "Revert Changes": "恢復變更",
-  "Animations": "動畫"
+  "Animations": "動畫",
+  "Multistreaming": "多平台直播",
+  "Alert Box": "通知方塊",
+  "Widget": "小工具",
+  "Creator Sites": "創作者網站",
+  "Apps Manager": "應用程式管理員",
+  "Theme Audit": "主題稽核",
+  "Login": "登入",
+  "Tip Settings": "捐贈設定",
+  "Apps Store Home": "應用程式商店首頁",
+  "Dashboard Home": "儀表板首頁",
+  "Alert Box Library": "通知方塊庫",
+  "Alert Box Settings": "通知方塊設定",
+  "Upgrade to Ultra": "升級到 Ultra"
 }

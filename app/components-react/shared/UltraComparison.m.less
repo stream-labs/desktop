@@ -10,21 +10,31 @@
 .headers-container {
   border-top: 1px solid var(--border);
   width: 250px;
-  margin-top: 48px;
+  margin-top: 232px;
   margin-right: 20px;
 
   &.condensed {
     margin-right: 0;
-    margin-top: 55px;
+    margin-top: 224px;
+  }
+
+  &.custom {
+    margin-top: 188px;
   }
 }
 
 .table-header {
   padding: 12px;
   border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
 
   i {
     margin-right: 8px;
+  }
+
+  i:global(.icon-question) {
+    margin-left: auto;
   }
 }
 
@@ -86,9 +96,10 @@
 
 .button {
   border-radius: 4px;
-  margin: 16px;
+  margin-bottom: 16px;
   text-align: center;
   padding: 14px;
+  width: 90%;
   background: var(--button);
 }
 

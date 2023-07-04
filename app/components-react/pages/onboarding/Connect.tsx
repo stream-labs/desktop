@@ -24,7 +24,7 @@ export function Connect() {
     setExtraPlatform,
   } = useModule(LoginModule);
   const { next } = useModule(OnboardingModule);
-  const { UsageStatisticsService, OnboardingService } = Services;
+  const { UsageStatisticsService, OnboardingService, RecordingModeService } = Services;
 
   if (selectedExtraPlatform) {
     return <ExtraPlatformConnect />;
@@ -50,7 +50,9 @@ export function Connect() {
     next();
   }
 
-  const platforms = ['streamlabs', 'twitch', 'youtube', 'facebook', 'trovo'];
+  const platforms = RecordingModeService.views.isRecordingModeEnabled
+    ? ['streamlabs', 'youtube']
+    : ['streamlabs', 'twitch', 'youtube', 'facebook', 'trovo'];
 
   return (
     <div className={styles.pageContainer}>
@@ -58,7 +60,7 @@ export function Connect() {
         <h1 className={commonStyles.titleContainer}>{$t('Connect')}</h1>
         {!isRelog && (
           <p style={{ marginBottom: 80 }}>
-            {$t('Sign in with your streaming account to get started with Streamlabs')}
+            {$t('Sign in with your content platform to get started with Streamlabs')}
           </p>
         )}
         {isRelog && (
@@ -195,8 +197,24 @@ export class LoginModule {
     }
   }
 
-  finishSLAuth(primaryPlatform?: TPlatform) {
-    return this.UserService.finishSLAuth(primaryPlatform);
+  async finishSLAuth(primaryPlatform?: TPlatform) {
+    const result = await this.UserService.finishSLAuth(primaryPlatform);
+
+    if (result === EPlatformCallResult.TwitchScopeMissing) {
+      await remote.dialog.showMessageBox(remote.getCurrentWindow(), {
+        type: 'warning',
+        message: $t(
+          'Streamlabs requires additional permissions from your Twitch account. Please log in with Twitch to continue.',
+        ),
+        title: 'Twitch Error',
+        buttons: [$t('Refresh Login')],
+      });
+
+      // Initiate a Twitch merge to get permissions
+      await this.authPlatform('twitch', () => {}, true);
+    }
+
+    return result;
   }
 
   @mutation()

@@ -1,4 +1,4 @@
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 import { Services } from '../../service-provider';
 import {
   FacebookService,
@@ -448,7 +448,7 @@ class StreamSchedulerModule {
   setTime(time: number) {
     this.state.time = time;
     if (this.state.selectedPlatform === 'facebook') {
-      getDefined(this.state.platformSettings.facebook).plannedStartTime = time;
+      getDefined(this.state.platformSettings.facebook).event_params.start_time = time;
     } else {
       getDefined(this.state.platformSettings.youtube).scheduledStartTime = time;
     }
@@ -526,10 +526,14 @@ function convertYTBroadcastToEvent(ytBroadcast: IYoutubeLiveBroadcast): IStreamE
  * Converts FB liveVideo to IStreamEvent
  */
 function convertFBLiveVideoToEvent(fbLiveVideo: IFacebookLiveVideoExtended): IStreamEvent {
+  // Videos "just" created don't seem to have `broadcast_start_time`, fallback to planned.
+  const date = fbLiveVideo.broadcast_start_time || fbLiveVideo.planned_start_time;
+  assertIsDefined(date);
+
   return {
     platform: 'facebook',
     id: fbLiveVideo.id,
-    date: new Date(fbLiveVideo.planned_start_time || fbLiveVideo.broadcast_start_time).valueOf(),
+    date: new Date(date).valueOf(),
     title: fbLiveVideo.title,
     status: 'scheduled',
     facebook: {

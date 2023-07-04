@@ -35,7 +35,6 @@ export class AuthModule {
         webPreferences: {
           partition,
           nodeIntegration: false,
-          nativeWindowOpen: true,
         },
       });
 
