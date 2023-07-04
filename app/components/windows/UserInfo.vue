@@ -29,7 +29,7 @@
         <div class="content">
           <div class="list" ref="scroll">
             <component
-              :class="{ row: true, name: item.value.name }"
+              :class="{ row: true, name: getDisplayName(item) }"
               v-for="item of comments"
               :key="item.seqId"
               :is="componentMap[item.component]"

@@ -4,7 +4,7 @@ import { Inject } from "services/core";
 import { ChatMessage } from "services/nicolive-program/ChatMessage";
 import { ChatComponentType } from "services/nicolive-program/ChatMessage/ChatComponentType";
 import { KonomiTag, NicoliveClient } from "services/nicolive-program/NicoliveClient";
-import { WrappedChatWithComponent } from "services/nicolive-program/WrappedChat";
+import { WrappedChat, WrappedChatWithComponent } from "services/nicolive-program/WrappedChat";
 import { KonomiTagsService } from "services/nicolive-program/konomi-tags";
 import { NicoliveCommentViewerService } from "services/nicolive-program/nicolive-comment-viewer";
 import { NicoliveProgramService } from "services/nicolive-program/nicolive-program";
@@ -16,6 +16,7 @@ import EmotionComment from '../nicolive-area/comment/EmotionComment.vue';
 import GiftComment from '../nicolive-area/comment/GiftComment.vue';
 import NicoadComment from '../nicolive-area/comment/NicoadComment.vue';
 import SystemMessage from '../nicolive-area/comment/SystemMessage.vue';
+import { getDisplayName } from "services/nicolive-program/ChatMessage/getDisplayName";
 
 const componentMap: { [type in ChatComponentType]: Vue.Component } = {
   common: CommonComment,
@@ -120,6 +121,10 @@ export default class UserInfo extends Vue {
       return item.value.user_id === this.userId;
     });
     return comments;
+  }
+
+  getDisplayName(chat: WrappedChat): string {
+    return getDisplayName(chat);
   }
 
   // getterにして関数を返さないと全コメントに対してrerenderが走る
