@@ -3,6 +3,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import { WrappedChatWithComponent } from 'services/nicolive-program/WrappedChat';
 import { ChatMessage } from 'services/nicolive-program/ChatMessage';
 import { getDisplayText } from 'services/nicolive-program/ChatMessage/displaytext';
+import { getDisplayName } from 'services/nicolive-program/ChatMessage/getDisplayName';
 
 @Component({})
 export class CommentBase extends Vue {
@@ -11,6 +12,9 @@ export class CommentBase extends Vue {
 
   get computedContent() {
     return getDisplayText(this.chat);
+  }
+  get computedName() {
+    return getDisplayName(this.chat);
   }
 
   get computedTitle() {

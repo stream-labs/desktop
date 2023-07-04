@@ -15,7 +15,11 @@
     <div class="content">
       <div class="list" ref="scroll">
         <component
-          :class="{ row: true, name: item.value.name, hint: item.value.no === nameplateHintNo }"
+          :class="{
+            row: true,
+            name: getDisplayName(item),
+            hint: item.value.no === nameplateHintNo,
+          }"
           v-for="item of items"
           :key="item.seqId"
           :is="componentMap[item.component]"

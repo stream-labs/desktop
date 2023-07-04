@@ -9,9 +9,9 @@
     <div class="comment-root">
       <div class="comment-number">{{ chat.value.no }}</div>
       <div class="comment-box">
-        <div class="comment-name-box" v-if="chat.value.name" @click.stop="$emit('commentUser')">
+        <div class="comment-name-box" v-if="computedName" @click.stop="$emit('commentUser')">
           <img class="comment-icon" :src="userIconURL" />
-          <div class="comment-name">{{ chat.value.name }}</div>
+          <div class="comment-name">{{ computedName }}</div>
         </div>
         <div class="comment-body">{{ computedContent }}</div>
       </div>

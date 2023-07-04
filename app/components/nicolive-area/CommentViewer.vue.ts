@@ -20,6 +20,7 @@ import EmotionComment from './comment/EmotionComment.vue';
 import GiftComment from './comment/GiftComment.vue';
 import NicoadComment from './comment/NicoadComment.vue';
 import SystemMessage from './comment/SystemMessage.vue';
+import { getDisplayName } from 'services/nicolive-program/ChatMessage/getDisplayName';
 
 const componentMap: { [type in ChatComponentType]: Vue.Component } = {
   common: CommonComment,
@@ -89,6 +90,9 @@ export default class CommentViewer extends Vue {
 
   pinnedItemContent(item: WrappedChat): string {
     return `${getContentWithFilter(item)}  (${this.getFormattedLiveTime(item.value)})`;
+  }
+  getDisplayName(item: WrappedChat): string {
+    return getDisplayName(item);
   }
 
   componentMap = componentMap;
