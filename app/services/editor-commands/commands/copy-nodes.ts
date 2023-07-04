@@ -20,10 +20,10 @@ import { cloneDeep } from 'lodash';
  *  - migrating a vanilla scene to a dual output scene
  * To maximize readability, the code for this is not very DRY.
  *
- *  @param selection - The selection of nodes
- *   @param destSceneId - The scene to copy the nodes to,
- *   @param duplicateSources - Boolean for whether the sources should be copied
- *   @param display - Optional, the display to assign the copied nodes to
+ *  @param selection - The selection of nodes to copy
+ *  @param destSceneId - The scene to copy the nodes to
+ *  @param duplicateSources - Boolean for whether the sources should be copied
+ *  @param display - Optional, the display to assign the copied nodes to
  */
 export class CopyNodesCommand extends Command {
   @Inject() scenesService: ScenesService;
@@ -149,20 +149,7 @@ export class CopyNodesCommand extends Command {
 
       this.hasNodeMap = true;
     } else {
-      const nodeIds = cloneDeep(this.selection.getIds());
-      if (this.hasNodeMap) {
-        // add dual output nodes to selection
-        this.selection.getIds().forEach(nodeId => {
-          const dualOutputNodeId = this.dualOutputService.views.getDualOutputNodeId(nodeId);
-          if (dualOutputNodeId) {
-            nodeIds.push(dualOutputNodeId);
-          }
-        });
-      }
-      const updatedSelection = new Selection(scene.id, nodeIds);
-      updatedSelection.freeze();
-      updatedSelection.getNodes().forEach(node => {
-        // this.selection.getNodes().forEach(node => {
+      this.selection.getNodes().forEach(node => {
         if (node.isFolder()) {
           // add folder
           const folder = scene.createFolder(node.name, { id: this.nodeIdsMap[node.id] });
@@ -260,10 +247,10 @@ export class CopyNodesCommand extends Command {
     Object.values(this.nodeIdsMap).forEach(nodeId => {
       const node = scene.getNode(nodeId);
       if (node) node.remove();
-    });
 
-    if (this.dualOutputService.views.hasNodeMap(scene.id)) {
-      this.sceneCollectionsService.removeNodeMap(scene.id);
-    }
+      if (this.dualOutputService.views.hasNodeMap(scene.id)) {
+        this.sceneCollectionsService.removeNodeMapEntry(nodeId, scene.id);
+      }
+    });
   }
 }

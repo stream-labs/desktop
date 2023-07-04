@@ -166,8 +166,29 @@ export class ClipboardService extends StatefulService<IClipboardState> {
   copy() {
     clipboard.clear();
     this.clear();
-    this.SET_SCENE_ITEMS_IDS(this.selectionService.views.globalSelection.getIds());
-    this.SET_SCENE_ITEMS_SCENE(this.scenesService.views.activeScene.id);
+
+    const activeSceneId = this.scenesService.views.activeScene.id;
+    const ids = new Set(this.selectionService.views.globalSelection.getIds());
+    /**
+     * For dual output scenes, also copy the corresponding nodes
+     * but don't add them to the selection so that they can still be
+     * manipulated in the display/source selector independently
+     */
+    if (this.dualOutputService.views.hasNodeMap(activeSceneId)) {
+      this.selectionService.views.globalSelection.getIds().forEach(id => {
+        const dualOutputNodeId = this.dualOutputService.views.getDualOutputNodeId(
+          id,
+          activeSceneId,
+          true,
+        );
+        if (dualOutputNodeId && !ids.has(dualOutputNodeId)) {
+          ids.add(dualOutputNodeId);
+        }
+      });
+    }
+
+    this.SET_SCENE_ITEMS_IDS(Array.from(ids));
+    this.SET_SCENE_ITEMS_SCENE(activeSceneId);
   }
 
   @shortcut('Ctrl+V')

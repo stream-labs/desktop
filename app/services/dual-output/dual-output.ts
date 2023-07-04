@@ -172,7 +172,11 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     );
   }
 
-  getDualOutputNodeId(nodeId: string, sceneId?: string) {
+  getDualOutputNodeId(nodeId: string, sceneId?: string, checkAll: boolean = false) {
+    if (checkAll) {
+      return this.getHorizontalNodeId(nodeId, sceneId) ?? this.getVerticalNodeId(nodeId, sceneId);
+    }
+
     return this.onlyVerticalDisplayActive
       ? this.getHorizontalNodeId(nodeId, sceneId)
       : this.getVerticalNodeId(nodeId, sceneId);
@@ -341,7 +345,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     const verticalNodeIds = new Set(this.views.getVerticalNodeIds(sceneId));
 
     if (
-      this.views.getVerticalNodeIds(sceneId).length > 0 &&
+      this.views.getVerticalNodeIds(sceneId)?.length > 0 &&
       !this.videoSettingsService.contexts.vertical
     ) {
       this.videoSettingsService.establishVideoContext('vertical');

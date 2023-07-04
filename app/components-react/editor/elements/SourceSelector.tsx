@@ -332,13 +332,16 @@ export class SourceSelectorModule {
         .map(i => i.id)
         .slice(swapIdx ? idx2 : idx1, swapIdx ? idx1 + 1 : idx2 + 1);
     }
-    if (this.isDualOutputActive) {
-      const dualOutputNodeId = this.dualOutputService.views.getDualOutputNodeId(
-        info.node.key as string,
-      );
-      if (dualOutputNodeId) {
-        ids.push(dualOutputNodeId);
-      }
+    if (this.dualOutputService.views.hasNodeMap(this.scene.id)) {
+      const updatedIds = new Set(ids);
+      ids.forEach(id => {
+        const dualOutputNodeId = this.dualOutputService.views.getDualOutputNodeId(id);
+        if (dualOutputNodeId && !updatedIds.has(dualOutputNodeId)) {
+          updatedIds.add(dualOutputNodeId);
+        }
+      });
+
+      ids = Array.from(updatedIds);
     }
 
     this.selectionService.views.globalSelection.select(ids);
