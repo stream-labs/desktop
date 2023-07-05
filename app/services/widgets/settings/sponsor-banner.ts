@@ -76,9 +76,9 @@ export class SponsorBannerService extends WidgetSettingsService<ISponsorBannerDa
   }
 
   protected patchBeforeSend(settings: ISponsorBannerSettings): any {
-    settings.hide_duration = settings.hide_duration_in_seconds / 60;
+    settings.hide_duration = Math.round(settings.hide_duration_in_seconds / 60);
     settings.hide_duration_secs = settings.hide_duration_in_seconds % 60;
-    settings.show_duration = settings.show_duration_in_seconds / 60;
+    settings.show_duration = Math.round(settings.show_duration_in_seconds / 60);
     settings.show_duration_secs = settings.show_duration_in_seconds % 60;
 
     settings.image_1_href = settings.placement_1_images.map(image => image.href);
