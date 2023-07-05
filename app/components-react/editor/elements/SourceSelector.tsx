@@ -381,24 +381,18 @@ export class SourceSelectorModule {
   }
 
   get activeItemIds() {
-    // because the source selector only works with the horizontal node ids
-    // convert vertical node ids to horizontal node ids, but only if the
-    // horizontal node is not also selected
-    if (this.isDualOutputActive) {
+    /* Because the source selector only works with either the horizontal
+     * or vertical node ids at one time, filter them in a dual output scene.
+     */
+    if (this.dualOutputService.views.hasNodeMap()) {
       const selectedIds = this.selectionService.state.selectedIds;
-      const verticalNodeIds = this.dualOutputService.views.verticalNodeIds;
+      const nodeIds = this.dualOutputService.views.onlyVerticalDisplayActive
+        ? this.dualOutputService.views.verticalNodeIds
+        : this.dualOutputService.views.horizontalNodeIds;
 
-      if (!verticalNodeIds) return selectedIds;
+      if (!nodeIds) return selectedIds;
 
-      return selectedIds.reduce((ids: string[], id: string) => {
-        if (verticalNodeIds.includes(id)) {
-          const horizontalNodeId = this.dualOutputService.views.getHorizontalNodeId(id);
-          if (horizontalNodeId) ids.push(horizontalNodeId);
-        } else {
-          ids.push(id);
-        }
-        return ids;
-      }, []);
+      return selectedIds.filter(id => nodeIds.includes(id));
     }
 
     return this.selectionService.state.selectedIds;
