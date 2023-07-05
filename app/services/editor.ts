@@ -470,9 +470,29 @@ export class EditorService extends StatefulService<IEditorServiceState> {
     if (this.state.cursor !== cursor) this.SET_CURSOR(cursor);
   }
 
-  // Takes the given mouse event, and determines if it is
-  // over the given box in base resolution space.
-  isOverBox(event: IMouseEvent, x: number, y: number, width: number, height: number) {
+  /**
+   * Determine if the mouse is over the resize box
+   * @remark
+   * Takes the given mouse event, and determines if it is
+   * over the given box in base resolution space.
+   *
+   * @param event - The mouse event
+   * @param x - The x coordinate of the box
+   * @param y - The y coordinate of the box
+   * @param width - The width of the box
+   * @param height - The height of the box
+   * @param borderWidth - Optional, an invisible width of the border, primarily used for the vertical display
+   * @returns - Boolean of whether or not it's over the box
+   */
+
+  isOverBox(
+    event: IMouseEvent,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    borderWidth: number = 0,
+  ): boolean {
     // We don't need to adjust mac coordinates for scale factor
     const factor = byOS({ [OS.Windows]: this.windowsService.state.main.scaleFactor, [OS.Mac]: 1 });
 
@@ -484,20 +504,38 @@ export class EditorService extends StatefulService<IEditorServiceState> {
 
     const box = { x, y, width, height };
 
-    if (mouse.x < box.x) {
-      return false;
-    }
+    if (borderWidth > 0) {
+      if (mouse.x < box.x - borderWidth && mouse.x < box.x) {
+        return false;
+      }
 
-    if (mouse.y < box.y) {
-      return false;
-    }
+      if (mouse.y < box.y - borderWidth && mouse.y < box.y) {
+        return false;
+      }
 
-    if (mouse.x > box.x + box.width) {
-      return false;
-    }
+      if (mouse.x > box.x + box.width + borderWidth && mouse.x > box.x + box.width) {
+        return false;
+      }
 
-    if (mouse.y > box.y + box.height) {
-      return false;
+      if (mouse.y > box.y + box.height + borderWidth && mouse.y > box.y + box.height) {
+        return false;
+      }
+    } else {
+      if (mouse.x < box.x) {
+        return false;
+      }
+
+      if (mouse.y < box.y) {
+        return false;
+      }
+
+      if (mouse.x > box.x + box.width) {
+        return false;
+      }
+
+      if (mouse.y > box.y + box.height) {
+        return false;
+      }
     }
 
     return true;
@@ -555,10 +593,8 @@ export class EditorService extends StatefulService<IEditorServiceState> {
         // prevent these other scene items from being selectable when they are the opposite context
         if (event.display !== region.item.display) return false;
 
-        const regionWidth = event.display === 'vertical' ? region.width + 6 : region.width;
-        const regionHeight = event.display === 'vertical' ? region.height + 6 : region.height;
-
-        return this.isOverBox(event, region.x, region.y, regionWidth, regionHeight);
+        const borderWidth = event.display === 'vertical' ? 20 : 0;
+        return this.isOverBox(event, region.x, region.y, region.width, region.height, borderWidth);
       });
     }
 
