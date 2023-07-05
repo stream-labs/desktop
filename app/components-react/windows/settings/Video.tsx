@@ -375,6 +375,10 @@ class VideoSettingsModule {
       message.error({
         content: $t('Cannot toggle dual output while live.'),
       });
+    } else if (Services.TransitionsService.views.studioMode) {
+      message.error({
+        content: $t('Cannot toggle dual output while in studio mode.'),
+      });
     } else {
       Services.DualOutputService.actions.setdualOutputMode();
       this.state.setShowDualOutputSettings(!this.state.showDualOutputSettings);
