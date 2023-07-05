@@ -179,11 +179,17 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
    * @param display - Optional, the context's display name
    */
   migrateSettings(display: TDisplayType = 'horizontal') {
-    // if this is the first time starting the app
-    // set default settings for horizontal context
+    /**
+     * If this is the first time starting the app set default settings for horizontal context
+     */
     if (display === 'horizontal' && !this.dualOutputService.views.videoSettings.horizontal) {
       this.loadLegacySettings();
       this.contexts.horizontal.video = this.contexts.horizontal.legacySettings;
+
+      // match the vertical display fps settings to the horizontal display's settings
+      this.setVideoSetting('fpsNum', this.contexts.horizontal.video.fpsNum, 'vertical');
+      this.setVideoSetting('fpsDen', this.contexts.horizontal.video.fpsDen, 'vertical');
+      this.setVideoSetting('fpsInt', this.contexts.horizontal.video.fpsNum, 'vertical');
     } else {
       // otherwise, load them from the dual output service
       const settings = this.dualOutputService.views.videoSettings[display];
