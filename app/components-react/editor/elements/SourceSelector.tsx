@@ -448,6 +448,7 @@ export class SourceSelectorModule {
     this.streamingService.actions.setSelectiveRecording(
       !this.streamingService.state.selectiveRecording,
     );
+    this.dualOutputService.actions.toggleDisplay(false, 'vertical');
   }
 
   cycleSelectiveRecording(sceneNodeId: string) {

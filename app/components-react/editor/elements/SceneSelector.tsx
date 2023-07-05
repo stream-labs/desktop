@@ -36,6 +36,7 @@ function SceneSelector() {
     studioMode: TransitionsService.views.studioMode,
     isMidStreamMode: StreamingService.views.isMidStreamMode,
     showDualOutput: DualOutputService.views.dualOutputMode,
+    selectiveRecording: StreamingService.state.selectiveRecording,
   }));
 
   const { treeSort } = useTree(true);
@@ -158,6 +159,13 @@ function SceneSelector() {
     });
   }
 
+  function showSelectiveRecordingMessage() {
+    message.error({
+      content: $t('Selective Recording can only be used with horizontal sources.'),
+      className: styles.toggleError,
+    });
+  }
+
   const DropdownMenu = (
     <div className={cx(styles.dropdownContainer, 'react')}>
       <div className={styles.dropdownItem} onClick={manageCollections} style={{ marginTop: '6px' }}>
@@ -238,6 +246,8 @@ function SceneSelector() {
                   showToggleDisplayErrorMessage();
                 } else if (v.studioMode && v.isHorizontal) {
                   showStudioModeErrorMessage();
+                } else if (v.selectiveRecording) {
+                  showSelectiveRecordingMessage();
                 } else {
                   v.toggleDisplay(!v.isVertical, 'vertical');
                 }

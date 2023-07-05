@@ -21,6 +21,7 @@ import {
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
 import { UserService } from 'services/user';
 import { SelectionService } from 'services/selection';
+import { StreamingService } from 'services/streaming';
 
 interface IDisplayVideoSettings {
   defaultDisplay: TDisplayType;
@@ -240,6 +241,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private userService: UserService;
   @Inject() private selectionService: SelectionService;
+  @Inject() private streamingService: StreamingService;
 
   static defaultState: IDualOutputServiceState = {
     displays: ['horizontal', 'vertical'],
@@ -276,6 +278,10 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       // confirm the scene collection has a node map
       if (!this.sceneCollectionsService.activeCollection.hasOwnProperty('sceneNodeMaps')) {
         this.sceneCollectionsService.initNodeMaps();
+      }
+
+      if (this.state.dualOutputMode && this.streamingService.state.selectiveRecording) {
+        this.streamingService.actions.setSelectiveRecording(false);
       }
 
       if (this.state.isLoading) {
