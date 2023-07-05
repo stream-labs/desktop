@@ -312,69 +312,36 @@ class VideoSettingsModule {
     }
   }
 
-  /**
-   * Sets the FPS type
-   * @remark set the same FPS type for both displays
-   */
   setFPSType(value: EFPSType) {
-    const displays = this.state.showDualOutputSettings
-      ? ['horizontal']
-      : ['horizontal', 'vertical'];
-    displays.forEach((display: TDisplayType) => {
-      this.service.actions.setVideoSetting('fpsType', value, display);
-      this.service.actions.setVideoSetting('fpsNum', 30, display);
-      this.service.actions.setVideoSetting('fpsDen', 1, display);
-    });
+    const display = this.state.display;
+    this.service.actions.setVideoSetting('fpsType', value, display);
+    this.service.actions.setVideoSetting('fpsNum', 30, display);
+    this.service.actions.setVideoSetting('fpsDen', 1, display);
   }
-
-  /**
-   * Sets Common FPS
-   * @remark set the same Common FPS for both displays
-   */
   setCommonFPS(value: string) {
-    const displays = this.state.showDualOutputSettings
-      ? ['horizontal']
-      : ['horizontal', 'vertical'];
-    displays.forEach((display: TDisplayType) => {
-      const [fpsNum, fpsDen] = value.split('-');
-      this.service.actions.setVideoSetting('fpsNum', Number(fpsNum), display);
-      this.service.actions.setVideoSetting('fpsDen', Number(fpsDen), display);
-    });
+    const display = this.state.display;
+    const [fpsNum, fpsDen] = value.split('-');
+    this.service.actions.setVideoSetting('fpsNum', Number(fpsNum), display);
+    this.service.actions.setVideoSetting('fpsDen', Number(fpsDen), display);
   }
-
-  /**
-   * Sets Integer FPS
-   * @remark set the same Integer FPS for both displays
-   */
   setIntegerFPS(value: string) {
-    const displays = this.state.showDualOutputSettings
-      ? ['horizontal']
-      : ['horizontal', 'vertical'];
-    displays.forEach((display: TDisplayType) => {
-      this.state.setFpsInt(Number(value));
-      if (Number(value) > 0 && Number(value) < 1001) {
-        this.service.actions.setVideoSetting('fpsNum', Number(value), display);
-        this.service.actions.setVideoSetting('fpsDen', 1, display);
-      }
-    });
+    const display = this.state.display;
+    this.state.setFpsInt(Number(value));
+    if (Number(value) > 0 && Number(value) < 1001) {
+      this.service.actions.setVideoSetting('fpsNum', Number(value), display);
+      this.service.actions.setVideoSetting('fpsDen', 1, display);
+    }
   }
-
-  /**
-   * Sets FPS
-   * @remark set the same FPS for both displays
-   */
   setFPS(key: 'fpsNum' | 'fpsDen', value: string) {
-    ['horizontal', 'vertical'].forEach((display: TDisplayType) => {
-      if (key === 'fpsNum') {
-        this.state.setFpsNum(Number(value));
-      } else {
-        this.state.setFpsDen(Number(value));
-      }
-
-      if (!invalidFps(this.state.fpsNum, this.state.fpsDen) && Number(value) > 0) {
-        this.service.actions.setVideoSetting(key, Number(value), display);
-      }
-    });
+    const display = this.state.display;
+    if (key === 'fpsNum') {
+      this.state.setFpsNum(Number(value));
+    } else {
+      this.state.setFpsDen(Number(value));
+    }
+    if (!invalidFps(this.state.fpsNum, this.state.fpsDen) && Number(value) > 0) {
+      this.service.actions.setVideoSetting(key, Number(value), display);
+    }
   }
 
   onChange(key: string) {
