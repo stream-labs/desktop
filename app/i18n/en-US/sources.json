@@ -354,5 +354,6 @@
   "Set scale filter 'Bicubic'": "Set scale filter 'Bicubic'",
   "Set scale filter 'Bilinear'": "Set scale filter 'Bilinear'",
   "Set scale filter 'Lanczos'": "Set scale filter 'Lanczos'",
-  "Set scale filter 'Area'": "Set scale filter 'Area'"
+  "Set scale filter 'Area'": "Set scale filter 'Area'",
+  "You currently have the same source on both canvases selected. Please select the source in the canvas to edit it independently.": "You currently have the same source on both canvases selected. Please select the source in the canvas to edit it independently."
 }

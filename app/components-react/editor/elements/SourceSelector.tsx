@@ -159,6 +159,24 @@ export class SourceSelectorModule {
     return this.selectionService.state.selectedIds.includes(node.id);
   }
 
+  /**
+   * Determine if the nodes are selected in the source selector
+   * @remark
+   * In dual output mode, this is used to show the link icon in the source selector
+   * @param nodeIds -
+   * @returns
+   */
+  allSelected(nodeIds: string[]): boolean {
+    const selectedIds = new Set(this.selectionService.views.globalSelection.getIds());
+
+    return nodeIds.reduce((selected: boolean, nodeId: string) => {
+      if (!selectedIds.has(nodeId)) {
+        selected = false;
+      }
+      return selected;
+    }, true);
+  }
+
   determineIcon(isLeaf: boolean, sourceId: string) {
     if (!isLeaf) {
       return this.state.expandedFoldersIds.includes(sourceId)
