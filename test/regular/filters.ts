@@ -1,9 +1,9 @@
-import { useSpectron, test } from '../helpers/spectron';
+import { useWebdriver, test } from '../helpers/webdriver';
 import { addFilter, openFiltersWindow, removeFilter } from '../helpers/modules/filters';
 import { addSource } from '../helpers/modules/sources';
 import { focusChild, isDisplayed, waitForDisplayed } from '../helpers/modules/core';
 
-useSpectron({
+useWebdriver({
   restartAppAfterEachTest: false,
   clearCollectionAfterEachTest: true,
 });

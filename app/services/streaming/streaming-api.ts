@@ -49,6 +49,7 @@ export interface IStreamInfo {
     tiktok: TGoLiveChecklistItemState;
     trovo: TGoLiveChecklistItemState;
     setupMultistream: TGoLiveChecklistItemState;
+    setupGreen: TGoLiveChecklistItemState;
     startVideoTransmission: TGoLiveChecklistItemState;
     postTweet: TGoLiveChecklistItemState;
   };
@@ -109,6 +110,12 @@ export interface IStreamingServiceApi {
   recordingStatusChange: Observable<ERecordingState>;
 
   /**
+   * Subscribe to be notified when the state
+   * of the streaming output changes.
+   */
+  replayBufferStatusChange: Observable<EReplayBufferState>;
+
+  /**
    * This subscription receives no events and
    * will be removed in a future version.
    * @deprecated
@@ -144,4 +151,14 @@ export interface IStreamingServiceApi {
    * Toggle the recording state
    */
   toggleRecording(): void;
+
+  /**
+   * Start replay buffer state
+   */
+  startReplayBuffer(): void;
+
+  /**
+   * Stop replay buffer state
+   */
+  stopReplayBuffer(): void;
 }

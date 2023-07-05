@@ -73,6 +73,7 @@ export { RestreamService } from 'services/restream';
 export { TwitterService } from 'services/integrations/twitter';
 export { UsageStatisticsService } from './services/usage-statistics';
 export { GameOverlayService } from 'services/game-overlay';
+export { SharedStorageService } from 'services/integrations/shared-storage';
 
 export { MediaGalleryService } from 'services/media-gallery';
 export { MediaBackupService } from 'services/media-backup';
@@ -94,6 +95,7 @@ export { RecentEventsService } from 'services/recent-events';
 export { MagicLinkService } from 'services/magic-link';
 export { GrowService } from 'services/grow/grow';
 export { GuestCamService } from 'services/guest-cam';
+export { GreenService } from 'services/green';
 
 // WIDGETS
 export { WidgetSource, WidgetsService } from './services/widgets';
@@ -186,6 +188,8 @@ import { SideNavService } from './services/side-nav';
 import { VideoSettingsService } from 'services/settings-v2/video';
 import { SettingsManagerService } from 'services/settings-manager';
 import { MarkersService } from 'services/markers';
+import { GreenService } from 'services/green';
+import { SharedStorageService } from 'services/integrations/shared-storage';
 
 export const AppServices = {
   AppService,
@@ -256,4 +260,6 @@ export const AppServices = {
   VideoSettingsService,
   SettingsManagerService,
   MarkersService,
+  GreenService,
+  SharedStorageService,
 };

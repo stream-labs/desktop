@@ -1,10 +1,10 @@
-import { test, useSpectron } from '../../helpers/spectron';
-import { assertOptions } from '../../helpers/spectron/assertions';
+import { test, useWebdriver } from '../../helpers/webdriver';
+import { assertOptions } from '../../helpers/webdriver/assertions';
 import { showSettingsWindow } from '../../helpers/modules/settings/settings';
 import { focusMain } from '../../helpers/modules/core';
 import { assertFormContains } from '../../helpers/modules/forms';
 
-useSpectron();
+useWebdriver();
 
 test('Populates audio settings', async t => {
   await showSettingsWindow('Audio');

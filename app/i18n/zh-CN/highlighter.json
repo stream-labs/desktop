@@ -90,5 +90,12 @@
   "An error occurred while reading %{file}": "读取 %{file}时发生错误",
   "An error occurred while reading audio from %{file}": "从 %{file}读取音频时发生错误",
   "An error occurred while mixing audio": "混合音频时发生错误",
-  "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "使用亮点选择器编辑您的回放视频，这是 Streamlabs 内置的免费编辑器。"
+  "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "使用亮点选择器编辑您的回放视频，这是 Streamlabs 内置的免费编辑器。",
+  "Upload To": "Upload To",
+  "Upload": "Upload",
+  "This feature requires a Streamlabs ID": "This feature requires a Streamlabs ID",
+  "Sign up for Streamlabs ID": "Sign up for Streamlabs ID",
+  "Add subtitles, transcribe, and more": "Add subtitles, transcribe, and more",
+  "Convert to mobile-friendly short video": "Convert to mobile-friendly short video",
+  "YouTube (private video)": "YouTube (private video)"
 }

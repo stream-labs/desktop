@@ -58,7 +58,7 @@ export function AppearanceSettings() {
     compactView: SideNavService.views.compactView,
     menuItemStatus: SideNavService.views.menuItemStatus,
     apps: PlatformAppsService.views.enabledApps.filter(app => {
-      return !!app.manifest.pages.find(page => {
+      return !!app?.manifest?.pages.find(page => {
         return page.slot === EAppPageSlot.TopNav;
       });
     }),
@@ -75,7 +75,7 @@ export function AppearanceSettings() {
   }));
 
   function openFFZSettings() {
-    WindowsService.createOneOffWindow(
+    WindowsService.actions.createOneOffWindow(
       {
         componentName: 'FFZSettings',
         title: $t('FrankerFaceZ Settings'),
@@ -90,7 +90,7 @@ export function AppearanceSettings() {
   }
 
   async function upgradeToPrime() {
-    MagicLinkService.linkToPrime('slobs-ui-themes');
+    MagicLinkService.actions.linkToPrime('slobs-ui-themes');
   }
 
   const shouldShowPrime = isLoggedIn && !isPrime;

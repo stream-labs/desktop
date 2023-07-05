@@ -39,7 +39,7 @@ export function UltraComparison(p: IUltraComparisonProps) {
     {
       text: $t('All Streamlabs Pro Tools'),
       icon: 'icon-streamlabs',
-      whisper: $t('Console, Crossclip, Oslo, Willow & Melon'),
+      whisper: 'Console, Cross Clip, Video Editor, & Podcast Editor',
     },
   ];
   const tableData = p.tableData || {
@@ -64,7 +64,7 @@ export function UltraComparison(p: IUltraComparisonProps) {
       { text: '✓', key: 'check1' },
       { text: '✓', key: 'check2' },
       { text: '✓', key: 'check3' },
-      { text: $t('Add Up To 4 Guests or Cameras') },
+      { text: $t('Add Up To 11 Guests or Cameras') },
       { text: $t('Access Full App Library (%{appNumber})', { appNumber: '60+' }) },
       { text: $t('Custom Tip Page and Domain') },
       { text: '10GB' },

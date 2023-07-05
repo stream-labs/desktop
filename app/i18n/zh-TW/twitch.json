@@ -1,7 +1,7 @@
 {
   "Twitch Category": "Twitch 類別",
   "Twitch Tags": "Twitch 標記",
-  "You need to re-login to access Twitch tags": "You need to re-login to access Twitch tags",
-  "Do not include special characters or spaces in your tag": "Do not include special characters or spaces in your tag",
-  "For example: \"Speedrunning\" or \"FirstPlaythrough\"": "For example: \"Speedrunning\" or \"FirstPlaythrough\""
+  "You need to re-login to access Twitch tags": "您必須重新登入才能使用 Twitch 標記功能",
+  "Do not include special characters or spaces in your tag": "標記中不可包含特殊字元或空格",
+  "For example: \"Speedrunning\" or \"FirstPlaythrough\"": "例如：「Speedrunning」或「FirstPlaythrough」"
 }

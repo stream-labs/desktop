@@ -21,6 +21,9 @@ import { YoutubeUploader } from './youtube/uploader';
 import { lazyModule } from 'util/lazy-module';
 import * as remote from '@electron/remote';
 import pick from 'lodash/pick';
+import { TDisplayType } from 'services/settings-v2';
+import { IVideo } from 'obs-studio-node';
+import { TOutputOrientation } from 'services/restream';
 
 interface IYoutubeServiceState extends IPlatformState {
   liveStreamingEnabled: boolean;
@@ -38,6 +41,7 @@ export interface IYoutubeStartStreamOptions extends IExtraBroadcastSettings {
   description: string;
   privacyStatus?: 'private' | 'public' | 'unlisted';
   scheduledStartTime?: number;
+  mode?: TOutputOrientation;
 }
 
 /**
@@ -199,6 +203,7 @@ export class YoutubeService
       privacyStatus: 'public',
       selfDeclaredMadeForKids: false,
       thumbnail: '',
+      mode: undefined,
     },
   };
 
@@ -271,7 +276,7 @@ export class YoutubeService
     this.state.liveStreamingEnabled = enabled;
   }
 
-  async beforeGoLive(settings: IGoLiveSettings) {
+  async beforeGoLive(settings: IGoLiveSettings, context?: TDisplayType) {
     const ytSettings = getDefined(settings.platforms.youtube);
     const streamToScheduledBroadcast = !!ytSettings.broadcastId;
     // update selected LiveBroadcast with new title and description
@@ -301,17 +306,22 @@ export class YoutubeService
     const streamKey = stream.cdn.ingestionInfo.streamName;
 
     if (!this.streamingService.views.isMultiplatformMode) {
-      this.streamSettingsService.setSettings({
-        platform: 'youtube',
-        key: streamKey,
-        streamType: 'rtmp_common',
-        server: 'rtmp://a.rtmp.youtube.com/live2',
-      });
+      this.streamSettingsService.setSettings(
+        {
+          platform: 'youtube',
+          key: streamKey,
+          streamType: 'rtmp_common',
+          server: 'rtmp://a.rtmp.youtube.com/live2',
+        },
+        context,
+      );
     }
 
     this.UPDATE_STREAM_SETTINGS({ ...ytSettings, broadcastId: broadcast.id });
     this.SET_STREAM_ID(stream.id);
     this.SET_STREAM_KEY(streamKey);
+
+    this.setPlatformContext('youtube');
   }
 
   /**
@@ -543,7 +553,7 @@ export class YoutubeService
     const contentDetails: Dictionary<any> = {
       enableAutoStart: isMidStreamMode
         ? broadcast.contentDetails.enableAutoStart
-        : params.enableAutoStop,
+        : params.enableAutoStart,
       enableAutoStop: params.enableAutoStop,
       enableDvr: params.enableDvr,
       enableEmbed: broadcast.contentDetails.enableEmbed,

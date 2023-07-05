@@ -38,7 +38,7 @@ export default function AdvancedStatistics() {
     });
 
     return () => {
-      NotificationsService.markAllAsRead();
+      NotificationsService.actions.markAllAsRead();
       notificationPushedSub.unsubscribe();
     };
   }, []);

@@ -7,7 +7,7 @@ const loadingStrings = () => [
   // Basic Feature Usage
   'You can edit the sounds of your stream alerts from the alertbox properties menu.',
   'You can access our theme library from the left sidebar.',
-  'Our 24/7 support staff is available at Discord.gg/stream.',
+  'Join our community at Discord.gg/stream.',
   'Sources are what we call media like text, images, video & audio feeds.',
   'Undo works in the Editor. Just hit Ctrl + Z!',
   'The sources listed at the top of your sources pane will be layered the highest in your editor.',
@@ -31,7 +31,7 @@ const loadingStrings = () => [
 
   // Prime Feature Usage
   'Our App Store contains advanced technology to take your stream to the next level.',
-  'With multi-stream, you can stream to YouTube, Twitch, Trovo, and Facebook at the same time.',
+  'With multi-stream, you can stream to YouTube, Trovo, and Facebook at the same time.',
   'You can customize the design of your tip page from the Theme Library.',
 ];
 

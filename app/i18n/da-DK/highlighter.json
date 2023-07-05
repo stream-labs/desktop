@@ -90,5 +90,12 @@
   "An error occurred while reading %{file}": "Der opstod en fejl under læsning af %{file}",
   "An error occurred while reading audio from %{file}": "Der opstod en fejl under læsning af lyd fra %{file}",
   "An error occurred while mixing audio": "Der opstod en fejl under mixing af lyd",
-  "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "Rediger dine afspilninger med Highlighter, der er et gratis redigeringsværktøj indbygget i Streamlabs."
+  "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "Rediger dine afspilninger med Highlighter, der er et gratis redigeringsværktøj indbygget i Streamlabs.",
+  "Upload To": "Upload To",
+  "Upload": "Upload",
+  "This feature requires a Streamlabs ID": "This feature requires a Streamlabs ID",
+  "Sign up for Streamlabs ID": "Sign up for Streamlabs ID",
+  "Add subtitles, transcribe, and more": "Add subtitles, transcribe, and more",
+  "Convert to mobile-friendly short video": "Convert to mobile-friendly short video",
+  "YouTube (private video)": "YouTube (private video)"
 }

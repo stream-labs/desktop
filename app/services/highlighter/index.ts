@@ -3,6 +3,7 @@ import path from 'path';
 import Vue from 'vue';
 import fs from 'fs-extra';
 import url from 'url';
+import * as remote from '@electron/remote';
 import { EStreamingState, StreamingService } from 'services/streaming';
 import { getPlatformService } from 'services/platforms';
 import { UserService } from 'services/user';
@@ -29,7 +30,7 @@ import { DismissablesService, EDismissable } from 'services/dismissables';
 import { ENotificationType, NotificationsService } from 'services/notifications';
 import { JsonrpcService } from 'services/api/jsonrpc';
 import { NavigationService } from 'services/navigation';
-import * as remote from '@electron/remote';
+import { SharedStorageService } from 'services/integrations/shared-storage';
 
 export interface IClip {
   path: string;
@@ -336,6 +337,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
   @Inject() notificationsService: NotificationsService;
   @Inject() jsonrpcService: JsonrpcService;
   @Inject() navigationService: NavigationService;
+  @Inject() sharedStorageService: SharedStorageService;
 
   /**
    * A dictionary of actual clip classes.
@@ -388,6 +390,18 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     this.state.upload = {
       ...this.state.upload,
       ...uploadInfo,
+    };
+  }
+
+  @mutation()
+  CLEAR_UPLOAD() {
+    this.state.upload = {
+      uploading: false,
+      uploadedBytes: 0,
+      totalBytes: 0,
+      cancelRequested: false,
+      videoId: null,
+      error: false,
     };
   }
 
@@ -934,7 +948,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
 
   cancelFunction: (() => void) | null = null;
 
-  async upload(options: IYoutubeVideoUploadOptions) {
+  async uploadYoutube(options: IYoutubeVideoUploadOptions) {
     if (!this.userService.state.auth?.platforms.youtube) {
       throw new Error('Cannot upload without YT linked');
     }
@@ -1002,6 +1016,49 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     }
   }
 
+  async uploadStorage() {
+    this.SET_UPLOAD_INFO({ uploading: true, cancelRequested: false, error: false });
+
+    const { cancel, complete } = await this.sharedStorageService.actions.return.uploadFile(
+      this.views.exportInfo.file,
+      progress => {
+        this.SET_UPLOAD_INFO({
+          uploadedBytes: progress.uploadedBytes,
+          totalBytes: progress.totalBytes,
+        });
+      },
+      error => {
+        this.SET_UPLOAD_INFO({ error: true });
+        console.error(error);
+      },
+    );
+    this.cancelFunction = cancel;
+    let id;
+    try {
+      const result = await complete;
+      id = result.id;
+    } catch (e: unknown) {
+      if (this.views.uploadInfo.cancelRequested) {
+        console.log('The upload was canceled');
+      } else {
+        this.SET_UPLOAD_INFO({ uploading: false, error: true });
+        this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
+          type: 'SharedStorageUploadError',
+        });
+      }
+    }
+    this.cancelFunction = null;
+    this.SET_UPLOAD_INFO({ uploading: false, cancelRequested: false, videoId: id || null });
+
+    if (id) {
+      this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
+        type: 'SharedStorageUploadSuccess',
+      });
+    }
+
+    return id;
+  }
+
   /**
    * Will cancel the currently in progress upload
    */
@@ -1010,5 +1067,9 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       this.SET_UPLOAD_INFO({ cancelRequested: true });
       this.cancelFunction();
     }
+  }
+
+  clearUpload() {
+    this.CLEAR_UPLOAD();
   }
 }

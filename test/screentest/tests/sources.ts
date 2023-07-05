@@ -1,11 +1,11 @@
-import { useSpectron, test } from '../../helpers/spectron';
+import { useWebdriver, test } from '../../helpers/webdriver';
 import { getApiClient } from '../../helpers/api-client';
 import { ISourcesServiceApi } from '../../../app/services/sources/sources-api';
 import { useScreentest } from '../screenshoter';
 import { ScenesService } from 'services/api/external-api/scenes';
 import { focusChild } from '../../helpers/modules/core';
 
-useSpectron({ restartAppAfterEachTest: false });
+useWebdriver({ restartAppAfterEachTest: false });
 useScreentest();
 
 test('Sources showcase window', async t => {

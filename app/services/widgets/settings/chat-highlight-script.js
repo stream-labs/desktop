@@ -72,7 +72,7 @@ function vanillaChatCrawl(el) {
   const mod = badges.includes('mod') ? '1' : '0';
 
   // Get and parse message content
-  const messageContainer = el.querySelector("span[data-test-selector='chat-line-message-body']");
+  const messageContainer = el.querySelector("span[data-a-target='chat-line-message-body']");
   const { crlf, emotes } = parseMessage(messageContainer.children);
 
   return { username, badges, crlf, emotes, subscriber, mod };

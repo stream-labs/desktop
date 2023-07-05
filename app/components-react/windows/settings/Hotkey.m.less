@@ -1,0 +1,73 @@
+@import '../../../styles/index.less';
+
+.hotkey {
+  display: flex;
+  flex-direction: row;
+}
+
+// TODO: we rather have flexbox handle all this, but this is porting ;)
+.hotkey-bindings {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+
+  /* hotkey description coming from child component `HotkeyBinding` */
+  :global(.ant-form-item-label1) {
+    width: 200px;
+    padding-right: 10px;
+    text-align: left;
+  }
+
+  /* the TextInput coming from `HotkeyBinding` */
+  :global(.ant-form-item-control-input1) {
+    width: 150px;
+    display: inline-block;
+  }
+
+  :global(.ant-form-inline) {
+    flex: 1;
+  }
+
+  :global(.ant-form-item) {
+    flex: 1 !important;
+  }
+
+  :global(.ant-form-item-label) {
+    flex: 1 !important;
+
+    label {
+      display: flex;
+    }
+
+  }
+
+  :global(.ant-form-item-control) {
+    display: flex !important;
+    flex: 1 !important;
+  }
+}
+
+.hotkey-binding {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+  margin-bottom: 24px;
+}
+
+.hotkey-controls {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.hotkey-control {
+  margin-left: 15px;
+  cursor: pointer;
+  opacity: 0.6;
+
+  &:hover {
+    opacity: 1;
+  }
+}

@@ -23,11 +23,15 @@ export function Prime() {
         { text: $t('Storage'), icon: 'icon-cloud-backup' },
         { text: $t('Custom Branding'), icon: 'icon-creator-site' },
         {
-          text: 'Crossclip',
-          icon: 'icon-streamlabs',
+          text: 'Cross Clip',
+          icon: 'icon-editor-7',
           tooltip: $t('Format Clips for TikTok, Shorts, etc'),
         },
-        { text: 'Oslo', icon: 'icon-streamlabs', tooltip: $t('Collaborative Video Editing') },
+        {
+          text: 'Video Editor',
+          icon: 'icon-streamlabs',
+          tooltip: $t('Collaborative Video Editing'),
+        },
         { text: $t('Merch Store'), icon: 'icon-upperwear' },
       ],
       tableData: {
@@ -51,7 +55,7 @@ export function Prime() {
           },
           { text: '✓', key: 'check1' },
           { text: '✓', key: 'check2' },
-          { text: $t('Add Up To 4 Guests or Cameras') },
+          { text: $t('Add Up To 11 Guests or Cameras') },
           { text: $t('Custom Tip Page and Domain') },
           { text: '10GB' },
           { text: $t('YouTube Thumbnail Maker, Creator Sites') },

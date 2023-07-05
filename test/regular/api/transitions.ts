@@ -1,8 +1,8 @@
-import { useSpectron, test } from '../../helpers/spectron';
+import { useWebdriver, test } from '../../helpers/webdriver';
 import { getApiClient } from '../../helpers/api-client';
 import { TransitionsService } from 'services/api/external-api/transitions';
 
-useSpectron({ restartAppAfterEachTest: false });
+useWebdriver({ restartAppAfterEachTest: false });
 
 test('Transitions', async t => {
   const api = await getApiClient();

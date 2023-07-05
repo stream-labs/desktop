@@ -152,7 +152,13 @@ export class ApiClient {
       };
       const rawMessage = `${JSON.stringify(requestBody)}\n`;
       this.log('Send async:', rawMessage);
-      this.socket.write(rawMessage);
+
+      if (!this.socket.writable) {
+        this.log('Socket is not writeable. Attempted to write:', rawMessage);
+        reject(false);
+      } else {
+        this.socket.write(rawMessage);
+      }
     });
   }
 

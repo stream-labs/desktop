@@ -6,6 +6,7 @@ import { TTwitchOAuthScope } from './twitch/index';
 import { IGoLiveSettings } from 'services/streaming';
 import { WidgetType } from '../widgets';
 import { ITrovoStartStreamOptions, TrovoService } from './trovo';
+import { TDisplayType } from 'services/settings-v2/video';
 
 export type Tag = string;
 export interface IGame {
@@ -169,7 +170,7 @@ export interface IPlatformService {
   /**
    * Sets up the stream key and live broadcast info required to go live.
    */
-  beforeGoLive: (options?: IGoLiveSettings) => Promise<void>;
+  beforeGoLive: (options?: IGoLiveSettings, context?: TDisplayType) => Promise<void>;
 
   afterGoLive: () => Promise<void>;
 
@@ -185,6 +186,8 @@ export interface IPlatformService {
     req: IPlatformRequest,
     useToken?: boolean | string,
   ) => Dictionary<string | undefined>;
+
+  setPlatformContext?: (platform: TPlatform) => void;
 
   liveDockEnabled: boolean;
 
@@ -217,7 +220,7 @@ export interface IUserInfo {
   username?: string;
 }
 
-export type TPlatform = 'twitch' | 'youtube' | 'facebook' | 'tiktok' | 'trovo';
+export type TPlatform = 'twitch' | 'facebook' | 'youtube' | 'tiktok' | 'trovo';
 
 export function getPlatformService(platform: TPlatform): IPlatformService {
   return {

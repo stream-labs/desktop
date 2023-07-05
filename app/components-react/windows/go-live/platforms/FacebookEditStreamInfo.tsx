@@ -22,16 +22,14 @@ import { IListOption } from '../../../shared/inputs/ListInput';
 import MessageLayout from '../MessageLayout';
 import PlatformSettingsLayout, {
   IPlatformComponentParams,
-  TLayoutMode
+  TLayoutMode,
 } from './PlatformSettingsLayout';
 import { assertIsDefined } from '../../../../util/properties-type-guards';
 import * as remote from '@electron/remote';
 import { $t } from 'services/i18n';
 import { Services } from '../../../service-provider';
 
-
 class FacebookEditStreamInfoModule {
-
   fbService = inject(FacebookService);
   dismissables = inject(DismissablesService);
   streamingService = inject(StreamingService);
@@ -71,7 +69,7 @@ class FacebookEditStreamInfoModule {
 
   bind = injectFormBinding(
     () => this.settings,
-      newFbSettings => this.updateSettings(newFbSettings),
+    newFbSettings => this.updateSettings(newFbSettings),
   );
 
   get layoutMode() {
@@ -87,8 +85,10 @@ class FacebookEditStreamInfoModule {
   }
 
   get shouldShowPermissionWarn() {
-    return (!this.canStreamToTimeline || !this.canStreamToGroup) &&
-    this.dismissables.views.shouldShow(EDismissable.FacebookNeedPermissionsTip);
+    return (
+      (!this.canStreamToTimeline || !this.canStreamToGroup) &&
+      this.dismissables.views.shouldShow(EDismissable.FacebookNeedPermissionsTip)
+    );
   }
 
   get shouldShowDestinationType() {
@@ -96,11 +96,15 @@ class FacebookEditStreamInfoModule {
   }
 
   get shouldShowGroups() {
-    return this.settings.destinationType === 'group' && !this.isUpdateMode && !this.settings.liveVideoId;
+    return (
+      this.settings.destinationType === 'group' && !this.isUpdateMode && !this.settings.liveVideoId
+    );
   }
 
   get shouldShowPages() {
-    return this.settings.destinationType === 'page' && !this.isUpdateMode && !this.settings.liveVideoId;
+    return (
+      this.settings.destinationType === 'page' && !this.isUpdateMode && !this.settings.liveVideoId
+    );
   }
 
   get shouldShowEvents() {
@@ -108,7 +112,7 @@ class FacebookEditStreamInfoModule {
   }
 
   get shouldShowGame() {
-    return !this.isUpdateMode;
+    return !this.isUpdateMode && !this.props.isScheduleMode;
   }
 
   get shouldShowPrivacy() {
@@ -117,8 +121,10 @@ class FacebookEditStreamInfoModule {
 
   get shouldShowPrivacyWarn() {
     const fbSettings = this.settings;
-    return !!((!fbSettings.liveVideoId && fbSettings.privacy?.value !== 'SELF') ||
-    (fbSettings.liveVideoId && fbSettings.privacy?.value));
+    return !!(
+      (!fbSettings.liveVideoId && fbSettings.privacy?.value !== 'SELF') ||
+      (fbSettings.liveVideoId && fbSettings.privacy?.value)
+    );
   }
 
   getDestinationOptions(): IListOption<TDestinationType>[] {
@@ -245,7 +251,6 @@ class FacebookEditStreamInfoModule {
   verifyGroup() {
     remote.shell.openExternal(`https://www.facebook.com/groups/${this.settings.groupId}/edit`);
   }
-
 }
 
 export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'facebook'>) {
@@ -269,13 +274,15 @@ export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'face
 function CommonFields() {
   const { settings, updateSettings, layoutMode } = useFacebook();
 
-  return <CommonPlatformFields
-    key="common"
-    platform="facebook"
-    layoutMode={layoutMode}
-    value={settings}
-    onChange={updateSettings}
-  />;
+  return (
+    <CommonPlatformFields
+      key="common"
+      platform="facebook"
+      layoutMode={layoutMode}
+      value={settings}
+      onChange={updateSettings}
+    />
+  );
 }
 
 function RequiredFields() {
@@ -351,9 +358,18 @@ function RequiredFields() {
   );
 }
 
-
 function OptionalFields() {
-  const { shouldShowPrivacy, settings, setPrivacy, getPrivacyOptions, shouldShowPrivacyWarn, shouldShowGame, shouldShowGamingWarning, bind, fbService } = useFacebook();
+  const {
+    shouldShowPrivacy,
+    settings,
+    setPrivacy,
+    getPrivacyOptions,
+    shouldShowPrivacyWarn,
+    shouldShowGame,
+    shouldShowGamingWarning,
+    bind,
+    fbService,
+  } = useFacebook();
   return (
     <div key="optional">
       {shouldShowPrivacy && (
@@ -399,9 +415,14 @@ function OptionalFields() {
   );
 }
 
-
 function Events() {
-  const { bind, shouldShowEvents, onEventChange, scheduledVideosLoaded, scheduledVideos } = useFacebook();
+  const {
+    bind,
+    shouldShowEvents,
+    onEventChange,
+    scheduledVideosLoaded,
+    scheduledVideos,
+  } = useFacebook();
   return (
     <div key="events">
       {shouldShowEvents && (
@@ -415,7 +436,9 @@ function Events() {
           options={[
             ...scheduledVideos.map(v => ({
               label: `${v.title} ${
-                v.planned_start_time ? moment(new Date(v.planned_start_time)).calendar() : ''
+                v.event_params?.start_time
+                  ? moment(new Date(v.event_params.start_time * 1000)).calendar()
+                  : ''
               }`,
               value: v.id,
             })),
@@ -426,10 +449,8 @@ function Events() {
   );
 }
 
-
 function PermissionsWarning() {
   const { isPrimary, reLogin, dismissWarning, reconnectFB } = useFacebook().extend(module => ({
-
     user: inject(UserService),
     navigation: inject(NavigationService),
     windows: Services.WindowsService,
@@ -451,10 +472,7 @@ function PermissionsWarning() {
   }));
 
   return (
-    <MessageLayout
-      message={$t('You can stream to your timeline and groups now')}
-      type={'success'}
-    >
+    <MessageLayout message={$t('You can stream to your timeline and groups now')} type={'success'}>
       {isPrimary && (
         <div>
           <div>{$t('Please log-out and log-in again to get these new features')}</div>
@@ -480,7 +498,6 @@ function PermissionsWarning() {
     </MessageLayout>
   );
 }
-
 
 function useFacebook() {
   return useModule(FacebookEditStreamInfoModule);

@@ -14,6 +14,7 @@ import { DismissablesService, EDismissable } from 'services/dismissables';
 import { EDeviceType } from 'services/hardware';
 import { $t } from 'services/i18n';
 import { SourcesService, TSourceType } from 'services/sources';
+import { ScenesService } from 'services/scenes';
 import { byOS, OS } from 'util/operating-systems';
 import { IGuest, GuestCamService } from 'services/guest-cam';
 import { inject, injectState, useModule } from 'slap';
@@ -29,6 +30,7 @@ import { EAvailableFeatures } from 'services/incremental-rollout';
 class GuestCamModule {
   private GuestCamService = inject(GuestCamService);
   private SourcesService = inject(SourcesService);
+  private ScenesService = inject(ScenesService);
   private AudioService = inject(AudioService);
   private EditorCommandsService = inject(EditorCommandsService);
   private DismissablesService = inject(DismissablesService);
@@ -84,6 +86,10 @@ class GuestCamModule {
     return this.GuestCamService.views.screenshareSourceId;
   }
 
+  get loggedIn() {
+    return this.UserService.views.isLoggedIn;
+  }
+
   get videoProducerSourceOptions() {
     const videoSourceType = byOS({ [OS.Windows]: 'dshow_input', [OS.Mac]: 'av_capture_input' });
 
@@ -106,14 +112,23 @@ class GuestCamModule {
   }
 
   get screenshareProducerSourceOptions() {
+    const noSources = { label: $t('None'), value: '' };
+
+    // TODO: consider moving to service
+    const scene = this.ScenesService.views.getScene(this.ScenesService.state.activeSceneId);
+
+    if (!scene) {
+      return [noSources];
+    }
+
+    const activeSceneSources = scene.getNestedSources().filter(sceneItem => sceneItem.video);
+
     return [
-      { label: $t('None'), value: '' },
-      ...this.SourcesService.views.sources
-        .filter(s => s.video)
-        .map(s => ({
-          label: s.name,
-          value: s.sourceId,
-        })),
+      noSources,
+      ...activeSceneSources.map(s => ({
+        label: s.name,
+        value: s.sourceId,
+      })),
     ];
   }
 
@@ -230,9 +245,9 @@ class GuestCamModule {
       .finally(() => this.state.setRegeneratingLink(false));
   }
 
-  truncateName(name: string) {
-    if (name.length > 10) {
-      return `${name.substring(0, 10)}...`;
+  truncateName(name: string, length = 10) {
+    if (name.length > length) {
+      return `${name.substring(0, length)}...`;
     }
 
     return name;
@@ -284,6 +299,7 @@ export default function GuestCamProperties() {
     sourceExists,
     produceOk,
     regeneratingLink,
+    loggedIn,
     regenerateLink,
     truncateName,
     disconnectFromHost,
@@ -309,6 +325,31 @@ export default function GuestCamProperties() {
     } else {
       return $t('Start Collab Cam');
     }
+  }
+
+  function getGuestLabel(guest: IGuest) {
+    const name = truncateName(guest.remoteProducer.name);
+    const icon = guest.remoteProducer.type === 'screenshare' ? 'fa-desktop' : 'fa-user';
+
+    return (
+      <span>
+        <i className={`fa ${icon}`} style={{ marginRight: 8 }} />
+        {name}
+      </span>
+    );
+  }
+
+  if (!loggedIn) {
+    return (
+      <ModalLayout>
+        <Alert
+          type="error"
+          showIcon={true}
+          closable={false}
+          message={<div>{$t('You must be logged in to use Collab Cam.')}</div>}
+        />
+      </ModalLayout>
+    );
   }
 
   return (
@@ -469,10 +510,7 @@ export default function GuestCamProperties() {
         </Tabs.TabPane>
         {guests.map(guest => {
           return (
-            <Tabs.TabPane
-              tab={truncateName(guest.remoteProducer.name)}
-              key={guest.remoteProducer.streamId}
-            >
+            <Tabs.TabPane tab={getGuestLabel(guest)} key={guest.remoteProducer.streamId}>
               <GuestPane guest={guest} />
             </Tabs.TabPane>
           );
@@ -606,7 +644,7 @@ function GuestPane(p: { guest: IGuest }) {
 
   const { visible, setVisible, volume, setVolume, disconnect } = bindings;
 
-  async function onDisonnectClick() {
+  async function onDisconnectClick() {
     let regen = true;
     setHideDisplay(true);
     const confirmed = await confirmAsync({
@@ -676,7 +714,7 @@ function GuestPane(p: { guest: IGuest }) {
               <button
                 className="button button--soft-warning"
                 style={{ width: 160 }}
-                onClick={onDisonnectClick}
+                onClick={onDisconnectClick}
               >
                 {$t('Disconnect')}
               </button>

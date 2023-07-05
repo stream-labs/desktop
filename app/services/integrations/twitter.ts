@@ -150,7 +150,6 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
       webPreferences: {
         partition,
         nodeIntegration: false,
-        nativeWindowOpen: true,
         sandbox: true,
       },
     });

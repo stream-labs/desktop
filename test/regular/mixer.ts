@@ -1,4 +1,4 @@
-import { useSpectron, test } from '../helpers/spectron';
+import { useWebdriver, test } from '../helpers/webdriver';
 import {
   addSource,
   selectSource,
@@ -7,7 +7,7 @@ import {
 } from '../helpers/modules/sources';
 import { addScene } from '../helpers/modules/scenes';
 import { click, focusChild, focusMain, waitForDisplayed } from '../helpers/modules/core';
-useSpectron();
+useWebdriver();
 
 test('Adding and removing a AudioSource', async t => {
   const app = t.context.app;

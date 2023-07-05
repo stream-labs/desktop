@@ -125,7 +125,7 @@
   "Configure the Multistream service": "멀티스트리밍 서비스 구성",
   "Apply optimized settings": "최적화 설정 적용하기",
   "Start video transmission": "비디오 전송 시작",
-  "Publish Youtube broadcast": "Youtube 방송 게시",
+  "Publish Youtube broadcast": "YouTube 방송 게시",
   "Post a tweet": "트윗하기",
   "You could try reducing the number of your destinations to one for direct streaming.": "직접 스트리밍하려면 목적지의 수를 한 곳으로 줄여보세요.",
   "Add Destination": "목적지 추가",
@@ -176,5 +176,5 @@
   "Step 3: Select which platforms you are streaming to when you hit \"Go Live\".": "3단계: ‘라이브 하기’를 눌렀을 때 스트리밍할 플랫폼을 선택합니다.",
   "New features coming soon!": "신규 기능 출시 예정!",
   "Stream to multiple platforms at once with <ultra>Streamlabs Ultra</ultra>.": "<ultra>Streamlabs Ultra</ultra>로 한 번에 여러 플랫폼에 스트리밍해보세요.",
-  "Upgrade your stream with premium themes with <ultra>Streamlabs Ultra</ultra>.": "Upgrade your stream with premium themes with <ultra>Streamlabs Ultra</ultra>."
+  "Upgrade your stream with premium themes with <ultra>Streamlabs Ultra</ultra>.": "<ultra>Streamlabs Ultra</ultra>의 프리미엄 테마로 스트리밍을 업그레이드하세요."
 }
