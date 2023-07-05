@@ -317,7 +317,10 @@ class VideoSettingsModule {
    * @remark set the same FPS type for both displays
    */
   setFPSType(value: EFPSType) {
-    ['horizontal', 'vertical'].forEach((display: TDisplayType) => {
+    const displays = this.state.showDualOutputSettings
+      ? ['horizontal']
+      : ['horizontal', 'vertical'];
+    displays.forEach((display: TDisplayType) => {
       this.service.actions.setVideoSetting('fpsType', value, display);
       this.service.actions.setVideoSetting('fpsNum', 30, display);
       this.service.actions.setVideoSetting('fpsDen', 1, display);
@@ -329,7 +332,10 @@ class VideoSettingsModule {
    * @remark set the same Common FPS for both displays
    */
   setCommonFPS(value: string) {
-    ['horizontal', 'vertical'].forEach((display: TDisplayType) => {
+    const displays = this.state.showDualOutputSettings
+      ? ['horizontal']
+      : ['horizontal', 'vertical'];
+    displays.forEach((display: TDisplayType) => {
       const [fpsNum, fpsDen] = value.split('-');
       this.service.actions.setVideoSetting('fpsNum', Number(fpsNum), display);
       this.service.actions.setVideoSetting('fpsDen', Number(fpsDen), display);
@@ -341,7 +347,10 @@ class VideoSettingsModule {
    * @remark set the same Integer FPS for both displays
    */
   setIntegerFPS(value: string) {
-    ['horizontal', 'vertical'].forEach((display: TDisplayType) => {
+    const displays = this.state.showDualOutputSettings
+      ? ['horizontal']
+      : ['horizontal', 'vertical'];
+    displays.forEach((display: TDisplayType) => {
       this.state.setFpsInt(Number(value));
       if (Number(value) > 0 && Number(value) < 1001) {
         this.service.actions.setVideoSetting('fpsNum', Number(value), display);

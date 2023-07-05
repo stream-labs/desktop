@@ -182,14 +182,11 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     /**
      * If this is the first time starting the app set default settings for horizontal context
      */
+    let matchToHorizontal = false;
     if (display === 'horizontal' && !this.dualOutputService.views.videoSettings.horizontal) {
       this.loadLegacySettings();
       this.contexts.horizontal.video = this.contexts.horizontal.legacySettings;
-
-      // match the vertical display fps settings to the horizontal display's settings
-      this.setVideoSetting('fpsNum', this.contexts.horizontal.video.fpsNum, 'vertical');
-      this.setVideoSetting('fpsDen', this.contexts.horizontal.video.fpsDen, 'vertical');
-      this.setVideoSetting('fpsInt', this.contexts.horizontal.video.fpsNum, 'vertical');
+      matchToHorizontal = true;
     } else {
       // otherwise, load them from the dual output service
       const settings = this.dualOutputService.views.videoSettings[display];
@@ -202,6 +199,13 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
 
     if (invalidFps(this.contexts[display].video.fpsNum, this.contexts[display].video.fpsDen)) {
       this.createDefaultFps(display);
+    }
+
+    if (this.contexts.vertical && matchToHorizontal) {
+      // match the vertical display fps settings to the horizontal display's settings
+      this.setVideoSetting('fpsNum', this.contexts.horizontal.video.fpsNum, 'vertical');
+      this.setVideoSetting('fpsDen', this.contexts.horizontal.video.fpsDen, 'vertical');
+      this.setVideoSetting('fpsInt', this.contexts.horizontal.video.fpsNum, 'vertical');
     }
 
     this.SET_VIDEO_CONTEXT(display, this.contexts[display].video);
