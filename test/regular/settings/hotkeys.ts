@@ -43,7 +43,7 @@ test('Binds a hotkey', async t => {
   await openHotkeySettings(t);
 
   const bindingEl = async (root = app) =>
-    await root.client.$('[data-testid=Start_Recording] [data-testid=binding]');
+    await root.client.$('[data-testid=Start_Recording] [data-name=binding]');
 
   const getBinding = async (root = app) => (await bindingEl(root)).getValue();
 

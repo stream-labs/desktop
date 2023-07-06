@@ -210,11 +210,6 @@ export function useInput<
     'data-id': inputId,
   };
 
-  // Respect passed data-testid attribute, otherwise it doesn't show on the input
-  if (Object.prototype.hasOwnProperty.call(inputProps, 'data-testid')) {
-    dataAttrs['data-testid'] = inputProps['data-testid'];
-  }
-
   // Create validation rules
   const rules = createValidationRules(type, inputProps);
 

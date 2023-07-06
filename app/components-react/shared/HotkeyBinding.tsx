@@ -82,7 +82,7 @@ export default function HotkeyBinding(p: {
   return (
     <Form layout="inline">
       <TextInput
-        data-testid="binding"
+        name="binding"
         style={{ width: 400 }}
         label={p.hotkey.description}
         value={getHotkeyString(p.binding, focused)}
