@@ -113,12 +113,12 @@ export default function Hotkey(props: HotkeyProps) {
             />
             <div className={styles.hotkeyControls}>
               <i
-                data-test-id="add-binding"
+                data-testid="add-binding"
                 className={cx(styles.hotkeyControl, 'fa', 'fa-plus')}
                 onClick={() => addBinding(index)}
               />
               <i
-                data-test-id="remove-binding"
+                data-testid="remove-binding"
                 className={cx(styles.hotkeyControl, 'fa', 'fa-minus')}
                 onClick={() => removeBinding(index)}
               />
@@ -133,7 +133,7 @@ export default function Hotkey(props: HotkeyProps) {
   const testId = description.replace(/\s+/, '_');
 
   return (
-    <div className={styles.hotkey} data-test-id={testId}>
+    <div className={styles.hotkey} data-testid={testId}>
       <HotkeyBindings bindings={bindings} />
     </div>
   );
