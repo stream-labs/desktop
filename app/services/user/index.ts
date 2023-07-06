@@ -230,7 +230,7 @@ class UserViews extends ViewHandler<IUserServiceState> {
   get isTwitchAuthedAndActive() {
     return this.streamSettingsServiceViews.state.protectedModeEnabled
       ? this.isTwitchAuthed
-      : this.settingsServiceViews.streamService === 'Twitch';
+      : this.settingsServiceViews.streamPlatform === 'Twitch';
   }
 
   get isFacebookAuthed() {

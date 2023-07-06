@@ -19,7 +19,7 @@ const trackOptions = [
 ];
 
 export default function GlobalSettings() {
-  const { SettingsService, UserService } = Services;
+  const { SettingsService, UserService, StreamingService } = Services;
 
   const {
     advancedAudioSettings,
@@ -30,6 +30,8 @@ export default function GlobalSettings() {
     vodTrackEnabled,
     isTwitchAuthedAndActive,
     recFormat,
+    isStreaming,
+    isRecording,
   } = useVuex(() => ({
     advancedAudioSettings: SettingsService.views.advancedAudioSettings,
     isAdvancedOutput: SettingsService.views.isAdvancedOutput,
@@ -39,6 +41,8 @@ export default function GlobalSettings() {
     vodTrackEnabled: SettingsService.views.vodTrackEnabled,
     isTwitchAuthedAndActive: UserService.views.isTwitchAuthedAndActive,
     recFormat: SettingsService.views.recFormat,
+    isStreaming: StreamingService.views.isStreaming,
+    isRecording: StreamingService.views.isRecording,
   }));
 
   const monitoringDevice = advancedAudioSettings?.parameters.find(
@@ -94,6 +98,7 @@ export default function GlobalSettings() {
             value={streamTrack + 1}
             options={trackOptions}
             onChange={value => handleOutputSettingsChange('TrackIndex', value)}
+            disabled={isStreaming}
           />
         )}
         {isAdvancedOutput && isTwitchAuthedAndActive && (
@@ -101,6 +106,7 @@ export default function GlobalSettings() {
             label={$t('Enable Twitch VOD Track')}
             value={vodTrackEnabled}
             onChange={value => handleOutputSettingsChange('VodTrackEnabled', value)}
+            disabled={isStreaming}
           />
         )}
         {isAdvancedOutput && vodTrackEnabled && (
@@ -109,6 +115,7 @@ export default function GlobalSettings() {
             value={vodTrack + 1}
             options={trackOptions.filter(opt => opt.value !== streamTrack + 1)}
             onChange={value => handleOutputSettingsChange('VodTrackIndex', value)}
+            disabled={isStreaming}
           />
         )}
         {isAdvancedOutput && (
@@ -127,7 +134,7 @@ export default function GlobalSettings() {
                   checkboxStyles={{ marginRight: '4px' }}
                   name={`flag${track}`}
                   onChange={(value: boolean) => handleTracksChange(i, value)}
-                  disabled={recFormat === 'flv'}
+                  disabled={isRecording || recFormat === 'flv'}
                 />
               ))}
             </div>
