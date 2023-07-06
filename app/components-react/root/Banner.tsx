@@ -23,12 +23,12 @@ export default function Banner() {
       } else {
         shell.openExternal(banner.link);
       }
-      if (banner.closeOnLink) close();
+      if (banner.closeOnLink) close('action');
     };
   }
 
-  function close() {
-    AnnouncementsService.actions.closeBanner();
+  function close(clickType: 'action' | 'dismissal') {
+    AnnouncementsService.actions.closeBanner(clickType);
   }
 
   return (
@@ -40,7 +40,7 @@ export default function Banner() {
         {banner.linkTitle}
         <i className="fas fa-arrow-right" />
       </span>
-      <span className={styles.close} onClick={close}>
+      <span className={styles.close} onClick={() => close('dismissal')}>
         {$t('Dismiss')}
       </span>
     </div>
