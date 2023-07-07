@@ -90,7 +90,7 @@ export default function TitleBar(props: { windowId: string }) {
           </div>
         )}
       </div>
-      <Banner />
+      {props.windowId === 'main' && <Banner />}
     </>
   );
 }

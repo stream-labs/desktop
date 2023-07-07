@@ -191,7 +191,7 @@ export class AnnouncementsService extends PersistentStatefulService<IAnnouncemen
 
     try {
       const newState = await jfetch<IAnnouncementsInfo>(req);
-      return newState;
+      return newState.id ? newState : null;
     } catch (e: unknown) {
       return null;
     }
