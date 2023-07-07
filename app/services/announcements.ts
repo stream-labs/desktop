@@ -190,20 +190,22 @@ export class AnnouncementsService extends PersistentStatefulService<IAnnouncemen
     const req = this.formRequest(endpoint);
 
     try {
-      const newState = await jfetch<IAnnouncementsInfo[]>(req);
-      return newState[0];
+      const newState = await jfetch<IAnnouncementsInfo>(req);
+      return newState;
     } catch (e: unknown) {
       return null;
     }
   }
 
-  async closeBanner() {
+  async closeBanner(clickType: 'action' | 'dismissal') {
     const endpoint = 'api/v5/slobs/announcement/close';
     const req = this.formRequest(endpoint, {
       method: 'POST',
+      headers: new Headers({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({
         clientId: this.userService.getLocalUserId(),
         announcementId: this.state.banner.id,
+        clickType,
       }),
     });
 

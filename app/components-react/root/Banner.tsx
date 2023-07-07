@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { shell } from 'electron';
+import React from 'react';
+import * as remote from '@electron/remote';
 import { useVuex } from 'components-react/hooks';
 import { Services } from 'components-react/service-provider';
 import { TAppPage } from 'services/navigation';
@@ -13,22 +13,20 @@ export default function Banner() {
   if (!banner) return <></>;
 
   function handleClick() {
-    return () => {
-      if (banner.linkTarget === 'slobs') {
-        if (banner.link === 'Settings') {
-          SettingsService.actions.showSettings(banner.params?.category);
-        } else {
-          NavigationService.actions.navigate(banner.link as TAppPage, banner.params);
-        }
+    if (banner.linkTarget === 'slobs') {
+      if (banner.link === 'Settings') {
+        SettingsService.actions.showSettings(banner.params?.category);
       } else {
-        shell.openExternal(banner.link);
+        NavigationService.actions.navigate(banner.link as TAppPage, banner.params);
       }
-      if (banner.closeOnLink) close();
-    };
+    } else {
+      remote.shell.openExternal(banner.link);
+    }
+    if (banner.closeOnLink) close('action');
   }
 
-  function close() {
-    AnnouncementsService.actions.closeBanner();
+  function close(clickType: 'action' | 'dismissal') {
+    AnnouncementsService.actions.closeBanner(clickType);
   }
 
   return (
@@ -40,7 +38,7 @@ export default function Banner() {
         {banner.linkTitle}
         <i className="fas fa-arrow-right" />
       </span>
-      <span className={styles.close} onClick={close}>
+      <span className={styles.close} onClick={() => close('dismissal')}>
         {$t('Dismiss')}
       </span>
     </div>
