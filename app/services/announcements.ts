@@ -201,10 +201,11 @@ export class AnnouncementsService extends PersistentStatefulService<IAnnouncemen
     const endpoint = 'api/v5/slobs/announcement/close';
     const req = this.formRequest(endpoint, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: new Headers({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({
         clientId: this.userService.getLocalUserId(),
         announcementId: this.state.banner.id,
+        clickType,
       }),
     });
 
