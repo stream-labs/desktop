@@ -32,6 +32,7 @@ export default function GlobalSettings() {
     recFormat,
     isStreaming,
     isRecording,
+    isMultiStreaming,
   } = useVuex(() => ({
     advancedAudioSettings: SettingsService.views.advancedAudioSettings,
     isAdvancedOutput: SettingsService.views.isAdvancedOutput,
@@ -43,6 +44,7 @@ export default function GlobalSettings() {
     recFormat: SettingsService.views.recFormat,
     isStreaming: StreamingService.views.isStreaming,
     isRecording: StreamingService.views.isRecording,
+    isMultiStreaming: StreamingService.views.isMultiplatformMode,
   }));
 
   const monitoringDevice = advancedAudioSettings?.parameters.find(
@@ -66,6 +68,8 @@ export default function GlobalSettings() {
   function handleOutputSettingsChange(type: string, value: number | boolean) {
     SettingsService.actions.setSettingValue('Output', type, value);
   }
+
+  const shouldShowTwitchVODTrack = isAdvancedOutput && isTwitchAuthedAndActive && !isMultiStreaming;
 
   return (
     <>
@@ -101,22 +105,25 @@ export default function GlobalSettings() {
             disabled={isStreaming}
           />
         )}
-        {isAdvancedOutput && isTwitchAuthedAndActive && (
-          <SwitchInput
-            label={$t('Enable Twitch VOD Track')}
-            value={vodTrackEnabled}
-            onChange={value => handleOutputSettingsChange('VodTrackEnabled', value)}
-            disabled={isStreaming}
-          />
-        )}
-        {isAdvancedOutput && vodTrackEnabled && (
-          <ListInput
-            label={$t('Twitch VOD Track')}
-            value={vodTrack + 1}
-            options={trackOptions.filter(opt => opt.value !== streamTrack + 1)}
-            onChange={value => handleOutputSettingsChange('VodTrackIndex', value)}
-            disabled={isStreaming}
-          />
+        {shouldShowTwitchVODTrack && (
+          <>
+            <SwitchInput
+              label={$t('Enable Twitch VOD Track')}
+              value={vodTrackEnabled}
+              onChange={value => handleOutputSettingsChange('VodTrackEnabled', value)}
+              disabled={isStreaming}
+            />
+
+            {vodTrackEnabled && (
+              <ListInput
+                label={$t('Twitch VOD Track')}
+                value={vodTrack + 1}
+                options={trackOptions.filter(opt => opt.value !== streamTrack + 1)}
+                onChange={value => handleOutputSettingsChange('VodTrackIndex', value)}
+                disabled={isStreaming}
+              />
+            )}
+          </>
         )}
         {isAdvancedOutput && (
           <InputWrapper
