@@ -184,6 +184,12 @@ export class AnnouncementsService extends PersistentStatefulService<IAnnouncemen
   }
 
   private async fetchBanner() {
+    const recentlyInstalled = await this.recentlyInstalled();
+
+    if (recentlyInstalled || !this.customizationService.state.enableAnnouncements) {
+      return null;
+    }
+
     const endpoint = `api/v5/slobs/announcement/get?clientId=${this.userService.getLocalUserId()}&locale=${
       this.i18nService.state.locale
     }`;
