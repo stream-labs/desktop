@@ -14,7 +14,7 @@ import { CustomizationService } from '../../../app/services/customization';
 import { assertFormContains, fillForm } from '../../helpers/modules/forms';
 import { sleep } from '../../helpers/sleep';
 
-useWebdriver({pauseIfFailed: false });
+useWebdriver({ pauseIfFailed: false });
 
 test('AlertBox for Twitch', t => testAlertbox(t, 'twitch'));
 test('AlertBox for YouTube', t => testAlertbox(t, 'youtube'));
@@ -62,7 +62,7 @@ async function testDonationAlert() {
   // fill the form
   const formData1 = {
     message_template: 'Test {name} donated {amount}!',
-    sound_volume: 30,
+    sound_volume: 50,
   };
   await fillForm(formData1);
 
