@@ -373,10 +373,8 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
 
   migrate(version: number) {
     if (version < 2) {
-      this.data.items.forEach(item => {
-        if (item.sceneNodeType === 'item') {
-          item.visible = true;
-        }
+      this.data.items = this.data.items.map(item => {
+        return item.sceneNodeType === 'item' ? { ...item, visible: true } : item;
       });
     }
   }
