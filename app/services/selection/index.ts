@@ -11,6 +11,7 @@ import { Selection } from './selection';
 import { ViewHandler } from 'services/core';
 import { GlobalSelection } from './global-selection';
 import { DualOutputService } from 'app-services';
+import { TDisplayType } from 'services/settings-v2';
 
 export { Selection, GlobalSelection };
 
@@ -68,37 +69,32 @@ export class SelectionService extends StatefulService<ISelectionState> {
     this.views.globalSelection.remove();
   }
 
-  openEditTransform() {
-    this.associateSelectionWithDisplay();
-    const windowHeight = this.views.globalSelection.isSceneItem() ? 500 : 300;
+  openEditTransform(display: TDisplayType = 'horizontal') {
+    this.associateSelectionWithDisplay(display);
+
     this.windowsService.showWindow({
       componentName: 'EditTransform',
       title: $t('Edit Transform'),
-      size: { width: 580, height: windowHeight },
+      size: { width: 580, height: 500 },
+      queryParams: { display },
     });
   }
 
-  associateSelectionWithDisplay() {
+  associateSelectionWithDisplay(display: TDisplayType) {
     if (this.dualOutputService.views.dualOutputMode) {
-      const lastSelected = this.scenesService.views.getSceneItem(this.views.lastSelectedId);
-      const filter = lastSelected.display;
-
-      // If the most recent selected node has a display associated,
       // check if there are nodes selected in the other display
-      if (filter) {
-        const selectedItems = this.state.selectedIds.map(id =>
-          this.scenesService.views.getSceneItem(id),
-        );
-        const requireFilter = selectedItems.some(item => item.display !== filter);
+      const selectedItems = this.state.selectedIds.map(id =>
+        this.scenesService.views.getSceneItem(id),
+      );
+      const requireFilter = selectedItems.some(item => item?.display !== display);
 
-        // If nodes in both displays are selected, alter selection to only include
-        // items in the last display selected
-        if (requireFilter) {
-          const filteredIds = selectedItems
-            .filter(item => item.display === filter)
-            .map(item => item.id);
-          this.select(filteredIds);
-        }
+      // If nodes in both displays are selected, alter selection to only include
+      // items in the last display selected
+      if (requireFilter) {
+        const filteredIds = selectedItems
+          .filter(item => item?.display === display)
+          .map(item => item.id);
+        this.select(filteredIds);
       }
     }
   }
