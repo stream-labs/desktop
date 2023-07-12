@@ -3,11 +3,13 @@ import { Inject } from 'services/core/injector';
 import { SceneItem } from 'services/scenes';
 import { VideoService } from 'services/video';
 import { WindowsService } from 'services/windows';
+import { DualOutputService } from 'services/dual-output';
 import { ScalableRectangle } from 'util/ScalableRectangle';
 import { SelectionService } from 'services/selection';
 import { EditorCommandsService } from 'services/editor-commands';
 import { IMouseEvent } from 'services/editor';
 import { byOS, OS } from './operating-systems';
+import { TDisplayType } from 'services/settings-v2';
 
 /*
  * An edge looks like:
@@ -61,6 +63,7 @@ export class DragHandler {
   @Inject() private windowsService: WindowsService;
   @Inject() private selectionService: SelectionService;
   @Inject() private editorCommandsService: EditorCommandsService;
+  @Inject() private dualOutputService: DualOutputService;
 
   // Settings
   snapEnabled: boolean;
@@ -90,6 +93,7 @@ export class DragHandler {
    * @param startEvent the mouse event for this drag
    * @param options drag handler options
    */
+
   constructor(startEvent: IMouseEvent, options: IDragHandlerOptions) {
     // Load some settings we care about
     this.snapEnabled = this.settingsService.views.values.General.SnappingEnabled;
@@ -118,7 +122,33 @@ export class DragHandler {
     // Load some attributes about sources
     const lastDragged = this.selectionService.views.globalSelection.getLastSelected();
 
-    if (lastDragged.isItem()) this.draggedSource = lastDragged;
+    if (lastDragged.isItem()) {
+      /**
+       * In dual output mode, the last selected node may be in a different display than the mouse event.
+       * Dragging scene items in the display should only transform the nodes in the display with the mouse event.
+       * So if the displays for the mouse event and last selected node don't match, use the node's partner
+       * in the other display.
+       *
+       * If there are any issues finding the partner node, use the last dragged source as a default.
+       * While it's not ideal, this will prevent errors from attempting to work with undefined values.
+       */
+      if (startEvent.display !== lastDragged.display) {
+        const dualOutputNodeId = this.dualOutputService.views.getDualOutputNodeId(lastDragged.id);
+        // confirm the partner id was found
+        if (dualOutputNodeId) {
+          const dualOutputNode = this.selectionService.views.globalSelection
+            .getItems()
+            .find(item => item.id === dualOutputNodeId);
+
+          // confirm the partner node was found, or use the last selected node as a default
+          this.draggedSource = dualOutputNode ?? lastDragged;
+        } else {
+          this.draggedSource = lastDragged;
+        }
+      } else {
+        this.draggedSource = lastDragged;
+      }
+    }
 
     this.otherSources = this.selectionService.views.globalSelection
       .clone()
@@ -192,6 +222,7 @@ export class DragHandler {
       'MoveItemsCommand',
       this.selectionService.views.globalSelection,
       { x: deltaX, y: deltaY },
+      event.display,
     );
   }
 

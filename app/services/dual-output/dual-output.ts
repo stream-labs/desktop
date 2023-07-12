@@ -173,14 +173,8 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     );
   }
 
-  getDualOutputNodeId(nodeId: string, sceneId?: string, checkAll: boolean = false) {
-    if (checkAll) {
-      return this.getHorizontalNodeId(nodeId, sceneId) ?? this.getVerticalNodeId(nodeId, sceneId);
-    }
-
-    return this.onlyVerticalDisplayActive
-      ? this.getHorizontalNodeId(nodeId, sceneId)
-      : this.getVerticalNodeId(nodeId, sceneId);
+  getDualOutputNodeId(nodeId: string, sceneId?: string) {
+    return this.getHorizontalNodeId(nodeId, sceneId) ?? this.getVerticalNodeId(nodeId, sceneId);
   }
 
   getVerticalNodeIds(sceneId: string): string[] {

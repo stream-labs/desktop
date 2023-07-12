@@ -96,6 +96,9 @@ export class EditorService extends StatefulService<IEditorServiceState> {
     vertical: 0,
   };
 
+  /**
+   * Store data for both displays for transform calculations
+   */
   dragHandler: DragHandler;
   resizeRegion: IResizeRegion;
   currentX: number;
@@ -148,7 +151,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   }
 
   startDragging(event: IMouseEvent) {
-    this.dragHandler = new DragHandler(event, {
+    const dragHandler = new DragHandler(event, {
       displaySize: {
         x: this.renderedWidths[event.display],
         y: this.renderedHeights[event.display],
@@ -158,6 +161,8 @@ export class EditorService extends StatefulService<IEditorServiceState> {
         y: this.renderedOffsetYs[event.display],
       },
     });
+
+    this.dragHandler = dragHandler;
     this.SET_CHANGING_POSITION_IN_PROGRESS(true);
     this.tcpServerService.stopRequestsHandling(false);
   }
@@ -238,6 +243,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
 
     this.dragHandler = null;
     this.resizeRegion = null;
+
     this.isCropping = false;
     this.SET_CHANGING_POSITION_IN_PROGRESS(false);
     this.positionUpdateFinished.next();
@@ -282,9 +288,9 @@ export class EditorService extends StatefulService<IEditorServiceState> {
       };
 
       if (this.isCropping) {
-        this.crop(converted.x, converted.y, options);
+        this.crop(converted.x, converted.y, options, event.display);
       } else {
-        this.resize(converted.x, converted.y, options);
+        this.resize(converted.x, converted.y, options, event.display);
       }
     } else if (this.dragHandler) {
       this.dragHandler.move(event);
@@ -317,7 +323,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
     this.updateCursor(event);
   }
 
-  crop(x: number, y: number, options: IResizeOptions) {
+  crop(x: number, y: number, options: IResizeOptions, display: TDisplayType) {
     const source = this.resizeRegion.item;
     const rect = new ScalableRectangle(source.rectangle);
 
@@ -364,6 +370,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
       new Selection(this.scene.id, source.sceneItemId),
       rect.crop,
       { x: rect.x, y: rect.y },
+      display,
     );
   }
 
@@ -372,6 +379,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
     x: number,
     y: number,
     options: IResizeOptions,
+    display: TDisplayType,
   ) {
     // Set defaults
     const opts = {
@@ -383,7 +391,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
 
     let scaleXDelta = 1;
     let scaleYDelta = 1;
-    const rect = this.selectionService.views.globalSelection.getBoundingRect();
+    const rect = this.selectionService.views.globalSelection.getBoundingRect(display);
     if (!rect) {
       // the source has been unselected/removed
       return;
@@ -436,6 +444,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
       this.selectionService.views.globalSelection,
       { x: scaleXDelta, y: scaleYDelta },
       AnchorPositions[opts.anchor],
+      display,
     );
   }
 
