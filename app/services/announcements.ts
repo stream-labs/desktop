@@ -1,4 +1,4 @@
-import { PersistentStatefulService, mutation, InitAfter } from 'services/core/index';
+import { PersistentStatefulService, mutation, InitAfter, ViewHandler } from 'services/core/index';
 import { UserService } from './user';
 import { HostsService } from './hosts';
 import { Inject, Service } from 'services';
@@ -24,15 +24,25 @@ export interface IAnnouncementsInfo {
   thumbnail: string;
   link: string;
   linkTarget: 'external' | 'slobs';
+  type: 0 | 1;
   params?: { [key: string]: string };
   closeOnLink?: boolean;
 }
 
-@InitAfter('UserService')
-export class AnnouncementsService extends PersistentStatefulService<{
+interface IAnnouncementsServiceState {
   news: IAnnouncementsInfo[];
+  banner: IAnnouncementsInfo;
   lastReadId: number;
-}> {
+}
+
+class AnnouncementsServiceViews extends ViewHandler<IAnnouncementsServiceState> {
+  get banner() {
+    return this.state.banner;
+  }
+}
+
+@InitAfter('UserService')
+export class AnnouncementsService extends PersistentStatefulService<IAnnouncementsServiceState> {
   @Inject() private hostsService: HostsService;
   @Inject() private userService: UserService;
   @Inject() private appService: AppService;
@@ -42,31 +52,43 @@ export class AnnouncementsService extends PersistentStatefulService<{
   @Inject() private jsonrpcService: JsonrpcService;
   @Inject() private windowsService: WindowsService;
 
-  static defaultState: { news: IAnnouncementsInfo[]; lastReadId: number } = {
+  static defaultState: IAnnouncementsServiceState = {
     news: [],
     lastReadId: 145,
+    banner: null,
   };
 
-  static filter(state: { news: IAnnouncementsInfo[]; lastReadId: number }) {
-    return { ...state, news: [] as IAnnouncementsInfo[] };
+  static filter(state: IAnnouncementsServiceState) {
+    return { ...state, news: [] as IAnnouncementsInfo[], banner: null as IAnnouncementsInfo };
   }
 
   init() {
     super.init();
-    this.userService.userLogin.subscribe(() => this.fetchLatestNews());
+    this.userService.userLogin.subscribe(() => {
+      this.fetchLatestNews();
+      this.getBanner();
+    });
   }
 
-  get bannersExist() {
+  get views() {
+    return new AnnouncementsServiceViews(this.state);
+  }
+
+  get newsExist() {
     return this.state.news.length > 0;
   }
 
   async getNews() {
-    if (this.bannersExist) return;
-    this.SET_BANNER(await this.fetchNews());
+    if (this.newsExist) return;
+    this.SET_NEWS(await this.fetchNews());
+  }
+
+  async getBanner() {
+    this.SET_BANNER(await this.fetchBanner());
   }
 
   seenNews() {
-    if (!this.bannersExist) return;
+    if (!this.newsExist) return;
     this.SET_LATEST_READ(this.state.news[0].id);
   }
 
@@ -161,6 +183,45 @@ export class AnnouncementsService extends PersistentStatefulService<{
     }
   }
 
+  private async fetchBanner() {
+    const recentlyInstalled = await this.recentlyInstalled();
+
+    if (recentlyInstalled || !this.customizationService.state.enableAnnouncements) {
+      return null;
+    }
+
+    const endpoint = `api/v5/slobs/announcement/get?clientId=${this.userService.getLocalUserId()}&locale=${
+      this.i18nService.state.locale
+    }`;
+    const req = this.formRequest(endpoint);
+
+    try {
+      const newState = await jfetch<IAnnouncementsInfo>(req);
+      return newState.id ? newState : null;
+    } catch (e: unknown) {
+      return null;
+    }
+  }
+
+  async closeBanner(clickType: 'action' | 'dismissal') {
+    const endpoint = 'api/v5/slobs/announcement/close';
+    const req = this.formRequest(endpoint, {
+      method: 'POST',
+      headers: new Headers({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({
+        clientId: this.userService.getLocalUserId(),
+        announcementId: this.state.banner.id,
+        clickType,
+      }),
+    });
+
+    try {
+      await jfetch(req);
+    } finally {
+      this.SET_BANNER(null);
+    }
+  }
+
   private formRequest(endpoint: string, options: any = {}) {
     const host = this.hostsService.streamlabs;
     const headers = authorizedHeaders(this.userService.apiToken, options.headers);
@@ -180,13 +241,18 @@ export class AnnouncementsService extends PersistentStatefulService<{
   }
 
   @mutation()
-  SET_BANNER(banners: IAnnouncementsInfo[]) {
-    this.state.news = banners;
+  SET_NEWS(news: IAnnouncementsInfo[]) {
+    this.state.news = news;
   }
 
   @mutation()
-  CLEAR_BANNER() {
-    this.state = AnnouncementsService.initialState;
+  CLEAR_NEWS() {
+    this.state = AnnouncementsService.defaultState;
+  }
+
+  @mutation()
+  SET_BANNER(banner: IAnnouncementsInfo | null) {
+    this.state.banner = banner;
   }
 
   @mutation()
