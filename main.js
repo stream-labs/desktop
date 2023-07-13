@@ -706,12 +706,6 @@ if (!gotTheLock) {
     mainWindow.close();
   });
 
-  ipcMain.on('requestSourceAttributes', (e, names) => {
-    const sizes = require('obs-studio-node').getSourcesSize(names);
-
-    e.sender.send('notifySourceAttributes', sizes);
-  });
-
   /* The following 2 methods need to live in the main process
      because events bound using the remote module are not
      executed synchronously and therefore default actions
