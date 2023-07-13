@@ -32,6 +32,7 @@ console.log(`pjson.name = ${pjson.name}`); // DEBUG
 ////////////////////////////////////////////////////////////////////////////////
 // Modules and other Requires
 ////////////////////////////////////////////////////////////////////////////////
+const electron = require('electron');
 const {
   app,
   BrowserWindow,
@@ -59,15 +60,57 @@ if (process.argv.includes('--clearCacheDir')) {
   rimraf.sync(rmPath);
 }
 
+// 必要なDLLが足りないため、Visual C++ 再頒布可能パッケージを案内するダイアログを表示する
+
+async function showRequiredSystemComponentInstallGuideDialog() {
+  const result = await dialog.showMessageBox({
+    type: 'error',
+    title: `${pjson.buildProductName} の実行に必要なシステムコンポーネントが不足しています`,
+    message:
+      'Microsoftのウェブサイトから Visual C++ 再頒布可能パッケージ(x64)をインストールしてから再度起動してください。',
+    buttons: ['ブラウザでダウンロードする', 'ダウンロードページを開く', '何もせず終了'],
+    defaultId: 1,
+    cancelId: 2,
+    noLink: true,
+  });
+  switch (result.response) {
+    case 0:
+      await electron.shell.openExternal('https://aka.ms/vs/16/release/vc_redist.x64.exe');
+      break;
+    case 1:
+      await electron.shell.openExternal(
+        'https://support.microsoft.com/ja-jp/help/2977003/the-latest-supported-visual-c-downloads',
+      );
+      break;
+    case 2:
+      break;
+  }
+  app.exit(0);
+}
+
 // This ensures that only one copy of our app can run at once.
 const gotTheLock = app.requestSingleInstanceLock();
 
 if (!gotTheLock) {
   app.quit();
-} else {
-  const electron = require('electron');
+}
+
+let crashHandler;
+
+try {
+  crashHandler = require('crash-handler');
+} catch (e) {
+  app.on('ready', () => {
+    showRequiredSystemComponentInstallGuideDialog();
+  });
+}
+
+if (crashHandler) initialize();
+
+function initialize() {
   const fs = require('fs');
   const { Updater } = require('./updater/Updater.js');
+  const NoWorkResult = require('postcss/lib/no-work-result');
   //const uuid = require('uuid/v4');
   const windowStateKeeper = require('electron-window-state');
   const { URL } = require('url');
@@ -281,32 +324,6 @@ if (!gotTheLock) {
     });
   }
 
-  // 必要なDLLが足りないため、Visual C++ 再頒布可能パッケージを案内するダイアログを表示する
-  async function showRequiredSystemComponentInstallGuideDialog() {
-    const result = await dialog.showMessageBox({
-      type: 'error',
-      title: `${pjson.buildProductName} の実行に必要なシステムコンポーネントが不足しています`,
-      message:
-        'Microsoftのウェブサイトから Visual C++ 再頒布可能パッケージ(x64)をインストールしてから再度起動してください。',
-      buttons: ['ブラウザでダウンロードする', 'ダウンロードページを開く', '何もせず終了'],
-      defaultId: 1,
-      cancelId: 2,
-      noLink: true,
-    });
-    switch (result.response) {
-      case 0:
-        await electron.shell.openExternal('https://aka.ms/vs/16/release/vc_redist.x64.exe');
-        break;
-      case 1:
-        await electron.shell.openExternal(
-          'https://support.microsoft.com/ja-jp/help/2977003/the-latest-supported-visual-c-downloads',
-        );
-        break;
-      case 2:
-        break;
-    }
-  }
-
   // eslint-disable-next-line no-inner-declarations
   async function startApp() {
     const isDevMode = process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test';
@@ -315,21 +332,13 @@ if (!gotTheLock) {
       crashHandlerLogPath = app.getPath('userData');
     }
 
-    try {
-      const crashHandler = require('crash-handler');
-      crashHandler.startCrashHandler(
-        app.getAppPath(),
-        process.env.NAIR_VERSION,
-        isDevMode.toString(),
-        crashHandlerLogPath,
-      );
-      crashHandler.registerProcess(pid, false);
-    } catch (e) {
-      console.error('Exception while loading crash-handler', e);
-      await showRequiredSystemComponentInstallGuideDialog();
-      app.exit();
-      return;
-    }
+    crashHandler.startCrashHandler(
+      app.getAppPath(),
+      process.env.NAIR_VERSION,
+      isDevMode.toString(),
+      crashHandlerLogPath,
+    );
+    crashHandler.registerProcess(pid, false);
 
     const mainWindowState = windowStateKeeper({
       defaultWidth: 1600,
