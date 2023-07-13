@@ -285,7 +285,7 @@ if (!gotTheLock) {
   async function showRequiredSystemComponentInstallGuideDialog() {
     const result = await dialog.showMessageBox({
       type: 'error',
-      title: '実行に必要なシステムコンポーネントが不足しています',
+      title: `${pjson.buildProductName} の実行に必要なシステムコンポーネントが不足しています`,
       message:
         'Microsoftのウェブサイトから Visual C++ 再頒布可能パッケージ(x64)をインストールしてから再度起動してください。',
       buttons: ['ブラウザでダウンロードする', 'ダウンロードページを開く', '何もせず終了'],
