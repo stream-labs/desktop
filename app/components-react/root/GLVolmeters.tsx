@@ -128,6 +128,11 @@ class GLVolmetersModule {
         }
       },
     );
+
+    // update volmeter subscriptions when audio sources change
+    this.audioService.audioSourceUpdated.subscribe(() => {
+      this.subscribeVolmeters();
+    });
   }
 
   $refs = {
