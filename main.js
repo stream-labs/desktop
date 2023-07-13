@@ -73,7 +73,6 @@ if (!gotTheLock) {
   const { URL } = require('url');
 
   const pid = require('process').pid;
-  const crashHandler = require('crash-handler');
 
   app.commandLine.appendSwitch('force-ui-direction', 'ltr');
 
@@ -282,21 +281,55 @@ if (!gotTheLock) {
     });
   }
 
+  // 必要なDLLが足りないため、Visual C++ 再頒布可能パッケージを案内するダイアログを表示する
+  async function showRequiredSystemComponentInstallGuideDialog() {
+    const result = await dialog.showMessageBox({
+      type: 'error',
+      title: '実行に必要なシステムコンポーネントが不足しています',
+      message:
+        'Microsoftのウェブサイトから Visual C++ 再頒布可能パッケージ(x64)をインストールしてから再度起動してください。',
+      buttons: ['ブラウザでダウンロードする', 'ダウンロードページを開く', '何もせず終了'],
+      defaultId: 1,
+      cancelId: 2,
+      noLink: true,
+    });
+    switch (result.response) {
+      case 0:
+        await electron.shell.openExternal('https://aka.ms/vs/16/release/vc_redist.x64.exe');
+        break;
+      case 1:
+        await electron.shell.openExternal(
+          'https://support.microsoft.com/ja-jp/help/2977003/the-latest-supported-visual-c-downloads',
+        );
+        break;
+      case 2:
+        break;
+    }
+  }
+
   // eslint-disable-next-line no-inner-declarations
-  function startApp() {
+  async function startApp() {
     const isDevMode = process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test';
     let crashHandlerLogPath = '';
     if (process.env.NODE_ENV !== 'production' || !!process.env.SLOBS_PREVIEW) {
       crashHandlerLogPath = app.getPath('userData');
     }
 
-    crashHandler.startCrashHandler(
-      app.getAppPath(),
-      process.env.NAIR_VERSION,
-      isDevMode.toString(),
-      crashHandlerLogPath,
-    );
-    crashHandler.registerProcess(pid, false);
+    try {
+      const crashHandler = require('crash-handler');
+      crashHandler.startCrashHandler(
+        app.getAppPath(),
+        process.env.NAIR_VERSION,
+        isDevMode.toString(),
+        crashHandlerLogPath,
+      );
+      crashHandler.registerProcess(pid, false);
+    } catch (e) {
+      console.error('Exception while loading crash-handler', e);
+      await showRequiredSystemComponentInstallGuideDialog();
+      app.exit();
+      return;
+    }
 
     const mainWindowState = windowStateKeeper({
       defaultWidth: 1600,
@@ -373,7 +406,13 @@ if (!gotTheLock) {
     });
 
     // Initialize the keylistener
-    require('node-libuiohook').startHook();
+    try {
+      require('node-libuiohook').startHook();
+    } catch (e) {
+      console.error('Exception while loading node-libuiohook', e);
+      await showRequiredSystemComponentInstallGuideDialog();
+      app.exit();
+    }
 
     mainWindow.on('closed', () => {
       require('node-libuiohook').stopHook();

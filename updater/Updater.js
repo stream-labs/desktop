@@ -4,6 +4,7 @@
 const { autoUpdater } = require('electron-updater');
 const { app, BrowserWindow, ipcMain } = require('electron');
 const semver = require('semver');
+const path = require('path');
 
 class Updater {
   // startApp is a callback that will start the app.  Ideally this
@@ -34,8 +35,8 @@ class Updater {
     });
   }
 
-  skipUpdateAndContinue() {
-    this.startApp();
+  async skipUpdateAndContinue() {
+    await this.startApp();
     this.finished = true;
     this.browserWindow.close();
   }
@@ -48,17 +49,17 @@ class Updater {
     if (!currentVer || !newVer) {
       return true;
     }
-    if (currentVer.major != newVer.major) {
+    if (currentVer.major !== newVer.major) {
       return true;
     }
-    if (currentVer.minor != newVer.minor) {
+    if (currentVer.minor !== newVer.minor) {
       return true;
     }
     return false;
   }
 
   textToLines(text) {
-    return text.split('\n')
+    return text.split('\n');
   }
 
   bindListeners() {
@@ -69,7 +70,10 @@ class Updater {
       this.updateState.fileSize = info.files[0].size;
       this.updateState.version = info.version;
       this.updateState.percent = 0;
-      this.updateState.isUnskippable = this.isUnskippableUpdate(process.env.NAIR_VERSION, info.version);
+      this.updateState.isUnskippable = this.isUnskippableUpdate(
+        process.env.NAIR_VERSION,
+        info.version,
+      );
       console.log(`oldVersion: ${process.env.NAIR_VERSION}
 newVersion: ${info.version}
 isUnskippable: ${this.updateState.isUnskippable}`);
@@ -159,7 +163,7 @@ isUnskippable: ${this.updateState.isUnskippable}`);
       browserWindow.webContents.openDevTools({ mode: 'undocked' });
     }
 
-    browserWindow.loadURL('file://' + __dirname + '/index.html');
+    browserWindow.loadURL('file://' + path.join(__dirname, 'index.html'));
 
     return browserWindow;
   }
