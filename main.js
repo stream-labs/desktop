@@ -33,16 +33,7 @@ console.log(`pjson.name = ${pjson.name}`); // DEBUG
 // Modules and other Requires
 ////////////////////////////////////////////////////////////////////////////////
 const electron = require('electron');
-const {
-  app,
-  BrowserWindow,
-  ipcMain,
-  session,
-  crashReporter,
-  dialog,
-  webContents,
-  shell,
-} = require('electron');
+const { app, BrowserWindow, ipcMain, session, dialog, webContents, shell } = electron;
 const path = require('path');
 const rimraf = require('rimraf');
 
@@ -75,10 +66,10 @@ async function showRequiredSystemComponentInstallGuideDialog() {
   });
   switch (result.response) {
     case 0:
-      await electron.shell.openExternal('https://aka.ms/vs/16/release/vc_redist.x64.exe');
+      await shell.openExternal('https://aka.ms/vs/16/release/vc_redist.x64.exe');
       break;
     case 1:
-      await electron.shell.openExternal(
+      await shell.openExternal(
         'https://support.microsoft.com/ja-jp/help/2977003/the-latest-supported-visual-c-downloads',
       );
       break;
