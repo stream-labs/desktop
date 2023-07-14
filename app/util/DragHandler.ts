@@ -9,7 +9,6 @@ import { SelectionService } from 'services/selection';
 import { EditorCommandsService } from 'services/editor-commands';
 import { IMouseEvent } from 'services/editor';
 import { byOS, OS } from './operating-systems';
-import { TDisplayType } from 'services/settings-v2';
 
 /*
  * An edge looks like:
@@ -179,6 +178,17 @@ export class DragHandler {
     rect.x = mousePos.x - this.mouseOffset.x;
     rect.y = mousePos.y - this.mouseOffset.y;
 
+    /**
+     * In dual output mode, prevent sources from being dragged outside of the canvas
+     * and show an error message when they are dragged too far out
+     */
+    if (
+      this.dualOutputService.views.dualOutputMode &&
+      (this.baseWidth - Math.abs(rect.x) < 25 || this.baseHeight - Math.abs(rect.y) < 25)
+    ) {
+      return true;
+    }
+
     // Adjust position for snapping
     // Holding Ctrl temporary disables snapping
     if (this.snapEnabled && !event.ctrlKey) {
@@ -224,6 +234,8 @@ export class DragHandler {
       { x: deltaX, y: deltaY },
       event.display,
     );
+
+    return false;
   }
 
   private mousePositionInCanvasSpace(event: IMouseEvent): IVec2 {

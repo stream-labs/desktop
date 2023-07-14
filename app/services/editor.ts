@@ -106,6 +106,8 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   isCropping: boolean;
   canDrag = true;
 
+  messageActive = false;
+
   handleOutputResize(region: IRectangle, display: TDisplayType) {
     this.renderedWidths[display] = region.width;
     this.renderedHeights[display] = region.height;
@@ -293,7 +295,8 @@ export class EditorService extends StatefulService<IEditorServiceState> {
         this.resize(converted.x, converted.y, options, event.display);
       }
     } else if (this.dragHandler) {
-      this.dragHandler.move(event);
+      // returns true if the drag handler is stopped to show error message
+      return this.dragHandler.move(event);
     } else if (event.buttons === 1) {
       // We might need to start dragging
       const sourcesInPriorityOrder = this.activeSources
