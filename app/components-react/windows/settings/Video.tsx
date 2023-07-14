@@ -390,6 +390,11 @@ class VideoSettingsModule {
   handleAuth() {
     Services.WindowsService.actions.closeChildWindow();
     this.userService.actions.showLogin();
+    const onboardingCompleted = Services.OnboardingService.onboardingCompleted.subscribe(() => {
+      Services.DualOutputService.actions.setdualOutputMode();
+      Services.SettingsService.actions.showSettings('Video');
+      onboardingCompleted.unsubscribe();
+    });
   }
 }
 
