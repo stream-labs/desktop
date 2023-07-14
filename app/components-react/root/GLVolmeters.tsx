@@ -8,7 +8,7 @@ import { compileShader, createProgram } from '../../util/webgl/utils';
 import vShaderSrc from '../../util/webgl/shaders/volmeter.vert';
 import fShaderSrc from '../../util/webgl/shaders/volmeter.frag';
 import { Services } from '../service-provider';
-import { useModule, useOnCreate } from 'slap';
+import { injectWatch, useModule, useOnCreate } from "slap";
 import { assertIsDefined, getDefined } from '../../util/properties-type-guards';
 
 
@@ -77,8 +77,10 @@ export default function GLVolmeters() {
 class GLVolmetersModule {
   private customizationService = Services.CustomizationService;
   private audioService = Services.AudioService;
+  private sourcesService = Services.SourcesService;
 
   subscriptions: Dictionary<IVolmeterSubscription> = {};
+  private sourcesServiceSubscriptions: Subscription[] = [];
 
   // Used for WebGL rendering
   private gl: WebGLRenderingContext;
@@ -128,11 +130,6 @@ class GLVolmetersModule {
         }
       },
     );
-
-    // update volmeter subscriptions when audio sources change
-    this.audioService.audioSourceUpdated.subscribe(() => {
-      this.subscribeVolmeters();
-    });
   }
 
   $refs = {
@@ -146,10 +143,13 @@ class GLVolmetersModule {
     });
   }
 
+  // update volmeters subscriptions when audio sources change
+  watchAudioSources = injectWatch(() => this.audioSources, () => this.subscribeVolmeters());
+
   /**
    * add or remove subscription for volmeters depending on current scene
    */
-  // @Watch('audioSources')
+
   private subscribeVolmeters() {
     const audioSources = this.audioSources;
     const sourcesOrder = audioSources.map(source => source.sourceId);
@@ -192,12 +192,6 @@ class GLVolmetersModule {
       // subscribe for event
       electron.ipcRenderer.sendTo(this.workerId, 'volmeterSubscribe', sourceId);
     });
-
-    // unsubscribe from not longer relevant volmeters
-    const currentSourcesIds = sourcesOrder;
-    const subscribedSourcesIds = Object.keys(this.subscriptions);
-    const sourcesToUnsubscribe = difference(subscribedSourcesIds, currentSourcesIds);
-    sourcesToUnsubscribe.forEach(sourceId => this.unsubscribeVolmeter(sourceId));
 
     this.sourcesOrder = sourcesOrder;
   }
