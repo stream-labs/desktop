@@ -8,7 +8,7 @@ import { compileShader, createProgram } from '../../util/webgl/utils';
 import vShaderSrc from '../../util/webgl/shaders/volmeter.vert';
 import fShaderSrc from '../../util/webgl/shaders/volmeter.frag';
 import { Services } from '../service-provider';
-import { useModule, useOnCreate } from 'slap';
+import { injectWatch, useModule } from 'slap';
 import { assertIsDefined, getDefined } from '../../util/properties-type-guards';
 
 
@@ -128,11 +128,6 @@ class GLVolmetersModule {
         }
       },
     );
-
-    // update volmeter subscriptions when audio sources change
-    this.audioService.audioSourceUpdated.subscribe(() => {
-      this.subscribeVolmeters();
-    });
   }
 
   $refs = {
@@ -146,10 +141,13 @@ class GLVolmetersModule {
     });
   }
 
+  // update volmeters subscriptions when audio sources change
+  watchAudioSources = injectWatch(() => this.audioSources, () => this.subscribeVolmeters());
+
   /**
    * add or remove subscription for volmeters depending on current scene
    */
-  // @Watch('audioSources')
+
   private subscribeVolmeters() {
     const audioSources = this.audioSources;
     const sourcesOrder = audioSources.map(source => source.sourceId);
