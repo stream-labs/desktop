@@ -149,7 +149,7 @@ class VideoSettingsModule {
       fpsType: {
         type: 'list',
         label: $t('FPS Type'),
-        onChange: async (val: EFPSType) => await this.setFPSType(val),
+        onChange: (val: EFPSType) => this.setFPSType(val),
         options: [
           { label: $t('Common FPS Values'), value: EFPSType.Common },
           { label: $t('Integer FPS Values'), value: EFPSType.Integer },
@@ -161,20 +161,20 @@ class VideoSettingsModule {
             type: 'list',
             label: $t('Common FPS Values'),
             options: FPS_OPTIONS,
-            onChange: async (val: string) => await this.setCommonFPS(val),
+            onChange: (val: string) => this.setCommonFPS(val),
             displayed: this.values.fpsType === EFPSType.Common,
           },
           fpsInt: {
             type: 'number',
             label: $t('FPS Value'),
-            onChange: async (val: string) => await this.setIntegerFPS(val),
+            onChange: (val: string) => this.setIntegerFPS(val),
             rules: [{ max: 1000, min: 1, message: $t('FPS Value must be between 1 and 1000') }],
             displayed: this.values.fpsType === EFPSType.Integer,
           },
           fpsNum: {
             type: 'number',
             label: $t('FPS Numerator'),
-            onChange: async (val: string) => await this.setFPS('fpsNum', val),
+            onChange: (val: string) => this.setFPS('fpsNum', val),
             rules: [
               { validator: this.fpsNumValidator.bind(this) },
               {
@@ -189,7 +189,7 @@ class VideoSettingsModule {
           fpsDen: {
             type: 'number',
             label: $t('FPS Denominator'),
-            onChange: async (val: string) => await this.setFPS('fpsDen', val),
+            onChange: (val: string) => this.setFPS('fpsDen', val),
             rules: [
               { validator: this.fpsDenValidator.bind(this) },
               {
@@ -319,7 +319,7 @@ class VideoSettingsModule {
    * If there is a vertical context, update it as well.
    * Otherwise, update the vertical display persisted settings.
    */
-  async setFPSType(value: EFPSType) {
+  setFPSType(value: EFPSType) {
     if (this.service.contexts.vertical) {
       this.service.actions.setVideoSetting('fpsType', value, 'horizontal');
       this.service.actions.setVideoSetting('fpsNum', 30, 'horizontal');
@@ -346,7 +346,7 @@ class VideoSettingsModule {
    * If there is a vertical context, update it as well.
    * Otherwise, update the vertical display persisted settings.
    */
-  async setCommonFPS(value: string) {
+  setCommonFPS(value: string) {
     const [fpsNum, fpsDen] = value.split('-');
     if (this.service.contexts.vertical) {
       this.service.actions.setVideoSetting('fpsNum', Number(fpsNum), 'horizontal');
@@ -369,7 +369,7 @@ class VideoSettingsModule {
    * If there is a vertical context, update it as well.
    * Otherwise, update the vertical display persisted settings.
    */
-  async setIntegerFPS(value: string) {
+  setIntegerFPS(value: string) {
     this.state.setFpsInt(Number(value));
     if (Number(value) > 0 && Number(value) < 1001) {
       if (this.service.contexts.vertical) {
@@ -394,7 +394,7 @@ class VideoSettingsModule {
    * If there is a vertical context, update it as well.
    * Otherwise, update the vertical display persisted settings.
    */
-  async setFPS(key: 'fpsNum' | 'fpsDen', value: string) {
+  setFPS(key: 'fpsNum' | 'fpsDen', value: string) {
     if (key === 'fpsNum') {
       this.state.setFpsNum(Number(value));
     } else {
