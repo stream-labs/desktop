@@ -8,7 +8,7 @@ import { compileShader, createProgram } from '../../util/webgl/utils';
 import vShaderSrc from '../../util/webgl/shaders/volmeter.vert';
 import fShaderSrc from '../../util/webgl/shaders/volmeter.frag';
 import { Services } from '../service-provider';
-import { injectWatch, useModule, useOnCreate } from "slap";
+import { injectWatch, useModule } from 'slap';
 import { assertIsDefined, getDefined } from '../../util/properties-type-guards';
 
 
@@ -77,10 +77,8 @@ export default function GLVolmeters() {
 class GLVolmetersModule {
   private customizationService = Services.CustomizationService;
   private audioService = Services.AudioService;
-  private sourcesService = Services.SourcesService;
 
   subscriptions: Dictionary<IVolmeterSubscription> = {};
-  private sourcesServiceSubscriptions: Subscription[] = [];
 
   // Used for WebGL rendering
   private gl: WebGLRenderingContext;
