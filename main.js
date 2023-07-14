@@ -86,19 +86,17 @@ if (!gotTheLock) {
   app.quit();
 }
 
-let crashHandler;
-
 try {
-  crashHandler = require('crash-handler');
+  const crashHandler = require('crash-handler');
+  initialize(crashHandler);
 } catch (e) {
+  console.error('require crash-handler failed: ', e);
   app.on('ready', () => {
     showRequiredSystemComponentInstallGuideDialog();
   });
 }
 
-if (crashHandler) initialize();
-
-function initialize() {
+function initialize(crashHandler) {
   const fs = require('fs');
   const { Updater } = require('./updater/Updater.js');
   const NoWorkResult = require('postcss/lib/no-work-result');
