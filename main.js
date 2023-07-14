@@ -99,7 +99,6 @@ try {
 function initialize(crashHandler) {
   const fs = require('fs');
   const { Updater } = require('./updater/Updater.js');
-  const NoWorkResult = require('postcss/lib/no-work-result');
   //const uuid = require('uuid/v4');
   const windowStateKeeper = require('electron-window-state');
   const { URL } = require('url');
