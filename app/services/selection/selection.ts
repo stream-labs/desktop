@@ -193,6 +193,11 @@ export class Selection {
     return items.length > 0;
   }
 
+  isGameCaptureSelected(): boolean {
+    const items = this.getItems().filter(item => item.source.type === 'game_capture');
+    return items.length > 0;
+  }
+
   getVisualItems(): SceneItem[] {
     return this.getItems().filter(item => item.isVisualSource);
   }
