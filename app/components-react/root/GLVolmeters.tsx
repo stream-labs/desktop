@@ -191,7 +191,7 @@ class GLVolmetersModule {
       electron.ipcRenderer.sendTo(this.workerId, 'volmeterSubscribe', sourceId);
     });
 
-    // unsubscribe from not longer relevant volmeters	
+    // unsubscribe from not longer relevant volmeters
     const currentSourcesIds = sourcesOrder;
     const subscribedSourcesIds = Object.keys(this.subscriptions);
     const sourcesToUnsubscribe = difference(subscribedSourcesIds, currentSourcesIds);
