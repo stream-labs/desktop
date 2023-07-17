@@ -11,6 +11,7 @@ import { GuestCamNode } from './guest-cam';
 import { VideoSettingsService } from 'services/settings-v2/video';
 import { DualOutputService } from 'services/dual-output';
 import { SettingsService } from 'services/settings';
+import { SceneCollectionsService } from 'services/scene-collections';
 
 interface ISchema {
   /**
@@ -36,6 +37,7 @@ interface ISchema {
 
   selectiveRecording?: boolean;
   dualOutputMode?: boolean;
+  sceneNodeMaps?: Dictionary<Dictionary<string>>;
   sources: SourcesNode;
   scenes: ScenesNode;
   hotkeys?: HotkeysNode;
@@ -57,6 +59,7 @@ export class RootNode extends Node<ISchema, {}> {
   @Inject() videoSettingsService: VideoSettingsService;
   @Inject() dualOutputService: DualOutputService;
   @Inject() settingsService: SettingsService;
+  @Inject() sceneCollectionsService: SceneCollectionsService;
 
   async save(): Promise<void> {
     const sources = new SourcesNode();
@@ -82,6 +85,7 @@ export class RootNode extends Node<ISchema, {}> {
       selectiveRecording: this.streamingService.state.selectiveRecording,
       dualOutputMode: this.dualOutputService.views.dualOutputMode,
       operatingSystem: process.platform as OS,
+      sceneNodeMaps: this.dualOutputService.views.sceneNodeMaps,
     };
   }
   /**
@@ -93,40 +97,12 @@ export class RootNode extends Node<ISchema, {}> {
     if (!this.videoSettingsService.contexts.horizontal) {
       const establishedContext = this.videoSettingsService.establishedContext.subscribe(
         async () => {
-          this.videoService.setBaseResolutions(this.data.baseResolutions);
-          this.streamingService.setSelectiveRecording(!!this.data.selectiveRecording);
-          this.streamingService.setDualOutputMode(this.data.dualOutputMode);
-
-          await this.data.transitions.load();
-          await this.data.sources.load({});
-          await this.data.scenes.load({});
-
-          if (this.data.hotkeys) {
-            await this.data.hotkeys.load({});
-          }
-
-          if (this.data.guestCam) {
-            await this.data.guestCam.load();
-          }
+          await this.loadData();
           establishedContext.unsubscribe();
         },
       );
     } else {
-      this.videoService.setBaseResolutions(this.data.baseResolutions);
-      this.streamingService.setSelectiveRecording(!!this.data.selectiveRecording);
-      this.streamingService.setDualOutputMode(this.data.dualOutputMode);
-
-      await this.data.transitions.load();
-      await this.data.sources.load({});
-      await this.data.scenes.load({});
-
-      if (this.data.hotkeys) {
-        await this.data.hotkeys.load({});
-      }
-
-      if (this.data.guestCam) {
-        await this.data.guestCam.load();
-      }
+      await this.loadData();
     }
   }
 
@@ -143,6 +119,27 @@ export class RootNode extends Node<ISchema, {}> {
     // Added multiple displays with individual base resolutions in version 4
     if (version < 4) {
       this.data.baseResolutions = this.videoService.baseResolutions;
+    }
+  }
+
+  async loadData() {
+    this.videoService.setBaseResolutions(this.data.baseResolutions);
+    this.streamingService.setSelectiveRecording(!!this.data.selectiveRecording);
+    this.streamingService.setDualOutputMode(this.data.dualOutputMode);
+
+    await this.data.transitions.load();
+    await this.data.sources.load({});
+    await this.data.scenes.load({});
+    if (this.data.sceneNodeMaps) {
+      this.sceneCollectionsService.initNodeMaps(this.data.sceneNodeMaps);
+    }
+
+    if (this.data.hotkeys) {
+      await this.data.hotkeys.load({});
+    }
+
+    if (this.data.guestCam) {
+      await this.data.guestCam.load();
     }
   }
 }
