@@ -130,7 +130,7 @@ export class RootNode extends Node<ISchema, {}> {
     await this.data.transitions.load();
     await this.data.sources.load({});
     await this.data.scenes.load({});
-    if (Object.keys(this.data.sceneNodeMaps).length > 0) {
+    if (this.data.sceneNodeMaps && Object.keys(this.data.sceneNodeMaps).length > 0) {
       this.sceneCollectionsService.initNodeMaps(this.data.sceneNodeMaps);
     }
 
