@@ -167,10 +167,29 @@ export class DragHandler {
     this.targetEdges = this.generateTargetEdges();
   }
 
-  // Should be called when the mouse moves
+  /**
+   * Should be called when the mouse moves
+   * @remark In dual output mode, scene items are prevented
+   * from moving outside of the editor display. We return a boolean
+   * to show an error message in the notifications component,
+   * which is emitted by the studio editor component.
+   *
+   * @param event - Mouseevent for repositioning the scene item
+   * @returns - boolean with whether or not the mouse move was stopped
+   */
+  //
   move(event: IMouseEvent) {
     const rect = new ScalableRectangle(this.draggedSource.rectangle);
     const denormalize = rect.normalize();
+
+    console.log('rect ', rect);
+    console.log('this ', this);
+    console.log('this.mouseOffset ', this.mouseOffset);
+
+    console.log('rect before ', {
+      x: rect.x,
+      y: rect.y,
+    });
 
     const mousePos = this.mousePositionInCanvasSpace(event);
 
@@ -178,19 +197,15 @@ export class DragHandler {
     rect.x = mousePos.x - this.mouseOffset.x;
     rect.y = mousePos.y - this.mouseOffset.y;
 
-    /**
-     * In dual output mode, prevent sources from being dragged outside of the canvas
-     * and show an error message when they are dragged too far out
-     */
-    if (
-      this.dualOutputService.views.dualOutputMode &&
-      (this.baseWidth - Math.abs(rect.x) < 25 || this.baseHeight - Math.abs(rect.y) < 25)
-    ) {
-      return true;
-    }
+    console.log('rect after ', {
+      x: rect.x,
+      y: rect.y,
+    });
 
-    // Adjust position for snapping
-    // Holding Ctrl temporary disables snapping
+    /**
+     * Adjust position for snapping
+     * Holding Ctrl temporary disables snapping
+     */
     if (this.snapEnabled && !event.ctrlKey) {
       const sourceEdges = this.generateSourceEdges(rect);
 
@@ -223,10 +238,65 @@ export class DragHandler {
 
     denormalize();
 
-    // Translate new position into a delta that can be applied
-    // to all selected sources equally.
+    /**
+     * Translate new position into a delta that can be applied
+     * to all selected sources equally.
+     */
     const deltaX = rect.x - this.draggedSource.transform.position.x;
     const deltaY = rect.y - this.draggedSource.transform.position.y;
+
+    /**
+     * In dual output mode, prevent sources from being dragged outside of the canvas
+     * and show an error message when they are dragged too far out
+     */
+    if (this.dualOutputService.views.dualOutputMode) {
+      const dragBoundaries = this.calculateDragBoundaries(rect);
+      console.log('dragBoundaries ', dragBoundaries);
+
+      // console.log('this.baseWidth - Math.abs(rect.x) ', this.baseWidth - Math.abs(rect.x));
+      // console.log('this.baseHeight - Math.abs(rect.y) ', this.baseHeight - Math.abs(rect.y));
+
+      if (
+        rect.x <= dragBoundaries.left ||
+        rect.x >= dragBoundaries.right ||
+        rect.y <= dragBoundaries.top ||
+        rect.y >= dragBoundaries.bottom
+        // this.baseWidth - Math.abs(rect.x) < dragBoundaries.x ||
+        // this.baseHeight - Math.abs(rect.y) < dragBoundaries.y
+      ) {
+        // use this for repositioning
+        if (rect.x <= dragBoundaries.left) {
+          rect.x = dragBoundaries.left + 1;
+          console.log('returning');
+          return true;
+        } else if (rect.x <= dragBoundaries.right) {
+          rect.x = dragBoundaries.right - 1;
+          console.log('returning');
+          return true;
+        } else if (rect.y >= dragBoundaries.top) {
+          rect.y = dragBoundaries.top + 1;
+          console.log('returning');
+          return true;
+        } else if (rect.y <= dragBoundaries.bottom) {
+          rect.y = dragBoundaries.bottom - 1;
+          console.log('returning');
+          return true;
+        }
+        // rect.x = rect.x <= dragBoundaries.left ? dragBoundaries.left + 1 : dragBoundaries.right - 1;
+        // rect.y = rect.y <= dragBoundaries.top ? dragBoundaries.top - 1 : rect.y + 1;
+
+        // rect.x = mousePos.x - this.mouseOffset.x;
+        // rect.y = mousePos.y - this.mouseOffset.y;
+        // this.editorCommandsService.executeCommand(
+        //   'MoveItemsCommand',
+        //   this.selectionService.views.globalSelection,
+        //   { x: deltaX + 1, y: deltaY - 1 },
+        //   event.display,
+        // );
+
+        // return true;
+      }
+    }
 
     this.editorCommandsService.executeCommand(
       'MoveItemsCommand',
@@ -237,6 +307,77 @@ export class DragHandler {
 
     return false;
   }
+
+  private calculateScale() {
+    const horizontalWidth = this.displaySize.x + this.displayOffset.x;
+    const horizontalHeight = this.displaySize.y + this.displayOffset.y;
+    const x = horizontalWidth / this.baseWidth;
+    const y = horizontalHeight / this.baseHeight;
+    return {
+      x,
+      y,
+    };
+  }
+
+  /**
+   * Prevent scene item from being dragged outside boundary
+   * @remark Primarily used for dual output mode. Converts rendered dimensions
+   * to the original dimensions for calculations.
+   * @param rect
+   * @returns
+   */
+  private calculateDragBoundaries(rect: IScalableRectangle) {
+    const scale = this.calculateScale();
+    // const nonScaledOffsetX = this.displayOffset.x * (scale.x * 100);
+    // const nonScaledOffsetY = this.displayOffset.y * (scale.y * 100);
+    console.log('this.displayOffset ', this.displayOffset);
+    const fivePixelsX = Math.ceil(5 * (scale.x * 100));
+    const fivePixelsY = Math.ceil(5 * (scale.y * 100));
+    console.log('fivePixelsX ', fivePixelsX);
+    console.log('fivePixelsY ', fivePixelsY);
+
+    console.log('rect ', rect);
+
+    const nonScaledOffsetX = this.displayOffset.x * (scale.x * 100);
+    const nonScaledOffsetY = this.displayOffset.y * (scale.y * 100);
+    console.log('nonScaledOffsetX ', nonScaledOffsetX);
+    console.log('nonScaledOffsetY ', nonScaledOffsetY);
+    // return {
+    //   top: fivePixelsY,
+    //   left: fivePixelsX,
+    //   bottom: nonScaledOffsetX - fivePixelsX,
+    //   right: nonScaledOffsetY - fivePixelsY,
+    // };
+
+    const width = rect.width;
+    const height = rect.height;
+    console.log('rect.width ', rect.width);
+    console.log('rect.height ', rect.height);
+
+    const top = -(rect.height - fivePixelsY);
+    const left = -(rect.width - fivePixelsY);
+    const bottom = nonScaledOffsetY - fivePixelsY;
+    const right = nonScaledOffsetX - fivePixelsX;
+
+    return {
+      top,
+      left,
+      bottom,
+      right,
+    };
+    // return {
+    //   x: Math.max(Math.ceil(nonScaledOffsetX * 0.1), 5),
+    //   y: Math.max(Math.ceil(nonScaledOffsetY * 0.1), 5),
+    // };
+    // return {
+    //   x: Math.max(Math.ceil(nonScaledOffsetX * 0.1), 5),
+    //   y: Math.max(Math.ceil(nonScaledOffsetY * 0.1), 5),
+    // };
+  }
+
+  // private calculateDragBoundaries() {
+  //   const offsets = this.calculateNonScaledOffset();
+  // }
 
   private mousePositionInCanvasSpace(event: IMouseEvent): IVec2 {
     return this.pageSpaceToCanvasSpace(

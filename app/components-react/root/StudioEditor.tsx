@@ -124,6 +124,7 @@ export default function StudioEditor() {
       moveInFlight = true;
       EditorService.actions.return.handleMouseMove(getMouseEvent(event, display)).then(stopMove => {
         if (stopMove && !messageActive) {
+          console.log('----------------> showmessage');
           showOutOfBoundsErrorMessage();
         }
         moveInFlight = false;
