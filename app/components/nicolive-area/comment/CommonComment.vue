@@ -1,12 +1,11 @@
 <template>
-  <div
-    class="root"
-    :class="[chat.type, { pseudoHover: commentMenuOpened }]"
-    :title="computedTitle"
-    :speaking="speaking"
-    @dblclick="$emit('pinned')"
-  >
-    <div class="comment-root">
+  <div class="root" :class="[chat.type, { pseudoHover: commentMenuOpened }]">
+    <div
+      class="comment-root"
+      :speaking="speaking"
+      :title="computedTitle"
+      @dblclick="$emit('pinned')"
+    >
       <div class="comment-number">{{ chat.value.no }}</div>
       <div class="comment-box">
         <div class="comment-name-box" v-if="computedName" @click.stop="$emit('commentUser')">
