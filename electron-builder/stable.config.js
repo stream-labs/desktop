@@ -29,6 +29,7 @@ const config = {
     // eslint-disable-next-line no-template-curly-in-string
     artifactName: 'n-air-app-setup.${version}.${ext}',
     include: 'installer.nsh',
+    warningsAsErrors: false,
   },
   win: {
     publisherName: ['DWANGO Co.,Ltd.'],

@@ -32,16 +32,8 @@ console.log(`pjson.name = ${pjson.name}`); // DEBUG
 ////////////////////////////////////////////////////////////////////////////////
 // Modules and other Requires
 ////////////////////////////////////////////////////////////////////////////////
-const {
-  app,
-  BrowserWindow,
-  ipcMain,
-  session,
-  crashReporter,
-  dialog,
-  webContents,
-  shell,
-} = require('electron');
+const electron = require('electron');
+const { app, BrowserWindow, ipcMain, session, dialog, webContents, shell } = electron;
 const path = require('path');
 const rimraf = require('rimraf');
 
@@ -59,13 +51,52 @@ if (process.argv.includes('--clearCacheDir')) {
   rimraf.sync(rmPath);
 }
 
+// 必要なDLLが足りないため、Visual C++ 再頒布可能パッケージを案内するダイアログを表示する
+
+async function showRequiredSystemComponentInstallGuideDialog() {
+  const result = await dialog.showMessageBox({
+    type: 'error',
+    title: `${pjson.buildProductName} の実行に必要なシステムコンポーネントが不足しています`,
+    message:
+      'Microsoftのウェブサイトから Visual C++ 再頒布可能パッケージ(x64)をインストールしてから再度起動してください。',
+    buttons: ['ブラウザでダウンロードする', 'ダウンロードページを開く', '何もせず終了'],
+    defaultId: 1,
+    cancelId: 2,
+    noLink: true,
+  });
+  switch (result.response) {
+    case 0:
+      await shell.openExternal('https://aka.ms/vs/17/release/vc_redist.x64.exe');
+      break;
+    case 1:
+      await shell.openExternal(
+        'https://support.microsoft.com/ja-jp/help/2977003/the-latest-supported-visual-c-downloads',
+      );
+      break;
+    case 2:
+      break;
+  }
+  app.exit(0);
+}
+
 // This ensures that only one copy of our app can run at once.
 const gotTheLock = app.requestSingleInstanceLock();
 
 if (!gotTheLock) {
   app.quit();
-} else {
-  const electron = require('electron');
+}
+
+try {
+  const crashHandler = require('crash-handler');
+  initialize(crashHandler);
+} catch (e) {
+  console.error('require crash-handler failed: ', e);
+  app.on('ready', () => {
+    showRequiredSystemComponentInstallGuideDialog();
+  });
+}
+
+function initialize(crashHandler) {
   const fs = require('fs');
   const { Updater } = require('./updater/Updater.js');
   //const uuid = require('uuid/v4');
@@ -73,7 +104,6 @@ if (!gotTheLock) {
   const { URL } = require('url');
 
   const pid = require('process').pid;
-  const crashHandler = require('crash-handler');
 
   app.commandLine.appendSwitch('force-ui-direction', 'ltr');
 
@@ -283,7 +313,7 @@ if (!gotTheLock) {
   }
 
   // eslint-disable-next-line no-inner-declarations
-  function startApp() {
+  async function startApp() {
     const isDevMode = process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test';
     let crashHandlerLogPath = '';
     if (process.env.NODE_ENV !== 'production' || !!process.env.SLOBS_PREVIEW) {
@@ -373,7 +403,13 @@ if (!gotTheLock) {
     });
 
     // Initialize the keylistener
-    require('node-libuiohook').startHook();
+    try {
+      require('node-libuiohook').startHook();
+    } catch (e) {
+      console.error('Exception while loading node-libuiohook', e);
+      await showRequiredSystemComponentInstallGuideDialog();
+      app.exit();
+    }
 
     mainWindow.on('closed', () => {
       require('node-libuiohook').stopHook();
@@ -665,12 +701,6 @@ if (!gotTheLock) {
     app.relaunch({ args });
     // Closing the main window starts the shut down sequence
     mainWindow.close();
-  });
-
-  ipcMain.on('requestSourceAttributes', (e, names) => {
-    const sizes = require('obs-studio-node').getSourcesSize(names);
-
-    e.sender.send('notifySourceAttributes', sizes);
   });
 
   /* The following 2 methods need to live in the main process
