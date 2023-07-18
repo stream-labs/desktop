@@ -19,7 +19,7 @@ const trackOptions = [
 ];
 
 export default function GlobalSettings() {
-  const { SettingsService, UserService } = Services;
+  const { SettingsService, UserService, StreamingService } = Services;
 
   const {
     advancedAudioSettings,
@@ -28,8 +28,11 @@ export default function GlobalSettings() {
     streamTrack,
     vodTrack,
     vodTrackEnabled,
-    isTwitchAuthed,
+    isTwitchAuthedAndActive,
     recFormat,
+    isStreaming,
+    isRecording,
+    isMultiStreaming,
   } = useVuex(() => ({
     advancedAudioSettings: SettingsService.views.advancedAudioSettings,
     isAdvancedOutput: SettingsService.views.isAdvancedOutput,
@@ -37,8 +40,11 @@ export default function GlobalSettings() {
     streamTrack: SettingsService.views.streamTrack,
     vodTrack: SettingsService.views.vodTrack,
     vodTrackEnabled: SettingsService.views.vodTrackEnabled,
-    isTwitchAuthed: UserService.views.isTwitchAuthed,
+    isTwitchAuthedAndActive: UserService.views.isTwitchAuthedAndActive,
     recFormat: SettingsService.views.recFormat,
+    isStreaming: StreamingService.views.isStreaming,
+    isRecording: StreamingService.views.isRecording,
+    isMultiStreaming: StreamingService.views.isMultiplatformMode,
   }));
 
   const monitoringDevice = advancedAudioSettings?.parameters.find(
@@ -62,6 +68,8 @@ export default function GlobalSettings() {
   function handleOutputSettingsChange(type: string, value: number | boolean) {
     SettingsService.actions.setSettingValue('Output', type, value);
   }
+
+  const shouldShowTwitchVODTrack = isAdvancedOutput && isTwitchAuthedAndActive && !isMultiStreaming;
 
   return (
     <>
@@ -94,22 +102,28 @@ export default function GlobalSettings() {
             value={streamTrack + 1}
             options={trackOptions}
             onChange={value => handleOutputSettingsChange('TrackIndex', value)}
+            disabled={isStreaming}
           />
         )}
-        {isAdvancedOutput && isTwitchAuthed && (
-          <SwitchInput
-            label={$t('Enable Twitch VOD Track')}
-            value={vodTrackEnabled}
-            onChange={value => handleOutputSettingsChange('VodTrackEnabled', value)}
-          />
-        )}
-        {isAdvancedOutput && vodTrackEnabled && (
-          <ListInput
-            label={$t('Twitch VOD Track')}
-            value={vodTrack + 1}
-            options={trackOptions.filter(opt => opt.value !== streamTrack + 1)}
-            onChange={value => handleOutputSettingsChange('VodTrackIndex', value)}
-          />
+        {shouldShowTwitchVODTrack && (
+          <>
+            <SwitchInput
+              label={$t('Enable Twitch VOD Track')}
+              value={vodTrackEnabled}
+              onChange={value => handleOutputSettingsChange('VodTrackEnabled', value)}
+              disabled={isStreaming}
+            />
+
+            {vodTrackEnabled && (
+              <ListInput
+                label={$t('Twitch VOD Track')}
+                value={vodTrack + 1}
+                options={trackOptions.filter(opt => opt.value !== streamTrack + 1)}
+                onChange={value => handleOutputSettingsChange('VodTrackIndex', value)}
+                disabled={isStreaming}
+              />
+            )}
+          </>
         )}
         {isAdvancedOutput && (
           <InputWrapper
@@ -127,7 +141,7 @@ export default function GlobalSettings() {
                   checkboxStyles={{ marginRight: '4px' }}
                   name={`flag${track}`}
                   onChange={(value: boolean) => handleTracksChange(i, value)}
-                  disabled={recFormat === 'flv'}
+                  disabled={isRecording || recFormat === 'flv'}
                 />
               ))}
             </div>
