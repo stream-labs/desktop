@@ -19,9 +19,9 @@ LangString require_restart 1033 "You must restart your computer to complete the 
 LangString failed_download 1033 "WARNING: N Air was unable to download the latest Visual C++ Redistributable package from Microsoft."
 
 # Japanese
-LangString failed_install 1041 "警告: Microsoft の最新の Visual C++再頒布可能パッケージのインストールができませんでした。"	
+LangString failed_install 1041 "警告: Microsoft の最新の Visual C++ 再頒布可能パッケージのインストールができませんでした。"	
 LangString require_restart 1041 "インストールを完了するには、コンピューターを再起動してください。"	
-LangString failed_download 1041 "警告: Microsoftから最新の Visual C++ 再頒布可能パッケージをダウンロードできませんでした。"	
+LangString failed_download 1041 "警告: Microsoft から最新の Visual C++ 再頒布可能パッケージをダウンロードできませんでした。"	
 
 !macro customInstall
   NSISdl::download https://aka.ms/vs/17/release/vc_redist.x64.exe "$INSTDIR\vc_redist.x64.exe"  
