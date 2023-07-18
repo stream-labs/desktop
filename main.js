@@ -66,7 +66,7 @@ async function showRequiredSystemComponentInstallGuideDialog() {
   });
   switch (result.response) {
     case 0:
-      await shell.openExternal('https://aka.ms/vs/16/release/vc_redist.x64.exe');
+      await shell.openExternal('https://aka.ms/vs/17/release/vc_redist.x64.exe');
       break;
     case 1:
       await shell.openExternal(
