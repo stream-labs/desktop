@@ -35,10 +35,19 @@
         <div class="sentinel" ref="sentinel"></div>
       </div>
       <div class="pinned" v-if="Boolean(pinnedComment)">
-        <div class="comment-number">{{ pinnedComment.value.no }}</div>
-        <div class="comment-body">
-          {{ pinnedItemContent(pinnedComment) }}
-        </div>
+        <component
+          :class="{
+            row: true,
+            name: getDisplayName(pinnedComment),
+          }"
+          :is="componentMap[pinnedComment.component]"
+          :chat="pinnedItem"
+          :getFormattedLiveTime="getFormattedLiveTime"
+          :commentMenuOpened="false"
+          :speaking="false"
+          :nameplateHint="false"
+          @commentUser="showUserInfo(pinnedComment)"
+        />
         <div class="close"><i class="icon-close icon-btn" @click="pin(null)"></i></div>
       </div>
       <div class="floating-wrapper">
@@ -161,20 +170,6 @@
   background-color: var(--color-popper-bg-dark);
   border: 1px solid var(--color-border-light);
   border-radius: 4px;
-
-  & > .comment-number {
-    flex-shrink: 0;
-    font-weight: @font-weight-bold;
-    color: @light-grey;
-  }
-
-  & > .comment-body {
-    flex-grow: 1;
-    margin-left: 16px;
-    font-weight: @font-weight-bold;
-    color: @white;
-    word-break: break-word;
-  }
 
   & > .close {
     display: flex;
