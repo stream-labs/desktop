@@ -20,7 +20,7 @@
       </div>
     </div>
     <div class="nameplate-hint" v-if="nameplateHint">
-      <div>[なふだ機能]を使ったコメントが投稿されました</div>
+      <div>［なふだ機能］を使ったコメントが投稿されました</div>
       <div>ニックネームをクリックして、視聴者のことをもっとよく知ってみよう!</div>
       <div>
         <a
