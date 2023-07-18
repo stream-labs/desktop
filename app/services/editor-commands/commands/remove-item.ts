@@ -90,13 +90,10 @@ export class RemoveItemCommand extends Command {
 
     const scene = this.scenesService.views.getScene(this.sceneId);
 
-    const item = scene.addSource(this.sourceId, { id: this.sceneItemId, select: false });
-    const display = item.display ?? 'horizontal';
-    const context = this.videoSettingsService.contexts[display];
-    item.setSettings({
-      ...this.settings,
-      output: context,
-      display,
+    scene.addSource(this.sourceId, {
+      id: this.sceneItemId,
+      select: false,
+      display: this.settings.display ?? 'horizontal',
     });
 
     this.reorderNodesSubcommand.rollback();
