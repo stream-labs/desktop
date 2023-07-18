@@ -337,7 +337,6 @@ class VideoSettingsModule {
       this.service.actions.setVideoSetting('fpsNum', 30, 'horizontal');
       this.service.actions.setVideoSetting('fpsDen', 1, 'horizontal');
     }
-    return Promise.resolve();
   }
 
   /**
@@ -361,7 +360,6 @@ class VideoSettingsModule {
       this.service.actions.setVideoSetting('fpsNum', Number(fpsNum), 'horizontal');
       this.service.actions.setVideoSetting('fpsDen', Number(fpsDen), 'horizontal');
     }
-    return Promise.resolve();
   }
   /**
    * Sets Integer FPS
@@ -385,7 +383,6 @@ class VideoSettingsModule {
         this.service.actions.setVideoSetting('fpsDen', 1, 'horizontal');
       }
     }
-    return Promise.resolve();
   }
 
   /**
@@ -410,7 +407,6 @@ class VideoSettingsModule {
         this.service.actions.setVideoSetting(key, Number(value), 'horizontal');
       }
     }
-    return Promise.resolve();
   }
 
   onChange(key: string) {
