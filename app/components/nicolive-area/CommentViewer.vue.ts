@@ -98,9 +98,6 @@ export default class CommentViewer extends Vue {
       }
     };
   }
-  pinnedItemContent(item: WrappedChat): string {
-    return `${getContentWithFilter(item)}  (${this.getFormattedLiveTime(item.value)})`;
-  }
   getDisplayName(item: WrappedChat): string {
     return getDisplayName(item);
   }
