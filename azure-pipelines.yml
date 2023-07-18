@@ -85,5 +85,3 @@ jobs:
 
       - script: 'yarn ci:compile'
         displayName: 'Compile Assets'
-        env:
-          NODE_OPTIONS: --openssl-legacy-provider

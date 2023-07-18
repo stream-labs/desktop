@@ -63,9 +63,7 @@ module.exports = {
     path: OUTPUT_DIR,
     filename: '[name].js',
     publicPath: '',
-    // Unfortunately this is not enough because webpack/lib/FileSystemInfo.js has a hardcoded MD4 call.
-    // So, we have to use export NODE_OPTIONS=--openssl-legacy-provider
-    // hashFunction: 'sha256',
+    hashFunction: 'sha256',
   },
 
   target: 'electron-renderer',
