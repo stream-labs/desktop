@@ -51,6 +51,7 @@ export default function Scrollable(initialProps: IScrollableProps & HTMLAttribut
           onOverflowChanged,
         },
       }}
+      onContextMenu={p.onContextMenu}
     >
       {p.children}
     </OverlayScrollbarsComponent>
