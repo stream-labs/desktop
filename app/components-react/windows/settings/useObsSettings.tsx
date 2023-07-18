@@ -21,7 +21,6 @@ class ObsSettingsModule {
     }
   }
 
-
   private get settingsService() {
     return Services.SettingsService;
   }
