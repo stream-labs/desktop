@@ -20,6 +20,7 @@ import { Rect } from 'util/rect';
 import { AnchorPoint, AnchorPositions, CenteringAxis } from 'util/ScalableRectangle';
 import { ISelectionState, TNodesList } from './index';
 import { DualOutputService } from 'services/dual-output';
+import { TDisplayType } from 'services/settings-v2';
 
 /**
  * Helper for working with multiple sceneItems
@@ -123,12 +124,17 @@ export class Selection {
   }
 
   /**
-   * return items with the order as in the scene
+   * Return items with the order as in the scene
+   *
+   * @param display - Optional, display to filter the selection by,
+   * primarily used for mouse events in the editor
    */
-  getItems(): SceneItem[] {
+  getItems(display?: TDisplayType): SceneItem[] {
     const scene = this.getScene();
     if (!this.getSize()) return [];
-    return scene.getItems().filter(item => this.state.selectedIds.includes(item.id));
+
+    const items = scene.getItems().filter(item => this.state.selectedIds.includes(item.id));
+    return display ? items.filter(item => item.display === display) : items;
   }
 
   /**
@@ -193,13 +199,14 @@ export class Selection {
     return items.length > 0;
   }
 
+  getVisualItems(display?: TDisplayType): SceneItem[] {
+    const items = this.getItems().filter(item => item.isVisualSource);
+    return display ? items.filter(item => item.display === display) : items;
+  }
+
   isGameCaptureSelected(): boolean {
     const items = this.getItems().filter(item => item.source.type === 'game_capture');
     return items.length > 0;
-  }
-
-  getVisualItems(): SceneItem[] {
-    return this.getItems().filter(item => item.isVisualSource);
   }
 
   /**
@@ -230,8 +237,8 @@ export class Selection {
     return this.state.selectedIds.length;
   }
 
-  getBoundingRect(): Rect {
-    const items = this.getVisualItems();
+  getBoundingRect(display?: TDisplayType): Rect {
+    const items = this.getVisualItems(display);
     if (!items.length) return null;
 
     let minTop = Infinity;

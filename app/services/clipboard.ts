@@ -179,7 +179,6 @@ export class ClipboardService extends StatefulService<IClipboardState> {
         const dualOutputNodeId = this.dualOutputService.views.getDualOutputNodeId(
           id,
           activeSceneId,
-          true,
         );
         if (dualOutputNodeId && !ids.has(dualOutputNodeId)) {
           ids.add(dualOutputNodeId);
