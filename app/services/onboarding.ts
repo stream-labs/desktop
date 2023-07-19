@@ -12,6 +12,7 @@ import { ObsImporterService } from './obs-importer';
 import Utils from './utils';
 import { RecordingModeService } from './recording-mode';
 import * as remote from '@electron/remote';
+import { Subject } from 'rxjs';
 
 enum EOnboardingSteps {
   MacPermissions = 'MacPermissions',
@@ -218,6 +219,8 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
 
   localStorageKey = 'UserHasBeenOnboarded';
 
+  onboardingCompleted = new Subject();
+
   @Inject() navigationService: NavigationService;
   @Inject() userService: UserService;
   @Inject() sceneCollectionsService: SceneCollectionsService;
@@ -311,6 +314,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
     }
 
     this.navigationService.navigate('Studio');
+    this.onboardingCompleted.next();
   }
 
   get isTwitchAuthed() {
