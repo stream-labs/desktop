@@ -204,6 +204,11 @@ export class Selection {
     return display ? items.filter(item => item.display === display) : items;
   }
 
+  isGameCaptureSelected(): boolean {
+    const items = this.getItems().filter(item => item.source.type === 'game_capture');
+    return items.length > 0;
+  }
+
   /**
    * the right order is not guaranteed
    */

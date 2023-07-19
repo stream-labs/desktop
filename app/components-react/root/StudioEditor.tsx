@@ -25,6 +25,7 @@ export default function StudioEditor() {
     performanceMode: CustomizationService.state.performanceMode,
     cursor: EditorService.state.cursor,
     studioMode: TransitionsService.state.studioMode,
+    dualOutputMode: DualOutputService.views.dualOutputMode,
     showHorizontalDisplay: DualOutputService.views.showHorizontalDisplay,
     showVerticalDisplay: DualOutputService.views.showVerticalDisplay,
     activeSceneId: ScenesService.views.activeSceneId,
@@ -190,9 +191,7 @@ export default function StudioEditor() {
       {displayEnabled && (
         <div className={cx(styles.studioModeContainer, { [styles.stacked]: studioModeStacked })}>
           {v.studioMode && <StudioModeControls stacked={studioModeStacked} />}
-          {v.showHorizontalDisplay && v.showVerticalDisplay && (
-            <DualOutputControls stacked={studioModeStacked} />
-          )}
+          {v.dualOutputMode && <DualOutputControls stacked={studioModeStacked} />}
           <div
             className={cx(styles.studioDisplayContainer, { [styles.stacked]: studioModeStacked })}
           >
@@ -350,20 +349,28 @@ function DualOutputControls(p: { stacked: boolean }) {
   function openSettingsWindow() {
     Services.SettingsService.actions.showSettings('Video');
   }
+  const showHorizontal = Services.DualOutputService.views.showHorizontalDisplay;
+  const showVertical = Services.DualOutputService.views.showVerticalDisplay;
+
   return (
     <div
       id="dual-output-header"
       className={cx(styles.dualOutputHeader, { [styles.stacked]: p.stacked })}
     >
-      <div className={styles.dualOutputModeDetails}>
-        <i className="icon-desktop" />
-        <span>{$t('Horizontal Output')}</span>
-      </div>
+      {showHorizontal && (
+        <div className={styles.dualOutputModeDetails}>
+          <i className="icon-desktop" />
+          <span>{$t('Horizontal Output')}</span>
+        </div>
+      )}
 
-      <div className={styles.dualOutputModeDetails}>
-        <i className="icon-phone-case" />
-        <span>{$t('Vertical Output')}</span>
-      </div>
+      {showVertical && (
+        <div className={styles.dualOutputModeDetails}>
+          <i className="icon-phone-case" />
+          <span>{$t('Vertical Output')}</span>
+        </div>
+      )}
+
       <a className={styles.manageLink} onClick={openSettingsWindow}>
         {$t('Manage Dual Output')}
       </a>

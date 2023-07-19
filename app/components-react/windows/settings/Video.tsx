@@ -56,6 +56,7 @@ const FPS_OPTIONS = [
 class VideoSettingsModule {
   service = Services.VideoSettingsService;
   userService = Services.UserService;
+  dualOutputService = Services.DualOutputService;
 
   get display(): TDisplayType {
     return this.state.display;
@@ -86,8 +87,8 @@ class VideoSettingsModule {
   state = injectState({
     display: 'horizontal' as TDisplayType,
     showModal: false,
-    showDualOutputSettings: Services.DualOutputService.views.dualOutputMode,
-    shouldShowDualOutputCheckbox: Services.DualOutputService.views.shouldShowDualOutputCheckbox,
+    showDualOutputSettings: this.dualOutputService.views.dualOutputMode,
+    shouldShowDualOutputCheckbox: this.dualOutputService.views.shouldShowDualOutputCheckbox,
     customBaseRes: !this.baseResOptions.find(
       opt => opt.value === this.service.values.horizontal.baseRes,
     ),
@@ -312,35 +313,99 @@ class VideoSettingsModule {
     }
   }
 
+  /**
+   * Sets the FPS type
+   * @remark set the same FPS type for both displays
+   * If there is a vertical context, update it as well.
+   * Otherwise, update the vertical display persisted settings.
+   */
   setFPSType(value: EFPSType) {
-    const display = this.state.display;
-    this.service.actions.setVideoSetting('fpsType', value, display);
-    this.service.actions.setVideoSetting('fpsNum', 30, display);
-    this.service.actions.setVideoSetting('fpsDen', 1, display);
-  }
-  setCommonFPS(value: string) {
-    const display = this.state.display;
-    const [fpsNum, fpsDen] = value.split('-');
-    this.service.actions.setVideoSetting('fpsNum', Number(fpsNum), display);
-    this.service.actions.setVideoSetting('fpsDen', Number(fpsDen), display);
-  }
-  setIntegerFPS(value: string) {
-    const display = this.state.display;
-    this.state.setFpsInt(Number(value));
-    if (Number(value) > 0 && Number(value) < 1001) {
-      this.service.actions.setVideoSetting('fpsNum', Number(value), display);
-      this.service.actions.setVideoSetting('fpsDen', 1, display);
+    if (this.service.contexts.vertical) {
+      this.service.actions.setVideoSetting('fpsType', value, 'horizontal');
+      this.service.actions.setVideoSetting('fpsNum', 30, 'horizontal');
+      this.service.actions.setVideoSetting('fpsDen', 1, 'horizontal');
+
+      this.service.actions.setVideoSetting('fpsType', value, 'vertical');
+      this.service.actions.setVideoSetting('fpsNum', 30, 'vertical');
+      this.service.actions.setVideoSetting('fpsDen', 1, 'vertical');
+    } else {
+      this.dualOutputService.actions.setVideoSetting({ fpsType: value }, 'vertical');
+      this.dualOutputService.actions.setVideoSetting({ fpsNum: 30 }, 'vertical');
+      this.dualOutputService.actions.setVideoSetting({ fpsDen: 1 }, 'vertical');
+
+      this.service.actions.setVideoSetting('fpsType', value, 'horizontal');
+      this.service.actions.setVideoSetting('fpsNum', 30, 'horizontal');
+      this.service.actions.setVideoSetting('fpsDen', 1, 'horizontal');
     }
   }
+
+  /**
+   * Sets Common FPS
+   * @remark set the same Common FPS for both displays
+   * If there is a vertical context, update it as well.
+   * Otherwise, update the vertical display persisted settings.
+   */
+  setCommonFPS(value: string) {
+    const [fpsNum, fpsDen] = value.split('-');
+    if (this.service.contexts.vertical) {
+      this.service.actions.setVideoSetting('fpsNum', Number(fpsNum), 'horizontal');
+      this.service.actions.setVideoSetting('fpsDen', Number(fpsDen), 'horizontal');
+
+      this.service.actions.setVideoSetting('fpsNum', Number(fpsNum), 'vertical');
+      this.service.actions.setVideoSetting('fpsDen', Number(fpsDen), 'vertical');
+    } else {
+      this.dualOutputService.actions.setVideoSetting({ fpsNum: Number(fpsNum) }, 'vertical');
+      this.dualOutputService.actions.setVideoSetting({ fpsDen: Number(fpsDen) }, 'vertical');
+
+      this.service.actions.setVideoSetting('fpsNum', Number(fpsNum), 'horizontal');
+      this.service.actions.setVideoSetting('fpsDen', Number(fpsDen), 'horizontal');
+    }
+  }
+  /**
+   * Sets Integer FPS
+   * @remark set the same Integer FPS for both displays
+   * If there is a vertical context, update it as well.
+   * Otherwise, update the vertical display persisted settings.
+   */
+  setIntegerFPS(value: string) {
+    this.state.setFpsInt(Number(value));
+    if (Number(value) > 0 && Number(value) < 1001) {
+      if (this.service.contexts.vertical) {
+        this.service.actions.setVideoSetting('fpsNum', Number(value), 'horizontal');
+        this.service.actions.setVideoSetting('fpsDen', 1, 'horizontal');
+        this.service.actions.setVideoSetting('fpsNum', Number(value), 'vertical');
+        this.service.actions.setVideoSetting('fpsDen', 1, 'vertical');
+      } else {
+        this.dualOutputService.actions.setVideoSetting({ fpsNum: Number(value) }, 'vertical');
+        this.dualOutputService.actions.setVideoSetting({ fpsDen: 1 }, 'vertical');
+
+        this.service.actions.setVideoSetting('fpsNum', Number(value), 'horizontal');
+        this.service.actions.setVideoSetting('fpsDen', 1, 'horizontal');
+      }
+    }
+  }
+
+  /**
+   * Sets FPS
+   * @remark Set the same FPS for both displays.
+   * If there is a vertical context, update it as well.
+   * Otherwise, update the vertical display persisted settings.
+   */
   setFPS(key: 'fpsNum' | 'fpsDen', value: string) {
-    const display = this.state.display;
     if (key === 'fpsNum') {
       this.state.setFpsNum(Number(value));
     } else {
       this.state.setFpsDen(Number(value));
     }
     if (!invalidFps(this.state.fpsNum, this.state.fpsDen) && Number(value) > 0) {
-      this.service.actions.setVideoSetting(key, Number(value), display);
+      if (this.service.contexts.vertical) {
+        this.service.actions.setVideoSetting(key, Number(value), 'horizontal');
+        this.service.actions.setVideoSetting(key, Number(value), 'vertical');
+      } else {
+        this.dualOutputService.actions.setVideoSetting({ [key]: Number(value) }, 'vertical');
+
+        this.service.actions.setVideoSetting(key, Number(value), 'horizontal');
+      }
     }
   }
 
@@ -376,7 +441,7 @@ class VideoSettingsModule {
         content: $t('Cannot toggle dual output while in studio mode.'),
       });
     } else {
-      Services.DualOutputService.actions.setdualOutputMode();
+      this.dualOutputService.actions.setdualOutputMode();
       this.state.setShowDualOutputSettings(!this.state.showDualOutputSettings);
       Services.UsageStatisticsService.recordFeatureUsage('DualOutput');
     }
@@ -390,6 +455,11 @@ class VideoSettingsModule {
   handleAuth() {
     Services.WindowsService.actions.closeChildWindow();
     this.userService.actions.showLogin();
+    const onboardingCompleted = Services.OnboardingService.onboardingCompleted.subscribe(() => {
+      Services.DualOutputService.actions.setdualOutputMode();
+      Services.SettingsService.actions.showSettings('Video');
+      onboardingCompleted.unsubscribe();
+    });
   }
 }
 

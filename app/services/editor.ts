@@ -227,6 +227,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
             selectedSceneId: this.scene.id,
             showSceneItemMenu: true,
             selectedSourceId: overSelected.sourceId,
+            display: event.display,
           });
         } else if (overSources.length) {
           this.selectionService.views.globalSelection.select(overSources[0].sceneItemId);
@@ -234,9 +235,10 @@ export class EditorService extends StatefulService<IEditorServiceState> {
             selectedSceneId: this.scene.id,
             showSceneItemMenu: true,
             selectedSourceId: overSources[0].sourceId,
+            display: event.display,
           });
         } else {
-          menu = new EditMenu({ selectedSceneId: this.scene.id });
+          menu = new EditMenu({ selectedSceneId: this.scene.id, display: event.display });
         }
 
         menu.popup();

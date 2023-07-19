@@ -6,7 +6,7 @@ import {
 } from './dual-output-data';
 import { verticalDisplayData } from '../settings-v2/default-settings-data';
 import { ScenesService, SceneItem, IPartialSettings, TSceneNode } from 'services/scenes';
-import { IVideoSetting, TDisplayType, VideoSettingsService } from 'services/settings-v2/video';
+import { TDisplayType, VideoSettingsService } from 'services/settings-v2/video';
 import { TPlatform } from 'services/platforms';
 import { EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
 import { EditorCommandsService } from 'services/editor-commands';
@@ -266,8 +266,34 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     // confirm custom destinations have a default display
     this.confirmDestinationDisplays();
 
-    // we need to confirm that the scene collection has a node map
-    // because this is a new property added for dual output
+    /**
+     * Confirm that the horizontal and vertical fps settings are the same
+     */
+    this.videoSettingsService.establishedContext.next(() => {
+      ['fpsNum', 'fpsDen', 'fpsInt'].forEach(fpsSetting => {
+        if (
+          this.state.videoSettings.horizontal[fpsSetting] !==
+          this.state.videoSettings.vertical[fpsSetting]
+        ) {
+          const value = this.state.videoSettings.horizontal[fpsSetting];
+
+          /**
+           * Only update the settings in the context if it exists
+           */
+          if (this.videoSettingsService.contexts.vertical) {
+            this.videoSettingsService.setVideoSetting(fpsSetting, value, 'vertical');
+          } else {
+            this.setVideoSetting({ [fpsSetting]: value }, 'vertical');
+          }
+        }
+      });
+    });
+
+    /**
+     * Confirm that the scene collection has a node map
+     * because this is a new property added  to the Scene Collection manifest entry
+     * for handling dual output nodes.
+     */
     this.sceneCollectionsService.collectionSwitched.subscribe(() => {
       // confirm the scene collection has a node map
       if (!this.sceneCollectionsService.activeCollection.hasOwnProperty('sceneNodeMaps')) {
@@ -283,6 +309,9 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       }
     });
 
+    /**
+     * Ensures that the scene nodes are assigned a context
+     */
     this.scenesService.sceneSwitched.subscribe(scene => {
       // if the scene is not empty, handle vertical nodes
       if (scene?.nodes.length) {
@@ -290,12 +319,18 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       }
     });
 
+    /**
+     * This is primarily used to assign contexts to the sources when loading scene items
+     * when loading the scene collection.
+     */
     this.scenesService.sourcesAdded.subscribe((sceneId: string) => {
       this.assignContexts(sceneId);
     });
 
-    // the user must be logged in to use dual output mode
-    // so toggle off dual output mode on log out
+    /**
+     * The user must be logged in to use dual output mode
+     * so toggle off dual output mode on log out.
+     */
     this.userService.userLogout.subscribe(() => {
       if (this.state.dualOutputMode) {
         this.setdualOutputMode();
@@ -353,7 +388,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
     sceneItems.forEach((sceneItem: SceneItem, index: number) => {
       // Item already has a context assigned
-      if (sceneItem.output) return;
+      if (sceneItem?.output) return;
 
       const display = verticalNodeIds?.has(sceneItem.id) ? 'vertical' : 'horizontal';
       this.assignNodeContext(sceneItem, display);
@@ -386,10 +421,11 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     const nodes = this.scenesService.views.getScene(sceneId).getNodes();
 
     nodes.forEach(node => {
-      if (!node?.display) {
-        const display = this.views.getNodeDisplay(node.id, sceneId);
-        this.assignNodeContext(node, display);
-      }
+      // Item already has a context assigned
+      if (node?.output) return;
+
+      const display = this.views.getNodeDisplay(node.id, sceneId);
+      this.assignNodeContext(node, display);
     });
     this.SET_IS_LOADING(false);
   }
@@ -488,7 +524,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    * Update Video Settings
    */
 
-  setVideoSetting(setting: Partial<IVideoSetting>, display?: TDisplayType) {
+  setVideoSetting(setting: Partial<IVideoInfo>, display?: TDisplayType) {
     this.SET_VIDEO_SETTING(setting, display);
   }
 
@@ -545,7 +581,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   }
 
   @mutation()
-  private SET_VIDEO_SETTING(setting: Partial<IVideoSetting>, display: TDisplayType = 'vertical') {
+  private SET_VIDEO_SETTING(setting: Partial<IVideoInfo>, display: TDisplayType = 'vertical') {
     this.state.videoSettings[display] = {
       ...this.state.videoSettings[display],
       ...setting,

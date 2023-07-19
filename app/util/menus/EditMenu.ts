@@ -12,9 +12,8 @@ import { SelectionService } from 'services/selection';
 import { ProjectorService } from 'services/projector';
 import { $t } from 'services/i18n';
 import { EditorCommandsService } from 'services/editor-commands';
-import { ERenderingMode } from '../../../obs-api';
 import { StreamingService } from 'services/streaming';
-import Utils from 'services/utils';
+import { TDisplayType } from 'services/settings-v2';
 import * as remote from '@electron/remote';
 import { ProjectorMenu } from './ProjectorMenu';
 import { FiltersMenu } from './FiltersMenu';
@@ -29,6 +28,7 @@ interface IEditMenuOptions {
   showSceneItemMenu?: boolean;
   selectedSceneId?: string;
   showAudioMixerMenu?: boolean;
+  display?: TDisplayType;
 }
 
 export class EditMenu extends Menu {
@@ -104,7 +104,7 @@ export class EditMenu extends Menu {
 
       this.append({
         label: $t('Transform'),
-        submenu: this.transformSubmenu().menu,
+        submenu: this.transformSubmenu(this.options?.display).menu,
       });
 
       this.append({
@@ -374,8 +374,8 @@ export class EditMenu extends Menu {
     }
   }
 
-  private transformSubmenu() {
-    return new SourceTransformMenu();
+  private transformSubmenu(display?: TDisplayType) {
+    return new SourceTransformMenu(display);
   }
 
   private groupSubmenu() {

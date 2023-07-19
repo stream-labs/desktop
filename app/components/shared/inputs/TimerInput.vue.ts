@@ -63,21 +63,21 @@ export default class TimerInput extends BaseInput<number, ITimerMetadata> {
     return second === currentSecond;
   }
 
-  setHour(val: number) {
+  setHour(val: string) {
     const currentMinsInSecs = Math.floor(this.value % 3600);
-    const hour = val * 3600;
+    const hour = parseInt(val, 10) * 3600;
     this.updateValue(currentMinsInSecs + hour);
   }
 
-  setMinute(val: number) {
+  setMinute(val: string) {
     const currentHrsInSecs = Math.floor(this.value / 3600) * 3600;
-    const minute = val * 60;
+    const minute = parseInt(val, 10) * 60;
     this.updateValue(currentHrsInSecs + minute);
   }
 
-  setSecond(val: number) {
+  setSecond(val: string) {
     const currentMinsInSecs = Math.floor((this.value % 3600) / 60) * 60;
-    this.updateValue(currentMinsInSecs + val);
+    this.updateValue(currentMinsInSecs + parseInt(val, 10));
   }
 
   updateValue(value: number) {
