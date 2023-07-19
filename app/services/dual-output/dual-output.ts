@@ -302,9 +302,9 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
      */
     this.sceneCollectionsService.collectionSwitched.subscribe(() => {
       // confirm the scene collection has a node map
-      if (!this.sceneCollectionsService.activeCollection.hasOwnProperty('sceneNodeMaps')) {
-        this.sceneCollectionsService.initNodeMaps();
-      }
+      // if (!this.sceneCollectionsService.activeCollection.hasOwnProperty('sceneNodeMaps')) {
+      //   this.sceneCollectionsService.initNodeMaps();
+      // }
 
       if (this.state.dualOutputMode && this.streamingService.state.selectiveRecording) {
         this.streamingService.actions.setSelectiveRecording(false);
@@ -329,10 +329,9 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
      * This is primarily used to assign contexts to the sources when loading scene items
      * when loading the scene collection.
      */
-    this.scenesService.sourcesAdded.subscribe((sceneId: string) => {
-      this.assignContexts(sceneId);
-    });
-
+    // this.scenesService.sourcesAdded.subscribe((sceneId: string) => {
+    //   this.assignContexts(sceneId);
+    // });
     /**
      * The user must be logged in to use dual output mode
      * so toggle off dual output mode on log out.
@@ -361,8 +360,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
   /**
    * Create or confirm nodes for vertical output when toggling vertical display
+   * @param sceneId - Id of the scene to map
    */
-
   confirmOrCreateVerticalNodes(sceneId: string) {
     if (!this.views.hasNodeMap(sceneId) && this.state.dualOutputMode) {
       try {
@@ -372,19 +371,24 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       }
     } else {
       try {
-        this.assignSceneNodes(sceneId);
+        this.confirmOrAssignSceneNodes(sceneId);
       } catch (error: unknown) {
         console.error('Error toggling Dual Output mode: ', error);
       }
     }
   }
 
-  assignSceneNodes(sceneId: string) {
+  /**
+   * Assign or confirm node contexts to a dual output scene
+   * @param sceneId - Id of the scene to map
+   */
+  confirmOrAssignSceneNodes(sceneId: string) {
     this.SET_IS_LOADING(true);
     const sceneItems = this.scenesService.views.getSceneItemsBySceneId(sceneId);
     if (!sceneItems) return;
     const verticalNodeIds = new Set(this.views.getVerticalNodeIds(sceneId));
 
+    // establish vertical context if it doesn't exist
     if (
       this.views.getVerticalNodeIds(sceneId)?.length > 0 &&
       !this.videoSettingsService.contexts.vertical
@@ -397,7 +401,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       if (sceneItem?.output) return;
 
       const display = verticalNodeIds?.has(sceneItem.id) ? 'vertical' : 'horizontal';
-      this.assignNodeContext(sceneItem, display);
+      this.assignNodeContext(sceneItem, sceneItem?.display ?? display);
       this.sceneNodeHandled.next(index);
     });
 
@@ -406,6 +410,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
   createSceneNodes(sceneId: string) {
     this.SET_IS_LOADING(true);
+
+    // establish vertical context if it doesn't exist
     if (this.state.dualOutputMode && !this.videoSettingsService.contexts.vertical) {
       this.videoSettingsService.establishVideoContext('vertical');
     }
@@ -422,19 +428,19 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     this.SET_IS_LOADING(false);
   }
 
-  assignContexts(sceneId: string) {
-    this.SET_IS_LOADING(true);
-    const nodes = this.scenesService.views.getScene(sceneId).getNodes();
+  // assignContexts(sceneId: string) {
+  //   this.SET_IS_LOADING(true);
+  //   const nodes = this.scenesService.views.getScene(sceneId).getNodes();
 
-    nodes.forEach(node => {
-      // Item already has a context assigned
-      if (node?.output) return;
+  //   nodes.forEach(node => {
+  //     // Item already has a context assigned
+  //     if (node?.output) return;
 
-      const display = this.views.getNodeDisplay(node.id, sceneId);
-      this.assignNodeContext(node, display);
-    });
-    this.SET_IS_LOADING(false);
-  }
+  //     const display = this.views.getNodeDisplay(node.id, sceneId);
+  //     this.assignNodeContext(node, display);
+  //   });
+  //   this.SET_IS_LOADING(false);
+  // }
 
   createOrAssignOutputNode(
     sceneItem: SceneItem,

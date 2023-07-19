@@ -19,13 +19,8 @@ export class NodeMapNode extends Node<ISceneNodeMapSchema, {}> {
   }
 
   async load() {
-    this.sceneCollectionsService.initNodeMaps(this.data.sceneNodeMaps);
+    if (this.data?.sceneNodeMaps && !this.sceneCollectionsService.hasOwnProperty('sceneNodeMaps')) {
+      this.sceneCollectionsService.initNodeMaps(this.data?.sceneNodeMaps);
+    }
   }
-
-  // migrate(version: number) {
-  //   if (version === 1) {
-  //     // init the scene node maps property
-  //     this.data.sceneNodeMaps = {};
-  //   }
-  // }
 }

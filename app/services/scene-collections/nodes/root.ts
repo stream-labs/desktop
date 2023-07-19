@@ -63,19 +63,19 @@ export class RootNode extends Node<ISchema, {}> {
   @Inject() sceneCollectionsService: SceneCollectionsService;
 
   async save(): Promise<void> {
+    const nodeMap = new NodeMapNode();
     const sources = new SourcesNode();
     const scenes = new ScenesNode();
     const transitions = new TransitionsNode();
     const hotkeys = new HotkeysNode();
     const guestCam = new GuestCamNode();
-    const nodeMap = new NodeMapNode();
 
+    await nodeMap.save();
     await sources.save({});
     await scenes.save({});
     await transitions.save();
     await hotkeys.save({});
     await guestCam.save();
-    await nodeMap.save();
 
     this.data = {
       sources,
@@ -128,10 +128,7 @@ export class RootNode extends Node<ISchema, {}> {
       this.streamingService.setSelectiveRecording(!!this.data.selectiveRecording);
       this.streamingService.setDualOutputMode(this.data.dualOutputMode);
 
-      if (this.data.nodeMap) {
-        console.log('loading node map');
-        await this.data.nodeMap.load();
-      }
+      await this.data.nodeMap.load();
 
       await this.data.transitions.load();
       await this.data.sources.load({});
@@ -161,9 +158,5 @@ export class RootNode extends Node<ISchema, {}> {
     if (version < 4) {
       this.data.baseResolutions = this.videoService.baseResolutions;
     }
-
-    // if (version < 5) {
-    //   this.data.nodeMap = {} as NodeMapNode;
-    // }
   }
 }

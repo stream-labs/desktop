@@ -45,6 +45,7 @@ const uuid = window['require']('uuid/v4');
 
 export const NODE_TYPES = {
   RootNode,
+  NodeMapNode,
   SourcesNode,
   ScenesNode,
   SceneItemsNode,
@@ -53,7 +54,6 @@ export const NODE_TYPES = {
   SceneFiltersNode,
   GuestCamNode,
   TransitionNode: TransitionsNode, // Alias old name to new node
-  NodeMapNode,
 };
 
 interface ISceneCollectionInternalCreateOptions extends ISceneCollectionCreateOptions {

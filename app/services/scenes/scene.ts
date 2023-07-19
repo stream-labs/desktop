@@ -160,8 +160,15 @@ export class Scene {
 
       const nodeMap = this.dualOutputService.views.activeSceneNodeMap;
       const verticalNodeIds = new Set(this.dualOutputService.views.verticalNodeIds);
+      // console.log('getSourceSelectorNodes verticalNodeIds ', verticalNodeIds);
+      // console.log('getSourceSelectorNodes nodeMap ', nodeMap);
+
       nodes = nodes.filter(node => {
-        return !populateWithVerticalNodes ? nodeMap[node.id] : verticalNodeIds.has(node.id);
+        // return !populateWithVerticalNodes ? nodeMap[node.id] : verticalNodeIds.has(node.id);
+
+        return populateWithVerticalNodes
+          ? node?.display === 'vertical'
+          : node?.display === 'horizontal';
       });
     }
     return nodes;
@@ -443,9 +450,7 @@ export class Scene {
     // create folder and items
     let itemIndex = 0;
     nodes.forEach(nodeModel => {
-      const display =
-        nodeModel?.display ??
-        this.dualOutputService.views.getNodeDisplay(nodeModel.id, this.state.id);
+      const display = nodeModel.display;
       const obsSceneItem = obsSceneItems[itemIndex];
       if (nodeModel.sceneNodeType === 'folder') {
         this.createFolder(nodeModel.name, { id: nodeModel.id, display });
@@ -468,8 +473,6 @@ export class Scene {
       if (nodeModel.sceneNodeType !== 'folder') return;
       this.getSelection(nodeModel.childrenIds).moveTo(this.id, nodeModel.id);
     });
-
-    this.scenesService.sourcesAdded.next(this.id);
   }
 
   canAddSource(sourceId: string): boolean {
