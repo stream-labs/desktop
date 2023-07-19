@@ -159,6 +159,7 @@ export function setSentryContext(ctx: ISentryContext) {
 class UserViews extends ViewHandler<IUserServiceState> {
   // Injecting HostsService since it's not stateful
   @Inject() hostsService: HostsService;
+  @Inject() magicLinkService: MagicLinkService;
 
   get settingsServiceViews() {
     return this.getServiceViews(SettingsService);
@@ -253,13 +254,9 @@ class UserViews extends ViewHandler<IUserServiceState> {
     const uiTheme = this.customizationServiceViews.isDarkTheme ? 'night' : 'day';
     let url = `https://${this.hostsService.streamlabs}/alert-box-themes?mode=${uiTheme}&slobs`;
 
-    if (this.isLoggedIn) {
-      url += `&oauth_token=${this.auth.apiToken}`;
-    }
-
     if (id) url += `&id=${id}`;
 
-    return url;
+    return this.magicLinkService.getMagicSessionUrl(url);
   }
 
   appStoreUrl(params?: { appId?: string | undefined; type?: string | undefined }) {
@@ -289,15 +286,11 @@ class UserViews extends ViewHandler<IUserServiceState> {
 
     url += `?mode=${uiTheme}&slobs`;
 
-    if (this.isLoggedIn) {
-      url += `&oauth_token=${this.auth.apiToken}`;
-    }
-
     if (type && id) {
       url += `#/?type=${type}&id=${id}`;
     }
 
-    return url;
+    return this.magicLinkService.getMagicSessionUrl(url);
   }
 }
 

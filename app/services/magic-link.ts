@@ -90,4 +90,10 @@ export class MagicLinkService extends Service {
       console.error('Error generating dashboard magic link', e);
     }
   }
+
+  getMagicSessionUrl(targetUrl: string) {
+    return `https://${this.hostsService.streamlabs}/slobs/magic/init-session?login_token=${
+      this.userService.apiToken
+    }&r=${encodeURIComponent(targetUrl)}`;
+  }
 }
