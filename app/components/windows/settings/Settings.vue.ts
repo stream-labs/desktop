@@ -17,14 +17,13 @@ import { MagicLinkService } from 'services/magic-link';
 import { UserService } from 'services/user';
 import { DismissablesService, EDismissable } from 'services/dismissables';
 import Scrollable from 'components/shared/Scrollable';
-import Hotkeys from './Hotkeys.vue';
 import {
   ObsSettings,
   PlatformLogo,
   NewBadge,
   UltraIcon,
   InstalledApps,
-  // Hotkeys,
+  Hotkeys,
 } from 'components/shared/ReactComponentList';
 import { $t } from 'services/i18n';
 import { debounce } from 'lodash-decorators';

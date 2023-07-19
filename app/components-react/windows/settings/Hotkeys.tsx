@@ -129,7 +129,7 @@ export default function Hotkeys(props: HotkeysProps) {
   const hasSceneHotkeys = hasHotkeys(sceneHotkeys);
 
   const sourceHotkeys = filteredHotkeySet.sources;
-  const hasSourceHotkeys = !!sourceHotkeys.length;
+  const hasSourceHotkeys = hasHotkeys(sourceHotkeys);
 
   const markerHotkeys = filteredHotkeySet.markers;
   const hasMarkers = !!markerHotkeys.length;
@@ -169,9 +169,12 @@ export default function Hotkeys(props: HotkeysProps) {
           {Object.keys(sourceHotkeys).map(renderSourcesHotkeyGroup)}
         </>
       )}
-      {/* TODO: 1-1 conversion, not sure if we're supposed to render this title if there aren't any markers */}
-      <h2>{$t('Markers')}</h2>
-      {hasMarkers && <HotkeyGroup hotkeys={markerHotkeys} isSearch={isSearch} title={null} />}
+      {hasMarkers && (
+        <>
+          <h2>{$t('Markers')}</h2>
+          <HotkeyGroup hotkeys={markerHotkeys} isSearch={isSearch} title={null} />
+        </>
+      )}
     </div>
   );
 }
