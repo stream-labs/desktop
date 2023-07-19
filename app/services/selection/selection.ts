@@ -202,6 +202,10 @@ export class Selection {
   getVisualItems(display?: TDisplayType): SceneItem[] {
     const items = this.getItems().filter(item => item.isVisualSource);
     return display ? items.filter(item => item.display === display) : items;
+
+  isGameCaptureSelected(): boolean {
+    const items = this.getItems().filter(item => item.source.type === 'game_capture');
+    return items.length > 0;
   }
 
   /**

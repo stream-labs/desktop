@@ -6,9 +6,9 @@ import { $t } from 'services/i18n';
 import { Menu } from 'util/menus/Menu';
 import { EditorCommandsService } from 'services/editor-commands';
 import BaseElement from './BaseElement';
-import GLVolmeters from '../../GLVolmeters';
 import { CustomizationService } from 'services/customization';
 import Scrollable from 'components/shared/Scrollable';
+import { GLVolmeters } from '../../shared/ReactComponentList';
 
 @Component({})
 export default class Mixer extends BaseElement {
@@ -73,7 +73,7 @@ export default class Mixer extends BaseElement {
         <Scrollable className="studio-controls-selector mixer-panel">
           <div style={{ position: 'relative' }}>
             {this.audioSources.length !== 0 && !this.performanceMode && (
-              <GLVolmeters style={{ left: '17px', right: '17px', height: '100%' }} />
+              <GLVolmeters />
             )}
             {this.audioSources.map(audioSource => (
               <MixerItem

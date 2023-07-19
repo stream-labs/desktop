@@ -14,3 +14,8 @@ const antdlibSettings = JSON.parse(fs.readFileSync(antdLibSettingsPath, 'utf8'))
 delete antdlibSettings.module;
 antdlibSettings.main = 'dist/antd.min.js';
 fs.writeFileSync(antdLibSettingsPath, JSON.stringify(antdlibSettings, null, 2));
+
+// Fix hardcoded MD4
+if (process.platform === 'darwin') {
+  execSync("find node_modules/webpack/lib -type f -exec sed -i '' 's|md4|sha256|g' {} \\;", { stdio: [0, 1, 2] });
+}

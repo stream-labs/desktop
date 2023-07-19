@@ -9,6 +9,7 @@ import Utils from '../../services/utils';
 import KevinSvg from './KevinSvg';
 import styles from './TitleBar.m.less';
 import * as remote from '@electron/remote';
+import Banner from 'components-react/root/Banner';
 
 export default function TitleBar(props: { windowId: string }) {
   const { CustomizationService, StreamingService, WindowsService } = Services;
@@ -59,34 +60,37 @@ export default function TitleBar(props: { windowId: string }) {
   }
 
   return (
-    <div
-      className={cx(styles.titlebar, v.theme, {
-        [styles['titlebar-mac']]: isMac,
-        [styles.titlebarError]: errorState,
-      })}
-    >
-      {!primeTheme && !isMac && (
-        <img className={styles.titlebarIcon} src={require('../../../media/images/icon.ico')} />
-      )}
-      {primeTheme && !isMac && <KevinSvg className={styles.titlebarIcon} />}
-      <div className={styles.titlebarTitle} onDoubleClick={maximize}>
-        {v.title}
-      </div>
-      {!isMac && (
-        <div className={styles.titlebarActions}>
-          {isDev && (
-            <i
-              className={cx('fas fa-sync', styles.titlebarAction)}
-              onClick={() => window.location.reload()}
-            />
-          )}
-          <i className={cx('icon-subtract', styles.titlebarAction)} onClick={minimize} />
-          {isMaximizable && (
-            <i className={cx('icon-expand-1', styles.titlebarAction)} onClick={maximize} />
-          )}
-          <i className={cx('icon-close', styles.titlebarAction)} onClick={close} />
+    <>
+      <div
+        className={cx(styles.titlebar, v.theme, {
+          [styles['titlebar-mac']]: isMac,
+          [styles.titlebarError]: errorState,
+        })}
+      >
+        {!primeTheme && !isMac && (
+          <img className={styles.titlebarIcon} src={require('../../../media/images/icon.ico')} />
+        )}
+        {primeTheme && !isMac && <KevinSvg className={styles.titlebarIcon} />}
+        <div className={styles.titlebarTitle} onDoubleClick={maximize}>
+          {v.title}
         </div>
-      )}
-    </div>
+        {!isMac && (
+          <div className={styles.titlebarActions}>
+            {isDev && (
+              <i
+                className={cx('fas fa-sync', styles.titlebarAction)}
+                onClick={() => window.location.reload()}
+              />
+            )}
+            <i className={cx('icon-subtract', styles.titlebarAction)} onClick={minimize} />
+            {isMaximizable && (
+              <i className={cx('icon-expand-1', styles.titlebarAction)} onClick={maximize} />
+            )}
+            <i className={cx('icon-close', styles.titlebarAction)} onClick={close} />
+          </div>
+        )}
+      </div>
+      {props.windowId === 'main' && <Banner />}
+    </>
   );
 }
