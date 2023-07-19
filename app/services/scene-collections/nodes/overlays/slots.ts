@@ -78,7 +78,7 @@ interface IContext {
 }
 
 export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
-  schemaVersion = 2;
+  schemaVersion = 1;
 
   @Inject() videoService: VideoService;
   @Inject() sourceFiltersService: SourceFiltersService;
@@ -359,10 +359,6 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
         );
       });
     }
-
-    if (obj.visible) {
-      sceneItem.setVisibility(obj.visible);
-    }
   }
 
   adjustTransform(item: SceneItem, obj: IItemSchema) {
@@ -378,13 +374,5 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
       crop: obj.crop,
       rotation: obj.rotation,
     });
-  }
-
-  migrate(version: number) {
-    if (version < 2) {
-      this.data.items = this.data.items.map(item => {
-        return item.sceneNodeType === 'item' ? { ...item, visible: true } : item;
-      });
-    }
   }
 }

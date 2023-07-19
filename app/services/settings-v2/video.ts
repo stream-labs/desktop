@@ -16,7 +16,6 @@ const displays = ['horizontal', 'vertical'] as const;
 export type TDisplayType = typeof displays[number];
 
 export interface IVideoSetting {
-  default: IVideoInfo;
   horizontal: IVideoInfo;
   vertical: IVideoInfo;
 }
@@ -117,7 +116,11 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
    * @returns Settings formatted for the video settings form
    */
   formatVideoSettings(display: TDisplayType = 'horizontal') {
-    const settings = this.state[display] ?? this.dualOutputService.views.videoSettings.vertical;
+    // use vertical display setting as a failsafe to prevent null errors
+    const settings =
+      this.contexts[display]?.video ??
+      this.dualOutputService.views.videoSettings[display] ??
+      this.dualOutputService.views.videoSettings.vertical;
 
     return {
       baseRes: `${settings?.baseWidth}x${settings?.baseHeight}`,
