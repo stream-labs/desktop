@@ -74,10 +74,9 @@ export class SceneItemsNode extends Node<ISchema, {}> {
         const hotkeys = new HotkeysNode();
 
         if (sceneItem.isItem()) {
-          const display = this.dualOutputService.views.getNodeDisplay(
-            sceneItem.sceneItemId,
-            sceneItem.sceneId,
-          );
+          const display =
+            sceneItem?.display ??
+            this.dualOutputService.views.getNodeDisplay(sceneItem.sceneItemId, sceneItem.sceneId);
           const context = this.videoSettingsService.contexts[display];
 
           hotkeys.save({ sceneItemId: sceneItem.sceneItemId }).then(() => {

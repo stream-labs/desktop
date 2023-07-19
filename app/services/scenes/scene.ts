@@ -433,6 +433,7 @@ export class Scene {
         scaleFilter: sceneNode.scaleFilter!,
         blendingMode: sceneNode.blendingMode!,
         blendingMethod: sceneNode.blendingMethod,
+        display: sceneNode.display,
       });
       return true;
     });
@@ -442,10 +443,12 @@ export class Scene {
     // create folder and items
     let itemIndex = 0;
     nodes.forEach(nodeModel => {
-      const display = this.dualOutputService.views.getNodeDisplay(nodeModel.id, this.state.id);
+      const display =
+        nodeModel?.display ??
+        this.dualOutputService.views.getNodeDisplay(nodeModel.id, this.state.id);
       const obsSceneItem = obsSceneItems[itemIndex];
       if (nodeModel.sceneNodeType === 'folder') {
-        this.createFolder(nodeModel.name, { id: nodeModel.id });
+        this.createFolder(nodeModel.name, { id: nodeModel.id, display });
       } else {
         this.ADD_SOURCE_TO_SCENE(
           nodeModel.id,

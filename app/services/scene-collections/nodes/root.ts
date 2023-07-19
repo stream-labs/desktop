@@ -3,6 +3,7 @@ import { SourcesNode } from './sources';
 import { ScenesNode } from './scenes';
 import { TransitionsNode } from './transitions';
 import { HotkeysNode } from './hotkeys';
+import { NodeMapNode } from './node-map';
 import { Inject } from 'services/core';
 import { VideoService } from 'services/video';
 import { StreamingService } from 'services/streaming';
@@ -11,6 +12,7 @@ import { GuestCamNode } from './guest-cam';
 import { VideoSettingsService } from 'services/settings-v2/video';
 import { DualOutputService } from 'services/dual-output';
 import { SettingsService } from 'services/settings';
+import { SceneCollectionsService } from '../scene-collections';
 
 interface ISchema {
   /**
@@ -40,6 +42,7 @@ interface ISchema {
   scenes: ScenesNode;
   hotkeys?: HotkeysNode;
   transitions?: TransitionsNode; // V2 Transitions
+  nodeMap?: NodeMapNode;
 
   guestCam?: GuestCamNode;
 
@@ -50,13 +53,14 @@ interface ISchema {
  * This is the root node of the config file
  */
 export class RootNode extends Node<ISchema, {}> {
-  schemaVersion = 4;
+  schemaVersion = 5;
 
   @Inject() videoService: VideoService;
   @Inject() streamingService: StreamingService;
   @Inject() videoSettingsService: VideoSettingsService;
   @Inject() dualOutputService: DualOutputService;
   @Inject() settingsService: SettingsService;
+  @Inject() sceneCollectionsService: SceneCollectionsService;
 
   async save(): Promise<void> {
     const sources = new SourcesNode();
@@ -64,12 +68,14 @@ export class RootNode extends Node<ISchema, {}> {
     const transitions = new TransitionsNode();
     const hotkeys = new HotkeysNode();
     const guestCam = new GuestCamNode();
+    const nodeMap = new NodeMapNode();
 
     await sources.save({});
     await scenes.save({});
     await transitions.save();
     await hotkeys.save({});
     await guestCam.save();
+    await nodeMap.save();
 
     this.data = {
       sources,
@@ -77,6 +83,7 @@ export class RootNode extends Node<ISchema, {}> {
       transitions,
       hotkeys,
       guestCam,
+      nodeMap,
       baseResolution: this.videoService.baseResolution,
       baseResolutions: this.videoSettingsService.baseResolutions,
       selectiveRecording: this.streamingService.state.selectiveRecording,
@@ -101,6 +108,11 @@ export class RootNode extends Node<ISchema, {}> {
           await this.data.sources.load({});
           await this.data.scenes.load({});
 
+          if (this.data.nodeMap) {
+            console.log('loading node map init');
+            await this.data.nodeMap.load();
+          }
+
           if (this.data.hotkeys) {
             await this.data.hotkeys.load({});
           }
@@ -115,6 +127,11 @@ export class RootNode extends Node<ISchema, {}> {
       this.videoService.setBaseResolutions(this.data.baseResolutions);
       this.streamingService.setSelectiveRecording(!!this.data.selectiveRecording);
       this.streamingService.setDualOutputMode(this.data.dualOutputMode);
+
+      if (this.data.nodeMap) {
+        console.log('loading node map');
+        await this.data.nodeMap.load();
+      }
 
       await this.data.transitions.load();
       await this.data.sources.load({});
@@ -144,5 +161,9 @@ export class RootNode extends Node<ISchema, {}> {
     if (version < 4) {
       this.data.baseResolutions = this.videoService.baseResolutions;
     }
+
+    // if (version < 5) {
+    //   this.data.nodeMap = {} as NodeMapNode;
+    // }
   }
 }

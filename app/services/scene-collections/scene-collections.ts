@@ -39,6 +39,7 @@ import Utils from 'services/utils';
 import * as remote from '@electron/remote';
 import { GuestCamNode } from './nodes/guest-cam';
 import { DualOutputService } from 'services/dual-output';
+import { NodeMapNode } from './nodes/node-map';
 
 const uuid = window['require']('uuid/v4');
 
@@ -52,6 +53,7 @@ export const NODE_TYPES = {
   SceneFiltersNode,
   GuestCamNode,
   TransitionNode: TransitionsNode, // Alias old name to new node
+  NodeMapNode,
 };
 
 interface ISceneCollectionInternalCreateOptions extends ISceneCollectionCreateOptions {
@@ -737,10 +739,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
           .catch(e => console.warn('Failed setting active collection'));
       }
 
-      if (!collection.hasOwnProperty('sceneNodeMaps')) {
-        collection.sceneNodeMaps = {};
-      }
-
       this.stateService.SET_ACTIVE_COLLECTION(id);
     }
   }
@@ -1038,5 +1036,13 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    */
   removeNodeMap(sceneId: string) {
     this.stateService.removeNodeMap(sceneId);
+  }
+
+  /**
+   * Flush manifest file
+   * @remark Primarily used for saving the scene node map in the overlay file
+   */
+  flushManifestFile() {
+    this.stateService.flushManifestFile();
   }
 }
