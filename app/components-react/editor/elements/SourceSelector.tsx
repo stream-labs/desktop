@@ -24,6 +24,7 @@ import { DualOutputSourceSelector } from './DualOutputSourceSelector';
 import { WidgetsService } from '../../../app-services';
 import { GuestCamService } from 'app-services';
 import { DualOutputService } from 'services/dual-output';
+import { SceneCollectionsService } from 'services/scene-collections';
 interface ISourceMetadata {
   id: string;
   title: string;
@@ -50,6 +51,7 @@ export class SourceSelectorModule {
   private audioService = inject(AudioService);
   private guestCamService = inject(GuestCamService);
   private dualOutputService = inject(DualOutputService);
+  private sceneCollectionsService = inject(SceneCollectionsService);
 
   sourcesTooltip = $t('The building blocks of your scene. Also contains widgets.');
   addSourceTooltip = $t('Add a new Source to your Scene. Includes widgets.');
@@ -59,6 +61,7 @@ export class SourceSelectorModule {
   state = injectState({
     expandedFoldersIds: [] as string[],
     showTreeMask: true,
+    sceneNodeMap: this.dualOutputService.views.activeSceneNodeMap,
   });
 
   nodeRefs = {};
@@ -117,7 +120,42 @@ export class SourceSelectorModule {
     return getTreeNodes(nodeData.filter(n => !n.parentId));
   }
 
+  filterNodes(): TSceneNode[] {
+    // getSourceSelectorNodes(): {
+    let nodes = this.scene.getNodes();
+    console.log('hasVerticalNodes ', JSON.stringify(this.dualOutputService.views.hasVerticalNodes));
+    console.log(
+      'sceneNodeMaps ',
+      JSON.stringify(this.sceneCollectionsService?.sceneNodeMaps?.[this.scene.id]),
+    );
+    if (this.dualOutputService.views.hasVerticalNodes) {
+      const populateWithVerticalNodes =
+        !this.dualOutputService.views.activeDisplays.horizontal &&
+        this.dualOutputService.views.activeDisplays.vertical;
+
+      /**
+       * nodeMap can be used for checking horizontal display nodes,
+       * but cannot lookup vertical display IDs so we use a Set instead
+       */
+
+      const nodeMap = this.dualOutputService.views.activeSceneNodeMap;
+      const verticalNodeIds = new Set(this.dualOutputService.views.verticalNodeIds);
+      // console.log('getSourceSelectorNodes verticalNodeIds ', verticalNodeIds);
+      // console.log('getSourceSelectorNodes nodeMap ', nodeMap);
+
+      nodes = nodes.filter((node: TSceneNode) => {
+        return !populateWithVerticalNodes ? nodeMap[node.id] : verticalNodeIds.has(node.id);
+
+        // return populateWithVerticalNodes
+        //   ? node?.display === 'vertical'
+        //   : node?.display === 'horizontal';
+      });
+    }
+    return nodes;
+  }
+
   get nodeData(): ISourceMetadata[] {
+    console.log('sceneNodeMap ', this.state.sceneNodeMap);
     return this.scene.getSourceSelectorNodes().map(node => {
       const itemsForNode = this.scene.getItemsForNode(node.id);
       const isVisible = itemsForNode.some(i => i.visible);

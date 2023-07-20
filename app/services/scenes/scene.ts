@@ -1,4 +1,4 @@
-import { ServiceHelper, mutation, Inject } from 'services';
+import { ServiceHelper, mutation, Inject, ExecuteInWorkerProcess } from 'services';
 import { ScenesService } from './scenes';
 import { Source, SourcesService, TSourceType } from 'services/sources';
 import {
@@ -25,6 +25,7 @@ import uuid from 'uuid/v4';
 import { assertIsDefined, getDefined } from 'util/properties-type-guards';
 import { VideoSettingsService, TDisplayType } from 'services/settings-v2';
 import { DualOutputService } from 'services/dual-output';
+import { SceneCollectionsService } from 'services/scene-collections';
 
 export type TSceneNode = SceneItem | SceneItemFolder;
 
@@ -46,6 +47,7 @@ export class Scene {
   @Inject() private selectionService: SelectionService;
   @Inject() private videoSettingsService: VideoSettingsService;
   @Inject() private dualOutputService: DualOutputService;
+  @Inject() private sceneCollectionsService: SceneCollectionsService;
 
   readonly state: IScene;
 
@@ -146,8 +148,14 @@ export class Scene {
    * in the source selector. The only instance where the vertical nodes are used
    * to populate the source selector is in dual output mode when the horizontal display is hidden.
    */
+
   getSourceSelectorNodes(): TSceneNode[] {
     let nodes = this.getNodes();
+    console.log('hasVerticalNodes ', JSON.stringify(this.dualOutputService.views.hasVerticalNodes));
+    console.log(
+      'sceneNodeMaps ',
+      JSON.stringify(this.sceneCollectionsService.sceneNodeMaps?.[this.id]),
+    );
     if (this.dualOutputService.views.hasVerticalNodes) {
       const populateWithVerticalNodes =
         !this.dualOutputService.views.activeDisplays.horizontal &&
@@ -164,11 +172,11 @@ export class Scene {
       // console.log('getSourceSelectorNodes nodeMap ', nodeMap);
 
       nodes = nodes.filter(node => {
-        // return !populateWithVerticalNodes ? nodeMap[node.id] : verticalNodeIds.has(node.id);
+        return !populateWithVerticalNodes ? nodeMap[node.id] : verticalNodeIds.has(node.id);
 
-        return populateWithVerticalNodes
-          ? node?.display === 'vertical'
-          : node?.display === 'horizontal';
+        // return populateWithVerticalNodes
+        //   ? node?.display === 'vertical'
+        //   : node?.display === 'horizontal';
       });
     }
     return nodes;

@@ -14,7 +14,6 @@ export class NodeMapNode extends Node<ISceneNodeMapSchema, {}> {
   async save() {
     if (this.sceneCollectionsService.activeCollection.hasOwnProperty('sceneNodeMaps')) {
       this.data.sceneNodeMaps = this.sceneCollectionsService.activeCollection.sceneNodeMaps;
-      this.sceneCollectionsService.flushManifestFile();
     }
   }
 
