@@ -9,6 +9,7 @@ import { ERenderingMode } from '../../../obs-api';
 import { TDisplayType } from 'services/settings-v2';
 import AutoProgressBar from 'components-react/shared/AutoProgressBar';
 import { useSubscription } from 'components-react/hooks/useSubscription';
+import { message } from 'antd';
 
 export default function StudioEditor() {
   const {
@@ -35,6 +36,7 @@ export default function StudioEditor() {
   const studioModeRef = useRef<HTMLDivElement>(null);
   const [studioModeStacked, setStudioModeStacked] = useState(false);
   const [verticalPlaceholder, setVerticalPlaceholder] = useState(false);
+  const [messageActive, setMessageActive] = useState(false);
   const studioModeTransitionName = useMemo(() => TransitionsService.getStudioTransitionName(), [
     v.studioMode,
   ]);
@@ -121,7 +123,11 @@ export default function StudioEditor() {
       }
 
       moveInFlight = true;
-      EditorService.actions.return.handleMouseMove(getMouseEvent(event, display)).then(() => {
+      EditorService.actions.return.handleMouseMove(getMouseEvent(event, display)).then(stopMove => {
+        if (stopMove && !messageActive) {
+          console.log('----------------> showmessage');
+          showOutOfBoundsErrorMessage();
+        }
         moveInFlight = false;
 
         if (lastMoveEvent) {
@@ -163,6 +169,22 @@ export default function StudioEditor() {
       },
     };
   }, []);
+
+  /**
+   * Show error message in dual output mode when the user
+   * attempts to drag a source out of the display.
+   * Prevent continual calls using the messageActive state variable.
+   */
+  function showOutOfBoundsErrorMessage() {
+    setMessageActive(true);
+    message.error({
+      content: $t('Cannot move source outside canvas in Dual Output Mode.'),
+      duration: 2,
+      className: styles.toggleError,
+    });
+
+    setTimeout(() => setMessageActive(false), 2000);
+  }
 
   return (
     <div className={styles.mainContainer} ref={studioModeRef}>

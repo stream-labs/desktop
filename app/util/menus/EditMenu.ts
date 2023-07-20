@@ -1,7 +1,7 @@
 import { Inject } from '../../services/core/injector';
 import { Menu } from './Menu';
 import { Source, SourcesService } from '../../services/sources';
-import { ScenesService, isItem } from '../../services/scenes';
+import { SceneItem, ScenesService, isItem } from '../../services/scenes';
 import { ClipboardService } from 'services/clipboard';
 import { SourceTransformMenu } from './SourceTransformMenu';
 import { GroupMenu } from './GroupMenu';
@@ -22,6 +22,7 @@ import { ScaleFilteringMenu } from './ScaleFilteringMenu';
 import { BlendingModeMenu } from './BlendingModeMenu';
 import { BlendingMethodMenu } from './BlendingMethodMenu';
 import { DeinterlacingModeMenu } from './DeinterlacingModeMenu';
+import { DualOutputService } from 'services/dual-output';
 
 interface IEditMenuOptions {
   selectedSourceId?: string;
@@ -43,6 +44,7 @@ export class EditMenu extends Menu {
   @Inject() private editorCommandsService: EditorCommandsService;
   @Inject() private streamingService: StreamingService;
   @Inject() private audioService: AudioService;
+  @Inject() private dualOutputService: DualOutputService;
 
   private scene = this.scenesService.views.getScene(this.options.selectedSceneId);
 
@@ -233,6 +235,22 @@ export class EditMenu extends Menu {
         click: () => {
           // if scene items are selected than remove the selection
           if (this.options.showSceneItemMenu) {
+            // for dual output scenes, also remove the partner node
+            // so update the selection before removing
+            if (this.dualOutputService.views.hasNodeMap(this.scene.id)) {
+              let ids = this.selectionService.views.globalSelection.getIds();
+              const updatedIds = new Set(ids);
+              ids.forEach(id => {
+                const dualOutputNodeId = this.dualOutputService.views.getDualOutputNodeId(id);
+                if (dualOutputNodeId && !updatedIds.has(dualOutputNodeId)) {
+                  updatedIds.add(dualOutputNodeId);
+                }
+              });
+
+              ids = Array.from(updatedIds);
+              this.selectionService.views.globalSelection.select(ids);
+            }
+
             this.selectionService.actions.removeSelected();
           } else {
             // if no items are selected we are in the MixerSources context menu
@@ -242,7 +260,17 @@ export class EditMenu extends Menu {
               const itemsToRemoveIds = scene
                 .getItems()
                 .filter(item => item.sourceId === this.source.sourceId)
-                .map(item => item.id);
+                .reduce((itemIds: string[], item: SceneItem) => {
+                  itemIds.push(item.id);
+                  // for dual output scenes, also remove the partner node
+                  if (this.dualOutputService.views.hasNodeMap()) {
+                    const dualOutputNodeId = this.dualOutputService.views.getDualOutputNodeId(
+                      item.id,
+                    );
+                    if (dualOutputNodeId) itemIds.push(dualOutputNodeId);
+                  }
+                  return itemIds;
+                }, []);
 
               this.editorCommandsService.executeCommand(
                 'RemoveNodesCommand',

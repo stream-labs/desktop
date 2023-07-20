@@ -273,7 +273,6 @@ export class ScenesService extends StatefulService<IScenesState> {
   sceneAdded = new Subject<IScene>();
   sceneRemoved = new Subject<IScene>();
   sceneSwitched = new Subject<IScene>();
-  sceneWillSwitch = new Subject<IScene>();
   itemAdded = new Subject<ISceneItem & ISource>();
   itemRemoved = new Subject<ISceneItem & ISource>();
   itemUpdated = new Subject<ISceneItem & ISource>();
@@ -413,7 +412,6 @@ export class ScenesService extends StatefulService<IScenesState> {
     if (!scene) return false;
 
     const activeScene = this.views.activeScene;
-    this.sceneWillSwitch.next(activeScene?.getModel());
 
     this.MAKE_SCENE_ACTIVE(id);
 

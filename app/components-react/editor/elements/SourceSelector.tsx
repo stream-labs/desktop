@@ -63,7 +63,14 @@ export class SourceSelectorModule {
 
   nodeRefs = {};
 
+  /**
+   * This property handles selection when expanding/collapsing folders
+   */
   callCameFromInsideTheHouse = false;
+  /**
+   * This property handles selection when clicking a dual output icon
+   */
+  callCameFromIcon = false;
 
   getTreeData(nodeData: ISourceMetadata[]) {
     // recursive function for transforming SceneNode[] to a Tree format of Antd.Tree
@@ -157,24 +164,6 @@ export class SourceSelectorModule {
 
   isSelected(node: TSceneNode) {
     return this.selectionService.state.selectedIds.includes(node.id);
-  }
-
-  /**
-   * Determine if the nodes are selected in the source selector
-   * @remark
-   * In dual output mode, this is used to show the link icon in the source selector
-   * @param nodeIds -
-   * @returns
-   */
-  allSelected(nodeIds: string[]): boolean {
-    const selectedIds = new Set(this.selectionService.views.globalSelection.getIds());
-
-    return nodeIds.reduce((selected: boolean, nodeId: string) => {
-      if (!selectedIds.has(nodeId)) {
-        selected = false;
-      }
-      return selected;
-    }, true);
   }
 
   determineIcon(isLeaf: boolean, sourceId: string) {
@@ -333,36 +322,63 @@ export class SourceSelectorModule {
     }
   }
 
-  makeActive(info: { node: DataNode; nativeEvent: MouseEvent }) {
+  makeActive(info: { node: DataNode; nativeEvent: MouseEvent } | string) {
     this.callCameFromInsideTheHouse = true;
-    let ids: string[] = [info.node.key as string];
 
-    if (info.nativeEvent.ctrlKey) {
-      ids = this.activeItemIds.concat(ids);
-    } else if (info.nativeEvent.shiftKey) {
-      // Logic for multi-select
-      const idx1 = this.nodeData.findIndex(
-        i => i.id === this.activeItemIds[this.activeItemIds.length - 1],
-      );
-      const idx2 = this.nodeData.findIndex(i => i.id === info.node.key);
-      const swapIdx = idx1 > idx2;
-      ids = this.nodeData
-        .map(i => i.id)
-        .slice(swapIdx ? idx2 : idx1, swapIdx ? idx1 + 1 : idx2 + 1);
-    }
-    if (this.dualOutputService.views.hasNodeMap(this.scene.id)) {
-      const updatedIds = new Set(ids);
-      ids.forEach(id => {
-        const dualOutputNodeId = this.dualOutputService.views.getDualOutputNodeId(id);
-        if (dualOutputNodeId && !updatedIds.has(dualOutputNodeId)) {
-          updatedIds.add(dualOutputNodeId);
-        }
-      });
-
-      ids = Array.from(updatedIds);
+    /**
+     * For calls made from a dual output toggle,
+     * select only the source from the icon clicked
+     */
+    if (typeof info === 'string') {
+      this.callCameFromIcon = true;
+      this.selectionService.views.globalSelection.reset();
+      this.selectionService.views.globalSelection.select([info]);
+      return;
     }
 
-    this.selectionService.views.globalSelection.select(ids);
+    /**
+     * Skip multiselect logic when call is made from toggle
+     */
+    if (!this.callCameFromIcon) {
+      let ids: string[] = [info.node.key as string];
+
+      if (info.nativeEvent.ctrlKey) {
+        ids = this.activeItemIds.concat(ids);
+      } else if (info.nativeEvent.shiftKey) {
+        // Logic for multi-select
+        const idx1 = this.nodeData.findIndex(
+          i => i.id === this.activeItemIds[this.activeItemIds.length - 1],
+        );
+        const idx2 = this.nodeData.findIndex(i => i.id === info.node.key);
+        const swapIdx = idx1 > idx2;
+        ids = this.nodeData
+          .map(i => i.id)
+          .slice(swapIdx ? idx2 : idx1, swapIdx ? idx1 + 1 : idx2 + 1);
+      }
+
+      /**
+       * In dual output mode with both displays active,
+       * clicking on the source selector selects both sources
+       */
+      if (
+        this.dualOutputService.views.hasNodeMap(this.scene.id) &&
+        this.dualOutputService.views.activeDisplays.horizontal &&
+        this.dualOutputService.views.activeDisplays.vertical
+      ) {
+        const updatedIds = new Set(ids);
+        ids.forEach(id => {
+          const dualOutputNodeId = this.dualOutputService.views.getDualOutputNodeId(id);
+          if (dualOutputNodeId && !updatedIds.has(dualOutputNodeId)) {
+            updatedIds.add(dualOutputNodeId);
+          }
+        });
+
+        ids = Array.from(updatedIds);
+      }
+      this.selectionService.views.globalSelection.select(ids);
+    }
+
+    this.callCameFromIcon = false;
   }
 
   @mutation()
@@ -398,6 +414,9 @@ export class SourceSelectorModule {
     this.nodeRefs[this.lastSelectedId]?.current?.scrollIntoView({ behavior: 'smooth' });
   }
 
+  /**
+   * Used for actions initiated from the source selector such as sorting and selecting
+   */
   get activeItemIds() {
     /* Because the source selector only works with either the horizontal
      * or vertical node ids at one time, filter them in a dual output scene.
@@ -416,6 +435,37 @@ export class SourceSelectorModule {
     return this.selectionService.state.selectedIds;
   }
 
+  /**
+   * Used to highlight selected items in the source selector
+   */
+  get selectionItemIds() {
+    /**
+     * When both displays are active, the source selector rows use the horizontal nodes to render.
+     * To highlight the source in the source selector when interacting with the source
+     * in the vertical display, convert the vertical node id to the horizontal node id.
+     */
+    if (
+      this.dualOutputService.views.activeDisplays.horizontal &&
+      this.dualOutputService.views.activeDisplays.vertical
+    ) {
+      const selectedIds = new Set(this.selectionService.state.selectedIds);
+
+      this.selectionService.state.selectedIds.map(id => {
+        const horizontalNodeId = this.dualOutputService.views.getHorizontalNodeId(id);
+        if (horizontalNodeId && !selectedIds.has(horizontalNodeId)) {
+          selectedIds.add(horizontalNodeId);
+        }
+      });
+
+      return Array.from(selectedIds);
+    }
+    // In all other cases, return all selected ids
+    return this.selectionService.state.selectedIds;
+  }
+
+  /**
+   * Used to get all items in the selection
+   */
   get activeItems() {
     return this.selectionService.views.globalSelection.getItems();
   }
@@ -561,7 +611,7 @@ function ItemsTree() {
   const {
     nodeData,
     getTreeData,
-    activeItemIds,
+    selectionItemIds,
     expandedFoldersIds,
     selectiveRecordingEnabled,
     showContextMenu,
@@ -597,7 +647,7 @@ function ItemsTree() {
       >
         {showTreeMask && <div className={styles.treeMask} data-name="treeMask" />}
         <Tree
-          selectedKeys={activeItemIds}
+          selectedKeys={selectionItemIds}
           expandedKeys={expandedFoldersIds}
           onSelect={(selectedKeys, info) => makeActive(info)}
           onExpand={(selectedKeys, info) => toggleFolder(info.node.key as string)}
