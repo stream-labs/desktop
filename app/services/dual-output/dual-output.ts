@@ -436,26 +436,32 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   //   this.SET_IS_LOADING(false);
   // }
 
+  /**
+   * Copy node or assign node context
+   * @remark Currently, only the widget service needs to confirm the display,
+   * all other function calls are to copy the horizontal node to a vertical node
+   * @param sceneItem - the scene item to copy or assign context
+   * @param display - the name of the context, which is also the display name
+   * @param isHorizontalDisplay - whether this is the horizontal or vertical display
+   * @param sceneId - the scene id where a copied node should be added, default is the active scene id
+   * @returns
+   */
   createOrAssignOutputNode(
     sceneItem: SceneItem,
     display: TDisplayType,
-    isFirstDisplay: boolean,
+    isHorizontalDisplay: boolean,
     sceneId?: string,
   ) {
-    if (isFirstDisplay) {
+    if (isHorizontalDisplay) {
       // if it's the first display, just assign the scene item's output to a context
       this.assignNodeContext(sceneItem, display);
       return sceneItem;
     } else {
       // if it's not the first display, copy the scene item
-      const scene = this.scenesService.views.getScene(sceneId);
-      const copiedSceneItem = scene.addSource(sceneItem.sourceId);
-      const context = this.videoSettingsService.contexts[display];
+      const scene = this.scenesService.views.getScene(sceneId ?? this.views.activeSceneId);
+      const copiedSceneItem = scene.addSource(sceneItem.sourceId, { display });
 
-      if (!copiedSceneItem || !context) return null;
-
-      const settings: IPartialSettings = { ...sceneItem.getSettings(), output: context, display };
-      copiedSceneItem.setSettings(settings);
+      if (!copiedSceneItem) return null;
 
       const selection = scene.getSelection(copiedSceneItem.id);
       this.editorCommandsService.executeCommand(

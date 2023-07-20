@@ -40,11 +40,9 @@ export class CreateExistingItemCommand extends Command {
   execute() {
     const item = this.scenesService.views
       .getScene(this.sceneId)
-      .addSource(this.sourceId, { id: this.sceneItemId });
+      .addSource(this.sourceId, { id: this.sceneItemId, display: 'horizontal' });
 
     if (this.dualOutputService.views.shouldCreateVerticalNode) {
-      this.dualOutputService.actions.assignNodeContext(item, 'horizontal');
-
       Promise.resolve(
         this.dualOutputService.actions.return.createOrAssignOutputNode(
           item,

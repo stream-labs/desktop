@@ -56,8 +56,6 @@ export class CreateSceneCommand extends Command {
     }
 
     if (nodesToCopy) {
-      const origSceneId =
-        this.options?.duplicateItemsFromScene ?? this.options?.groupFromOrigin.originSceneId;
       this.copyNodesSubcommand =
         this.copyNodesSubcommand || new CopyNodesCommand(nodesToCopy, this.sceneId);
       this.copyNodesSubcommand.execute();

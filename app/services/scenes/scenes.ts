@@ -330,15 +330,9 @@ export class ScenesService extends StatefulService<IScenesState> {
         .slice()
         .reverse()
         .forEach(item => {
-          const newItem = newScene.addSource(item.sourceId);
           const display = item?.display ?? this.dualOutputService.views.getNodeDisplay(item.id, id);
-          const context = this.videoSettingsService.contexts[display];
-          const settings = {
-            ...item.getSettings(),
-            output: context,
-            display,
-          };
-          newItem.setSettings(settings);
+
+          const newItem = newScene.addSource(item.sourceId, { display });
 
           /**
            * when creating the scene in dual output mode

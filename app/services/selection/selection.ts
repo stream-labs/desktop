@@ -320,6 +320,7 @@ export class Selection {
           sourcesMap[sceneNode.sourceId]
             ? sourcesMap[sceneNode.sourceId].sourceId
             : sceneNode.sourceId,
+          { display: sceneNode?.display },
         );
         insertedNode.setSettings(sceneNode.getSettings());
         insertedNodes.push(insertedNode);

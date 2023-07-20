@@ -555,6 +555,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
     await root.load();
     this.hotkeysService.bindHotkeys();
+    console.log('after load data into state sceneNodeMaps', this.activeCollection?.sceneNodeMaps);
   }
 
   /**

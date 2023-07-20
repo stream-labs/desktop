@@ -46,14 +46,13 @@ export class CreateNewItemCommand extends Command {
     this.options.id = this.options.id || this.sceneItemId;
     this.options.sourceAddOptions.sourceId =
       this.options.sourceAddOptions.sourceId || this.sourceId;
+    this.options.display = 'horizontal';
 
     const item = this.scenesService.views
       .getScene(this.sceneId)
       .createAndAddSource(this.name, this.type, this.settings, this.options);
 
     if (this.dualOutputService.views.shouldCreateVerticalNode) {
-      this.dualOutputService.actions.assignNodeContext(item, 'horizontal');
-
       Promise.resolve(
         this.dualOutputService.actions.return.createOrAssignOutputNode(
           item,
