@@ -8,6 +8,7 @@ import fs from 'fs';
 import path from 'path';
 import { getDefined } from '../../../util/properties-type-guards';
 import { useVuex } from 'components-react/hooks';
+import Tooltip from 'components-react/shared/Tooltip';
 
 export function GeneralSettings() {
   return (
@@ -52,6 +53,7 @@ function ExtraSettings() {
     StreamlabelsService,
     RecordingModeService,
     SettingsService,
+    DualOutputService,
   } = Services;
   const isLoggedIn = UserService.isLoggedIn;
   const isTwitch = isLoggedIn && getDefined(UserService.platform).type === 'twitch';
@@ -60,11 +62,19 @@ function ExtraSettings() {
   const protectedMode = StreamSettingsService.state.protectedModeEnabled;
   const disableHAFilePath = path.join(AppService.appDataDirectory, 'HADisable');
   const [disableHA, setDisableHA] = useState(() => fs.existsSync(disableHAFilePath));
-  const { isRecordingOrStreaming, recordingMode, updateStreamInfoOnLive } = useVuex(() => ({
+
+  const {
+    isRecordingOrStreaming,
+    recordingMode,
+    updateStreamInfoOnLive,
+    isDualOutputScene,
+  } = useVuex(() => ({
     isRecordingOrStreaming: StreamingService.isStreaming || StreamingService.isRecording,
     recordingMode: RecordingModeService.views.isRecordingModeEnabled,
     updateStreamInfoOnLive: CustomizationService.state.updateStreamInfoOnLive,
+    isDualOutputScene: DualOutputService.views.hasNodeMap(),
   }));
+
   const canRunOptimizer =
     // HDR Settings are not compliant with the auto-optimizer
     !SettingsService.views.hasHDRSettings && isTwitch && !isRecordingOrStreaming && protectedMode;
@@ -147,11 +157,21 @@ function ExtraSettings() {
             </button>
           </div>
           {canRunOptimizer && (
-            <div className="input-container">
-              <button className="button button--default" onClick={runAutoOptimizer}>
-                {$t('Auto Optimize')}
-              </button>
-            </div>
+            <Tooltip
+              title={$t('Auto optimizer disabled for dual output scenes')}
+              placement="bottom"
+              lightShadow
+            >
+              <div className="input-container">
+                <button
+                  className="button button--default"
+                  onClick={runAutoOptimizer}
+                  disabled={isDualOutputScene}
+                >
+                  {$t('Auto Optimize')}
+                </button>
+              </div>
+            </Tooltip>
           )}
 
           <div className="input-container">
