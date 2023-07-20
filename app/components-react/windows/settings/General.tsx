@@ -68,16 +68,22 @@ function ExtraSettings() {
     recordingMode,
     updateStreamInfoOnLive,
     isDualOutputScene,
+    isSimpleOutputMode,
   } = useVuex(() => ({
     isRecordingOrStreaming: StreamingService.isStreaming || StreamingService.isRecording,
     recordingMode: RecordingModeService.views.isRecordingModeEnabled,
     updateStreamInfoOnLive: CustomizationService.state.updateStreamInfoOnLive,
+    isSimpleOutputMode: SettingsService.views.isSimpleOutputMode,
     isDualOutputScene: DualOutputService.views.hasNodeMap(),
   }));
 
   const canRunOptimizer =
     // HDR Settings are not compliant with the auto-optimizer
-    !SettingsService.views.hasHDRSettings && isTwitch && !isRecordingOrStreaming && protectedMode;
+    !SettingsService.views.hasHDRSettings &&
+    isTwitch &&
+    !isRecordingOrStreaming &&
+    protectedMode &&
+    isSimpleOutputMode;
 
   function restartStreamlabelsSession() {
     StreamlabelsService.restartSession().then(result => {
@@ -159,8 +165,9 @@ function ExtraSettings() {
           {canRunOptimizer && (
             <Tooltip
               title={$t('Auto optimizer disabled for dual output scenes')}
-              placement="bottom"
+              placement="top"
               lightShadow
+              disabled={!isDualOutputScene}
             >
               <div className="input-container">
                 <button

@@ -24,24 +24,34 @@ interface ITooltipTipProps {
   lightShadow?: boolean;
   placement?: TTipPosition;
   content?: HTMLElement | boolean;
+  disabled?: boolean;
 }
 
 export default function Tooltip(props: PropsWithChildren<ITooltipTipProps>) {
-  const { title, className, style, lightShadow, placement = 'bottom', content } = props;
+  const { title, className, style, lightShadow, placement = 'bottom', content, disabled } = props;
 
   return (
     <div className={cx(styles.tooltipWrapper, className)}>
       <div className={cx(styles.tooltipArrow)} />
-      <AntdTooltip
-        className={cx({ [styles.lightShadow]: lightShadow })}
-        placement={placement}
-        title={title}
-        style={style}
-        getPopupContainer={triggerNode => triggerNode}
-      >
-        {content}
-        {{ ...props }.children}
-      </AntdTooltip>
+      {disabled ? (
+        <>
+          {content}
+          {{ ...props }.children}
+        </>
+      ) : (
+        <AntdTooltip
+          className={cx({ [styles.lightShadow]: lightShadow })}
+          placement={placement}
+          title={title}
+          style={style}
+          getPopupContainer={triggerNode => triggerNode}
+          mouseLeaveDelay={0.3}
+          trigger={['hover', 'focus', 'click']}
+        >
+          {content}
+          {{ ...props }.children}
+        </AntdTooltip>
+      )}
     </div>
   );
 }

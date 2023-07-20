@@ -27,7 +27,6 @@ import { SceneCollectionsService } from 'services/scene-collections';
 import * as remote from '@electron/remote';
 import fs from 'fs';
 import path from 'path';
-import { DualOutputService } from 'app-services';
 
 export interface ISettingsValues {
   General: {
@@ -132,6 +131,10 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
     return settingsValues as ISettingsValues;
   }
 
+  get isSimpleOutputMode() {
+    return this.values.Output.Mode === 'Simple';
+  }
+
   get isAdvancedOutput() {
     return this.state.Output.type === 1;
   }
@@ -202,7 +205,6 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
   @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject() private sceneCollectionsService: SceneCollectionsService;
   @Inject() private hardwareService: HardwareService;
-  @Inject() private dualOutputService: DualOutputService;
 
   @Inject()
   private videoEncodingOptimizationService: VideoEncodingOptimizationService;
