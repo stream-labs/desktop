@@ -952,7 +952,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   initNodeMaps(sceneNodeMap?: { [sceneId: string]: Dictionary<string> }) {
     if (!this.activeCollection) return;
 
-    this.activeCollection.sceneNodeMaps = sceneNodeMap ?? {};
+    this.stateService.initNodeMaps(sceneNodeMap);
   }
 
   /**
