@@ -154,11 +154,14 @@ export class Scene {
       const populateWithVerticalNodes =
         !this.dualOutputService.views.activeDisplays.horizontal &&
         this.dualOutputService.views.activeDisplays.vertical;
-
+      /**
+       * nodeMap can be used for checking horizontal display nodes,
+       * but cannot lookup vertical display IDs so we use a Set instead
+       */
+      const nodeMap = this.dualOutputService.views.activeSceneNodeMap;
+      const verticalNodeIds = new Set(this.dualOutputService.views.verticalNodeIds);
       nodes = nodes.filter(node => {
-        return populateWithVerticalNodes
-          ? node?.display === 'vertical'
-          : node?.display === 'horizontal';
+        return !populateWithVerticalNodes ? nodeMap[node.id] : verticalNodeIds.has(node.id);
       });
     }
     return nodes;

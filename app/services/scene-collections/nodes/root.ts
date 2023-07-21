@@ -127,7 +127,9 @@ export class RootNode extends Node<ISchema, {}> {
       this.streamingService.setSelectiveRecording(!!this.data.selectiveRecording);
       this.streamingService.setDualOutputMode(this.data.dualOutputMode);
 
-      await this.data.nodeMap.load();
+      if (this.data.nodeMap) {
+        await this.data.nodeMap.load();
+      }
 
       await this.data.transitions.load();
       await this.data.sources.load({});
