@@ -109,7 +109,6 @@ export class RootNode extends Node<ISchema, {}> {
           await this.data.scenes.load({});
 
           if (this.data.nodeMap) {
-            console.log('loading node map init');
             await this.data.nodeMap.load();
           }
 

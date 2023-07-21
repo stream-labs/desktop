@@ -555,7 +555,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
     await root.load();
     this.hotkeysService.bindHotkeys();
-    console.log('after load data into state sceneNodeMaps', this.activeCollection?.sceneNodeMaps);
   }
 
   /**
@@ -1037,13 +1036,5 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    */
   removeNodeMap(sceneId: string) {
     this.stateService.removeNodeMap(sceneId);
-  }
-
-  /**
-   * Flush manifest file
-   * @remark Primarily used for saving the scene node map in the overlay file
-   */
-  flushManifestFile() {
-    this.stateService.flushManifestFile();
   }
 }

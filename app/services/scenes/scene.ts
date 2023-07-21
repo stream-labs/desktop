@@ -1,4 +1,4 @@
-import { ServiceHelper, mutation, Inject, ExecuteInWorkerProcess } from 'services';
+import { ServiceHelper, mutation, Inject } from 'services';
 import { ScenesService } from './scenes';
 import { Source, SourcesService, TSourceType } from 'services/sources';
 import {
@@ -22,10 +22,9 @@ import { TSceneNodeInfo } from 'services/scene-collections/nodes/scene-items';
 import * as fs from 'fs';
 import * as path from 'path';
 import uuid from 'uuid/v4';
-import { assertIsDefined, getDefined } from 'util/properties-type-guards';
+import { assertIsDefined } from 'util/properties-type-guards';
 import { VideoSettingsService, TDisplayType } from 'services/settings-v2';
 import { DualOutputService } from 'services/dual-output';
-import { SceneCollectionsService } from 'services/scene-collections';
 
 export type TSceneNode = SceneItem | SceneItemFolder;
 
@@ -47,7 +46,6 @@ export class Scene {
   @Inject() private selectionService: SelectionService;
   @Inject() private videoSettingsService: VideoSettingsService;
   @Inject() private dualOutputService: DualOutputService;
-  @Inject() private sceneCollectionsService: SceneCollectionsService;
 
   readonly state: IScene;
 
@@ -151,32 +149,16 @@ export class Scene {
 
   getSourceSelectorNodes(): TSceneNode[] {
     let nodes = this.getNodes();
-    console.log('hasVerticalNodes ', JSON.stringify(this.dualOutputService.views.hasVerticalNodes));
-    console.log(
-      'sceneNodeMaps ',
-      JSON.stringify(this.sceneCollectionsService.sceneNodeMaps?.[this.id]),
-    );
+
     if (this.dualOutputService.views.hasVerticalNodes) {
       const populateWithVerticalNodes =
         !this.dualOutputService.views.activeDisplays.horizontal &&
         this.dualOutputService.views.activeDisplays.vertical;
 
-      /**
-       * nodeMap can be used for checking horizontal display nodes,
-       * but cannot lookup vertical display IDs so we use a Set instead
-       */
-
-      const nodeMap = this.dualOutputService.views.activeSceneNodeMap;
-      const verticalNodeIds = new Set(this.dualOutputService.views.verticalNodeIds);
-      // console.log('getSourceSelectorNodes verticalNodeIds ', verticalNodeIds);
-      // console.log('getSourceSelectorNodes nodeMap ', nodeMap);
-
       nodes = nodes.filter(node => {
-        return !populateWithVerticalNodes ? nodeMap[node.id] : verticalNodeIds.has(node.id);
-
-        // return populateWithVerticalNodes
-        //   ? node?.display === 'vertical'
-        //   : node?.display === 'horizontal';
+        return populateWithVerticalNodes
+          ? node?.display === 'vertical'
+          : node?.display === 'horizontal';
       });
     }
     return nodes;
@@ -458,7 +440,7 @@ export class Scene {
     // create folder and items
     let itemIndex = 0;
     nodes.forEach(nodeModel => {
-      const display = nodeModel.display;
+      const display = nodeModel?.display;
       const obsSceneItem = obsSceneItems[itemIndex];
       if (nodeModel.sceneNodeType === 'folder') {
         this.createFolder(nodeModel.name, { id: nodeModel.id, display });

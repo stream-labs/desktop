@@ -281,7 +281,6 @@ export class SceneItem extends SceneItemNode {
     const display = customSceneItem?.display ?? this?.display ?? 'horizontal';
     const context = this.videoSettingsService.contexts[display];
 
-    // @@@ TODO maybe remove the below?
     const obsSceneItem = this.getObsSceneItem();
     obsSceneItem.video = context as obs.IVideo;
 

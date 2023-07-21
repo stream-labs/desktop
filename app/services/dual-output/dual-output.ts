@@ -5,7 +5,7 @@ import {
   IDualOutputDestinationSetting,
 } from './dual-output-data';
 import { verticalDisplayData } from '../settings-v2/default-settings-data';
-import { ScenesService, SceneItem, IPartialSettings, TSceneNode } from 'services/scenes';
+import { ScenesService, SceneItem, TSceneNode } from 'services/scenes';
 import { TDisplayType, VideoSettingsService } from 'services/settings-v2/video';
 import { TPlatform } from 'services/platforms';
 import { EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
@@ -290,16 +290,10 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     });
 
     /**
-     * Confirm that the scene collection has a node map
-     * because this is a new property added  to the Scene Collection manifest entry
-     * for handling dual output nodes.
+     * Selective recording is currently not available in dual output mode
+     * due to API restrictions. For now, toggle it off when switching to dual output mode.
      */
     this.sceneCollectionsService.collectionSwitched.subscribe(() => {
-      // confirm the scene collection has a node map
-      // if (!this.sceneCollectionsService.activeCollection.hasOwnProperty('sceneNodeMaps')) {
-      //   this.sceneCollectionsService.initNodeMaps();
-      // }
-
       if (this.state.dualOutputMode && this.streamingService.state.selectiveRecording) {
         this.streamingService.actions.setSelectiveRecording(false);
       }
@@ -319,13 +313,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       }
     });
 
-    /**
-     * This is primarily used to assign contexts to the sources when loading scene items
-     * when loading the scene collection.
-     */
-    // this.scenesService.sourcesAdded.subscribe((sceneId: string) => {
-    //   this.assignContexts(sceneId);
-    // });
     /**
      * The user must be logged in to use dual output mode
      * so toggle off dual output mode on log out.
@@ -421,20 +408,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     );
     this.SET_IS_LOADING(false);
   }
-
-  // assignContexts(sceneId: string) {
-  //   this.SET_IS_LOADING(true);
-  //   const nodes = this.scenesService.views.getScene(sceneId).getNodes();
-
-  //   nodes.forEach(node => {
-  //     // Item already has a context assigned
-  //     if (node?.output) return;
-
-  //     const display = this.views.getNodeDisplay(node.id, sceneId);
-  //     this.assignNodeContext(node, display);
-  //   });
-  //   this.SET_IS_LOADING(false);
-  // }
 
   /**
    * Copy node or assign node context
