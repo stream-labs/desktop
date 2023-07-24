@@ -53,7 +53,7 @@ interface ISchema {
  * This is the root node of the config file
  */
 export class RootNode extends Node<ISchema, {}> {
-  schemaVersion = 5;
+  schemaVersion = 4;
 
   @Inject() videoService: VideoService;
   @Inject() streamingService: StreamingService;
