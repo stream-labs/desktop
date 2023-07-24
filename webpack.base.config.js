@@ -63,6 +63,7 @@ module.exports = {
     path: OUTPUT_DIR,
     filename: '[name].js',
     publicPath: '',
+    hashFunction: 'sha256',
   },
 
   target: 'electron-renderer',
