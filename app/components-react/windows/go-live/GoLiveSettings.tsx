@@ -103,7 +103,7 @@ export default function GoLiveSettings() {
             {isAdvancedMode && <div className={styles.spacer} />}
             {/*EXTRAS*/}
             <Section isSimpleMode={!isAdvancedMode} title={$t('Extras')}>
-              <TwitterInput />
+              {/* <TwitterInput /> */}
               {!!canUseOptimizedProfile && <OptimizedProfileSwitcher />}
             </Section>
           </Scrollable>
