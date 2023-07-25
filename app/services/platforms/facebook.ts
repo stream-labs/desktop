@@ -49,7 +49,7 @@ export interface IFacebookLiveVideo {
   game: string;
   description: string;
   permalink_url: string;
-  video: { id: string };
+  video: { id: string; is_crosspost_video?: boolean };
   broadcast_start_time: string;
   planned_start_time?: string;
   /** custom fields we've created */
@@ -136,6 +136,7 @@ const VIDEO_FIELDS = [
   'planned_start_time',
   'permalink_url',
   'video',
+  'is_crosspost_video',
 ];
 
 @InheritMutations()
