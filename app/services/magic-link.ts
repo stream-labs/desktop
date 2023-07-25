@@ -91,9 +91,14 @@ export class MagicLinkService extends Service {
     }
   }
 
-  getMagicSessionUrl(targetUrl: string) {
-    return `https://${this.hostsService.streamlabs}/slobs/magic/init-session?login_token=${
-      this.userService.apiToken
-    }&r=${encodeURIComponent(targetUrl)}`;
+  async getMagicSessionUrl(targetUrl: string) {
+    try {
+      const loginToken = (await this.fetchNewToken()).login_token;
+      return `https://${
+        this.hostsService.streamlabs
+      }/slobs/magic/init-session?login_token=${loginToken}&r=${encodeURIComponent(targetUrl)}`;
+    } catch (e: unknown) {
+      console.error('Error generating session magic link', e);
+    }
   }
 }
