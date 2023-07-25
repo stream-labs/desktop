@@ -65,6 +65,7 @@ import PlatformAppPopOut from './windows/PlatformAppPopOut';
 import RecentEventsWindow from './windows/RecentEvents';
 import NewBadge from './shared/NewBadge';
 import RecordingHistory from './windows/RecordingHistory';
+import ConnectionSettings from './windows/scene-transitions/ConnectionSettings';
 import UltraIcon from './shared/UltraIcon';
 import EditTransform from './windows/EditTransform';
 import InstalledApps from './windows/settings/InstalledApps';
@@ -142,6 +143,7 @@ export const components = {
   EditTransform,
   InstalledApps,
   Blank,
+  ConnectionSettings,
   Hotkeys,
   GLVolmeters: createRoot(GLVolmeters),
 };

@@ -3,7 +3,14 @@ import { clickSceneTransitions, addScene } from '../helpers/modules/scenes';
 import { getFormInput } from '../helpers/webdriver/forms';
 import { dismissModal } from '../helpers/webdriver/modals';
 import { FormMonkey } from '../helpers/form-monkey';
-import { click, clickButton, focusChild, focusMain } from '../helpers/modules/core';
+import {
+  click,
+  clickButton,
+  focusChild,
+  focusMain,
+  waitForDisplayed,
+} from '../helpers/modules/core';
+import { setInputValue } from '../helpers/modules/forms';
 
 useWebdriver({
   restartAppAfterEachTest: false,
@@ -79,12 +86,10 @@ test('Changing connections', async t => {
   await dismissModal(t);
   await (await app.client.$('button=Connections')).click();
   await (await app.client.$('button=Add Connection')).click();
-  const form = new FormMonkey(t);
-  await form.fillByTitles({
-    'Beginning Scene': connectionBegin,
-    'Scene Transition': connectionTransition,
-    'Ending Scene': connectionEnd,
-  });
+  await setInputValue('[data-name="fromSceneId"]', connectionBegin);
+  await setInputValue('[data-name="transitionId"]', connectionTransition);
+  await setInputValue('[data-name="toSceneId"]', connectionEnd);
+
   await (await t.context.app.client.$('button=Done')).click();
   await focusMain();
   await clickSceneTransitions();
@@ -93,13 +98,10 @@ test('Changing connections', async t => {
   await (await app.client.$('button=Connections')).click();
   await (await app.client.$('.icon-edit')).click();
 
-  t.true(
-    await form.includesByTitles({
-      'Beginning Scene': connectionBegin,
-      'Scene Transition': connectionTransition,
-      'Ending Scene': connectionEnd,
-    }),
-  );
+  await waitForDisplayed(`[data-selected-option-label="${connectionBegin}"]`);
+  await waitForDisplayed(`[data-selected-option-label="${connectionTransition}"]`);
+  await waitForDisplayed(`[data-selected-option-label="${connectionEnd}"]`);
+  t.pass();
 });
 
 test('Showing redudant connection warning', async t => {

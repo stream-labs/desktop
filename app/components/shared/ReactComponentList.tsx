@@ -69,6 +69,9 @@ export class BrowserView extends ReactComponent {}
 })
 export class Chat extends ReactComponent {}
 
+@Component({ props: { name: { default: 'ConnectionSettings' } } })
+export class ConnectionSettings extends ReactComponent {}
+
 @Component({
   props: {
     name: { default: 'Display' },
