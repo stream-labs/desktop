@@ -224,9 +224,7 @@ class FacebookEditStreamInfoModule {
         destinationType,
         destinationId,
       );
-      if (selectedVideo.video?.is_crosspost_video !== true) {
-        scheduledVideos.push(selectedVideo);
-      }
+      scheduledVideos.push(selectedVideo);
     }
 
     this.state.update({
