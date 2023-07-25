@@ -15,6 +15,7 @@ import { WindowsService } from '../windows';
 import { assertIsDefined, getDefined } from '../../util/properties-type-guards';
 import { TDisplayType } from 'services/settings-v2';
 import { TOutputOrientation } from 'services/restream';
+import uniqBy from 'lodash/uniqBy';
 interface IFacebookPage {
   access_token: string;
   name: string;
@@ -577,8 +578,10 @@ export class FacebookService
     // wait for all requests
     const videoCollections = await Promise.all(requests);
 
-    // return a joined list of all videos
-    return flatten(videoCollections);
+    // joined list of all videos
+    const videos = flatten(videoCollections);
+
+    return uniqBy(videos, v => v.id);
   }
 
   /**
