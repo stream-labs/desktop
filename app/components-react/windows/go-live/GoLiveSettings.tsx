@@ -102,10 +102,12 @@ export default function GoLiveSettings() {
             {/*ADD SOME SPACE IN ADVANCED MODE*/}
             {isAdvancedMode && <div className={styles.spacer} />}
             {/*EXTRAS*/}
-            <Section isSimpleMode={!isAdvancedMode} title={$t('Extras')}>
-              <TwitterInput />
-              {!!canUseOptimizedProfile && <OptimizedProfileSwitcher />}
-            </Section>
+            {!!canUseOptimizedProfile && (
+              <Section isSimpleMode={!isAdvancedMode} title={$t('Extras')}>
+                {/* <TwitterInput /> */}
+                {!!canUseOptimizedProfile && <OptimizedProfileSwitcher />}
+              </Section>
+            )}
           </Scrollable>
         )}
       </Col>
