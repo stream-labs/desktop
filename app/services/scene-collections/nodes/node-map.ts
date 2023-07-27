@@ -22,7 +22,9 @@ export class NodeMapNode extends Node<ISchema, {}> {
 
   async load() {
     if (this.data?.sceneNodeMaps) {
-      this.sceneCollectionsService.initNodeMaps(this.data?.sceneNodeMaps);
+      this.sceneCollectionsService.initNodeMaps(this.data.sceneNodeMaps);
+    } else {
+      this.sceneCollectionsService.initNodeMaps({});
     }
   }
 }
