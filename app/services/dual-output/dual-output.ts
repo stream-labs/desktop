@@ -64,8 +64,7 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   }
 
   get sceneNodeMaps(): { [sceneId: string]: Dictionary<string> } {
-    if (!this.activeCollection) return {};
-    return this.activeCollection.sceneNodeMaps;
+    return this.activeCollection?.sceneNodeMaps || {};
   }
 
   get activeSceneNodeMap(): Dictionary<string> {
