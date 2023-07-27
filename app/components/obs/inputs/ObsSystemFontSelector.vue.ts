@@ -55,6 +55,11 @@ export default class ObsSystemFontSelector extends ObsInput<IObsInput<IObsFont>>
   }
 
   setStyle(style: string) {
+    // Set a default style if not set, otherwise `selectedFont` can't be found below
+    if (!this.value.value.style) {
+      this.value.value.style = 'Regular';
+    }
+
     const font = this.fonts.find(f => f.style === style && f.family === this.selectedFont.family);
     this.setFont({ flags: this.getFlagsFromFont(font), style: font.style });
   }
