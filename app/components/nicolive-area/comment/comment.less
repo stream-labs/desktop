@@ -1,12 +1,25 @@
-@import "../../../styles/index";
+@import url('../../../styles/index');
+
+.common__comment-root {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.common__comment-wrapper {
+  position: relative;
+  display: flex;
+  flex-grow: 1;
+  padding: 8px 32px 8px 0;
+}
 
 .common__comment-header {
-  padding-left: 16px;
-  text-align: center;
   box-sizing: border-box;
-  flex-shrink: 0;
   display: flex;
+  flex-shrink: 0;
   align-items: center;
+  justify-content: flex-end;
+  min-width: 32px;
 
   > i {
     font-size: @font-size4;
@@ -14,28 +27,30 @@
 }
 
 .common__comment-number {
-  min-width: 40px;
-  padding-left: 16px;
-  text-align: right;
-  flex-shrink: 0;
   box-sizing: border-box;
+  flex-shrink: 0;
+  width: 32px;
+  font-size: @font-size2;
+  line-height: 16px;
   color: var(--color-text-dark);
+  text-align: right;
 
-  [speaking=true] & {
+  [speaking='true'] & {
     color: var(--color-text-active);
   }
 }
 
 .common__comment-body {
-  .text-ellipsis;
-  margin-left: 16px;
   flex-grow: 1;
+  margin: 0 0 0 16px;
+  font-size: @font-size2;
+  line-height: 16px;
 }
 
 .common__comment-misc {
   width: 32px;
+  height: 32px;
   text-align: center;
-  flex-shrink: 0;
 
   > i {
     line-height: 32px;
@@ -45,24 +60,26 @@
 .comment-row-fade(@bg-color) {
   animation-name: comment-row-fade-in, comment-row-fade-out;
   animation-duration: 200ms, 900ms;
-  animation-timing-function: ease, cubic-bezier(.54,.19,.47,1);
+  animation-timing-function: ease, cubic-bezier(0.54, 0.19, 0.47, 1);
   animation-delay: 0ms, 200ms;
 
   @keyframes comment-row-fade-in {
     0% {
-      background-color: rgba(@bg-color, 0);
+      background-color: rgb(@bg-color 0);
     }
+
     100% {
-      background-color: rgba(@bg-color, .75);
+      background-color: rgb(@bg-color 0.75);
     }
   }
-  
+
   @keyframes comment-row-fade-out {
     0% {
-      background-color: rgba(@bg-color, .75);
+      background-color: rgb(@bg-color 0.75);
     }
+
     100% {
-      background-color: rgba(@bg-color, .0);
+      background-color: rgb(@bg-color 0);
     }
   }
 }

@@ -36,6 +36,7 @@
       </div>
       <div class="pinned" v-if="Boolean(pinnedComment)">
         <component
+          class="comment-readonly"
           :class="{
             row: true,
             name: getDisplayName(pinnedComment),
@@ -137,21 +138,6 @@
   overflow-y: auto;
 }
 
-.row {
-  width: 100%;
-  height: 32px;
-  font-size: @font-size2;
-  line-height: 32px;
-
-  &.name {
-    height: 64px;
-
-    &.hint {
-      height: 192px;
-    }
-  }
-}
-
 .sentinel {
   height: 4px;
   margin-top: -4px;
@@ -165,22 +151,27 @@
   left: 8px;
   z-index: @z-index-default-content;
   display: flex;
-  padding: 12px 16px;
+  padding: 0;
   font-size: @font-size2;
   background-color: var(--color-popper-bg-dark);
   border: 1px solid var(--color-border-light);
-  border-radius: 4px;
+  .radius;
+
+  & /deep/ .comment-wrapper {
+    padding: 8px 0;
+  }
 
   & > .close {
     display: flex;
     flex-shrink: 0;
     align-items: center;
-    height: 18px;
-    margin-left: 16px;
+    width: 12px;
+    height: 12px;
+    margin: 8px 8px 0 0;
 
     & > .icon-btn {
       margin: 0;
-      font-size: 10px;
+      font-size: @font-size2;
     }
   }
 }
