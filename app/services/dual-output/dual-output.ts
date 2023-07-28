@@ -358,6 +358,10 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    */
 
   confirmOrCreateVerticalNodes(sceneId: string) {
+    const sceneSources = this.scenesService.views.sceneSourcesForScene(sceneId);
+    if (sceneSources.length > 0) {
+      sceneSources.forEach(scene => this.confirmOrCreateVerticalNodes(scene.id));
+    }
     if (!this.views.hasNodeMap(sceneId) && this.state.dualOutputMode) {
       try {
         this.createSceneNodes(sceneId);
