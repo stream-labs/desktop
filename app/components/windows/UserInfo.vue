@@ -10,7 +10,7 @@
           <div class="user-account">
             <p class="user-id">ID: {{ userId }}</p>
             <p class="user-type" :class="{ 'is-premium': isPremium }">
-              {{ isPremium ? 'プレミアfffム会員' : '一般会員' }}
+              {{ isPremium ? 'プレミアム会員' : '一般会員' }}
             </p>
           </div>
         </div>
