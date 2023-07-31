@@ -104,7 +104,7 @@ export default function GoLiveSettings() {
             {/*EXTRAS*/}
             {!!canUseOptimizedProfile && (
               <Section isSimpleMode={!isAdvancedMode} title={$t('Extras')}>
-                {/* <TwitterInput /> */}
+                <TwitterInput />
                 {!!canUseOptimizedProfile && <OptimizedProfileSwitcher />}
               </Section>
             )}
