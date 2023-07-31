@@ -11,6 +11,8 @@ import * as remote from '@electron/remote';
 const TwitterIcon = TwitterOutlined;
 
 export default function TwitterInput() {
+  const { TwitterService } = Services;
+
   const { tweetText } = useGoLiveSettings().extend(module => {
     function getTwitterState() {
       return {
@@ -21,6 +23,10 @@ export default function TwitterInput() {
     return {
       get streamTitle() {
         return module.state.commonFields.title;
+      },
+
+      get url() {
+        return TwitterService.views.url;
       },
 
       tweetTextWatch: injectWatch(getTwitterState, () => {

@@ -14,8 +14,6 @@ import Spinner from '../../shared/Spinner';
 import ButtonHighlighted from '../../shared/ButtonHighlighted';
 import UltraIcon from '../../shared/UltraIcon';
 import GoLiveError from './GoLiveError';
-import * as remote from '@electron/remote';
-import InputWrapper from 'components-react/shared/inputs/InputWrapper';
 import TwitterInput from './Twitter';
 
 const PlusIcon = PlusOutlined as Function;
@@ -36,7 +34,6 @@ export default function GoLiveSettings() {
     canAddDestinations,
     shouldShowPrimeLabel,
     canUseOptimizedProfile,
-    tweetText,
   } = useGoLiveSettings().extend(module => {
     const {
       RestreamService,
@@ -73,11 +70,6 @@ export default function GoLiveSettings() {
   const shouldShowSettings = !error && !isLoading;
   const shouldShowLeftCol = protectedModeEnabled;
   const shouldShowAddDestButton = canAddDestinations;
-
-  const openTweetIntent = () =>
-    remote.shell.openExternal(
-      `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText || '')}`,
-    );
 
   return (
     <Row gutter={16} style={{ height: 'calc(100% + 24px)' }}>
