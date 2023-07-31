@@ -8,10 +8,9 @@ import { injectWatch } from 'slap';
 import { TwitterOutlined } from '@ant-design/icons';
 import * as remote from '@electron/remote';
 
-const TwitterIcon = TwitterOutlined as Function;
+const TwitterIcon = TwitterOutlined;
 
 export default function TwitterInput() {
-  const { TwitterService, UserService } = Services;
   const { tweetText } = useGoLiveSettings().extend(module => {
     function getTwitterState() {
       return {
@@ -22,14 +21,6 @@ export default function TwitterInput() {
     return {
       get streamTitle() {
         return module.state.commonFields.title;
-      },
-
-      get platform() {
-        return UserService.views.platform?.type;
-      },
-
-      get url() {
-        return TwitterService.views.url;
       },
 
       tweetTextWatch: injectWatch(getTwitterState, () => {
@@ -45,7 +36,7 @@ export default function TwitterInput() {
     );
 
   return (
-    <InputWrapper label={$t('Share Your Stream')}>
+    <InputWrapper label={$t('Share Your Stream')} style={{ marginTop: 16 }}>
       <Button icon={<TwitterIcon />} onClick={openTweetIntent}>
         {$t('Tweet')}
       </Button>
