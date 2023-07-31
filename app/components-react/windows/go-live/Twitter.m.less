@@ -1,9 +1,18 @@
 @import '../../../styles/index';
 
+.container {
+  margin-top: -20px;
+
+  textarea {
+    margin-bottom: 4px !important;
+  }
+}
+
 .twitter-tweet-input {
   :global(textarea),
   :global(.s-form-area__label) {
     background: var(--section-alt) !important;
+    .margin-bottom(1);
   }
 }
 
@@ -16,14 +25,15 @@
 }
 
 .section {
-  .padding(2);
   .margin-bottom(3);
   .radius();
+  padding: 0 !important;
 
-  background: var(--section-alt) !important;
+  // background: var(--section-alt) !important;
 
   textarea {
     border-color: var(--midtone);
+    .margin-bottom(1);
   }
 
   // add smaller font-size for the switcher input

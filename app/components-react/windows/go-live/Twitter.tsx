@@ -5,7 +5,7 @@ import cx from 'classnames';
 import { $t } from '../../../services/i18n';
 import css from './Twitter.m.less';
 import { CheckboxInput, SwitchInput, TextAreaInput, TextInput } from '../../shared/inputs';
-import { Row, Col, Button } from 'antd';
+import { Row, Col, Tooltip } from 'antd';
 import { useGoLiveSettings } from './useGoLiveSettings';
 import { injectWatch } from 'slap';
 
@@ -15,12 +15,10 @@ export default function TwitterInput() {
     tweetText,
     updateSettings,
     tweetWhenGoingLive,
-    linked,
     screenName,
     platform,
     useStreamlabsUrl,
   } = useGoLiveSettings().extend(module => {
-
     function getTwitterState() {
       return {
         streamTitle: module.state.commonFields.title,
@@ -37,10 +35,6 @@ export default function TwitterInput() {
       },
       get useStreamlabsUrl() {
         return TwitterService.state.creatorSiteOnboardingComplete;
-      },
-
-      get linked() {
-        return TwitterService.state.linked;
       },
 
       get screenName() {
@@ -62,73 +56,52 @@ export default function TwitterInput() {
     };
   });
 
-  function unlink() {
-    TwitterService.actions.return
-      .unlinkTwitter()
-      .then(() => TwitterService.actions.getTwitterStatus());
-  }
-
   function setUseStreamlabsUrl(value: boolean) {
     TwitterService.actions.setStreamlabsUrl(value);
   }
 
   function renderLinkedView() {
     return (
-      <div className={cx('section', css.section)}>
-        <p className={css.twitterShareText}>{$t('Share Your Stream')}</p>
-        <Row className={css.switcherRow}>
-          <Col span={14}>
-            <SwitchInput
-              label={$t('Enable Tweet Sharing')}
-              layout="inline"
-              onChange={shouldTweet => TwitterService.actions.setTweetPreference(shouldTweet)}
-              value={tweetWhenGoingLive}
-              className={css.twitterTweetToggle}
-            />
-          </Col>
-          <Col span={10} style={{ textAlign: 'right' }}>
-            <InputWrapper layout="inline">@{screenName}</InputWrapper>
-          </Col>
-        </Row>
-
-        <TextAreaInput
-          name="tweetText"
-          value={tweetText}
-          onChange={tweetText => updateSettings({ tweetText })}
-          nowrap={true}
-          showCount={true}
-          maxLength={280}
-          rows={5}
-          disabled={!tweetWhenGoingLive}
+      <>
+        <SwitchInput
+          label={
+            <Tooltip
+              title={$t(
+                'Due to recent Twitter API limitations enabling this option will open a browser window for you to tweet instead of automatically tweeting on your behalf.',
+              )}
+            >
+              <span>Enable Tweet Sharing</span>
+            </Tooltip>
+          }
+          layout="inline"
+          onChange={shouldTweet => TwitterService.actions.setTweetPreference(shouldTweet)}
+          value={tweetWhenGoingLive}
+          className={css.twitterTweetToggle}
         />
-        {['twitch', 'trovo'].includes(platform!) && (
-          <CheckboxInput
-            value={useStreamlabsUrl}
-            onInput={setUseStreamlabsUrl}
-            label={$t('Use Streamlabs URL')}
-          />
+        {tweetWhenGoingLive && (
+          <div className={css.container}>
+            <TextAreaInput
+              name="tweetText"
+              value={tweetText}
+              onChange={tweetText => updateSettings({ tweetText })}
+              nowrap={true}
+              showCount={true}
+              maxLength={280}
+              rows={5}
+            />
+            {['twitch', 'trovo'].includes(platform!) && (
+              <CheckboxInput
+                value={useStreamlabsUrl}
+                onInput={setUseStreamlabsUrl}
+                label={$t('Use Streamlabs URL')}
+              />
+            )}
+          </div>
         )}
-        <div style={{ marginTop: '30px', textAlign: 'right' }}>
-          <Button onClick={unlink}>{$t('Unlink Twitter')}</Button>
-        </div>
-      </div>
+      </>
     );
   }
 
-  function renderUnlinkedView() {
-    return (
-      <div className={css.section}>
-        <p className={css.twitterShareText}>{$t('Share Your Stream')}</p>
-        <p>{$t("Tweet to let your followers know you're going live")}</p>
-        <button
-          className="button button--default"
-          onClick={() => TwitterService.actions.openLinkTwitterDialog()}
-        >
-          {$t('Connect to Twitter')} <i className="fab fa-twitter" />
-        </button>
-      </div>
-    );
-  }
-
-  return <InputWrapper>{linked ? renderLinkedView() : renderUnlinkedView()}</InputWrapper>;
+  // Since we're opening the browser to tweet, linking isn't necessary. TODO: rename method
+  return <InputWrapper label={$t('Share Your Stream')}>{renderLinkedView()}</InputWrapper>;
 }
