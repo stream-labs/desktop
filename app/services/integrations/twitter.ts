@@ -121,19 +121,26 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
     });
   }
 
-  async postTweet(tweet: string) {
-    const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/twitter/tweet`;
-    const headers = authorizedHeaders(this.userService.apiToken);
-    headers.append('Content-Type', 'application/json');
-    const request = new Request(url, {
-      headers,
-      method: 'POST',
-      body: JSON.stringify({ tweet }),
-    });
-    return jfetch(request).catch(e =>
-      throwStreamError('TWEET_FAILED', e, e.result?.error || $t('Could not connect to Twitter')),
-    );
+  async postTweet(tweet: string, postViaApi = false) {
+    // Posting via API is not working due to Twitter API changes, keeping this code here for future reference
+    if (postViaApi) {
+      const host = this.hostsService.streamlabs;
+      const url = `https://${host}/api/v5/slobs/twitter/tweet`;
+      const headers = authorizedHeaders(this.userService.apiToken);
+      headers.append('Content-Type', 'application/json');
+      const request = new Request(url, {
+        headers,
+        method: 'POST',
+        body: JSON.stringify({ tweet }),
+      });
+      return jfetch(request).catch(e =>
+        throwStreamError('TWEET_FAILED', e, e.result?.error || $t('Could not connect to Twitter')),
+      );
+    } else {
+      return remote.shell.openExternal(
+        `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweet)}`,
+      );
+    }
   }
 
   openLinkTwitterDialog() {
