@@ -74,10 +74,9 @@ export class SceneItemsNode extends Node<ISchema, {}> {
         const hotkeys = new HotkeysNode();
 
         if (sceneItem.isItem()) {
-          const display = this.dualOutputService.views.getNodeDisplay(
-            sceneItem.sceneItemId,
-            sceneItem.sceneId,
-          );
+          const display =
+            sceneItem?.display ??
+            this.dualOutputService.views.getNodeDisplay(sceneItem.sceneItemId, sceneItem.sceneId);
           const context = this.videoSettingsService.contexts[display];
 
           hotkeys.save({ sceneItemId: sceneItem.sceneItemId }).then(() => {
@@ -139,18 +138,39 @@ export class SceneItemsNode extends Node<ISchema, {}> {
   load(context: IContext): Promise<void> {
     this.sanitizeIds();
 
-    this.data.items.forEach(item => {
-      if (item.sceneNodeType === 'item') {
-        if (item.streamVisible == null) item.streamVisible = true;
-        if (item.recordingVisible == null) item.recordingVisible = true;
+    // on first load, a dual output scene needs to assign displays and contexts to the scene items
+    // but if the scene item already has a display assigned, skip it
+    if (this.dualOutputService.views.hasNodeMap(context.scene.id)) {
+      // nodes must be assigned to a context, so if it doesn't exist, establish it
+      if (!this.videoSettingsService.contexts.vertical) {
+        this.videoSettingsService.establishVideoContext('vertical');
       }
-    });
 
-    if (
-      this.dualOutputService.views.hasNodeMap(context.scene.id) &&
-      !this.videoSettingsService.contexts.vertical
-    ) {
-      this.videoSettingsService.establishVideoContext('vertical');
+      const nodeMap = this.dualOutputService.views.sceneNodeMaps[context.scene.id];
+
+      const verticalNodeIds = Object.values(nodeMap);
+
+      this.data.items.forEach(item => {
+        if (!item?.display) {
+          item.display = verticalNodeIds.includes(item.id) ? 'vertical' : 'horizontal';
+        }
+
+        if (item.sceneNodeType === 'item') {
+          if (item.streamVisible == null) item.streamVisible = true;
+          if (item.recordingVisible == null) item.recordingVisible = true;
+        }
+      });
+    } else {
+      // for vanilla scenes, assign all items to the horizontal display
+      this.data.items.forEach(item => {
+        if (!item?.display) {
+          item.display = 'horizontal';
+        }
+        if (item.sceneNodeType === 'item') {
+          if (item.streamVisible == null) item.streamVisible = true;
+          if (item.recordingVisible == null) item.recordingVisible = true;
+        }
+      });
     }
 
     context.scene.addSources(this.data.items);

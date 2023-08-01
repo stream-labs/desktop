@@ -93,7 +93,7 @@ export class RemoveItemCommand extends Command {
     scene.addSource(this.sourceId, {
       id: this.sceneItemId,
       select: false,
-      display: this.settings.display ?? 'horizontal',
+      display: this.settings?.display,
     });
 
     this.reorderNodesSubcommand.rollback();

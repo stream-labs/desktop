@@ -96,15 +96,13 @@ export class CopyNodesCommand extends Command {
       this.selection.getNodes().forEach(node => {
         if (node.isFolder()) {
           // add folder
-          const folder = scene.createFolder(node.name, { id: this.nodeIdsMap[node.id] });
-          this.nodeIdsMap[node.id] = folder.id;
-
-          // assign display
           const display =
             this.display ??
             this.dualOutputService.views.getNodeDisplay(node.id, this.selection.sceneId);
 
-          folder.setDisplay(display);
+          const folder = scene.createFolder(node.name, { id: this.nodeIdsMap[node.id], display });
+          this.nodeIdsMap[node.id] = folder.id;
+
           // if needed, create node map entry
           if (this.display === 'vertical') {
             // when creating dual output nodes for a vanilla scene, the passed in display is set to vertical
@@ -116,16 +114,13 @@ export class CopyNodesCommand extends Command {
           insertedNodes.push(folder);
         } else {
           // add item
-          const sourceId =
-            this.sourceIdsMap != null ? this.sourceIdsMap[node.sourceId] : node.sourceId;
-          const item = scene.addSource(sourceId, { id: this.nodeIdsMap[node.id] });
-
-          // assign context and display
           const display =
             this.display ??
             this.dualOutputService.views.getNodeDisplay(node.id, this.selection.sceneId);
-          const context = this.videoSettingsService.contexts[display];
-          item.setSettings({ ...node.getSettings(), output: context, display });
+
+          const sourceId =
+            this.sourceIdsMap != null ? this.sourceIdsMap[node.sourceId] : node.sourceId;
+          const item = scene.addSource(sourceId, { id: this.nodeIdsMap[node.id], display });
 
           // if needed, create node map entry
           if (this.display === 'vertical') {
@@ -152,28 +147,23 @@ export class CopyNodesCommand extends Command {
       this.selection.getNodes().forEach(node => {
         if (node.isFolder()) {
           // add folder
-          const folder = scene.createFolder(node.name, { id: this.nodeIdsMap[node.id] });
-
-          // assign display
           const display =
             this.display ??
             this.dualOutputService.views.getNodeDisplay(node.id, this.selection.sceneId);
-          folder.setDisplay(display);
+
+          const folder = scene.createFolder(node.name, { id: this.nodeIdsMap[node.id], display });
 
           this.nodeIdsMap[node.id] = folder.id;
           insertedNodes.push(folder);
         } else {
           // add item
-          const sourceId =
-            this.sourceIdsMap != null ? this.sourceIdsMap[node.sourceId] : node.sourceId;
-          const item = scene.addSource(sourceId, { id: this.nodeIdsMap[node.id] });
-
-          // assign context and display
           const display =
             this.display ??
             this.dualOutputService.views.getNodeDisplay(node.id, this.selection.sceneId);
-          const context = this.videoSettingsService.contexts[display];
-          item.setSettings({ ...node.getSettings(), output: context, display });
+
+          const sourceId =
+            this.sourceIdsMap != null ? this.sourceIdsMap[node.sourceId] : node.sourceId;
+          const item = scene.addSource(sourceId, { id: this.nodeIdsMap[node.id], display });
 
           // add to arrays for reordering
           this.nodeIdsMap[node.id] = item.id;
