@@ -107,6 +107,10 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
     this.handleDismissables();
     this.platformAppsService.allAppsLoaded.subscribe(() => this.updateAllApps());
 
+    if (!this.state.menuItems[EMenuItemKey.RecordingHistory]) {
+      this.ADD_MENU_ITEM(ENavName.TopNav, EMenuItemKey.RecordingHistory);
+    }
+
     this.state.currentMenuItem =
       this.layoutService.state.currentTab !== 'default'
         ? this.layoutService.state.currentTab
@@ -244,6 +248,7 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
           { ...SideNavMenuItems()[EMenuItemKey.Themes], isActive: true },
           { ...SideNavMenuItems()[EMenuItemKey.AppStore], isActive: true },
           { ...SideNavMenuItems()[EMenuItemKey.Highlighter], isActive: true },
+          { ...SideNavMenuItems()[EMenuItemKey.RecordingHistory], isActive: true },
           { ...SideNavMenuItems()[EMenuItemKey.ThemeAudit], isActive: true },
         ],
       },
@@ -358,5 +363,17 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
   @mutation()
   private SET_CURRENT_MENU_ITEM(key: EMenuItemKey | string) {
     this.state.currentMenuItem = key;
+  }
+
+  // should only be used when adding a new navigatable item to the side nav for the first time
+  @mutation()
+  private ADD_MENU_ITEM(navName: ENavName, key: EMenuItemKey) {
+    this.state[navName] = {
+      ...this.state[navName],
+      menuItems: [
+        ...this.state[navName].menuItems,
+        navName === ENavName.TopNav ? SideBarTopNavData()[key] : SideBarBottomNavData()[key],
+      ],
+    };
   }
 }
