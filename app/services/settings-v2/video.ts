@@ -155,7 +155,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
    * @param display - Optional, the context's display name
    */
 
-  loadLegacySettings(display: TDisplayType = 'horizontal') {
+  loadLegacySettings(display: TDisplayType = 'horizontal', syncContextSettings?: boolean) {
     const legacySettings = this.contexts[display]?.legacySettings;
     const videoSettings = this.contexts[display]?.video;
 
@@ -177,6 +177,26 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
         this.dualOutputService.setVideoSetting({ [key]: legacySettings[key] }, display);
       });
       this.contexts[display].video = this.contexts[display].legacySettings;
+    }
+
+    /**
+     * When running the optimizer, the backend applies settings to both contexts
+     * but the horizontal and vertical contexts need to have the same fps settings
+     * so apply the horizontal settings fps settings to the vertical settings.
+     */
+    if (syncContextSettings) {
+      const horizontalScaleType = this.contexts.horizontal.video.scaleType;
+      const horizontalFpsType = this.contexts.horizontal.video.fpsType;
+      const horizontalFpsNum = this.contexts.horizontal.video.fpsNum;
+      const horizontalFpsDen = this.contexts.horizontal.video.fpsDen;
+
+      this.dualOutputService.actions.setVideoSetting(
+        { scaleType: horizontalScaleType },
+        'vertical',
+      );
+      this.dualOutputService.actions.setVideoSetting({ fpsType: horizontalFpsType }, 'vertical');
+      this.dualOutputService.actions.setVideoSetting({ fpsNum: horizontalFpsNum }, 'vertical');
+      this.dualOutputService.actions.setVideoSetting({ fpsDen: horizontalFpsDen }, 'vertical');
     }
   }
 
