@@ -59,6 +59,7 @@ export class SourceSelectorModule {
   state = injectState({
     expandedFoldersIds: [] as string[],
     showTreeMask: true,
+    sceneNodeMap: this.dualOutputService.views.activeSceneNodeMap,
   });
 
   nodeRefs = {};

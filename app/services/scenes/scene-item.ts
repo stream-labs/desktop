@@ -278,7 +278,7 @@ export class SceneItem extends SceneItemNode {
     const visible = customSceneItem.visible;
     const position = { x: customSceneItem.x, y: customSceneItem.y };
     const crop = customSceneItem.crop;
-    const display = this?.display ?? 'horizontal';
+    const display = customSceneItem?.display ?? this?.display ?? 'horizontal';
     const context = this.videoSettingsService.contexts[display];
 
     const obsSceneItem = this.getObsSceneItem();

@@ -22,7 +22,7 @@ import { TSceneNodeInfo } from 'services/scene-collections/nodes/scene-items';
 import * as fs from 'fs';
 import * as path from 'path';
 import uuid from 'uuid/v4';
-import { assertIsDefined, getDefined } from 'util/properties-type-guards';
+import { assertIsDefined } from 'util/properties-type-guards';
 import { VideoSettingsService, TDisplayType } from 'services/settings-v2';
 import { DualOutputService } from 'services/dual-output';
 
@@ -146,18 +146,18 @@ export class Scene {
    * in the source selector. The only instance where the vertical nodes are used
    * to populate the source selector is in dual output mode when the horizontal display is hidden.
    */
+
   getSourceSelectorNodes(): TSceneNode[] {
     let nodes = this.getNodes();
+
     if (this.dualOutputService.views.hasVerticalNodes) {
       const populateWithVerticalNodes =
         !this.dualOutputService.views.activeDisplays.horizontal &&
         this.dualOutputService.views.activeDisplays.vertical;
-
       /**
        * nodeMap can be used for checking horizontal display nodes,
        * but cannot lookup vertical display IDs so we use a Set instead
        */
-
       const nodeMap = this.dualOutputService.views.activeSceneNodeMap;
       const verticalNodeIds = new Set(this.dualOutputService.views.verticalNodeIds);
       nodes = nodes.filter(node => {
@@ -433,6 +433,7 @@ export class Scene {
         scaleFilter: sceneNode.scaleFilter!,
         blendingMode: sceneNode.blendingMode!,
         blendingMethod: sceneNode.blendingMethod,
+        display: sceneNode.display,
       });
       return true;
     });
@@ -442,10 +443,10 @@ export class Scene {
     // create folder and items
     let itemIndex = 0;
     nodes.forEach(nodeModel => {
-      const display = this.dualOutputService.views.getNodeDisplay(nodeModel.id, this.state.id);
+      const display = nodeModel?.display ?? 'horizontal';
       const obsSceneItem = obsSceneItems[itemIndex];
       if (nodeModel.sceneNodeType === 'folder') {
-        this.createFolder(nodeModel.name, { id: nodeModel.id });
+        this.createFolder(nodeModel.name, { id: nodeModel.id, display });
       } else {
         this.ADD_SOURCE_TO_SCENE(
           nodeModel.id,
@@ -465,8 +466,6 @@ export class Scene {
       if (nodeModel.sceneNodeType !== 'folder') return;
       this.getSelection(nodeModel.childrenIds).moveTo(this.id, nodeModel.id);
     });
-
-    this.scenesService.sourcesAdded.next(this.id);
   }
 
   canAddSource(sourceId: string): boolean {

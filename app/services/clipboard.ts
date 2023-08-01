@@ -379,12 +379,9 @@ export class ClipboardService extends StatefulService<IClipboardState> {
 
       const itemModel = node.item as ISceneItem & ISource;
 
+      const display = node.settings?.display ?? node?.item?.display;
       // add sceneItem and apply settings
-      const sceneItem = scene.addSource(sourceIdMap[itemModel.sourceId]);
-
-      const display = this.dualOutputService.views.getNodeDisplay(sceneItem.id, scene.id);
-      const context = this.videoSettingsService.contexts[display];
-      sceneItem.setSettings({ ...node.settings, output: context, display });
+      const sceneItem = scene.addSource(sourceIdMap[itemModel.sourceId], { display });
 
       // set parent for item
       if (itemModel.parentId) sceneItem.setParent(folderIdMap[itemModel.parentId]);

@@ -14,7 +14,6 @@ import uuid from 'uuid/v4';
 import { DualOutputService } from 'services/dual-output';
 import { TDisplayType } from 'services/settings-v2/video';
 import { InitAfter, ViewHandler } from 'services/core';
-import { VideoSettingsService } from 'services/settings-v2';
 
 export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
 
@@ -276,12 +275,10 @@ export class ScenesService extends StatefulService<IScenesState> {
   itemAdded = new Subject<ISceneItem & ISource>();
   itemRemoved = new Subject<ISceneItem & ISource>();
   itemUpdated = new Subject<ISceneItem & ISource>();
-  sourcesAdded = new Subject();
 
   @Inject() private windowsService: WindowsService;
   @Inject() private sourcesService: SourcesService;
   @Inject() private transitionsService: TransitionsService;
-  @Inject() private videoSettingsService: VideoSettingsService;
 
   @mutation()
   private ADD_SCENE(id: string, name: string) {
@@ -330,15 +327,9 @@ export class ScenesService extends StatefulService<IScenesState> {
         .slice()
         .reverse()
         .forEach(item => {
-          const newItem = newScene.addSource(item.sourceId);
           const display = item?.display ?? this.dualOutputService.views.getNodeDisplay(item.id, id);
-          const context = this.videoSettingsService.contexts[display];
-          const settings = {
-            ...item.getSettings(),
-            output: context,
-            display,
-          };
-          newItem.setSettings(settings);
+
+          const newItem = newScene.addSource(item.sourceId, { display });
 
           /**
            * when creating the scene in dual output mode
