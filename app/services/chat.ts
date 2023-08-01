@@ -351,14 +351,18 @@ export class ChatService extends Service {
           this.chatView.webContents
             .executeJavaScript(
               `
-                document.querySelector('html').style.overflowY='hidden !important';
-                var chatContainer = document.querySelector('div[data-pagelet="page"] > div');
+                document.querySelector('html').style = 'overflow-y: hidden !important;';
+
+                var chatContainer = document.querySelector('iframe').contentDocument.querySelector('body > div > div > div');
                 chatContainer.style.marginLeft = '0';
                 chatContainer.style.marginRight = '0';
+                chatContainer.style.maxWidth = 'none';
                 `,
               true,
             )
-            .catch(e => {});
+            .catch(e => {
+              console.error(e);
+            });
         });
       }
     });
