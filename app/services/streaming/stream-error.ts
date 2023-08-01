@@ -50,11 +50,6 @@ export const errorTypes = {
       return $t('Failed to upload the thumbnail');
     },
   },
-  TWEET_FAILED: {
-    get message() {
-      return $t('Failed to post the Tweet');
-    },
-  },
   PRIME_REQUIRED: {
     get message() {
       return $t('This feature is for Ultra members only');
