@@ -103,7 +103,12 @@ export class AutoConfigService extends Service {
 
     if (progress.event === 'done') {
       obs.NodeObs.TerminateAutoConfig();
-      this.videoSettingsService.loadLegacySettings();
+      /**
+       * On the backend, the optimizer applies settings to both the vertical and horizontal contexts
+       * but we only want to apply these settings to the horizontal context. So restore the vertical
+       * settings from the local settings.
+       */
+      this.videoSettingsService.loadLegacySettings('vertical', true);
     }
   }
 
@@ -114,7 +119,12 @@ export class AutoConfigService extends Service {
       } else {
         obs.NodeObs.TerminateAutoConfig();
 
-        this.videoSettingsService.loadLegacySettings();
+        /**
+         * On the backend, the optimizer applies settings to both the vertical and horizontal contexts
+         * but we only want to apply these settings to the horizontal context. So restore the vertical
+         * settings from the local settings.
+         */
+        this.videoSettingsService.loadLegacySettings('vertical', true);
         debounce(() => this.configProgress.next({ ...progress, event: 'done' }), 1000)();
       }
     }
