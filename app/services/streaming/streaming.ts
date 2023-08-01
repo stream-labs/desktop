@@ -38,7 +38,6 @@ import isEqual from 'lodash/isEqual';
 import { createStreamError, IStreamError, StreamError, TStreamErrorType } from './stream-error';
 import { authorizedHeaders } from 'util/requests';
 import { HostsService } from '../hosts';
-import { TwitterService } from '../integrations/twitter';
 import { assertIsDefined, getDefined } from 'util/properties-type-guards';
 import { StreamInfoView } from './streaming-view';
 import { GrowService } from 'services/grow/grow';
@@ -86,7 +85,6 @@ export class StreamingService
   @Inject() private videoEncodingOptimizationService: VideoEncodingOptimizationService;
   @Inject() private restreamService: RestreamService;
   @Inject() private hostsService: HostsService;
-  @Inject() private twitterService: TwitterService;
   @Inject() private growService: GrowService;
   @Inject() private recordingModeService: RecordingModeService;
   @Inject() private markersService: MarkersService;
@@ -130,7 +128,6 @@ export class StreamingService
         setupMultistream: 'not-started',
         setupGreen: 'not-started',
         startVideoTransmission: 'not-started',
-        postTweet: 'not-started',
       },
     },
   };
@@ -224,16 +221,6 @@ export class StreamingService
         }
       }),
     );
-
-    // prepopulate Twitter
-    try {
-      if (this.twitterService.state.linked && this.twitterService.state.tweetWhenGoingLive) {
-        await this.twitterService.getTwitterStatus();
-      }
-    } catch (e: unknown) {
-      // do not block streaming if something is wrong on the Twitter side
-      console.error('Error fetching Twitter status', e);
-    }
 
     // successfully prepopulated
     this.UPDATE_STREAM_INFO({ lifecycle: 'waitForNewSettings' });
@@ -379,25 +366,6 @@ export class StreamingService
     // check if we should show the waring about the disabled Auto-start
     if (settings.platforms.youtube?.enabled && !settings.platforms.youtube.enableAutoStart) {
       this.SET_WARNING('YT_AUTO_START_IS_DISABLED');
-    }
-
-    // tweet
-    if (
-      settings.tweetText &&
-      this.twitterService.state.linked &&
-      this.twitterService.state.tweetWhenGoingLive
-    ) {
-      try {
-        await this.runCheck('postTweet', () => this.twitterService.postTweet(settings.tweetText!));
-      } catch (e: unknown) {
-        console.error('unable to post a tweet', e);
-        if (e instanceof StreamError) {
-          this.setError(e);
-        } else {
-          this.setError('TWEET_FAILED');
-        }
-        return;
-      }
     }
 
     // all done

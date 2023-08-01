@@ -15,7 +15,7 @@ import Utils from '../../../services/utils';
  * Shows transition to live progress and helps troubleshoot related problems
  */
 export default function GoLiveChecklist(p: HTMLAttributes<unknown>) {
-  const { VideoEncodingOptimizationService, TwitterService, WindowsService } = Services;
+  const { VideoEncodingOptimizationService, WindowsService } = Services;
   const {
     error,
     enabledPlatforms,
@@ -26,15 +26,9 @@ export default function GoLiveChecklist(p: HTMLAttributes<unknown>) {
     getPlatformDisplayName,
     isUpdateMode,
     shouldShowOptimizedProfile,
-    shouldPostTweet,
   } = useGoLiveSettings().extend(module => ({
-
     get shouldShowOptimizedProfile() {
       return VideoEncodingOptimizationService.state.useOptimizedProfile && !module.isUpdateMode;
-    },
-
-    get shouldPostTweet() {
-      return !module.isUpdateMode && TwitterService.state.tweetWhenGoingLive;
     },
   }));
 
@@ -79,9 +73,6 @@ export default function GoLiveChecklist(p: HTMLAttributes<unknown>) {
           {/* START TRANSMISSION */}
           {!isUpdateMode &&
             renderCheck($t('Start video transmission'), checklist.startVideoTransmission)}
-
-          {/* POST A TWEET */}
-          {shouldPostTweet && renderCheck($t('Post a tweet'), checklist.postTweet)}
         </Timeline>
 
         {/* WARNING MESSAGE */}

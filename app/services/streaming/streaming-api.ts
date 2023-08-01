@@ -51,7 +51,6 @@ export interface IStreamInfo {
     setupMultistream: TGoLiveChecklistItemState;
     setupGreen: TGoLiveChecklistItemState;
     startVideoTransmission: TGoLiveChecklistItemState;
-    postTweet: TGoLiveChecklistItemState;
   };
 }
 
