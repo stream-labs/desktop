@@ -12,4 +12,5 @@ export type ChatMessage = {
   anonymity?: number;
   mail?: string;
   score?: number;
+  name?: string;
 };

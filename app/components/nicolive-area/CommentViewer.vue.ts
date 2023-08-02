@@ -1,25 +1,26 @@
+import { clipboard } from 'electron';
+import { Inject } from 'services/core/injector';
+import { CustomizationService } from 'services/customization';
+import { ChatMessage } from 'services/nicolive-program/ChatMessage';
+import { ChatComponentType } from 'services/nicolive-program/ChatMessage/ChatComponentType';
+import { WrappedChat, WrappedChatWithComponent } from 'services/nicolive-program/WrappedChat';
+import { getContentWithFilter } from 'services/nicolive-program/getContentWithFilter';
+import { NicoliveCommentFilterService } from 'services/nicolive-program/nicolive-comment-filter';
+import { NicoliveCommentViewerService } from 'services/nicolive-program/nicolive-comment-viewer';
+import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
+import { ISettingsServiceApi } from 'services/settings';
+import { Menu } from 'util/menus/Menu';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-import { Inject } from 'services/core/injector';
-import { NicoliveCommentViewerService } from 'services/nicolive-program/nicolive-comment-viewer';
-import { WrappedChat, WrappedChatWithComponent } from 'services/nicolive-program/WrappedChat';
-import CommentForm from './CommentForm.vue';
+import NAirLogo from '../../../media/images/n-air-logo.svg';
 import CommentFilter from './CommentFilter.vue';
-import { ChatMessage } from 'services/nicolive-program/ChatMessage';
-import { Menu } from 'util/menus/Menu';
-import { clipboard } from 'electron';
-import { NicoliveCommentFilterService } from 'services/nicolive-program/nicolive-comment-filter';
-import { getContentWithFilter } from 'services/nicolive-program/getContentWithFilter';
-import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
+import CommentForm from './CommentForm.vue';
 import CommonComment from './comment/CommonComment.vue';
-import SystemMessage from './comment/SystemMessage.vue';
+import EmotionComment from './comment/EmotionComment.vue';
 import GiftComment from './comment/GiftComment.vue';
 import NicoadComment from './comment/NicoadComment.vue';
-import EmotionComment from './comment/EmotionComment.vue';
-import { ChatComponentType } from 'services/nicolive-program/ChatMessage/ChatComponentType';
-import { CustomizationService } from 'services/customization';
-import NAirLogo from '../../../media/images/n-air-logo.svg';
-import { ISettingsServiceApi } from 'services/settings';
+import SystemMessage from './comment/SystemMessage.vue';
+import { getDisplayName } from 'services/nicolive-program/ChatMessage/getDisplayName';
 
 const componentMap: { [type in ChatComponentType]: Vue.Component } = {
   common: CommonComment,
@@ -87,8 +88,18 @@ export default class CommentViewer extends Vue {
     }
   }
 
-  pinnedItemComtent(item: WrappedChat): string {
-    return `${getContentWithFilter(item)}  (${this.getFormattedLiveTime(item.value)})`;
+  get pinnedItem(): WrappedChat | null {
+    const item = this.pinnedComment;
+    return item && {
+      ...item,
+      value: {
+        ...item.value,
+        content: `${getContentWithFilter(item)}  (${this.getFormattedLiveTime(item.value)})`,
+      }
+    };
+  }
+  getDisplayName(item: WrappedChat): string {
+    return getDisplayName(item);
   }
 
   componentMap = componentMap;
@@ -106,6 +117,13 @@ export default class CommentViewer extends Vue {
 
   get speakingSeqId() {
     return this.nicoliveCommentViewerService.speakingSeqId;
+  }
+
+  get nameplateHintNo(): number | undefined {
+    const nameplateHint = this.nicoliveProgramService.stateService.state.nameplateHint;
+    if (!nameplateHint) return undefined;
+    if (nameplateHint.programID !== this.nicoliveProgramService.state.programID) return undefined;
+    return nameplateHint.commentNo;
   }
 
   refreshConnection() {
@@ -180,6 +198,10 @@ export default class CommentViewer extends Vue {
       }
     });
     menu.popup();
+  }
+
+  showUserInfo(item: WrappedChatWithComponent) {
+    this.nicoliveCommentViewerService.showUserInfo(item.value.user_id, item.value.name, (item.value.premium & 1) !== 0);
   }
 
   private cleanup: () => void = undefined;

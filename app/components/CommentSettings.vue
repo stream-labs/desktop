@@ -7,7 +7,7 @@
       <div class="input-container">
         <div class="input-wrapper">
           <div class="row">
-            <div class="name">匿名(184)のコメントを表示</div>
+            <div class="name">匿名のコメントを表示</div>
             <div class="value">
               <input type="checkbox" v-model="showAnonymous" class="toggle-button" />
             </div>
@@ -178,7 +178,7 @@
 
 <script lang="ts" src="./CommentSettings.vue.ts"></script>
 <style lang="less" scoped>
-@import '../styles/index';
+@import url('../styles/index');
 
 select {
   margin: 0;
@@ -198,10 +198,10 @@ select {
 }
 
 .row {
-  width: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
+  width: 100%;
 }
 
 .input-heading {
@@ -218,9 +218,9 @@ select {
 }
 
 .name {
+  flex-grow: 1;
   font-size: @font-size4;
   color: var(--color-text);
-  flex-grow: 1;
 }
 
 .value {
@@ -245,28 +245,28 @@ select {
 }
 
 & /deep/ .multiselect__tags {
+  position: relative;
   height: 100%;
   overflow: hidden;
-  position: relative;
   box-shadow: inset 0 0 0 1px var(--color-border-light);
 
   [data-type='webSpeech'] & {
-    background: url(../../media/images/windows_bg.png) center no-repeat / 100% auto;
+    background: url('../../media/images/windows_bg.png') center no-repeat / 100% auto;
   }
 
   [data-type='nVoice'] & {
-    background: url(../../media/images/nvoice_bg.png) center no-repeat / 100% auto;
+    background: url('../../media/images/nvoice_bg.png') center no-repeat / 100% auto;
 
-    &:after {
-      content: '';
+    &::after {
       position: absolute;
       top: -64px;
       right: -37px;
       width: 414px;
       height: 415px;
-      background: url(../../media/images/nvoice.png) no-repeat center/ 100% auto;
+      content: '';
+      background: url('../../media/images/nvoice.png') no-repeat center/ 100% auto;
+      filter: drop-shadow(4px 4px 12px rgb(@black 0.3));
       opacity: 0.9;
-      filter: drop-shadow(4px 4px 12px rgba(@black, 0.3));
     }
   }
 }
@@ -274,7 +274,7 @@ select {
 & /deep/ .multiselect__select {
   line-height: 64px;
 
-  &:before {
+  &::before {
     right: 16px;
     color: var(--color-text-light);
   }
@@ -284,9 +284,9 @@ select {
   height: 64px;
   padding: 0 16px;
   color: var(--color-text-light);
-  border: none;
+  text-shadow: 0 0 4px rgb(@black 0.25);
   background: transparent;
-  text-shadow: 0px 0px 4px rgba(@black, 0.25);
+  border: none;
 
   &:hover {
     border-color: var(--color-border-light);
@@ -297,4 +297,3 @@ select {
   top: 8px;
 }
 </style>
-

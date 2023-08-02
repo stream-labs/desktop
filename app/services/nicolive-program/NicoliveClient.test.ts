@@ -436,3 +436,5 @@ describe('webviews', () => {
     expect(mock.browserWindow.close).toHaveBeenCalled();
   });
 });
+
+// TODO add test for konomiTags, userFollow APIs

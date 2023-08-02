@@ -31,8 +31,8 @@ import Vue from 'vue';
 import Util from 'services/utils';
 import { Subject } from 'rxjs';
 import ExecuteInCurrentWindow from '../util/execute-in-current-window';
-
 import BrowserSourceInteraction from 'components/windows/BrowserSourceInteraction';
+import UserInfo from 'components/windows/UserInfo.vue';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -64,6 +64,7 @@ export function getComponents() {
     NicoliveProgramSelector,
     Informations,
     AutoCompactConfirmDialog,
+    UserInfo,
     BrowserSourceInteraction,
   };
 }
