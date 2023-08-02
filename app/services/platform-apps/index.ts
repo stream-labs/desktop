@@ -289,13 +289,9 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
    */
 
   async refreshProductionApps() {
-    //   const toUnload = this.state.loadedApps;
-    //   this.state.loadedApps = {...this.state.loadedApps};
-    //   toUnload.forEach(app => this.unloadApp(app));
-    //   this.state.loadedApps = {};
     this.unloadAllApps();
     this.loadProductionApps();
-    this.sideNavService.actions.updateAllApps();
+    this.sideNavService.actions.updateAllApps(this.state.loadedApps);
   }
 
   /**

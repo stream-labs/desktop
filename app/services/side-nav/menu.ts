@@ -105,7 +105,10 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
     this.userService.userLoginFinished.subscribe(() => this.handleUserLogin());
 
     this.handleDismissables();
-    this.platformAppsService.allAppsLoaded.subscribe(() => this.updateAllApps());
+
+    this.platformAppsService.allAppsLoaded.subscribe((loadedApps: ILoadedApp[]) =>
+      this.updateAllApps(loadedApps),
+    );
 
     this.state.currentMenuItem =
       this.layoutService.state.currentTab !== 'default'
@@ -206,8 +209,9 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
     this.TOGGLE_MENU_ITEM(navName, menuItemKey, status);
   }
 
-  updateAllApps() {
-    this.UPDATE_ALL_APPS(this.platformAppsService.views.enabledApps);
+  updateAllApps(loadedApps: ILoadedApp[]) {
+    console.log('loadedApps ', JSON.stringify(loadedApps));
+    this.UPDATE_ALL_APPS(loadedApps);
   }
 
   toggleApp(appId: string) {
