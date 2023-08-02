@@ -10,9 +10,10 @@ import KevinSvg from './KevinSvg';
 import styles from './TitleBar.m.less';
 import * as remote from '@electron/remote';
 import Banner from 'components-react/root/Banner';
+import { useRealmObject } from 'components-react/hooks/realm';
 
 export default function TitleBar(props: { windowId: string }) {
-  const { CustomizationService, StreamingService, WindowsService } = Services;
+  const { CustomizationService, StreamingService, WindowsService, TestRealmService } = Services;
 
   const isMaximizable = remote.getCurrentWindow().isMaximizable() !== false;
   const isMac = byOS({ [OS.Windows]: false, [OS.Mac]: true });
@@ -23,6 +24,8 @@ export default function TitleBar(props: { windowId: string }) {
     }),
     false,
   );
+
+  const title = useRealmObject(TestRealmService.state).name;
 
   const isDev = useMemo(() => Utils.isDevMode(), []);
 
@@ -72,7 +75,7 @@ export default function TitleBar(props: { windowId: string }) {
         )}
         {primeTheme && !isMac && <KevinSvg className={styles.titlebarIcon} />}
         <div className={styles.titlebarTitle} onDoubleClick={maximize}>
-          {v.title}
+          {title}
         </div>
         {!isMac && (
           <div className={styles.titlebarActions}>
