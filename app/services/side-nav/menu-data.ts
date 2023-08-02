@@ -1,6 +1,13 @@
 import { TAppPage } from 'services/navigation';
 import { $t } from 'services/i18n';
 
+/**
+ * Update Menu Items
+ * 1. EMenuItemKey: Add/update/remove enum in EMenuItemKey.
+ * 2. Add string title to menuTitles.
+ * 3. Add an entry to SideNavMenuItems. Use the subMenuItems property to add submenu items from SideBarSubMenuItems to the menu item.
+ * 4. To show the menu item, add it to either SideBarTopNavData or SideBarBottomNavData.
+ */
 export enum EMenuItemKey {
   Editor = 'editor',
   LayoutEditor = 'layout-editor',
@@ -18,6 +25,13 @@ export enum EMenuItemKey {
   Login = 'login',
 }
 
+/**
+ * Update SubMenu Items
+ * 1. ESubMenuItemKey: Add/update/remove enum.
+ * 2. Add string title to menuTitles.
+ * 3. Add entry to SideBarSubMenuItems.
+ * 4. To show the submenu item, add it to a menu item entry in SideNavMenuItems by using the subMenuItems property.
+ */
 export enum ESubMenuItemKey {
   Scene = 'browse-overlays',
   AlertBoxLibrary = 'alertbox-library',
@@ -35,6 +49,11 @@ export enum ESubMenuItemKey {
 
 export const ESideNavKey = { ...EMenuItemKey, ...ESubMenuItemKey };
 
+/**
+ * Update External Links
+ * 1. Confirm external link parameter for url.
+ * 2. Add/update/remove type in TExternalLinkType. The type is the url parameter.
+ */
 export type TExternalLinkType =
   | 'overlay'
   | 'widget-theme'
@@ -45,6 +64,11 @@ export type TExternalLinkType =
   | 'tipping/methods'
   | 'multistream';
 
+/**
+ * Update Protocal Link Map
+ * 1. Confirm protocol link parameter for url.
+ * 2. Add/update/remove entry in ProtocolLinkKeyMap. The ket is the url parameter.
+ */
 export const ProtocolLinkKeyMap = {
   ['overlay']: ESubMenuItemKey.Scene,
   ['widget-theme']: ESubMenuItemKey.Widget,
@@ -52,7 +76,6 @@ export const ProtocolLinkKeyMap = {
 };
 
 type TSideNavItem = TAppPage | TExternalLinkType | 'NavTools' | 'WidgetWindow' | string;
-
 export interface IAppMenuItem {
   id: string;
   name?: string;
@@ -84,6 +107,11 @@ export enum ENavName {
   BottomNav = 'bottom-nav',
 }
 
+/**
+ * The string titles for the menu items and submenu items
+ * @param item - key for the menu item
+ * @returns string title
+ */
 export const menuTitles = (item: EMenuItemKey | ESubMenuItemKey | string) => {
   return {
     [EMenuItemKey.Editor]: $t('Editor'),
@@ -115,6 +143,9 @@ export const menuTitles = (item: EMenuItemKey | ESubMenuItemKey | string) => {
   }[item];
 };
 
+/**
+ * Menu items in the top menu of the side nav
+ */
 export const SideBarTopNavData = (): IMenu => ({
   name: ENavName.TopNav,
   menuItems: [
@@ -129,6 +160,9 @@ export const SideBarTopNavData = (): IMenu => ({
   ],
 });
 
+/**
+ * Menu items in the bottom menu of the side nav
+ */
 export const SideBarBottomNavData = (): IMenu => ({
   name: ENavName.BottomNav,
   menuItems: [
@@ -145,6 +179,9 @@ export type TMenuItems = {
   [MenuItem in Partial<EMenuItemKey>]: IMenuItem | IParentMenuItem;
 };
 
+/**
+ * Data for menu items in the side nav
+ */
 export const SideNavMenuItems = (): TMenuItems => ({
   [EMenuItemKey.Editor]: {
     key: EMenuItemKey.Editor,
@@ -268,6 +305,9 @@ type TSubMenuItems = {
   [MenuItem in ESubMenuItemKey]: IMenuItem | IParentMenuItem;
 };
 
+/**
+ * Data for sub menu items in the side nav
+ */
 export const SideBarSubMenuItems = (): TSubMenuItems => ({
   [ESubMenuItemKey.Scene]: {
     key: ESubMenuItemKey.Scene,
