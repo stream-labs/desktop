@@ -155,7 +155,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
    * @param display - Optional, the context's display name
    */
 
-  loadLegacySettings(display: TDisplayType = 'horizontal', syncContextSettings?: boolean) {
+  loadLegacySettings(display: TDisplayType = 'horizontal') {
     const legacySettings = this.contexts[display]?.legacySettings;
     const videoSettings = this.contexts[display]?.video;
 
@@ -179,24 +179,8 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
       this.contexts[display].video = this.contexts[display].legacySettings;
     }
 
-    /**
-     * When running the optimizer, the backend applies settings to both contexts
-     * but the horizontal and vertical contexts need to have the same fps settings
-     * so apply the horizontal settings fps settings to the vertical settings.
-     */
-    if (syncContextSettings) {
-      const horizontalScaleType = this.contexts.horizontal.video.scaleType;
-      const horizontalFpsType = this.contexts.horizontal.video.fpsType;
-      const horizontalFpsNum = this.contexts.horizontal.video.fpsNum;
-      const horizontalFpsDen = this.contexts.horizontal.video.fpsDen;
-
-      this.dualOutputService.actions.setVideoSetting(
-        { scaleType: horizontalScaleType },
-        'vertical',
-      );
-      this.dualOutputService.actions.setVideoSetting({ fpsType: horizontalFpsType }, 'vertical');
-      this.dualOutputService.actions.setVideoSetting({ fpsNum: horizontalFpsNum }, 'vertical');
-      this.dualOutputService.actions.setVideoSetting({ fpsDen: horizontalFpsDen }, 'vertical');
+    if (invalidFps(this.contexts[display].video.fpsNum, this.contexts[display].video.fpsDen)) {
+      this.createDefaultFps(display);
     }
   }
 
@@ -220,10 +204,10 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
         this.SET_VIDEO_SETTING(key, settings[key], display);
       });
       this.contexts[display].video = settings;
-    }
 
-    if (invalidFps(this.contexts[display].video.fpsNum, this.contexts[display].video.fpsDen)) {
-      this.createDefaultFps(display);
+      if (invalidFps(this.contexts[display].video.fpsNum, this.contexts[display].video.fpsDen)) {
+        this.createDefaultFps(display);
+      }
     }
 
     this.SET_VIDEO_CONTEXT(display, this.contexts[display].video);
@@ -258,10 +242,59 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     this.setVideoSetting('fpsDen', 1, display);
   }
 
+  /**
+   * Migrate optimizer settings to vertical context
+   *
+   * @remarks
+   * When running the optimizer, the backend only updates the horizontal context,
+   * so apply the horizontal settings to the vertical settings.
+   */
+  migrateAutoConfigSettings() {
+    if (this.contexts?.vertical) {
+      // also update vertical context
+      const newVerticalSettings = {
+        fpsNum: this.contexts.horizontal.video.fpsNum,
+        fpsDen: this.contexts.horizontal.video.fpsDen,
+        baseWidth: this.state.vertical.baseWidth,
+        baseHeight: this.state.vertical.baseHeight,
+        outputWidth: this.state.vertical.outputWidth,
+        outputHeight: this.state.vertical.outputHeight,
+        outputFormat: this.contexts.horizontal.video.outputFormat,
+        colorspace: this.contexts.horizontal.video.colorspace,
+        range: this.contexts.horizontal.video.range,
+        scaleType: this.contexts.horizontal.video.scaleType,
+        fpsType: this.contexts.horizontal.video.fpsType,
+      };
+
+      this.updateVideoSettings(newVerticalSettings, 'vertical');
+    } else {
+      // if there is no vertical context, only update persisted settings for vertical context
+      const horizontalScaleType = this.contexts.horizontal.video.scaleType;
+      const horizontalFpsType = this.contexts.horizontal.video.fpsType;
+      const horizontalFpsNum = this.contexts.horizontal.video.fpsNum;
+      const horizontalFpsDen = this.contexts.horizontal.video.fpsDen;
+
+      this.dualOutputService.setVideoSetting({ scaleType: horizontalScaleType }, 'vertical');
+      this.dualOutputService.setVideoSetting({ fpsType: horizontalFpsType }, 'vertical');
+      this.dualOutputService.setVideoSetting({ fpsNum: horizontalFpsNum }, 'vertical');
+      this.dualOutputService.setVideoSetting({ fpsDen: horizontalFpsDen }, 'vertical');
+    }
+  }
+
   @debounce(200)
   updateObsSettings(display: TDisplayType = 'horizontal') {
     this.contexts[display].video = this.state[display];
     this.contexts[display].legacySettings = this.state[display];
+  }
+
+  updateVideoSettings(patch: Partial<IVideoInfo>, display: TDisplayType = 'horizontal') {
+    const newVideoSettings = { ...this.contexts[display].video, ...patch };
+
+    this.SET_VIDEO_CONTEXT(display, newVideoSettings);
+    this.updateObsSettings(display);
+
+    // also update the persisted settings
+    this.dualOutputService.updateVideoSettings(newVideoSettings, display);
   }
 
   setVideoSetting(key: string, value: unknown, display: TDisplayType = 'horizontal') {
@@ -293,12 +326,12 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   }
 
   @mutation()
-  DESTROY_VIDEO_CONTEXT(display: TDisplayType = 'horizontal') {
+  private DESTROY_VIDEO_CONTEXT(display: TDisplayType = 'horizontal') {
     this.state[display] = null as IVideoInfo;
   }
 
   @mutation()
-  SET_VIDEO_SETTING(key: string, value: unknown, display: TDisplayType = 'horizontal') {
+  private SET_VIDEO_SETTING(key: string, value: unknown, display: TDisplayType = 'horizontal') {
     this.state[display] = {
       ...this.state[display],
       [key]: value,
@@ -306,16 +339,11 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   }
 
   @mutation()
-  SET_VIDEO_CONTEXT(display: TDisplayType = 'horizontal', settings?: IVideoInfo) {
+  private SET_VIDEO_CONTEXT(display: TDisplayType = 'horizontal', settings?: IVideoInfo) {
     if (settings) {
       this.state[display] = settings;
     } else {
       this.state[display] = {} as IVideoInfo;
     }
-  }
-
-  @mutation()
-  REMOVE_CONTEXT(display: TDisplayType) {
-    this.state[display] = null as IVideoInfo;
   }
 }
