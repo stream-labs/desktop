@@ -1,15 +1,20 @@
 <template>
-  <div class="root" :class="[chat.type, { pseudoHover: commentMenuOpened }]">
+  <div class="root comment-root" :class="[chat.type, { pseudoHover: commentMenuOpened }]">
     <div
-      class="comment-root"
+      class="comment-wrapper"
       :speaking="speaking"
       :title="computedTitle"
       @dblclick="$emit('pinned')"
     >
       <div class="comment-number">{{ chat.value.no }}</div>
       <div class="comment-box">
-        <div class="comment-name-box" v-if="computedName" @click.stop="$emit('commentUser')">
-          <img class="comment-icon" :src="userIconURL" />
+        <div
+          class="comment-name-box"
+          :title="computedName"
+          v-if="computedName"
+          @click.stop="$emit('commentUser')"
+        >
+          <img class="comment-icon" :src="userIconURL" :alt="computedName" />
           <div class="comment-name">{{ computedName }}</div>
         </div>
         <div class="comment-body">{{ computedContent }}</div>
@@ -19,9 +24,11 @@
       </div>
     </div>
     <div class="nameplate-hint" v-if="nameplateHint">
-      <div>［なふだ機能］を使ったコメントが投稿されました</div>
-      <div>ニックネームをクリックして、視聴者のことをもっとよく知ってみよう!</div>
-      <div>
+      <div class="nameplate-hint-header">［なふだ機能］を使ったコメントが投稿されました</div>
+      <div class="nameplate-hint-body">
+        ニックネームをクリックして、視聴者のことをもっとよく知ってみよう!
+      </div>
+      <div class="nameplate-hint-anchor">
         <a
           @click.prevent="openInDefaultBrowser($event)"
           href="https://qa.nicovideo.jp/faq/show/21148?site_domain=default"
@@ -38,58 +45,67 @@
 @import url('../../../styles/index');
 @import url('./comment');
 
-.root {
-  display: flex;
-  flex-direction: column;
+.comment-root {
+  .common__comment-root;
 }
 
-.comment-root {
-  display: flex;
-  flex: 1;
-  flex-direction: row;
+.comment-wrapper {
+  .common__comment-wrapper;
 
-  &:hover,
-  &.pseudoHover {
+  .comment-root:not(.comment-readonly):hover &,
+  .comment-root:not(.comment-readonly):hover &.pseudoHover {
     .bg-hover();
-
-    & > .comment-misc {
-      display: block;
-    }
   }
 }
 
 .comment-number {
   .common__comment-number;
+
+  .name & {
+    margin-top: 4px;
+  }
 }
 
 .comment-box {
   display: flex;
-  flex: 1;
   flex-direction: column;
 }
 
 .comment-name-box {
-  display: flex;
-  flex: 1;
-  flex-direction: row;
-  align-items: center;
-  margin-left: 16px;
+  display: none;
+  pointer-events: none;
+
+  .name & {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 24px;
+    margin: 0 16px 4px;
+    margin-left: 16px;
+    pointer-events: all;
+    cursor: pointer;
+  }
 }
 
 .comment-icon {
-  width: 16px;
-  height: 16px;
-  margin-right: 4px;
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+  border-radius: 9999px;
 }
 
 .comment-name {
-  color: var(--color-text-light);
+  font-size: @font-size2;
+  color: var(--color-text);
+
+  .comment-name-box:hover & {
+    color: var(--color-text-active);
+  }
 }
 
 .comment-body {
   .common__comment-body;
 
-  flex: 1;
   color: var(--color-text-light);
 
   .operator & {
@@ -104,17 +120,46 @@
 .comment-misc {
   .common__comment-misc;
 
+  position: absolute;
+  top: 0;
+  right: 0;
   display: none;
+
+  .comment-root:not(.comment-readonly):hover & {
+    display: block;
+  }
 }
 
 .nameplate-hint {
   display: flex;
   flex: 1;
   flex-direction: column;
-  padding-right: 8px;
-  padding-left: 8px;
-  margin-left: 16px;
-  background-color: var(--color-bg-secondary);
+  padding: 12px 16px;
+  margin: 8px 16px;
+  background-color: var(--color-bg-quinary);
+  .radius;
+}
+
+.nameplate-hint-header {
+  .bold;
+
+  margin-bottom: 4px;
+  font-size: @font-size3;
+  color: var(--color-text-light);
+}
+
+.nameplate-hint-body {
+  font-size: @font-size2;
+  color: var(--color-text);
+}
+
+.nameplate-hint-anchor {
+  margin-top: 4px;
+  font-size: @font-size2;
+
+  a {
+    color: var(--color-text-active);
+  }
 }
 
 .nameplate-hint div {
