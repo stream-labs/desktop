@@ -9,7 +9,7 @@ import {
 } from './index';
 import { StreamingService } from 'services/streaming';
 import { UserService } from 'services/user';
-import { HostsService } from 'services/hosts';
+import { HostsService, UrlService } from 'services/hosts';
 import { IFacebookStartStreamOptions } from './facebook';
 import { StreamSettingsService } from '../settings/streaming';
 import * as remote from '@electron/remote';
@@ -33,6 +33,7 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
   @Inject() protected streamingService: StreamingService;
   @Inject() protected userService: UserService;
   @Inject() protected hostsService: HostsService;
+  @Inject() protected urlService: UrlService;
   @Inject() protected streamSettingsService: StreamSettingsService;
   @Inject() protected greenService: GreenService;
   @Inject() protected videoSettingsService: VideoSettingsService;
@@ -48,8 +49,9 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
 
   get mergeUrl() {
     const host = this.hostsService.streamlabs;
+    const protocol = this.urlService.protocol;
     const token = this.userService.apiToken;
-    return `https://${host}/slobs/merge/${token}/${this.platform}_account`;
+    return `${protocol}${host}/slobs/merge/${token}/${this.platform}_account`;
   }
 
   averageViewers: number;

@@ -4,7 +4,7 @@ import { handleResponse, authorizedHeaders, jfetch } from 'util/requests';
 import { mutation } from 'services/core/stateful-service';
 import { Service, Inject, ViewHandler } from 'services/core';
 import electron from 'electron';
-import { HostsService } from 'services/hosts';
+import { HostsService, UrlService } from 'services/hosts';
 import {
   getPlatformService,
   TPlatform,
@@ -159,6 +159,7 @@ export function setSentryContext(ctx: ISentryContext) {
 class UserViews extends ViewHandler<IUserServiceState> {
   // Injecting HostsService since it's not stateful
   @Inject() hostsService: HostsService;
+  @Inject() urlService: UrlService;
   @Inject() magicLinkService: MagicLinkService;
 
   get settingsServiceViews() {
@@ -252,9 +253,10 @@ class UserViews extends ViewHandler<IUserServiceState> {
 
   appStoreUrl(params?: { appId?: string | undefined; type?: string | undefined }) {
     const host = this.hostsService.platform;
+    const protocol = this.urlService.protocol;
     const token = this.auth.apiToken;
     const nightMode = this.customizationServiceViews.isDarkTheme ? 'night' : 'day';
-    let url = `https://${host}/slobs-store`;
+    let url = `${protocol}${host}/slobs-store`;
 
     if (params?.appId) {
       url = `${url}/app/${params?.appId}`;
@@ -269,6 +271,7 @@ class UserViews extends ViewHandler<IUserServiceState> {
 
 export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private hostsService: HostsService;
+  @Inject() private urlService: UrlService;
   @Inject() private customizationService: CustomizationService;
   @Inject() private sceneCollectionsService: SceneCollectionsService;
   @Inject() private windowsService: WindowsService;
@@ -494,8 +497,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     if (!this.state.auth) return;
 
     const host = this.hostsService.streamlabs;
+    const protocol = this.urlService.protocol;
     const headers = authorizedHeaders(this.apiToken);
-    const url = `https://${host}/api/v5/slobs/validate`;
+    const url = `${protocol}${host}/api/v5/slobs/validate`;
     const request = new Request(url, { headers });
 
     const valid = await fetch(request).then(res => {
@@ -637,8 +641,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     if (!this.state.auth || !this.state.auth.apiToken) return;
 
     const host = this.hostsService.streamlabs;
+    const protocol = this.urlService.protocol;
     const headers = authorizedHeaders(this.apiToken);
-    const url = `https://${host}/api/v5/restream/user/info`;
+    const url = `${protocol}${host}/api/v5/restream/user/info`;
     const request = new Request(url, { headers });
 
     return jfetch<ILinkedPlatformsResponse>(request).catch(() => {
@@ -652,7 +657,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   async setPrimeStatus() {
     const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/prime`; // TODO: will this url change?
+    const protocol = this.urlService.protocol;
+    const url = `${protocol}${host}/api/v5/slobs/prime`; // TODO: will this url change?
     const headers = authorizedHeaders(this.apiToken);
     const request = new Request(url, { headers });
     return jfetch<{
@@ -796,6 +802,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   recentEventsUrl() {
     if (!this.isLoggedIn) return '';
     const host = this.hostsService.streamlabs;
+    const protocol = this.urlService.protocol;
     const token = this.widgetToken;
     const nightMode = this.customizationService.isDarkTheme ? 'night' : 'day';
     const isMediaShare =
@@ -804,7 +811,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         ? '&view=media-share'
         : '';
 
-    return `https://${host}/dashboard/recent-events?token=${token}&mode=${nightMode}&electron${isMediaShare}`;
+    return `${protocol}${host}/dashboard/recent-events?token=${token}&mode=${nightMode}&electron${isMediaShare}`;
   }
 
   dashboardUrl(subPage: string, hidenav: boolean = false) {
@@ -846,7 +853,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   getDonationSettings() {
     const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/donation/settings`;
+    const protocol = this.urlService.protocol;
+    const url = `${protocol}${host}/api/v5/slobs/donation/settings`;
     const headers = authorizedHeaders(this.apiToken);
     const request = new Request(url, { headers });
 
@@ -866,7 +874,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     const host = this.hostsService.streamlabs;
     const headers = authorizedHeaders(this.apiToken);
-    const url = `https://${host}/api/v5/slobs/clear-force-login-status`;
+    const protocol = this.urlService.protocol;
+    const url = `${protocol}${host}/api/v5/slobs/clear-force-login-status`;
     const request = new Request(url, { headers, method: 'POST' });
 
     return jfetch<unknown>(request);

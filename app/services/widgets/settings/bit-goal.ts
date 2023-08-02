@@ -10,7 +10,7 @@ export class BitGoalService extends GenericGoalService {
   getApiSettings() {
     return {
       type: WidgetType.BitGoal,
-      url: WidgetDefinitions[WidgetType.BitGoal].url(this.getHost(), this.getWidgetToken()),
+      url: WidgetDefinitions[WidgetType.BitGoal].url(this.getUrlProtocol(), this.getHost(), this.getWidgetToken()),
       dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/bitgoal/settings`,
       previewUrl: `https://${this.getHost()}/widgets/bit-goal?token=${this.getWidgetToken()}`,
       settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/bitgoal/settings`,

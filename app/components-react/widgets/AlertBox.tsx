@@ -285,15 +285,16 @@ function AnimationSettingsPanel() {
 function DonationSettings() {
   const { createVariationBinding } = useAlertBox();
   const bind = createVariationBinding('donation', 'default', useForceUpdate());
-  const { HostsService, UsageStatisticsService, MagicLinkService } = Services;
+  const { HostsService, UsageStatisticsService, MagicLinkService, UrlService } = Services;
   const host = HostsService.streamlabs;
+  const protocol = UrlService.protocol;
 
   function openDonationSettings() {
     MagicLinkService.actions.openDonationSettings();
   }
 
   function openTipPageSettings() {
-    remote.shell.openExternal(`https://${host}/editor?ref=slobs`);
+    remote.shell.openExternal(`${protocol}${host}/editor?ref=slobs`);
     UsageStatisticsService.actions.recordFeatureUsage('openDonationSettings');
   }
 

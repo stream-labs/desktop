@@ -44,7 +44,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
   getApiSettings() {
     return {
       type: WidgetType.AlertBox,
-      url: WidgetDefinitions[WidgetType.AlertBox].url(this.getHost(), this.getWidgetToken()),
+      url: WidgetDefinitions[WidgetType.AlertBox].url(this.getUrlProtocol(), this.getHost(), this.getWidgetToken()),
       previewUrl: `https://${this.getHost()}/alert-box/v3/${this.getWidgetToken()}`,
       dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/alertbox?include_linked_integrations_only=true&primary_only=false`,
       settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/alertbox`,

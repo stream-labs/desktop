@@ -3,7 +3,7 @@ import flatten from 'lodash/flatten';
 import * as remote from '@electron/remote';
 import { mutation, InheritMutations, ViewHandler } from '../core/stateful-service';
 import { IPlatformService, IGame, TPlatformCapability, IPlatformRequest, IPlatformState } from '.';
-import { HostsService } from 'services/hosts';
+import { HostsService, UrlService } from 'services/hosts';
 import { Inject } from 'services/core/injector';
 import { authorizedHeaders } from 'util/requests';
 import { UserService } from 'services/user';
@@ -143,6 +143,7 @@ export class FacebookService
   extends BasePlatformService<IFacebookServiceState>
   implements IPlatformService {
   @Inject() protected hostsService: HostsService;
+  @Inject() protected urlService: UrlService;
   @Inject() private windowsService: WindowsService;
 
   readonly platform = 'facebook';
@@ -214,14 +215,16 @@ export class FacebookService
 
   get authUrl() {
     const host = this.hostsService.streamlabs;
+    const protocol = this.urlService.protocol;
     const query = `_=${Date.now()}&skip_splash=true&external=electron&facebook&force_verify&origin=slobs`;
-    return `https://${host}/slobs/login?${query}`;
+    return `${protocol}${host}/slobs/login?${query}`;
   }
 
   get mergeUrl() {
     const host = this.hostsService.streamlabs;
+    const protocol = this.urlService.protocol;
     const token = this.userService.apiToken;
-    return `https://${host}/slobs/merge/${token}/facebook_account`;
+    return `${protocol}${host}/slobs/merge/${token}/facebook_account`;
   }
 
   get oauthToken() {
@@ -713,7 +716,8 @@ export class FacebookService
    */
   private postPage(pageId: string) {
     const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/user/facebook/pages`;
+    const protocol = this.urlService.protocol;
+    const url = `${protocol}${host}/api/v5/slobs/user/facebook/pages`;
     const headers = authorizedHeaders(this.userService.apiToken!);
     headers.append('Content-Type', 'application/json');
     const request = new Request(url, {

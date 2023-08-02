@@ -10,7 +10,7 @@ export class StarsGoalService extends GenericGoalService {
   getApiSettings() {
     return {
       type: WidgetType.StarsGoal,
-      url: WidgetDefinitions[WidgetType.StarsGoal].url(this.getHost(), this.getWidgetToken()),
+      url: WidgetDefinitions[WidgetType.StarsGoal].url(this.getUrlProtocol(), this.getHost(), this.getWidgetToken()),
       previewUrl: `https://${this.getHost()}/widgets/stars-goal?token=${this.getWidgetToken()}`,
       dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/starsgoal/settings`,
       settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/starsgoal/settings`,

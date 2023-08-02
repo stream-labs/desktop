@@ -46,7 +46,7 @@ export class TipJarService extends WidgetSettingsService<ITipJarData> {
   getApiSettings() {
     return {
       type: WidgetType.TipJar,
-      url: WidgetDefinitions[WidgetType.TipJar].url(this.getHost(), this.getWidgetToken()),
+      url: WidgetDefinitions[WidgetType.TipJar].url(this.getUrlProtocol(), this.getHost(), this.getWidgetToken()),
       previewUrl: `https://${this.getHost()}/widgets/tip-jar/v1/${this.getWidgetToken()}?simulate=1`,
       dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/tipjar`,
       settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/tipjar`,
