@@ -13,6 +13,7 @@ import {
   TMenuItems,
   EMenuItemKey,
   IMenuItem,
+  IParentMenuItem,
   SideNavMenuItems,
   ENavName,
   IMenu,
@@ -108,7 +109,18 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
     this.platformAppsService.allAppsLoaded.subscribe(() => this.updateAllApps());
 
     if (!this.state.menuItems[EMenuItemKey.RecordingHistory]) {
-      this.ADD_MENU_ITEM(ENavName.TopNav, EMenuItemKey.RecordingHistory);
+      // subtract 2 because the Theme Audit should always be the last menu item
+      const index = this.state[ENavName.TopNav].menuItems.length - 2;
+
+      // add the recording history to the array of menu items
+      const updatedMenuItems = this.state[ENavName.TopNav].menuItems.splice(
+        index,
+        0,
+        SideNavMenuItems[EMenuItemKey.RecordingHistory],
+      );
+
+      // update the menu items
+      this.UPDATE_MENU_ITEMS(ENavName.TopNav, updatedMenuItems);
     }
 
     this.state.currentMenuItem =
@@ -365,15 +377,18 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
     this.state.currentMenuItem = key;
   }
 
-  // should only be used when adding a new navigatable item to the side nav for the first time
+  /**
+   * Update menu items in the side nav
+   *
+   * @remark - because the rendered menu items are in an array, replace the entire array to update the menu
+   * @param navName - Name of the menu to update
+   * @param menuItems - Updated menu items
+   */
   @mutation()
-  private ADD_MENU_ITEM(navName: ENavName, key: EMenuItemKey) {
+  private UPDATE_MENU_ITEMS(navName: ENavName, menuItems: (IMenuItem | IParentMenuItem)[]) {
     this.state[navName] = {
-      ...this.state[navName],
-      menuItems: [
-        ...this.state[navName].menuItems,
-        navName === ENavName.TopNav ? SideBarTopNavData()[key] : SideBarBottomNavData()[key],
-      ],
+      name: navName,
+      menuItems: [...menuItems],
     };
   }
 }

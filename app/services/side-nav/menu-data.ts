@@ -124,6 +124,7 @@ export const SideBarTopNavData = (): IMenu => ({
     SideNavMenuItems()[EMenuItemKey.Themes],
     SideNavMenuItems()[EMenuItemKey.AppStore],
     SideNavMenuItems()[EMenuItemKey.Highlighter],
+    SideNavMenuItems()[EMenuItemKey.RecordingHistory],
     SideNavMenuItems()[EMenuItemKey.ThemeAudit],
   ],
 });
@@ -181,7 +182,6 @@ export const SideNavMenuItems = (): TMenuItems => ({
     isActive: true,
     isExpanded: false,
   },
-
   [EMenuItemKey.AppStore]: {
     key: EMenuItemKey.AppStore,
     target: 'PlatformAppStore',
