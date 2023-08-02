@@ -3,7 +3,7 @@
     <div class="user-info" slot="content">
       <div class="user-detail">
         <div class="user-detail-left">
-          <img :src="userIconURL" width="32" height="32" class="user-icon" />
+          <img :src="userIconURL" width="32" height="32" class="user-icon" :alt="userName" />
         </div>
         <div class="user-detail-body">
           <div class="user-name">{{ userName }}</div>
