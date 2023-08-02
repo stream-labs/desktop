@@ -27,8 +27,8 @@ const sourceIconMap = {
   ndi_source: 'icon-NDI',
   near: 'icon-nvoice-character-source',
   'decklink-input': 'icon-blackmagic',
-  vlc_source: 'icon-media',
-  wasapi_process_output_capture: 'icon-display',
+  vlc_source: 'icon-play',
+  wasapi_process_output_capture: 'icon-app-speaker',
 };
 
 @Component({

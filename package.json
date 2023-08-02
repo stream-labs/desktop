@@ -229,7 +229,12 @@
     "webpack-cli": "^4.9.1",
     "webpack-dev-server": "^4.13.1",
     "webpack-manifest-plugin": "^4.0.2",
-    "webpack-merge": "^5.8.0"
+    "webpack-merge": "^5.8.0",
+    "@vue/babel-preset-jsx": "1.2.4",
+    "babel-helper-vue-jsx-merge-props": "2.0.3",
+    "babel-plugin-syntax-jsx": "6.18.0",
+    "babel-plugin-transform-vue-jsx": "3.7.0",
+    "shelljs": "^0.8.5"
   },
   "husky": {
     "hooks": {
