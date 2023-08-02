@@ -138,7 +138,7 @@ export default function RecordingHistory() {
   }
 
   return (
-    <ModalLayout hideFooter scrollable>
+    <>
       <h2>{$t('Recordings')}</h2>
       <div className={styles.recordingsContainer} id="recordingHistory">
         {recordings.map(recording => (
@@ -166,7 +166,7 @@ export default function RecordingHistory() {
       </div>
       <ExportModal />
       <SLIDModal />
-    </ModalLayout>
+    </>
   );
 }
 
