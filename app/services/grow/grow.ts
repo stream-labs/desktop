@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import uuid from 'uuid/v4';
 import { StatefulService, mutation, ViewHandler, Inject } from 'services/core';
-import { HostsService } from 'services/hosts';
+import { HostsService, UrlService } from 'services/hosts';
 import { UserService } from 'services/user';
 import { jfetch, authorizedHeaders } from 'util/requests';
 import { GOAL_OPTIONS, GROWTH_TIPS } from './grow-data';
@@ -123,6 +123,7 @@ class GrowServiceViews extends ViewHandler<IGrowServiceState> {
 export class GrowService extends StatefulService<IGrowServiceState> {
   @Inject() userService: UserService;
   @Inject() hostsService: HostsService;
+  @Inject() urlService: UrlService;
   @Inject() twitchService: TwitchService;
   @Inject() youtubeService: YoutubeService;
   @Inject() facebookService: FacebookService;
@@ -176,7 +177,7 @@ export class GrowService extends StatefulService<IGrowServiceState> {
   }
 
   formGoalRequest(method = 'GET', body?: any) {
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/growth/goal`;
+    const url = `${this.urlService.protocol}${this.hostsService.streamlabs}/api/v5/slobs/growth/goal`;
     const headers = authorizedHeaders(
       this.userService.apiToken,
       new Headers({ 'Content-Type': 'application/json' }),
@@ -193,7 +194,7 @@ export class GrowService extends StatefulService<IGrowServiceState> {
   }
 
   fetchAnalytics() {
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/dashboard-analytics`;
+    const url = `${this.urlService.protocol}${this.hostsService.streamlabs}/api/v5/slobs/dashboard-analytics`;
     const headers = authorizedHeaders(
       this.userService.apiToken,
       new Headers({ 'Content-Type': 'application/json' }),
@@ -228,7 +229,7 @@ export class GrowService extends StatefulService<IGrowServiceState> {
 
   fetchUniversityProgress() {
     if (!this.userService.isLoggedIn) return;
-    const url = `https://${this.hostsService.streamlabs}/university/api/user/info/${this.userService.widgetToken}`;
+    const url = `${this.urlService.protocol}${this.hostsService.streamlabs}/university/api/user/info/${this.userService.widgetToken}`;
     const req = new Request(url);
     jfetch<{ user: IUniversityProgress }>(req).then(json =>
       this.SET_UNIVERSITY_PROGRESS(json.user),

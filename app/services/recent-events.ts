@@ -1,4 +1,4 @@
-import { HostsService } from 'services/hosts';
+import { HostsService, UrlService } from 'services/hosts';
 import { StatefulService, Inject, mutation, InitAfter, ViewHandler } from 'services/core';
 import { UserService, LoginLifecycle } from 'services/user';
 import { authorizedHeaders, handleResponse, jfetch } from 'util/requests';
@@ -398,6 +398,7 @@ class RecentEventsViews extends ViewHandler<IRecentEventsState> {
 @InitAfter('UserService')
 export class RecentEventsService extends StatefulService<IRecentEventsState> {
   @Inject() private hostsService: HostsService;
+  @Inject() private urlService: UrlService;
   @Inject() private userService: UserService;
   @Inject() private windowsService: WindowsService;
   @Inject() private websocketService: WebsocketService;
@@ -469,7 +470,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   fetchRecentEvents() {
     const typeString = this.getEventTypesString();
     // eslint-disable-next-line
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/recentevents/${this.userService.widgetToken}?types=${typeString}`;
+    const url = `${this.urlService.protocol}${this.hostsService.streamlabs}/api/v5/slobs/recentevents/${this.userService.widgetToken}?types=${typeString}`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
     return jfetch<{ data: Dictionary<IRecentEvent[]> }>(request).catch(() => {
@@ -479,7 +480,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
 
   async fetchConfig() {
     // eslint-disable-next-line
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/widget/config?widget=recent_events`;
+    const url = `${this.urlService.protocol}${this.hostsService.streamlabs}/api/v5/slobs/widget/config?widget=recent_events`;
     const headers = authorizedHeaders(this.userService.apiToken);
     return jfetch<IRecentEventsConfig>(url, { headers }).catch(() => {
       console.warn('Error fetching recent events config');
@@ -488,7 +489,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
 
   fetchMediaShareState() {
     // eslint-disable-next-line
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/widget/config?widget=media-sharing`;
+    const url = `${this.urlService.protocol}${this.hostsService.streamlabs}/api/v5/slobs/widget/config?widget=media-sharing`;
     const headers = authorizedHeaders(this.userService.apiToken);
     return jfetch<{ settings: { advanced_settings: { enabled: boolean } } }>(url, {
       headers,
@@ -579,7 +580,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   async fetchReadReceipts(hashValues: string): Promise<{ data: Dictionary<boolean> }> {
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/readreceipts`;
+    const url = `${this.urlService.protocol}${this.hostsService.streamlabs}/api/v5/slobs/readreceipts`;
     const headers = authorizedHeaders(
       this.userService.apiToken,
       new Headers({ 'Content-Type': 'application/json' }),
@@ -596,7 +597,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       this.userService.apiToken,
       new Headers({ 'Content-Type': 'application/json' }),
     );
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/widget/repeatalert`;
+    const url = `${this.urlService.protocol}${this.hostsService.streamlabs}/api/v5/slobs/widget/repeatalert`;
     const body = JSON.stringify({
       data: event,
       type: event.type,
@@ -608,7 +609,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   async readAlert(event: IRecentEvent) {
     this.TOGGLE_RECENT_EVENT_READ(event.uuid);
     const newEvent = this.views.getEvent(event.uuid);
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/widget/readalert`;
+    const url = `${this.urlService.protocol}${this.hostsService.streamlabs}/api/v5/slobs/widget/readalert`;
     const headers = authorizedHeaders(
       this.userService.apiToken,
       new Headers({ 'Content-Type': 'application/json' }),
@@ -622,7 +623,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   async postUpdateFilterPreferences() {
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/widget/recentevents`;
+    const url = `${this.urlService.protocol}${this.hostsService.streamlabs}/api/v5/slobs/widget/recentevents`;
     const headers = authorizedHeaders(
       this.userService.apiToken,
       new Headers({ 'Content-Type': 'application/json' }),
@@ -633,21 +634,21 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   async skipAlert() {
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/alerts/skip`;
+    const url = `${this.urlService.protocol}${this.hostsService.streamlabs}/api/v5/slobs/alerts/skip`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers, method: 'POST' });
     return await fetch(request).then(handleResponse);
   }
 
   async pauseAlertQueue() {
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/alerts/pause_queue`;
+    const url = `${this.urlService.protocol}${this.hostsService.streamlabs}/api/v5/slobs/alerts/pause_queue`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers, method: 'POST' });
     return fetch(request).then(handleResponse);
   }
 
   async unpauseAlertQueue() {
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/alerts/unpause_queue`;
+    const url = `${this.urlService.protocol}${this.hostsService.streamlabs}/api/v5/slobs/alerts/unpause_queue`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers, method: 'POST' });
     return fetch(request).then(handleResponse);
@@ -909,7 +910,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       new Headers({ 'Content-Type': 'application/json' }),
     );
     // eslint-disable-next-line
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/widget/recentevents/eventspanel`;
+    const url = `${this.urlService.protocol}${this.hostsService.streamlabs}/api/v5/slobs/widget/recentevents/eventspanel`;
     const body = JSON.stringify({ muted: !this.state.muted });
     return await fetch(new Request(url, { headers, body, method: 'POST' })).then(handleResponse);
   }
@@ -957,7 +958,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   fetchSafeModeStatus() {
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/safemode`;
+    const url = `${this.urlService.protocol}${this.hostsService.streamlabs}/api/v5/slobs/safemode`;
     const headers = authorizedHeaders(this.userService.apiToken);
     return jfetch<{
       safe_mode_settings: { active: boolean; data: ISafeModeServerSettings; ends_at: number };
@@ -1008,7 +1009,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       this.userService.apiToken,
       new Headers({ 'Content-Type': 'application/json' }),
     );
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/safemode`;
+    const url = `${this.urlService.protocol}${this.hostsService.streamlabs}/api/v5/slobs/safemode`;
     const sm = this.state.safeMode;
     const body = JSON.stringify({
       clear_chat: sm.clearChat,
@@ -1034,7 +1035,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     if (!this.state.safeMode.enabled) return;
 
     const headers = authorizedHeaders(this.userService.apiToken);
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/safemode`;
+    const url = `${this.urlService.protocol}${this.hostsService.streamlabs}/api/v5/slobs/safemode`;
     this.SET_SAFE_MODE_SETTINGS({ loading: true });
     const promise = jfetch(new Request(url, { headers, method: 'DELETE' }));
 

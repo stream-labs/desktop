@@ -2,7 +2,7 @@
 
 import { Inject } from './core/injector';
 import { UserService } from './user';
-import { HostsService } from './hosts';
+import { HostsService, UrlService } from './hosts';
 import fs from 'fs';
 import path from 'path';
 import { authorizedHeaders, handleResponse } from 'util/requests';
@@ -86,6 +86,7 @@ export function track(event: TUsageEvent) {
 export class UsageStatisticsService extends Service {
   @Inject() userService: UserService;
   @Inject() hostsService: HostsService;
+  @Inject() urlService: UrlService;
 
   installerId: string;
   version = Utils.env.SLOBS_VERSION;
@@ -165,7 +166,7 @@ export class UsageStatisticsService extends Service {
       bodyData.installer_id = this.installerId;
     }
 
-    const request = new Request(`https://${this.hostsService.streamlabs}/api/v5/slobs/log`, {
+    const request = new Request(`${this.urlService.protocol}${this.hostsService.streamlabs}/api/v5/slobs/log`, {
       headers,
       method: 'POST',
       body: JSON.stringify(bodyData),

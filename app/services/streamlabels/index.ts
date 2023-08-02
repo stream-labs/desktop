@@ -1,7 +1,7 @@
 import { mutation, StatefulService } from 'services/core/stateful-service';
 import { UserService } from 'services/user';
 import { Inject } from 'services/core/injector';
-import { HostsService } from 'services/hosts';
+import { HostsService, UrlService } from 'services/hosts';
 import { authorizedHeaders, handleResponse, jfetch } from 'util/requests';
 import { TSocketEvent, WebsocketService } from 'services/websocket';
 import { AppService } from 'services/app';
@@ -110,6 +110,7 @@ const capitalize = (val: string) =>
 export class StreamlabelsService extends StatefulService<IStreamlabelsServiceState> {
   @Inject() userService: UserService;
   @Inject() hostsService: HostsService;
+  @Inject() urlService: UrlService;
   @Inject() websocketService: WebsocketService;
   @Inject() appService: AppService;
 
@@ -284,7 +285,7 @@ export class StreamlabelsService extends StatefulService<IStreamlabelsServiceSta
     const headers = authorizedHeaders(this.userService.apiToken);
     headers.append('Content-Type', 'application/json');
 
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels/settings`;
+    const url = `${this.urlService.protocol}${this.hostsService.streamlabs}/api/v5/slobs/stream-labels/settings`;
     const request = new Request(url, {
       headers,
       method: 'POST',
@@ -299,7 +300,7 @@ export class StreamlabelsService extends StatefulService<IStreamlabelsServiceSta
   restartSession(): Promise<boolean> {
     if (!this.userService.isLoggedIn) return;
 
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels/restart-session`;
+    const url = `${this.urlService.protocol}${this.hostsService.streamlabs}/api/v5/slobs/stream-labels/restart-session`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
 
@@ -319,7 +320,7 @@ export class StreamlabelsService extends StatefulService<IStreamlabelsServiceSta
   private fetchInitialData(): void {
     if (!this.userService.isLoggedIn) return;
 
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels/files`;
+    const url = `${this.urlService.protocol}${this.hostsService.streamlabs}/api/v5/slobs/stream-labels/files`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
 
@@ -329,7 +330,7 @@ export class StreamlabelsService extends StatefulService<IStreamlabelsServiceSta
   private fetchSettings(): void {
     if (!this.userService.isLoggedIn) return;
 
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels/settings`;
+    const url = `${this.urlService.protocol}${this.hostsService.streamlabs}/api/v5/slobs/stream-labels/settings`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
 
@@ -342,7 +343,7 @@ export class StreamlabelsService extends StatefulService<IStreamlabelsServiceSta
     if (!this.userService.isLoggedIn) return;
 
     const platform = this.userService.platform.type;
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels/app-settings/${platform}`;
+    const url = `${this.urlService.protocol}${this.hostsService.streamlabs}/api/v5/slobs/stream-labels/app-settings/${platform}`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
 

@@ -86,7 +86,7 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
 
   unlink() {
     // unlink platform and reload auth state
-    // const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/unlink/${this.platform}_account`;
+    // const url = `${this.urlService.protocol}${this.hostsService.streamlabs}/api/v5/slobs/unlink/${this.platform}_account`;
     // const headers = authorizedHeaders(this.userService.apiToken!);
     // const request = new Request(url, { headers });
     // return fetch(request)
@@ -94,7 +94,7 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
     //   .then(_ => this.userService.updateLinkedPlatforms());
 
     remote.shell.openExternal(
-      `https://${this.hostsService.streamlabs}/dashboard#/settings/account-settings`,
+      `${this.urlService.protocol}${this.hostsService.streamlabs}/dashboard#/settings/account-settings`,
     );
   }
 

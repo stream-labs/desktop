@@ -821,12 +821,12 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const i18nService = I18nService.instance as I18nService; // TODO: replace with getResource('I18nService')
     const locale = i18nService.state.locale;
     // eslint-disable-next-line
-    return `https://${this.hostsService.streamlabs}/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}&l=${locale}&hidenav=${hideNav}`;
+    return `${this.urlService.protocol}${this.hostsService.streamlabs}/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}&l=${locale}&hidenav=${hideNav}`;
   }
 
   async alertboxLibraryUrl(id?: string) {
     const uiTheme = this.customizationService.views.isDarkTheme ? 'night' : 'day';
-    let url = `https://${this.hostsService.streamlabs}/alert-box-themes?mode=${uiTheme}&slobs`;
+    let url = `${this.urlService.protocol}${this.hostsService.streamlabs}/alert-box-themes?mode=${uiTheme}&slobs`;
 
     if (id) url += `&id=${id}`;
 
@@ -836,7 +836,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   async overlaysUrl(type?: 'overlay' | 'widget-themes' | 'site-themes', id?: string) {
     const uiTheme = this.customizationService.views.isDarkTheme ? 'night' : 'day';
 
-    let url = `https://${this.hostsService.streamlabs}/library`;
+    let url = `${this.urlService.protocol}${this.hostsService.streamlabs}/library`;
 
     if (type && !id) {
       url += `/${type}`;
@@ -996,7 +996,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    */
   async startSLAuth() {
     const query = `_=${Date.now()}&skip_splash=true&external=electron&slid&force_verify&origin=slobs`;
-    const url = `https://${this.hostsService.streamlabs}/slobs/login?${query}`;
+    const url = `${this.urlService.protocol}${this.hostsService.streamlabs}/slobs/login?${query}`;
 
     this.SET_AUTH_STATE(EAuthProcessState.Loading);
     const auth = await this.authModule.startExternalAuth(
@@ -1049,7 +1049,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   async startSLMerge(): Promise<EPlatformCallResult> {
-    const authUrl = `https://${this.hostsService.streamlabs}/slobs/merge/${this.apiToken}/streamlabs_account`;
+    const authUrl = `${this.urlService.protocol}${this.hostsService.streamlabs}/slobs/merge/${this.apiToken}/streamlabs_account`;
 
     if (!this.isLoggedIn) {
       throw new Error('Account merging can only be performed while logged in');
