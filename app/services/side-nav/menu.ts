@@ -28,7 +28,6 @@ interface ISideNavServiceState {
   hasLegacyMenu: boolean;
   compactView: boolean;
   currentMenuItem: EMenuItemKey | string;
-  menuItems: TMenuItems;
   apps: IAppMenuItem[];
   [ENavName.TopNav]: IMenu;
   [ENavName.BottomNav]: IMenu;
@@ -95,7 +94,6 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
     hasLegacyMenu: true,
     currentMenuItem: EMenuItemKey.Editor,
     compactView: false,
-    menuItems: SideNavMenuItems(),
     apps: [null, null, null, null, null], // up to five apps may be displayed in the closed sidebar
     [ENavName.TopNav]: SideBarTopNavData(),
     [ENavName.BottomNav]: SideBarBottomNavData(),
@@ -108,20 +106,26 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
     this.handleDismissables();
     this.platformAppsService.allAppsLoaded.subscribe(() => this.updateAllApps());
 
-    if (!this.state.menuItems[EMenuItemKey.RecordingHistory]) {
+    const hasRecordingHistory = this.state[ENavName.TopNav].menuItems.find(
+      item => item.key === EMenuItemKey.RecordingHistory,
+    );
+
+    if (!hasRecordingHistory) {
       // subtract 2 because the Theme Audit should always be the last menu item
       const index = this.state[ENavName.TopNav].menuItems.length - 2;
 
       // add the recording history to the array of menu items
-      const updatedMenuItems = this.state[ENavName.TopNav].menuItems.splice(
+      const updatedMenuItems = [...this.state[ENavName.TopNav].menuItems].splice(
         index,
         0,
-        SideNavMenuItems[EMenuItemKey.RecordingHistory],
+        SideNavMenuItems()[EMenuItemKey.RecordingHistory],
       );
 
       // update the menu items
       this.UPDATE_MENU_ITEMS(ENavName.TopNav, updatedMenuItems);
     }
+
+    console.log(this.state[ENavName.TopNav]);
 
     this.state.currentMenuItem =
       this.layoutService.state.currentTab !== 'default'
@@ -268,7 +272,10 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
         ...this.state[ENavName.BottomNav],
         menuItems: this.state[ENavName.BottomNav].menuItems.map((menuItem: IMenuItem) => {
           if (menuItem.key === EMenuItemKey.Dashboard) {
-            return { ...this.state.menuItems[EMenuItemKey.Dashboard], isExpanded: true };
+            return {
+              ...this.state[ENavName.BottomNav].menuItems[EMenuItemKey.Dashboard],
+              isExpanded: true,
+            };
           }
           return menuItem;
         }),
