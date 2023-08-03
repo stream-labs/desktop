@@ -4,6 +4,7 @@ import { mutation, StatefulService } from '../core/stateful-service';
 import { IVideoInfo, EScaleType, EFPSType, IVideo, VideoFactory, Video } from '../../../obs-api';
 import { DualOutputService } from 'services/dual-output';
 import { SettingsService } from 'services/settings';
+import { OutputSettingsService } from 'services/settings/output';
 import { Subject } from 'rxjs';
 
 /**
@@ -48,6 +49,7 @@ export function invalidFps(num: number, den: number) {
 export class VideoSettingsService extends StatefulService<IVideoSetting> {
   @Inject() dualOutputService: DualOutputService;
   @Inject() settingsService: SettingsService;
+  @Inject() outputSettingsService: OutputSettingsService;
 
   initialState = {
     horizontal: null as IVideoInfo,
@@ -239,30 +241,28 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   }
 
   /**
-   * Migrate optimizer settings to vertical context
-   *
-   * @remarks
-   * When running the optimizer, the backend only updates the horizontal context,
-   * so apply the horizontal settings to the vertical settings.
+   * Migrate optimized settings to vertical context
    */
   migrateAutoConfigSettings() {
+    // load optimized settings onto horizontal context
+    this.loadLegacySettings('horizontal');
+
     if (this.contexts?.vertical) {
-      // also update vertical context
+      // add optimized settings to vertical context
       const newVerticalSettings = {
-        fpsNum: this.contexts.horizontal.video.fpsNum,
-        fpsDen: this.contexts.horizontal.video.fpsDen,
+        ...this.contexts.horizontal.video,
         baseWidth: this.state.vertical.baseWidth,
         baseHeight: this.state.vertical.baseHeight,
         outputWidth: this.state.vertical.outputWidth,
         outputHeight: this.state.vertical.outputHeight,
-        outputFormat: this.contexts.horizontal.video.outputFormat,
-        colorspace: this.contexts.horizontal.video.colorspace,
-        range: this.contexts.horizontal.video.range,
-        scaleType: this.contexts.horizontal.video.scaleType,
-        fpsType: this.contexts.horizontal.video.fpsType,
       };
-
       this.updateVideoSettings(newVerticalSettings, 'vertical');
+
+      // update the Video settings property to the horizontal context dimensions
+      const base = `${this.state.horizontal.baseWidth}x${this.state.horizontal.baseHeight}`;
+      const output = `${this.state.horizontal.outputWidth}x${this.state.horizontal.outputHeight}`;
+      this.settingsService.setSettingValue('Video', 'Base', base);
+      this.settingsService.setSettingValue('Video', 'Output', output);
     } else {
       // if there is no vertical context, only update persisted settings for vertical context
       const horizontalScaleType = this.contexts.horizontal.video.scaleType;
@@ -274,6 +274,32 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
       this.dualOutputService.setVideoSetting({ fpsType: horizontalFpsType }, 'vertical');
       this.dualOutputService.setVideoSetting({ fpsNum: horizontalFpsNum }, 'vertical');
       this.dualOutputService.setVideoSetting({ fpsDen: horizontalFpsDen }, 'vertical');
+    }
+  }
+
+  /**
+   * Confirm video setting dimensions in settings
+   * @remarks Primarily used with the optimizer to ensure the horizontal context dimensions
+   * are the dimensions in the settings
+   */
+  confirmVideoSettingDimensions() {
+    const [baseWidth, baseHeight] = this.settingsService.views.values.Video.Base.split('x');
+    const [outputWidth, outputHeight] = this.settingsService.views.values.Video.Output.split('x');
+
+    if (
+      Number(baseWidth) !== this.state.horizontal.baseWidth ||
+      Number(baseHeight) !== this.state.horizontal.baseHeight
+    ) {
+      const base = `${this.state.horizontal.baseWidth}x${this.state.horizontal.baseHeight}`;
+      this.settingsService.setSettingValue('Video', 'Base', base);
+    }
+
+    if (
+      Number(outputWidth) !== this.state.horizontal.outputWidth ||
+      Number(outputHeight) !== this.state.horizontal.outputHeight
+    ) {
+      const output = `${this.state.horizontal.outputWidth}x${this.state.horizontal.outputHeight}`;
+      this.settingsService.setSettingValue('Video', 'Output', output);
     }
   }
 

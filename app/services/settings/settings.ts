@@ -27,6 +27,7 @@ import { SceneCollectionsService } from 'services/scene-collections';
 import * as remote from '@electron/remote';
 import fs from 'fs';
 import path from 'path';
+import { VideoSettingsService } from 'services/settings-v2/video';
 
 export interface ISettingsValues {
   General: {
@@ -68,7 +69,16 @@ export interface ISettingsValues {
     VodTrackIndex?: string;
     keyint_sec?: number;
   };
-  Video: ISettingsVideoInfo; // default video context
+  Video: {
+    Base: string;
+    Output: string;
+    ScaleType: string;
+    FPSType: string;
+    FPSCommon: string;
+    FPSInt: number;
+    FPSNum: number;
+    FPSDen: number;
+  };
   Audio: Dictionary<TObsValue>;
   Advanced: {
     DelayEnable: boolean;
@@ -80,17 +90,6 @@ export interface ISettingsValues {
     NewSocketLoopEnable: boolean;
     LowLatencyEnable: boolean;
   };
-}
-
-interface ISettingsVideoInfo {
-  Base: string;
-  Output: string;
-  ScaleType: string;
-  FPSType: string;
-  FPSCommon: string;
-  FPSInt: number;
-  FPSNum: number;
-  FPSDen: number;
 }
 
 export interface ISettingsSubCategory {
@@ -205,6 +204,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
   @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject() private sceneCollectionsService: SceneCollectionsService;
   @Inject() private hardwareService: HardwareService;
+  @Inject() private videoSettingsService: VideoSettingsService;
 
   @Inject()
   private videoEncodingOptimizationService: VideoEncodingOptimizationService;
@@ -482,7 +482,18 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
 
   setSettings(categoryName: string, settingsData: ISettingsSubCategory[]) {
     if (categoryName === 'Audio') this.setAudioSettings([settingsData.pop()]);
-    if (categoryName === 'Video') return;
+
+    /**
+     * Only allow updating video settings if running the optimizer
+     * when a vertical context exists.
+     */
+    if (
+      categoryName === 'Video' &&
+      !this.videoSettingsService.contexts?.vertical &&
+      !['Base', 'Output'].includes(categoryName)
+    ) {
+      return;
+    }
 
     const dataToSave = [];
 
