@@ -45,7 +45,7 @@ export abstract class SceneItemNode implements ISceneItemNode {
   get childrenIds(): string[] {
     return this.getScene()
       .getModel()
-      .nodes.filter(node => node.parentId === this.id)
+      .nodes.filter(node => node.parentId === this.id && node.id !== this.id)
       .map(node => node.id);
   }
 
