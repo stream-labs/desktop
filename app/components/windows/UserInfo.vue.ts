@@ -95,9 +95,8 @@ export default class UserInfo extends Vue {
     }
   }
 
-  get userIconURL(): string {
-    return NicoliveClient.getUserIconURL(this.userId, '' /* TODO hash */);
-  }
+  userIconURL = NicoliveClient.getUserIconURL(this.userId, `${Date.now()}`);
+  defaultUserIconURL = NicoliveClient.defaultUserIconURL;
 
   get userName() {
     return this.windowsService.getChildWindowQueryParams().userName;

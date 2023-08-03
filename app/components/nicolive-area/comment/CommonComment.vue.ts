@@ -9,9 +9,8 @@ export default class CommonComment extends CommentBase {
   @Prop() speaking: boolean;
   @Prop() nameplateHint: boolean;
 
-  get userIconURL(): string {
-    return NicoliveClient.getUserIconURL(this.chat.value.user_id, `${this.chat.value.thread}`);
-  }
+  userIconURL = NicoliveClient.getUserIconURL(this.chat.value.user_id, `${this.chat.value.thread}`);
+  defaultUserIconURL = NicoliveClient.defaultUserIconURL;
 
   openInDefaultBrowser(event: MouseEvent): void {
     const href = (event.currentTarget as HTMLAnchorElement).href;
