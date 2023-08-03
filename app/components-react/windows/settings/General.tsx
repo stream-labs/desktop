@@ -8,7 +8,6 @@ import fs from 'fs';
 import path from 'path';
 import { getDefined } from '../../../util/properties-type-guards';
 import { useVuex } from 'components-react/hooks';
-import Tooltip from 'components-react/shared/Tooltip';
 
 export function GeneralSettings() {
   return (
@@ -67,14 +66,12 @@ function ExtraSettings() {
     isRecordingOrStreaming,
     recordingMode,
     updateStreamInfoOnLive,
-    isDualOutputScene,
     isSimpleOutputMode,
   } = useVuex(() => ({
     isRecordingOrStreaming: StreamingService.isStreaming || StreamingService.isRecording,
     recordingMode: RecordingModeService.views.isRecordingModeEnabled,
     updateStreamInfoOnLive: CustomizationService.state.updateStreamInfoOnLive,
     isSimpleOutputMode: SettingsService.views.isSimpleOutputMode,
-    isDualOutputScene: DualOutputService.views.hasNodeMap(),
   }));
 
   /**
@@ -167,22 +164,11 @@ function ExtraSettings() {
             </button>
           </div>
           {canRunOptimizer && (
-            <Tooltip
-              title={$t('Auto optimizer disabled for dual output scenes')}
-              placement="top"
-              lightShadow
-              disabled={!isDualOutputScene}
-            >
-              <div className="input-container">
-                <button
-                  className="button button--default"
-                  onClick={runAutoOptimizer}
-                  disabled={isDualOutputScene}
-                >
-                  {$t('Auto Optimize')}
-                </button>
-              </div>
-            </Tooltip>
+            <div className="input-container">
+              <button className="button button--default" onClick={runAutoOptimizer}>
+                {$t('Auto Optimize')}
+              </button>
+            </div>
           )}
 
           <div className="input-container">
