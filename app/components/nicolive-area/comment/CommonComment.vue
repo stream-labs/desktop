@@ -14,7 +14,12 @@
           v-if="computedName"
           @click.stop="$emit('commentUser')"
         >
-          <img class="comment-icon" :src="userIconURL" :alt="computedName" />
+          <img
+            class="comment-icon"
+            :src="userIconURL"
+            :alt="computedName"
+            @error.once="userIconURL = defaultUserIconURL"
+          />
           <div class="comment-name">{{ computedName }}</div>
         </div>
         <div class="comment-body">{{ computedContent }}</div>
