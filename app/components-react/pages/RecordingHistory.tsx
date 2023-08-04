@@ -43,18 +43,22 @@ class RecordingHistoryModule {
   get uploadOptions() {
     const opts = [
       {
-        label: $t('Convert to mobile-friendly short video'),
+        label: $t('Clip'),
         value: 'crossclip',
         icon: 'icon-crossclip',
       },
       {
-        label: $t('Add subtitles, transcribe, and more'),
+        label: $t('Transcribe'),
         value: 'typestudio',
         icon: 'icon-mic',
       },
     ];
     if (this.hasYoutube) {
-      opts.push({ label: $t('YouTube (private video)'), value: 'youtube', icon: 'icon-youtube' });
+      opts.unshift({
+        label: $t('Upload'),
+        value: 'youtube',
+        icon: 'icon-youtube',
+      });
     }
 
     return opts;
@@ -124,22 +128,28 @@ export default function RecordingHistory() {
     }
   }, [uploadInfo.error]);
 
-  function MenuItems(p: { filename: string }) {
+  function UploadActions(p: { filename: string }) {
     return (
-      <Menu className={styles.menu}>
+      <span className={styles.actionGroup}>
         {uploadOptions.map(opt => (
-          <Menu.Item key={opt.value} onClick={() => handleSelect(p.filename, opt.value)}>
+          <span
+            className={styles.action}
+            key={opt.value}
+            style={{ color: `var(--${opt.value === 'youtube' ? 'button' : opt.value})` }}
+            onClick={() => handleSelect(p.filename, opt.value)}
+          >
             <i className={opt.icon} />
-            <span style={{ marginLeft: 8 }}>{opt.label}</span>
-          </Menu.Item>
+            &nbsp;
+            <span>{opt.label}</span>
+          </span>
         ))}
-      </Menu>
+      </span>
     );
   }
 
   return (
-    <>
-      <h2>{$t('Recordings')}</h2>
+    <div className={styles.container}>
+      <h1>{$t('Recordings')}</h1>
       <div className={styles.recordingsContainer} id="recordingHistory">
         {recordings.map(recording => (
           <div className={styles.recording} key={recording.timestamp}>
@@ -149,24 +159,13 @@ export default function RecordingHistory() {
                 {recording.filename}
               </span>
             </Tooltip>
-            {uploadOptions.length > 0 && (
-              <Dropdown
-                overlay={<MenuItems filename={recording.filename} />}
-                placement="bottomRight"
-                getPopupContainer={() => document.getElementById('recordingHistory')!}
-              >
-                <Button className={cx('button button--default', styles.uploadButton)}>
-                  {$t('Upload To')}
-                  <i className="icon-dropdown" />
-                </Button>
-              </Dropdown>
-            )}
+            {uploadOptions.length > 0 && <UploadActions filename={recording.filename} />}
           </div>
         ))}
       </div>
       <ExportModal />
       <SLIDModal />
-    </>
+    </div>
   );
 }
 
