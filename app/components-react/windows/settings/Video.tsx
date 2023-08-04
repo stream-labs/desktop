@@ -434,11 +434,15 @@ class VideoSettingsModule {
   setShowDualOutput() {
     if (Services.StreamingService.views.isMidStreamMode) {
       message.error({
-        content: $t('Cannot toggle dual output while live.'),
+        content: $t('Cannot toggle Dual Output while live.'),
       });
     } else if (Services.TransitionsService.views.studioMode) {
       message.error({
-        content: $t('Cannot toggle dual output while in studio mode.'),
+        content: $t('Cannot toggle Dual Output while in Studio Mode.'),
+      });
+    } else if (Services.StreamingService.state.selectiveRecording) {
+      message.error({
+        content: $t('Cannot toggle Dual Output with Selective Recording.'),
       });
     } else {
       this.dualOutputService.actions.setdualOutputMode();
