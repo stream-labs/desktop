@@ -150,6 +150,11 @@ export default function RecordingHistory() {
   return (
     <div className={styles.container}>
       <h1>{$t('Recordings')}</h1>
+      <div style={{ marginBottom: 24 }}>
+        {$t(
+          'Record your screen with Streamlabs Desktop. Once recording is complete, it will be displayed here. Access your files or edit further with Streamlabs tools.',
+        )}
+      </div>
       <div className={styles.recordingsContainer} id="recordingHistory">
         {recordings.map(recording => (
           <div className={styles.recording} key={recording.timestamp}>
