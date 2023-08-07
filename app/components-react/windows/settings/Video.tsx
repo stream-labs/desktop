@@ -440,10 +440,6 @@ class VideoSettingsModule {
       message.error({
         content: $t('Cannot toggle Dual Output while in Studio Mode.'),
       });
-    } else if (Services.StreamingService.state.selectiveRecording) {
-      message.error({
-        content: $t('Cannot toggle Dual Output with Selective Recording.'),
-      });
     } else {
       this.dualOutputService.actions.setdualOutputMode();
       this.state.setShowDualOutputSettings(!this.state.showDualOutputSettings);

@@ -333,7 +333,14 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
     if (this.state.dualOutputMode) {
       this.confirmOrCreateVerticalNodes(this.views.activeSceneId);
-      this.toggleDisplay(true, 'vertical');
+
+      /**
+       * Selective recording only works with horizontal sources, so don't show the
+       * vertical display if toggling with selective recording active
+       */
+      if (!this.streamingService.state.selectiveRecording) {
+        this.toggleDisplay(true, 'vertical');
+      }
     } else {
       this.selectionService.views.globalSelection.reset();
     }
