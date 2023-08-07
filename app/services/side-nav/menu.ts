@@ -106,8 +106,11 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
 
     this.handleDismissables();
 
-    this.platformAppsService.allAppsLoaded.subscribe((loadedApps: ILoadedApp[]) =>
-      this.updateAllApps(loadedApps),
+    const allAppsLoaded = this.platformAppsService.allAppsLoaded.subscribe(
+      (loadedApps: ILoadedApp[]) => {
+        this.updateAllApps(loadedApps);
+        allAppsLoaded.unsubscribe();
+      },
     );
 
     this.state.currentMenuItem =

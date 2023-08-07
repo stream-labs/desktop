@@ -217,7 +217,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
         }
       }
 
-      this.allAppsLoaded.next();
+      this.allAppsLoaded.next(this.state.loadedApps);
     });
 
     this.userService.userLogout.subscribe(() => {
