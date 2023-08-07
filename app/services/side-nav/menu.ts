@@ -210,7 +210,6 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
   }
 
   updateAllApps(loadedApps: ILoadedApp[]) {
-    console.log('loadedApps ', JSON.stringify(loadedApps));
     this.UPDATE_ALL_APPS(loadedApps);
   }
 
