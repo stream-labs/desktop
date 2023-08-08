@@ -1,7 +1,7 @@
 import { useEffect, useReducer } from 'react';
-import Realm from 'realm';
+import { RealmObject } from 'services/realm';
 
-export function useRealmObject<T extends Realm.Object>(obj: T) {
+export function useRealmObject<T extends RealmObject>(obj: T) {
   const [_, forceUpdate] = useReducer(x => x + 1, 0);
 
   useEffect(() => {
@@ -9,10 +9,10 @@ export function useRealmObject<T extends Realm.Object>(obj: T) {
       forceUpdate();
     };
 
-    obj.addListener(listener);
+    obj.realmModel.addListener(listener);
 
     return () => {
-      obj.removeListener(listener);
+      obj.realmModel.removeListener(listener);
     };
   }, [obj]);
 

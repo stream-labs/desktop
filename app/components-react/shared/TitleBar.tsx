@@ -25,7 +25,14 @@ export default function TitleBar(props: { windowId: string }) {
     false,
   );
 
-  const title = useRealmObject(TestRealmService.state).name;
+  // NOT reactive
+  const name = TestRealmService.state1.fullName;
+
+  // Reactive
+  const title = useRealmObject(TestRealmService.state2).title;
+
+  // const title = useRealmObject(TestRealmService.state1).fullName;
+  // const ephem = useRealmObject(TestRealmService.state2).title;
 
   const isDev = useMemo(() => Utils.isDevMode(), []);
 

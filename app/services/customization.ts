@@ -16,6 +16,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import { AppService } from './app';
 import * as obs from '../../obs-api';
+import { RealmObject } from './realm';
 
 // Maps to --background
 const THEME_BACKGROUNDS = {
@@ -75,6 +76,78 @@ export interface ICustomizationServiceState {
   pinnedStatistics: IPinnedStatistics;
   enableCrashDumps: boolean;
   enableAnnouncements: boolean;
+}
+
+class PinnedStatistics extends RealmObject {
+  cpu: boolean;
+  fps: boolean;
+  droppedFrames: boolean;
+  bandwidth: boolean;
+
+  static schema = {
+    name: 'PinnedStatistics',
+    embedded: true,
+    properties: {
+      cpu: { type: 'bool', default: false },
+      fps: { type: 'bool', default: false },
+      droppedFrames: { type: 'bool', default: false },
+      bandwidth: { type: 'bool', default: false },
+    },
+  };
+}
+
+PinnedStatistics.register({ persist: true });
+
+class CustomizationState extends RealmObject {
+  theme: string;
+  updateStreamInfoOnLive: boolean;
+  livePreviewEnabled: boolean;
+  leftDock: boolean;
+  hideViewerCount: boolean;
+  folderSelection: boolean;
+  legacyAlertbox: boolean | null;
+  livedockCollapsed: boolean;
+  livedockSize: number;
+  eventsSize: number;
+  controlsSize: number;
+  performanceMode: boolean;
+  chatZoomFactor: number;
+  enableBTTVEmotes: boolean;
+  enableFFZEmotes: boolean;
+  mediaBackupOptOut: boolean;
+  navigateToLiveOnStreamStart: boolean;
+  experimental?: {
+    volmetersFPSLimit?: number;
+  };
+  designerMode: boolean;
+  legacyEvents: boolean;
+  pinnedStatistics: IPinnedStatistics;
+  enableCrashDumps: boolean;
+  enableAnnouncements: boolean;
+
+  // TODO: Finish
+  static schema = {
+    name: 'CustomizationState',
+    properties: {
+      theme: { type: 'string', default: 'night-theme' },
+      updateStreamInfoOnLive: { type: 'bool', default: true },
+      livePreviewEnabled: { type: 'bool', default: true },
+      leftDock: { type: 'bool', default: false },
+      hideViewerCount: { type: 'bool', default: false },
+      folderSelection: { type: 'bool', default: false },
+      legacyAlertbox: { type: 'bool', default: false },
+      livedockCollapsed: { type: 'bool', default: true },
+      livedockSize: { type: 'double', default: 0 },
+      eventsSize: { type: 'double', default: 156 },
+      controlsSize: { type: 'double', default: 240 },
+      performanceMode: { type: 'bool', default: false },
+      chatZoomFactor: { type: 'double', default: 1 },
+      enableBTTVEmotes: { type: 'bool', default: false },
+      enableFFZEmotes: { type: 'bool', default: false },
+      mediaBackupOptOut: { type: 'bool', default: false },
+      navigateToLiveOnStreamStart: { type: 'bool', default: true },
+    },
+  };
 }
 
 class CustomizationViews extends ViewHandler<ICustomizationServiceState> {

@@ -4,59 +4,124 @@ import path from 'path';
 import * as remote from '@electron/remote';
 import { ExecuteInCurrentWindow } from './core';
 
-export class TestObject extends Realm.Object<TestObject> {
-  name: string;
+/**
+ * This class is our extension of the Realm.Object class.
+ * The reason it doesn't sublass Realm.Object directly is
+ * because Realm does not support inheritance properly.
+ * Therefore, we use a workaround involving a wrapper object
+ * and dynamically defining properties.
+ */
+export class RealmObject {
+  /**
+   * Internal reference to realm model
+   */
+  private _realmModel: Realm.Object;
 
-  static schema = {
-    name: 'TestObject',
-    properties: {
-      _id: 'int',
-      name: 'string',
-    },
-  };
-}
+  /**
+   * Returns a reference to the realm db this object is stored in
+   */
+  get db() {
+    return (RealmService.instance as RealmService).getDb(this);
+  }
 
-export function State(type: typeof Realm.Object): PropertyDecorator {
-  return function (target: unknown, property: string) {
-    let state: Realm.Object;
+  /**
+   * Public accessor for the underlying Realm model.
+   * Implemented as a getter because this class can be created
+   * before the database connection is established.
+   */
+  get realmModel() {
+    if (!RealmService.hasInstance) {
+      throw new Error('Realm service does not exist!');
+    }
 
-    console.log('REALM REGISTER', type.name);
-    RealmService.registerObject(type);
+    if (!this.db) {
+      throw new Error('Realm is not connected!');
+    }
 
-    Object.defineProperty(target, property, {
-      get: () => {
-        if (!RealmService.hasInstance) {
-          throw new Error('Realm service does not exist!');
+    if (!this._realmModel) {
+      console.log('GOT DB', this.db);
+
+      // Check the db
+      const result = this.db.objects(this.schema.name);
+
+      if (result.length) {
+        this._realmModel = result[0];
+      } else {
+        // TODO: Make this better
+        // We might already be in a write transaction
+        try {
+          this.db.write(() => {
+            this._realmModel = this.db.create(this.schema.name, {});
+          });
+        } catch (e: unknown) {
+          this._realmModel = this.db.create(this.schema.name, {});
         }
+      }
+    }
 
-        const realm = RealmService.instance as RealmService;
+    return this._realmModel;
+  }
 
-        if (!realm.persistentDb) {
-          throw new Error('Realm is not connected!');
-        }
+  constructor(public schema: Realm.ObjectSchema) {}
 
-        if (!state) {
-          // Check the db
-          const result = realm.persistentDb.objects(type['schema'].name);
+  static inject<T = RealmObject>(this: { new (schema: any): T } & typeof RealmObject) {
+    if (!RealmService.registeredClasses[this.schema.name]) {
+      throw new Error(
+        `Tried to inject \`${this.schema.name}\` before it was registered! Did you call \`${this.schema.name}.register()\` immediately after defining the class?`,
+      );
+    }
 
-          if (result.length) {
-            state = result[0];
-          } else {
-            console.log('CREATING NEW OBJECT IN DB');
-            realm.persistentDb.write(() => {
-              realm.persistentDb.create(type['schema'].name, {});
-            });
-          }
-        }
+    const instance = new this(this.schema);
 
-        return state;
-      },
+    // Apply dynamic getters
+    Object.keys(this.schema.properties).forEach(key => {
+      Object.defineProperty(instance, key, {
+        get() {
+          return this.realmModel[key];
+        },
+        set(val: any) {
+          this.realmModel[key] = val;
+        },
+      });
     });
-  };
+
+    return instance;
+  }
+
+  static register<T extends typeof RealmObject>(this: T, opts: IRealmOptions = {}) {
+    if (RealmService.registeredClasses[this.schema.name]) {
+      throw new Error(`\`${this.schema.name}\` was registered twice!`);
+    }
+
+    // Make sure every object has a unique id
+    this.schema.properties['_id'] = { type: 'uuid', default: new Realm.BSON.UUID() };
+
+    const schema = this.schema;
+
+    // This is jumping around some hoops because Realm is extremely picky
+    // about the name and base class of its object models.
+    const klass = {
+      [this.schema.name]: class extends Realm.Object {
+        static schema = schema;
+      },
+    };
+
+    // TypeScript doesn't love metaprogramming
+    RealmService.registerObject(
+      (klass[this.schema.name] as unknown) as typeof Realm.Object,
+      opts.persist,
+    );
+  }
+
+  /**
+   * Inheriting classes should define this in Realm schema format.
+   * @see https://www.mongodb.com/docs/realm/sdk/node/model-data/define-a-realm-object-model/
+   */
+  static schema: Realm.ObjectSchema;
 }
 
-interface IStateOptions {
-  persist: boolean;
+interface IRealmOptions {
+  persist?: boolean;
 }
 
 export class RealmService extends Service {
@@ -67,7 +132,7 @@ export class RealmService extends Service {
     const realmPath = path.join(remote.app.getPath('userData'), 'ephemeral.realm');
 
     return {
-      schema: RealmService.objects,
+      schema: RealmService.ephemeralSchemas,
       path: realmPath,
       inMemory: true,
     };
@@ -77,7 +142,7 @@ export class RealmService extends Service {
     const realmPath = path.join(remote.app.getPath('userData'), 'persistent.realm');
 
     return {
-      schema: RealmService.objects,
+      schema: RealmService.persistentSchemas,
       path: realmPath,
     };
   }
@@ -93,9 +158,25 @@ export class RealmService extends Service {
     console.log('REALM INITED');
   }
 
-  static objects: typeof Realm.Object[] = [];
+  static persistentSchemas: typeof Realm.Object[] = [];
+  static ephemeralSchemas: typeof Realm.Object[] = [];
+  static registeredClasses: Dictionary<'persistent' | 'ephemeral'> = {};
 
-  static registerObject(obj: typeof Realm.Object) {
-    this.objects.push(obj);
+  static registerObject(obj: typeof Realm.Object, persist = false) {
+    persist ? this.persistentSchemas.push(obj) : this.ephemeralSchemas.push(obj);
+    this.registeredClasses[obj['schema']['name']] = persist ? 'persistent' : 'ephemeral';
+  }
+
+  /**
+   * Returns the realm db for a given RealmObject
+   * @param obj A RealmObject
+   */
+  @ExecuteInCurrentWindow()
+  getDb(obj: RealmObject) {
+    if (RealmService.registeredClasses[obj.schema.name] === 'persistent') {
+      return this.persistentDb;
+    } else {
+      return this.ephemeralDb;
+    }
   }
 }

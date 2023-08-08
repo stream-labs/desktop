@@ -6,6 +6,7 @@ import { Services } from '../service-provider';
 import cloneDeep from 'lodash/cloneDeep';
 import styles from './PerformanceMetrics.m.less';
 import { $t } from '../../services/i18n';
+import { useRealmObject } from 'components-react/hooks/realm';
 
 type TPerformanceMetricsMode = 'full' | 'limited';
 
@@ -18,14 +19,11 @@ export default function PerformanceMetrics(props: {
   const v = useVuex(
     () => ({
       pinnedStats: CustomizationService.views.pinnedStatistics,
-      cpuPercent: PerformanceService.views.cpuPercent,
-      frameRate: PerformanceService.views.frameRate,
-      droppedFrames: PerformanceService.views.droppedFrames,
-      percentDropped: PerformanceService.views.percentDropped,
-      bandwidth: PerformanceService.views.bandwidth,
     }),
     false,
   );
+
+  const stats = useRealmObject(PerformanceService.state);
 
   function showAttribute(attribute: string) {
     return props.mode === 'full' || v.pinnedStats[attribute];
@@ -48,14 +46,14 @@ export default function PerformanceMetrics(props: {
   }
 
   const metadata = {
-    cpu: { value: `${v.cpuPercent}%`, label: $t('CPU'), icon: 'icon-cpu' },
-    fps: { value: v.frameRate, label: 'FPS', icon: 'icon-fps' },
+    cpu: { value: `${stats.cpuPercent}%`, label: $t('CPU'), icon: 'icon-cpu' },
+    fps: { value: stats.frameRateFixed, label: 'FPS', icon: 'icon-fps' },
     droppedFrames: {
-      value: `${v.droppedFrames} (${v.percentDropped}%)`,
+      value: `${stats.droppedFrames} (${stats.percentDropped}%)`,
       label: $t('Dropped Frames'),
       icon: 'icon-dropped-frames',
     },
-    bandwidth: { value: v.bandwidth, label: 'kb/s', icon: 'icon-bitrate' },
+    bandwidth: { value: stats.bandwidth, label: 'kb/s', icon: 'icon-bitrate' },
   };
 
   const shownCells = ['cpu', 'fps', 'droppedFrames', 'bandwidth'].filter((val: string) =>
