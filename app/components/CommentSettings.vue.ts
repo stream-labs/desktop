@@ -1,7 +1,7 @@
 import { Inject } from 'services/core/injector';
 import { NicoliveCommentLocalFilterService } from 'services/nicolive-program/nicolive-comment-local-filter';
 import { NicoliveCommentSynthesizerService } from 'services/nicolive-program/nicolive-comment-synthesizer';
-import { SynthesizerId, SynthesizerSelector, SynthesizerSelectors } from 'services/nicolive-program/state';
+import { NicoliveProgramStateService, SynthesizerId, SynthesizerSelector, SynthesizerSelectors } from 'services/nicolive-program/state';
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import VueSlider from 'vue-slider-component';
@@ -18,6 +18,8 @@ export default class CommentSettings extends Vue {
   private nicoliveCommentSynthesizerService: NicoliveCommentSynthesizerService;
   @Inject()
   private nicoliveCommentLocalFilterService: NicoliveCommentLocalFilterService;
+  @Inject()
+  private nicoliveProgramStateService: NicoliveProgramStateService;
 
   close() {
     this.$emit('close');
@@ -34,6 +36,13 @@ export default class CommentSettings extends Vue {
   }
   set enabled(e: boolean) {
     this.nicoliveCommentSynthesizerService.enabled = e;
+  }
+
+  get nameplateEnabled(): boolean {
+    return this.nicoliveProgramStateService.state.nameplateEnabled;
+  }
+  set nameplateEnabled(e: boolean) {
+    this.nicoliveProgramStateService.updateNameplateEnabled(e);
   }
 
   get rate(): number {

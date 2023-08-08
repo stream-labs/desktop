@@ -32,6 +32,7 @@ import { KonomiTag } from './NicoliveClient';
 import { WrappedChat, WrappedChatWithComponent } from './WrappedChat';
 import { NicoliveCommentLocalFilterService } from './nicolive-comment-local-filter';
 import { NicoliveCommentSynthesizerService } from './nicolive-comment-synthesizer';
+import { NicoliveProgramStateService } from './state';
 
 function makeEmulatedChat(
   content: string,
@@ -82,6 +83,7 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
   private client: IMessageServerClient | null = null;
 
   @Inject() private nicoliveProgramService: NicoliveProgramService;
+  @Inject() private nicoliveProgramStateService: NicoliveProgramStateService;
   @Inject() private nicoliveCommentFilterService: NicoliveCommentFilterService;
   @Inject() private nicoliveCommentLocalFilterService: NicoliveCommentLocalFilterService;
   @Inject() private nicoliveCommentSynthesizerService: NicoliveCommentSynthesizerService;
@@ -113,8 +115,22 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
     return (chat: WrappedChatWithComponent) =>
       chat.type !== 'invisible' && this.nicoliveCommentLocalFilterService.filterFn(chat);
   }
+
+  // なふだがoff なら名前を消す
+  get filterNameplate(): (chat: WrappedChatWithComponent) => WrappedChatWithComponent {
+    if (!this.nicoliveProgramStateService.state.nameplateEnabled) {
+      return (chat) => {
+        return { ...chat, value: { ...chat.value, name: undefined } };
+      }
+    } else {
+      return (chat) => chat;
+    }
+  }
+
   get itemsLocalFiltered() {
-    return this.items.filter(this.filterFn);
+    return this.items
+      .filter(this.filterFn)
+      .map(this.filterNameplate);
   }
   get recentPopoutsLocalFiltered() {
     return this.state.popoutMessages.filter(this.filterFn);
