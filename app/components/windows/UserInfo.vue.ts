@@ -87,6 +87,12 @@ export default class UserInfo extends Vue {
     });
   }
 
+  updated() {
+    if (this.isLatestVisible) {
+      this.scrollToLatest();
+    }
+  }
+
   beforeDestroy() {
     this.konomiTagsSubscription.unsubscribe();
 
