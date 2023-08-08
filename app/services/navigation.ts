@@ -17,7 +17,8 @@ export type TAppPage =
   | 'StreamScheduler'
   | 'Highlighter'
   | 'Grow'
-  | 'ThemeAudit';
+  | 'ThemeAudit'
+  | 'RecordingHistory';
 
 interface INavigationState {
   currentPage: TAppPage;
