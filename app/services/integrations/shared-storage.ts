@@ -147,6 +147,7 @@ export class SharedStorageService extends Service {
   }
 
   private async uploadS3File() {
+    if (!this.uploader) return;
     return await this.uploader.start();
   }
 

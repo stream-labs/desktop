@@ -228,6 +228,13 @@ export function AppearanceSettings() {
               value={menuItemStatus[EMenuItemKey.Highlighter]}
               disabled={!isLoggedIn || compactView}
             />
+            <SwitchInput
+              label={menuTitles(EMenuItemKey.RecordingHistory)}
+              layout="horizontal"
+              onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItemKey.RecordingHistory)}
+              value={menuItemStatus[EMenuItemKey.RecordingHistory]}
+              disabled={!isLoggedIn || compactView}
+            />
           </Col>
 
           {/* SIDENAV APPS SETTINGS */}
