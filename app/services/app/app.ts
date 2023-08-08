@@ -175,7 +175,7 @@ export class AppService extends StatefulService<IAppState> {
       // this.keyListenerService.shutdown(); 未実装
       // this.platformAppsService.unloadAllApps(); 未実装
       // await this.usageStatisticsService.flushEvents(); 未実装
-      this.windowsService.closeAllOneOffs(); // intead .shutdown(); window.child.close() が処理できないため
+      this.windowsService.closeAllOneOffs(); // intead .shutdown(); window.child.close is 'Object has been destroyed' in this time
       this.ipcServerService.stopListening();
       // await this.userService.flushUserSession(); 未実装
       await this.sceneCollectionsService.deinitialize();
