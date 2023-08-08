@@ -104,7 +104,13 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
     this.userService.userLoginFinished.subscribe(() => this.handleUserLogin());
 
     this.handleDismissables();
-    this.platformAppsService.allAppsLoaded.subscribe(() => this.updateAllApps());
+
+    const allAppsLoaded = this.platformAppsService.allAppsLoaded.subscribe(
+      (loadedApps: ILoadedApp[]) => {
+        this.updateAllApps(loadedApps);
+        allAppsLoaded.unsubscribe();
+      },
+    );
 
     const hasRecordingHistory = this.state[ENavName.TopNav].menuItems.find(
       item => item.key === EMenuItemKey.RecordingHistory,
@@ -226,8 +232,8 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
     this.TOGGLE_MENU_ITEM(navName, menuItemKey, status);
   }
 
-  updateAllApps() {
-    this.UPDATE_ALL_APPS(this.platformAppsService.views.enabledApps);
+  updateAllApps(loadedApps: ILoadedApp[]) {
+    this.UPDATE_ALL_APPS(loadedApps);
   }
 
   toggleApp(appId: string) {
