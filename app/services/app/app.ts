@@ -169,12 +169,18 @@ export class AppService extends StatefulService<IAppState> {
     window.setTimeout(async () => {
       obs.NodeObs.InitShutdownSequence();
       this.crashReporterService.beginShutdown();
+      // this.shutdownStarted.next();
+      // this.keyListenerService.shutdown();
+      // this.platformAppsService.unloadAllApps();
+      // await this.usageStatisticsService.flushEvents();
+      this.windowsService.closeAllOneOffs(); // intead .shutdown(); window.child.close is undefined
+      this.ipcServerService.stopListening();
       // await this.userService.flushUserSession();
       await this.sceneCollectionsService.deinitialize();
-      this.performanceMonitorService.stop();
+      this.performanceMonitorService.stop(); // instead this.performanceService.stop();
       this.transitionsService.shutdown();
-      this.windowsService.closeAllOneOffs();
-
+      // this.videoSettingsService.shutdown();
+      // await this.gameOverlayService.destroy();
       await this.fileManagerService.flushAll();
       obs.NodeObs.RemoveSourceCallback();
       obs.NodeObs.OBS_service_removeCallback();
