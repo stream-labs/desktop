@@ -36,7 +36,7 @@
         <div class="tag-list-header">好きなものリスト ({{ konomiTags.length }})</div>
         <div class="tag-list-body">
           <div
-            v-for="tag in konomiTags.slice(0, 20)"
+            v-for="tag in konomiTags"
             :key="tag.name"
             :class="{ tagname: true, common: tag.common }"
           >
