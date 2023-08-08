@@ -15,7 +15,6 @@ import { byOS, OS } from 'util/operating-systems';
 import { TcpServerService } from './api/tcp-server';
 import { Subject } from 'rxjs';
 import { TDisplayType, VideoSettingsService } from './settings-v2';
-// import { StreamingService } from 'services/streaming';
 
 /**
  * Examine scene items props
@@ -65,7 +64,6 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   @Inject() private editorCommandsService: EditorCommandsService;
   @Inject() private tcpServerService: TcpServerService;
   @Inject() private videoSettingsService: VideoSettingsService;
-  // @Inject() private streamingService: StreamingService;
 
   /**
    * emit this event when drag or resize have been finished
@@ -122,7 +120,6 @@ export class EditorService extends StatefulService<IEditorServiceState> {
    *****************/
 
   handleMouseDown(event: IMouseEvent) {
-    console.log('\nMOUSE DOWN\n');
     if (this.activeSources.length > 0) {
       const overResize = this.isOverResize(event);
 
@@ -134,8 +131,6 @@ export class EditorService extends StatefulService<IEditorServiceState> {
 
     // prevent dragging if the clicking is past the source
     if (!this.getOverSources(event).length) this.canDrag = false;
-
-    console.log('can drag ', this.canDrag);
 
     this.updateCursor(event);
   }
@@ -574,8 +569,6 @@ export class EditorService extends StatefulService<IEditorServiceState> {
    * @returns Boolean representing if the mouse is over the source
    */
   isOverSource(event: IMouseEvent, source: SceneItem) {
-    console.log('source ', source);
-    console.log('source.display ', source.display);
     if (event.display !== source.display) {
       return false;
     }
