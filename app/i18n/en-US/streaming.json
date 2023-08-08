@@ -202,5 +202,6 @@
   "To use Dual Output you must stream to at least one horizontal and one vertical platform.": "To use Dual Output you must stream to at least one horizontal and one vertical platform.",
   "Cannot toggle Dual Output while live.": "Cannot toggle Dual Output while live.",
   "Cannot toggle Dual Output while in Studio Mode.": "Cannot toggle Dual Output while in Studio Mode.",
-  "Cannot toggle Dual Output with Selective Recording.": "Cannot toggle Dual Output with Selective Recording."
+  "Dual Output enabled. Selective Recording only works with horizontal sources.": "Dual Output enabled. Selective Recording only works with horizontal sources.",
+  "Selective Recording can only be used with horizontal sources.": "Selective Recording can only be used with horizontal sources."
 }
