@@ -11,10 +11,12 @@ import {
   SharedStorageService,
   OnboardingService,
   WindowsService,
+  NotificationsService,
 } from 'app-services';
 import styles from './RecordingHistory.m.less';
 import AutoProgressBar from 'components-react/shared/AutoProgressBar';
 import { GetSLID } from 'components-react/highlighter/StorageUpload';
+import { ENotificationType } from 'services/notifications';
 
 class RecordingHistoryModule {
   private RecordingModeService = inject(RecordingModeService);
@@ -22,6 +24,7 @@ class RecordingHistoryModule {
   private SharedStorageService = inject(SharedStorageService);
   private OnboardingService = inject(OnboardingService);
   private WindowsService = inject(WindowsService);
+  private NotificationsService = inject(NotificationsService);
   state = injectState({ showSLIDModal: false });
 
   get recordings() {
@@ -62,6 +65,14 @@ class RecordingHistoryModule {
     }
 
     return opts;
+  }
+
+  postError(message: string) {
+    this.NotificationsService.push({
+      message,
+      type: ENotificationType.WARNING,
+      lifeTime: 5000,
+    });
   }
 
   connectSLID() {
@@ -115,6 +126,7 @@ export default function RecordingHistory() {
     uploadOptions,
     handleSelect,
     uploadInfo,
+    postError,
   } = useModule(RecordingHistoryModule);
 
   useEffect(() => {
@@ -124,7 +136,7 @@ export default function RecordingHistory() {
       // We don't want to surface unexpected TS errors to the user
       !/TypeError/.test(uploadInfo.error)
     ) {
-      message.error(uploadInfo.error, 5);
+      postError(uploadInfo.error);
     }
   }, [uploadInfo.error]);
 
