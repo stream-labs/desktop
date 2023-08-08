@@ -3,14 +3,16 @@
     <div class="user-info" slot="content">
       <div class="user-detail">
         <div class="user-detail-left">
-          <img
-            :src="userIconURL"
-            width="32"
-            height="32"
-            class="user-icon"
-            :alt="userName"
-            @error.once="userIconURL = defaultUserIconURL"
-          />
+          <a @click="openUserPage" title="ユーザーページをブラウザで開く">
+            <img
+              :src="userIconURL"
+              width="32"
+              height="32"
+              class="user-icon"
+              :alt="userName"
+              @error.once="userIconURL = defaultUserIconURL"
+            />
+          </a>
         </div>
         <div class="user-detail-body">
           <div class="user-name">{{ userName }}</div>
