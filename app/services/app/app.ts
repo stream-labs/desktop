@@ -163,18 +163,26 @@ export class AppService extends StatefulService<IAppState> {
 
   @track({ event: 'app_close' })
   private shutdownHandler() {
+    // SLOBS の shutdownHandlerでの順序に従います
+    // https://github.com/stream-labs/desktop/blob/05edf2206a3c10c13b60ede8ddd5e776509ebd5f/app/services/app/app.ts#L178
     this.START_LOADING();
     this.tcpServerService.stopListening();
 
     window.setTimeout(async () => {
       obs.NodeObs.InitShutdownSequence();
       this.crashReporterService.beginShutdown();
-      // await this.userService.flushUserSession();
+      // this.shutdownStarted.next(); 未実装
+      // this.keyListenerService.shutdown(); 未実装
+      // this.platformAppsService.unloadAllApps(); 未実装
+      // await this.usageStatisticsService.flushEvents(); 未実装
+      this.windowsService.closeAllOneOffs(); // intead .shutdown(); window.child.close is 'Object has been destroyed' in this time
+      this.ipcServerService.stopListening();
+      // await this.userService.flushUserSession(); 未実装
       await this.sceneCollectionsService.deinitialize();
-      this.performanceMonitorService.stop();
+      this.performanceMonitorService.stop(); // instead this.performanceService.stop();
       this.transitionsService.shutdown();
-      this.windowsService.closeAllOneOffs();
-
+      // this.videoSettingsService.shutdown(); 未実装
+      // await this.gameOverlayService.destroy(); 未実装
       await this.fileManagerService.flushAll();
       obs.NodeObs.RemoveSourceCallback();
       obs.NodeObs.OBS_service_removeCallback();
