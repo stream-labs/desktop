@@ -3,7 +3,7 @@
     <div class="user-info" slot="content">
       <div class="user-detail">
         <div class="user-detail-left">
-          <a @click="openUserPage" title="ユーザーページをブラウザで開く">
+          <a class="user-page-link" @click="openUserPage" title="ユーザーページをブラウザで開く">
             <img
               :src="userIconURL"
               width="32"
@@ -15,7 +15,9 @@
           </a>
         </div>
         <div class="user-detail-body">
-          <div class="user-name">{{ userName }}</div>
+          <a class="user-page-link" @click="openUserPage" title="ユーザーページをブラウザで開く">
+            <div class="user-name">{{ userName }}</div>
+          </a>
           <div class="user-account">
             <p class="user-id">ID: {{ userId }}</p>
             <p class="user-type" :class="{ 'is-premium': isPremium }">
@@ -84,6 +86,10 @@
   flex-direction: column;
   flex-grow: 1;
   overflow: hidden;
+}
+
+.user-page-link {
+  text-decoration: none;
 }
 
 .user-icon {
