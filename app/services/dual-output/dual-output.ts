@@ -304,6 +304,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         this.streamingService.actions.setSelectiveRecording(false);
       }
 
+      this.convertSceneSources(this.scenesService.views.activeSceneId);
+
       if (this.state.isLoading) {
         this.setIsCollectionOrSceneLoading(false);
       }
@@ -324,6 +326,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
      * when loading the scene collection.
      */
     this.scenesService.sourcesAdded.subscribe((sceneId: string) => {
+      this.convertSceneSources(sceneId);
       this.assignContexts(sceneId);
     });
 
@@ -358,10 +361,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    */
 
   confirmOrCreateVerticalNodes(sceneId: string) {
-    const sceneSources = this.scenesService.views.sceneSourcesForScene(sceneId);
-    if (sceneSources.length > 0) {
-      sceneSources.forEach(scene => this.confirmOrCreateVerticalNodes(scene.id));
-    }
+    this.convertSceneSources(sceneId);
     if (!this.views.hasNodeMap(sceneId) && this.state.dualOutputMode) {
       try {
         this.createSceneNodes(sceneId);
@@ -374,6 +374,13 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       } catch (error: unknown) {
         console.error('Error toggling Dual Output mode: ', error);
       }
+    }
+  }
+
+  convertSceneSources(sceneId: string) {
+    const sceneSources = this.scenesService.views.sceneSourcesForScene(sceneId);
+    if (sceneSources.length > 0) {
+      sceneSources.forEach(scene => this.confirmOrCreateVerticalNodes(scene.id));
     }
   }
 
@@ -440,6 +447,9 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     isFirstDisplay: boolean,
     sceneId?: string,
   ) {
+    if (sceneItem.type === 'scene') {
+      this.confirmOrCreateVerticalNodes(sceneItem.id);
+    }
     if (isFirstDisplay) {
       // if it's the first display, just assign the scene item's output to a context
       this.assignNodeContext(sceneItem, display);
