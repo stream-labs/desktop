@@ -143,8 +143,12 @@
 }
 
 .tag-list {
+  display: flex;
+  flex-direction: column;
   flex-grow: 1;
+  max-height: 176px; // 5段目が半分見える高さ
   margin-bottom: 16px;
+  overflow: hidden;
   background-color: var(--color-bg-secondary);
 }
 
@@ -161,7 +165,6 @@
   flex-grow: 1;
   flex-wrap: wrap;
   min-height: 54px;
-  max-height: 138px;
   padding: 16px 8px 8px 16px;
   overflow: auto;
 
