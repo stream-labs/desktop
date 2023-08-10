@@ -54,9 +54,15 @@ class DummyMessageServerClient implements IMessageServerClient {
       map(res => ({
         chat: {
           ...makeEmulatedChat(`${res}`).value,
-          user_id: '2',
-          premium: 1,
-          name: '戀塚',
+          ...(res % 2 === 0 ? {
+            user_id: '2',
+            premium: 1,
+            name: '戀塚',
+          } : {
+            user_id: '19208',
+            premium: 0,
+            name: '（・＿・）ノ',
+          }),
           no: res + 1,
         },
       })),
