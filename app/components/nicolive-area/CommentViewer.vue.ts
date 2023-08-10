@@ -88,13 +88,18 @@ export default class CommentViewer extends Vue {
 
   pin(item: WrappedChatWithComponent | null): void {
     if (!item || item.type === 'normal') {
-      this.nicoliveCommentViewerService.pinComment(item && {
-        ...item,
-        value: {
-          ...item.value,
-          name: item.value.name || item.rawName, // なふだon/offに追従できるようにnameを復元して保持する
-        },
-      });
+      this.nicoliveCommentViewerService.pinComment(null);
+      if (item) {
+        this.$nextTick(() => {
+          this.nicoliveCommentViewerService.pinComment(item && {
+            ...item,
+            value: {
+              ...item.value,
+              name: item.value.name || item.rawName, // なふだon/offに追従できるようにnameを復元して保持する
+            },
+          });
+        });
+      }
     }
   }
 

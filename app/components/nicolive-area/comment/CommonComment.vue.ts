@@ -1,4 +1,4 @@
-import { Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import { CommentBase } from './CommentBase';
 import { NicoliveClient } from 'services/nicolive-program/NicoliveClient';
 import { remote } from 'electron';
@@ -9,17 +9,7 @@ export default class CommonComment extends CommentBase {
   @Prop() speaking: boolean;
   @Prop() nameplateHint: boolean;
 
-  userIconURL: string = '';
-
-  updateUserIconURL() {
-    this.userIconURL = NicoliveClient.getUserIconURL(this.chat.value.user_id, `${this.chat.value.thread}`);
-  }
-  @Watch('chat') chatChanged() {
-    this.updateUserIconURL();
-  }
-  mounted() {
-    this.updateUserIconURL();
-  }
+  userIconURL: string = NicoliveClient.getUserIconURL(this.chat.value.user_id, `${this.chat.value.thread}`);
 
   defaultUserIconURL = NicoliveClient.defaultUserIconURL;
 
