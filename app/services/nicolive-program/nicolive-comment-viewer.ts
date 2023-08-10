@@ -120,7 +120,14 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
   get filterNameplate(): (chat: WrappedChatWithComponent) => WrappedChatWithComponent {
     if (!this.nicoliveProgramStateService.state.nameplateEnabled) {
       return (chat) => {
-        return { ...chat, value: { ...chat.value, name: undefined } };
+        return {
+          ...chat,
+          value: {
+            ...chat.value,
+            name: undefined,
+          },
+          rawName: chat.value.name, // ピン留めコメント用に元のnameを保持する
+        };
       }
     } else {
       return (chat) => chat;
