@@ -88,7 +88,7 @@ export default class CommentViewer extends Vue {
 
   pin(item: WrappedChatWithComponent | null): void {
     if (!item || item.type === 'normal') {
-      this.nicoliveCommentViewerService.pinComment({
+      this.nicoliveCommentViewerService.pinComment(item && {
         ...item,
         value: {
           ...item.value,
