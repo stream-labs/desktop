@@ -156,7 +156,8 @@
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  max-height: 176px; // 5段目が半分見える高さ
+  min-height: 120px; // 3段目がちら見えする高さ
+  max-height: 176px; // 5段目がちら見えする高さ
   margin-bottom: 16px;
   overflow: hidden;
   background-color: var(--color-bg-secondary);
@@ -210,7 +211,6 @@
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  max-height: 360px;
   overflow: hidden;
   background-color: var(--color-bg-secondary);
 }
