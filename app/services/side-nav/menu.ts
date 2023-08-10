@@ -10,7 +10,6 @@ import {
 import { ILoadedApp } from 'services/platform-apps';
 import { EDismissable } from 'services/dismissables';
 import {
-  TMenuItems,
   EMenuItemKey,
   IMenuItem,
   IParentMenuItem,
@@ -20,6 +19,7 @@ import {
   IAppMenuItem,
   SideBarTopNavData,
   SideBarBottomNavData,
+  loggedOutMenuItems,
 } from './menu-data';
 
 interface ISideNavServiceState {
@@ -64,6 +64,14 @@ class SideNavViews extends ViewHandler<ISideNavServiceState> {
     return this.state.showCustomEditor;
   }
 
+  get loggedOutMenuItemKeys() {
+    return loggedOutMenuItems.map(item => item.key);
+  }
+
+  get loggedOutMenuItemTargets() {
+    return loggedOutMenuItems.map(item => item?.target).filter(target => target);
+  }
+
   getExpandedMenuItems(name: ENavName) {
     if (!name) return;
     return this.state[name].menuItems.reduce((keys, menuItem: IMenuItem) => {
@@ -106,6 +114,9 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
     this.handleDismissables();
     this.platformAppsService.allAppsLoaded.subscribe(() => this.updateAllApps());
 
+    /**
+     * Determine if the user has the recording history menu item
+     */
     const hasRecordingHistory = this.state[ENavName.TopNav].menuItems.find(
       item => item.key === EMenuItemKey.RecordingHistory,
     );
@@ -115,17 +126,12 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
       const index = this.state[ENavName.TopNav].menuItems.length - 2;
 
       // add the recording history to the array of menu items
-      const updatedMenuItems = [...this.state[ENavName.TopNav].menuItems].splice(
-        index,
-        0,
-        SideNavMenuItems()[EMenuItemKey.RecordingHistory],
-      );
+      const menuItems = [...this.state[ENavName.TopNav].menuItems];
+      menuItems.splice(index, 0, SideNavMenuItems()[EMenuItemKey.RecordingHistory]);
 
       // update the menu items
-      this.UPDATE_MENU_ITEMS(ENavName.TopNav, updatedMenuItems);
+      this.UPDATE_MENU_ITEMS(ENavName.TopNav, menuItems);
     }
-
-    console.log(this.state[ENavName.TopNav]);
 
     this.state.currentMenuItem =
       this.layoutService.state.currentTab !== 'default'
@@ -150,16 +156,13 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
   }
 
   handleUserLogin() {
-    const registrationDate = this.userService.state.createdAt;
-
-    // TODO: set Date to specific date
-    const legacyMenu = registrationDate < new Date('December 8, 2022').valueOf();
-
     /**
      * Determine if the login is an initial login
      * A legacy user's initial login will have showing the new side nav badge set to true
      * A new user's initial login will have the legacy menu property incorrectly set
      */
+    const registrationDate = this.userService.state.createdAt;
+    const legacyMenu = registrationDate < new Date('December 8, 2022').valueOf();
 
     if (
       !(legacyMenu && this.dismissablesService.views.shouldShow(EDismissable.NewSideNav)) &&
@@ -167,6 +170,11 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
       this.state.hasLegacyMenu
     ) {
       this.SET_NEW_USER_LOGIN();
+    }
+
+    // confirm correct menu item is highlighted
+    if (this.state.currentMenuItem !== this.layoutService.state.currentTab) {
+      this.SET_CURRENT_MENU_ITEM(this.layoutService.state.currentTab);
     }
 
     this.dismissablesService.dismiss(EDismissable.LoginPrompt);
