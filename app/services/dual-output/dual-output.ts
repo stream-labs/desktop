@@ -380,7 +380,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   convertSceneSources(sceneId: string) {
     const sceneSources = this.scenesService.views.sceneSourcesForScene(sceneId);
     if (sceneSources.length > 0) {
-      sceneSources.forEach(scene => this.confirmOrCreateVerticalNodes(scene.id));
+      sceneSources.forEach(scene => this.confirmOrCreateVerticalNodes(scene.sourceId));
     }
   }
 
@@ -448,7 +448,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     sceneId?: string,
   ) {
     if (sceneItem.type === 'scene') {
-      this.confirmOrCreateVerticalNodes(sceneItem.id);
+      this.confirmOrCreateVerticalNodes(sceneItem.sourceId);
     }
     if (isFirstDisplay) {
       // if it's the first display, just assign the scene item's output to a context
