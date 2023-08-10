@@ -3,7 +3,7 @@
     <div class="user-info" slot="content">
       <div class="user-detail">
         <div class="user-detail-left">
-          <a class="user-page-link" @click="openUserPage" title="ユーザーページをブラウザで開く">
+          <a class="user-page-link" @click="openUserPage" :title="userName">
             <img
               :src="userIconURL"
               width="32"
@@ -15,7 +15,7 @@
           </a>
         </div>
         <div class="user-detail-body">
-          <a class="user-page-link" @click="openUserPage" title="ユーザーページをブラウザで開く">
+          <a class="user-page-link" @click="openUserPage" :title="userName">
             <div class="user-name">{{ userName }}</div>
           </a>
           <div class="user-account">
@@ -103,6 +103,10 @@
   font-weight: @font-weight-bold;
   color: var(--color-text-light);
   .text-ellipsis;
+
+  .user-detail:hover & {
+    color: var(--color-text-active);
+  }
 }
 
 .user-account {
@@ -159,6 +163,10 @@
 }
 
 .tag-list-header {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  height: 40px;
   padding: 8px 16px;
   font-size: @font-size4;
   font-weight: @font-weight-bold;
@@ -202,11 +210,16 @@
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  max-height: 360px;
   overflow: hidden;
   background-color: var(--color-bg-secondary);
 }
 
 .comment-list-header {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  height: 40px;
   padding: 8px 16px;
   font-size: @font-size4;
   font-weight: @font-weight-bold;
