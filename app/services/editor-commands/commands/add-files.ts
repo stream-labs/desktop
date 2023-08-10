@@ -27,22 +27,27 @@ export class AddFilesCommand extends Command {
       const currentItemsSelection = scene.getSelection().selectAll();
       this.files.map(file => scene.addFile(file));
       const addedNodes = currentItemsSelection.getInverted();
-      this.addNodesSubCommands = addedNodes.map(node => {
-        if (node.isItem()) {
-          const source = node.getSource();
-          return new CreateNewItemCommand(
-            this.sceneId,
-            source.name,
-            source.type,
-            source.getSettings(),
-            {
-              id: node.id,
-              sourceAddOptions: { sourceId: source.sourceId },
-            },
-          );
-        }
-        return new CreateFolderCommand(this.sceneId, node.name);
-      });
+
+      // skip creating editor commands for the vertical nodes
+      // because the editor command handles them when undoing/redoing
+      this.addNodesSubCommands = addedNodes
+        .filter(node => node?.display === 'horizontal')
+        .map(node => {
+          if (node.isItem()) {
+            const source = node.getSource();
+            return new CreateNewItemCommand(
+              this.sceneId,
+              source.name,
+              source.type,
+              source.getSettings(),
+              {
+                id: node.id,
+                sourceAddOptions: { sourceId: source.sourceId },
+              },
+            );
+          }
+          return new CreateFolderCommand(this.sceneId, node.name);
+        });
       this.removeNodesSubCommand = new RemoveNodesCommand(scene.getSelection(addedNodes));
     } else {
       // redo logic

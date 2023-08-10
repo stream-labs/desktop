@@ -52,7 +52,7 @@ export class CreateNewItemCommand extends Command {
       .getScene(this.sceneId)
       .createAndAddSource(this.name, this.type, this.settings, this.options);
 
-    if (this.dualOutputService.views.shouldCreateVerticalNode) {
+    if (this.dualOutputService.views.hasNodeMap(this.sceneId)) {
       Promise.resolve(
         this.dualOutputService.actions.return.createOrAssignOutputNode(
           item,
