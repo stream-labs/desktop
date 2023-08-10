@@ -159,6 +159,7 @@ export function setSentryContext(ctx: ISentryContext) {
 class UserViews extends ViewHandler<IUserServiceState> {
   // Injecting HostsService since it's not stateful
   @Inject() hostsService: HostsService;
+  @Inject() magicLinkService: MagicLinkService;
 
   get settingsServiceViews() {
     return this.getServiceViews(SettingsService);
@@ -249,19 +250,6 @@ class UserViews extends ViewHandler<IUserServiceState> {
     return this.state.auth;
   }
 
-  alertboxLibraryUrl(id?: string) {
-    const uiTheme = this.customizationServiceViews.isDarkTheme ? 'night' : 'day';
-    let url = `https://${this.hostsService.streamlabs}/alert-box-themes?mode=${uiTheme}&slobs`;
-
-    if (this.isLoggedIn) {
-      url += `&oauth_token=${this.auth.apiToken}`;
-    }
-
-    if (id) url += `&id=${id}`;
-
-    return url;
-  }
-
   appStoreUrl(params?: { appId?: string | undefined; type?: string | undefined }) {
     const host = this.hostsService.platform;
     const token = this.auth.apiToken;
@@ -276,28 +264,6 @@ class UserViews extends ViewHandler<IUserServiceState> {
     }
 
     return `${url}?token=${token}&mode=${nightMode}`;
-  }
-
-  overlaysUrl(type?: 'overlay' | 'widget-themes' | 'site-themes', id?: string) {
-    const uiTheme = this.customizationServiceViews.isDarkTheme ? 'night' : 'day';
-
-    let url = `https://${this.hostsService.streamlabs}/library`;
-
-    if (type && !id) {
-      url += `/${type}`;
-    }
-
-    url += `?mode=${uiTheme}&slobs`;
-
-    if (this.isLoggedIn) {
-      url += `&oauth_token=${this.auth.apiToken}`;
-    }
-
-    if (type && id) {
-      url += `#/?type=${type}&id=${id}`;
-    }
-
-    return url;
   }
 }
 
@@ -849,6 +815,33 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const locale = i18nService.state.locale;
     // eslint-disable-next-line
     return `https://${this.hostsService.streamlabs}/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}&l=${locale}&hidenav=${hideNav}`;
+  }
+
+  async alertboxLibraryUrl(id?: string) {
+    const uiTheme = this.customizationService.views.isDarkTheme ? 'night' : 'day';
+    let url = `https://${this.hostsService.streamlabs}/alert-box-themes?mode=${uiTheme}&slobs`;
+
+    if (id) url += `&id=${id}`;
+
+    return await this.magicLinkService.actions.return.getMagicSessionUrl(url);
+  }
+
+  async overlaysUrl(type?: 'overlay' | 'widget-themes' | 'site-themes', id?: string) {
+    const uiTheme = this.customizationService.views.isDarkTheme ? 'night' : 'day';
+
+    let url = `https://${this.hostsService.streamlabs}/library`;
+
+    if (type && !id) {
+      url += `/${type}`;
+    }
+
+    url += `?mode=${uiTheme}&slobs`;
+
+    if (type && id) {
+      url += `#/?type=${type}&id=${id}`;
+    }
+
+    return await this.magicLinkService.actions.return.getMagicSessionUrl(url);
   }
 
   getDonationSettings() {

@@ -87,7 +87,7 @@ export default function FeaturesNav() {
     setCurrentMenuItem: SideNavService.actions.setCurrentMenuItem,
     tabs: LayoutService.state.tabs,
     loggedIn: UserService.views.isLoggedIn,
-    menu: SideNavService.views.state[ENavName.TopNav],
+    menu: SideNavService.state[ENavName.TopNav],
     compactView: SideNavService.views.compactView,
     isOpen: SideNavService.views.isOpen,
     openMenuItems: SideNavService.views.getExpandedMenuItems(ENavName.TopNav),
@@ -123,14 +123,6 @@ export default function FeaturesNav() {
   const studioModeItem = useMemo(() => {
     return menu.menuItems.find(menuItem => menuItem.key === EMenuItemKey.StudioMode);
   }, []);
-
-  const studioTabs = Object.keys(tabs).map((tab, i) => ({
-    key: tab,
-    target: tab,
-    title: i === 0 || !tabs[tab].name ? menuTitles('Editor') : tabs[tab].name,
-    icon: tabs[tab].icon,
-    trackingTarget: tab === 'default' ? 'editor' : 'custom',
-  }));
 
   /*
    * Theme audit will only ever be enabled on individual accounts or enabled
