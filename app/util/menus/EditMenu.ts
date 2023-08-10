@@ -235,22 +235,6 @@ export class EditMenu extends Menu {
         click: () => {
           // if scene items are selected than remove the selection
           if (this.options.showSceneItemMenu) {
-            // for dual output scenes, also remove the partner node
-            // so update the selection before removing
-            if (this.dualOutputService.views.hasNodeMap(this.scene.id)) {
-              let ids = this.selectionService.views.globalSelection.getIds();
-              const updatedIds = new Set(ids);
-              ids.forEach(id => {
-                const dualOutputNodeId = this.dualOutputService.views.getDualOutputNodeId(id);
-                if (dualOutputNodeId && !updatedIds.has(dualOutputNodeId)) {
-                  updatedIds.add(dualOutputNodeId);
-                }
-              });
-
-              ids = Array.from(updatedIds);
-              this.selectionService.views.globalSelection.select(ids);
-            }
-
             this.selectionService.actions.removeSelected();
           } else {
             // if no items are selected we are in the MixerSources context menu
