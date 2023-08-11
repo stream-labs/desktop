@@ -47,6 +47,7 @@ export class EditMenu extends Menu {
   @Inject() private dualOutputService: DualOutputService;
 
   private scene = this.scenesService.views.getScene(this.options.selectedSceneId);
+  private showProjectionMenuItem = true;
 
   private readonly source: Source;
 
@@ -61,6 +62,11 @@ export class EditMenu extends Menu {
     ) {
       this.source = this.selectionService.views.globalSelection.getItems()[0].getSource();
     }
+
+    // Selective recording can only be used with horizontal sources
+    this.showProjectionMenuItem =
+      this.options?.display !== 'vertical' &&
+      !this.selectionService.views.globalSelection.getItems('vertical').length;
 
     this.appendEditMenuItems();
   }
@@ -333,7 +339,9 @@ export class EditMenu extends Menu {
 
     this.append({ type: 'separator' });
 
-    this.append({ label: $t('Projector'), submenu: this.projectorSubmenu().menu });
+    if (this.showProjectionMenuItem) {
+      this.append({ label: $t('Projector'), submenu: this.projectorSubmenu().menu });
+    }
 
     this.append({
       label: $t('Performance Mode'),
