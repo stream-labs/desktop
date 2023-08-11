@@ -6,7 +6,6 @@ import { Source } from 'services/sources';
 import { ReorderNodesCommand, EPlaceType } from './reorder-nodes';
 import { $t } from 'services/i18n';
 import { ISceneItemSettings } from 'services/api/external-api/scenes';
-import { VideoSettingsService } from 'services/settings-v2';
 
 // Removing and recreating a source is a very complex event.
 // We can save a lot of time by leveraging the scene collection system.
@@ -31,7 +30,6 @@ class SourceReviver extends SourcesNode {
  */
 export class RemoveItemCommand extends Command {
   @Inject() private scenesService: ScenesService;
-  @Inject() private videoSettingsService: VideoSettingsService;
 
   private sceneId: string;
   private sourceId: string;
@@ -53,6 +51,10 @@ export class RemoveItemCommand extends Command {
 
   async execute() {
     const item = this.scenesService.views.getSceneItem(this.sceneItemId);
+
+    console.log('removing ', this.sceneItemId);
+    console.log('item ', item);
+    console.log('item display ', item?.display);
 
     const scene = this.scenesService.views.getScene(item.sceneId);
     this.sceneId = item.sceneId;

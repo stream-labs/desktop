@@ -123,6 +123,11 @@ export class Selection {
     return this.getScene().getSelection(this.getIds());
   }
 
+  addVerticalItems(): Selection {
+    const verticalItems = this.getItems('vertical');
+    return this.add(verticalItems);
+  }
+
   /**
    * Return items with the order as in the scene
    *

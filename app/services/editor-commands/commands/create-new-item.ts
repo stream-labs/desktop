@@ -53,6 +53,7 @@ export class CreateNewItemCommand extends Command {
       .createAndAddSource(this.name, this.type, this.settings, this.options);
 
     if (this.dualOutputService.views.hasNodeMap(this.sceneId)) {
+      console.log('create vertical node ', this.sceneId);
       Promise.resolve(
         this.dualOutputService.actions.return.createOrAssignOutputNode(
           item,
