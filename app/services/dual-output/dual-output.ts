@@ -294,6 +294,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
      * due to API restrictions. For now, toggle it off when switching to dual output mode.
      */
     this.sceneCollectionsService.collectionSwitched.subscribe(() => {
+      this.convertSceneSources(this.scenesService.views.activeSceneId);
+
       if (this.state.isLoading) {
         this.setIsCollectionOrSceneLoading(false);
       }
@@ -347,6 +349,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    * @param sceneId - Id of the scene to map
    */
   confirmOrCreateVerticalNodes(sceneId: string) {
+    this.convertSceneSources(sceneId);
     if (!this.views.hasNodeMap(sceneId) && this.state.dualOutputMode) {
       try {
         this.createSceneNodes(sceneId);
@@ -359,6 +362,13 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       } catch (error: unknown) {
         console.error('Error toggling Dual Output mode: ', error);
       }
+    }
+  }
+
+  convertSceneSources(sceneId: string) {
+    const sceneSources = this.scenesService.views.sceneSourcesForScene(sceneId);
+    if (sceneSources.length > 0) {
+      sceneSources.forEach(scene => this.confirmOrCreateVerticalNodes(scene.sourceId));
     }
   }
 
@@ -428,6 +438,9 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     isHorizontalDisplay: boolean,
     sceneId?: string,
   ) {
+    if (sceneItem.type === 'scene') {
+      this.confirmOrCreateVerticalNodes(sceneItem.sourceId);
+    }
     if (isHorizontalDisplay) {
       // if it's the first display, just assign the scene item's output to a context
       this.assignNodeContext(sceneItem, display);

@@ -176,6 +176,12 @@ class ScenesViews extends ViewHandler<IScenesState> {
     return new Scene(sceneModel.id);
   }
 
+  sceneSourcesForScene(sceneId: string): SceneItem[] {
+    const scene = this.getScene(sceneId);
+    if (!scene) return [];
+    return scene.getItems().filter(sceneItem => sceneItem.type === 'scene');
+  }
+
   get activeSceneId() {
     return this.state.activeSceneId;
   }
