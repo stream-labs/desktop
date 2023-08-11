@@ -499,7 +499,10 @@ export class SourceSelectorModule {
     this.streamingService.actions.setSelectiveRecording(
       !this.streamingService.state.selectiveRecording,
     );
-    this.dualOutputService.actions.toggleDisplay(false, 'vertical');
+    if (!this.selectiveRecordingEnabled && this.isDualOutputActive) {
+      this.dualOutputService.actions.toggleDisplay(false, 'vertical');
+      this.selectionService.views.globalSelection.filterDualOutputNodes();
+    }
   }
 
   cycleSelectiveRecording(sceneNodeId: string) {

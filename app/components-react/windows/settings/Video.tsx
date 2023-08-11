@@ -434,16 +434,29 @@ class VideoSettingsModule {
   setShowDualOutput() {
     if (Services.StreamingService.views.isMidStreamMode) {
       message.error({
-        content: $t('Cannot toggle dual output while live.'),
+        content: $t('Cannot toggle Dual Output while live.'),
       });
     } else if (Services.TransitionsService.views.studioMode) {
       message.error({
-        content: $t('Cannot toggle dual output while in studio mode.'),
+        content: $t('Cannot toggle Dual Output while in Studio Mode.'),
       });
     } else {
+      // toggle dual output
       this.dualOutputService.actions.setdualOutputMode();
       this.state.setShowDualOutputSettings(!this.state.showDualOutputSettings);
       Services.UsageStatisticsService.recordFeatureUsage('DualOutput');
+
+      // show warning message if selective recording is active
+      if (
+        Services.StreamingService.state.selectiveRecording &&
+        !this.dualOutputService.views.dualOutputMode
+      ) {
+        message.warning({
+          content: $t(
+            'Dual Output enabled. Selective Recording only works with horizontal sources.',
+          ),
+        });
+      }
     }
   }
 

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useMemo } from 'react';
 import cx from 'classnames';
-import { Dropdown, Tooltip, Tree, message } from 'antd';
+import { Dropdown, Tooltip as AntdTooltip, Tree, message } from 'antd';
+import Tooltip from 'components-react/shared/Tooltip';
 import { DownOutlined } from '@ant-design/icons';
 import * as remote from '@electron/remote';
 import { Menu } from 'util/menus/Menu';
@@ -213,12 +214,17 @@ function SceneSelector() {
             <span className={styles.activeScene}>{activeCollection?.name}</span>
           </span>
         </Dropdown>
-        <Tooltip title={$t('Add a new Scene.')} placement="bottomLeft">
+        <AntdTooltip title={$t('Add a new Scene.')} placement="bottomLeft">
           <i className="icon-add-circle icon-button icon-button--lg" onClick={addScene} />
-        </Tooltip>
+        </AntdTooltip>
 
         {v.showDualOutput && (
-          <Tooltip id="toggle-horizontal-tooltip" title={horizontalTooltip} placement="bottomRight">
+          <Tooltip
+            id="toggle-horizontal-tooltip"
+            title={horizontalTooltip}
+            className={styles.displayToggle}
+            placement="bottomRight"
+          >
             <i
               id="horizontal-display-toggle"
               onClick={() => {
@@ -238,7 +244,13 @@ function SceneSelector() {
         )}
 
         {v.showDualOutput && (
-          <Tooltip id="toggle-vertical-tooltip" title={verticalTooltip} placement="bottomRight">
+          <Tooltip
+            id="toggle-vertical-tooltip"
+            title={verticalTooltip}
+            className={styles.displayToggle}
+            placement="bottomRight"
+            disabled={v.selectiveRecording}
+          >
             <i
               id="vertical-display-toggle"
               onClick={() => {
@@ -253,15 +265,16 @@ function SceneSelector() {
                 }
               }}
               className={cx('icon-phone-case icon-button icon-button--lg', {
-                active: v.isVertical,
+                active: v.isVertical && !v.selectiveRecording,
+                disabled: v.selectiveRecording,
               })}
             />
           </Tooltip>
         )}
 
-        <Tooltip title={$t('Edit Scene Transitions.')} placement="bottomRight">
+        <AntdTooltip title={$t('Edit Scene Transitions.')} placement="bottomRight">
           <i className="icon-transition icon-button icon-button--lg" onClick={showTransitions} />
-        </Tooltip>
+        </AntdTooltip>
       </div>
       <Scrollable style={{ height: '100%' }} className={styles.scenesContainer}>
         <Tree
@@ -289,14 +302,12 @@ function SceneSelector() {
 }
 
 function TreeNode(p: { scene: IScene; removeScene: (scene: IScene) => void }) {
-  const { ScenesService, EditorCommandsService } = Services;
-
   return (
     <div className={styles.sourceTitleContainer} data-name={p.scene.name} data-role="scene">
       <span className={styles.sourceTitle}>{p.scene.name}</span>
-      <Tooltip title={$t('Remove Scene.')} placement="left">
+      <AntdTooltip title={$t('Remove Scene.')} placement="left">
         <i onClick={() => p.removeScene(p.scene)} className="icon-trash" />
-      </Tooltip>
+      </AntdTooltip>
     </div>
   );
 }

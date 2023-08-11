@@ -15,7 +15,7 @@ interface IConfigStepPresentation {
 
 export function Optimize() {
   const { AutoConfigService, RecordingModeService } = Services;
-  const [optimizing, setOptimizing] = useState(false);
+  const [optimizingState, setOptimizingState] = useState<'initial' | 'running' | 'error'>('initial');
   const [stepInfo, setStepInfo] = useState<IConfigStepPresentation | null>(null);
   const steps = [
     'detecting_location',
@@ -29,7 +29,7 @@ export function Optimize() {
     'saving_settings',
   ];
   const percentage =
-    optimizing && stepInfo ? (steps.indexOf(stepInfo.description) + 1) / steps.length : 0;
+    optimizingState === 'running' && stepInfo ? (steps.indexOf(stepInfo.description) + 1) / steps.length : 0;
   const { setProcessing, next } = useModule(OnboardingModule);
 
   function summaryForStep(progress: IConfigProgress) {
@@ -47,7 +47,7 @@ export function Optimize() {
   }
 
   function optimize() {
-    setOptimizing(true);
+    setOptimizingState('running');
     setProcessing(true);
 
     const sub = AutoConfigService.configProgress.subscribe(progress => {
@@ -70,7 +70,10 @@ export function Optimize() {
         sub.unsubscribe();
         next();
       } else {
+        console.error("AutoConfigService error:", progress.description);
         setProcessing(false);
+        sub.unsubscribe();
+        setOptimizingState('error');
       }
     });
 
@@ -79,17 +82,25 @@ export function Optimize() {
       : AutoConfigService.actions.start();
   }
 
+  function closeOnError() {
+    next();
+  }
+
   return (
     <div>
       <h1 className={commonStyles.titleContainer}>
-        {optimizing ? $t('Optimizing...') : $t('Optimize')}
+        {optimizingState === 'running' ? $t('Optimizing...') : (optimizingState === 'initial' ? $t('Optimize') : $t('Error'))}
       </h1>
-      <div style={{ width: '60%', margin: 'auto', textAlign: 'center' }}>
-        {$t(
-          "Click below and we'll analyze your internet speed and computer hardware to give you the best settings possible.",
-        )}
-      </div>
-      {optimizing ? (
+      {(optimizingState === 'initial' || optimizingState === 'error') && (
+        <div style={{ width: '60%', margin: 'auto', textAlign: 'center' }}>
+          {optimizingState === 'initial' ? $t(
+            "Click below and we'll analyze your internet speed and computer hardware to give you the best settings possible.",
+          ): $t(
+            "An error has occurred during optimization attempt. Only default settings are applied",
+          )}
+        </div>
+      )}
+      {optimizingState === 'running' ? (
         <div style={{ margin: 'auto', marginTop: 24, width: '80%' }}>
           <AutoProgressBar percent={percentage * 100} timeTarget={1000 * 60} />
           <span>{stepInfo && stepInfo.summary}</span>
@@ -97,10 +108,10 @@ export function Optimize() {
       ) : (
         <button
           className={commonStyles.optionCard}
-          onClick={optimize}
+          onClick={() => optimizingState === 'initial' ? optimize() : closeOnError()}
           style={{ margin: 'auto', marginTop: 24 }}
         >
-          <h2 style={{ color: 'var(--action-button-text)' }}>{$t('Start')}</h2>
+          <h2 style={{ color: 'var(--action-button-text)' }}>{optimizingState === 'initial' ? $t('Start') : $t('Ok')}</h2>
         </button>
       )}
     </div>

@@ -652,11 +652,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
   },
   [WidgetType.MediaShare]: {
     name: $t('Media Share'),
-    description: $t(
-      'Please note that when advanced media share is enabled,' +
-        ' media will no longer play through your alert box widget.' +
-        ' Media will only play through this media share widget.',
-    ),
+    description: $t('Allow your viewers to donate to share media on your stream.'),
     demoVideo: false,
     demoFilename: 'media.png',
     supportList: [],

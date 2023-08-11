@@ -1,6 +1,6 @@
 {
   "Source: %{sourceName}": "Kaynak: %{sourceName}",
-  "Collab Cam": "İş Birliği Kamerası",
+  "Collab Cam": "Collab Cam",
   "Invite a guest to join your stream from a web browser.": "Bir web tarayıcısından yayınınıza katılması için bir konuk davet edin.",
   "Guest Cam is currently listening for connecting guests, but is not broadcasting your microphone and webcam to your guests yet.": "Konuk Kamerası şu anda bağlanan konukları dinliyor ancak mikrofonunuz ve web kameranız henüz konuklarınıza açık değil.",
   "No microphone source is selected. Your guest will not be able to hear you.": "Mikrofon kaynağı seçilmedi. Konuğunuz sizi duyamaz.",

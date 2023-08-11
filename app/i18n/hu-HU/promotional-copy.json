@@ -70,5 +70,6 @@
   "No Watermark + 1080p/60fps + More": "Nincs vízjel + 1080p/60fps + több",
   "1 Hour Videos + 250GB Storage + More": "1 órás videók + 250 GB tárhely + több",
   "Highest Profit Margins": "Highest Profit Margins",
-  "%{monthlyPrice}/mo or %{yearlyPrice}/year": "%{monthlyPrice}/hó vagy %{yearlyPrice}/év"
+  "%{monthlyPrice}/mo or %{yearlyPrice}/year": "%{monthlyPrice}/hó vagy %{yearlyPrice}/év",
+  "Text-based editing of VOD content": "Text-based editing of VOD content"
 }
