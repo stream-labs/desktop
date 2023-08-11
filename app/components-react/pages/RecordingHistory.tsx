@@ -147,7 +147,7 @@ export default function RecordingHistory() {
           <span
             className={styles.action}
             key={opt.value}
-            style={{ color: `var(--${opt.value === 'youtube' ? 'button' : opt.value})` }}
+            style={{ color: `var(--${opt.value === 'youtube' ? 'title' : opt.value})` }}
             onClick={() => handleSelect(p.filename, opt.value)}
           >
             <i className={opt.icon} />
