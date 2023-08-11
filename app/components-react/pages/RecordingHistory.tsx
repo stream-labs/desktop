@@ -48,7 +48,7 @@ class RecordingHistoryModule {
       {
         label: $t('Clip'),
         value: 'crossclip',
-        icon: 'icon-crossclip',
+        icon: 'icon-editor-7',
       },
       {
         label: $t('Transcribe'),
