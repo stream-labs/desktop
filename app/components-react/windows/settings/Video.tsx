@@ -137,6 +137,7 @@ class VideoSettingsModule {
       scaleType: {
         type: 'list',
         label: $t('Downscale Filter'),
+        onChange: (val: EScaleType) => this.setScaleType(val),
         options: [
           {
             label: $t('Bilinear (Fastest, but blurry if scaling)'),
@@ -310,6 +311,23 @@ class VideoSettingsModule {
       this.state.setCustomBaseRes(value);
     } else {
       this.state.setCustomOutputRes(value);
+    }
+  }
+
+  /**
+   * Sets the Scale Type
+   * @remark set the same FPS type for both displays
+   * If there is a vertical context, update it as well.
+   * Otherwise, update the vertical display persisted settings.
+   */
+
+  setScaleType(value: EScaleType) {
+    this.service.actions.setVideoSetting('scaleType', value, 'horizontal');
+
+    if (this.service.contexts.vertical) {
+      this.service.actions.setVideoSetting('scaleType', value, 'vertical');
+    } else {
+      this.dualOutputService.actions.setVideoSetting({ scaleType: value }, 'vertical');
     }
   }
 

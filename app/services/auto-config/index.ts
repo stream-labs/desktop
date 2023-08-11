@@ -60,6 +60,21 @@ export class AutoConfigService extends Service {
       return;
     }
 
+    /**
+     * Using the optimizer when two contexts are active is tricky because the optimizer
+     * works with the last context created. If the app has opened a dual output scene at any
+     * point during the current session, the vertical context exists. The optimizer
+     * should only run on the horizontal context. Until output settings and streaming are migrated,
+     * some non-optimal trickery is necessary.
+     *
+     * By design, the only difference in settings between the horizontal and vertical contexts is
+     * the base width/height and output width/height. So before running the optimizer,
+     * confirm that horizontal base width/height and output width/height are on the Video property.
+     */
+    if (this.videoSettingsService.contexts?.vertical) {
+      this.videoSettingsService.confirmVideoSettingDimensions();
+    }
+
     obs.NodeObs.InitializeAutoConfig(
       (progress: IConfigProgress) => {
         this.handleProgress(progress);
@@ -105,7 +120,9 @@ export class AutoConfigService extends Service {
 
     if (progress.event === 'done') {
       obs.NodeObs.TerminateAutoConfig();
-      this.videoSettingsService.loadLegacySettings();
+
+      // apply optimized settings to the video contexts
+      this.videoSettingsService.migrateAutoConfigSettings();
     }
   }
 
@@ -116,7 +133,8 @@ export class AutoConfigService extends Service {
       } else {
         obs.NodeObs.TerminateAutoConfig();
 
-        this.videoSettingsService.loadLegacySettings();
+        // apply optimized settings to the video contexts
+        this.videoSettingsService.migrateAutoConfigSettings();
         debounce(() => this.configProgress.next({ ...progress, event: 'done' }), 1000)();
       }
     }
