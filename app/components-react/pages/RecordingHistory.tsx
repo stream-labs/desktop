@@ -68,7 +68,7 @@ class RecordingHistoryModule {
   }
 
   postError(message: string) {
-    this.NotificationsService.push({
+    this.NotificationsService.actions.push({
       message,
       type: ENotificationType.WARNING,
       lifeTime: 5000,
@@ -77,12 +77,12 @@ class RecordingHistoryModule {
 
   connectSLID() {
     this.OnboardingService.actions.start({ isLogin: true });
-    this.WindowsService.closeChildWindow();
+    this.WindowsService.actions.closeChildWindow();
   }
 
   handleSelect(filename: string, platform: string) {
     if (this.uploadInfo.uploading) {
-      message.error($t('Upload already in progress'), 5);
+      this.postError($t('Upload already in progress'));
       return;
     }
     if (platform === 'youtube') return this.uploadToYoutube(filename);
