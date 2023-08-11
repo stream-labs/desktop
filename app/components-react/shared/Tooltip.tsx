@@ -19,6 +19,7 @@ type TTipPosition =
 
 interface ITooltipTipProps {
   title: string;
+  id?: string;
   className?: HTMLAttributes<HTMLElement> | string;
   style?: CSSProperties;
   lightShadow?: boolean;
@@ -28,11 +29,22 @@ interface ITooltipTipProps {
 }
 
 export default function Tooltip(props: PropsWithChildren<ITooltipTipProps>) {
-  const { title, className, style, lightShadow, placement = 'bottom', content, disabled } = props;
+  const {
+    title,
+    id,
+    className = undefined,
+    style,
+    lightShadow,
+    placement = 'bottom',
+    content,
+    disabled = false,
+  } = props;
 
   return (
-    <div className={cx(styles.tooltipWrapper, className)}>
-      <div className={cx(styles.tooltipArrow)} />
+    <div
+      id={id}
+      className={className ? cx(className, styles.tooltipWrapper) : styles.tooltipWrapper}
+    >
       {disabled ? (
         <>
           {content}
@@ -40,12 +52,12 @@ export default function Tooltip(props: PropsWithChildren<ITooltipTipProps>) {
         </>
       ) : (
         <AntdTooltip
-          className={cx({ [styles.lightShadow]: lightShadow })}
+          className={cx(styles.tooltipArrow, { [styles.lightShadow]: lightShadow })}
           placement={placement}
           title={title}
           style={style}
           getPopupContainer={triggerNode => triggerNode}
-          mouseLeaveDelay={0.3}
+          mouseLeaveDelay={0.1}
           trigger={['hover', 'focus', 'click']}
         >
           {content}

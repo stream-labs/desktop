@@ -294,10 +294,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
      * due to API restrictions. For now, toggle it off when switching to dual output mode.
      */
     this.sceneCollectionsService.collectionSwitched.subscribe(() => {
-      if (this.state.dualOutputMode && this.streamingService.state.selectiveRecording) {
-        this.streamingService.actions.setSelectiveRecording(false);
-      }
-
       this.convertSceneSources(this.scenesService.views.activeSceneId);
 
       if (this.state.isLoading) {
@@ -335,7 +331,14 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
     if (this.state.dualOutputMode) {
       this.confirmOrCreateVerticalNodes(this.views.activeSceneId);
-      this.toggleDisplay(true, 'vertical');
+
+      /**
+       * Selective recording only works with horizontal sources, so don't show the
+       * vertical display if toggling with selective recording active
+       */
+      if (!this.streamingService.state.selectiveRecording) {
+        this.toggleDisplay(true, 'vertical');
+      }
     } else {
       this.selectionService.views.globalSelection.reset();
     }
