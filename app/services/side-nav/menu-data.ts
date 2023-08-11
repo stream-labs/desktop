@@ -120,7 +120,7 @@ export const menuTitles = (item: EMenuItemKey | ESubMenuItemKey | string) => {
     [EMenuItemKey.Themes]: $t('Themes'),
     [EMenuItemKey.AppStore]: $t('App Store'),
     [EMenuItemKey.Highlighter]: $t('Highlighter'),
-    [EMenuItemKey.RecordingHistory]: $t('Recording History'),
+    [EMenuItemKey.RecordingHistory]: $t('Recordings'),
     [EMenuItemKey.ThemeAudit]: $t('Theme Audit'),
     [EMenuItemKey.DevTools]: 'Dev Tools',
     [EMenuItemKey.GetPrime]: $t('Get Ultra'),
