@@ -294,10 +294,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
      * due to API restrictions. For now, toggle it off when switching to dual output mode.
      */
     this.sceneCollectionsService.collectionSwitched.subscribe(() => {
-      if (this.state.dualOutputMode && this.streamingService.state.selectiveRecording) {
-        this.streamingService.actions.setSelectiveRecording(false);
-      }
-
       if (this.state.isLoading) {
         this.setIsCollectionOrSceneLoading(false);
       }
