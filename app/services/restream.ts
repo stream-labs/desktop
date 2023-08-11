@@ -106,10 +106,12 @@ export class RestreamService extends StatefulService<IRestreamState> {
       const videoId = fbView.state.settings.liveVideoId;
       const token = fbView.getDestinationToken();
       fbParams = `&fbVideoId=${videoId}`;
-      // all destinations except "page" require a token
-      if (fbView.state.settings.destinationType !== 'page') {
-        fbParams += `&fbToken=${token}`;
-      }
+      /*
+       * The chat widget on core still passes fbToken to Facebook comments API.
+       * Not sure if this has always been the case but assuming null for pages is no
+       * longer allowed.
+       */
+      fbParams += `&fbToken=${token}`;
     }
     return `https://${this.host}/embed/chat?oauth_token=${this.userService.apiToken}${fbParams}`;
   }

@@ -39,11 +39,13 @@ import Utils from 'services/utils';
 import * as remote from '@electron/remote';
 import { GuestCamNode } from './nodes/guest-cam';
 import { DualOutputService } from 'services/dual-output';
+import { NodeMapNode } from './nodes/node-map';
 
 const uuid = window['require']('uuid/v4');
 
 export const NODE_TYPES = {
   RootNode,
+  NodeMapNode,
   SourcesNode,
   ScenesNode,
   SceneItemsNode,
@@ -737,10 +739,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
           .catch(e => console.warn('Failed setting active collection'));
       }
 
-      if (!collection.hasOwnProperty('sceneNodeMaps')) {
-        collection.sceneNodeMaps = {};
-      }
-
       this.stateService.SET_ACTIVE_COLLECTION(id);
     }
   }
@@ -953,7 +951,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   initNodeMaps(sceneNodeMap?: { [sceneId: string]: Dictionary<string> }) {
     if (!this.activeCollection) return;
 
-    this.activeCollection.sceneNodeMaps = sceneNodeMap ?? {};
+    this.stateService.initNodeMaps(sceneNodeMap);
   }
 
   /**

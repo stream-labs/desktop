@@ -11,8 +11,7 @@ import { Inject } from 'services/core/injector';
 import { Subject } from 'rxjs';
 import { PlatformAppsService } from 'services/platform-apps';
 import { ScenesService } from 'services/scenes';
-import { AudioService, IAudioSource } from 'services/audio';
-import path from 'path';
+import { AudioService } from 'services/audio';
 
 interface ISourceFlags {
   audio: boolean;

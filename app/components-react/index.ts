@@ -64,7 +64,7 @@ import PlatformAppPageView from './shared/PlatformAppPageView';
 import PlatformAppPopOut from './windows/PlatformAppPopOut';
 import RecentEventsWindow from './windows/RecentEvents';
 import NewBadge from './shared/NewBadge';
-import RecordingHistory from './windows/RecordingHistory';
+import RecordingHistory from './pages/RecordingHistory';
 import UltraIcon from './shared/UltraIcon';
 import EditTransform from './windows/EditTransform';
 import InstalledApps from './windows/settings/InstalledApps';

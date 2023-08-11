@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import urlLib from 'url';
-import electron from 'electron';
 import { Service } from 'services';
 import { ENotificationType } from 'services/notifications';
 import { $t } from 'services/i18n';
@@ -26,6 +25,17 @@ export default function BrowseOverlays(p: {
     RestreamService,
   } = Services;
   const [downloading, setDownloading] = useState(false);
+  const [overlaysUrl, setOverlaysUrl] = useState('');
+
+  useEffect(() => {
+    async function getOverlaysUrl() {
+      const url = await UserService.actions.return.overlaysUrl(p.params?.type, p.params?.id);
+      if (!url) return;
+      setOverlaysUrl(url);
+    }
+
+    getOverlaysUrl();
+  }, [p.params?.type, p.params?.id]);
 
   function onBrowserViewReady(view: Electron.BrowserView) {
     new GuestApiHandler().exposeApi(view.webContents.id, {
@@ -123,10 +133,12 @@ export default function BrowseOverlays(p: {
       ),
     });
   }
+
+  if (!overlaysUrl) return <></>;
   return (
     <BrowserView
       onReady={onBrowserViewReady}
-      src={UserService.views.overlaysUrl(p.params?.type, p.params?.id)}
+      src={overlaysUrl}
       style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}
       enableGuestApi
       setLocale

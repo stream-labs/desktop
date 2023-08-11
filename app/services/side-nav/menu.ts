@@ -13,6 +13,7 @@ import {
   TMenuItems,
   EMenuItemKey,
   IMenuItem,
+  IParentMenuItem,
   SideNavMenuItems,
   ENavName,
   IMenu,
@@ -27,7 +28,6 @@ interface ISideNavServiceState {
   hasLegacyMenu: boolean;
   compactView: boolean;
   currentMenuItem: EMenuItemKey | string;
-  menuItems: TMenuItems;
   apps: IAppMenuItem[];
   [ENavName.TopNav]: IMenu;
   [ENavName.BottomNav]: IMenu;
@@ -94,7 +94,6 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
     hasLegacyMenu: true,
     currentMenuItem: EMenuItemKey.Editor,
     compactView: false,
-    menuItems: SideNavMenuItems(),
     apps: [null, null, null, null, null], // up to five apps may be displayed in the closed sidebar
     [ENavName.TopNav]: SideBarTopNavData(),
     [ENavName.BottomNav]: SideBarBottomNavData(),
@@ -105,7 +104,34 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
     this.userService.userLoginFinished.subscribe(() => this.handleUserLogin());
 
     this.handleDismissables();
-    this.platformAppsService.allAppsLoaded.subscribe(() => this.updateAllApps());
+
+    const allAppsLoaded = this.platformAppsService.allAppsLoaded.subscribe(
+      (loadedApps: ILoadedApp[]) => {
+        this.updateAllApps(loadedApps);
+        allAppsLoaded.unsubscribe();
+      },
+    );
+
+    const hasRecordingHistory = this.state[ENavName.TopNav].menuItems.find(
+      item => item.key === EMenuItemKey.RecordingHistory,
+    );
+
+    if (!hasRecordingHistory) {
+      // subtract 2 because the Theme Audit should always be the last menu item
+      const index = this.state[ENavName.TopNav].menuItems.length - 2;
+
+      // add the recording history to the array of menu items
+      const updatedMenuItems = [...this.state[ENavName.TopNav].menuItems].splice(
+        index,
+        0,
+        SideNavMenuItems()[EMenuItemKey.RecordingHistory],
+      );
+
+      // update the menu items
+      this.UPDATE_MENU_ITEMS(ENavName.TopNav, updatedMenuItems);
+    }
+
+    console.log(this.state[ENavName.TopNav]);
 
     this.state.currentMenuItem =
       this.layoutService.state.currentTab !== 'default'
@@ -206,8 +232,8 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
     this.TOGGLE_MENU_ITEM(navName, menuItemKey, status);
   }
 
-  updateAllApps() {
-    this.UPDATE_ALL_APPS(this.platformAppsService.views.enabledApps);
+  updateAllApps(loadedApps: ILoadedApp[]) {
+    this.UPDATE_ALL_APPS(loadedApps);
   }
 
   toggleApp(appId: string) {
@@ -244,6 +270,7 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
           { ...SideNavMenuItems()[EMenuItemKey.Themes], isActive: true },
           { ...SideNavMenuItems()[EMenuItemKey.AppStore], isActive: true },
           { ...SideNavMenuItems()[EMenuItemKey.Highlighter], isActive: true },
+          { ...SideNavMenuItems()[EMenuItemKey.RecordingHistory], isActive: true },
           { ...SideNavMenuItems()[EMenuItemKey.ThemeAudit], isActive: true },
         ],
       },
@@ -251,7 +278,10 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
         ...this.state[ENavName.BottomNav],
         menuItems: this.state[ENavName.BottomNav].menuItems.map((menuItem: IMenuItem) => {
           if (menuItem.key === EMenuItemKey.Dashboard) {
-            return { ...this.state.menuItems[EMenuItemKey.Dashboard], isExpanded: true };
+            return {
+              ...this.state[ENavName.BottomNav].menuItems[EMenuItemKey.Dashboard],
+              isExpanded: true,
+            };
           }
           return menuItem;
         }),
@@ -358,5 +388,20 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
   @mutation()
   private SET_CURRENT_MENU_ITEM(key: EMenuItemKey | string) {
     this.state.currentMenuItem = key;
+  }
+
+  /**
+   * Update menu items in the side nav
+   *
+   * @remark - because the rendered menu items are in an array, replace the entire array to update the menu
+   * @param navName - Name of the menu to update
+   * @param menuItems - Updated menu items
+   */
+  @mutation()
+  private UPDATE_MENU_ITEMS(navName: ENavName, menuItems: (IMenuItem | IParentMenuItem)[]) {
+    this.state[navName] = {
+      name: navName,
+      menuItems: [...menuItems],
+    };
   }
 }
