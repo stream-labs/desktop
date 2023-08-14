@@ -11,10 +11,12 @@ import {
   SharedStorageService,
   OnboardingService,
   WindowsService,
+  NotificationsService,
 } from 'app-services';
 import styles from './RecordingHistory.m.less';
 import AutoProgressBar from 'components-react/shared/AutoProgressBar';
 import { GetSLID } from 'components-react/highlighter/StorageUpload';
+import { ENotificationType } from 'services/notifications';
 
 class RecordingHistoryModule {
   private RecordingModeService = inject(RecordingModeService);
@@ -22,6 +24,7 @@ class RecordingHistoryModule {
   private SharedStorageService = inject(SharedStorageService);
   private OnboardingService = inject(OnboardingService);
   private WindowsService = inject(WindowsService);
+  private NotificationsService = inject(NotificationsService);
   state = injectState({ showSLIDModal: false });
 
   get recordings() {
@@ -43,31 +46,43 @@ class RecordingHistoryModule {
   get uploadOptions() {
     const opts = [
       {
-        label: $t('Convert to mobile-friendly short video'),
+        label: $t('Clip'),
         value: 'crossclip',
-        icon: 'icon-crossclip',
+        icon: 'icon-editor-7',
       },
       {
-        label: $t('Add subtitles, transcribe, and more'),
+        label: $t('Transcribe'),
         value: 'typestudio',
         icon: 'icon-mic',
       },
     ];
     if (this.hasYoutube) {
-      opts.push({ label: $t('YouTube (private video)'), value: 'youtube', icon: 'icon-youtube' });
+      opts.unshift({
+        label: $t('Upload'),
+        value: 'youtube',
+        icon: 'icon-youtube',
+      });
     }
 
     return opts;
   }
 
+  postError(message: string) {
+    this.NotificationsService.actions.push({
+      message,
+      type: ENotificationType.WARNING,
+      lifeTime: 5000,
+    });
+  }
+
   connectSLID() {
     this.OnboardingService.actions.start({ isLogin: true });
-    this.WindowsService.closeChildWindow();
+    this.WindowsService.actions.closeChildWindow();
   }
 
   handleSelect(filename: string, platform: string) {
     if (this.uploadInfo.uploading) {
-      message.error($t('Upload already in progress'), 5);
+      this.postError($t('Upload already in progress'));
       return;
     }
     if (platform === 'youtube') return this.uploadToYoutube(filename);
@@ -111,6 +126,7 @@ export default function RecordingHistory() {
     uploadOptions,
     handleSelect,
     uploadInfo,
+    postError,
   } = useModule(RecordingHistoryModule);
 
   useEffect(() => {
@@ -120,26 +136,37 @@ export default function RecordingHistory() {
       // We don't want to surface unexpected TS errors to the user
       !/TypeError/.test(uploadInfo.error)
     ) {
-      message.error(uploadInfo.error, 5);
+      postError(uploadInfo.error);
     }
   }, [uploadInfo.error]);
 
-  function MenuItems(p: { filename: string }) {
+  function UploadActions(p: { filename: string }) {
     return (
-      <Menu className={styles.menu}>
+      <span className={styles.actionGroup}>
         {uploadOptions.map(opt => (
-          <Menu.Item key={opt.value} onClick={() => handleSelect(p.filename, opt.value)}>
+          <span
+            className={styles.action}
+            key={opt.value}
+            style={{ color: `var(--${opt.value === 'youtube' ? 'title' : opt.value})` }}
+            onClick={() => handleSelect(p.filename, opt.value)}
+          >
             <i className={opt.icon} />
-            <span style={{ marginLeft: 8 }}>{opt.label}</span>
-          </Menu.Item>
+            &nbsp;
+            <span>{opt.label}</span>
+          </span>
         ))}
-      </Menu>
+      </span>
     );
   }
 
   return (
-    <ModalLayout hideFooter scrollable>
-      <h2>{$t('Recordings')}</h2>
+    <div className={styles.container}>
+      <h1>{$t('Recordings')}</h1>
+      <div style={{ marginBottom: 24 }}>
+        {$t(
+          'Record your screen with Streamlabs Desktop. Once recording is complete, it will be displayed here. Access your files or edit further with Streamlabs tools.',
+        )}
+      </div>
       <div className={styles.recordingsContainer} id="recordingHistory">
         {recordings.map(recording => (
           <div className={styles.recording} key={recording.timestamp}>
@@ -149,24 +176,13 @@ export default function RecordingHistory() {
                 {recording.filename}
               </span>
             </Tooltip>
-            {uploadOptions.length > 0 && (
-              <Dropdown
-                overlay={<MenuItems filename={recording.filename} />}
-                placement="bottomRight"
-                getPopupContainer={() => document.getElementById('recordingHistory')!}
-              >
-                <Button className={cx('button button--default', styles.uploadButton)}>
-                  {$t('Upload To')}
-                  <i className="icon-dropdown" />
-                </Button>
-              </Dropdown>
-            )}
+            {uploadOptions.length > 0 && <UploadActions filename={recording.filename} />}
           </div>
         ))}
       </div>
       <ExportModal />
       <SLIDModal />
-    </ModalLayout>
+    </div>
   );
 }
 
