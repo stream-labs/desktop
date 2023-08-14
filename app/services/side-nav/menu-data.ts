@@ -7,6 +7,8 @@ import { $t } from 'services/i18n';
  * 2. Add string title to menuTitles.
  * 3. Add an entry to SideNavMenuItems. Use the subMenuItems property to add submenu items from SideBarSubMenuItems to the menu item.
  * 4. To show the menu item, add it to either SideBarTopNavData or SideBarBottomNavData.
+ * 5. To show a menu item in the top nav to a logged out user, add it to loggedOutMenuItems.
+ * 6. To show a menu item in the top nav compact menu, add it to compactMenuItemKeys.
  */
 export enum EMenuItemKey {
   Editor = 'editor',
@@ -87,9 +89,11 @@ export interface IMenu {
   menuItems: (IMenuItem | IParentMenuItem)[];
 }
 
-export interface IMenuItem {
+interface ISideNavItem {
   key: TSideNavItem;
   target?: TSideNavItem; // optional because menu item could be a toggle
+}
+export interface IMenuItem extends ISideNavItem {
   type?: TExternalLinkType | string;
   trackingTarget?: string;
   icon?: string;
@@ -107,6 +111,21 @@ export enum ENavName {
   BottomNav = 'bottom-nav',
 }
 
+export const loggedOutMenuItems: ISideNavItem[] = [
+  {
+    key: EMenuItemKey.Editor,
+    target: 'Studio',
+  },
+  { key: EMenuItemKey.RecordingHistory, target: 'RecordingHistory' },
+];
+
+export const compactMenuItemKeys: EMenuItemKey[] = [
+  EMenuItemKey.Editor,
+  EMenuItemKey.Themes,
+  EMenuItemKey.AppStore,
+  EMenuItemKey.Highlighter,
+];
+
 /**
  * The string titles for the menu items and submenu items
  * @param item - key for the menu item
@@ -120,7 +139,7 @@ export const menuTitles = (item: EMenuItemKey | ESubMenuItemKey | string) => {
     [EMenuItemKey.Themes]: $t('Themes'),
     [EMenuItemKey.AppStore]: $t('App Store'),
     [EMenuItemKey.Highlighter]: $t('Highlighter'),
-    [EMenuItemKey.RecordingHistory]: $t('Recording History'),
+    [EMenuItemKey.RecordingHistory]: $t('Recordings'),
     [EMenuItemKey.ThemeAudit]: $t('Theme Audit'),
     [EMenuItemKey.DevTools]: 'Dev Tools',
     [EMenuItemKey.GetPrime]: $t('Get Ultra'),

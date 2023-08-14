@@ -48,7 +48,7 @@ class RecordingHistoryModule {
       {
         label: $t('Clip'),
         value: 'crossclip',
-        icon: 'icon-crossclip',
+        icon: 'icon-editor-7',
       },
       {
         label: $t('Transcribe'),
@@ -68,7 +68,7 @@ class RecordingHistoryModule {
   }
 
   postError(message: string) {
-    this.NotificationsService.push({
+    this.NotificationsService.actions.push({
       message,
       type: ENotificationType.WARNING,
       lifeTime: 5000,
@@ -77,12 +77,12 @@ class RecordingHistoryModule {
 
   connectSLID() {
     this.OnboardingService.actions.start({ isLogin: true });
-    this.WindowsService.closeChildWindow();
+    this.WindowsService.actions.closeChildWindow();
   }
 
   handleSelect(filename: string, platform: string) {
     if (this.uploadInfo.uploading) {
-      message.error($t('Upload already in progress'), 5);
+      this.postError($t('Upload already in progress'));
       return;
     }
     if (platform === 'youtube') return this.uploadToYoutube(filename);
@@ -147,7 +147,7 @@ export default function RecordingHistory() {
           <span
             className={styles.action}
             key={opt.value}
-            style={{ color: `var(--${opt.value === 'youtube' ? 'button' : opt.value})` }}
+            style={{ color: `var(--${opt.value === 'youtube' ? 'title' : opt.value})` }}
             onClick={() => handleSelect(p.filename, opt.value)}
           >
             <i className={opt.icon} />
