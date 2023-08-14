@@ -77,13 +77,17 @@ function ExtraSettings() {
     isDualOutputScene: DualOutputService.views.hasNodeMap(),
   }));
 
-  const canRunOptimizer =
-    // HDR Settings are not compliant with the auto-optimizer
-    !SettingsService.views.hasHDRSettings &&
-    isTwitch &&
-    !isRecordingOrStreaming &&
-    protectedMode &&
-    isSimpleOutputMode;
+  /**
+   * Temporarily disable optimizer until migrated to the new API
+   */
+  const canRunOptimizer = false;
+  // const canRunOptimizer =
+  // HDR Settings are not compliant with the auto-optimizer
+  // !SettingsService.views.hasHDRSettings &&
+  // isTwitch &&
+  // !isRecordingOrStreaming &&
+  // protectedMode &&
+  // isSimpleOutputMode;
 
   function restartStreamlabelsSession() {
     StreamlabelsService.restartSession().then(result => {
