@@ -256,14 +256,17 @@ export class Scene {
 
     if (fstat.isDirectory()) {
       if (this.dualOutputService.views.hasNodeMap()) {
-        // create horizontal folder
+        // create horizontal and vertical folders
         const horizontalFolder = this.createFolder(fname, { display: 'horizontal' });
-        if (folderId) horizontalFolder.setParent(folderId);
+        const verticalFolder = this.createFolder(fname, { display: 'vertical' });
 
         // create vertical folder
-        const verticalFolder = this.createFolder(fname, { display: 'vertical' });
-        const verticalFolderParentId = this.dualOutputService.views.getVerticalNodeId(folderId);
-        if (verticalFolderParentId) verticalFolder.setParent(verticalFolderParentId);
+        if (folderId) {
+          horizontalFolder.setParent(folderId);
+
+          const verticalFolderParentId = this.dualOutputService.views.getVerticalNodeId(folderId);
+          if (verticalFolderParentId) verticalFolder.setParent(verticalFolderParentId);
+        }
 
         // add entry to node map
         this.sceneCollectionsService.createNodeMapEntry(
@@ -291,9 +294,10 @@ export class Scene {
     const source = this.sourcesService.addFile(addPath);
     if (!source) return null;
     const item = this.addSource(source.sourceId, { display: 'horizontal' });
-    if (folderId) item.setParent(folderId);
-
-    if (this.dualOutputService.views.hasNodeMap) {
+    if (folderId) {
+      item.setParent(folderId);
+    }
+    if (this.dualOutputService.views.hasNodeMap()) {
       Promise.resolve(
         this.dualOutputService.actions.return.createOrAssignOutputNode(
           item,
@@ -304,7 +308,7 @@ export class Scene {
       ).then(node => {
         if (folderId) {
           const verticalFolderId = this.dualOutputService.views.getVerticalNodeId(folderId);
-          if (verticalFolderId) node.setParent(verticalFolderId);
+          if (node && verticalFolderId) node.setParent(verticalFolderId);
         }
         return node;
       });
