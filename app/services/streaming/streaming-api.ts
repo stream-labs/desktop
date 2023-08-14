@@ -52,7 +52,6 @@ export interface IStreamInfo {
     setupMultistream: TGoLiveChecklistItemState;
     setupDualOutput: TGoLiveChecklistItemState;
     startVideoTransmission: TGoLiveChecklistItemState;
-    postTweet: TGoLiveChecklistItemState;
   };
 }
 

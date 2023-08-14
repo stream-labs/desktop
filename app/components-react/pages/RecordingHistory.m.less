@@ -1,5 +1,12 @@
 @import "../../styles/index.less";
 
+.container {
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  width: 100%;
+}
+
 .recordings-container {
   display: flex;
   flex-direction: column;
@@ -8,18 +15,30 @@
 .recording {
   display: flex;
   align-items: center;
-  border-bottom: 1px solid var(--border);
-  padding: 8px;
+  padding: 16px;
+  border-radius: 4px;
 
   :global(.fa-youtube):hover {
     cursor: pointer;
   }
+
+  &:nth-child(odd) {
+    background: var(--section);
+  }
 }
 
-.menu {
-  border: 1px solid var(--border) !important;
-  padding: 8px;
-  border-radius: 4px;
+.action-group {
+  margin-left: auto;
+}
+
+.action {
+  margin-right: 16px;
+  font-weight: 500;
+
+  &:hover {
+    cursor: pointer;
+    text-decoration: underline;
+  }
 }
 
 .upload-button {
@@ -33,7 +52,7 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   display: block;
-  margin-left: auto;
+  margin-left: 24px;
   margin-right: 8px;
   overflow: hidden;
   direction: rtl;

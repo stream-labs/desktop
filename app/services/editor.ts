@@ -569,7 +569,9 @@ export class EditorService extends StatefulService<IEditorServiceState> {
    * @returns Boolean representing if the mouse is over the source
    */
   isOverSource(event: IMouseEvent, source: SceneItem) {
-    if (event.display !== source.display) return false;
+    if (event.display !== source.display) {
+      return false;
+    }
 
     const rect = new ScalableRectangle(source.rectangle);
     rect.normalize();
@@ -605,7 +607,9 @@ export class EditorService extends StatefulService<IEditorServiceState> {
       return this.resizeRegions.find(region => {
         // obs connects all of the scene items to each display, but only renders those assigned to the display's context
         // prevent these other scene items from being selectable when they are the opposite context
-        if (event.display !== region.item.display) return false;
+        if (event.display !== region.item.display) {
+          return false;
+        }
 
         const borderWidth = event.display === 'vertical' ? 20 : 0;
         return this.isOverBox(event, region.x, region.y, region.width, region.height, borderWidth);

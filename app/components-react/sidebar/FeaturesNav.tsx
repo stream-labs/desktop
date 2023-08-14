@@ -6,6 +6,7 @@ import {
   IParentMenuItem,
   TExternalLinkType,
   menuTitles,
+  compactMenuItemKeys,
 } from 'services/side-nav';
 import { $t } from 'services/i18n';
 import { EAvailableFeatures } from 'services/incremental-rollout';
@@ -31,7 +32,7 @@ export default function FeaturesNav() {
   }
 
   function navigate(page: TAppPage, trackingTarget?: string, type?: TExternalLinkType | string) {
-    if (!UserService.views.isLoggedIn && page !== 'Studio') return;
+    if (!UserService.views.isLoggedIn && !loggedOutMenuItemTargets.includes(page)) return;
 
     if (trackingTarget) {
       UsageStatisticsService.actions.recordClick('SideNav2', trackingTarget);
@@ -56,14 +57,12 @@ export default function FeaturesNav() {
     }
     setCurrentMenuItem(key ?? menuItem.key);
   }
-
   const {
     NavigationService,
     UserService,
     IncrementalRolloutService,
     UsageStatisticsService,
     SideNavService,
-    LayoutService,
     TransitionsService,
   } = Services;
 
@@ -71,7 +70,6 @@ export default function FeaturesNav() {
     featureIsEnabled,
     currentMenuItem,
     setCurrentMenuItem,
-    tabs,
     loggedIn,
     menu,
     compactView,
@@ -80,37 +78,35 @@ export default function FeaturesNav() {
     expandMenuItem,
     studioMode,
     showCustomEditor,
+    loggedOutMenuItemKeys,
+    loggedOutMenuItemTargets,
   } = useVuex(() => ({
     featureIsEnabled: (feature: EAvailableFeatures) =>
       IncrementalRolloutService.views.featureIsEnabled(feature),
     currentMenuItem: SideNavService.views.currentMenuItem,
     setCurrentMenuItem: SideNavService.actions.setCurrentMenuItem,
-    tabs: LayoutService.state.tabs,
     loggedIn: UserService.views.isLoggedIn,
-    menu: SideNavService.views.state[ENavName.TopNav],
+    menu: SideNavService.state[ENavName.TopNav],
     compactView: SideNavService.views.compactView,
     isOpen: SideNavService.views.isOpen,
     openMenuItems: SideNavService.views.getExpandedMenuItems(ENavName.TopNav),
     expandMenuItem: SideNavService.actions.expandMenuItem,
     studioMode: TransitionsService.views.studioMode,
     showCustomEditor: SideNavService.views.showCustomEditor,
+    loggedOutMenuItemKeys: SideNavService.views.loggedOutMenuItemKeys,
+    loggedOutMenuItemTargets: SideNavService.views.loggedOutMenuItemTargets,
   }));
 
   const menuItems = useMemo(() => {
     if (!loggedIn) {
-      return menu.menuItems.filter(menuItem => menuItem.key === EMenuItemKey.Editor);
+      return menu.menuItems.filter(menuItem =>
+        loggedOutMenuItemKeys.includes(menuItem.key as EMenuItemKey),
+      );
     }
     return !compactView
       ? menu.menuItems
       : menu.menuItems.filter((menuItem: IMenuItem) => {
-          if (
-            [
-              EMenuItemKey.Editor,
-              EMenuItemKey.Themes,
-              EMenuItemKey.AppStore,
-              EMenuItemKey.Highlighter,
-            ].includes(menuItem.key as EMenuItemKey)
-          ) {
+          if (compactMenuItemKeys.includes(menuItem.key as EMenuItemKey)) {
             return menuItem;
           }
         });
@@ -123,14 +119,6 @@ export default function FeaturesNav() {
   const studioModeItem = useMemo(() => {
     return menu.menuItems.find(menuItem => menuItem.key === EMenuItemKey.StudioMode);
   }, []);
-
-  const studioTabs = Object.keys(tabs).map((tab, i) => ({
-    key: tab,
-    target: tab,
-    title: i === 0 || !tabs[tab].name ? menuTitles('Editor') : tabs[tab].name,
-    icon: tabs[tab].icon,
-    trackingTarget: tab === 'default' ? 'editor' : 'custom',
-  }));
 
   /*
    * Theme audit will only ever be enabled on individual accounts or enabled

@@ -47,6 +47,7 @@ export class EditMenu extends Menu {
   @Inject() private dualOutputService: DualOutputService;
 
   private scene = this.scenesService.views.getScene(this.options.selectedSceneId);
+  private showProjectionMenuItem = true;
 
   private readonly source: Source;
 
@@ -61,6 +62,11 @@ export class EditMenu extends Menu {
     ) {
       this.source = this.selectionService.views.globalSelection.getItems()[0].getSource();
     }
+
+    // Selective recording can only be used with horizontal sources
+    this.showProjectionMenuItem =
+      this.options?.display !== 'vertical' &&
+      !this.selectionService.views.globalSelection.getItems('vertical').length;
 
     this.appendEditMenuItems();
   }
@@ -235,22 +241,6 @@ export class EditMenu extends Menu {
         click: () => {
           // if scene items are selected than remove the selection
           if (this.options.showSceneItemMenu) {
-            // for dual output scenes, also remove the partner node
-            // so update the selection before removing
-            if (this.dualOutputService.views.hasNodeMap(this.scene.id)) {
-              let ids = this.selectionService.views.globalSelection.getIds();
-              const updatedIds = new Set(ids);
-              ids.forEach(id => {
-                const dualOutputNodeId = this.dualOutputService.views.getDualOutputNodeId(id);
-                if (dualOutputNodeId && !updatedIds.has(dualOutputNodeId)) {
-                  updatedIds.add(dualOutputNodeId);
-                }
-              });
-
-              ids = Array.from(updatedIds);
-              this.selectionService.views.globalSelection.select(ids);
-            }
-
             this.selectionService.actions.removeSelected();
           } else {
             // if no items are selected we are in the MixerSources context menu
@@ -349,7 +339,9 @@ export class EditMenu extends Menu {
 
     this.append({ type: 'separator' });
 
-    this.append({ label: $t('Projector'), submenu: this.projectorSubmenu().menu });
+    if (this.showProjectionMenuItem) {
+      this.append({ label: $t('Projector'), submenu: this.projectorSubmenu().menu });
+    }
 
     this.append({
       label: $t('Performance Mode'),

@@ -14,7 +14,7 @@ import { DefaultHardwareService } from './hardware';
 import { RunInLoadingMode } from './app/app-decorators';
 import { byOS, OS } from 'util/operating-systems';
 import { JsonrpcService } from './api/jsonrpc';
-import { WindowsService, UsageStatisticsService, SharedStorageService } from 'app-services';
+import { NavigationService, UsageStatisticsService, SharedStorageService } from 'app-services';
 import { getPlatformService } from 'services/platforms';
 import { IYoutubeUploadResponse } from 'services/platforms/youtube/uploader';
 import { YoutubeService } from 'services/platforms/youtube';
@@ -63,7 +63,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
   @Inject() private notificationsService: NotificationsService;
   @Inject() private jsonrpcService: JsonrpcService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
-  @Inject() private windowsService: WindowsService;
+  @Inject() private navigationService: NavigationService;
   @Inject() private sharedStorageService: SharedStorageService;
 
   static defaultState: IRecordingModeState = {
@@ -206,11 +206,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
   }
 
   showRecordingHistory() {
-    this.windowsService.actions.showWindow({
-      componentName: 'RecordingHistory',
-      title: $t('Recording History'),
-      size: { width: 550, height: 600 },
-    });
+    this.navigationService.navigate('RecordingHistory');
   }
 
   async uploadToYoutube(filename: string) {
