@@ -427,6 +427,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     display: TDisplayType,
     isHorizontalDisplay: boolean,
     sceneId?: string,
+    verticalNodeId?: string,
   ) {
     if (isHorizontalDisplay) {
       // if it's the first display, just assign the scene item's output to a context
@@ -435,7 +436,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     } else {
       // if it's not the first display, copy the scene item
       const scene = this.scenesService.views.getScene(sceneId ?? this.views.activeSceneId);
-      const copiedSceneItem = scene.addSource(sceneItem.sourceId, { display });
+      const copiedSceneItem = scene.addSource(sceneItem.sourceId, { id: verticalNodeId, display });
 
       if (!copiedSceneItem) return null;
 

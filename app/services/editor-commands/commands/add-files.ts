@@ -2,12 +2,15 @@ import { Command } from './command';
 import { $t } from 'services/i18n';
 import { CreateNewItemCommand } from './create-new-item';
 import { Inject } from '../../core';
-import { ScenesService } from '../../scenes';
+import { ScenesService, TSceneNode } from '../../scenes';
 import { CreateFolderCommand } from './create-folder';
 import { RemoveNodesCommand } from './remove-nodes';
+import { DualOutputService } from 'services/dual-output';
 
 export class AddFilesCommand extends Command {
   @Inject() private scenesService: ScenesService;
+  @Inject() private dualOutputService: DualOutputService;
+
   private addNodesSubCommands: (CreateNewItemCommand | CreateFolderCommand)[];
   private removeNodesSubCommand: RemoveNodesCommand;
 
@@ -31,9 +34,10 @@ export class AddFilesCommand extends Command {
       // because the editor command handles them when undoing/redoing
       this.addNodesSubCommands = addedNodes
         .filter(node => node?.display === 'horizontal')
-        .map(node => {
+        .map((node: TSceneNode) => {
           if (node.isItem()) {
             const source = node.getSource();
+            const verticalNodeId = this.dualOutputService.views.getVerticalNodeId(node.id);
             return new CreateNewItemCommand(
               this.sceneId,
               source.name,
@@ -43,30 +47,11 @@ export class AddFilesCommand extends Command {
                 id: node.id,
                 sourceAddOptions: { sourceId: source.sourceId },
               },
+              verticalNodeId,
             );
           }
           return new CreateFolderCommand(this.sceneId, node.name);
         });
-      // const addedNodes = scene.getSelection().getInverted();
-
-      // console.log('addedNodes ', addedNodes);
-
-      // this.addNodesSubCommands = addedNodes.map(node => {
-      //   if (node.isItem()) {
-      //     const source = node.getSource();
-      //     return new CreateNewItemCommand(
-      //       this.sceneId,
-      //       source.name,
-      //       source.type,
-      //       source.getSettings(),
-      //       {
-      //         id: node.id,
-      //         sourceAddOptions: { sourceId: source.sourceId },
-      //       },
-      //     );
-      //   }
-      //   return new CreateFolderCommand(this.sceneId, node.name);
-      // });
       this.removeNodesSubCommand = new RemoveNodesCommand(scene.getSelection(addedNodes));
     } else {
       // redo logic

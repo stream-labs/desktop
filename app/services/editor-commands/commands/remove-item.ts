@@ -6,6 +6,7 @@ import { Source } from 'services/sources';
 import { ReorderNodesCommand, EPlaceType } from './reorder-nodes';
 import { $t } from 'services/i18n';
 import { ISceneItemSettings } from 'services/api/external-api/scenes';
+import { DualOutputService } from 'services/dual-output';
 
 // Removing and recreating a source is a very complex event.
 // We can save a lot of time by leveraging the scene collection system.
@@ -30,17 +31,21 @@ class SourceReviver extends SourcesNode {
  */
 export class RemoveItemCommand extends Command {
   @Inject() private scenesService: ScenesService;
+  @Inject() private dualOutputService: DualOutputService;
 
   private sceneId: string;
   private sourceId: string;
   private sourceReviver: SourceReviver;
 
   private reorderNodesSubcommand: ReorderNodesCommand;
+  private verticalReorderNodesSubcommand: ReorderNodesCommand;
 
   private settings: ISceneItemSettings;
+  private dualOutputVerticalNodeId: string;
 
-  constructor(private sceneItemId: string) {
+  constructor(private sceneItemId: string, private verticalNodeId?: string) {
     super();
+    this.dualOutputVerticalNodeId = verticalNodeId;
   }
 
   get description() {
@@ -51,10 +56,6 @@ export class RemoveItemCommand extends Command {
 
   async execute() {
     const item = this.scenesService.views.getSceneItem(this.sceneItemId);
-
-    console.log('removing ', this.sceneItemId);
-    console.log('item ', item);
-    console.log('item display ', item?.display);
 
     const scene = this.scenesService.views.getScene(item.sceneId);
     this.sceneId = item.sceneId;
@@ -70,6 +71,25 @@ export class RemoveItemCommand extends Command {
       EPlaceType.After,
     );
     this.reorderNodesSubcommand.execute();
+
+    // also remove vertical node if it exists
+    if (this.dualOutputService.views.hasNodeMap(this.sceneId) || this.dualOutputVerticalNodeId) {
+      const verticalNodeId =
+        this.dualOutputVerticalNodeId ??
+        this.dualOutputService.views.getVerticalNodeId(this.sceneItemId);
+
+      if (verticalNodeId && this.scenesService.views.getSceneItem(this.verticalNodeId)) {
+        const verticalItem = this.scenesService.views.getSceneItem(this.verticalNodeId);
+        this.verticalReorderNodesSubcommand = new ReorderNodesCommand(
+          scene.getSelection(this.verticalNodeId),
+          void 0,
+          EPlaceType.After,
+        );
+        this.verticalReorderNodesSubcommand.execute();
+
+        verticalItem.remove();
+      }
+    }
 
     // If this was the last item using this source, the underlying source
     // will automatically be removed. In this case, we need to store enough
@@ -92,11 +112,22 @@ export class RemoveItemCommand extends Command {
 
     const scene = this.scenesService.views.getScene(this.sceneId);
 
-    scene.addSource(this.sourceId, {
+    const horizontalItem = scene.addSource(this.sourceId, {
       id: this.sceneItemId,
       select: false,
       display: this.settings?.display,
     });
+
+    if (this.dualOutputVerticalNodeId) {
+      this.dualOutputService.createOrAssignOutputNode(
+        horizontalItem,
+        'vertical',
+        false,
+        this.sceneId,
+        this.verticalNodeId,
+      );
+      this.verticalReorderNodesSubcommand.rollback();
+    }
 
     this.reorderNodesSubcommand.rollback();
   }
