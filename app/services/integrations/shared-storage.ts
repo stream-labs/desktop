@@ -142,12 +142,15 @@ export class SharedStorageService extends Service {
       return await jfetch(new Request(url, { headers, body, method: 'POST' }));
     } catch (e: unknown) {
       this.uploading = false;
+      // Signifies an API failure
+      if (e.toString() === '[object Object]') {
+        return Promise.reject('Error preparing storage upload');
+      }
       return Promise.reject(e);
     }
   }
 
   private async uploadS3File() {
-    if (!this.uploader) return;
     return await this.uploader.start();
   }
 
