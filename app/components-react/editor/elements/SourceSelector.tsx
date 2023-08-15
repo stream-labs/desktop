@@ -38,6 +38,7 @@ interface ISourceMetadata {
   canShowActions: boolean;
   parentId?: string;
   sceneId?: string;
+  toggleAll?: boolean;
 }
 
 export class SourceSelectorModule {
@@ -93,7 +94,7 @@ export class SourceSelectorModule {
               isVisible={sceneNode.isVisible}
               isLocked={sceneNode.isLocked}
               canShowActions={sceneNode.canShowActions}
-              toggleVisibility={() => this.toggleVisibility(sceneNode.id)}
+              toggleVisibility={() => this.toggleVisibility(sceneNode.id, sceneNode?.toggleAll)}
               toggleLock={() => this.toggleLock(sceneNode.id)}
               selectiveRecordingEnabled={this.selectiveRecordingEnabled}
               isStreamVisible={sceneNode.isStreamVisible}
@@ -121,7 +122,8 @@ export class SourceSelectorModule {
   get nodeData(): ISourceMetadata[] {
     return this.scene.getSourceSelectorNodes().map(node => {
       const itemsForNode = this.scene.getItemsForNode(node.id);
-      const isVisible = itemsForNode.some(i => i.visible);
+      const toggleAll = this.dualOutputService.views.hasNodeMap();
+
       const isLocked = itemsForNode.every(i => i.locked);
       const isRecordingVisible = itemsForNode.every(i => i.recordingVisible);
       const isStreamVisible = itemsForNode.every(i => i.streamVisible);
@@ -132,8 +134,18 @@ export class SourceSelectorModule {
         );
       });
       const isDualOutputActive = this.isDualOutputActive;
-
       const isFolder = !isItem(node);
+
+      let isVisible = itemsForNode.some(i => i.visible);
+
+      // In dual output mode, the icon-view/icon-hide toggle only updates when
+      // all scene items have the same visibility
+      if (toggleAll && this.isDualOutputActive) {
+        const dualOutputNodeId = this.dualOutputService.views.getDualOutputNodeId(node.id);
+        const itemsForDualOutputNode = this.scene.getItemsForNode(dualOutputNodeId);
+        isVisible =
+          itemsForNode.some(i => i.visible) || itemsForDualOutputNode.some(i => i.visible);
+      }
 
       // create the object
       return {
@@ -150,6 +162,7 @@ export class SourceSelectorModule {
         sceneId: node.sceneId,
         canShowActions: itemsForNode.length > 0,
         isFolder,
+        toggleAll,
       };
     });
   }
@@ -471,11 +484,66 @@ export class SourceSelectorModule {
     return this.selectionService.views.globalSelection.getItems();
   }
 
-  toggleVisibility(sceneNodeId: string | undefined, status?: boolean) {
+  /**
+   * Toggle the visibility of the scene item
+   * @remark If the intent is to toggle scene items in both displays but the partner
+   * node id for dual output cannot be found, this will just toggle the selected node
+   * @param sceneNodeId - string of the id of the node selected
+   * @param toggleAll - boolean for whether nodes in both displays should be toggled
+   */
+  toggleVisibility(sceneNodeId: string | undefined, toggleAll: boolean = false) {
     if (!sceneNodeId) return;
+
+    if (toggleAll) {
+      const bothToggled = this.toggleBothVisibility(sceneNodeId);
+      if (bothToggled) return;
+    }
+
     const selection = this.scene.getSelection(sceneNodeId);
-    const visible = status ?? !selection.isVisible();
+    const visible = !selection.isVisible();
     this.editorCommandsService.actions.executeCommand('HideItemsCommand', selection, !visible);
+  }
+
+  /**
+   * Primarily used to toggle both dual output scene items at the same time
+   * @remark A little counterintuitive, but to reduce executions of the hide items command,
+   * this function only executes the hide items command if both scene items currently have
+   * the same visibility. This instead of setting the dual output node to the same visibility
+   * as the selected node and then applying the desired visibility to both.
+   *
+   * Otherwise, proceed with toggling just the selected node because this will match
+   * the visibility between the two nodes.
+   *
+   * If the partner node id is not found, only the selected node is toggled.
+
+   * @param sceneNodeId - string of the id of the node selected
+   * @returns boolean signifying whether or not the hide items command was executed
+   */
+  toggleBothVisibility(sceneNodeId: string): boolean {
+    const dualOutputNodeId = this.dualOutputService.views.getDualOutputNodeId(sceneNodeId);
+    if (!dualOutputNodeId) return false;
+
+    const selectedNodeSelection = this.scene.getSelection(sceneNodeId);
+    const dualOutputNodeSelection = this.scene.getSelection(dualOutputNodeId);
+
+    const selectedNodeVisibility = !selectedNodeSelection.isVisible();
+    const dualOutputNodeVisibility = !dualOutputNodeSelection.isVisible();
+
+    if (selectedNodeVisibility === dualOutputNodeVisibility) {
+      const selection = this.scene.getSelection([sceneNodeId, dualOutputNodeId]);
+
+      this.editorCommandsService.actions.executeCommand(
+        'HideItemsCommand',
+        selection,
+        !selectedNodeVisibility,
+      );
+
+      // nodes toggled
+      return true;
+    }
+
+    // nodes not toggled
+    return false;
   }
 
   get selectiveRecordingEnabled() {
@@ -726,9 +794,7 @@ const TreeNode = React.forwardRef(
               </Tooltip>
             )}
             <i onClick={p.toggleLock} className={p.isLocked ? 'icon-lock' : 'icon-unlock'} />
-            {!p.isDualOutputActive && (
-              <i onClick={p.toggleVisibility} className={p.isVisible ? 'icon-view' : 'icon-hide'} />
-            )}
+            <i onClick={p.toggleVisibility} className={p.isVisible ? 'icon-view' : 'icon-hide'} />
           </>
         )}
         <Tooltip
