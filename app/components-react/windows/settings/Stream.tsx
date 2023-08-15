@@ -95,8 +95,8 @@ class StreamSettingsModule {
   }
 
   @mutation()
-  addCustomDest() {
-    if (!this.userService.isPrime) {
+  addCustomDest(linkToPrime: boolean = false) {
+    if (linkToPrime) {
       this.magicLinkService.actions.linkToPrime('slobs-multistream');
       return;
     }
@@ -433,18 +433,13 @@ function Platform(p: { platform: TPlatform }) {
  * Renders a custom destinations list
  */
 function CustomDestinationList() {
-  const {
-    isPrime,
-    customDestinations,
-    editCustomDestMode,
-    addCustomDest,
-    isDarkTheme,
-  } = useStreamSettings();
-  const shouldShowPrimeLabel = !isPrime;
+  const { isPrime, customDestinations, editCustomDestMode, addCustomDest } = useStreamSettings();
+
   const destinations = customDestinations;
   const isEditMode = editCustomDestMode !== false;
   const shouldShowAddForm = editCustomDestMode === true;
   const canAddMoreDestinations = destinations.length < 2;
+  const shouldShowPrimeLabel = !isPrime && destinations.length > 0;
 
   return (
     <div>
@@ -452,13 +447,13 @@ function CustomDestinationList() {
         <CustomDestination key={ind} ind={ind} destination={dest} />
       ))}
       {!isEditMode && canAddMoreDestinations && (
-        <a className={css.addDestinationBtn} onClick={addCustomDest}>
+        <a className={css.addDestinationBtn} onClick={() => addCustomDest(shouldShowPrimeLabel)}>
           <i className={cx('fa fa-plus', css.plus)} />
           <span>{$t('Add Destination')}</span>
 
           {shouldShowPrimeLabel ? (
             <ButtonHighlighted
-              onClick={addCustomDest}
+              onClick={() => addCustomDest(true)}
               filled
               text={$t('Ultra')}
               icon={<UltraIcon type="simple" />}

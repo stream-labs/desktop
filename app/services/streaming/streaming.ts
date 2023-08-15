@@ -195,7 +195,7 @@ export class StreamingService
           } else {
             primeRequired = true;
           }
-          if (primeRequired) {
+          if (primeRequired && !this.views.isDualOutputMode) {
             this.setError('PRIME_REQUIRED');
             this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
             return;
