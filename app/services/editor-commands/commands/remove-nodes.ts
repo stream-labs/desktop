@@ -46,13 +46,19 @@ export class RemoveNodesCommand extends Command {
     const hasNodeMap = this.dualOutputService.views.hasNodeMap(this.selection.sceneId);
 
     this.selection.getFolders().forEach(folder => {
-      if (hasNodeMap && this.dualOutputService.views.getVerticalNodeId(folder.id)) {
+      if (
+        hasNodeMap &&
+        this.dualOutputService.views.getVerticalNodeId(folder.id, this.selection.sceneId)
+      ) {
         // save node map entries to restore them when rolling back
         // to prevent duplicates, only save when encountering a horizontal node
 
         this.nodeMapEntries = {
           ...this.nodeMapEntries,
-          [folder.id]: this.dualOutputService.views.getVerticalNodeId(folder.id),
+          [folder.id]: this.dualOutputService.views.getVerticalNodeId(
+            folder.id,
+            this.selection.sceneId,
+          ),
         };
 
         this.sceneCollectionsService.removeNodeMapEntry(this.selection.sceneId, folder.id);
@@ -64,19 +70,20 @@ export class RemoveNodesCommand extends Command {
     });
 
     for (const item of this.selection.getItems()) {
-      if (hasNodeMap && this.dualOutputService.views.getVerticalNodeId(item.id)) {
+      const verticalNodeId = this.dualOutputService.views.getVerticalNodeId(
+        item.id,
+        this.selection.sceneId,
+      );
+      if (hasNodeMap && verticalNodeId) {
         // save node map entries to restore them when rolling back
         // to prevent duplicates, only save when encountering a horizontal node
-
         this.nodeMapEntries = {
           ...this.nodeMapEntries,
-          [item.id]: this.dualOutputService.views.getVerticalNodeId(item.id),
+          [item.id]: verticalNodeId,
         };
-
         this.sceneCollectionsService.removeNodeMapEntry(this.selection.sceneId, item.id);
       }
-
-      const subCommand = new RemoveItemCommand(item.id);
+      const subCommand = new RemoveItemCommand(item.id, verticalNodeId);
       await subCommand.execute();
       this.removeItemSubCommands.push(subCommand);
     }

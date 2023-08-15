@@ -37,9 +37,11 @@ export class CreateNewItemCommand extends Command {
     private type: TSourceType,
     private settings?: Dictionary<any>,
     private options: ISceneNodeAddOptions = {},
+    private verticalNodeId?: string,
   ) {
     super();
     this.description = $t('Create %{sourceName}', { sourceName: name });
+    this.dualOutputVerticalNodeId = this.verticalNodeId;
   }
 
   execute() {
@@ -52,15 +54,27 @@ export class CreateNewItemCommand extends Command {
       .getScene(this.sceneId)
       .createAndAddSource(this.name, this.type, this.settings, this.options);
 
-    if (this.dualOutputService.views.shouldCreateVerticalNode) {
-      Promise.resolve(
-        this.dualOutputService.actions.return.createOrAssignOutputNode(
+    if (this.dualOutputService.views.hasNodeMap(this.sceneId)) {
+      if (this.dualOutputVerticalNodeId) {
+        this.dualOutputService.createOrAssignOutputNode(
           item,
           'vertical',
           false,
           this.sceneId,
-        ),
-      ).then(node => (this.dualOutputVerticalNodeId = node.id));
+          this.dualOutputVerticalNodeId,
+        );
+      } else {
+        Promise.resolve(
+          this.dualOutputService.actions.return.createOrAssignOutputNode(
+            item,
+            'vertical',
+            false,
+            this.sceneId,
+          ),
+        ).then(node => {
+          this.dualOutputVerticalNodeId = node.id;
+        });
+      }
     }
 
     this.sourceId = item.sourceId;

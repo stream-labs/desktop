@@ -25,6 +25,7 @@ import uuid from 'uuid/v4';
 import { assertIsDefined } from 'util/properties-type-guards';
 import { VideoSettingsService, TDisplayType } from 'services/settings-v2';
 import { DualOutputService } from 'services/dual-output';
+import { SceneCollectionsService } from 'services/scene-collections';
 
 export type TSceneNode = SceneItem | SceneItemFolder;
 
@@ -46,6 +47,7 @@ export class Scene {
   @Inject() private selectionService: SelectionService;
   @Inject() private videoSettingsService: VideoSettingsService;
   @Inject() private dualOutputService: DualOutputService;
+  @Inject() private sceneCollectionsService: SceneCollectionsService;
 
   readonly state: IScene;
 
@@ -253,17 +255,64 @@ export class Scene {
     const fname = path.parse(addPath).name;
 
     if (fstat.isDirectory()) {
-      const folder = this.createFolder(fname);
-      if (folderId) folder.setParent(folderId);
-      const files = fs.readdirSync(addPath).reverse();
-      files.forEach(filePath => this.addFile(path.join(addPath, filePath), folder.id));
-      return folder;
+      if (this.dualOutputService.views.hasNodeMap()) {
+        // create horizontal and vertical folders
+        const horizontalFolder = this.createFolder(fname, { display: 'horizontal' });
+        const verticalFolder = this.createFolder(fname, { display: 'vertical' });
+
+        // create vertical folder
+        if (folderId) {
+          horizontalFolder.setParent(folderId);
+
+          const verticalFolderParentId = this.dualOutputService.views.getVerticalNodeId(folderId);
+          if (verticalFolderParentId) verticalFolder.setParent(verticalFolderParentId);
+        }
+
+        // add entry to node map
+        this.sceneCollectionsService.createNodeMapEntry(
+          this.id,
+          horizontalFolder.id,
+          verticalFolder.id,
+        );
+
+        // create horizontal and vertical nodes
+        const files = fs.readdirSync(addPath).reverse();
+        files.forEach(filePath => {
+          this.addFile(path.join(addPath, filePath), horizontalFolder.id);
+          this.addFile(path.join(addPath, filePath), verticalFolder.id);
+        });
+        return horizontalFolder;
+      } else {
+        const folder = this.createFolder(fname);
+        if (folderId) folder.setParent(folderId);
+        const files = fs.readdirSync(addPath).reverse();
+        files.forEach(filePath => this.addFile(path.join(addPath, filePath), folder.id));
+        return folder;
+      }
     }
 
     const source = this.sourcesService.addFile(addPath);
     if (!source) return null;
-    const item = this.addSource(source.sourceId);
-    if (folderId) item.setParent(folderId);
+    const item = this.addSource(source.sourceId, { display: 'horizontal' });
+    if (folderId) {
+      item.setParent(folderId);
+    }
+    if (this.dualOutputService.views.hasNodeMap()) {
+      Promise.resolve(
+        this.dualOutputService.actions.return.createOrAssignOutputNode(
+          item,
+          'vertical',
+          false,
+          this.id,
+        ),
+      ).then(node => {
+        if (folderId) {
+          const verticalFolderId = this.dualOutputService.views.getVerticalNodeId(folderId);
+          if (node && verticalFolderId) node.setParent(verticalFolderId);
+        }
+        return node;
+      });
+    }
     return item;
   }
 
@@ -276,7 +325,7 @@ export class Scene {
       sceneNodeType: 'folder',
       sceneId: this.id,
       parentId: '',
-      display: options?.display,
+      display: options?.display ?? 'horizontal',
     });
     return this.getFolder(id)!;
   }
