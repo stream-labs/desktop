@@ -351,7 +351,9 @@ function DualOutputControls(p: { stacked: boolean }) {
     Services.SettingsService.actions.showSettings('Video');
   }
   const showHorizontal = Services.DualOutputService.views.showHorizontalDisplay;
-  const showVertical = Services.DualOutputService.views.showVerticalDisplay;
+  const showVertical =
+    Services.DualOutputService.views.showVerticalDisplay &&
+    !Services.StreamingService.state.selectiveRecording;
 
   return (
     <div
