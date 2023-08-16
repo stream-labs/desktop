@@ -14,6 +14,7 @@
         'main-contents--onboarding': page === 'Onboarding',
       }"
     >
+      {{ cpu }}
       <side-nav
         v-if="page !== 'Onboarding' && !showLoadingSpinner"
         :locked="applicationLoading"

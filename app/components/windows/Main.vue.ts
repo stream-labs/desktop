@@ -21,7 +21,7 @@ import {
 } from 'components/shared/ReactComponentList';
 import { ScenesService } from 'services/scenes';
 import { PlatformAppsService } from 'services/platform-apps';
-import { EditorCommandsService } from '../../app-services';
+import { EditorCommandsService, PerformanceService } from '../../app-services';
 import VueResize from 'vue-resize';
 import { $t } from 'services/i18n';
 import fs from 'fs';
@@ -83,10 +83,17 @@ export default class Main extends Vue {
   @Inject() scenesService: ScenesService;
   @Inject() platformAppsService: PlatformAppsService;
   @Inject() editorCommandsService: EditorCommandsService;
+  @Inject() performanceService: PerformanceService;
 
   private modalOptions: IModalOptions = {
     renderFn: null,
   };
+
+  get cpu() {
+    return this.performanceService.state.CPU;
+  }
+
+  mixins
 
   created() {
     window.addEventListener('resize', this.windowSizeHandler);
