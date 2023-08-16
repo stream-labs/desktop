@@ -203,15 +203,6 @@ export default class CommentViewer extends Vue {
           this.nicoliveCommentFilterService.addFilter({ type: 'user', body: item.value.user_id });
         },
       });
-
-      // for DEBUG
-      menu.append({
-        id: 'reset nameplateHint',
-        label: 'DEBUG: reset nameplateHint',
-        click: () => {
-          this.nicoliveProgramService.stateService.updateNameplateHint(undefined);
-        },
-      });
     }
 
     // コンテキストメニューが出るとホバー判定が消えるので、外観を維持するために注目している要素を保持しておく
