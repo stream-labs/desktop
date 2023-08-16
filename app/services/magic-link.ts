@@ -2,7 +2,7 @@ import { Service } from 'services';
 import { Inject } from 'services/core';
 import { UserService } from 'services/user';
 import { authorizedHeaders, jfetch } from 'util/requests';
-import { HostsService } from './hosts';
+import { HostsService, UrlService } from './hosts';
 import * as remote from '@electron/remote';
 import electron from 'electron';
 import { UsageStatisticsService } from './usage-statistics';
@@ -19,6 +19,7 @@ interface ILoginError {
 export class MagicLinkService extends Service {
   @Inject() userService: UserService;
   @Inject() hostsService: HostsService;
+  @Inject() urlService: UrlService;
   @Inject() usageStatisticsService: UsageStatisticsService;
 
   async getDashboardMagicLink(subPage = '', source?: string) {
@@ -26,10 +27,10 @@ export class MagicLinkService extends Service {
     const sourceString = source ? `&refl=${source}` : '';
     if (subPage === 'multistream') {
       // TODO: remove this if statement when multistream settings are implemented
-      return `https://${this.hostsService.streamlabs}/content-hub/post/how-to-multistream-the-ultimate-guide-to-multistreaming?login_token=${token}`;
+      return `${this.urlService.protocol}${this.hostsService.streamlabs}/content-hub/post/how-to-multistream-the-ultimate-guide-to-multistreaming?login_token=${token}`;
     }
 
-    return `https://${this.hostsService.streamlabs}/slobs/magic/dashboard?login_token=${token}&r=${
+    return `${this.urlService.protocol}${this.hostsService.streamlabs}/slobs/magic/dashboard?login_token=${token}&r=${
       subPage ?? ''
     }${sourceString}`;
   }
@@ -37,7 +38,7 @@ export class MagicLinkService extends Service {
   private fetchNewToken(): Promise<ILoginTokenResponse> {
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(
-      `https://${this.hostsService.streamlabs}/api/v5/slobs/login/token`,
+      `${this.urlService.protocol}${this.hostsService.streamlabs}/api/v5/slobs/login/token`,
       { headers },
     );
 
@@ -51,7 +52,7 @@ export class MagicLinkService extends Service {
   async linkToPrime(refl: string) {
     if (!this.userService.views.isLoggedIn) {
       return remote.shell.openExternal(
-        `https://${this.hostsService.streamlabs}/ultra?refl=${refl}`,
+        `${this.urlService.protocol}${this.hostsService.streamlabs}/ultra?refl=${refl}`,
       );
     }
     try {

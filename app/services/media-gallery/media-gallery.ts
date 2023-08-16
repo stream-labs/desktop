@@ -3,7 +3,7 @@ import { Inject } from '../core/injector';
 import { authorizedHeaders, downloadFile } from '../../util/requests';
 import { Service } from 'services/core/service';
 import { UserService } from 'services/user';
-import { HostsService } from 'services/hosts';
+import { HostsService, UrlService } from 'services/hosts';
 import { WindowsService } from 'services/windows';
 import uuid from 'uuid';
 import { $t } from '../i18n';
@@ -50,6 +50,7 @@ const DEFAULT_MAX_FILE_SIZE = 25 * Math.pow(1024, 2);
 export class MediaGalleryService extends Service {
   @Inject() private userService: UserService;
   @Inject() private hostsService: HostsService;
+  @Inject() private urlService: UrlService;
   @Inject() private windowsService: WindowsService;
 
   private promises: Dictionary<{
@@ -134,8 +135,9 @@ export class MediaGalleryService extends Service {
 
   private formRequest(endpoint: string, options?: any) {
     const host = this.hostsService.streamlabs;
+    const protocol = this.urlService.protocol;
     const headers = authorizedHeaders(this.userService.apiToken);
-    const url = `https://${host}/${endpoint}`;
+    const url = `${protocol}${host}/${endpoint}`;
     return new Request(url, { ...options, headers });
   }
 

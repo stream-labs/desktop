@@ -2,7 +2,7 @@ import { Inject } from 'services/core/injector';
 import { authorizedHeaders, jfetch } from 'util/requests';
 import { mutation, StatefulService, ViewHandler } from 'services/core/stateful-service';
 import { UserService } from 'services/user';
-import { HostsService } from './hosts';
+import { HostsService, UrlService } from './hosts';
 import Utils from 'services/utils';
 import { InitAfter } from './core';
 import { AppService } from './app';
@@ -37,6 +37,7 @@ interface IIncrementalRolloutServiceState {
 export class IncrementalRolloutService extends StatefulService<IIncrementalRolloutServiceState> {
   @Inject() private userService: UserService;
   @Inject() private hostsService: HostsService;
+  @Inject() private urlService: UrlService;
   @Inject() private appService: AppService;
 
   static initialState: IIncrementalRolloutServiceState = {
@@ -76,7 +77,8 @@ export class IncrementalRolloutService extends StatefulService<IIncrementalRollo
   fetchAvailableFeatures() {
     if (this.userService.isLoggedIn) {
       const host = this.hostsService.streamlabs;
-      const url = `https://${host}/api/v5/slobs/available-features`;
+      const protocol = this.urlService.protocol;
+      const url = `${protocol}${host}/api/v5/slobs/available-features`;
       const headers = authorizedHeaders(this.userService.apiToken);
       const request = new Request(url, { headers });
 

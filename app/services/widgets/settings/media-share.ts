@@ -58,7 +58,7 @@ export class MediaShareService extends WidgetSettingsService<IMediaShareData> {
   getApiSettings() {
     return {
       type: WidgetType.MediaShare,
-      url: WidgetDefinitions[WidgetType.MediaShare].url(this.getHost(), this.getWidgetToken()),
+      url: WidgetDefinitions[WidgetType.MediaShare].url(this.getUrlProtocol(), this.getHost(), this.getWidgetToken()),
       previewUrl: `https://${this.getHost()}/widgets/media/v1/${this.getWidgetToken()}`,
       settingsUpdateEvent: 'mediaSharingSettingsUpdate',
       goalCreateEvent: 'newmediaShare',

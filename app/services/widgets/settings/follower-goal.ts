@@ -10,7 +10,7 @@ export class FollowerGoalService extends GenericGoalService {
   getApiSettings() {
     return {
       type: WidgetType.FollowerGoal,
-      url: WidgetDefinitions[WidgetType.FollowerGoal].url(this.getHost(), this.getWidgetToken()),
+      url: WidgetDefinitions[WidgetType.FollowerGoal].url(this.getUrlProtocol(), this.getHost(), this.getWidgetToken()),
       previewUrl: `https://${this.getHost()}/widgets/follower-goal?token=${this.getWidgetToken()}`,
       dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/followergoal/settings`,
       settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/followergoal/settings`,

@@ -45,7 +45,7 @@ export interface IWidgetConfig {
   };
 }
 
-export function getWidgetsConfig(host: string, token: string): Record<TWidgetType, IWidgetConfig> {
+export function getWidgetsConfig(protocol: string, host: string, token: string): Record<TWidgetType, IWidgetConfig> {
   return {
     [WidgetType.AlertBox]: {
       type: WidgetType.AlertBox,
@@ -63,10 +63,10 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
         height: 940,
       },
 
-      url: `https://${host}/alert-box/v3/${token}`,
-      previewUrl: `https://${host}/alert-box/v3/${token}`,
-      dataFetchUrl: `https://${host}/api/v5/slobs/widget/alertbox?include_linked_integrations_only=true&primary_only=false`,
-      settingsSaveUrl: `https://${host}/api/v5/slobs/widget/alertbox`,
+      url: `${protocol}${host}/alert-box/v3/${token}`,
+      previewUrl: `${protocol}${host}/alert-box/v3/${token}`,
+      dataFetchUrl: `${protocol}${host}/api/v5/slobs/widget/alertbox?include_linked_integrations_only=true&primary_only=false`,
+      settingsSaveUrl: `${protocol}${host}/api/v5/slobs/widget/alertbox`,
       settingsUpdateEvent: 'filteredAlertBoxSettingsUpdate',
       customCodeAllowed: true,
       customFieldsAllowed: false,
@@ -88,10 +88,10 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
         height: 900,
       },
 
-      url: `https://${host}/widgets/viewer-count?token=${token}`,
-      previewUrl: `https://${host}/widgets/viewer-count?token=${token}&simulate=1`,
-      dataFetchUrl: `https://${host}/api/v5/slobs/widget/viewercount`,
-      settingsSaveUrl: `https://${host}/api/v5/slobs/widget/viewercount`,
+      url: `${protocol}${host}/widgets/viewer-count?token=${token}`,
+      previewUrl: `${protocol}${host}/widgets/viewer-count?token=${token}&simulate=1`,
+      dataFetchUrl: `${protocol}${host}/api/v5/slobs/widget/viewercount`,
+      settingsSaveUrl: `${protocol}${host}/api/v5/slobs/widget/viewercount`,
       settingsUpdateEvent: 'viewerCountSettingsUpdate',
       customCodeAllowed: true,
       customFieldsAllowed: true,
@@ -113,10 +113,10 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
         height: 700,
       },
 
-      url: `https://${host}/widgets/game-widget?token=${token}`,
-      previewUrl: `https://${host}/widgets/game-widget?token=${token}&simulate=1`,
-      dataFetchUrl: `https://${host}/api/v5/slobs/widget/game-widget`,
-      settingsSaveUrl: `https://${host}/api/v5/slobs/widget/game-widget`,
+      url: `${protocol}${host}/widgets/game-widget?token=${token}`,
+      previewUrl: `${protocol}${host}/widgets/game-widget?token=${token}&simulate=1`,
+      dataFetchUrl: `${protocol}${host}/api/v5/slobs/widget/game-widget`,
+      settingsSaveUrl: `${protocol}${host}/api/v5/slobs/widget/game-widget`,
       settingsUpdateEvent: 'gameWidgetSettingsUpdate',
       customCodeAllowed: false,
       customFieldsAllowed: false,
@@ -138,10 +138,10 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
         height: 900,
       },
 
-      url: `https://${host}/widgets/emote-wall?token=${token}`,
-      previewUrl: `https://${host}/widgets/emote-wall?token=${token}&simulate=1`,
-      dataFetchUrl: `https://${host}/api/v5/slobs/widget/emote-wall`,
-      settingsSaveUrl: `https://${host}/api/v5/slobs/widget/emote-wall`,
+      url: `${protocol}${host}/widgets/emote-wall?token=${token}`,
+      previewUrl: `${protocol}${host}/widgets/emote-wall?token=${token}&simulate=1`,
+      dataFetchUrl: `${protocol}${host}/api/v5/slobs/widget/emote-wall`,
+      settingsSaveUrl: `${protocol}${host}/api/v5/slobs/widget/emote-wall`,
       settingsUpdateEvent: 'emoteWallSettingsUpdate',
       customCodeAllowed: true,
       customFieldsAllowed: true,
@@ -192,10 +192,10 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
         height: 700,
       },
 
-      url: `https://${host}/widgets/chat-box/v1/${token}`,
-      previewUrl: `https://${host}/widgets/chat-box/v1/${token}?simulate=1`,
-      dataFetchUrl: `https://${host}/api/v5/slobs/widget/chatbox`,
-      settingsSaveUrl: `https://${host}/api/v5/slobs/widget/chatbox`,
+      url: `${protocol}${host}/widgets/chat-box/v1/${token}`,
+      previewUrl: `${protocol}${host}/widgets/chat-box/v1/${token}?simulate=1`,
+      dataFetchUrl: `${protocol}${host}/api/v5/slobs/widget/chatbox`,
+      settingsSaveUrl: `${protocol}${host}/api/v5/slobs/widget/chatbox`,
       settingsUpdateEvent: 'chatBoxSettingsUpdate',
       customCodeAllowed: true,
       customFieldsAllowed: true,
@@ -225,10 +225,10 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
         height: 900,
       },
 
-      url: `https://${host}/widgets/donation-ticker?token=${token}`,
-      previewUrl: `https://${host}/widgets/donation-ticker?token=${token}&simulate=1`,
-      dataFetchUrl: `https://${host}/api/v5/slobs/widget/ticker`,
-      settingsSaveUrl: `https://${host}/api/v5/slobs/widget/ticker`,
+      url: `${protocol}${host}/widgets/donation-ticker?token=${token}`,
+      previewUrl: `${protocol}${host}/widgets/donation-ticker?token=${token}&simulate=1`,
+      dataFetchUrl: `${protocol}${host}/api/v5/slobs/widget/ticker`,
+      settingsSaveUrl: `${protocol}${host}/api/v5/slobs/widget/ticker`,
       settingsUpdateEvent: 'donationTickerSettingsUpdate',
       customCodeAllowed: true,
       customFieldsAllowed: true,
@@ -278,10 +278,10 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
         height: 700,
       },
 
-      url: `https://${host}/widgets/custom-widget?token=${token}`,
-      previewUrl: `https://${host}/widgets/custom-widget?token=${token}`,
-      dataFetchUrl: `https://${host}/api/v5/slobs/widget/customwidget`,
-      settingsSaveUrl: `https://${host}/api/v5/slobs/widget/customwidget`,
+      url: `${protocol}${host}/widgets/custom-widget?token=${token}`,
+      previewUrl: `${protocol}${host}/widgets/custom-widget?token=${token}`,
+      dataFetchUrl: `${protocol}${host}/api/v5/slobs/widget/customwidget`,
+      settingsSaveUrl: `${protocol}${host}/api/v5/slobs/widget/customwidget`,
       settingsUpdateEvent: 'customWidgetSettingsUpdate',
       customCodeAllowed: true,
       customFieldsAllowed: true,

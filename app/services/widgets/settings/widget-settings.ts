@@ -1,5 +1,5 @@
 import cloneDeep from 'lodash/cloneDeep';
-import { HostsService } from 'services/hosts';
+import { HostsService, UrlService } from 'services/hosts';
 import { Inject } from '../../core/injector';
 import { UserService, LoginLifecycle } from 'services/user';
 import { handleResponse, authorizedHeaders } from '../../../util/requests';
@@ -40,6 +40,7 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
   extends StatefulService<IWidgetSettingsState<TWidgetData>>
   implements IWidgetSettingsServiceApi {
   @Inject() private hostsService: HostsService;
+  @Inject() private urlService: UrlService;
   @Inject() protected userService: UserService;
   @Inject() private widgetsService: WidgetsService;
   @Inject() protected websocketService: WebsocketService;
@@ -178,6 +179,9 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
       .then(handleResponse);
   }
 
+  protected getUrlProtocol(): string {
+    return this.urlService.protocol;
+  }
   protected getHost(): string {
     return this.hostsService.streamlabs;
   }

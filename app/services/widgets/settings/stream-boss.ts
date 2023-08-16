@@ -56,7 +56,7 @@ export class StreamBossService extends BaseGoalService<IStreamBossData, IStreamB
   getApiSettings() {
     return {
       type: WidgetType.StreamBoss,
-      url: WidgetDefinitions[WidgetType.StreamBoss].url(this.getHost(), this.getWidgetToken()),
+      url: WidgetDefinitions[WidgetType.StreamBoss].url(this.getUrlProtocol(), this.getHost(), this.getWidgetToken()),
       previewUrl: `https://${this.getHost()}/widgets/streamboss?token=${this.getWidgetToken()}`,
       settingsUpdateEvent: 'streambossSettingsUpdate',
       goalCreateEvent: 'newStreamboss',
