@@ -19,6 +19,7 @@ export default function StudioEditor() {
     TransitionsService,
     ScenesService,
     DualOutputService,
+    StreamingService,
   } = Services;
   const v = useVuex(() => ({
     hideStyleBlockers: WindowsService.state.main.hideStyleBlockers,
@@ -27,7 +28,8 @@ export default function StudioEditor() {
     studioMode: TransitionsService.state.studioMode,
     dualOutputMode: DualOutputService.views.dualOutputMode,
     showHorizontalDisplay: DualOutputService.views.showHorizontalDisplay,
-    showVerticalDisplay: DualOutputService.views.showVerticalDisplay,
+    showVerticalDisplay:
+      DualOutputService.views.showVerticalDisplay && !StreamingService.state.selectiveRecording,
     activeSceneId: ScenesService.views.activeSceneId,
     isLoading: DualOutputService.views.isLoading,
   }));
