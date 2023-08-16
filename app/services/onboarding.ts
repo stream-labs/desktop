@@ -84,13 +84,14 @@ export const ONBOARDING_STEPS = () => ({
     hideButton: true,
     label: $t('Add a Theme'),
   },
-  [EOnboardingSteps.Optimize]: {
-    component: 'Optimize',
-    disableControls: false,
-    hideSkip: false,
-    hideButton: true,
-    label: $t('Optimize'),
-  },
+  // Temporarily skip auto config until migration to new API
+  // [EOnboardingSteps.Optimize]: {
+  //   component: 'Optimize',
+  //   disableControls: false,
+  //   hideSkip: false,
+  //   hideButton: true,
+  //   label: $t('Optimize'),
+  // },
   [EOnboardingSteps.Prime]: {
     component: 'Prime',
     disableControls: false,
@@ -193,9 +194,12 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ThemeSelector]);
     }
 
-    if (userViews.isTwitchAuthed || userViews.isYoutubeAuthed || recordingModeEnabled) {
-      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Optimize]);
-    }
+    /**
+     * Temporarily disable optimizer until migrated to the new API
+     */
+    // if (userViews.isTwitchAuthed || userViews.isYoutubeAuthed || recordingModeEnabled) {
+    //   steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Optimize]);
+    // }
 
     if (!userViews.isPrime) {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Prime]);
