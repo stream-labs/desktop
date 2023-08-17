@@ -9,6 +9,19 @@ import {
   openErrorDialogFromFailure,
 } from 'services/nicolive-program/NicoliveFailure';
 
+function isHash(item: FilterRecord): boolean {
+  if (item.type !== 'user') return false;
+  return item.body.match(/[^0-9]/) !== null; // 仮
+}
+
+function getBody(item: FilterRecord): string {
+  if (item.type === 'user') {
+    return `ID: ${isHash(item) ? '******** (匿名)' : item.body}`;
+  } else {
+    return item.body;
+  }
+}
+
 @Component({})
 export default class CommentFilter extends Vue {
   @Inject()
@@ -59,6 +72,11 @@ export default class CommentFilter extends Vue {
     user: 'ユーザーID',
     command: 'コマンド',
   };
+  PLACEHOLDER = {
+    word: 'コメントを入力',
+    user: 'ユーザーIDを入力 (例:12345678)',
+    command: 'コマンドを入力',
+  }
 
   get count() {
     return this.filters.length;
@@ -66,6 +84,13 @@ export default class CommentFilter extends Vue {
 
   get maxCount() {
     return this.userService.isPremium ? 500 : 40;
+  }
+
+  get invalid(): boolean {
+    if (this.currentType === 'user') {
+      return !this.newFilterValue.match(/^[1-9][0-9]*$/);
+    }
+    return false;
   }
 
   adding: boolean = false;
@@ -104,7 +129,15 @@ export default class CommentFilter extends Vue {
   }
 
   get currentTypeFilters() {
-    return this.filters.filter(x => x.type === this.currentType);
+    return this.filters.filter(x => x.type === this.currentType).map(item => {
+      return {
+        id: item.id,
+        type: item.type,
+        body: getBody(item),
+        register_date: `登録日時: ${new Date(item.register_date).toLocaleString()}`,
+        comment_body: item.comment_body && `コメント: ${item.comment_body}`,
+      };
+    });
   }
 
   mounted() {

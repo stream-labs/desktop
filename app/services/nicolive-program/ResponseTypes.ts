@@ -191,6 +191,8 @@ export type FilterRecord = {
   id: number;
   type: 'word' | 'user' | 'command';
   body: string;
+  register_date?: number; // 仮: NG登録日時
+  comment_body?: string; // 仮: NG登録時のコメント本文
 };
 
 export type FilterType = FilterRecord['type'];
