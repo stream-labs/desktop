@@ -6,6 +6,7 @@ import { CustomizationService } from 'services/customization';
 import { Inject } from 'services/core/injector';
 import electron from 'electron';
 import * as obs from '../../../obs-api';
+import * as Sentry from '@sentry/vue';
 
 interface IPerformanceState {
   CPU: number;
@@ -47,11 +48,35 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
     this.intervalId = window.setInterval(() => this.update(), STATS_UPDATE_INTERVAL);
   }
 
-  private update() {
-    const stats: IPerformanceState = this.customizationService.pollingPerformanceStatistics
-      ? obs.NodeObs.OBS_API_getPerformanceStatistics()
-      : { CPU: 0 };
+  private getState(): IPerformanceState {
+    if (!this.customizationService.pollingPerformanceStatistics) {
+      return {
+        CPU: 0,
+        numberDroppedFrames: 0,
+        percentageDroppedFrames: 0,
+        streamingBandwidth: 0,
+        frameRate: 0,
+      };
+    }
+    try {
+      return obs.NodeObs.OBS_API_getPerformanceStatistics();
+    } catch (e) {
+      if (this.statsFailed) {
+        // Sentryイベント数削減のため、2回目以降はbreadcrumbsに記録する
+        Sentry.addBreadcrumb({
+          category: 'performance.getState',
+          message: e.toString(),
+          level: 'warning',
+        });
+      } else {
+        Sentry.captureException(e);
+      }
+      return null;
+    }
+  }
 
+  private update() {
+    const stats = this.getState();
     if (!stats) {
       if (this.statsFailed) {
         // sentry送信削減

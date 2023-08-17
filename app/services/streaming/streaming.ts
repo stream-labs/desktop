@@ -91,9 +91,23 @@ export class StreamingService
   init() {
     super.init();
 
-    obs.NodeObs.OBS_service_connectOutputSignals((info: IOBSOutputSignalInfo) => {
-      this.handleOBSOutputSignal(info);
-    });
+    try {
+      Sentry.addBreadcrumb({
+        category: 'obs',
+        message: 'OBS_service_connectOutputSignals',
+      });
+      obs.NodeObs.OBS_service_connectOutputSignals((info: IOBSOutputSignalInfo) => {
+        this.handleOBSOutputSignal(info);
+      });
+    } catch (e) {
+      Sentry.withScope(scope => {
+        scope.setLevel('error');
+        scope.setTag('service', 'StreamingService');
+        scope.setTag('method', 'init');
+        scope.setFingerprint(['StreamingService', 'init', 'obs', 'exception']);
+        Sentry.captureException(e);
+      });
+    }
   }
 
   getModel() {
@@ -294,11 +308,21 @@ export class StreamingService
       if (shouldConfirm && !confirm(confirmText)) return;
 
       this.powerSaveId = electron.remote.powerSaveBlocker.start('prevent-display-sleep');
-      obs.NodeObs.OBS_service_startStreaming();
-      Sentry.addBreadcrumb({
-        category: 'stream',
-        message: 'Start streaming',
-      });
+      try {
+        Sentry.addBreadcrumb({
+          category: 'obs',
+          message: 'OBS_service_startStreaming',
+        });
+        obs.NodeObs.OBS_service_startStreaming();
+      } catch (e) {
+        Sentry.withScope(scope => {
+          scope.setLevel('error');
+          scope.setTag('service', 'StreamingService');
+          scope.setTag('method', 'toggleStreaming');
+          scope.setFingerprint(['StreamingService', 'startStreaming', 'obs', 'exception']);
+          Sentry.captureException(e);
+        });
+      }
       return;
     }
 
@@ -316,11 +340,22 @@ export class StreamingService
         electron.remote.powerSaveBlocker.stop(this.powerSaveId);
       }
 
-      obs.NodeObs.OBS_service_stopStreaming(false);
-      Sentry.addBreadcrumb({
-        category: 'stream',
-        message: `Stop streaming from ${this.state.streamingStatus}`,
-      });
+      try {
+        Sentry.addBreadcrumb({
+          category: 'obs',
+          message: `OBS_service_stopStreaming(false) from ${this.state.streamingStatus}`,
+        });
+        obs.NodeObs.OBS_service_stopStreaming(false);
+      } catch (e) {
+        Sentry.withScope(scope => {
+          scope.setLevel('error');
+          scope.setTag('service', 'StreamingService');
+          scope.setTag('method', 'toggleStreaming');
+          scope.setFingerprint(['StreamingService', 'stopStreaming', 'obs', 'exception']);
+          Sentry.captureException(e);
+        });
+        return;
+      }
 
       const keepRecording = this.settingsService.state.General.KeepRecordingWhenStreamStops;
       if (!keepRecording && this.state.recordingStatus === ERecordingState.Recording) {
@@ -335,11 +370,22 @@ export class StreamingService
     }
 
     if (this.state.streamingStatus === EStreamingState.Ending) {
-      obs.NodeObs.OBS_service_stopStreaming(true);
-      Sentry.addBreadcrumb({
-        category: 'stream',
-        message: `Stop streaming from ${this.state.streamingStatus}`,
-      });
+      try {
+        Sentry.addBreadcrumb({
+          category: 'obs',
+          message: `OBS_service_stopStreaming(true) from ${this.state.streamingStatus}`,
+        });
+        obs.NodeObs.OBS_service_stopStreaming(true);
+      } catch (e) {
+        Sentry.withScope(scope => {
+          scope.setLevel('error');
+          scope.setTag('service', 'StreamingService');
+          scope.setTag('method', 'toggleStreaming');
+          scope.setFingerprint(['StreamingService', 'stopStreaming', 'obs', 'exception']);
+          Sentry.captureException(e);
+        });
+        return;
+      }
       return;
     }
   }
@@ -440,11 +486,21 @@ export class StreamingService
 
   toggleRecording() {
     if (this.state.recordingStatus === ERecordingState.Recording) {
-      obs.NodeObs.OBS_service_stopRecording();
-      Sentry.addBreadcrumb({
-        category: 'record',
-        message: 'Stop recording',
-      });
+      try {
+        Sentry.addBreadcrumb({
+          category: 'obs',
+          message: 'OBS_service_stopRecording',
+        });
+        obs.NodeObs.OBS_service_stopRecording();
+      } catch (e) {
+        Sentry.withScope(scope => {
+          scope.setLevel('error');
+          scope.setTag('service', 'StreamingService');
+          scope.setTag('method', 'toggleRecording');
+          scope.setFingerprint(['StreamingService', 'stopRecording', 'obs', 'exception']);
+          Sentry.captureException(e);
+        });
+      }
       return;
     }
 
@@ -468,11 +524,21 @@ export class StreamingService
         }
       }
 
-      obs.NodeObs.OBS_service_startRecording();
-      Sentry.addBreadcrumb({
-        category: 'record',
-        message: 'Start recording',
-      });
+      try {
+        Sentry.addBreadcrumb({
+          category: 'obs',
+          message: 'OBS_service_startRecording',
+        });
+        obs.NodeObs.OBS_service_startRecording();
+      } catch (e) {
+        Sentry.withScope(scope => {
+          scope.setLevel('error');
+          scope.setTag('service', 'StreamingService');
+          scope.setTag('method', 'toggleRecording');
+          scope.setFingerprint(['StreamingService', 'startRecording', 'obs', 'exception']);
+          Sentry.captureException(e);
+        });
+      }
       return;
     }
   }
@@ -480,26 +546,56 @@ export class StreamingService
   startReplayBuffer() {
     if (this.state.replayBufferStatus !== EReplayBufferState.Offline) return;
 
-    obs.NodeObs.OBS_service_startReplayBuffer();
-    Sentry.addBreadcrumb({
-      category: 'replay',
-      message: 'Start replay buffer',
-    });
+    try {
+      Sentry.addBreadcrumb({
+        category: 'obs',
+        message: 'OBS_service_startReplayBuffer',
+      });
+      obs.NodeObs.OBS_service_startReplayBuffer();
+    } catch (e) {
+      Sentry.withScope(scope => {
+        scope.setLevel('error');
+        scope.setTag('service', 'StreamingService');
+        scope.setTag('method', 'startReplayBuffer');
+        scope.setFingerprint(['StreamingService', 'startReplayBuffer', 'obs', 'exception']);
+        Sentry.captureException(e);
+      });
+    }
   }
 
   stopReplayBuffer() {
     if (this.state.replayBufferStatus === EReplayBufferState.Running) {
-      obs.NodeObs.OBS_service_stopReplayBuffer(false);
-      Sentry.addBreadcrumb({
-        category: 'replay',
-        message: 'Stop replay buffer(running)',
-      });
+      try {
+        Sentry.addBreadcrumb({
+          category: 'obs',
+          message: 'OBS_service_stopReplayBuffer(false)',
+        });
+        obs.NodeObs.OBS_service_stopReplayBuffer(false);
+      } catch (e) {
+        Sentry.withScope(scope => {
+          scope.setLevel('error');
+          scope.setTag('service', 'StreamingService');
+          scope.setTag('method', 'stopReplayBuffer');
+          scope.setFingerprint(['StreamingService', 'stopReplayBuffer(running)', 'obs', 'exception']);
+          Sentry.captureException(e);
+        });
+      }
     } else if (this.state.replayBufferStatus === EReplayBufferState.Stopping) {
-      obs.NodeObs.OBS_service_stopReplayBuffer(true);
-      Sentry.addBreadcrumb({
-        category: 'replay',
-        message: 'Stop replay buffer(stopping)',
-      });
+      try {
+        Sentry.addBreadcrumb({
+          category: 'obs',
+          message: 'OBS_service_stopReplayBuffer(true)',
+        });
+        obs.NodeObs.OBS_service_stopReplayBuffer(true);
+      } catch (e) {
+        Sentry.withScope(scope => {
+          scope.setLevel('error');
+          scope.setTag('service', 'StreamingService');
+          scope.setTag('method', 'stopReplayBuffer');
+          scope.setFingerprint(['StreamingService', 'stopReplayBuffer(stopping)', 'obs', 'exception']);
+          Sentry.captureException(e);
+        });
+      }
     }
   }
 
@@ -507,11 +603,21 @@ export class StreamingService
     if (this.state.replayBufferStatus === EReplayBufferState.Running) {
       this.SET_REPLAY_BUFFER_STATUS(EReplayBufferState.Saving);
       this.replayBufferStatusChange.next(EReplayBufferState.Saving);
-      obs.NodeObs.OBS_service_processReplayBufferHotkey();
-      Sentry.addBreadcrumb({
-        category: 'replay',
-        message: 'Save replay',
-      });
+      try {
+        Sentry.addBreadcrumb({
+          category: 'obs',
+          message: 'OBS_service_processReplayBufferHotkey',
+        });
+        obs.NodeObs.OBS_service_processReplayBufferHotkey();
+      } catch (e) {
+        Sentry.withScope(scope => {
+          scope.setLevel('error');
+          scope.setTag('service', 'StreamingService');
+          scope.setTag('method', 'saveReplay');
+          scope.setFingerprint(['StreamingService', 'saveReplay', 'obs', 'exception']);
+          Sentry.captureException(e);
+        });
+      }
     }
   }
 
