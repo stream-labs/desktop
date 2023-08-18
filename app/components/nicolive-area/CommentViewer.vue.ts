@@ -8,6 +8,7 @@ import { getContentWithFilter } from 'services/nicolive-program/getContentWithFi
 import { NicoliveCommentFilterService } from 'services/nicolive-program/nicolive-comment-filter';
 import { NicoliveCommentViewerService } from 'services/nicolive-program/nicolive-comment-viewer';
 import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
+import { NicoliveProgramStateService } from 'services/nicolive-program/state';
 import { ISettingsServiceApi } from 'services/settings';
 import { Menu } from 'util/menus/Menu';
 import Vue from 'vue';
@@ -47,6 +48,9 @@ export default class CommentViewer extends Vue {
   private nicoliveProgramService: NicoliveProgramService;
 
   @Inject()
+  private nicoliveProgramStateService: NicoliveProgramStateService;
+
+  @Inject()
   private nicoliveCommentViewerService: NicoliveCommentViewerService;
 
   @Inject()
@@ -84,7 +88,18 @@ export default class CommentViewer extends Vue {
 
   pin(item: WrappedChatWithComponent | null): void {
     if (!item || item.type === 'normal') {
-      this.nicoliveCommentViewerService.pinComment(item);
+      this.nicoliveCommentViewerService.pinComment(null);
+      if (item) {
+        this.$nextTick(() => {
+          this.nicoliveCommentViewerService.pinComment(item && {
+            ...item,
+            value: {
+              ...item.value,
+              name: item.value.name || item.rawName, // なふだon/offに追従できるようにnameを復元して保持する
+            },
+          });
+        });
+      }
     }
   }
 
@@ -95,9 +110,11 @@ export default class CommentViewer extends Vue {
       value: {
         ...item.value,
         content: `${getContentWithFilter(item)}  (${this.getFormattedLiveTime(item.value)})`,
-      }
+        name: this.nicoliveProgramStateService.state.nameplateEnabled ? item.value.name : undefined,
+      },
     };
   }
+
   getDisplayName(item: WrappedChat): string {
     return getDisplayName(item);
   }

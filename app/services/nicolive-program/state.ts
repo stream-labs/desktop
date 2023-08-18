@@ -31,15 +31,17 @@ interface IState {
   panelOpened: boolean;
   speechSynthesizerSettings?: SpeechSynthesizerSettingsState;
   nameplateHint?: NameplateHintState;
+  nameplateEnabled: boolean;
 }
 
 /**
  * ニコ生配信機能に関する永続化したい状態を管理するService
  */
 export class NicoliveProgramStateService extends PersistentStatefulService<IState> {
-  static defaultState = {
+  static defaultState: IState = {
     autoExtensionEnabled: false,
     panelOpened: true,
+    nameplateEnabled: true,
   };
 
   private subject: Subject<IState> = new BehaviorSubject<IState>(this.state);
@@ -59,6 +61,10 @@ export class NicoliveProgramStateService extends PersistentStatefulService<IStat
 
   updateNameplateHint(newState?: NameplateHintState): void {
     this.setState({ nameplateHint: newState });
+  }
+
+  updateNameplateEnabled(newState?: boolean): void {
+    this.setState({ nameplateEnabled: newState });
   }
 
   private setState(nextState: Partial<IState>): void {

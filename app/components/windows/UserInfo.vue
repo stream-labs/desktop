@@ -3,17 +3,21 @@
     <div class="user-info" slot="content">
       <div class="user-detail">
         <div class="user-detail-left">
-          <img
-            :src="userIconURL"
-            width="32"
-            height="32"
-            class="user-icon"
-            :alt="userName"
-            @error.once="userIconURL = defaultUserIconURL"
-          />
+          <a class="user-page-link" @click="openUserPage" :title="userName">
+            <img
+              :src="userIconURL"
+              width="32"
+              height="32"
+              class="user-icon"
+              :alt="userName"
+              @error.once="userIconURL = defaultUserIconURL"
+            />
+          </a>
         </div>
         <div class="user-detail-body">
-          <div class="user-name">{{ userName }}</div>
+          <a class="user-page-link" @click="openUserPage" :title="userName">
+            <div class="user-name">{{ userName }}</div>
+          </a>
           <div class="user-account">
             <p class="user-id">ID: {{ userId }}</p>
             <p class="user-type" :class="{ 'is-premium': isPremium }">
@@ -34,7 +38,7 @@
         <div class="tag-list-header">好きなものリスト ({{ konomiTags.length }})</div>
         <div class="tag-list-body">
           <div
-            v-for="tag in konomiTags.slice(0, 20)"
+            v-for="tag in konomiTags"
             :key="tag.name"
             :class="{ tagname: true, common: tag.common }"
           >
@@ -84,6 +88,10 @@
   overflow: hidden;
 }
 
+.user-page-link {
+  text-decoration: none;
+}
+
 .user-icon {
   width: 48px;
   height: 48px;
@@ -95,6 +103,10 @@
   font-weight: @font-weight-bold;
   color: var(--color-text-light);
   .text-ellipsis;
+
+  .user-detail:hover & {
+    color: var(--color-text-active);
+  }
 }
 
 .user-account {
@@ -141,12 +153,21 @@
 }
 
 .tag-list {
+  display: flex;
+  flex-direction: column;
   flex-grow: 1;
+  min-height: 120px; // 3段目がちら見えする高さ
+  max-height: 176px; // 5段目がちら見えする高さ
   margin-bottom: 16px;
+  overflow: hidden;
   background-color: var(--color-bg-secondary);
 }
 
 .tag-list-header {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  height: 40px;
   padding: 8px 16px;
   font-size: @font-size4;
   font-weight: @font-weight-bold;
@@ -159,7 +180,6 @@
   flex-grow: 1;
   flex-wrap: wrap;
   min-height: 54px;
-  max-height: 138px;
   padding: 16px 8px 8px 16px;
   overflow: auto;
 
@@ -196,6 +216,10 @@
 }
 
 .comment-list-header {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  height: 40px;
   padding: 8px 16px;
   font-size: @font-size4;
   font-weight: @font-weight-bold;

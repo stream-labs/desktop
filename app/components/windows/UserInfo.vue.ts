@@ -17,6 +17,7 @@ import GiftComment from '../nicolive-area/comment/GiftComment.vue';
 import NicoadComment from '../nicolive-area/comment/NicoadComment.vue';
 import SystemMessage from '../nicolive-area/comment/SystemMessage.vue';
 import { getDisplayName } from 'services/nicolive-program/ChatMessage/getDisplayName';
+import electron from 'electron';
 
 const componentMap: { [type in ChatComponentType]: Vue.Component } = {
   common: CommonComment,
@@ -84,6 +85,12 @@ export default class UserInfo extends Vue {
     this.nicoliveProgramService.client.fetchUserFollow(this.userId).then(following => {
       this.isFollowing = following;
     });
+  }
+
+  updated() {
+    if (this.isLatestVisible) {
+      this.scrollToLatest();
+    }
   }
 
   beforeDestroy() {
@@ -173,5 +180,9 @@ export default class UserInfo extends Vue {
     this.nicoliveProgramService.client.unFollowUser(this.userId).then(() => {
       this.isFollowing = false;
     });
+  }
+
+  openUserPage() {
+    electron.remote.shell.openExternal(`https://www.nicovideo.jp/user/${this.userId}`);
   }
 }

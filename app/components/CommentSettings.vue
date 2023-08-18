@@ -32,6 +32,21 @@
     </div>
     <div class="section">
       <div class="input-label section-heading">
+        <label>なふだ設定</label>
+      </div>
+      <div class="input-container">
+        <div class="input-wrapper">
+          <div class="row">
+            <div class="name">コメントリストのなふだを表示</div>
+            <div class="value">
+              <input type="checkbox" v-model="nameplateEnabled" class="toggle-button" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="input-label section-heading">
         <label>音声設定</label>
         <button
           class="button--text section-heading-button"
