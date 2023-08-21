@@ -320,13 +320,15 @@ function initialize(crashHandler) {
       crashHandlerLogPath = app.getPath('userData');
     }
 
-    crashHandler.startCrashHandler(
-      app.getAppPath(),
-      process.env.NAIR_VERSION,
-      isDevMode.toString(),
-      crashHandlerLogPath,
-    );
-    crashHandler.registerProcess(pid, false);
+    if (!process.env.DEV_SERVER) {
+      crashHandler.startCrashHandler(
+        app.getAppPath(),
+        process.env.NAIR_VERSION,
+        isDevMode.toString(),
+        crashHandlerLogPath,
+      );
+      crashHandler.registerProcess(pid, false);
+    }
 
     const mainWindowState = windowStateKeeper({
       defaultWidth: 1600,
@@ -370,11 +372,17 @@ function initialize(crashHandler) {
     const LOAD_DELAY = 2000;
     setTimeout(
       () => {
-        if (process.env.NAIR_PRODUCTION_DEBUG || process.env.DEV_SERVER) openDevTools();
+        if (process.env.NAIR_PRODUCTION_DEBUG) openDevTools();
         mainWindow.loadURL(`${global.indexUrl}?windowId=main`);
       },
       isDevMode ? LOAD_DELAY : 0,
     );
+
+    if (process.env.DEV_SERVER) {
+      mainWindow.webContents.on('did-finish-load', () => {
+        openDevTools();
+      });
+    }
 
     mainWindow.on('close', e => {
       if (!shutdownStarted) {
@@ -441,11 +449,13 @@ function initialize(crashHandler) {
     });
 
     if (isDevMode || process.env.NAIR_PRODUCTION_DEBUG) {
+      /*
       console.log('installing vue devtools extension...');
       const { default: installExtension, VUEJS_DEVTOOLS } = require('electron-devtools-installer');
       installExtension(VUEJS_DEVTOOLS)
         .then(name => console.log(name))
         .catch(err => console.log(err));
+        */
     }
 
     // if (process.env.NAIR_PRODUCTION_DEBUG || process.env.DEV_SERVER) openDevTools();
