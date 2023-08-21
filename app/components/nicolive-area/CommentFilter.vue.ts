@@ -87,6 +87,9 @@ export default class CommentFilter extends Vue {
   }
 
   get invalid(): boolean {
+    if (this.newFilterValue === '') {
+      return false;
+    }
     if (this.currentType === 'user') {
       return !this.newFilterValue.match(/^[1-9][0-9]*$/);
     }

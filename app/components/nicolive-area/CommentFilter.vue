@@ -41,7 +41,11 @@
           :disabled="adding"
           :readonly="adding"
         />
-        <button type="submit" :disabled="adding || invalid" class="button button--secondary">
+        <button
+          type="submit"
+          :disabled="!newFilterValue || adding || invalid"
+          class="button button--secondary"
+        >
           追加
         </button>
       </form>
