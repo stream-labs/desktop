@@ -325,7 +325,7 @@ async function startApp() {
         },
         globalExtra: {
           'sentry[release]': pjson.version,
-          'sentry[user][ip]': '{{auto}}',
+          'sentry[user][ip_address]': '{{auto}}',
         },
       });
     }
