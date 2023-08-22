@@ -74,8 +74,6 @@ export default function HotkeyBinding(p: {
 
     event.preventDefault();
 
-    console.log(event);
-
     p.onBind({
       key: event.code,
       modifiers: getModifiers(event),
