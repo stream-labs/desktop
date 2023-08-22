@@ -202,6 +202,6 @@
   "To use Dual Output you must stream to at least one horizontal and one vertical platform.": "To use Dual Output you must stream to at least one horizontal and one vertical platform.",
   "Cannot toggle Dual Output while live.": "Cannot toggle Dual Output while live.",
   "Cannot toggle Dual Output while in Studio Mode.": "Cannot toggle Dual Output while in Studio Mode.",
-  "Dual Output enabled. Selective Recording only works with horizontal sources.": "Dual Output enabled. Selective Recording only works with horizontal sources.",
+  "Dual Output can’t be displayed - Selective Recording only works with horizontal sources and disables editing the vertical output scene. Please disable selective recording from Scenes to set up Dual Output.": "Dual Output can’t be displayed - Selective Recording only works with horizontal sources and disables editing the vertical output scene. Please disable selective recording from Scenes to set up Dual Output.",
   "Selective Recording can only be used with horizontal sources.": "Selective Recording can only be used with horizontal sources."
 }
