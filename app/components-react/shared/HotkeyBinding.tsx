@@ -49,7 +49,9 @@ function isModifierPress(event: React.KeyboardEvent<HTMLInputElement>) {
   );
 }
 
-function getModifiers(event: React.KeyboardEvent<HTMLInputElement>) {
+function getModifiers(
+  event: React.KeyboardEvent<HTMLInputElement> | React.MouseEvent<HTMLInputElement>,
+) {
   return {
     alt: event.altKey,
     ctrl: event.ctrlKey,
@@ -68,12 +70,34 @@ export default function HotkeyBinding(p: {
 
   function handlePress(event: React.KeyboardEvent<HTMLInputElement>) {
     // We don't allow binding a modifier by instelf
-    if (isModifierPress(event)) return;
+    if (isModifierPress(event) || !focused) return;
 
     event.preventDefault();
 
+    console.log(event);
+
     p.onBind({
       key: event.code,
+      modifiers: getModifiers(event),
+    });
+    if (inputRef.current) inputRef.current.blur();
+  }
+
+  function handleClick(event: React.MouseEvent<HTMLInputElement>) {
+    const key = event.button;
+    const isPrimaryButton = key === 0 || key === 2;
+    if (!focused || isPrimaryButton) return;
+
+    event.preventDefault();
+
+    const code = {
+      1: 'MiddleMouseButton',
+      3: 'X1MouseButton',
+      4: 'X2MouseButton',
+    };
+
+    p.onBind({
+      key: code[key],
       modifiers: getModifiers(event),
     });
     if (inputRef.current) inputRef.current.blur();
@@ -89,6 +113,7 @@ export default function HotkeyBinding(p: {
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         onKeyDown={handlePress}
+        onMouseDown={handleClick}
         inputRef={inputRef}
       />
     </Form>
