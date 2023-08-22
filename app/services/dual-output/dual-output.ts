@@ -87,10 +87,6 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return this.state.destinationSettings;
   }
 
-  get hasVerticalContext() {
-    return !!this.videoSettingsService.state.vertical;
-  }
-
   get horizontalNodeIds(): string[] {
     if (!this.activeSceneNodeMap) return;
 
