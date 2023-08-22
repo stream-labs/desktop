@@ -13,6 +13,7 @@ import { VideoService } from 'services/video';
 import { track, UsageStatisticsService } from 'services/usage-statistics';
 import { IpcServerService } from 'services/api/ipc-server';
 import { TcpServerService } from 'services/api/tcp-server';
+import { ExternalApiV2Service } from 'services/api/external-api-v2';
 import { StreamlabelsService } from 'services/streamlabels';
 import { PerformanceService } from 'services/performance';
 import { SceneCollectionsService } from 'services/scene-collections';
@@ -92,6 +93,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private settingsService: SettingsService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject() private videoSettingsService: VideoSettingsService;
+  @Inject() private externalApiV2Service: ExternalApiV2Service;
 
   static initialState: IAppState = {
     loading: true,

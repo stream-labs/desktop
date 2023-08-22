@@ -267,6 +267,8 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
       }
     }
 
+    console.log('fetchSettingsFromObs -> settings', categoryName, settings);
+
     return {
       type: settingsMetadata.type,
       formData: settings,

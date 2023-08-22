@@ -67,6 +67,8 @@
   },
   "dependencies": {
     "@electron/remote": "2.0.8",
+    "@trpc/client": "^10.37.1",
+    "@trpc/server": "^10.37.1",
     "abort-controller": "^3.0.0",
     "archiver": "2.1.1",
     "aws-sdk": "^2.344.0",
@@ -94,8 +96,10 @@
     "semver": "^5.5.1",
     "socket.io-client": "2.1.1",
     "tasklist": "^3.1.1",
+    "trpc-openapi": "^1.2.0",
     "uuid": "^3.0.1",
-    "vuejs-datepicker": "^1.6.2"
+    "vuejs-datepicker": "^1.6.2",
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "7zip-bin": "2.4.1",

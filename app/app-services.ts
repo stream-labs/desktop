@@ -4,6 +4,7 @@
 
 // OFFLINE SERVICES
 export { AppService } from 'services/app';
+export { ExternalApiV2Service } from 'services/api/external-api-v2';
 export { InternalApiService } from 'services/api/internal-api';
 export { ExternalApiService } from 'services/api/external-api';
 export { ExternalApiLimitsService } from 'services/api/external-api-limits';
