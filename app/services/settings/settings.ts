@@ -48,6 +48,12 @@ export interface ISettingsValues {
     service: string;
     server: string;
   };
+  StreamSecond: {
+    key: string;
+    streamType: string;
+    service: string;
+    server: string;
+  };
   Output: {
     Mode: string;
     RecRB?: boolean;
@@ -62,16 +68,7 @@ export interface ISettingsValues {
     VodTrackIndex?: string;
     keyint_sec?: number;
   };
-  Video: {
-    Base: string;
-    Output: string;
-    ScaleType: string;
-    FPSType: string;
-    FPSCommon: string;
-    FPSInt: number;
-    FPSNum: number;
-    FPSDen: number;
-  };
+  Video: ISettingsVideoInfo; // default video context
   Audio: Dictionary<TObsValue>;
   Advanced: {
     DelayEnable: boolean;
@@ -83,6 +80,17 @@ export interface ISettingsValues {
     NewSocketLoopEnable: boolean;
     LowLatencyEnable: boolean;
   };
+}
+
+interface ISettingsVideoInfo {
+  Base: string;
+  Output: string;
+  ScaleType: string;
+  FPSType: string;
+  FPSCommon: string;
+  FPSInt: number;
+  FPSNum: number;
+  FPSDen: number;
 }
 
 export interface ISettingsSubCategory {
@@ -121,6 +129,10 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
     }
 
     return settingsValues as ISettingsValues;
+  }
+
+  get isSimpleOutputMode() {
+    return this.values.Output.Mode === 'Simple';
   }
 
   get isAdvancedOutput() {

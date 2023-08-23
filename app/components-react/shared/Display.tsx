@@ -5,6 +5,7 @@ import { Display as OBSDisplay } from '../../services/video';
 import { TDisplayType } from 'services/settings-v2/video';
 import uuid from 'uuid/v4';
 interface DisplayProps {
+  id?: string;
   sourceId?: string;
   paddingSize?: number;
   drawUI?: boolean;
@@ -23,11 +24,12 @@ export default function Display(props: DisplayProps) {
     drawUI: false,
     clickHandler: () => {},
     onOutputResize: () => {},
+    type: props?.type ?? 'horizontal',
     ...props,
   };
 
   const v = useVuex(() => {
-    const videoSettings = VideoSettingsService.contexts[p.type ?? 'horizontal']?.video;
+    const videoSettings = VideoSettingsService.baseResolutions[p.type];
 
     return {
       paddingColor: CustomizationService.views.displayBackground,
@@ -80,6 +82,7 @@ export default function Display(props: DisplayProps) {
 
   return (
     <div
+      id={p?.id}
       className="display"
       ref={displayEl}
       style={{

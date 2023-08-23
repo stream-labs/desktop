@@ -25,6 +25,7 @@ import { TOutputOrientation } from 'services/restream';
 export interface ITwitchStartStreamOptions {
   title: string;
   game?: string;
+  video?: IVideo;
   tags: string[];
   mode?: TOutputOrientation;
 }
@@ -78,8 +79,9 @@ export class TwitchService
     settings: {
       title: '',
       game: '',
-      tags: [],
+      video: undefined,
       mode: undefined,
+      tags: [],
     },
   };
 

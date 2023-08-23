@@ -3,6 +3,7 @@ import { Inject } from 'services/core/injector';
 import { SceneItem } from 'services/scenes';
 import { VideoService } from 'services/video';
 import { WindowsService } from 'services/windows';
+import { DualOutputService } from 'services/dual-output';
 import { ScalableRectangle } from 'util/ScalableRectangle';
 import { SelectionService } from 'services/selection';
 import { EditorCommandsService } from 'services/editor-commands';
@@ -61,6 +62,7 @@ export class DragHandler {
   @Inject() private windowsService: WindowsService;
   @Inject() private selectionService: SelectionService;
   @Inject() private editorCommandsService: EditorCommandsService;
+  @Inject() private dualOutputService: DualOutputService;
 
   // Settings
   snapEnabled: boolean;
@@ -90,6 +92,7 @@ export class DragHandler {
    * @param startEvent the mouse event for this drag
    * @param options drag handler options
    */
+
   constructor(startEvent: IMouseEvent, options: IDragHandlerOptions) {
     // Load some settings we care about
     this.snapEnabled = this.settingsService.views.values.General.SnappingEnabled;
@@ -99,8 +102,10 @@ export class DragHandler {
     this.centerSnapping = this.settingsService.views.values.General.CenterSnapping;
 
     // Load some attributes about the video canvas
-    this.baseWidth = this.videoService.baseWidth;
-    this.baseHeight = this.videoService.baseHeight;
+    const baseRes = this.videoService.baseResolutions[startEvent.display];
+    this.baseWidth = baseRes.baseWidth;
+    this.baseHeight = baseRes.baseHeight;
+
     this.displaySize = options.displaySize;
     this.displayOffset = options.displayOffset;
 
@@ -116,7 +121,33 @@ export class DragHandler {
     // Load some attributes about sources
     const lastDragged = this.selectionService.views.globalSelection.getLastSelected();
 
-    if (lastDragged.isItem()) this.draggedSource = lastDragged;
+    if (lastDragged.isItem()) {
+      /**
+       * In dual output mode, the last selected node may be in a different display than the mouse event.
+       * Dragging scene items in the display should only transform the nodes in the display with the mouse event.
+       * So if the displays for the mouse event and last selected node don't match, use the node's partner
+       * in the other display.
+       *
+       * If there are any issues finding the partner node, use the last dragged source as a default.
+       * While it's not ideal, this will prevent errors from attempting to work with undefined values.
+       */
+      if (startEvent.display !== lastDragged.display) {
+        const dualOutputNodeId = this.dualOutputService.views.getDualOutputNodeId(lastDragged.id);
+        // confirm the partner id was found
+        if (dualOutputNodeId) {
+          const dualOutputNode = this.selectionService.views.globalSelection
+            .getItems()
+            .find(item => item.id === dualOutputNodeId);
+
+          // confirm the partner node was found, or use the last selected node as a default
+          this.draggedSource = dualOutputNode ?? lastDragged;
+        } else {
+          this.draggedSource = lastDragged;
+        }
+      } else {
+        this.draggedSource = lastDragged;
+      }
+    }
 
     this.otherSources = this.selectionService.views.globalSelection
       .clone()
@@ -136,7 +167,17 @@ export class DragHandler {
     this.targetEdges = this.generateTargetEdges();
   }
 
-  // Should be called when the mouse moves
+  /**
+   * Should be called when the mouse moves
+   * @remark In dual output mode, scene items are prevented
+   * from moving outside of the editor display. We return a boolean
+   * to show an error message in the notifications component,
+   * which is emitted by the studio editor component.
+   *
+   * @param event - Mouseevent for repositioning the scene item
+   * @returns - boolean with whether or not the mouse move was stopped
+   */
+  //
   move(event: IMouseEvent) {
     const rect = new ScalableRectangle(this.draggedSource.rectangle);
     const denormalize = rect.normalize();
@@ -147,8 +188,39 @@ export class DragHandler {
     rect.x = mousePos.x - this.mouseOffset.x;
     rect.y = mousePos.y - this.mouseOffset.y;
 
-    // Adjust position for snapping
-    // Holding Ctrl temporary disables snapping
+    /**
+     * In dual output mode, prevent sources from being dragged outside of the canvas
+     * and show an error message when they are dragged too far out
+     */
+    if (this.dualOutputService.views.dualOutputMode) {
+      rect.normalize();
+
+      const dragBoundaries = {
+        left: -rect.scaledWidth - this.displayOffset.x,
+        top: -rect.scaledHeight - this.displayOffset.y,
+        right: this.baseWidth + this.displayOffset.x,
+        bottom: this.baseHeight + this.displayOffset.y,
+      };
+
+      if (rect.x < 0 && rect.x <= dragBoundaries.left) {
+        rect.x = dragBoundaries.left + 0.5;
+        return true;
+      } else if (rect.y < 0 && rect.y <= dragBoundaries.top) {
+        rect.y = dragBoundaries.top + 0.5;
+        return true;
+      } else if (rect.x >= dragBoundaries.right) {
+        rect.x = dragBoundaries.right - 0.5;
+        return true;
+      } else if (rect.y >= dragBoundaries.bottom) {
+        rect.y = dragBoundaries.bottom - 0.5;
+        return true;
+      }
+    }
+
+    /**
+     * Adjust position for snapping
+     * Holding Ctrl temporary disables snapping
+     */
     if (this.snapEnabled && !event.ctrlKey) {
       const sourceEdges = this.generateSourceEdges(rect);
 
@@ -181,8 +253,10 @@ export class DragHandler {
 
     denormalize();
 
-    // Translate new position into a delta that can be applied
-    // to all selected sources equally.
+    /**
+     * Translate new position into a delta that can be applied
+     * to all selected sources equally.
+     */
     const deltaX = rect.x - this.draggedSource.transform.position.x;
     const deltaY = rect.y - this.draggedSource.transform.position.y;
 
@@ -190,20 +264,28 @@ export class DragHandler {
       'MoveItemsCommand',
       this.selectionService.views.globalSelection,
       { x: deltaX, y: deltaY },
+      event.display,
     );
+
+    return false;
   }
 
   private mousePositionInCanvasSpace(event: IMouseEvent): IVec2 {
-    return this.pageSpaceToCanvasSpace({
-      x: event.pageX - this.displayOffset.x,
-      y: event.pageY - this.displayOffset.y,
-    });
+    return this.pageSpaceToCanvasSpace(
+      {
+        x: event.pageX - this.displayOffset.x,
+        y: event.pageY - this.displayOffset.y,
+      },
+      event.display,
+    );
   }
 
-  private pageSpaceToCanvasSpace(vec: IVec2) {
+  private pageSpaceToCanvasSpace(vec: IVec2, display = 'horizontal') {
+    const baseWidth = this.videoService.baseResolutions[display].baseWidth;
+    const baseHeight = this.videoService.baseResolutions[display].baseHeight;
     return {
-      x: (vec.x * this.scaleFactor * this.baseWidth) / this.displaySize.x,
-      y: (vec.y * this.scaleFactor * this.baseHeight) / this.displaySize.y,
+      x: (vec.x * this.scaleFactor * baseWidth) / this.displaySize.x,
+      y: (vec.y * this.scaleFactor * baseHeight) / this.displaySize.y,
     };
   }
 

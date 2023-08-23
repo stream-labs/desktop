@@ -141,6 +141,12 @@
   "Revert Changes": "Revert Changes",
   "Animations": "Animations",
   "Multistreaming": "Multistreaming",
+  "Upgrade to Ultra": "Upgrade to Ultra",
+  "Twitch": "Twitch",
+  "Facebook": "Facebook",
+  "YouTube": "YouTube",
+  "Trovo": "Trovo",
+  "TikTok": "TikTok",
   "Alert Box": "Alert Box",
   "Widget": "Widget",
   "Creator Sites": "Creator Sites",
@@ -151,6 +157,5 @@
   "Apps Store Home": "Apps Store Home",
   "Dashboard Home": "Dashboard Home",
   "Alert Box Library": "Alert Box Library",
-  "Alert Box Settings": "Alert Box Settings",
-  "Upgrade to Ultra": "Upgrade to Ultra"
+  "Alert Box Settings": "Alert Box Settings"
 }

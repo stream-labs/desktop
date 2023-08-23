@@ -21,6 +21,7 @@ export default function EditStreamWindow() {
     error,
     lifecycle,
     isMultiplatformMode,
+    isDualOutputMode,
     updateStream,
     isAdvancedMode,
     switchAdvancedMode,
@@ -33,7 +34,7 @@ export default function EditStreamWindow() {
   const shouldShowSettings = !shouldShowChecklist;
   const shouldShowUpdateButton = lifecycle !== 'runChecklist';
   const shouldShowGoBackButton = !shouldShowUpdateButton && error;
-  const shouldShowAdvancedSwitch = isMultiplatformMode;
+  const shouldShowAdvancedSwitch = isMultiplatformMode || isDualOutputMode;
 
   useOnCreate(() => {
     // the streamingService still may keep a error from GoLive flow like a "Post a Tweet" error

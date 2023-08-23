@@ -18,6 +18,7 @@ import { WidgetType } from '../../../widgets';
 import { byOS, OS, getOS } from 'util/operating-systems';
 import { GameCaptureNode } from './game-capture';
 import { Node } from '../node';
+import { TDisplayType } from 'services/settings-v2';
 
 type TContent =
   | ImageNode
@@ -55,6 +56,9 @@ interface IItemSchema {
   filters?: IFilterInfo[];
 
   mixerHidden?: boolean;
+
+  visible?: boolean;
+  display?: TDisplayType;
 }
 
 export interface IFolderSchema {
@@ -62,6 +66,7 @@ export interface IFolderSchema {
   name: string;
   sceneNodeType: 'folder';
   childrenIds: string[];
+  display?: TDisplayType;
 }
 
 export type TSlotSchema = IItemSchema | IFolderSchema;
@@ -105,6 +110,8 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
       scaleY: sceneNode.transform.scale.y / this.videoService.baseHeight,
       crop: sceneNode.transform.crop,
       rotation: sceneNode.transform.rotation,
+      visible: sceneNode.visible,
+      display: sceneNode?.display,
       filters: sceneNode.getObsInput().filters.map(filter => {
         filter.save();
 
@@ -193,9 +200,10 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
     let sceneItem: SceneItem;
 
     const id = obj.id;
+    const display = obj.display;
 
     if (obj.sceneNodeType === 'folder') {
-      context.scene.createFolder(obj.name, { id });
+      context.scene.createFolder(obj.name, { id, display });
       return;
     }
 
@@ -213,13 +221,17 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
       });
 
       if (existingWebcam) {
-        sceneItem = context.scene.addSource(existingWebcam.sourceId, { id, select: false });
+        sceneItem = context.scene.addSource(existingWebcam.sourceId, {
+          id,
+          select: false,
+          display,
+        });
       } else {
         sceneItem = context.scene.createAndAddSource(
           obj.name,
           webcamSourceType,
           {},
-          { id, select: false },
+          { id, select: false, display },
         );
       }
 
@@ -244,7 +256,7 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
         obj.name,
         'image_source',
         {},
-        { id, select: false },
+        { id, select: false, display },
       );
     } else if (obj.content instanceof GameCaptureNode) {
       if (getOS() === OS.Windows) {
@@ -252,7 +264,7 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
           obj.name,
           'game_capture',
           {},
-          { id, select: false },
+          { id, select: false, display },
         );
 
         // Adjust scales by the ratio of the exported base resolution to
@@ -268,28 +280,28 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
         obj.name,
         byOS({ [OS.Windows]: 'text_gdiplus', [OS.Mac]: 'text_ft2_source' }),
         {},
-        { id, select: false },
+        { id, select: false, display },
       );
     } else if (obj.content instanceof VideoNode) {
       sceneItem = context.scene.createAndAddSource(
         obj.name,
         'ffmpeg_source',
         {},
-        { id, select: false },
+        { id, select: false, display },
       );
     } else if (obj.content instanceof IconLibraryNode) {
       sceneItem = context.scene.createAndAddSource(
         obj.name,
         'image_source',
         {},
-        { id, select: false, sourceAddOptions: { propertiesManager: 'iconLibrary' } },
+        { id, select: false, sourceAddOptions: { propertiesManager: 'iconLibrary' }, display },
       );
     } else if (obj.content instanceof StreamlabelNode) {
       sceneItem = context.scene.createAndAddSource(
         obj.name,
         byOS({ [OS.Windows]: 'text_gdiplus', [OS.Mac]: 'text_ft2_source' }),
         {},
-        { id, select: false },
+        { id, select: false, display },
       );
     } else if (obj.content instanceof WidgetNode) {
       // Check for already existing widgets of the same type instead
@@ -300,7 +312,7 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
           const type: WidgetType = source.getPropertiesManagerSettings().widgetType;
 
           if (widgetType === type) {
-            sceneItem = context.scene.addSource(source.sourceId, { id, select: false });
+            sceneItem = context.scene.addSource(source.sourceId, { id, select: false, display });
             existing = true;
           }
         }
@@ -311,12 +323,12 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
           obj.name,
           'browser_source',
           {},
-          { id, select: false },
+          { id, select: false, display },
         );
       }
     } else if (obj.content instanceof SceneSourceNode) {
       const sceneId = obj.content.data.sceneId;
-      sceneItem = context.scene.addSource(sceneId, { select: false });
+      sceneItem = context.scene.addSource(sceneId, { select: false, display });
 
       // Adjust scales by the ratio of the exported base resolution to
       // the users current base resolution

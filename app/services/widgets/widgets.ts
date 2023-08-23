@@ -25,6 +25,7 @@ import { TPlatform } from '../platforms';
 import { getAlertsConfig, TAlertType } from './alerts-config';
 import { getWidgetsConfig } from './widgets-config';
 import { WidgetDisplayData } from '.';
+import { DualOutputService } from 'services/dual-output';
 
 export interface IWidgetSourcesState {
   widgetSources: Dictionary<IWidgetSource>;
@@ -73,6 +74,7 @@ export class WidgetsService
   @Inject() hostsService: HostsService;
   @Inject() videoService: VideoService;
   @Inject() editorCommandsService: EditorCommandsService;
+  @Inject() dualOutputService: DualOutputService;
 
   widgetDisplayData = WidgetDisplayData(); // cache widget display data
 
@@ -364,19 +366,54 @@ export class WidgetsService
       widgetItem = scene.createAndAddSource(scene.name, 'browser_source');
     }
 
+    if (this.dualOutputService.views.hasNodeMap()) {
+      this.dualOutputService.views.displays.forEach(display => {
+        // create widget
+        this.createWidgetFromJSON(
+          widget,
+          widgetItem,
+          this.videoService.baseResolutions[display].baseWidth,
+          this.videoService.baseResolutions[display].baseHeight,
+        );
+
+        // assign widget context
+        this.dualOutputService.actions.createOrAssignOutputNode(
+          widgetItem,
+          display,
+          display === 'horizontal',
+          scene.id,
+        );
+      });
+    } else {
+      this.createWidgetFromJSON(
+        widget,
+        widgetItem,
+        this.videoService.baseResolutions.horizontal.baseWidth,
+        this.videoService.baseResolutions.horizontal.baseHeight,
+      );
+    }
+  }
+
+  createWidgetFromJSON(
+    widget: ISerializableWidget,
+    widgetItem: SceneItem,
+    baseWidth: number,
+    baseHeight: number,
+  ) {
     const source = widgetItem.getSource();
 
     source.setName(widget.name);
     source.updateSettings(widget.settings);
     source.replacePropertiesManager('widget', { widgetType: widget.type });
+
     widgetItem.setTransform({
       position: {
-        x: widget.x * this.videoService.baseWidth,
-        y: widget.y * this.videoService.baseHeight,
+        x: widget.x * baseWidth,
+        y: widget.y * baseHeight,
       },
       scale: {
-        x: widget.scaleX * this.videoService.baseWidth,
-        y: widget.scaleY * this.videoService.baseHeight,
+        x: widget.scaleX * baseWidth,
+        y: widget.scaleY * baseHeight,
       },
     });
   }

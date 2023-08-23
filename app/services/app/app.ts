@@ -10,6 +10,7 @@ import { TransitionsService } from 'services/transitions';
 import { SourcesService } from 'services/sources';
 import { ScenesService } from 'services/scenes';
 import { VideoService } from 'services/video';
+import { VideoSettingsService } from 'services/settings-v2/video';
 import { track, UsageStatisticsService } from 'services/usage-statistics';
 import { IpcServerService } from 'services/api/ipc-server';
 import { TcpServerService } from 'services/api/tcp-server';
@@ -39,9 +40,9 @@ import { ApplicationMenuService } from 'services/application-menu';
 import { KeyListenerService } from 'services/key-listener';
 import { MetricsService } from '../metrics';
 import { SettingsService } from '../settings';
+import { DualOutputService } from 'services/dual-output';
 import { OS, getOS } from 'util/operating-systems';
 import * as remote from '@electron/remote';
-import { VideoSettingsService } from 'services/settings-v2/video';
 
 interface IAppState {
   loading: boolean;
@@ -92,6 +93,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private settingsService: SettingsService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject() private videoSettingsService: VideoSettingsService;
+  @Inject() private dualOutputService: DualOutputService;
 
   static initialState: IAppState = {
     loading: true,

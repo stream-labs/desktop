@@ -11,6 +11,8 @@ import { PlatformAppsService } from 'services/platform-apps';
 import { IGoLiveSettings, IPlatformFlags } from 'services/streaming';
 import { TDisplayType } from 'services/settings-v2/video';
 import Vue from 'vue';
+import { IVideo } from 'obs-studio-node';
+import { DualOutputService } from 'services/dual-output';
 import { TOutputOrientation } from 'services/restream';
 
 interface ISavedGoLiveSettings {
@@ -18,6 +20,8 @@ interface ISavedGoLiveSettings {
     twitch?: IPlatformFlags;
     facebook?: IPlatformFlags;
     youtube?: IPlatformFlags;
+    trovo?: IPlatformFlags;
+    tiktok?: IPlatformFlags;
   };
   customDestinations?: ICustomStreamDestination[];
   advancedMode: boolean;
@@ -28,6 +32,8 @@ export interface ICustomStreamDestination {
   url: string;
   streamKey?: string;
   enabled: boolean;
+  display?: TDisplayType;
+  video?: IVideo;
   mode?: TOutputOrientation;
 }
 
@@ -99,6 +105,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
   @Inject() private userService: UserService;
   @Inject() private platformAppsService: PlatformAppsService;
   @Inject() private streamSettingsService: StreamSettingsService;
+  @Inject() private dualOutputService: DualOutputService;
 
   static defaultState: IStreamSettingsState = {
     protectedModeEnabled: true,
@@ -144,7 +151,11 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     });
 
     // save settings related to "Settings->Stream" window
-    let streamFormData = cloneDeep(this.views.obsStreamSettings);
+    // each context has their own settings
+    let streamFormData =
+      streamName === 'StreamSecond'
+        ? cloneDeep(this.views.obsStreamSecondSettings)
+        : cloneDeep(this.views.obsStreamSettings);
 
     streamFormData.forEach(subCategory => {
       subCategory.parameters.forEach(parameter => {
@@ -165,7 +176,10 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     );
 
     if (!mustUpdateObsSettings) return;
-    streamFormData = cloneDeep(this.views.obsStreamSettings);
+    streamFormData =
+      streamName === 'StreamSecond'
+        ? cloneDeep(this.views.obsStreamSecondSettings)
+        : cloneDeep(this.views.obsStreamSettings);
 
     streamFormData.forEach(subCategory => {
       subCategory.parameters.forEach(parameter => {
@@ -192,9 +206,16 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     if (settingsPatch.platforms) {
       const pickedFields: (keyof IPlatformFlags)[] = ['enabled', 'useCustomFields'];
       const platforms: Dictionary<IPlatformFlags> = {};
-      Object.keys(settingsPatch.platforms).map(
-        platform => (platforms[platform] = pick(settingsPatch.platforms![platform], pickedFields)),
-      );
+      Object.keys(settingsPatch.platforms).map(platform => {
+        const platformSettings = pick(settingsPatch.platforms![platform], pickedFields);
+
+        if (this.dualOutputService.views.dualOutputMode) {
+          platformSettings.video = this.dualOutputService.views.getPlatformContext(
+            platform as TPlatform,
+          );
+        }
+        return (platforms[platform] = platformSettings);
+      });
       patch.platforms = platforms as ISavedGoLiveSettings['platforms'];
     }
 
@@ -234,8 +255,9 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     };
   }
 
-  setObsStreamSettings(formData: ISettingsSubCategory[]) {
-    this.settingsService.setSettings('Stream', formData);
+  setObsStreamSettings(formData: ISettingsSubCategory[], context?: number) {
+    const streamName = !context || context === 0 ? 'Stream' : 'StreamSecond';
+    this.settingsService.setSettings(streamName, formData);
   }
 
   get protectedModeEnabled(): boolean {
@@ -342,6 +364,10 @@ class StreamSettingsView extends ViewHandler<IStreamSettingsState> {
 
   get obsStreamSettings(): ISettingsSubCategory[] {
     return this.getServiceViews(SettingsService).state.Stream.formData;
+  }
+
+  get obsStreamSecondSettings(): ISettingsSubCategory[] {
+    return this.getServiceViews(SettingsService).state.StreamSecond.formData;
   }
 
   /**

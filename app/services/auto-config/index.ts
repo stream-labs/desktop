@@ -32,43 +32,48 @@ export class AutoConfigService extends Service {
   configProgress = new Subject<IConfigProgress>();
 
   async start() {
-    try {
-      if (this.userService.views.isTwitchAuthed) {
-        const service = getPlatformService('twitch') as TwitchService;
-        const key = await service.fetchStreamKey();
-        this.streamSettingsService.setSettings({ key, platform: 'twitch' });
-      } else if (this.userService.views.isYoutubeAuthed) {
-        const service = getPlatformService('youtube') as YoutubeService;
-        await service.beforeGoLive({
-          platforms: {
-            youtube: {
-              enabled: true,
-              useCustomFields: false,
-              title: 'bandwidthTest',
-              description: 'bandwidthTest',
-              privacyStatus: 'private',
-              categoryId: '1',
-            },
-          },
-          advancedMode: true,
-          customDestinations: [],
-        });
-      }
-    } catch (e: unknown) {
-      console.error('Failure fetching stream key for auto config');
-      this.handleProgress({ event: 'error', description: 'error_fetching_stream_key' });
-      return;
-    }
+    /**
+     * Temporarily disable optimizer until migrated to the new API
+     */
+    return;
 
-    obs.NodeObs.InitializeAutoConfig(
-      (progress: IConfigProgress) => {
-        this.handleProgress(progress);
-        this.configProgress.next(progress);
-      },
-      { continent: '', service_name: '' },
-    );
+    // try {
+    //   if (this.userService.views.isTwitchAuthed) {
+    //     const service = getPlatformService('twitch') as TwitchService;
+    //     const key = await service.fetchStreamKey();
+    //     this.streamSettingsService.setSettings({ key, platform: 'twitch' });
+    //   } else if (this.userService.views.isYoutubeAuthed) {
+    //     const service = getPlatformService('youtube') as YoutubeService;
+    //     await service.beforeGoLive({
+    //       platforms: {
+    //         youtube: {
+    //           enabled: true,
+    //           useCustomFields: false,
+    //           title: 'bandwidthTest',
+    //           description: 'bandwidthTest',
+    //           privacyStatus: 'private',
+    //           categoryId: '1',
+    //         },
+    //       },
+    //       advancedMode: true,
+    //       customDestinations: [],
+    //     });
+    //   }
+    // } catch (e: unknown) {
+    //   console.error('Failure fetching stream key for auto config');
+    //   this.handleProgress({ event: 'error', description: 'error_fetching_stream_key' });
+    //   return;
+    // }
 
-    obs.NodeObs.StartBandwidthTest();
+    // obs.NodeObs.InitializeAutoConfig(
+    //   (progress: IConfigProgress) => {
+    //     this.handleProgress(progress);
+    //     this.configProgress.next(progress);
+    //   },
+    //   { continent: '', service_name: '' },
+    // );
+
+    // obs.NodeObs.StartBandwidthTest();
   }
 
   async startRecording() {
@@ -105,7 +110,7 @@ export class AutoConfigService extends Service {
 
     if (progress.event === 'done') {
       obs.NodeObs.TerminateAutoConfig();
-      this.videoSettingsService.migrateSettings();
+      this.videoSettingsService.loadLegacySettings();
     }
   }
 
@@ -115,7 +120,8 @@ export class AutoConfigService extends Service {
         obs.NodeObs.StartSaveSettings();
       } else {
         obs.NodeObs.TerminateAutoConfig();
-        this.videoSettingsService.migrateSettings();
+
+        this.videoSettingsService.loadLegacySettings();
         debounce(() => this.configProgress.next({ ...progress, event: 'done' }), 1000)();
       }
     }

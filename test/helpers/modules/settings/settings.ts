@@ -1,8 +1,8 @@
 import {
   click,
   clickButton,
+  clickCheckbox,
   focusChild,
-  getFocusedWindowId,
   useChildWindow,
   useMainWindow,
 } from '../core';
@@ -11,7 +11,7 @@ import { tmpdir } from 'os';
 import * as path from 'path';
 import { setInputValue } from '../forms/base';
 import { FormMonkey } from '../../form-monkey';
-import { getContext } from '../../webdriver';
+import { TExecutionContext } from '../../../helpers/webdriver';
 
 /**
  * Open the settings window with a given category selected

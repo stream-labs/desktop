@@ -5,13 +5,14 @@ import cloneDeep from 'lodash/cloneDeep';
 import { IObsListOption, TObsValue, IObsListInput } from 'components/obs/inputs/ObsInput';
 import { mutation, StatefulService, ViewHandler } from 'services/core/stateful-service';
 import * as obs from '../../../obs-api';
+import { InitAfter } from 'services/core';
 import { Inject } from 'services/core/injector';
 import namingHelpers from 'util/NamingHelpers';
 import { WindowsService } from 'services/windows';
 import { WidgetDisplayData, WidgetsService, WidgetType } from 'services/widgets';
 import { DefaultManager } from './properties-managers/default-manager';
 import { WidgetManager } from './properties-managers/widget-manager';
-import { ISceneItem, Scene, ScenesService } from 'services/scenes';
+import { ISceneItem, ScenesService } from 'services/scenes';
 import { StreamlabelsManager } from './properties-managers/streamlabels-manager';
 import { PlatformAppManager } from './properties-managers/platform-app-manager';
 import { UserService } from 'services/user';
@@ -164,6 +165,7 @@ class SourcesViews extends ViewHandler<ISourcesState> {
   }
 }
 
+@InitAfter('VideoSettingsService')
 export class SourcesService extends StatefulService<ISourcesState> {
   static initialState = {
     sources: {},
@@ -544,14 +546,6 @@ export class SourcesService extends StatefulService<ISourcesState> {
       this.defaultHardwareService.state.defaultVideoDevice
     ) {
       resolvedSettings.device = this.defaultHardwareService.state.defaultVideoDevice;
-    }
-
-    // TODO: Specifically for TikTok, we don't use auto mode on game capture
-    // for portrait resolutions, because auto mode will distort the game.
-    // We should remove this change when the backend team makes a change on their
-    // end to better scale the game capture in auto mode.
-    if (type === 'game_capture' && this.videoService.baseHeight > this.videoService.baseWidth) {
-      resolvedSettings.capture_mode = 'any_fullscreen';
     }
 
     return resolvedSettings;

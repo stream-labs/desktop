@@ -1,36 +1,35 @@
 import React, { CSSProperties, SVGProps } from 'react';
-import { Button } from 'antd';
+import { Button, ButtonProps } from 'antd';
 import cx from 'classnames';
 import styles from './ButtonHighlighted.m.less';
 
-interface IButtonHighlighted {
+interface IButtonHighlighted extends ButtonProps {
   icon?: SVGProps<SVGElement> | HTMLDivElement;
   className?: string;
   disabled?: boolean;
   style?: CSSProperties;
   filled?: boolean;
-  text: string;
+  faded?: boolean;
+  text?: string;
   onClick?: () => void;
 }
 
-export default function ButtonHighlighted({
-  icon,
-  className,
-  disabled,
-  style,
-  filled,
-  text,
-  onClick,
-}: IButtonHighlighted) {
+export default function ButtonHighlighted(p: IButtonHighlighted) {
   return (
     <Button
-      className={cx(styles.highlighted, className, filled && styles.filled)}
-      style={style}
-      onClick={onClick}
-      disabled={disabled}
+      className={cx(
+        styles.highlighted,
+        p.className,
+        p.filled && styles.filled,
+        p.faded && styles.faded,
+      )}
+      style={p.style}
+      onClick={p.onClick}
+      disabled={p.disabled}
     >
-      {icon}
-      {text}
+      {p.icon}
+      {p.text}
+      {p.children}
     </Button>
   );
 }
