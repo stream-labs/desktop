@@ -454,7 +454,7 @@ class VideoSettingsModule {
         remote.dialog.showMessageBox({
           title: 'Vertical Display Disabled',
           message: $t(
-            'Dual Output can’t be displayed - Selective Recording only works with horizontal sources and disables editing the vertical output scene. Please disable selective recording from Scenes to set up Dual Output.',
+            'Dual Output can’t be displayed - Selective Recording only works with horizontal sources and disables editing the vertical output scene. Please disable selective recording from Sources to set up Dual Output.',
           ),
         });
       }
