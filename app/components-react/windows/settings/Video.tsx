@@ -451,9 +451,10 @@ class VideoSettingsModule {
         Services.StreamingService.state.selectiveRecording &&
         !this.dualOutputService.views.dualOutputMode
       ) {
-        message.warning({
-          content: $t(
-            'Dual Output enabled. Selective Recording only works with horizontal sources.',
+        remote.dialog.showMessageBox({
+          title: 'Vertical Display Disabled',
+          message: $t(
+            'Dual Output can’t be displayed - Selective Recording only works with horizontal sources and disables editing the vertical output scene. Please disable selective recording from Sources to set up Dual Output.',
           ),
         });
       }
