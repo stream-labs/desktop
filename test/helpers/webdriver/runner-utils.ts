@@ -8,7 +8,6 @@ import { ITestContext } from './index';
 import { uniq } from 'lodash';
 const fs = require('fs');
 const fetch = require('node-fetch');
-const request = require('request');
 const tasklist = require('tasklist');
 const kill = require('tree-kill');
 

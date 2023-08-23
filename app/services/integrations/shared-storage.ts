@@ -66,12 +66,13 @@ export class SharedStorageService extends Service {
     onError?: (error: unknown) => void,
     platform?: string,
   ) {
+    let uploadInfo;
     try {
       if (this.uploading) {
         throw new Error($t('Upload already in progress'));
       }
       this.uploading = true;
-      const uploadInfo = await this.prepareUpload(filepath, platform);
+      uploadInfo = await this.prepareUpload(filepath, platform);
       this.id = uploadInfo.file.id;
       this.uploader = new S3Uploader({
         fileInfo: uploadInfo,
@@ -83,7 +84,11 @@ export class SharedStorageService extends Service {
     } catch (e: unknown) {
       onError(e);
     }
-    return { cancel: this.cancelUpload.bind(this), complete: this.performUpload() };
+    return {
+      cancel: this.cancelUpload.bind(this),
+      complete: this.performUpload(),
+      size: uploadInfo?.file?.size,
+    };
   }
 
   async performUpload() {
