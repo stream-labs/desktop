@@ -141,6 +141,12 @@
   "Revert Changes": "Отменить изменения",
   "Animations": "Анимации",
   "Multistreaming": "Многопоточная трансляция",
+  "Upgrade to Ultra": "Перейдите на версию Ultra",
+  "Twitch": "Twitch",
+  "Facebook": "Facebook",
+  "YouTube": "YouTube",
+  "Trovo": "Trovo",
+  "TikTok": "TikTok",
   "Alert Box": "Оповещения",
   "Widget": "Виджет",
   "Creator Sites": "Авторские сайты",
@@ -151,6 +157,5 @@
   "Apps Store Home": "Магазин приложений (домашняя страница)",
   "Dashboard Home": "Панель управления (домашняя страница)",
   "Alert Box Library": "Библиотека оповещений",
-  "Alert Box Settings": "Настройки оповещений",
-  "Upgrade to Ultra": "Перейдите на версию Ultra"
+  "Alert Box Settings": "Настройки оповещений"
 }
