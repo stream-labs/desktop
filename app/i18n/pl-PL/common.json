@@ -141,6 +141,12 @@
   "Revert Changes": "Cofnij zmiany",
   "Animations": "Animacje",
   "Multistreaming": "Multistreaming",
+  "Upgrade to Ultra": "Ulepsz do wersji Ultra",
+  "Twitch": "Twitch",
+  "Facebook": "Facebook",
+  "YouTube": "YouTube",
+  "Trovo": "Trovo",
+  "TikTok": "TikTok",
   "Alert Box": "Pole powiadomień",
   "Widget": "Widżet",
   "Creator Sites": "Strony twórców",
@@ -151,6 +157,5 @@
   "Apps Store Home": "Strona główna sklepu z aplikacjami",
   "Dashboard Home": "Strona główna panelu kontrolnego",
   "Alert Box Library": "Biblioteka pola powiadomień",
-  "Alert Box Settings": "Ustawienia pola powiadomień",
-  "Upgrade to Ultra": "Ulepsz do wersji Ultra"
+  "Alert Box Settings": "Ustawienia pola powiadomień"
 }
