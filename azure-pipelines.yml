@@ -74,6 +74,10 @@ jobs:
       clean: resources
 
     steps:
+      - task: NodeTool@0
+        inputs:
+          versionSpec: '18.x'
+
       - script: yarn install --immutable --network-timeout 1000000 2>&1
         displayName: 'Install Dependencies'
 
