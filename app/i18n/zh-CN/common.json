@@ -141,6 +141,12 @@
   "Revert Changes": "还原更改",
   "Animations": "动画",
   "Multistreaming": "多重直播",
+  "Upgrade to Ultra": "升级至 Ultra",
+  "Twitch": "Twitch",
+  "Facebook": "Facebook",
+  "YouTube": "YouTube",
+  "Trovo": "Trovo",
+  "TikTok": "TikTok",
   "Alert Box": "提醒框",
   "Widget": "小工具",
   "Creator Sites": "创作者网站",
@@ -151,6 +157,5 @@
   "Apps Store Home": "应用商店主页",
   "Dashboard Home": "仪表板首页",
   "Alert Box Library": "提醒框库",
-  "Alert Box Settings": "提醒框设置",
-  "Upgrade to Ultra": "升级至 Ultra"
+  "Alert Box Settings": "提醒框设置"
 }
