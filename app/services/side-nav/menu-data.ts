@@ -124,6 +124,7 @@ export const compactMenuItemKeys: EMenuItemKey[] = [
   EMenuItemKey.Themes,
   EMenuItemKey.AppStore,
   EMenuItemKey.Highlighter,
+  EMenuItemKey.RecordingHistory,
 ];
 
 /**
