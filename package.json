@@ -240,7 +240,7 @@
   },
   "resolutions": {
     "minimist": "1.2.6",
-    "xmlhttprequest-ssl": "1.6.1"
+    "xmlhttprequest-ssl": "1.6.2"
   },
   "packageManager": "yarn@3.1.1"
 }

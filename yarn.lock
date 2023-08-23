@@ -17430,10 +17430,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"xmlhttprequest-ssl@npm:1.6.1":
-  version: 1.6.1
-  resolution: "xmlhttprequest-ssl@npm:1.6.1"
-  checksum: 38eef7d922f6beb25dbd32cf0162620416b5298d6f22e841d3ad14e589fbbff566d0ec6812b81427e107b41b4a2cbe4254ac357bf367135d6fd111e80ae2c538
+"xmlhttprequest-ssl@npm:1.6.2":
+  version: 1.6.2
+  resolution: "xmlhttprequest-ssl@npm:1.6.2"
+  checksum: 3090153881ea81e8964f0d79e4cfef87324f4c0cdc3fb826937b9a3794ec458e5df6ddfbe1822c1c61290200a50b47e7f64f747f0f83a7749d86432e94690757
   languageName: node
   linkType: hard
 
