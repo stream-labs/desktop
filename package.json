@@ -94,8 +94,7 @@
     "socket.io-client": "2.3.1",
     "tasklist": "^3.1.1",
     "uuid": "^3.0.1",
-    "vuejs-datepicker": "^1.6.2",
-    "zustand": "^4.4.1"
+    "vuejs-datepicker": "^1.6.2"
   },
   "devDependencies": {
     "7zip-bin": "2.4.1",
@@ -233,7 +232,8 @@
     "webpack": "5.76.0",
     "webpack-cli": "5.1.4",
     "webpack-manifest-plugin": "3.0.0",
-    "webpack-merge": "5.2.0"
+    "webpack-merge": "5.2.0",
+    "zustand": "^4.4.1"
   },
   "optionalDependencies": {
     "node-win32-np": "1.0.6"
