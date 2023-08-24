@@ -16,7 +16,7 @@ export function initStore<TState extends any>(initialStateDraft: TState) {
     if ((initialState as any).hasOwnProperty(key)) {
       Object.defineProperty(store, key, {
         get() {
-          return initialState[key];
+          return store.getState()[key];
         },
       });
     }
