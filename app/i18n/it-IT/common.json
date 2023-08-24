@@ -141,6 +141,12 @@
   "Revert Changes": "Annulla modifiche",
   "Animations": "Animazioni",
   "Multistreaming": "Multistreaming",
+  "Upgrade to Ultra": "Esegui l’upgrade a Ultra",
+  "Twitch": "Twitch",
+  "Facebook": "Facebook",
+  "YouTube": "YouTube",
+  "Trovo": "Trovo",
+  "TikTok": "TikTok",
   "Alert Box": "Finestra di avviso",
   "Widget": "Widget",
   "Creator Sites": "Creator Sites",
@@ -151,6 +157,5 @@
   "Apps Store Home": "Home app store",
   "Dashboard Home": "Home dashboard",
   "Alert Box Library": "Finestra di avviso Libreria",
-  "Alert Box Settings": "Impostazioni finestra di avviso",
-  "Upgrade to Ultra": "Esegui l’upgrade a Ultra"
+  "Alert Box Settings": "Impostazioni finestra di avviso"
 }

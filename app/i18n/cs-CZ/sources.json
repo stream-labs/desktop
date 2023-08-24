@@ -354,5 +354,8 @@
   "Set scale filter 'Bicubic'": "Nastavit filtr měřítka „Bikubické“",
   "Set scale filter 'Bilinear'": "Nastavit filtr měřítka „Bilineární“",
   "Set scale filter 'Lanczos'": "Nastavit filtr měřítka „Lanczos“",
-  "Set scale filter 'Area'": "Nastavit filtr měřítka „Oblast“"
+  "Set scale filter 'Area'": "Nastavit filtr měřítka „Oblast“",
+  "You currently have the same source on both canvases selected. Please select the source in the canvas to edit it independently.": "You currently have the same source on both canvases selected. Please select the source in the canvas to edit it independently.",
+  "Selective Recording can only be used with horizontal sources.": "Selective Recording can only be used with horizontal sources.",
+  "Cannot move source outside canvas in Dual Output Mode.": "Cannot move source outside canvas in Dual Output Mode."
 }

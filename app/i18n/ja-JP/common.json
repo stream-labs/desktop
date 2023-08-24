@@ -141,6 +141,12 @@
   "Revert Changes": "変更を元に戻す",
   "Animations": "動画",
   "Multistreaming": "マルチストリーミング",
+  "Upgrade to Ultra": "Ultra にアップグレード",
+  "Twitch": "Twitch",
+  "Facebook": "Facebook",
+  "YouTube": "YouTube",
+  "Trovo": "Trovo",
+  "TikTok": "TikTok",
   "Alert Box": "アラートボックス",
   "Widget": "ウィジェット",
   "Creator Sites": "クリエーターサイト",
@@ -151,6 +157,5 @@
   "Apps Store Home": "Apps Store ホーム",
   "Dashboard Home": "ダッシュボード ホーム",
   "Alert Box Library": "アラートボックス ライブラリ",
-  "Alert Box Settings": "アラートボックス設定",
-  "Upgrade to Ultra": "Ultra にアップグレード"
+  "Alert Box Settings": "アラートボックス設定"
 }
