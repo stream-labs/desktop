@@ -141,6 +141,12 @@
   "Revert Changes": "Değişiklikleri Geri Al",
   "Animations": "Animasyonlar",
   "Multistreaming": "Çoklu Yayın",
+  "Upgrade to Ultra": "Ultra’ya yükseltin",
+  "Twitch": "Twitch",
+  "Facebook": "Facebook",
+  "YouTube": "YouTube",
+  "Trovo": "Trovo",
+  "TikTok": "TikTok",
   "Alert Box": "Uyarı kutusu",
   "Widget": "Pencere ögesi",
   "Creator Sites": "İçerik Oluşturucu Siteleri",
@@ -151,6 +157,5 @@
   "Apps Store Home": "Uygulama Mağazası Ana Sayfa",
   "Dashboard Home": "Gösterge Paneli Ana Sayfa",
   "Alert Box Library": "Uyarı Kutusu Kütüphanesi",
-  "Alert Box Settings": "Uyarı Kutusu Seçenekleri",
-  "Upgrade to Ultra": "Ultra’ya yükseltin"
+  "Alert Box Settings": "Uyarı Kutusu Seçenekleri"
 }

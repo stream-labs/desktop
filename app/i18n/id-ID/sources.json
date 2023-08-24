@@ -354,5 +354,8 @@
   "Set scale filter 'Bicubic'": "Tetapkan filter skala pada 'Bicubic'",
   "Set scale filter 'Bilinear'": "Tetapkan filter skala pada 'Bilinear'",
   "Set scale filter 'Lanczos'": "Tetapkan filter skala pada 'Lanczos'",
-  "Set scale filter 'Area'": "Tetapkan filter skala pada 'Area'"
+  "Set scale filter 'Area'": "Tetapkan filter skala pada 'Area'",
+  "You currently have the same source on both canvases selected. Please select the source in the canvas to edit it independently.": "You currently have the same source on both canvases selected. Please select the source in the canvas to edit it independently.",
+  "Selective Recording can only be used with horizontal sources.": "Selective Recording can only be used with horizontal sources.",
+  "Cannot move source outside canvas in Dual Output Mode.": "Cannot move source outside canvas in Dual Output Mode."
 }
