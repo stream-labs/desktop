@@ -95,7 +95,8 @@
     "socket.io-client": "2.1.1",
     "tasklist": "^3.1.1",
     "uuid": "^3.0.1",
-    "vuejs-datepicker": "^1.6.2"
+    "vuejs-datepicker": "^1.6.2",
+    "zustand": "^4.4.1"
   },
   "devDependencies": {
     "7zip-bin": "2.4.1",
