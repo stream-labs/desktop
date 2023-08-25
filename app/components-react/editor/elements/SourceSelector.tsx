@@ -1,9 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Tooltip, Tree } from 'antd';
 import { DataNode } from 'rc-tree/lib/interface';
 import { TreeProps } from 'rc-tree/lib/Tree';
 import cx from 'classnames';
-import { inject, injectState, injectWatch, mutation, useModule } from 'slap';
 import { SourcesService } from 'services/sources';
 import { ScenesService, ISceneItem, TSceneNode, isItem } from 'services/scenes';
 import { SelectionService } from 'services/selection';
@@ -22,6 +21,9 @@ import HelpTip from 'components-react/shared/HelpTip';
 import Translate from 'components-react/shared/Translate';
 import { WidgetsService } from '../../../app-services';
 import { GuestCamService } from 'app-services';
+import { Services } from 'components-react/service-provider';
+import { initStore, useController } from '../../hooks/zustand';
+import { useVuex } from '../../hooks';
 
 interface ISourceMetadata {
   id: string;
@@ -37,22 +39,22 @@ interface ISourceMetadata {
   parentId?: string;
 }
 
-class SourceSelectorModule {
-  private scenesService = inject(ScenesService);
-  private sourcesService = inject(SourcesService);
-  private widgetsService = inject(WidgetsService);
-  private selectionService = inject(SelectionService);
-  private editorCommandsService = inject(EditorCommandsService);
-  private streamingService = inject(StreamingService);
-  private audioService = inject(AudioService);
-  private guestCamService = inject(GuestCamService);
+class SourceSelectorController {
+  private scenesService = Services.ScenesService;
+  private sourcesService = Services.SourcesService;
+  private widgetsService = Services.WidgetsService;
+  private selectionService = Services.SelectionService;
+  private editorCommandsService = Services.EditorCommandsService;
+  private streamingService = Services.StreamingService;
+  private audioService = Services.AudioService;
+  private guestCamService = Services.GuestCamService;
 
   sourcesTooltip = $t('The building blocks of your scene. Also contains widgets.');
   addSourceTooltip = $t('Add a new Source to your Scene. Includes widgets.');
   openSourcePropertiesTooltip = $t('Open the Source Properties.');
   addGroupTooltip = $t('Add a Group so you can move multiple Sources at the same time.');
 
-  state = injectState({
+  store = initStore({
     expandedFoldersIds: [] as string[],
     showTreeMask: true,
   });
@@ -60,6 +62,13 @@ class SourceSelectorModule {
   nodeRefs = {};
 
   callCameFromInsideTheHouse = false;
+
+  constructor() {
+    this.selectionService.store.watch(
+      s => s.lastSelectedId,
+      () => this.expandSelectedFolders(),
+    );
+  }
 
   getTreeData(nodeData: ISourceMetadata[]) {
     // recursive function for transforming SceneNode[] to a Tree format of Antd.Tree
@@ -149,7 +158,7 @@ class SourceSelectorModule {
 
   determineIcon(isLeaf: boolean, sourceId: string) {
     if (!isLeaf) {
-      return this.state.expandedFoldersIds.includes(sourceId)
+      return this.store.expandedFoldersIds.includes(sourceId)
         ? 'fas fa-folder-open'
         : 'fa fa-folder';
     }
@@ -295,20 +304,19 @@ class SourceSelectorModule {
     this.selectionService.views.globalSelection.select(ids);
   }
 
-  @mutation()
   toggleFolder(nodeId: string) {
-    if (this.state.expandedFoldersIds.includes(nodeId)) {
-      this.state.expandedFoldersIds.splice(this.state.expandedFoldersIds.indexOf(nodeId), 1);
-    } else {
-      this.state.expandedFoldersIds.push(nodeId);
-    }
+    this.store.setState(s => {
+      if (s.expandedFoldersIds.includes(nodeId)) {
+        s.expandedFoldersIds.splice(s.expandedFoldersIds.indexOf(nodeId), 1);
+      } else {
+        s.expandedFoldersIds.push(nodeId);
+      }
+    });
   }
 
   get lastSelectedId() {
     return this.selectionService.state.lastSelectedId;
   }
-
-  watchSelected = injectWatch(() => this.lastSelectedId, this.expandSelectedFolders);
 
   async expandSelectedFolders() {
     if (this.callCameFromInsideTheHouse) {
@@ -317,9 +325,10 @@ class SourceSelectorModule {
     }
     const node = this.scene.getNode(this.lastSelectedId);
     if (!node || this.selectionService.state.selectedIds.length > 1) return;
-    this.state.setExpandedFoldersIds(
-      this.state.expandedFoldersIds.concat(node.getPath().slice(0, -1)),
-    );
+
+    this.store.setState(s => {
+      s.expandedFoldersIds.concat(node.getPath().slice(0, -1));
+    });
 
     this.nodeRefs[this.lastSelectedId].current.scrollIntoView({ behavior: 'smooth' });
   }
@@ -404,7 +413,7 @@ class SourceSelectorModule {
 }
 
 function SourceSelector() {
-  const { nodeData } = useModule(SourceSelectorModule);
+  const { nodeData } = useController(SourceSelectorCtx);
   return (
     <>
       <StudioControls />
@@ -438,7 +447,7 @@ function StudioControls() {
     addSource,
     addFolder,
     toggleSelectiveRecording,
-  } = useModule(SourceSelectorModule);
+  } = useController(SourceSelectorCtx);
 
   return (
     <div className={styles.topContainer} data-name="sourcesControls">
@@ -468,19 +477,26 @@ function StudioControls() {
 }
 
 function ItemsTree() {
-  const {
-    nodeData,
-    getTreeData,
-    activeItemIds,
-    expandedFoldersIds,
-    selectiveRecordingEnabled,
-    showContextMenu,
-    makeActive,
-    toggleFolder,
-    handleSort,
-    showTreeMask,
-    setShowTreeMask,
-  } = useModule(SourceSelectorModule);
+  const controller = useController(SourceSelectorCtx);
+  const { getTreeData, showContextMenu, makeActive, toggleFolder, handleSort, store } = controller;
+  const { showTreeMask, expandedFoldersIds } = store.useState(s => ({
+    showTreeMask: s.showTreeMask,
+    expandedFoldersIds: s.expandedFoldersIds,
+  }));
+  const { nodeData, activeItemIds, selectiveRecordingEnabled } = useVuex(() => {
+    return {
+      nodeData: controller.nodeData,
+      activeItemIds: controller.activeItemIds,
+      selectiveRecordingEnabled: controller.selectiveRecordingEnabled,
+    };
+  });
+  const setShowTreeMask = useCallback(
+    (isShown: boolean) =>
+      store.setState(s => {
+        s.showTreeMask = isShown;
+      }),
+    [],
+  );
 
   // Force a rerender when the state of selective recording changes
   const [selectiveRecordingToggled, setSelectiveRecordingToggled] = useState(false);
@@ -608,9 +624,11 @@ const TreeNode = React.forwardRef(
     );
   },
 );
+export const SourceSelectorCtx = React.createContext<SourceSelectorController | null>(null);
 
 export default function SourceSelectorElement() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const controller = useMemo(() => new SourceSelectorController(), []);
   const { renderElement } = useBaseElement(
     <SourceSelector />,
     { x: 200, y: 120 },
@@ -618,12 +636,14 @@ export default function SourceSelectorElement() {
   );
 
   return (
-    <div
-      ref={containerRef}
-      data-name="SourceSelector"
-      style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
-    >
-      {renderElement()}
-    </div>
+    <SourceSelectorCtx.Provider value={controller}>
+      <div
+        ref={containerRef}
+        data-name="SourceSelector"
+        style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+      >
+        {renderElement()}
+      </div>
+    </SourceSelectorCtx.Provider>
   );
 }
