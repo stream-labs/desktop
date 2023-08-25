@@ -119,7 +119,7 @@ export class RemoveItemCommand extends Command {
     });
 
     if (this.dualOutputVerticalNodeId) {
-      await this.dualOutputService.createOrAssignOutputNode(
+      this.dualOutputService.createOrAssignOutputNode(
         horizontalItem,
         'vertical',
         false,

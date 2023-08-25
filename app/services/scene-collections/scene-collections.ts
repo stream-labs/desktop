@@ -989,7 +989,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * @returns
    */
 
-  async createNodeMapEntry(sceneId: string, horizontalNodeId: string, verticalNodeId: string) {
+  createNodeMapEntry(sceneId: string, horizontalNodeId: string, verticalNodeId: string) {
     if (!this.activeCollection) return;
     if (!this.activeCollection.hasOwnProperty('sceneNodeMaps')) {
       this.activeCollection.sceneNodeMaps = {};

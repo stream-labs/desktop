@@ -428,7 +428,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    * @param sceneId - the scene id where a copied node should be added, default is the active scene id
    * @returns
    */
-  async createOrAssignOutputNode(
+  createOrAssignOutputNode(
     sceneItem: SceneItem,
     display: TDisplayType,
     isHorizontalDisplay: boolean,
@@ -457,11 +457,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         EPlaceType.Before,
       );
 
-      await this.sceneCollectionsService.createNodeMapEntry(
-        sceneId,
-        sceneItem.id,
-        copiedSceneItem.id,
-      );
+      this.sceneCollectionsService.createNodeMapEntry(sceneId, sceneItem.id, copiedSceneItem.id);
       return copiedSceneItem;
     }
   }

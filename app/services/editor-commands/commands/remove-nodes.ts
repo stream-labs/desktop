@@ -104,8 +104,8 @@ export class RemoveNodesCommand extends Command {
     if (this.nodeMapEntries) {
       const sceneId = this.selection.sceneId;
 
-      Object.keys(this.nodeMapEntries).forEach(async horizontalNodeId => {
-        await this.sceneCollectionsService.createNodeMapEntry(
+      Object.keys(this.nodeMapEntries).forEach(horizontalNodeId => {
+        this.sceneCollectionsService.createNodeMapEntry(
           sceneId,
           horizontalNodeId,
           this.nodeMapEntries[horizontalNodeId],
