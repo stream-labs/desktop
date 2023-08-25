@@ -335,7 +335,7 @@ export class Scene {
   removeFolder(folderId: string) {
     const sceneFolder = this.getFolder(folderId);
     const node = this.state.nodes.find(node => node?.id === sceneFolder.id)!;
-    if (!sceneFolder) return;
+    if (!sceneFolder || !node) return;
     if (sceneFolder.isSelected()) sceneFolder.deselect();
     sceneFolder.getSelection().remove();
     sceneFolder.detachParent();
@@ -349,7 +349,7 @@ export class Scene {
   removeItem(sceneItemId: string) {
     const sceneItem = this.getItem(sceneItemId);
     const node = this.state.nodes.find(node => node?.id === sceneItem.id)!;
-    if (!sceneItem) return;
+    if (!sceneItem || !node) return;
     const sceneItemModel = sceneItem.getModel();
     if (sceneItem.isSelected()) sceneItem.deselect();
     sceneItem.detachParent();
