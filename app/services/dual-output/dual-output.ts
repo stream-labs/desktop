@@ -46,6 +46,7 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   @Inject() private videoSettingsService: VideoSettingsService;
   @Inject() private sceneCollectionsService: SceneCollectionsService;
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
+  @Inject() private streamingService: StreamingService;
 
   get activeSceneId(): string {
     return this.scenesService.views.activeSceneId;
@@ -214,6 +215,18 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
         : this.activeSceneNodeMap[nodeId];
 
     return this.scenesService.views.getNodeVisibility(id, sceneId ?? this.activeSceneId);
+  }
+
+  getCanStreamDualOutput() {
+    const platformDisplays = this.streamingService.views.activeDisplayPlatforms;
+    const destinationDisplays = this.streamingService.views.activeDisplayDestinations;
+
+    const horizontalHasDestinations =
+      platformDisplays.horizontal.length > 0 || destinationDisplays.horizontal.length > 0;
+    const verticalHasDestinations =
+      platformDisplays.vertical.length > 0 || destinationDisplays.vertical.length > 0;
+
+    return horizontalHasDestinations && verticalHasDestinations;
   }
 
   hasNodeMap(sceneId?: string) {
