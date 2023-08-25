@@ -93,7 +93,7 @@ export class CopyNodesCommand extends Command {
      */
     if (isDualOutputMode && !this.hasNodeMap) {
       // Create all nodes first
-      this.selection.getNodes().forEach(node => {
+      this.selection.getNodes().forEach(async node => {
         if (node.isFolder()) {
           // add folder
           const display =
@@ -107,7 +107,11 @@ export class CopyNodesCommand extends Command {
           if (this.display === 'vertical') {
             // when creating dual output nodes for a vanilla scene, the passed in display is set to vertical
             // if the scene has dual output nodes, add a node map entry only when copying a horizontal node
-            this.sceneCollectionsService.createNodeMapEntry(this.destSceneId, node.id, folder.id);
+            await this.sceneCollectionsService.createNodeMapEntry(
+              this.destSceneId,
+              node.id,
+              folder.id,
+            );
           }
 
           this.nodeIdsMap[node.id] = folder.id;
@@ -133,7 +137,11 @@ export class CopyNodesCommand extends Command {
 
             // when creating dual output scene nodes, the passed in display is set to vertical
             // if the scene has dual output nodes, add a node map entry only when copying a horizontal node
-            this.sceneCollectionsService.createNodeMapEntry(this.destSceneId, node.id, item.id);
+            await this.sceneCollectionsService.createNodeMapEntry(
+              this.destSceneId,
+              node.id,
+              item.id,
+            );
           }
 
           // add to arrays for reordering

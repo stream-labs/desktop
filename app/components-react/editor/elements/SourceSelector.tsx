@@ -412,6 +412,18 @@ export class SourceSelectorModule {
     return this.dualOutputService.views.dualOutputMode;
   }
 
+  get horizontalActive() {
+    return this.dualOutputService.views.activeDisplays.horizontal;
+  }
+
+  get verticalActive() {
+    return this.dualOutputService.views.activeDisplays.vertical;
+  }
+
+  get isDualOutputLoading() {
+    return this.dualOutputService.views.isLoading && !this.dualOutputService.views.hasVerticalNodes;
+  }
+
   watchSelected = injectWatch(() => this.lastSelectedId, this.expandSelectedFolders);
 
   async expandSelectedFolders() {

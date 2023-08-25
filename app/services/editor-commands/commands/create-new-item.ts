@@ -45,6 +45,7 @@ export class CreateNewItemCommand extends Command {
   }
 
   execute() {
+    console.log('CREATE-ITEM EXECUTE');
     this.options.id = this.options.id || this.sceneItemId;
     this.options.sourceAddOptions.sourceId =
       this.options.sourceAddOptions.sourceId || this.sourceId;
@@ -56,12 +57,13 @@ export class CreateNewItemCommand extends Command {
 
     if (this.dualOutputService.views.hasNodeMap(this.sceneId)) {
       if (this.dualOutputVerticalNodeId) {
-        this.dualOutputService.createOrAssignOutputNode(
-          item,
-          'vertical',
-          false,
-          this.sceneId,
-          this.dualOutputVerticalNodeId,
+        Promise.resolve(
+          this.dualOutputService.actions.return.createOrAssignOutputNode(
+            item,
+            'vertical',
+            false,
+            this.sceneId,
+          ),
         );
       } else {
         Promise.resolve(
@@ -84,6 +86,7 @@ export class CreateNewItemCommand extends Command {
   }
 
   rollback() {
+    console.log('CREATE-ITEM ROLLBACK');
     this.scenesService.views.getScene(this.sceneId).removeItem(this.sceneItemId);
 
     if (this.dualOutputVerticalNodeId) {

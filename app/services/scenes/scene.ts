@@ -81,7 +81,7 @@ export class Scene {
 
   getNode(sceneNodeId: string): TSceneNode | null {
     const nodeModel = this.state.nodes.find(
-      sceneItemModel => sceneItemModel.id === sceneNodeId,
+      sceneItemModel => sceneItemModel?.id === sceneNodeId,
     ) as ISceneItem;
 
     if (!nodeModel) return null;
@@ -110,20 +110,22 @@ export class Scene {
 
   getItems(): SceneItem[] {
     return this.state.nodes
-      .filter(node => node.sceneNodeType === 'item')
+      .filter(node => node && node?.sceneNodeType === 'item')
       .map(item => this.getItem(item.id)!);
   }
 
   getFolders(): SceneItemFolder[] {
     return this.state.nodes
-      .filter(node => node.sceneNodeType === 'folder')
+      .filter(node => node && node?.sceneNodeType === 'folder')
       .map(item => this.getFolder(item.id)!);
   }
 
   getNodes(): TSceneNode[] {
-    return this.state.nodes.map(node => {
-      return node.sceneNodeType === 'folder' ? this.getFolder(node.id)! : this.getItem(node.id)!;
-    });
+    return this.state.nodes
+      .filter(node => node)
+      .map(node => {
+        return node.sceneNodeType === 'folder' ? this.getFolder(node.id)! : this.getItem(node.id)!;
+      });
   }
 
   getRootNodes(): TSceneNode[] {
@@ -175,14 +177,14 @@ export class Scene {
 
   // Required for performance. Using Selection is too slow (Service Helpers)
   getItemsForNode(sceneNodeId: string): ISceneItem[] {
-    const node = this.state.nodes.find(n => n.id === sceneNodeId);
+    const node = this.state.nodes.find(n => n?.id === sceneNodeId);
     if (!node) return [];
 
     if (node.sceneNodeType === 'item') {
       return [node];
     }
 
-    const children = this.state.nodes.filter(n => n.parentId === sceneNodeId);
+    const children = this.state.nodes.filter(n => n?.parentId === sceneNodeId);
     let childrenItems: ISceneItem[] = [];
 
     children.forEach(c => (childrenItems = childrenItems.concat(this.getItemsForNode(c.id))));
@@ -332,11 +334,12 @@ export class Scene {
 
   removeFolder(folderId: string) {
     const sceneFolder = this.getFolder(folderId);
+    const node = this.state.nodes.find(node => node?.id === sceneFolder.id)!;
     if (!sceneFolder) return;
     if (sceneFolder.isSelected()) sceneFolder.deselect();
     sceneFolder.getSelection().remove();
     sceneFolder.detachParent();
-    this.REMOVE_NODE_FROM_SCENE(folderId);
+    this.REMOVE_NODE_FROM_SCENE(node);
   }
 
   remove(force?: boolean): IScene | null {
@@ -345,12 +348,13 @@ export class Scene {
 
   removeItem(sceneItemId: string) {
     const sceneItem = this.getItem(sceneItemId);
+    const node = this.state.nodes.find(node => node?.id === sceneItem.id)!;
     if (!sceneItem) return;
     const sceneItemModel = sceneItem.getModel();
     if (sceneItem.isSelected()) sceneItem.deselect();
     sceneItem.detachParent();
     sceneItem.getObsSceneItem().remove();
-    this.REMOVE_NODE_FROM_SCENE(sceneItemId);
+    this.REMOVE_NODE_FROM_SCENE(node);
     this.scenesService.itemRemoved.next(sceneItemModel);
   }
 
@@ -664,11 +668,10 @@ export class Scene {
   }
 
   @mutation()
-  private REMOVE_NODE_FROM_SCENE(nodeId: string) {
-    const item = this.state.nodes.find(item => item.id === nodeId)!;
-    item.isRemoved = true;
+  private REMOVE_NODE_FROM_SCENE(node: ISceneItem | ISceneItemFolder) {
+    node.isRemoved = true;
     this.state.nodes = this.state.nodes.filter(item => {
-      return item.id !== nodeId;
+      return item?.id !== node.id;
     });
   }
 
@@ -677,7 +680,7 @@ export class Scene {
     // TODO: This is O(n^2)
     this.state.nodes = order.map(id => {
       return this.state.nodes.find(item => {
-        return item.id === id;
+        return item?.id === id;
       })!;
     });
   }

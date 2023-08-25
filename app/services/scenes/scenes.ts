@@ -243,8 +243,10 @@ class ScenesViews extends ViewHandler<IScenesState> {
     return null;
   }
 
-  getNodeVisibility(sceneNodeId: string, sceneId?: string) {
+  getNodeVisibility(sceneNodeId: string, sceneId?: string): boolean {
     const nodeModel: TSceneNode | null = this.getSceneNode(sceneNodeId);
+
+    if (!nodeModel) return false;
 
     if (nodeModel instanceof SceneItem) {
       return nodeModel?.visible;

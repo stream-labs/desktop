@@ -46,6 +46,7 @@ export class CreateFolderCommand extends Command {
   }
 
   execute() {
+    console.log('CREATE-ITEM ROLLBACK');
     const scene = this.scenesService.views.getScene(this.sceneId);
     const folder = scene.createFolder(this.name, { id: this.folderId, display: 'horizontal' });
     this.folderId = folder.id;
@@ -109,6 +110,7 @@ export class CreateFolderCommand extends Command {
   }
 
   rollback() {
+    console.log('CREATE-FOLDER ROLLBACK');
     // remove vertical folder node and node map entry
     if (this.dualOutputService.views.hasNodeMap(this.sceneId)) {
       if (this.dualOutputModeToFolderSubCommand) this.dualOutputModeToFolderSubCommand.rollback();

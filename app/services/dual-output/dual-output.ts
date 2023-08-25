@@ -199,14 +199,14 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return display === 'horizontal' ? 'landscape' : 'portrait';
   }
 
-  getIsHorizontalVisible(nodeId: string, sceneId?: string) {
-    if (!this.hasVerticalNodes) return;
+  getIsHorizontalVisible(nodeId: string, sceneId?: string): boolean {
+    if (!this.hasVerticalNodes) return false;
     return this.scenesService.views.getNodeVisibility(nodeId, sceneId ?? this.activeSceneId);
   }
 
-  getIsVerticalVisible(nodeId: string, sceneId?: string) {
+  getIsVerticalVisible(nodeId: string, sceneId?: string): boolean {
     // in the source selector, the vertical node id is determined by the visible display
-    if (!this.hasVerticalNodes) return;
+    if (!this.hasVerticalNodes) return false;
 
     const id =
       this.activeDisplays.vertical && !this.activeDisplays.horizontal
@@ -428,7 +428,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    * @param sceneId - the scene id where a copied node should be added, default is the active scene id
    * @returns
    */
-  createOrAssignOutputNode(
+  async createOrAssignOutputNode(
     sceneItem: SceneItem,
     display: TDisplayType,
     isHorizontalDisplay: boolean,
@@ -457,7 +457,11 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         EPlaceType.Before,
       );
 
-      this.sceneCollectionsService.createNodeMapEntry(sceneId, sceneItem.id, copiedSceneItem.id);
+      await this.sceneCollectionsService.createNodeMapEntry(
+        sceneId,
+        sceneItem.id,
+        copiedSceneItem.id,
+      );
       return copiedSceneItem;
     }
   }

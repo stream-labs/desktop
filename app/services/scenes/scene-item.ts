@@ -95,7 +95,7 @@ export class SceneItem extends SceneItemNode {
   constructor(sceneId: string, sceneItemId: string, sourceId: string) {
     super();
     const sceneItemState = this.scenesService.state.scenes[sceneId].nodes.find(item => {
-      return item.id === sceneItemId;
+      return item?.id === sceneItemId;
     }) as ISceneItem;
     assertIsDefined(sceneItemState);
 

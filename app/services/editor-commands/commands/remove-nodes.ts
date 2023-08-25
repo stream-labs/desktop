@@ -38,6 +38,7 @@ export class RemoveNodesCommand extends Command {
   }
 
   async execute() {
+    console.log('REMOVE-NODES EXECUTE');
     this.removeFolderSubCommands = [];
     this.removeItemSubCommands = [];
 
@@ -90,6 +91,7 @@ export class RemoveNodesCommand extends Command {
   }
 
   async rollback() {
+    console.log('REMOVE-NODES ROLLBACK');
     for (const itemCommand of [...this.removeItemSubCommands].reverse()) {
       await itemCommand.rollback();
     }
@@ -102,8 +104,8 @@ export class RemoveNodesCommand extends Command {
     if (this.nodeMapEntries) {
       const sceneId = this.selection.sceneId;
 
-      Object.keys(this.nodeMapEntries).forEach(horizontalNodeId => {
-        this.sceneCollectionsService.createNodeMapEntry(
+      Object.keys(this.nodeMapEntries).forEach(async horizontalNodeId => {
+        await this.sceneCollectionsService.createNodeMapEntry(
           sceneId,
           horizontalNodeId,
           this.nodeMapEntries[horizontalNodeId],

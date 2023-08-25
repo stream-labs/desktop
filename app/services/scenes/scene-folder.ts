@@ -29,7 +29,7 @@ export class SceneItemFolder extends SceneItemNode {
     this.id = id;
 
     const state = this.scenesService.state.scenes[sceneId].nodes.find(item => {
-      return item.id === id;
+      return item?.id === id;
     });
     assertIsDefined(state);
     Utils.applyProxy(this, state);
