@@ -56,7 +56,7 @@ export class CreateNewItemCommand extends Command {
 
     // check the existence of all scene node maps because the scene may not have a
     // node map created for it
-    if (this.dualOutputService.views.sceneNodeMaps) {
+    if (this.dualOutputService.views.hasSceneNodeMaps) {
       if (this.dualOutputVerticalNodeId) {
         this.dualOutputService.createOrAssignOutputNode(
           item,

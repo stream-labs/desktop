@@ -44,7 +44,7 @@ export class CreateExistingItemCommand extends Command {
 
     // check the existence of all scene node maps because the scene may not have a
     // node map created for it
-    if (this.dualOutputService.views.sceneNodeMaps) {
+    if (this.dualOutputService.views.hasSceneNodeMaps) {
       Promise.resolve(
         this.dualOutputService.actions.return.createOrAssignOutputNode(
           item,

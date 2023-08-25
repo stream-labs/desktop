@@ -52,7 +52,7 @@ export class CreateFolderCommand extends Command {
 
     // check the existence of all scene node maps because the scene may not have a
     // node map created for it
-    if (this.dualOutputService.views.sceneNodeMaps) {
+    if (this.dualOutputService.views.hasSceneNodeMaps) {
       const verticalFolder = scene.createFolder(this.name, {
         id: this.verticalFolderId,
         display: 'vertical',

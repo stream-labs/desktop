@@ -68,7 +68,7 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   }
 
   get activeSceneNodeMap(): Dictionary<string> {
-    return this.sceneNodeMaps[this.activeSceneId];
+    return this.sceneCollectionsService.sceneNodeMaps[this.activeSceneId];
   }
 
   get hasVerticalNodes() {
@@ -77,6 +77,10 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
 
   get shouldCreateVerticalNode(): boolean {
     return this.dualOutputMode || this.hasVerticalNodes;
+  }
+
+  get hasSceneNodeMaps(): boolean {
+    return !!this.sceneCollectionsService?.sceneNodeMaps;
   }
 
   get platformSettings() {
@@ -200,13 +204,13 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   }
 
   getIsHorizontalVisible(nodeId: string, sceneId?: string) {
-    if (!this.hasVerticalNodes) return;
+    if (!this.hasVerticalNodes) return false;
     return this.scenesService.views.getNodeVisibility(nodeId, sceneId ?? this.activeSceneId);
   }
 
   getIsVerticalVisible(nodeId: string, sceneId?: string) {
     // in the source selector, the vertical node id is determined by the visible display
-    if (!this.hasVerticalNodes) return;
+    if (!this.hasVerticalNodes) return false;
 
     const id =
       this.activeDisplays.vertical && !this.activeDisplays.horizontal

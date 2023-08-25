@@ -122,7 +122,7 @@ export class SourceSelectorModule {
   get nodeData(): ISourceMetadata[] {
     return this.scene.getSourceSelectorNodes().map(node => {
       const itemsForNode = this.scene.getItemsForNode(node.id);
-      const toggleAll = !!this.dualOutputService.views.sceneNodeMaps;
+      const toggleAll = this.dualOutputService.views.hasSceneNodeMaps;
 
       const isLocked = itemsForNode.every(i => i.locked);
       const isRecordingVisible = itemsForNode.every(i => i.recordingVisible);
