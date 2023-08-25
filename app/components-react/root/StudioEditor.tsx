@@ -361,22 +361,21 @@ function DualOutputControls(p: { stacked: boolean }) {
       className={cx(styles.dualOutputHeader, { [styles.stacked]: p.stacked })}
     >
       {showHorizontal && (
-        <div className={styles.dualOutputModeDetails}>
+        <div className={styles.horizontalHeader}>
           <i className="icon-desktop" />
           <span>{$t('Horizontal Output')}</span>
         </div>
       )}
 
       {showVertical && (
-        <div className={styles.dualOutputModeDetails}>
+        <div className={styles.verticalHeader}>
           <i className="icon-phone-case" />
           <span>{$t('Vertical Output')}</span>
         </div>
       )}
-
-      <a className={styles.manageLink} onClick={openSettingsWindow}>
-        {$t('Manage Dual Output')}
-      </a>
+      <div className={styles.manageLink}>
+        <a onClick={openSettingsWindow}>{$t('Manage Dual Output')}</a>
+      </div>
     </div>
   );
 }
