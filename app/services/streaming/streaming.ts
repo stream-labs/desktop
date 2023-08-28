@@ -840,7 +840,12 @@ export class StreamingService
         errorText = $t('streaming.noSpaceError');
       } else if (info.code === obs.EOutputCode.Unsupported) {
         errorText = $t('streaming.unsupportedError');
-      } else if (info.code === obs.EOutputCode.Error) {
+      } else if (info.code === obs.EOutputCode.OutdatedDriver) {
+        errorText = $t('streaming.outdatedDriverError');
+      } else {
+        // obs.EOutputCode.Error
+        // -4 is used for generic unknown messages in OBS. Both -4 and any other code
+        // we don't recognize should fall into this branch and show a generic error.
         errorText = $t('streaming.error') + info.error;
       }
 
