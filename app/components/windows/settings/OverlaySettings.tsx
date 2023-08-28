@@ -103,7 +103,7 @@ export default class OverlaySettings extends Vue {
     return (
       <button class="button button--action" disabled={this.busy} onClick={fn}>
         {title}
-        {this.busy && <i class="fa fa-spinner fa-pulse" />}
+        {this.busy && <i class="fa fa-spinner fa-pulse" style={{ marginLeft: '5px' }} />}
       </button>
     );
   }

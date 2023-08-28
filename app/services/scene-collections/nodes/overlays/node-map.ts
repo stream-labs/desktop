@@ -12,8 +12,11 @@ export class NodeMapNode extends Node<ISceneNodeMapSchema, {}> {
   @Inject() sceneCollectionsService: SceneCollectionsService;
 
   async save() {
-    if (this.sceneCollectionsService.activeCollection.hasOwnProperty('sceneNodeMaps')) {
-      this.data.sceneNodeMaps = this.sceneCollectionsService.activeCollection.sceneNodeMaps;
+    const activeCollection = this.sceneCollectionsService.activeCollection;
+    if (activeCollection?.sceneNodeMaps) {
+      this.data = {
+        sceneNodeMaps: this.sceneCollectionsService?.sceneNodeMaps,
+      };
     }
   }
 
