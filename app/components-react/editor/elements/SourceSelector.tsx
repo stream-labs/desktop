@@ -60,7 +60,6 @@ export class SourceSelectorModule {
   state = injectState({
     expandedFoldersIds: [] as string[],
     showTreeMask: true,
-    sceneNodeMap: this.dualOutputService.views.activeSceneNodeMap,
   });
 
   nodeRefs = {};
@@ -101,6 +100,7 @@ export class SourceSelectorModule {
               isRecordingVisible={sceneNode.isRecordingVisible}
               isGuestCamActive={sceneNode.isGuestCamActive}
               isDualOutputActive={sceneNode.isDualOutputActive}
+              hasNodeMap={this.hasNodeMap}
               cycleSelectiveRecording={() => this.cycleSelectiveRecording(sceneNode.id)}
               ref={this.nodeRefs[sceneNode.id]}
               onDoubleClick={() => this.sourceProperties(sceneNode.id)}
@@ -122,7 +122,7 @@ export class SourceSelectorModule {
   get nodeData(): ISourceMetadata[] {
     return this.scene.getSourceSelectorNodes().map(node => {
       const itemsForNode = this.scene.getItemsForNode(node.id);
-      const toggleAll = this.dualOutputService.views.hasNodeMap();
+      const toggleAll = !!this.dualOutputService.views.sceneNodeMaps[this.scene.id];
 
       const isLocked = itemsForNode.every(i => i.locked);
       const isRecordingVisible = itemsForNode.every(i => i.recordingVisible);
@@ -410,6 +410,10 @@ export class SourceSelectorModule {
 
   get isDualOutputActive() {
     return this.dualOutputService.views.dualOutputMode;
+  }
+
+  get hasNodeMap() {
+    return !!this.dualOutputService.views.sceneNodeMaps[this.scene.id];
   }
 
   watchSelected = injectWatch(() => this.lastSelectedId, this.expandSelectedFolders);
@@ -750,6 +754,7 @@ const TreeNode = React.forwardRef(
       isGuestCamActive: boolean;
       isDualOutputActive: boolean;
       canShowActions: boolean;
+      hasNodeMap: boolean;
       toggleVisibility: (ev: unknown) => unknown;
       toggleLock: (ev: unknown) => unknown;
       cycleSelectiveRecording: (ev: unknown) => void;
@@ -782,7 +787,7 @@ const TreeNode = React.forwardRef(
         {p.canShowActions && (
           <>
             {p.isGuestCamActive && <i className="fa fa-signal" />}
-            {p.isDualOutputActive && (
+            {p.isDualOutputActive && p.hasNodeMap && (
               <DualOutputSourceSelector nodeId={p.id} sceneId={p?.sceneId} />
             )}
             {p.selectiveRecordingEnabled && (

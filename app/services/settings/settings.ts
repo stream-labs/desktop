@@ -24,6 +24,7 @@ import { StreamingService } from 'services/streaming';
 import { byOS, getOS, OS } from 'util/operating-systems';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { SceneCollectionsService } from 'services/scene-collections';
+import { Subject } from 'rxjs';
 import * as remote from '@electron/remote';
 import fs from 'fs';
 import path from 'path';
@@ -209,6 +210,8 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
   @Inject()
   private videoEncodingOptimizationService: VideoEncodingOptimizationService;
 
+  audioRefreshed = new Subject();
+
   get views() {
     return new SettingsViews(this.state);
   }
@@ -308,6 +311,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
       type: ESettingsCategoryType.Untabbed,
       formData: this.getAudioSettingsFormData(this.state['Audio'].formData[0]),
     });
+    this.audioRefreshed.next();
   }
 
   showSettings(categoryName?: string) {

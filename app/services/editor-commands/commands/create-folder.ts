@@ -50,8 +50,9 @@ export class CreateFolderCommand extends Command {
     const folder = scene.createFolder(this.name, { id: this.folderId, display: 'horizontal' });
     this.folderId = folder.id;
 
-    // if the scene has dual output nodes, create the dual output folder
-    if (this.dualOutputService.views.hasNodeMap(this.sceneId)) {
+    // check the existence of all scene node maps because the scene may not have a
+    // node map created for it
+    if (this.dualOutputService.views.hasSceneNodeMaps) {
       const verticalFolder = scene.createFolder(this.name, {
         id: this.verticalFolderId,
         display: 'vertical',
