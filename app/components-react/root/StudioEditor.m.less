@@ -189,10 +189,10 @@
 }
 
 .dual-output-header {
-  // identical to .studio-mode-controls
-  height: 60px;
-  display: flex;
+  display: grid;
   align-items: center;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: minmax(60px, auto);
   color: var(--paragraph);
   background-color: var(--background);
 
@@ -202,26 +202,35 @@
     height: initial;
   }
 
-  .dual-output-mode-details {
-    flex-grow: 2;
-    text-align: center;
-    font-size: 16px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    span {
-      margin: 0 10px;
-    }
+  i {
+    margin: 0 10px;
   }
 
-  a.manage-link {
-    position: absolute;
-    right: 10px;
+  .horizontal-header {
+    grid-column: 1 / 3;
+    grid-row: 1;
+    justify-self: center;
+    align-self: center;
+  }
+
+  .vertical-header {
+    grid-column: 3 / 5;
+    grid-row: 1;
+    justify-self: center;
+    align-self: center;
+  }
+
+  .manage-link {
+    grid-column: 4 / 5;
+    grid-row: 1;
+    justify-self: flex-end;
+    align-self: flex-end;
     color: var(--paragraph);
     font-size: 11px;
     font-weight: 400;
     text-decoration: underline;
+    margin: 0 0 5px 10px;
+    white-space: nowrap;
 
     &:hover {
       text-decoration: none;
