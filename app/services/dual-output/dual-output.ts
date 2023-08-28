@@ -288,7 +288,9 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     });
 
     /**
-     * Audio is always refreshed after the scene collection is switched
+     * The audio sources refresh every time the scene collection is switched.
+     * To prevent errors, wait until the audio sources have refreshed before
+     * confirming that the scene items have contexts assigned.
      */
     this.settingsService.audioRefreshed.subscribe(() => {
       this.convertSceneSources(this.scenesService.views.activeSceneId);
