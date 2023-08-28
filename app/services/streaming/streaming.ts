@@ -4,6 +4,7 @@ import moment from 'moment';
 import { Subject } from 'rxjs';
 import { Inject } from 'services/core/injector';
 import { mutation, StatefulService } from 'services/core/stateful-service';
+import Utils from 'services/utils';
 import { CustomizationService } from 'services/customization';
 import { $t } from 'services/i18n';
 import { NicoliveCommentSynthesizerService } from 'services/nicolive-program/nicolive-comment-synthesizer';
@@ -505,11 +506,6 @@ export class StreamingService
     }
 
     if (this.state.recordingStatus === ERecordingState.Offline) {
-      if (!this.settingsService.isValidOutputRecordingPath()) {
-        alert($t('streaming.badPathError'));
-        return;
-      }
-
       if (this.userService.isNiconicoLoggedIn()) {
         const recordingSettings = this.settingsService.getRecordingSettings();
         if (recordingSettings) {
@@ -751,6 +747,8 @@ export class StreamingService
     this.usageStatisticsService.recordEvent(event);
   }
 
+  private outputErrorOpen = false;
+
   private handleOBSOutputSignal(info: IOBSOutputSignalInfo) {
     console.debug('OBS Output signal: ', info);
 
@@ -826,6 +824,11 @@ export class StreamingService
     }
 
     if (info.code) {
+      if (this.outputErrorOpen) {
+        console.warn('Not showing error message because existing window is open.', info);
+        return;
+      }
+
       let errorText = '';
 
       if (info.code === obs.EOutputCode.BadPath) {
@@ -849,7 +852,25 @@ export class StreamingService
         errorText = $t('streaming.error') + info.error;
       }
 
-      alert(errorText);
+      const title = {
+        [EOBSOutputType.Streaming]: $t('streaming.streamingError'),
+        [EOBSOutputType.Recording]: $t('streaming.recordingError'),
+        [EOBSOutputType.ReplayBuffer]: $t('streaming.replayBufferError'),
+      }[info.type];
+
+      (async () => {
+        this.outputErrorOpen = true;
+        try {
+          await electron.remote.dialog.showMessageBox(Utils.getMainWindow(), {
+            buttons: ['OK'],
+            title,
+            type: 'error',
+            message: errorText,
+          });
+        } finally {
+          this.outputErrorOpen = false;
+        }
+      })();
     }
   }
 
