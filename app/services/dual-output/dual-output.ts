@@ -22,6 +22,7 @@ import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremen
 import { UserService } from 'services/user';
 import { SelectionService } from 'services/selection';
 import { StreamingService } from 'services/streaming';
+import { SettingsService } from 'services/settings';
 
 interface IDisplayVideoSettings {
   defaultDisplay: TDisplayType;
@@ -46,6 +47,7 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   @Inject() private videoSettingsService: VideoSettingsService;
   @Inject() private sceneCollectionsService: SceneCollectionsService;
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
+  @Inject() private streamingService: StreamingService;
 
   get activeSceneId(): string {
     return this.scenesService.views.activeSceneId;
@@ -68,7 +70,7 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   }
 
   get activeSceneNodeMap(): Dictionary<string> {
-    return this.sceneNodeMaps[this.activeSceneId];
+    return this.sceneCollectionsService.sceneNodeMaps[this.activeSceneId];
   }
 
   get hasVerticalNodes() {
@@ -76,7 +78,12 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   }
 
   get shouldCreateVerticalNode(): boolean {
-    return this.dualOutputMode || this.hasVerticalNodes;
+    return this.hasSceneNodeMaps;
+  }
+
+  get hasSceneNodeMaps(): boolean {
+    const nodeMaps = this.sceneCollectionsService?.sceneNodeMaps;
+    return !!nodeMaps && Object.entries(nodeMaps).length > 0;
   }
 
   get platformSettings() {
@@ -200,13 +207,13 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   }
 
   getIsHorizontalVisible(nodeId: string, sceneId?: string) {
-    if (!this.hasVerticalNodes) return;
+    if (!this.hasVerticalNodes) return false;
     return this.scenesService.views.getNodeVisibility(nodeId, sceneId ?? this.activeSceneId);
   }
 
   getIsVerticalVisible(nodeId: string, sceneId?: string) {
     // in the source selector, the vertical node id is determined by the visible display
-    if (!this.hasVerticalNodes) return;
+    if (!this.hasVerticalNodes) return false;
 
     const id =
       this.activeDisplays.vertical && !this.activeDisplays.horizontal
@@ -214,6 +221,18 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
         : this.activeSceneNodeMap[nodeId];
 
     return this.scenesService.views.getNodeVisibility(id, sceneId ?? this.activeSceneId);
+  }
+
+  getCanStreamDualOutput() {
+    const platformDisplays = this.streamingService.views.activeDisplayPlatforms;
+    const destinationDisplays = this.streamingService.views.activeDisplayDestinations;
+
+    const horizontalHasDestinations =
+      platformDisplays.horizontal.length > 0 || destinationDisplays.horizontal.length > 0;
+    const verticalHasDestinations =
+      platformDisplays.vertical.length > 0 || destinationDisplays.vertical.length > 0;
+
+    return horizontalHasDestinations && verticalHasDestinations;
   }
 
   hasNodeMap(sceneId?: string) {
@@ -232,6 +251,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   @Inject() private userService: UserService;
   @Inject() private selectionService: SelectionService;
   @Inject() private streamingService: StreamingService;
+  @Inject() private settingsService: SettingsService;
 
   static defaultState: IDualOutputServiceState = {
     displays: ['horizontal', 'vertical'],
@@ -286,10 +306,10 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     });
 
     /**
-     * Selective recording is currently not available in dual output mode
-     * due to API restrictions. For now, toggle it off when switching to dual output mode.
+     * The audio settings refresh each time the scene collection is switched.
+     * When a collection is loaded, confirm all sources have been assigned a context.
      */
-    this.sceneCollectionsService.collectionSwitched.subscribe(() => {
+    this.settingsService.audioRefreshed.subscribe(() => {
       this.convertSceneSources(this.scenesService.views.activeSceneId);
 
       if (this.state.isLoading) {

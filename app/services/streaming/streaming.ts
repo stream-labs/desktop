@@ -45,6 +45,7 @@ import * as remote from '@electron/remote';
 import { RecordingModeService } from 'services/recording-mode';
 import { MarkersService } from 'services/markers';
 import { byOS, OS } from 'util/operating-systems';
+import { DualOutputService } from 'services/dual-output';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -88,6 +89,7 @@ export class StreamingService
   @Inject() private recordingModeService: RecordingModeService;
   @Inject() private videoSettingsService: VideoSettingsService;
   @Inject() private markersService: MarkersService;
+  @Inject() private dualOutputService: DualOutputService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
@@ -835,6 +837,16 @@ export class StreamingService
   }
 
   async toggleStreaming(options?: TStartStreamOptions, force = false) {
+    if (this.views.isDualOutputMode && !this.dualOutputService.views.getCanStreamDualOutput()) {
+      this.notificationsService.actions.push({
+        message: $t('Set up Go Live Settings for Dual Output Mode in the Go Live window.'),
+        type: ENotificationType.WARNING,
+        lifeTime: 2000,
+      });
+      this.showGoLiveWindow();
+      return;
+    }
+
     if (this.state.streamingStatus === EStreamingState.Offline) {
       if (this.recordingModeService.views.isRecordingModeEnabled) return;
 
