@@ -22,6 +22,7 @@ import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremen
 import { UserService } from 'services/user';
 import { SelectionService } from 'services/selection';
 import { StreamingService } from 'services/streaming';
+import { SettingsService } from 'services/settings';
 
 interface IDisplayVideoSettings {
   defaultDisplay: TDisplayType;
@@ -232,6 +233,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   @Inject() private userService: UserService;
   @Inject() private selectionService: SelectionService;
   @Inject() private streamingService: StreamingService;
+  @Inject() private settingsService: SettingsService;
 
   static defaultState: IDualOutputServiceState = {
     displays: ['horizontal', 'vertical'],
@@ -286,10 +288,9 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     });
 
     /**
-     * Selective recording is currently not available in dual output mode
-     * due to API restrictions. For now, toggle it off when switching to dual output mode.
+     * Audio is always refreshed after the scene collection is switched
      */
-    this.sceneCollectionsService.collectionSwitched.subscribe(() => {
+    this.settingsService.audioRefreshed.subscribe(() => {
       this.convertSceneSources(this.scenesService.views.activeSceneId);
 
       if (this.state.isLoading) {
