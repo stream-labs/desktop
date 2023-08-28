@@ -314,14 +314,16 @@ export class WidgetsService
     const settings = { ...source.getObsInput().settings };
     settings.url = '';
 
+    const display = widgetItem?.display ?? 'horizontal';
+
     return {
       settings,
       name: source.name,
       type: source.getPropertiesManagerSettings().widgetType,
-      x: widgetItem.transform.position.x / this.videoService.baseWidth,
-      y: widgetItem.transform.position.y / this.videoService.baseHeight,
-      scaleX: widgetItem.transform.scale.x / this.videoService.baseWidth,
-      scaleY: widgetItem.transform.scale.y / this.videoService.baseHeight,
+      x: widgetItem.transform.position.x / this.videoService.baseResolutions[display].baseWidth,
+      y: widgetItem.transform.position.y / this.videoService.baseResolutions[display].baseHeight,
+      scaleX: widgetItem.transform.scale.x / this.videoService.baseResolutions[display].baseWidth,
+      scaleY: widgetItem.transform.scale.y / this.videoService.baseResolutions[display].baseHeight,
     };
   }
 
