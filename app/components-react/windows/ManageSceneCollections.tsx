@@ -5,7 +5,7 @@ import moment from 'moment';
 import cx from 'classnames';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
 import { Services } from 'components-react/service-provider';
-import { confirmAsync, promptAsync } from 'components-react/modals';
+import { confirmAsync, promptAsync, alertAsync } from 'components-react/modals';
 import Scrollable from 'components-react/shared/Scrollable';
 import { $t } from 'services/i18n';
 import { $i } from 'services/utils';
@@ -183,7 +183,17 @@ function CollectionNode(p: {
     if (p.collection.needsRename) rename();
   }
 
-  function makeActive() {
+  async function makeActive() {
+    if (p.collection?.sceneNodeMaps && SceneCollectionsService.hideDualOutputCollections) {
+      await alertAsync({
+        title: $t(
+          'Cannot open dual output scenes collections. Please select another scene collection.',
+        ),
+        closable: true,
+      });
+      return;
+    }
+
     if (p.collection.operatingSystem !== getOS()) return;
     SceneCollectionsService.actions.load(p.collection.id);
   }
@@ -215,18 +225,33 @@ function CollectionNode(p: {
     if (deleteConfirmed) SceneCollectionsService.actions.delete(p.collection.id);
   }
 
+  function createIcon() {
+    // confirm if there are scene node maps
+    if (
+      SceneCollectionsService.hideDualOutputCollections &&
+      p.collection?.sceneNodeMaps &&
+      Object.values(p.collection).length > 0
+    ) {
+      return <i className="icon-close" />;
+    }
+
+    return (
+      <i
+        className={cx(
+          'fab',
+          p.collection.operatingSystem === OS.Windows ? 'fa-windows' : 'fa-apple',
+        )}
+      />
+    );
+  }
+
   return (
     <div
       onDoubleClick={makeActive}
       className={cx(styles.collectionNode, { [styles.active]: isActive })}
     >
       <span>
-        <i
-          className={cx(
-            'fab',
-            p.collection.operatingSystem === OS.Windows ? 'fa-windows' : 'fa-apple',
-          )}
-        />
+        {createIcon()}
         {p.collection.name}
       </span>
       {p.recentlyUpdated && <span className={styles.whisper}>Updated {modified}</span>}

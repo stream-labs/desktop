@@ -16,6 +16,7 @@ import { ERenderingMode } from '../../../../obs-api';
 import styles from './SceneSelector.m.less';
 import useBaseElement from './hooks';
 import { IScene } from 'services/scenes';
+import { ISceneCollectionsManifestEntry } from 'services/scene-collections';
 
 function SceneSelector() {
   const {
@@ -30,7 +31,14 @@ function SceneSelector() {
   const { treeSort } = useTree(true);
 
   const [showDropdown, setShowDropdown] = useState(false);
-  const { scenes, activeSceneId, activeScene, collections, activeCollection } = useVuex(() => ({
+  const {
+    scenes,
+    activeSceneId,
+    activeScene,
+    collections,
+    activeCollection,
+    hideDualOutputCollections,
+  } = useVuex(() => ({
     scenes: ScenesService.views.scenes.map(scene => ({
       title: <TreeNode scene={scene} removeScene={removeScene} />,
       key: scene.id,
@@ -41,6 +49,7 @@ function SceneSelector() {
     activeSceneId: ScenesService.views.activeSceneId,
     activeCollection: SceneCollectionsService.activeCollection,
     collections: SceneCollectionsService.collections,
+    hideDualOutputCollections: SceneCollectionsService.hideDualOutputCollections,
   }));
 
   function showContextMenu(info: { event: React.MouseEvent }) {
@@ -123,6 +132,46 @@ function SceneSelector() {
     setShowDropdown(false);
   }
 
+  function createRow(collection: ISceneCollectionsManifestEntry) {
+    // confirm if there are scene node maps
+    if (
+      hideDualOutputCollections &&
+      collection?.sceneNodeMaps &&
+      Object.values(collection?.sceneNodeMaps).length > 0
+    ) {
+      return (
+        <Tooltip title={$t('Cannot open dual output scenes.')}>
+          <div
+            key={collection.id}
+            className={cx(styles.dropdownItem, {
+              [styles.osMismatch]: getOS() !== collection.operatingSystem,
+            })}
+            data-name={collection.name}
+          >
+            <i className="icon-close" />
+            {collection.name}
+          </div>
+        </Tooltip>
+      );
+    }
+
+    return (
+      <div
+        key={collection.id}
+        onClick={() => loadCollection(collection.id)}
+        className={cx(styles.dropdownItem, {
+          [styles.osMismatch]: getOS() !== collection.operatingSystem,
+        })}
+        data-name={collection.name}
+      >
+        <i
+          className={cx('fab', collection.operatingSystem === 'win32' ? 'fa-windows' : 'fa-apple')}
+        />
+        {collection.name}
+      </div>
+    );
+  }
+
   const DropdownMenu = (
     <div className={cx(styles.dropdownContainer, 'react')}>
       <div className={styles.dropdownItem} onClick={manageCollections} style={{ marginTop: '6px' }}>
@@ -132,24 +181,7 @@ function SceneSelector() {
       <hr style={{ borderColor: 'var(--border)' }} />
       <span className={styles.whisper}>{$t('Your Scene Collections')}</span>
       <Scrollable style={{ height: 'calc(100% - 60px)' }}>
-        {collections.map(collection => (
-          <div
-            key={collection.id}
-            onClick={() => loadCollection(collection.id)}
-            className={cx(styles.dropdownItem, {
-              [styles.osMismatch]: getOS() !== collection.operatingSystem,
-            })}
-            data-name={collection.name}
-          >
-            <i
-              className={cx(
-                'fab',
-                collection.operatingSystem === 'win32' ? 'fa-windows' : 'fa-apple',
-              )}
-            />
-            {collection.name}
-          </div>
-        ))}
+        {collections.map(collection => createRow(collection))}
       </Scrollable>
     </div>
   );
