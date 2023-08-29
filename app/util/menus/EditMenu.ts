@@ -215,7 +215,21 @@ export class EditMenu extends Menu {
                 .then(({ filePath }) => {
                   if (!filePath) return;
 
-                  this.widgetsService.saveWidgetFile(filePath, selectedItem.sceneItemId);
+                  /**
+                   * In dual output mode, the edit menu can be opened on either display
+                   * but for the purposes of persisting widget data, only the horizontal
+                   * scene item data should be persisted. Determine the correct sceneItemId
+                   * here.
+                   */
+
+                  const sceneItemId =
+                    this.options?.display === 'vertical'
+                      ? this.dualOutputService.views.getDualOutputNodeId(selectedItem.sceneItemId)
+                      : selectedItem.sceneItemId;
+
+                  console.log('sceneItemId ', sceneItemId);
+
+                  this.widgetsService.saveWidgetFile(filePath, sceneItemId);
                 });
             },
           });

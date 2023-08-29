@@ -2,7 +2,6 @@ import { Inject } from 'services/core/injector';
 import { UserService } from '../user';
 import { ScenesService, SceneItem, Scene } from '../scenes';
 import { SourcesService } from '../sources';
-import { VideoService } from '../video';
 import { HostsService } from '../hosts';
 import { ScalableRectangle } from 'util/ScalableRectangle';
 import namingHelpers from 'util/NamingHelpers';
@@ -26,6 +25,7 @@ import { getAlertsConfig, TAlertType } from './alerts-config';
 import { getWidgetsConfig } from './widgets-config';
 import { WidgetDisplayData } from '.';
 import { DualOutputService } from 'services/dual-output';
+import { TDisplayType, VideoSettingsService } from 'services/settings-v2';
 
 export interface IWidgetSourcesState {
   widgetSources: Dictionary<IWidgetSource>;
@@ -72,9 +72,9 @@ export class WidgetsService
   @Inject() scenesService: ScenesService;
   @Inject() sourcesService: SourcesService;
   @Inject() hostsService: HostsService;
-  @Inject() videoService: VideoService;
   @Inject() editorCommandsService: EditorCommandsService;
   @Inject() dualOutputService: DualOutputService;
+  @Inject() videoSettingsService: VideoSettingsService;
 
   widgetDisplayData = WidgetDisplayData(); // cache widget display data
 
@@ -140,8 +140,8 @@ export class WidgetsService
     });
 
     rect.withAnchor(widgetTransform.anchor, () => {
-      rect.x = widgetTransform.x * this.videoService.baseWidth;
-      rect.y = widgetTransform.y * this.videoService.baseHeight;
+      rect.x = widgetTransform.x * this.videoSettingsService.baseResolutions.horizontal.baseWidth;
+      rect.y = widgetTransform.y * this.videoSettingsService.baseResolutions.horizontal.baseHeight;
     });
 
     const item = this.editorCommandsService.executeCommand(
@@ -169,6 +169,7 @@ export class WidgetsService
             y: rect.y,
           },
         },
+        display: 'horizontal',
       },
     );
 
@@ -318,10 +319,18 @@ export class WidgetsService
       settings,
       name: source.name,
       type: source.getPropertiesManagerSettings().widgetType,
-      x: widgetItem.transform.position.x / this.videoService.baseWidth,
-      y: widgetItem.transform.position.y / this.videoService.baseHeight,
-      scaleX: widgetItem.transform.scale.x / this.videoService.baseWidth,
-      scaleY: widgetItem.transform.scale.y / this.videoService.baseHeight,
+      x:
+        widgetItem.transform.position.x /
+        this.videoSettingsService.baseResolutions.horizontal.baseWidth,
+      y:
+        widgetItem.transform.position.y /
+        this.videoSettingsService.baseResolutions.horizontal.baseHeight,
+      scaleX:
+        widgetItem.transform.scale.x /
+        this.videoSettingsService.baseResolutions.horizontal.baseWidth,
+      scaleY:
+        widgetItem.transform.scale.y /
+        this.videoSettingsService.baseResolutions.horizontal.baseHeight,
     };
   }
 
@@ -363,34 +372,38 @@ export class WidgetsService
 
     // Otherwise, create a new one
     if (!widgetItem) {
-      widgetItem = scene.createAndAddSource(scene.name, 'browser_source');
+      widgetItem = scene.createAndAddSource(scene.name, 'browser_source', {
+        display: 'horizontal',
+      });
     }
 
+    // create widget from horizontal scene item
+    this.createWidgetFromJSON(
+      widget,
+      widgetItem,
+      this.videoSettingsService.baseResolutions.horizontal.baseWidth,
+      this.videoSettingsService.baseResolutions.horizontal.baseHeight,
+      'horizontal',
+    );
+
+    // if this is a dual output scene, also create the vertical scene item
     if (this.dualOutputService.views.hasNodeMap()) {
-      this.dualOutputService.views.displays.forEach(display => {
-        // create widget
+      Promise.resolve(
+        this.dualOutputService.actions.return.createOrAssignOutputNode(
+          widgetItem,
+          'vertical',
+          false,
+          widgetItem.sceneId,
+        ),
+      ).then(verticalSceneItem => {
         this.createWidgetFromJSON(
           widget,
-          widgetItem,
-          this.videoService.baseResolutions[display].baseWidth,
-          this.videoService.baseResolutions[display].baseHeight,
-        );
-
-        // assign widget context
-        this.dualOutputService.actions.createOrAssignOutputNode(
-          widgetItem,
-          display,
-          display === 'horizontal',
-          scene.id,
+          verticalSceneItem,
+          this.videoSettingsService.baseResolutions.horizontal.baseWidth,
+          this.videoSettingsService.baseResolutions.horizontal.baseHeight,
+          'vertical',
         );
       });
-    } else {
-      this.createWidgetFromJSON(
-        widget,
-        widgetItem,
-        this.videoService.baseResolutions.horizontal.baseWidth,
-        this.videoService.baseResolutions.horizontal.baseHeight,
-      );
     }
   }
 
@@ -399,6 +412,7 @@ export class WidgetsService
     widgetItem: SceneItem,
     baseWidth: number,
     baseHeight: number,
+    display: TDisplayType,
   ) {
     const source = widgetItem.getSource();
 
@@ -408,8 +422,8 @@ export class WidgetsService
 
     widgetItem.setTransform({
       position: {
-        x: widget.x * baseWidth,
-        y: widget.y * baseHeight,
+        x: display === 'vertical' ? 0 : widget.x * baseWidth,
+        y: display === 'vertical' ? 0 : widget.y * baseHeight,
       },
       scale: {
         x: widget.scaleX * baseWidth,
