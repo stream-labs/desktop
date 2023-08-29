@@ -195,6 +195,12 @@ export class SceneCollectionsService extends Service implements ISceneCollection
             ),
           });
           await this.create();
+        } else {
+          // if this collection is not a dual output collection, switch as normal
+          await this.setActiveCollection(id);
+
+          await this.readCollectionDataAndLoadIntoApplicationState(id);
+          this.collectionSwitched.next(this.getCollection(id)!);
         }
       } else {
         await this.setActiveCollection(id);
