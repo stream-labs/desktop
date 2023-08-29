@@ -14,7 +14,7 @@ interface IContext {
 }
 
 export class RootNode extends Node<ISchema, IContext> {
-  schemaVersion = 1;
+  schemaVersion = 2;
 
   savedAssets: Dictionary<string> = {};
 

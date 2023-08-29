@@ -120,6 +120,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     if (this.activeCollection && this.activeCollection.operatingSystem === getOS()) {
       await this.load(this.activeCollection.id, true);
     } else if (this.loadableCollections.length > 0) {
+      console.log('does not have active');
       let latestId = this.loadableCollections[0].id;
       let latestModified = this.loadableCollections[0].modified;
 
@@ -698,7 +699,15 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * Deletes on the server and removes from the store
    */
   private async removeCollection(id: string) {
-    this.collectionRemoved.next(this.collections.find(coll => coll.id === id));
+    this.collectionRemoved.next(
+      this.collections.find(coll => {
+        const skip = coll?.sceneNodeMaps && Object.values(coll?.sceneNodeMaps).length > 0;
+
+        if (coll.id === id && !skip) {
+          return coll;
+        }
+      }),
+    );
     this.stateService.DELETE_COLLECTION(id);
     await this.safeSync();
 
