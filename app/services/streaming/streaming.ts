@@ -858,8 +858,8 @@ export class StreamingService
         [EOBSOutputType.ReplayBuffer]: $t('streaming.replayBufferError'),
       }[info.type];
 
+      this.outputErrorOpen = true;
       (async () => {
-        this.outputErrorOpen = true;
         try {
           await electron.remote.dialog.showMessageBox(Utils.getMainWindow(), {
             buttons: ['OK'],
