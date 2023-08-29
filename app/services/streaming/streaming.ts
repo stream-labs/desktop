@@ -361,6 +361,26 @@ export class StreamingService
      * SET DUAL OUTPUT SETTINGS
      */
     if (this.views.isDualOutputMode) {
+      const horizontalStream: string[] = this.views.activeDisplayDestinations.horizontal;
+      horizontalStream.concat(this.views.activeDisplayPlatforms.horizontal as string[]);
+
+      const verticalStream: string[] = this.views.activeDisplayDestinations.vertical;
+      verticalStream.concat(this.views.activeDisplayPlatforms.vertical as string[]);
+
+      const allPlatforms = this.views.enabledPlatforms;
+      const allDestinations = this.views.customDestinations
+        .filter(dest => dest.enabled)
+        .map(dest => dest.name);
+
+      // record dual output analytics event
+      this.usageStatisticsService.recordAnalyticsEvent('DualOutput', {
+        type: 'StreamingDualOutput',
+        platforms: allPlatforms,
+        destinations: allDestinations,
+        horizontal: horizontalStream,
+        vertical: verticalStream,
+      });
+
       // if needed, set up multistreaming for dual output
       const shouldMultistreamDisplay = this.views.shouldMultistreamDisplay;
 
