@@ -3,7 +3,7 @@ import { Inject } from 'services/core';
 import { SceneCollectionsService } from 'services/scene-collections';
 
 interface ISchema {
-  sceneNodeMaps: { [sceneId: string]: Dictionary<string> };
+  sceneNodeMaps?: { [sceneId: string]: Dictionary<string> };
 }
 
 export class NodeMapNode extends Node<ISchema, {}> {
