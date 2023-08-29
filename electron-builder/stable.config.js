@@ -33,7 +33,8 @@ const config = {
   },
   win: {
     publisherName: ['DWANGO Co.,Ltd.'],
-    rfc3161TimeStampServer: 'http://timestamp.digicert.com/?alg=sha1',
+    certificateSubjectName: 'DWANGO Co.,Ltd.',
+    rfc3161TimeStampServer: 'http://timestamp.digicert.com',
     timeStampServer: 'http://timestamp.digicert.com',
   },
   extraMetadata: {
