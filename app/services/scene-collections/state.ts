@@ -39,6 +39,10 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
     return this.collections.find(coll => coll.id === this.state.activeId);
   }
 
+  get sceneNodeMaps() {
+    return this.activeCollection?.sceneNodeMaps;
+  }
+
   /**
    * Loads the manifest file into the state for this service.
    */
@@ -175,6 +179,19 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
     return path.join(this.collectionsDirectory, `${id}.json`);
   }
 
+  /**
+   * Initialize node maps property on scene collections manifest
+   *
+   * @remark The sceneNodeMaps property is used to allow
+   * dual output scenes to track which nodes are paired.
+   * It is a dictionary with the scene id as the key and
+   * the value a key-value pair with the horizontal node id
+   * as the key and the vertical node id as the value.
+   */
+  initNodeMaps(sceneNodeMap?: { [sceneId: string]: Dictionary<string> }) {
+    this.INIT_NODE_MAPS(sceneNodeMap);
+  }
+
   @mutation()
   SET_ACTIVE_COLLECTION(id: string) {
     this.state.activeId = id;
@@ -244,5 +261,14 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
     Object.keys(state).forEach(key => {
       Vue.set(this.state, key, state[key]);
     });
+  }
+
+  @mutation()
+  INIT_NODE_MAPS(sceneNodeMap?: { [sceneId: string]: Dictionary<string> }) {
+    const activeId = this.state.activeId;
+    const coll = this.state.collections.find(coll => coll.id === activeId);
+    // confirm or set node map
+    if (!coll) return;
+    coll.sceneNodeMaps = sceneNodeMap ?? {};
   }
 }

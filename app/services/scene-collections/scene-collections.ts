@@ -38,11 +38,13 @@ import { byOS, OS, getOS } from 'util/operating-systems';
 import Utils from 'services/utils';
 import * as remote from '@electron/remote';
 import { GuestCamNode } from './nodes/guest-cam';
+import { NodeMapNode } from './nodes/node-map';
 
 const uuid = window['require']('uuid/v4');
 
 export const NODE_TYPES = {
   RootNode,
+  NodeMapNode,
   SourcesNode,
   ScenesNode,
   SceneItemsNode,
@@ -115,6 +117,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     if (this.activeCollection && this.activeCollection.operatingSystem === getOS()) {
       await this.load(this.activeCollection.id, true);
     } else if (this.loadableCollections.length > 0) {
+      console.log('does not have active');
       let latestId = this.loadableCollections[0].id;
       let latestModified = this.loadableCollections[0].modified;
 
@@ -176,10 +179,35 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   async load(id: string, shouldAttemptRecovery = true): Promise<void> {
     await this.deloadCurrentApplicationState();
     try {
-      await this.setActiveCollection(id);
+      // prevent opening dual output scene collections
+      if (this.hideDualOutputCollections) {
+        const collection = this.collections.find(coll => coll.id === id);
+        if (
+          collection &&
+          collection?.sceneNodeMaps &&
+          Object.values(collection?.sceneNodeMaps).length > 0
+        ) {
+          remote.dialog.showMessageBox(Utils.getMainWindow(), {
+            title: 'Streamlabs Desktop',
+            type: 'warning',
+            message: $t(
+              'Cannot load dual output scene collection.  A new one will be created instead.',
+            ),
+          });
+          await this.create();
+        } else {
+          // if this collection is not a dual output collection, switch as normal
+          await this.setActiveCollection(id);
 
-      await this.readCollectionDataAndLoadIntoApplicationState(id);
-      this.collectionSwitched.next(this.getCollection(id)!);
+          await this.readCollectionDataAndLoadIntoApplicationState(id);
+          this.collectionSwitched.next(this.getCollection(id)!);
+        }
+      } else {
+        await this.setActiveCollection(id);
+
+        await this.readCollectionDataAndLoadIntoApplicationState(id);
+        this.collectionSwitched.next(this.getCollection(id)!);
+      }
     } catch (e: unknown) {
       console.error('Error loading collection!', e);
 
@@ -465,6 +493,14 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     return this.stateService.activeCollection;
   }
 
+  get sceneNodeMaps() {
+    return this.stateService.sceneNodeMaps;
+  }
+
+  get hideDualOutputCollections() {
+    return Number(Utils.env.SLOBS_VERSION.split('.')[1]) < 14;
+  }
+
   /* PRIVATE ----------------------------------------------------- */
 
   /**
@@ -678,7 +714,18 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * Deletes on the server and removes from the store
    */
   private async removeCollection(id: string) {
-    this.collectionRemoved.next(this.collections.find(coll => coll.id === id));
+    this.collectionRemoved.next(
+      this.collections.find(coll => {
+        const skip =
+          this.hideDualOutputCollections &&
+          coll?.sceneNodeMaps &&
+          Object.values(coll?.sceneNodeMaps).length > 0;
+
+        if (coll.id === id && !skip) {
+          return coll;
+        }
+      }),
+    );
     this.stateService.DELETE_COLLECTION(id);
     await this.safeSync();
 
@@ -914,5 +961,22 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
   canSync(): boolean {
     return this.userService.isLoggedIn && !this.appService.state.argv.includes('--nosync');
+  }
+
+  /**
+   * Add a scene node map
+   *
+   * @remarks
+   * For dual output scenes, save a node map in the scene collection manifest for each scene
+   * so that the horizontal and vertical nodes for dual output mode
+   * can reference each other.
+   *
+   * @param sceneNodeMap - Optional, the node map to add
+   */
+
+  initNodeMaps(sceneNodeMap?: { [sceneId: string]: Dictionary<string> }) {
+    if (!this.activeCollection) return;
+
+    this.stateService.initNodeMaps(sceneNodeMap);
   }
 }

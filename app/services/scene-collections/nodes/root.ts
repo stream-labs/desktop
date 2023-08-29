@@ -3,6 +3,7 @@ import { SourcesNode } from './sources';
 import { ScenesNode } from './scenes';
 import { TransitionsNode } from './transitions';
 import { HotkeysNode } from './hotkeys';
+import { NodeMapNode } from './node-map';
 import { Inject } from 'services/core';
 import { VideoService } from 'services/video';
 import { StreamingService } from 'services/streaming';
@@ -21,6 +22,7 @@ interface ISchema {
   scenes: ScenesNode;
   hotkeys?: HotkeysNode;
   transitions?: TransitionsNode; // V2 Transitions
+  nodeMap?: NodeMapNode;
 
   guestCam?: GuestCamNode;
 
@@ -29,7 +31,7 @@ interface ISchema {
 
 // This is the root node of the config file
 export class RootNode extends Node<ISchema, {}> {
-  schemaVersion = 3;
+  schemaVersion = 4;
 
   @Inject() videoService: VideoService;
   @Inject() streamingService: StreamingService;
@@ -37,12 +39,14 @@ export class RootNode extends Node<ISchema, {}> {
   @Inject() settingsService: SettingsService;
 
   async save(): Promise<void> {
+    const nodeMap = new NodeMapNode();
     const sources = new SourcesNode();
     const scenes = new ScenesNode();
     const transitions = new TransitionsNode();
     const hotkeys = new HotkeysNode();
     const guestCam = new GuestCamNode();
 
+    await nodeMap.save();
     await sources.save({});
     await scenes.save({});
     await transitions.save();
@@ -55,6 +59,7 @@ export class RootNode extends Node<ISchema, {}> {
       transitions,
       hotkeys,
       guestCam,
+      nodeMap,
       baseResolution: this.videoService.baseResolution,
       selectiveRecording: this.streamingService.state.selectiveRecording,
       operatingSystem: process.platform as OS,
@@ -64,6 +69,10 @@ export class RootNode extends Node<ISchema, {}> {
   async load(): Promise<void> {
     this.videoService.setBaseResolution(this.data.baseResolution);
     this.streamingService.setSelectiveRecording(!!this.data.selectiveRecording);
+
+    if (this.data.nodeMap) {
+      await this.data.nodeMap.load();
+    }
 
     await this.data.transitions.load();
     await this.data.sources.load({});
