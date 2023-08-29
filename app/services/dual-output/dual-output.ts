@@ -83,7 +83,7 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
 
   get hasSceneNodeMaps(): boolean {
     const nodeMaps = this.sceneCollectionsService?.sceneNodeMaps;
-    return !!nodeMaps && Object.entries(nodeMaps).length > 0;
+    return this.dualOutputMode || (!!nodeMaps && Object.entries(nodeMaps).length > 0);
   }
 
   get platformSettings() {
