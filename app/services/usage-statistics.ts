@@ -39,7 +39,8 @@ type TAnalyticsEvent =
   | 'WebcamUse'
   | 'MicrophoneUse'
   | 'GuestCam'
-  | 'RecordingHistory';
+  | 'RecordingHistory'
+  | 'DualOutput';
 
 interface IAnalyticsEvent {
   product: string;

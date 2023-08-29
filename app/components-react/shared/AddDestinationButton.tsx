@@ -17,7 +17,13 @@ interface IAddDestinationButtonProps {
 
 export default function AddDestinationButton(p: IAddDestinationButtonProps) {
   const { addDestination, shouldShowPrimeLabel } = useGoLiveSettings().extend(module => {
-    const { RestreamService, SettingsService, MagicLinkService, UserService } = Services;
+    const {
+      RestreamService,
+      SettingsService,
+      MagicLinkService,
+      UserService,
+      UsageStatisticsService,
+    } = Services;
 
     return {
       addDestination() {
@@ -25,6 +31,10 @@ export default function AddDestinationButton(p: IAddDestinationButtonProps) {
         if (UserService.views.isPrime) {
           SettingsService.actions.showSettings('Stream');
         } else {
+          // record dual output analytics event
+          UsageStatisticsService.recordAnalyticsEvent('DualOutput', {
+            type: 'UpgradeToUltra',
+          });
           MagicLinkService.linkToPrime('slobs-multistream');
         }
       },
