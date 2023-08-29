@@ -716,12 +716,12 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   private async removeCollection(id: string) {
     this.collectionRemoved.next(
       this.collections.find(coll => {
-        if (
-          coll.id === id &&
-          !this.hideDualOutputCollections &&
-          !coll?.sceneNodeMaps &&
-          Object.values(coll?.sceneNodeMaps).length < 1
-        ) {
+        const skip =
+          this.hideDualOutputCollections &&
+          coll?.sceneNodeMaps &&
+          Object.values(coll?.sceneNodeMaps).length > 0;
+
+        if (coll.id === id && !skip) {
           return coll;
         }
       }),
