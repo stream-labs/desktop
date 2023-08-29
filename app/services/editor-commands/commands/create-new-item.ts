@@ -58,12 +58,14 @@ export class CreateNewItemCommand extends Command {
     // node map created for it
     if (this.dualOutputService.views.hasSceneNodeMaps) {
       if (this.dualOutputVerticalNodeId) {
-        this.dualOutputService.createOrAssignOutputNode(
-          item,
-          'vertical',
-          false,
-          this.sceneId,
-          this.dualOutputVerticalNodeId,
+        Promise.resolve(
+          this.dualOutputService.actions.return.createOrAssignOutputNode(
+            item,
+            'vertical',
+            false,
+            this.sceneId,
+            this.dualOutputVerticalNodeId,
+          ),
         );
       } else {
         Promise.resolve(
