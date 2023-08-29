@@ -230,7 +230,7 @@ function CollectionNode(p: {
     if (
       SceneCollectionsService.hideDualOutputCollections &&
       p.collection?.sceneNodeMaps &&
-      Object.values(p.collection).length > 0
+      Object.values(p.collection?.sceneNodeMaps).length > 0
     ) {
       return <i className="icon-close" />;
     }
