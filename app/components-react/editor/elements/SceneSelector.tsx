@@ -17,6 +17,7 @@ import { ERenderingMode } from '../../../../obs-api';
 import styles from './SceneSelector.m.less';
 import useBaseElement from './hooks';
 import { IScene } from 'services/scenes';
+import { ISceneCollectionsManifestEntry } from 'services/scene-collections';
 
 function SceneSelector() {
   const {
@@ -179,18 +180,12 @@ function SceneSelector() {
         {collections.map(collection => (
           <div
             key={collection.id}
-            onClick={() => loadCollection(collection.id)}
             className={cx(styles.dropdownItem, {
               [styles.osMismatch]: getOS() !== collection.operatingSystem,
             })}
             data-name={collection.name}
           >
-            <i
-              className={cx(
-                'fab',
-                collection.operatingSystem === 'win32' ? 'fa-windows' : 'fa-apple',
-              )}
-            />
+            <i className="icon-close" />
             {collection.name}
           </div>
         ))}
