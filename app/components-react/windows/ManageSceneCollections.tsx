@@ -227,11 +227,7 @@ function CollectionNode(p: {
 
   function createIcon() {
     // confirm if there are scene node maps
-    if (
-      SceneCollectionsService.hideDualOutputCollections &&
-      p.collection?.sceneNodeMaps &&
-      Object.values(p.collection?.sceneNodeMaps).length > 0
-    ) {
+    if (SceneCollectionsService.hideDualOutputCollections && p.collection?.sceneNodeMaps) {
       return <i className="icon-close" />;
     }
 
