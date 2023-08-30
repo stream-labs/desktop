@@ -445,6 +445,9 @@ class VideoSettingsModule {
       this.dualOutputService.actions.setdualOutputMode();
       this.state.setShowDualOutputSettings(!this.state.showDualOutputSettings);
       Services.UsageStatisticsService.recordFeatureUsage('DualOutput');
+      Services.UsageStatisticsService.recordAnalyticsEvent('DualOutput', {
+        type: 'ToggleOnDualOutput',
+      });
 
       // show warning message if selective recording is active
       if (

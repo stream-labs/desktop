@@ -214,25 +214,19 @@ function CollectionNode(p: {
     );
     if (deleteConfirmed) SceneCollectionsService.actions.delete(p.collection.id);
   }
-
-  function createIcon() {
-    return (
-      <i
-        className={cx(
-          'fab',
-          p.collection.operatingSystem === OS.Windows ? 'fa-windows' : 'fa-apple',
-        )}
-      />
-    );
-  }
-
+  
   return (
     <div
       onDoubleClick={makeActive}
       className={cx(styles.collectionNode, { [styles.active]: isActive })}
     >
       <span>
-        {createIcon()}
+        <i
+          className={cx(
+            'fab',
+            p.collection.operatingSystem === OS.Windows ? 'fa-windows' : 'fa-apple',
+          )}
+        />
         {p.collection.name}
       </span>
       {p.recentlyUpdated && <span className={styles.whisper}>Updated {modified}</span>}
