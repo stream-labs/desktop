@@ -39,7 +39,7 @@ export default class StudioFooterComponent extends Vue {
   }
 
   get replayBufferEnabled() {
-    return this.settingsService.state.Output.RecRB;
+    return this.settingsService.state.Output?.RecRB;
   }
 
   get replayBufferOffline() {
