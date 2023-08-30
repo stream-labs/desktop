@@ -324,7 +324,7 @@ async function runScript({
 
     info(`creating release ${newTag}...`);
     const draft = false;
-    const result = await octokit.repos.createRelease({
+    const releaseParams = {
       owner: target.organization,
       repo: target.repository,
       tag_name: newTag,
@@ -332,6 +332,11 @@ async function runScript({
       body: patchNote.notes,
       draft,
       prerelease: releaseChannel !== 'stable',
+    };
+
+    let result = await octokit.repos.createRelease({
+      ...releaseParams,
+      draft: true,
     });
 
     await uploadToGithub({
@@ -354,6 +359,16 @@ async function runScript({
       pathname: binaryFilePath,
       contentType: 'application/octet-stream',
     });
+
+    if (!draft) {
+      info(`publishing release ${newTag}...`);
+      const release_id = result.data.id;
+      result = await octokit.repos.updateRelease({
+        ...releaseParams,
+        release_id,
+        draft: false,
+      });
+    }
 
     // open release edit page on github
     const editUrl = draft ? result.data.html_url.replace('/tag/', '/edit/') : result.data.html_url;
