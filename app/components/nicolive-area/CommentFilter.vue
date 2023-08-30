@@ -9,7 +9,7 @@
         <button
           type="button"
           @click="currentType = 'word'"
-          class="choice"
+          class="button--tab"
           :class="{ active: currentType === 'word' }"
         >
           コメント
@@ -17,7 +17,7 @@
         <button
           type="button"
           @click="currentType = 'user'"
-          class="choice"
+          class="button--tab"
           :class="{ active: currentType === 'user' }"
         >
           ユーザーID
@@ -25,7 +25,7 @@
         <button
           type="button"
           @click="currentType = 'command'"
-          class="choice"
+          class="button--tab"
           :class="{ active: currentType === 'command' }"
         >
           コマンド
@@ -120,46 +120,13 @@
   display: flex;
   flex-shrink: 0;
   align-items: center;
-  padding: 0 8px;
-  margin-bottom: 8px;
-  font-size: 12px;
+  height: 44px;
+  padding: 0 16px;
   border-bottom: 1px solid @border;
 
   > button {
-    position: relative;
-    padding: 16px 8px;
-    margin-right: 8px;
-    font-size: 12px;
-    color: var(--color-text);
-
-    &::after {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      display: block;
-      width: 100%;
-      height: 2px;
-      content: '';
-      background-color: transparent;
-    }
-
-    &:hover {
-      color: var(--color-text-light);
-    }
-
-    &.active {
-      color: var(--color-text-active);
-
-      &::after {
-        background-color: var(--color-text-active);
-      }
-    }
-  }
-
-  > .registrations {
-    margin-right: 8px;
-    margin-left: auto;
-    color: @light-grey;
+    flex-grow: 1;
+    height: 100%;
   }
 }
 
@@ -167,7 +134,7 @@
   display: flex;
   flex-shrink: 0;
   justify-content: center;
-  padding: 8px;
+  padding: 16px;
 
   > input {
     box-sizing: border-box;
