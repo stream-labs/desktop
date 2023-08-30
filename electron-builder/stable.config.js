@@ -33,7 +33,7 @@ const config = {
   },
   win: {
     publisherName: ['DWANGO Co.,Ltd.'],
-    rfc3161TimeStampServer: 'http://timestamp.digicert.com/?alg=sha1',
+    rfc3161TimeStampServer: 'http://timestamp.digicert.com',
     timeStampServer: 'http://timestamp.digicert.com',
   },
   extraMetadata: {
@@ -43,6 +43,9 @@ const config = {
 
 if (process.env.NAIR_LICENSE_API_KEY) {
   config.extraMetadata.getlicensenair_key = process.env.NAIR_LICENSE_API_KEY;
+}
+if (process.env.CERTIFICATE_SUBJECT_NAME) {
+  config.win.certificateSubjectName = process.env.CERTIFICATE_SUBJECT_NAME;
 }
 
 module.exports = config;
