@@ -134,11 +134,7 @@ function SceneSelector() {
 
   function createRow(collection: ISceneCollectionsManifestEntry) {
     // confirm if there are scene node maps
-    if (
-      hideDualOutputCollections &&
-      collection?.sceneNodeMaps &&
-      Object.values(collection?.sceneNodeMaps).length > 0
-    ) {
+    if (hideDualOutputCollections && collection?.sceneNodeMaps) {
       return (
         <Tooltip title={$t('Cannot open dual output scenes.')}>
           <div
