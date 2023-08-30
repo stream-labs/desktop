@@ -184,16 +184,6 @@ function CollectionNode(p: {
   }
 
   async function makeActive() {
-    if (p.collection?.sceneNodeMaps && SceneCollectionsService.hideDualOutputCollections) {
-      await alertAsync({
-        title: $t(
-          'Cannot open dual output scenes collections. Please select another scene collection.',
-        ),
-        closable: true,
-      });
-      return;
-    }
-
     if (p.collection.operatingSystem !== getOS()) return;
     SceneCollectionsService.actions.load(p.collection.id);
   }
@@ -225,33 +215,18 @@ function CollectionNode(p: {
     if (deleteConfirmed) SceneCollectionsService.actions.delete(p.collection.id);
   }
 
-  function createIcon() {
-    // confirm if there are scene node maps
-    if (
-      SceneCollectionsService.hideDualOutputCollections &&
-      p.collection?.sceneNodeMaps &&
-      Object.values(p.collection?.sceneNodeMaps).length > 0
-    ) {
-      return <i className="icon-close" />;
-    }
-
-    return (
-      <i
-        className={cx(
-          'fab',
-          p.collection.operatingSystem === OS.Windows ? 'fa-windows' : 'fa-apple',
-        )}
-      />
-    );
-  }
-
   return (
     <div
       onDoubleClick={makeActive}
       className={cx(styles.collectionNode, { [styles.active]: isActive })}
     >
       <span>
-        {createIcon()}
+        <i
+          className={cx(
+            'fab',
+            p.collection.operatingSystem === OS.Windows ? 'fa-windows' : 'fa-apple',
+          )}
+        />
         {p.collection.name}
       </span>
       {p.recentlyUpdated && <span className={styles.whisper}>Updated {modified}</span>}

@@ -180,12 +180,18 @@ function SceneSelector() {
         {collections.map(collection => (
           <div
             key={collection.id}
+            onClick={() => loadCollection(collection.id)}
             className={cx(styles.dropdownItem, {
               [styles.osMismatch]: getOS() !== collection.operatingSystem,
             })}
             data-name={collection.name}
           >
-            <i className="icon-close" />
+            <i
+              className={cx(
+                'fab',
+                collection.operatingSystem === 'win32' ? 'fa-windows' : 'fa-apple',
+              )}
+            />
             {collection.name}
           </div>
         ))}
