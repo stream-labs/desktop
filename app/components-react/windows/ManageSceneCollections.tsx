@@ -214,7 +214,7 @@ function CollectionNode(p: {
     );
     if (deleteConfirmed) SceneCollectionsService.actions.delete(p.collection.id);
   }
-
+  
   return (
     <div
       onDoubleClick={makeActive}
