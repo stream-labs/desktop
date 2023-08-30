@@ -19,6 +19,7 @@ export enum EAvailableFeatures {
   themeAudit = 'slobs--theme-audit',
   reactWidgets = 'slobs--react-widgets',
   sharedStorage = 'slobs--shared-storage',
+  dualOutput = 'slobs--dual-output',
 
   /**
    * There are two flags because one is used for beta access and

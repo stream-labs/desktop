@@ -354,5 +354,8 @@
   "Set scale filter 'Bicubic'": "Indstil skalafilteret \"Bicubic\"",
   "Set scale filter 'Bilinear'": "Indstil skalafilteret \"Bilinear\"",
   "Set scale filter 'Lanczos'": "Indstil skalafilteret \"Lanczos\"",
-  "Set scale filter 'Area'": "Indstil skalafilteret \"Areal\""
+  "Set scale filter 'Area'": "Indstil skalafilteret \"Areal\"",
+  "You currently have the same source on both canvases selected. Please select the source in the canvas to edit it independently.": "You currently have the same source on both canvases selected. Please select the source in the canvas to edit it independently.",
+  "Selective Recording can only be used with horizontal sources.": "Selective Recording can only be used with horizontal sources.",
+  "Cannot move source outside canvas in Dual Output Mode.": "Cannot move source outside canvas in Dual Output Mode."
 }

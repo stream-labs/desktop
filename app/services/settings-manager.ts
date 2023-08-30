@@ -1,6 +1,4 @@
-import { Inject, Service, ViewHandler } from 'services/core';
-import { GreenService } from './green';
-import * as obs from '../../obs-api';
+import { Service, ViewHandler } from 'services/core';
 
 // /*
 // Eventually this service will be in charge of storing and managing settings profiles

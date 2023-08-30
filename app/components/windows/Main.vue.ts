@@ -17,6 +17,7 @@ import {
   PlatformAppStore,
   BrowseOverlays,
   PlatformAppMainPage,
+  RecordingHistory,
 } from 'components/shared/ReactComponentList';
 import { ScenesService } from 'services/scenes';
 import { PlatformAppsService } from 'services/platform-apps';
@@ -66,6 +67,7 @@ const loadedTheme = () => {
     LayoutEditor,
     AlertboxLibrary,
     ModalWrapper,
+    RecordingHistory,
     StreamScheduler,
     Highlighter,
     Grow,

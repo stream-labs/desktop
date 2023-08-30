@@ -9,12 +9,12 @@ import { Row, Col } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { Section } from './Section';
 import PlatformSettings from './PlatformSettings';
-import TwitterInput from './Twitter';
 import OptimizedProfileSwitcher from './OptimizedProfileSwitcher';
 import Spinner from '../../shared/Spinner';
 import ButtonHighlighted from '../../shared/ButtonHighlighted';
 import UltraIcon from '../../shared/UltraIcon';
 import GoLiveError from './GoLiveError';
+import TwitterInput from './Twitter';
 
 const PlusIcon = PlusOutlined as Function;
 
@@ -47,7 +47,8 @@ export default function GoLiveSettings() {
       get canAddDestinations() {
         const linkedPlatforms = module.state.linkedPlatforms;
         const customDestinations = module.state.customDestinations;
-        return linkedPlatforms.length + customDestinations.length < 5;
+        const isPrime = UserService.views.isPrime;
+        return !isPrime && linkedPlatforms.length + customDestinations.length < 5;
       },
 
       addDestination() {
@@ -93,7 +94,7 @@ export default function GoLiveSettings() {
 
       {/*RIGHT COLUMN*/}
       <Col span={shouldShowLeftCol ? 16 : 24} style={{ height: '100%' }}>
-        <Spinner visible={isLoading} />
+        <Spinner visible={isLoading} relative />
         <GoLiveError />
         {shouldShowSettings && (
           <Scrollable style={{ height: '100%' }} snapToWindowEdge>

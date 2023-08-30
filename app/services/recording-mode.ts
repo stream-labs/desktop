@@ -14,7 +14,7 @@ import { DefaultHardwareService } from './hardware';
 import { RunInLoadingMode } from './app/app-decorators';
 import { byOS, OS } from 'util/operating-systems';
 import { JsonrpcService } from './api/jsonrpc';
-import { WindowsService, UsageStatisticsService, SharedStorageService } from 'app-services';
+import { NavigationService, UsageStatisticsService, SharedStorageService } from 'app-services';
 import { getPlatformService } from 'services/platforms';
 import { IYoutubeUploadResponse } from 'services/platforms/youtube/uploader';
 import { YoutubeService } from 'services/platforms/youtube';
@@ -63,7 +63,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
   @Inject() private notificationsService: NotificationsService;
   @Inject() private jsonrpcService: JsonrpcService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
-  @Inject() private windowsService: WindowsService;
+  @Inject() private navigationService: NavigationService;
   @Inject() private sharedStorageService: SharedStorageService;
 
   static defaultState: IRecordingModeState = {
@@ -206,11 +206,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
   }
 
   showRecordingHistory() {
-    this.windowsService.actions.showWindow({
-      componentName: 'RecordingHistory',
-      title: $t('Recording History'),
-      size: { width: 550, height: 600 },
-    });
+    this.navigationService.navigate('RecordingHistory');
   }
 
   async uploadToYoutube(filename: string) {
@@ -258,7 +254,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
 
   async uploadToStorage(filename: string, platform?: string) {
     this.SET_UPLOAD_INFO({ uploading: true });
-    const { cancel, complete } = await this.sharedStorageService.actions.return.uploadFile(
+    const { cancel, complete, size } = await this.sharedStorageService.actions.return.uploadFile(
       filename,
       progress => {
         this.SET_UPLOAD_INFO({
@@ -271,7 +267,18 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
       },
       platform,
     );
-    this.cancelFunction = cancel;
+    this.usageStatisticsService.recordAnalyticsEvent('RecordingHistory', {
+      type: 'UploadStorageBegin',
+      fileSize: size,
+    });
+
+    this.cancelFunction = () => {
+      this.usageStatisticsService.recordAnalyticsEvent('RecordingHistory', {
+        type: 'UploadStorageCancel',
+        fileSize: size,
+      });
+      cancel();
+    };
     let result;
     try {
       result = await complete;
@@ -283,6 +290,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
 
       this.usageStatisticsService.recordAnalyticsEvent('RecordingHistory', {
         type: 'UploadStorageError',
+        fileSize: size,
       });
     }
 
@@ -292,6 +300,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
     if (result) {
       this.usageStatisticsService.recordAnalyticsEvent('RecordingHistory', {
         type: 'UploadStorageSuccess',
+        fileSize: size,
       });
       return result.id;
     }

@@ -15,6 +15,7 @@ import { WindowsService } from '../windows';
 import { assertIsDefined, getDefined } from '../../util/properties-type-guards';
 import { TDisplayType } from 'services/settings-v2';
 import { TOutputOrientation } from 'services/restream';
+
 interface IFacebookPage {
   access_token: string;
   name: string;
@@ -678,7 +679,7 @@ export class FacebookService
       return `https://www.facebook.com/live/producer/dashboard/${this.state.videoId}/COMMENTS/`;
     } else if (page && this.state.settings.game) {
       // if it's not a GVC page but the game is selected then use a legacy chatUrl
-      return 'https://www.facebook.com/gaming/streamer/chat/';
+      return `https://www.facebook.com/gaming/streamer/chat/?page=${page.id}`;
     } else {
       // in other cases we can use only read-only chat
       const token = this.views.getDestinationToken(

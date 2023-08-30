@@ -7,6 +7,7 @@ import { IStreamError } from './stream-error';
 import { ICustomStreamDestination } from '../settings/streaming';
 import { ITiktokStartStreamOptions } from '../platforms/tiktok';
 import { ITrovoStartStreamOptions } from '../platforms/trovo';
+import { IVideo } from 'obs-studio-node';
 
 export enum EStreamingState {
   Offline = 'offline',
@@ -49,9 +50,8 @@ export interface IStreamInfo {
     tiktok: TGoLiveChecklistItemState;
     trovo: TGoLiveChecklistItemState;
     setupMultistream: TGoLiveChecklistItemState;
-    setupGreen: TGoLiveChecklistItemState;
+    setupDualOutput: TGoLiveChecklistItemState;
     startVideoTransmission: TGoLiveChecklistItemState;
-    postTweet: TGoLiveChecklistItemState;
   };
 }
 
@@ -81,6 +81,7 @@ export interface IGoLiveSettings extends IStreamSettings {
 export interface IPlatformFlags {
   enabled: boolean;
   useCustomFields: boolean;
+  video?: IVideo;
 }
 
 export interface IStreamingServiceState {
@@ -91,6 +92,7 @@ export interface IStreamingServiceState {
   replayBufferStatus: EReplayBufferState;
   replayBufferStatusTime: string;
   selectiveRecording: boolean;
+  dualOutputMode: boolean;
   info: IStreamInfo;
 }
 

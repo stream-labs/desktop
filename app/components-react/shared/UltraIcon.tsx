@@ -108,7 +108,7 @@ export default function UltraIcon({ type, className, style }: IUltraIcon) {
     return (
       <i
         className={cx('icon-ultra', className)}
-        style={style ? style : { fontSize: '12px', color: 'var(--black)' }}
+        style={style ?? { fontSize: '12px', color: 'var(--black)' }}
       />
     );
   }

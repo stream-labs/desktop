@@ -254,7 +254,7 @@ function PlatformSelect(p: { onClose: () => void }) {
   const platformOptions = [
     { label: 'YouTube', value: 'youtube' },
     { label: 'Cross Clip', value: 'crossclip' },
-    { label: 'Type Studio', value: 'typestudio' },
+    { label: 'Podcast Editor', value: 'typestudio' },
   ];
 
   return (

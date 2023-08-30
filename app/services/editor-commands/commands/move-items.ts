@@ -1,10 +1,15 @@
 import { ModifyTransformCommand } from './modify-transform';
 import { Selection } from 'services/selection';
 import { $t } from 'services/i18n';
+import { TDisplayType } from 'services/settings-v2';
 
 export class MoveItemsCommand extends ModifyTransformCommand {
-  constructor(selection: Selection, private deltaPosition: Partial<IVec2>) {
-    super(selection);
+  constructor(
+    selection: Selection,
+    private deltaPosition: Partial<IVec2>,
+    protected display?: TDisplayType,
+  ) {
+    super(selection, display);
   }
 
   get description() {
@@ -12,7 +17,7 @@ export class MoveItemsCommand extends ModifyTransformCommand {
   }
 
   modifyTransform() {
-    this.selection.getItems().forEach(item => {
+    this.selection.getItems(this.display).forEach(item => {
       item.setTransform({
         position: {
           x: item.transform.position.x + (this.deltaPosition.x || 0),

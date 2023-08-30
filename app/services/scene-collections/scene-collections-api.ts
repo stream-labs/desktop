@@ -95,6 +95,12 @@ export interface ISceneCollectionsManifestEntry {
   needsRename: boolean;
 
   /**
+   * This is for dual output so that the horizontal and vertical nodes
+   * can reference each other
+   */
+  sceneNodeMaps?: { [sceneId: string]: Dictionary<string> };
+
+  /**
    * We don't support bi-directional sync between operating systems.
    */
   operatingSystem: OS;

@@ -5,7 +5,7 @@ import moment from 'moment';
 import cx from 'classnames';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
 import { Services } from 'components-react/service-provider';
-import { confirmAsync, promptAsync } from 'components-react/modals';
+import { confirmAsync, promptAsync, alertAsync } from 'components-react/modals';
 import Scrollable from 'components-react/shared/Scrollable';
 import { $t } from 'services/i18n';
 import { $i } from 'services/utils';
@@ -150,10 +150,8 @@ export default function ManageSceneCollections() {
                       <UltraIcon
                         type="simple"
                         style={{
-                          fill: '#09161D',
-                          display: 'inline-block',
-                          height: '12px',
-                          width: '12px',
+                          color: 'var(--black)',
+                          fontSize: '12px',
                           marginRight: '5px',
                         }}
                       />
@@ -185,7 +183,7 @@ function CollectionNode(p: {
     if (p.collection.needsRename) rename();
   }
 
-  function makeActive() {
+  async function makeActive() {
     if (p.collection.operatingSystem !== getOS()) return;
     SceneCollectionsService.actions.load(p.collection.id);
   }
@@ -216,7 +214,7 @@ function CollectionNode(p: {
     );
     if (deleteConfirmed) SceneCollectionsService.actions.delete(p.collection.id);
   }
-
+  
   return (
     <div
       onDoubleClick={makeActive}

@@ -502,3 +502,11 @@ export class Hotkeys extends ReactComponent<{
   highlightSearch: (searchStr: string) => void;
   scanning: boolean;
 }> {}
+
+@Component({
+  props: {
+    name: { default: 'GLVolmeters' },
+    wrapperStyles: { default: () => ({ position: 'absolute', left: '17px', right: '17px', height: '100%' }) },
+  },
+})
+export class GLVolmeters extends ReactComponent {}

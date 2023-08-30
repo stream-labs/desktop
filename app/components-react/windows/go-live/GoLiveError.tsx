@@ -41,12 +41,13 @@ export default function GoLiveError() {
       case 'RESTREAM_DISABLED':
       case 'RESTREAM_SETUP_FAILED':
         return renderRestreamError(error);
+      case 'DUAL_OUTPUT_RESTREAM_DISABLED':
+      case 'DUAL_OUTPUT_SETUP_FAILED':
+        return renderDualOutputError(error);
       case 'YOUTUBE_STREAMING_DISABLED':
         return renderYoutubeStreamingDisabled(error);
       case 'MACHINE_LOCKED':
         return renderMachineLockedError(error);
-      case 'TWEET_FAILED':
-        return renderTweetFailedError(error);
       default:
         return <MessageLayout error={error} />;
     }
@@ -147,15 +148,21 @@ export default function GoLiveError() {
     );
   }
 
-  function renderTweetFailedError(error: IStreamError) {
-    return <MessageLayout error={error} message={$t('Failed to post the Tweet')}></MessageLayout>;
-  }
-
   function renderRestreamError(error: IStreamError) {
     return (
       <MessageLayout error={error}>
         {$t(
           'Please try again. If the issue persists, you can stream directly to a single platform instead.',
+        )}
+      </MessageLayout>
+    );
+  }
+
+  function renderDualOutputError(error: IStreamError) {
+    return (
+      <MessageLayout error={error}>
+        {$t(
+          'Please try again. If the issue persists, you can stream in single output mode instead.',
         )}
       </MessageLayout>
     );

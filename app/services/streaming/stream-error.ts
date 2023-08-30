@@ -40,6 +40,16 @@ export const errorTypes = {
       return $t('Failed to configure the Multistream server');
     },
   },
+  DUAL_OUTPUT_RESTREAM_DISABLED: {
+    get message() {
+      return $t('The Multistream server is temporarily unavailable for Dual Output');
+    },
+  },
+  DUAL_OUTPUT_SETUP_FAILED: {
+    get message() {
+      return $t('Failed to configure the Dual Output service');
+    },
+  },
   YOUTUBE_STREAMING_DISABLED: {
     get message() {
       return $t('Your YouTube account is not enabled for live streaming');
@@ -48,11 +58,6 @@ export const errorTypes = {
   YOUTUBE_THUMBNAIL_UPLOAD_FAILED: {
     get message() {
       return $t('Failed to upload the thumbnail');
-    },
-  },
-  TWEET_FAILED: {
-    get message() {
-      return $t('Failed to post the Tweet');
     },
   },
   PRIME_REQUIRED: {

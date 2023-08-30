@@ -39,6 +39,10 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
     return this.collections.find(coll => coll.id === this.state.activeId);
   }
 
+  get sceneNodeMaps() {
+    return this.activeCollection?.sceneNodeMaps;
+  }
+
   /**
    * Loads the manifest file into the state for this service.
    */
@@ -175,6 +179,52 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
     return path.join(this.collectionsDirectory, `${id}.json`);
   }
 
+  /**
+   * Initialize node maps property on scene collections manifest
+   *
+   * @remark The sceneNodeMaps property is used to allow
+   * dual output scenes to track which nodes are paired.
+   * It is a dictionary with the scene id as the key and
+   * the value a key-value pair with the horizontal node id
+   * as the key and the vertical node id as the value.
+   */
+  initNodeMaps(sceneNodeMap?: { [sceneId: string]: Dictionary<string> }) {
+    this.INIT_NODE_MAPS(sceneNodeMap);
+  }
+
+  /**
+   * Add an entry to the scene node map
+   *
+   * @remark Use for dual output scenes when creating a scene item
+   * @param sceneId - The scene's id
+   * @param horizontalNodeId - The horizontal node's id, to be used as the key
+   * @param verticalNodeId - The vertical node's id, to be used as the value
+   */
+  createNodeMapEntry(sceneId: string, horizontalNodeId: string, verticalNodeId: string) {
+    this.CREATE_NODE_MAP_ENTRY(sceneId, horizontalNodeId, verticalNodeId);
+  }
+
+  /**
+   * Remove a node map entry
+   *
+   * @remark Use for dual output scenes when removing a scene item
+   * @param horizontalNodeId - The horizontal node's id, to be used as the key
+   * @param sceneId - The scene's id, to locate the correct node map in the scene collection
+   */
+  removeNodeMapEntry(horizontalNodeId: string, sceneId: string) {
+    this.REMOVE_NODE_MAP_ENTRY(horizontalNodeId, sceneId);
+  }
+
+  /**
+   * Remove a scene node map
+   *
+   * @remark Use when removing a dual output scene
+   * @param sceneId - The scene's id
+   */
+  removeNodeMap(sceneId: string) {
+    this.REMOVE_NODE_MAP(sceneId);
+  }
+
   @mutation()
   SET_ACTIVE_COLLECTION(id: string) {
     this.state.activeId = id;
@@ -190,6 +240,7 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
       operatingSystem: os,
       deleted: false,
       needsRename: false,
+      sceneNodeMaps: {},
     });
   }
 
@@ -244,5 +295,57 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
     Object.keys(state).forEach(key => {
       Vue.set(this.state, key, state[key]);
     });
+  }
+
+  @mutation()
+  INIT_NODE_MAPS(sceneNodeMap?: { [sceneId: string]: Dictionary<string> }) {
+    const activeId = this.state.activeId;
+    const coll = this.state.collections.find(coll => coll.id === activeId);
+    // confirm or set node map
+    if (!coll) return;
+    coll.sceneNodeMaps = sceneNodeMap ?? {};
+  }
+
+  @mutation()
+  CREATE_NODE_MAP_ENTRY(sceneId: string, horizontalNodeId: string, verticalNodeId: string) {
+    const activeId = this.state.activeId;
+    const coll = this.state.collections.find(coll => coll.id === activeId);
+    // confirm or set node map
+    if (!coll) return;
+    if (!coll.sceneNodeMaps) coll.sceneNodeMaps = {};
+    if (!coll.sceneNodeMaps[sceneId]) coll.sceneNodeMaps[sceneId] = {};
+
+    coll.sceneNodeMaps[sceneId] = {
+      ...coll.sceneNodeMaps[sceneId],
+      [horizontalNodeId]: verticalNodeId,
+    };
+  }
+
+  @mutation()
+  REMOVE_NODE_MAP_ENTRY(horizontalNodeId: string, sceneId: string) {
+    const activeId = this.state.activeId;
+    const coll = this.state.collections.find(coll => coll.id === activeId);
+
+    // confirm existence of scene node map
+    if (!coll || !coll.sceneNodeMaps || !coll.sceneNodeMaps[sceneId]) return;
+
+    const nodeMap = coll.sceneNodeMaps[sceneId];
+    // use the horizontal node id as the key when deleting the node map entry
+    delete nodeMap[horizontalNodeId];
+
+    coll.sceneNodeMaps[sceneId] = { ...nodeMap };
+  }
+
+  @mutation()
+  REMOVE_NODE_MAP(sceneId: string) {
+    const activeId = this.state.activeId;
+    const coll = this.state.collections.find(coll => coll.id === activeId);
+
+    // confirm existence of scene node map
+    if (!coll || !coll.sceneNodeMaps || !coll.sceneNodeMaps[sceneId]) return;
+
+    const nodeMaps = coll.sceneNodeMaps;
+    delete nodeMaps[sceneId];
+    coll.sceneNodeMaps = { ...nodeMaps };
   }
 }

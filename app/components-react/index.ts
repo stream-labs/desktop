@@ -64,11 +64,12 @@ import PlatformAppPageView from './shared/PlatformAppPageView';
 import PlatformAppPopOut from './windows/PlatformAppPopOut';
 import RecentEventsWindow from './windows/RecentEvents';
 import NewBadge from './shared/NewBadge';
-import RecordingHistory from './windows/RecordingHistory';
+import RecordingHistory from './pages/RecordingHistory';
 import UltraIcon from './shared/UltraIcon';
 import EditTransform from './windows/EditTransform';
 import InstalledApps from './windows/settings/InstalledApps';
 import Hotkeys from './windows/settings/Hotkeys';
+import GLVolmeters from './root/GLVolmeters';
 
 // list of React components to be used inside Vue components
 export const components = {
@@ -142,4 +143,5 @@ export const components = {
   InstalledApps,
   Blank,
   Hotkeys,
+  GLVolmeters: createRoot(GLVolmeters),
 };

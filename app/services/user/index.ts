@@ -159,6 +159,15 @@ export function setSentryContext(ctx: ISentryContext) {
 class UserViews extends ViewHandler<IUserServiceState> {
   // Injecting HostsService since it's not stateful
   @Inject() hostsService: HostsService;
+  @Inject() magicLinkService: MagicLinkService;
+
+  get settingsServiceViews() {
+    return this.getServiceViews(SettingsService);
+  }
+
+  get streamSettingsServiceViews() {
+    return this.getServiceViews(StreamSettingsService);
+  }
 
   get customizationServiceViews() {
     return this.getServiceViews(CustomizationService);
@@ -206,6 +215,25 @@ class UserViews extends ViewHandler<IUserServiceState> {
     return this.isLoggedIn && this.platform.type === 'twitch';
   }
 
+  /*
+   * The method above doesn't take into account Advanced mode,
+   * resulting in platform-specific functionality (like VOD track on Twitch)
+   * to appear enabled when it shouldn't if the user has set a different Service
+   * in the advanced view.
+   *
+   * Does not modify the above method as we're not sure how many places this
+   * (perhaps more expensive) check is necessary, or whether it'd match the
+   * expected caller behavior.
+   *
+   * TODO: When going back to Recommended Settings, the Service setting here
+   * doesn't get reset.
+   */
+  get isTwitchAuthedAndActive() {
+    return this.streamSettingsServiceViews.state.protectedModeEnabled
+      ? this.isTwitchAuthed
+      : this.settingsServiceViews.streamPlatform === 'Twitch';
+  }
+
   get isFacebookAuthed() {
     return this.isLoggedIn && this.platform.type === 'facebook';
   }
@@ -222,19 +250,6 @@ class UserViews extends ViewHandler<IUserServiceState> {
     return this.state.auth;
   }
 
-  alertboxLibraryUrl(id?: string) {
-    const uiTheme = this.customizationServiceViews.isDarkTheme ? 'night' : 'day';
-    let url = `https://${this.hostsService.streamlabs}/alert-box-themes?mode=${uiTheme}&slobs`;
-
-    if (this.isLoggedIn) {
-      url += `&oauth_token=${this.auth.apiToken}`;
-    }
-
-    if (id) url += `&id=${id}`;
-
-    return url;
-  }
-
   appStoreUrl(params?: { appId?: string | undefined; type?: string | undefined }) {
     const host = this.hostsService.platform;
     const token = this.auth.apiToken;
@@ -249,28 +264,6 @@ class UserViews extends ViewHandler<IUserServiceState> {
     }
 
     return `${url}?token=${token}&mode=${nightMode}`;
-  }
-
-  overlaysUrl(type?: 'overlay' | 'widget-themes' | 'site-themes', id?: string) {
-    const uiTheme = this.customizationServiceViews.isDarkTheme ? 'night' : 'day';
-
-    let url = `https://${this.hostsService.streamlabs}/library`;
-
-    if (type && !id) {
-      url += `/${type}`;
-    }
-
-    url += `?mode=${uiTheme}&slobs`;
-
-    if (this.isLoggedIn) {
-      url += `&oauth_token=${this.auth.apiToken}`;
-    }
-
-    if (type && id) {
-      url += `#/?type=${type}&id=${id}`;
-    }
-
-    return url;
   }
 }
 
@@ -822,6 +815,33 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const locale = i18nService.state.locale;
     // eslint-disable-next-line
     return `https://${this.hostsService.streamlabs}/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}&l=${locale}&hidenav=${hideNav}`;
+  }
+
+  async alertboxLibraryUrl(id?: string) {
+    const uiTheme = this.customizationService.views.isDarkTheme ? 'night' : 'day';
+    let url = `https://${this.hostsService.streamlabs}/alert-box-themes?mode=${uiTheme}&slobs`;
+
+    if (id) url += `&id=${id}`;
+
+    return await this.magicLinkService.actions.return.getMagicSessionUrl(url);
+  }
+
+  async overlaysUrl(type?: 'overlay' | 'widget-themes' | 'site-themes', id?: string) {
+    const uiTheme = this.customizationService.views.isDarkTheme ? 'night' : 'day';
+
+    let url = `https://${this.hostsService.streamlabs}/library`;
+
+    if (type && !id) {
+      url += `/${type}`;
+    }
+
+    url += `?mode=${uiTheme}&slobs`;
+
+    if (type && id) {
+      url += `#/?type=${type}&id=${id}`;
+    }
+
+    return await this.magicLinkService.actions.return.getMagicSessionUrl(url);
   }
 
   getDonationSettings() {

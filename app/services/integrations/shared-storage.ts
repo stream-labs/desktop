@@ -37,7 +37,7 @@ class SharedStorageServiceViews extends ViewHandler<{}> {
       return `https://crossclip.streamlabs.com/storage/${id}`;
     }
     if (platform === 'typestudio') {
-      return `https://app.typestudio.co/storage/${id}`;
+      return `https://podcasteditor.streamlabs.com/storage/${id}`;
     }
     return '';
   }
@@ -66,12 +66,13 @@ export class SharedStorageService extends Service {
     onError?: (error: unknown) => void,
     platform?: string,
   ) {
+    let uploadInfo;
     try {
       if (this.uploading) {
         throw new Error($t('Upload already in progress'));
       }
       this.uploading = true;
-      const uploadInfo = await this.prepareUpload(filepath, platform);
+      uploadInfo = await this.prepareUpload(filepath, platform);
       this.id = uploadInfo.file.id;
       this.uploader = new S3Uploader({
         fileInfo: uploadInfo,
@@ -83,7 +84,11 @@ export class SharedStorageService extends Service {
     } catch (e: unknown) {
       onError(e);
     }
-    return { cancel: this.cancelUpload.bind(this), complete: this.performUpload() };
+    return {
+      cancel: this.cancelUpload.bind(this),
+      complete: this.performUpload(),
+      size: uploadInfo?.file?.size,
+    };
   }
 
   async performUpload() {
@@ -142,6 +147,10 @@ export class SharedStorageService extends Service {
       return await jfetch(new Request(url, { headers, body, method: 'POST' }));
     } catch (e: unknown) {
       this.uploading = false;
+      // Signifies an API failure
+      if (e.toString() === '[object Object]') {
+        return Promise.reject('Error preparing storage upload');
+      }
       return Promise.reject(e);
     }
   }

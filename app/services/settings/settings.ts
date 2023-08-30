@@ -24,6 +24,7 @@ import { StreamingService } from 'services/streaming';
 import { byOS, getOS, OS } from 'util/operating-systems';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { SceneCollectionsService } from 'services/scene-collections';
+import { Subject } from 'rxjs';
 import * as remote from '@electron/remote';
 import fs from 'fs';
 import path from 'path';
@@ -48,6 +49,12 @@ export interface ISettingsValues {
     service: string;
     server: string;
   };
+  StreamSecond: {
+    key: string;
+    streamType: string;
+    service: string;
+    server: string;
+  };
   Output: {
     Mode: string;
     RecRB?: boolean;
@@ -62,16 +69,7 @@ export interface ISettingsValues {
     VodTrackIndex?: string;
     keyint_sec?: number;
   };
-  Video: {
-    Base: string;
-    Output: string;
-    ScaleType: string;
-    FPSType: string;
-    FPSCommon: string;
-    FPSInt: number;
-    FPSNum: number;
-    FPSDen: number;
-  };
+  Video: ISettingsVideoInfo; // default video context
   Audio: Dictionary<TObsValue>;
   Advanced: {
     DelayEnable: boolean;
@@ -83,6 +81,17 @@ export interface ISettingsValues {
     NewSocketLoopEnable: boolean;
     LowLatencyEnable: boolean;
   };
+}
+
+interface ISettingsVideoInfo {
+  Base: string;
+  Output: string;
+  ScaleType: string;
+  FPSType: string;
+  FPSCommon: string;
+  FPSInt: number;
+  FPSNum: number;
+  FPSDen: number;
 }
 
 export interface ISettingsSubCategory {
@@ -123,6 +132,10 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
     return settingsValues as ISettingsValues;
   }
 
+  get isSimpleOutputMode() {
+    return this.values.Output.Mode === 'Simple';
+  }
+
   get isAdvancedOutput() {
     return this.state.Output.type === 1;
   }
@@ -154,6 +167,10 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
   get audioTracks() {
     if (!this.isAdvancedOutput) return [];
     return Utils.numberToBinnaryArray(this.values.Output.RecTracks, 6).reverse();
+  }
+
+  get streamPlatform() {
+    return this.values.Stream.service;
   }
 
   get vodTrackEnabled() {
@@ -192,6 +209,8 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
 
   @Inject()
   private videoEncodingOptimizationService: VideoEncodingOptimizationService;
+
+  audioRefreshed = new Subject();
 
   get views() {
     return new SettingsViews(this.state);
@@ -292,6 +311,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
       type: ESettingsCategoryType.Untabbed,
       formData: this.getAudioSettingsFormData(this.state['Audio'].formData[0]),
     });
+    this.audioRefreshed.next();
   }
 
   showSettings(categoryName?: string) {

@@ -14,9 +14,9 @@ import { JsonrpcService } from './api/jsonrpc';
 import { TroubleshooterService, TIssueCode } from 'services/troubleshooter';
 import { $t } from 'services/i18n';
 import { StreamingService, EStreamingState } from 'services/streaming';
+import { VideoSettingsService } from 'services/settings-v2/video';
 import { UsageStatisticsService } from './usage-statistics';
 import { ViewHandler } from './core';
-import { VideoSettingsService } from './settings-v2/video';
 
 interface IPerformanceState {
   CPU: number;

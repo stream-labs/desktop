@@ -141,6 +141,12 @@
   "Revert Changes": "변경 취소",
   "Animations": "애니메이션",
   "Multistreaming": "멀티스트리밍",
+  "Upgrade to Ultra": "Ultra로 업그레이드",
+  "Twitch": "Twitch",
+  "Facebook": "Facebook",
+  "YouTube": "YouTube",
+  "Trovo": "Trovo",
+  "TikTok": "TikTok",
   "Alert Box": "알림 상자",
   "Widget": "위젯",
   "Creator Sites": "크리에이터 사이트",
@@ -151,6 +157,5 @@
   "Apps Store Home": "앱스토어 홈",
   "Dashboard Home": "대시보드 홈",
   "Alert Box Library": "알림 상자 라이브러리",
-  "Alert Box Settings": "알림 상자 설정",
-  "Upgrade to Ultra": "Ultra로 업그레이드"
+  "Alert Box Settings": "알림 상자 설정"
 }
