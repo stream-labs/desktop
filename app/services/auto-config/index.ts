@@ -6,7 +6,7 @@ import { Inject } from 'services';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { getPlatformService } from 'services/platforms';
 import { TwitchService } from 'services/platforms/twitch';
-import { YoutubeService } from 'app-services';
+import { SettingsService, YoutubeService } from 'app-services';
 import { VideoSettingsService } from 'services/settings-v2/video';
 import { UserService } from 'services/user';
 
@@ -28,6 +28,7 @@ export class AutoConfigService extends Service {
   @Inject() streamSettingsService: StreamSettingsService;
   @Inject() videoSettingsService: VideoSettingsService;
   @Inject() userService: UserService;
+  @Inject() private settingsService: SettingsService;
 
   configProgress = new Subject<IConfigProgress>();
 
@@ -65,12 +66,13 @@ export class AutoConfigService extends Service {
     //   return;
     // }
 
+    // const settings = this.settingsService.views.values;
     // obs.NodeObs.InitializeAutoConfig(
     //   (progress: IConfigProgress) => {
     //     this.handleProgress(progress);
     //     this.configProgress.next(progress);
     //   },
-    //   { continent: '', service_name: '' },
+    //   { continent: '', service_name: '', bind_ip: settings.Advanced.BindIP },
     // );
 
     // obs.NodeObs.StartBandwidthTest();
@@ -93,24 +95,33 @@ export class AutoConfigService extends Service {
         obs.NodeObs.StartRecordingEncoderTest();
       } else if (progress.description === 'recordingEncoder_test') {
         obs.NodeObs.StartCheckSettings();
-      } else if (progress.description === 'checking_settings') {
-        obs.NodeObs.StartSaveStreamSettings();
-      } else if (progress.description === 'saving_service') {
-        obs.NodeObs.StartSaveSettings();
-      } else if (progress.description === 'setting_default_settings') {
-        obs.NodeObs.StartSaveStreamSettings();
       }
     }
 
+    let applySettings = false;
     if (progress.event === 'error') {
-      obs.NodeObs.StartSetDefaultSettings();
+      obs.NodeObs.UseAutoConfigDefaultSettings();
       obs.NodeObs.TerminateAutoConfig();
       this.configProgress.next(progress);
+      applySettings = true;
     }
 
     if (progress.event === 'done') {
       obs.NodeObs.TerminateAutoConfig();
       this.videoSettingsService.loadLegacySettings();
+      applySettings = true;
+    }
+
+    if (applySettings) {
+       const settings = obs.NodeObs.GetNewSettings() as Array<[string, string, any]>;
+       for (const settingsTuple of settings) {
+         const [category, name, value] = settingsTuple;
+         if (category === 'Video') {
+           this.videoSettingsService.setVideoSetting(name, value);
+         } else {
+           this.settingsService.setSettingValue(category, name, value);
+         }
+       }
     }
   }
 

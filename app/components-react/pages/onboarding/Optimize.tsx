@@ -24,9 +24,6 @@ export function Optimize() {
     'streamingEncoder_test',
     'recordingEncoder_test',
     'checking_settings',
-    'setting_default_settings',
-    'saving_service',
-    'saving_settings',
   ];
   const percentage =
     optimizingState === 'running' && stepInfo ? (steps.indexOf(stepInfo.description) + 1) / steps.length : 0;
@@ -40,9 +37,6 @@ export function Optimize() {
       streamingEncoder_test: $t('Testing streaming encoder...'),
       recordingEncoder_test: $t('Testing recording encoder...'),
       checking_settings: $t('Attempting stream...'),
-      setting_default_settings: $t('Reverting to defaults...'),
-      saving_service: $t('Applying stream settings...'),
-      saving_settings: $t('Applying general settings...'),
     }[progress.description];
   }
 
