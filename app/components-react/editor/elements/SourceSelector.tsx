@@ -309,7 +309,7 @@ export class SourceSelectorModule {
     /**
      * If this is a dual output scene, reorder the corresponding nodes
      */
-    if (this.dualOutputService.views.hasNodeMap(this.scene.id)) {
+    if (this.dualOutputService.views.hasSceneNodeMaps) {
       const destNodeId = destNode?.id ?? (info.node.key as string);
       const dualOutputNodes = targetNodes
         .map(nodeId => {
@@ -412,8 +412,27 @@ export class SourceSelectorModule {
     return this.dualOutputService.views.dualOutputMode;
   }
 
+  /**
+   * Determines if the current scene has a node map entry in the scene collections node map.
+   * The existence of the scene node maps property in the scene collection's manifest indicates
+   * that the scene collection has been converted to a dual output scene. An entry in the
+   * scene node maps in the scene collection manifest indicates that the scene in the
+   * scene collection has been made active in dual output mode. To reduce bulk, scenes only
+   * create vertical nodes when the following are true:
+   *   1. The scene collection has been opened in dual output mode.
+   *   2. The scene has been opened at any point after the scene collection has been opened in
+   *      dual output mode.
+   * This is a finite distinction from the scene collection having any node maps for any scene.
+   */
   get hasNodeMap() {
     return !!this.dualOutputService.views.sceneNodeMaps[this.scene.id];
+  }
+  /**
+   * True if there are any node maps in the scene collections scene node map property
+   * in the scene collections manifest or if dual output mode is on.
+   */
+  get hasSceneNodeMaps() {
+    return this.dualOutputService.views.hasSceneNodeMaps;
   }
 
   watchSelected = injectWatch(() => this.lastSelectedId, this.expandSelectedFolders);
@@ -600,7 +619,7 @@ export class SourceSelectorModule {
   }
 
   createSelection(sceneNodeId: string) {
-    if (this.dualOutputService.views.hasNodeMap()) {
+    if (this.dualOutputService.views.hasSceneNodeMaps) {
       /**
        * Toggling the lock applies to both horizontal and vertical scene items
        */

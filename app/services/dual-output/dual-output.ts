@@ -73,14 +73,23 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return this.sceneCollectionsService.sceneNodeMaps[this.activeSceneId];
   }
 
+  /**
+   * Confirm that an entry exists in the scene collections manifest's scene node map property
+   */
   get hasVerticalNodes() {
     return !!this.sceneNodeMaps[this.activeSceneId];
   }
 
-  get shouldCreateVerticalNode(): boolean {
-    return this.hasSceneNodeMaps;
-  }
-
+  /**
+   * Determines if there are any node maps in the scene collections scene node map property in the
+   * scene collections manifest. The existence of the node map in the scene collections manifest
+   * shows that the scene collection has been converted to a dual output scene collection. To prevent
+   * undefined or null errors from unexpected behavior, confirm that there are any entries in the
+   * collection's scene node maps property.
+   *
+   * Also check to see if dual output mode is active so that a new scene created in dual output mode
+   * will correctly create item and show display toggles.
+   */
   get hasSceneNodeMaps(): boolean {
     const nodeMaps = this.sceneCollectionsService?.sceneNodeMaps;
     return this.dualOutputMode || (!!nodeMaps && Object.entries(nodeMaps).length > 0);
