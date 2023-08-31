@@ -84,7 +84,7 @@ export class RootNode extends Node<ISchema, {}> {
       hotkeys,
       guestCam,
       nodeMap,
-      baseResolution: this.videoService.baseResolution,
+      baseResolution: this.videoSettingsService.baseResolutions.horizontal,
       baseResolutions: this.videoSettingsService.baseResolutions,
       selectiveRecording: this.streamingService.state.selectiveRecording,
       dualOutputMode: this.dualOutputService.views.dualOutputMode,
@@ -157,7 +157,7 @@ export class RootNode extends Node<ISchema, {}> {
     }
     // Added multiple displays with individual base resolutions in version 4
     if (version < 4) {
-      this.data.baseResolutions = this.videoService.baseResolutions;
+      this.data.baseResolutions = this.videoSettingsService.baseResolutions;
     }
   }
 }
