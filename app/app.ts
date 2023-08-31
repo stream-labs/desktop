@@ -10,7 +10,7 @@ import Vue from 'vue';
 
 import { createStore } from './store';
 import { WindowsService } from './services/windows';
-import { AppService } from './services/app';
+import { AppService, setAppServiceSentryBackendUrl } from './services/app';
 import Utils from './services/utils';
 import electron from 'electron';
 import * as Sentry from '@sentry/electron/renderer';
@@ -64,7 +64,10 @@ if (isProduction) {
       processType: 'renderer',
     },
   });
+
 }
+
+setAppServiceSentryBackendUrl(getSentryCrashReportUrl(sentryParam));
 
 const windowId = Utils.getWindowId();
 

@@ -31,6 +31,12 @@ import Utils from 'services/utils';
 
 const crashHandler = window['require']('crash-handler');
 
+let SENTRY_SERVER_URL: string;
+
+export function setAppServiceSentryBackendUrl(url: string) {
+  SENTRY_SERVER_URL = url;
+};
+
 interface IAppState {
   loading: boolean;
   argv: string[];
@@ -105,6 +111,7 @@ export class AppService extends StatefulService<IAppState> {
       'en-US',
       this.appDataDirectory,
       electron.remote.process.env.NAIR_VERSION,
+      SENTRY_SERVER_URL,
     );
 
     if (apiResult !== EVideoCodes.Success) {
