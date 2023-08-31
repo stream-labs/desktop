@@ -100,7 +100,7 @@ export class RootNode extends Node<ISchema, {}> {
     if (!this.videoSettingsService.contexts.horizontal) {
       const establishedContext = this.videoSettingsService.establishedContext.subscribe(
         async () => {
-          this.videoService.setBaseResolutions(this.data.baseResolutions);
+          this.videoService.setBaseResolution(this.data.baseResolutions);
           this.streamingService.setSelectiveRecording(!!this.data.selectiveRecording);
           this.streamingService.setDualOutputMode(this.data.dualOutputMode);
 
@@ -123,7 +123,7 @@ export class RootNode extends Node<ISchema, {}> {
         },
       );
     } else {
-      this.videoService.setBaseResolutions(this.data.baseResolutions);
+      this.videoService.setBaseResolution(this.data.baseResolutions);
       this.streamingService.setSelectiveRecording(!!this.data.selectiveRecording);
       this.streamingService.setDualOutputMode(this.data.dualOutputMode);
 
