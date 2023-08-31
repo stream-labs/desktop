@@ -6,10 +6,13 @@ import { ScenesService, TSceneNode } from '../../scenes';
 import { CreateFolderCommand } from './create-folder';
 import { RemoveNodesCommand } from './remove-nodes';
 import { DualOutputService } from 'services/dual-output';
+import { EditorCommandsService } from 'services/editor-commands';
 
 export class AddFilesCommand extends Command {
   @Inject() private scenesService: ScenesService;
   @Inject() private dualOutputService: DualOutputService;
+
+  @Inject() private editorCommandsService: EditorCommandsService;
 
   private addNodesSubCommands: (CreateNewItemCommand | CreateFolderCommand)[];
   private removeNodesSubCommand: RemoveNodesCommand;
@@ -23,6 +26,13 @@ export class AddFilesCommand extends Command {
   }
 
   execute() {
+    if (
+      this.dualOutputService.views.dualOutputMode &&
+      this.editorCommandsService.state.operationInProgress
+    ) {
+      return;
+    }
+
     const scene = this.scenesService.views.getScene(this.sceneId);
 
     // initial executing
@@ -61,5 +71,11 @@ export class AddFilesCommand extends Command {
 
   async rollback() {
     await this.removeNodesSubCommand.execute();
+
+    // try {
+    //   await this.removeNodesSubCommand.execute();
+    // } catch (error: unknown) {
+    //   console.error('Error rolling back add files command. ', error);
+    // }
   }
 }

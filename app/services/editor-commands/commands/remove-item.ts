@@ -128,7 +128,22 @@ export class RemoveItemCommand extends Command {
       );
       this.verticalReorderNodesSubcommand.rollback();
     }
+    //   Promise.resolve(
+    //     this.dualOutputService.actions.return.createOrAssignOutputNode(
+    //       horizontalItem,
+    //       'vertical',
+    //       false,
+    //       this.sceneId,
+    //       this.dualOutputVerticalNodeId,
+    //     ),
+    //   );
+    //   console.log('error rollback vertical');
+    //   if (this.verticalReorderNodesSubcommand) {
+    //     this.verticalReorderNodesSubcommand.rollback();
+    //   }
+    // }
 
+    // console.log('error rollback horizontal');
     this.reorderNodesSubcommand.rollback();
   }
 }
