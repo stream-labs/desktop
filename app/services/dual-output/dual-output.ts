@@ -70,7 +70,7 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   }
 
   get activeSceneNodeMap(): Dictionary<string> {
-    return this.sceneCollectionsService.sceneNodeMaps[this.activeSceneId];
+    return this.sceneCollectionsService?.sceneNodeMaps[this.activeSceneId];
   }
 
   /**
@@ -244,7 +244,16 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return horizontalHasDestinations && verticalHasDestinations;
   }
 
-  hasNodeMap(sceneId?: string) {
+  /**
+   * Confirm if a scene has a node map for dual output.
+   * @remark If the scene collection does not have the scene node maps property in the
+   * scene collection manifest, this will return false.
+   * @param sceneId Optional id of the scene to look up. If no scene id is provided, the active
+   * scene's id will be used.
+   * @returns Boolean for whether or not the scene has an entry in the scene collections scene node map.
+   */
+  hasNodeMap(sceneId?: string): boolean {
+    if (!this.sceneCollectionsService?.sceneNodeMaps) return false;
     const nodeMap = sceneId ? this.sceneNodeMaps[sceneId] : this.activeSceneNodeMap;
     return !!nodeMap && Object.keys(nodeMap).length > 0;
   }
