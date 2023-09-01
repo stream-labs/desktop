@@ -71,11 +71,5 @@ export class AddFilesCommand extends Command {
 
   async rollback() {
     await this.removeNodesSubCommand.execute();
-
-    // try {
-    //   await this.removeNodesSubCommand.execute();
-    // } catch (error: unknown) {
-    //   console.error('Error rolling back add files command. ', error);
-    // }
   }
 }
