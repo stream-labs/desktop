@@ -43,7 +43,7 @@ export class RemoveNodesCommand extends Command {
 
     this.nodeOrder = this.selection.getScene().getNodesIds();
 
-    const hasNodeMap = this.dualOutputService.views.hasNodeMap(this.selection.sceneId);
+    const hasNodeMap = this.dualOutputService.views.hasSceneNodeMaps;
 
     this.selection.getFolders().forEach(folder => {
       if (
@@ -74,18 +74,11 @@ export class RemoveNodesCommand extends Command {
         item.id,
         this.selection.sceneId,
       );
-      if (hasNodeMap && verticalNodeId) {
-        // save node map entries to restore them when rolling back
-        // to prevent duplicates, only save when encountering a horizontal node
-        this.nodeMapEntries = {
-          ...this.nodeMapEntries,
-          [item.id]: verticalNodeId,
-        };
-        this.sceneCollectionsService.removeNodeMapEntry(this.selection.sceneId, item.id);
+      if (item?.display === 'horizontal') {
+        const subCommand = new RemoveItemCommand(item.id, verticalNodeId);
+        await subCommand.execute();
+        this.removeItemSubCommands.push(subCommand);
       }
-      const subCommand = new RemoveItemCommand(item.id, verticalNodeId);
-      await subCommand.execute();
-      this.removeItemSubCommands.push(subCommand);
     }
   }
 
@@ -98,7 +91,7 @@ export class RemoveNodesCommand extends Command {
 
     this.selection.getScene().setNodesOrder(this.nodeOrder);
 
-    // restore node map for dual output scenes
+    // restore node map for folders for dual output scenes
     if (this.nodeMapEntries) {
       const sceneId = this.selection.sceneId;
 
