@@ -93,7 +93,7 @@ export class CopyNodesCommand extends Command {
      */
     if (isDualOutputMode && !this.hasNodeMap) {
       // Create all nodes first
-      this.selection.getNodes().forEach(async node => {
+      this.selection.getNodes().forEach(node => {
         if (node.isFolder()) {
           // add folder
           const display =
