@@ -2,6 +2,7 @@
   <div class="container">
     <div class="header">
       <p class="header-title">放送者NG設定</p>
+      <span class="registrations">（登録数 {{ count }}/{{ maxCount }}）</span>
       <i class="icon-close icon-btn" @click="close"></i>
     </div>
     <div class="content">
@@ -30,7 +31,6 @@
         >
           コマンド
         </button>
-        <div class="registrations">登録数 {{ count }}/{{ maxCount }}</div>
       </div>
       <form class="add-form" @submit.prevent="onAdd">
         <input
@@ -40,20 +40,21 @@
           :placeholder="PLACEHOLDER[currentType]"
           :disabled="adding"
           :readonly="adding"
+          :class="{ 'is-error': invalid }"
         />
         <button
           type="submit"
           :disabled="!newFilterValue || adding || invalid"
           class="button button--secondary"
         >
-          追加
+          登録
         </button>
+        <div class="form-tip floating-wrapper" v-if="invalid">
+          このユーザーIDは存在しないか、無効な文字列です
+        </div>
       </form>
-      <div class="floating-wrapper" v-if="invalid">
-        このユーザーIDは存在しないか、無効な文字列です
-      </div>
       <div class="list">
-        <div class="row" v-for="item of currentTypeFilters" :key="item.id">
+        <div class="item row" v-for="item of currentTypeFilters" :key="item.id">
           <div class="item-box">
             <div class="item-body" :title="item.body">{{ item.body }}</div>
             <div class="item-comment" v-if="item.comment_body" :title="item.comment_body">
@@ -93,6 +94,9 @@
   justify-content: center;
   height: 48px;
   padding: 4px 16px;
+  color: var(--color-text-light);
+  .bold;
+
   border-bottom: 1px solid var(--color-border-light);
 
   > .header-title {
@@ -131,16 +135,20 @@
 }
 
 .add-form {
+  position: relative;
   display: flex;
   flex-shrink: 0;
   justify-content: center;
+  height: 72px;
   padding: 16px;
+  border-bottom: 1px solid var(--color-border-light);
 
   > input {
     box-sizing: border-box;
     flex-grow: 1;
     width: auto;
-    padding-right: 36px;
+    height: 100%;
+    padding: 0 12px;
     border-radius: 4px 0 0 4px;
 
     &::placeholder {
@@ -150,21 +158,16 @@
 
   > button {
     flex-shrink: 0;
+    height: 100%;
     border-radius: 0 4px 4px 0;
   }
 }
 
 .floating-wrapper {
   position: absolute;
+  top: 64px;
   right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: @z-index-default-content;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-  pointer-events: none;
+  left: 16px;
 }
 
 .list {
@@ -186,34 +189,30 @@
   }
 }
 
+.item {
+  padding: 12px 16px;
+}
+
 .item-box {
   .text-ellipsis;
 
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  margin-top: 12px;
-  margin-bottom: 12px;
-
-  div {
-    height: 24px;
-    line-height: 24px;
-  }
 }
 
 .item-body {
-  margin-left: 16px;
   color: var(--color-text);
 }
 
 .item-comment {
-  margin-left: 16px;
+  font-size: @font-size2;
   color: var(--color-text-dark);
 }
 
 .item-date {
   flex-shrink: 0;
-  margin-left: 16px;
+  font-size: @font-size2;
   color: var(--color-text-dark);
 }
 
@@ -222,6 +221,5 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  margin-right: 16px;
 }
 </style>
