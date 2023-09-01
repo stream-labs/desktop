@@ -267,7 +267,7 @@ export class EditMenu extends Menu {
                 .reduce((itemIds: string[], item: SceneItem) => {
                   itemIds.push(item.id);
                   // for dual output scenes, also remove the partner node
-                  if (this.dualOutputService.views.hasNodeMap()) {
+                  if (this.dualOutputService.views.hasSceneNodeMaps) {
                     const dualOutputNodeId = this.dualOutputService.views.getDualOutputNodeId(
                       item.id,
                     );

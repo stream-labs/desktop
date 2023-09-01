@@ -147,7 +147,7 @@ export class Selection {
     const nodes = scene.getNodes();
     const ids = this.state.selectedIds;
 
-    return nodes.filter(node => ids.includes(node.id));
+    return nodes.filter(node => node && ids.includes(node.id));
   }
 
   /**

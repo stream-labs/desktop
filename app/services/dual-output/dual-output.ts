@@ -215,11 +215,25 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return display === 'horizontal' ? 'landscape' : 'portrait';
   }
 
+  /**
+   * Get the visibility for the vertical node.
+   * @remark Primarily used for the source toggles. The id of the node is determined either by the
+   * @param nodeId
+   * @param sceneId
+   * @returns
+   */
   getIsHorizontalVisible(nodeId: string, sceneId?: string) {
     if (!this.hasVerticalNodes) return false;
     return this.scenesService.views.getNodeVisibility(nodeId, sceneId ?? this.activeSceneId);
   }
 
+  /**
+   * Get the visibility for the vertical node.
+   * @remark Primarily used for the source toggles. The id of the node is determined either by the
+   * @param nodeId
+   * @param sceneId
+   * @returns
+   */
   getIsVerticalVisible(nodeId: string, sceneId?: string) {
     // in the source selector, the vertical node id is determined by the visible display
     if (!this.hasVerticalNodes) return false;
