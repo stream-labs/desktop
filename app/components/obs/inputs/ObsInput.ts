@@ -43,7 +43,7 @@ export declare type TObsValue = number | string | boolean | IObsFont | TObsStrin
  * common interface for OBS objects properties
  */
 export interface IObsInput<TValueType> {
-  value: TValueType;
+  value?: TValueType;
   name: string;
   description: string;
   showDescription?: boolean;

@@ -771,14 +771,22 @@ export class SettingsService
   setSettings(categoryName: string, settingsData: ISettingsSubCategory[]) {
     if (categoryName === 'Audio') this.setAudioSettings([settingsData.pop()]);
 
-    const dataToSave = [];
+    const dataToSave: {
+      nameSubCategory: string;
+      parameters: {
+        name: string;
+        type: string;
+        subType: string;
+        currentValue: number | string | boolean;
+      }[];
+    }[] = [];
 
     for (const subGroup of settingsData) {
       dataToSave.push({
         ...subGroup,
         parameters: inputValuesToObsValues(subGroup.parameters, {
           valueToCurrentValue: true,
-        }),
+        }) as any, // TODO fix type
       });
     }
 
