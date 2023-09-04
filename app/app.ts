@@ -1,4 +1,4 @@
-import { I18nService } from 'services/i18n';
+import { I18nService, $t } from 'services/i18n';
 
 // eslint-disable-next-line
 window['eval'] = global.eval = () => {
@@ -10,7 +10,7 @@ import Vue from 'vue';
 
 import { createStore } from './store';
 import { WindowsService } from './services/windows';
-import { AppService, setAppServiceSentryBackendUrl } from './services/app';
+import { AppService } from './services/app';
 import Utils from './services/utils';
 import electron from 'electron';
 import * as Sentry from '@sentry/electron/renderer';
@@ -25,6 +25,11 @@ import VeeValidate from 'vee-validate';
 import ChildWindow from 'components/windows/ChildWindow.vue';
 import OneOffWindow from 'components/windows/OneOffWindow.vue';
 import util from 'util';
+import * as obs from '../obs-api';
+import uuid from 'uuid/v4';
+import path from 'path';
+
+const crashHandler = window['require']('crash-handler');
 
 const { ipcRenderer, remote } = electron;
 
@@ -67,7 +72,7 @@ if (isProduction) {
 
 }
 
-setAppServiceSentryBackendUrl(getSentryCrashReportUrl(sentryParam));
+const SENTRY_SERVER_URL = getSentryCrashReportUrl(sentryParam);
 
 const windowId = Utils.getWindowId();
 
@@ -142,11 +147,70 @@ document.addEventListener('dragenter', event => event.preventDefault());
 document.addEventListener('drop', event => event.preventDefault());
 document.addEventListener('auxclick', event => event.preventDefault());
 
+
+export const apiInitErrorResultToMessage = (resultCode: obs.EVideoCodes) => {
+  switch (resultCode) {
+    case obs.EVideoCodes.NotSupported: {
+      return $t('OBSInit.NotSupportedError');
+    }
+    case obs.EVideoCodes.ModuleNotFound: {
+      return $t('OBSInit.ModuleNotFoundError');
+    }
+    default: {
+      return $t('OBSInit.UnknownError');
+    }
+  }
+};
+
+const showDialog = (message: string): void => {
+  electron.remote.dialog.showErrorBox($t('OBSInit.ErrorTitle'), message);
+};
+
 document.addEventListener('DOMContentLoaded', () => {
   createStore().then(async store => {
     const windowsService: WindowsService = WindowsService.instance;
 
     if (Utils.isMainWindow()) {
+      // Services
+      const appService: AppService = AppService.instance;
+
+      // This is used for debugging
+      window['obs'] = obs;
+
+      // Host a new OBS server instance
+      obs.IPC.host(`nair-${uuid()}`);
+      obs.NodeObs.SetWorkingDirectory(
+        path.join(
+          electron.remote.app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
+          'node_modules',
+          'obs-studio-node',
+        ),
+      );
+
+      crashHandler.registerProcess(appService.pid, false);
+
+      // await this.obsUserPluginsService.initialize();
+
+      // Initialize OBS API
+      const apiResult = obs.NodeObs.OBS_API_initAPI(
+        'en-US',
+        appService.appDataDirectory,
+        electron.remote.process.env.NAIR_VERSION,
+        SENTRY_SERVER_URL,
+      );
+
+      if (apiResult !== obs.EVideoCodes.Success) {
+        const message = apiInitErrorResultToMessage(apiResult);
+        showDialog(message);
+
+        crashHandler.unregisterProcess(appService.pid);
+
+        obs.IPC.disconnect();
+
+        electron.ipcRenderer.send('shutdownComplete');
+        return;
+      }
+
       ipcRenderer.on('closeWindow', () => windowsService.closeMainWindow());
       AppService.instance.load();
     } else {
