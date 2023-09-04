@@ -205,6 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         crashHandler.unregisterProcess(appService.pid);
 
+        obs.NodeObs.InitShutdownSequence();
         obs.IPC.disconnect();
 
         electron.ipcRenderer.send('shutdownComplete');
