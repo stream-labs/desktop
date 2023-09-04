@@ -3,6 +3,7 @@ import { NicoliveClient, isOk } from './NicoliveClient';
 import { FilterRecord } from './ResponseTypes';
 import { Inject } from 'services/core/injector';
 import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
+import { NicoliveProgramStateService } from 'services/nicolive-program/state';
 import { map, distinctUntilChanged } from 'rxjs/operators';
 import { NicoliveFailure } from './NicoliveFailure';
 import { WrappedChat } from './WrappedChat';
@@ -53,6 +54,8 @@ interface INicoliveCommentFilterState {
 
 export class NicoliveCommentFilterService extends StatefulService<INicoliveCommentFilterState> {
   @Inject() private nicoliveProgramService: NicoliveProgramService;
+  @Inject('NicoliveProgramStateService') private stateService: NicoliveProgramStateService;
+
   private client = new NicoliveClient();
 
   static initialState = {
@@ -160,5 +163,12 @@ export class NicoliveCommentFilterService extends StatefulService<INicoliveComme
   @mutation()
   private UPDATE_FILTERS(filters: FilterRecord[]) {
     this.state = { filters };
+  }
+
+  get ngPanelInfoCoachingClosed() {
+    return this.stateService.state.ngPanelInfoCoachingClosed;
+  }
+  set ngPanelInfoCoachingClosed(value: boolean) {
+    this.stateService.updateNgPanelInfoCoachingClosed(value);
   }
 }
