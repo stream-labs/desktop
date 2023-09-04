@@ -1,4 +1,4 @@
-@import './styles/_colors.less';
+@import url('./styles/_colors.less');
 
 // デフォルトのスタイルセット
 :root {
@@ -13,7 +13,7 @@
   --color-bg-tertiary: @bg-tertiary;
   --color-bg-quaternary: @bg-quaternary;
   --color-bg-quinary: @bg-quinary;
-  --color-bg-active: rgba(@light-grey, .2);
+  --color-bg-active: fade(@light-grey, 15%);
 
   // primary
   --color-primary: @text-primary;
@@ -25,23 +25,23 @@
   --color-accent-variant: @accent-hover;
 
   // border
-  --color-border-dark: rgba(@black, .5);
-  --color-border-light: rgba(@white, .15);
-  --color-border-accent:  @grey;
+  --color-border-dark: fade(@black, 50%);
+  --color-border-light: fade(@white, 15%);
+  --color-border-accent: @grey;
 
   // text
   --color-text: @light-grey;
   --color-text-light: @white;
   --color-text-dark: @grey;
   --color-text-active: @text-primary;
-  --color-text-disabled: rgba(@light-grey, .26);
+  --color-text-disabled: fade(@light-grey, 26%);
 
   // button
   --color-button-label: @white;
   --color-button-primary: @text-secondary;
-  --color-button-primary-hover: rgba(@text-secondary, .8);
-  --color-button-secondary: rgba(@grey, .8);
-  --color-button-secondary-hover: rgba(@grey, .6);
+  --color-button-primary-hover: fade(@text-secondary, 80%);
+  --color-button-secondary: fade(@grey, 80%);
+  --color-button-secondary-hover: fade(@grey, 60%);
   --color-button-tertiary: darken(@grey, 25%);
   --color-button-tertiary-hover: darken(@grey, 32%);
   --color-button-accent: @accent;
@@ -60,7 +60,7 @@
   --color-popper-bg-dark: @bg-secondary;
 
   // scroll
-  --color-scroll-bar: rgba(@grey, .4);
+  --color-scroll-bar: fade(@grey, 40%);
 
   // brand color
   --color-brand-nicoad: @nicoad-brand-color;
@@ -72,17 +72,18 @@
   // input color
   --color-input: @grey;
   --color-input-active: @text-primary;
-  --color-input-bg: rgba(@bg-primary, .6);
+  --color-input-bg: fade(@bg-primary, 60%);
 
   // tooltip
   --color-tooltip-bg: @bg-secondary;
   --color-tooltip-text: @white;
-  --color-tooltip-border: rgba(@light-grey, .2);
+  --color-tooltip-border: fade(@light-grey, 20%);
 
   // red
   --color-red: @red;
   --color-red-hover: darken(@red, 15%);
   --color-red-dark: darken(@red, 40%);
+  --color-red-light: lighten(@red, 10%);
 
   // error
   --color-error: @red;
@@ -98,10 +99,10 @@
 
 // フルモード
 .isFullMode {
-  /*!*/
+  /* ! */
 }
 
 // コンパクトモード
 .isCompactMode {
-  /*!*/
+  /* ! */
 }

@@ -4,6 +4,7 @@ import { Inject } from 'services/core/injector';
 import { NicoliveCommentFilterService } from 'services/nicolive-program/nicolive-comment-filter';
 import { FilterType, FilterRecord } from 'services/nicolive-program/ResponseTypes';
 import { UserService } from 'services/user';
+import Banner from '../shared/banner.vue';
 import {
   NicoliveFailure,
   openErrorDialogFromFailure,
@@ -22,7 +23,11 @@ function getBody(item: FilterRecord): string {
   }
 }
 
-@Component({})
+@Component({
+  components: {
+    Banner,
+  },
+})
 export default class CommentFilter extends Vue {
   @Inject()
   private nicoliveCommentFilterService: NicoliveCommentFilterService;
@@ -76,7 +81,7 @@ export default class CommentFilter extends Vue {
     word: 'コメントを入力',
     user: 'ユーザーIDを入力 (例:12345678)',
     command: 'コマンドを入力',
-  }
+  };
 
   get count() {
     return this.filters.length;
@@ -132,18 +137,22 @@ export default class CommentFilter extends Vue {
   }
 
   get currentTypeFilters() {
-    return this.filters.filter(x => x.type === this.currentType).map(item => {
-      return {
-        id: item.id,
-        type: item.type,
-        body: getBody(item),
-        register_date: `登録日時: ${new Date(item.register_date).toLocaleString()}`,
-        comment_body: item.comment_body && `コメント: ${item.comment_body}`,
-      };
-    });
+    return this.filters
+      .filter(x => x.type === this.currentType)
+      .map(item => {
+        return {
+          id: item.id,
+          type: item.type,
+          body: getBody(item),
+          register_date: `登録日時: ${new Date(item.register_date).toLocaleString()}`,
+          comment_body: item.comment_body && `コメント: ${item.comment_body}`,
+        };
+      });
   }
 
   mounted() {
     this.reloadFilters();
   }
+
+  isBannerOpened = true;
 }

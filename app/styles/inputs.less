@@ -37,6 +37,10 @@ textarea {
     color: var(--color-bg-primary);
     background-color: var(--color-primary);
   }
+
+  &.is-error {
+    border-color: var(--color-red-light);
+  }
 }
 
 .input {
@@ -392,4 +396,29 @@ textarea {
 
 .custom-select-trigger::after {
   content: @n-air--codepoint--drop-down-arrow;
+}
+
+.form-tip {
+  .radius;
+
+  z-index: @z-index-popper;
+  width: fit-content;
+  padding: 8px 12px;
+  font-size: @font-size2;
+  color: var(--color-text-light);
+  pointer-events: none;
+  background-color: var(--color-bg-quaternary);
+  filter: drop-shadow(@shadow);
+
+  &::before {
+    position: absolute;
+    top: -5px;
+    left: 0;
+    width: 0;
+    height: 0;
+    margin-left: 24px;
+    content: '';
+    border: var(--color-bg-quaternary) 5px solid;
+    transform: translateX(-12px) rotate(-45deg);
+  }
 }
