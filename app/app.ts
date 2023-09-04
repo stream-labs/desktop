@@ -151,19 +151,23 @@ document.addEventListener('auxclick', event => event.preventDefault());
 export const apiInitErrorResultToMessage = (resultCode: obs.EVideoCodes) => {
   switch (resultCode) {
     case obs.EVideoCodes.NotSupported: {
-      return $t('OBSInit.NotSupportedError');
+      // "Failed to initialize OBS. Your video drivers may be out of date, or N Air may not be supported on your system.",
+      return 'OBSの初期化に失敗しました。ビデオドライバーが古い、もしくはN Airがサポートしないシステムの可能性があります。';
     }
     case obs.EVideoCodes.ModuleNotFound: {
-      return $t('OBSInit.ModuleNotFoundError');
+      // "DirectX could not be found on your system. Please install the latest version of DirectX for your machine here <https://www.microsoft.com/en-us/download/details.aspx?id=35?> and try again.",
+      return 'DirectXが見つかりませんでした。最新のDirectXをこちら<https://www.microsoft.com/en-us/download/details.aspx?id=35?> からインストールしてから、再度お試しください。';
     }
     default: {
-      return $t('OBSInit.UnknownError');
+      // "An unknown error was encountered while initializing OBS.",
+      return 'OBSの初期化中に不明なエラーが発生しました';
     }
   }
 };
 
 const showDialog = (message: string): void => {
-  electron.remote.dialog.showErrorBox($t('OBSInit.ErrorTitle'), message);
+  // "OBSInit.ErrorTitle": "Initialization Error",
+  electron.remote.dialog.showErrorBox('初期化エラー', message);
 };
 
 document.addEventListener('DOMContentLoaded', () => {
