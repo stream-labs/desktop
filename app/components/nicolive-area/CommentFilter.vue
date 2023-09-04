@@ -70,6 +70,16 @@
           ></button>
         </div>
       </div>
+      <banner
+        class="banner"
+        title="タイトルタイトルタイトル"
+        body="本文本文本文本文本文本文本文本文本文本文"
+        anchorLabel="リンク"
+        anchorLink="https://blog.nicovideo.jp/niconews/"
+        @close="isBannerOpened = false"
+        v-if="isBannerOpened"
+      >
+      </banner>
     </div>
   </div>
 </template>
@@ -221,5 +231,13 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
+}
+
+.banner {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  left: 16px;
+  .shadow;
 }
 </style>
