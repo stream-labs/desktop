@@ -36,8 +36,6 @@ const { ipcRenderer, remote } = electron;
 const nAirVersion = remote.process.env.NAIR_VERSION;
 const isProduction = process.env.NODE_ENV === 'production';
 
-const FakeObsInitializeError = true; // DEBUG
-
 type SentryParams = {
   organization: string;
   key: string;
@@ -206,16 +204,12 @@ document.addEventListener('DOMContentLoaded', () => {
       // await this.obsUserPluginsService.initialize();
 
       // Initialize OBS API
-      let apiResult = obs.NodeObs.OBS_API_initAPI(
+      const apiResult = obs.NodeObs.OBS_API_initAPI(
         'en-US',
         appService.appDataDirectory,
         electron.remote.process.env.NAIR_VERSION,
         SENTRY_SERVER_URL,
       );
-
-      if (FakeObsInitializeError) {
-        apiResult = obs.EVideoCodes.NotSupported;
-      }
 
       if (apiResult !== obs.EVideoCodes.Success) {
         const message = apiInitErrorResultToMessage(apiResult);
