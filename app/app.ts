@@ -1,4 +1,4 @@
-import { I18nService, $t } from 'services/i18n';
+import { I18nService } from 'services/i18n';
 
 // eslint-disable-next-line
 window['eval'] = global.eval = () => {
