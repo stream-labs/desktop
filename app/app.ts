@@ -147,27 +147,35 @@ document.addEventListener('dragenter', event => event.preventDefault());
 document.addEventListener('drop', event => event.preventDefault());
 document.addEventListener('auxclick', event => event.preventDefault());
 
+const locale = electron.remote.app.getLocale();
 
 export const apiInitErrorResultToMessage = (resultCode: obs.EVideoCodes) => {
   switch (resultCode) {
     case obs.EVideoCodes.NotSupported: {
-      // "Failed to initialize OBS. Your video drivers may be out of date, or N Air may not be supported on your system.",
-      return 'OBSの初期化に失敗しました。ビデオドライバーが古い、もしくはN Airがサポートしないシステムの可能性があります。';
+      if (locale === 'ja') {
+        return 'OBSの初期化に失敗しました。ビデオドライバーが古い、もしくはN Airがサポートしないシステムの可能性があります。';
+      }
+      return 'Failed to initialize OBS. Your video drivers may be out of date, or N Air may not be supported on your system.';
     }
     case obs.EVideoCodes.ModuleNotFound: {
-      // "DirectX could not be found on your system. Please install the latest version of DirectX for your machine here <https://www.microsoft.com/en-us/download/details.aspx?id=35?> and try again.",
-      return 'DirectXが見つかりませんでした。最新のDirectXをこちら<https://www.microsoft.com/en-us/download/details.aspx?id=35?> からインストールしてから、再度お試しください。';
+      if (locale === 'ja') {
+        return 'DirectXが見つかりませんでした。最新のDirectXをこちら<https://www.microsoft.com/en-us/download/details.aspx?id=35?> からインストールしてから、再度お試しください。';
+      }
+      return 'DirectX could not be found on your system. Please install the latest version of DirectX for your machine here <https://www.microsoft.com/en-us/download/details.aspx?id=35?> and try again.';
     }
     default: {
-      // "An unknown error was encountered while initializing OBS.",
-      return 'OBSの初期化中に不明なエラーが発生しました';
+      if (locale === 'ja') {
+        return 'OBSの初期化中に不明なエラーが発生しました';
+      }
+      return 'An unknown error was encountered while initializing OBS.';
     }
   }
 };
 
 const showDialog = (message: string): void => {
-  // "OBSInit.ErrorTitle": "Initialization Error",
-  electron.remote.dialog.showErrorBox('初期化エラー', message);
+  electron.remote.dialog.showErrorBox(
+    locale === 'ja' ? '初期化エラー' : 'Initialization Error',
+    message);
 };
 
 document.addEventListener('DOMContentLoaded', () => {
