@@ -87,7 +87,7 @@ export interface ISaveSettingsData {
 }
 
 export const NodeObs: {
-  // https://github.com/stream-labs/obs-studio-node/blob/0.23.71/obs-studio-client/source/nodeobs_api.hpp
+  // https://github.com/stream-labs/obs-studio-node/blob/0.23.59/obs-studio-client/source/nodeobs_api.hpp
   OBS_API_initAPI(locale: string, directory: string, version: string, sentryUrl: string): EVideoCodes;
   // OBS_API_destroyOBS_API(): void;
   OBS_API_getPerformanceStatistics(): {
@@ -146,7 +146,7 @@ export const NodeObs: {
   // GetLowLatencyAudioBufferingLegacy(): boolean | undefined;
 
 
-  // https://github.com/stream-labs/obs-studio-node/blob/0.23.71/obs-studio-client/source/callback-manager.cpp
+  // https://github.com/stream-labs/obs-studio-node/blob/0.23.59/obs-studio-client/source/callback-manager.cpp
   RegisterSourceCallback(callback: (objs: {
     name: string;
     width: number;
@@ -156,7 +156,7 @@ export const NodeObs: {
   RemoveSourceCallback(): void;
 
 
-  // https://github.com/stream-labs/obs-studio-node/blob/0.23.71/obs-studio-client/source/nodeobs_service.hpp
+  // https://github.com/stream-labs/obs-studio-node/blob/0.23.59/obs-studio-client/source/nodeobs_service.hpp
   OBS_service_resetAudioContext(): void;
   OBS_service_resetVideoContext(): void;
 
@@ -188,7 +188,7 @@ export const NodeObs: {
   // OBS_service_isVirtualCamPluginInstalled(): number; // VcamInstalledStatus
 
 
-  // https://github.com/stream-labs/obs-studio-node/blob/0.23.71/obs-studio-client/source/nodeobs_display.hpp
+  // https://github.com/stream-labs/obs-studio-node/blob/0.23.59/obs-studio-client/source/nodeobs_display.hpp
   // OBS_content_setDayTheme(dayTheme: boolean): void;
   OBS_content_createDisplay(window: Buffer, key: string, mode: number, renderAtBottom?: boolean): void;
   OBS_content_destroyDisplay(key: string): void;
@@ -207,7 +207,7 @@ export const NodeObs: {
   // OBS_content_createIOSurface(key: string): number | undefined;
 
 
-  // https://github.com/stream-labs/obs-studio-node/blob/0.23.71/obs-studio-client/source/nodeobs_settings.hpp
+  // https://github.com/stream-labs/obs-studio-node/blob/0.23.59/obs-studio-client/source/nodeobs_settings.hpp
   OBS_settings_getSettings(category: string): {
     data: IGetSettingsData[];
     type: number;
