@@ -408,6 +408,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       if (source.width !== info.width || source.height !== info.height) {
         const size = { id: source.sourceId, width: info.width, height: info.height };
         this.UPDATE_SOURCE(size);
+        this.sourceUpdated.next(source.getModel());
       }
       this.updateSourceFlags(source, info.flags);
     });

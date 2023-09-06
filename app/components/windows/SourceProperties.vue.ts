@@ -33,7 +33,8 @@ export default class SourceProperties extends Vue {
   initialProperties: TObsFormData = [];
   tainted = false;
 
-  sourcesSubscription: Subscription;
+  sourceRemovedSub: Subscription;
+  sourceUpdatedSub: Subscription;
 
   get windowId() {
     return Util.getCurrentUrlParams().windowId;
@@ -48,15 +49,21 @@ export default class SourceProperties extends Vue {
   mounted() {
     this.properties = this.source ? this.source.getPropertiesFormData() : [];
     this.initialProperties = cloneDeep(this.properties);
-    this.sourcesSubscription = this.sourcesService.sourceRemoved.subscribe(source => {
+    this.sourceRemovedSub = this.sourcesService.sourceRemoved.subscribe(source => {
       if (source.sourceId === this.sourceId) {
         electron.remote.getCurrentWindow().close();
+      }
+    });
+    this.sourceUpdatedSub = this.sourcesService.sourceUpdated.subscribe(source => {
+      if (source.sourceId === this.sourceId) {
+        this.refresh();
       }
     });
   }
 
   destroyed() {
-    this.sourcesSubscription.unsubscribe();
+    this.sourceRemovedSub.unsubscribe();
+    this.sourceUpdatedSub.unsubscribe();
   }
 
   get propertiesManagerUI() {
@@ -67,7 +74,6 @@ export default class SourceProperties extends Vue {
     const source = this.sourcesService.getSource(this.sourceId);
     source.setPropertiesFormData([properties[changedIndex]]);
     this.tainted = true;
-    this.refresh();
   }
 
   refresh() {
