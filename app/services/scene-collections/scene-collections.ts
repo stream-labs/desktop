@@ -318,7 +318,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * @param name the name of the new scene collection
    * @param id An optional ID, if omitted the active collection ID is used
    */
-  async duplicate(name: string, id?: string) {
+  async duplicate(name: string, id?: string): Promise<string> {
     const oldId = id ?? this.activeCollection?.id;
     if (oldId == null) return;
 
@@ -329,8 +329,36 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
     const newId = uuid();
     const duplicatedName = $t('Copy of %{collectionName}', { collectionName: name });
-    await this.insertCollection(newId, duplicatedName, oldColl.operatingSystem, false, oldId);
+    const collection = await this.insertCollection(
+      newId,
+      duplicatedName,
+      oldColl.operatingSystem,
+      false,
+      oldId,
+    );
     this.enableAutoSave();
+
+    return collection.id;
+  }
+
+  /**
+   * Convert a dual output scene to a vanilla scene
+   * @remark This duplicates the scene collection before conversion to prevent loss of data
+   * @params Boolean for if the vertical sources should be assigned to the horizontal display
+   * @returns String filepath for new collection
+   */
+  async convertDualOutputCollection(assignToHorizontal: boolean = false): Promise<string> {
+    const name = `${this.activeCollection?.name} - Converted`;
+
+    const collectionId = await this.duplicate(name, this.activeCollection?.id);
+
+    this.dualOutputService.setdualOutputMode(false);
+
+    await this.load(collectionId);
+
+    await this.convertToVanillaSceneCollection(assignToHorizontal);
+
+    return this.stateService.getCollectionFilePath(collectionId);
   }
 
   downloadProgress = new Subject<IDownloadProgress>();
@@ -1045,5 +1073,40 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    */
   removeNodeMap(sceneId: string) {
     this.stateService.removeNodeMap(sceneId);
+  }
+
+  /**
+   * Convert dual output scene collection to vanilla scene collection
+   */
+  async convertToVanillaSceneCollection(assignToHorizontal?: boolean) {
+    if (!this.sceneNodeMaps) return;
+
+    const sceneIds = Object.keys(this.sceneNodeMaps);
+
+    sceneIds.forEach(sceneId => {
+      const nodes = this.scenesService.views.getScene(sceneId).getNodes();
+
+      nodes.forEach(node => {
+        if (node?.display && node?.display === 'vertical') {
+          if (!assignToHorizontal) {
+            // remove node from scene
+            if (node.isFolder()) {
+              node.ungroup();
+            } else {
+              node.remove();
+            }
+
+            const horizontalNodeId = this.dualOutputService.views.getHorizontalNodeId(node.id);
+            this.removeNodeMapEntry(sceneId, horizontalNodeId);
+          } else {
+            node.setDisplay('horizontal');
+          }
+        }
+      });
+
+      this.stateService.removeNodeMap(sceneId);
+    });
+
+    await this.save();
   }
 }

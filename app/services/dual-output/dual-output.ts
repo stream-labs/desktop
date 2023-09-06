@@ -374,8 +374,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    * Edit dual output display settings
    */
 
-  setdualOutputMode() {
-    this.SET_SHOW_DUAL_OUTPUT();
+  setdualOutputMode(status?: boolean) {
+    this.SET_SHOW_DUAL_OUTPUT(status);
 
     if (this.state.dualOutputMode) {
       this.confirmOrCreateVerticalNodes(this.views.activeSceneId);
@@ -615,10 +615,10 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   }
 
   @mutation()
-  private SET_SHOW_DUAL_OUTPUT() {
+  private SET_SHOW_DUAL_OUTPUT(status?: boolean) {
     this.state = {
       ...this.state,
-      dualOutputMode: !this.state.dualOutputMode,
+      dualOutputMode: status ?? !this.state.dualOutputMode,
     };
   }
 
