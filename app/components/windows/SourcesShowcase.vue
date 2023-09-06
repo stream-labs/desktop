@@ -111,6 +111,28 @@
         <NVoiceCharacterSourceIcon slot="media" />
       </add-source-info>
 
+      <add-source-info
+        v-if="inspectedSource === 'custom_cast_ndi_source'"
+        sourceType="custom_cast_ndi_source"
+        key="19"
+      >
+        <NdiSourceIcon slot="media" />
+      </add-source-info>
+
+      <add-source-info
+        v-if="inspectedSource === 'custom_cast_ndi_guide'"
+        sourceType="custom_cast_ndi_guide"
+        key="20"
+      >
+        <NdiSourceIcon slot="media" />
+        <p slot="attention-text" class="attention">
+          {{ $t('sources.installNdiMessage') }}
+          <button class="button button--primary" @click="downloadNdiRuntime">
+            {{ $t('sources.downloadNdiRuntime') }}
+          </button>
+        </p>
+      </add-source-info>
+
       <div class="source-info" v-if="inspectedSource === null">
         <AddFileIcon slot="media" />
         <div class="source-info__text">
@@ -145,7 +167,7 @@
         <button
           @click="selectInspectedSource()"
           class="button button--primary"
-          :disabled="inspectedSource === null"
+          :disabled="!readyToAdd"
           data-test="AddSource"
         >
           {{ $t('sources.addSourceButton') }}

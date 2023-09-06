@@ -413,5 +413,14 @@
   "vlc_source": {
     "name": "VLCソース",
     "description": "ビデオのプレイリストをシーンに追加します。"
+  },
+  "custom_cast_ndi_source": {
+    "name": "カスタムキャスト",
+    "description": "カスタムキャストの配信(NDI)をシーンに追加します。",
+    "custom_cast_ndi_not_found": "カスタムキャストからNDI出力をしてください。"
+  },
+  "custom_cast_ndi_guide": {
+    "name": "カスタムキャスト",
+    "description": "カスタムキャストの配信(NDI)をシーンに追加します。"
   }
 }

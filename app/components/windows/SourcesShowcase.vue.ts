@@ -30,6 +30,7 @@ import AppAudioCaptureSourceIcon from '../../../media/images/app-speaker.svg';
 import VLCSourceIcon from '../../../media/images/play.svg';
 import { NVoiceCharacterType, NVoiceCharacterTypes } from 'services/nvoice-character';
 import { omit } from 'lodash';
+import { remote } from 'electron';
 
 type TInspectableSource = TSourceType | NVoiceCharacterType;
 
@@ -70,7 +71,13 @@ export default class SourcesShowcase extends Vue {
   @Inject() windowsService: WindowsService;
 
   selectSource(sourceType: TInspectableSource, options: ISelectSourceOptions = {}) {
-    if (NVoiceCharacterTypes.includes(sourceType as NVoiceCharacterType)) {
+    if (sourceType === 'custom_cast_ndi_source') {
+      const propertiesManagerSettings: Dictionary<any> = {
+        ...omit(options, 'propertiesManager'),
+        propertiesManager: 'custom-cast-ndi',
+      };
+      this.sourcesService.showAddSource('ndi_source', propertiesManagerSettings);
+    } else if (NVoiceCharacterTypes.includes(sourceType as NVoiceCharacterType)) {
       const propertiesManagerSettings: Dictionary<any> = {
         NVoiceCharacterType: sourceType as NVoiceCharacterType,
         ...omit(options, 'propertiesManager'),
@@ -115,5 +122,13 @@ export default class SourcesShowcase extends Vue {
       if (type.value === 'scene' && this.scenesService.scenes.length <= 1) return false;
       return true;
     });
+  }
+
+  downloadNdiRuntime() {
+    remote.shell.openExternal('http://ndi.link/NDIRedistV5');
+  }
+
+  get readyToAdd() {
+    return this.inspectedSource !== null && this.inspectedSource !== 'custom_cast_ndi_guide';
   }
 }

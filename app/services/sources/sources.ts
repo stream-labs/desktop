@@ -10,6 +10,7 @@ import namingHelpers from 'util/NamingHelpers';
 import { WindowsService } from 'services/windows';
 import { DefaultManager } from './properties-managers/default-manager';
 import { NVoiceCharacterManager } from './properties-managers/nvoice-character-manager';
+import { CustomCastNdiManager } from './properties-managers/custom-cast-ndi-manager';
 import { ScenesService, ISceneItem } from 'services/scenes';
 import {
   IActivePropertyManager,
@@ -35,6 +36,7 @@ const DoNotDuplicateFlag = obs.ESourceOutputFlags.DoNotDuplicate;
 export const PROPERTIES_MANAGER_TYPES = {
   default: DefaultManager,
   'nvoice-character': NVoiceCharacterManager,
+  'custom-cast-ndi': CustomCastNdiManager,
 };
 
 interface IObsSourceCallbackInfo {
@@ -356,6 +358,15 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
     // 'near' is not an obs input type so we have to set it manually
     availableWhitelistedType.push(...(NVoiceCharacterTypes as unknown as TSourceType[]));
+
+    const NDIExists = obsAvailableTypes.includes('ndi_source');
+    if (NDIExists) {
+      // 'custom_cast_ndi_source' is not an obs input type so we have to set it manually
+      availableWhitelistedType.push('custom_cast_ndi_source');
+    } else {
+      // NDI インストール案内を出す
+      availableWhitelistedType.push('custom_cast_ndi_guide');
+    }
 
     const availableWhitelistedSourceType = availableWhitelistedType.map(value => ({
       value,

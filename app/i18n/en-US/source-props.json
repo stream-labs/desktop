@@ -413,5 +413,14 @@
   "vlc_source": {
     "name": "VLC Source",
     "description": "Add playlists of videos to your scene."
+  },
+  "custom_cast_ndi_source": {
+    "name": "CUSTOM CAST",
+    "description": "Add CUSTOM CAST NDI output stream to your scene.",
+    "custom_cast_ndi_not_found": "No NDI output from CUSTOM CAST"
+  },
+  "custom_cast_ndi_guide": {
+    "name": "CUSTOM CAST",
+    "description": "Add CUSTOM CAST NDI output stream to your scene."
   }
 }
