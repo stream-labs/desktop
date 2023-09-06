@@ -10,7 +10,7 @@ import { HotkeysNode } from './nodes/hotkeys';
 import { SceneFiltersNode } from './nodes/scene-filters';
 import path from 'path';
 import { parse } from './parse';
-import { ScenesService } from 'services/scenes';
+import { ScenesService, TSceneNode } from 'services/scenes';
 import { SourcesService } from 'services/sources';
 import { E_AUDIO_CHANNELS } from 'services/audio';
 import { AppService } from 'services/app';
@@ -350,7 +350,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   async convertDualOutputCollection(assignToHorizontal: boolean = false): Promise<string> {
     const name = `${this.activeCollection?.name} - Converted`;
 
-    const collectionId = await this.duplicate(name, this.activeCollection?.id);
+    const collectionId = await this.duplicate(name);
 
     this.dualOutputService.setdualOutputMode(false);
 
@@ -1079,12 +1079,12 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * Convert dual output scene collection to vanilla scene collection
    */
   async convertToVanillaSceneCollection(assignToHorizontal?: boolean) {
-    if (!this.sceneNodeMaps) return;
+    if (!this.activeCollection?.sceneNodeMaps) return;
 
-    const sceneIds = Object.keys(this.sceneNodeMaps);
+    const sceneIds: string[] = Object.keys(this.activeCollection?.sceneNodeMaps);
 
     sceneIds.forEach(sceneId => {
-      const nodes = this.scenesService.views.getScene(sceneId).getNodes();
+      const nodes: TSceneNode[] = this.scenesService.views.getScene(sceneId).getNodes();
 
       nodes.forEach(node => {
         if (node?.display && node?.display === 'vertical') {
@@ -1097,7 +1097,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
             }
 
             const horizontalNodeId = this.dualOutputService.views.getHorizontalNodeId(node.id);
-            this.removeNodeMapEntry(sceneId, horizontalNodeId);
+            if (horizontalNodeId) this.removeNodeMapEntry(sceneId, horizontalNodeId);
           } else {
             node.setDisplay('horizontal');
           }
