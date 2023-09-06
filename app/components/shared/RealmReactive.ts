@@ -1,19 +1,31 @@
 import { RealmObject } from 'services/realm';
 import Vue from 'vue';
 
-export function realmReactive<T extends RealmObject>(obj: T) {
-  function listener(this: Vue) {
-    this.$forceUpdate();
-  };
+/**
+ * Vue mixin that applies reactivity whenever a type of RealmObject changes.
+ * IMPORTANT: Accessing Realm from computed properties will not be reactive
+ * as Vue will never recompute computed properties that don't depend on Vue
+ * reactive state.  Use a method instead.
+ * @param klass A class of RealmObject
+ */
+export function realmReactive<T extends typeof RealmObject>(klass: T) {
+  const obj = new klass(klass.schema);
+
+  let listener: (vue: Vue) => void;
 
   return {
-    created: () => {
-      console.log('VUE MIXIN CREATE');
+    mounted() {
+      if (!listener) {
+        listener = function (vue: Vue) {
+          vue.$forceUpdate();
+        }.bind({}, this);
+      }
+
       obj.realmModel.addListener(listener);
     },
-    destroyed: () => {
+    destroyed() {
+      if (!listener) return;
       obj.realmModel.removeListener(listener);
-      console.log('VUE MIXIN DESTROY');
     },
   };
 }

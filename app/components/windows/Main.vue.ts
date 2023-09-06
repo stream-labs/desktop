@@ -41,6 +41,8 @@ import ResizeBar from 'components/shared/ResizeBar.vue';
 import { getPlatformService } from 'services/platforms';
 import ModalWrapper from '../shared/modals/ModalWrapper';
 import antdThemes from 'styles/antd/index';
+import { realmReactive } from 'components/shared/RealmReactive';
+import { PerformanceState } from 'services/performance';
 
 const loadedTheme = () => {
   const customizationState = localStorage.getItem('PersistentStatefulService-CustomizationService');
@@ -88,12 +90,6 @@ export default class Main extends Vue {
   private modalOptions: IModalOptions = {
     renderFn: null,
   };
-
-  get cpu() {
-    return this.performanceService.state.CPU;
-  }
-
-  mixins
 
   created() {
     window.addEventListener('resize', this.windowSizeHandler);

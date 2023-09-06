@@ -33,7 +33,7 @@ interface IPerformanceState {
   frameRate: number;
 }
 
-class PerformanceState extends RealmObject implements IPerformanceState {
+export class PerformanceState extends RealmObject implements IPerformanceState {
   CPU: number;
   numberDroppedFrames: number;
   percentageDroppedFrames: number;
