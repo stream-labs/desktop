@@ -1084,6 +1084,8 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     const sceneIds: string[] = Object.keys(this.activeCollection?.sceneNodeMaps);
 
     sceneIds.forEach(sceneId => {
+      if (!sceneId) return;
+
       const nodes: TSceneNode[] = this.scenesService.views.getScene(sceneId).getNodes();
 
       nodes.forEach(node => {
