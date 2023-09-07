@@ -39,6 +39,18 @@ export default class Utils {
     return this.getWindowId() === 'child';
   }
 
+  static getMainWindow(): Electron.BrowserWindow {
+    return electron.remote.BrowserWindow.getAllWindows().find(
+      win => Utils.getUrlParams(win.webContents.getURL()).windowId === 'main',
+    );
+  }
+
+  static getChildWindow(): Electron.BrowserWindow {
+    return electron.remote.BrowserWindow.getAllWindows().find(
+      win => Utils.getUrlParams(win.webContents.getURL()).windowId === 'child',
+    );
+  }
+
   static isDevMode(): boolean {
     return process.env.NODE_ENV !== 'production' || !!process.env.NAIR_PRODUCTION_DEBUG;
   }

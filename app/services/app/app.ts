@@ -23,13 +23,9 @@ import { QuestionaireService } from 'services/questionaire';
 import { InformationsService } from 'services/informations';
 import { CrashReporterService } from 'services/crash-reporter';
 import * as obs from '../../../obs-api';
-import { EVideoCodes } from 'obs-studio-node/module';
-import { $t } from '../i18n';
 import { RunInLoadingMode } from './app-decorators';
-import path from 'path';
 import Utils from 'services/utils';
 
-const crashHandler = window['require']('crash-handler');
 
 interface IAppState {
   loading: boolean;
@@ -72,7 +68,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private crashReporterService: CrashReporterService;
   private loadingPromises: Dictionary<Promise<any>> = {};
 
-  private pid = require('process').pid;
+  readonly pid = require('process').pid;
 
   @track({ event: 'boot' })
   @RunInLoadingMode()
@@ -81,42 +77,6 @@ export class AppService extends StatefulService<IAppState> {
       electron.ipcRenderer.on('showErrorAlert', () => {
         this.SET_ERROR_ALERT(true);
       });
-    }
-
-    // This is used for debugging
-    window['obs'] = obs;
-
-    // Host a new OBS server instance
-    obs.IPC.host(`nair-${uuid()}`);
-    obs.NodeObs.SetWorkingDirectory(
-      path.join(
-        electron.remote.app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
-        'node_modules',
-        'obs-studio-node',
-      ),
-    );
-
-    crashHandler.registerProcess(this.pid, false);
-
-    // await this.obsUserPluginsService.initialize();
-
-    // Initialize OBS API
-    const apiResult = obs.NodeObs.OBS_API_initAPI(
-      'en-US',
-      this.appDataDirectory,
-      electron.remote.process.env.NAIR_VERSION,
-    );
-
-    if (apiResult !== EVideoCodes.Success) {
-      const message = apiInitErrorResultToMessage(apiResult);
-      showDialog(message);
-
-      crashHandler.unregisterProcess(this.pid);
-
-      obs.IPC.disconnect();
-
-      electron.ipcRenderer.send('shutdownComplete');
-      return;
     }
 
     // We want to start this as early as possible so that any
@@ -298,21 +258,3 @@ export class AppService extends StatefulService<IAppState> {
     this.state.argv = argv;
   }
 }
-
-export const apiInitErrorResultToMessage = (resultCode: EVideoCodes) => {
-  switch (resultCode) {
-    case EVideoCodes.NotSupported: {
-      return $t('OBSInit.NotSupportedError');
-    }
-    case EVideoCodes.ModuleNotFound: {
-      return $t('OBSInit.ModuleNotFoundError');
-    }
-    default: {
-      return $t('OBSInit.UnknownError');
-    }
-  }
-};
-
-const showDialog = (message: string): void => {
-  electron.remote.dialog.showErrorBox($t('OBSInit.ErrorTitle'), message);
-};

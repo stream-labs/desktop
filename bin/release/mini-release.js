@@ -9,6 +9,7 @@ const OctoKit = require('@octokit/rest');
 const sh = require('shelljs');
 const colors = require('colors/safe');
 const yaml = require('js-yaml');
+const fetch = require('node-fetch');
 const { log, info, error, executeCmd, confirm } = require('./scripts/prompt');
 const { checkEnv, getTagCommitId } = require('./scripts/util');
 const {
@@ -26,6 +27,8 @@ const {
 
 const pjson = JSON.parse(fs.readFileSync(path.resolve('./package.json'), 'utf-8'));
 
+const SLACK_TEST = false; // for debug
+
 /**
  * @param {string} filename
  */
@@ -33,6 +36,71 @@ function eslintFix(filename) {
   const gitRootDir = executeCmd('git rev-parse --show-toplevel', { silent: true }).stdout.trim();
   const eslint = path.resolve(gitRootDir, 'node_modules/.bin/eslint');
   executeCmd(`${eslint} --fix ${filename}`);
+}
+
+async function postToSlack(message) {
+  const webhookUrl = process.env.NAIR_SLACK_WEBHOOK_URL;
+  if (!webhookUrl) {
+    info('NAIR_SLACK_WEBHOOK_URL is not set. skip posting to slack.');
+    return;
+  }
+
+  const payload = JSON.stringify(message);
+  // executeCmd(`curl -X POST -H 'Content-type: application/json' --data '${payload}' ${webhookUrl}`);
+  // use fetch instead of curl
+  const res = await fetch(webhookUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: payload,
+  });
+
+  if (!res.ok) {
+    throw new Error(`failed to post to slack: ${res.status} ${res.statusText}`);
+  }
+}
+
+async function postReleaseToSlack({ version, environment, channel, link, notes }) {
+  await postToSlack({
+    blocks: [
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: '*Released*',
+        },
+      },
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `<${link}|*${version}* (*${environment}*, *${channel}*)>`,
+        },
+      },
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: 'Patch Note',
+        },
+      },
+    ],
+    attachments: [
+      {
+        color: '#36a64f',
+        blocks: [
+          {
+            type: 'section',
+            text: {
+              type: 'plain_text',
+              text: notes,
+            },
+          },
+        ],
+      },
+    ],
+  });
 }
 
 /**
@@ -255,13 +323,14 @@ async function runScript({
     });
 
     info(`creating release ${newTag}...`);
+    const draft = false;
     const result = await octokit.repos.createRelease({
       owner: target.organization,
       repo: target.repository,
       tag_name: newTag,
       name: newTag,
       body: patchNote.notes,
-      draft: false,
+      draft,
       prerelease: releaseChannel !== 'stable',
     });
 
@@ -287,8 +356,15 @@ async function runScript({
     });
 
     // open release edit page on github
-    const editUrl = result.data.html_url.replace('/tag/', '/edit/');
+    const editUrl = draft ? result.data.html_url.replace('/tag/', '/edit/') : result.data.html_url;
     executeCmd(`start ${editUrl}`);
+    await postReleaseToSlack({
+      version: newVersion,
+      environment: releaseEnvironment,
+      channel: releaseChannel,
+      link: editUrl,
+      notes: patchNote.notes,
+    });
 
     info(`finally, release Version ${newVersion} on the browser!`);
   } else {
@@ -378,7 +454,18 @@ async function releaseRoutine() {
   });
 }
 
-if (!module.parent) {
+if (SLACK_TEST) {
+  postReleaseToSlack({
+    version: '1.0.0',
+    environment: 'public',
+    channel: 'stable',
+    link: 'https://example.com',
+    notes: `
+ * test
+ * test 2 #123
+`,
+  });
+} else if (!module.parent) {
   releaseRoutine().catch(e => {
     error(e);
     sh.exit(1);

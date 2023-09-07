@@ -25,6 +25,11 @@ import VeeValidate from 'vee-validate';
 import ChildWindow from 'components/windows/ChildWindow.vue';
 import OneOffWindow from 'components/windows/OneOffWindow.vue';
 import util from 'util';
+import * as obs from '../obs-api';
+import uuid from 'uuid/v4';
+import path from 'path';
+
+const crashHandler = window['require']('crash-handler');
 
 const { ipcRenderer, remote } = electron;
 
@@ -64,7 +69,10 @@ if (isProduction) {
       processType: 'renderer',
     },
   });
+
 }
+
+const SENTRY_SERVER_URL = getSentryCrashReportUrl(sentryParam);
 
 const windowId = Utils.getWindowId();
 
@@ -139,11 +147,83 @@ document.addEventListener('dragenter', event => event.preventDefault());
 document.addEventListener('drop', event => event.preventDefault());
 document.addEventListener('auxclick', event => event.preventDefault());
 
+const locale = electron.remote.app.getLocale();
+
+export const apiInitErrorResultToMessage = (resultCode: obs.EVideoCodes) => {
+  switch (resultCode) {
+    case obs.EVideoCodes.NotSupported: {
+      if (locale === 'ja') {
+        return 'OBSの初期化に失敗しました。ビデオドライバーが古い、もしくはN Airがサポートしないシステムの可能性があります。';
+      }
+      return 'Failed to initialize OBS. Your video drivers may be out of date, or N Air may not be supported on your system.';
+    }
+    case obs.EVideoCodes.ModuleNotFound: {
+      if (locale === 'ja') {
+        return 'DirectXが見つかりませんでした。最新のDirectXをこちら<https://www.microsoft.com/en-us/download/details.aspx?id=35?> からインストールしてから、再度お試しください。';
+      }
+      return 'DirectX could not be found on your system. Please install the latest version of DirectX for your machine here <https://www.microsoft.com/en-us/download/details.aspx?id=35?> and try again.';
+    }
+    default: {
+      if (locale === 'ja') {
+        return 'OBSの初期化中に不明なエラーが発生しました';
+      }
+      return 'An unknown error was encountered while initializing OBS.';
+    }
+  }
+};
+
+const showDialog = (message: string): void => {
+  electron.remote.dialog.showErrorBox(
+    locale === 'ja' ? '初期化エラー' : 'Initialization Error',
+    message);
+};
+
 document.addEventListener('DOMContentLoaded', () => {
   createStore().then(async store => {
     const windowsService: WindowsService = WindowsService.instance;
 
     if (Utils.isMainWindow()) {
+      // Services
+      const appService: AppService = AppService.instance;
+
+      // This is used for debugging
+      window['obs'] = obs;
+
+      // Host a new OBS server instance
+      obs.IPC.host(`nair-${uuid()}`);
+      obs.NodeObs.SetWorkingDirectory(
+        path.join(
+          electron.remote.app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
+          'node_modules',
+          'obs-studio-node',
+        ),
+      );
+
+      crashHandler.registerProcess(appService.pid, false);
+
+      // await this.obsUserPluginsService.initialize();
+
+      // Initialize OBS API
+      const apiResult = obs.NodeObs.OBS_API_initAPI(
+        'en-US',
+        appService.appDataDirectory,
+        electron.remote.process.env.NAIR_VERSION,
+        SENTRY_SERVER_URL,
+      );
+
+      if (apiResult !== obs.EVideoCodes.Success) {
+        const message = apiInitErrorResultToMessage(apiResult);
+        showDialog(message);
+
+        crashHandler.unregisterProcess(appService.pid);
+
+        obs.NodeObs.InitShutdownSequence();
+        obs.IPC.disconnect();
+
+        electron.ipcRenderer.send('shutdownComplete');
+        return;
+      }
+
       ipcRenderer.on('closeWindow', () => windowsService.closeMainWindow());
       AppService.instance.load();
     } else {
