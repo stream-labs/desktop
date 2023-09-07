@@ -318,7 +318,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * @param name the name of the new scene collection
    * @param id An optional ID, if omitted the active collection ID is used
    */
-  async duplicate(name: string, id?: string): Promise<string> {
+  async duplicate(name: string, id?: string): Promise<string | undefined> {
     const oldId = id ?? this.activeCollection?.id;
     if (oldId == null) return;
 
@@ -347,10 +347,14 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * @params Boolean for if the vertical sources should be assigned to the horizontal display
    * @returns String filepath for new collection
    */
-  async convertDualOutputCollection(assignToHorizontal: boolean = false): Promise<string> {
+  async convertDualOutputCollection(
+    assignToHorizontal: boolean = false,
+  ): Promise<string | undefined> {
     const name = `${this.activeCollection?.name} - Converted`;
 
     const collectionId = await this.duplicate(name);
+
+    if (!collectionId) return;
 
     this.dualOutputService.setdualOutputMode(false);
 
@@ -1081,12 +1085,21 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   async convertToVanillaSceneCollection(assignToHorizontal?: boolean) {
     if (!this.activeCollection?.sceneNodeMaps) return;
 
-    const sceneIds: string[] = Object.keys(this.activeCollection?.sceneNodeMaps);
+    const allSceneIds: string[] = this.scenesService.getSceneIds();
 
-    sceneIds.forEach(sceneId => {
+    const dualOutputSceneIds: string[] = Object.keys(this.activeCollection?.sceneNodeMaps);
+
+    // check for nodes assigned to the vertical display for all scenes
+    allSceneIds.forEach(sceneId => {
       if (!sceneId) return;
 
-      const nodes: TSceneNode[] = this.scenesService.views.getScene(sceneId).getNodes();
+      const scene = this.scenesService.views.getScene(sceneId);
+      if (!scene) return;
+
+      const nodes: TSceneNode[] = scene.getNodes();
+      if (!nodes) return;
+
+      const isDualOutputScene: boolean = dualOutputSceneIds.includes(sceneId);
 
       nodes.forEach(node => {
         if (node?.display && node?.display === 'vertical') {
@@ -1098,15 +1111,25 @@ export class SceneCollectionsService extends Service implements ISceneCollection
               node.remove();
             }
 
-            const horizontalNodeId = this.dualOutputService.views.getHorizontalNodeId(node.id);
-            if (horizontalNodeId) this.removeNodeMapEntry(sceneId, horizontalNodeId);
+            /**
+             * Only attempt to remove entries for node if the scene is a dual output scene.
+             * This removes the key-value pair of the horizontal and vertical node from the scene node map.
+             * Remove entries one by one to prevent possible undefined errors.
+             */
+            if (isDualOutputScene) {
+              const horizontalNodeId = this.dualOutputService.views.getHorizontalNodeId(node.id);
+              if (horizontalNodeId) this.removeNodeMapEntry(sceneId, horizontalNodeId);
+            }
           } else {
             node.setDisplay('horizontal');
           }
         }
       });
 
-      this.stateService.removeNodeMap(sceneId);
+      if (isDualOutputScene) {
+        // remove entry for scene node map
+        this.stateService.removeNodeMap(sceneId);
+      }
     });
 
     await this.save();
