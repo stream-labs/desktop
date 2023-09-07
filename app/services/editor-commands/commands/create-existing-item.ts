@@ -45,14 +45,26 @@ export class CreateExistingItemCommand extends Command {
     // check the existence of all scene node maps because the scene may not have a
     // node map created for it
     if (this.dualOutputService.views.hasSceneNodeMaps) {
-      Promise.resolve(
-        this.dualOutputService.actions.return.createOrAssignOutputNode(
-          item,
-          'vertical',
-          false,
-          this.sceneId,
-        ),
-      ).then(node => (this.dualOutputVerticalNodeId = node.id));
+      if (this.dualOutputVerticalNodeId) {
+        Promise.resolve(
+          this.dualOutputService.actions.return.createOrAssignOutputNode(
+            item,
+            'vertical',
+            false,
+            this.sceneId,
+            this.dualOutputVerticalNodeId,
+          ),
+        );
+      } else {
+        Promise.resolve(
+          this.dualOutputService.actions.return.createOrAssignOutputNode(
+            item,
+            'vertical',
+            false,
+            this.sceneId,
+          ),
+        ).then(node => (this.dualOutputVerticalNodeId = node.id));
+      }
     }
 
     this.sceneItemId = item.id;

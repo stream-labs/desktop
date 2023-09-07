@@ -152,8 +152,8 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
    */
 
   loadLegacySettings(display: TDisplayType = 'horizontal') {
-    const legacySettings = this.contexts[display].legacySettings;
-    const videoSettings = this.contexts[display].video;
+    const legacySettings = this.contexts[display]?.legacySettings;
+    const videoSettings = this.contexts[display]?.video;
 
     if (!legacySettings && !videoSettings) return;
 

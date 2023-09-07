@@ -72,9 +72,9 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
   executeCommand<TCommand extends keyof typeof COMMANDS>(
     commandType: TCommand,
     // eslint-disable-next-line prettier/prettier
-    ...commandArgs: ConstructorParameters<(typeof COMMANDS)[TCommand]>
+    ...commandArgs: ConstructorParameters<typeof COMMANDS[TCommand]>
   ): // eslint-disable-next-line prettier/prettier
-    ReturnType<InstanceType<(typeof COMMANDS)[TCommand]>['execute']> {
+  ReturnType<InstanceType<typeof COMMANDS[TCommand]>['execute']> {
     // Executing any command clears out the redo history, since we are
     // creating a new branch in the timeline.
     this.redoHistory = [];
@@ -121,7 +121,7 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
 
   @shortcut('Ctrl+Z')
   undo() {
-    if (this.state.operationInProgress) return;
+    if (this.state.operationInProgress || this.undoHistory.length < 1) return;
 
     this.usageStatisticsService.recordFeatureUsage('Undo');
 
@@ -133,6 +133,7 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
       let ret: any;
 
       try {
+        console.log(command);
         ret = command.rollback();
       } catch (e: unknown) {
         this.handleUndoRedoError(true, e);

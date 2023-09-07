@@ -81,7 +81,7 @@ export class Scene {
 
   getNode(sceneNodeId: string): TSceneNode | null {
     const nodeModel = this.state.nodes.find(
-      sceneItemModel => sceneItemModel.id === sceneNodeId,
+      sceneItemModel => sceneItemModel && sceneItemModel.id === sceneNodeId,
     ) as ISceneItem;
 
     if (!nodeModel) return null;

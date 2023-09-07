@@ -7,6 +7,7 @@ import { ReorderNodesCommand, EPlaceType } from './reorder-nodes';
 import { $t } from 'services/i18n';
 import { ISceneItemSettings } from 'services/api/external-api/scenes';
 import { DualOutputService } from 'services/dual-output';
+import { SceneCollectionsService } from 'services/scene-collections';
 
 // Removing and recreating a source is a very complex event.
 // We can save a lot of time by leveraging the scene collection system.
@@ -32,6 +33,7 @@ class SourceReviver extends SourcesNode {
 export class RemoveItemCommand extends Command {
   @Inject() private scenesService: ScenesService;
   @Inject() private dualOutputService: DualOutputService;
+  @Inject() private sceneCollectionsService: SceneCollectionsService;
 
   private sceneId: string;
   private sourceId: string;
@@ -73,10 +75,12 @@ export class RemoveItemCommand extends Command {
     this.reorderNodesSubcommand.execute();
 
     // also remove vertical node if it exists
-    if (this.dualOutputService.views.hasNodeMap(this.sceneId) || this.dualOutputVerticalNodeId) {
+    if (this.dualOutputService.views.hasSceneNodeMaps || this.dualOutputVerticalNodeId) {
       const verticalNodeId =
         this.dualOutputVerticalNodeId ??
         this.dualOutputService.views.getVerticalNodeId(this.sceneItemId);
+
+      this.sceneCollectionsService.removeNodeMapEntry(this.sceneId, item.id);
 
       if (verticalNodeId && this.scenesService.views.getSceneItem(this.verticalNodeId)) {
         const verticalItem = this.scenesService.views.getSceneItem(this.verticalNodeId);
@@ -119,14 +123,18 @@ export class RemoveItemCommand extends Command {
     });
 
     if (this.dualOutputVerticalNodeId) {
-      this.dualOutputService.createOrAssignOutputNode(
-        horizontalItem,
-        'vertical',
-        false,
-        this.sceneId,
-        this.verticalNodeId,
+      Promise.resolve(
+        this.dualOutputService.actions.return.createOrAssignOutputNode(
+          horizontalItem,
+          'vertical',
+          false,
+          this.sceneId,
+          this.dualOutputVerticalNodeId,
+        ),
       );
-      this.verticalReorderNodesSubcommand.rollback();
+      if (this.verticalReorderNodesSubcommand) {
+        this.verticalReorderNodesSubcommand.rollback();
+      }
     }
 
     this.reorderNodesSubcommand.rollback();

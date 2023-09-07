@@ -68,7 +68,7 @@ export class SelectionService extends StatefulService<ISelectionState> {
   removeSelected() {
     // for dual output scenes, also remove the partner node
     // so update the selection before removing
-    if (this.dualOutputService.views.hasNodeMap()) {
+    if (this.dualOutputService.views.hasSceneNodeMaps) {
       let ids = this.views.globalSelection.getIds();
       const updatedIds = new Set(ids);
       ids.forEach(id => {
