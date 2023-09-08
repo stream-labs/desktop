@@ -144,8 +144,8 @@ export default class CommentFilter extends Vue {
           id: item.id,
           type: item.type,
           body: getBody(item),
-          register_date: `登録日時: ${new Date(item.register_date).toLocaleString()}`,
-          comment_body: item.comment_body && `コメント: ${item.comment_body}`,
+          register_date: `登録日時: ${new Date(item.createdAt).toLocaleString()}`,
+          comment_body: item.memo && `コメント: ${item.memo}`,
         };
       });
   }
