@@ -25,6 +25,13 @@ export class RealmObject {
   }
 
   /**
+   * Serializable id string as hex
+   */
+  get idString() {
+    return this.realmModel['_id'].toHexString();
+  }
+
+  /**
    * Public accessor for the underlying Realm model.
    * Implemented as a getter because this class can be created
    * before the database connection is established.
@@ -42,11 +49,20 @@ export class RealmObject {
       console.log('GOT DB', this.db);
 
       // Check the db
-      const result = this.db.objects(this.schema.name);
+      let result = this.db.objects(this.schema.name);
+
+      // Filter by id if present
+      if (this._initWithId) {
+        result = result.filtered('_id == $0', this._initWithId);
+      }
 
       if (result.length) {
         this._realmModel = result[0];
       } else {
+        if (this._initWithId) {
+          throw new Error(`Object with id does not exist: ${this._initWithId}`);
+        }
+
         // TODO: Make this better
         // We might already be in a write transaction
         try {
@@ -62,20 +78,14 @@ export class RealmObject {
     return this._realmModel;
   }
 
-  constructor(public schema: Realm.ObjectSchema) {}
+  private _initWithId: Realm.BSON.UUID;
 
-  static inject<T = RealmObject>(this: { new (schema: any): T } & typeof RealmObject) {
-    if (!RealmService.registeredClasses[this.schema.name]) {
-      throw new Error(
-        `Tried to inject \`${this.schema.name}\` before it was registered! Did you call \`${this.schema.name}.register()\` immediately after defining the class?`,
-      );
-    }
-
-    const instance = new this(this.schema);
+  constructor(public schema: Realm.ObjectSchema, id?: Realm.BSON.UUID) {
+    this._initWithId = id;
 
     // Apply dynamic getters
     Object.keys(this.schema.properties).forEach(key => {
-      Object.defineProperty(instance, key, {
+      Object.defineProperty(this, key, {
         get() {
           return this.realmModel[key];
         },
@@ -84,12 +94,20 @@ export class RealmObject {
         },
       });
     });
+  }
 
-    return instance;
+  static inject<T = RealmObject>(this: { new (schema: any): T } & typeof RealmObject) {
+    if (!RealmService.databaseMappings[this.schema.name]) {
+      throw new Error(
+        `Tried to inject \`${this.schema.name}\` before it was registered! Did you call \`${this.schema.name}.register()\` immediately after defining the class?`,
+      );
+    }
+
+    return new this(this.schema);
   }
 
   static register<T extends typeof RealmObject>(this: T, opts: IRealmOptions = {}) {
-    if (RealmService.registeredClasses[this.schema.name]) {
+    if (RealmService.databaseMappings[this.schema.name]) {
       throw new Error(`\`${this.schema.name}\` was registered twice!`);
     }
 
@@ -109,8 +127,14 @@ export class RealmObject {
     // TypeScript doesn't love metaprogramming
     RealmService.registerObject(
       (klass[this.schema.name] as unknown) as typeof Realm.Object,
+      this,
       opts.persist,
     );
+  }
+
+  static fromId(id: string) {
+    const uuid = Realm.BSON.UUID.createFromHexString(id);
+    return new this(this.schema, uuid);
   }
 
   /**
@@ -160,11 +184,13 @@ export class RealmService extends Service {
 
   static persistentSchemas: typeof Realm.Object[] = [];
   static ephemeralSchemas: typeof Realm.Object[] = [];
-  static registeredClasses: Dictionary<'persistent' | 'ephemeral'> = {};
+  static databaseMappings: Dictionary<'persistent' | 'ephemeral'> = {};
+  static registeredClasses: Dictionary<typeof RealmObject> = {};
 
-  static registerObject(obj: typeof Realm.Object, persist = false) {
+  static registerObject(obj: typeof Realm.Object, klass: typeof RealmObject, persist = false) {
     persist ? this.persistentSchemas.push(obj) : this.ephemeralSchemas.push(obj);
-    this.registeredClasses[obj['schema']['name']] = persist ? 'persistent' : 'ephemeral';
+    this.databaseMappings[obj['schema']['name']] = persist ? 'persistent' : 'ephemeral';
+    this.registeredClasses[obj['schema']['name']] = klass;
   }
 
   /**
@@ -173,7 +199,7 @@ export class RealmService extends Service {
    */
   @ExecuteInCurrentWindow()
   getDb(obj: RealmObject) {
-    if (RealmService.registeredClasses[obj.schema.name] === 'persistent') {
+    if (RealmService.databaseMappings[obj.schema.name] === 'persistent') {
       return this.persistentDb;
     } else {
       return this.ephemeralDb;

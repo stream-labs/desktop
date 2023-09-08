@@ -147,6 +147,11 @@ export class PerformanceService extends Service {
 
   state = PerformanceState.inject();
 
+  // TODO: Remove - testing function
+  getState() {
+    return this.state;
+  }
+
   static initialState: IPerformanceState = {
     CPU: 0,
     numberDroppedFrames: 0,
