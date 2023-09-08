@@ -9,45 +9,6 @@ import { NicoliveFailure } from './NicoliveFailure';
 import { WrappedChat } from './WrappedChat';
 import { Subject } from 'rxjs';
 
-const DummyFilters: Omit<FilterRecord, 'id'>[] = [
-  {
-    type: 'word',
-    body: 'test',
-    register_date: Date.parse('2020-01-01T00:00:00Z'),
-    comment_body: undefined,
-  },
-  {
-    type: 'user',
-    body: '2',
-    register_date: Date.parse('2020-01-01T00:00:00Z'),
-    comment_body: undefined,
-  },
-  {
-    type: 'user',
-    body: 'hash',
-    register_date: Date.parse('2020-01-01T00:00:00Z'),
-    comment_body: undefined,
-  },
-  {
-    type: 'user',
-    body: 'hash',
-    register_date: Date.parse('2020-01-01T00:00:00Z'),
-    comment_body: 'ぶぶ漬けでもいかがどすか',
-  },
-  {
-    type: 'user',
-    body: '2',
-    register_date: Date.parse('2020-01-01T00:00:00Z'),
-    comment_body: 'ぶぶ漬けでもいかがどすか',
-  },
-  {
-    type: 'command',
-    body: 'big red shita',
-    register_date: Date.parse('2020-01-01T00:00:00Z'),
-    comment_body: undefined,
-  },
-];
-
 interface INicoliveCommentFilterState {
   filters: FilterRecord[];
 }
@@ -109,10 +70,6 @@ export class NicoliveCommentFilterService extends StatefulService<INicoliveComme
   }
 
   async fetchFilters() {
-    if (process.env.DEV_SERVER) {
-      this.updateFilters(DummyFilters.map((rec, i) => ({ ...rec, id: i })));
-      return;
-    }
     const result = await this.client.fetchFilters(this.programID);
     if (!isOk(result)) {
       throw NicoliveFailure.fromClientError('fetchFilters', result);
@@ -122,9 +79,6 @@ export class NicoliveCommentFilterService extends StatefulService<INicoliveComme
   }
 
   async addFilter(record: Omit<FilterRecord, 'id'>) {
-    if (process.env.DEV_SERVER) {
-      return;
-    }
     const result = await this.client.addFilters(this.programID, [record]);
     if (!isOk(result)) {
       throw NicoliveFailure.fromClientError('addFilters', result);
@@ -143,9 +97,6 @@ export class NicoliveCommentFilterService extends StatefulService<INicoliveComme
   }
 
   async deleteFilters(ids: number[]) {
-    if (process.env.DEV_SERVER) {
-      return;
-    }
     const result = await this.client.deleteFilters(this.programID, ids);
     if (!isOk(result)) {
       throw NicoliveFailure.fromClientError('deleteFilters', result);
