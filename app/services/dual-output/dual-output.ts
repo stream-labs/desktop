@@ -18,7 +18,7 @@ import {
   ISceneCollectionsManifestEntry,
   SceneCollectionsService,
 } from 'services/scene-collections';
-import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
+import { IncrementalRolloutService } from 'services/incremental-rollout';
 import { UserService } from 'services/user';
 import { SelectionService } from 'services/selection';
 import { StreamingService } from 'services/streaming';
@@ -129,10 +129,6 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
 
   get defaultDisplay() {
     return this.state.videoSettings.defaultDisplay;
-  }
-
-  get shouldShowDualOutputCheckbox() {
-    return this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.dualOutput);
   }
 
   get showHorizontalDisplay() {
