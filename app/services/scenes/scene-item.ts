@@ -274,6 +274,10 @@ export class SceneItem extends SceneItemNode {
     this.setSettings({ recordingVisible });
   }
 
+  setDisplay(display: TDisplayType) {
+    this.setSettings({ display });
+  }
+
   loadItemAttributes(customSceneItem: ISceneItemInfo) {
     const visible = customSceneItem.visible;
     const position = { x: customSceneItem.x, y: customSceneItem.y };

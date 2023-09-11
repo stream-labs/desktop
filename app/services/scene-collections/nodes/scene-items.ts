@@ -5,7 +5,6 @@ import { SourcesService } from '../../sources';
 import { Inject } from '../../core/injector';
 import { TDisplayType, VideoSettingsService } from 'services/settings-v2';
 import { DualOutputService } from 'services/dual-output';
-import { IVideo } from 'obs-studio-node';
 
 interface ISchema {
   items: TSceneNodeInfo[];
@@ -40,7 +39,6 @@ interface ISceneNodeInfo {
   id: string;
   sceneNodeType: 'item' | 'folder';
   display?: TDisplayType;
-  output?: IVideo;
 }
 
 export type TSceneNodeInfo = ISceneItemInfo | ISceneItemFolderInfo;
@@ -100,7 +98,6 @@ export class SceneItemsNode extends Node<ISchema, {}> {
               blendingMethod: sceneItem.blendingMethod,
               sceneNodeType: 'item',
               display,
-              output: context,
             });
           });
         } else {
