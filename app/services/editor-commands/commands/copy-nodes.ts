@@ -101,7 +101,6 @@ export class CopyNodesCommand extends Command {
             this.dualOutputService.views.getNodeDisplay(node.id, this.selection.sceneId);
 
           const folder = scene.createFolder(node.name, { id: this.nodeIdsMap[node.id], display });
-          this.nodeIdsMap[node.id] = folder.id;
 
           // if needed, create node map entry
           if (this.display === 'vertical') {
@@ -114,13 +113,16 @@ export class CopyNodesCommand extends Command {
           insertedNodes.push(folder);
         } else {
           // add item
-          const display =
+          const itemDisplay =
             this.display ??
             this.dualOutputService.views.getNodeDisplay(node.id, this.selection.sceneId);
 
           const sourceId =
             this.sourceIdsMap != null ? this.sourceIdsMap[node.sourceId] : node.sourceId;
-          const item = scene.addSource(sourceId, { id: this.nodeIdsMap[node.id], display });
+          const item = scene.addSource(sourceId, {
+            id: this.nodeIdsMap[node.id],
+            display: itemDisplay,
+          });
 
           // if needed, create node map entry
           if (this.display === 'vertical') {
@@ -136,6 +138,10 @@ export class CopyNodesCommand extends Command {
             // when creating dual output scene nodes, the passed in display is set to vertical
             // if the scene has dual output nodes, add a node map entry only when copying a horizontal node
             this.sceneCollectionsService.createNodeMapEntry(this.destSceneId, node.id, item.id);
+          } else {
+            // apply origin scene item settings to copied scene item
+            const { display, output, ...settings } = node.getSettings();
+            item.setSettings(settings);
           }
 
           // add to arrays for reordering
@@ -159,13 +165,20 @@ export class CopyNodesCommand extends Command {
           insertedNodes.push(folder);
         } else {
           // add item
-          const display =
+          const itemDisplay =
             this.display ??
             this.dualOutputService.views.getNodeDisplay(node.id, this.selection.sceneId);
 
           const sourceId =
             this.sourceIdsMap != null ? this.sourceIdsMap[node.sourceId] : node.sourceId;
-          const item = scene.addSource(sourceId, { id: this.nodeIdsMap[node.id], display });
+          const item = scene.addSource(sourceId, {
+            id: this.nodeIdsMap[node.id],
+            display: itemDisplay,
+          });
+
+          // apply origin scene item settings to copied scene item
+          const { display, output, ...settings } = node.getSettings();
+          item.setSettings(settings);
 
           // add to arrays for reordering
           this.nodeIdsMap[node.id] = item.id;
