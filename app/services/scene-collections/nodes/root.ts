@@ -84,7 +84,7 @@ export class RootNode extends Node<ISchema, {}> {
       hotkeys,
       guestCam,
       nodeMap,
-      baseResolution: this.videoSettingsService.baseResolutions.horizontal,
+      baseResolution: this.videoSettingsService.baseResolutions?.horizontal,
       baseResolutions: this.videoSettingsService.baseResolutions,
       selectiveRecording: this.streamingService.state.selectiveRecording,
       dualOutputMode: this.dualOutputService.views.dualOutputMode,

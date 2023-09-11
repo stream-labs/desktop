@@ -10,7 +10,7 @@ import { HotkeysNode } from './nodes/hotkeys';
 import { SceneFiltersNode } from './nodes/scene-filters';
 import path from 'path';
 import { parse } from './parse';
-import { ScenesService } from 'services/scenes';
+import { ScenesService, TSceneNode } from 'services/scenes';
 import { SourcesService } from 'services/sources';
 import { E_AUDIO_CHANNELS } from 'services/audio';
 import { AppService } from 'services/app';
@@ -318,7 +318,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * @param name the name of the new scene collection
    * @param id An optional ID, if omitted the active collection ID is used
    */
-  async duplicate(name: string, id?: string) {
+  async duplicate(name: string, id?: string): Promise<string | undefined> {
     const oldId = id ?? this.activeCollection?.id;
     if (oldId == null) return;
 
@@ -329,8 +329,40 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
     const newId = uuid();
     const duplicatedName = $t('Copy of %{collectionName}', { collectionName: name });
-    await this.insertCollection(newId, duplicatedName, oldColl.operatingSystem, false, oldId);
+    const collection = await this.insertCollection(
+      newId,
+      duplicatedName,
+      oldColl.operatingSystem,
+      false,
+      oldId,
+    );
     this.enableAutoSave();
+
+    return collection.id;
+  }
+
+  /**
+   * Convert a dual output scene to a vanilla scene
+   * @remark This duplicates the scene collection before conversion to prevent loss of data
+   * @params Boolean for if the vertical sources should be assigned to the horizontal display
+   * @returns String filepath for new collection
+   */
+  async convertDualOutputCollection(
+    assignToHorizontal: boolean = false,
+  ): Promise<string | undefined> {
+    const name = `${this.activeCollection?.name} - Converted`;
+
+    const collectionId = await this.duplicate(name);
+
+    if (!collectionId) return;
+
+    this.dualOutputService.setdualOutputMode(false);
+
+    await this.load(collectionId);
+
+    await this.convertToVanillaSceneCollection(assignToHorizontal);
+
+    return this.stateService.getCollectionFilePath(collectionId);
   }
 
   downloadProgress = new Subject<IDownloadProgress>();
@@ -1045,5 +1077,61 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    */
   removeNodeMap(sceneId: string) {
     this.stateService.removeNodeMap(sceneId);
+  }
+
+  /**
+   * Convert dual output scene collection to vanilla scene collection
+   */
+  async convertToVanillaSceneCollection(assignToHorizontal?: boolean) {
+    if (!this.activeCollection?.sceneNodeMaps) return;
+
+    const allSceneIds: string[] = this.scenesService.getSceneIds();
+
+    const dualOutputSceneIds: string[] = Object.keys(this.activeCollection?.sceneNodeMaps);
+
+    // check for nodes assigned to the vertical display for all scenes
+    allSceneIds.forEach(sceneId => {
+      if (!sceneId) return;
+
+      const scene = this.scenesService.views.getScene(sceneId);
+      if (!scene) return;
+
+      const nodes: TSceneNode[] = scene.getNodes();
+      if (!nodes) return;
+
+      const isDualOutputScene: boolean = dualOutputSceneIds.includes(sceneId);
+
+      nodes.forEach(node => {
+        if (node?.display && node?.display === 'vertical') {
+          if (!assignToHorizontal) {
+            // remove node from scene
+            if (node.isFolder()) {
+              node.ungroup();
+            } else {
+              node.remove();
+            }
+
+            /**
+             * Only attempt to remove entries for node if the scene is a dual output scene.
+             * This removes the key-value pair of the horizontal and vertical node from the scene node map.
+             * Remove entries one by one to prevent possible undefined errors.
+             */
+            if (isDualOutputScene) {
+              const horizontalNodeId = this.dualOutputService.views.getHorizontalNodeId(node.id);
+              if (horizontalNodeId) this.removeNodeMapEntry(sceneId, horizontalNodeId);
+            }
+          } else {
+            node.setDisplay('horizontal');
+          }
+        }
+      });
+
+      if (isDualOutputScene) {
+        // remove entry for scene node map
+        this.stateService.removeNodeMap(sceneId);
+      }
+    });
+
+    await this.save();
   }
 }
