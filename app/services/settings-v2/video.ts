@@ -84,10 +84,14 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   get baseResolutions() {
     const videoSettings = this.dualOutputService.views.videoSettings;
     const [widthStr, heightStr] = this.settingsService.views.values.Video.Base.split('x');
-    const defaultWidth = parseInt(widthStr, 10);
-    const defaultHeight = parseInt(heightStr, 10);
 
-    const horizontalWidth = videoSettings.horizontal
+    // to prevent any possible undefined errors on load in the event that the root node
+    // attempts to load before the first video context has finished establishing
+    // the below are fallback dimensions
+    const defaultWidth = widthStr ? parseInt(widthStr, 10) : 1920;
+    const defaultHeight = heightStr ? parseInt(heightStr, 10) : 1080;
+
+    const horizontalWidth = videoSettings?.horizontal
       ? videoSettings.horizontal?.baseWidth
       : defaultWidth;
     const horizontalHeight = videoSettings.horizontal
@@ -185,7 +189,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     /**
      * If this is the first time starting the app set default settings for horizontal context
      */
-    if (display === 'horizontal' && !this.dualOutputService.views.videoSettings.horizontal) {
+    if (display === 'horizontal' && !this.dualOutputService.views.videoSettings?.horizontal) {
       this.loadLegacySettings();
       this.contexts.horizontal.video = this.contexts.horizontal.legacySettings;
     } else {

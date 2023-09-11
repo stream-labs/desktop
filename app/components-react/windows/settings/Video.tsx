@@ -88,7 +88,6 @@ class VideoSettingsModule {
     display: 'horizontal' as TDisplayType,
     showModal: false,
     showDualOutputSettings: this.dualOutputService.views.dualOutputMode,
-    shouldShowDualOutputCheckbox: this.dualOutputService.views.shouldShowDualOutputCheckbox,
     customBaseRes: !this.baseResOptions.find(
       opt => opt.value === this.service.values.horizontal.baseRes,
     ),
@@ -487,7 +486,6 @@ export function VideoSettings() {
     showDualOutputSettings,
     showModal,
     isLoggedIn,
-    shouldShowDualOutputCheckbox,
     onChange,
     setDisplay,
     setShowDualOutput,
@@ -499,11 +497,8 @@ export function VideoSettings() {
     <>
       <div className={styles.videoSettingsHeader}>
         <h2>{$t('Video')}</h2>
-        {/* TODO: Comment in for release */}
-        {/* {shouldShowDualOutputCheckbox && ( */}
         <div className={styles.doToggle}>
           {/* THIS CHECKBOX TOGGLES DUAL OUTPUT MODE FOR THE ENTIRE APP */}
-
           <CheckboxInput
             id="dual-output-checkbox"
             name="dual-output-checkbox"

@@ -405,6 +405,10 @@ export class ScenesService extends StatefulService<IScenesState> {
     return count;
   }
 
+  getSceneIds(): string[] {
+    return Object.keys(this.state.scenes);
+  }
+
   makeSceneActive(id: string): boolean {
     const scene = this.views.getScene(id);
     if (!scene) return false;
