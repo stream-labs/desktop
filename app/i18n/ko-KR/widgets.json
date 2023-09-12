@@ -69,7 +69,7 @@
   "Sparks sent are exactly <amount>": "전송된 스파크는 정확히 <amount>입니다",
   "Ember amount is at least <amount>": "엠버 수량은 최소 <amount>입니다",
   "Ember amount is exactly <amopunt>": "엠버 수량은 정확히 <amopunt>입니다",
-  "Please note that when advanced media share is enabled, media will no longer play through your alert box widget. Media will only play through this media share widget.": "고급 미디어 공유가 활성화되면 알림 상자 위젯을 통해 더는 미디어가 재생되지 않습니다. 미디어는 이 미디어 공유 위젯을 통해서만 재생됩니다.",
+  "Allow your viewers to donate to share media on your stream.": "Allow your viewers to donate to share media on your stream.",
   "Twitch Subscribers": "Twitch 구독자",
   "YouTube Members": "YouTube 멤버",
   "Media Share": "미디어 공유",

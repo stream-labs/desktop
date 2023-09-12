@@ -964,15 +964,20 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       safe_mode_settings: { active: boolean; data: ISafeModeServerSettings; ends_at: number };
     }>(url, {
       headers,
-    }).then(data => {
-      this.updateSafeModeSettingsFromServer(data.safe_mode_settings.data);
+    })
+      .then(data => {
+        this.updateSafeModeSettingsFromServer(data.safe_mode_settings.data);
 
-      if (data.safe_mode_settings.active) {
-        this.onSafeModeEnabled(data.safe_mode_settings.ends_at);
-      } else {
+        if (data.safe_mode_settings.active) {
+          this.onSafeModeEnabled(data.safe_mode_settings.ends_at);
+        } else {
+          this.onSafeModeDisabled();
+        }
+      })
+      .catch(error => {
+        console.warn('Error fetching safe mode settings', error);
         this.onSafeModeDisabled();
-      }
-    });
+      });
   }
 
   updateSafeModeSettingsFromServer(data: ISafeModeServerSettings) {

@@ -110,7 +110,7 @@ export default class Utils {
   }
 
   static shouldUseLocalHost(): boolean {
-    return Utils.env.SLOBS_USE_LOCAL_HOST as boolean;
+    return true;//Utils.env.SLOBS_USE_LOCAL_HOST as boolean;
   }
 
   static shouldUseBeta(): boolean {

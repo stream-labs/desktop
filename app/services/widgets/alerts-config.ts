@@ -237,7 +237,7 @@ export function getAlertsConfig(
         return `${protocol}${host}/api/v5/slobs/test/streamlabs/merch`;
       },
       tooltip: $t('Plays an alert when a viewer buys your merch'),
-      tooltipLink: 'https://streamlabs.com/dashboard#/merchadmin',
+      tooltipLink: `${protocol}${host}/dashboard#/merchadmin`,
     },
 
     ytSubscriber: {

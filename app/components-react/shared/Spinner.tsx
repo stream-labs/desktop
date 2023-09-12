@@ -48,7 +48,7 @@ export default function Spinner(
   const classNames = cx({
     [css.container]: true,
     [css.hasVisibleSpinner]: visibility.isSpinnerVisible,
-    [css.relative]: p.relative,
+    [css.spinnerRelative]: p.relative,
     [css.pageLoader]: p.pageLoader,
   });
 

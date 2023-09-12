@@ -12,6 +12,8 @@ import { Source, SourcesService } from 'services/api/external-api/sources';
 import { getExternalNodeModel, ISceneNodeModel, SceneNode } from './scene-node';
 import Utils from '../../../utils';
 import { Inject, ServiceHelper } from '../../../core';
+import { IVideo } from 'obs-studio-node';
+import { TDisplayType } from 'services/settings-v2';
 
 /**
  * Serialized representation of {@link SceneItem}.
@@ -28,6 +30,7 @@ export interface ISceneItemModel extends ISceneItemSettings, ISceneNodeModel {
  */
 export interface ISceneItemSettings {
   transform: ITransform;
+  readonly position?: IVec2;
   visible: boolean;
   locked: boolean;
   streamVisible: boolean;
@@ -35,6 +38,8 @@ export interface ISceneItemSettings {
   scaleFilter: EScaleType;
   blendingMode: EBlendingMode;
   blendingMethod: EBlendingMethod;
+  output?: IVideo;
+  display?: TDisplayType;
 }
 
 /**
@@ -216,15 +221,15 @@ export class SceneItem extends SceneNode implements ISceneItemActions, ISceneIte
   }
 
   stretchToScreen(): void {
-    return this.sceneItem.stretchToScreen();
+    return this.sceneItem.stretchToScreen(this.sceneItem.display);
   }
 
   fitToScreen(): void {
-    return this.sceneItem.fitToScreen();
+    return this.sceneItem.fitToScreen(this.sceneItem.display);
   }
 
   centerOnScreen(): void {
-    return this.sceneItem.centerOnScreen();
+    return this.sceneItem.centerOnScreen(this.sceneItem.display);
   }
 
   rotate(deg: number): void {
@@ -244,6 +249,7 @@ export class SceneItem extends SceneNode implements ISceneItemActions, ISceneIte
    */
   setScale(newScaleModel: IVec2, origin?: IVec2): void {
     return this.sceneItem.setScale(newScaleModel, origin);
+    // return this.sceneItem.setScale(newScaleModel, origin, this.sceneItem.display);
   }
 
   setContentCrop(): void {
@@ -270,5 +276,7 @@ export function getExternalSceneItemModel(
     scaleFilter: internalModel.scaleFilter,
     blendingMode: internalModel.blendingMode,
     blendingMethod: internalModel.blendingMethod,
+    output: internalModel.output,
+    display: internalModel.display,
   };
 }

@@ -10,7 +10,7 @@ import cx from 'classnames';
 const ANT_SWITCH_FEATURES = ['checkedChildren', 'unCheckedChildren'] as const;
 
 export type TSwitchInputProps = TSlobsInputProps<
-  { inputRef?: React.Ref<HTMLInputElement> },
+  { inputRef?: React.Ref<HTMLInputElement>; style?: React.CSSProperties; name?: string },
   boolean,
   SwitchProps,
   ValuesOf<typeof ANT_SWITCH_FEATURES>
@@ -24,13 +24,14 @@ export const SwitchInput = InputComponent((p: TSwitchInputProps) => {
    */
   return wrapperAttrs?.layout === 'horizontal' ? (
     <InputWrapper {...{ wrapperAttrs, nowrap: true }}>
-      <Form.Item colon={false} aria-label={p.label} className={styles.horizontalItem}>
+      <Form.Item colon={false} aria-label={p.label} style={p.style}>
         <Switch
           checked={inputAttrs.value}
           size="small"
           {...inputAttrs}
           ref={p.inputRef}
-          className={cx(styles.horizontal)}
+          className={cx(styles.horizontal, styles.horizontalItem)}
+          checkedChildren={<i className="check-mark" />}
         />
         {p.label}
       </Form.Item>

@@ -1,10 +1,12 @@
 import { Node } from '../node';
 import { ScenesNode } from './scenes';
 import { TransitionNode } from './transition';
+import { NodeMapNode } from './node-map';
 
 interface ISchema {
   scenes: ScenesNode;
   transition?: TransitionNode;
+  nodeMap: NodeMapNode;
 }
 
 interface IContext {
@@ -12,7 +14,7 @@ interface IContext {
 }
 
 export class RootNode extends Node<ISchema, IContext> {
-  schemaVersion = 1;
+  schemaVersion = 2;
 
   savedAssets: Dictionary<string> = {};
 
@@ -23,10 +25,14 @@ export class RootNode extends Node<ISchema, IContext> {
     const transition = new TransitionNode();
     await transition.save(context);
 
-    this.data = { scenes, transition };
+    const nodeMap = new NodeMapNode();
+    await nodeMap.save();
+
+    this.data = { scenes, transition, nodeMap };
   }
 
   async load(context: IContext): Promise<void> {
+    if (this.data.nodeMap) await this.data.nodeMap.load();
     if (this.data.transition) await this.data.transition.load(context);
     await this.data.scenes.load({ ...context, savedAssets: this.savedAssets });
   }

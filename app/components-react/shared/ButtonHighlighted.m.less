@@ -57,4 +57,29 @@ button.highlighted {
     background: linear-gradient(123.53deg, #52ecbe 0%, #d4f2a3 48.8%, #fdfef7 75.86%, #fffbfa 100%)
       padding-box !important;
   }
+
+  &.faded,
+  &.faded:active,
+  &.faded:focus,
+  &.faded:visited {
+    color: var(--title);
+    width: 100%;
+    padding: 20px 10px;
+    opacity: 0.85;
+    background: linear-gradient(0deg, var(--background), var(--background)) padding-box,
+      linear-gradient(123.53deg, #2de8b0 0%, #cbe953 48.8%, #ffab48 75.86%, #ff5151 100%) border-box !important;
+
+    &::after {
+      opacity: 0.1;
+      z-index: 1;
+    }
+
+    &:hover {
+      transition: 0.3s !important;
+      opacity: 1 !important;
+      background: linear-gradient(0deg, var(--background), var(--background)) padding-box,
+        linear-gradient(123.53deg, #2de8b0 0%, #cbe953 48.8%, #ffab48 75.86%, #ff5151 100%)
+          border-box !important;
+    }
+  }
 }

@@ -15,6 +15,8 @@ import { getOS, OS } from 'util/operating-systems';
 import { UsageStatisticsService } from './usage-statistics';
 import { SourcesService } from 'services/sources';
 import { VideoSettingsService } from './settings-v2';
+import { DualOutputService } from './dual-output';
+import { NotificationsService, ENotificationType } from './notifications';
 
 export const TRANSITION_DURATION_MAX = 2_000_000_000;
 
@@ -112,6 +114,8 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
   @Inject() usageStatisticsService: UsageStatisticsService;
   @Inject() sourcesService: SourcesService;
   @Inject() videoSettingsService: VideoSettingsService;
+  @Inject() dualOutputService: DualOutputService;
+  @Inject() notificationsService: NotificationsService;
 
   get views() {
     return new TransitionsViews(this.state);
@@ -163,6 +167,14 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
 
   enableStudioMode() {
     if (this.state.studioMode) return;
+    if (this.dualOutputService.views.dualOutputMode) {
+      this.notificationsService.actions.push({
+        message: $t('Cannot toggle Studio Mode in Dual Output Mode.'),
+        type: ENotificationType.WARNING,
+        lifeTime: 2000,
+      });
+      return;
+    }
 
     this.usageStatisticsService.recordFeatureUsage('StudioMode');
     this.SET_STUDIO_MODE(true);
