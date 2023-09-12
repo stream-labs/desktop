@@ -76,7 +76,7 @@ export function useController<T>(ControllerCtx: Context<T>): NonNullable<T> {
     for (const actionName of actionNames) {
       // Skip the constructor and any non-function properties.
       if (actionName === 'constructor') continue;
-      if (!(controller as any)[actionName].bind) continue;
+      if (!(controller as any)[actionName]?.bind) continue;
       actions[actionName] = (controller as any)[actionName].bind(controller);
     }
 
