@@ -6,7 +6,7 @@ skip_commits:
     - README.md
 
 install:
-  - ps: Install-Product node 16 x64
+  - ps: Install-Product node 18 x64
   - ps: Add-Content -Path "$env:userprofile\.npmrc" -Value "//npm.pkg.github.com/:_authToken=$env:github_token"
   - yarn install --frozen-lockfile --check-files
   - yarn compile:ci
@@ -28,7 +28,7 @@ test_script:
 
 notifications:
   - provider: GitHubPullRequest
-    template: "{{#failed}}:x: build failed{{/failed}} {{#jobs}} {{#messages}} {{message}} {{/messages}} {{/jobs}}"
+    template: '{{#failed}}:x: build failed{{/failed}} {{#jobs}} {{#messages}} {{message}} {{/messages}} {{/jobs}}'
 
 cache:
   - plugins
