@@ -152,7 +152,10 @@ export class Scene {
   getSourceSelectorNodes(): TSceneNode[] {
     let nodes = this.getNodes();
 
-    if (this.dualOutputService.views.hasVerticalNodes) {
+    if (
+      this.dualOutputService.state.dualOutputMode &&
+      this.dualOutputService.views.hasVerticalNodes
+    ) {
       const populateWithVerticalNodes =
         !this.dualOutputService.views.activeDisplays.horizontal &&
         this.dualOutputService.views.activeDisplays.vertical;
@@ -166,6 +169,7 @@ export class Scene {
         return !populateWithVerticalNodes ? nodeMap[node.id] : verticalNodeIds.has(node.id);
       });
     }
+
     return nodes;
   }
 
