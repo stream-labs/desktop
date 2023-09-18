@@ -102,12 +102,28 @@ export const ONBOARDING_STEPS = () => ({
 });
 
 const THEME_METADATA = {
-  2560: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/0a2acb8/0a2acb8.overlay',
-  2559: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/6dcbf5f/6dcbf5f.overlay',
-  2624: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/eeeb9e1/eeeb9e1.overlay',
-  2657: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/0697cee/0697cee.overlay',
-  2656: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/59acc9a/59acc9a.overlay',
-  2639: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/a1a4ab0/a1a4ab0.overlay',
+  FREE: {
+    2560: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/0a2acb8/0a2acb8.overlay',
+    2559: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/6dcbf5f/6dcbf5f.overlay',
+    2624: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/eeeb9e1/eeeb9e1.overlay',
+    2657: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/0697cee/0697cee.overlay',
+    2656: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/59acc9a/59acc9a.overlay',
+    2639: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/a1a4ab0/a1a4ab0.overlay',
+  },
+  PAID: {
+    // Waves (paid version)
+    3216: 'https://cdn.streamlabs.com/marketplace/overlays/439338/8164789/8164789.overlay',
+    // Esports Legacy (free)
+    3010: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/30a5873/30a5873.overlay',
+    // Scythe (paid version)
+    2561: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/de716b6/de716b6.overlay',
+    // Neon Pixel (paid version)
+    2574: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/fdb4d16/fdb4d16.overlay',
+    // Talon (paid version)
+    1207: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/c5f35e1/c5f35e1.overlay',
+    // Halloween Nights (free)
+    2682: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/1fbce2a/1fbce2a.overlay',
+  },
 };
 
 export interface IOnboardingStep {
@@ -251,11 +267,15 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   }
 
   async fetchThemes() {
-    return await Promise.all(Object.keys(THEME_METADATA).map(id => this.fetchThemeData(id)));
+    return await Promise.all(Object.keys(this.themeMetadata).map(this.fetchThemeData));
+  }
+
+  get themeMetadata() {
+    return this.userService.views.isPrime ? THEME_METADATA.PAID : THEME_METADATA.FREE;
   }
 
   themeUrl(id: number) {
-    return THEME_METADATA[id];
+    return this.themeMetadata[id];
   }
 
   get views() {
