@@ -52,7 +52,6 @@ function ExtraSettings() {
     StreamlabelsService,
     RecordingModeService,
     SettingsService,
-    DualOutputService,
   } = Services;
   const isLoggedIn = UserService.isLoggedIn;
   const isTwitch = isLoggedIn && getDefined(UserService.platform).type === 'twitch';
@@ -74,17 +73,13 @@ function ExtraSettings() {
     isSimpleOutputMode: SettingsService.views.isSimpleOutputMode,
   }));
 
-  /**
-   * Temporarily disable optimizer until migrated to the new API
-   */
-  const canRunOptimizer = false;
-  // const canRunOptimizer =
   // HDR Settings are not compliant with the auto-optimizer
-  // !SettingsService.views.hasHDRSettings &&
-  // isTwitch &&
-  // !isRecordingOrStreaming &&
-  // protectedMode &&
-  // isSimpleOutputMode;
+  const canRunOptimizer =
+    !SettingsService.views.hasHDRSettings &&
+    isTwitch &&
+    !isRecordingOrStreaming &&
+    protectedMode &&
+    isSimpleOutputMode;
 
   function restartStreamlabelsSession() {
     StreamlabelsService.restartSession().then(result => {
