@@ -7,8 +7,6 @@ import Display from 'components-react/shared/Display';
 import { $t } from 'services/i18n';
 import { ERenderingMode } from '../../../obs-api';
 import { TDisplayType } from 'services/settings-v2';
-import AutoProgressBar from 'components-react/shared/AutoProgressBar';
-import { useSubscription } from 'components-react/hooks/useSubscription';
 import { message } from 'antd';
 
 export default function StudioEditor() {
@@ -31,9 +29,8 @@ export default function StudioEditor() {
     showVerticalDisplay:
       DualOutputService.views.showVerticalDisplay && !StreamingService.state.selectiveRecording,
     activeSceneId: ScenesService.views.activeSceneId,
-    isLoading: DualOutputService.views.isLoading,
   }));
-  const displayEnabled = !v.hideStyleBlockers && !v.performanceMode && !v.isLoading;
+  const displayEnabled = !v.hideStyleBlockers && !v.performanceMode;
   const placeholderRef = useRef<HTMLDivElement>(null);
   const studioModeRef = useRef<HTMLDivElement>(null);
   const [studioModeStacked, setStudioModeStacked] = useState(false);
@@ -275,7 +272,6 @@ export default function StudioEditor() {
           </div>
         </div>
       )}
-      {v.isLoading && <DualOutputProgressBar sceneId={v.activeSceneId} />}
       {!displayEnabled && (
         <div className={styles.noPreview}>
           {v.performanceMode && (
@@ -376,25 +372,6 @@ function DualOutputControls(p: { stacked: boolean }) {
       <div className={styles.manageLink}>
         <a onClick={openSettingsWindow}>{$t('Manage Dual Output')}</a>
       </div>
-    </div>
-  );
-}
-
-function DualOutputProgressBar(p: { sceneId: string }) {
-  const { DualOutputService, ScenesService } = Services;
-
-  const [current, setCurrent] = useState(0);
-
-  const v = useVuex(() => ({
-    total: ScenesService.views.getSceneItemsBySceneId(p.sceneId)?.length ?? 1,
-  }));
-
-  useSubscription(DualOutputService.sceneNodeHandled, index => setCurrent(index));
-
-  return (
-    <div className={styles.progressBar}>
-      <AutoProgressBar percent={(current / v.total) * 100} timeTarget={10 * 1000} />
-      <p>{$t('Loading scene...')}</p>
     </div>
   );
 }
