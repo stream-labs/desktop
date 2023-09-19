@@ -21,7 +21,6 @@ import { UserService } from 'services/user';
 import { SelectionService } from 'services/selection';
 import { StreamingService } from 'services/streaming';
 import { SettingsService } from 'services/settings';
-import { RunInLoadingMode } from 'services/app/app-decorators';
 
 interface IDisplayVideoSettings {
   defaultDisplay: TDisplayType;
@@ -406,7 +405,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    * Assign or confirm node contexts to a dual output scene
    * @param sceneId - Id of the scene to map
    */
-  @RunInLoadingMode()
+  // @RunInLoadingMode()
   confirmOrAssignSceneNodes(sceneId: string) {
     const sceneItems = this.scenesService.views.getSceneItemsBySceneId(sceneId);
     if (!sceneItems) return;
@@ -459,7 +458,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     });
   }
 
-  @RunInLoadingMode()
+  // @RunInLoadingMode()
   createSceneNodes(sceneId: string) {
     // establish vertical context if it doesn't exist
     if (this.state.dualOutputMode && !this.videoSettingsService.contexts.vertical) {
