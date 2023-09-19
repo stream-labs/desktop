@@ -82,6 +82,7 @@ export interface IObsSliderInputValue extends IObsNumberInputValue {
 
 export interface IObsTextInputValue extends IObsInput<string> {
   multiline: boolean;
+  info: boolean;
 }
 
 export interface IObsBitmaskInput extends IObsInput<number> {
