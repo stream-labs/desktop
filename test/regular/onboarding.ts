@@ -42,10 +42,9 @@ test('Go through the onboarding and autoconfig', async t => {
     await sleep(1000);
   }
 
-  // Temporarily skip auto config test until migration to new API
   // Start auto config
-  // t.true(await (await app.client.$('button=Start')).isExisting());
-  // await (await app.client.$('button=Start')).click();
+  t.true(await (await app.client.$('button=Start')).isExisting());
+  await (await app.client.$('button=Start')).click();
 
   await (await t.context.app.client.$('div=Choose Starter')).waitForDisplayed({ timeout: 60000 });
   // Skip purchasing prime
