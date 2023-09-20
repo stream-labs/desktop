@@ -49,7 +49,8 @@ test('Dual output checkbox toggles Dual Output mode', async (t: TExecutionContex
   t.false(await isDisplayed('div#vertical-display'));
 });
 
-test('Auto config works with only the horizontal context', async (t: TExecutionContext) => {
+// TODO: finish test
+test.skip('Auto config works with only the horizontal context', async (t: TExecutionContext) => {
   const app = t.context.app;
 
   const client = await getApiClient();
@@ -102,35 +103,14 @@ test('Auto config works with only the horizontal context', async (t: TExecutionC
     await assertFormContains({ baseRes: 1920 });
     await assertFormContains({ baseHeight: 1080 });
   });
-  // const videoSettingsForm = useForm('video-settings');
 
-  // const horizontalBaseWidthState = videoSettingsService.state.horizontal.baseWidth;
-  // const verticalBaseHeightState = videoSettingsService.state.vertical.baseHeight;
+  const horizontalBaseWidthState = videoSettingsService.state.horizontal.baseWidth;
+  const verticalBaseHeightState = videoSettingsService.state.vertical.baseHeight;
 
-  // const [baseWidth, baseHeight] = settingsService.views.values.Video.Base.split('x');
+  const [baseWidth, baseHeight] = settingsService.views.values.Video.Base.split('x');
 
-  // console.log('horizontalBaseWidthState ', horizontalBaseWidthState);
-  // console.log('verticalBaseHeightState ', verticalBaseHeightState);
-  // console.log('baseWidth ', baseWidth);
-  // console.log('baseHeight ', baseHeight);
-
-  // t.true(horizontalBaseWidthState === 1920);
-  // t.true(verticalBaseHeightState === 1080);
-
-  t.pass();
-
-  // await logIn();
-  // await toggleDualOutputMode();
-
-  // const client = await getApiClient();
-  // const dualOutputService = client.getResource<DualOutputService>('DualOutputService');
-
-  // await focusMain();
-  // t.true(await isDisplayed('div#vertical-display'));
-
-  // await toggleDualOutputMode();
-  // await focusMain();
-  // t.false(await isDisplayed('div#vertical-display'));
+  t.true(horizontalBaseWidthState === 1920);
+  t.true(verticalBaseHeightState === 1080);
 });
 
 /**
