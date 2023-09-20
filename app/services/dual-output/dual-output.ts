@@ -62,7 +62,10 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   }
 
   get activeSceneNodeMap(): Dictionary<string> {
-    return this.sceneCollectionsService?.sceneNodeMaps[this.activeSceneId];
+    return (
+      this.sceneCollectionsService?.sceneNodeMaps &&
+      this.sceneCollectionsService?.sceneNodeMaps[this.activeSceneId]
+    );
   }
 
   /**
@@ -425,6 +428,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       // confirm all vertical scene items exist
       if (
         sceneItem?.display === 'horizontal' &&
+        this.views.activeSceneNodeMap &&
         (!this.views.activeSceneNodeMap[sceneItem.id] ||
           !sceneItemIds.includes(this.views.activeSceneNodeMap[sceneItem.id]))
       ) {
