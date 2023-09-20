@@ -24,7 +24,6 @@ import {
 import { $t } from 'services/i18n';
 import { AudioService } from '../audio';
 import uuid from 'uuid/v4';
-import SourceProperties from 'components/windows/SourceProperties.vue';
 import { UserService } from 'services/user';
 import { NVoiceCharacterTypes } from 'services/nvoice-character';
 
