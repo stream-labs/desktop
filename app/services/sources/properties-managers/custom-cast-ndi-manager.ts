@@ -16,11 +16,11 @@ export class CustomCastNdiManager extends PropertiesManager {
       ndiSourceNameProp.enabled = false;
 
       const re = /.* \(CUSTOMCAST\)/;
-      const customCastNdiIndex = ndiSourceNameProp.options.findIndex(option => {
+      const customCastNdi = ndiSourceNameProp.options.find(option => {
         return (typeof option.value === 'string') && option.value.match(re);
       });
 
-      if (customCastNdiIndex === -1) {
+      if (customCastNdi === undefined) {
         // CUSTOMCAST NDIが見つからないときは案内メッセージを付ける
         return [{
           type: 'OBS_PROPERTY_TEXT',
@@ -33,7 +33,7 @@ export class CustomCastNdiManager extends PropertiesManager {
       }
 
       // CUSTOMCAST NDIを強制選択する
-      const ndi_source_name = ndiSourceNameProp.options[customCastNdiIndex].value;
+      const ndi_source_name = customCastNdi.value;
       if (this.obsSource.settings['ndi_source_name'].value !== ndi_source_name) {
         this.obsSource.update({ ndi_source_name });
       }
