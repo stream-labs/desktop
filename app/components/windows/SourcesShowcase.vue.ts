@@ -71,6 +71,9 @@ export default class SourcesShowcase extends Vue {
   @Inject() windowsService: WindowsService;
 
   selectSource(sourceType: TInspectableSource, options: ISelectSourceOptions = {}) {
+    if (!this.readyToAdd) {
+      return;
+    }
     if (sourceType === 'custom_cast_ndi_source') {
       const propertiesManagerSettings: Dictionary<any> = {
         ...omit(options, 'propertiesManager'),

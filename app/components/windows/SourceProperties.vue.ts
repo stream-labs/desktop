@@ -17,7 +17,7 @@ const PeriodicUpdateSources: TSourceType[] = [
   'ndi_source',
   'custom_cast_ndi_source',
 ];
-const PeriodicUpdateInterval = 5000;
+const PeriodicUpdateInterval = 5000; // in Milliseconds
 @Component({
   components: {
     ModalLayout,
