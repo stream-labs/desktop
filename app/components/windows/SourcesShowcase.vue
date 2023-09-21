@@ -163,7 +163,7 @@
         </div>
       </div>
 
-      <div class="modal-layout-controls">
+      <div class="modal-layout-controls bottom-sticky">
         <button
           @click="selectInspectedSource()"
           class="button button--primary"
@@ -278,5 +278,10 @@
   padding-right: 16px;
   font-size: @font-size2;
   color: var(--color-text);
+}
+
+.bottom-sticky {
+  position: sticky;
+  bottom: 0;
 }
 </style>
