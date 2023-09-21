@@ -5,13 +5,11 @@ import { $t } from "services/i18n";
 export class CustomCastNdiManager extends PropertiesManager {
   getPropertiesFormData(): TObsFormData {
     const propArray = super.getPropertiesFormData();
-    const ndiSourceNamePropIndex = propArray.findIndex(
+    const ndiSourceNameProp = propArray.find(
       prop => prop.name === 'ndi_source_name',
-    );
+    ) as IObsListInput<TObsValue>;
 
-    if (ndiSourceNamePropIndex !== -1) {
-      const ndiSourceNameProp = propArray[ndiSourceNamePropIndex] as IObsListInput<TObsValue>;
-
+    if (ndiSourceNameProp !== undefined) {
       // NDIソース選択を禁止する
       ndiSourceNameProp.enabled = false;
 
