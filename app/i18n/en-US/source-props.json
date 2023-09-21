@@ -370,8 +370,8 @@
     "description": "Add video / audio from Blackmagic device."
   },
   "ndi_source": {
-    "name": "NDI™ Source",
-    "description": "Allow you to capture NDI output streams.",
+    "name": "NDI® Source",
+    "description": "Allow you to capture NDI® output streams.",
     "ndi_source_name": {
       "name": null
     },
@@ -416,11 +416,11 @@
   },
   "custom_cast_ndi_source": {
     "name": "CUSTOM CAST",
-    "description": "Add CUSTOM CAST NDI output stream to your scene.",
-    "custom_cast_ndi_not_found": "No NDI output from CUSTOM CAST"
+    "description": "Add CUSTOM CAST NDI® output stream to your scene.",
+    "custom_cast_ndi_not_found": "No NDI® output from CUSTOM CAST"
   },
   "custom_cast_ndi_guide": {
     "name": "CUSTOM CAST",
-    "description": "Add CUSTOM CAST NDI output stream to your scene."
+    "description": "Add CUSTOM CAST NDI® output stream to your scene."
   }
 }

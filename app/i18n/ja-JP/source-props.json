@@ -370,8 +370,8 @@
     "description": "シーンにBlackmagicデバイスからの映像・音声を追加します"
   },
   "ndi_source": {
-    "name": "NDI™ ソース",
-    "description": "NDIの出力ストリームをキャプチャします。",
+    "name": "NDI®ソース",
+    "description": "NDI®の出力ストリームをキャプチャします。",
     "ndi_source_name": {
       "name": "ソース名"
     },
@@ -416,11 +416,11 @@
   },
   "custom_cast_ndi_source": {
     "name": "カスタムキャスト",
-    "description": "カスタムキャストの配信(NDI)をシーンに追加します。",
-    "custom_cast_ndi_not_found": "カスタムキャストからNDI出力をしてください。"
+    "description": "カスタムキャストの配信(NDI®)をシーンに追加します。",
+    "custom_cast_ndi_not_found": "カスタムキャストからNDI®出力をしてください。"
   },
   "custom_cast_ndi_guide": {
     "name": "カスタムキャスト",
-    "description": "カスタムキャストの配信(NDI)をシーンに追加します。"
+    "description": "カスタムキャストの配信(NDI®)をシーンに追加します。"
   }
 }
