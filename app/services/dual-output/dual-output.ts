@@ -588,6 +588,10 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     this.SET_VIDEO_SETTING(setting, display);
   }
 
+  updateVideoSettings(settings: IVideoInfo, display: TDisplayType = 'horizontal') {
+    this.UPDATE_VIDEO_SETTING(settings, display);
+  }
+
   @mutation()
   private UPDATE_PLATFORM_SETTING(platform: TPlatform | string, display: TDisplayType) {
     this.state.platformSettings = {
@@ -638,5 +642,10 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       ...this.state.videoSettings[display],
       ...setting,
     };
+  }
+
+  @mutation()
+  private UPDATE_VIDEO_SETTING(setting: IVideoInfo, display: TDisplayType = 'vertical') {
+    this.state.videoSettings[display] = { ...setting };
   }
 }
