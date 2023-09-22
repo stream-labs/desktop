@@ -57,7 +57,7 @@ export default function MixerItem(p: { audioSourceId: string; volmetersEnabled?:
           min={0}
           max={1}
           step={0.01}
-          style={{ flexGrow: 1 }}
+          style={{ flexGrow: 1, marginBottom: 8, marginTop: 8 }}
           uncontrolled
         />
         <div className={styles.controls}>
