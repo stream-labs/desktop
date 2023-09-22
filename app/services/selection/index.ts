@@ -10,6 +10,8 @@ import { EditorCommandsService } from 'services/editor-commands';
 import { Selection } from './selection';
 import { ViewHandler } from 'services/core';
 import { GlobalSelection } from './global-selection';
+import { DualOutputService } from 'app-services';
+import { TDisplayType } from 'services/settings-v2';
 
 export { Selection, GlobalSelection };
 
@@ -26,6 +28,10 @@ export type TNodesList = string | string[] | ISceneItemNode | ISceneItemNode[];
 class SelectionViews extends ViewHandler<ISelectionState> {
   get globalSelection() {
     return new GlobalSelection();
+  }
+
+  get lastSelectedId() {
+    return this.state.lastSelectedId;
   }
 }
 
@@ -46,6 +52,7 @@ export class SelectionService extends StatefulService<ISelectionState> {
   @Inject() private scenesService: ScenesService;
   @Inject() private windowsService: WindowsService;
   @Inject() private editorCommandsService: EditorCommandsService;
+  @Inject() private dualOutputService: DualOutputService;
 
   init() {
     this.scenesService.sceneSwitched.subscribe(() => {
@@ -59,16 +66,53 @@ export class SelectionService extends StatefulService<ISelectionState> {
 
   @shortcut('Delete')
   removeSelected() {
+    // for dual output scenes, also remove the partner node
+    // so update the selection before removing
+    if (this.dualOutputService.views.hasSceneNodeMaps) {
+      let ids = this.views.globalSelection.getIds();
+      const updatedIds = new Set(ids);
+      ids.forEach(id => {
+        const dualOutputNodeId = this.dualOutputService.views.getDualOutputNodeId(id);
+        if (dualOutputNodeId && !updatedIds.has(dualOutputNodeId)) {
+          updatedIds.add(dualOutputNodeId);
+        }
+      });
+
+      ids = Array.from(updatedIds);
+      this.select(ids);
+    }
+
     this.views.globalSelection.remove();
   }
 
-  openEditTransform() {
-    const windowHeight = this.views.globalSelection.isSceneItem() ? 500 : 300;
+  openEditTransform(display: TDisplayType = 'horizontal') {
+    this.associateSelectionWithDisplay(display);
+
     this.windowsService.showWindow({
       componentName: 'EditTransform',
       title: $t('Edit Transform'),
-      size: { width: 580, height: windowHeight },
+      size: { width: 580, height: 500 },
+      queryParams: { display },
     });
+  }
+
+  associateSelectionWithDisplay(display: TDisplayType) {
+    if (this.dualOutputService.views.dualOutputMode) {
+      // check if there are nodes selected in the other display
+      const selectedItems = this.state.selectedIds.map(id =>
+        this.scenesService.views.getSceneItem(id),
+      );
+      const requireFilter = selectedItems.some(item => item?.display !== display);
+
+      // If nodes in both displays are selected, alter selection to only include
+      // items in the last display selected
+      if (requireFilter) {
+        const filteredIds = selectedItems
+          .filter(item => item?.display === display)
+          .map(item => item.id);
+        this.select(filteredIds);
+      }
+    }
   }
 
   select(items: TNodesList): void {

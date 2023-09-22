@@ -28,7 +28,8 @@ import { Rect } from '../../util/rect';
 import { TSceneNodeType } from './scenes';
 import { ServiceHelper, ExecuteInWorkerProcess } from 'services/core';
 import { assertIsDefined } from '../../util/properties-type-guards';
-import { VideoSettingsService } from 'services/settings-v2';
+import { VideoSettingsService, TDisplayType } from 'services/settings-v2';
+import { EditorService } from 'services/editor';
 /**
  * A SceneItem is a source that contains
  * all of the information about that source, and
@@ -65,6 +66,8 @@ export class SceneItem extends SceneItemNode {
   sceneNodeType: TSceneNodeType = 'item';
 
   output?: obs.IVideo;
+  display?: TDisplayType;
+  readonly position: IVec2;
 
   // Some computed attributes
 
@@ -87,6 +90,7 @@ export class SceneItem extends SceneItemNode {
   @Inject() private sourcesService: SourcesService;
   @Inject() private videoService: VideoService;
   @Inject() private videoSettingsService: VideoSettingsService;
+  @Inject() private editorService: EditorService;
 
   constructor(sceneId: string, sceneItemId: string, sourceId: string) {
     super();
@@ -139,6 +143,8 @@ export class SceneItem extends SceneItemNode {
       scaleFilter: this.scaleFilter,
       blendingMode: this.blendingMode,
       blendingMethod: this.blendingMethod,
+      output: this.output,
+      display: this.display,
     };
   }
 
@@ -268,13 +274,19 @@ export class SceneItem extends SceneItemNode {
     this.setSettings({ recordingVisible });
   }
 
+  setDisplay(display: TDisplayType) {
+    this.setSettings({ display });
+  }
+
   loadItemAttributes(customSceneItem: ISceneItemInfo) {
     const visible = customSceneItem.visible;
     const position = { x: customSceneItem.x, y: customSceneItem.y };
     const crop = customSceneItem.crop;
-    const context = this.videoSettingsService.contexts.horizontal;
+    const display = customSceneItem?.display ?? this?.display ?? 'horizontal';
+    const context = this.videoSettingsService.contexts[display];
 
-    this.getObsSceneItem().video = context as obs.IVideo;
+    const obsSceneItem = this.getObsSceneItem();
+    obsSceneItem.video = context as obs.IVideo;
 
     this.UPDATE({
       visible,
@@ -291,7 +303,9 @@ export class SceneItem extends SceneItemNode {
       scaleFilter: customSceneItem.scaleFilter,
       blendingMode: customSceneItem.blendingMode,
       blendingMethod: customSceneItem.blendingMethod,
+      display,
       output: context,
+      position: obsSceneItem.position,
     });
   }
 
@@ -375,27 +389,27 @@ export class SceneItem extends SceneItemNode {
     });
   }
 
-  stretchToScreen() {
+  stretchToScreen(display?: TDisplayType) {
     const rect = new ScalableRectangle(this.rectangle);
-    rect.stretchAcross(this.videoService.getScreenRectangle());
+    rect.stretchAcross(this.videoService.getScreenRectangle(display));
     this.setRect(rect);
   }
 
-  fitToScreen() {
+  fitToScreen(display?: TDisplayType) {
     const rect = new ScalableRectangle(this.rectangle);
-    rect.fitTo(this.videoService.getScreenRectangle());
+    rect.fitTo(this.videoService.getScreenRectangle(display));
     this.setRect(rect);
   }
 
-  centerOnScreen() {
+  centerOnScreen(display?: TDisplayType) {
     const rect = new ScalableRectangle(this.rectangle);
-    rect.centerOn(this.videoService.getScreenRectangle());
+    rect.centerOn(this.videoService.getScreenRectangle(display));
     this.setRect(rect);
   }
 
-  centerOnAxis(axis: CenteringAxis) {
+  centerOnAxis(axis: CenteringAxis, display?: TDisplayType) {
     const rect = new ScalableRectangle(this.rectangle);
-    rect.centerOn(this.videoService.getScreenRectangle(), axis);
+    rect.centerOn(this.videoService.getScreenRectangle(display), axis);
     this.setRect(rect);
   }
 

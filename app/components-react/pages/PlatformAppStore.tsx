@@ -46,12 +46,6 @@ export default function PlatformAppStore(p: { params: { appId?: string; type?: s
     PlatformAppsService.actions.loadProductionApps();
   }
 
-  async function refreshProductionApps() {
-    PlatformAppsService.actions.unloadAllApps();
-    PlatformAppsService.actions.loadProductionApps();
-    SideNavService.actions.updateAllApps();
-  }
-
   async function navigateToApp(appId: string) {
     NavigationService.actions.navigate('PlatformAppMainPage', { appId });
   }

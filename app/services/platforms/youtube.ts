@@ -15,14 +15,14 @@ import { WindowsService } from 'services/windows';
 import { I18nService } from 'services/i18n';
 import { throwStreamError } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
+import { TDisplayType } from 'services/settings-v2/video';
 import { assertIsDefined, getDefined } from 'util/properties-type-guards';
 import Utils from '../utils';
 import { YoutubeUploader } from './youtube/uploader';
 import { lazyModule } from 'util/lazy-module';
 import * as remote from '@electron/remote';
-import pick from 'lodash/pick';
-import { TDisplayType } from 'services/settings-v2';
 import { IVideo } from 'obs-studio-node';
+import pick from 'lodash/pick';
 import { TOutputOrientation } from 'services/restream';
 
 interface IYoutubeServiceState extends IPlatformState {
@@ -151,6 +151,7 @@ interface IExtraBroadcastSettings {
   projection?: 'rectangular' | '360';
   latencyPreference?: 'normal' | 'low' | 'ultraLow';
   selfDeclaredMadeForKids?: boolean;
+  video?: IVideo;
 }
 
 type TStreamStatus = 'active' | 'created' | 'error' | 'inactive' | 'ready';
@@ -203,6 +204,7 @@ export class YoutubeService
       privacyStatus: 'public',
       selfDeclaredMadeForKids: false,
       thumbnail: '',
+      video: undefined,
       mode: undefined,
     },
   };
@@ -278,6 +280,7 @@ export class YoutubeService
 
   async beforeGoLive(settings: IGoLiveSettings, context?: TDisplayType) {
     const ytSettings = getDefined(settings.platforms.youtube);
+
     const streamToScheduledBroadcast = !!ytSettings.broadcastId;
     // update selected LiveBroadcast with new title and description
     // or create a new LiveBroadcast if there are no broadcasts selected

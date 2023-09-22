@@ -153,6 +153,7 @@ export default function AddSource() {
             propertiesManagerSettings: sourceAddOptions.propertiesManagerSettings,
             guestCamStreamId: sourceAddOptions.guestCamStreamId,
           },
+          display: 'horizontal',
         },
       );
       source = item?.source;
