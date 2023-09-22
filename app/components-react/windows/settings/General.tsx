@@ -8,7 +8,6 @@ import fs from 'fs';
 import path from 'path';
 import { getDefined } from '../../../util/properties-type-guards';
 import { useVuex } from 'components-react/hooks';
-import Tooltip from 'components-react/shared/Tooltip';
 
 export function GeneralSettings() {
   return (
@@ -53,7 +52,6 @@ function ExtraSettings() {
     StreamlabelsService,
     RecordingModeService,
     SettingsService,
-    DualOutputService,
   } = Services;
   const isLoggedIn = UserService.isLoggedIn;
   const isTwitch = isLoggedIn && getDefined(UserService.platform).type === 'twitch';
@@ -67,27 +65,21 @@ function ExtraSettings() {
     isRecordingOrStreaming,
     recordingMode,
     updateStreamInfoOnLive,
-    isDualOutputScene,
     isSimpleOutputMode,
   } = useVuex(() => ({
     isRecordingOrStreaming: StreamingService.isStreaming || StreamingService.isRecording,
     recordingMode: RecordingModeService.views.isRecordingModeEnabled,
     updateStreamInfoOnLive: CustomizationService.state.updateStreamInfoOnLive,
     isSimpleOutputMode: SettingsService.views.isSimpleOutputMode,
-    isDualOutputScene: DualOutputService.views.hasNodeMap(),
   }));
 
-  /**
-   * Temporarily disable optimizer until migrated to the new API
-   */
-  const canRunOptimizer = false;
-  // const canRunOptimizer =
   // HDR Settings are not compliant with the auto-optimizer
-  // !SettingsService.views.hasHDRSettings &&
-  // isTwitch &&
-  // !isRecordingOrStreaming &&
-  // protectedMode &&
-  // isSimpleOutputMode;
+  const canRunOptimizer =
+    !SettingsService.views.hasHDRSettings &&
+    isTwitch &&
+    !isRecordingOrStreaming &&
+    protectedMode &&
+    isSimpleOutputMode;
 
   function restartStreamlabelsSession() {
     StreamlabelsService.restartSession().then(result => {
@@ -167,22 +159,11 @@ function ExtraSettings() {
             </button>
           </div>
           {canRunOptimizer && (
-            <Tooltip
-              title={$t('Auto optimizer disabled for dual output scenes')}
-              placement="top"
-              lightShadow
-              disabled={!isDualOutputScene}
-            >
-              <div className="input-container">
-                <button
-                  className="button button--default"
-                  onClick={runAutoOptimizer}
-                  disabled={isDualOutputScene}
-                >
-                  {$t('Auto Optimize')}
-                </button>
-              </div>
-            </Tooltip>
+            <div className="input-container">
+              <button className="button button--default" onClick={runAutoOptimizer}>
+                {$t('Auto Optimize')}
+              </button>
+            </div>
           )}
 
           <div className="input-container">

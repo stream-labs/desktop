@@ -32,48 +32,58 @@ export class AutoConfigService extends Service {
   configProgress = new Subject<IConfigProgress>();
 
   async start() {
+    try {
+      if (this.userService.views.isTwitchAuthed) {
+        const service = getPlatformService('twitch') as TwitchService;
+        const key = await service.fetchStreamKey();
+        this.streamSettingsService.setSettings({ key, platform: 'twitch' });
+      } else if (this.userService.views.isYoutubeAuthed) {
+        const service = getPlatformService('youtube') as YoutubeService;
+        await service.beforeGoLive({
+          platforms: {
+            youtube: {
+              enabled: true,
+              useCustomFields: false,
+              title: 'bandwidthTest',
+              description: 'bandwidthTest',
+              privacyStatus: 'private',
+              categoryId: '1',
+            },
+          },
+          advancedMode: true,
+          customDestinations: [],
+        });
+      }
+    } catch (e: unknown) {
+      console.error('Failure fetching stream key for auto config');
+      this.handleProgress({ event: 'error', description: 'error_fetching_stream_key' });
+      return;
+    }
+
     /**
-     * Temporarily disable optimizer until migrated to the new API
+     * Using the optimizer when two contexts are active is tricky because the optimizer
+     * works with the last context created. If the app has opened a dual output scene at any
+     * point during the current session, the vertical context exists. The optimizer
+     * should only run on the horizontal context. Until output settings and streaming are migrated,
+     * some non-optimal trickery is necessary.
+     *
+     * By design, the only difference in settings between the horizontal and vertical contexts is
+     * the base width/height and output width/height. So before running the optimizer,
+     * confirm that horizontal base width/height and output width/height are on the Video property.
      */
-    return;
+    if (this.videoSettingsService.contexts?.vertical) {
+      this.videoSettingsService.confirmVideoSettingDimensions();
+    }
 
-    // try {
-    //   if (this.userService.views.isTwitchAuthed) {
-    //     const service = getPlatformService('twitch') as TwitchService;
-    //     const key = await service.fetchStreamKey();
-    //     this.streamSettingsService.setSettings({ key, platform: 'twitch' });
-    //   } else if (this.userService.views.isYoutubeAuthed) {
-    //     const service = getPlatformService('youtube') as YoutubeService;
-    //     await service.beforeGoLive({
-    //       platforms: {
-    //         youtube: {
-    //           enabled: true,
-    //           useCustomFields: false,
-    //           title: 'bandwidthTest',
-    //           description: 'bandwidthTest',
-    //           privacyStatus: 'private',
-    //           categoryId: '1',
-    //         },
-    //       },
-    //       advancedMode: true,
-    //       customDestinations: [],
-    //     });
-    //   }
-    // } catch (e: unknown) {
-    //   console.error('Failure fetching stream key for auto config');
-    //   this.handleProgress({ event: 'error', description: 'error_fetching_stream_key' });
-    //   return;
-    // }
+    obs.NodeObs.InitializeAutoConfig(
+      (progress: IConfigProgress) => {
+        this.handleProgress(progress);
+        this.configProgress.next(progress);
+      },
+      { continent: '', service_name: '' },
+    );
 
-    // obs.NodeObs.InitializeAutoConfig(
-    //   (progress: IConfigProgress) => {
-    //     this.handleProgress(progress);
-    //     this.configProgress.next(progress);
-    //   },
-    //   { continent: '', service_name: '' },
-    // );
-
-    // obs.NodeObs.StartBandwidthTest();
+    obs.NodeObs.StartBandwidthTest();
   }
 
   async startRecording() {
@@ -110,7 +120,9 @@ export class AutoConfigService extends Service {
 
     if (progress.event === 'done') {
       obs.NodeObs.TerminateAutoConfig();
-      this.videoSettingsService.loadLegacySettings();
+
+      // apply optimized settings to the video contexts
+      this.videoSettingsService.migrateAutoConfigSettings();
     }
   }
 
@@ -121,7 +133,8 @@ export class AutoConfigService extends Service {
       } else {
         obs.NodeObs.TerminateAutoConfig();
 
-        this.videoSettingsService.loadLegacySettings();
+        // apply optimized settings to the video contexts
+        this.videoSettingsService.migrateAutoConfigSettings();
         debounce(() => this.configProgress.next({ ...progress, event: 'done' }), 1000)();
       }
     }

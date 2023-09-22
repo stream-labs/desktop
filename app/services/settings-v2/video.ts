@@ -4,6 +4,7 @@ import { mutation, StatefulService } from '../core/stateful-service';
 import { IVideoInfo, EScaleType, EFPSType, IVideo, VideoFactory, Video } from '../../../obs-api';
 import { DualOutputService } from 'services/dual-output';
 import { SettingsService } from 'services/settings';
+import { OutputSettingsService } from 'services/settings/output';
 import { Subject } from 'rxjs';
 
 /**
@@ -48,6 +49,7 @@ export function invalidFps(num: number, den: number) {
 export class VideoSettingsService extends StatefulService<IVideoSetting> {
   @Inject() dualOutputService: DualOutputService;
   @Inject() settingsService: SettingsService;
+  @Inject() outputSettingsService: OutputSettingsService;
 
   initialState = {
     horizontal: null as IVideoInfo,
@@ -84,10 +86,14 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   get baseResolutions() {
     const videoSettings = this.dualOutputService.views.videoSettings;
     const [widthStr, heightStr] = this.settingsService.views.values.Video.Base.split('x');
-    const defaultWidth = parseInt(widthStr, 10);
-    const defaultHeight = parseInt(heightStr, 10);
 
-    const horizontalWidth = videoSettings.horizontal
+    // to prevent any possible undefined errors on load in the event that the root node
+    // attempts to load before the first video context has finished establishing
+    // the below are fallback dimensions
+    const defaultWidth = widthStr ? parseInt(widthStr, 10) : 1920;
+    const defaultHeight = heightStr ? parseInt(heightStr, 10) : 1080;
+
+    const horizontalWidth = videoSettings?.horizontal
       ? videoSettings.horizontal?.baseWidth
       : defaultWidth;
     const horizontalHeight = videoSettings.horizontal
@@ -174,6 +180,10 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
       });
       this.contexts[display].video = this.contexts[display].legacySettings;
     }
+
+    if (invalidFps(this.contexts[display].video.fpsNum, this.contexts[display].video.fpsDen)) {
+      this.createDefaultFps(display);
+    }
   }
 
   /**
@@ -185,7 +195,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     /**
      * If this is the first time starting the app set default settings for horizontal context
      */
-    if (display === 'horizontal' && !this.dualOutputService.views.videoSettings.horizontal) {
+    if (display === 'horizontal' && !this.dualOutputService.views.videoSettings?.horizontal) {
       this.loadLegacySettings();
       this.contexts.horizontal.video = this.contexts.horizontal.legacySettings;
     } else {
@@ -196,10 +206,10 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
         this.SET_VIDEO_SETTING(key, settings[key], display);
       });
       this.contexts[display].video = settings;
-    }
 
-    if (invalidFps(this.contexts[display].video.fpsNum, this.contexts[display].video.fpsDen)) {
-      this.createDefaultFps(display);
+      if (invalidFps(this.contexts[display].video.fpsNum, this.contexts[display].video.fpsDen)) {
+        this.createDefaultFps(display);
+      }
     }
 
     this.SET_VIDEO_CONTEXT(display, this.contexts[display].video);
@@ -234,10 +244,83 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     this.setVideoSetting('fpsDen', 1, display);
   }
 
+  /**
+   * Migrate optimized settings to vertical context
+   */
+  migrateAutoConfigSettings() {
+    // load optimized settings onto horizontal context
+    this.loadLegacySettings('horizontal');
+
+    if (this.contexts?.vertical) {
+      // add optimized settings to vertical context
+      const newVerticalSettings = {
+        ...this.contexts.horizontal.video,
+        baseWidth: this.state.vertical.baseWidth,
+        baseHeight: this.state.vertical.baseHeight,
+        outputWidth: this.state.vertical.outputWidth,
+        outputHeight: this.state.vertical.outputHeight,
+      };
+      this.updateVideoSettings(newVerticalSettings, 'vertical');
+
+      // update the Video settings property to the horizontal context dimensions
+      const base = `${this.state.horizontal.baseWidth}x${this.state.horizontal.baseHeight}`;
+      const output = `${this.state.horizontal.outputWidth}x${this.state.horizontal.outputHeight}`;
+      this.settingsService.setSettingValue('Video', 'Base', base);
+      this.settingsService.setSettingValue('Video', 'Output', output);
+    } else {
+      // if there is no vertical context, only update persisted settings for vertical context
+      const horizontalScaleType = this.contexts.horizontal.video.scaleType;
+      const horizontalFpsType = this.contexts.horizontal.video.fpsType;
+      const horizontalFpsNum = this.contexts.horizontal.video.fpsNum;
+      const horizontalFpsDen = this.contexts.horizontal.video.fpsDen;
+
+      this.dualOutputService.setVideoSetting({ scaleType: horizontalScaleType }, 'vertical');
+      this.dualOutputService.setVideoSetting({ fpsType: horizontalFpsType }, 'vertical');
+      this.dualOutputService.setVideoSetting({ fpsNum: horizontalFpsNum }, 'vertical');
+      this.dualOutputService.setVideoSetting({ fpsDen: horizontalFpsDen }, 'vertical');
+    }
+  }
+
+  /**
+   * Confirm video setting dimensions in settings
+   * @remarks Primarily used with the optimizer to ensure the horizontal context dimensions
+   * are the dimensions in the settings
+   */
+  confirmVideoSettingDimensions() {
+    const [baseWidth, baseHeight] = this.settingsService.views.values.Video.Base.split('x');
+    const [outputWidth, outputHeight] = this.settingsService.views.values.Video.Output.split('x');
+
+    if (
+      Number(baseWidth) !== this.state.horizontal.baseWidth ||
+      Number(baseHeight) !== this.state.horizontal.baseHeight
+    ) {
+      const base = `${this.state.horizontal.baseWidth}x${this.state.horizontal.baseHeight}`;
+      this.settingsService.setSettingValue('Video', 'Base', base);
+    }
+
+    if (
+      Number(outputWidth) !== this.state.horizontal.outputWidth ||
+      Number(outputHeight) !== this.state.horizontal.outputHeight
+    ) {
+      const output = `${this.state.horizontal.outputWidth}x${this.state.horizontal.outputHeight}`;
+      this.settingsService.setSettingValue('Video', 'Output', output);
+    }
+  }
+
   @debounce(200)
   updateObsSettings(display: TDisplayType = 'horizontal') {
     this.contexts[display].video = this.state[display];
     this.contexts[display].legacySettings = this.state[display];
+  }
+
+  updateVideoSettings(patch: Partial<IVideoInfo>, display: TDisplayType = 'horizontal') {
+    const newVideoSettings = { ...this.contexts[display].video, ...patch };
+
+    this.SET_VIDEO_CONTEXT(display, newVideoSettings);
+    this.updateObsSettings(display);
+
+    // also update the persisted settings
+    this.dualOutputService.updateVideoSettings(newVideoSettings, display);
   }
 
   setVideoSetting(key: string, value: unknown, display: TDisplayType = 'horizontal') {
@@ -269,12 +352,12 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   }
 
   @mutation()
-  DESTROY_VIDEO_CONTEXT(display: TDisplayType = 'horizontal') {
+  private DESTROY_VIDEO_CONTEXT(display: TDisplayType = 'horizontal') {
     this.state[display] = null as IVideoInfo;
   }
 
   @mutation()
-  SET_VIDEO_SETTING(key: string, value: unknown, display: TDisplayType = 'horizontal') {
+  private SET_VIDEO_SETTING(key: string, value: unknown, display: TDisplayType = 'horizontal') {
     this.state[display] = {
       ...this.state[display],
       [key]: value,
@@ -282,16 +365,11 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   }
 
   @mutation()
-  SET_VIDEO_CONTEXT(display: TDisplayType = 'horizontal', settings?: IVideoInfo) {
+  private SET_VIDEO_CONTEXT(display: TDisplayType = 'horizontal', settings?: IVideoInfo) {
     if (settings) {
       this.state[display] = settings;
     } else {
       this.state[display] = {} as IVideoInfo;
     }
-  }
-
-  @mutation()
-  REMOVE_CONTEXT(display: TDisplayType) {
-    this.state[display] = null as IVideoInfo;
   }
 }

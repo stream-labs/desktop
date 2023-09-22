@@ -88,7 +88,6 @@ class VideoSettingsModule {
     display: 'horizontal' as TDisplayType,
     showModal: false,
     showDualOutputSettings: this.dualOutputService.views.dualOutputMode,
-    shouldShowDualOutputCheckbox: this.dualOutputService.views.shouldShowDualOutputCheckbox,
     customBaseRes: !this.baseResOptions.find(
       opt => opt.value === this.service.values.horizontal.baseRes,
     ),
@@ -137,6 +136,7 @@ class VideoSettingsModule {
       scaleType: {
         type: 'list',
         label: $t('Downscale Filter'),
+        onChange: (val: EScaleType) => this.setScaleType(val),
         options: [
           {
             label: $t('Bilinear (Fastest, but blurry if scaling)'),
@@ -314,6 +314,23 @@ class VideoSettingsModule {
   }
 
   /**
+   * Sets the Scale Type
+   * @remark set the same FPS type for both displays
+   * If there is a vertical context, update it as well.
+   * Otherwise, update the vertical display persisted settings.
+   */
+
+  setScaleType(value: EScaleType) {
+    this.service.actions.setVideoSetting('scaleType', value, 'horizontal');
+
+    if (this.service.contexts.vertical) {
+      this.service.actions.setVideoSetting('scaleType', value, 'vertical');
+    } else {
+      this.dualOutputService.actions.setVideoSetting({ scaleType: value }, 'vertical');
+    }
+  }
+
+  /**
    * Sets the FPS type
    * @remark set the same FPS type for both displays
    * If there is a vertical context, update it as well.
@@ -487,7 +504,6 @@ export function VideoSettings() {
     showDualOutputSettings,
     showModal,
     isLoggedIn,
-    shouldShowDualOutputCheckbox,
     onChange,
     setDisplay,
     setShowDualOutput,
@@ -499,11 +515,8 @@ export function VideoSettings() {
     <>
       <div className={styles.videoSettingsHeader}>
         <h2>{$t('Video')}</h2>
-        {/* TODO: Comment in for release */}
-        {/* {shouldShowDualOutputCheckbox && ( */}
         <div className={styles.doToggle}>
           {/* THIS CHECKBOX TOGGLES DUAL OUTPUT MODE FOR THE ENTIRE APP */}
-
           <CheckboxInput
             id="dual-output-checkbox"
             name="dual-output-checkbox"
