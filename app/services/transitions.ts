@@ -5,6 +5,7 @@ import { TObsValue, TObsFormData } from 'components/obs/inputs/ObsInput';
 import { IListOption } from 'components/shared/inputs';
 import { WindowsService } from 'services/windows';
 import { ScenesService } from 'services/scenes';
+import { Scene } from 'services/scenes/scene';
 import uuid from 'uuid/v4';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { $t } from 'services/i18n';
@@ -138,6 +139,11 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
   sceneDuplicate: obs.IScene;
 
   /**
+   * This is an application's id of duplicated scene from above
+   */
+  currentSceneId: string;
+
+  /**
    * Used to prevent studio mode transitions before the current
    * one is complete.
    */
@@ -181,6 +187,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     this.studioModeChanged.next(true);
 
     if (!this.studioModeTransition) this.createStudioModeTransition();
+    this.currentSceneId = this.scenesService.views.activeScene.id;
     const currentScene = this.scenesService.views.activeScene.getObsScene();
     this.sceneDuplicate = currentScene.duplicate(uuid(), obs.ESceneDupType.Copy);
 
@@ -192,6 +199,13 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
 
   disableStudioMode() {
     if (!this.state.studioMode) return;
+
+    const activeSceneId = this.scenesService.views.activeScene.id;
+    if (activeSceneId !== this.currentSceneId) {
+      // Need to deactivate previously activated sources, because activation work as the reference counter.
+      const scene = this.scenesService.views.getScene(activeSceneId);
+      this.activateFfmpegSources(scene, false);
+    }
 
     this.SET_STUDIO_MODE(false);
     this.studioModeChanged.next(false);
@@ -265,10 +279,37 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     }
   }
 
+  // This sould be used in 'Studio mode' only.
+  // When user selects some new scene in this mode with video file source, it is not
+  // playing without activation when option 'Restart playback when source becomes active' is set,
+  // which is true by default
+  activateFfmpegSources(scene: Scene, active: boolean) {
+    if (!this.state.studioMode) {
+      return;
+    }
+
+    for (const source of scene.getNestedSources()) {
+      if (source.type === 'ffmpeg_source') {
+        if (active) {
+          source.getObsInput().activate();
+        } else {
+          source.getObsInput().deactivate();
+        }
+      }
+    }
+  }
+
   transition(sceneAId: string | null, sceneBId: string) {
     if (this.state.studioMode) {
+      if (sceneAId && sceneAId !== this.currentSceneId) {
+        const prevScene = this.scenesService.views.getScene(sceneAId);
+        this.activateFfmpegSources(prevScene, false); // deactivate
+      }
+
       const scene = this.scenesService.views.getScene(sceneBId);
       this.studioModeTransition.set(scene.getObsScene());
+      this.activateFfmpegSources(scene, true);
+
       return;
     }
 
