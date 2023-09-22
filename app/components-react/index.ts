@@ -69,7 +69,7 @@ import UltraIcon from './shared/UltraIcon';
 import EditTransform from './windows/EditTransform';
 import InstalledApps from './windows/settings/InstalledApps';
 import Hotkeys from './windows/settings/Hotkeys';
-import GLVolmeters from './root/GLVolmeters';
+import Mixer from './editor/elements/Mixer';
 
 // list of React components to be used inside Vue components
 export const components = {
@@ -143,5 +143,5 @@ export const components = {
   InstalledApps,
   Blank,
   Hotkeys,
-  GLVolmeters: createRoot(GLVolmeters),
+  Mixer: createRoot(Mixer),
 };
