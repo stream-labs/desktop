@@ -404,8 +404,6 @@ async function releaseRoutine() {
   info(colors.magenta('| N Air Interactive Release Script |'));
   info(colors.magenta('|----------------------------------|'));
 
-  checkEnv('CSC_LINK');
-  checkEnv('CSC_KEY_PASSWORD');
   checkEnv('NAIR_LICENSE_API_KEY');
   checkEnv('SENTRY_AUTH_TOKEN');
   checkEnv('AWS_ACCESS_KEY_ID');
