@@ -39,6 +39,8 @@ export class Scene {
   name: string;
   nodes: (ISceneItem | ISceneItemFolder)[];
   resourceId: string;
+  dualOutputNodeMap: Dictionary<string>;
+  verticalNodesLoaded: boolean;
 
   private _resourceId: string;
 
@@ -138,6 +140,19 @@ export class Scene {
     return this.state.nodes.map(item => item.id);
   }
 
+  /**
+   * The node map is for dual output so that the horizontal and vertical nodes can reference each other
+   */
+  getNodeMap(): Dictionary<string> {
+    return this.state.dualOutputNodeMap;
+  }
+
+  /**
+   * Used to determine if the scene has already loaded dual output nodes
+   */
+  getVerticalNodesLoaded(): boolean {
+    return this.state.verticalNodesLoaded;
+  }
   /**
    * After a scene has been opened in dual output mode, the vertical nodes
    * must be filtered. Any scene with dual output nodes will use horizontal nodes
@@ -431,6 +446,23 @@ export class Scene {
   }
 
   /**
+   * Denote that the scene has been converted to a dual output scene
+   */
+  setHasNodeMap(status: boolean) {
+    this.SET_HAS_NODE_MAP(status);
+  }
+
+  /**
+   * Confirm that the dual output nodes have been handled
+   * @remark For every session, the first time the user opens a dual output scene
+   * the dual output service confirms or creates the nodes for the vertical display.
+   * After this first time, we don't need to check the scene.
+   */
+  setDualOutputNodesLoaded(status: boolean) {
+    this.SET_DUAL_OUTPUT_NODES_LOADED(status);
+  }
+
+  /**
    * Makes sure all scene items are in the correct order in OBS.
    */
   private reconcileNodeOrderWithObs() {
@@ -693,5 +725,15 @@ export class Scene {
     const childNodeState = this.state.nodes.find(node => node.id === childNodeId);
     assertIsDefined(childNodeState);
     childNodeState.parentId = parentFolderId;
+  }
+
+  @mutation()
+  private SET_HAS_NODE_MAP(status?: boolean) {
+    this.state.hasNodeMap = status;
+  }
+
+  @mutation()
+  private SET_DUAL_OUTPUT_NODES_LOADED(status?: boolean) {
+    this.state.verticalNodesLoaded = status;
   }
 }

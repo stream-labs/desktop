@@ -21,6 +21,7 @@ import { UserService } from 'services/user';
 import { SelectionService } from 'services/selection';
 import { StreamingService } from 'services/streaming';
 import { SettingsService } from 'services/settings';
+import { Source, SourcesService } from 'services/sources';
 
 interface IDisplayVideoSettings {
   defaultDisplay: TDisplayType;
@@ -275,6 +276,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   @Inject() private selectionService: SelectionService;
   @Inject() private streamingService: StreamingService;
   @Inject() private settingsService: SettingsService;
+  @Inject() private sourcesService: SourcesService;
 
   static defaultState: IDualOutputServiceState = {
     displays: ['horizontal', 'vertical'],
@@ -330,7 +332,18 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
      * When a collection is loaded, confirm all sources have been assigned a context.
      */
     this.settingsService.audioRefreshed.subscribe(() => {
-      this.convertSceneSources(this.scenesService.views.activeSceneId);
+      // this.convertSceneSources(this.scenesService.views.activeSceneId);
+    });
+
+    /**
+     * For dual output scene collections, if a scene is added as sources, confirm vertical nodes are also created
+     * for that scene so that they will render correctly within the scene source.
+     */
+    this.sourcesService.sourceAdded.subscribe((source: Source) => {
+      if (source.type === 'scene' && this.views.hasNodeMap()) {
+        console.log('source.id ', source.sourceId);
+        this.convertSceneSources(source.sourceId);
+      }
     });
 
     /**
@@ -338,7 +351,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
      */
     this.scenesService.sceneSwitched.subscribe(scene => {
       // if the scene is not empty, handle vertical nodes
-      if (scene?.nodes.length) {
+      if (scene?.nodes.length && !scene.verticalNodesLoaded) {
+        console.log('confirming scene for ', scene.id);
         this.confirmOrCreateVerticalNodes(scene.id);
       }
     });
@@ -381,22 +395,31 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    * @param sceneId - Id of the scene to map
    */
   confirmOrCreateVerticalNodes(sceneId: string) {
-    this.convertSceneSources(sceneId);
     if (!this.views.hasNodeMap(sceneId) && this.state.dualOutputMode) {
       try {
         this.createSceneNodes(sceneId);
       } catch (error: unknown) {
         console.error('Error toggling Dual Output mode: ', error);
+        return;
       }
     } else {
       try {
         this.confirmOrAssignSceneNodes(sceneId);
       } catch (error: unknown) {
         console.error('Error toggling Dual Output mode: ', error);
+        return;
       }
     }
+
+    this.scenesService.setHasNodeMap(sceneId, true);
+    this.scenesService.setDualOutputNodesLoaded(sceneId, true);
   }
 
+  /**
+   * Primarily used for dual output scenes to handle vertical scene items
+   * when a scene has been added as a source.
+   * @param sceneId - the scene to confirm vertical nodes
+   */
   convertSceneSources(sceneId: string) {
     const sceneSources = this.scenesService.views.sceneSourcesForScene(sceneId);
     if (sceneSources.length > 0) {
@@ -410,6 +433,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    */
   // @RunInLoadingMode()
   confirmOrAssignSceneNodes(sceneId: string) {
+    console.log('confirming or assigning');
     const sceneItems = this.scenesService.views.getSceneItemsBySceneId(sceneId);
     if (!sceneItems) return;
 

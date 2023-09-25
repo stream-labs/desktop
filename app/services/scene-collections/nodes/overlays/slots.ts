@@ -196,11 +196,22 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
     }
   }
 
+  /**
+   * Load a scene item into state.
+   * @remark Before dual output was added in v.1.14, scene items did not have a display assigned to them.
+   * If a scene item does not have the display property, the backend will assign it
+   * to the horizontal display by default, so we never have to worry about the scene
+   * item not rendering without the display property. But to prevent any potential undefined
+   * errors on the frontend, we add the display property on load to assign the scene item
+   * to the horizontal display by default.
+   */
   async loadItem(obj: TSlotSchema, context: IContext): Promise<void> {
     let sceneItem: SceneItem;
 
     const id = obj.id;
-    const display = obj.display;
+
+    // Assign or init display property on scene item
+    const display = obj?.display ?? 'horizontal';
 
     if (obj.sceneNodeType === 'folder') {
       context.scene.createFolder(obj.name, { id, display });

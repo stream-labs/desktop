@@ -21,6 +21,8 @@ export interface IScene {
   id: string;
   name: string;
   nodes: (ISceneItem | ISceneItemFolder)[];
+  dualOutputNodeMap?: Dictionary<string>;
+  verticalNodesLoaded?: boolean;
 }
 
 export interface ISceneNodeAddOptions {
@@ -62,6 +64,7 @@ export interface ISceneCreateOptions {
   duplicateSourcesFromScene?: string;
   sceneId?: string; // A new ID will be generated if one is not provided
   makeActive?: boolean;
+  dualOutputNodeMap?: Dictionary<string>;
 }
 
 export interface ITransform {
@@ -288,11 +291,13 @@ export class ScenesService extends StatefulService<IScenesState> {
   @Inject() private transitionsService: TransitionsService;
 
   @mutation()
-  private ADD_SCENE(id: string, name: string) {
+  private ADD_SCENE(id: string, name: string, dualOutputNodeMap?: Dictionary<string>) {
     Vue.set<IScene>(this.state.scenes, id, {
       id,
       name,
       nodes: [],
+      dualOutputNodeMap,
+      verticalNodesLoaded: false,
     });
     this.state.displayOrder.push(id);
   }
@@ -320,7 +325,8 @@ export class ScenesService extends StatefulService<IScenesState> {
   createScene(name: string, options: ISceneCreateOptions = {}) {
     // Get an id to identify the scene on the frontend
     const id = options.sceneId || `scene_${uuid()}`;
-    this.ADD_SCENE(id, name);
+    const dualOutputNodeMap = options?.dualOutputNodeMap;
+    this.ADD_SCENE(id, name, dualOutputNodeMap);
     const obsScene = SceneFactory.create(id);
     this.sourcesService.addSource(obsScene.source, name, { sourceId: id });
 
@@ -609,5 +615,19 @@ export class ScenesService extends StatefulService<IScenesState> {
       }
     }
     return true;
+  }
+
+  setHasNodeMap(sceneId: string, status: boolean) {
+    const scene = this.views.getScene(sceneId);
+    if (!scene) return;
+
+    scene.setHasNodeMap(status);
+  }
+
+  setDualOutputNodesLoaded(sceneId: string, status: boolean) {
+    const scene = this.views.getScene(sceneId);
+    if (!scene) return;
+
+    scene.setDualOutputNodesLoaded(status);
   }
 }

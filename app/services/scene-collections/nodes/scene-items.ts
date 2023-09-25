@@ -75,7 +75,6 @@ export class SceneItemsNode extends Node<ISchema, {}> {
           const display =
             sceneItem?.display ??
             this.dualOutputService.views.getNodeDisplay(sceneItem.sceneItemId, sceneItem.sceneId);
-          const context = this.videoSettingsService.contexts[display];
 
           hotkeys.save({ sceneItemId: sceneItem.sceneItemId }).then(() => {
             const transform = sceneItem.transform;
@@ -138,6 +137,7 @@ export class SceneItemsNode extends Node<ISchema, {}> {
     // on first load, a dual output scene needs to assign displays and contexts to the scene items
     // but if the scene item already has a display assigned, skip it
     if (this.dualOutputService.views.hasNodeMap(context.scene.id)) {
+      console.log('looping node map');
       // nodes must be assigned to a context, so if it doesn't exist, establish it
       if (!this.videoSettingsService.contexts.vertical) {
         this.videoSettingsService.establishVideoContext('vertical');
@@ -148,6 +148,7 @@ export class SceneItemsNode extends Node<ISchema, {}> {
       const verticalNodeIds = Object.values(nodeMap);
 
       this.data.items.forEach(item => {
+        console.log('--> item display on load ', item?.display);
         if (!item?.display) {
           item.display = verticalNodeIds.includes(item.id) ? 'vertical' : 'horizontal';
         }
@@ -159,7 +160,9 @@ export class SceneItemsNode extends Node<ISchema, {}> {
       });
     } else {
       // for vanilla scenes, assign all items to the horizontal display
+      console.log('looping no node map');
       this.data.items.forEach(item => {
+        console.log('--> item display on load ', item?.display);
         if (!item?.display) {
           item.display = 'horizontal';
         }

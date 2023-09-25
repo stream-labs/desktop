@@ -7,6 +7,7 @@ interface ISchema {
   name: string;
   sceneId: string;
   slots: SlotsNode;
+  dualOutputNodeMap?: Dictionary<string>;
 }
 
 interface IContext {
@@ -41,6 +42,7 @@ export class ScenesNode extends ArrayNode<ISchema, IContext, Scene> {
   async loadItem(obj: ISchema, context: IContext): Promise<() => Promise<void>> {
     const scene = this.scenesService.createScene(obj.name, {
       sceneId: obj.sceneId,
+      dualOutputNodeMap: obj?.dualOutputNodeMap,
     });
 
     // Load items into the scene after all scenes have been created

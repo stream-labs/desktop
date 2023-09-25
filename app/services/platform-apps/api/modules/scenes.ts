@@ -65,6 +65,8 @@ interface IScene {
   id: string;
   name: string;
   nodes: (ISceneItem | ISceneItemFolder)[];
+  hasNodeMap: boolean;
+  dualOutputLoaded: boolean;
 }
 
 export class ScenesModule extends Module {
@@ -204,6 +206,8 @@ export class ScenesModule extends Module {
       nodes: scene.getNodes().map(node => {
         return this.serializeNode(node);
       }),
+      hasNodeMap: scene?.hasNodeMap ?? false,
+      dualOutputLoaded: scene?.dualOutputLoaded ?? false,
     };
   }
 
@@ -214,6 +218,7 @@ export class ScenesModule extends Module {
         type: ESceneNodeType.Folder,
         name: node.name,
         childrenIds: node.childrenIds,
+        display: node?.display,
       } as ISceneItemFolder;
     }
     if (node.isItem()) {
@@ -224,6 +229,7 @@ export class ScenesModule extends Module {
         visible: node.visible,
         locked: node.locked,
         transform: node.transform,
+        display: node?.display,
       } as ISceneItem;
     }
   }

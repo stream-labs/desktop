@@ -12,10 +12,11 @@ export interface ISceneSchema {
   active: boolean;
   hotkeys?: HotkeysNode;
   filters?: SceneFiltersNode;
+  dualOutputNodeMap?: Dictionary<string>;
 }
 
 export class ScenesNode extends ArrayNode<ISceneSchema, {}, Scene> {
-  schemaVersion = 1;
+  schemaVersion = 2;
 
   scenesService: ScenesService = ScenesService.instance;
   sourcesService: SourcesService = SourcesService.instance;
@@ -46,6 +47,7 @@ export class ScenesNode extends ArrayNode<ISceneSchema, {}, Scene> {
             id: scene.id,
             name: scene.name,
             active: this.scenesService.views.activeSceneId === scene.id,
+            dualOutputNodeMap: scene?.dualOutputNodeMap,
           });
         });
     });
@@ -68,7 +70,10 @@ export class ScenesNode extends ArrayNode<ISceneSchema, {}, Scene> {
 
   loadItem(obj: ISceneSchema): Promise<() => Promise<void>> {
     return new Promise(resolve => {
-      const scene = this.scenesService.createScene(obj.name, { sceneId: obj.id });
+      const scene = this.scenesService.createScene(obj.name, {
+        sceneId: obj.id,
+        dualOutputNodeMap: obj?.dualOutputNodeMap,
+      });
 
       if (obj.filters) obj.filters.load({ sceneId: scene.id });
 

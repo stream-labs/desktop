@@ -32,6 +32,10 @@ export default function AddSource() {
   }) as ISourceAddOptions;
   const widgetType = sourceAddOptions.propertiesManagerSettings?.widgetType;
 
+  console.log('sourceType ', sourceType);
+  console.log('sourceAddOptions ', sourceAddOptions);
+  console.log('widgetType ', widgetType);
+
   const { platform, activeScene, sources } = useVuex(() => ({
     platform: UserService.views.platform?.type,
     activeScene: ScenesService.views.activeScene,
@@ -112,6 +116,10 @@ export default function AddSource() {
       );
       return;
     }
+
+    // for dual output scene collections, it is possible that the scene
+    // For optimization when a vanilla scene collection is converted to a dual output scene collection,
+    // vertical nodes are only created when the
     EditorCommandsService.actions.executeCommand(
       'CreateExistingItemCommand',
       activeScene.id,
