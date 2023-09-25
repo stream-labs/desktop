@@ -1,14 +1,10 @@
 import TsxComponent from 'components/tsx-component';
 import { Watch } from 'vue-property-decorator';
 import { LayoutSlot, LayoutService, IVec2Array } from 'services/layout';
+import BaseElement from 'components/editor/elements/BaseElement';
 import { Inject } from 'services/core';
 import { CustomizationService } from 'services/customization';
 import { WindowsService } from 'services/windows';
-
-// Hack to fix typecasting until React port
-class BaseElement extends TsxComponent {
-  mins = { x: 0, y: 0 };
-}
 
 export class LayoutProps {
   onTotalWidth: (slots: IVec2Array, isColumns: boolean) => void = () => {};
