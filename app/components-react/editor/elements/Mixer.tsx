@@ -22,11 +22,11 @@ export default function Mixer() {
     return !canvas.getContext('webgl');
   }, []);
 
-  const { performanceMode, audioSources } = useVuex(() => ({
+  const { performanceMode, audioSourceIds } = useVuex(() => ({
     performanceMode: CustomizationService.state.performanceMode,
-    audioSources: AudioService.views.sourcesForCurrentScene.filter(
-      source => !source.mixerHidden && source.isControlledViaObs,
-    ),
+    audioSourceIds: AudioService.views.sourcesForCurrentScene
+      .filter(source => !source.mixerHidden && source.isControlledViaObs)
+      .map(source => source.sourceId),
   }));
 
   function showAdvancedSettings() {
@@ -65,11 +65,11 @@ export default function Mixer() {
           style={{ height: 'calc(100% - 32px)' }}
         >
           <div style={{ position: 'relative' }} onContextMenu={handleRightClick}>
-            {audioSources.length !== 0 && !performanceMode && <GLVolmeters />}
-            {audioSources.map(audioSource => (
+            {audioSourceIds.length !== 0 && !performanceMode && <GLVolmeters />}
+            {audioSourceIds.map(sourceId => (
               <MixerItem
-                key={audioSource.sourceId}
-                audioSourceId={audioSource.sourceId}
+                key={sourceId}
+                audioSourceId={sourceId}
                 volmetersEnabled={needToRenderVolmeters}
               />
             ))}
