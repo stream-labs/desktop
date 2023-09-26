@@ -243,6 +243,9 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     // confirm all vertical fps settings are synced to the horizontal fps settings
     if (display === 'vertical') {
       this.syncFPSSettings();
+
+      // Video.video = this.state.horizontal;
+      // Video.legacySettings = this.state.horizontal;
     }
 
     // update contexts to values on state
@@ -261,7 +264,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     this.settingsService.refreshVideoSettings();
   }
 
-  syncFPSSettings() {
+  syncFPSSettings(updateContexts?: boolean) {
     const fpsSettings = ['scaleType', 'fpsType', 'fpsCom', 'fpsNum', 'fpsDen', 'fpsInt'];
 
     let updated = false;
@@ -280,6 +283,11 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
         updated = true;
       }
     });
+
+    if (updateContexts && updated) {
+      this.contexts.vertical.video = this.state.vertical;
+      this.contexts.vertical.legacySettings = this.state.vertical;
+    }
   }
 
   /**

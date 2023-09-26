@@ -302,6 +302,13 @@ export class StreamingService
       });
     }
 
+    /**
+     * Confirm that vertical and horizontal context fps settings are synced
+     */
+    if (this.videoSettingsService.state.vertical) {
+      this.videoSettingsService.syncFPSSettings(true);
+    }
+
     // save enabled platforms to reuse setting with the next app start
     this.streamSettingsService.setSettings({ goLiveSettings: settings });
 
@@ -830,7 +837,7 @@ export class StreamingService
     const recordWhenStreaming = this.streamSettingsService.settings.recordWhenStreaming;
 
     if (recordWhenStreaming && this.state.recordingStatus === ERecordingState.Offline) {
-      this.toggleRecording();
+      this.toggleRecording(true);
     }
 
     const replayWhenStreaming = this.streamSettingsService.settings.replayBufferWhileStreaming;
@@ -928,7 +935,7 @@ export class StreamingService
 
       const keepRecording = this.streamSettingsService.settings.keepRecordingWhenStreamStops;
       if (!keepRecording && this.state.recordingStatus === ERecordingState.Recording) {
-        this.toggleRecording();
+        this.toggleRecording(true);
       }
 
       const keepReplaying = this.streamSettingsService.settings.keepReplayBufferStreamStops;
@@ -970,13 +977,17 @@ export class StreamingService
     this.toggleRecording();
   }
 
-  toggleRecording() {
+  toggleRecording(fromStartStream: boolean = false) {
     if (this.state.recordingStatus === ERecordingState.Recording) {
       NodeObs.OBS_service_stopRecording();
       return;
     }
 
     if (this.state.recordingStatus === ERecordingState.Offline) {
+      // only sync fps settings if not streaming
+      // otherwise syncing is handled in the go live function
+      this.videoSettingsService.syncFPSSettings(!fromStartStream);
+
       // load latest video and output settings into the store
       // this is likely not necessary when the output settings are migrated to the v2 API
       this.settingsService.refreshVideoSettings();
