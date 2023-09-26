@@ -979,7 +979,7 @@ export class StreamingService
     if (this.state.recordingStatus === ERecordingState.Offline) {
       // load latest video and output settings into the store
       // this is likely not necessary when the output settings are migrated to the v2 API
-      this.settingsService.refreshVideoSettings(true);
+      this.settingsService.refreshVideoSettings();
 
       NodeObs.OBS_service_startRecording();
       return;

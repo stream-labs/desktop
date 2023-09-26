@@ -317,18 +317,12 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
   }
 
   /**
-   * Guarantee the latest video and output settings are in obs and that the fps settings
-   * are synced between the two contexts.
+   * Guarantee the latest video and output settings are in obs
    * @remark - This is currently only used to confirm settings before recording because the
    * video settings use the v2 api and the output settings use the v1 api. This is likely not
    * necessary when the output settings are moved to the v2 api.
-   * @param syncVideoSettings - only used before starting recording to confirm the fps settings
-   * between the horizontal and vertical contexts are synced
    */
-  refreshVideoSettings(syncVideoSettings?: boolean) {
-    if (syncVideoSettings) {
-      this.videoSettingsService.syncFPSSettings();
-    }
+  refreshVideoSettings() {
     const newVideoSettings = this.fetchSettingsFromObs('Video').formData;
     const newOutputSettings = this.fetchSettingsFromObs('Output').formData;
 

@@ -240,6 +240,12 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
 
   @debounce(200)
   updateObsSettings(display: TDisplayType = 'horizontal') {
+    // confirm all vertical fps settings are synced to the horizontal fps settings
+    if (display === 'vertical') {
+      this.syncFPSSettings();
+    }
+
+    // update contexts to values on state
     this.contexts[display].video = this.state[display];
     this.contexts[display].legacySettings = this.state[display];
   }
@@ -274,11 +280,6 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
         updated = true;
       }
     });
-
-    if (updated) {
-      this.contexts.vertical.video = this.state.vertical;
-      this.contexts.vertical.legacySettings = this.state.vertical;
-    }
   }
 
   /**
