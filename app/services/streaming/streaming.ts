@@ -4,7 +4,7 @@ import { EOutputCode, Global, NodeObs } from '../../../obs-api';
 import { Inject } from 'services/core/injector';
 import moment from 'moment';
 import padStart from 'lodash/padStart';
-import { IOutputSettings, OutputSettingsService } from 'services/settings';
+import { IOutputSettings, OutputSettingsService, SettingsService } from 'services/settings';
 import { WindowsService } from 'services/windows';
 import { Subject } from 'rxjs';
 import {
@@ -90,6 +90,7 @@ export class StreamingService
   @Inject() private videoSettingsService: VideoSettingsService;
   @Inject() private markersService: MarkersService;
   @Inject() private dualOutputService: DualOutputService;
+  @Inject() private settingsService: SettingsService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
@@ -809,6 +810,9 @@ export class StreamingService
           }
 
           if (signalInfo.signal === EOBSOutputSignal.Start) {
+            // to prevent any possible syncing issues between the horizontal and vertical contexts
+            // confirm that the fps settings are synced
+            this.videoSettingsService.syncFPSSettings();
             NodeObs.OBS_service_startStreaming('vertical');
             signalChanged.unsubscribe();
           }
@@ -976,6 +980,10 @@ export class StreamingService
     }
 
     if (this.state.recordingStatus === ERecordingState.Offline) {
+      // load latest video and output settings into the store
+      // this is likely not necessary when the output settings are migrated to the v2 API
+      this.settingsService.refreshVideoSettings(true);
+
       NodeObs.OBS_service_startRecording();
       return;
     }

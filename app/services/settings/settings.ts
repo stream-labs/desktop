@@ -28,6 +28,7 @@ import { Subject } from 'rxjs';
 import * as remote from '@electron/remote';
 import fs from 'fs';
 import path from 'path';
+import { VideoSettingsService } from 'services/settings-v2';
 
 export interface ISettingsValues {
   General: {
@@ -206,6 +207,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
   @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject() private sceneCollectionsService: SceneCollectionsService;
   @Inject() private hardwareService: HardwareService;
+  @Inject() private videoSettingsService: VideoSettingsService;
 
   @Inject()
   private videoEncodingOptimizationService: VideoEncodingOptimizationService;
@@ -312,6 +314,26 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
       formData: this.getAudioSettingsFormData(this.state['Audio'].formData[0]),
     });
     this.audioRefreshed.next();
+  }
+
+  /**
+   * Guarantee the latest video and output settings are in obs and that the fps settings
+   * are synced between the two contexts.
+   * @remark - This is currently only used to confirm settings before recording because the
+   * video settings use the v2 api and the output settings use the v1 api. This is likely not
+   * necessary when the output settings are moved to the v2 api.
+   * @param syncVideoSettings - only used before starting recording to confirm the fps settings
+   * between the horizontal and vertical contexts are synced
+   */
+  refreshVideoSettings(syncVideoSettings?: boolean) {
+    if (syncVideoSettings) {
+      this.videoSettingsService.syncFPSSettings();
+    }
+    const newVideoSettings = this.fetchSettingsFromObs('Video').formData;
+    const newOutputSettings = this.fetchSettingsFromObs('Output').formData;
+
+    this.setSettings('Video', newVideoSettings, 'Video');
+    this.setSettings('Output', newOutputSettings);
   }
 
   showSettings(categoryName?: string) {
@@ -484,9 +506,23 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
     ];
   }
 
-  setSettings(categoryName: string, settingsData: ISettingsSubCategory[]) {
+  /**
+   * Set settings in obs.
+   * @remark The forceApplyCategory parameter is currently only used for refreshing
+   * video settings before starting recording. This is because the video settings is using the v2 api
+   * and the output settings are currently using the v1 api. This will no longer be needed when
+   * output settings are migrated to the new api.
+   * @param categoryName - name of property
+   * @param settingsData - data to set
+   * @param forceApplyCategory - name of property to force apply settings.
+   */
+  setSettings(
+    categoryName: string,
+    settingsData: ISettingsSubCategory[],
+    forceApplyCategory?: string,
+  ) {
     if (categoryName === 'Audio') this.setAudioSettings([settingsData.pop()]);
-    if (categoryName === 'Video') return;
+    if (categoryName === 'Video' && forceApplyCategory && forceApplyCategory !== 'Video') return;
 
     const dataToSave = [];
 

@@ -250,6 +250,35 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
 
     // also update the persisted settings
     this.dualOutputService.setVideoSetting({ [key]: value }, display);
+
+    // refresh v1 settings
+    this.settingsService.refreshVideoSettings();
+  }
+
+  syncFPSSettings() {
+    const fpsSettings = ['scaleType', 'fpsType', 'fpsCom', 'fpsNum', 'fpsDen', 'fpsInt'];
+
+    let updated = false;
+    fpsSettings.forEach((setting: string) => {
+      const hasSameVideoSetting =
+        this.contexts.horizontal.video[setting] === this.contexts.vertical.video[setting];
+      const hasSameLegacySetting =
+        this.contexts.horizontal.legacySettings[setting] ===
+        this.contexts.vertical.legacySettings[setting];
+
+      // sync the horizontal setting to the vertical setting if they are not the same
+      if (!hasSameVideoSetting || !hasSameLegacySetting) {
+        const value = this.contexts.horizontal.legacySettings[setting];
+        this.SET_VIDEO_SETTING(setting, value, 'vertical');
+        this.dualOutputService.setVideoSetting({ [setting]: value }, 'vertical');
+        updated = true;
+      }
+    });
+
+    if (updated) {
+      this.contexts.vertical.video = this.state.vertical;
+      this.contexts.vertical.legacySettings = this.state.vertical;
+    }
   }
 
   /**
