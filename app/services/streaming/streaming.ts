@@ -810,9 +810,6 @@ export class StreamingService
           }
 
           if (signalInfo.signal === EOBSOutputSignal.Start) {
-            // to prevent any possible syncing issues between the horizontal and vertical contexts
-            // confirm that the fps settings are synced
-            this.videoSettingsService.syncFPSSettings();
             NodeObs.OBS_service_startStreaming('vertical');
             signalChanged.unsubscribe();
           }
