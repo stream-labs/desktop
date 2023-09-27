@@ -148,7 +148,6 @@ export class Scene {
    * in the source selector. The only instance where the vertical nodes are used
    * to populate the source selector is in dual output mode when the horizontal display is hidden.
    */
-
   getSourceSelectorNodes(): TSceneNode[] {
     let nodes = this.getNodes();
 
