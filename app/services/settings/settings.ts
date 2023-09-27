@@ -506,6 +506,11 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
    * video settings before starting recording. This is because the video settings is using the v2 api
    * and the output settings are currently using the v1 api. This will no longer be needed when
    * output settings are migrated to the new api.
+   *
+   * This parameter exists because we need to guarantee that the latest video and output settings
+   * are in the store when recording. Currently, the only time that a value is passed in is in the
+   * refreshVideoSettings function that is called right before starting recording. We need to force
+   * the store to load the video setting but only in this instance.
    * @param categoryName - name of property
    * @param settingsData - data to set
    * @param forceApplyCategory - name of property to force apply settings.
