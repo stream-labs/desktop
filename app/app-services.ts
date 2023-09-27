@@ -2,6 +2,8 @@
  * All services must be registered in this file
  */
 
+import { VideoSettingsService } from 'services/settings-v2';
+
 // OFFLINE SERVICES
 export { AppService } from 'services/app';
 export { InternalApiService } from 'services/api/internal-api';
@@ -68,3 +70,5 @@ export { CrashReporterService } from 'services/crash-reporter';
 export { PatchNotesService } from 'services/patch-notes';
 export { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 export { StreamingService } from 'services/streaming';
+
+export { VideoSettingsService } from 'services/settings-v2';

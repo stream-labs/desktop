@@ -11,8 +11,7 @@
       "env": {
         "NAIR_UNSTABLE": "1",
         "SLOBS_PRODUCTION_DEBUG": "true"
-      },
-      "preLaunchTask": "npm: compile"
+      }
     },
     {
       "type": "chrome",

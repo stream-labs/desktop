@@ -8,6 +8,7 @@ import { WindowsService } from './windows';
 import { ScalableRectangle } from '../util/ScalableRectangle';
 import { Subscription } from 'rxjs';
 import { SelectionService } from 'services/selection';
+import { TDisplayType, VideoSettingsService } from './settings-v2';
 
 const { remote } = electron;
 
@@ -196,6 +197,7 @@ export class Display {
 
 export class VideoService extends Service {
   @Inject() settingsService: SettingsService;
+  @Inject() videoSettingsService: VideoSettingsService;
 
   init() {
     this.settingsService.loadSettingsIntoStore();
@@ -247,18 +249,23 @@ export class VideoService extends Service {
     sourceId?: string,
   ) {
     const electronWindow = remote.BrowserWindow.fromId(electronWindowId);
+    const context = this.videoSettingsService.contexts.horizontal;
 
     if (sourceId) {
       obs.NodeObs.OBS_content_createSourcePreviewDisplay(
         electronWindow.getNativeWindowHandle(),
         sourceId,
         name,
+        false,
+        context,
       );
     } else {
       obs.NodeObs.OBS_content_createDisplay(
         electronWindow.getNativeWindowHandle(),
         name,
         renderingMode,
+        false,
+        context,
       );
     }
   }
