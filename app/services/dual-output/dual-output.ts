@@ -305,7 +305,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     /**
      * Confirm that the horizontal and vertical fps settings are the same
      */
-    this.videoSettingsService.establishedContext.next(() => {
+    const establishedContext = this.videoSettingsService.establishedContext.subscribe(() => {
       ['fpsNum', 'fpsDen', 'fpsInt'].forEach(fpsSetting => {
         if (
           this.state.videoSettings.horizontal[fpsSetting] !==
@@ -318,6 +318,11 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
            */
           if (this.videoSettingsService.contexts.vertical) {
             this.videoSettingsService.setVideoSetting(fpsSetting, value, 'vertical');
+
+            // unsubscribe after the vertical context has been established because after both
+            // the horizontal and vertical contexts are established for dual output
+            // no more contexts will be established
+            establishedContext.unsubscribe();
           } else {
             this.setVideoSetting({ [fpsSetting]: value }, 'vertical');
           }
