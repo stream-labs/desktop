@@ -79,7 +79,7 @@ test('Recording with two contexts active', async t => {
     await stopRecording();
 
     // Wait to ensure that output setting are editable
-    await sleep(500);
+    await sleep(1000);
   }
 
   // Check that every file was created
