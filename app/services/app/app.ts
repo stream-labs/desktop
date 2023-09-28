@@ -10,6 +10,7 @@ import { TransitionsService } from 'services/transitions';
 import { SourcesService } from 'services/sources';
 import { ScenesService } from 'services/scenes';
 import { VideoService } from 'services/video';
+import { VideoSettingsService } from 'services/settings-v2';
 import { track } from 'services/usage-statistics';
 import { IpcServerService } from 'services/api/ipc-server';
 import { TcpServerService } from 'services/api/tcp-server';
@@ -25,7 +26,6 @@ import { CrashReporterService } from 'services/crash-reporter';
 import * as obs from '../../../obs-api';
 import { RunInLoadingMode } from './app-decorators';
 import Utils from 'services/utils';
-
 
 interface IAppState {
   loading: boolean;
@@ -58,6 +58,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() sourcesService: SourcesService;
   @Inject() scenesService: ScenesService;
   @Inject() videoService: VideoService;
+  @Inject() videoSettingsService: VideoSettingsService;
   @Inject() private ipcServerService: IpcServerService;
   @Inject() private tcpServerService: TcpServerService;
   @Inject() private performanceMonitorService: PerformanceMonitorService;
@@ -141,7 +142,7 @@ export class AppService extends StatefulService<IAppState> {
       await this.sceneCollectionsService.deinitialize();
       this.performanceMonitorService.stop(); // instead this.performanceService.stop();
       this.transitionsService.shutdown();
-      // this.videoSettingsService.shutdown(); 未実装
+      this.videoSettingsService.shutdown();
       // await this.gameOverlayService.destroy(); 未実装
       await this.fileManagerService.flushAll();
       obs.NodeObs.RemoveSourceCallback();

@@ -62,7 +62,7 @@ export {
   ERangeType,
   Video,
 } from 'obs-studio-node/module';
-import { EOutputCode, EVideoCodes } from 'obs-studio-node/module';
+import { EOutputCode, EVideoCodes, IVideo } from 'obs-studio-node/module';
 
 export interface IGetSettingsData {
   nameSubCategory: string;
@@ -212,7 +212,7 @@ export const NodeObs: {
     key: string,
     mode: number,
     renderAtBottom: boolean,
-    context: any,
+    context: IVideo,
   ): void;
   OBS_content_destroyDisplay(key: string): void;
   OBS_content_getDisplayPreviewOffset(key: string): IVec2 | undefined;
@@ -222,7 +222,7 @@ export const NodeObs: {
     sourceName: string,
     key: string,
     renderAtBottom: boolean,
-    context: any,
+    context: IVideo,
   ): void;
   OBS_content_resizeDisplay(key: string, width: number, height: number): void;
   OBS_content_moveDisplay(key: string, x: number, y: number): void;
