@@ -314,7 +314,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
      * Confirm that the horizontal and vertical fps settings are the same
      */
     this.videoSettingsService.establishedContext.next(() => {
-      ['fpsNum', 'fpsDen', 'fpsInt'].forEach(fpsSetting => {
+      ['scaleType', 'fpsType', 'fpsCom', 'fpsNum', 'fpsDen', 'fpsInt'].forEach(fpsSetting => {
         if (
           this.state.videoSettings.horizontal[fpsSetting] !==
           this.state.videoSettings.vertical[fpsSetting]
