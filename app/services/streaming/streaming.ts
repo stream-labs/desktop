@@ -4,7 +4,7 @@ import { EOutputCode, Global, NodeObs } from '../../../obs-api';
 import { Inject } from 'services/core/injector';
 import moment from 'moment';
 import padStart from 'lodash/padStart';
-import { IOutputSettings, OutputSettingsService, SettingsService } from 'services/settings';
+import { IOutputSettings, OutputSettingsService } from 'services/settings';
 import { WindowsService } from 'services/windows';
 import { Subject } from 'rxjs';
 import {
@@ -90,7 +90,6 @@ export class StreamingService
   @Inject() private videoSettingsService: VideoSettingsService;
   @Inject() private markersService: MarkersService;
   @Inject() private dualOutputService: DualOutputService;
-  @Inject() private settingsService: SettingsService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
@@ -300,13 +299,6 @@ export class StreamingService
         destination.video = this.videoSettingsService.contexts[display];
         destination.mode = this.views.getDisplayContextName(display);
       });
-    }
-
-    /**
-     * Confirm that vertical and horizontal context fps settings are synced
-     */
-    if (this.videoSettingsService.state.vertical) {
-      this.videoSettingsService.syncFPSSettings(true);
     }
 
     // save enabled platforms to reuse setting with the next app start
@@ -837,7 +829,7 @@ export class StreamingService
     const recordWhenStreaming = this.streamSettingsService.settings.recordWhenStreaming;
 
     if (recordWhenStreaming && this.state.recordingStatus === ERecordingState.Offline) {
-      this.toggleRecording(true);
+      this.toggleRecording();
     }
 
     const replayWhenStreaming = this.streamSettingsService.settings.replayBufferWhileStreaming;
@@ -935,7 +927,7 @@ export class StreamingService
 
       const keepRecording = this.streamSettingsService.settings.keepRecordingWhenStreamStops;
       if (!keepRecording && this.state.recordingStatus === ERecordingState.Recording) {
-        this.toggleRecording(true);
+        this.toggleRecording();
       }
 
       const keepReplaying = this.streamSettingsService.settings.keepReplayBufferStreamStops;
@@ -977,21 +969,13 @@ export class StreamingService
     this.toggleRecording();
   }
 
-  toggleRecording(fromStartStream: boolean = false) {
+  toggleRecording() {
     if (this.state.recordingStatus === ERecordingState.Recording) {
       NodeObs.OBS_service_stopRecording();
       return;
     }
 
     if (this.state.recordingStatus === ERecordingState.Offline) {
-      // only sync fps settings if not streaming
-      // otherwise syncing is handled in the go live function
-      this.videoSettingsService.syncFPSSettings(!fromStartStream);
-
-      // load latest video and output settings into the store
-      // this is likely not necessary when the output settings are migrated to the v2 API
-      this.settingsService.refreshVideoSettings();
-
       NodeObs.OBS_service_startRecording();
       return;
     }
