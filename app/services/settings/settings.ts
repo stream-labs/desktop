@@ -69,7 +69,17 @@ export interface ISettingsValues {
     VodTrackIndex?: string;
     keyint_sec?: number;
   };
-  Video: ISettingsVideoInfo; // default video context
+  Video: {
+    // default video context
+    Base: string;
+    Output: string;
+    ScaleType: string;
+    FPSType: string;
+    FPSCommon: string;
+    FPSInt: number;
+    FPSNum: number;
+    FPSDen: number;
+  };
   Audio: Dictionary<TObsValue>;
   Advanced: {
     DelayEnable: boolean;
@@ -82,18 +92,6 @@ export interface ISettingsValues {
     LowLatencyEnable: boolean;
   };
 }
-
-interface ISettingsVideoInfo {
-  Base: string;
-  Output: string;
-  ScaleType: string;
-  FPSType: string;
-  FPSCommon: string;
-  FPSInt: number;
-  FPSNum: number;
-  FPSDen: number;
-}
-
 export interface ISettingsSubCategory {
   nameSubCategory: string;
   codeSubCategory?: string;
@@ -314,6 +312,19 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
     this.audioRefreshed.next();
   }
 
+  /**
+   * Guarantee the latest video and output settings are in obs
+   * @remark - This is currently only used to confirm settings before recording because the
+   * video settings use the v2 api and the output settings use the v1 api. This is likely not
+   * necessary when the output settings are moved to the v2 api.
+   */
+  refreshVideoSettings() {
+    const newVideoSettings = this.fetchSettingsFromObs('Video').formData;
+    const newOutputSettings = this.fetchSettingsFromObs('Output').formData;
+    this.setSettings('Video', newVideoSettings, 'Video');
+    this.setSettings('Output', newOutputSettings);
+  }
+
   showSettings(categoryName?: string) {
     this.windowsService.showWindow({
       componentName: 'Settings',
@@ -483,10 +494,28 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
       },
     ];
   }
-
-  setSettings(categoryName: string, settingsData: ISettingsSubCategory[]) {
+  /**
+   * Set settings in obs.
+   * @remark The forceApplyCategory parameter is currently only used for refreshing
+   * video settings before starting recording. This is because the video settings is using the v2 api
+   * and the output settings are currently using the v1 api. This will no longer be needed when
+   * output settings are migrated to the new api.
+   *
+   * This parameter exists because we need to guarantee that the latest video and output settings
+   * are in the store when recording. Currently, the only time that a value is passed in is in the
+   * refreshVideoSettings function that is called right before starting recording. We need to force
+   * the store to load the video setting but only in this instance.
+   * @param categoryName - name of property
+   * @param settingsData - data to set
+   * @param forceApplyCategory - name of property to force apply settings.
+   */
+  setSettings(
+    categoryName: string,
+    settingsData: ISettingsSubCategory[],
+    forceApplyCategory?: string,
+  ) {
     if (categoryName === 'Audio') this.setAudioSettings([settingsData.pop()]);
-    if (categoryName === 'Video') return;
+    if (categoryName === 'Video' && forceApplyCategory && forceApplyCategory !== 'Video') return;
 
     const dataToSave = [];
 
