@@ -320,7 +320,9 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
    */
   refreshVideoSettings() {
     const newVideoSettings = this.fetchSettingsFromObs('Video').formData;
+    const newOutputSettings = this.fetchSettingsFromObs('Output').formData;
     this.setSettings('Video', newVideoSettings, 'Video');
+    this.setSettings('Output', newOutputSettings);
   }
 
   showSettings(categoryName?: string) {

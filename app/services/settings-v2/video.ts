@@ -230,6 +230,14 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     Video.video = this.state.horizontal;
     Video.legacySettings = this.state.horizontal;
 
+    // ensure vertical context as the same fps settings as the horizontal context
+    if (display === 'vertical') {
+      const updated = this.syncFPSSettings();
+      if (updated) {
+        this.settingsService.refreshVideoSettings();
+      }
+    }
+
     return !!this.contexts[display];
   }
 
@@ -241,9 +249,6 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   @debounce(200)
   updateObsSettings(display: TDisplayType = 'horizontal') {
     // confirm all vertical fps settings are synced to the horizontal fps settings
-    if (display === 'vertical') {
-      this.syncFPSSettings();
-    }
     // update contexts to values on state
     this.contexts[display].video = this.state[display];
     this.contexts[display].legacySettings = this.state[display];
@@ -270,13 +275,16 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
    * we need to apply this change to both contexts to keep them synced.
    * @param - Currently, we must confirm fps settings are synced before start streaming
    */
-  syncFPSSettings(updateContexts?: boolean) {
+  syncFPSSettings(updateContexts?: boolean): boolean {
     const fpsSettings = ['scaleType', 'fpsType', 'fpsCom', 'fpsNum', 'fpsDen', 'fpsInt'];
+
     // update persisted local settings if the vertical context does not exist
     const verticalVideoSetting = this.contexts.vertical
       ? this.contexts.vertical.video
       : this.dualOutputService.views.videoSettings.vertical;
+
     let updated = false;
+
     fpsSettings.forEach((setting: string) => {
       const hasSameVideoSetting = this.contexts.horizontal.video[setting] === verticalVideoSetting;
       let shouldUpdate = hasSameVideoSetting;
@@ -289,17 +297,25 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
       }
       // sync the horizontal setting to the vertical setting if they are not the same
       if (shouldUpdate) {
-        const value = this.contexts.horizontal.legacySettings[setting];
-        this.SET_VIDEO_SETTING(setting, value, 'vertical');
+        const value = this.state.horizontal[setting];
+        // always update persisted setting
         this.dualOutputService.setVideoSetting({ [setting]: value }, 'vertical');
+
+        // update state if the vertical context exists
+        if (this.contexts.vertical) {
+          this.SET_VIDEO_SETTING(setting, value, 'vertical');
+        }
+
         updated = true;
       }
     });
+
     // only update the vertical context if it exists
-    if (updateContexts && this.contexts.vertical && updated) {
+    if ((updateContexts || updated) && this.contexts.vertical) {
       this.contexts.vertical.video = this.state.vertical;
       this.contexts.vertical.legacySettings = this.state.vertical;
     }
+    return updated;
   }
 
   /**
