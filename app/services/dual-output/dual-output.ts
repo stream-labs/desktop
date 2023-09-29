@@ -303,29 +303,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     this.confirmDestinationDisplays();
 
     /**
-     * Confirm that the horizontal and vertical fps settings are the same
-     */
-    this.videoSettingsService.establishedContext.next(() => {
-      ['fpsNum', 'fpsDen', 'fpsInt'].forEach(fpsSetting => {
-        if (
-          this.state.videoSettings.horizontal[fpsSetting] !==
-          this.state.videoSettings.vertical[fpsSetting]
-        ) {
-          const value = this.state.videoSettings.horizontal[fpsSetting];
-
-          /**
-           * Only update the settings in the context if it exists
-           */
-          if (this.videoSettingsService.contexts.vertical) {
-            this.videoSettingsService.setVideoSetting(fpsSetting, value, 'vertical');
-          } else {
-            this.setVideoSetting({ [fpsSetting]: value }, 'vertical');
-          }
-        }
-      });
-    });
-
-    /**
      * The audio settings refresh each time the scene collection is switched.
      * When a collection is loaded, confirm all sources have been assigned a context.
      */
