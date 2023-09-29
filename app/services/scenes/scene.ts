@@ -148,27 +148,23 @@ export class Scene {
    * in the source selector. The only instance where the vertical nodes are used
    * to populate the source selector is in dual output mode when the horizontal display is hidden.
    */
-
   getSourceSelectorNodes(): TSceneNode[] {
     let nodes = this.getNodes();
 
-    if (
-      this.dualOutputService.state.dualOutputMode &&
-      this.dualOutputService.views.hasVerticalNodes
-    ) {
-      const populateWithVerticalNodes =
-        !this.dualOutputService.views.activeDisplays.horizontal &&
-        this.dualOutputService.views.activeDisplays.vertical;
-      /**
-       * nodeMap can be used for checking horizontal display nodes,
-       * but cannot lookup vertical display IDs so we use a Set instead
-       */
-      const nodeMap = this.dualOutputService.views.activeSceneNodeMap;
-      const verticalNodeIds = new Set(this.dualOutputService.views.verticalNodeIds);
-      nodes = nodes.filter(node => {
-        return !populateWithVerticalNodes ? nodeMap[node.id] : verticalNodeIds.has(node.id);
-      });
-    }
+    const populateWithVerticalNodes =
+      !this.dualOutputService.views.activeDisplays.horizontal &&
+      this.dualOutputService.views.activeDisplays.vertical;
+
+    nodes = nodes.filter(node => {
+      // only return vertical nodes if only the vertical display is active
+      if (populateWithVerticalNodes && node?.display === 'vertical') {
+        return node;
+      }
+      // return horizontal nodes if either only the horizontal display is active or both displays are active
+      if (!populateWithVerticalNodes && node?.display === 'horizontal') {
+        return node;
+      }
+    });
 
     return nodes;
   }
