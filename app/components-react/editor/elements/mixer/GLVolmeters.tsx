@@ -1,22 +1,20 @@
 import React, { useEffect, useRef } from 'react';
-import { IVolmeter } from '../../services/audio';
+import { IVolmeter } from 'services/audio';
 import { Subscription } from 'rxjs';
 import electron from 'electron';
-import { Watch } from 'vue-property-decorator';
 import difference from 'lodash/difference';
-import { compileShader, createProgram } from '../../util/webgl/utils';
-import vShaderSrc from '../../util/webgl/shaders/volmeter.vert';
-import fShaderSrc from '../../util/webgl/shaders/volmeter.frag';
-import { Services } from '../service-provider';
+import { compileShader, createProgram } from 'util/webgl/utils';
+import vShaderSrc from 'util/webgl/shaders/volmeter.vert';
+import fShaderSrc from 'util/webgl/shaders/volmeter.frag';
+import { Services } from 'components-react/service-provider';
 import { injectWatch, useModule } from 'slap';
-import { assertIsDefined, getDefined } from '../../util/properties-type-guards';
-
+import { assertIsDefined, getDefined } from 'util/properties-type-guards';
 
 // Configuration
 const CHANNEL_HEIGHT = 3;
 const SPACE_BETWEEN_CHANNELS = 2;
 const PADDING_TOP = 39;
-const PADDING_BOTTOM = 41;
+const PADDING_BOTTOM = 51;
 const PEAK_WIDTH = 4;
 const PEAK_HOLD_CYCLES = 100;
 const WARNING_LEVEL = -20;
@@ -55,7 +53,7 @@ export default function GLVolmeters() {
   useEffect(() => {
     assertIsDefined(canvasRef.current);
     setupNewCanvas(canvasRef.current);
-  },[]);
+  }, []);
 
   return (
     <div style={{ position: 'absolute', height: '100%', width: '100%' }}>
@@ -67,6 +65,8 @@ export default function GLVolmeters() {
           top: 0,
           right: 0,
           left: 0,
+          paddingLeft: '32px',
+          paddingRight: '64px',
           height: '100%',
         }}
       />
@@ -142,7 +142,10 @@ class GLVolmetersModule {
   }
 
   // update volmeters subscriptions when audio sources change
-  watchAudioSources = injectWatch(() => this.audioSources, () => this.subscribeVolmeters());
+  watchAudioSources = injectWatch(
+    () => this.audioSources,
+    () => this.subscribeVolmeters(),
+  );
 
   /**
    * add or remove subscription for volmeters depending on current scene
@@ -298,11 +301,15 @@ class GLVolmetersModule {
 
     // lookup uniforms
     this.resolutionLocation = getDefined(this.gl.getUniformLocation(this.program, 'u_resolution'));
-    this.translationLocation = getDefined(this.gl.getUniformLocation(this.program, 'u_translation'));
+    this.translationLocation = getDefined(
+      this.gl.getUniformLocation(this.program, 'u_translation'),
+    );
     this.scaleLocation = getDefined(this.gl.getUniformLocation(this.program, 'u_scale'));
     this.volumeLocation = getDefined(this.gl.getUniformLocation(this.program, 'u_volume'));
     this.peakHoldLocation = getDefined(this.gl.getUniformLocation(this.program, 'u_peakHold'));
-    this.bgMultiplierLocation = getDefined(this.gl.getUniformLocation(this.program, 'u_bgMultiplier'));
+    this.bgMultiplierLocation = getDefined(
+      this.gl.getUniformLocation(this.program, 'u_bgMultiplier'),
+    );
 
     this.gl.useProgram(this.program);
 
