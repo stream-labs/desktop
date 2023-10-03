@@ -22,11 +22,11 @@ export default function Mixer() {
     return !canvas.getContext('webgl');
   }, []);
 
-  const { performanceMode, audioSources } = useVuex(() => ({
+  const { performanceMode, audioSourceIds } = useVuex(() => ({
     performanceMode: CustomizationService.state.performanceMode,
-    audioSources: AudioService.views.sourcesForCurrentScene.filter(
-      source => !source.mixerHidden && source.isControlledViaObs,
-    ),
+    audioSourceIds: AudioService.views.sourcesForCurrentScene
+      .filter(source => !source.mixerHidden && source.isControlledViaObs)
+      .map(source => source.sourceId),
   }));
 
   function showAdvancedSettings() {
@@ -44,7 +44,7 @@ export default function Mixer() {
 
   function Element() {
     return (
-      <div onContextMenu={handleRightClick}>
+      <>
         <div className="studio-controls-top">
           <Tooltip
             title={$t('Monitor audio levels. If the bars are moving you are outputting audio.')}
@@ -60,19 +60,22 @@ export default function Mixer() {
             />
           </Tooltip>
         </div>
-        <Scrollable className="studio-controls-selector mixer-panel">
-          <div style={{ position: 'relative' }}>
-            {audioSources.length !== 0 && !performanceMode && <GLVolmeters />}
-            {audioSources.map(audioSource => (
+        <Scrollable
+          className="studio-controls-selector mixer-panel"
+          style={{ height: 'calc(100% - 32px)' }}
+        >
+          <div style={{ position: 'relative' }} onContextMenu={handleRightClick}>
+            {audioSourceIds.length !== 0 && !performanceMode && <GLVolmeters />}
+            {audioSourceIds.map(sourceId => (
               <MixerItem
-                key={audioSource.sourceId}
-                audioSourceId={audioSource.sourceId}
+                key={sourceId}
+                audioSourceId={sourceId}
                 volmetersEnabled={needToRenderVolmeters}
               />
             ))}
           </div>
         </Scrollable>
-      </div>
+      </>
     );
   }
 

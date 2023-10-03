@@ -14,7 +14,7 @@ import { assertIsDefined, getDefined } from 'util/properties-type-guards';
 const CHANNEL_HEIGHT = 3;
 const SPACE_BETWEEN_CHANNELS = 2;
 const PADDING_TOP = 39;
-const PADDING_BOTTOM = 41;
+const PADDING_BOTTOM = 51;
 const PEAK_WIDTH = 4;
 const PEAK_HOLD_CYCLES = 100;
 const WARNING_LEVEL = -20;
@@ -65,6 +65,8 @@ export default function GLVolmeters() {
           top: 0,
           right: 0,
           left: 0,
+          paddingLeft: '32px',
+          paddingRight: '64px',
           height: '100%',
         }}
       />
