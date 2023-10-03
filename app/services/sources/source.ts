@@ -17,6 +17,7 @@ import omitBy from 'lodash/omitBy';
 import omit from 'lodash/omit';
 import { assertIsDefined } from '../../util/properties-type-guards';
 import { SourceFiltersService } from '../source-filters';
+import { TransitionsService } from 'services/transitions';
 
 @ServiceHelper('SourcesService')
 export class Source implements ISourceApi {
@@ -44,6 +45,7 @@ export class Source implements ISourceApi {
 
   @Inject() private scenesService: ScenesService;
   @Inject() private sourceFiltersService: SourceFiltersService;
+  @Inject() private transitionsService: TransitionsService;
 
   /**
    * Should only be called by functions with the ExecuteInWorkerProcess() decorator
@@ -186,6 +188,15 @@ export class Source implements ISourceApi {
     const manager = this.sourcesService.propertiesManagers[this.sourceId].manager;
     manager.setPropertiesFormData(properties);
     this.sourcesService.sourceUpdated.next(this.state);
+
+    // In studio mode if user sets path to newly created source, we need to start playback manually,
+    // because source in studio mode is not active.
+    if (this.transitionsService.state.studioMode && properties.length === 1) {
+      const settings = properties.at(0);
+      if (settings?.enabled && settings?.name === 'local_file' && this.type === 'ffmpeg_source') {
+        this.getObsInput().play();
+      }
+    }
   }
 
   duplicate(newSourceId?: string): Source | null {
