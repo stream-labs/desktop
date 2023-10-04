@@ -38,35 +38,35 @@ export default function ResizeBar(p: ResizeBarProps) {
     startMouseTracking(event);
   }
 
-  function startMouseTracking(event: React.MouseEvent) {
+  function startMouseTracking(ev: React.MouseEvent) {
     if (!barRef.current) return;
     setActive(true);
-    const mouseMoveListener = (event: React.MouseEvent) => onMouseMoveHandler(event);
+    const mouseMoveListener = (event: MouseEvent) => onMouseMoveHandler(event);
     barRef.current.addEventListener('mousemove', mouseMoveListener);
     barRef.current.addEventListener(
       'mouseup',
-      (event: React.MouseEvent) => {
+      () => {
         if (!barRef.current) return;
         barRef.current.removeEventListener('mousemove', mouseMoveListener);
-        stopMouseTracking(event);
+        stopMouseTracking();
       },
       { once: true },
     );
     barRef.current.addEventListener(
       'mouseleave',
-      (event: React.MouseEvent) => {
+      () => {
         if (!barRef.current) return;
         barRef.current.removeEventListener('mousemove', mouseMoveListener);
-        stopMouseTracking(event);
+        stopMouseTracking();
       },
       { once: true },
     );
 
-    mouseInitial = isHorizontal ? event.pageX : event.pageY;
+    mouseInitial = isHorizontal ? ev.pageX : ev.pageY;
     p.onResizestart();
   }
 
-  function stopMouseTracking(event: React.MouseEvent) {
+  function stopMouseTracking() {
     setActive(false);
     let offset = barOffset;
     if (p.reverse) offset = -offset;
@@ -77,7 +77,7 @@ export default function ResizeBar(p: ResizeBarProps) {
     p.onInput(offset + p.value);
   }
 
-  function onMouseMoveHandler(event: React.MouseEvent) {
+  function onMouseMoveHandler(event: MouseEvent) {
     const mouseOffset = (isHorizontal ? event.pageX : event.pageY) - mouseInitial;
 
     // handle max and min constraints
