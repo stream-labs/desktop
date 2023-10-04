@@ -1,1 +1,2 @@
-export { default as Default } from './Default';
+export { Default } from './Default';
+export { Classic } from './Classic';

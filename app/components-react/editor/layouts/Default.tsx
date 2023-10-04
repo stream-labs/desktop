@@ -4,7 +4,7 @@ import useLayout, { LayoutProps, ILayoutSlotArray } from './hooks';
 import ResizeBar from 'components-react/root/ResizeBar';
 import styles from './Layouts.m.less';
 
-export default function Default(p: React.PropsWithChildren<LayoutProps>) {
+export function Default(p: React.PropsWithChildren<LayoutProps>) {
   const vectors: ILayoutSlotArray = ['1', '2', ['3', '4', '5']];
   const componentRef = useRef<HTMLDivElement>(null);
 
@@ -17,8 +17,6 @@ export default function Default(p: React.PropsWithChildren<LayoutProps>) {
   );
 
   function BottomSection() {
-    if (!p.children) return <></>;
-
     return (
       <div
         className={styles.segmented}

@@ -45,7 +45,7 @@ export const LAYOUT_DATA: ILayoutData = {
   [ELayout.Classic]: {
     resizeDefaults: { bar1: 0.4 },
     className: 'classic',
-    component: 'Default',
+    component: 'Classic',
   },
   [ELayout.FourByFour]: {
     resizeDefaults: { bar1: 0.25, bar2: 0.25 },
