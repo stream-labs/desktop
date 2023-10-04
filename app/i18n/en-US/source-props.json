@@ -418,7 +418,11 @@
     "name": "CUSTOM CAST",
     "description": "Add CUSTOM CAST NDI® output stream to your scene.",
     "custom_cast_ndi_not_found": "No NDI® output from CUSTOM CAST",
-    "custom_cast_ndi_not_found_2": "Note: If you are connected to WiFi, NDI® cannot be used if the Windows network profile is set to \"Public\". Please connect to a network with a \"Private\" profile to use it."
+    "custom_cast_ndi_not_found_2": "Note: NDI® cannot be used if the Windows network profile is set to \"Public\". Please connect to a network with a \"Private\" profile to use it.",
+    "network_help_button": {
+      "name": "Make a Wi-Fi network public or private in Windows",
+      "url": "https://support.microsoft.com/en-us/windows/make-a-wi-fi-network-public-or-private-in-windows-0460117d-8d3e-a7ac-f003-7a0da607448d"
+    }
   },
   "custom_cast_ndi_guide": {
     "name": "CUSTOM CAST",

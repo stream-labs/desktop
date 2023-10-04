@@ -1,4 +1,4 @@
-import { IObsListInput, IObsTextInputValue, TObsFormData, TObsValue } from "components/obs/inputs/ObsInput";
+import { IObsListInput, IObsTextInputValue, TObsFormData, TObsValue, IObsButtonInputValue } from "components/obs/inputs/ObsInput";
 import { PropertiesManager } from "./properties-manager";
 import { $t } from "services/i18n";
 
@@ -30,9 +30,24 @@ export class CustomCastNdiManager extends PropertiesManager {
             info: true,
           } as IObsTextInputValue;
         };
+        const linkButton = (name: string, description: string, url: string) => {
+          return {
+            type: 'NAIR_PROPERTY_LINK_BUTTON',
+            name,
+            description,
+            visible: true,
+            multiline: false,
+            info: true,
+            url,
+          } as IObsButtonInputValue;
+        }
         return [
           staticText('custom_cast_ndi_not_found', $t('source-props.custom_cast_ndi_source.custom_cast_ndi_not_found')),
           staticText('custom_cast_ndi_not_found_2', $t('source-props.custom_cast_ndi_source.custom_cast_ndi_not_found_2')),
+          linkButton(
+            'network_help_button',
+            $t('source-props.custom_cast_ndi_source.network_help_button.name'),
+            $t('source-props.custom_cast_ndi_source.network_help_button.url')),
         ];
       }
 
