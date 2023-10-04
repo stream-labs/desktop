@@ -5,6 +5,7 @@ import { Services } from 'components-react/service-provider';
 
 export class LayoutProps {
   onTotalWidth: (slots: IVec2Array, isColumns: boolean) => void = () => {};
+  childrenMins: Dictionary<IVec2>;
 }
 
 export interface IResizeMins {
@@ -19,7 +20,7 @@ export default function useLayout(
   component: HTMLElement,
   vectors: ILayoutSlotArray,
   isColumns: boolean,
-  children: React.ReactNode,
+  childrenMins: Dictionary<IVec2>,
   onTotalWidth: (slots: IVec2Array, isColumns: boolean) => void = () => {},
 ) {
   const { CustomizationService, LayoutService, WindowsService } = Services;
@@ -92,8 +93,8 @@ export default function useLayout(
 
   function minsFromSlot(slot: LayoutSlot) {
     // If there is no component slotted we return no minimum
-    if (!children || !children[slot]) return { x: 0, y: 0 };
-    return children[slot].mins;
+    if (!childrenMins || !childrenMins[slot]) return { x: 0, y: 0 };
+    return childrenMins[slot];
   }
 
   function calculateMinimum(slots?: ILayoutSlotArray) {

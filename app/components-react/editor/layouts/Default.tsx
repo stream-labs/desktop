@@ -12,7 +12,7 @@ export default function Default(p: React.PropsWithChildren<LayoutProps>) {
     componentRef.current as HTMLElement,
     vectors,
     false,
-    p.children,
+    p.childrenMins,
     p.onTotalWidth,
   );
 
