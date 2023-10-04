@@ -20,14 +20,20 @@ export class CustomCastNdiManager extends PropertiesManager {
 
       if (customCastNdi === undefined) {
         // CUSTOMCAST NDIが見つからないときは案内メッセージを付ける
-        return [{
-          type: 'OBS_PROPERTY_TEXT',
-          name: 'custom_cast_ndi_not_found',
-          description: $t('source-props.custom_cast_ndi_source.custom_cast_ndi_not_found'),
-          visible: true,
-          multiline: false,
-          info: true,
-        } as IObsTextInputValue];
+        const staticText = (name: string, description: string) => {
+          return {
+            type: 'OBS_PROPERTY_TEXT',
+            name,
+            description,
+            visible: true,
+            multiline: false,
+            info: true,
+          } as IObsTextInputValue;
+        };
+        return [
+          staticText('custom_cast_ndi_not_found', $t('source-props.custom_cast_ndi_source.custom_cast_ndi_not_found')),
+          staticText('custom_cast_ndi_not_found_2', $t('source-props.custom_cast_ndi_source.custom_cast_ndi_not_found_2')),
+        ];
       }
 
       // CUSTOMCAST NDIを強制選択する
