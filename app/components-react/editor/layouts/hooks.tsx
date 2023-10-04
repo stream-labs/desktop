@@ -19,7 +19,7 @@ export default function useLayout(
   component: HTMLElement,
   vectors: ILayoutSlotArray,
   isColumns: boolean,
-  children: IVec2[],
+  children: React.ReactNode,
   onTotalWidth: (slots: IVec2Array, isColumns: boolean) => void = () => {},
 ) {
   const { CustomizationService, LayoutService, WindowsService } = Services;
@@ -92,8 +92,8 @@ export default function useLayout(
 
   function minsFromSlot(slot: LayoutSlot) {
     // If there is no component slotted we return no minimum
-    if (!children[slot]) return { x: 0, y: 0 };
-    return children[slot];
+    if (!children || !children[slot]) return { x: 0, y: 0 };
+    return children[slot].mins;
   }
 
   function calculateMinimum(slots?: ILayoutSlotArray) {

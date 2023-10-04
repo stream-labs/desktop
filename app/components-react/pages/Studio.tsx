@@ -26,7 +26,7 @@ export default function Studio(p: { onTotalWidth: (width: Number) => void }) {
     elements.forEach((el: ELayoutElement) => {
       const Component = LayoutService.views.elementComponent(el);
       const slot = slottedElements[el]?.slot;
-      if (slot) {
+      if (slot && Component) {
         children[slot] = <Component />;
       }
     });
