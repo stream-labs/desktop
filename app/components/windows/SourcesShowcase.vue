@@ -127,14 +127,13 @@
         <NdiSourceIcon slot="media" />
         <p slot="attention-text" class="attention">
           {{ $t('sources.installNdiMessage') }}
-          <button class="button button--primary" @click="downloadNdiRuntime">
+          <button class="button button--secondary" @click="downloadNdiRuntime">
             {{ $t('sources.downloadNdiRuntime') }}
           </button>
         </p>
       </add-source-info>
 
       <div class="source-info" v-if="inspectedSource === null">
-        <AddFileIcon slot="media" />
         <div class="source-info__text">
           <h3>{{ $t('sources.sourcesWelcomeMessage') }}</h3>
           <ol>
@@ -142,6 +141,9 @@
             <li>{{ $t('sources.addSourceProcess2') }}</li>
             <li>{{ $t('sources.addSourceProcess3') }}</li>
           </ol>
+        </div>
+        <div class="source-info__media">
+          <AddFileIcon slot="media" />
         </div>
       </div>
 
@@ -166,7 +168,7 @@
       <div class="modal-layout-controls bottom-sticky">
         <button
           @click="selectInspectedSource()"
-          class="button button--primary"
+          class="button button--secondary"
           :disabled="!readyToAdd"
           data-test="AddSource"
         >
@@ -183,26 +185,46 @@
 @import url('../../styles/index');
 
 .source-info {
+  position: relative;
   display: flex;
-  flex: 0 0 192px;
+  flex: 0 0 180px;
   flex-direction: row;
   flex-wrap: nowrap;
   align-items: center;
-  height: 192px;
-  padding: 0 20px;
-
-  svg {
-    flex: 1;
-    height: 82px;
-  }
+  height: 180px;
+  padding: 0 24px;
+  margin: 16px 16px 0;
+  overflow: hidden;
+  background-color: var(--color-bg-tertiary);
 }
 
-.source-info__text,
-.source-support__list {
-  flex: 2;
+.source-info__text {
+  z-index: @z-index-default-content;
+  max-width: 440px;
 
-  > h3 {
-    font-size: 16px;
+  h3,
+  .desc {
+    margin-bottom: 8px;
+  }
+
+  h3 {
+    display: flex;
+    align-items: center;
+    font-size: @font-size6;
+
+    svg {
+      width: 20px;
+      height: 20px;
+      margin-right: 8px;
+    }
+  }
+
+  ol {
+    margin-bottom: 0;
+  }
+
+  .desc {
+    color: var(--color-text-light);
   }
 }
 </style>
@@ -210,22 +232,35 @@
 <style lang="less" scoped>
 @import url('../../styles/index');
 
+.source-support__list {
+  > h3 {
+    font-size: @font-size6;
+    color: var(--color-text-light);
+  }
+
+  ol {
+    margin-bottom: 0;
+  }
+}
+
 .add-source {
   position: relative;
   display: flex;
   flex-direction: column;
   height: 100%;
+  overflow: hidden;
   color: var(--color-text);
 }
 
 .sources {
   display: flex;
-  flex: 1 0 auto;
   padding: 0 16px;
+  overflow: hidden;
 }
 
 .source-group {
   flex: 0 0 100%;
+  overflow-y: auto;
 }
 
 .source-list {
@@ -264,24 +299,37 @@
 
 .source-info__media {
   display: flex;
-  flex: 0 0 50%;
   align-content: center;
   align-items: center;
   justify-content: center;
-  max-height: 180px;
-  padding-left: 20px;
-  overflow: hidden;
+  margin: 0 8px 0 auto;
   text-align: center;
+
+  svg {
+    width: 120px;
+    height: 120px;
+    color: var(--color-text-dark);
+  }
+
+  [data-type='near'] &,
+  [data-type='custom_cast_ndi_guide'] & {
+    display: none;
+  }
 }
 
 .attention {
   padding-right: 16px;
+  margin-bottom: 0;
   font-size: @font-size2;
-  color: var(--color-text);
+  color: var(--color-text-light);
+
+  .button {
+    margin-top: 8px;
+  }
 }
 
-.bottom-sticky {
-  position: sticky;
-  bottom: 0;
-}
+// .bottom-sticky {
+//   position: sticky;
+//   bottom: 0;
+// }
 </style>
