@@ -62,7 +62,7 @@ class LayoutViews extends ViewHandler<ILayoutServiceState> {
   }
 
   elementComponent(element: ELayoutElement) {
-    if (!element) return;
+    if (!element) return '';
     return ELEMENT_DATA()[element].component;
   }
 

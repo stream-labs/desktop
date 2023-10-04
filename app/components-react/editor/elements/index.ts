@@ -1,7 +1,7 @@
 export { MiniFeed } from './Minifeed';
 export { LegacyEvents } from './LegacyEvents';
-export { SceneSelectorElement as SceneSelector } from './SceneSelector';
-export { SourceSelectorElement as SourceSelector } from './SourceSelector';
+export { SceneSelectorElement } from './SceneSelector';
+export { SourceSelectorElement } from './SourceSelector';
 export { Mixer } from './Mixer';
 export { RecordingPreview } from './RecordingPreview';
 export { StreamPreview } from './StreamPreview';
