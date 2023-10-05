@@ -25,6 +25,7 @@ const sourceIconMap = {
   openvr_capture: 'icon-vr-google',
   liv_capture: 'icon-vr-google',
   ndi_source: 'icon-NDI',
+  custom_cast_ndi_source: 'icon-nvoice-character-source',
   near: 'icon-nvoice-character-source',
   'decklink-input': 'icon-blackmagic',
   vlc_source: 'icon-play',
@@ -75,11 +76,14 @@ export default class SourceSelector extends Vue {
       return 'icon-folder';
     }
     const sourceDetails = this.sourcesService.getSource(sourceId).getComparisonDetails();
-    if (sourceDetails.propertiesManager === 'nvoice-character') {
-      return sourceIconMap[sourceDetails.nVoiceCharacterType || 'near'];
+    switch (sourceDetails.propertiesManager) {
+      case 'nvoice-character':
+        return sourceIconMap[sourceDetails.nVoiceCharacterType || 'near'];
+      case 'custom-cast-ndi':
+        return sourceIconMap['custom_cast_ndi_source'];
+      default:
+        return sourceIconMap[sourceDetails.type] || 'icon-file';
     }
-
-    return sourceIconMap[sourceDetails.type] || 'icon-file';
   }
 
   addSource() {
@@ -105,10 +109,10 @@ export default class SourceSelector extends Vue {
     const sceneNode = this.scene.getNode(sceneNodeId);
     const menuOptions = sceneNode
       ? {
-          selectedSceneId: this.scene.id,
-          sceneNodeId,
-          showSceneItemMenu: true,
-        }
+        selectedSceneId: this.scene.id,
+        sceneNodeId,
+        showSceneItemMenu: true,
+      }
       : { selectedSceneId: this.scene.id };
 
     const menu = new EditMenu(menuOptions);
