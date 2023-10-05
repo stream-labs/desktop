@@ -31,9 +31,9 @@ export default function useLayout(
     chatCollapsed: CustomizationService.state.livedockCollapsed,
   }));
 
-  const [bars, setBars] = useState<{ bar1: number | null; bar2: number | null }>({
-    bar1: null,
-    bar2: null,
+  const [bars, setBars] = useState<{ bar1: number; bar2: number }>({
+    bar1: 0,
+    bar2: 0,
   });
 
   const [resizing, setResizing] = useState(false);
@@ -42,12 +42,13 @@ export default function useLayout(
     const [restSlots, bar1Slots, bar2Slots] = vectorsToSlots();
     const rest = calculateMinimum(restSlots);
     const bar1 = calculateMinimum(bar1Slots);
-    const bar2 = calculateMinimum(bar2Slots);
+    let bar2;
+    if (bar2Slots) bar2 = calculateMinimum(bar2Slots);
     return { rest, bar1, bar2 };
   }, []);
 
   useEffect(() => {
-    console.log('firing', component);
+    console.log('firing', !!component);
     if (!component) return;
     onTotalWidth(mapVectors(vectors), isColumns);
 
@@ -99,8 +100,7 @@ export default function useLayout(
     return childrenMins[slot];
   }
 
-  function calculateMinimum(slots?: ILayoutSlotArray) {
-    if (!slots) return;
+  function calculateMinimum(slots: ILayoutSlotArray) {
     const mins = mapVectors(slots);
     return calculateMin(mins);
   }
