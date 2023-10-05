@@ -420,7 +420,7 @@
     "custom_cast_ndi_not_found": "No NDI® output from CUSTOM CAST",
     "custom_cast_ndi_not_found_2": "Note: NDI® cannot be used if the Windows network profile is set to \"Public\". Please connect to a network with a \"Private\" profile to use it.",
     "network_help_button": {
-      "name": "about network profile",
+      "name": "About network profile",
       "url": "https://support.microsoft.com/en-us/windows/make-a-wi-fi-network-public-or-private-in-windows-0460117d-8d3e-a7ac-f003-7a0da607448d"
     }
   },
