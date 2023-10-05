@@ -168,7 +168,7 @@
       <div class="modal-layout-controls bottom-sticky">
         <button
           @click="selectInspectedSource()"
-          class="button button--secondary"
+          class="button button--primary"
           :disabled="!readyToAdd"
           data-test="AddSource"
         >
