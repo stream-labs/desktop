@@ -1842,7 +1842,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@electron/get@npm:^1.12.4, @electron/get@npm:^1.13.0":
+"@electron/get@npm:^1.12.4":
   version: 1.14.1
   resolution: "@electron/get@npm:1.14.1"
   dependencies:
@@ -1861,6 +1861,25 @@ __metadata:
     global-tunnel-ng:
       optional: true
   checksum: 21fec5e82bbee8f9fa183b46e05675b137c3130c7999d3b2b34a0047d1a06ec3c76347b9bbdb9911ba9b2123697804e360a15dda9db614c0226d5d4dcc4d6d15
+  languageName: node
+  linkType: hard
+
+"@electron/get@npm:^2.0.0":
+  version: 2.0.3
+  resolution: "@electron/get@npm:2.0.3"
+  dependencies:
+    debug: ^4.1.1
+    env-paths: ^2.2.0
+    fs-extra: ^8.1.0
+    global-agent: ^3.0.0
+    got: ^11.8.5
+    progress: ^2.0.3
+    semver: ^6.2.0
+    sumchecker: ^3.0.1
+  dependenciesMeta:
+    global-agent:
+      optional: true
+  checksum: 98f7713e1dda6d1b9d1598890e4e12e38e2d2cb7634e44c31bd494c60a1e97583cdfe4a38408985daaa8deee0a1ea3b6b1add3520874bdb00b6bffba86e7e30d
   languageName: node
   linkType: hard
 
@@ -2763,10 +2782,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^14.6.2":
-  version: 14.18.47
-  resolution: "@types/node@npm:14.18.47"
-  checksum: 249467fa37e60bb7ce631616a5fea53f3b957a6792c6a09f7db7cdff85a7410c9e657dd9fa54bcc9d878e58f35407ce35169b84556f46b2154f90bc71063e1d0
+"@types/node@npm:^16.11.26":
+  version: 16.18.57
+  resolution: "@types/node@npm:16.18.57"
+  checksum: db21a14416de3abce8dfc30d9e9513c505060ef4d197fdc1b1b7374feca3417a7757172d041989fd49910245e9f2d7869201accac3cceee7c75bfdf8759ead6d
   languageName: node
   linkType: hard
 
@@ -5428,7 +5447,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"concat-stream@npm:1.6.2, concat-stream@npm:^1.6.2":
+"concat-stream@npm:1.6.2":
   version: 1.6.2
   resolution: "concat-stream@npm:1.6.2"
   dependencies:
@@ -6438,16 +6457,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron@npm:17.4.11":
-  version: 17.4.11
-  resolution: "electron@npm:17.4.11"
+"electron@npm:22.3.25":
+  version: 22.3.25
+  resolution: "electron@npm:22.3.25"
   dependencies:
-    "@electron/get": ^1.13.0
-    "@types/node": ^14.6.2
-    extract-zip: ^1.0.3
+    "@electron/get": ^2.0.0
+    "@types/node": ^16.11.26
+    extract-zip: ^2.0.1
   bin:
     electron: cli.js
-  checksum: 2aad627183577d514ad79cb3f99eaa24e8acdba74e464eb62e699ebfe0ce1c12a7890ee5d6f2d5ab32daed0e449f9e161a21fb61841b3931438f215e1ad8099e
+  checksum: be8af444bd7c9ca5504a445b660da172831150c0645b3ab46ee867ce6793ec7f77c38e5deb554caf7e4bdf2a910b500a98009a6edbeb3a2a5423a5efd8367a90
   languageName: node
   linkType: hard
 
@@ -7047,7 +7066,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"extract-zip@npm:2.0.1, extract-zip@npm:^2.0.0":
+"extract-zip@npm:2.0.1, extract-zip@npm:^2.0.0, extract-zip@npm:^2.0.1":
   version: 2.0.1
   resolution: "extract-zip@npm:2.0.1"
   dependencies:
@@ -7061,20 +7080,6 @@ __metadata:
   bin:
     extract-zip: cli.js
   checksum: 8cbda9debdd6d6980819cc69734d874ddd71051c9fe5bde1ef307ebcedfe949ba57b004894b585f758b7c9eeeea0e3d87f2dda89b7d25320459c2c9643ebb635
-  languageName: node
-  linkType: hard
-
-"extract-zip@npm:^1.0.3":
-  version: 1.7.0
-  resolution: "extract-zip@npm:1.7.0"
-  dependencies:
-    concat-stream: ^1.6.2
-    debug: ^2.6.9
-    mkdirp: ^0.5.4
-    yauzl: ^2.10.0
-  bin:
-    extract-zip: cli.js
-  checksum: 011bab660d738614555773d381a6ba4815d98c1cfcdcdf027e154ebcc9fc8c9ef637b3ea5c9b2144013100071ee41722ed041fc9aacc60f6198ef747cac0c073
   languageName: node
   linkType: hard
 
@@ -7853,7 +7858,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"got@npm:^11.0.2, got@npm:^11.8.1":
+"got@npm:^11.0.2, got@npm:^11.8.1, got@npm:^11.8.5":
   version: 11.8.6
   resolution: "got@npm:11.8.6"
   dependencies:
@@ -10228,17 +10233,6 @@ __metadata:
   bin:
     mkdirp: bin/cmd.js
   checksum: 3bce20ea525f9477befe458ab85284b0b66c8dc3812f94155af07c827175948cdd8114852ac6c6d82009b13c1048c37f6d98743eb019651ee25c39acc8aabe7d
-  languageName: node
-  linkType: hard
-
-"mkdirp@npm:^0.5.4":
-  version: 0.5.6
-  resolution: "mkdirp@npm:0.5.6"
-  dependencies:
-    minimist: ^1.2.6
-  bin:
-    mkdirp: bin/cmd.js
-  checksum: 0c91b721bb12c3f9af4b77ebf73604baf350e64d80df91754dc509491ae93bf238581e59c7188360cec7cb62fc4100959245a42cfe01834efedc5e9d068376c2
   languageName: node
   linkType: hard
 
@@ -13229,7 +13223,7 @@ __metadata:
     css-element-queries: 1.2.3
     css-loader: 2.1.1
     dotenv: 8.2.0
-    electron: 17.4.11
+    electron: 22.3.25
     electron-builder: 22.14.5
     electron-chromedriver: 17.0.0
     electron-devtools-installer: 3.1.1
