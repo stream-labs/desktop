@@ -54,7 +54,9 @@ export default class AddSource extends Vue {
   selectedSourceId = this.sources[0] ? this.sources[0].sourceId : null;
 
   mounted() {
-    if (this.sourceAddOptions.propertiesManager === 'nvoice-character') {
+    if (this.sourceAddOptions.propertiesManager === 'custom-cast-ndi') {
+      this.name = this.sourcesService.suggestName($t('source-props.custom_cast_ndi_source.name'));
+    } else if (this.sourceAddOptions.propertiesManager === 'nvoice-character') {
       const type = this.sourceAddOptions.propertiesManagerSettings.nVoiceCharacterType || 'near';
       this.name = this.sourcesService.suggestName($t(`source-props.${type}.name`));
     } else {

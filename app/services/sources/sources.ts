@@ -10,6 +10,7 @@ import namingHelpers from 'util/NamingHelpers';
 import { WindowsService } from 'services/windows';
 import { DefaultManager } from './properties-managers/default-manager';
 import { NVoiceCharacterManager } from './properties-managers/nvoice-character-manager';
+import { CustomCastNdiManager } from './properties-managers/custom-cast-ndi-manager';
 import { ScenesService, ISceneItem } from 'services/scenes';
 import {
   IActivePropertyManager,
@@ -24,7 +25,6 @@ import {
 import { $t } from 'services/i18n';
 import { AudioService } from '../audio';
 import uuid from 'uuid/v4';
-import SourceProperties from 'components/windows/SourceProperties.vue';
 import { UserService } from 'services/user';
 import { NVoiceCharacterTypes } from 'services/nvoice-character';
 
@@ -36,6 +36,7 @@ const DoNotDuplicateFlag = obs.ESourceOutputFlags.DoNotDuplicate;
 export const PROPERTIES_MANAGER_TYPES = {
   default: DefaultManager,
   'nvoice-character': NVoiceCharacterManager,
+  'custom-cast-ndi': CustomCastNdiManager,
 };
 
 interface IObsSourceCallbackInfo {
@@ -358,6 +359,15 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     // 'near' is not an obs input type so we have to set it manually
     availableWhitelistedType.push(...(NVoiceCharacterTypes as unknown as TSourceType[]));
 
+    const NDIExists = obsAvailableTypes.includes('ndi_source');
+    if (NDIExists) {
+      // 'custom_cast_ndi_source' is not an obs input type so we have to set it manually
+      availableWhitelistedType.push('custom_cast_ndi_source');
+    } else {
+      // NDI インストール案内を出す
+      availableWhitelistedType.push('custom_cast_ndi_guide');
+    }
+
     const availableWhitelistedSourceType = availableWhitelistedType.map(value => ({
       value,
       description: $t(`source-props.${value}.name`),
@@ -408,6 +418,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       if (source.width !== info.width || source.height !== info.height) {
         const size = { id: source.sourceId, width: info.width, height: info.height };
         this.UPDATE_SOURCE(size);
+        this.sourceUpdated.next(source.getModel());
       }
       this.updateSourceFlags(source, info.flags);
     });
@@ -524,7 +535,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       title: $t('sources.addSourceTitle'),
       size: {
         width: 680,
-        height: 600,
+        height: 650,
       },
     });
   }

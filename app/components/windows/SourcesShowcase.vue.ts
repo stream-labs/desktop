@@ -25,11 +25,12 @@ import WasapiOutputIcon from '../../../media/images/wasapi-output-icon.svg';
 import MonitorCaptureIcon from '../../../media/images/monitor-capture-icon.svg';
 import NdiSourceIcon from '../../../media/images/ndi-icon.svg';
 import BlackmagicSourceIcon from '../../../media/images/blackmagic-icon.svg';
-import NVoiceCharacterSourceIcon from '../../../media/images/nvoice-character-source-icon.svg';
+import CharacterSourceIcon from '../../../media/images/character-source-icon.svg';
 import AppAudioCaptureSourceIcon from '../../../media/images/app-speaker.svg';
 import VLCSourceIcon from '../../../media/images/play.svg';
 import { NVoiceCharacterType, NVoiceCharacterTypes } from 'services/nvoice-character';
 import { omit } from 'lodash';
+import { remote } from 'electron';
 
 type TInspectableSource = TSourceType | NVoiceCharacterType;
 
@@ -58,7 +59,7 @@ interface ISelectSourceOptions {
     MonitorCaptureIcon,
     NdiSourceIcon,
     BlackmagicSourceIcon,
-    NVoiceCharacterSourceIcon,
+    CharacterSourceIcon,
     AppAudioCaptureSourceIcon,
     VLCSourceIcon,
   },
@@ -70,7 +71,16 @@ export default class SourcesShowcase extends Vue {
   @Inject() windowsService: WindowsService;
 
   selectSource(sourceType: TInspectableSource, options: ISelectSourceOptions = {}) {
-    if (NVoiceCharacterTypes.includes(sourceType as NVoiceCharacterType)) {
+    if (!this.readyToAdd) {
+      return;
+    }
+    if (sourceType === 'custom_cast_ndi_source') {
+      const propertiesManagerSettings: Dictionary<any> = {
+        ...omit(options, 'propertiesManager'),
+        propertiesManager: 'custom-cast-ndi',
+      };
+      this.sourcesService.showAddSource('ndi_source', propertiesManagerSettings);
+    } else if (NVoiceCharacterTypes.includes(sourceType as NVoiceCharacterType)) {
       const propertiesManagerSettings: Dictionary<any> = {
         NVoiceCharacterType: sourceType as NVoiceCharacterType,
         ...omit(options, 'propertiesManager'),
@@ -115,5 +125,13 @@ export default class SourcesShowcase extends Vue {
       if (type.value === 'scene' && this.scenesService.scenes.length <= 1) return false;
       return true;
     });
+  }
+
+  downloadNdiRuntime() {
+    remote.shell.openExternal('http://ndi.link/NDIRedistV5');
+  }
+
+  get readyToAdd() {
+    return this.inspectedSource !== null && this.inspectedSource !== 'custom_cast_ndi_guide';
   }
 }

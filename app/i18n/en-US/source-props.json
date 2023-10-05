@@ -370,8 +370,8 @@
     "description": "Add video / audio from Blackmagic device."
   },
   "ndi_source": {
-    "name": "NDI™ Source",
-    "description": "Allow you to capture NDI output streams.",
+    "name": "NDI® Source",
+    "description": "Allow you to capture NDI® output streams.",
     "ndi_source_name": {
       "name": null
     },
@@ -413,5 +413,19 @@
   "vlc_source": {
     "name": "VLC Source",
     "description": "Add playlists of videos to your scene."
+  },
+  "custom_cast_ndi_source": {
+    "name": "CUSTOM CAST",
+    "description": "Add CUSTOM CAST NDI® output stream to your scene.",
+    "custom_cast_ndi_not_found": "No NDI® output from CUSTOM CAST",
+    "custom_cast_ndi_not_found_2": "Note: NDI® cannot be used if the Windows network profile is set to \"Public\". Please connect to a network with a \"Private\" profile to use it.",
+    "network_help_button": {
+      "name": "About network profile",
+      "url": "https://support.microsoft.com/en-us/windows/make-a-wi-fi-network-public-or-private-in-windows-0460117d-8d3e-a7ac-f003-7a0da607448d"
+    }
+  },
+  "custom_cast_ndi_guide": {
+    "name": "CUSTOM CAST",
+    "description": "Add CUSTOM CAST NDI® output stream to your scene."
   }
 }
