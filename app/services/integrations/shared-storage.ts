@@ -106,7 +106,7 @@ export class SharedStorageService extends Service {
 
   validateFile(filepath: string, platform?: string) {
     const stats = fs.lstatSync(filepath);
-    if (platform) {
+    if (platform && PLATFORM_RULES[platform]) {
       if (stats.size > PLATFORM_RULES[platform].size) {
         throw new Error($t('File is too large to upload'));
       }
