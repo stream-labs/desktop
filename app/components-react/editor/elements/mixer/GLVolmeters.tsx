@@ -21,7 +21,8 @@ const WARNING_LEVEL = -20;
 const DANGER_LEVEL = -9;
 
 // Colors (RGB)
-const GREEN = [49, 195, 162];
+const GREEN = [128, 245, 210];
+const LIGHT_MODE_GREEN = [18, 128, 121];
 const YELLOW = [255, 205, 71];
 const RED = [252, 62, 63];
 
@@ -65,8 +66,8 @@ export default function GLVolmeters() {
           top: 0,
           right: 0,
           left: 0,
-          paddingLeft: '32px',
-          paddingRight: '64px',
+          paddingLeft: '16px',
+          paddingRight: '16px',
           height: '100%',
         }}
       />
@@ -320,7 +321,8 @@ class GLVolmetersModule {
     this.gl.uniform1f(dangerLocation, this.dbToUnitScalar(DANGER_LEVEL));
 
     // Set colors
-    this.setColorUniform('u_green', GREEN);
+    const green = this.customizationService.views.isDarkTheme ? GREEN : LIGHT_MODE_GREEN;
+    this.setColorUniform('u_green', green);
     this.setColorUniform('u_yellow', YELLOW);
     this.setColorUniform('u_red', RED);
   }
