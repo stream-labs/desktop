@@ -39,7 +39,8 @@
     }
   }
 
-  &[data-type='custom_cast_ndi_guide'] {
+  &[data-type='custom_cast_ndi_guide'],
+  &[data-type='custom_cast_ndi_source'] {
     background: linear-gradient(90deg, #0264c8 0%, #5aa1ea 66.15%, #add5ff 100%);
 
     &::after {
@@ -77,7 +78,8 @@
   }
 
   [data-type='near'] &,
-  [data-type='custom_cast_ndi_guide'] & {
+  [data-type='custom_cast_ndi_guide'] &,
+  [data-type='custom_cast_ndi_source'] & {
     display: none;
   }
 }

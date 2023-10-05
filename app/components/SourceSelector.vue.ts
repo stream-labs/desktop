@@ -25,8 +25,8 @@ const sourceIconMap = {
   openvr_capture: 'icon-vr-google',
   liv_capture: 'icon-vr-google',
   ndi_source: 'icon-NDI',
-  custom_cast_ndi_source: 'icon-nvoice-character-source',
-  near: 'icon-nvoice-character-source',
+  custom_cast_ndi_source: 'icon-character-source',
+  near: 'icon-character-source',
   'decklink-input': 'icon-blackmagic',
   vlc_source: 'icon-play',
   wasapi_process_output_capture: 'icon-app-speaker',
@@ -109,10 +109,10 @@ export default class SourceSelector extends Vue {
     const sceneNode = this.scene.getNode(sceneNodeId);
     const menuOptions = sceneNode
       ? {
-        selectedSceneId: this.scene.id,
-        sceneNodeId,
-        showSceneItemMenu: true,
-      }
+          selectedSceneId: this.scene.id,
+          sceneNodeId,
+          showSceneItemMenu: true,
+        }
       : { selectedSceneId: this.scene.id };
 
     const menu = new EditMenu(menuOptions);

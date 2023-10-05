@@ -108,7 +108,7 @@
       </add-source-info>
 
       <add-source-info v-if="inspectedSource === 'near'" sourceType="near" key="18">
-        <NVoiceCharacterSourceIcon slot="media" />
+        <CharacterSourceIcon slot="media" />
       </add-source-info>
 
       <add-source-info
@@ -116,7 +116,7 @@
         sourceType="custom_cast_ndi_source"
         key="19"
       >
-        <NdiSourceIcon slot="media" />
+        <CharacterSourceIcon slot="media" />
       </add-source-info>
 
       <add-source-info
@@ -124,7 +124,7 @@
         sourceType="custom_cast_ndi_guide"
         key="20"
       >
-        <NdiSourceIcon slot="media" />
+        <CharacterSourceIcon slot="media" />
         <p slot="attention-text" class="attention">
           {{ $t('sources.installNdiMessage') }}
           <button class="button button--secondary" @click="downloadNdiRuntime">

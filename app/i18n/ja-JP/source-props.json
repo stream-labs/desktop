@@ -416,7 +416,7 @@
   },
   "custom_cast_ndi_source": {
     "name": "カスタムキャスト",
-    "description": "カスタムキャストの配信(NDI®)をシーンに追加します。",
+    "description": "カスタムキャストの配信(NDI<sup>®</sup>)をシーンに追加します。",
     "custom_cast_ndi_not_found": "カスタムキャストからNDI®出力をしてください",
     "custom_cast_ndi_not_found_2": "注意: Windowsのネットワークプロファイルが「パブリック」になっているとNDI®は利用出来ません。プロファイルが「プライベート」のネットワークに接続してご利用ください。",
     "network_help_button": {
