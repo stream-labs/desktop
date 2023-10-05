@@ -9,7 +9,7 @@ export function Default(p: React.PropsWithChildren<LayoutProps>) {
   const componentRef = useRef<HTMLDivElement>(null);
 
   const { mins, bars, resizes, calculateMax, setResizing, setBar } = useLayout(
-    componentRef.current as HTMLElement,
+    componentRef.current as HTMLDivElement,
     vectors,
     false,
     p.childrenMins,

@@ -1,4 +1,4 @@
-import React, { ReactChild, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { LayoutSlot, IVec2Array } from 'services/layout';
 import { useVuex } from 'components-react/hooks';
 import { Services } from 'components-react/service-provider';
@@ -17,7 +17,7 @@ export interface IResizeMins {
 export interface ILayoutSlotArray extends Array<ILayoutSlotArray | LayoutSlot> {}
 
 export default function useLayout(
-  component: HTMLElement,
+  component: HTMLDivElement | null,
   vectors: ILayoutSlotArray,
   isColumns: boolean,
   childrenMins: Dictionary<IVec2>,
@@ -47,6 +47,7 @@ export default function useLayout(
   }, []);
 
   useEffect(() => {
+    console.log('firing', component);
     if (!component) return;
     onTotalWidth(mapVectors(vectors), isColumns);
 
@@ -75,6 +76,7 @@ export default function useLayout(
   }
 
   function getBarPixels(bar: 'bar1' | 'bar2', offset: number) {
+    if (!component) return;
     // Migrate from pixels to proportions
     if ((resizes[bar] as number) >= 1) setBar(bar, resizes[bar] as number);
     const { height, width } = component.getBoundingClientRect();
@@ -83,7 +85,7 @@ export default function useLayout(
   }
 
   function setBar(bar: 'bar1' | 'bar2', val: number) {
-    if (val === 0) return;
+    if (val === 0 || !component) return;
     setBars({ ...bars, [bar]: val });
     const { height, width } = component.getBoundingClientRect();
     const totalSize = isColumns ? width : height;
@@ -121,8 +123,11 @@ export default function useLayout(
       offset = livedockSize * -1;
     }
     const bar1 = getBarPixels('bar1', offset);
-    const bar2 = getBarPixels('bar2', offset);
-    setBars({ bar1, bar2 });
+    if (bar1) setBar('bar1', bar1);
+    if (mins.bar2) {
+      const bar2 = getBarPixels('bar2', offset);
+      if (bar2) setBar('bar2', bar2);
+    }
   }
 
   function calculateMax(restMin: number) {
