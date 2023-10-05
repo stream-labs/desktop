@@ -39,6 +39,9 @@ class SharedStorageServiceViews extends ViewHandler<{}> {
     if (platform === 'typestudio') {
       return `https://podcasteditor.streamlabs.com/storage/${id}`;
     }
+    if (platform === 'videoeditor') {
+      return `https://videoeditor.streamlabs.com/import/${id}`;
+    }
     return '';
   }
 }
