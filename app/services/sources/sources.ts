@@ -535,7 +535,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       title: $t('sources.addSourceTitle'),
       size: {
         width: 680,
-        height: 600,
+        height: 650,
       },
     });
   }
