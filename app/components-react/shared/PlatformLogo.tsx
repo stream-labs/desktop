@@ -27,6 +27,7 @@ export default function PlatformLogo(p: IProps & HTMLAttributes<unknown>) {
       trovo: 'fab fa-trovo',
       dlive: 'dlive',
       nimotv: 'nimotv',
+      twitter: 'twitter',
       streamlabs: 'icon-streamlabs',
     }[p.platform];
   }

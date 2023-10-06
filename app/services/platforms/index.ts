@@ -2,6 +2,7 @@ import { ITwitchStartStreamOptions, TwitchService } from './twitch';
 import { IYoutubeStartStreamOptions, YoutubeService } from './youtube';
 import { FacebookService, IFacebookStartStreamOptions } from './facebook';
 import { ITiktokStartStreamOptions, TiktokService } from './tiktok';
+import { TwitterPlatformService } from './twitter';
 import { TTwitchOAuthScope } from './twitch/index';
 import { IGoLiveSettings } from 'services/streaming';
 import { WidgetType } from '../widgets';
@@ -227,9 +228,10 @@ export enum EPlatform {
   Facebook = 'facebook',
   TikTok = 'tiktok',
   Trovo = 'trovo',
+  Twitter = 'twitter',
 }
 
-export type TPlatform = 'twitch' | 'youtube' | 'facebook' | 'tiktok' | 'trovo';
+export type TPlatform = 'twitch' | 'youtube' | 'facebook' | 'tiktok' | 'trovo' | 'twitter';
 
 export const platformList = [
   EPlatform.Facebook,
@@ -237,6 +239,7 @@ export const platformList = [
   EPlatform.Trovo,
   EPlatform.Twitch,
   EPlatform.YouTube,
+  EPlatform.Twitter,
 ];
 
 export const platformLabels = (platform: TPlatform | string) =>
@@ -255,6 +258,7 @@ export function getPlatformService(platform: TPlatform): IPlatformService {
     facebook: FacebookService.instance,
     tiktok: TiktokService.instance,
     trovo: TrovoService.instance,
+    twitter: TwitterPlatformService.instance,
   }[platform];
 }
 

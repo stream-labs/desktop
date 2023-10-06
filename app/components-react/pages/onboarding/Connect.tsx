@@ -52,7 +52,7 @@ export function Connect() {
 
   const platforms = RecordingModeService.views.isRecordingModeEnabled
     ? ['streamlabs', 'youtube']
-    : ['streamlabs', 'twitch', 'youtube', 'facebook', 'trovo'];
+    : ['streamlabs', 'twitch', 'youtube', 'facebook', 'trovo', 'twitter'];
 
   return (
     <div className={styles.pageContainer}>
