@@ -249,6 +249,7 @@ export const platformLabels = (platform: TPlatform | string) =>
     [EPlatform.Facebook]: $t('Facebook'),
     [EPlatform.TikTok]: $t('TikTok'),
     [EPlatform.Trovo]: $t('Trovo'),
+    [EPlatform.Twitter]: 'Twitter',
   }[platform]);
 
 export function getPlatformService(platform: TPlatform): IPlatformService {
