@@ -298,6 +298,9 @@ export default class LiveDock extends Vue {
   }
 
   get canEditChannelInfo(): boolean {
+    // Twitter doesn't support editing title after going live
+    if (this.isTwitter && !this.isRestreaming) return false;
+
     return (
       this.streamingService.views.isMidStreamMode ||
       this.userService.state.auth?.primaryPlatform === 'twitch'
