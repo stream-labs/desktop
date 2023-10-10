@@ -83,6 +83,28 @@ export class MarkersService extends PersistentStatefulService<IMarkersServiceSta
     });
   }
 
+  parseCSV(filepath: string) {
+    const bookmarksArray: { text: string; starts_at: number }[] = [];
+    return new Promise((resolve, reject) => {
+      const stream = fs.createReadStream(filepath);
+      stream.on('line', row => {
+        if (/Timecode In,Timecode Out/.test(row)) return;
+        const els = row.split(',');
+        const timestamp: number[] = els[1].split(':').map(Number);
+        const ms = timestamp.reverse().reduce((prev, current, idx) => {
+          if (idx === 0) return prev + current * 10;
+          return prev + current * 1000 * 60 ** (idx - 1);
+        }, 0);
+        bookmarksArray.push({
+          text: els[8],
+          starts_at: ms,
+        });
+      });
+      stream.on('error', err => reject(err));
+      stream.on('close', () => resolve(bookmarksArray));
+    });
+  }
+
   setMarkerName(marker: string, value: string) {
     this.SET_MARKER_NAME(marker, value);
   }
