@@ -88,8 +88,6 @@ export class TwitterPlatformService
   }
 
   async afterStopStream(): Promise<void> {
-    await super.afterGoLive();
-
     if (this.state.broadcastId) {
       await this.endStream(this.state.broadcastId);
     }
