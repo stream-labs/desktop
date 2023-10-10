@@ -4,6 +4,8 @@
 
   "windowCaptureMessage": "※Google Chromeの場合、設定のハードウェアアクセラレーションが有効だとキャプチャできないことがあります。",
   "gameCaptureMessage": "※PCゲームの種類によってはキャプチャできない場合があります。その際はウィンドウキャプチャをお試しください。",
+  "installNdiMessage": "※NDI®を使用するには、NDI®のウィブサイトから NDI® Toolsまたは NDI® Runtimeをダウンロード、インストールしてWindowsを再起動してください。",
+  "downloadNdiRuntime": "NDI® Runtimeをブラウザでダウンロードする",
 
   "sourcesWelcomeMessage": "ここではシーンに追加するソースを選択できます。",
   "addSourceProcess1": "追加したいソースを下記の中から選んでください。",

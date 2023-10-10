@@ -111,10 +111,12 @@ export type TSourceType =
   | 'ovrstream_dc_source'
   | 'vlc_source'
   | 'wasapi_process_output_capture'
+  | 'custom_cast_ndi_source'
+  | 'custom_cast_ndi_guide'
   ;
 
 // Register new properties manager here
-export type TPropertiesManager = 'default' | 'nvoice-character';
+export type TPropertiesManager = 'default' | 'nvoice-character' | 'custom-cast-ndi';
 
 export function isNoAudioPropertiesManagerType(propertiesManagerType: TPropertiesManager): boolean {
   return ['nvoice-character'].includes(propertiesManagerType);

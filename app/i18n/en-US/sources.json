@@ -4,6 +4,8 @@
 
   "windowCaptureMessage": "If you can not capture please turn off hardware acceleration from Google Chrome settings.",
   "gameCaptureMessage": "Some games may not properly be captured. Try window capture in such case.",
+  "installNdiMessage": "Please install NDI® Tools/Runtime from NDI® website and restart Windows.",
+  "downloadNdiRuntime": "Download NDI® Runtime on your browser",
 
   "sourcesWelcomeMessage": "Welcome to sources!",
   "addSourceProcess1": "Browse through our sources",

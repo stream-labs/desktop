@@ -236,6 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
     Vue.use(VueI18n);
     const i18nService: I18nService = I18nService.instance;
     await i18nService.load(); // load translations from a disk
+    const notFoundKeys = new Set<string>();
 
     const i18n = new VueI18n({
       locale: i18nService.state.locale,
@@ -248,7 +249,10 @@ document.addEventListener('DOMContentLoaded', () => {
             // this adds huge amount of lines to console.
 
             // console.warn(`i18n missing key - ${key}: ${values[0].fallback}`);
-            console.warn(`i18n missing key - ${key}: (フォールバックなし)`);
+            if (!notFoundKeys.has(key)) {
+              notFoundKeys.add(key);
+              console.warn(`i18n missing key - ${key}: (フォールバックなし)`);
+            }
           }
           return values[0].fallback;
         }
