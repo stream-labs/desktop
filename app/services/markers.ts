@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import moment from 'moment';
 import { Inject, mutation, PersistentStatefulService, ViewHandler } from 'services/core';
 import { UsageStatisticsService } from './usage-statistics';
 import { $t } from './i18n';
@@ -90,11 +91,9 @@ export class MarkersService extends PersistentStatefulService<IMarkersServiceSta
       stream.on('line', row => {
         if (/Timecode In,Timecode Out/.test(row)) return;
         const els = row.split(',');
-        const timestamp: number[] = els[1].split(':').map(Number);
-        const ms = timestamp.reverse().reduce((prev, current, idx) => {
-          if (idx === 0) return prev + current * 10;
-          return prev + current * 1000 * 60 ** (idx - 1);
-        }, 0);
+        const timestampArr: number[] = els[1].split(':');
+        timestampArr.pop(); // The last element is always 0 hundredths of a second
+        const ms = moment.duration(timestampArr.join(':')).milliseconds();
         bookmarksArray.push({
           text: els[8],
           starts_at: ms,
