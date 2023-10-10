@@ -114,7 +114,8 @@ export default class Utils {
   }
 
   static shouldUseBeta(): boolean {
-    return Utils.env.SLD_USE_BETA as boolean;
+    return true;
+    // return Utils.env.SLD_USE_BETA as boolean;
   }
 
   /**

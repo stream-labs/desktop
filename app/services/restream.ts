@@ -15,6 +15,7 @@ import { TrovoService } from './platforms/trovo';
 import * as remote from '@electron/remote';
 import { VideoSettingsService, TDisplayType } from './settings-v2/video';
 import { DualOutputService } from './dual-output';
+import { TwitterPlatformService } from './platforms/twitter';
 
 export type TOutputOrientation = 'landscape' | 'portrait';
 interface IRestreamTarget {
@@ -54,6 +55,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
   @Inject() trovoService: TrovoService;
   @Inject() videoSettingsService: VideoSettingsService;
   @Inject() dualOutputService: DualOutputService;
+  @Inject('TwitterPlatformService') twitterService: TwitterPlatformService;
 
   settings: IUserSettingsResponse;
 
@@ -271,6 +273,14 @@ export class RestreamService extends StatefulService<IRestreamState> {
       tikTokTarget.platform = 'relay';
       tikTokTarget.streamKey = `${ttSettings.serverUrl}/${ttSettings.streamKey}`;
       tikTokTarget.mode = this.dualOutputService.views.getPlatformMode('tiktok');
+    }
+
+    // treat twitter as a custom destination
+    const twitterTarget = newTargets.find(t => t.platform === 'twitter');
+    if (twitterTarget) {
+      twitterTarget.platform = 'relay';
+      twitterTarget.streamKey = `${this.twitterService.state.ingest}/${this.twitterService.state.streamKey}`;
+      twitterTarget.mode = this.dualOutputService.views.getPlatformMode('twitter');
     }
 
     await this.createTargets(newTargets);

@@ -71,6 +71,7 @@ export { TiktokService } from 'services/platforms/tiktok';
 export { TrovoService } from 'services/platforms/trovo';
 export { RestreamService } from 'services/restream';
 export { TwitterService } from 'services/integrations/twitter';
+export { TwitterPlatformService } from 'services/platforms/twitter';
 export { UsageStatisticsService } from './services/usage-statistics';
 export { GameOverlayService } from 'services/game-overlay';
 export { SharedStorageService } from 'services/integrations/shared-storage';
@@ -138,6 +139,7 @@ import { TwitterService } from './services/integrations/twitter';
 import { SettingsService } from './services/settings';
 import { UserService } from './services/user';
 import { TwitchService } from './services/platforms/twitch';
+import { TwitterPlatformService } from './services/platforms/twitter';
 import { TwitchTagsService } from './services/platforms/twitch/index';
 import { TrovoService } from './services/platforms/trovo';
 import { YoutubeService } from './services/platforms/youtube';
@@ -217,6 +219,7 @@ export const AppServices = {
   FacebookService,
   UserService,
   TwitchService,
+  TwitterPlatformService,
   TwitchTagsService,
   TrovoService,
   DismissablesService,

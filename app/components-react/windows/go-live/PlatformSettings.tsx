@@ -11,6 +11,7 @@ import { TiktokEditStreamInfo } from './platforms/TiktokEditStreamInfo';
 import { IPlatformComponentParams, TLayoutMode } from './platforms/PlatformSettingsLayout';
 import { getDefined } from '../../../util/properties-type-guards';
 import { TrovoEditStreamInfo } from './platforms/TrovoEditStreamInfo';
+import { TwitterEditStreamInfo } from './platforms/TwitterEditStreamInfo';
 
 export default function PlatformSettings() {
   const {
@@ -94,6 +95,9 @@ export default function PlatformSettings() {
                 <TiktokEditStreamInfo {...createPlatformBinding('tiktok')} />
               )}
               {platform === 'trovo' && <TrovoEditStreamInfo {...createPlatformBinding('trovo')} />}
+              {platform === 'twitter' && (
+                <TwitterEditStreamInfo {...createPlatformBinding('twitter')} />
+              )}
             </Section>
           ))}
         </div>

@@ -19,24 +19,18 @@ import { IVideo } from 'obs-studio-node';
 
 interface ITwitterServiceState extends IPlatformState {
   settings: ITwitterStartStreamOptions;
-  userInfo: ITwitterUserInfo;
-  channelInfo: { gameId: string; gameName: string; gameImage: string };
+  broadcastId: string;
+  ingest: string;
 }
 
-export interface ITwitterStartStreamOptions {}
-
-interface ITwitterChannelInfo {
-  live_title: string;
-  category_id: string;
-  category_name: string;
-  stream_key: string;
-  current_viewers: number;
-  followers: number;
+export interface ITwitterStartStreamOptions {
+  title: string;
 }
 
-interface ITwitterUserInfo {
-  userId: string;
-  channelId: string;
+interface ITwitterStartStreamResponse {
+  id: string;
+  key: string;
+  rtmp: string;
 }
 
 @InheritMutations()
@@ -45,17 +39,16 @@ export class TwitterPlatformService
   implements IPlatformService {
   static initialState: ITwitterServiceState = {
     ...BasePlatformService.initialState,
-    settings: { title: '', game: '', mode: undefined },
-    userInfo: { userId: '', channelId: '' },
-    channelInfo: { gameId: '', gameName: '', gameImage: '' },
+    settings: { title: '' },
+    broadcastId: '',
+    ingest: '',
   };
 
-  readonly capabilities = new Set<TPlatformCapability>([]);
+  readonly capabilities = new Set<TPlatformCapability>(['title']);
   readonly apiBase = 'https://api.twitter.com/2';
   readonly platform = 'twitter';
-  readonly displayName = 'X';
+  readonly displayName = 'X (Twitter)';
   readonly gameImageSize = { width: 30, height: 40 };
-  rtmpServer = '';
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions = {
     width: 600,
@@ -73,25 +66,37 @@ export class TwitterPlatformService
   }
 
   async beforeGoLive(goLiveSettings: IGoLiveSettings, context?: TDisplayType) {
-    const twSettings = getDefined(goLiveSettings.platforms.trovo);
+    const title = getDefined(goLiveSettings.platforms.twitter).title;
+    const streamInfo = await this.startStream(title);
 
-    const key = this.state.streamKey;
+    this.SET_STREAM_KEY(streamInfo.key);
+    this.SET_BROADCAST_ID(streamInfo.id);
+    this.SET_INGEST(streamInfo.rtmp);
+
     if (!this.streamingService.views.isMultiplatformMode) {
       this.streamSettingsService.setSettings(
         {
           streamType: 'rtmp_custom',
-          key,
-          server: this.rtmpServer,
+          key: streamInfo.key,
+          server: streamInfo.rtmp,
         },
         context,
       );
     }
 
-    await this.putChannelInfo(twSettings);
-
     this.setPlatformContext('twitter');
   }
 
+  async afterStopStream(): Promise<void> {
+    await super.afterGoLive();
+
+    if (this.state.broadcastId) {
+      await this.endStream(this.state.broadcastId);
+    }
+  }
+
+  // Note, this needs to be here but should never be called, because we
+  // currently don't make any calls directly to Twitter
   fetchNewToken(): Promise<void> {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/twitter/refresh`;
@@ -116,55 +121,45 @@ export class TwitterPlatformService
     }
   }
 
+  async startStream(title: string) {
+    const host = this.hostsService.streamlabs;
+    const url = `https://${host}/api/v5/slobs/twitter/stream/start`;
+    const headers = authorizedHeaders(this.userService.apiToken!);
+    const body = new FormData();
+    body.append('title', title);
+    const request = new Request(url, { headers, method: 'POST', body });
+
+    return jfetch<ITwitterStartStreamResponse>(request);
+  }
+
+  async endStream(id: string) {
+    const host = this.hostsService.streamlabs;
+    const url = `https://${host}/api/v5/slobs/twitter/stream/${id}/end`;
+    const headers = authorizedHeaders(this.userService.apiToken!);
+    const request = new Request(url, { headers, method: 'POST' });
+
+    return jfetch<{}>(request);
+  }
+
   /**
    * prepopulate channel info and save it to the store
    */
   async prepopulateInfo(): Promise<void> {
-    const channelInfo = await this.fetchChannelInfo();
-    const userInfo = await this.requestTwitter<ITwitterUserInfo>(`${this.apiBase}/getuserinfo`);
-    this.SET_STREAM_SETTINGS({ title: channelInfo.live_title, game: channelInfo.category_id });
-    this.SET_USER_INFO(userInfo);
-    this.SET_STREAM_KEY(channelInfo.stream_key.replace('live/', ''));
-    // TODO: the order of mutations is corrupted for the GoLive window
-    // adding a sleep() call here to ensure the "SET_PREPOPULATED" will come in the last place
-    await Utils.sleep(50);
+    // We don't prepopulate anything for Twitter
+
     this.SET_PREPOPULATED(true);
   }
 
   async putChannelInfo(settings: ITwitterStartStreamOptions): Promise<void> {
-    const channel_id = this.state.userInfo.channelId;
-    this.UPDATE_STREAM_SETTINGS(settings);
-    await this.requestTwitter<ITwitterChannelInfo>({
-      url: '',
-      method: 'POST',
-      body: JSON.stringify({}),
-    });
-  }
-
-  private fetchChannelInfo(): Promise<ITwitterChannelInfo> {
-    return this.requestTwitter<ITwitterChannelInfo>('');
+    // TODO: This is not currently possible to do on Twitter
   }
 
   getHeaders() {
-    const token = this.userService.state.auth!.platforms.twitter?.token;
-    return {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      'Client-ID': '4f78d282c0f72dc3143da8278f697fc4',
-      ...(token ? { Authorization: `OAuth ${token}` } : {}),
-    };
+    return {};
   }
 
   get liveDockEnabled(): boolean {
     return true;
-  }
-
-  async fetchViewerCount(): Promise<number> {
-    return (await this.fetchChannelInfo()).current_viewers;
-  }
-
-  async fetchFollowers(): Promise<number> {
-    return (await this.fetchChannelInfo()).followers;
   }
 
   get streamPageUrl() {
@@ -176,12 +171,12 @@ export class TwitterPlatformService
   }
 
   @mutation()
-  private SET_USER_INFO(userInfo: ITwitterUserInfo) {
-    this.state.userInfo = userInfo;
+  SET_BROADCAST_ID(id: string) {
+    this.state.broadcastId = id;
   }
 
   @mutation()
-  private SET_CHANNEL_INFO(info: ITwitterServiceState['channelInfo']) {
-    this.state.channelInfo = info;
+  SET_INGEST(ingest: string) {
+    this.state.ingest = ingest;
   }
 }

@@ -21,6 +21,9 @@ export default class PlatformLogo extends TsxComponent<LogoProps> {
       nimotv: 'nimotv',
       streamlabs: 'icon-streamlabs',
       trovo: 'trovo',
+
+      // TODO: X Logo, not twitter
+      twitter: 'fab fa-twitter',
     }[this.props.platform];
   }
 
