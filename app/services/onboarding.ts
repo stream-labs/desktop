@@ -13,10 +13,11 @@ import Utils from './utils';
 import { RecordingModeService } from './recording-mode';
 import * as remote from '@electron/remote';
 import { Subject } from 'rxjs';
+import { Stream } from 'stream';
 
 enum EOnboardingSteps {
   MacPermissions = 'MacPermissions',
-  SteamingOrRecording = 'StreamingOrRecording',
+  StreamingOrRecording = 'StreamingOrRecording',
   Connect = 'Connect',
   PrimaryPlatformSelect = 'PrimaryPlatformSelect',
   FreshOrImport = 'FreshOrImport',
@@ -25,6 +26,7 @@ enum EOnboardingSteps {
   ThemeSelector = 'ThemeSelector',
   Optimize = 'Optimize',
   Prime = 'Prime',
+  Tips = 'Tips',
 }
 
 export const ONBOARDING_STEPS = () => ({
@@ -34,8 +36,9 @@ export const ONBOARDING_STEPS = () => ({
     hideSkip: true,
     hideButton: true,
     isPreboarding: true,
+    cond: () => process.platform === OS.Mac,
   },
-  [EOnboardingSteps.SteamingOrRecording]: {
+  [EOnboardingSteps.StreamingOrRecording]: {
     component: 'StreamingOrRecording',
     disableControls: true,
     hideSkip: true,
@@ -55,6 +58,7 @@ export const ONBOARDING_STEPS = () => ({
     hideSkip: true,
     hideButton: true,
     isPreboarding: true,
+    cond: ({ isPartialSLAuth }: OnboardingStepContext) => isPartialSLAuth,
   },
   [EOnboardingSteps.FreshOrImport]: {
     component: 'FreshOrImport',
@@ -62,6 +66,8 @@ export const ONBOARDING_STEPS = () => ({
     hideSkip: true,
     hideButton: true,
     isPreboarding: true,
+    cond: ({ isObsInstalled, recordingModeEnabled }: OnboardingStepContext) =>
+      isObsInstalled && !recordingModeEnabled,
   },
   [EOnboardingSteps.ObsImport]: {
     component: 'ObsImport',
@@ -69,6 +75,8 @@ export const ONBOARDING_STEPS = () => ({
     hideSkip: false,
     hideButton: true,
     label: $t('Import'),
+    cond: ({ importedFromObs, isObsInstalled }: OnboardingStepContext) =>
+      importedFromObs && isObsInstalled,
   },
   [EOnboardingSteps.HardwareSetup]: {
     component: 'HardwareSetup',
@@ -76,6 +84,7 @@ export const ONBOARDING_STEPS = () => ({
     hideSkip: false,
     hideButton: false,
     label: $t('Set Up Mic and Webcam'),
+    cond: ({ importedFromObs }: OnboardingStepContext) => !importedFromObs,
   },
   [EOnboardingSteps.ThemeSelector]: {
     component: 'ThemeSelector',
@@ -83,6 +92,17 @@ export const ONBOARDING_STEPS = () => ({
     hideSkip: false,
     hideButton: true,
     label: $t('Add a Theme'),
+    cond: ({
+      isLoggedIn,
+      existingSceneCollections,
+      importedFromObs,
+      recordingModeEnabled,
+      platformSupportsThemes,
+    }: OnboardingStepContext) =>
+      !existingSceneCollections &&
+      !importedFromObs &&
+      !recordingModeEnabled &&
+      ((isLoggedIn && platformSupportsThemes) || !isLoggedIn),
   },
   // Temporarily skip auto config until migration to new API
   // [EOnboardingSteps.Optimize]: {
@@ -91,6 +111,7 @@ export const ONBOARDING_STEPS = () => ({
   //   hideSkip: false,
   //   hideButton: true,
   //   label: $t('Optimize'),
+  //   cond: ({ isTwitchAuthed, isYoutubeAuthed, recordingModeEnabled }: OnboardingStepContext) => isTwitchAuthed || isYoutubeAuthed || recordingModeEnabled,
   // },
   [EOnboardingSteps.Prime]: {
     component: 'Prime',
@@ -98,6 +119,16 @@ export const ONBOARDING_STEPS = () => ({
     hideSkip: false,
     hideButton: true,
     label: $t('Ultra'),
+  },
+  [EOnboardingSteps.Tips]: {
+    component: 'Tips',
+    disableControls: false,
+    hideSkip: true,
+    hideButton: true,
+    cond: ({ streamerKnowledgeMode }: OnboardingStepContext) =>
+      [StreamerKnowledgeMode.BEGINNER, StreamerKnowledgeMode.INTERMEDIATE].includes(
+        streamerKnowledgeMode,
+      ),
   },
 });
 
@@ -126,6 +157,18 @@ const THEME_METADATA = {
   },
 };
 
+interface OnboardingStepContext {
+  streamerKnowledgeMode: StreamerKnowledgeMode | null;
+  isPartialSLAuth: boolean;
+  existingSceneCollections: boolean;
+  isObsInstalled: boolean;
+  recordingModeEnabled: boolean;
+  importedFromObs: boolean;
+  isLoggedIn: boolean;
+  isUltra: boolean;
+  platformSupportsThemes: boolean;
+}
+
 export interface IOnboardingStep {
   component: string;
   disableControls: boolean;
@@ -133,6 +176,7 @@ export interface IOnboardingStep {
   hideButton: boolean;
   label?: string;
   isPreboarding?: boolean;
+  cond?: (ctx: OnboardingStepContext) => boolean;
 }
 
 interface IOnboardingOptions {
@@ -143,10 +187,16 @@ interface IOnboardingOptions {
   isImport: boolean; // When users are importing from OBS
 }
 
+export enum StreamerKnowledgeMode {
+  BEGINNER = 'BEGINNER',
+  INTERMEDIATE = 'INTERMEDIATE',
+  ADVANCED = 'ADVANCED',
+}
 interface IOnboardingServiceState {
   options: IOnboardingOptions;
   importedFromObs: boolean;
   existingSceneCollections: boolean;
+  streamerKnowledgeMode: StreamerKnowledgeMode | null;
 }
 
 export interface IThemeMetadata {
@@ -172,56 +222,104 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
   }
 
   get steps() {
-    const steps: IOnboardingStep[] = [];
     const userViews = this.getServiceViews(UserService);
     const isOBSinstalled = this.getServiceViews(ObsImporterService).isOBSinstalled();
     const recordingModeEnabled = this.getServiceViews(RecordingModeService).isRecordingModeEnabled;
 
-    if (process.platform === OS.Mac) {
-      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.MacPermissions]);
+    const streamerKnowledgeMode = this.streamerKnowledgeMode;
+
+    const { existingSceneCollections, importedFromObs } = this.state;
+    const { isLoggedIn, isPrime: isUltra } = userViews;
+
+    const ctx: OnboardingStepContext = {
+      streamerKnowledgeMode,
+      recordingModeEnabled,
+      existingSceneCollections,
+      importedFromObs,
+      isLoggedIn,
+      isUltra,
+      isObsInstalled: isOBSinstalled,
+      isPartialSLAuth: userViews.auth && userViews.isPartialSLAuth,
+      platformSupportsThemes: getPlatformService(userViews.platform.type)?.hasCapability('themes'),
+    };
+
+    return this.getStepsForMode(streamerKnowledgeMode)(ctx);
+  }
+
+  getStepsForMode(mode: StreamerKnowledgeMode) {
+    const { getSteps } = this;
+
+    switch (mode) {
+      case StreamerKnowledgeMode.BEGINNER:
+        return getSteps([
+          EOnboardingSteps.MacPermissions,
+          EOnboardingSteps.StreamingOrRecording,
+          EOnboardingSteps.Connect,
+          EOnboardingSteps.PrimaryPlatformSelect,
+          EOnboardingSteps.FreshOrImport,
+          EOnboardingSteps.ObsImport,
+          EOnboardingSteps.HardwareSetup,
+          EOnboardingSteps.ThemeSelector,
+          EOnboardingSteps.Prime,
+          EOnboardingSteps.Tips,
+        ]);
+      case StreamerKnowledgeMode.INTERMEDIATE:
+        /*
+         * Yes, these are the same as beginner, only inner screens are supposed to differ,
+         * but the one screen that was provided is currently disabled (Optimizer), and the
+         * other one is yet to be implemented (Tips).
+         * Nevertheless, this sets the foundation for future changes.
+         */
+        return getSteps([
+          EOnboardingSteps.MacPermissions,
+          EOnboardingSteps.StreamingOrRecording,
+          EOnboardingSteps.Connect,
+          EOnboardingSteps.PrimaryPlatformSelect,
+          EOnboardingSteps.FreshOrImport,
+          EOnboardingSteps.ObsImport,
+          EOnboardingSteps.HardwareSetup,
+          EOnboardingSteps.ThemeSelector,
+          EOnboardingSteps.Prime,
+          EOnboardingSteps.Tips,
+        ]);
+      case StreamerKnowledgeMode.ADVANCED:
+        return getSteps([
+          EOnboardingSteps.FreshOrImport,
+          EOnboardingSteps.ObsImport,
+          EOnboardingSteps.HardwareSetup,
+          EOnboardingSteps.Prime,
+        ]);
+      default:
+        return getSteps([
+          EOnboardingSteps.MacPermissions,
+          EOnboardingSteps.StreamingOrRecording,
+          EOnboardingSteps.Connect,
+          EOnboardingSteps.PrimaryPlatformSelect,
+          EOnboardingSteps.FreshOrImport,
+          EOnboardingSteps.ObsImport,
+          EOnboardingSteps.HardwareSetup,
+          EOnboardingSteps.ThemeSelector,
+          EOnboardingSteps.Prime,
+        ]);
     }
+  }
 
-    steps.push(ONBOARDING_STEPS()[EOnboardingSteps.SteamingOrRecording]);
+  getSteps(stepNames: EOnboardingSteps[]) {
+    return (ctx: OnboardingStepContext): IOnboardingStep[] => {
+      const steps = stepNames.map(step => ONBOARDING_STEPS()[step]);
 
-    steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Connect]);
+      return steps.reduce((acc, step: IOnboardingStep) => {
+        if (!step.cond || (step.cond && step.cond(ctx))) {
+          acc.push(step);
+        }
 
-    if (userViews.auth && userViews.isPartialSLAuth) {
-      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.PrimaryPlatformSelect]);
-    }
+        return acc;
+      }, [] as IOnboardingStep[]);
+    };
+  }
 
-    if (isOBSinstalled && !recordingModeEnabled) {
-      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.FreshOrImport]);
-    }
-
-    if (this.state.importedFromObs && isOBSinstalled) {
-      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ObsImport]);
-    } else {
-      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.HardwareSetup]);
-    }
-
-    if (
-      !this.state.existingSceneCollections &&
-      !this.state.importedFromObs &&
-      !recordingModeEnabled &&
-      ((userViews.isLoggedIn &&
-        getPlatformService(userViews.platform.type).hasCapability('themes')) ||
-        !userViews.isLoggedIn)
-    ) {
-      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ThemeSelector]);
-    }
-
-    /**
-     * Temporarily disable optimizer until migrated to the new API
-     */
-    // if (userViews.isTwitchAuthed || userViews.isYoutubeAuthed || recordingModeEnabled) {
-    //   steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Optimize]);
-    // }
-
-    if (!userViews.isPrime) {
-      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Prime]);
-    }
-
-    return steps;
+  get streamerKnowledgeMode() {
+    return this.state.streamerKnowledgeMode;
   }
 }
 
@@ -235,6 +333,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
     },
     importedFromObs: false,
     existingSceneCollections: false,
+    streamerKnowledgeMode: null,
   };
 
   localStorageKey = 'UserHasBeenOnboarded';
@@ -261,13 +360,18 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
     this.state.existingSceneCollections = val;
   }
 
+  @mutation()
+  SET_STREAMER_KNOWLEDGE_MODE(val: StreamerKnowledgeMode) {
+    this.state.streamerKnowledgeMode = val;
+  }
+
   async fetchThemeData(id: string) {
     const url = `https://overlays.streamlabs.com/api/overlay/${id}`;
     return jfetch<IThemeMetadata>(url);
   }
 
   async fetchThemes() {
-    return await Promise.all(Object.keys(this.themeMetadata).map(this.fetchThemeData));
+    return await Promise.all(Object.keys(this.themeMetadata).map(id => this.fetchThemeData(id)));
   }
 
   get themeMetadata() {
@@ -305,8 +409,10 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
     this.SET_EXISTING_COLLECTIONS(this.existingSceneCollections);
   }
 
-  // A login attempt is an abbreviated version of the onboarding process,
-  // and some steps should be skipped.
+  setStreamerKnowledgeMode(val: StreamerKnowledgeMode | null) {
+    this.SET_STREAMER_KNOWLEDGE_MODE(val);
+  }
+
   start(options: Partial<IOnboardingOptions> = {}) {
     const actualOptions: IOnboardingOptions = {
       isLogin: false,
@@ -350,6 +456,8 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   }
 
   startOnboardingIfRequired() {
+    this.start();
+    return true;
     // Useful for testing in dev env
     if (Utils.env.SLD_FORCE_ONBOARDING_STEP) {
       this.start();
@@ -364,3 +472,77 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
     return true;
   }
 }
+/*
+import { createMachine, assign, actions } from 'xstate';
+const onboardingMachine = createMachine(
+  {
+    id: 'onboarding',
+    initial: 'starting',
+    predictableActionArguments: true,
+    context: {
+      usageMode: null,
+    },
+    states: {
+      starting: {
+        on: {
+          NEXT: [{ target: 'macPermissions', cond: 'isMac' }, { target: 'chooseOnboardingModes' }],
+        },
+      },
+      macPermissions: {
+        on: {
+          NEXT: { target: 'chooseOnboardingModes' },
+        },
+      },
+      chooseOnboardingModes: {
+        initial: 'chooseUsageMode',
+        states: {
+          chooseUsageMode: {
+            description: 'Choose Streaming or Recording Mode',
+            on: {
+              CHOOSE_STREAMING: {
+                target: '.streaming',
+                description: 'Choose Streaming Mode',
+              },
+              CHOOSE_RECORDING: {
+                target: '.recording',
+                description: 'Choose Recording Mode',
+              },
+            },
+            states: {
+              streaming: {
+                always: '../chooseKnowledgeLevel',
+              },
+              recording: {
+                always: '../chooseKnowledgeLevel',
+              },
+            },
+          },
+          chooseKnowledgeLevel: {
+            description: 'Choose Streamer Knowledge Level',
+            on: {
+              CHOOSE_BEGINNER: '../beginnerOnboarding',
+              CHOOSE_INTERMEDIATE: '../intermediateOnboarding',
+              CHOOSE_ADVANCED: '../advancedOnboarding',
+            },
+          },
+        },
+      },
+      loginOrSignup: {},
+      beginnerOnboarding: {
+        on: {
+          NEXT: 'loginOrSignup',
+        },
+      },
+      intermediateOnboarding: {},
+      advancedOnboarding: {},
+    },
+  },
+  {
+    guards: {
+      isMac: (context, event) => {
+        return process.platform === OS.Mac;
+      },
+    },
+  },
+);
+*/

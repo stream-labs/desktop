@@ -61,3 +61,36 @@
     margin: 0 !important;
   }
 }
+
+.footer {
+  position: absolute;
+  display: flex;
+  justify-content: flex-end;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  // TODO: fix once we add pagination container
+  margin: 80px;
+}
+
+.svg-backgrounds {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  width: 100%;
+  height: 100%;
+
+}
+
+:global(#oval-left) {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+:global(#oval-right) {
+  position: absolute;
+  top: 0;
+  right: 0;
+}

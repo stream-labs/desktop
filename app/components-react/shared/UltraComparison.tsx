@@ -27,48 +27,54 @@ interface IUltraComparisonProps {
 export function UltraComparison(p: IUltraComparisonProps) {
   const { MagicLinkService } = Services;
   const tableHeaders = p.tableHeaders || [
-    { text: $t('Themes and Overlays'), icon: 'icon-themes' },
-    { text: $t('Alerts and Widgets'), icon: 'icon-alert-box' },
     { text: $t('Streamlabs Desktop'), icon: 'icon-desktop' },
+    { text: $t('Themes and Overlays'), icon: 'icon-themes' },
     { text: $t('Multistream'), icon: 'icon-multistream' },
-    { text: $t('Collab Cam'), icon: 'icon-team-2' },
     { text: $t('Desktop App Store'), icon: 'icon-store' },
+    { text: $t('Collab Cam'), icon: 'icon-team-2' },
+    { text: $t('Cloudbot'), icon: 'icon-cloudbot' },
+    { text: $t('Alerts and Widgets'), icon: 'icon-alert-box' },
+    { text: $t('Streamlabs Mobile'), icon: 'icon-phone' },
+    { text: $t('Streamlabs Console'), icon: 'icon-console' },
     { text: $t('Tips'), icon: 'icon-donation-settings' },
     { text: $t('Storage'), icon: 'icon-cloud-backup' },
-    { text: $t('Cloudbot'), icon: 'icon-cloudbot' },
     {
       text: $t('All Streamlabs Pro Tools'),
       icon: 'icon-streamlabs',
-      whisper: 'Console, Cross Clip, Video Editor, & Podcast Editor',
+      whisper: 'Cross Clip, Talk Studio, Video Editor, Podcast Editor',
     },
   ];
   const tableData = p.tableData || {
     standard: [
-      { text: $t('Access to Free Overlays and Themes') },
       { text: '✓', key: 'check1' },
-      { text: '✓', key: 'check2' },
-      { text: '—' },
-      { text: $t('Add 1 Guest') },
+      { text: $t('Access to Free Overlays and Themes') },
+      { text: '—', key: 'dash1' },
       { text: $t('Limited Free Apps') },
+      { text: $t('Add 1 Guest') },
+      { text: $t('Basic Chatbot') },
+      { text: '✓', key: 'check2' },
+      { text: '✓', key: 'check3' },
+      { text: '—', key: 'dash2' },
       { text: $t('No-fee Tipping') },
       { text: '1GB' },
-      { text: $t('Basic Chatbot') },
       { text: $t('Basic Features') },
     ],
     prime: [
+      { text: '✓', key: 'check1' },
       {
         text: p.condensed
           ? $t('Access to All Overlays and Themes')
           : $t('Access to All Overlays and Themes (%{themeNumber})', { themeNumber: '1000+' }),
       },
-      { text: '✓', key: 'check1' },
       { text: '✓', key: 'check2' },
-      { text: '✓', key: 'check3' },
-      { text: $t('Add Up To 11 Guests or Cameras') },
       { text: $t('Access Full App Library (%{appNumber})', { appNumber: '60+' }) },
+      { text: $t('Add Up To 11 Guests or Cameras') },
+      { text: $t('Custom Named Chatbot') },
+      { text: '✓', key: 'check3' },
+      { text: '✓  ' + $t('+ Disconnect Protection') },
+      { text: '✓', key: 'check4' },
       { text: $t('Custom Tip Page and Domain') },
       { text: '10GB' },
-      { text: $t('Custom Named Chatbot') },
       { text: $t('Pro Upgrade') },
     ],
   };

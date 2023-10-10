@@ -15,8 +15,9 @@ export function Prime() {
   if (RecordingModeService.views.isRecordingModeEnabled) {
     tableProps = {
       tableHeaders: [
-        { text: $t('Themes and Overlays'), icon: 'icon-themes' },
         { text: $t('Streamlabs Desktop'), icon: 'icon-desktop' },
+        { text: $t('Themes and Overlays'), icon: 'icon-themes' },
+        { text: $t('Multistream'), icon: 'icon-multistream' },
         { text: $t('Highlighter'), icon: 'icon-slice' },
         { text: $t('Collab Cam'), icon: 'icon-team-2' },
         { text: $t('Tipping'), icon: 'icon-donation-settings' },
@@ -36,8 +37,13 @@ export function Prime() {
       ],
       tableData: {
         standard: [
-          { text: $t('Access to Free Overlays and Themes') },
           { text: '✓', key: 'check1' },
+          {
+            text: $t('Access to All Overlays and Themes (%{themeNumber})', {
+              themeNumber: '1000+',
+            }),
+          },
+          { text: '—' },
           { text: '✓', key: 'check2' },
           { text: $t('Add 1 Guest') },
           { text: $t('No-Fee Tipping') },
@@ -48,12 +54,12 @@ export function Prime() {
           { text: $t('Design and Sell Custom Merch') },
         ],
         prime: [
+          { text: '✓', key: 'check1' },
           {
             text: $t('Access to All Overlays and Themes (%{themeNumber})', {
               themeNumber: '1000+',
             }),
           },
-          { text: '✓', key: 'check1' },
           { text: '✓', key: 'check2' },
           { text: $t('Add Up To 11 Guests or Cameras') },
           { text: $t('Custom Tip Page and Domain') },
@@ -73,8 +79,7 @@ export function Prime() {
   );
 
   return (
-    <div style={{ width: '100%' }}>
-      <h1 className={commonStyles.titleContainer}>{$t('Choose your Streamlabs plan')}</h1>
+    <div style={{ width: '100%', marginTop: '144px' }}>
       <UltraComparison onSkip={next} refl="slobs-onboarding" {...tableProps} />
     </div>
   );

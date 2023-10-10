@@ -7,8 +7,11 @@ import cx from 'classnames';
 import { $t } from 'services/i18n';
 import * as stepComponents from './steps';
 import Utils from 'services/utils';
-import { IOnboardingStep, ONBOARDING_STEPS } from 'services/onboarding';
+import { IOnboardingStep, ONBOARDING_STEPS, StreamerKnowledgeMode } from 'services/onboarding';
 import Scrollable from 'components-react/shared/Scrollable';
+import StreamlabsDesktopLogo from 'components-react/shared/StreamlabsDesktopLogo';
+import StreamlabsLogo from 'components-react/shared/StreamlabsLogo';
+import StreamlabsUltraLogo from 'components-react/shared/StreamlabsUltraLogo';
 
 export default function Onboarding() {
   const { currentStep, next, processing, finish, UsageStatisticsService } = useModule(
@@ -56,7 +59,27 @@ export default function Onboarding() {
   );
 }
 
+function TopBarLogo({ component }: { component: string }) {
+  switch (component) {
+    case 'StreamingOrRecording':
+      return <StreamlabsLogo />;
+    case 'Prime':
+      return <StreamlabsUltraLogo />;
+    default:
+      return <StreamlabsDesktopLogo />;
+  }
+}
+
 function TopBar() {
+  const component = useModule(OnboardingModule).currentStep.component;
+
+  return (
+    <div className={styles.topBarContainer}>
+      <TopBarLogo component={component} />
+    </div>
+  );
+
+  /*
   const { stepIndex, preboardingOffset, singletonStep, steps } = useModule(OnboardingModule);
 
   if (stepIndex < preboardingOffset || singletonStep) {
@@ -87,6 +110,7 @@ function TopBar() {
       })}
     </div>
   );
+  */
 }
 
 function ActionButton() {
@@ -150,6 +174,10 @@ export class OnboardingModule {
     return this.steps.filter(step => step.isPreboarding).length;
   }
 
+  get streamerKnowledgeMode() {
+    return this.OnboardingService.views.streamerKnowledgeMode;
+  }
+
   setRecordingMode() {
     this.RecordingModeService.setRecordingMode(true);
     this.RecordingModeService.setUpRecordingFirstTimeSetup();
@@ -157,6 +185,10 @@ export class OnboardingModule {
 
   setImportFromObs() {
     this.OnboardingService.setObsImport(true);
+  }
+
+  setStreamerKnowledgeMode(mode: StreamerKnowledgeMode | null) {
+    this.OnboardingService.setStreamerKnowledgeMode(mode);
   }
 
   finish() {
