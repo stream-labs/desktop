@@ -263,8 +263,6 @@ export function getPlatformService(platform: TPlatform): IPlatformService {
   }[platform];
 }
 
-window['getPlatformService'] = getPlatformService;
-
 export interface IPlatformRequest extends RequestInit {
   url: string;
 }
