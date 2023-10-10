@@ -75,8 +75,6 @@ export class AuthModule {
         this.authServer.unref();
       }
 
-      console.log(authUrl);
-
       this.authServer = http.createServer((request, response) => {
         const parsed = this.parseAuthFromUrl(request.url, merge);
 
