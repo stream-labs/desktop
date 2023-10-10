@@ -268,8 +268,6 @@ export default class LiveDock extends Vue {
     }
 
     if (this.userService.state.auth.primaryPlatform === 'twitter') {
-      console.log(tabs.slice(1));
-
       // Twitter is the only primary platform without a chat
       return tabs.slice(1);
     }
