@@ -2,8 +2,6 @@
  * All services must be registered in this file
  */
 
-import { VideoSettingsService } from 'services/settings-v2';
-
 // OFFLINE SERVICES
 export { AppService } from 'services/app';
 export { InternalApiService } from 'services/api/internal-api';

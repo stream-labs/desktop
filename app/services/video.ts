@@ -8,7 +8,7 @@ import { WindowsService } from './windows';
 import { ScalableRectangle } from '../util/ScalableRectangle';
 import { Subscription } from 'rxjs';
 import { SelectionService } from 'services/selection';
-import { TDisplayType, VideoSettingsService } from './settings-v2';
+import { VideoSettingsService } from './settings-v2';
 
 const { remote } = electron;
 

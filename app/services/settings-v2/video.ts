@@ -11,12 +11,13 @@ import { Subject } from 'rxjs';
  * Add display type options by adding the display name to the displays array
  * and the context name to the context name map.
  */
-const displays = ['horizontal', 'vertical'] as const;
+//const displays = ['horizontal', 'vertical'] as const;
+const displays = ['horizontal'] as const;
 export type TDisplayType = (typeof displays)[number];
 
 export interface IVideoSetting {
   horizontal: IVideoInfo;
-  vertical: IVideoInfo;
+  //  vertical: IVideoInfo;
 }
 
 export interface IVideoSettingFormatted {
@@ -50,7 +51,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
 
   initialState = {
     horizontal: null as IVideoInfo,
-    vertical: null as IVideoInfo,
+    //  vertical: null as IVideoInfo,
   };
 
   establishedContext = new Subject();
@@ -67,13 +68,13 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
 
   contexts = {
     horizontal: null as IVideo,
-    vertical: null as IVideo,
+    //    vertical: null as IVideo,
   };
 
   get values() {
     return {
       horizontal: this.formatVideoSettings('horizontal'),
-      vertical: this.formatVideoSettings('vertical'),
+      //      vertical: this.formatVideoSettings('vertical'),
     };
   }
 
@@ -87,7 +88,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
 
     return {
       horizontal: { baseWidth, baseHeight },
-      vertical: { baseWidth, baseHeight },
+      // vertical: { baseWidth, baseHeight },
     };
 
     // // const videoSettings = this.dualOutputService.views.videoSettings;
