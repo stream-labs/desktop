@@ -51,6 +51,10 @@ export default class LiveDock extends Vue {
   underlyingSelectedChat = 'default';
 
   get selectedChat() {
+    if (this.underlyingSelectedChat === 'default' && this.isTwitter && this.isRestreaming) {
+      return 'restream';
+    }
+
     if (this.underlyingSelectedChat === 'default') return 'default';
     if (this.underlyingSelectedChat === 'restream') {
       if (this.restreamService.shouldGoLiveWithRestream) return 'restream';
@@ -183,6 +187,10 @@ export default class LiveDock extends Vue {
     return this.userService.platform.type === 'trovo';
   }
 
+  get isTwitter() {
+    return this.userService.platform.type === 'twitter';
+  }
+
   get hideViewerCount() {
     return this.customizationService.state.hideViewerCount;
   }
@@ -259,7 +267,18 @@ export default class LiveDock extends Vue {
       });
     }
 
+    if (this.userService.state.auth.primaryPlatform === 'twitter') {
+      console.log(tabs.slice(1));
+
+      // Twitter is the only primary platform without a chat
+      return tabs.slice(1);
+    }
+
     return tabs;
+  }
+
+  get isRestreaming() {
+    return this.restreamService.shouldGoLiveWithRestream;
   }
 
   get isPopOutAllowed() {
