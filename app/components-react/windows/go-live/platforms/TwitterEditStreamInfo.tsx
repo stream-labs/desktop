@@ -22,7 +22,7 @@ export function TwitterEditStreamInfo(p: IPlatformComponentParams<'twitter'>) {
         commonFields={
           <CommonPlatformFields
             key="common"
-            platform="trovo"
+            platform="twitter"
             layoutMode={p.layoutMode}
             value={twSettings}
             onChange={updateSettings}
