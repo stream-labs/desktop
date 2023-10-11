@@ -240,7 +240,8 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
       isUltra,
       isObsInstalled: isOBSinstalled,
       isPartialSLAuth: userViews.auth && userViews.isPartialSLAuth,
-      platformSupportsThemes: getPlatformService(userViews.platform.type)?.hasCapability('themes'),
+      platformSupportsThemes:
+        isLoggedIn && getPlatformService(userViews.platform?.type)?.hasCapability('themes'),
     };
 
     return this.getStepsForMode(streamerKnowledgeMode)(ctx);
