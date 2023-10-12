@@ -23,6 +23,7 @@ import { TSceneNodeInfo } from 'services/scene-collections/nodes/scene-items';
 import * as fs from 'fs';
 import uuid from 'uuid/v4';
 import { assertIsDefined } from 'util/properties-type-guards';
+import { VideoSettingsService, TDisplayType } from 'services/settings-v2';
 
 export type TSceneNode = SceneItem | SceneItemFolder;
 
@@ -42,6 +43,7 @@ export class Scene {
   @Inject() private scenesService: ScenesService;
   @Inject() private sourcesService: SourcesService;
   @Inject() private selectionService: SelectionService;
+  @Inject() private videoSettingsService: VideoSettingsService;
 
   private readonly state: IScene;
 
@@ -154,10 +156,21 @@ export class Scene {
 
     const obsSceneItem: obs.ISceneItem = this.getObsScene().add(source.getObsInput());
 
-    this.ADD_SOURCE_TO_SCENE(sceneItemId, source.sourceId, obsSceneItem.id);
+    const display = 'horizontal';
+    // assign context to scene item
+    const context = this.videoSettingsService.contexts.horizontal;
+
+    this.ADD_SOURCE_TO_SCENE(
+      sceneItemId,
+      source.sourceId,
+      obsSceneItem.id,
+      display,
+      obsSceneItem.position,
+    );
     const sceneItem = this.getItem(sceneItemId);
 
     sceneItem.loadAttributes();
+    sceneItem.setSettings({ ...sceneItem.getSettings(), display, output: context });
 
     // Newly added sources are immediately active
     this.selectionService.select(sceneItemId);
@@ -356,6 +369,7 @@ export class Scene {
         scaleFilter: item.scaleFilter,
         blendingMode: item.blendingMode,
         blendingMethod: item.blendingMethod,
+        display: item.display,
       });
       return true;
     });
@@ -365,11 +379,20 @@ export class Scene {
     // create folder and items
     let itemIndex = 0;
     nodes.forEach(nodeModel => {
+      const display = 'horizontal';
+      const obsSceneItem = obsSceneItems[itemIndex];
+
       if (nodeModel.sceneNodeType === 'folder') {
         this.createFolder(nodeModel.name, { id: nodeModel.id });
       } else {
         const itemModel = nodeModel as ISceneItemInfo;
-        this.ADD_SOURCE_TO_SCENE(itemModel.id, itemModel.sourceId, obsSceneItems[itemIndex].id);
+        this.ADD_SOURCE_TO_SCENE(
+          itemModel.id,
+          itemModel.sourceId,
+          obsSceneItems[itemIndex].id,
+          display,
+          obsSceneItem.position,
+        );
         this.getItem(itemModel.id).loadItemAttributes(itemModel);
         itemIndex++;
       }
@@ -476,7 +499,13 @@ export class Scene {
   }
 
   @mutation()
-  private ADD_SOURCE_TO_SCENE(sceneItemId: string, sourceId: string, obsSceneItemId: number) {
+  private ADD_SOURCE_TO_SCENE(
+    sceneItemId: string,
+    sourceId: string,
+    obsSceneItemId: number,
+    display: TDisplayType,
+    position: IVec2,
+  ) {
     this.state.nodes.unshift({
       // This is information that belongs to a scene/source pair
 
@@ -512,6 +541,8 @@ export class Scene {
       scaleFilter: EScaleType.Disable,
       blendingMode: EBlendingMode.Normal,
       blendingMethod: EBlendingMethod.Default,
+      display,
+      position,
     });
   }
 

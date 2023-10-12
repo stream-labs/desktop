@@ -9,6 +9,7 @@ import { ScalableRectangle } from '../util/ScalableRectangle';
 import { Subscription } from 'rxjs';
 import { SelectionService } from 'services/selection';
 import { VideoSettingsService } from './settings-v2';
+import { InitAfter } from 'services/core';
 
 const { remote } = electron;
 
@@ -195,6 +196,7 @@ export class Display {
   }
 }
 
+@InitAfter('VideoSettingsService')
 export class VideoService extends Service {
   @Inject() settingsService: SettingsService;
   @Inject() videoSettingsService: VideoSettingsService;
@@ -221,14 +223,19 @@ export class VideoService extends Service {
   }
 
   get baseResolution() {
-    const [widthStr, heightStr] = this.settingsService.state.Video.Base.split('x');
-    const width = parseInt(widthStr, 10);
-    const height = parseInt(heightStr, 10);
-
+    const baseResolutions = this.videoSettingsService.baseResolutions;
     return {
-      width,
-      height,
+      width: baseResolutions.horizontal.baseWidth,
+      height: baseResolutions.horizontal.baseHeight,
     };
+    // const [widthStr, heightStr] = this.settingsService.state.Video.Base.split('x');
+    // const width = parseInt(widthStr, 10);
+    // const height = parseInt(heightStr, 10);
+
+    // return {
+    //   width,
+    //   height,
+    // };
   }
 
   setBaseResolution(resolution: { width: number; height: number }) {

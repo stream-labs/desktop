@@ -27,6 +27,7 @@ import { AudioService } from '../audio';
 import uuid from 'uuid/v4';
 import { UserService } from 'services/user';
 import { NVoiceCharacterTypes } from 'services/nvoice-character';
+import { InitAfter } from 'services/core';
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
@@ -45,7 +46,7 @@ interface IObsSourceCallbackInfo {
   height: number;
   flags: number;
 }
-
+@InitAfter('VideoSettingsService')
 export class SourcesService extends StatefulService<ISourcesState> implements ISourcesServiceApi {
   static initialState = {
     sources: {},

@@ -2,7 +2,7 @@ import { Service } from 'services/core/service';
 import { ISettingsSubCategory, SettingsService } from 'services/settings';
 import { Inject } from 'services/core/injector';
 import { Dictionary } from 'vuex';
-
+import { VideoSettingsService } from 'services/settings-v2/video';
 /**
  * list of encoders for simple mode
  */
@@ -88,6 +88,7 @@ export interface IOutputSettings {
 
 interface IOutputSettingsPatch {
   mode?: TOutputSettingsMode;
+  inputResolution: string;
   streaming?: Partial<IStreamingEncoderSettings>;
   recording?: Partial<IRecordingEncoderSettings>;
   replayBuffer?: Partial<IReplayBufferSettings>;
@@ -166,7 +167,7 @@ export function obsEncoderToEncoderFamily(
 
 export class OutputSettingsService extends Service {
   @Inject() private settingsService: SettingsService;
-
+  @Inject() private videoSettingsService: VideoSettingsService;
   /**
    * returns unified settings for the Streaming and Recording encoder
    * independently of selected mode
@@ -344,6 +345,12 @@ export class OutputSettingsService extends Service {
       this.settingsService.setSettingValue('Output', 'Mode', settingsPatch.mode);
     }
     const currentSettings = this.getSettings();
+
+    if (settingsPatch.inputResolution) {
+      const [width, height] = settingsPatch.inputResolution.split('x');
+      this.videoSettingsService.setVideoSetting('baseWidth', Number(width));
+      this.videoSettingsService.setVideoSetting('baseHeight', Number(height));
+    }
 
     if (settingsPatch.streaming) {
       this.setStreamingEncoderSettings(currentSettings, settingsPatch.streaming);
