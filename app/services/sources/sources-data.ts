@@ -271,4 +271,12 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     description: $t('Capture the audio coming from a specific application.'),
     icon: 'fas fa-user',
   },
+  spout_capture: {
+    name: $t('Spout2 capture (Vtube support)'),
+    description: $t(
+      'Virtual avatar capture source. Enables high resolution, zero-compression and zero-latency video capture from VTube third-party software.',
+    ),
+    supportList: ['VSeeFace', 'VTube Studio'],
+    icon: 'icon-face-masks-3',
+  },
 });

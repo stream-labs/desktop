@@ -357,5 +357,10 @@
   "Set scale filter 'Area'": "Set scale filter 'Area'",
   "You currently have the same source on both canvases selected. Please select the source in the canvas to edit it independently.": "You currently have the same source on both canvases selected. Please select the source in the canvas to edit it independently.",
   "Selective Recording can only be used with horizontal sources.": "Selective Recording can only be used with horizontal sources.",
-  "Cannot move source outside canvas in Dual Output Mode.": "Cannot move source outside canvas in Dual Output Mode."
+  "Cannot move source outside canvas in Dual Output Mode.": "Cannot move source outside canvas in Dual Output Mode.",
+  "Spout Senders": "Spout Senders",
+  "Composite mode": "Composite mode",
+  "Poll time for new senders": "Poll time for new senders",
+  "Spout2 capture (Vtube support)": "Spout2 capture (Vtube support)",
+  "Virtual avatar capture source. Enables high resolution, zero-compression and zero-latency video capture from VTube third-party software.": "Virtual avatar capture source. Enables high resolution, zero-compression and zero-latency video capture from VTube third-party software."
 }
