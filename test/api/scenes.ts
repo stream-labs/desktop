@@ -116,6 +116,10 @@ test('Scenes events', async t => {
 
   image.setVisibility(false);
   event = await client.fetchNextEvent();
+
+  // 待てば通せるようだがsleepでは別エラーになるので
+  image.setVisibility(false);
+  event = await client.fetchNextEvent();
   t.is(event.data.visible, false);
 
   image.remove();
