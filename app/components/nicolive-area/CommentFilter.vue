@@ -72,9 +72,9 @@
       </div>
       <banner
         class="banner"
-        title="タイトルタイトルタイトル"
-        body="本文本文本文本文本文本文本文本文本文本文"
-        anchorLabel="リンク"
+        title="匿名ユーザーによるNG登録についても、無期限に登録されるようになりました"
+        body=""
+        anchorLabel="詳細はこちら"
         anchorLink="https://blog.nicovideo.jp/niconews/"
         @close="isBannerOpened = false"
         v-if="isBannerOpened"
