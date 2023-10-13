@@ -182,6 +182,7 @@ export const NodeObs: {
   OBS_service_stopStreaming(forceStop: boolean): void;
   OBS_service_stopRecording(): void;
   OBS_service_stopReplayBuffer(forceStop: boolean): void;
+  OBS_service_setVideoInfo(video: IVideo, display: string): void;
 
   OBS_service_connectOutputSignals(
     callback: (info: {

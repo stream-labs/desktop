@@ -320,8 +320,7 @@ export class StreamingService
           message: 'OBS_service_startStreaming',
         });
         const horizontalContext = this.videoSettingsService.contexts.horizontal;
-        (obs.NodeObs as any).OBS_service_setVideoInfo(horizontalContext, 'horizontal');
-
+        obs.NodeObs.OBS_service_setVideoInfo(horizontalContext, 'horizontal');
         obs.NodeObs.OBS_service_startStreaming();
       } catch (e) {
         Sentry.withScope(scope => {
