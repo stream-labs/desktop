@@ -47,8 +47,7 @@ export default function GoLiveSettings() {
       get canAddDestinations() {
         const linkedPlatforms = module.state.linkedPlatforms;
         const customDestinations = module.state.customDestinations;
-        const isPrime = UserService.views.isPrime;
-        return !isPrime && linkedPlatforms.length + customDestinations.length < 5;
+        return linkedPlatforms.length + customDestinations.length < 5;
       },
 
       addDestination() {
@@ -60,7 +59,7 @@ export default function GoLiveSettings() {
         }
       },
 
-      shouldShowPrimeLabel: !RestreamService.state.grandfathered,
+      shouldShowPrimeLabel: !RestreamService.state.grandfathered && !UserService.views.isPrime,
 
       canUseOptimizedProfile:
         VideoEncodingOptimizationService.state.canSeeOptimizedProfile ||
@@ -83,7 +82,7 @@ export default function GoLiveSettings() {
           {shouldShowAddDestButton && (
             <a className={styles.addDestinationBtn} onClick={addDestination}>
               <PlusIcon style={{ paddingLeft: '17px', fontSize: '24px' }} />
-              {$t('Add Destination')}
+              <span style={{ flex: 1 }}>{$t('Add Destination')}</span>
               {shouldShowPrimeLabel && (
                 <ButtonHighlighted filled text={$t('Ultra')} icon={<UltraIcon type="simple" />} />
               )}
