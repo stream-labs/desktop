@@ -252,7 +252,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
     }
   }
 
-  async uploadToStorage(filename: string, platform?: string) {
+  async uploadToStorage(filename: string, platform: string) {
     this.SET_UPLOAD_INFO({ uploading: true });
     const { cancel, complete, size } = await this.sharedStorageService.actions.return.uploadFile(
       filename,
@@ -270,12 +270,14 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
     this.usageStatisticsService.recordAnalyticsEvent('RecordingHistory', {
       type: 'UploadStorageBegin',
       fileSize: size,
+      platform,
     });
 
     this.cancelFunction = () => {
       this.usageStatisticsService.recordAnalyticsEvent('RecordingHistory', {
         type: 'UploadStorageCancel',
         fileSize: size,
+        platform,
       });
       cancel();
     };
@@ -291,6 +293,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
       this.usageStatisticsService.recordAnalyticsEvent('RecordingHistory', {
         type: 'UploadStorageError',
         fileSize: size,
+        platform,
       });
     }
 
@@ -301,6 +304,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
       this.usageStatisticsService.recordAnalyticsEvent('RecordingHistory', {
         type: 'UploadStorageSuccess',
         fileSize: size,
+        platform,
       });
       return result.id;
     }

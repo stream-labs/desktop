@@ -319,23 +319,10 @@ class VideoSettingsModule {
    * Otherwise, update the vertical display persisted settings.
    */
   setFPSType(value: EFPSType) {
-    if (this.service.contexts.vertical) {
-      this.service.actions.setVideoSetting('fpsType', value, 'horizontal');
-      this.service.actions.setVideoSetting('fpsNum', 30, 'horizontal');
-      this.service.actions.setVideoSetting('fpsDen', 1, 'horizontal');
-
-      this.service.actions.setVideoSetting('fpsType', value, 'vertical');
-      this.service.actions.setVideoSetting('fpsNum', 30, 'vertical');
-      this.service.actions.setVideoSetting('fpsDen', 1, 'vertical');
-    } else {
-      this.dualOutputService.actions.setVideoSetting({ fpsType: value }, 'vertical');
-      this.dualOutputService.actions.setVideoSetting({ fpsNum: 30 }, 'vertical');
-      this.dualOutputService.actions.setVideoSetting({ fpsDen: 1 }, 'vertical');
-
-      this.service.actions.setVideoSetting('fpsType', value, 'horizontal');
-      this.service.actions.setVideoSetting('fpsNum', 30, 'horizontal');
-      this.service.actions.setVideoSetting('fpsDen', 1, 'horizontal');
-    }
+    this.service.actions.setVideoSetting('fpsType', value, 'horizontal');
+    this.service.actions.setVideoSetting('fpsNum', 30, 'horizontal');
+    this.service.actions.setVideoSetting('fpsDen', 1, 'horizontal');
+    this.service.actions.syncFPSSettings();
   }
 
   /**
@@ -346,19 +333,10 @@ class VideoSettingsModule {
    */
   setCommonFPS(value: string) {
     const [fpsNum, fpsDen] = value.split('-');
-    if (this.service.contexts.vertical) {
-      this.service.actions.setVideoSetting('fpsNum', Number(fpsNum), 'horizontal');
-      this.service.actions.setVideoSetting('fpsDen', Number(fpsDen), 'horizontal');
 
-      this.service.actions.setVideoSetting('fpsNum', Number(fpsNum), 'vertical');
-      this.service.actions.setVideoSetting('fpsDen', Number(fpsDen), 'vertical');
-    } else {
-      this.dualOutputService.actions.setVideoSetting({ fpsNum: Number(fpsNum) }, 'vertical');
-      this.dualOutputService.actions.setVideoSetting({ fpsDen: Number(fpsDen) }, 'vertical');
-
-      this.service.actions.setVideoSetting('fpsNum', Number(fpsNum), 'horizontal');
-      this.service.actions.setVideoSetting('fpsDen', Number(fpsDen), 'horizontal');
-    }
+    this.service.actions.setVideoSetting('fpsNum', Number(fpsNum), 'horizontal');
+    this.service.actions.setVideoSetting('fpsDen', Number(fpsDen), 'horizontal');
+    this.service.actions.syncFPSSettings();
   }
   /**
    * Sets Integer FPS
@@ -369,18 +347,9 @@ class VideoSettingsModule {
   setIntegerFPS(value: string) {
     this.state.setFpsInt(Number(value));
     if (Number(value) > 0 && Number(value) < 1001) {
-      if (this.service.contexts.vertical) {
-        this.service.actions.setVideoSetting('fpsNum', Number(value), 'horizontal');
-        this.service.actions.setVideoSetting('fpsDen', 1, 'horizontal');
-        this.service.actions.setVideoSetting('fpsNum', Number(value), 'vertical');
-        this.service.actions.setVideoSetting('fpsDen', 1, 'vertical');
-      } else {
-        this.dualOutputService.actions.setVideoSetting({ fpsNum: Number(value) }, 'vertical');
-        this.dualOutputService.actions.setVideoSetting({ fpsDen: 1 }, 'vertical');
-
-        this.service.actions.setVideoSetting('fpsNum', Number(value), 'horizontal');
-        this.service.actions.setVideoSetting('fpsDen', 1, 'horizontal');
-      }
+      this.service.actions.setVideoSetting('fpsNum', Number(value), 'horizontal');
+      this.service.actions.setVideoSetting('fpsDen', 1, 'horizontal');
+      this.service.actions.syncFPSSettings();
     }
   }
 
@@ -397,14 +366,8 @@ class VideoSettingsModule {
       this.state.setFpsDen(Number(value));
     }
     if (!invalidFps(this.state.fpsNum, this.state.fpsDen) && Number(value) > 0) {
-      if (this.service.contexts.vertical) {
-        this.service.actions.setVideoSetting(key, Number(value), 'horizontal');
-        this.service.actions.setVideoSetting(key, Number(value), 'vertical');
-      } else {
-        this.dualOutputService.actions.setVideoSetting({ [key]: Number(value) }, 'vertical');
-
-        this.service.actions.setVideoSetting(key, Number(value), 'horizontal');
-      }
+      this.service.actions.setVideoSetting(key, Number(value), 'horizontal');
+      this.service.actions.syncFPSSettings();
     }
   }
 

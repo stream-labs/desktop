@@ -1,6 +1,7 @@
 import { test, useWebdriver } from '../../helpers/webdriver';
 import { useForm } from '../../helpers/modules/forms/form';
 import { showSettingsWindow } from '../../helpers/modules/settings/settings';
+import { sleep } from '../../helpers/sleep';
 
 useWebdriver();
 
@@ -30,6 +31,9 @@ test('Populates common fps values', async t => {
   await videoSettingsForm.fillForm({
     fpsType: 'Common FPS Values',
   });
+
+  // wait for fps settings to sync between horizontal and vertical contexts
+  await sleep(500);
 
   await t.notThrowsAsync(async () => {
     await videoSettingsForm.assertInputOptions('fpsCom', '30', [
