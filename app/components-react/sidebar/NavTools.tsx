@@ -316,6 +316,7 @@ function LoginMenuItem(p: {
                   styles.platformLogo,
                   styles[`platform-logo-${platform?.type ?? 'default'}`],
                 )}
+                size={platform.type === 'twitter' ? 20 : undefined}
               />
             )}
             <span className={styles.username}>{platform?.username || $t('Log Out')}</span>
