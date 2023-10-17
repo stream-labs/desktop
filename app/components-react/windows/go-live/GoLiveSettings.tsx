@@ -34,6 +34,7 @@ export default function GoLiveSettings() {
     canAddDestinations,
     shouldShowPrimeLabel,
     canUseOptimizedProfile,
+    showTweet,
   } = useGoLiveSettings().extend(module => {
     const {
       RestreamService,
@@ -64,6 +65,8 @@ export default function GoLiveSettings() {
       canUseOptimizedProfile:
         VideoEncodingOptimizationService.state.canSeeOptimizedProfile ||
         VideoEncodingOptimizationService.state.useOptimizedProfile,
+
+      showTweet: UserService.views.auth?.primaryPlatform !== 'twitter',
     };
   });
 
@@ -103,7 +106,7 @@ export default function GoLiveSettings() {
             {isAdvancedMode && <div className={styles.spacer} />}
             {/*EXTRAS*/}
             <Section isSimpleMode={!isAdvancedMode} title={$t('Extras')}>
-              <TwitterInput />
+              {showTweet && <TwitterInput />}
               {!!canUseOptimizedProfile && <OptimizedProfileSwitcher />}
             </Section>
           </Scrollable>

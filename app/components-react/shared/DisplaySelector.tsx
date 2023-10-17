@@ -5,13 +5,14 @@ import { Services } from 'components-react/service-provider';
 import { RadioInput } from './inputs';
 import { displayLabels } from 'services/dual-output';
 import { TDisplayType } from 'services/settings-v2';
-import { platformLabels } from 'services/platforms';
+import { TPlatform, platformLabels } from 'services/platforms';
 import { useGoLiveSettings } from 'components-react/windows/go-live/useGoLiveSettings';
+import { ICustomStreamDestination } from 'services/settings/streaming';
 
 interface IDisplaySelectorProps {
   title: string;
   index: number;
-  isPlatform: boolean;
+  platform: TPlatform | null;
   nolabel?: boolean;
   nomargin?: boolean;
   className?: string;
@@ -29,9 +30,10 @@ export default function DisplaySelector(p: IDisplaySelectorProps) {
     isMidstreamMode: StreamingService.views.isMidStreamMode,
   }));
 
-  const platform = p.title.toLowerCase();
-  const setting = p.isPlatform ? v.platformSettings[platform] : customDestinations[p.index];
-  const label = p.isPlatform ? platformLabels(platform) : setting.name;
+  const setting = p.platform ? v.platformSettings[p.platform] : customDestinations[p.index];
+  const label = p.platform
+    ? platformLabels(p.platform)
+    : (setting as ICustomStreamDestination).name;
 
   const displays = [
     {
@@ -55,8 +57,8 @@ export default function DisplaySelector(p: IDisplaySelectorProps) {
       defaultValue="horizontal"
       options={displays}
       onChange={(val: TDisplayType) =>
-        p.isPlatform
-          ? v.updatePlatformSetting(platform, val)
+        p.platform
+          ? v.updatePlatformSetting(p.platform, val)
           : updateCustomDestinationDisplay(p.index, val)
       }
       value={setting?.display ?? 'horizontal'}
