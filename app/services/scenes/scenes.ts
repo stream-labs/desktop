@@ -13,6 +13,7 @@ import { $t } from 'services/i18n';
 import namingHelpers from 'util/NamingHelpers';
 import uuid from 'uuid/v4';
 import { TDisplayType } from 'services/settings-v2/video';
+import { InitAfter } from 'services/core';
 
 export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
 
@@ -135,6 +136,7 @@ export interface ISceneItemFolder extends ISceneItemNode {
   sceneNodeType: 'folder';
 }
 
+@InitAfter('VideoSettingsService')
 export class ScenesService extends StatefulService<IScenesState> {
   static initialState: IScenesState = {
     activeSceneId: '',
