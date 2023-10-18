@@ -23,6 +23,7 @@ import { UserService } from 'services/user';
 import { SelectionService } from 'services/selection';
 import { StreamingService } from 'services/streaming';
 import { SettingsService } from 'services/settings';
+import { RunInLoadingMode } from 'services/app/app-decorators';
 
 interface IDisplayVideoSettings {
   defaultDisplay: TDisplayType;
@@ -347,6 +348,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    * Edit dual output display settings
    */
 
+  @RunInLoadingMode()
   setdualOutputMode(status?: boolean) {
     this.SET_SHOW_DUAL_OUTPUT(status);
 
