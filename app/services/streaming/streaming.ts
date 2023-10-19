@@ -1,6 +1,16 @@
 import Vue from 'vue';
 import { mutation, StatefulService } from 'services/core/stateful-service';
-import { EOutputCode, Global, NodeObs } from '../../../obs-api';
+import {
+  EOutputCode,
+  Global,
+  NodeObs,
+  AudioEncoderFactory,
+  SimpleRecordingFactory,
+  ERecordingFormat,
+  ERecordingQuality,
+  VideoEncoderFactory,
+  ISimpleRecording,
+} from '../../../obs-api';
 import { Inject } from 'services/core/injector';
 import moment from 'moment';
 import padStart from 'lodash/padStart';
@@ -46,6 +56,7 @@ import { RecordingModeService } from 'services/recording-mode';
 import { MarkersService } from 'services/markers';
 import { byOS, OS } from 'util/operating-systems';
 import { DualOutputService } from 'services/dual-output';
+import path from 'path';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -105,6 +116,8 @@ export class StreamingService
 
   private resolveStartStreaming: Function = () => {};
   private rejectStartStreaming: Function = () => {};
+
+  private verticalRecording: ISimpleRecording = null;
 
   static initialState: IStreamingServiceState = {
     streamingStatus: EStreamingState.Offline,
@@ -970,6 +983,14 @@ export class StreamingService
   }
 
   toggleRecording() {
+    if (this.dualOutputService.views.dualOutputMode) {
+      this.toggleDualOutputRecording();
+    } else {
+      this.toggleSingleOutputRecording();
+    }
+  }
+
+  toggleSingleOutputRecording() {
     if (this.state.recordingStatus === ERecordingState.Recording) {
       NodeObs.OBS_service_stopRecording();
       return;
@@ -977,6 +998,43 @@ export class StreamingService
 
     if (this.state.recordingStatus === ERecordingState.Offline) {
       NodeObs.OBS_service_startRecording();
+      return;
+    }
+  }
+
+  toggleDualOutputRecording() {
+    if (this.state.recordingStatus === ERecordingState.Recording) {
+      // stop recording vertical display
+      this.verticalRecording.stop();
+      SimpleRecordingFactory.destroy(this.verticalRecording);
+      this.verticalRecording = null;
+
+      // stop recording horizontal display
+      NodeObs.OBS_service_stopRecording();
+
+      return;
+    }
+
+    if (this.state.recordingStatus === ERecordingState.Offline) {
+      // get output settings for horizontal display
+      const path = this.outputSettingsService.getSettings().recording.path;
+
+      // record vertical canvas
+      this.verticalRecording = SimpleRecordingFactory.create();
+      this.verticalRecording.path = path;
+      this.verticalRecording.format = ERecordingFormat.MP4;
+      this.verticalRecording.quality = ERecordingQuality.HighQuality;
+      this.verticalRecording.video = this.videoSettingsService.contexts.vertical;
+      this.verticalRecording.videoEncoder = VideoEncoderFactory.create('obs_x264', 'video-encoder');
+      this.verticalRecording.lowCPU = false;
+      this.verticalRecording.audioEncoder = AudioEncoderFactory.create();
+      this.verticalRecording.overwrite = false;
+      this.verticalRecording.noSpace = false;
+
+      // start recording horizontal display
+      NodeObs.OBS_service_startRecording();
+      // start recording vertical display
+      this.verticalRecording.start();
       return;
     }
   }
