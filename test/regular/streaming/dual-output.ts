@@ -4,7 +4,6 @@ import {
   waitForSettingsWindowLoaded,
 } from '../../helpers/modules/streaming';
 import {
-  click,
   clickIfDisplayed,
   focusChild,
   focusMain,
@@ -17,9 +16,9 @@ import {
 import { logIn } from '../../helpers/modules/user';
 import { toggleDualOutputMode, toggleDisplay } from '../../helpers/modules/dual-output';
 import { getApiClient } from '../../helpers/api-client';
-import { releaseUserInPool, reserveUserFromPool } from '../../helpers/webdriver/user';
 import { test, useWebdriver, TExecutionContext } from '../../helpers/webdriver';
 import { SceneBuilder } from '../../helpers/scene-builder';
+import { addSource } from '../../helpers/modules/sources';
 
 useWebdriver();
 
@@ -32,33 +31,133 @@ test.skip('User must be logged in to use Dual Output', async (t: TExecutionConte
   t.true(await isDisplayed('form#login-modal', { timeout: 1000 }));
 });
 
-test.skip('Dual output checkbox toggles Dual Output mode', async (t: TExecutionContext) => {
+test('Dual output checkbox toggles Dual Output mode and duplicates sources', async (t: TExecutionContext) => {
   await logIn();
+
+  const sceneBuilder = new SceneBuilder(await getApiClient());
+
+  await addSource('Color Block', 'Color Source');
+  await addSource('Color Block', 'Color Source 2');
+  await addSource('Color Block', 'Color Source 3');
+
+  t.true(
+    sceneBuilder.isEqualTo(
+      `
+    Color Source 3:
+    Color Source 2:
+    Color Source:
+  `,
+    ),
+  );
+
+  // toggle dual output on and convert dual output scene collection
   await toggleDualOutputMode();
   await focusMain();
   // @@@ TODO check for property, not element
   t.true(await isDisplayed('div#vertical-display'));
+  t.true(
+    sceneBuilder.isEqualTo(
+      `
+    Color Source 3:
+    Color Source 2:
+    Color Source:
+    Color Source 3:
+    Color Source 2:
+    Color Source:
+  `,
+    ),
+  );
 
+  // toggle dual output off, vertical nodes persist
   await toggleDualOutputMode();
   await focusMain();
   t.false(await isDisplayed('div#vertical-display'));
-});
+  t.true(
+    sceneBuilder.isEqualTo(
+      `
+    Color Source 3:
+    Color Source 2:
+    Color Source:
+    Color Source 3:
+    Color Source 2:
+    Color Source:
+  `,
+    ),
+  );
 
-/**
- * Dual output displays
- */
-test.skip('Dual output elements show on toggle', async (t: TExecutionContext) => {
-  await logIn();
+  // toggle dual output on, nodes do not duplicate
   await toggleDualOutputMode();
-  await focusMain();
-
-  t.true(await isDisplayed('div#vertical-display'));
-  t.true(await isDisplayed('div#dual-output-header'));
-  t.true(await isDisplayed('i#horizontal-display-toggle'));
-  t.true(await isDisplayed('i#vertical-display-toggle'));
+  t.true(
+    sceneBuilder.isEqualTo(
+      `
+    Color Source 3:
+    Color Source 2:
+    Color Source:
+    Color Source 3:
+    Color Source 2:
+    Color Source:
+  `,
+    ),
+  );
 });
 
-test.skip('Dual output toggles', async (t: TExecutionContext) => {
+// TODO: finish test
+test.skip('Auto config works with only the horizontal context', async (t: TExecutionContext) => {
+  // const app = t.context.app;
+  // const client = await getApiClient();
+  // const videoSettingsService = client.getResource<VideoSettingsService>('VideoSettingsService');
+  // const settingsService = client.getResource<SettingsService>('SettingsService');
+  // videoSettingsService.establishVideoContext('horizontal');
+  // videoSettingsService.establishVideoContext('vertical');
+  // videoSettingsService.setVideoSetting('baseWidth', 852, 'horizontal');
+  // videoSettingsService.setVideoSetting('baseHeight', 480, 'horizontal');
+  // videoSettingsService.setVideoSetting('baseWidth', 720, 'vertical');
+  // videoSettingsService.setVideoSetting('baseHeight', 1280, 'vertical');
+  // await focusMain();
+  // if (!(await isDisplayed('h2=Live Streaming'))) return;
+  // await click('h2=Live Streaming');
+  // await click('button=Continue');
+  // await (await app.client.$('button=Twitch')).isExisting();
+  // await logIn('twitch');
+  // await sleep(1000);
+  // if (await (await t.context.app.client.$('span=Skip')).isExisting()) {
+  //   await (await t.context.app.client.$('span=Skip')).click();
+  //   await sleep(1000);
+  // }
+  // if (await (await t.context.app.client.$('div=Start Fresh')).isExisting()) {
+  //   await (await t.context.app.client.$('div=Start Fresh')).click();
+  //   await sleep(1000);
+  // }
+  // if (await (await t.context.app.client.$('button=Skip')).isExisting()) {
+  //   await (await t.context.app.client.$('button=Skip')).click();
+  //   await sleep(1000);
+  // }
+  // if (await (await t.context.app.client.$('button=Skip')).isExisting()) {
+  //   await (await t.context.app.client.$('button=Skip')).click();
+  //   await sleep(1000);
+  // }
+  // // Start auto config
+  // t.true(await (await app.client.$('button=Start')).isExisting());
+  // await (await app.client.$('button=Start')).click();
+  // await (await t.context.app.client.$('div=Choose Starter')).waitForDisplayed({ timeout: 60000 });
+  // if (await (await t.context.app.client.$('div=Choose Starter')).isExisting()) {
+  //   await (await t.context.app.client.$('div=Choose Starter')).click();
+  //   await sleep(1000);
+  // }
+  // await (await app.client.$('span=Sources')).waitForDisplayed({ timeout: 60000 });
+  // await showSettingsWindow('Video', async () => {
+  //   await assertFormContains({ baseRes: 1920 });
+  //   await assertFormContains({ baseHeight: 1080 });
+  // });
+  // const horizontalBaseWidthState = videoSettingsService.state.horizontal.baseWidth;
+  // const verticalBaseHeightState = videoSettingsService.state.vertical.baseHeight;
+  // const [baseWidth, baseHeight] = settingsService.views.values.Video.Base.split('x');
+  // t.true(horizontalBaseWidthState === 1920);
+  // t.true(verticalBaseHeightState === 1080);
+  t.pass();
+});
+
+test.skip('Dual output toggles filter sources', async (t: TExecutionContext) => {
   await logIn();
   await toggleDualOutputMode();
   await focusMain();

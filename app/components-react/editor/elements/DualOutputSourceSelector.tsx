@@ -6,7 +6,6 @@ import { SourceSelectorModule } from './SourceSelector';
 
 interface IDualOutputSourceSelector {
   nodeId: string;
-  sceneId?: string;
 }
 export function DualOutputSourceSelector(p: IDualOutputSourceSelector) {
   const {
@@ -23,11 +22,8 @@ export function DualOutputSourceSelector(p: IDualOutputSourceSelector) {
       DualOutputService.views.verticalNodeIds && horizontalActive
         ? DualOutputService.views.activeSceneNodeMap[p.nodeId]
         : p.nodeId,
-    isHorizontalVisible:
-      !isDualOutputLoading && DualOutputService.views.getIsHorizontalVisible(p.nodeId, p?.sceneId),
-    isVerticalVisible:
-      !isDualOutputLoading && DualOutputService.views.getIsVerticalVisible(p.nodeId, p?.sceneId),
-    isLoading: DualOutputService.views.isLoading && !DualOutputService.views.hasVerticalNodes,
+    isHorizontalVisible: DualOutputService.views.getIsHorizontalVisible(p.nodeId),
+    isVerticalVisible: DualOutputService.views.getIsVerticalVisible(p.nodeId),
   }));
 
   const showHorizontalToggle = useMemo(() => {
