@@ -26,6 +26,8 @@ import { VideoSettingsService } from 'services/settings-v2/video';
 import { SettingsService } from 'services/settings';
 import { showSettingsWindow } from '../../helpers/modules/settings/settings';
 import { assertFormContains } from '../../helpers/modules/forms/form';
+import { SceneCollectionsService } from 'app-services';
+import { addSource } from '../../helpers/modules/sources';
 
 useWebdriver();
 
@@ -38,15 +40,73 @@ test('User must be logged in to use Dual Output', async (t: TExecutionContext) =
   t.true(await isDisplayed('form#login-modal', { timeout: 1000 }));
 });
 
-test('Dual output checkbox toggles Dual Output mode', async (t: TExecutionContext) => {
+test('Dual output checkbox toggles Dual Output mode and duplicates sources', async (t: TExecutionContext) => {
   await logIn();
+
+  const sceneBuilder = new SceneBuilder(await getApiClient());
+
+  await addSource('Color Block', 'Color Source');
+  await addSource('Color Block', 'Color Source 2');
+  await addSource('Color Block', 'Color Source 3');
+
+  t.true(
+    sceneBuilder.isEqualTo(
+      `
+    Color Source 3:
+    Color Source 2:
+    Color Source:
+  `,
+    ),
+  );
+
+  // toggle dual output on and convert dual output scene collection
   await toggleDualOutputMode();
   await focusMain();
   t.true(await isDisplayed('div#vertical-display'));
+  t.true(
+    sceneBuilder.isEqualTo(
+      `
+    Color Source 3:
+    Color Source 2:
+    Color Source:
+    Color Source 3:
+    Color Source 2:
+    Color Source:
+  `,
+    ),
+  );
 
+  // toggle dual output off, vertical nodes persist
   await toggleDualOutputMode();
   await focusMain();
   t.false(await isDisplayed('div#vertical-display'));
+  t.true(
+    sceneBuilder.isEqualTo(
+      `
+    Color Source 3:
+    Color Source 2:
+    Color Source:
+    Color Source 3:
+    Color Source 2:
+    Color Source:
+  `,
+    ),
+  );
+
+  // toggle dual output on, nodes do not duplicate
+  await toggleDualOutputMode();
+  t.true(
+    sceneBuilder.isEqualTo(
+      `
+    Color Source 3:
+    Color Source 2:
+    Color Source:
+    Color Source 3:
+    Color Source 2:
+    Color Source:
+  `,
+    ),
+  );
 });
 
 // TODO: finish test
@@ -105,21 +165,7 @@ test.skip('Auto config works with only the horizontal context', async (t: TExecu
   t.pass();
 });
 
-/**
- * Dual output displays
- */
-test.skip('Dual output elements show on toggle', async (t: TExecutionContext) => {
-  await logIn();
-  await toggleDualOutputMode();
-  await focusMain();
-
-  t.true(await isDisplayed('div#vertical-display'));
-  t.true(await isDisplayed('div#dual-output-header'));
-  t.true(await isDisplayed('i#horizontal-display-toggle'));
-  t.true(await isDisplayed('i#vertical-display-toggle'));
-});
-
-test.skip('Dual output toggles', async (t: TExecutionContext) => {
+test.skip('Dual output toggles filter sources', async (t: TExecutionContext) => {
   await logIn();
   await toggleDualOutputMode();
   await focusMain();
