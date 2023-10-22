@@ -148,6 +148,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
           console.log(`Canvas resolution is ${setting.value}. reset to ${CanvasResolution}.`);
           setting.value = CanvasResolution;
           this.settingsService.setSettings('Video', video);
+          this.settingsService.setSettingValue('Video', 'Base', CanvasResolution);
         }
       }
     }
