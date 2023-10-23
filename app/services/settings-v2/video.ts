@@ -261,6 +261,13 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     //    this.dualOutputService.setVideoSetting({ [key]: value }, display);
   }
 
+  refrectResolution(display: TDisplayType = 'horizontal') {
+    const wh = this.baseResolutions
+    this.state[display].baseWidth = wh.horizontal.baseWidth
+    this.state[display].baseHeight = wh.horizontal.baseHeight
+    this.updateObsSettings()
+  }
+
   /**
    * Shut down the video settings service
    *

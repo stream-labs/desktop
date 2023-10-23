@@ -31,6 +31,7 @@ import {
 } from './optimizer';
 import { getBestSettingsForNiconico } from './niconico-optimization';
 import { TcpServerService } from 'services/api/tcp-server';
+import { VideoSettingsService } from '../settings-v2';
 
 export interface ISettingsState {
   General: {
@@ -94,8 +95,7 @@ type RecordingSettings = {
 
 export class SettingsService
   extends StatefulService<ISettingsState>
-  implements ISettingsServiceApi, ISettingsAccessor
-{
+  implements ISettingsServiceApi, ISettingsAccessor {
   static initialState = {};
 
   static convertFormDataToState(settingsFormData: TSettingsFormData): ISettingsState {
@@ -122,6 +122,8 @@ export class SettingsService
 
   @Inject()
   private videoEncodingOptimizationService: VideoEncodingOptimizationService;
+
+  @Inject() videoSettingsService: VideoSettingsService;
 
   init() {
     this.loadSettingsIntoStore();
@@ -484,10 +486,10 @@ export class SettingsService
       : (this.findSettingValue(output, 'Audio - Track 1', 'Track1Bitrate') as string);
     const rate_control = !isSimple
       ? (this.findSettingValue(output, 'Streaming', 'rate_control') as
-          | 'CBR'
-          | 'VBR'
-          | 'ABR'
-          | 'CRF')
+        | 'CBR'
+        | 'VBR'
+        | 'ABR'
+        | 'CRF')
       : null;
     const profile = !isSimple
       ? (this.findSettingValue(output, 'Streaming', 'profile') as 'high' | 'main' | 'baseline')
@@ -800,6 +802,9 @@ export class SettingsService
 
     obs.NodeObs.OBS_settings_saveSettings(categoryName, dataToSave);
     this.SET_SETTINGS(SettingsService.convertFormDataToState({ [categoryName]: settingsData }));
+
+    // displayに解像度変更が届かないようなので補助
+    if (categoryName === 'Video') this.videoSettingsService.refrectResolution()
   }
 
   private setAudioSettings(settingsData: ISettingsSubCategory[]) {
