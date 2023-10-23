@@ -32,17 +32,18 @@ export function Classic(p: React.PropsWithChildren<LayoutProps>) {
         max={calculateMax(mins.rest)}
         min={mins.bar1}
         reverse={true}
-      />
-      <div
-        className={styles.segmented}
-        style={{ height: `${resizes.bar1 * 100}%`, padding: '0 8px' }}
       >
-        {['2', '3', '4'].map(slot => (
-          <div key={slot} className={cx(styles.cell, 'no-top-padding')}>
-            {p.children![slot]}
-          </div>
-        ))}
-      </div>
+        <div
+          className={styles.segmented}
+          style={{ height: `${resizes.bar1 * 100}%`, padding: '8px' }}
+        >
+          {['2', '3', '4'].map(slot => (
+            <div key={slot} className={cx(styles.cell, 'no-top-padding')}>
+              {p.children![slot]}
+            </div>
+          ))}
+        </div>
+      </ResizeBar>
     </div>
   );
 }

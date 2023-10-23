@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { Resizable, ResizableProps } from 'react-resizable';
 import cx from 'classnames';
 import styles from './ResizeBar.m.less';
 
@@ -20,96 +21,44 @@ interface ResizeBarProps {
 /**
  * This component can be added to any element as a resize control
  */
-export default function ResizeBar(p: ResizeBarProps) {
-  const [active, setActive] = useState(false);
-  const [transform, setTransform] = useState(''); // css-transform prop ResizeBar
+export default function ResizeBar(p: React.PropsWithChildren<ResizeBarProps>) {
+  let resizableProps: ResizableProps;
 
-  const barRef = useRef<HTMLDivElement>(null);
-
-  let barOffset = 0;
-  let mouseInitial = 0;
-
-  const hasConstraints = p.max !== Infinity || p.min !== -Infinity;
-  const isHorizontal = ['left', 'right'].includes(p.position);
-
-  function onMouseDownHandler(event: React.MouseEvent) {
-    // Handle cases where the window size is too small to allow resizing
-    if (p.max <= p.min) return;
-    startMouseTracking(event);
-  }
-
-  function startMouseTracking(ev: React.MouseEvent) {
-    if (!barRef.current) return;
-    setActive(true);
-    const mouseMoveListener = (event: MouseEvent) => onMouseMoveHandler(event);
-    barRef.current.addEventListener('mousemove', mouseMoveListener);
-    barRef.current.addEventListener(
-      'mouseup',
-      () => {
-        if (!barRef.current) return;
-        barRef.current.removeEventListener('mousemove', mouseMoveListener);
-        stopMouseTracking();
-      },
-      { once: true },
-    );
-    barRef.current.addEventListener(
-      'mouseleave',
-      () => {
-        if (!barRef.current) return;
-        barRef.current.removeEventListener('mousemove', mouseMoveListener);
-        stopMouseTracking();
-      },
-      { once: true },
-    );
-
-    mouseInitial = isHorizontal ? ev.pageX : ev.pageY;
-    p.onResizestart();
-  }
-
-  function stopMouseTracking() {
-    setActive(false);
-    let offset = barOffset;
-    if (p.reverse) offset = -offset;
-    barOffset = 0;
-    mouseInitial = 0;
-    updateTransform();
-    p.onResizestop(offset);
-    p.onInput(offset + p.value);
-  }
-
-  function onMouseMoveHandler(event: MouseEvent) {
-    const mouseOffset = (isHorizontal ? event.pageX : event.pageY) - mouseInitial;
-
-    // handle max and min constraints
-    if (hasConstraints) {
-      const value = p.reverse ? p.value - mouseOffset : p.value + mouseOffset;
-
-      if (value > p.max) {
-        barOffset = p.reverse ? p.value - p.max : p.max - p.value;
-      } else if (value < p.min) {
-        barOffset = p.reverse ? p.value - p.min : p.min - p.value;
-      } else {
-        barOffset = mouseOffset;
-      }
-    } else {
-      barOffset = mouseOffset;
-    }
-
-    updateTransform();
-  }
-
-  function updateTransform() {
-    setTransform(isHorizontal ? `translateX(${barOffset}px)` : `translateY(${barOffset}px)`);
+  if (p.position === 'top') {
+    resizableProps = {
+      width: Infinity,
+      height: p.value,
+      resizeHandles: ['n'],
+      minConstraints: [Infinity, p.min],
+      maxConstraints: [Infinity, p.max],
+    };
+  } else {
+    resizableProps = {
+      height: Infinity,
+      width: p.value,
+      resizeHandles: p.position === 'left' ? ['w'] : ['e'],
+      minConstraints: [p.min, Infinity],
+      maxConstraints: [p.max, Infinity],
+    };
   }
 
   return (
-    <div
-      ref={barRef}
-      className={cx(styles.resizeBar, styles[p.position], { [styles.active]: active })}
-      style={{ transform }}
-      onMouseDown={onMouseDownHandler}
+    <Resizable
+      onResizeStart={(e: React.SyntheticEvent, data: { size: { height: number } }) =>
+        p.onResizestart()
+      }
+      onResizeStop={() => p.onResizestop()}
+      onResize={(e: React.SyntheticEvent, data: { size: { height: number } }) =>
+        p.onInput(data.size.height)
+      }
+      {...resizableProps}
+      handle={
+        <div className={cx(styles.resizeBar, styles[p.position])}>
+          <div className={styles.resizeLine} />
+        </div>
+      }
     >
-      <div className={styles.resizeLine} />
-    </div>
+      {p.children}
+    </Resizable>
   );
 }
