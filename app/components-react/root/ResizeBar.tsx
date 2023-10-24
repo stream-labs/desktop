@@ -31,6 +31,7 @@ export default function ResizeBar(p: React.PropsWithChildren<ResizeBarProps>) {
       resizeHandles: ['n'],
       minConstraints: [Infinity, p.min],
       maxConstraints: [Infinity, p.max],
+      axis: 'y',
     };
   } else {
     resizableProps = {
@@ -39,6 +40,7 @@ export default function ResizeBar(p: React.PropsWithChildren<ResizeBarProps>) {
       resizeHandles: p.position === 'left' ? ['w'] : ['e'],
       minConstraints: [p.min, Infinity],
       maxConstraints: [p.max, Infinity],
+      axis: 'x',
     };
   }
 
@@ -51,6 +53,7 @@ export default function ResizeBar(p: React.PropsWithChildren<ResizeBarProps>) {
       onResize={(e: React.SyntheticEvent, data: { size: { height: number } }) =>
         p.onInput(data.size.height)
       }
+      transformScale={2}
       {...resizableProps}
       handle={
         <div className={cx(styles.resizeBar, styles[p.position])}>
