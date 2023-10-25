@@ -42,7 +42,9 @@ export function DualOutputSourceSelector(p: IDualOutputSourceSelector) {
             toggleVisibility(p.nodeId);
             makeActive(p.nodeId);
           }}
-          className={v.isHorizontalVisible ? 'icon-desktop' : 'icon-desktop-hide'}
+          className={`${
+            v.isHorizontalVisible ? 'icon-desktop' : 'icon-desktop-hide'
+          } horizontal-source-icon`}
         />
       )}
 
@@ -52,7 +54,9 @@ export function DualOutputSourceSelector(p: IDualOutputSourceSelector) {
             toggleVisibility(v.verticalNodeId);
             makeActive(v.verticalNodeId);
           }}
-          className={v.isVerticalVisible ? 'icon-phone-case' : 'icon-phone-case-hide'}
+          className={`${
+            v.isVerticalVisible ? 'icon-phone-case' : 'icon-phone-case-hide'
+          } vertical-source-icon`}
         />
       )}
     </>

@@ -46,10 +46,12 @@ export abstract class SceneNode implements ISerializable {
   id: string;
   sceneNodeType: TSceneNodeType;
   parentId: string;
+  display?: TDisplayType;
 
   constructor(public sceneId: string, public nodeId: string) {
     this.scene = this.internalScenesService.views.getScene(sceneId);
     this.sceneNode = this.scene.getNode(this.nodeId);
+    this.display = this.sceneNode?.display;
   }
 
   private isDestroyed(): boolean {
