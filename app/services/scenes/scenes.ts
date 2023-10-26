@@ -199,8 +199,8 @@ class ScenesViews extends ViewHandler<IScenesState> {
   }
 
   // adding this getter here is in preparation for migrating the scene node maps property to the scenes service
-  get sceneNodeMaps(): { [sceneId: string]: Dictionary<string> } {
-    return this.sceneCollectionsService.sceneNodeMaps;
+  get sceneNodeMaps(): { [sceneId: string]: Dictionary<string> } | undefined {
+    return this.sceneCollectionsService?.sceneNodeMaps;
   }
 
   getSceneItems(): SceneItem[] {
