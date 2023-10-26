@@ -1,43 +1,29 @@
 import React, { useRef } from 'react';
 import cx from 'classnames';
-import useLayout, { LayoutProps, ILayoutSlotArray } from './hooks';
+import useLayout, { LayoutProps } from './hooks';
 import ResizeBar from 'components-react/root/ResizeBar';
 import styles from './Layouts.m.less';
 
-export function Default(p: React.PropsWithChildren<LayoutProps>) {
-  const vectors: ILayoutSlotArray = ['1', '2', ['3', '4', '5']];
+export function FourByFour(p: React.PropsWithChildren<LayoutProps>) {
   const componentRef = useRef<HTMLDivElement>(null);
 
   const { mins, bars, resizes, calculateMax, setResizing, setBar } = useLayout(
-    componentRef.current as HTMLDivElement,
-    vectors,
+    componentRef.current,
+    ['1', ['2', '3'], ['4', '5']],
     false,
     p.childrenMins,
     p.onTotalWidth,
   );
 
-  function BottomSection() {
-    if (!resizes.bar2) return <></>;
-
-    return (
-      <div
-        className={styles.segmented}
-        style={{ height: `${resizes.bar2 * 100}%`, padding: '0 8px' }}
-      >
-        {['3', '4', '5'].map(slot => (
-          <div className={cx(styles.cell, 'no-top-padding')}>{p.children![slot]}</div>
-        ))}
-      </div>
-    );
+  if (!mins.bar2 || !resizes.bar2) {
+    return <></>;
   }
 
-  if (!mins.bar2) return <></>;
-
   return (
-    <div className={styles.rows} ref={componentRef}>
+    <div className={styles.rows}>
       <div
         className={styles.cell}
-        style={{ height: `${100 - (resizes.bar1 + resizes.bar2!) * 100}%` }}
+        style={{ height: `${100 - (resizes.bar1 + resizes.bar2) * 100}%` }}
       >
         {p.children!['1']}
       </div>
@@ -49,14 +35,11 @@ export function Default(p: React.PropsWithChildren<LayoutProps>) {
         onResizestop={() => setResizing(false)}
         max={calculateMax(mins.rest + bars.bar2)}
         min={mins.bar1}
-      >
-        <div
-          style={{ height: `${resizes.bar1 * 100}%` }}
-          className={cx(styles.cell, 'no-top-padding')}
-        >
-          {p.children!['2']}
-        </div>
-      </ResizeBar>
+      />
+      <div className={styles.segmented} style={{ height: `${resizes.bar1 * 100}%` }}>
+        <div className={cx(styles.cell, 'no-top-padding')}>{p.children!['2']}</div>
+        <div className={cx(styles.cell, 'no-top-padding')}>{p.children!['3']}</div>
+      </div>
       <ResizeBar
         position="top"
         value={bars.bar2}
@@ -65,9 +48,14 @@ export function Default(p: React.PropsWithChildren<LayoutProps>) {
         onResizestop={() => setResizing(false)}
         max={calculateMax(mins.rest + mins.bar1)}
         min={mins.bar2}
+      />
+      <div
+        className={styles.segmented}
+        style={{ height: `${resizes.bar2 * 100}%`, padding: '0 8px' }}
       >
-        <BottomSection />
-      </ResizeBar>
+        <div className={cx(styles.cell, 'no-top-padding')}>{p.children!['4']}</div>
+        <div className={cx(styles.cell, 'no-top-padding')}>{p.children!['5']}</div>
+      </div>
     </div>
   );
 }

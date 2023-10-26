@@ -9,13 +9,16 @@ interface ResizeBarProps {
   value: number;
   min: number;
   max: number;
-  // by default ResizeBar increases the value when move to bottom/right
-  // and decreases when move to left/top
-  // change this option to reverse this behavior
-  reverse: boolean;
   onResizestart: (offset?: number) => void;
   onResizestop: (offset?: number) => void;
   onInput: (val: number) => void;
+}
+
+interface ResizableData {
+  size: {
+    height: number;
+    width: number;
+  };
 }
 
 /**
@@ -44,15 +47,18 @@ export default function ResizeBar(p: React.PropsWithChildren<ResizeBarProps>) {
     };
   }
 
+  function handleResize(callback: (val?: number) => void) {
+    return (e: React.SyntheticEvent, data: ResizableData) => {
+      const value = p.position === 'top' ? data.size.height : data.size.width;
+      callback(value);
+    };
+  }
+
   return (
     <Resizable
-      onResizeStart={(e: React.SyntheticEvent, data: { size: { height: number } }) =>
-        p.onResizestart()
-      }
-      onResizeStop={() => p.onResizestop()}
-      onResize={(e: React.SyntheticEvent, data: { size: { height: number } }) =>
-        p.onInput(data.size.height)
-      }
+      onResizeStart={handleResize(p.onResizestart)}
+      onResizeStop={handleResize(p.onResizestop)}
+      onResize={handleResize(p.onInput)}
       transformScale={2}
       {...resizableProps}
       handle={

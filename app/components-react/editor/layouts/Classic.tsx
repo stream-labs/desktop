@@ -15,9 +15,6 @@ export function Classic(p: React.PropsWithChildren<LayoutProps>) {
     p.onTotalWidth,
   );
 
-  console.log('rendering', !!componentRef.current);
-  console.log(bars, mins, resizes);
-
   return (
     <div className={styles.rows} ref={componentRef}>
       <div className={styles.cell} style={{ height: `${100 - resizes.bar1 * 100}%` }}>
@@ -31,7 +28,6 @@ export function Classic(p: React.PropsWithChildren<LayoutProps>) {
         onResizestop={() => setResizing(false)}
         max={calculateMax(mins.rest)}
         min={mins.bar1}
-        reverse={true}
       >
         <div
           className={styles.segmented}
