@@ -40,7 +40,7 @@ export const LAYOUT_DATA: ILayoutData = {
   [ELayout.TwoPane]: {
     resizeDefaults: { bar1: 0.5, bar2: 0.3 },
     className: 'twoPane',
-    component: 'Default',
+    component: 'TwoPane',
   },
   [ELayout.Classic]: {
     resizeDefaults: { bar1: 0.4 },
@@ -50,27 +50,27 @@ export const LAYOUT_DATA: ILayoutData = {
   [ELayout.FourByFour]: {
     resizeDefaults: { bar1: 0.25, bar2: 0.25 },
     className: 'fourByFour',
-    component: 'Default',
+    component: 'FourByFour',
   },
   [ELayout.Triplets]: {
     resizeDefaults: { bar1: 0.6, bar2: 0.3 },
     className: 'triplets',
-    component: 'Default',
+    component: 'Triplets',
   },
   [ELayout.OnePane]: {
     resizeDefaults: { bar1: 0.7 },
     className: 'onePane',
-    component: 'Default',
+    component: 'OnePane',
   },
   [ELayout.OnePaneR]: {
     resizeDefaults: { bar1: 0.3 },
     className: 'onePaneR',
-    component: 'Default',
+    component: 'OnePaneR',
   },
   [ELayout.Pyramid]: {
     resizeDefaults: { bar1: 0.4 },
     className: 'pyramid',
-    component: 'Default',
+    component: 'Pyramid',
   },
 };
 

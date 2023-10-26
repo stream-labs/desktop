@@ -4,7 +4,7 @@ import useLayout, { LayoutProps } from './hooks';
 import ResizeBar from 'components-react/root/ResizeBar';
 import styles from './Layouts.m.less';
 
-export function Triplets(p: React.PropsWithChildren<LayoutProps>) {
+export function TwoPane(p: React.PropsWithChildren<LayoutProps>) {
   const componentRef = useRef<HTMLDivElement>(null);
 
   const { mins, bars, resizes, calculateMax, setBar } = useLayout(
