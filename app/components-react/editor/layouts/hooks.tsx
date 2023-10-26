@@ -36,8 +36,6 @@ export default function useLayout(
     bar2: 0,
   });
 
-  const [resizing, setResizing] = useState(false);
-
   const mins = useMemo(() => {
     const [restSlots, bar1Slots, bar2Slots] = vectorsToSlots();
     const rest = calculateMinimum(restSlots);
@@ -58,14 +56,6 @@ export default function useLayout(
       window.removeEventListener('resize', () => updateSize());
     };
   }, [component, chatCollapsed]);
-
-  useEffect(() => {
-    if (resizing) {
-      WindowsService.actions.updateStyleBlockers('main', true);
-    } else {
-      WindowsService.actions.updateStyleBlockers('main', false);
-    }
-  }, [resizing]);
 
   function vectorsToSlots() {
     const slotArray: Array<ILayoutSlotArray> = [];
@@ -137,5 +127,5 @@ export default function useLayout(
     return max - restMin;
   }
 
-  return { setResizing, calculateMax, setBar, mins, bars, resizes };
+  return { calculateMax, setBar, mins, bars, resizes };
 }

@@ -7,7 +7,7 @@ import styles from './Layouts.m.less';
 export function FourByFour(p: React.PropsWithChildren<LayoutProps>) {
   const componentRef = useRef<HTMLDivElement>(null);
 
-  const { mins, bars, resizes, calculateMax, setResizing, setBar } = useLayout(
+  const { mins, bars, resizes, calculateMax, setBar } = useLayout(
     componentRef.current,
     ['1', ['2', '3'], ['4', '5']],
     false,
@@ -31,8 +31,6 @@ export function FourByFour(p: React.PropsWithChildren<LayoutProps>) {
         position="top"
         value={bars.bar1}
         onInput={(value: number) => setBar('bar1', value)}
-        onResizestart={() => setResizing(true)}
-        onResizestop={() => setResizing(false)}
         max={calculateMax(mins.rest + bars.bar2)}
         min={mins.bar1}
       >
@@ -45,8 +43,6 @@ export function FourByFour(p: React.PropsWithChildren<LayoutProps>) {
         position="top"
         value={bars.bar2}
         onInput={(value: number) => setBar('bar2', value)}
-        onResizestart={() => setResizing(true)}
-        onResizestop={() => setResizing(false)}
         max={calculateMax(mins.rest + mins.bar1)}
         min={mins.bar2}
       >

@@ -7,7 +7,7 @@ import styles from './Layouts.m.less';
 export function Pyramid(p: React.PropsWithChildren<LayoutProps>) {
   const componentRef = useRef<HTMLDivElement>(null);
 
-  const { mins, bars, resizes, calculateMax, setResizing, setBar } = useLayout(
+  const { mins, bars, resizes, calculateMax, setBar } = useLayout(
     componentRef.current,
     ['1', ['2', '3']],
     false,
@@ -24,8 +24,6 @@ export function Pyramid(p: React.PropsWithChildren<LayoutProps>) {
         position="top"
         value={bars.bar1}
         onInput={(value: number) => setBar('bar1', value)}
-        onResizestart={() => setResizing(true)}
-        onResizestop={() => setResizing(false)}
         max={calculateMax(mins.rest)}
         min={mins.bar1}
       >

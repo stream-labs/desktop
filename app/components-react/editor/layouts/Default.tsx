@@ -8,7 +8,7 @@ export function Default(p: React.PropsWithChildren<LayoutProps>) {
   const vectors: ILayoutSlotArray = ['1', '2', ['3', '4', '5']];
   const componentRef = useRef<HTMLDivElement>(null);
 
-  const { mins, bars, resizes, calculateMax, setResizing, setBar } = useLayout(
+  const { mins, bars, resizes, calculateMax, setBar } = useLayout(
     componentRef.current as HTMLDivElement,
     vectors,
     false,
@@ -45,8 +45,6 @@ export function Default(p: React.PropsWithChildren<LayoutProps>) {
         position="top"
         value={bars.bar1}
         onInput={(value: number) => setBar('bar1', value)}
-        onResizestart={() => setResizing(true)}
-        onResizestop={() => setResizing(false)}
         max={calculateMax(mins.rest + bars.bar2)}
         min={mins.bar1}
       >
@@ -61,8 +59,6 @@ export function Default(p: React.PropsWithChildren<LayoutProps>) {
         position="top"
         value={bars.bar2}
         onInput={(value: number) => setBar('bar2', value)}
-        onResizestart={() => setResizing(true)}
-        onResizestop={() => setResizing(false)}
         max={calculateMax(mins.rest + mins.bar1)}
         min={mins.bar2}
       >

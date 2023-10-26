@@ -7,7 +7,7 @@ import styles from './Layouts.m.less';
 export function OnePane(p: React.PropsWithChildren<LayoutProps>) {
   const componentRef = useRef<HTMLDivElement>(null);
 
-  const { mins, bars, resizes, calculateMax, setResizing, setBar } = useLayout(
+  const { mins, bars, resizes, calculateMax, setBar } = useLayout(
     componentRef.current,
     ['2', ['1', ['3', '4', '5']]],
     false,
@@ -24,8 +24,6 @@ export function OnePane(p: React.PropsWithChildren<LayoutProps>) {
         position="left"
         value={bars.bar1}
         onInput={(value: number) => setBar('bar1', value)}
-        onResizestart={() => setResizing(true)}
-        onResizestop={() => setResizing(false)}
         max={calculateMax(mins.rest)}
         min={mins.bar1}
       >

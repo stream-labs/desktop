@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Resizable, ResizableProps } from 'react-resizable';
 import cx from 'classnames';
 import styles from './ResizeBar.m.less';
+import { Services } from 'components-react/service-provider';
 
 interface ResizeBarProps {
   // the side of the external container to stick ResizeBar to
@@ -9,8 +10,8 @@ interface ResizeBarProps {
   value: number;
   min: number;
   max: number;
-  onResizestart: (offset?: number) => void;
-  onResizestop: (offset?: number) => void;
+  onResizestart?: (offset?: number) => void;
+  onResizestop?: (offset?: number) => void;
   onInput: (val: number) => void;
 }
 
@@ -25,6 +26,8 @@ interface ResizableData {
  * This component can be added to any element as a resize control
  */
 export default function ResizeBar(p: React.PropsWithChildren<ResizeBarProps>) {
+  const { WindowsService } = Services;
+
   let resizableProps: ResizableProps;
 
   if (p.position === 'top') {
@@ -54,10 +57,24 @@ export default function ResizeBar(p: React.PropsWithChildren<ResizeBarProps>) {
     };
   }
 
+  function resizeStart(val?: number) {
+    WindowsService.actions.updateStyleBlockers('main', true);
+    if (p.onResizestart) {
+      p.onResizestart(val);
+    }
+  }
+
+  function resizeStop(val?: number) {
+    WindowsService.actions.updateStyleBlockers('main', false);
+    if (p.onResizestop) {
+      p.onResizestop(val);
+    }
+  }
+
   return (
     <Resizable
-      onResizeStart={handleResize(p.onResizestart)}
-      onResizeStop={handleResize(p.onResizestop)}
+      onResizeStart={handleResize(resizeStart)}
+      onResizeStop={handleResize(resizeStop)}
       onResize={handleResize(p.onInput)}
       transformScale={2}
       {...resizableProps}
