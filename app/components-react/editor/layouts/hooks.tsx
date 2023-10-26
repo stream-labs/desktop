@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { LayoutSlot, IVec2Array } from 'services/layout';
 import { useVuex } from 'components-react/hooks';
 import { Services } from 'components-react/service-provider';
@@ -17,7 +17,6 @@ export interface IResizeMins {
 export interface ILayoutSlotArray extends Array<ILayoutSlotArray | LayoutSlot> {}
 
 export default function useLayout(
-  component: HTMLDivElement | null,
   vectors: ILayoutSlotArray,
   isColumns: boolean,
   childrenMins: Dictionary<IVec2>,
@@ -46,16 +45,22 @@ export default function useLayout(
   }, []);
 
   useEffect(() => {
-    console.log('firing', !!component);
-    if (!component) return;
     onTotalWidth(mapVectors(vectors), isColumns);
-
-    window.addEventListener('resize', () => updateSize());
     updateSize();
-    return () => {
+  }, [chatCollapsed]);
+
+  const componentEl = useRef<HTMLDivElement | null>(null);
+
+  const componentRef = useCallback(node => {
+    if (node) {
+      componentEl.current = node;
+      onTotalWidth(mapVectors(vectors), isColumns);
+      window.addEventListener('resize', () => updateSize());
+      updateSize();
+    } else {
       window.removeEventListener('resize', () => updateSize());
-    };
-  }, [component, chatCollapsed]);
+    }
+  }, []);
 
   function vectorsToSlots() {
     const slotArray: Array<ILayoutSlotArray> = [];
@@ -67,18 +72,18 @@ export default function useLayout(
   }
 
   function getBarPixels(bar: 'bar1' | 'bar2', offset: number) {
-    if (!component) return;
+    if (!componentEl.current) return;
     // Migrate from pixels to proportions
     if ((resizes[bar] as number) >= 1) setBar(bar, resizes[bar] as number);
-    const { height, width } = component.getBoundingClientRect();
+    const { height, width } = componentEl.current.getBoundingClientRect();
     const offsetSize = isColumns ? width - offset : height;
     return Math.round(offsetSize * (resizes[bar] as number));
   }
 
   function setBar(bar: 'bar1' | 'bar2', val: number) {
-    if (val === 0 || !component) return;
+    if (val === 0 || !componentEl.current) return;
     setBars({ ...bars, [bar]: val });
-    const { height, width } = component.getBoundingClientRect();
+    const { height, width } = componentEl.current.getBoundingClientRect();
     const totalSize = isColumns ? width : height;
     const proportion = parseFloat((val / totalSize).toFixed(2));
     LayoutService.actions.setBarResize(bar, proportion);
@@ -121,11 +126,11 @@ export default function useLayout(
   }
 
   function calculateMax(restMin: number) {
-    if (!component) return 0;
-    const { height, width } = component.getBoundingClientRect();
+    if (!componentEl.current) return 0;
+    const { height, width } = componentEl.current.getBoundingClientRect();
     const max = isColumns ? width : height;
     return max - restMin;
   }
 
-  return { calculateMax, setBar, mins, bars, resizes };
+  return { componentRef, calculateMax, setBar, mins, bars, resizes };
 }

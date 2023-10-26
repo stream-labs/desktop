@@ -5,10 +5,7 @@ import ResizeBar from 'components-react/root/ResizeBar';
 import styles from './Layouts.m.less';
 
 export function FourByFour(p: React.PropsWithChildren<LayoutProps>) {
-  const componentRef = useRef<HTMLDivElement>(null);
-
-  const { mins, bars, resizes, calculateMax, setBar } = useLayout(
-    componentRef.current,
+  const { mins, bars, resizes, calculateMax, setBar, componentRef } = useLayout(
     ['1', ['2', '3'], ['4', '5']],
     false,
     p.childrenMins,

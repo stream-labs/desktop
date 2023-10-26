@@ -5,10 +5,7 @@ import ResizeBar from 'components-react/root/ResizeBar';
 import styles from './Layouts.m.less';
 
 export function Pyramid(p: React.PropsWithChildren<LayoutProps>) {
-  const componentRef = useRef<HTMLDivElement>(null);
-
-  const { mins, bars, resizes, calculateMax, setBar } = useLayout(
-    componentRef.current,
+  const { mins, bars, resizes, calculateMax, setBar, componentRef } = useLayout(
     ['1', ['2', '3']],
     false,
     p.childrenMins,

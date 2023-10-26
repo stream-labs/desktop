@@ -5,12 +5,8 @@ import ResizeBar from 'components-react/root/ResizeBar';
 import styles from './Layouts.m.less';
 
 export function Default(p: React.PropsWithChildren<LayoutProps>) {
-  const vectors: ILayoutSlotArray = ['1', '2', ['3', '4', '5']];
-  const componentRef = useRef<HTMLDivElement>(null);
-
-  const { mins, bars, resizes, calculateMax, setBar } = useLayout(
-    componentRef.current as HTMLDivElement,
-    vectors,
+  const { mins, bars, resizes, calculateMax, setBar, componentRef } = useLayout(
+    ['1', '2', ['3', '4', '5']],
     false,
     p.childrenMins,
     p.onTotalWidth,
