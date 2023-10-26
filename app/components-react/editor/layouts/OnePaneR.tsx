@@ -10,7 +10,7 @@ export function OnePaneR(p: React.PropsWithChildren<LayoutProps>) {
   const { mins, bars, resizes, calculateMax, setBar } = useLayout(
     componentRef.current,
     [['1', ['3', '4', '5']], '2'],
-    false,
+    true,
     p.childrenMins,
     p.onTotalWidth,
   );
