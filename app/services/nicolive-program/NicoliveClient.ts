@@ -374,7 +374,7 @@ export class NicoliveClient {
     });
     try {
       const resp = await fetch(
-        `${NicoliveClient.live2BaseURL}/unama/tool/v2/programs/${programID}/ssng`, // TODO
+        `${NicoliveClient.live2BaseURL}/unama/tool/v2/programs/${programID}/ssng`,
         requestInit,
       );
       return NicoliveClient.wrapResult<Filters['data']>(resp);
@@ -397,7 +397,7 @@ export class NicoliveClient {
     });
     try {
       const resp = await fetch(
-        `${NicoliveClient.live2BaseURL}/unama/tool/v2/programs/${programID}/ssng`, // TODO
+        `${NicoliveClient.live2BaseURL}/unama/tool/v2/programs/${programID}/ssng/create`,
         requestInit,
       );
       return NicoliveClient.wrapResult<Filters['data']>(resp);
