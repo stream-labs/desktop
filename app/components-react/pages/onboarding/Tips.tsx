@@ -20,6 +20,7 @@ const linkProps = { slot: 'link', onClick: openExternalLink };
 function AllStarsTip() {
   return (
     <li>
+      <i className="icon-earnings" />
       <Translate
         message={$t(
           'Earn rewards by streaming. Check your All Stars rank <link>in your dashboard</link>',
@@ -35,6 +36,7 @@ function BeginnerTips() {
   return (
     <>
       <li>
+        <i className="icon-desktop" />
         <Translate
           message={$t('Set yourself up for success with our <link>getting started guide</link>')}
         >
@@ -45,6 +47,7 @@ function BeginnerTips() {
         </Translate>
       </li>
       <li>
+        <i className="icon-disconnected" />
         <Translate message={$t('Prevent crashes with <link>this troubleshooting guide</link>')}>
           <a
             href="https://streamlabs.com/content-hub/post/streamlabs-desktop-crash-troubleshooting-guide"
@@ -54,6 +57,7 @@ function BeginnerTips() {
       </li>
       <AllStarsTip />
       <li>
+        <i className="icon-education" />
         <Translate
           message={$t(
             'Learn more about streaming through our free <link>Streamer University</link>',
@@ -73,6 +77,7 @@ function IntermediateTips() {
   return (
     <>
       <li>
+        <i className="icon-widgets" />
         <Translate
           message={$t('Set up your alerts and widgets on <link>Streamlabs Dashboard</link>')}
         >
@@ -81,6 +86,7 @@ function IntermediateTips() {
       </li>
       <AllStarsTip />
       <li>
+        <i className="icon-settings" />
         <Translate
           message={$t(
             'Need further assistance? Check out our <link>Creator resource hub</link> for everything you need',
@@ -99,7 +105,7 @@ export function Tips() {
   const title =
     streamerKnowledgeMode === StreamerKnowledgeMode.BEGINNER
       ? $t('Tips to run your first stream like Pro:')
-      : $t('Tips to get the most out of your experience');
+      : $t('Tips to get the most out of your experience:');
 
   const tips = useMemo(() => {
     if (streamerKnowledgeMode === StreamerKnowledgeMode.BEGINNER) {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import styles from './Connect.m.less';
 import commonStyles from './Common.m.less';
 import { $t } from 'services/i18n';
@@ -14,8 +14,11 @@ import { EAuthProcessState } from 'services/user';
 import { ListInput } from 'components-react/shared/inputs';
 import Form from 'components-react/shared/inputs/Form';
 import Signup from './Signup';
+import { SkipContext } from './OnboardingContext';
 
 export function Connect() {
+  const ctx = useContext(SkipContext);
+
   const {
     isRelog,
     selectedExtraPlatform,
@@ -33,9 +36,18 @@ export function Connect() {
   }
 
   function onSkip() {
-    if (loading || authInProgress) return;
+    if (loading || authInProgress) {
+      return;
+    }
+
+    console.log('running next from connect skip');
     next();
+
+    // Do not run default skip
+    return false;
   }
+
+  ctx.onSkip = onSkip;
 
   function onSelectExtraPlatform(val: TExtraPlatform | 'tiktok' | undefined) {
     if (val === 'tiktok') {
@@ -128,11 +140,6 @@ export function Connect() {
             </Form>
           </>
         )}
-      </div>
-      <div className={styles.footer}>
-        <span className={styles['link-button']} onClick={onSkip}>
-          {$t('Skip')}
-        </span>
       </div>
       <div className={styles.svgBackgrounds}>
         <SVGOvalLeftBackground />

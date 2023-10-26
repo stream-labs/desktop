@@ -70,20 +70,49 @@
 
 .footer {
   display: flex;
-  justify-content: flex-end;
-  position: relative;
-  background: var(--background);
-  left: 0;
-  right: 0;
+  flex-direction: row;
+  position: absolute;
   bottom: 0;
-  width: calc(100% - 80px);
   padding: 24px 0;
-  margin: 0 40px;
-  z-index: 10;
-  flex-shrink: 0;
-  border-top: 1px solid var(--border);
+  width: 100%;
 
-  button {
-    margin-left: 16px;
+  .progress {
+    display: flex;
+    flex: 1;
+    align-self: center;
+    justify-content: center;
+    margin-top: 40px;
+    margin-bottom: 40px;
+
+    // Accomodate progress bar so still centered when there's a skip button to its right
+    &-with-skip {
+      padding-left: 40px;
+    }
+
+    :global(.ant-progress-steps-item) {
+      width: 8px !important;
+      height: 8px !important;
+      border-radius: 8px;
+      background-color: var(--midtone);
+      margin-right: 8px;
+
+      &-active {
+        background-color: var(--icon);
+      }
+    }
+  }
+
+  .skip {
+    position: relative;
+    bottom: 20px;
+    right: 40px;
+  }
+}
+
+.link-button {
+  text-decoration: underline;
+
+  &:hover {
+    cursor: pointer;
   }
 }

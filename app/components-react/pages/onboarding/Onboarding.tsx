@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo, useContext, createContext } from 'react';
+import { Button, Progress } from 'antd';
 import styles from './Onboarding.m.less';
 import commonStyles from './Common.m.less';
 import { Services } from 'components-react/service-provider';
@@ -12,15 +13,49 @@ import Scrollable from 'components-react/shared/Scrollable';
 import StreamlabsDesktopLogo from 'components-react/shared/StreamlabsDesktopLogo';
 import StreamlabsLogo from 'components-react/shared/StreamlabsLogo';
 import StreamlabsUltraLogo from 'components-react/shared/StreamlabsUltraLogo';
+import { SkipContext } from './OnboardingContext';
 
 export default function Onboarding() {
-  const { currentStep, next, processing, finish, UsageStatisticsService } = useModule(
-    OnboardingModule,
-  );
+  const {
+    currentStep,
+    steps,
+    totalSteps,
+    next,
+    processing,
+    finish,
+    UsageStatisticsService,
+  } = useModule(OnboardingModule);
+
+  // This would probably be easier with Vuex or RxJS but not sure how easy is to rely on return values
+  const ctx = useContext(SkipContext);
+
+  const skip = () => {
+    // Return false from skip function to avoid running the default skip logic
+    const result = ctx.onSkip();
+
+    // We do not want to reset onSkip if the skip function returns undefined
+    if (result === undefined) return;
+
+    // Reset onSkip to default, after a component's custom skip function has run
+    ctx.onSkip = () => true;
+
+    // Skip default behavior if the skip function returns false
+    if (result === false) return;
+
+    next(true);
+  };
 
   useEffect(() => {
     UsageStatisticsService.actions.recordShown('Onboarding', currentStep.component);
   }, [currentStep.component]);
+
+  const currentStepIndex = useMemo(() => {
+    if (!currentStep) {
+      return 0;
+    }
+
+    return steps.findIndex(step => step.component === currentStep.component);
+  }, [steps]);
 
   // TODO: Onboarding service needs a refactor away from step index-based.
   // In the meantime, if we run a render cycle and step index is greater
@@ -33,28 +68,43 @@ export default function Onboarding() {
 
   const Component = stepComponents[currentStep.component];
 
+  const percent = ((currentStepIndex + 1) / totalSteps) * 100;
+
+  // FIXME: pagination is showing if user picks recording mode
   return (
     <div className={styles.onboardingContainer}>
       {<TopBar />}
+
       <div className={styles.onboardingContent}>
         <Scrollable style={{ height: '100%' }}>
           <Component />
+          {!currentStep.hideButton && <ActionButton />}
         </Scrollable>
       </div>
-      {(!currentStep.hideSkip || !currentStep.hideButton) && (
-        <div className={styles.footer}>
-          {!currentStep.hideSkip && (
+
+      <div className={styles.footer}>
+        <div
+          className={cx(styles.progress, { [styles.progressWithSkip]: currentStep.isSkippable })}
+        >
+          <Progress showInfo={false} steps={totalSteps} percent={percent} />
+        </div>
+
+        {currentStep.isSkippable && (
+          <div className={styles.skip}>
             <button
-              className={cx('button button--trans', commonStyles.onboardingButton)}
-              onClick={() => next(true)}
+              className={cx(
+                'button button--trans',
+                styles.linkButton,
+                commonStyles.onboardingButton,
+              )}
+              onClick={skip}
               disabled={processing}
             >
               {$t('Skip')}
             </button>
-          )}
-          <ActionButton />
-        </div>
-      )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -119,15 +169,18 @@ function ActionButton() {
   if (currentStep.hideButton) return null;
   const isPrimeStep = currentStep.label === $t('Ultra');
   return (
-    <button
-      className={cx('button button--action', commonStyles.onboardingButton, {
-        ['button--prime']: isPrimeStep,
-      })}
-      onClick={() => next()}
-      disabled={processing}
-    >
-      {isPrimeStep ? $t('Go Ultra') : $t('Continue')}
-    </button>
+    <div style={{ flex: 1, justifyContent: 'center', display: 'flex', alignItems: 'center' }}>
+      <Button
+        className={cx({ 'button--prime': isPrimeStep })}
+        type="primary"
+        shape="round"
+        size="large"
+        onClick={() => next()}
+        disabled={processing}
+      >
+        {isPrimeStep ? $t('Go Ultra') : $t('Continue')}
+      </Button>
+    </div>
   );
 }
 
@@ -157,6 +210,10 @@ export class OnboardingModule {
     return this.OnboardingService.views.steps;
   }
 
+  get totalSteps() {
+    return this.OnboardingService.views.totalSteps;
+  }
+
   get singletonStep() {
     return this.OnboardingService.views.singletonStep;
   }
@@ -178,9 +235,15 @@ export class OnboardingModule {
     return this.OnboardingService.views.streamerKnowledgeMode;
   }
 
-  setRecordingMode() {
-    this.RecordingModeService.setRecordingMode(true);
-    this.RecordingModeService.setUpRecordingFirstTimeSetup();
+  setRecordingMode(val: boolean) {
+    this.RecordingModeService.setRecordingMode(val);
+    if (val) {
+      this.RecordingModeService.setUpRecordingFirstTimeSetup();
+    }
+  }
+
+  get isRecordingModeEnabled() {
+    return this.RecordingModeService.views.isRecordingModeEnabled;
   }
 
   setImportFromObs() {

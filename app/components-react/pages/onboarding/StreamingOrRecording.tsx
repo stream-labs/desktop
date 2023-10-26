@@ -17,6 +17,7 @@ export function StreamingOrRecording() {
     UsageStatisticsService,
     streamerKnowledgeMode,
     setStreamerKnowledgeMode,
+    isRecordingModeEnabled,
   } = useModule(OnboardingModule);
   const [active, setActive] = useState<'streaming' | 'recording' | null>(null);
 
@@ -39,8 +40,19 @@ export function StreamingOrRecording() {
       if (!result) return;
 
       setStreamerKnowledgeMode(null);
-      setRecordingMode();
+      setRecordingMode(true);
     }
+
+    /*
+     * Edge case as users shouldn't go multiple times through onboarding,
+     * but after selecting recording mode, it gets enabled and picking
+     * streaming mode subsequently does not disable it, preventing you from logging
+     * with Twitch, etc.
+     */
+    if (active === 'streaming' && isRecordingModeEnabled) {
+      setRecordingMode(false);
+    }
+
     UsageStatisticsService.actions.recordClick('StreamingOrRecording', active);
 
     UsageStatisticsService.actions.recordClick(
