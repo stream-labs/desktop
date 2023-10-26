@@ -515,7 +515,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   }
 
   get sceneNodeMaps() {
-    return this.stateService.sceneNodeMaps;
+    return this.stateService?.sceneNodeMaps;
   }
 
   /* PRIVATE ----------------------------------------------------- */
