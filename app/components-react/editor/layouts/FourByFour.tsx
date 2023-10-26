@@ -20,7 +20,7 @@ export function FourByFour(p: React.PropsWithChildren<LayoutProps>) {
   }
 
   return (
-    <div className={styles.rows}>
+    <div className={styles.rows} ref={componentRef}>
       <div
         className={styles.cell}
         style={{ height: `${100 - (resizes.bar1 + resizes.bar2) * 100}%` }}
@@ -35,11 +35,12 @@ export function FourByFour(p: React.PropsWithChildren<LayoutProps>) {
         onResizestop={() => setResizing(false)}
         max={calculateMax(mins.rest + bars.bar2)}
         min={mins.bar1}
-      />
-      <div className={styles.segmented} style={{ height: `${resizes.bar1 * 100}%` }}>
-        <div className={cx(styles.cell, 'no-top-padding')}>{p.children!['2']}</div>
-        <div className={cx(styles.cell, 'no-top-padding')}>{p.children!['3']}</div>
-      </div>
+      >
+        <div className={styles.segmented} style={{ height: `${resizes.bar1 * 100}%` }}>
+          <div className={cx(styles.cell, 'no-top-padding')}>{p.children!['2']}</div>
+          <div className={cx(styles.cell, 'no-top-padding')}>{p.children!['3']}</div>
+        </div>
+      </ResizeBar>
       <ResizeBar
         position="top"
         value={bars.bar2}
@@ -48,14 +49,15 @@ export function FourByFour(p: React.PropsWithChildren<LayoutProps>) {
         onResizestop={() => setResizing(false)}
         max={calculateMax(mins.rest + mins.bar1)}
         min={mins.bar2}
-      />
-      <div
-        className={styles.segmented}
-        style={{ height: `${resizes.bar2 * 100}%`, padding: '0 8px' }}
       >
-        <div className={cx(styles.cell, 'no-top-padding')}>{p.children!['4']}</div>
-        <div className={cx(styles.cell, 'no-top-padding')}>{p.children!['5']}</div>
-      </div>
+        <div
+          className={styles.segmented}
+          style={{ height: `${resizes.bar2 * 100}%`, padding: '0 8px' }}
+        >
+          <div className={cx(styles.cell, 'no-top-padding')}>{p.children!['4']}</div>
+          <div className={cx(styles.cell, 'no-top-padding')}>{p.children!['5']}</div>
+        </div>
+      </ResizeBar>
     </div>
   );
 }
