@@ -365,6 +365,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     } else {
       this.selectionService.views.globalSelection.reset();
     }
+
+    this.settingsService.showSettings('Video');
   }
 
   /**
