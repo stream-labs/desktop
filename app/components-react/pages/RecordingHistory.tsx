@@ -55,6 +55,11 @@ class RecordingHistoryModule {
         value: 'typestudio',
         icon: 'icon-mic',
       },
+      {
+        label: $t('Edit'),
+        value: 'videoeditor',
+        icon: 'icon-play-round',
+      },
     ];
     if (this.hasYoutube) {
       opts.unshift({
