@@ -255,6 +255,7 @@ function PlatformSelect(p: { onClose: () => void }) {
     { label: 'YouTube', value: 'youtube' },
     { label: 'Cross Clip', value: 'crossclip' },
     { label: 'Podcast Editor', value: 'typestudio' },
+    { label: 'Video Editor', value: 'videoeditor' },
   ];
 
   return (
