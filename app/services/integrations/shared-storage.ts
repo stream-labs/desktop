@@ -40,7 +40,7 @@ class SharedStorageServiceViews extends ViewHandler<{}> {
       return `https://podcasteditor.streamlabs.com/storage/${id}`;
     }
     if (platform === 'videoeditor') {
-      return `https://videoeditor.streamlabs.com/import/${id}`;
+      return `https://stage.oslo.io/import/${id}`;
     }
     return '';
   }
@@ -168,7 +168,7 @@ export class SharedStorageService extends Service {
     const { name, dir } = path.parse(filepath);
     const bookmarksFile = path.join(dir, `${name}_markers.csv`);
     let bookmarks;
-    // if (fs.existsSync(bookmarksFile)) bookmarks = await this.parseBookmarks(bookmarksFile);
+    if (fs.existsSync(bookmarksFile)) bookmarks = await this.parseBookmarks(bookmarksFile);
     const url = `${this.host}/storage/v1/temporary-shares`;
     const headers = authorizedHeaders(
       this.userService.apiToken,
