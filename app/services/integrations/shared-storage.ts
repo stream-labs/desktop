@@ -136,6 +136,7 @@ export class SharedStorageService extends Service {
     this.cancel();
     this.id = undefined;
     this.cancel = undefined;
+    this.uploading = false;
     return await jfetch(new Request(url, { headers, method: 'DELETE' }));
   }
 
