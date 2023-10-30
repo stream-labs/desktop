@@ -44,7 +44,7 @@ export const ONBOARDING_STEPS = () => ({
     hideButton: true,
     isPreboarding: true,
     cond: isMac,
-    isSkippable: false,
+    isSkippable: true,
   },
   [EOnboardingSteps.StreamingOrRecording]: {
     component: 'StreamingOrRecording',
