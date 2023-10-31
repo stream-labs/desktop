@@ -1,11 +1,11 @@
 import React from 'react';
 import omit from 'lodash/omit';
-import { injectState, mutation, useModule } from 'slap';
 import { Services } from '../../service-provider';
 import { TPropertiesManager, TSourceType } from 'services/sources';
 import { WidgetType } from 'services/widgets';
 import { byOS, OS } from 'util/operating-systems';
 import { IAppSource } from 'services/platform-apps';
+import { initStore, useController } from 'components-react/hooks/zustand';
 
 interface ISelectSourceOptions {
   propertiesManager?: TPropertiesManager;
@@ -19,8 +19,8 @@ type TInspectableSource = TSourceType | WidgetType | 'streamlabel' | 'app_source
 /**
  * A module for components in the SourceShowcase window
  */
-class SourceShowcaseModule {
-  state = injectState({
+export class SourceShowcaseController {
+  store = initStore({
     inspectedSource: (Services.UserService.views.isLoggedIn
       ? 'AlertBox'
       : 'ffmpeg_source') as TInspectableSource,
@@ -50,15 +50,16 @@ class SourceShowcaseModule {
     }, []);
   }
 
-  @mutation()
   inspectSource(source: string, appId?: string, appSourceId?: string) {
-    this.state.inspectedSource = source;
-    this.state.inspectedAppId = appId || '';
-    this.state.inspectedAppSourceId = appSourceId || '';
+    this.store.setState(s => {
+      s.inspectedSource = source;
+      s.inspectedAppId = appId || '';
+      s.inspectedAppSourceId = appSourceId || '';
+    });
   }
 
   selectInspectedSource() {
-    const inspectedSource = this.state.inspectedSource;
+    const inspectedSource = this.store.inspectedSource;
     if (WidgetType[inspectedSource] != null) {
       this.selectWidget(WidgetType[inspectedSource] as WidgetType);
     } else if (inspectedSource === 'streamlabel') {
@@ -68,7 +69,7 @@ class SourceShowcaseModule {
     } else if (inspectedSource === 'icon_library') {
       this.selectSource('image_source', { propertiesManager: 'iconLibrary' });
     } else if (inspectedSource === 'app_source') {
-      this.selectAppSource(this.state.inspectedAppId, this.state.inspectedAppSourceId);
+      this.selectAppSource(this.store.inspectedAppId, this.store.inspectedAppSourceId);
     } else if (
       this.sourcesService.getAvailableSourcesTypes().includes(inspectedSource as TSourceType)
     ) {
@@ -109,7 +110,11 @@ class SourceShowcaseModule {
   }
 }
 
+export const SourceShowcaseControllerCtx = React.createContext<SourceShowcaseController | null>(
+  null,
+);
+
 // wrap the module in a hook
 export function useSourceShowcaseSettings() {
-  return useModule(SourceShowcaseModule);
+  return useController(SourceShowcaseControllerCtx);
 }
