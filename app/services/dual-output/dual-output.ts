@@ -350,6 +350,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
   @RunInLoadingMode()
   setdualOutputMode(status?: boolean) {
+    if (!this.userService.isLoggedIn) return;
+
     this.SET_SHOW_DUAL_OUTPUT(status);
 
     if (this.state.dualOutputMode) {
