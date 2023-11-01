@@ -4,6 +4,7 @@ import { TextInput } from 'components-react/shared/inputs';
 import { byOS, OS } from 'util/operating-systems';
 import Form from './inputs/Form';
 import { Input } from 'antd';
+import { Services } from 'components-react/service-provider';
 
 /**
  * Turns a binding into a string representation
@@ -65,6 +66,8 @@ export default function HotkeyBinding(p: {
   binding: IBinding | null;
   onBind: (binding: IBinding) => void;
 }) {
+  const { MarkersService } = Services;
+
   const [focused, setFocused] = useState(false);
   const inputRef = useRef<Input>(null);
 
@@ -101,12 +104,27 @@ export default function HotkeyBinding(p: {
     if (inputRef.current) inputRef.current.blur();
   }
 
+  function handleLabel(value: string) {
+    MarkersService.actions.setMarkerName(p.hotkey.actionName, value);
+  }
+
+  function HotkeyLabel() {
+    if (!p.hotkey.isMarker) return <>{p.hotkey.description || ''}</>;
+    return (
+      <TextInput
+        value={MarkersService.views.getLabel(p.hotkey.actionName)}
+        onChange={handleLabel}
+        nowrap
+      />
+    );
+  }
+
   return (
     <Form layout="inline">
       <TextInput
         name="binding"
         style={{ width: 400 }}
-        label={p.hotkey.description}
+        label={<HotkeyLabel />}
         value={getHotkeyString(p.binding, focused)}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}

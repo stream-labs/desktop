@@ -136,6 +136,7 @@ export class SharedStorageService extends Service {
     this.cancel();
     this.id = undefined;
     this.cancel = undefined;
+    this.uploading = false;
     return await jfetch(new Request(url, { headers, method: 'DELETE' }));
   }
 
@@ -168,7 +169,7 @@ export class SharedStorageService extends Service {
     const { name, dir } = path.parse(filepath);
     const bookmarksFile = path.join(dir, `${name}_markers.csv`);
     let bookmarks;
-    // if (fs.existsSync(bookmarksFile)) bookmarks = await this.parseBookmarks(bookmarksFile);
+    if (fs.existsSync(bookmarksFile)) bookmarks = await this.parseBookmarks(bookmarksFile);
     const url = `${this.host}/storage/v1/temporary-shares`;
     const headers = authorizedHeaders(
       this.userService.apiToken,
