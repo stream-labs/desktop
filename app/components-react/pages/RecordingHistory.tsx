@@ -16,6 +16,7 @@ import styles from './RecordingHistory.m.less';
 import AutoProgressBar from 'components-react/shared/AutoProgressBar';
 import { GetSLID } from 'components-react/highlighter/StorageUpload';
 import { ENotificationType } from 'services/notifications';
+import Scrollable from 'components-react/shared/Scrollable';
 import { Services } from '../service-provider';
 import { initStore, useController } from '../hooks/zustand';
 import { useVuex } from '../hooks';
@@ -186,17 +187,19 @@ export function RecordingHistory() {
         )}
       </div>
       <div className={styles.recordingsContainer} id="recordingHistory">
-        {recordings.map(recording => (
-          <div className={styles.recording} key={recording.timestamp}>
-            <span style={{ marginRight: '8px' }}>{formattedTimestamp(recording.timestamp)}</span>
-            <Tooltip title={$t('Show in folder')}>
-              <span onClick={() => showFile(recording.filename)} className={styles.filename}>
-                {recording.filename}
-              </span>
-            </Tooltip>
-            {uploadOptions.length > 0 && <UploadActions filename={recording.filename} />}
-          </div>
-        ))}
+        <Scrollable style={{ height: '100%' }}>
+          {recordings.map(recording => (
+            <div className={styles.recording} key={recording.timestamp}>
+              <span style={{ marginRight: '8px' }}>{formattedTimestamp(recording.timestamp)}</span>
+              <Tooltip title={$t('Show in folder')}>
+                <span onClick={() => showFile(recording.filename)} className={styles.filename}>
+                  {recording.filename}
+                </span>
+              </Tooltip>
+              {uploadOptions.length > 0 && <UploadActions filename={recording.filename} />}
+            </div>
+          ))}
+        </Scrollable>
       </div>
       <ExportModal />
       <SLIDModal />
