@@ -14,8 +14,9 @@ const openExternalLink: React.MouseEventHandler<HTMLAnchorElement> = evt => {
   shell.openExternal(evt.currentTarget.href);
 };
 
-const dashboardUrl = 'https://streamlabs.com/dashboard';
 const linkProps = { slot: 'link', onClick: openExternalLink };
+const dashboardUrl = 'https://streamlabs.com/dashboard';
+const allStarsUrl = `${dashboardUrl}#/all-stars}`;
 
 function AllStarsTip() {
   return (
@@ -23,10 +24,10 @@ function AllStarsTip() {
       <i className="icon-earnings" />
       <Translate
         message={$t(
-          'Earn rewards by streaming. Check your All Stars rank <link>in your dashboard</link>',
+          'Earn rewards by streaming. Check your All Stars rank <link>on your dashboard</link>',
         )}
       >
-        <a href={dashboardUrl} {...linkProps} />
+        <a href={allStarsUrl} {...linkProps} />
       </Translate>
     </li>
   );
@@ -104,7 +105,7 @@ export function Tips() {
 
   const title =
     streamerKnowledgeMode === StreamerKnowledgeMode.BEGINNER
-      ? $t('Tips to run your first stream like Pro:')
+      ? $t('Tips to run your first stream like a Pro:')
       : $t('Tips to get the most out of your experience:');
 
   const tips = useMemo(() => {
@@ -120,7 +121,9 @@ export function Tips() {
 
   return (
     <div className={styles.container}>
-      <div className={commonStyles.titleContainer}>{title}</div>
+      <div className={commonStyles.titleContainer} style={{ marginBottom: 0 }}>
+        {title}
+      </div>
 
       <ul>{tips}</ul>
 

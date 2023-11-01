@@ -61,6 +61,10 @@ export function Connect() {
 
   function afterLogin() {
     OnboardingService.actions.setExistingCollections();
+    /* Since this is the only component that uses custom skip step, might be fine do this this reset default here
+     * but revisit if this ever changes
+     */
+    ctx.onSkip = () => true;
     next();
   }
 

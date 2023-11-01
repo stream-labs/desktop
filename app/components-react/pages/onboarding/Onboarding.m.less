@@ -82,7 +82,14 @@
     align-self: center;
     justify-content: center;
     margin-top: 40px;
-    margin-bottom: 40px;
+
+    @media (min-height: 700px) {
+      margin-bottom: 40px;
+    }
+
+    @media (max-height: 700px) {
+      display: none;
+    }
 
     // Accomodate progress bar so still centered when there's a skip button to its right
     &-with-skip {
@@ -103,8 +110,9 @@
   }
 
   .skip {
-    position: relative;
-    bottom: 20px;
+    // position: relative makes the skip button go left on small windows
+    position: absolute;
+    bottom: 60px;
     right: 40px;
   }
 }

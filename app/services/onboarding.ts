@@ -54,7 +54,8 @@ export const ONBOARDING_STEPS = () => ({
   },
   [EOnboardingSteps.Connect]: {
     component: 'Connect',
-    isSkippable: isIntermediateOrAdvancedOrUnselected,
+    // Skippable for now, ideally will make non-skippable for beginners with a custom RTMP URL setup
+    isSkippable: true,
     hideButton: true,
     isPreboarding: true,
   },
@@ -437,77 +438,3 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
     return true;
   }
 }
-/*
-import { createMachine, assign, actions } from 'xstate';
-const onboardingMachine = createMachine(
-  {
-    id: 'onboarding',
-    initial: 'starting',
-    predictableActionArguments: true,
-    context: {
-      usageMode: null,
-    },
-    states: {
-      starting: {
-        on: {
-          NEXT: [{ target: 'macPermissions', cond: 'isMac' }, { target: 'chooseOnboardingModes' }],
-        },
-      },
-      macPermissions: {
-        on: {
-          NEXT: { target: 'chooseOnboardingModes' },
-        },
-      },
-      chooseOnboardingModes: {
-        initial: 'chooseUsageMode',
-        states: {
-          chooseUsageMode: {
-            description: 'Choose Streaming or Recording Mode',
-            on: {
-              CHOOSE_STREAMING: {
-                target: '.streaming',
-                description: 'Choose Streaming Mode',
-              },
-              CHOOSE_RECORDING: {
-                target: '.recording',
-                description: 'Choose Recording Mode',
-              },
-            },
-            states: {
-              streaming: {
-                always: '../chooseKnowledgeLevel',
-              },
-              recording: {
-                always: '../chooseKnowledgeLevel',
-              },
-            },
-          },
-          chooseKnowledgeLevel: {
-            description: 'Choose Streamer Knowledge Level',
-            on: {
-              CHOOSE_BEGINNER: '../beginnerOnboarding',
-              CHOOSE_INTERMEDIATE: '../intermediateOnboarding',
-              CHOOSE_ADVANCED: '../advancedOnboarding',
-            },
-          },
-        },
-      },
-      loginOrSignup: {},
-      beginnerOnboarding: {
-        on: {
-          NEXT: 'loginOrSignup',
-        },
-      },
-      intermediateOnboarding: {},
-      advancedOnboarding: {},
-    },
-  },
-  {
-    guards: {
-      isMac: (context, event) => {
-        return process.platform === OS.Mac;
-      },
-    },
-  },
-);
-*/

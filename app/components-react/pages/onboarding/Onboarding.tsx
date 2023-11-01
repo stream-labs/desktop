@@ -30,6 +30,7 @@ export default function Onboarding() {
   const ctx = useContext(SkipContext);
 
   const skip = () => {
+    console.log('running on skip', ctx.onSkip);
     // Return false from skip function to avoid running the default skip logic
     const result = ctx.onSkip();
 
@@ -83,11 +84,14 @@ export default function Onboarding() {
       </div>
 
       <div className={styles.footer}>
-        <div
-          className={cx(styles.progress, { [styles.progressWithSkip]: currentStep.isSkippable })}
-        >
-          <Progress showInfo={false} steps={totalSteps} percent={percent} />
-        </div>
+        {/* Skip pagination on Ultra step since it overlaps */}
+        {currentStep.component !== 'Prime' && (
+          <div
+            className={cx(styles.progress, { [styles.progressWithSkip]: currentStep.isSkippable })}
+          >
+            <Progress showInfo={false} steps={totalSteps} percent={percent} />
+          </div>
+        )}
 
         {currentStep.isSkippable && (
           <div className={styles.skip}>
@@ -128,39 +132,6 @@ function TopBar() {
       <TopBarLogo component={component} />
     </div>
   );
-
-  /*
-  const { stepIndex, preboardingOffset, singletonStep, steps } = useModule(OnboardingModule);
-
-  if (stepIndex < preboardingOffset || singletonStep) {
-    return <div />;
-  }
-
-  const offset = preboardingOffset;
-  const stepIdx = stepIndex - offset;
-  const filteredSteps = steps.filter(step => !step.isPreboarding);
-
-  return (
-    <div className={styles.topBarContainer}>
-      {filteredSteps.map((step, i) => {
-        let stepClass;
-        if (i === stepIdx) stepClass = styles.current;
-        if (i < stepIdx) stepClass = styles.completed;
-        if (i > stepIdx) stepClass = styles.incomplete;
-        return (
-          <div className={styles.topBarSegment} key={step.label}>
-            <div className={cx(styles.topBarStep, stepClass)}>
-              {i < stepIdx && <i className="icon-check-mark" />}
-            </div>
-            {i < filteredSteps.length - 1 && (
-              <div className={cx(styles.topBarSeperator, stepClass)} />
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-  */
 }
 
 function ActionButton() {

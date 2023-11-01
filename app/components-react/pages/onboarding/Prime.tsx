@@ -15,59 +15,60 @@ export function Prime() {
   if (RecordingModeService.views.isRecordingModeEnabled) {
     tableProps = {
       tableHeaders: [
-        { text: $t('Streamlabs Desktop'), icon: 'icon-desktop' },
         { text: $t('Themes and Overlays'), icon: 'icon-themes' },
-        { text: $t('Multistream'), icon: 'icon-multistream' },
+        { text: $t('Streamlabs Desktop'), icon: 'icon-desktop' },
         { text: $t('Highlighter'), icon: 'icon-slice' },
-        { text: $t('Collab Cam'), icon: 'icon-team-2' },
-        { text: $t('Tipping'), icon: 'icon-donation-settings' },
         { text: $t('Storage'), icon: 'icon-cloud-backup' },
-        { text: $t('Custom Branding'), icon: 'icon-creator-site' },
-        {
-          text: 'Cross Clip',
-          icon: 'icon-editor-7',
-          tooltip: $t('Format Clips for TikTok, Shorts, etc'),
-        },
         {
           text: 'Video Editor',
           icon: 'icon-streamlabs',
           tooltip: $t('Collaborative Video Editing'),
         },
+        {
+          text: 'Cross Clip',
+          icon: 'icon-editor-7',
+          tooltip: $t('Format Clips for TikTok, Shorts, etc'),
+        },
+        { text: $t('Custom Branding'), icon: 'icon-creator-site' },
+        { text: $t('Tipping'), icon: 'icon-donation-settings' },
         { text: $t('Merch Store'), icon: 'icon-upperwear' },
+        { text: $t('Collab Cam'), icon: 'icon-team-2' },
+        {
+          text: $t('All Streamlabs Pro Tools'),
+          icon: 'icon-streamlabs',
+          whisper: 'Cross Clip, Talk Studio, Video Editor, Podcast Editor',
+        },
       ],
       tableData: {
         standard: [
+          { text: $t('Access to Free Overlays and Themes') },
           { text: '✓', key: 'check1' },
-          {
-            text: $t('Access to All Overlays and Themes (%{themeNumber})', {
-              themeNumber: '1000+',
-            }),
-          },
-          { text: '—' },
           { text: '✓', key: 'check2' },
-          { text: $t('Add 1 Guest') },
-          { text: $t('No-Fee Tipping') },
           { text: '1GB' },
-          { text: $t('Logo Maker, Intro Maker, Emote Maker') },
-          { text: $t('Create Custom Videos with Watermark') },
           { text: $t('30 Minute Videos + 15GB Storage') },
+          { text: $t('Create Custom Videos with Watermark') },
+          { text: $t('Logo Maker, Intro Maker, Emote Maker') },
+          { text: $t('No-Fee Tipping') },
           { text: $t('Design and Sell Custom Merch') },
+          { text: $t('Add 1 Guest') },
+          { text: $t('Basic Features') },
         ],
         prime: [
-          { text: '✓', key: 'check1' },
           {
             text: $t('Access to All Overlays and Themes (%{themeNumber})', {
               themeNumber: '1000+',
             }),
           },
+          { text: '✓', key: 'check1' },
           { text: '✓', key: 'check2' },
-          { text: $t('Add Up To 11 Guests or Cameras') },
-          { text: $t('Custom Tip Page and Domain') },
           { text: '10GB' },
-          { text: $t('YouTube Thumbnail Maker, Creator Sites') },
-          { text: $t('No Watermark + 1080p/60fps + More') },
           { text: $t('1 Hour Videos + 250GB Storage + More') },
+          { text: $t('No Watermark + 1080p/60fps + More') },
+          { text: $t('YouTube Thumbnail Maker, Creator Sites') },
+          { text: $t('Custom Tip Page and Domain') },
           { text: $t('Highest Profit Margins') },
+          { text: $t('Add Up To 11 Guests or Cameras') },
+          { text: $t('Pro Upgrade') },
         ],
       },
     };
@@ -79,8 +80,10 @@ export function Prime() {
   );
 
   return (
-    <div style={{ width: '100%', marginTop: '144px' }}>
-      <UltraComparison onSkip={next} refl="slobs-onboarding" {...tableProps} />
+    <div style={{ width: '100%' }}>
+      <div style={{ width: '100%', marginTop: '144px' }}>
+        <UltraComparison onSkip={next} refl="slobs-onboarding" {...tableProps} />
+      </div>
     </div>
   );
 }
