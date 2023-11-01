@@ -6,6 +6,7 @@ import { KeyListenerService } from 'services/key-listener';
 import { StatefulService, mutation, ServiceHelper, Inject } from './core';
 import { defer, mapValues } from 'lodash';
 import { $t } from 'services/i18n';
+import { NicoliveProgramService } from './nicolive-program/nicolive-program';
 
 function getScenesService(): ScenesService {
   return ScenesService.instance;
@@ -17,6 +18,10 @@ function getSourcesService(): SourcesService {
 
 function getStreamingService(): StreamingService {
   return StreamingService.instance;
+}
+
+function getNicoliveProgramService(): NicoliveProgramService {
+  return NicoliveProgramService.instance;
 }
 
 function getTransitionsService(): TransitionsService {
@@ -119,6 +124,24 @@ const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
       name: 'SAVE_REPLAY',
       description: () => $t('hotkeys.saveReplay'),
       down: () => getStreamingService().saveReplay(),
+    },
+    {
+      name: 'START_PROGRAM',
+      description: () => '番組開始',
+      down: () => getNicoliveProgramService().startProgram(),
+      isActive: () => {
+        const nicolive = getNicoliveProgramService();
+        return nicolive.state.isStarting || nicolive.state.status !== 'test';
+      },
+    },
+    {
+      name: 'END_PROGRAM',
+      description: () => '番組終了',
+      down: () => getNicoliveProgramService().endProgram(),
+      isActive: () => {
+        const nicolive = getNicoliveProgramService();
+        return nicolive.state.isEnding || nicolive.state.status !== 'onAir';
+      }
     },
   ],
 
