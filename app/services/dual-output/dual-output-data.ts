@@ -49,6 +49,10 @@ export const DualOutputPlatformSettings: TDualOutputPlatformSettings = {
     platform: EPlatform.Trovo,
     display: EOutputDisplayType.Horizontal,
   },
+  [EPlatform.Twitter]: {
+    platform: EPlatform.Twitter,
+    display: EOutputDisplayType.Horizontal,
+  },
 };
 
 export const displayLabels = (display: EOutputDisplayType | string) =>

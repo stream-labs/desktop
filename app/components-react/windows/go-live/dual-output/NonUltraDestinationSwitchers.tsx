@@ -190,7 +190,7 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
         </div>
         <div className={styles.platformDisplay}>
           <span className={styles.label}>{`${$t('Output')}:`}</span>
-          <DisplaySelector title={title} isPlatform={!!platform} index={p.index} nolabel nomargin />
+          <DisplaySelector title={title} platform={platform} index={p.index} nolabel nomargin />
         </div>
       </div>
     );

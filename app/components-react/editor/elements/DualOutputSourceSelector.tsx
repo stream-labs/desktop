@@ -9,28 +9,27 @@ interface IDualOutputSourceSelector {
   sceneId?: string;
 }
 export function DualOutputSourceSelector(p: IDualOutputSourceSelector) {
-  const { toggleVisibility, makeActive } = useModule(SourceSelectorModule);
+  const { toggleVisibility, makeActive, horizontalActive, verticalActive } = useModule(
+    SourceSelectorModule,
+  );
   const { DualOutputService } = Services;
 
   const v = useVuex(() => ({
     verticalNodeId:
-      DualOutputService.views.verticalNodeIds && DualOutputService.views.activeDisplays.horizontal
+      DualOutputService.views.verticalNodeIds && horizontalActive
         ? DualOutputService.views.activeSceneNodeMap[p.nodeId]
         : p.nodeId,
     isHorizontalVisible: DualOutputService.views.getIsHorizontalVisible(p.nodeId, p?.sceneId),
     isVerticalVisible: DualOutputService.views.getIsVerticalVisible(p.nodeId, p?.sceneId),
-    isLoading: DualOutputService.views.isLoading && !DualOutputService.views.hasVerticalNodes,
-    horizontalActive: DualOutputService.views.activeDisplays.horizontal,
-    verticalActive: DualOutputService.views.activeDisplays.vertical,
   }));
 
   const showHorizontalToggle = useMemo(() => {
-    return !v?.isLoading && v.horizontalActive;
-  }, [!v?.isLoading, v.horizontalActive]);
+    return horizontalActive;
+  }, [horizontalActive]);
 
   const showVerticalToggle = useMemo(() => {
-    return !v?.isLoading && v?.verticalNodeId && v.verticalActive;
-  }, [!v?.isLoading, v?.verticalNodeId, v.verticalActive]);
+    return v?.verticalNodeId && verticalActive;
+  }, [v?.verticalNodeId, verticalActive]);
 
   return (
     <>

@@ -88,7 +88,6 @@ class VideoSettingsModule {
     display: 'horizontal' as TDisplayType,
     showModal: false,
     showDualOutputSettings: this.dualOutputService.views.dualOutputMode,
-    shouldShowDualOutputCheckbox: this.dualOutputService.views.shouldShowDualOutputCheckbox,
     customBaseRes: !this.baseResOptions.find(
       opt => opt.value === this.service.values.horizontal.baseRes,
     ),
@@ -137,6 +136,7 @@ class VideoSettingsModule {
       scaleType: {
         type: 'list',
         label: $t('Downscale Filter'),
+        onChange: (val: EScaleType) => this.setScaleType(val),
         options: [
           {
             label: $t('Bilinear (Fastest, but blurry if scaling)'),
@@ -314,29 +314,33 @@ class VideoSettingsModule {
   }
 
   /**
+   * Sets the Scale Type
+   * @remark set the same FPS type for both displays
+   * If there is a vertical context, update it as well.
+   * Otherwise, update the vertical display persisted settings.
+   */
+
+  setScaleType(value: EScaleType) {
+    this.service.actions.setVideoSetting('scaleType', value, 'horizontal');
+
+    if (this.service.contexts.vertical) {
+      this.service.actions.setVideoSetting('scaleType', value, 'vertical');
+    } else {
+      this.dualOutputService.actions.setVideoSetting({ scaleType: value }, 'vertical');
+    }
+  }
+
+  /**
    * Sets the FPS type
    * @remark set the same FPS type for both displays
    * If there is a vertical context, update it as well.
    * Otherwise, update the vertical display persisted settings.
    */
   setFPSType(value: EFPSType) {
-    if (this.service.contexts.vertical) {
-      this.service.actions.setVideoSetting('fpsType', value, 'horizontal');
-      this.service.actions.setVideoSetting('fpsNum', 30, 'horizontal');
-      this.service.actions.setVideoSetting('fpsDen', 1, 'horizontal');
-
-      this.service.actions.setVideoSetting('fpsType', value, 'vertical');
-      this.service.actions.setVideoSetting('fpsNum', 30, 'vertical');
-      this.service.actions.setVideoSetting('fpsDen', 1, 'vertical');
-    } else {
-      this.dualOutputService.actions.setVideoSetting({ fpsType: value }, 'vertical');
-      this.dualOutputService.actions.setVideoSetting({ fpsNum: 30 }, 'vertical');
-      this.dualOutputService.actions.setVideoSetting({ fpsDen: 1 }, 'vertical');
-
-      this.service.actions.setVideoSetting('fpsType', value, 'horizontal');
-      this.service.actions.setVideoSetting('fpsNum', 30, 'horizontal');
-      this.service.actions.setVideoSetting('fpsDen', 1, 'horizontal');
-    }
+    this.service.actions.setVideoSetting('fpsType', value, 'horizontal');
+    this.service.actions.setVideoSetting('fpsNum', 30, 'horizontal');
+    this.service.actions.setVideoSetting('fpsDen', 1, 'horizontal');
+    this.service.actions.syncFPSSettings();
   }
 
   /**
@@ -347,19 +351,10 @@ class VideoSettingsModule {
    */
   setCommonFPS(value: string) {
     const [fpsNum, fpsDen] = value.split('-');
-    if (this.service.contexts.vertical) {
-      this.service.actions.setVideoSetting('fpsNum', Number(fpsNum), 'horizontal');
-      this.service.actions.setVideoSetting('fpsDen', Number(fpsDen), 'horizontal');
 
-      this.service.actions.setVideoSetting('fpsNum', Number(fpsNum), 'vertical');
-      this.service.actions.setVideoSetting('fpsDen', Number(fpsDen), 'vertical');
-    } else {
-      this.dualOutputService.actions.setVideoSetting({ fpsNum: Number(fpsNum) }, 'vertical');
-      this.dualOutputService.actions.setVideoSetting({ fpsDen: Number(fpsDen) }, 'vertical');
-
-      this.service.actions.setVideoSetting('fpsNum', Number(fpsNum), 'horizontal');
-      this.service.actions.setVideoSetting('fpsDen', Number(fpsDen), 'horizontal');
-    }
+    this.service.actions.setVideoSetting('fpsNum', Number(fpsNum), 'horizontal');
+    this.service.actions.setVideoSetting('fpsDen', Number(fpsDen), 'horizontal');
+    this.service.actions.syncFPSSettings();
   }
   /**
    * Sets Integer FPS
@@ -370,18 +365,9 @@ class VideoSettingsModule {
   setIntegerFPS(value: string) {
     this.state.setFpsInt(Number(value));
     if (Number(value) > 0 && Number(value) < 1001) {
-      if (this.service.contexts.vertical) {
-        this.service.actions.setVideoSetting('fpsNum', Number(value), 'horizontal');
-        this.service.actions.setVideoSetting('fpsDen', 1, 'horizontal');
-        this.service.actions.setVideoSetting('fpsNum', Number(value), 'vertical');
-        this.service.actions.setVideoSetting('fpsDen', 1, 'vertical');
-      } else {
-        this.dualOutputService.actions.setVideoSetting({ fpsNum: Number(value) }, 'vertical');
-        this.dualOutputService.actions.setVideoSetting({ fpsDen: 1 }, 'vertical');
-
-        this.service.actions.setVideoSetting('fpsNum', Number(value), 'horizontal');
-        this.service.actions.setVideoSetting('fpsDen', 1, 'horizontal');
-      }
+      this.service.actions.setVideoSetting('fpsNum', Number(value), 'horizontal');
+      this.service.actions.setVideoSetting('fpsDen', 1, 'horizontal');
+      this.service.actions.syncFPSSettings();
     }
   }
 
@@ -398,14 +384,8 @@ class VideoSettingsModule {
       this.state.setFpsDen(Number(value));
     }
     if (!invalidFps(this.state.fpsNum, this.state.fpsDen) && Number(value) > 0) {
-      if (this.service.contexts.vertical) {
-        this.service.actions.setVideoSetting(key, Number(value), 'horizontal');
-        this.service.actions.setVideoSetting(key, Number(value), 'vertical');
-      } else {
-        this.dualOutputService.actions.setVideoSetting({ [key]: Number(value) }, 'vertical');
-
-        this.service.actions.setVideoSetting(key, Number(value), 'horizontal');
-      }
+      this.service.actions.setVideoSetting(key, Number(value), 'horizontal');
+      this.service.actions.syncFPSSettings();
     }
   }
 
@@ -487,7 +467,6 @@ export function VideoSettings() {
     showDualOutputSettings,
     showModal,
     isLoggedIn,
-    shouldShowDualOutputCheckbox,
     onChange,
     setDisplay,
     setShowDualOutput,
@@ -499,11 +478,8 @@ export function VideoSettings() {
     <>
       <div className={styles.videoSettingsHeader}>
         <h2>{$t('Video')}</h2>
-        {/* TODO: Comment in for release */}
-        {/* {shouldShowDualOutputCheckbox && ( */}
         <div className={styles.doToggle}>
           {/* THIS CHECKBOX TOGGLES DUAL OUTPUT MODE FOR THE ENTIRE APP */}
-
           <CheckboxInput
             id="dual-output-checkbox"
             name="dual-output-checkbox"

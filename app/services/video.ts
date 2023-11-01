@@ -350,7 +350,7 @@ export class VideoService extends Service {
     };
   }
 
-  setBaseResolutions(resolutions: {
+  setBaseResolution(resolutions: {
     horizontal: {
       baseWidth: number;
       baseHeight: number;
@@ -360,12 +360,15 @@ export class VideoService extends Service {
       baseHeight: number;
     };
   }) {
-    const display = this.dualOutputService.views.defaultDisplay ?? 'horizontal';
-    this.settingsService.setSettingValue(
-      'Video',
-      'Base',
-      `${resolutions[display].baseWidth}x${resolutions[display].baseHeight}`,
-    );
+    // if the context has not been established when the migration for the root node has run,
+    // there will be no base resolution data in the node so access it directly from the service if that is the case
+    const baseWidth =
+      resolutions?.horizontal.baseWidth ??
+      this.videoSettingsService.baseResolutions.horizontal.baseWidth;
+    const baseHeight =
+      resolutions?.horizontal.baseHeight ??
+      this.videoSettingsService.baseResolutions.horizontal.baseHeight;
+    this.settingsService.setSettingValue('Video', 'Base', `${baseWidth}x${baseHeight}`);
   }
 
   /**
