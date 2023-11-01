@@ -87,16 +87,18 @@ export class MarkersService extends PersistentStatefulService<IMarkersServiceSta
   parseCSV(filepath: string) {
     const bookmarksArray: { text: string; starts_at: number }[] = [];
     return new Promise((resolve, reject) => {
-      const stream = fs.createReadStream(filepath);
-      stream.on('line', row => {
-        if (/Timecode In,Timecode Out/.test(row)) return;
-        const els = row.split(',');
-        const timestampArr: number[] = els[1].split(':');
-        timestampArr.pop(); // The last element is always 0 hundredths of a second
-        const ms = moment.duration(timestampArr.join(':')).milliseconds();
-        bookmarksArray.push({
-          text: els[8],
-          starts_at: ms,
+      const stream = fs.createReadStream(filepath, 'utf8');
+      stream.on('data', (data: string) => {
+        data.split('\n').forEach(row => {
+          if (/Timecode In,Timecode Out/.test(row)) return;
+          const els = row.split(',');
+          const timestampArr: string[] = els[1].split(':');
+          timestampArr.pop(); // The last element is always 0 hundredths of a second
+          const ms = moment.duration(timestampArr.join(':')).asMilliseconds();
+          bookmarksArray.push({
+            text: els[8],
+            starts_at: ms,
+          });
         });
       });
       stream.on('error', err => reject(err));

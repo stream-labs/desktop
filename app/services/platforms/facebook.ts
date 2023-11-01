@@ -211,7 +211,7 @@ export class FacebookService
     this.state.videoId = id;
   }
 
-  apiBase = 'https://graph.facebook.com';
+  apiBase = 'https://graph.facebook.com/v17.0';
 
   get authUrl() {
     const host = this.hostsService.streamlabs;
