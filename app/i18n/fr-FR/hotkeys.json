@@ -23,5 +23,6 @@
   "Next Slide": "Diapositive suivante",
   "Previous Slide": "Diapositive précédente",
   "Toggle Performance Mode": "Activer/désactiver le mode Performance",
-  "Skip Alert": "Passer l'alerte"
+  "Skip Alert": "Passer l'alerte",
+  "To use hotkeys on Mac, go to System Settings > Security > Accessibility and toggle on for Streamlabs Desktop.": "To use hotkeys on Mac, go to System Settings > Security > Accessibility and toggle on for Streamlabs Desktop."
 }
