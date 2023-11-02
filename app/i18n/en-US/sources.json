@@ -362,5 +362,6 @@
   "Composite mode": "Composite mode",
   "Poll time for new senders": "Poll time for new senders",
   "Spout2 capture (Vtube support)": "Spout2 capture (Vtube support)",
-  "Virtual avatar capture source. Enables high resolution, zero-compression and zero-latency video capture from VTube third-party software.": "Virtual avatar capture source. Enables high resolution, zero-compression and zero-latency video capture from VTube third-party software."
+  "Virtual avatar capture source. Enables high resolution, zero-compression and zero-latency video capture from VTube third-party software.": "Virtual avatar capture source. Enables high resolution, zero-compression and zero-latency video capture from VTube third-party software.",
+  "Learn how to set it up": "Learn how to set it up"
 }

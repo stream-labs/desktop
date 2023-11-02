@@ -276,7 +276,10 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     description: $t(
       'Virtual avatar capture source. Enables high resolution, zero-compression and zero-latency video capture from VTube third-party software.',
     ),
+    demoFilename: 'source-spout2-thumbnail.gif',
     supportList: ['VSeeFace', 'VTube Studio'],
     icon: 'icon-face-masks-3',
+    link: 'https://streamlabs.com/content-hub/post/best-free-vtuber-software',
+    linkText: $t('Learn how to set it up'),
   },
 });

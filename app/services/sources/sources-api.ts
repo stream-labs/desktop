@@ -167,4 +167,6 @@ export interface ISourceDisplayData {
   demoVideo?: boolean;
   icon: string;
   shortDesc?: string;
+  link?: string;
+  linkText?: string;
 }

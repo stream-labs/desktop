@@ -23,6 +23,7 @@
   overflow-wrap: break-word;
   text-overflow: ellipsis;
   min-height: 56px;
+  display: flex;
 
   i {
     margin-right: 8px;
@@ -45,7 +46,15 @@
 
 .source-tag.exclude-wrap {
   height: 32px;
-  white-space: nowrap;
+  white-space: break-spaces;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.info-link {
+  text-decoration: underline;
+
+  &:hover {
+    cursor: pointer;
+  }
 }
