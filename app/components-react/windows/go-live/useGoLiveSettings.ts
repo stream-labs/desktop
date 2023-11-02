@@ -222,25 +222,31 @@ export class GoLiveSettingsModule {
    * Determine if all dual output go live requirements are fulfilled
    */
   getCanStreamDualOutput() {
-    const platformDisplays = Services.StreamingService.views.activeDisplayPlatforms;
+    // confirm both displays have a platform or destination selected when streaming with dual output
+    if (Services.DualOutputService.views.streamVertical) {
+      const platformDisplays = Services.StreamingService.views.activeDisplayPlatforms;
 
-    // determine which enabled custom destinations use which displays
-    const destinationDisplays = this.state.customDestinations.reduce(
-      (displays: TDisplayDestinations, destination: ICustomStreamDestination, index: number) => {
-        if (destination.enabled && destination?.display) {
-          displays[destination.display].push(destination.name);
-        }
-        return displays;
-      },
-      { horizontal: [], vertical: [] },
-    );
-    // determine if both displays are selected for active platforms
-    const horizontalHasDestinations =
-      platformDisplays.horizontal.length > 0 || destinationDisplays.horizontal.length > 0;
-    const verticalHasDestinations =
-      platformDisplays.vertical.length > 0 || destinationDisplays.vertical.length > 0;
+      // determine which enabled custom destinations use which displays
+      const destinationDisplays = this.state.customDestinations.reduce(
+        (displays: TDisplayDestinations, destination: ICustomStreamDestination, index: number) => {
+          if (destination.enabled && destination?.display) {
+            displays[destination.display].push(destination.name);
+          }
+          return displays;
+        },
+        { horizontal: [], vertical: [] },
+      );
+      // determine if both displays are selected for active platforms
+      const horizontalHasDestinations =
+        platformDisplays.horizontal.length > 0 || destinationDisplays.horizontal.length > 0;
+      const verticalHasDestinations =
+        platformDisplays.vertical.length > 0 || destinationDisplays.vertical.length > 0;
 
-    return horizontalHasDestinations && verticalHasDestinations;
+      return horizontalHasDestinations && verticalHasDestinations;
+    }
+
+    // if not streaming, recording must be toggled on
+    return Services.DualOutputService.views.recordVertical;
   }
 
   /**
@@ -248,6 +254,7 @@ export class GoLiveSettingsModule {
    */
   async validate() {
     if (Services.DualOutputService.views.dualOutputMode && !this.getCanStreamDualOutput()) {
+      // @@@ TODO: update error message for recording
       message.error(
         $t(
           'To use Dual Output you must stream to at least one horizontal and one vertical platform.',

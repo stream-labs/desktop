@@ -21,6 +21,7 @@ enum EStreamingState {
 enum ERecordingState {
   Offline = 'offline',
   Starting = 'starting',
+  Start = 'start',
   Recording = 'recording',
   Stopping = 'stopping',
   Wrote = 'wrote',
