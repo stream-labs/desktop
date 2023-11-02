@@ -230,6 +230,38 @@ export class OutputSettingsService extends Service {
     };
   }
 
+  getSimpleRecordingSettings() {
+    const output = this.settingsService.state.Output.formData;
+    const video = this.settingsService.state.Video.formData;
+
+    const outputSettings = this.getSettings();
+    console.log('outputSettings ', outputSettings);
+    console.log('encSet ', this.getStreamingEncoderSettings(output, video));
+
+    const path = outputSettings.recording.path;
+    const enc = outputSettings.recording.encoder;
+    const encoder = this.getStreamingEncoderSettings(output, video).encoder;
+
+    const toReturn = {
+      path,
+      encoder,
+    };
+    console.log('obj ret ', toReturn);
+    // const format = ERecordingFormat.MP4;
+    // const quality = ERecordingQuality.HighQuality;
+    // const video = this.videoSettingsService.contexts.horizontal;
+    // const videoEncoder = VideoEncoderFactory.create('obs_x264', 'video-encoder');
+    // const lowCPU = false;
+    // const audioEncoder = AudioEncoderFactory.create();
+    // const overwrite = false;
+    // const noSpace = false;
+
+    return {
+      path,
+      encoder,
+    };
+  }
+
   private getStreamingEncoderSettings(
     output: ISettingsSubCategory[],
     video: ISettingsSubCategory[],
@@ -245,6 +277,7 @@ export class OutputSettingsService extends Service {
         this.settingsService.findSettingValue(output, 'Streaming', 'StreamEncoder'),
     ) as EEncoderFamily;
     let preset: string;
+    console.log('encoder 1 ', encoder);
 
     if (encoder === 'amd') {
       // The settings for AMD also have a Preset field but it's not what we need
