@@ -5,7 +5,7 @@ import { HighlighterService } from 'services/highlighter';
 import { Inject } from 'services/core/injector';
 import { Dictionary } from 'vuex';
 import { AudioService } from 'app-services';
-import { parse } from 'path';
+import { ERecordingQuality, ERecordingFormat } from 'obs-studio-node';
 
 /**
  * list of encoders for simple mode
@@ -232,33 +232,62 @@ export class OutputSettingsService extends Service {
 
   getSimpleRecordingSettings() {
     const output = this.settingsService.state.Output.formData;
-    const video = this.settingsService.state.Video.formData;
+    const advanced = this.settingsService.state.Advanced.formData;
 
-    const outputSettings = this.getSettings();
-    console.log('outputSettings ', outputSettings);
-    console.log('encSet ', this.getStreamingEncoderSettings(output, video));
+    const path = this.settingsService.findSettingValue(output, 'Recording', 'FilePath');
 
-    const path = outputSettings.recording.path;
-    const enc = outputSettings.recording.encoder;
-    const encoder = this.getStreamingEncoderSettings(output, video).encoder;
+    const format = this.settingsService.findValidListValue(
+      output,
+      'Recording',
+      'RecFormat',
+    ) as ERecordingFormat;
 
-    const toReturn = {
-      path,
-      encoder,
-    };
-    console.log('obj ret ', toReturn);
-    // const format = ERecordingFormat.MP4;
-    // const quality = ERecordingQuality.HighQuality;
-    // const video = this.videoSettingsService.contexts.horizontal;
-    // const videoEncoder = VideoEncoderFactory.create('obs_x264', 'video-encoder');
-    // const lowCPU = false;
-    // const audioEncoder = AudioEncoderFactory.create();
-    // const overwrite = false;
-    // const noSpace = false;
+    const oldQualityName = this.settingsService.findSettingValue(output, 'Recording', 'RecQuality');
+    let quality = ERecordingQuality.HigherQuality;
+
+    switch (oldQualityName) {
+      case 'Small':
+        quality = ERecordingQuality.HighQuality;
+        break;
+      case 'HQ':
+        quality = ERecordingQuality.HigherQuality;
+        break;
+      case 'Lossless':
+        quality = ERecordingQuality.Lossless;
+        break;
+      case 'Stream':
+        quality = ERecordingQuality.Stream;
+        break;
+    }
+
+    const convertedEncoderName = this.convertEncoderToNewAPI(this.getSettings().recording.encoder);
+    const encoder =
+      convertedEncoderName === EObsSimpleEncoder.x264_lowcpu
+        ? EObsAdvancedEncoder.obs_x264
+        : convertedEncoderName;
+
+    const lowCPU = convertedEncoderName === EObsSimpleEncoder.x264_lowcpu;
+
+    const overwrite = this.settingsService.findSettingValue(
+      advanced,
+      'Recording',
+      'OverwriteIfExists',
+    );
+
+    const noSpace = this.settingsService.findSettingValue(
+      output,
+      'Recording',
+      'FileNameWithoutSpace',
+    );
 
     return {
       path,
+      format,
+      quality,
       encoder,
+      lowCPU,
+      overwrite,
+      noSpace,
     };
   }
 
@@ -277,7 +306,6 @@ export class OutputSettingsService extends Service {
         this.settingsService.findSettingValue(output, 'Streaming', 'StreamEncoder'),
     ) as EEncoderFamily;
     let preset: string;
-    console.log('encoder 1 ', encoder);
 
     if (encoder === 'amd') {
       // The settings for AMD also have a Preset field but it's not what we need
@@ -515,6 +543,23 @@ export class OutputSettingsService extends Service {
 
     if (settingsPatch.bitrate) {
       this.settingsService.setSettingValue('Output', 'Recbitrate', settingsPatch.bitrate);
+    }
+  }
+
+  convertEncoderToNewAPI(encoder: EObsSimpleEncoder | string) {
+    switch (encoder) {
+      case EObsSimpleEncoder.x264:
+        return EObsAdvancedEncoder.obs_x264;
+      case EObsSimpleEncoder.nvenc:
+        return EObsAdvancedEncoder.ffmpeg_nvenc;
+      case EObsSimpleEncoder.amd:
+        return EObsAdvancedEncoder.amd_amf_h264;
+      case EObsSimpleEncoder.qsv:
+        return EObsAdvancedEncoder.obs_qsv11;
+      case EObsSimpleEncoder.jim_nvenc:
+        return EObsAdvancedEncoder.jim_nvenc;
+      case EObsSimpleEncoder.x264_lowcpu:
+        return EObsSimpleEncoder.x264_lowcpu;
     }
   }
 }
