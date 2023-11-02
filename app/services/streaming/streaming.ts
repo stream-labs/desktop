@@ -9,6 +9,8 @@ import {
   VideoEncoderFactory,
   ISimpleRecording,
   ERecordingQuality,
+  IAdvancedRecording,
+  AdvancedRecordingFactory,
 } from '../../../obs-api';
 import { Inject } from 'services/core/injector';
 import moment from 'moment';
@@ -115,8 +117,8 @@ export class StreamingService
   private resolveStartStreaming: Function = () => {};
   private rejectStartStreaming: Function = () => {};
 
-  private horizontalRecording: ISimpleRecording = null;
-  private verticalRecording: ISimpleRecording = null;
+  private horizontalRecording: ISimpleRecording | IAdvancedRecording = null;
+  private verticalRecording: ISimpleRecording | IAdvancedRecording = null;
 
   static initialState: IStreamingServiceState = {
     streamingStatus: EStreamingState.Offline,
@@ -985,27 +987,6 @@ export class StreamingService
   }
 
   toggleRecording() {
-    if (this.outputSettingsService.getSettings().mode === 'Simple') {
-      this.toggleSimpleRecording();
-    } else {
-      this.toggleAdvancedRecording();
-    }
-  }
-
-  toggleAdvancedRecording() {
-    // currently is just recording using the old API and only horizontal display
-    if (this.state.recordingStatus === ERecordingState.Recording) {
-      NodeObs.OBS_service_stopRecording();
-      return;
-    }
-
-    if (this.state.recordingStatus === ERecordingState.Offline) {
-      NodeObs.OBS_service_startRecording();
-      return;
-    }
-  }
-
-  toggleSimpleRecording() {
     if (this.state.recordingStatus === ERecordingState.Recording) {
       const time = new Date().toISOString();
       this.SET_RECORDING_STATUS(ERecordingState.Stopping, time);
@@ -1014,92 +995,180 @@ export class StreamingService
       if (this.verticalRecording) {
         // stop recording vertical display
         this.verticalRecording.stop();
-        SimpleRecordingFactory.destroy(this.verticalRecording);
-        this.verticalRecording = null;
-        this.SET_VERTICAL_RECORDING_STATUS(ERecordingState.Offline, time);
       }
 
       // stop recording horizontal display
       this.horizontalRecording.stop();
-      SimpleRecordingFactory.destroy(this.horizontalRecording);
-      this.horizontalRecording = null;
-      this.SET_RECORDING_STATUS(ERecordingState.Offline, time);
 
       return;
     }
 
     if (this.state.recordingStatus === ERecordingState.Offline) {
-      // get output settings for horizontal display
-      const sharedSettings = this.outputSettingsService.getSimpleRecordingSettings();
+      if (this.outputSettingsService.getSettings().mode === 'Simple') {
+        this.startSimpleRecording();
+      } else {
+        this.startAdvancedRecording();
+      }
+    }
+  }
 
-      // set up horizontal recording
-      this.horizontalRecording = SimpleRecordingFactory.create();
-      this.horizontalRecording.path = sharedSettings.path;
-      this.horizontalRecording.format = sharedSettings.format;
-      this.horizontalRecording.quality = ERecordingQuality.HigherQuality;
-      this.horizontalRecording.video = this.videoSettingsService.contexts.horizontal;
-      this.horizontalRecording.videoEncoder = VideoEncoderFactory.create(
-        sharedSettings.encoder,
-        'video-encoder',
-      );
-      this.horizontalRecording.lowCPU = sharedSettings.lowCPU;
-      this.horizontalRecording.audioEncoder = AudioEncoderFactory.create();
-      this.horizontalRecording.overwrite = sharedSettings.overwrite;
-      this.horizontalRecording.noSpace = sharedSettings.noSpace;
-      this.horizontalRecording.signalHandler = signal => {
-        console.log('horizontal signal ', signal);
+  startAdvancedRecording() {
+    // currently is just recording using the old API and only horizontal display
+
+    const sharedSettings = this.outputSettingsService.getSimpleRecordingSettings();
+
+    this.horizontalRecording = AdvancedRecordingFactory.create();
+
+    this.horizontalRecording.path = sharedSettings.path;
+    this.horizontalRecording.format = sharedSettings.format;
+    this.horizontalRecording.videoEncoder = VideoEncoderFactory.create(
+      sharedSettings.encoder,
+      'video-encoder',
+    );
+    this.horizontalRecording.overwrite = sharedSettings.overwrite;
+    this.horizontalRecording.noSpace = sharedSettings.noSpace;
+    this.horizontalRecording.video = this.videoSettingsService.contexts.horizontal;
+    this.horizontalRecording.signalHandler = signal => {
+      if (signal.signal === ERecordingState.Start) {
+        this.usageStatisticsService.recordFeatureUsage('Recording');
+        this.usageStatisticsService.recordAnalyticsEvent('RecordingStatus', {
+          status: ERecordingState.Recording,
+          code: signal.code,
+          display: 'horizontal',
+        });
+
+        const time = new Date().toISOString();
+        this.SET_RECORDING_STATUS(ERecordingState.Recording, time);
+      }
+
+      if (signal.signal === ERecordingState.Wrote) {
+        AdvancedRecordingFactory.destroy(this.horizontalRecording as IAdvancedRecording);
+        const time = new Date().toISOString();
+        this.SET_RECORDING_STATUS(ERecordingState.Offline, time);
+        this.horizontalRecording = null;
+      }
+    };
+
+    // this.horizontalRecording.mixer = 7;
+    // this.horizontalRecording.rescaling = true;
+    // this.horizontalRecording.outputWidth = 1920;
+    // this.horizontalRecording.outputHeight = 1080;
+    // this.horizontalRecording.useStreamEncoders = false;
+
+    if (this.views.isDualOutputMode && this.dualOutputService.views.recordVertical) {
+      this.verticalRecording = AdvancedRecordingFactory.create();
+      this.verticalRecording.signalHandler = signal => {
         if (signal.signal === ERecordingState.Start) {
           this.usageStatisticsService.recordFeatureUsage('Recording');
           this.usageStatisticsService.recordAnalyticsEvent('RecordingStatus', {
             status: ERecordingState.Recording,
             code: signal.code,
-            display: 'horizontal',
+            display: 'vertical',
           });
 
           const time = new Date().toISOString();
           this.SET_RECORDING_STATUS(ERecordingState.Recording, time);
         }
+
+        if (signal.signal === ERecordingState.Wrote) {
+          AdvancedRecordingFactory.destroy(this.verticalRecording as IAdvancedRecording);
+          const time = new Date().toISOString();
+          this.SET_RECORDING_STATUS(ERecordingState.Offline, time);
+          this.verticalRecording = null;
+        }
       };
-
-      if (this.views.isDualOutputMode && this.dualOutputService.views.recordVertical) {
-        // set up vertical recording
-
-        this.verticalRecording = SimpleRecordingFactory.create();
-        this.verticalRecording.path = sharedSettings.path;
-        this.verticalRecording.format = sharedSettings.format;
-        this.verticalRecording.quality = ERecordingQuality.HigherQuality;
-        this.verticalRecording.video = this.videoSettingsService.contexts.vertical;
-        this.verticalRecording.videoEncoder = VideoEncoderFactory.create(
-          sharedSettings.encoder,
-          'video-encoder',
-        );
-        this.verticalRecording.lowCPU = sharedSettings.lowCPU;
-        this.verticalRecording.audioEncoder = AudioEncoderFactory.create();
-        this.verticalRecording.overwrite = sharedSettings.overwrite;
-        this.verticalRecording.noSpace = sharedSettings.noSpace;
-        this.verticalRecording.signalHandler = signal => {
-          console.log('vertical signal ', signal);
-          if (signal.signal === ERecordingState.Start) {
-            this.usageStatisticsService.recordFeatureUsage('Recording');
-            this.usageStatisticsService.recordAnalyticsEvent('RecordingStatus', {
-              status: ERecordingState.Recording,
-              code: signal.code,
-              display: 'vertical',
-            });
-
-            const time = new Date().toISOString();
-            this.SET_RECORDING_STATUS(ERecordingState.Recording, time);
-          }
-        };
-      }
-
-      // start recording vertical display
-      this.horizontalRecording.start();
-      if (this.verticalRecording) {
-        this.verticalRecording.start();
-      }
-      return;
     }
+
+    // start recording
+    this.horizontalRecording.start();
+    if (this.verticalRecording) {
+      this.verticalRecording.start();
+    }
+    return;
+  }
+
+  startSimpleRecording() {
+    const sharedSettings = this.outputSettingsService.getSimpleRecordingSettings();
+
+    // set up horizontal recording
+    this.horizontalRecording = SimpleRecordingFactory.create();
+    this.horizontalRecording.path = sharedSettings.path;
+    this.horizontalRecording.format = sharedSettings.format;
+    this.horizontalRecording.quality = ERecordingQuality.HigherQuality;
+    this.horizontalRecording.video = this.videoSettingsService.contexts.horizontal;
+    this.horizontalRecording.videoEncoder = VideoEncoderFactory.create(
+      sharedSettings.encoder,
+      'video-encoder',
+    );
+    this.horizontalRecording.lowCPU = sharedSettings.lowCPU;
+    this.horizontalRecording.audioEncoder = AudioEncoderFactory.create();
+    this.horizontalRecording.overwrite = sharedSettings.overwrite;
+    this.horizontalRecording.noSpace = sharedSettings.noSpace;
+    this.horizontalRecording.signalHandler = signal => {
+      if (signal.signal === ERecordingState.Start) {
+        this.usageStatisticsService.recordFeatureUsage('Recording');
+        this.usageStatisticsService.recordAnalyticsEvent('RecordingStatus', {
+          status: ERecordingState.Recording,
+          code: signal.code,
+          display: 'horizontal',
+        });
+
+        const time = new Date().toISOString();
+        this.SET_RECORDING_STATUS(ERecordingState.Recording, time);
+      }
+
+      if (signal.signal === ERecordingState.Wrote) {
+        SimpleRecordingFactory.destroy(this.horizontalRecording as ISimpleRecording);
+        const time = new Date().toISOString();
+        this.SET_RECORDING_STATUS(ERecordingState.Offline, time);
+        this.horizontalRecording = null;
+      }
+    };
+
+    // set up vertical recording
+    if (this.views.isDualOutputMode && this.dualOutputService.views.recordVertical) {
+      this.verticalRecording = SimpleRecordingFactory.create();
+      this.verticalRecording.path = sharedSettings.path;
+      this.verticalRecording.format = sharedSettings.format;
+      this.verticalRecording.quality = ERecordingQuality.HigherQuality;
+      this.verticalRecording.video = this.videoSettingsService.contexts.vertical;
+      this.verticalRecording.videoEncoder = VideoEncoderFactory.create(
+        sharedSettings.encoder,
+        'video-encoder',
+      );
+      this.verticalRecording.lowCPU = sharedSettings.lowCPU;
+      this.verticalRecording.audioEncoder = AudioEncoderFactory.create();
+      this.verticalRecording.overwrite = sharedSettings.overwrite;
+      this.verticalRecording.noSpace = sharedSettings.noSpace;
+      this.verticalRecording.signalHandler = signal => {
+        if (signal.signal === ERecordingState.Start) {
+          this.usageStatisticsService.recordFeatureUsage('Recording');
+          this.usageStatisticsService.recordAnalyticsEvent('RecordingStatus', {
+            status: ERecordingState.Recording,
+            code: signal.code,
+            display: 'vertical',
+          });
+
+          const time = new Date().toISOString();
+          this.SET_RECORDING_STATUS(ERecordingState.Recording, time);
+        }
+
+        if (signal.signal === ERecordingState.Wrote) {
+          SimpleRecordingFactory.destroy(this.verticalRecording as ISimpleRecording);
+
+          const time = new Date().toISOString();
+          this.SET_RECORDING_STATUS(ERecordingState.Offline, time);
+          this.verticalRecording = null;
+        }
+      };
+    }
+
+    // start recording
+    this.horizontalRecording.start();
+    if (this.verticalRecording) {
+      this.verticalRecording.start();
+    }
+    return;
   }
 
   splitFile() {
