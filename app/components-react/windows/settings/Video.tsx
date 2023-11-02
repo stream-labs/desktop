@@ -99,6 +99,8 @@ class VideoSettingsModule {
     fpsNum: this.service.values.horizontal.fpsNum,
     fpsDen: this.service.values.horizontal.fpsDen,
     fpsInt: this.service.values.horizontal.fpsNum,
+    recordVertical: this.dualOutputService.views.recordVertical,
+    streamVertical: this.dualOutputService.views.streamVertical,
   });
 
   get metadata() {
@@ -444,6 +446,24 @@ class VideoSettingsModule {
     }
   }
 
+  setRecordVertical() {
+    this.dualOutputService.actions.setRecordVertical(!this.state.recordVertical);
+    this.state.setRecordVertical(!this.state.recordVertical);
+
+    if (this.state.streamVertical !== true) {
+      this.dualOutputService.actions.setStreamVertical(true);
+      this.state.setStreamVertical(true);
+    }
+  }
+
+  setStreamVertical() {
+    const recordStatus = !this.state.recordVertical;
+    this.dualOutputService.actions.setRecordVertical(recordStatus);
+    this.state.setRecordVertical(recordStatus);
+    this.dualOutputService.actions.setStreamVertical(!recordStatus);
+    this.state.setStreamVertical(!recordStatus);
+  }
+
   handleShowModal(status: boolean) {
     Services.WindowsService.actions.updateStyleBlockers('child', status);
     this.state.setShowModal(status);
@@ -467,9 +487,14 @@ export function VideoSettings() {
     showDualOutputSettings,
     showModal,
     isLoggedIn,
+    recordVertical,
+    streamVertical,
+    display,
     onChange,
     setDisplay,
     setShowDualOutput,
+    setRecordVertical,
+    setStreamVertical,
     handleShowModal,
     handleAuth,
   } = useModule(VideoSettingsModule);
@@ -514,6 +539,48 @@ export function VideoSettings() {
           name="video-settings"
         />
       </div>
+      {display === 'vertical' && (
+        <div style={{ display: 'flex' }}>
+          <div className={styles.doToggle} style={{ display: 'flex' }}>
+            <CheckboxInput
+              id="Record Vertical"
+              name="Record Vertical"
+              data-name="Record Vertical"
+              label="Record Vertical"
+              value={recordVertical}
+              onChange={setRecordVertical}
+              className={styles.doCheckbox}
+            />
+            <Tooltip
+              title={$t('Record both horizontal and vertical displays.')}
+              className={styles.doTooltip}
+              placement="bottomRight"
+              lightShadow
+            >
+              <i className="icon-information" />
+            </Tooltip>
+          </div>
+          {/* <div className={styles.doToggle} style={{ display: 'flex', marginLeft: '20px' }}>
+            <CheckboxInput
+              id="Record Only Vertical"
+              name="Record Only Vertical"
+              data-name="Record Only Vertical"
+              label="Record Only Vertical"
+              value={recordVertical}
+              onChange={setStreamVertical}
+              className={styles.doCheckbox}
+            />
+            <Tooltip
+              title={$t("Record vertical display but don't stream vertical display.")}
+              className={styles.doTooltip}
+              placement="bottomRight"
+              lightShadow
+            >
+              <i className="icon-information" />
+            </Tooltip>
+          </div> */}
+        </div>
+      )}
       <LoginPromptModal
         showModal={showModal}
         handleAuth={handleAuth}
