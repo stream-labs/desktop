@@ -36,6 +36,8 @@ interface IDualOutputServiceState {
   platformSettings: TDualOutputPlatformSettings;
   destinationSettings: Dictionary<IDualOutputDestinationSetting>;
   dualOutputMode: boolean;
+  recordVertical: boolean;
+  streamVertical: boolean;
   videoSettings: IDisplayVideoSettings;
 }
 
@@ -51,6 +53,14 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
 
   get dualOutputMode(): boolean {
     return this.state.dualOutputMode;
+  }
+
+  get recordVertical(): boolean {
+    return this.state.recordVertical;
+  }
+
+  get streamVertical(): boolean {
+    return this.state.streamVertical;
   }
 
   get activeCollection(): ISceneCollectionsManifestEntry {
@@ -281,6 +291,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     platformSettings: DualOutputPlatformSettings,
     destinationSettings: {},
     dualOutputMode: false,
+    recordVertical: false,
+    streamVertical: true,
     videoSettings: {
       defaultDisplay: 'horizontal',
       horizontal: null,
@@ -351,6 +363,20 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     } else {
       this.selectionService.views.globalSelection.reset();
     }
+  }
+
+  /**
+   * Record vertical display
+   */
+  setRecordVertical(status: boolean) {
+    this.SET_RECORD_VERTICAL(status);
+  }
+
+  /**
+   * Stream vertical display
+   */
+  setStreamVertical(status: boolean) {
+    this.SET_STREAM_VERTICAL(status);
   }
 
   /**
@@ -624,5 +650,21 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   @mutation()
   private UPDATE_VIDEO_SETTING(setting: IVideoInfo, display: TDisplayType = 'vertical') {
     this.state.videoSettings[display] = { ...setting };
+  }
+
+  @mutation()
+  private SET_RECORD_VERTICAL(status: boolean) {
+    this.state = {
+      ...this.state,
+      recordVertical: status,
+    };
+  }
+
+  @mutation()
+  private SET_STREAM_VERTICAL(status: boolean) {
+    this.state = {
+      ...this.state,
+      streamVertical: status,
+    };
   }
 }

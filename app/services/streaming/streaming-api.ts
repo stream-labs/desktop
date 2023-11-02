@@ -20,6 +20,7 @@ export enum EStreamingState {
 export enum ERecordingState {
   Offline = 'offline',
   Starting = 'starting',
+  Start = 'start',
   Recording = 'recording',
   Stopping = 'stopping',
   Wrote = 'wrote',
@@ -88,7 +89,9 @@ export interface IStreamingServiceState {
   streamingStatus: EStreamingState;
   streamingStatusTime: string;
   recordingStatus: ERecordingState;
+  verticalRecordingStatus: ERecordingState;
   recordingStatusTime: string;
+  verticalRecordingStatusTime: string;
   replayBufferStatus: EReplayBufferState;
   replayBufferStatusTime: string;
   selectiveRecording: boolean;

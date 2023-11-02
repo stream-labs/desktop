@@ -117,13 +117,16 @@ export class StreamingService
   private resolveStartStreaming: Function = () => {};
   private rejectStartStreaming: Function = () => {};
 
+  private horizontalRecording: ISimpleRecording = null;
   private verticalRecording: ISimpleRecording = null;
 
   static initialState: IStreamingServiceState = {
     streamingStatus: EStreamingState.Offline,
     streamingStatusTime: new Date().toISOString(),
     recordingStatus: ERecordingState.Offline,
+    verticalRecordingStatus: ERecordingState.Offline,
     recordingStatusTime: new Date().toISOString(),
+    verticalRecordingStatusTime: new Date().toISOString(),
     replayBufferStatus: EReplayBufferState.Offline,
     replayBufferStatusTime: new Date().toISOString(),
     selectiveRecording: false,
@@ -1004,13 +1007,21 @@ export class StreamingService
 
   toggleDualOutputRecording() {
     if (this.state.recordingStatus === ERecordingState.Recording) {
+      const time = new Date().toISOString();
+
       // stop recording vertical display
+      this.SET_VERTICAL_RECORDING_STATUS(ERecordingState.Wrote, time);
       this.verticalRecording.stop();
       SimpleRecordingFactory.destroy(this.verticalRecording);
       this.verticalRecording = null;
+      this.SET_VERTICAL_RECORDING_STATUS(ERecordingState.Offline, time);
 
       // stop recording horizontal display
-      NodeObs.OBS_service_stopRecording();
+      this.SET_RECORDING_STATUS(ERecordingState.Wrote, time);
+      this.horizontalRecording.stop();
+      SimpleRecordingFactory.destroy(this.horizontalRecording);
+      this.horizontalRecording = null;
+      this.SET_RECORDING_STATUS(ERecordingState.Offline, time);
 
       return;
     }
@@ -1018,6 +1029,33 @@ export class StreamingService
     if (this.state.recordingStatus === ERecordingState.Offline) {
       // get output settings for horizontal display
       const path = this.outputSettingsService.getSettings().recording.path;
+
+      this.horizontalRecording = SimpleRecordingFactory.create();
+      this.horizontalRecording.path = path;
+      this.horizontalRecording.format = ERecordingFormat.MP4;
+      this.horizontalRecording.quality = ERecordingQuality.HighQuality;
+      this.horizontalRecording.video = this.videoSettingsService.contexts.horizontal;
+      this.horizontalRecording.videoEncoder = VideoEncoderFactory.create(
+        'obs_x264',
+        'video-encoder',
+      );
+      this.horizontalRecording.lowCPU = false;
+      this.horizontalRecording.audioEncoder = AudioEncoderFactory.create();
+      this.horizontalRecording.overwrite = false;
+      this.horizontalRecording.noSpace = false;
+      this.horizontalRecording.signalHandler = signal => {
+        if (signal.signal === ERecordingState.Start) {
+          this.usageStatisticsService.recordFeatureUsage('Recording');
+          this.usageStatisticsService.recordAnalyticsEvent('RecordingStatus', {
+            status: ERecordingState.Recording,
+            code: signal.code,
+            display: 'horizontal',
+          });
+
+          const time = new Date().toISOString();
+          this.SET_RECORDING_STATUS(ERecordingState.Recording, time);
+        }
+      };
 
       // record vertical canvas
       this.verticalRecording = SimpleRecordingFactory.create();
@@ -1030,10 +1068,22 @@ export class StreamingService
       this.verticalRecording.audioEncoder = AudioEncoderFactory.create();
       this.verticalRecording.overwrite = false;
       this.verticalRecording.noSpace = false;
+      this.verticalRecording.signalHandler = signal => {
+        if (signal.signal === ERecordingState.Start) {
+          this.usageStatisticsService.recordFeatureUsage('Recording');
+          this.usageStatisticsService.recordAnalyticsEvent('RecordingStatus', {
+            status: ERecordingState.Recording,
+            code: signal.code,
+            display: 'verticalv',
+          });
 
-      // start recording horizontal display
-      NodeObs.OBS_service_startRecording();
+          const time = new Date().toISOString();
+          this.SET_VERTICAL_RECORDING_STATUS(ERecordingState.Recording, time);
+        }
+      };
+
       // start recording vertical display
+      this.horizontalRecording.start();
       this.verticalRecording.start();
       return;
     }
@@ -1498,6 +1548,12 @@ export class StreamingService
   private SET_RECORDING_STATUS(status: ERecordingState, time: string) {
     this.state.recordingStatus = status;
     this.state.recordingStatusTime = time;
+  }
+
+  @mutation()
+  private SET_VERTICAL_RECORDING_STATUS(status: ERecordingState, time: string) {
+    this.state.verticalRecordingStatus = status;
+    this.state.verticalRecordingStatusTime = time;
   }
 
   @mutation()
