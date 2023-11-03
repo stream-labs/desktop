@@ -291,6 +291,47 @@ export class OutputSettingsService extends Service {
     };
   }
 
+  getAdvancedRecordingSettings() {
+    const output = this.settingsService.state.Output.formData;
+    const advanced = this.settingsService.state.Advanced.formData;
+
+    const path = this.settingsService.findSettingValue(output, 'Recording', 'RecFilePath');
+    const encoder = this.settingsService.findSettingValue(output, 'Recording', 'RecEncoder');
+    const rescaling = this.settingsService.findSettingValue(output, 'Recording', 'RecRescale');
+    const mixer = this.settingsService.findSettingValue(output, 'Recording', 'RecTracks');
+    const useStreamEncoders =
+      this.settingsService.findSettingValue(output, 'Recording', 'RecEncoder') === 'none';
+
+    const format = this.settingsService.findValidListValue(
+      output,
+      'Recording',
+      'RecFormat',
+    ) as ERecordingFormat;
+
+    const overwrite = this.settingsService.findSettingValue(
+      advanced,
+      'Recording',
+      'OverwriteIfExists',
+    );
+
+    const noSpace = this.settingsService.findSettingValue(
+      output,
+      'Recording',
+      'RecFileNameWithoutSpace',
+    );
+
+    return {
+      path,
+      format,
+      encoder,
+      overwrite,
+      noSpace,
+      rescaling,
+      mixer,
+      useStreamEncoders,
+    };
+  }
+
   private getStreamingEncoderSettings(
     output: ISettingsSubCategory[],
     video: ISettingsSubCategory[],
