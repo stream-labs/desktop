@@ -12,6 +12,8 @@ import {
   IAdvancedRecording,
   AdvancedRecordingFactory,
   EOutputSignal,
+  ERecordingFormat,
+  AudioTrackFactory,
 } from '../../../obs-api';
 import { Inject } from 'services/core/injector';
 import moment from 'moment';
@@ -1013,40 +1015,68 @@ export class StreamingService
   }
 
   startAdvancedRecording() {
-    // currently is just recording using the old API and only horizontal display
+    const sharedSettings = this.outputSettingsService.getAdvancedRecordingSettings();
 
-    const sharedSettings = this.outputSettingsService.getSimpleRecordingSettings();
+    console.log('sharedSettings ', sharedSettings);
 
     this.horizontalRecording = AdvancedRecordingFactory.create();
-
     this.horizontalRecording.path = sharedSettings.path;
     this.horizontalRecording.format = sharedSettings.format;
     this.horizontalRecording.videoEncoder = VideoEncoderFactory.create(
       sharedSettings.encoder,
       'video-encoder',
     );
-    this.horizontalRecording.overwrite = sharedSettings.overwrite;
-    this.horizontalRecording.noSpace = sharedSettings.noSpace;
+    this.horizontalRecording.overwrite = true;
+    this.horizontalRecording.noSpace = true;
     this.horizontalRecording.video = this.videoSettingsService.contexts.horizontal;
     this.horizontalRecording.signalHandler = signal => {
+      console.log('signal horizontal ', signal);
       this.handleRecordingSignal(signal, 'horizontal');
     };
 
-    // this.horizontalRecording.mixer = 7;
-    // this.horizontalRecording.rescaling = true;
-    // this.horizontalRecording.outputWidth = 1920;
-    // this.horizontalRecording.outputHeight = 1080;
-    // this.horizontalRecording.useStreamEncoders = false;
+    this.horizontalRecording.mixer = sharedSettings.mixer;
+    this.horizontalRecording.rescaling = sharedSettings.rescaling;
+    this.horizontalRecording.outputWidth = this.dualOutputService.views.videoSettings.horizontal.outputWidth;
+    this.horizontalRecording.outputHeight = this.dualOutputService.views.videoSettings.horizontal.outputHeight;
+    this.horizontalRecording.useStreamEncoders = sharedSettings.useStreamEncoders;
 
+    const track1 = AudioTrackFactory.create(160, 'track1');
+    AudioTrackFactory.setAtIndex(track1, 1);
+
+    // set up vertical recording
+    // currently, can only record vertical when also recording horizontal
     if (this.views.isDualOutputMode && this.dualOutputService.views.recordVertical) {
       this.verticalRecording = AdvancedRecordingFactory.create();
+
+      this.verticalRecording.path = sharedSettings.path;
+      this.verticalRecording.format = sharedSettings.format;
+      this.verticalRecording.videoEncoder = VideoEncoderFactory.create(
+        sharedSettings.encoder,
+        'video-encoder',
+      );
+      this.verticalRecording.overwrite = sharedSettings.overwrite;
+      this.verticalRecording.noSpace = sharedSettings.noSpace;
+      this.verticalRecording.video = this.videoSettingsService.contexts.vertical;
+
       this.verticalRecording.signalHandler = signal => {
+        console.log('signal vertical ', signal);
         this.handleRecordingSignal(signal, 'vertical');
       };
+
+      this.verticalRecording.mixer = sharedSettings.mixer;
+      this.verticalRecording.rescaling = sharedSettings.rescaling;
+      this.verticalRecording.outputWidth = this.dualOutputService.views.videoSettings.vertical.outputWidth;
+      this.verticalRecording.outputHeight = this.dualOutputService.views.videoSettings.vertical.outputHeight;
+      this.verticalRecording.useStreamEncoders = sharedSettings.useStreamEncoders;
+
+      const track2 = AudioTrackFactory.create(160, 'track2');
+      AudioTrackFactory.setAtIndex(track2, 2);
     }
 
     // start recording
-    this.horizontalRecording.start();
+    if (this.horizontalRecording) {
+      this.horizontalRecording.start();
+    }
     if (this.verticalRecording) {
       this.verticalRecording.start();
     }
@@ -1075,6 +1105,7 @@ export class StreamingService
     };
 
     // set up vertical recording
+    // currently, can only record vertical when also recording horizontal
     if (this.views.isDualOutputMode && this.dualOutputService.views.recordVertical) {
       this.verticalRecording = SimpleRecordingFactory.create();
       this.verticalRecording.path = sharedSettings.path;
@@ -1106,6 +1137,7 @@ export class StreamingService
 
   handleRecordingSignal(signal: EOutputSignal, display: TDisplayType) {
     const time = new Date().toISOString();
+
     if (signal.signal === ERecordingState.Start) {
       this.usageStatisticsService.recordFeatureUsage('Recording');
       this.usageStatisticsService.recordAnalyticsEvent('RecordingStatus', {
