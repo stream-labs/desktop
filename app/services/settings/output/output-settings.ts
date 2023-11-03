@@ -234,17 +234,16 @@ export class OutputSettingsService extends Service {
     const output = this.settingsService.state.Output.formData;
     const advanced = this.settingsService.state.Advanced.formData;
 
-    const path = this.settingsService.findSettingValue(output, 'Recording', 'FilePath');
+    const path: string = this.settingsService.findSettingValue(output, 'Recording', 'FilePath');
 
-    const format = this.settingsService.findValidListValue(
+    const format: ERecordingFormat = this.settingsService.findValidListValue(
       output,
       'Recording',
       'RecFormat',
     ) as ERecordingFormat;
 
     const oldQualityName = this.settingsService.findSettingValue(output, 'Recording', 'RecQuality');
-    let quality = ERecordingQuality.HigherQuality;
-
+    let quality: ERecordingQuality = ERecordingQuality.HigherQuality;
     switch (oldQualityName) {
       case 'Small':
         quality = ERecordingQuality.HighQuality;
@@ -260,21 +259,24 @@ export class OutputSettingsService extends Service {
         break;
     }
 
-    const convertedEncoderName = this.convertEncoderToNewAPI(this.getSettings().recording.encoder);
-    const encoder =
+    const convertedEncoderName:
+      | EObsSimpleEncoder.x264_lowcpu
+      | EObsAdvancedEncoder = this.convertEncoderToNewAPI(this.getSettings().recording.encoder);
+
+    const encoder: EObsAdvancedEncoder =
       convertedEncoderName === EObsSimpleEncoder.x264_lowcpu
         ? EObsAdvancedEncoder.obs_x264
         : convertedEncoderName;
 
-    const lowCPU = convertedEncoderName === EObsSimpleEncoder.x264_lowcpu;
+    const lowCPU: boolean = convertedEncoderName === EObsSimpleEncoder.x264_lowcpu;
 
-    const overwrite = this.settingsService.findSettingValue(
+    const overwrite: boolean = this.settingsService.findSettingValue(
       advanced,
       'Recording',
       'OverwriteIfExists',
     );
 
-    const noSpace = this.settingsService.findSettingValue(
+    const noSpace: boolean = this.settingsService.findSettingValue(
       output,
       'Recording',
       'FileNameWithoutSpace',
@@ -587,7 +589,9 @@ export class OutputSettingsService extends Service {
     }
   }
 
-  convertEncoderToNewAPI(encoder: EObsSimpleEncoder | string) {
+  convertEncoderToNewAPI(
+    encoder: EObsSimpleEncoder | string,
+  ): EObsSimpleEncoder.x264_lowcpu | EObsAdvancedEncoder {
     switch (encoder) {
       case EObsSimpleEncoder.x264:
         return EObsAdvancedEncoder.obs_x264;
