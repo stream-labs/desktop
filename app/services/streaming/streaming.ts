@@ -11,6 +11,7 @@ import {
   ERecordingQuality,
   IAdvancedRecording,
   AdvancedRecordingFactory,
+  EOutputSignal,
 } from '../../../obs-api';
 import { Inject } from 'services/core/injector';
 import moment from 'moment';
@@ -124,9 +125,7 @@ export class StreamingService
     streamingStatus: EStreamingState.Offline,
     streamingStatusTime: new Date().toISOString(),
     recordingStatus: ERecordingState.Offline,
-    verticalRecordingStatus: ERecordingState.Offline,
     recordingStatusTime: new Date().toISOString(),
-    verticalRecordingStatusTime: new Date().toISOString(),
     replayBufferStatus: EReplayBufferState.Offline,
     replayBufferStatusTime: new Date().toISOString(),
     selectiveRecording: false,
@@ -990,15 +989,16 @@ export class StreamingService
     if (this.state.recordingStatus === ERecordingState.Recording) {
       const time = new Date().toISOString();
       this.SET_RECORDING_STATUS(ERecordingState.Stopping, time);
-      this.SET_VERTICAL_RECORDING_STATUS(ERecordingState.Stopping, time);
 
+      // stop recording vertical display
       if (this.verticalRecording) {
-        // stop recording vertical display
         this.verticalRecording.stop();
       }
 
       // stop recording horizontal display
-      this.horizontalRecording.stop();
+      if (this.horizontalRecording) {
+        this.horizontalRecording.stop();
+      }
 
       return;
     }
@@ -1029,24 +1029,7 @@ export class StreamingService
     this.horizontalRecording.noSpace = sharedSettings.noSpace;
     this.horizontalRecording.video = this.videoSettingsService.contexts.horizontal;
     this.horizontalRecording.signalHandler = signal => {
-      if (signal.signal === ERecordingState.Start) {
-        this.usageStatisticsService.recordFeatureUsage('Recording');
-        this.usageStatisticsService.recordAnalyticsEvent('RecordingStatus', {
-          status: ERecordingState.Recording,
-          code: signal.code,
-          display: 'horizontal',
-        });
-
-        const time = new Date().toISOString();
-        this.SET_RECORDING_STATUS(ERecordingState.Recording, time);
-      }
-
-      if (signal.signal === ERecordingState.Wrote) {
-        AdvancedRecordingFactory.destroy(this.horizontalRecording as IAdvancedRecording);
-        const time = new Date().toISOString();
-        this.SET_RECORDING_STATUS(ERecordingState.Offline, time);
-        this.horizontalRecording = null;
-      }
+      this.handleRecordingSignal(signal, 'horizontal');
     };
 
     // this.horizontalRecording.mixer = 7;
@@ -1058,24 +1041,7 @@ export class StreamingService
     if (this.views.isDualOutputMode && this.dualOutputService.views.recordVertical) {
       this.verticalRecording = AdvancedRecordingFactory.create();
       this.verticalRecording.signalHandler = signal => {
-        if (signal.signal === ERecordingState.Start) {
-          this.usageStatisticsService.recordFeatureUsage('Recording');
-          this.usageStatisticsService.recordAnalyticsEvent('RecordingStatus', {
-            status: ERecordingState.Recording,
-            code: signal.code,
-            display: 'vertical',
-          });
-
-          const time = new Date().toISOString();
-          this.SET_RECORDING_STATUS(ERecordingState.Recording, time);
-        }
-
-        if (signal.signal === ERecordingState.Wrote) {
-          AdvancedRecordingFactory.destroy(this.verticalRecording as IAdvancedRecording);
-          const time = new Date().toISOString();
-          this.SET_RECORDING_STATUS(ERecordingState.Offline, time);
-          this.verticalRecording = null;
-        }
+        this.handleRecordingSignal(signal, 'vertical');
       };
     }
 
@@ -1105,24 +1071,7 @@ export class StreamingService
     this.horizontalRecording.overwrite = sharedSettings.overwrite;
     this.horizontalRecording.noSpace = sharedSettings.noSpace;
     this.horizontalRecording.signalHandler = signal => {
-      if (signal.signal === ERecordingState.Start) {
-        this.usageStatisticsService.recordFeatureUsage('Recording');
-        this.usageStatisticsService.recordAnalyticsEvent('RecordingStatus', {
-          status: ERecordingState.Recording,
-          code: signal.code,
-          display: 'horizontal',
-        });
-
-        const time = new Date().toISOString();
-        this.SET_RECORDING_STATUS(ERecordingState.Recording, time);
-      }
-
-      if (signal.signal === ERecordingState.Wrote) {
-        SimpleRecordingFactory.destroy(this.horizontalRecording as ISimpleRecording);
-        const time = new Date().toISOString();
-        this.SET_RECORDING_STATUS(ERecordingState.Offline, time);
-        this.horizontalRecording = null;
-      }
+      this.handleRecordingSignal(signal, 'horizontal');
     };
 
     // set up vertical recording
@@ -1141,34 +1090,53 @@ export class StreamingService
       this.verticalRecording.overwrite = sharedSettings.overwrite;
       this.verticalRecording.noSpace = sharedSettings.noSpace;
       this.verticalRecording.signalHandler = signal => {
-        if (signal.signal === ERecordingState.Start) {
-          this.usageStatisticsService.recordFeatureUsage('Recording');
-          this.usageStatisticsService.recordAnalyticsEvent('RecordingStatus', {
-            status: ERecordingState.Recording,
-            code: signal.code,
-            display: 'vertical',
-          });
-
-          const time = new Date().toISOString();
-          this.SET_RECORDING_STATUS(ERecordingState.Recording, time);
-        }
-
-        if (signal.signal === ERecordingState.Wrote) {
-          SimpleRecordingFactory.destroy(this.verticalRecording as ISimpleRecording);
-
-          const time = new Date().toISOString();
-          this.SET_RECORDING_STATUS(ERecordingState.Offline, time);
-          this.verticalRecording = null;
-        }
+        this.handleRecordingSignal(signal, 'vertical');
       };
     }
 
     // start recording
-    this.horizontalRecording.start();
+    if (this.horizontalRecording) {
+      this.horizontalRecording.start();
+    }
     if (this.verticalRecording) {
       this.verticalRecording.start();
     }
     return;
+  }
+
+  handleRecordingSignal(signal: EOutputSignal, display: TDisplayType) {
+    const time = new Date().toISOString();
+    if (signal.signal === ERecordingState.Start) {
+      this.usageStatisticsService.recordFeatureUsage('Recording');
+      this.usageStatisticsService.recordAnalyticsEvent('RecordingStatus', {
+        status: ERecordingState.Recording,
+        code: signal.code,
+        display,
+      });
+      this.SET_RECORDING_STATUS(ERecordingState.Recording, time);
+    }
+
+    if (signal.signal === ERecordingState.Wrote) {
+      if (this.outputSettingsService.getSettings().mode === 'Advanced') {
+        if (display === 'horizontal' && this.horizontalRecording) {
+          AdvancedRecordingFactory.destroy(this.horizontalRecording as IAdvancedRecording);
+          this.horizontalRecording = null;
+        } else if (display === 'vertical' && this.verticalRecording) {
+          AdvancedRecordingFactory.destroy(this.verticalRecording as IAdvancedRecording);
+          this.verticalRecording = null;
+        }
+      } else {
+        if (display === 'horizontal' && this.horizontalRecording) {
+          SimpleRecordingFactory.destroy(this.horizontalRecording as ISimpleRecording);
+          this.horizontalRecording = null;
+        } else if (display === 'vertical' && this.verticalRecording) {
+          SimpleRecordingFactory.destroy(this.verticalRecording as ISimpleRecording);
+          this.verticalRecording = null;
+        }
+      }
+
+      this.SET_RECORDING_STATUS(ERecordingState.Offline, time);
+    }
   }
 
   splitFile() {
@@ -1630,12 +1598,6 @@ export class StreamingService
   private SET_RECORDING_STATUS(status: ERecordingState, time: string) {
     this.state.recordingStatus = status;
     this.state.recordingStatusTime = time;
-  }
-
-  @mutation()
-  private SET_VERTICAL_RECORDING_STATUS(status: ERecordingState, time: string) {
-    this.state.verticalRecordingStatus = status;
-    this.state.verticalRecordingStatusTime = time;
   }
 
   @mutation()
