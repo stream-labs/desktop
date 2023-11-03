@@ -142,7 +142,7 @@ function ActionButton() {
   return (
     <div style={{ flex: 1, justifyContent: 'center', display: 'flex', alignItems: 'center' }}>
       <Button
-        className={cx({ 'button--prime': isPrimeStep })}
+        className={cx(styles.actionButton, { 'button--prime': isPrimeStep })}
         type="primary"
         shape="round"
         size="large"

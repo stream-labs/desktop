@@ -127,28 +127,33 @@
 
   svg {
     fill: var(--section-alt);
+    transform: rotateY(180deg);
+    transition: all 0.5s ease-in-out;
   }
 
   img {
     position: absolute;
     bottom: 0;
     left: 0;
+    transition: all 0.5s ease-in-out;
   }
 }
 
 @media (max-width: 1100px) {
   .footer {
     svg {
-      margin-top: 195px;
     }
-    display: none;
+    //display: none;
   }
 }
 
-@media (max-height: 800px) {
+@media (max-height: 750px) {
   .footer {
-    svg, img {
-      display: none;
+    img {
+      transform: scale(0.5) translate(-50%, 50%)
+    }
+    svg {
+      transform: rotateY(180deg) translateX(40%);
     }
   }
 }
