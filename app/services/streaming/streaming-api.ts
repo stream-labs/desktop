@@ -90,9 +90,7 @@ export interface IStreamingServiceState {
   streamingStatus: EStreamingState;
   streamingStatusTime: string;
   recordingStatus: ERecordingState;
-  verticalRecordingStatus: ERecordingState;
   recordingStatusTime: string;
-  verticalRecordingStatusTime: string;
   replayBufferStatus: EReplayBufferState;
   replayBufferStatusTime: string;
   selectiveRecording: boolean;
