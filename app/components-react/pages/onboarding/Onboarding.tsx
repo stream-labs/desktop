@@ -69,16 +69,9 @@ export default function Onboarding() {
 
   const Component = stepComponents[currentStep.component];
 
-  const percent = ((currentStepIndex + 1) / totalSteps) * 100;
-
-  const stepClass = `onboarding-step-${currentStep.component.toLowerCase()}`;
-
-  /* Skip pagination on Ultra step since it overlaps */
-  const shouldShowPagination = currentStep.component !== 'Prime';
-
   return (
-    <div className={cx(styles.onboardingContainer, stepClass)}>
-      {<TopBar />}
+    <div className={cx(styles.onboardingContainer)}>
+      <TopBar />
 
       <div className={styles.onboardingContent}>
         <Scrollable style={{ height: '100%' }}>
@@ -87,31 +80,48 @@ export default function Onboarding() {
         </Scrollable>
       </div>
 
-      <div className={styles.footer}>
-        {shouldShowPagination && (
-          <div
-            className={cx(styles.progress, { [styles.progressWithSkip]: currentStep.isSkippable })}
-          >
-            <Progress showInfo={false} steps={totalSteps} percent={percent} />
-          </div>
-        )}
+      <Footer
+        onSkip={skip}
+        currentStep={currentStep}
+        currentStepIndex={currentStepIndex}
+        isProcessing={processing}
+        totalSteps={totalSteps}
+      />
+    </div>
+  );
+}
 
-        {currentStep.isSkippable && (
-          <div className={styles.skip}>
-            <button
-              className={cx(
-                'button button--trans',
-                styles.linkButton,
-                commonStyles.onboardingButton,
-              )}
-              onClick={skip}
-              disabled={processing}
-            >
-              {$t('Skip')}
-            </button>
-          </div>
-        )}
+interface FooterProps {
+  currentStep: IOnboardingStep;
+  currentStepIndex: number;
+  totalSteps: number;
+  onSkip: () => void;
+  isProcessing: boolean;
+}
+
+function Footer({ currentStep, totalSteps, onSkip, isProcessing, currentStepIndex }: FooterProps) {
+  const percent = ((currentStepIndex + 1) / totalSteps) * 100;
+
+  /* Skip pagination on Ultra step since it overlaps */
+  const isPrimeStep = currentStep.component === 'Prime';
+
+  return (
+    <div className={cx(styles.footer, { [styles.footerPrime]: isPrimeStep })}>
+      <div className={cx(styles.progress, { [styles.progressWithSkip]: currentStep.isSkippable })}>
+        <Progress showInfo={false} steps={totalSteps} percent={percent} />
       </div>
+
+      {currentStep.isSkippable && (
+        <div className={styles.skip}>
+          <button
+            className={cx('button button--trans', styles.linkButton, commonStyles.onboardingButton)}
+            onClick={onSkip}
+            disabled={isProcessing}
+          >
+            {$t('Skip')}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -131,7 +141,11 @@ function TopBar() {
   const component = useModule(OnboardingModule).currentStep.component;
 
   return (
-    <div className={styles.topBarContainer}>
+    <div
+      className={cx(styles.topBarContainer, {
+        [styles.topBarContainerPrime]: component === 'Prime',
+      })}
+    >
       <TopBarLogo component={component} />
     </div>
   );
@@ -141,7 +155,9 @@ function ActionButton() {
   const { currentStep, next, processing } = useModule(OnboardingModule);
 
   if (currentStep.hideButton) return null;
-  const isPrimeStep = currentStep.label === $t('Ultra');
+
+  const isPrimeStep = currentStep.component === 'Prime';
+
   return (
     <div style={{ flex: 1, justifyContent: 'center', display: 'flex', alignItems: 'center' }}>
       <Button

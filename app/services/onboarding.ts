@@ -40,53 +40,53 @@ const isMac = () => process.platform === OS.Mac;
 
 export const ONBOARDING_STEPS = () => ({
   [EOnboardingSteps.MacPermissions]: {
-    component: 'MacPermissions',
+    component: 'MacPermissions' as const,
     hideButton: true,
     isPreboarding: true,
     cond: isMac,
     isSkippable: true,
   },
   [EOnboardingSteps.StreamingOrRecording]: {
-    component: 'StreamingOrRecording',
+    component: 'StreamingOrRecording' as const,
     hideButton: true,
     isPreboarding: true,
     isSkippable: false,
   },
   [EOnboardingSteps.Connect]: {
-    component: 'Connect',
+    component: 'Connect' as const,
     // Skippable for now, ideally will make non-skippable for beginners with a custom RTMP URL setup
     isSkippable: true,
     hideButton: true,
     isPreboarding: true,
   },
   [EOnboardingSteps.PrimaryPlatformSelect]: {
-    component: 'PrimaryPlatformSelect',
+    component: 'PrimaryPlatformSelect' as const,
     hideButton: true,
     isPreboarding: true,
     cond: ({ isPartialSLAuth }: OnboardingStepContext) => isPartialSLAuth,
   },
   [EOnboardingSteps.FreshOrImport]: {
-    component: 'FreshOrImport',
+    component: 'FreshOrImport' as const,
     hideButton: true,
     isPreboarding: true,
     cond: ({ isObsInstalled, recordingModeEnabled }: OnboardingStepContext) =>
       isObsInstalled && !recordingModeEnabled,
   },
   [EOnboardingSteps.ObsImport]: {
-    component: 'ObsImport',
+    component: 'ObsImport' as const,
     hideButton: true,
     label: $t('Import'),
     cond: ({ importedFromObs, isObsInstalled }: OnboardingStepContext) =>
       importedFromObs && isObsInstalled,
   },
   [EOnboardingSteps.HardwareSetup]: {
-    component: 'HardwareSetup',
+    component: 'HardwareSetup' as const,
     label: $t('Set Up Mic and Webcam'),
     cond: ({ importedFromObs }: OnboardingStepContext) => !importedFromObs,
     isSkippable: true,
   },
   [EOnboardingSteps.ThemeSelector]: {
-    component: 'ThemeSelector',
+    component: 'ThemeSelector' as const,
     hideButton: true,
     label: $t('Add a Theme'),
     cond: ({
@@ -104,7 +104,7 @@ export const ONBOARDING_STEPS = () => ({
   },
   // Temporarily skip auto config until migration to new API
   // [EOnboardingSteps.Optimize]: {
-  //   component: 'Optimize',
+  //   component: 'Optimize' as const,
   //   disableControls: false,
   //   hideSkip: false,
   //   hideButton: true,
@@ -112,14 +112,14 @@ export const ONBOARDING_STEPS = () => ({
   //   cond: ({ isTwitchAuthed, isYoutubeAuthed, recordingModeEnabled }: OnboardingStepContext) => isTwitchAuthed || isYoutubeAuthed || recordingModeEnabled,
   // },
   [EOnboardingSteps.Prime]: {
-    component: 'Prime',
+    component: 'Prime' as const,
     hideButton: true,
     label: $t('Ultra'),
-    cond: ({ isUltra }: OnboardingStepContext) => !isUltra,
+    // cond: ({ isUltra }: OnboardingStepContext) => !isUltra,
     isSkippable: true,
   },
   [EOnboardingSteps.Tips]: {
-    component: 'Tips',
+    component: 'Tips' as const,
     hideButton: true,
     cond: isBeginnerOrIntermediateOrUnselected,
     isSkippable: false,
@@ -139,7 +139,19 @@ export interface OnboardingStepContext {
 }
 
 export interface IOnboardingStep {
-  component: string;
+  // Adding these explicitly so we don't accidentally do a comparison in some other components
+  component:
+    | 'MacPermissions'
+    | 'StreamingOrRecording'
+    | 'Connect'
+    | 'PrimaryPlatformSelect'
+    | 'FreshOrImport'
+    | 'ObsImport'
+    | 'HardwareSetup'
+    | 'ThemeSelector'
+    | 'Optimize'
+    | 'Prime'
+    | 'Tips';
   hideButton?: boolean;
   label?: string;
   isPreboarding?: boolean;

@@ -19,6 +19,7 @@ export function Prime() {
         { text: $t('Streamlabs Desktop'), icon: 'icon-desktop' },
         { text: $t('Highlighter'), icon: 'icon-slice' },
         { text: $t('Storage'), icon: 'icon-cloud-backup' },
+        { text: $t('Seamless Creator Workflow'), icon: 'icon-user' },
         {
           text: 'Video Editor',
           icon: 'icon-streamlabs',
@@ -45,6 +46,7 @@ export function Prime() {
           { text: '✓', key: 'check1' },
           { text: '✓', key: 'check2' },
           { text: '1GB' },
+          { text: '✓', key: 'check3' },
           { text: $t('30 Minute Videos + 15GB Storage') },
           { text: $t('Create Custom Videos with Watermark') },
           { text: $t('Logo Maker, Intro Maker, Emote Maker') },
@@ -62,6 +64,7 @@ export function Prime() {
           { text: '✓', key: 'check1' },
           { text: '✓', key: 'check2' },
           { text: '10GB' },
+          { text: '✓', key: 'check3' },
           { text: $t('1 Hour Videos + 250GB Storage + More') },
           { text: $t('No Watermark + 1080p/60fps + More') },
           { text: $t('YouTube Thumbnail Maker, Creator Sites') },
@@ -80,8 +83,16 @@ export function Prime() {
   );
 
   return (
-    <div style={{ width: '100%' }}>
-      <div style={{ width: '100%', marginTop: '144px' }}>
+    <div
+      style={{
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        height: '100%',
+      }}
+    >
+      <div style={{ width: '100%' }}>
         <UltraComparison onSkip={next} refl="slobs-onboarding" {...tableProps} />
       </div>
     </div>
