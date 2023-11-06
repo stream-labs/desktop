@@ -71,9 +71,13 @@ export default function Onboarding() {
 
   const percent = ((currentStepIndex + 1) / totalSteps) * 100;
 
-  // FIXME: pagination is showing if user picks recording mode
+  const stepClass = `onboarding-step-${currentStep.component.toLowerCase()}`;
+
+  /* Skip pagination on Ultra step since it overlaps */
+  const shouldShowPagination = currentStep.component !== 'Prime';
+
   return (
-    <div className={styles.onboardingContainer}>
+    <div className={cx(styles.onboardingContainer, stepClass)}>
       {<TopBar />}
 
       <div className={styles.onboardingContent}>
@@ -84,8 +88,7 @@ export default function Onboarding() {
       </div>
 
       <div className={styles.footer}>
-        {/* Skip pagination on Ultra step since it overlaps */}
-        {currentStep.component !== 'Prime' && (
+        {shouldShowPagination && (
           <div
             className={cx(styles.progress, { [styles.progressWithSkip]: currentStep.isSkippable })}
           >

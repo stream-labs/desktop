@@ -16,7 +16,7 @@ const openExternalLink: React.MouseEventHandler<HTMLAnchorElement> = evt => {
 
 const linkProps = { slot: 'link', onClick: openExternalLink };
 const dashboardUrl = 'https://streamlabs.com/dashboard';
-const allStarsUrl = `${dashboardUrl}#/all-stars}`;
+const allStarsUrl = `${dashboardUrl}#/allstars`;
 
 function AllStarsTip() {
   return (
