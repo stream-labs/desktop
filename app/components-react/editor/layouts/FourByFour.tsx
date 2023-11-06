@@ -12,10 +12,6 @@ export function FourByFour(p: React.PropsWithChildren<LayoutProps>) {
     p.onTotalWidth,
   );
 
-  if (!mins.bar2 || !resizes.bar2) {
-    return <></>;
-  }
-
   return (
     <div className={styles.rows} ref={componentRef}>
       <div

@@ -12,8 +12,6 @@ export function TwoPane(p: React.PropsWithChildren<LayoutProps>) {
     p.onTotalWidth,
   );
 
-  if (!resizes.bar2 || !mins.bar2) return <></>;
-
   return (
     <div className={cx(styles.columns, styles.sidePadded)} ref={componentRef}>
       <ResizeBar

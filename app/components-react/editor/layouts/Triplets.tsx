@@ -28,8 +28,6 @@ export function Triplets(p: React.PropsWithChildren<LayoutProps>) {
     );
   }
 
-  if (!resizes.bar2 || !mins.bar2) return <></>;
-
   return (
     <div className={cx(styles.columns, styles.sidePadded)} ref={componentRef}>
       <ResizeBar

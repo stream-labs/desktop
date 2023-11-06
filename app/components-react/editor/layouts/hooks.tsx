@@ -39,7 +39,7 @@ export default function useLayout(
     const [restSlots, bar1Slots, bar2Slots] = vectorsToSlots();
     const rest = calculateMinimum(restSlots);
     const bar1 = calculateMinimum(bar1Slots);
-    let bar2;
+    let bar2 = 0;
     if (bar2Slots) bar2 = calculateMinimum(bar2Slots);
     return { rest, bar1, bar2 };
   }, []);
@@ -47,6 +47,11 @@ export default function useLayout(
   useEffect(() => {
     onTotalWidth(mapVectors(vectors), isColumns);
     updateSize();
+    window.addEventListener('resize', () => updateSize());
+
+    return () => {
+      window.removeEventListener('resize', () => updateSize());
+    };
   }, [chatCollapsed]);
 
   const componentEl = useRef<HTMLDivElement | null>(null);
@@ -55,10 +60,7 @@ export default function useLayout(
     if (node) {
       componentEl.current = node;
       onTotalWidth(mapVectors(vectors), isColumns);
-      window.addEventListener('resize', () => updateSize());
       updateSize();
-    } else {
-      window.removeEventListener('resize', () => updateSize());
     }
   }, []);
 

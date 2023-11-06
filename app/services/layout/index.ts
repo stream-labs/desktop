@@ -21,7 +21,7 @@ interface ILayoutState {
   icon: string;
   currentLayout: ELayout;
   slottedElements: { [Element in ELayoutElement]?: { slot: LayoutSlot; src?: string } };
-  resizes: { bar1: number; bar2?: number };
+  resizes: { bar1: number; bar2: number };
 }
 interface ILayoutServiceState {
   currentTab: string;

@@ -25,7 +25,7 @@ export enum ELayoutElement {
 
 type ILayoutData = {
   [Layout in ELayout]: {
-    resizeDefaults: { bar1: number; bar2?: number };
+    resizeDefaults: { bar1: number; bar2: number };
     className: string;
     component: string;
   };
@@ -43,7 +43,7 @@ export const LAYOUT_DATA: ILayoutData = {
     component: 'TwoPane',
   },
   [ELayout.Classic]: {
-    resizeDefaults: { bar1: 0.4 },
+    resizeDefaults: { bar1: 0.4, bar2: 0 },
     className: 'classic',
     component: 'Classic',
   },
@@ -58,17 +58,17 @@ export const LAYOUT_DATA: ILayoutData = {
     component: 'Triplets',
   },
   [ELayout.OnePane]: {
-    resizeDefaults: { bar1: 0.7 },
+    resizeDefaults: { bar1: 0.7, bar2: 0 },
     className: 'onePane',
     component: 'OnePane',
   },
   [ELayout.OnePaneR]: {
-    resizeDefaults: { bar1: 0.3 },
+    resizeDefaults: { bar1: 0.3, bar2: 0 },
     className: 'onePaneR',
     component: 'OnePaneR',
   },
   [ELayout.Pyramid]: {
-    resizeDefaults: { bar1: 0.4 },
+    resizeDefaults: { bar1: 0.4, bar2: 0 },
     className: 'pyramid',
     component: 'Pyramid',
   },

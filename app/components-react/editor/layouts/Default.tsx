@@ -12,25 +12,6 @@ export function Default(p: React.PropsWithChildren<LayoutProps>) {
     p.onTotalWidth,
   );
 
-  function BottomSection() {
-    if (!resizes.bar2) return <></>;
-
-    return (
-      <div
-        className={styles.segmented}
-        style={{ height: `${resizes.bar2 * 100}%`, padding: '0 8px' }}
-      >
-        {['3', '4', '5'].map(slot => (
-          <div key={slot} className={cx(styles.cell, 'no-top-padding')}>
-            {p.children![slot]}
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  if (!mins.bar2) return <></>;
-
   return (
     <div className={styles.rows} ref={componentRef}>
       <div
@@ -60,7 +41,16 @@ export function Default(p: React.PropsWithChildren<LayoutProps>) {
         max={calculateMax(mins.rest + mins.bar1)}
         min={mins.bar2}
       >
-        <BottomSection />
+        <div
+          className={styles.segmented}
+          style={{ height: `${resizes.bar2! * 100}%`, padding: '0 8px' }}
+        >
+          {['3', '4', '5'].map(slot => (
+            <div key={slot} className={cx(styles.cell, 'no-top-padding')}>
+              {p.children![slot]}
+            </div>
+          ))}
+        </div>
       </ResizeBar>
     </div>
   );
