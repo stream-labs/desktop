@@ -21,7 +21,9 @@ export function Default(p: React.PropsWithChildren<LayoutProps>) {
         style={{ height: `${resizes.bar2 * 100}%`, padding: '0 8px' }}
       >
         {['3', '4', '5'].map(slot => (
-          <div className={cx(styles.cell, 'no-top-padding')}>{p.children![slot]}</div>
+          <div key={slot} className={cx(styles.cell, 'no-top-padding')}>
+            {p.children![slot]}
+          </div>
         ))}
       </div>
     );
