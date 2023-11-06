@@ -9,7 +9,7 @@ import UltraIcon from 'components-react/shared/UltraIcon';
 import { CheckboxInput, ListInput, SliderInput, TextInput } from 'components-react/shared/inputs';
 import Form from 'components-react/shared/inputs/Form';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { DismissablesService, EDismissable } from 'services/dismissables';
 import { EDeviceType } from 'services/hardware';
 import { $t } from 'services/i18n';
@@ -17,7 +17,6 @@ import { SourcesService, TSourceType } from 'services/sources';
 import { ScenesService } from 'services/scenes';
 import { byOS, OS } from 'util/operating-systems';
 import { IGuest, GuestCamService } from 'services/guest-cam';
-import { inject, injectState, useModule } from 'slap';
 import {
   AudioService,
   EditorCommandsService,
@@ -26,18 +25,21 @@ import {
 } from 'app-services';
 import { confirmAsync } from 'components-react/modals';
 import { EAvailableFeatures } from 'services/incremental-rollout';
+import { initStore, useController } from '../hooks/zustand';
 
-class GuestCamModule {
-  private GuestCamService = inject(GuestCamService);
-  private SourcesService = inject(SourcesService);
-  private ScenesService = inject(ScenesService);
-  private AudioService = inject(AudioService);
-  private EditorCommandsService = inject(EditorCommandsService);
-  private DismissablesService = inject(DismissablesService);
-  private UserService = inject(UserService);
-  private IncrementalRolloutService = inject(IncrementalRolloutService);
+const GuestCamCtx = React.createContext<GuestCamController | null>(null);
 
-  state = injectState({
+class GuestCamController {
+  private GuestCamService = Services.GuestCamService;
+  private SourcesService = Services.SourcesService;
+  private ScenesService = Services.ScenesService;
+  private AudioService = Services.AudioService;
+  private EditorCommandsService = Services.EditorCommandsService;
+  private DismissablesService = Services.DismissablesService;
+  private UserService = Services.UserService;
+  private IncrementalRolloutService = Services.IncrementalRolloutService;
+
+  store = initStore({
     regeneratingLink: false,
     hideDisplay: false,
   });
@@ -239,10 +241,14 @@ class GuestCamModule {
   }
 
   regenerateLink() {
-    this.state.setRegeneratingLink(true);
-    this.GuestCamService.actions.return
-      .regenerateInviteLink()
-      .finally(() => this.state.setRegeneratingLink(false));
+    this.store.setState(s => {
+      s.regeneratingLink = true;
+    });
+    this.GuestCamService.actions.return.regenerateInviteLink().finally(() =>
+      this.store.setState(s => {
+        s.regeneratingLink = false;
+      }),
+    );
   }
 
   truncateName(name: string, length = 10) {
@@ -263,6 +269,16 @@ class GuestCamModule {
 }
 
 export default function GuestCamProperties() {
+  const controller = useMemo(() => new GuestCamController(), []);
+
+  return (
+    <GuestCamCtx.Provider value={controller}>
+      <GuestCamPropertiesModal />
+    </GuestCamCtx.Provider>
+  );
+}
+
+function GuestCamPropertiesModal() {
   const {
     GuestCamService,
     SourcesService,
@@ -279,6 +295,9 @@ export default function GuestCamProperties() {
 
     return guest.remoteProducer.streamId;
   }, []);
+  const controller = useController(GuestCamCtx);
+  const { regenerateLink, truncateName, disconnectFromHost } = controller;
+  const regeneratingLink = controller.store.useState(s => s.regeneratingLink);
   const {
     guests,
     uniqueGuests,
@@ -298,12 +317,28 @@ export default function GuestCamProperties() {
     screenshareProducerSourceOptions,
     sourceExists,
     produceOk,
-    regeneratingLink,
     loggedIn,
-    regenerateLink,
-    truncateName,
-    disconnectFromHost,
-  } = useModule(GuestCamModule);
+  } = useVuex(() => ({
+    guests: controller.guests,
+    uniqueGuests: controller.uniqueGuests,
+    maxGuests: controller.maxGuests,
+    shouldShowPrimeUpgrade: controller.shouldShowPrimeUpgrade,
+    joinAsGuest: controller.joinAsGuest,
+    hostName: controller.hostName,
+    showFirstTimeModal: controller.showFirstTimeModal,
+    inviteUrl: controller.inviteUrl,
+    videoProducerSource: controller.videoProducerSource,
+    videoProducerSourceId: controller.videoProducerSourceId,
+    videoProducerSourceOptions: controller.videoProducerSourceOptions,
+    audioProducerSource: controller.audioProducerSource,
+    audioProducerSourceId: controller.audioProducerSourceId,
+    audioProducerSourceOptions: controller.audioProducerSourceOptions,
+    screenshareProducerSourceId: controller.screenshareProducerSourceId,
+    screenshareProducerSourceOptions: controller.screenshareProducerSourceOptions,
+    sourceExists: controller.sourceExists,
+    produceOk: controller.produceOk,
+    loggedIn: controller.loggedIn,
+  }));
 
   function getModalContent() {
     if (showFirstTimeModal) {
@@ -539,10 +574,18 @@ export default function GuestCamProperties() {
 }
 
 function GuestSourceSelector(p: { guest: IGuest; style?: React.CSSProperties }) {
-  const { availableSources, getBindingsForGuest, setHideDisplay } = useModule(GuestCamModule);
+  const controller = useController(GuestCamCtx);
+  const { getBindingsForGuest, store } = controller;
+  const availableSources = useVuex(() => controller.availableSources);
   const bindings = useVuex(() => getBindingsForGuest(p.guest.remoteProducer.streamId));
   const sourceId = bindings ? bindings.sourceId : null;
   const { GuestCamService, SourcesService } = Services;
+
+  const setHideDisplay = useCallback((isHidden: boolean) => {
+    store.setState(s => {
+      s.hideDisplay = isHidden;
+    });
+  }, []);
 
   async function setSourceId(sourceId?: string) {
     if (!sourceId) {
@@ -616,9 +659,12 @@ function DisconnectModal(p: { setCheckboxVal: (val: boolean) => void }) {
 }
 
 function GuestPane(p: { guest: IGuest }) {
-  const { getBindingsForGuest, addNewSource, regenerateLink, setHideDisplay } = useModule(
-    GuestCamModule,
-  );
+  const { getBindingsForGuest, addNewSource, regenerateLink, store } = useController(GuestCamCtx);
+  const setHideDisplay = useCallback((isHidden: boolean) => {
+    store.setState(s => {
+      s.hideDisplay = isHidden;
+    });
+  }, []);
 
   // TODO: Talk to Alex about how the useModule pattern thinks this should
   // be handled with reactivity. For now, wrap in useVuex to make it reactive.
@@ -727,7 +773,8 @@ function GuestPane(p: { guest: IGuest }) {
 }
 
 function GuestDisplay(p: { guest: IGuest }) {
-  const { produceOk, getBindingsForGuest, hideDisplay } = useModule(GuestCamModule);
+  const { produceOk, getBindingsForGuest, store } = useController(GuestCamCtx);
+  const hideDisplay = store.useState(s => s.hideDisplay);
   const bindings = useVuex(() => getBindingsForGuest(p.guest.remoteProducer.streamId));
 
   if (!bindings) return <div></div>;

@@ -51,15 +51,17 @@ export default function MixerItem(p: { audioSourceId: string; volmetersEnabled?:
       )}
 
       <div className="flex">
-        <SliderInput
-          value={deflection}
-          onInput={onSliderChangeHandler}
-          min={0}
-          max={1}
-          step={0.01}
-          debounce={500}
-          style={{ flexGrow: 1, marginBottom: 8, marginTop: 8 }}
-        />
+        <div style={{ width: '100%', marginTop: '8px', marginBottom: '8px' }}>
+          <SliderInput
+            value={deflection}
+            onInput={onSliderChangeHandler}
+            min={0}
+            max={1}
+            step={0.01}
+            debounce={500}
+            nowrap
+          />
+        </div>
         <div className={styles.controls}>
           <i
             className={cx('icon-button', muted ? 'icon-mute' : 'icon-audio')}
