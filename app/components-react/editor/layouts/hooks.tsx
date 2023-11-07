@@ -84,7 +84,7 @@ export default function useLayout(
 
   function setBar(bar: 'bar1' | 'bar2', val: number) {
     if (val === 0 || !componentEl.current) return;
-    setBars({ ...bars, [bar]: val });
+    setBars(oldState => ({ ...oldState, [bar]: val }));
     const { height, width } = componentEl.current.getBoundingClientRect();
     const totalSize = isColumns ? width : height;
     const proportion = parseFloat((val / totalSize).toFixed(2));
