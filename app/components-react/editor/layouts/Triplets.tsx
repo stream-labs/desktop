@@ -16,21 +16,8 @@ export function Triplets(p: React.PropsWithChildren<LayoutProps>) {
     p.onTotalWidth,
   );
 
-  function StackedSection(props: { slots: string[]; width: string }) {
-    return (
-      <div className={styles.stacked} style={{ width: props.width }}>
-        {props.slots.map(slot => (
-          <div key={slot} className={styles.cell}>
-            {p.children?.[slot] || <></>}
-          </div>
-        ))}
-      </div>
-    );
-  }
-
   return (
     <div className={cx(styles.columns, styles.sidePadded)} ref={componentRef}>
-      <StackedSection slots={['1', '4']} width={`${100 - (resizes.bar1 + resizes.bar2) * 100}%`} />
       <ResizeBar
         position="left"
         value={bars.bar1}
@@ -38,16 +25,38 @@ export function Triplets(p: React.PropsWithChildren<LayoutProps>) {
         max={calculateMax(mins.rest + bars.bar2)}
         min={mins.bar1}
       >
-        <StackedSection slots={['2', '5']} width={`${resizes.bar1 * 100}%`} />
+        <div
+          className={styles.stacked}
+          style={{ width: `${100 - (resizes.bar1 + resizes.bar2) * 100}%` }}
+        >
+          {['1', '4'].map(slot => (
+            <div key={slot} className={styles.cell}>
+              {p.children?.[slot] || <></>}
+            </div>
+          ))}
+        </div>
       </ResizeBar>
+      <div className={styles.stacked} style={{ width: `${resizes.bar1 * 100}%` }}>
+        {['2', '5'].map(slot => (
+          <div key={slot} className={styles.cell}>
+            {p.children?.[slot] || <></>}
+          </div>
+        ))}
+      </div>
       <ResizeBar
-        position="left"
+        position="right"
         value={bars.bar2}
         onInput={(value: number) => setBar('bar2', value)}
         max={calculateMax(mins.rest + mins.bar1)}
         min={mins.bar2}
       >
-        <StackedSection slots={['3', '6']} width={`${resizes.bar2 * 100}%`} />
+        <div className={styles.stacked} style={{ width: `${resizes.bar2 * 100}%` }}>
+          {['3', '6'].map(slot => (
+            <div key={slot} className={styles.cell}>
+              {p.children?.[slot] || <></>}
+            </div>
+          ))}
+        </div>
       </ResizeBar>
     </div>
   );

@@ -1,6 +1,6 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import cx from 'classnames';
-import useLayout, { LayoutProps, ILayoutSlotArray } from './hooks';
+import useLayout, { LayoutProps } from './hooks';
 import ResizeBar from 'components-react/root/ResizeBar';
 import styles from './Layouts.m.less';
 
