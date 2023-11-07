@@ -52,7 +52,7 @@ export function Connect() {
 
   const platforms = RecordingModeService.views.isRecordingModeEnabled
     ? ['streamlabs', 'youtube']
-    : ['streamlabs', 'twitch', 'youtube', 'facebook', 'trovo'];
+    : ['streamlabs', 'twitch', 'youtube', 'facebook', 'trovo', 'twitter'];
 
   return (
     <div className={styles.pageContainer}>
@@ -171,7 +171,7 @@ export class LoginModule {
 
     const result = await this.UserService.startAuth(
       platform,
-      ['youtube', 'twitch'].includes(platform) ? 'external' : 'internal',
+      ['youtube', 'twitch', 'twitter'].includes(platform) ? 'external' : 'internal',
       merge,
     );
 
