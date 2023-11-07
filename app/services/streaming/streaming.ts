@@ -809,7 +809,7 @@ export class StreamingService
     this.powerSaveId = remote.powerSaveBlocker.start('prevent-display-sleep');
 
     // start streaming
-    if (this.views.isDualOutputMode) {
+    if (this.views.isDualOutputMode && !this.dualOutputService.views.recordVertical) {
       // start dual output
 
       const horizontalContext = this.videoSettingsService.contexts.horizontal;
@@ -843,7 +843,9 @@ export class StreamingService
       NodeObs.OBS_service_startStreaming();
     }
 
-    const recordWhenStreaming = this.streamSettingsService.settings.recordWhenStreaming;
+    const recordWhenStreaming =
+      this.streamSettingsService.settings.recordWhenStreaming ||
+      this.dualOutputService.views.recordVertical;
 
     if (recordWhenStreaming && this.state.recordingStatus === ERecordingState.Offline) {
       this.toggleRecording();
@@ -1005,10 +1007,10 @@ export class StreamingService
     }
 
     if (this.state.recordingStatus === ERecordingState.Offline) {
-      this.createRecording('horizontal');
-
       if (this.views.isDualOutputMode && this.dualOutputService.views.recordVertical) {
         this.createRecording('vertical');
+      } else {
+        this.createRecording('horizontal');
       }
     }
   }
@@ -1104,11 +1106,8 @@ export class StreamingService
         [OS.Windows]: fileName.replace(/\//, '\\'),
       });
 
-      // console.log('writing ', display, ' , ', parsedName);
       await this.recordingModeService.addRecordingEntry(parsedName);
-      // console.log('added ', display);
       await this.markersService.exportCsv(parsedName);
-      // console.log('markers wrote ', display);
 
       // destroy recording factory instances
       if (this.outputSettingsService.getSettings().mode === 'Advanced') {

@@ -14,7 +14,12 @@ import { DefaultHardwareService } from './hardware';
 import { RunInLoadingMode } from './app/app-decorators';
 import { byOS, OS } from 'util/operating-systems';
 import { JsonrpcService } from './api/jsonrpc';
-import { NavigationService, UsageStatisticsService, SharedStorageService } from 'app-services';
+import {
+  NavigationService,
+  UsageStatisticsService,
+  SharedStorageService,
+  SideNavService,
+} from 'app-services';
 import { getPlatformService } from 'services/platforms';
 import { IYoutubeUploadResponse } from 'services/platforms/youtube/uploader';
 import { YoutubeService } from 'services/platforms/youtube';
@@ -66,6 +71,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
   @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject() private navigationService: NavigationService;
   @Inject() private sharedStorageService: SharedStorageService;
+  @Inject() private sideNavService: SideNavService;
 
   recordingAdded = new Subject();
 
@@ -192,30 +198,14 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
     const timestamp = moment().format();
     this.ADD_RECORDING_ENTRY(timestamp, filename);
 
-    await Vue.nextTick();
-    console.log('ticked ', filename);
-
-    await new Promise(resolve => {
-      // if (verticalFileName) {
-      //   this.ADD_RECORDING_ENTRY(timestamp, verticalFileName);
-      // }
-      // if (showNotification) {
-      // setTimeout(() => console.log('timing'), 5000);
-      //
-      // console.log('waiting');
-      setTimeout(resolve, 5000);
-      this.notificationsService.actions.push({
-        type: ENotificationType.SUCCESS,
-        message: $t('A new Recording has been completed. Click for more info'),
-        action: this.jsonrpcService.createRequest(
-          Service.getResourceId(this),
-          'showRecordingHistory',
-        ),
-      });
+    this.notificationsService.actions.push({
+      type: ENotificationType.SUCCESS,
+      message: $t('A new Recording has been completed. Click for more info'),
+      action: this.jsonrpcService.createRequest(
+        Service.getResourceId(this),
+        'showRecordingHistory',
+      ),
     });
-    // } else {
-    //   this.recordingAdded.next();
-    // }
   }
 
   pruneRecordingEntries() {
@@ -232,6 +222,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
 
   showRecordingHistory() {
     this.navigationService.navigate('RecordingHistory');
+    this.sideNavService.setCurrentMenuItem('recording-history');
   }
 
   async uploadToYoutube(filename: string) {
