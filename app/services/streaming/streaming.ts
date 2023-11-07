@@ -1039,8 +1039,8 @@ export class StreamingService
     recording.video = this.videoSettingsService.contexts[display];
 
     // set signal handler
-    recording.signalHandler = signal => {
-      this.handleRecordingSignal(signal, display);
+    recording.signalHandler = async signal => {
+      await this.handleRecordingSignal(signal, display);
     };
 
     // handle unique properties (including audio)
@@ -1069,7 +1069,7 @@ export class StreamingService
     }
   }
 
-  handleRecordingSignal(info: EOutputSignal, display: TDisplayType) {
+  async handleRecordingSignal(info: EOutputSignal, display: TDisplayType) {
     // map signals to status
     const nextState: ERecordingState = ({
       [EOBSOutputSignal.Start]: ERecordingState.Recording,
@@ -1104,46 +1104,11 @@ export class StreamingService
         [OS.Windows]: fileName.replace(/\//, '\\'),
       });
 
-      this.recordingModeService.actions.addRecordingEntry(parsedName);
-      this.markersService.actions.exportCsv(parsedName);
-      this.recordingModeService.addRecordingEntry(parsedName);
-
-      // const horizontalFileName = this.horizontalRecording.lastFile();
-      // const horizontalParsedFilename = byOS({
-      //   [OS.Mac]: horizontalFileName,
-      //   [OS.Windows]: horizontalFileName.replace(/\//, '\\'),
-      // });
-
-      // // add recordings to recording history
-      // if (this.verticalRecording) {
-      //   const verticalFileName = this.verticalRecording.lastFile();
-      //   const verticalParsedFileName = byOS({
-      //     [OS.Mac]: verticalFileName,
-      //     [OS.Windows]: verticalFileName.replace(/\//, '\\'),
-      //   });
-
-      //   const recordingAdded = this.recordingModeService.recordingAdded.subscribe(async () => {
-      //     this.recordingModeService.actions.addRecordingEntry(horizontalParsedFilename);
-      //     await this.markersService.exportCsv(horizontalParsedFilename);
-      //     this.recordingModeService.addRecordingEntry(horizontalParsedFilename);
-      //     recordingAdded.unsubscribe();
-      //   });
-
-      //   this.recordingModeService.actions.addRecordingEntry(verticalParsedFileName, false);
-      //   await this.markersService.exportCsv(verticalParsedFileName);
-      //   this.recordingModeService.addRecordingEntry(verticalParsedFileName, false);
-      //   this.recordingModeService.recordingAdded.next();
-      // await this.markersService.exportCsv(verticalParsedFileName);
-      // await this.markersService.exportCsv(horizontalParsedFilename);
-      // this.recordingModeService.addRecordingEntry(
-      //   horizontalParsedFilename,
-      //   verticalParsedFileName,
-      // );
-      // } else {
-      //   this.recordingModeService.actions.addRecordingEntry(horizontalParsedFilename);
-      //   await this.markersService.exportCsv(horizontalParsedFilename);
-      //   this.recordingModeService.addRecordingEntry(horizontalParsedFilename);
-      // }
+      // console.log('writing ', display, ' , ', parsedName);
+      await this.recordingModeService.addRecordingEntry(parsedName, display === 'horizontal');
+      // console.log('added ', display);
+      await this.markersService.exportCsv(parsedName);
+      // console.log('markers wrote ', display);
 
       // destroy recording factory instances
       if (this.outputSettingsService.getSettings().mode === 'Advanced') {
