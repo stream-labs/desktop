@@ -1105,7 +1105,7 @@ export class StreamingService
       });
 
       // console.log('writing ', display, ' , ', parsedName);
-      await this.recordingModeService.addRecordingEntry(parsedName, display === 'horizontal');
+      await this.recordingModeService.addRecordingEntry(parsedName);
       // console.log('added ', display);
       await this.markersService.exportCsv(parsedName);
       // console.log('markers wrote ', display);
