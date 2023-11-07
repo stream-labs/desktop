@@ -147,7 +147,7 @@
     "css-element-queries": "1.2.3",
     "css-loader": "2.1.1",
     "dotenv": "8.2.0",
-    "electron": "25.8.0",
+    "electron": "25.9.3",
     "electron-builder": "22.14.5",
     "electron-chromedriver": "25.1.1",
     "electron-devtools-installer": "3.1.1",
