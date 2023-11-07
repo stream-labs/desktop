@@ -18,6 +18,7 @@ import { NavigationService, UsageStatisticsService, SharedStorageService } from 
 import { getPlatformService } from 'services/platforms';
 import { IYoutubeUploadResponse } from 'services/platforms/youtube/uploader';
 import { YoutubeService } from 'services/platforms/youtube';
+import { Subject } from 'rxjs';
 
 interface IRecordingEntry {
   timestamp: string;
@@ -65,6 +66,8 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
   @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject() private navigationService: NavigationService;
   @Inject() private sharedStorageService: SharedStorageService;
+
+  recordingAdded = new Subject();
 
   static defaultState: IRecordingModeState = {
     enabled: false,
@@ -180,9 +183,18 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
     }, 10 * 1000);
   }
 
-  addRecordingEntry(filename: string) {
+  /**
+   * Add entry to recording history and show notification
+   * @param filename - name of file to show in recording history
+   * @param showNotification - primarily used when recording in dual output mode to only show the notification once
+   */
+  addRecordingEntry(filename: string, showNotification: boolean = true) {
     const timestamp = moment().format();
     this.ADD_RECORDING_ENTRY(timestamp, filename);
+    // if (verticalFileName) {
+    //   this.ADD_RECORDING_ENTRY(timestamp, verticalFileName);
+    // }
+    // if (showNotification) {
     this.notificationsService.actions.push({
       type: ENotificationType.SUCCESS,
       message: $t('A new Recording has been completed. Click for more info'),
@@ -191,6 +203,9 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
         'showRecordingHistory',
       ),
     });
+    // } else {
+    //   this.recordingAdded.next();
+    // }
   }
 
   pruneRecordingEntries() {

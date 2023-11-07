@@ -21,10 +21,8 @@ export enum EStreamingState {
 export enum ERecordingState {
   Offline = 'offline',
   Starting = 'starting',
-  Start = 'start',
   Recording = 'recording',
   Stopping = 'stopping',
-  Stop = 'stop',
   Wrote = 'wrote',
 }
 
