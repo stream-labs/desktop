@@ -1069,22 +1069,83 @@ export class StreamingService
     }
   }
 
-  handleRecordingSignal(signal: EOutputSignal, display: TDisplayType) {
-    const time = new Date().toISOString();
+  handleRecordingSignal(info: EOutputSignal, display: TDisplayType) {
+    // map signals to status
+    const nextState: ERecordingState = ({
+      [EOBSOutputSignal.Start]: ERecordingState.Recording,
+      [EOBSOutputSignal.Starting]: ERecordingState.Starting,
+      [EOBSOutputSignal.Stop]: ERecordingState.Offline,
+      [EOBSOutputSignal.Stopping]: ERecordingState.Stopping,
+      [EOBSOutputSignal.Wrote]: ERecordingState.Wrote,
+    } as Dictionary<ERecordingState>)[info.signal];
 
-    if (signal.signal === ERecordingState.Start) {
+    // We received a signal we didn't recognize
+    if (!nextState) return;
+
+    if (info.signal === ERecordingState.Recording) {
       const mode = this.views.isDualOutputMode ? 'dual' : 'single';
       this.usageStatisticsService.recordFeatureUsage('Recording');
       this.usageStatisticsService.recordAnalyticsEvent('RecordingStatus', {
         status: ERecordingState.Recording,
-        code: signal.code,
+        code: info.code,
         mode,
         display,
       });
-      this.SET_RECORDING_STATUS(ERecordingState.Recording, time);
     }
 
-    if (signal.signal === ERecordingState.Wrote) {
+    if (info.signal === ERecordingState.Wrote) {
+      const fileName =
+        display === 'vertical'
+          ? this.verticalRecording.lastFile()
+          : this.horizontalRecording.lastFile();
+
+      const parsedName = byOS({
+        [OS.Mac]: fileName,
+        [OS.Windows]: fileName.replace(/\//, '\\'),
+      });
+
+      this.recordingModeService.actions.addRecordingEntry(parsedName);
+      this.markersService.actions.exportCsv(parsedName);
+      this.recordingModeService.addRecordingEntry(parsedName);
+
+      // const horizontalFileName = this.horizontalRecording.lastFile();
+      // const horizontalParsedFilename = byOS({
+      //   [OS.Mac]: horizontalFileName,
+      //   [OS.Windows]: horizontalFileName.replace(/\//, '\\'),
+      // });
+
+      // // add recordings to recording history
+      // if (this.verticalRecording) {
+      //   const verticalFileName = this.verticalRecording.lastFile();
+      //   const verticalParsedFileName = byOS({
+      //     [OS.Mac]: verticalFileName,
+      //     [OS.Windows]: verticalFileName.replace(/\//, '\\'),
+      //   });
+
+      //   const recordingAdded = this.recordingModeService.recordingAdded.subscribe(async () => {
+      //     this.recordingModeService.actions.addRecordingEntry(horizontalParsedFilename);
+      //     await this.markersService.exportCsv(horizontalParsedFilename);
+      //     this.recordingModeService.addRecordingEntry(horizontalParsedFilename);
+      //     recordingAdded.unsubscribe();
+      //   });
+
+      //   this.recordingModeService.actions.addRecordingEntry(verticalParsedFileName, false);
+      //   await this.markersService.exportCsv(verticalParsedFileName);
+      //   this.recordingModeService.addRecordingEntry(verticalParsedFileName, false);
+      //   this.recordingModeService.recordingAdded.next();
+      // await this.markersService.exportCsv(verticalParsedFileName);
+      // await this.markersService.exportCsv(horizontalParsedFilename);
+      // this.recordingModeService.addRecordingEntry(
+      //   horizontalParsedFilename,
+      //   verticalParsedFileName,
+      // );
+      // } else {
+      //   this.recordingModeService.actions.addRecordingEntry(horizontalParsedFilename);
+      //   await this.markersService.exportCsv(horizontalParsedFilename);
+      //   this.recordingModeService.addRecordingEntry(horizontalParsedFilename);
+      // }
+
+      // destroy recording factory instances
       if (this.outputSettingsService.getSettings().mode === 'Advanced') {
         if (display === 'horizontal' && this.horizontalRecording) {
           AdvancedRecordingFactory.destroy(this.horizontalRecording as IAdvancedRecording);
@@ -1103,8 +1164,14 @@ export class StreamingService
         }
       }
 
-      this.SET_RECORDING_STATUS(ERecordingState.Offline, time);
+      // Wrote signals come after Offline, so we return early here
+      // to not falsely set our state out of Offline
+      return;
     }
+
+    const time = new Date().toISOString();
+    this.SET_RECORDING_STATUS(nextState, time);
+    this.recordingStatusChange.next(nextState);
   }
 
   splitFile() {
@@ -1331,41 +1398,37 @@ export class StreamingService
         this.clearReconnectingNotification();
       }
     } else if (info.type === EOBSOutputType.Recording) {
-      const nextState: ERecordingState = ({
-        [EOBSOutputSignal.Start]: ERecordingState.Recording,
-        [EOBSOutputSignal.Starting]: ERecordingState.Starting,
-        [EOBSOutputSignal.Stop]: ERecordingState.Offline,
-        [EOBSOutputSignal.Stopping]: ERecordingState.Stopping,
-        [EOBSOutputSignal.Wrote]: ERecordingState.Wrote,
-      } as Dictionary<ERecordingState>)[info.signal];
-
-      // We received a signal we didn't recognize
-      if (!nextState) return;
-
-      if (info.signal === EOBSOutputSignal.Start) {
-        this.usageStatisticsService.recordFeatureUsage('Recording');
-        this.usageStatisticsService.recordAnalyticsEvent('RecordingStatus', {
-          status: nextState,
-          code: info.code,
-        });
-      }
-
-      if (info.signal === EOBSOutputSignal.Wrote) {
-        const filename = NodeObs.OBS_service_getLastRecording();
-        const parsedFilename = byOS({
-          [OS.Mac]: filename,
-          [OS.Windows]: filename.replace(/\//, '\\'),
-        });
-        this.recordingModeService.actions.addRecordingEntry(parsedFilename);
-        this.markersService.actions.exportCsv(parsedFilename);
-        this.recordingModeService.addRecordingEntry(parsedFilename);
-        // Wrote signals come after Offline, so we return early here
-        // to not falsely set our state out of Offline
-        return;
-      }
-
-      this.SET_RECORDING_STATUS(nextState, time);
-      this.recordingStatusChange.next(nextState);
+      // const nextState: ERecordingState = ({
+      //   [EOBSOutputSignal.Start]: ERecordingState.Recording,
+      //   [EOBSOutputSignal.Starting]: ERecordingState.Starting,
+      //   [EOBSOutputSignal.Stop]: ERecordingState.Offline,
+      //   [EOBSOutputSignal.Stopping]: ERecordingState.Stopping,
+      //   [EOBSOutputSignal.Wrote]: ERecordingState.Wrote,
+      // } as Dictionary<ERecordingState>)[info.signal];
+      // // We received a signal we didn't recognize
+      // if (!nextState) return;
+      // if (info.signal === EOBSOutputSignal.Start) {
+      //   this.usageStatisticsService.recordFeatureUsage('Recording');
+      //   this.usageStatisticsService.recordAnalyticsEvent('RecordingStatus', {
+      //     status: nextState,
+      //     code: info.code,
+      //   });
+      // }
+      // if (info.signal === EOBSOutputSignal.Wrote) {
+      //   const filename = NodeObs.OBS_service_getLastRecording();
+      //   const parsedFilename = byOS({
+      //     [OS.Mac]: filename,
+      //     [OS.Windows]: filename.replace(/\//, '\\'),
+      //   });
+      //   this.recordingModeService.actions.addRecordingEntry(parsedFilename);
+      //   this.markersService.actions.exportCsv(parsedFilename);
+      //   this.recordingModeService.addRecordingEntry(parsedFilename);
+      //   // Wrote signals come after Offline, so we return early here
+      //   // to not falsely set our state out of Offline
+      //   return;
+      // }
+      // this.SET_RECORDING_STATUS(nextState, time);
+      // this.recordingStatusChange.next(nextState);
     } else if (info.type === EOBSOutputType.ReplayBuffer) {
       const nextState: EReplayBufferState = ({
         [EOBSOutputSignal.Start]: EReplayBufferState.Running,
