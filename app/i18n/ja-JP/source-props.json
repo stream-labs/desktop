@@ -370,8 +370,8 @@
     "description": "シーンにBlackmagicデバイスからの映像・音声を追加します"
   },
   "ndi_source": {
-    "name": "NDI™ ソース",
-    "description": "NDIの出力ストリームをキャプチャします。",
+    "name": "NDI®ソース",
+    "description": "NDI®の出力ストリームをキャプチャします。",
     "ndi_source_name": {
       "name": "ソース名"
     },
@@ -413,5 +413,19 @@
   "vlc_source": {
     "name": "VLCソース",
     "description": "ビデオのプレイリストをシーンに追加します。"
+  },
+  "custom_cast_ndi_source": {
+    "name": "カスタムキャスト",
+    "description": "カスタムキャストの配信(NDI®)をシーンに追加します。",
+    "custom_cast_ndi_not_found": "カスタムキャストからNDI®出力をしてください",
+    "custom_cast_ndi_not_found_2": "注意: Windowsのネットワークプロファイルが「パブリック」になっているとNDI®は利用できません。プロファイルが「プライベート」のネットワークに接続してご利用ください。",
+    "network_help_button": {
+      "name": "ネットワークプロファイルについて",
+      "url": "https://support.microsoft.com/ja-jp/windows/windows-10-%E3%81%A7-wi-fi-%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF%E3%82%92%E5%85%AC%E8%A1%86%E3%81%BE%E3%81%9F%E3%81%AF%E3%83%97%E3%83%A9%E3%82%A4%E3%83%99%E3%83%BC%E3%83%88%E3%81%AB%E3%81%99%E3%82%8B-0460117d-8d3e-a7ac-f003-7a0da607448d"
+    }
+  },
+  "custom_cast_ndi_guide": {
+    "name": "カスタムキャスト",
+    "description": "カスタムキャストの配信(NDI®)をシーンに追加します。"
   }
 }

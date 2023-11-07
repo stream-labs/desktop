@@ -11,7 +11,9 @@
         @change="onInputHandler"
       />
     </div>
-    <div class="input-wrapper" v-else-if="value.info">{{ value.description }}</div>
+    <div class="input-wrapper input-wrapper-description" v-else-if="value.info">
+      {{ value.description }}
+    </div>
     <div class="input-wrapper" v-else>
       <input
         :type="textVisible ? 'text' : 'password'"
@@ -42,5 +44,9 @@
   flex: 0 0 auto;
   width: 80px;
   margin-left: 12px;
+}
+
+.input-wrapper-description {
+  width: 100%;
 }
 </style>
