@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import cx from 'classnames';
 import useLayout, { LayoutProps } from './hooks';
 import ResizeBar from 'components-react/root/ResizeBar';
@@ -21,7 +21,7 @@ export function Triplets(p: React.PropsWithChildren<LayoutProps>) {
       <div className={styles.stacked} style={{ width: props.width }}>
         {props.slots.map(slot => (
           <div key={slot} className={styles.cell}>
-            {p.children![slot]}
+            {p.children?.[slot] || <></>}
           </div>
         ))}
       </div>
@@ -30,19 +30,16 @@ export function Triplets(p: React.PropsWithChildren<LayoutProps>) {
 
   return (
     <div className={cx(styles.columns, styles.sidePadded)} ref={componentRef}>
+      <StackedSection slots={['1', '4']} width={`${100 - (resizes.bar1 + resizes.bar2) * 100}%`} />
       <ResizeBar
-        position="right"
+        position="left"
         value={bars.bar1}
         onInput={(value: number) => setBar('bar1', value)}
         max={calculateMax(mins.rest + bars.bar2)}
         min={mins.bar1}
       >
-        <StackedSection
-          slots={['1', '4']}
-          width={`${100 - (resizes.bar1 + resizes.bar2) * 100}%`}
-        />
+        <StackedSection slots={['2', '5']} width={`${resizes.bar1 * 100}%`} />
       </ResizeBar>
-      <StackedSection slots={['2', '5']} width={`${resizes.bar1 * 100}%`} />
       <ResizeBar
         position="left"
         value={bars.bar2}

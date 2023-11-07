@@ -15,7 +15,7 @@ export function Classic(p: React.PropsWithChildren<LayoutProps>) {
   return (
     <div className={styles.rows} ref={componentRef}>
       <div className={styles.cell} style={{ height: `${100 - resizes.bar1 * 100}%` }}>
-        {p.children!['1']}
+        {p.children?.['1'] || <></>}
       </div>
       <ResizeBar
         position="top"
@@ -30,7 +30,7 @@ export function Classic(p: React.PropsWithChildren<LayoutProps>) {
         >
           {['2', '3', '4'].map(slot => (
             <div key={slot} className={cx(styles.cell, 'no-top-padding')}>
-              {p.children![slot]}
+              {p.children?.[slot] || <></>}
             </div>
           ))}
         </div>

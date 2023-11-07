@@ -43,7 +43,7 @@ export default function ResizeBar(p: React.PropsWithChildren<ResizeBarProps>) {
     resizableProps = {
       height: Infinity,
       width: p.value,
-      resizeHandles: p.position === 'left' ? ['w'] : ['e'],
+      resizeHandles: ['w'],
       minConstraints: [p.min, Infinity],
       maxConstraints: [p.max, Infinity],
       axis: 'x',

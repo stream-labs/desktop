@@ -18,7 +18,7 @@ export function Default(p: React.PropsWithChildren<LayoutProps>) {
         className={styles.cell}
         style={{ height: `${100 - (resizes.bar1 + resizes.bar2!) * 100}%` }}
       >
-        {p.children!['1']}
+        {p.children?.['1'] || <></>}
       </div>
       <ResizeBar
         position="top"
@@ -31,7 +31,7 @@ export function Default(p: React.PropsWithChildren<LayoutProps>) {
           style={{ height: `${resizes.bar1 * 100}%` }}
           className={cx(styles.cell, 'no-top-padding')}
         >
-          {p.children!['2']}
+          {p.children?.['2'] || <></>}
         </div>
       </ResizeBar>
       <ResizeBar
@@ -47,7 +47,7 @@ export function Default(p: React.PropsWithChildren<LayoutProps>) {
         >
           {['3', '4', '5'].map(slot => (
             <div key={slot} className={cx(styles.cell, 'no-top-padding')}>
-              {p.children![slot]}
+              {p.children?.[slot] || <></>}
             </div>
           ))}
         </div>

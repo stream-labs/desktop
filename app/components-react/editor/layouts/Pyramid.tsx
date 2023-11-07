@@ -15,7 +15,7 @@ export function Pyramid(p: React.PropsWithChildren<LayoutProps>) {
   return (
     <div className={styles.rows} ref={componentRef}>
       <div className={styles.cell} style={{ height: `${100 - resizes.bar1 * 100}%` }}>
-        {p.children!['1']}
+        {p.children?.['1'] || <></>}
       </div>
       <ResizeBar
         position="top"
@@ -30,7 +30,7 @@ export function Pyramid(p: React.PropsWithChildren<LayoutProps>) {
         >
           {['2', '3'].map(slot => (
             <div className={cx(styles.cell, 'no-top-padding')} key={slot}>
-              {p.children![slot]}
+              {p.children?.[slot] || <></>}
             </div>
           ))}
         </div>

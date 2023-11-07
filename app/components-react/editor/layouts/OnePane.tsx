@@ -15,24 +15,24 @@ export function OnePane(p: React.PropsWithChildren<LayoutProps>) {
   return (
     <div className={cx(styles.columns, styles.sidePadded)} ref={componentRef}>
       <ResizeBar
-        position="right"
+        position="left"
         value={bars.bar1}
         onInput={(value: number) => setBar('bar1', value)}
         max={calculateMax(mins.rest)}
         min={mins.bar1}
       >
         <div style={{ width: `${100 - resizes.bar1 * 100}%` }} className={styles.cell}>
-          {p.children!['2']}
+          {p.children?.['2'] || <></>}
         </div>
       </ResizeBar>
       <div className={styles.rows} style={{ width: `${resizes.bar1 * 100}%`, paddingTop: '16px' }}>
         <div className={styles.cell} style={{ height: '100%' }}>
-          {p.children!['1']}
+          {p.children?.['1'] || <></>}
         </div>
         <div className={styles.segmented}>
-          <div className={styles.cell}>{p.children!['3']}</div>
-          <div className={styles.cell}>{p.children!['4']}</div>
-          <div className={styles.cell}>{p.children!['5']}</div>
+          <div className={styles.cell}>{p.children?.['3'] || <></>}</div>
+          <div className={styles.cell}>{p.children?.['4'] || <></>}</div>
+          <div className={styles.cell}>{p.children?.['5'] || <></>}</div>
         </div>
       </div>
     </div>
