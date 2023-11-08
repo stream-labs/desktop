@@ -153,10 +153,20 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
    * Returns a list of enabled for streaming platforms from the given settings object
    */
   getEnabledPlatforms(platforms: IStreamSettings['platforms']): TPlatform[] {
-    return Object.keys(platforms).filter(
+    const enabled = Object.keys(platforms).filter(
       (platform: TPlatform) =>
         this.linkedPlatforms.includes(platform) && platforms[platform]?.enabled,
     ) as TPlatform[];
+
+    // currently in dual output mode, when recording the vertical display
+    // it cannot also be streamed so does not need to be set up
+    if (this.isDualOutputMode && this.dualOutputView.recordVertical) {
+      return enabled.filter(
+        platform => this.dualOutputView.getPlatformDisplay(platform) === 'horizontal',
+      );
+    }
+
+    return enabled;
   }
 
   /**

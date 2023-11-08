@@ -930,7 +930,7 @@ export class StreamingService
         remote.powerSaveBlocker.stop(this.powerSaveId);
       }
 
-      if (this.views.isDualOutputMode) {
+      if (this.views.isDualOutputMode && !this.dualOutputService.views.recordVertical) {
         const signalChanged = this.signalInfoChanged.subscribe(
           (signalInfo: IOBSOutputSignalInfo) => {
             if (
@@ -970,7 +970,7 @@ export class StreamingService
     }
 
     if (this.state.streamingStatus === EStreamingState.Ending) {
-      if (this.views.isDualOutputMode) {
+      if (this.views.isDualOutputMode && !this.dualOutputService.views.recordVertical) {
         NodeObs.OBS_service_stopStreaming(true, 'horizontal');
         NodeObs.OBS_service_stopStreaming(true, 'vertical');
       } else {
@@ -1013,15 +1013,16 @@ export class StreamingService
     }
 
     if (this.state.recordingStatus === ERecordingState.Offline) {
+      // currently in dual output mode if recording the vertical display, don't record the horizontal display
       if (this.views.isDualOutputMode && this.dualOutputService.views.recordVertical) {
-        this.createRecording('vertical');
+        this.createRecording('vertical', 2);
       } else {
-        this.createRecording('horizontal');
+        this.createRecording('horizontal', 1);
       }
     }
   }
 
-  createRecording(display: TDisplayType) {
+  private createRecording(display: TDisplayType, index: number) {
     const mode = this.outputSettingsService.getSettings().mode;
 
     const recording =
@@ -1056,13 +1057,9 @@ export class StreamingService
       recording['outputWidth'] = this.dualOutputService.views.videoSettings[display].outputWidth;
       recording['outputHeight'] = this.dualOutputService.views.videoSettings[display].outputHeight;
 
-      if (display === 'vertical') {
-        const track2 = AudioTrackFactory.create(160, 'track2');
-        AudioTrackFactory.setAtIndex(track2, 2);
-      } else {
-        const track1 = AudioTrackFactory.create(160, 'track1');
-        AudioTrackFactory.setAtIndex(track1, 1);
-      }
+      const trackName = `track${index}`;
+      const track = AudioTrackFactory.create(160, trackName);
+      AudioTrackFactory.setAtIndex(track, index);
     } else {
       recording['audioEncoder'] = AudioEncoderFactory.create();
     }
@@ -1077,13 +1074,18 @@ export class StreamingService
     }
   }
 
-  async handleRecordingSignal(info: EOutputSignal, display: TDisplayType) {
+  private async handleRecordingSignal(info: EOutputSignal, display: TDisplayType) {
     // map signals to status
     const nextState: ERecordingState = ({
-      [EOutputSignalState.Start]: ERecordingState.Recording,
-      [EOutputSignalState.Stop]: ERecordingState.Wrote,
-      [EOutputSignalState.Stopping]: ERecordingState.Stopping,
-      [EOutputSignalState.Wrote]: ERecordingState.Wrote,
+      // merge conflict
+      // [EOutputSignalState.Start]: ERecordingState.Recording,
+      // [EOutputSignalState.Stop]: ERecordingState.Wrote,
+      // [EOutputSignalState.Stopping]: ERecordingState.Stopping,
+      // [EOutputSignalState.Wrote]: ERecordingState.Wrote,
+      [EOBSOutputSignal.Start]: ERecordingState.Recording,
+      [EOBSOutputSignal.Stop]: ERecordingState.Offline,
+      [EOBSOutputSignal.Stopping]: ERecordingState.Stopping,
+      [EOBSOutputSignal.Wrote]: ERecordingState.Wrote,
     } as Dictionary<ERecordingState>)[info.signal];
 
     // We received a signal we didn't recognize
@@ -1144,6 +1146,8 @@ export class StreamingService
     const time = new Date().toISOString();
     this.SET_RECORDING_STATUS(nextState, time);
     this.recordingStatusChange.next(nextState);
+
+    this.handleOutputCode(info);
   }
 
   splitFile() {
@@ -1302,7 +1306,8 @@ export class StreamingService
     console.debug('OBS Output signal: ', info);
 
     const shouldResolve =
-      !this.views.isDualOutputMode || (this.views.isDualOutputMode && info.service === 'vertical');
+      !this.views.isDualOutputMode ||
+      (this.views.isDualOutputMode && this.dualOutputService.views.recordVertical);
 
     const time = new Date().toISOString();
 
@@ -1423,7 +1428,10 @@ export class StreamingService
         this.replayBufferFileWrite.next(NodeObs.OBS_service_getLastReplay());
       }
     }
+    this.handleOutputCode(info);
+  }
 
+  private handleOutputCode(info: IOBSOutputSignalInfo | EOutputSignal) {
     if (info.code) {
       if (this.outputErrorOpen) {
         console.warn('Not showing error message because existing window is open.', info);
