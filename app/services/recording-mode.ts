@@ -194,7 +194,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
    * @param filename - name of file to show in recording history
    * @param showNotification - primarily used when recording in dual output mode to only show the notification once
    */
-  async addRecordingEntry(filename: string) {
+  addRecordingEntry(filename: string) {
     const timestamp = moment().format();
     this.ADD_RECORDING_ENTRY(timestamp, filename);
 
@@ -353,7 +353,6 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
   @mutation()
   private ADD_RECORDING_ENTRY(timestamp: string, filename: string) {
     Vue.set(this.state.recordingHistory, timestamp, { timestamp, filename });
-    console.log('setting ', filename);
   }
 
   @mutation()

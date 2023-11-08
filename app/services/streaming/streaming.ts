@@ -114,6 +114,7 @@ export class StreamingService
 
   // Dummy subscription for stream deck
   streamingStateChange = new Subject<void>();
+  private recordingStopped = new Subject();
 
   powerSaveId: number;
 
@@ -127,7 +128,9 @@ export class StreamingService
     streamingStatus: EStreamingState.Offline,
     streamingStatusTime: new Date().toISOString(),
     recordingStatus: ERecordingState.Offline,
+    verticalRecordingStatus: ERecordingState.Offline,
     recordingStatusTime: new Date().toISOString(),
+    verticalRecordingStatusTime: new Date().toString(),
     replayBufferStatus: EReplayBufferState.Offline,
     replayBufferStatusTime: new Date().toISOString(),
     selectiveRecording: false,
@@ -991,16 +994,30 @@ export class StreamingService
 
   toggleRecording() {
     if (this.state.recordingStatus === ERecordingState.Recording) {
-      const time = new Date().toISOString();
-      this.SET_RECORDING_STATUS(ERecordingState.Stopping, time);
+      let time = new Date().toISOString();
 
       // stop recording vertical display
       if (this.verticalRecording) {
-        this.verticalRecording.stop();
-      }
+        const recordingStopped = this.recordingStopped.subscribe(async () => {
+          await new Promise(resolve =>
+            // sleep for 2 seconds to allow a different time stamp to be generated
+            // because the recording history uses the time stamp as keys
+            // if the same time stamp is used, the entry will be replaced in the recording history
+            setTimeout(() => {
+              time = new Date().toISOString();
+              this.SET_RECORDING_STATUS(ERecordingState.Stopping, time, 'horizontal');
+              this.horizontalRecording.stop();
+            }, 1000),
+          );
+          recordingStopped.unsubscribe();
+        });
 
-      // stop recording horizontal display
-      if (this.horizontalRecording) {
+        this.SET_RECORDING_STATUS(ERecordingState.Stopping, time, 'vertical');
+        this.verticalRecording.stop();
+        this.recordingStopped.next();
+      } else if (this.horizontalRecording) {
+        // stop recording horizontal display
+        this.SET_RECORDING_STATUS(ERecordingState.Stopping, time, 'horizontal');
         this.horizontalRecording.stop();
       }
 
@@ -1103,7 +1120,7 @@ export class StreamingService
         [OS.Windows]: fileName.replace(/\//, '\\'),
       });
 
-      await this.recordingModeService.addRecordingEntry(parsedName);
+      this.recordingModeService.addRecordingEntry(parsedName);
       await this.markersService.exportCsv(parsedName);
 
       // destroy recording factory instances
@@ -1131,7 +1148,7 @@ export class StreamingService
     }
 
     const time = new Date().toISOString();
-    this.SET_RECORDING_STATUS(nextState, time);
+    this.SET_RECORDING_STATUS(nextState, time, display);
     this.recordingStatusChange.next(nextState);
 
     this.handleOutputCode(info);
@@ -1593,9 +1610,18 @@ export class StreamingService
   }
 
   @mutation()
-  private SET_RECORDING_STATUS(status: ERecordingState, time: string) {
-    this.state.recordingStatus = status;
-    this.state.recordingStatusTime = time;
+  private SET_RECORDING_STATUS(
+    status: ERecordingState,
+    time: string,
+    display: TDisplayType = 'horizontal',
+  ) {
+    if (display === 'vertical') {
+      this.state.verticalRecordingStatus = status;
+      this.state.verticalRecordingStatusTime = time;
+    } else {
+      this.state.recordingStatus = status;
+      this.state.recordingStatusTime = time;
+    }
   }
 
   @mutation()
