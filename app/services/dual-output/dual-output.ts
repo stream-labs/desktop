@@ -257,7 +257,7 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     const verticalHasDestinations =
       platformDisplays.vertical.length > 0 || destinationDisplays.vertical.length > 0;
 
-    return horizontalHasDestinations && verticalHasDestinations;
+    return this.state.recordVertical || (horizontalHasDestinations && verticalHasDestinations);
   }
 
   /**
