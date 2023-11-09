@@ -6,7 +6,6 @@ import { SourceSelectorModule } from './SourceSelector';
 
 interface IDualOutputSourceSelector {
   nodeId: string;
-  sceneId?: string;
 }
 export function DualOutputSourceSelector(p: IDualOutputSourceSelector) {
   const { toggleVisibility, makeActive, horizontalActive, verticalActive } = useModule(
@@ -19,8 +18,8 @@ export function DualOutputSourceSelector(p: IDualOutputSourceSelector) {
       DualOutputService.views.verticalNodeIds && horizontalActive
         ? DualOutputService.views.activeSceneNodeMap[p.nodeId]
         : p.nodeId,
-    isHorizontalVisible: DualOutputService.views.getIsHorizontalVisible(p.nodeId, p?.sceneId),
-    isVerticalVisible: DualOutputService.views.getIsVerticalVisible(p.nodeId, p?.sceneId),
+    isHorizontalVisible: DualOutputService.views.getIsHorizontalVisible(p.nodeId),
+    isVerticalVisible: DualOutputService.views.getIsVerticalVisible(p.nodeId),
   }));
 
   const showHorizontalToggle = useMemo(() => {
@@ -39,7 +38,9 @@ export function DualOutputSourceSelector(p: IDualOutputSourceSelector) {
             toggleVisibility(p.nodeId);
             makeActive(p.nodeId);
           }}
-          className={v.isHorizontalVisible ? 'icon-desktop' : 'icon-desktop-hide'}
+          className={`${
+            v.isHorizontalVisible ? 'icon-desktop' : 'icon-desktop-hide'
+          } horizontal-source-icon`}
         />
       )}
 
@@ -49,7 +50,9 @@ export function DualOutputSourceSelector(p: IDualOutputSourceSelector) {
             toggleVisibility(v.verticalNodeId);
             makeActive(v.verticalNodeId);
           }}
-          className={v.isVerticalVisible ? 'icon-phone-case' : 'icon-phone-case-hide'}
+          className={`${
+            v.isVerticalVisible ? 'icon-phone-case' : 'icon-phone-case-hide'
+          } vertical-source-icon`}
         />
       )}
     </>
