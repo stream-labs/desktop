@@ -14,6 +14,7 @@ import uuid from 'uuid/v4';
 import { DualOutputService } from 'services/dual-output';
 import { TDisplayType } from 'services/settings-v2/video';
 import { InitAfter, ViewHandler } from 'services/core';
+import { SceneCollectionsService } from 'app-services';
 
 export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
 
@@ -169,6 +170,7 @@ export interface ISceneItemFolder extends ISceneItemNode {
 
 class ScenesViews extends ViewHandler<IScenesState> {
   @Inject() private scenesService: ScenesService;
+  @Inject() private sceneCollectionsService: SceneCollectionsService;
 
   getScene(sceneId: string): Scene | null {
     const sceneModel = this.state.scenes[sceneId];
@@ -194,6 +196,11 @@ class ScenesViews extends ViewHandler<IScenesState> {
 
   get scenes(): Scene[] {
     return this.state.displayOrder.map(id => this.getScene(id)!);
+  }
+
+  // adding this getter here is in preparation for migrating the scene node maps property to the scenes service
+  get sceneNodeMaps(): { [sceneId: string]: Dictionary<string> } | undefined {
+    return this.sceneCollectionsService?.sceneNodeMaps;
   }
 
   getSceneItems(): SceneItem[] {
