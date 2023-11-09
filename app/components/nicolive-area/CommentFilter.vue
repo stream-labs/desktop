@@ -49,9 +49,7 @@
         >
           登録
         </button>
-        <div class="form-tip floating-wrapper" v-if="invalid">
-          このユーザーIDは存在しないか、無効な文字列です
-        </div>
+        <div class="form-tip floating-wrapper" v-if="invalid">数字以外の文字列は登録できません</div>
       </form>
       <div class="list">
         <div class="item row" v-for="item of currentTypeFilters" :key="item.id">
