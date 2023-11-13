@@ -249,6 +249,8 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
 
   @debounce(200)
   updateObsSettings(display: TDisplayType = 'horizontal') {
+    console.log(this.contexts.horizontal.legacySettings)
+    console.log(this.contexts.horizontal.video)
     this.contexts[display].video = this.state[display];
     this.contexts[display].legacySettings = this.state[display];
   }
@@ -261,11 +263,14 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     //    this.dualOutputService.setVideoSetting({ [key]: value }, display);
   }
 
-  refrectResolution(display: TDisplayType = 'horizontal') {
-    const wh = this.baseResolutions
-    this.state[display].baseWidth = wh.horizontal.baseWidth
-    this.state[display].baseHeight = wh.horizontal.baseHeight
-    this.updateObsSettings()
+  // 現状settingsの情報はlegacyにあるのでそれを反映させる
+  refrectLegacy(display: TDisplayType = 'horizontal') {
+    const legacySettings = this.contexts[display].legacySettings
+    this.contexts[display].video = legacySettings;
+
+    Object.keys(legacySettings).forEach((key: any) => {
+      this.SET_VIDEO_SETTING(key, legacySettings[key], 'horizontal');
+    });
   }
 
   /**

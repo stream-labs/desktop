@@ -803,8 +803,10 @@ export class SettingsService
     obs.NodeObs.OBS_settings_saveSettings(categoryName, dataToSave);
     this.SET_SETTINGS(SettingsService.convertFormDataToState({ [categoryName]: settingsData }));
 
-    // displayに解像度変更が届かないようなので補助
-    if (categoryName === 'Video') this.videoSettingsService.refrectResolution()
+    // video_settingsに設定を伝える
+    if (categoryName === 'Video') {
+      this.videoSettingsService.refrectLegacy()
+    }
   }
 
   private setAudioSettings(settingsData: ISettingsSubCategory[]) {
