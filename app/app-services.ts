@@ -62,6 +62,7 @@ export { NicoliveCommentLocalFilterService } from 'services/nicolive-program/nic
 export { NicoliveCommentSynthesizerService } from 'services/nicolive-program/nicolive-comment-synthesizer';
 export { NVoiceClientService } from 'services/nicolive-program/n-voice-client';
 export { KonomiTagsService } from 'services/nicolive-program/konomi-tags';
+export { CustomcastUsageService } from 'services/custom-cast-usage';
 
 export { IncrementalRolloutService } from 'services/incremental-rollout';
 export { CrashReporterService } from 'services/crash-reporter';
