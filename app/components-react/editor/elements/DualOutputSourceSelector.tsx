@@ -9,13 +9,9 @@ interface IDualOutputSourceSelector {
   sceneId?: string;
 }
 export function DualOutputSourceSelector(p: IDualOutputSourceSelector) {
-  const {
-    toggleVisibility,
-    makeActive,
-    horizontalActive,
-    verticalActive,
-    isDualOutputLoading,
-  } = useModule(SourceSelectorModule);
+  const { toggleVisibility, makeActive, horizontalActive, verticalActive } = useModule(
+    SourceSelectorModule,
+  );
   const { DualOutputService } = Services;
 
   const v = useVuex(() => ({
@@ -31,12 +27,12 @@ export function DualOutputSourceSelector(p: IDualOutputSourceSelector) {
   }));
 
   const showHorizontalToggle = useMemo(() => {
-    return !isDualOutputLoading && horizontalActive;
-  }, [!isDualOutputLoading, horizontalActive]);
+    return horizontalActive;
+  }, [horizontalActive]);
 
   const showVerticalToggle = useMemo(() => {
-    return !isDualOutputLoading && v?.verticalNodeId && verticalActive;
-  }, [!isDualOutputLoading, v?.verticalNodeId, verticalActive]);
+    return v?.verticalNodeId && verticalActive;
+  }, [v?.verticalNodeId, verticalActive]);
 
   return (
     <>

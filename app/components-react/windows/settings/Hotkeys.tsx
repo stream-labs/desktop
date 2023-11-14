@@ -6,6 +6,8 @@ import { $t } from '../../../services/i18n';
 import mapValues from 'lodash/mapValues';
 import Fuse from 'fuse.js';
 import type { Scene, Source } from 'app-services';
+import Tooltip from 'components-react/shared/Tooltip';
+import { getOS, OS } from 'util/operating-systems';
 
 interface IAugmentedHotkey extends IHotkey {
   // Will be scene or source name
@@ -155,7 +157,24 @@ export default function Hotkeys(props: HotkeysProps) {
   return (
     <div>
       {hasGeneralHotkeys && (
-        <HotkeyGroup hotkeys={generalHotkeys} isSearch={isSearch} title={null} />
+        <>
+          {getOS() === OS.Mac && (
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <h2>{$t('Hotkeys')}</h2>
+              <Tooltip
+                title={$t(
+                  'To use hotkeys on Mac, go to System Settings > Security > Accessibility and toggle on for Streamlabs Desktop.',
+                )}
+                lightShadow
+                wrapperStyle={{ marginBottom: '4px' }}
+                placement="leftTop"
+              >
+                <i className="icon-information" style={{ padding: '0 0 4px 5px' }} />
+              </Tooltip>
+            </div>
+          )}
+          <HotkeyGroup hotkeys={generalHotkeys} isSearch={isSearch} title={null} />
+        </>
       )}
       {hasSceneHotkeys && (
         <>
