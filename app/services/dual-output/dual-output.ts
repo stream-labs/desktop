@@ -219,9 +219,9 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
    * @param sceneId
    * @returns
    */
-  getIsHorizontalVisible(nodeId: string) {
+  getIsHorizontalVisible(nodeId: string, sceneId?: string) {
     if (!this.hasVerticalNodes) return false;
-    return this.scenesService.views.getNodeVisibility(nodeId, this.activeSceneId);
+    return this.scenesService.views.getNodeVisibility(nodeId, sceneId ?? this.activeSceneId);
   }
 
   /**
@@ -231,7 +231,7 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
    * @param sceneId
    * @returns
    */
-  getIsVerticalVisible(nodeId: string) {
+  getIsVerticalVisible(nodeId: string, sceneId?: string) {
     // in the source selector, the vertical node id is determined by the visible display
     if (!this.hasVerticalNodes) return false;
 
@@ -240,7 +240,7 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
         ? nodeId
         : this.activeSceneNodeMap[nodeId];
 
-    return this.scenesService.views.getNodeVisibility(id, this.activeSceneId);
+    return this.scenesService.views.getNodeVisibility(id, sceneId ?? this.activeSceneId);
   }
 
   getCanStreamDualOutput() {
