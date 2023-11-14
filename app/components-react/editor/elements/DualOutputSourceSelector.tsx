@@ -20,9 +20,11 @@ export function DualOutputSourceSelector(p: IDualOutputSourceSelector) {
         ? DualOutputService.views.activeSceneNodeMap[p.nodeId]
         : p.nodeId,
     isHorizontalVisible:
-      !isDualOutputLoading && DualOutputService.views.getIsHorizontalVisible(p.nodeId, p?.sceneId),
+      !DualOutputService.views.isLoading &&
+      DualOutputService.views.getIsHorizontalVisible(p.nodeId, p?.sceneId),
     isVerticalVisible:
-      !isDualOutputLoading && DualOutputService.views.getIsVerticalVisible(p.nodeId, p?.sceneId),
+      !DualOutputService.views.isLoading &&
+      DualOutputService.views.getIsVerticalVisible(p.nodeId, p?.sceneId),
     isLoading: DualOutputService.views.isLoading && !DualOutputService.views.hasVerticalNodes,
   }));
 
