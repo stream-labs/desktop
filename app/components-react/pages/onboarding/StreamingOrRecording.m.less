@@ -16,10 +16,18 @@
   top: 144px;
   height: calc(~'100% - 144px');
   row-gap: 60px;
+
+  @media (max-height: 600px) {
+    top: 100px;
+  }
 }
 
 .title {
   font-size: 48px;
+
+  @media (max-height: 600px) {
+    display: none;
+  }
 }
 
 .subtitle {
@@ -33,6 +41,7 @@
   display: flex;
   justify-content: center;
   column-gap: 24px;
+  width: 100%;
 }
 
 .streamer-knowledge-mode-container {
@@ -62,7 +71,13 @@
   cursor: pointer;
   color: var(--paragraph);
   background-color: var(--border);
-  width: 350px;
+  padding-left: 18px;
+  padding-right: 18px;
+
+  @media (min-width: 801px) {
+    width: 350px;
+  }
+
   border-radius: 100px;
 
   border: 2px solid transparent;
@@ -109,7 +124,6 @@
 .button-container {
   flex: 1;
   opacity: 0;
-  transition: opacity 0.5s;
   cursor: inherit;
 
   &.active {

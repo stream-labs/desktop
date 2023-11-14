@@ -6,6 +6,7 @@ import { OnboardingModule } from './Onboarding';
 import { Services } from 'components-react/service-provider';
 import { useWatchVuex } from 'components-react/hooks';
 import { UltraComparison } from 'components-react/shared/UltraComparison';
+import styles from './Prime.m.less';
 
 export function Prime() {
   const { UserService, RecordingModeService } = Services;
@@ -83,15 +84,7 @@ export function Prime() {
   );
 
   return (
-    <div
-      style={{
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        height: '100%',
-      }}
-    >
+    <div className={styles.container}>
       <div style={{ width: '100%' }}>
         <UltraComparison onSkip={next} refl="slobs-onboarding" {...tableProps} />
       </div>
