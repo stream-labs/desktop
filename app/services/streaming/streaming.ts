@@ -1031,6 +1031,21 @@ export class StreamingService
       } else {
         this.createRecording('horizontal', 1);
       }
+
+      // handle dual output streaming and recording
+      if (this.views.isDualOutputMode) {
+        // if recording in dual output mode, always record vertical display
+
+        // if streaming and recording in dual output mode, only stream horizontal display and record vertical display
+        if (this.state.streamingStatus === EStreamingState.Offline) {
+          this.createRecording('horizontal', 1);
+        } else if (this.dualOutputService.views.recordVertical) {
+          this.createRecording('vertical', 2);
+        }
+      } else {
+        // handle single output recording
+        this.createRecording('horizontal', 1);
+      }
     }
   }
 
