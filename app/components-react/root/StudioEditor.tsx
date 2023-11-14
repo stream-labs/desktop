@@ -350,6 +350,9 @@ function DualOutputControls(p: { stacked: boolean }) {
   const showVertical =
     Services.DualOutputService.views.showVerticalDisplay &&
     !Services.StreamingService.state.selectiveRecording;
+  const isRecording = Services.StreamingService.views.isRecording;
+  const isVerticalRecording = Services.StreamingService.views.isVerticalRecording;
+  const isStreaming = Services.StreamingService.views.isStreaming;
 
   return (
     <div
@@ -360,6 +363,8 @@ function DualOutputControls(p: { stacked: boolean }) {
         <div className={styles.horizontalHeader}>
           <i className="icon-desktop" />
           <span>{$t('Horizontal Output')}</span>
+          {isStreaming && <i className={cx(styles.streamIcon, 'icon-studio')} />}
+          {isRecording && <i className={cx(styles.recordIcon, 'icon-record')} />}
         </div>
       )}
 
@@ -367,6 +372,7 @@ function DualOutputControls(p: { stacked: boolean }) {
         <div className={styles.verticalHeader}>
           <i className="icon-phone-case" />
           <span>{$t('Vertical Output')}</span>
+          {isVerticalRecording && <i className={cx(styles.recordIcon, 'icon-record')} />}
         </div>
       )}
       <div className={styles.manageLink}>
