@@ -24,6 +24,8 @@ import { getPlatformService } from 'services/platforms';
 import { IYoutubeUploadResponse } from 'services/platforms/youtube/uploader';
 import { YoutubeService } from 'services/platforms/youtube';
 import { Subject } from 'rxjs';
+import { TDisplayType } from './settings-v2';
+import { capitalize } from 'lodash';
 
 interface IRecordingEntry {
   timestamp: string;
@@ -194,20 +196,22 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
    * @param filename - name of file to show in recording history
    * @param showNotification - primarily used when recording in dual output mode to only show the notification once
    */
-  addRecordingEntry(filename: string, showNotification: boolean = true) {
+  addRecordingEntry(filename: string, display?: TDisplayType) {
     const timestamp = moment().format();
     this.ADD_RECORDING_ENTRY(timestamp, filename);
 
-    if (showNotification) {
-      this.notificationsService.actions.push({
-        type: ENotificationType.SUCCESS,
-        message: $t('A new Recording has been completed. Click for more info'),
-        action: this.jsonrpcService.createRequest(
-          Service.getResourceId(this),
-          'showRecordingHistory',
-        ),
-      });
-    }
+    const message = display
+      ? $t(`A new ${capitalize(display)} Recording has been completed. Click for more info`)
+      : $t('A new Recording has been completed. Click for more info');
+
+    this.notificationsService.actions.push({
+      type: ENotificationType.SUCCESS,
+      message,
+      action: this.jsonrpcService.createRequest(
+        Service.getResourceId(this),
+        'showRecordingHistory',
+      ),
+    });
   }
 
   pruneRecordingEntries() {
