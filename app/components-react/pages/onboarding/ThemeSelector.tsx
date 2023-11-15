@@ -71,11 +71,11 @@ export function ThemeSelector() {
 
   return (
     <div style={{ width: '100%' }}>
-      <h1 className={commonStyles.titleContainer}>{$t('Add a Theme')}</h1>
+      <h1 className={commonStyles.titleContainer}>{$t('Add an Overlay')}</h1>
 
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         {$t(
-          'You unlocked hundreds of Ultra themes! Choose from the ones below or navigate to the Themes tab later to personalize your scenes.',
+          'You unlocked hundreds of Ultra overlays! Choose from the ones below or navigate to the Overlays tab later to personalize your scenes.',
         )}
       </div>
       <div>
