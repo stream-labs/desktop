@@ -853,7 +853,9 @@ export class StreamingService
                 NodeObs.OBS_service_stopStreaming(true, 'horizontal');
                 NodeObs.OBS_service_stopStreaming(true, 'vertical');
                 // Refactor when move streaming to new API
-                this.SET_VERTICAL_STREAMING_STATUS(EStreamingState.Offline);
+                if (this.state.verticalStreamingStatus !== EStreamingState.Offline) {
+                  this.SET_VERTICAL_STREAMING_STATUS(EStreamingState.Offline);
+                }
               }
 
               if (signalInfo.signal === EOBSOutputSignal.Start) {
@@ -861,7 +863,9 @@ export class StreamingService
 
                 // Refactor when move streaming to new API
                 const time = new Date().toISOString();
-                this.SET_VERTICAL_STREAMING_STATUS(EStreamingState.Live, time);
+                if (this.state.verticalStreamingStatus === EStreamingState.Offline) {
+                  this.SET_VERTICAL_STREAMING_STATUS(EStreamingState.Live, time);
+                }
 
                 signalChanged.unsubscribe();
               }
@@ -968,6 +972,10 @@ export class StreamingService
               signalInfo.signal === EOBSOutputSignal.Deactivate
             ) {
               NodeObs.OBS_service_stopStreaming(false, 'vertical');
+              // Refactor when move streaming to new API
+              if (this.state.verticalStreamingStatus !== EStreamingState.Offline) {
+                this.SET_VERTICAL_STREAMING_STATUS(EStreamingState.Offline);
+              }
               signalChanged.unsubscribe();
             }
           },
@@ -1003,11 +1011,16 @@ export class StreamingService
     }
 
     if (this.state.streamingStatus === EStreamingState.Ending) {
-      if (this.views.isDualOutputMode && !this.dualOutputService.views.recordVertical) {
+      if (
+        this.views.isDualOutputMode &&
+        this.state.verticalRecordingStatus === ERecordingState.Offline
+      ) {
         NodeObs.OBS_service_stopStreaming(true, 'horizontal');
-        NodeObs.OBS_service_stopStreaming(true, 'vertical');
         // Refactor when move streaming to new API
-        this.SET_VERTICAL_STREAMING_STATUS(EStreamingState.Offline);
+        if (this.state.verticalStreamingStatus !== EStreamingState.Offline) {
+          this.SET_VERTICAL_STREAMING_STATUS(EStreamingState.Offline);
+        }
+        NodeObs.OBS_service_stopStreaming(true, 'vertical');
       } else {
         NodeObs.OBS_service_stopStreaming(true);
       }
@@ -1030,6 +1043,7 @@ export class StreamingService
   }
 
   toggleRecording() {
+    // stop recording
     if (
       this.state.recordingStatus === ERecordingState.Recording &&
       this.state.verticalRecordingStatus === ERecordingState.Recording
@@ -1078,6 +1092,7 @@ export class StreamingService
       this.horizontalRecording.stop();
     }
 
+    // start recording
     if (
       this.state.recordingStatus === ERecordingState.Offline &&
       this.state.verticalRecordingStatus === ERecordingState.Offline
@@ -1387,9 +1402,22 @@ export class StreamingService
   private handleOBSOutputSignal(info: IOBSOutputSignalInfo) {
     console.debug('OBS Output signal: ', info);
 
+    /*
+     * Resolve when:
+     * - Single output mode: always resolve
+     * - Dual output mode: after vertical stream started
+     * - Dual output mode: when vertical display is second destination,
+     *   resolve after horizontal stream started
+     */
+    const isVerticalDisplayStartSignal =
+      info.service === 'vertical' && info.signal === EOBSOutputSignal.Start;
+
     const shouldResolve =
       !this.views.isDualOutputMode ||
-      (this.views.isDualOutputMode && this.dualOutputService.views.recordVertical);
+      (this.views.isDualOutputMode && isVerticalDisplayStartSignal) ||
+      (this.views.isDualOutputMode &&
+        info.signal === EOBSOutputSignal.Start &&
+        this.dualOutputService.views.recordVertical);
 
     const time = new Date().toISOString();
 
