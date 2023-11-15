@@ -189,13 +189,6 @@ export class ScenesService {
   get activeSceneId(): string {
     return this.scenesService.views.activeSceneId;
   }
-
-  /**
-   * Accessor for the scene node maps for dual output
-   */
-  get sceneNodeMaps(): { [sceneId: string]: Dictionary<string> } {
-    return this.scenesService.views.sceneNodeMaps;
-  }
 }
 
 export interface ISceneNodeAddOptions {

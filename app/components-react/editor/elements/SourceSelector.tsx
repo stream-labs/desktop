@@ -37,6 +37,7 @@ interface ISourceMetadata {
   isFolder: boolean;
   canShowActions: boolean;
   parentId?: string;
+  sceneId?: string;
   toggleAll?: boolean;
 }
 
@@ -88,6 +89,7 @@ export class SourceSelectorModule {
             <TreeNode
               title={sceneNode.title}
               id={sceneNode.id}
+              sceneId={sceneNode.sceneId}
               isVisible={sceneNode.isVisible}
               isLocked={sceneNode.isLocked}
               canShowActions={sceneNode.canShowActions}
@@ -157,6 +159,7 @@ export class SourceSelectorModule {
         isGuestCamActive,
         isDualOutputActive,
         parentId: node.parentId,
+        sceneId: node.sceneId,
         canShowActions: itemsForNode.length > 0,
         isFolder,
         toggleAll,
@@ -769,6 +772,7 @@ const TreeNode = React.forwardRef(
     p: {
       title: string;
       id: string;
+      sceneId?: string;
       isLocked: boolean;
       isVisible: boolean;
       isStreamVisible: boolean;
@@ -810,7 +814,9 @@ const TreeNode = React.forwardRef(
         {p.canShowActions && (
           <>
             {p.isGuestCamActive && <i className="fa fa-signal" />}
-            {p.isDualOutputActive && p.hasNodeMap && <DualOutputSourceSelector nodeId={p.id} />}
+            {p.isDualOutputActive && p.hasNodeMap && (
+              <DualOutputSourceSelector nodeId={p.id} sceneId={p?.sceneId} />
+            )}
             {p.selectiveRecordingEnabled && (
               <Tooltip title={selectiveRecordingMetadata().tooltip} placement="left">
                 <i

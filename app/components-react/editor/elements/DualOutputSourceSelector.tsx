@@ -6,6 +6,7 @@ import { SourceSelectorModule } from './SourceSelector';
 
 interface IDualOutputSourceSelector {
   nodeId: string;
+  sceneId?: string;
 }
 export function DualOutputSourceSelector(p: IDualOutputSourceSelector) {
   const { toggleVisibility, makeActive, horizontalActive, verticalActive } = useModule(
@@ -18,8 +19,13 @@ export function DualOutputSourceSelector(p: IDualOutputSourceSelector) {
       DualOutputService.views.verticalNodeIds && horizontalActive
         ? DualOutputService.views.activeSceneNodeMap[p.nodeId]
         : p.nodeId,
-    isHorizontalVisible: DualOutputService.views.getIsHorizontalVisible(p.nodeId),
-    isVerticalVisible: DualOutputService.views.getIsVerticalVisible(p.nodeId),
+    isHorizontalVisible:
+      !DualOutputService.views.isLoading &&
+      DualOutputService.views.getIsHorizontalVisible(p.nodeId, p?.sceneId),
+    isVerticalVisible:
+      !DualOutputService.views.isLoading &&
+      DualOutputService.views.getIsVerticalVisible(p.nodeId, p?.sceneId),
+    isLoading: DualOutputService.views.isLoading && !DualOutputService.views.hasVerticalNodes,
   }));
 
   const showHorizontalToggle = useMemo(() => {
@@ -38,9 +44,7 @@ export function DualOutputSourceSelector(p: IDualOutputSourceSelector) {
             toggleVisibility(p.nodeId);
             makeActive(p.nodeId);
           }}
-          className={`${
-            v.isHorizontalVisible ? 'icon-desktop' : 'icon-desktop-hide'
-          } horizontal-source-icon`}
+          className={v.isHorizontalVisible ? 'icon-desktop' : 'icon-desktop-hide'}
         />
       )}
 
@@ -50,9 +54,7 @@ export function DualOutputSourceSelector(p: IDualOutputSourceSelector) {
             toggleVisibility(v.verticalNodeId);
             makeActive(v.verticalNodeId);
           }}
-          className={`${
-            v.isVerticalVisible ? 'icon-phone-case' : 'icon-phone-case-hide'
-          } vertical-source-icon`}
+          className={v.isVerticalVisible ? 'icon-phone-case' : 'icon-phone-case-hide'}
         />
       )}
     </>
