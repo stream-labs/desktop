@@ -194,18 +194,20 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
    * @param filename - name of file to show in recording history
    * @param showNotification - primarily used when recording in dual output mode to only show the notification once
    */
-  addRecordingEntry(filename: string) {
+  addRecordingEntry(filename: string, showNotification: boolean = true) {
     const timestamp = moment().format();
     this.ADD_RECORDING_ENTRY(timestamp, filename);
 
-    this.notificationsService.actions.push({
-      type: ENotificationType.SUCCESS,
-      message: $t('A new Recording has been completed. Click for more info'),
-      action: this.jsonrpcService.createRequest(
-        Service.getResourceId(this),
-        'showRecordingHistory',
-      ),
-    });
+    if (showNotification) {
+      this.notificationsService.actions.push({
+        type: ENotificationType.SUCCESS,
+        message: $t('A new Recording has been completed. Click for more info'),
+        action: this.jsonrpcService.createRequest(
+          Service.getResourceId(this),
+          'showRecordingHistory',
+        ),
+      });
+    }
   }
 
   pruneRecordingEntries() {

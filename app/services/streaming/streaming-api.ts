@@ -89,7 +89,9 @@ export interface IPlatformFlags {
 
 export interface IStreamingServiceState {
   streamingStatus: EStreamingState;
+  verticalStreamingStatus: EStreamingState;
   streamingStatusTime: string;
+  verticalStreamingStatusTime: string;
   recordingStatus: ERecordingState;
   verticalRecordingStatus: ERecordingState;
   recordingStatusTime: string;

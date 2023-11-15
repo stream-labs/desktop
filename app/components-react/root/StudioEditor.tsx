@@ -354,10 +354,8 @@ function DualOutputControls(p: { stacked: boolean }) {
       DualOutputService.views.showVerticalDisplay && !StreamingService.state.selectiveRecording,
     isHorizontalRecording: StreamingService.views.isHorizontalRecording,
     isVerticalRecording: StreamingService.views.isVerticalRecording,
-    isHorizontalStreaming:
-      StreamingService.views.isStreaming && !StreamingService.views.isVerticalRecording,
-    isVerticalStreaming:
-      StreamingService.views.isStreaming && !StreamingService.views.isVerticalRecording,
+    isHorizontalStreaming: StreamingService.views.isStreaming,
+    isVerticalStreaming: StreamingService.views.isVerticalStreaming,
   }));
 
   /**
@@ -378,8 +376,8 @@ function DualOutputControls(p: { stacked: boolean }) {
           <i className="icon-desktop" />
           <span>{$t('Horizontal Output')}</span>
           <DualOutputIcons
-            showStream={v.isHorizontalRecording}
-            showRecord={v.isVerticalRecording}
+            showStream={v.isHorizontalStreaming}
+            showRecord={v.isHorizontalRecording}
           />
         </div>
       )}
@@ -401,7 +399,7 @@ function DualOutputControls(p: { stacked: boolean }) {
 function DualOutputIcons(p: { showStream: boolean; showRecord: boolean }) {
   return (
     <>
-      {p.showStream && p.showRecord ? (
+      {!p.showStream && p.showRecord ? (
         <i className={cx(styles.recordIcon, 'icon-record')} />
       ) : (
         <>
