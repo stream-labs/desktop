@@ -131,7 +131,9 @@ export class StreamingService
 
   static initialState: IStreamingServiceState = {
     streamingStatus: EStreamingState.Offline,
+    verticalStreamingStatus: EStreamingState.Offline,
     streamingStatusTime: new Date().toISOString(),
+    verticalStreamingStatusTime: new Date().toISOString(),
     recordingStatus: ERecordingState.Offline,
     verticalRecordingStatus: ERecordingState.Offline,
     recordingStatusTime: new Date().toISOString(),
@@ -850,10 +852,17 @@ export class StreamingService
               if (signalInfo.code !== 0) {
                 NodeObs.OBS_service_stopStreaming(true, 'horizontal');
                 NodeObs.OBS_service_stopStreaming(true, 'vertical');
+                // Refactor when move streaming to new API
+                this.SET_VERTICAL_STREAMING_STATUS(EStreamingState.Offline);
               }
 
               if (signalInfo.signal === EOBSOutputSignal.Start) {
                 NodeObs.OBS_service_startStreaming('vertical');
+
+                // Refactor when move streaming to new API
+                const time = new Date().toISOString();
+                this.SET_VERTICAL_STREAMING_STATUS(EStreamingState.Live, time);
+
                 signalChanged.unsubscribe();
               }
             }
@@ -997,6 +1006,8 @@ export class StreamingService
       if (this.views.isDualOutputMode && !this.dualOutputService.views.recordVertical) {
         NodeObs.OBS_service_stopStreaming(true, 'horizontal');
         NodeObs.OBS_service_stopStreaming(true, 'vertical');
+        // Refactor when move streaming to new API
+        this.SET_VERTICAL_STREAMING_STATUS(EStreamingState.Offline);
       } else {
         NodeObs.OBS_service_stopStreaming(true);
       }
@@ -1177,7 +1188,7 @@ export class StreamingService
         [OS.Windows]: fileName.replace(/\//, '\\'),
       });
 
-      this.recordingModeService.addRecordingEntry(parsedName);
+      this.recordingModeService.addRecordingEntry(parsedName, display === 'horizontal');
       await this.markersService.exportCsv(parsedName);
 
       // destroy recording factory instances
@@ -1321,6 +1332,13 @@ export class StreamingService
   }
 
   get formattedDurationInCurrentRecordingState() {
+    // in dual output mode, if using vertical recording as the second destination
+    // display the vertical recording status time
+    if (this.state.recordingStatus !== ERecordingState.Offline) {
+      this.formattedDurationSince(moment(this.state.recordingStatusTime));
+    } else if (this.state.verticalRecordingStatus !== ERecordingState.Offline) {
+      return this.formattedDurationSince(moment(this.state.verticalRecordingStatusTime));
+    }
     return this.formattedDurationSince(moment(this.state.recordingStatusTime));
   }
 
@@ -1635,6 +1653,16 @@ export class StreamingService
   private SET_STREAMING_STATUS(status: EStreamingState, time?: string) {
     this.state.streamingStatus = status;
     if (time) this.state.streamingStatusTime = time;
+  }
+
+  /**
+   * Refactor when streaming moved to the new api
+   * Currently only used in dual output mode to show streaming status of the vertical display
+   */
+  @mutation()
+  private SET_VERTICAL_STREAMING_STATUS(status: EStreamingState, time?: string) {
+    this.state.verticalStreamingStatus = status;
+    if (time) this.state.verticalStreamingStatusTime = time;
   }
 
   @mutation()
