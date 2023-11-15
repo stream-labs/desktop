@@ -27,6 +27,7 @@ export default function StudioFooterComponent() {
     streamingStatus,
     streamQuality,
     isLoggedIn,
+    isDualStream,
     canSchedule,
     replayBufferOffline,
     replayBufferStopping,
@@ -124,7 +125,7 @@ export default function StudioFooterComponent() {
             {$t('Looking to stream?')}
           </button>
         )}
-        {!recordingModeEnabled && <RecordingButton />}
+        {!recordingModeEnabled && !isDualStream && <RecordingButton />}
         {replayBufferEnabled && replayBufferOffline && (
           <div className={styles.navItem}>
             <Tooltip placement="left" title={$t('Start Replay Buffer')}>
@@ -253,6 +254,13 @@ class FooterModule {
 
   get isLoggedIn() {
     return Services.UserService.views.isLoggedIn;
+  }
+
+  get isDualStream() {
+    return (
+      Services.StreamingService.state.streamingStatus !== EStreamingState.Offline &&
+      Services.StreamingService.state.verticalStreamingStatus !== EStreamingState.Offline
+    );
   }
 
   get canSchedule() {
