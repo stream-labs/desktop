@@ -7,7 +7,8 @@ import { getApiClient } from '../api-client';
 import {
   click,
   clickButton,
-  focusChild, getFocusedWindowId,
+  focusChild,
+  getFocusedWindowId,
   isDisplayed,
   select,
   selectButton,
@@ -116,8 +117,12 @@ export async function chatIsVisible() {
   });
 }
 
-export async function startRecording() {
+export async function startRecording(isDualOutputRecording?: boolean) {
   await click('.record-button');
+  // in dual output mode, we need to wait for both recordings to start
+  if (isDualOutputRecording) {
+    await sleep(500);
+  }
   await waitForDisplayed('.record-button.active');
 }
 
