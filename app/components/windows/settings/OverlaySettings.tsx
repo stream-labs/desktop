@@ -114,7 +114,7 @@ export default class OverlaySettings extends Vue {
         <div class="section">
           <p>
             {$t(
-              'This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk.',
+              'This feature is intended for overlay designers to export their work for our Overlay Library. Not all sources will be exported, use at your own risk.',
             )}
           </p>
           {this.button($t('Export Overlay File'), () => this.saveOverlay())}

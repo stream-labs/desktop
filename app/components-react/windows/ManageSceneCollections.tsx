@@ -126,9 +126,9 @@ export default function ManageSceneCollections() {
               <div>
                 <strong>{$t('Template')}</strong>
                 {isLoggedIn ? (
-                  <p>{$t('Choose a template from our theme library')}</p>
+                  <p>{$t('Choose a template from our overlay library')}</p>
                 ) : (
-                  <p>{$t('Log in to choose a template from our theme library')}</p>
+                  <p>{$t('Log in to choose a template from our overlay library')}</p>
                 )}
               </div>
               <img src={$i('images/prime-themes.png')} />
@@ -138,7 +138,7 @@ export default function ManageSceneCollections() {
                 <div className={styles.ultra}>
                   <strong>{$t('Ultra')}</strong>
                   <p>
-                    <Translate message="Upgrade your stream with premium themes with <ultra>Streamlabs Ultra</ultra>.">
+                    <Translate message="Upgrade your stream with premium overlays with <ultra>Streamlabs Ultra</ultra>.">
                       <u slot="ultra" />
                     </Translate>
                   </p>
@@ -214,7 +214,7 @@ function CollectionNode(p: {
     );
     if (deleteConfirmed) SceneCollectionsService.actions.delete(p.collection.id);
   }
-  
+
   return (
     <div
       onDoubleClick={makeActive}
