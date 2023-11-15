@@ -828,9 +828,11 @@ export class StreamingService
         NodeObs.OBS_service_setVideoInfo(horizontalContext, 'horizontal');
 
         const signalChanged = this.signalInfoChanged.subscribe(
-          (signalInfo: IOBSOutputSignalInfo) => {
+          async (signalInfo: IOBSOutputSignalInfo) => {
             if (signalInfo.service === 'default') {
               if (signalInfo.signal === EOBSOutputSignal.Start) {
+                // Refactor when migrate to new API, sleep to allow state to update
+                await new Promise(resolve => setTimeout(resolve, 300));
                 this.toggleRecording();
                 signalChanged.unsubscribe();
               }
@@ -1203,7 +1205,7 @@ export class StreamingService
         [OS.Windows]: fileName.replace(/\//, '\\'),
       });
 
-      this.recordingModeService.addRecordingEntry(parsedName, display === 'horizontal');
+      this.recordingModeService.addRecordingEntry(parsedName, display);
       await this.markersService.exportCsv(parsedName);
 
       // destroy recording factory instances

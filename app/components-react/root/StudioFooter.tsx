@@ -218,7 +218,7 @@ function RecordingTimer() {
   const [recordingTime, setRecordingTime] = useState('');
 
   const { isRecording } = useVuex(() => ({
-    isRecording: StreamingService.views.isRecording,
+    isRecording: StreamingService.views.isRecording || StreamingService.views.isVerticalRecording,
   }));
 
   useEffect(() => {
