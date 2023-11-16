@@ -17,7 +17,8 @@ import { setFormDropdown } from '../helpers/webdriver/forms';
 useWebdriver();
 
 /**
- * Recording in single output mode with a vanilla scene collection
+ * Records all formats in single output mode with a vanilla scene collection
+ * and dual output mode with a dual output scene collection
  */
 test('Recording', async t => {
   const tmpDir = await setTemporaryRecordingPath();
@@ -27,6 +28,11 @@ test('Recording', async t => {
 
   const formats = ['flv', 'mp4', 'mov', 'mkv', 'ts', 'm3u8'];
 
+  await showSettingsWindow('Output', async () => {
+    await setFormDropdown('Recording Quality', 'High Quality, Medium File Size');
+    await sleep(500);
+  });
+
   // Record 0.5s video in every format
   for (const format of formats) {
     await showSettingsWindow('Output', async () => {
@@ -34,7 +40,6 @@ test('Recording', async t => {
       await form.setInputValue(await form.getInputSelectorByTitle('Recording Format'), format);
       await clickButton('Done');
     });
-
     await focusMain();
     await startRecording();
     await sleep(500);
@@ -45,31 +50,67 @@ test('Recording', async t => {
   }
 
   // Check that every file was created
-  const files = await readdir(tmpDir);
+  const singleOutputFiles = await readdir(tmpDir);
 
   // M3U8 creates multiple TS files in addition to the catalog itself.
-  t.true(files.length >= formats.length, `Files that were created:\n${files.join('\n')}`);
+  t.true(
+    singleOutputFiles.length >= formats.length,
+    `Files that were created:\n${singleOutputFiles.join('\n')}`,
+  );
+
+  await logIn(t);
+  await toggleDualOutputMode();
+  // low resolution reduces CPU usage
+  // await setOutputResolution('100x100');
+  // Record 0.5s video in every format
+  for (const format of formats) {
+    await showSettingsWindow('Output', async () => {
+      // await setFormDropdown('Recording Quality', 'High Quality, Medium File Size');
+      // await sleep(500);
+      const form = new FormMonkey(t);
+      await form.setInputValue(await form.getInputSelectorByTitle('Recording Format'), format);
+      await clickButton('Done');
+    });
+
+    await focusMain();
+    await startRecording();
+    await sleep(500);
+    await stopRecording();
+    // Wait to ensure that output setting are editable
+    // await sleep(1000);
+  }
+  // Check that every file was created
+  const dualOutputFiles = (await readdir(tmpDir))
+    .filter(file => !singleOutputFiles.includes(file))
+    .map(file => file);
+  // M3U8 creates multiple TS files in addition to the catalog itself.
+  t.true(
+    dualOutputFiles.length >= formats.length,
+    `Files that were created:\n${dualOutputFiles.join('\n')}`,
+  );
 });
 
 /**
- * Recording in single output mode with a dual output scene collection
+ * Recording in dual output mode with a dual output scene collection
  */
 test('Recording Dual Output', async t => {
   await logIn(t);
   await toggleDualOutputMode();
 
   const tmpDir = await setTemporaryRecordingPath();
-  await showSettingsWindow('Output');
-  await setFormDropdown('Recording Quality', 'High Quality, Medium File Size');
-
-  await sleep(500);
 
   // low resolution reduces CPU usage
   await setOutputResolution('100x100');
 
+  await showSettingsWindow('Output', async () => {
+    await setFormDropdown('Recording Quality', 'High Quality, Medium File Size');
+    await sleep(500);
+    await clickButton('Done');
+  });
+
   // Recording mode: record horizontal and vertical displays
   await focusMain();
-  await startRecording(true);
+  await startRecording();
   // Record icons show in both headers
   await isDisplayed('i.icon-record');
   const icons = await selectElements('i.icon-record');
@@ -80,20 +121,28 @@ test('Recording Dual Output', async t => {
 
   // Generated two recordings
   await showPage('Recordings');
-  const recordingFiles = await selectElements('span.file');
-  t.true(recordingFiles.length === 2);
+  const recordings = await selectElements('span.file');
+  t.true(recordings.length === 2);
 
-  // Check that every file was created
+  // Check that every two files were created with correct file name
   const files = await readdir(tmpDir);
-  t.true(recordingFiles.length === files.length);
+  t.true(recordings.length === files.length);
+  const fileNames = files.map(file => file.split('/').pop());
+  recordings.forEach(async recording => {
+    const recordingName = await recording.getText();
+    t.true(fileNames.includes[recordingName]);
+  });
 
   // Streaming mode (both):
   // - Cannot record either display (button will hide after go live)
   // - Stream icons show in both headers
   // - Record icons do not show in headers
   // - No recordings generated
+  // await focusMain();
+  // await prepareToGoLive();
+  // await clickGoLive();
 
-  await sleep(5000);
+  // await sleep(5000);
   t.pass();
   // Streaming mode (vert record):
   // - Stream horizontal and record vertical
@@ -101,65 +150,4 @@ test('Recording Dual Output', async t => {
   // - Confirm only vertical is recording
   // - Generate one recording
   // - Stream icon shows in horizontal header, record icon shows in vertical header
-});
-
-/**
- * Recording in dual output mode
- */
-test('Dual output record both displays', async t => {
-  await logIn(t);
-  await toggleDualOutputMode();
-  const tmpDir = await setTemporaryRecordingPath();
-  // low resolution reduces CPU usage
-  await setOutputResolution('100x100');
-  const formats = ['flv', 'mp4', 'mov', 'mkv', 'ts', 'm3u8'];
-  // Record 0.5s video in every format
-  for (const format of formats) {
-    await showSettingsWindow('Output', async () => {
-      const form = new FormMonkey(t);
-      await form.setInputValue(await form.getInputSelectorByTitle('Recording Format'), format);
-      await clickButton('Done');
-    });
-    await focusMain();
-    await startRecording();
-    await sleep(1000);
-    await stopRecording();
-    // Wait to ensure that output setting are editable
-    await sleep(1000);
-  }
-  // Check that every file was created
-  const files = await readdir(tmpDir);
-  // M3U8 creates multiple TS files in addition to the catalog itself.
-  t.true(files.length >= formats.length, `Files that were created:\n${files.join('\n')}`);
-});
-
-/**
- * Recording with two contexts active (horizontal and vertical)
- * should produce no different results than with one context.
- */
-test('Recording with two contexts active', async t => {
-  await logIn(t);
-  await toggleDualOutputMode();
-  const tmpDir = await setTemporaryRecordingPath();
-  // low resolution reduces CPU usage
-  await setOutputResolution('100x100');
-  const formats = ['flv', 'mp4', 'mov', 'mkv', 'ts', 'm3u8'];
-  // Record 0.5s video in every format
-  for (const format of formats) {
-    await showSettingsWindow('Output', async () => {
-      const form = new FormMonkey(t);
-      await form.setInputValue(await form.getInputSelectorByTitle('Recording Format'), format);
-      await clickButton('Done');
-    });
-    await focusMain();
-    await startRecording();
-    await sleep(1000);
-    await stopRecording();
-    // Wait to ensure that output setting are editable
-    await sleep(1000);
-  }
-  // Check that every file was created
-  const files = await readdir(tmpDir);
-  // M3U8 creates multiple TS files in addition to the catalog itself.
-  t.true(files.length >= formats.length, `Files that were created:\n${files.join('\n')}`);
 });
