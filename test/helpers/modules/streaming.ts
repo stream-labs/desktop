@@ -117,12 +117,12 @@ export async function chatIsVisible() {
   });
 }
 
-export async function startRecording(isDualOutputRecording?: boolean) {
+export async function startRecording() {
   await click('.record-button');
-  // in dual output mode, we need to wait for both recordings to start
-  if (isDualOutputRecording) {
-    await sleep(500);
-  }
+  // Refactor when migrate output and stream settings to new API
+  // currently, because of the data mapping from the old api
+  // that is needed to work with the new api, it take a little longer to start the recording
+  await sleep(500);
   await waitForDisplayed('.record-button.active');
 }
 

@@ -1205,7 +1205,12 @@ export class StreamingService
         [OS.Windows]: fileName.replace(/\//, '\\'),
       });
 
-      this.recordingModeService.addRecordingEntry(parsedName, display);
+      // in dual output mode, each confirmation should be labelled for each display
+      if (this.views.isDualOutputMode) {
+        this.recordingModeService.addRecordingEntry(parsedName, display);
+      } else {
+        this.recordingModeService.addRecordingEntry(parsedName);
+      }
       await this.markersService.exportCsv(parsedName);
 
       // destroy recording factory instances
