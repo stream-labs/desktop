@@ -253,5 +253,10 @@
   "Markers": "Markers",
   "Manage Dual Output": "Manage Dual Output",
   "Auto optimizer disabled for dual output scenes": "Auto optimizer disabled for dual output scenes",
-  "Scene Collection": "Scene Collection"
+  "Scene Collection": "Scene Collection",
+  "High": "High",
+  "Above High": "Above High",
+  "Normal": "Normal",
+  "Below Normal": "Below Normal",
+  "Idle": "Idle"
 }
