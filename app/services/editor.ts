@@ -241,7 +241,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
           menu = new EditMenu({ selectedSceneId: this.scene.id, display: event.display });
         }
 
-        menu.popup({ window: this.windowsService.windows.main, x: event.pageX, y: event.pageY });
+        menu.popup();
       }
     }
 

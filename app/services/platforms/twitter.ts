@@ -165,9 +165,7 @@ export class TwitterPlatformService
   }
 
   get chatUrl() {
-    const broadcastId = this.state.broadcastId;
-    if (!broadcastId) return '';
-    return `https://twitter.com/i/broadcasts/${broadcastId}/chat`;
+    return '';
   }
 
   @mutation()

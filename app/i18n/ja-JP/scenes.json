@@ -50,11 +50,11 @@
   "Enter a Scene Collection Name": "シーンコレクション名を入力",
   "Copy of %{collectionName}": "%{collectionName} のコピー",
   "Your Scene Collections": "あなたのシーンコレクション",
-  "Dual Output Mode": "Dual Output モード",
-  "Horizontal Output": "横方向出力",
-  "Vertical Output": "縦方向出力",
-  "Arrange sources here for a vertical scene layout.": "縦方向シーンレイアウト用のソースをここに配置します。",
-  "Arrange sources here for a horizontal scene layout.": "横方向シーンレイアウト用のソースをここに配置します。",
-  "Toggle Dual Output Mode.": "Dual Output モードを切り替えます。",
-  "Cannot hide dual output toggles in dual output mode.": "Dual Output モードでは Dual Output トグルを非表示にできません。"
+  "Dual Output Mode": "Dual Output Mode",
+  "Horizontal Output": "Horizontal Output",
+  "Vertical Output": "Vertical Output",
+  "Arrange sources here for a vertical scene layout.": "Arrange sources here for a vertical scene layout.",
+  "Arrange sources here for a horizontal scene layout.": "Arrange sources here for a horizontal scene layout.",
+  "Toggle Dual Output Mode.": "Toggle Dual Output Mode.",
+  "Cannot hide dual output toggles in dual output mode.": "Cannot hide dual output toggles in dual output mode."
 }

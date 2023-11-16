@@ -23,8 +23,7 @@ enum EOnboardingSteps {
   ObsImport = 'ObsImport',
   HardwareSetup = 'HardwareSetup',
   ThemeSelector = 'ThemeSelector',
-  // temporarily disable auto config until migrate to new api
-  // Optimize = 'Optimize',
+  Optimize = 'Optimize',
   Prime = 'Prime',
 }
 
@@ -85,14 +84,13 @@ export const ONBOARDING_STEPS = () => ({
     hideButton: true,
     label: $t('Add a Theme'),
   },
-  // temporarily disable auto config until migrate to new api
-  // [EOnboardingSteps.Optimize]: {
-  //   component: 'Optimize',
-  //   disableControls: false,
-  //   hideSkip: false,
-  //   hideButton: true,
-  //   label: $t('Optimize'),
-  // },
+  [EOnboardingSteps.Optimize]: {
+    component: 'Optimize',
+    disableControls: false,
+    hideSkip: false,
+    hideButton: true,
+    label: $t('Optimize'),
+  },
   [EOnboardingSteps.Prime]: {
     component: 'Prime',
     disableControls: false,
@@ -167,8 +165,7 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
 
       return ONBOARDING_STEPS()[EOnboardingSteps.Connect];
     }
-    // temporarily disable auto config until migrate to new api
-    // if (this.state.options.isOptimize) return ONBOARDING_STEPS()[EOnboardingSteps.Optimize];
+    if (this.state.options.isOptimize) return ONBOARDING_STEPS()[EOnboardingSteps.Optimize];
     if (this.state.options.isHardware) return ONBOARDING_STEPS()[EOnboardingSteps.HardwareSetup];
     if (this.state.options.isImport) return ONBOARDING_STEPS()[EOnboardingSteps.ObsImport];
   }
@@ -212,10 +209,9 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ThemeSelector]);
     }
 
-    // temporarily disable auto config until migrate to new api
-    // if (userViews.isTwitchAuthed || userViews.isYoutubeAuthed || recordingModeEnabled) {
-    //   steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Optimize]);
-    // }
+    if (userViews.isTwitchAuthed || userViews.isYoutubeAuthed || recordingModeEnabled) {
+      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Optimize]);
+    }
 
     if (!userViews.isPrime) {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Prime]);

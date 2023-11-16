@@ -9,12 +9,8 @@ export class Menu {
     this.menu = new remote.Menu();
   }
 
-  popup(opts?: { window: Electron.BrowserWindow; x: number; y: number }) {
-    if (opts) {
-      this.menu.popup(opts);
-    } else {
-      this.menu.popup({ window: remote.getCurrentWindow() });
-    }
+  popup() {
+    this.menu.popup({ window: remote.getCurrentWindow() });
   }
 
   append(options: Electron.MenuItemConstructorOptions) {

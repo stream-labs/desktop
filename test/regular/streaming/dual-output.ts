@@ -20,6 +20,12 @@ import { getApiClient } from '../../helpers/api-client';
 import { releaseUserInPool, reserveUserFromPool } from '../../helpers/webdriver/user';
 import { test, useWebdriver, TExecutionContext } from '../../helpers/webdriver';
 import { SceneBuilder } from '../../helpers/scene-builder';
+import { sleep } from '../../helpers/sleep';
+import { DualOutputService } from '../../../app/services/dual-output';
+import { VideoSettingsService } from 'services/settings-v2/video';
+import { SettingsService } from 'services/settings';
+import { showSettingsWindow } from '../../helpers/modules/settings/settings';
+import { assertFormContains } from '../../helpers/modules/forms/form';
 
 useWebdriver();
 
@@ -32,7 +38,7 @@ test('User must be logged in to use Dual Output', async (t: TExecutionContext) =
   t.true(await isDisplayed('form#login-modal', { timeout: 1000 }));
 });
 
-test.skip('Dual output checkbox toggles Dual Output mode', async (t: TExecutionContext) => {
+test('Dual output checkbox toggles Dual Output mode', async (t: TExecutionContext) => {
   await logIn();
   await toggleDualOutputMode();
   await focusMain();
@@ -41,6 +47,62 @@ test.skip('Dual output checkbox toggles Dual Output mode', async (t: TExecutionC
   await toggleDualOutputMode();
   await focusMain();
   t.false(await isDisplayed('div#vertical-display'));
+});
+
+// TODO: finish test
+test.skip('Auto config works with only the horizontal context', async (t: TExecutionContext) => {
+  // const app = t.context.app;
+  // const client = await getApiClient();
+  // const videoSettingsService = client.getResource<VideoSettingsService>('VideoSettingsService');
+  // const settingsService = client.getResource<SettingsService>('SettingsService');
+  // videoSettingsService.establishVideoContext('horizontal');
+  // videoSettingsService.establishVideoContext('vertical');
+  // videoSettingsService.setVideoSetting('baseWidth', 852, 'horizontal');
+  // videoSettingsService.setVideoSetting('baseHeight', 480, 'horizontal');
+  // videoSettingsService.setVideoSetting('baseWidth', 720, 'vertical');
+  // videoSettingsService.setVideoSetting('baseHeight', 1280, 'vertical');
+  // await focusMain();
+  // if (!(await isDisplayed('h2=Live Streaming'))) return;
+  // await click('h2=Live Streaming');
+  // await click('button=Continue');
+  // await (await app.client.$('button=Twitch')).isExisting();
+  // await logIn('twitch');
+  // await sleep(1000);
+  // if (await (await t.context.app.client.$('span=Skip')).isExisting()) {
+  //   await (await t.context.app.client.$('span=Skip')).click();
+  //   await sleep(1000);
+  // }
+  // if (await (await t.context.app.client.$('div=Start Fresh')).isExisting()) {
+  //   await (await t.context.app.client.$('div=Start Fresh')).click();
+  //   await sleep(1000);
+  // }
+  // if (await (await t.context.app.client.$('button=Skip')).isExisting()) {
+  //   await (await t.context.app.client.$('button=Skip')).click();
+  //   await sleep(1000);
+  // }
+  // if (await (await t.context.app.client.$('button=Skip')).isExisting()) {
+  //   await (await t.context.app.client.$('button=Skip')).click();
+  //   await sleep(1000);
+  // }
+  // // Start auto config
+  // t.true(await (await app.client.$('button=Start')).isExisting());
+  // await (await app.client.$('button=Start')).click();
+  // await (await t.context.app.client.$('div=Choose Starter')).waitForDisplayed({ timeout: 60000 });
+  // if (await (await t.context.app.client.$('div=Choose Starter')).isExisting()) {
+  //   await (await t.context.app.client.$('div=Choose Starter')).click();
+  //   await sleep(1000);
+  // }
+  // await (await app.client.$('span=Sources')).waitForDisplayed({ timeout: 60000 });
+  // await showSettingsWindow('Video', async () => {
+  //   await assertFormContains({ baseRes: 1920 });
+  //   await assertFormContains({ baseHeight: 1080 });
+  // });
+  // const horizontalBaseWidthState = videoSettingsService.state.horizontal.baseWidth;
+  // const verticalBaseHeightState = videoSettingsService.state.vertical.baseHeight;
+  // const [baseWidth, baseHeight] = settingsService.views.values.Video.Base.split('x');
+  // t.true(horizontalBaseWidthState === 1920);
+  // t.true(verticalBaseHeightState === 1080);
+  t.pass();
 });
 
 /**
