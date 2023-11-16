@@ -1842,25 +1842,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@electron/get@npm:^1.12.4, @electron/get@npm:^1.13.0":
-  version: 1.14.1
-  resolution: "@electron/get@npm:1.14.1"
+"@electron/get@npm:^2.0.0, @electron/get@npm:^2.0.1":
+  version: 2.0.2
+  resolution: "@electron/get@npm:2.0.2"
   dependencies:
     debug: ^4.1.1
     env-paths: ^2.2.0
     fs-extra: ^8.1.0
     global-agent: ^3.0.0
-    global-tunnel-ng: ^2.7.1
-    got: ^9.6.0
+    got: ^11.8.5
     progress: ^2.0.3
     semver: ^6.2.0
     sumchecker: ^3.0.1
   dependenciesMeta:
     global-agent:
       optional: true
-    global-tunnel-ng:
-      optional: true
-  checksum: 21fec5e82bbee8f9fa183b46e05675b137c3130c7999d3b2b34a0047d1a06ec3c76347b9bbdb9911ba9b2123697804e360a15dda9db614c0226d5d4dcc4d6d15
+  checksum: 900845cc0b31b54761fc9b0ada2dea1e999e59aacc48999d53903bcb7c9a0a7356b5fe736cf610b2a56c5a21f5a3c0e083b2ed2b7e52c36a4d0f420d4b5ec268
   languageName: node
   linkType: hard
 
@@ -2763,17 +2760,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^14.6.2":
-  version: 14.18.47
-  resolution: "@types/node@npm:14.18.47"
-  checksum: 249467fa37e60bb7ce631616a5fea53f3b957a6792c6a09f7db7cdff85a7410c9e657dd9fa54bcc9d878e58f35407ce35169b84556f46b2154f90bc71063e1d0
-  languageName: node
-  linkType: hard
-
 "@types/node@npm:^18.0.0":
   version: 18.15.11
   resolution: "@types/node@npm:18.15.11"
   checksum: 977b4ad04708897ff0eb049ecf82246d210939c82461922d20f7d2dcfd81bbc661582ba3af28869210f7e8b1934529dcd46bff7d448551400f9d48b9d3bddec3
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^18.11.18":
+  version: 18.16.18
+  resolution: "@types/node@npm:18.16.18"
+  checksum: d32d8a0a04cd3f5ecb361bcb42f3a07623881ac90d680e06bf626defb3c663a94860d11690babe607cfe67265eceeb8a59ba5fe40c0e49f5a1b01e0088640469
   languageName: node
   linkType: hard
 
@@ -5428,7 +5425,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"concat-stream@npm:1.6.2, concat-stream@npm:^1.6.2":
+"concat-stream@npm:1.6.2":
   version: 1.6.2
   resolution: "concat-stream@npm:1.6.2"
   dependencies:
@@ -5453,16 +5450,6 @@ __metadata:
     semver: ^7.3.2
     well-known-symbols: ^2.0.0
   checksum: 9a5512c1013cb7afee419033f2d0fd5733be13c2c368a8cf81435eab5975376189745f3813d299eed1c7bdf3391638c6dad8d748920908332e53d26b0ab68e96
-  languageName: node
-  linkType: hard
-
-"config-chain@npm:^1.1.11":
-  version: 1.1.13
-  resolution: "config-chain@npm:1.1.13"
-  dependencies:
-    ini: ^1.3.4
-    proto-list: ~1.2.1
-  checksum: 828137a28e7c2fc4b7fb229bd0cd6c1397bcf83434de54347e608154008f411749041ee392cbe42fab6307e02de4c12480260bf769b7d44b778fdea3839eafab
   languageName: node
   linkType: hard
 
@@ -6327,15 +6314,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron-chromedriver@npm:17.0.0":
-  version: 17.0.0
-  resolution: "electron-chromedriver@npm:17.0.0"
+"electron-chromedriver@npm:25.1.1":
+  version: 25.1.1
+  resolution: "electron-chromedriver@npm:25.1.1"
   dependencies:
-    "@electron/get": ^1.12.4
+    "@electron/get": ^2.0.1
     extract-zip: ^2.0.0
   bin:
     chromedriver: chromedriver.js
-  checksum: e498aff6fe3bfd95d7e5f9d1158bdad5147ebd18266292c62879b305720fe9e188eac62d1bf40e71267159a0a9a9d6a9539aed2dc6224efeafebf3bd7dcee3df
+  checksum: 9794ab16ca3f5186a1de27b01eb25846949cdaa3d93f3388165792499044348897d910e53e11f29e16c53a6e95631aaa9f079d2ad677c3baaf4dfac40bea8359
   languageName: node
   linkType: hard
 
@@ -6438,16 +6425,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron@npm:17.4.11":
-  version: 17.4.11
-  resolution: "electron@npm:17.4.11"
+"electron@npm:25.9.3":
+  version: 25.9.3
+  resolution: "electron@npm:25.9.3"
   dependencies:
-    "@electron/get": ^1.13.0
-    "@types/node": ^14.6.2
-    extract-zip: ^1.0.3
+    "@electron/get": ^2.0.0
+    "@types/node": ^18.11.18
+    extract-zip: ^2.0.1
   bin:
     electron: cli.js
-  checksum: 2aad627183577d514ad79cb3f99eaa24e8acdba74e464eb62e699ebfe0ce1c12a7890ee5d6f2d5ab32daed0e449f9e161a21fb61841b3931438f215e1ad8099e
+  checksum: 855aff79ff14843ea8a853f534a7f442b02891b29037f0c21b52180ee36e827515dc0dd3e1e472e1041c2f2b4b23ebd319e7dd42a7c57955741071572003f11d
   languageName: node
   linkType: hard
 
@@ -6476,13 +6463,6 @@ __metadata:
   version: 3.0.0
   resolution: "emojis-list@npm:3.0.0"
   checksum: ddaaa02542e1e9436c03970eeed445f4ed29a5337dfba0fe0c38dfdd2af5da2429c2a0821304e8a8d1cadf27fdd5b22ff793571fa803ae16852a6975c65e8e70
-  languageName: node
-  linkType: hard
-
-"encodeurl@npm:^1.0.2":
-  version: 1.0.2
-  resolution: "encodeurl@npm:1.0.2"
-  checksum: e50e3d508cdd9c4565ba72d2012e65038e5d71bdc9198cb125beb6237b5b1ade6c0d343998da9e170fb2eae52c1bed37d4d6d98a46ea423a0cddbed5ac3f780c
   languageName: node
   linkType: hard
 
@@ -7047,7 +7027,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"extract-zip@npm:2.0.1, extract-zip@npm:^2.0.0":
+"extract-zip@npm:2.0.1, extract-zip@npm:^2.0.0, extract-zip@npm:^2.0.1":
   version: 2.0.1
   resolution: "extract-zip@npm:2.0.1"
   dependencies:
@@ -7061,20 +7041,6 @@ __metadata:
   bin:
     extract-zip: cli.js
   checksum: 8cbda9debdd6d6980819cc69734d874ddd71051c9fe5bde1ef307ebcedfe949ba57b004894b585f758b7c9eeeea0e3d87f2dda89b7d25320459c2c9643ebb635
-  languageName: node
-  linkType: hard
-
-"extract-zip@npm:^1.0.3":
-  version: 1.7.0
-  resolution: "extract-zip@npm:1.7.0"
-  dependencies:
-    concat-stream: ^1.6.2
-    debug: ^2.6.9
-    mkdirp: ^0.5.4
-    yauzl: ^2.10.0
-  bin:
-    extract-zip: cli.js
-  checksum: 011bab660d738614555773d381a6ba4815d98c1cfcdcdf027e154ebcc9fc8c9ef637b3ea5c9b2144013100071ee41722ed041fc9aacc60f6198ef747cac0c073
   languageName: node
   linkType: hard
 
@@ -7724,18 +7690,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"global-tunnel-ng@npm:^2.7.1":
-  version: 2.7.1
-  resolution: "global-tunnel-ng@npm:2.7.1"
-  dependencies:
-    encodeurl: ^1.0.2
-    lodash: ^4.17.10
-    npm-conf: ^1.1.3
-    tunnel: ^0.0.6
-  checksum: b7e016093eab6058b5fdd8caea31c22dc1a607f0f0b41c001ade5e0227c5d74efe9ce9bae56316d794bc1cedd461a187b8b7e8f0a3eb4d194972cdfb9d860af2
-  languageName: node
-  linkType: hard
-
 "globals@npm:^11.1.0":
   version: 11.7.0
   resolution: "globals@npm:11.7.0"
@@ -7853,7 +7807,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"got@npm:^11.0.2, got@npm:^11.8.1":
+"got@npm:^11.0.2, got@npm:^11.8.1, got@npm:^11.8.5":
   version: 11.8.6
   resolution: "got@npm:11.8.6"
   dependencies:
@@ -8365,13 +8319,6 @@ __metadata:
   version: 2.0.0
   resolution: "ini@npm:2.0.0"
   checksum: e7aadc5fb2e4aefc666d74ee2160c073995a4061556b1b5b4241ecb19ad609243b9cceafe91bae49c219519394bbd31512516cb22a3b1ca6e66d869e0447e84e
-  languageName: node
-  linkType: hard
-
-"ini@npm:^1.3.4":
-  version: 1.3.8
-  resolution: "ini@npm:1.3.8"
-  checksum: dfd98b0ca3a4fc1e323e38a6c8eb8936e31a97a918d3b377649ea15bdb15d481207a0dda1021efbd86b464cae29a0d33c1d7dcaf6c5672bee17fa849bc50a1b3
   languageName: node
   linkType: hard
 
@@ -9628,7 +9575,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash@npm:4.17.21, lodash@npm:^4.17.10, lodash@npm:^4.17.11, lodash@npm:^4.17.14, lodash@npm:^4.17.15, lodash@npm:^4.17.19, lodash@npm:^4.17.20, lodash@npm:^4.17.21, lodash@npm:^4.2.0, lodash@npm:^4.8.0":
+"lodash@npm:4.17.21, lodash@npm:^4.17.11, lodash@npm:^4.17.14, lodash@npm:^4.17.15, lodash@npm:^4.17.19, lodash@npm:^4.17.20, lodash@npm:^4.17.21, lodash@npm:^4.2.0, lodash@npm:^4.8.0":
   version: 4.17.21
   resolution: "lodash@npm:4.17.21"
   checksum: eb835a2e51d381e561e508ce932ea50a8e5a68f4ebdd771ea240d3048244a8d13658acbd502cd4829768c56f2e16bdd4340b9ea141297d472517b83868e677f7
@@ -10231,17 +10178,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mkdirp@npm:^0.5.4":
-  version: 0.5.6
-  resolution: "mkdirp@npm:0.5.6"
-  dependencies:
-    minimist: ^1.2.6
-  bin:
-    mkdirp: bin/cmd.js
-  checksum: 0c91b721bb12c3f9af4b77ebf73604baf350e64d80df91754dc509491ae93bf238581e59c7188360cec7cb62fc4100959245a42cfe01834efedc5e9d068376c2
-  languageName: node
-  linkType: hard
-
 "mkdirp@npm:^1.0.3, mkdirp@npm:^1.0.4":
   version: 1.0.4
   resolution: "mkdirp@npm:1.0.4"
@@ -10519,16 +10455,6 @@ __metadata:
   version: 6.1.0
   resolution: "normalize-url@npm:6.1.0"
   checksum: 4a4944631173e7d521d6b80e4c85ccaeceb2870f315584fa30121f505a6dfd86439c5e3fdd8cd9e0e291290c41d0c3599f0cb12ab356722ed242584c30348e50
-  languageName: node
-  linkType: hard
-
-"npm-conf@npm:^1.1.3":
-  version: 1.1.3
-  resolution: "npm-conf@npm:1.1.3"
-  dependencies:
-    config-chain: ^1.1.11
-    pify: ^3.0.0
-  checksum: 2d4e933b657623d98183ec408d17318547296b1cd17c4d3587e2920c554675f24f829d8f5f7f84db3a020516678fdcd01952ebaaf0e7fa8a17f6c39be4154bef
   languageName: node
   linkType: hard
 
@@ -11086,13 +11012,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pify@npm:^3.0.0":
-  version: 3.0.0
-  resolution: "pify@npm:3.0.0"
-  checksum: 6cdcbc3567d5c412450c53261a3f10991665d660961e06605decf4544a61a97a54fefe70a68d5c37080ff9d6f4cf51444c90198d1ba9f9309a6c0d6e9f5c4fde
-  languageName: node
-  linkType: hard
-
 "pify@npm:^4.0.1":
   version: 4.0.1
   resolution: "pify@npm:4.0.1"
@@ -11435,13 +11354,6 @@ __metadata:
   version: 2.0.4
   resolution: "property-expr@npm:2.0.4"
   checksum: 7ac142e189f0feef685f327f582efe13bfbc24a0b6e2328afdb38520bc140caa5f91dfa9529f2539b4468d85dc83a593e1ef0e0f7401b525368bb634b323bf54
-  languageName: node
-  linkType: hard
-
-"proto-list@npm:~1.2.1":
-  version: 1.2.4
-  resolution: "proto-list@npm:1.2.4"
-  checksum: 4d4826e1713cbfa0f15124ab0ae494c91b597a3c458670c9714c36e8baddf5a6aad22842776f2f5b137f259c8533e741771445eb8df82e861eea37a6eaba03f7
   languageName: node
   linkType: hard
 
@@ -13229,9 +13141,9 @@ __metadata:
     css-element-queries: 1.2.3
     css-loader: 2.1.1
     dotenv: 8.2.0
-    electron: 17.4.11
+    electron: 25.9.3
     electron-builder: 22.14.5
-    electron-chromedriver: 17.0.0
+    electron-chromedriver: 25.1.1
     electron-devtools-installer: 3.1.1
     electron-notarize: 1.0.0
     electron-react-devtools: ^0.5.3
@@ -14401,13 +14313,6 @@ __metadata:
   peerDependencies:
     typescript: ">=2.8.0 || >= 3.2.0-dev || >= 3.3.0-dev || >= 3.4.0-dev || >= 3.5.0-dev || >= 3.6.0-dev || >= 3.6.0-beta || >= 3.7.0-dev || >= 3.7.0-beta"
   checksum: 0dd8c29b2f554d71179dfdd7c3a55b973c0d21ba2b28868ca2acc0bda7469e2ae94f7f454c0f342934b3a653ed4424bfa9c12fa84dac0e126408d6fcd9271510
-  languageName: node
-  linkType: hard
-
-"tunnel@npm:^0.0.6":
-  version: 0.0.6
-  resolution: "tunnel@npm:0.0.6"
-  checksum: c362948df9ad34b649b5585e54ce2838fa583aa3037091aaed66793c65b423a264e5229f0d7e9a95513a795ac2bd4cb72cda7e89a74313f182c1e9ae0b0994fa
   languageName: node
   linkType: hard
 

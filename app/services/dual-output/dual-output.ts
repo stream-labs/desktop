@@ -40,6 +40,7 @@ interface IDualOutputServiceState {
   recordVertical: boolean;
   streamVertical: boolean;
   videoSettings: IDisplayVideoSettings;
+  isLoading: boolean;
 }
 
 class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
@@ -47,6 +48,10 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   @Inject() private videoSettingsService: VideoSettingsService;
   @Inject() private sceneCollectionsService: SceneCollectionsService;
   @Inject() private streamingService: StreamingService;
+
+  get isLoading(): boolean {
+    return this.state.isLoading;
+  }
 
   get activeSceneId(): string {
     return this.scenesService.views.activeSceneId;
@@ -303,6 +308,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         vertical: false,
       },
     },
+    isLoading: false,
   };
 
   get views() {
@@ -419,6 +425,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    */
   // @RunInLoadingMode()
   confirmOrAssignSceneNodes(sceneId: string) {
+    this.SET_IS_LOADING(true);
     const sceneItems = this.scenesService.views.getSceneItemsBySceneId(sceneId);
     if (!sceneItems) return;
 
@@ -469,10 +476,12 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       const display = verticalNodeIds?.has(sceneItem.id) ? 'vertical' : 'horizontal';
       this.assignNodeContext(sceneItem, sceneItem?.display ?? display);
     });
+    this.SET_IS_LOADING(false);
   }
 
   // @RunInLoadingMode()
   createSceneNodes(sceneId: string) {
+    this.SET_IS_LOADING(true);
     // establish vertical context if it doesn't exist
     if (this.state.dualOutputMode && !this.videoSettingsService.contexts.vertical) {
       this.videoSettingsService.establishVideoContext('vertical');
@@ -487,6 +496,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       false,
       'vertical',
     );
+    this.SET_IS_LOADING(false);
   }
 
   /**
@@ -601,6 +611,10 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     this.UPDATE_VIDEO_SETTING(settings, display);
   }
 
+  setIsLoading(status: boolean) {
+    this.SET_IS_LOADING(status);
+  }
+
   @mutation()
   private UPDATE_PLATFORM_SETTING(platform: TPlatform | string, display: TDisplayType) {
     this.state.platformSettings = {
@@ -672,5 +686,9 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       ...this.state,
       streamVertical: status,
     };
+  }
+
+  private SET_IS_LOADING(status: boolean) {
+    this.state = { ...this.state, isLoading: status };
   }
 }
