@@ -8,11 +8,9 @@ import {
   SimpleRecordingFactory,
   VideoEncoderFactory,
   ISimpleRecording,
-  ERecordingQuality,
   IAdvancedRecording,
   AdvancedRecordingFactory,
   EOutputSignal,
-  ERecordingFormat,
   AudioTrackFactory,
 } from '../../../obs-api';
 import { Inject } from 'services/core/injector';
@@ -77,6 +75,13 @@ enum EOBSOutputSignal {
   ReconnectSuccess = 'reconnect_success',
   Wrote = 'wrote',
   WriteError = 'writing_error',
+}
+
+enum EOutputSignalState {
+  Start = 'start',
+  Stop = 'stop',
+  Stopping = 'stopping',
+  Wrote = 'wrote',
 }
 
 interface IOBSOutputSignalInfo {
@@ -1073,17 +1078,16 @@ export class StreamingService
   async handleRecordingSignal(info: EOutputSignal, display: TDisplayType) {
     // map signals to status
     const nextState: ERecordingState = ({
-      [EOBSOutputSignal.Start]: ERecordingState.Recording,
-      [EOBSOutputSignal.Starting]: ERecordingState.Starting,
-      [EOBSOutputSignal.Stop]: ERecordingState.Offline,
-      [EOBSOutputSignal.Stopping]: ERecordingState.Stopping,
-      [EOBSOutputSignal.Wrote]: ERecordingState.Wrote,
+      [EOutputSignalState.Start]: ERecordingState.Recording,
+      [EOutputSignalState.Stop]: ERecordingState.Wrote,
+      [EOutputSignalState.Stopping]: ERecordingState.Stopping,
+      [EOutputSignalState.Wrote]: ERecordingState.Wrote,
     } as Dictionary<ERecordingState>)[info.signal];
 
     // We received a signal we didn't recognize
     if (!nextState) return;
 
-    if (info.signal === ERecordingState.Recording) {
+    if (nextState === ERecordingState.Recording) {
       const mode = this.views.isDualOutputMode ? 'dual' : 'single';
       this.usageStatisticsService.recordFeatureUsage('Recording');
       this.usageStatisticsService.recordAnalyticsEvent('RecordingStatus', {
@@ -1094,7 +1098,7 @@ export class StreamingService
       });
     }
 
-    if (info.signal === ERecordingState.Wrote) {
+    if (nextState === ERecordingState.Wrote) {
       const fileName =
         display === 'vertical'
           ? this.verticalRecording.lastFile()
@@ -1106,7 +1110,7 @@ export class StreamingService
       });
 
       // console.log('writing ', display, ' , ', parsedName);
-      await this.recordingModeService.addRecordingEntry(parsedName, display === 'horizontal');
+      this.recordingModeService.addRecordingEntry(parsedName);
       // console.log('added ', display);
       await this.markersService.exportCsv(parsedName);
       // console.log('markers wrote ', display);
@@ -1130,8 +1134,9 @@ export class StreamingService
         }
       }
 
-      // Wrote signals come after Offline, so we return early here
-      // to not falsely set our state out of Offline
+      const time = new Date().toISOString();
+      this.SET_RECORDING_STATUS(ERecordingState.Offline, time);
+      this.recordingStatusChange.next(ERecordingState.Offline);
       return;
     }
 
