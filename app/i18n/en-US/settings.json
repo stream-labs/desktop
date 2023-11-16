@@ -109,6 +109,7 @@
   "Pipe Name": "Pipe Name",
   "Websockets": "Websockets",
   "Enabled": "Enabled",
+  "Disabled": "Disabled",
   "Allow Remote Connections": "Allow Remote Connections",
   "Port": "Port",
   "Audio - Track 1": "Audio - Track 1",
