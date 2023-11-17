@@ -29,6 +29,7 @@ import {
   IStreamingServiceApi,
   IStreamingServiceState,
 } from './streaming-api';
+import { CustomcastUsageService } from '../custom-cast-usage';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -65,6 +66,7 @@ export class StreamingService
   @Inject() notificationsService: NotificationsService;
   @Inject() private nicoliveCommentSynthesizerService: NicoliveCommentSynthesizerService;
   @Inject() private nicoliveProgramService: NicoliveProgramService;
+  @Inject() private customcastUsageService: CustomcastUsageService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
@@ -687,12 +689,14 @@ export class StreamingService
     const streamingTrackId = this.usageStatisticsService.generateStreamingTrackID();
     this.SET_STREAMING_TRACK_ID(streamingTrackId);
     this.actionLog('stream_start', streamingTrackId);
+    this.customcastUsageService.startStreaming();
   }
 
   private logStreamEnd() {
     const streamingTrackId = this.state.streamingTrackId;
     this.SET_STREAMING_TRACK_ID('');
     this.actionLog('stream_end', streamingTrackId);
+    this.customcastUsageService.stopStreaming();
   }
 
   private actionLog(eventType: 'stream_start' | 'stream_end', streamingTrackId: string) {

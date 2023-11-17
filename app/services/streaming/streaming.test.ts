@@ -4,7 +4,7 @@ import { EStreamingState, ERecordingState } from './streaming-api';
 import { createSetupFunction } from 'util/test-setup';
 import { RequestError } from 'util/RequestError';
 
-function noop(..._args: any[]) {}
+function noop(..._args: any[]) { }
 
 jest.mock('services/core/stateful-service');
 jest.mock('services/core/injector');
@@ -27,6 +27,7 @@ jest.mock('util/menus/Menu', () => ({}));
 jest.mock('services/notifications', () => ({}));
 jest.mock('services/nicolive-program/nicolive-program', () => ({}));
 jest.mock('services/nicolive-program/nicolive-comment-synthesizer', () => ({}));
+jest.mock('services/custom-cast-usage', () => ({}));
 const showWindow = jest.fn();
 
 const createInjectee = ({
@@ -95,6 +96,14 @@ const createInjectee = ({
     },
     fetchProgram: noop,
   },
+  CustomcastUsageService: {
+    state: {
+      isCustomcastUsed: false,
+      programID: '',
+    },
+    startStreaming: noop,
+    stopStreaming: noop,
+  }
 });
 
 const setup = createSetupFunction({
