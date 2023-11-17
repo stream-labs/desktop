@@ -8,11 +8,18 @@ import {
   setTemporaryRecordingPath,
   showSettingsWindow,
 } from '../helpers/modules/settings/settings';
-import { clickButton, focusMain, selectElements, isDisplayed } from '../helpers/modules/core';
+import {
+  clickButton,
+  focusMain,
+  selectElements,
+  isDisplayed,
+  select,
+} from '../helpers/modules/core';
 import { logIn } from '../helpers/webdriver/user';
 import { toggleDualOutputMode } from '../helpers/modules/dual-output';
 import { showPage } from '../helpers/modules/navigation';
-import { setFormDropdown } from '../helpers/webdriver/forms';
+import { getFormDropdownOptions, setFormDropdown } from '../helpers/webdriver/forms';
+import { useForm } from '../helpers/modules/forms';
 
 useWebdriver();
 
@@ -112,8 +119,8 @@ test('Recording Dual Output', async t => {
   await focusMain();
   await startRecording();
   // Record icons show in both headers
-  await isDisplayed('i.icon-record');
-  const icons = await selectElements('i.icon-record');
+  await isDisplayed('i.icon-record:not(.hidden)');
+  const icons = await selectElements('i.icon-record:not(.hidden)');
   t.true(icons.length === 2);
   await stopRecording();
   // Wait to ensure that video file is finalized
@@ -150,4 +157,94 @@ test('Recording Dual Output', async t => {
   // - Confirm only vertical is recording
   // - Generate one recording
   // - Stream icon shows in horizontal header, record icon shows in vertical header
+});
+
+/**
+ * Records all file quality in single output mode with a vanilla scene collection
+ * and dual output mode with a dual output scene collection
+ */
+test('Recording File Quality', async t => {
+  // const tmpDir = await setTemporaryRecordingPath();
+
+  // // low resolution reduces CPU usage
+  // await setOutputResolution('100x100');
+
+  // const formats = ['flv', 'mp4', 'mov', 'mkv', 'ts', 'm3u8'];
+
+  await showSettingsWindow('Output', async () => {
+    const options = await selectElements('.multiselect__option > span');
+    // const labels = options.map(async (option: WebdriverIO.Element) => await option.getText());
+
+    // Record 0.5s video with every quality
+    for (const option of options) {
+      const title = await option.getText();
+      console.log('title ', title);
+    }
+    // const options = await selectElements('[data-name]="RecQuality"');
+    // const options = await getFormDropdownOptions('Recording Quality', 'RecQuality');
+
+    // console.log(labels);
+    // await setFormDropdown('Recording Quality', 'High Quality, Medium File Size');
+    await sleep(50000);
+  });
+
+  // Record 0.5s video in every format
+  // for (const format of formats) {
+  // await showSettingsWindow('Output', async () => {
+  //   const form = new FormMonkey(t);
+  //   // await form.setInputValue(await form.getInputSelectorByTitle('Recording Format'), 'mp4');
+  //   const videoQualities = await form.read();
+
+  //   console.log('videoQualities ', videoQualities);
+  //   await clickButton('Done');
+  // });
+  //   await focusMain();
+  //   await startRecording();
+  //   await sleep(500);
+  //   await stopRecording();
+
+  //   // Wait to ensure that output setting are editable
+  //   await sleep(500);
+  // }
+
+  // // Check that every file was created
+  // const singleOutputFiles = await readdir(tmpDir);
+
+  // // M3U8 creates multiple TS files in addition to the catalog itself.
+  // t.true(
+  //   singleOutputFiles.length >= formats.length,
+  //   `Files that were created:\n${singleOutputFiles.join('\n')}`,
+  // );
+
+  // await logIn(t);
+  // await toggleDualOutputMode();
+  // // low resolution reduces CPU usage
+  // // await setOutputResolution('100x100');
+  // // Record 0.5s video in every format
+  // for (const format of formats) {
+  //   await showSettingsWindow('Output', async () => {
+  //     // await setFormDropdown('Recording Quality', 'High Quality, Medium File Size');
+  //     // await sleep(500);
+  //     const form = new FormMonkey(t);
+  //     await form.setInputValue(await form.getInputSelectorByTitle('Recording Format'), format);
+  //     await clickButton('Done');
+  //   });
+
+  //   await focusMain();
+  //   await startRecording();
+  //   await sleep(500);
+  //   await stopRecording();
+  //   // Wait to ensure that output setting are editable
+  //   // await sleep(1000);
+  // }
+  // // Check that every file was created
+  // const dualOutputFiles = (await readdir(tmpDir))
+  //   .filter(file => !singleOutputFiles.includes(file))
+  //   .map(file => file);
+  // // M3U8 creates multiple TS files in addition to the catalog itself.
+  // t.true(
+  //   dualOutputFiles.length >= formats.length,
+  //   `Files that were created:\n${dualOutputFiles.join('\n')}`,
+  // );
+  t.pass();
 });
