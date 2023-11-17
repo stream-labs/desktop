@@ -126,8 +126,8 @@ export class StreamingService
   private resolveStartStreaming: Function = () => {};
   private rejectStartStreaming: Function = () => {};
 
-  private horizontalRecording: ISimpleRecording | IAdvancedRecording = null;
-  private verticalRecording: ISimpleRecording | IAdvancedRecording = null;
+  private horizontalRecording: ISimpleRecording | IAdvancedRecording | null = null;
+  private verticalRecording: ISimpleRecording | IAdvancedRecording | null = null;
 
   static initialState: IStreamingServiceState = {
     streamingStatus: EStreamingState.Offline,
