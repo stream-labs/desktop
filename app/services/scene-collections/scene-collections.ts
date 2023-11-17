@@ -220,6 +220,9 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   async create(
     options: ISceneCollectionInternalCreateOptions = {},
   ): Promise<ISceneCollectionsManifestEntry> {
+    if (this.dualOutputService.views.dualOutputMode) {
+      this.dualOutputService.actions.setIsCollectionOrSceneLoading(true);
+    }
     await this.deloadCurrentApplicationState();
 
     const name = options.name || this.suggestName(DEFAULT_COLLECTION_NAME);
