@@ -4,8 +4,11 @@ import { addSource } from '../helpers/modules/sources';
 import {
   setOutputResolution,
   setTemporaryRecordingPath,
+  showSettingsWindow,
 } from '../helpers/modules/settings/settings';
-import { focusMain } from '../helpers/modules/core';
+import { clickButton, focusMain } from '../helpers/modules/core';
+import { sleep } from '../helpers/sleep';
+import { setFormDropdown } from '../helpers/webdriver/forms';
 
 useWebdriver();
 
@@ -17,6 +20,12 @@ test('Selective Recording', async t => {
 
   // set lower resolution for better performance in CI
   await setOutputResolution('100x100');
+
+  await showSettingsWindow('Output', async () => {
+    await setFormDropdown('Recording Quality', 'High Quality, Medium File Size');
+    await sleep(500);
+    await clickButton('Done');
+  });
 
   // Add a browser source
   await addSource(sourceType, sourceName);
