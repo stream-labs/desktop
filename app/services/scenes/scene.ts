@@ -156,11 +156,14 @@ export class Scene {
       this.dualOutputService.views.activeDisplays.vertical;
 
     nodes = nodes.filter(node => {
-      // only return vertical nodes if only the vertical display is active
+      // if only the vertical display is active
+      // only return vertical nodes
       if (populateWithVerticalNodes && node?.display === 'vertical') {
         return node;
       }
-      // return horizontal nodes if either only the horizontal display is active or both displays are active
+
+      // if only the horizontal display is active or both displays are active
+      // only return horizontal nodes
       if (!populateWithVerticalNodes && node?.display === 'horizontal') {
         return node;
       }
