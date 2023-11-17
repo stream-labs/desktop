@@ -172,7 +172,7 @@ test('Recording File Quality', async t => {
   // const formats = ['flv', 'mp4', 'mov', 'mkv', 'ts', 'm3u8'];
 
   await showSettingsWindow('Output', async () => {
-    const options = await selectElements('.multiselect__option > span');
+    const options = await selectElements('.multiselect__option');
     // const labels = options.map(async (option: WebdriverIO.Element) => await option.getText());
 
     // Record 0.5s video with every quality
