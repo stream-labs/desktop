@@ -7,6 +7,8 @@ import {
   SceneNode,
 } from '../../app/services/api/external-api/scenes';
 import { TSourceType } from '../../app/services/sources';
+import { TDisplayType } from 'services/settings-v2';
+import { SceneCollectionsService } from 'app-services';
 
 interface ISceneBuilderNode {
   name: string;
@@ -14,6 +16,7 @@ interface ISceneBuilderNode {
   sourceType?: TSourceType;
   id?: string;
   children?: ISceneBuilderNode[];
+  display?: TDisplayType;
 }
 
 /**
@@ -42,6 +45,7 @@ interface ISceneBuilderNode {
  */
 export class SceneBuilder {
   private scenesService: ScenesService;
+  private sceneCollectionsService: SceneCollectionsService;
 
   /**
    * `Item:` will be converted to this default type
@@ -135,10 +139,10 @@ export class SceneBuilder {
     };
   }
 
-  build(scetch: string): ISceneBuilderNode[] {
+  build(sketch: string, display?: TDisplayType): ISceneBuilderNode[] {
     this.scene.clear();
-    const nodes = this.parse(scetch);
-    return this.buildNodes(nodes);
+    const nodes = this.parse(sketch);
+    return this.buildNodes(nodes, display);
   }
 
   isEqualTo(sketch: string): boolean {
@@ -161,6 +165,7 @@ export class SceneBuilder {
           id: sceneNode.id,
           type: 'folder' as TSceneNodeType,
           children: this.getSceneSchema(sceneNode.id),
+          display: sceneNode?.display,
         };
       }
       if (sceneNode.isItem()) {
@@ -171,6 +176,7 @@ export class SceneBuilder {
           sourceType: (
             sceneNode as SceneItem
           ).getSource().type,
+          display: sceneNode?.display,
         };
       }
     });
@@ -205,7 +211,18 @@ export class SceneBuilder {
     return sketch;
   }
 
-  private buildNodes(nodes: ISceneBuilderNode[], parentId?: string): ISceneBuilderNode[] {
+  /**
+   * Private function to create the scene nodes
+   * @param nodes - nodes to create
+   * @param addDefaultDisplay - whether to add a value for the
+   * @param parentId
+   * @returns
+   */
+  private buildNodes(
+    nodes: ISceneBuilderNode[],
+    display?: TDisplayType | undefined,
+    parentId?: string,
+  ): ISceneBuilderNode[] {
     nodes.reverse().forEach(node => {
       let sceneNode: SceneNode;
 
@@ -219,7 +236,11 @@ export class SceneBuilder {
         }
       } else {
         sceneNode = this.scene.createFolder(node.name);
-        if (node.children.length) this.buildNodes(node.children, sceneNode.id);
+        if (node.children.length) this.buildNodes(node.children, display, sceneNode.id);
+      }
+
+      if (display) {
+        node.display = display;
       }
 
       node.id = sceneNode.id;
@@ -227,5 +248,45 @@ export class SceneBuilder {
     });
 
     return nodes;
+  }
+
+  /**
+   * The functions below are primarily used for testing dual output
+   */
+
+  confirmDualOutputCollection(): boolean {
+    const nodes = this.getSceneSchema();
+
+    // if scene node map doesn't exist, return
+    const activeSceneId = this.scenesService.activeSceneId;
+    const sceneNodeMaps = this.sceneCollectionsService?.sceneNodeMaps;
+    if (!sceneNodeMaps) return false;
+
+    const nodeMap = sceneNodeMaps[activeSceneId];
+    if (!nodeMap) return false;
+
+    // confirm all horizontal nodes have a partner vertical node
+    return nodes.reduce((hasPartner: boolean, node: ISceneBuilderNode) => {
+      if (node?.display === 'horizontal' && !nodeMap[node.id]) {
+        hasPartner = false;
+      }
+      return hasPartner;
+    }, true);
+  }
+
+  confirmVanillaCollection(): boolean {
+    const nodes = this.getSceneSchema();
+
+    // if the scene node map exists, return
+    const sceneNodeMaps = this.sceneCollectionsService?.sceneNodeMaps;
+    if (sceneNodeMaps || Object.values(sceneNodeMaps).length > 0) return false;
+
+    // confirm only horizonal nodes exist
+    return nodes.reduce((onlyHorizontal: boolean, node: ISceneBuilderNode) => {
+      if (node?.display !== 'horizontal') {
+        onlyHorizontal = false;
+      }
+      return onlyHorizontal;
+    }, true);
   }
 }

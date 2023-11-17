@@ -65,8 +65,6 @@ interface IScene {
   id: string;
   name: string;
   nodes: (ISceneItem | ISceneItemFolder)[];
-  hasNodeMap: boolean;
-  dualOutputLoaded: boolean;
 }
 
 export class ScenesModule extends Module {
@@ -206,8 +204,6 @@ export class ScenesModule extends Module {
       nodes: scene.getNodes().map(node => {
         return this.serializeNode(node);
       }),
-      hasNodeMap: scene?.hasNodeMap ?? false,
-      dualOutputLoaded: scene?.dualOutputLoaded ?? false,
     };
   }
 

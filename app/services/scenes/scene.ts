@@ -446,13 +446,6 @@ export class Scene {
   }
 
   /**
-   * Denote that the scene has been converted to a dual output scene
-   */
-  setHasNodeMap(status: boolean) {
-    this.SET_HAS_NODE_MAP(status);
-  }
-
-  /**
    * Confirm that the dual output nodes have been handled
    * @remark For every session, the first time the user opens a dual output scene
    * the dual output service confirms or creates the nodes for the vertical display.
@@ -725,11 +718,6 @@ export class Scene {
     const childNodeState = this.state.nodes.find(node => node.id === childNodeId);
     assertIsDefined(childNodeState);
     childNodeState.parentId = parentFolderId;
-  }
-
-  @mutation()
-  private SET_HAS_NODE_MAP(status?: boolean) {
-    this.state.hasNodeMap = status;
   }
 
   @mutation()

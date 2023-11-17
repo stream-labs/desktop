@@ -617,13 +617,6 @@ export class ScenesService extends StatefulService<IScenesState> {
     return true;
   }
 
-  setHasNodeMap(sceneId: string, status: boolean) {
-    const scene = this.views.getScene(sceneId);
-    if (!scene) return;
-
-    scene.setHasNodeMap(status);
-  }
-
   setDualOutputNodesLoaded(sceneId: string, status: boolean) {
     const scene = this.views.getScene(sceneId);
     if (!scene) return;

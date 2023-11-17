@@ -4,270 +4,234 @@ import {
   waitForSettingsWindowLoaded,
 } from '../../helpers/modules/streaming';
 import {
-  click,
   clickIfDisplayed,
   focusChild,
   focusMain,
-  hoverElement,
   isDisplayed,
   selectElements,
-  useMainWindow,
-  waitForText,
 } from '../../helpers/modules/core';
 import { logIn } from '../../helpers/modules/user';
-import { toggleDualOutputMode, toggleDisplay } from '../../helpers/modules/dual-output';
+import {
+  toggleDualOutputMode,
+  toggleDisplay,
+  confirmSelectorNodesDisplay,
+  confirmHasDisplaysAssigned,
+} from '../../helpers/modules/dual-output';
 import { getApiClient } from '../../helpers/api-client';
-import { releaseUserInPool, reserveUserFromPool } from '../../helpers/webdriver/user';
 import { test, useWebdriver, TExecutionContext } from '../../helpers/webdriver';
 import { SceneBuilder } from '../../helpers/scene-builder';
-import { sleep } from '../../helpers/sleep';
-import { DualOutputService } from '../../../app/services/dual-output';
-import { VideoSettingsService } from 'services/settings-v2/video';
-import { SettingsService } from 'services/settings';
-import { showSettingsWindow } from '../../helpers/modules/settings/settings';
-import { assertFormContains } from '../../helpers/modules/forms/form';
+import { addSource } from '../../helpers/modules/sources';
+import { ScenesService } from 'services/api/external-api/scenes';
 
 useWebdriver();
 
 /**
  * Dual output video settings
  */
-test('User must be logged in to use Dual Output', async (t: TExecutionContext) => {
+test.skip('User must be logged in to use Dual Output', async (t: TExecutionContext) => {
   await toggleDualOutputMode(false);
   await focusChild();
   t.true(await isDisplayed('form#login-modal', { timeout: 1000 }));
 });
 
-test('Dual output checkbox toggles Dual Output mode', async (t: TExecutionContext) => {
+test('Dual output checkbox toggles Dual Output mode and duplicates sources', async (t: TExecutionContext) => {
   await logIn();
+
+  const sceneBuilder = new SceneBuilder(await getApiClient());
+
+  await addSource('Color Block', 'Color Source');
+  await addSource('Color Block', 'Color Source 2');
+  await addSource('Color Block', 'Color Source 3');
+
+  t.true(
+    sceneBuilder.isEqualTo(
+      `
+    Color Source 3:
+    Color Source 2:
+    Color Source:
+  `,
+    ),
+  );
+
+  // toggle dual output on and convert dual output scene collection
   await toggleDualOutputMode();
   await focusMain();
+  // @@@ TODO check for property, not element
   t.true(await isDisplayed('div#vertical-display'));
+  t.true(
+    sceneBuilder.isEqualTo(
+      `
+    Color Source 3:
+    Color Source 2:
+    Color Source:
+    Color Source 3:
+    Color Source 2:
+    Color Source:
+  `,
+    ),
+  );
 
+  // toggle dual output off, vertical nodes persist
   await toggleDualOutputMode();
   await focusMain();
   t.false(await isDisplayed('div#vertical-display'));
+  t.true(
+    sceneBuilder.isEqualTo(
+      `
+    Color Source 3:
+    Color Source 2:
+    Color Source:
+    Color Source 3:
+    Color Source 2:
+    Color Source:
+  `,
+    ),
+  );
+
+  // toggle dual output on, nodes do not duplicate
+  await toggleDualOutputMode();
+  t.true(
+    sceneBuilder.isEqualTo(
+      `
+    Color Source 3:
+    Color Source 2:
+    Color Source:
+    Color Source 3:
+    Color Source 2:
+    Color Source:
+  `,
+    ),
+  );
 });
 
-// TODO: finish test
-test.skip('Auto config works with only the horizontal context', async (t: TExecutionContext) => {
-  // const app = t.context.app;
-  // const client = await getApiClient();
-  // const videoSettingsService = client.getResource<VideoSettingsService>('VideoSettingsService');
-  // const settingsService = client.getResource<SettingsService>('SettingsService');
-  // videoSettingsService.establishVideoContext('horizontal');
-  // videoSettingsService.establishVideoContext('vertical');
-  // videoSettingsService.setVideoSetting('baseWidth', 852, 'horizontal');
-  // videoSettingsService.setVideoSetting('baseHeight', 480, 'horizontal');
-  // videoSettingsService.setVideoSetting('baseWidth', 720, 'vertical');
-  // videoSettingsService.setVideoSetting('baseHeight', 1280, 'vertical');
-  // await focusMain();
-  // if (!(await isDisplayed('h2=Live Streaming'))) return;
-  // await click('h2=Live Streaming');
-  // await click('button=Continue');
-  // await (await app.client.$('button=Twitch')).isExisting();
-  // await logIn('twitch');
-  // await sleep(1000);
-  // if (await (await t.context.app.client.$('span=Skip')).isExisting()) {
-  //   await (await t.context.app.client.$('span=Skip')).click();
-  //   await sleep(1000);
-  // }
-  // if (await (await t.context.app.client.$('div=Start Fresh')).isExisting()) {
-  //   await (await t.context.app.client.$('div=Start Fresh')).click();
-  //   await sleep(1000);
-  // }
-  // if (await (await t.context.app.client.$('button=Skip')).isExisting()) {
-  //   await (await t.context.app.client.$('button=Skip')).click();
-  //   await sleep(1000);
-  // }
-  // if (await (await t.context.app.client.$('button=Skip')).isExisting()) {
-  //   await (await t.context.app.client.$('button=Skip')).click();
-  //   await sleep(1000);
-  // }
-  // // Start auto config
-  // t.true(await (await app.client.$('button=Start')).isExisting());
-  // await (await app.client.$('button=Start')).click();
-  // await (await t.context.app.client.$('div=Choose Starter')).waitForDisplayed({ timeout: 60000 });
-  // if (await (await t.context.app.client.$('div=Choose Starter')).isExisting()) {
-  //   await (await t.context.app.client.$('div=Choose Starter')).click();
-  //   await sleep(1000);
-  // }
-  // await (await app.client.$('span=Sources')).waitForDisplayed({ timeout: 60000 });
-  // await showSettingsWindow('Video', async () => {
-  //   await assertFormContains({ baseRes: 1920 });
-  //   await assertFormContains({ baseHeight: 1080 });
-  // });
-  // const horizontalBaseWidthState = videoSettingsService.state.horizontal.baseWidth;
-  // const verticalBaseHeightState = videoSettingsService.state.vertical.baseHeight;
-  // const [baseWidth, baseHeight] = settingsService.views.values.Video.Base.split('x');
-  // t.true(horizontalBaseWidthState === 1920);
-  // t.true(verticalBaseHeightState === 1080);
-  t.pass();
-});
-
-/**
- * Dual output displays
- */
-test.skip('Dual output elements show on toggle', async (t: TExecutionContext) => {
+test('Dual output display toggles show/hides displays and filters sources', async (t: TExecutionContext) => {
   await logIn();
+
+  const client = await getApiClient();
+  const sceneBuilder = new SceneBuilder(client);
+
+  await addSource('Color Block', 'Color Source');
+  await addSource('Color Block', 'Color Source 2');
+  await addSource('Color Block', 'Color Source 3');
+
   await toggleDualOutputMode();
   await focusMain();
 
-  t.true(await isDisplayed('div#vertical-display'));
-  t.true(await isDisplayed('div#dual-output-header'));
-  t.true(await isDisplayed('i#horizontal-display-toggle'));
-  t.true(await isDisplayed('i#vertical-display-toggle'));
-});
+  t.true(sceneBuilder.confirmDualOutputCollection());
 
-test.skip('Dual output toggles', async (t: TExecutionContext) => {
-  await logIn();
-  await toggleDualOutputMode();
-  await focusMain();
+  const scenesService = client.getResource<ScenesService>('ScenesService');
+
+  let sceneNodes = scenesService.activeScene.getSourceSelectorNodes();
+  let visibleHorizontalNodes: WebdriverIO.Element[] = [];
+  let visibleVerticalNodes: WebdriverIO.Element[] = [];
 
   // check permutations of toggling on and off the displays
+  // toggle horizontal, vertical display active
   await clickIfDisplayed('i#horizontal-display-toggle');
   t.false(await isDisplayed('div#horizontal-display'));
   t.true(await isDisplayed('div#vertical-display'));
 
+  // should only show vertical sources in source selector
+  sceneNodes = scenesService.activeScene.getSourceSelectorNodes();
+  visibleHorizontalNodes = await selectElements('i.horizontal-source-icon');
+  visibleVerticalNodes = await selectElements('i.vertical-source-icon');
+
+  t.is(sceneNodes.length, visibleVerticalNodes.length);
+  t.is(visibleHorizontalNodes.length, 0);
+  t.is(confirmSelectorNodesDisplay(sceneNodes, 'vertical'), true);
+
+  // toggle vertical, no displays active
   await toggleDisplay('vertical', true);
   t.false(await isDisplayed('div#horizontal-display'));
   t.false(await isDisplayed('div#vertical-display'));
 
+  // should hide both horizontal and vertical sources in source selector
+  visibleHorizontalNodes = await selectElements('i.horizontal-source-icon');
+  visibleVerticalNodes = await selectElements('i.vertical-source-icon');
+
+  t.is(visibleHorizontalNodes.length, 0);
+  t.is(visibleVerticalNodes.length, 0);
+
+  // toggle horizontal, only horizontal active
   await toggleDisplay('horizontal');
   t.true(await isDisplayed('div#horizontal-display'));
   t.false(await isDisplayed('div#vertical-display'));
 
+  // should only show horizontal sources in source selector
+  sceneNodes = scenesService.activeScene.getSourceSelectorNodes();
+  visibleHorizontalNodes = await selectElements('i.horizontal-source-icon');
+  visibleVerticalNodes = await selectElements('i.vertical-source-icon');
+
+  t.is(sceneNodes.length, visibleHorizontalNodes.length);
+  t.is(visibleVerticalNodes.length, 0);
+  t.is(confirmSelectorNodesDisplay(sceneNodes, 'horizontal'), true);
+
+  // toggle vertical, both displays active
   await toggleDisplay('vertical');
   t.true(await isDisplayed('div#horizontal-display'));
   t.true(await isDisplayed('div#vertical-display'));
 
+  // should show both horizontal and vertical sources in source selector
+  sceneNodes = scenesService.activeScene.getSourceSelectorNodes();
+  visibleHorizontalNodes = await selectElements('i.horizontal-source-icon');
+  visibleVerticalNodes = await selectElements('i.vertical-source-icon');
+
+  t.is(sceneNodes.length, visibleHorizontalNodes.length);
+  t.is(sceneNodes.length, visibleVerticalNodes.length);
+  t.is(confirmHasDisplaysAssigned(sceneNodes), true);
+
+  // toggle vertical, only horizontal active
   await toggleDisplay('vertical');
   t.true(await isDisplayed('div#horizontal-display'));
   t.false(await isDisplayed('div#vertical-display'));
 
+  // should only show horizontal sources in source selector
+  sceneNodes = scenesService.activeScene.getSourceSelectorNodes();
+  visibleHorizontalNodes = await selectElements('i.horizontal-source-icon');
+  visibleVerticalNodes = await selectElements('i.vertical-source-icon');
+
+  t.is(sceneNodes.length, visibleHorizontalNodes.length);
+  t.is(visibleVerticalNodes.length, 0);
+  t.is(confirmSelectorNodesDisplay(sceneNodes, 'horizontal'), true);
+
+  // toggle horizontal, both displays inactive
   await toggleDisplay('horizontal');
   t.false(await isDisplayed('div#horizontal-display'));
   t.false(await isDisplayed('div#vertical-display'));
 
+  // should hide both horizontal and vertical sources in source selector
+  sceneNodes = scenesService.activeScene.getSourceSelectorNodes();
+  visibleHorizontalNodes = await selectElements('i.horizontal-source-icon');
+  visibleVerticalNodes = await selectElements('i.vertical-source-icon');
+
+  t.is(visibleHorizontalNodes.length, 0);
+  t.is(visibleVerticalNodes.length, 0);
+
+  // toggle vertical, only vertical active
   await toggleDisplay('vertical');
   t.false(await isDisplayed('div#horizontal-display'));
   t.true(await isDisplayed('div#vertical-display'));
 
+  // should only show vertical sources in source selector
+  sceneNodes = scenesService.activeScene.getSourceSelectorNodes();
+  visibleHorizontalNodes = await selectElements('i.horizontal-source-icon');
+  visibleVerticalNodes = await selectElements('i.vertical-source-icon');
+
+  t.is(sceneNodes.length, visibleVerticalNodes.length);
+  t.is(visibleHorizontalNodes.length, 0);
+  t.is(confirmSelectorNodesDisplay(sceneNodes, 'vertical'), true);
+
+  // toggle horizontal, both displays active
   await toggleDisplay('horizontal');
   t.true(await isDisplayed('div#horizontal-display'));
   t.true(await isDisplayed('div#vertical-display'));
-});
 
-test.skip('Dual output toggle tooltip text', async t => {
-  // @@@ TODO hover selector working by tooltip still not showing
-  await logIn();
-  await toggleDualOutputMode();
+  // should show both horizontal and vertical sources in source selector
+  visibleHorizontalNodes = await selectElements('i.horizontal-source-icon');
+  visibleVerticalNodes = await selectElements('i.vertical-source-icon');
 
-  await useMainWindow(async () => {
-    await focusMain();
-
-    await isDisplayed('i#horizontal-display-toggle');
-    await isDisplayed('i#horizontal-display-toggle');
-
-    // check tooltip text changes on hover
-    await hoverElement('i#horizontal-display-toggle', 50000);
-    t.true(await isDisplayed('div#toggle-horizontal-tooltip'));
-    t.true(await waitForText('Hide horizontal display'));
-    await toggleDisplay('horizontal');
-    await hoverElement('i#horizontal-display-toggle', 50000);
-    t.true(await waitForText('Show horizontal display'));
-
-    await hoverElement('i#vertical-display-toggle', 50000);
-    t.true(await waitForText('Hide vertical display'));
-    await toggleDisplay('vertical');
-    await hoverElement('i#vertical-display-toggle', 50000);
-    t.true(await waitForText('Show vertical display'));
-  });
-});
-
-test.skip('Dual output display toggles filter scene items in source selector', async t => {
-  // @@@ TODO scene items not auto duplicating when toggling
-
-  /* This is not a perfectly precise assessment of whether the correct nodes are showing in the source selector.
-   * The more precise check of the data is in the dual output api tests.
-   */
-
-  const client = await getApiClient();
-  const sceneBuilder = new SceneBuilder(client);
-  sceneBuilder.build(`
-    Folder1
-    Folder2
-      Item1: image
-      Item2: browser_source
-    Folder3
-      Item3:
-   `);
-
-  // the number of rows in the source selector should be constant when toggling displays or streaming modes
-  const numSourceRows = (await selectElements('div[data-role="source"]')).length;
-
-  await logIn();
-  await toggleDualOutputMode();
-  await focusMain();
-  // const sceneBuilder = new SceneBuilder(client);
-  // sceneBuilder.build(`
-  //   Folder1
-  //   Folder2
-  //     Item1: image
-  //     Item2: browser_source
-  //   Folder3
-  //     Item3:
-  //  `);
-
-  // const numSourceRows = (await selectElements('div[data-role="source"]')).length;
-  await isDisplayed('i.horizontal-item', { timeout: 10000 });
-  await isDisplayed('i.vertical-item', { timeout: 10000 });
-
-  // in dual output mode with both displays on
-  // show both horizontal and vertical scene items side by side
-  t.true((await selectElements('div[data-role="source"]')).length === numSourceRows);
-  t.true((await selectElements('i.horizontal-item')).length === numSourceRows);
-  t.true((await selectElements('i.vertical-item')).length === numSourceRows);
-
-  // in dual output mode with the horizontal display off
-  // show only vertical scene items
-  await toggleDisplay('horizontal');
-  t.true((await selectElements('div[data-role="source"]')).length === numSourceRows);
-  t.true((await selectElements('i.horizontal-item')).length === 0);
-  t.true((await selectElements('i.vertical-item')).length === numSourceRows);
-
-  // in dual output mode with both displays off
-  // show both horizontal and vertical scene items side by side
-  await toggleDisplay('vertical');
-  t.true((await selectElements('div[data-role="source"]')).length === numSourceRows);
-  t.true((await selectElements('i.horizontal-item')).length === numSourceRows);
-  t.true((await selectElements('i.vertical-item')).length === numSourceRows);
-
-  // in dual output mode with the vertical display off
-  // only show horizontal scene items
-  await toggleDisplay('horizontal');
-  t.true((await selectElements('div[data-role="source"]')).length === numSourceRows);
-  t.true((await selectElements('i.horizontal-item')).length === numSourceRows);
-  t.true((await selectElements('i.vertical-item')).length === 0);
-
-  // in single output mode, only show horizontal scene items
-  await toggleDualOutputMode();
-  t.true((await selectElements('div[data-role="source"]')).length === numSourceRows);
-  t.true((await selectElements('i.horizontal-item')).length === 0);
-  t.true((await selectElements('i.vertical-item')).length === 0);
-});
-
-test.skip('Dual output source toggles show/hide scene items in displays', async t => {
-  // const client = await getApiClient();
-  // const dualOutputService = client.getResource<DualOutputService>('DualOutputService');
-  // const horizontalNodeIds = dualOutputService.views.horizontalNodeIds;
-  // const verticalNodeIds = dualOutputService.views.verticalNodeIds;
-  // await logIn();
-  // await toggleDualOutputMode(t, true);
-  // await focusMain();
-  // data-role="source"
-  // vertical-item
-  // horizontal-item
+  t.is(sceneNodes.length, visibleHorizontalNodes.length);
+  t.is(sceneNodes.length, visibleVerticalNodes.length);
 });
 
 // test('Dual output scene item toggles', async t => {});

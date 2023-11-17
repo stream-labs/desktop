@@ -10,6 +10,7 @@ import { getExternalSceneItemModel, SceneItem } from './scene-item';
 import { SceneItemFolder } from './scene-item-folder';
 import Utils from '../../../utils';
 import { ISerializable } from '../../rpc-api';
+import { DualOutputService } from 'app-services';
 
 /**
  * Serialized representation of a {@link Scene}.
@@ -30,6 +31,7 @@ export interface ISceneModel {
 export class Scene implements ISceneModel, ISerializable {
   @InjectFromExternalApi() private scenesService: ScenesService;
   @InjectFromExternalApi() private sourcesService: SourcesService;
+  @Inject() private dualOutputService: DualOutputService;
   @Inject('ScenesService')
   private internalScenesService: InternalScenesService;
   name: string;
@@ -295,4 +297,26 @@ export class Scene implements ISceneModel, ISerializable {
   getSelection(ids?: string[]): Selection {
     return new Selection(this.sceneId, ids);
   }
+
+  getSourceSelectorNodes(): SceneNode[] {
+    let nodes = this.getNodes();
+
+    const populateWithVerticalNodes =
+      !this.dualOutputService.views.activeDisplays.horizontal &&
+      this.dualOutputService.views.activeDisplays.vertical;
+
+    nodes = nodes.filter(node => {
+      // only return vertical nodes if only the vertical display is active
+      if (populateWithVerticalNodes && node?.display === 'vertical') {
+        return node;
+      }
+      // return horizontal nodes if either only the horizontal display is active or both displays are active
+      if (!populateWithVerticalNodes && node?.display === 'horizontal') {
+        return node;
+      }
+    });
+
+    return nodes;
+  }
+
 }

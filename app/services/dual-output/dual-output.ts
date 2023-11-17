@@ -411,7 +411,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       }
     }
 
-    this.scenesService.setHasNodeMap(sceneId, true);
     this.scenesService.setDualOutputNodesLoaded(sceneId, true);
   }
 
