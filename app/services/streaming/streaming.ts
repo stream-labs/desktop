@@ -749,7 +749,10 @@ export class StreamingService
   }
 
   get isRecording() {
-    return this.state.recordingStatus !== ERecordingState.Offline;
+    return (
+      this.state.recordingStatus !== ERecordingState.Offline ||
+      this.state.verticalRecordingStatus !== ERecordingState.Offline
+    );
   }
 
   get isReplayBufferActive() {
@@ -1033,6 +1036,7 @@ export class StreamingService
       // currently in dual output mode if recording the vertical display, don't record the horizontal display
       if (this.views.isDualOutputMode && this.dualOutputService.views.recordVertical) {
         this.createRecording('vertical', 2);
+        this.createRecording('horizontal', 1);
       } else {
         this.createRecording('horizontal', 1);
       }
@@ -1094,15 +1098,10 @@ export class StreamingService
   private async handleRecordingSignal(info: EOutputSignal, display: TDisplayType) {
     // map signals to status
     const nextState: ERecordingState = ({
-      // merge conflict
-      // [EOutputSignalState.Start]: ERecordingState.Recording,
-      // [EOutputSignalState.Stop]: ERecordingState.Wrote,
-      // [EOutputSignalState.Stopping]: ERecordingState.Stopping,
-      // [EOutputSignalState.Wrote]: ERecordingState.Wrote,
-      [EOBSOutputSignal.Start]: ERecordingState.Recording,
-      [EOBSOutputSignal.Stop]: ERecordingState.Offline,
-      [EOBSOutputSignal.Stopping]: ERecordingState.Stopping,
-      [EOBSOutputSignal.Wrote]: ERecordingState.Wrote,
+      [EOutputSignalState.Start]: ERecordingState.Recording,
+      [EOutputSignalState.Stop]: ERecordingState.Stopping,
+      [EOutputSignalState.Stopping]: ERecordingState.Stopping,
+      [EOutputSignalState.Wrote]: ERecordingState.Wrote,
     } as Dictionary<ERecordingState>)[info.signal];
 
     // We received a signal we didn't recognize
@@ -1120,10 +1119,7 @@ export class StreamingService
     }
 
     if (nextState === ERecordingState.Wrote) {
-      const fileName =
-        display === 'vertical'
-          ? this.verticalRecording.lastFile()
-          : this.horizontalRecording.lastFile();
+      const fileName = await this.getFileName(display);
 
       const parsedName = byOS({
         [OS.Mac]: fileName,
@@ -1163,6 +1159,31 @@ export class StreamingService
     this.recordingStatusChange.next(nextState);
 
     this.handleOutputCode(info);
+  }
+
+  /**
+   * Gets the filename of the recording
+   * @remark In the new API, there can be a delay between the wrote signal
+   * and the finalizing of the file in the directory. The existence of the file name
+   * is a signifier that it has been finalized. In order for the file name to populate
+   * in the recording history, make sure the file has been finalized
+   * @param display - determines which recording object to use
+   * @returns string file name
+   */
+  async getFileName(display: TDisplayType): Promise<string> {
+    return await new Promise(resolve => {
+      const wroteInterval = setInterval(() => {
+        const fileName =
+          display === 'vertical'
+            ? this.verticalRecording.lastFile()
+            : this.horizontalRecording.lastFile();
+
+        if (fileName) {
+          resolve(fileName);
+          clearInterval(wroteInterval);
+        }
+      }, 300);
+    });
   }
 
   splitFile() {
