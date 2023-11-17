@@ -22,13 +22,13 @@ export function ExperimentalSettings() {
     });
   }
 
-   /**
+  /**
    * Convert a dual output scene collection to a vanilla scene collection
    * @param assignToHorizontal Boolean for if the vertical sources should be assigned to the
    * horizontal display or should be deleted
    * @param exportOverlay Boolean for is the scene collection should be exported upon completion
    */
-   async function convertDualOutputCollection(assignToHorizontal: boolean = false) {
+  async function convertDualOutputCollection(assignToHorizontal: boolean = false) {
     // confirm that the active scene collection is a dual output collection
     if (
       !SceneCollectionsService?.sceneNodeMaps ||
@@ -77,7 +77,7 @@ export function ExperimentalSettings() {
       <div className="section">
         <h2>{$t('Repair Scene Collection')}</h2>
         <Button onClick={repairSceneCollection}>Repair Scene Collection</Button>
-        </div>
+      </div>
       <div className="section">
         <h2>{$t('Convert Dual Output Scene Collection')}</h2>
 
@@ -95,7 +95,7 @@ export function ExperimentalSettings() {
             {$t('Convert')}
           </Button>
         </div>
-        <div style={{ marginTop: '10px' }}>
+        {/* <div style={{ marginTop: '10px' }}>
           <h4>{$t('Assign Vertical Sources to Horizontal Display')}</h4>
           <Button
             className="assign-collection button button--soft-warning"
@@ -103,7 +103,7 @@ export function ExperimentalSettings() {
           >
             {$t('Assign')}
           </Button>
-        </div>
+        </div> */}
       </div>
       <div className="section">
         <h2>{$t('Show Components Library')}</h2>

@@ -318,5 +318,4 @@ export class Scene implements ISceneModel, ISerializable {
 
     return nodes;
   }
-
 }

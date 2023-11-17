@@ -141,19 +141,6 @@ export class Scene {
   }
 
   /**
-   * The node map is for dual output so that the horizontal and vertical nodes can reference each other
-   */
-  getNodeMap(): Dictionary<string> {
-    return this.state.dualOutputNodeMap;
-  }
-
-  /**
-   * Used to determine if the scene has already loaded dual output nodes
-   */
-  getVerticalNodesLoaded(): boolean {
-    return this.state.verticalNodesLoaded;
-  }
-  /**
    * After a scene has been opened in dual output mode, the vertical nodes
    * must be filtered. Any scene with dual output nodes will use horizontal nodes
    * to populate the source selector. This is to prevent the vertical nodes
