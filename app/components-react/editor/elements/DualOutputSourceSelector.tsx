@@ -19,17 +19,22 @@ export function DualOutputSourceSelector(p: IDualOutputSourceSelector) {
       DualOutputService.views.verticalNodeIds && horizontalActive
         ? DualOutputService.views.activeSceneNodeMap[p.nodeId]
         : p.nodeId,
-    isHorizontalVisible: DualOutputService.views.getIsHorizontalVisible(p.nodeId, p?.sceneId),
-    isVerticalVisible: DualOutputService.views.getIsVerticalVisible(p.nodeId, p?.sceneId),
+    isHorizontalVisible:
+      !DualOutputService.views.isLoading &&
+      DualOutputService.views.getIsHorizontalVisible(p.nodeId, p?.sceneId),
+    isVerticalVisible:
+      !DualOutputService.views.isLoading &&
+      DualOutputService.views.getIsVerticalVisible(p.nodeId, p?.sceneId),
+    isLoading: DualOutputService.views.isLoading && !DualOutputService.views.hasVerticalNodes,
   }));
 
   const showHorizontalToggle = useMemo(() => {
-    return horizontalActive;
-  }, [horizontalActive]);
+    return !v.isLoading && horizontalActive;
+  }, [!v.isLoading, horizontalActive]);
 
   const showVerticalToggle = useMemo(() => {
-    return v?.verticalNodeId && verticalActive;
-  }, [v?.verticalNodeId, verticalActive]);
+    return !v.isLoading && v?.verticalNodeId && verticalActive;
+  }, [!v.isLoading, v?.verticalNodeId, verticalActive]);
 
   return (
     <>

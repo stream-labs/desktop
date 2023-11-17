@@ -25,7 +25,7 @@
   "Show in folder": "Exibir na pasta",
   "Recordings": "Gravações",
   "Marker %{label} added at %{timestamp}": "Marcador %{label} adicionado às %{timestamp}",
-  "File is too large to upload": "File is too large to upload",
-  "File type %{extension} is not supported": "File type %{extension} is not supported",
-  "Upload already in progress": "Upload already in progress"
+  "File is too large to upload": "O arquivo é muito grande para ser carregado",
+  "File type %{extension} is not supported": "Tipo de arquivo %{extension} não é compatível",
+  "Upload already in progress": "Upload em andamento"
 }

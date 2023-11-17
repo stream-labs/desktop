@@ -1,8 +1,20 @@
 {
   "Successfully saved %{filename}": "Успешно сохранен файл %{filename}",
+  "Successfully converted %{filename}": "Успешно конвертировано: %{filename}",
+  "Successfully saved %{filename} to %{filepath}": "%{filename} успешно сохранен в %{filepath}",
   "Successfully loaded %{filename}.overlay": "Успешно загружен файл %{filename}.overlay",
   "This is an experimental feature.  Use at your own risk.": "Это экспериментальная функция. Используйте на свой страх и риск.",
   "Export Overlay File": "Экспорт файла оверлея",
   "Import Overlay File": "Импорт файла оверлея",
-  "Import Widget File in Current Scene": "Импортировать виджет в текущую сцену"
+  "Import Widget File in Current Scene": "Импортировать виджет в текущую сцену",
+  "The active scene collection is not a dual output scene collection.": "Активная коллекция сцен не является коллекцией сцен Dual Output.",
+  "Convert to Vanilla Scene": "Конвертировать в Vanilla Scene",
+  "Convert": "Конвертировать",
+  "Convert and Export Overlay": "Конвертировать и экспортировать оверлей",
+  "Assign": "Назначить",
+  "Assign and Export Overlay": "Назначить и экспортировать оверлей",
+  "Assign Vertical Sources to Horizontal Display": "Назначить вертикальные источники горизонтальному отображению",
+  "The below will create a copy of the active scene collection, set the copy as the active collection, and then apply the function.": "Описанные ниже действия создадут копию активной коллекции сцен, установят копию как активную коллекцию, а затем применят функцию.",
+  "Manage Dual Output Scene": "Управлять сценой Dual Output",
+  "Unable to convert dual output collection.": "Невозможно конвертировать коллекцию Dual Output."
 }
