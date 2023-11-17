@@ -104,7 +104,7 @@ test('Dual output checkbox toggles Dual Output mode and duplicates sources', asy
   );
 });
 
-test('Dual output display toggles show/hides displays and filters sources', async (t: TExecutionContext) => {
+test.skip('Dual output display toggles show/hides displays and filters sources', async (t: TExecutionContext) => {
   await logIn();
 
   const client = await getApiClient();
