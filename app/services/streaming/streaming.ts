@@ -1259,13 +1259,16 @@ export class StreamingService
   async getFileName(display: TDisplayType): Promise<string> {
     return await new Promise(resolve => {
       const wroteInterval = setInterval(() => {
-        const fileName =
-          display === 'vertical'
-            ? this.verticalRecording.lastFile()
-            : this.horizontalRecording.lastFile();
+        // confirm vertical recording exists
+        let filename = '';
+        if (display === 'vertical' && this.verticalRecording) {
+          filename = this.verticalRecording.lastFile();
+        } else if (display === 'horizontal' && this.horizontalRecording) {
+          filename = this.horizontalRecording.lastFile();
+        }
 
-        if (fileName) {
-          resolve(fileName);
+        if (filename !== '') {
+          resolve(filename);
           clearInterval(wroteInterval);
         }
       }, 300);
