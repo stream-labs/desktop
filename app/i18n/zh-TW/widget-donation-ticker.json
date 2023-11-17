@@ -14,5 +14,10 @@
   "Manage List": "管理清單",
   "Font Settings": "字型設定",
   "A hex color for the text of the": "文字的十六進制顏色",
-  "token": "符記"
+  "token": "符記",
+  "Each donation that shows in the donation ticker will be in this format. Available tokens:": "每個在贊助跑馬燈中顯示的贊助會使用此格式。可用的標記：",
+  "The maximum amount of donations to show in the ticker. Must be a number greater than 0.": "在跑馬燈中顯示的最大贊助金額。數字必須大於 0。",
+  "How fast the ticker should scroll between 1 (fastest) and 10 (slowest). Set to 0 for no scrolling.": "跑馬燈捲動速度介於 1 (最快) 到 10 (最慢) 之間。設定為 0 表示不捲動。",
+  "The font size in pixels. Reasonable size typically ranges between 24px and 48px.": "以像素為單位的字型大小。合理的大小範圍通常在 24px 和 48px 之間。",
+  "How thick to make the font. The value should range between 300 (thinnest) and 900 (thickest)": "字型的粗細。此值範圍應在 300 (最細) 和 900 (最粗) 之間。"
 }

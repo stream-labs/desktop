@@ -29,7 +29,7 @@
   "Does not support: Closed captions, 1440p, and 4k resolutions": "Understøtter ikke: Undertekster, 1440p- og 4k-opløsning",
   "Enable DVR": "Aktivér DVR",
   "Additional Settings": "Flere indstillinger",
-  "Open Youtube Studio": "Åbn Youtube Studio",
+  "Open Youtube Studio": "Åbn YouTube Studio",
   "360° video": "360-graders video",
   "Enable Auto-start": "Aktivér automatisk start",
   "Enable Auto-stop": "Aktivér automatisk stop",
@@ -37,7 +37,7 @@
   "Enabling auto-start will automatically start the stream when you start sending data from your streaming software": "Hvis du aktiverer automatisk start, startes streamingen automatisk når du begynder dataoverførslen fra streamingsoftwaren",
   "Enabling auto-stop will automatically stop the stream when you stop sending data from your streaming software": "Hvis du aktiverer automatisk stop, stoppes streamingen automatisk når du stopper med at overføre data fra streamingsoftwaren",
   "DVR controls enable the viewer to control the video playback experience by pausing, rewinding, or fast forwarding content": "DVR-betjening gør det muligt for seeren at styre videoafspilningen ved at sætte den på pause og spole frem og tilbage",
-  "Auto-start is disabled for your broadcast. You should manually publish your stream from Youtube Studio": "Automatisk start er deaktiveret for denne udsendelse. Streamen skal udgives manuelt via Youtube Studio",
+  "Auto-start is disabled for your broadcast. You should manually publish your stream from Youtube Studio": "Automatisk start er deaktiveret for denne udsendelse. Streamen skal udgives manuelt via YouTube Studio",
   "Made for kids": "Beregnet for børn",
   "Features like personalized ads and live chat won't be available on live streams made for kids.": "Funktioner som personlige annoncer og livechat vil ikke være tilgængelige på livestreams der er lavet til børn.",
   "Try our new thumbnail editor": "Prøv vores nye miniaturebillede-editor"

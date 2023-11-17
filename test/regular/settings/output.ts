@@ -1,8 +1,8 @@
-import { test, useSpectron } from '../../helpers/spectron';
-import { setFormDropdown } from '../../helpers/spectron/forms';
+import { test, useWebdriver } from '../../helpers/webdriver';
+import { setFormDropdown } from '../../helpers/webdriver/forms';
 import { focusChild, focusMain } from '../../helpers/modules/core';
 
-useSpectron();
+useWebdriver();
 
 test('Populates simple output mode settings', async t => {
   const { app } = t.context;

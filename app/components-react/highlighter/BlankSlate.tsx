@@ -93,12 +93,7 @@ export default function BlankSlate(p: { close: () => void }) {
   return (
     <div className={styles.clipsViewRoot} style={{ width: '100%', display: 'flex' }}>
       <Scrollable style={{ padding: 24, width: '100%' }}>
-        <h1>
-          {$t('Highlighter')}{' '}
-          <span style={{ fontSize: 12, verticalAlign: 'top', color: 'var(--beta-text)' }}>
-            {$t('Beta')}
-          </span>
-        </h1>
+        <h1>{$t('Highlighter')}</h1>
         <p>
           {$t(
             'The highlighter allows you to clip the best moments from your livestream and edit them together into an exciting highlight video you can upload directly to YouTube.',

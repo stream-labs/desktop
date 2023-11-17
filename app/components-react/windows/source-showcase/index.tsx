@@ -7,18 +7,31 @@ import { SourceDisplayData } from 'services/sources';
 import { WidgetDisplayData, WidgetType } from 'services/widgets';
 import { $i } from 'services/utils';
 import { $t } from 'services/i18n';
-import { useSourceShowcaseSettings } from './useSourceShowcase';
+import {
+  SourceShowcaseController,
+  SourceShowcaseControllerCtx,
+  useSourceShowcaseSettings,
+} from './useSourceShowcase';
 import styles from './SourceShowcase.m.less';
 import SourceGrid from './SourceGrid';
+import Scrollable from 'components-react/shared/Scrollable';
+import pick from 'lodash/pick';
 
 const { Content, Sider } = Layout;
 
 export default function SourcesShowcase() {
-  const {
-    selectInspectedSource,
-    availableAppSources,
-    inspectedSource,
-  } = useSourceShowcaseSettings();
+  const controller = useMemo(() => new SourceShowcaseController(), []);
+  return (
+    <SourceShowcaseControllerCtx.Provider value={controller}>
+      <SourcesShowcaseModal />
+    </SourceShowcaseControllerCtx.Provider>
+  );
+}
+
+function SourcesShowcaseModal() {
+  const { selectInspectedSource, availableAppSources, store } = useSourceShowcaseSettings();
+
+  const inspectedSource = store.useState(s => s.inspectedSource);
 
   const [activeTab, setActiveTab] = useState('all');
 
@@ -51,7 +64,8 @@ export default function SourcesShowcase() {
 
 function SideBar() {
   const { UserService, CustomizationService, PlatformAppsService } = Services;
-  const { inspectedSource, inspectedAppId, inspectedAppSourceId } = useSourceShowcaseSettings();
+  const { store } = useSourceShowcaseSettings();
+  const { inspectedSource, inspectedAppId, inspectedAppSourceId } = store.useState();
 
   const { demoMode, platform } = useVuex(() => ({
     demoMode: CustomizationService.views.isDarkTheme ? 'night' : 'day',
@@ -95,26 +109,26 @@ function SideBar() {
       collapsedWidth={0}
     >
       <div className={styles.preview}>
-        {displayData?.demoFilename && (
-          <div className={styles.imageContainer}>
-            {displayData?.demoVideo && (
-              <video autoPlay loop key={previewSrc}>
-                <source src={previewSrc} />
-              </video>
-            )}
-            {!displayData?.demoVideo && <img src={previewSrc} />}
-          </div>
-        )}
-        <h2>{displayData?.name}</h2>
-        <div>{displayData?.description}</div>
-        {displayData?.supportList?.length > 0 && (
-          <div className={styles.supportHeader}>{$t('Supports:')}</div>
-        )}
-        <ul style={{ fontSize: '13px' }}>
-          {displayData?.supportList?.map(support => (
-            <li key={support}>{support}</li>
+        {displayData?.demoFilename &&
+          (displayData?.demoVideo ? (
+            <video autoPlay loop key={previewSrc}>
+              <source src={previewSrc} />
+            </video>
+          ) : (
+            <img src={previewSrc} />
           ))}
-        </ul>
+        <Scrollable style={{ height: '100%' }}>
+          <h2 style={{ marginTop: '24px' }}>{displayData?.name}</h2>
+          <div>{displayData?.description}</div>
+          {displayData?.supportList?.length > 0 && (
+            <div className={styles.supportHeader}>{$t('Supports:')}</div>
+          )}
+          <ul style={{ fontSize: '13px' }}>
+            {displayData?.supportList?.map(support => (
+              <li key={support}>{support}</li>
+            ))}
+          </ul>
+        </Scrollable>
       </div>
     </Sider>
   );

@@ -1,4 +1,4 @@
-import { useSpectron, test } from '../helpers/spectron';
+import { useWebdriver, test } from '../helpers/webdriver';
 import { addSource, sourceIsExisting } from '../helpers/modules/sources';
 import {
   addScene,
@@ -12,7 +12,7 @@ import { SceneCollectionsService } from 'app-services';
 import { clickButton, focusMain, select, waitForDisplayed } from '../helpers/modules/core';
 import { useForm } from '../helpers/modules/forms';
 
-useSpectron();
+useWebdriver();
 
 // Checks for the default audio sources
 async function checkDefaultSources() {
@@ -38,7 +38,7 @@ test('Adding and removing a scene', async t => {
 
   await selectScene(sceneName);
   await checkDefaultSources();
-  await clickRemoveScene();
+  await clickRemoveScene(sceneName);
 
   t.false(await (await select(`div=${sceneName}`)).isExisting());
 });
@@ -47,7 +47,7 @@ test('Scene switching with sources', async t => {
   const sceneName = 'Coolest Scene Ever';
   const sourceName = 'Awesome Source';
 
-  await addSource('Color Source', sourceName);
+  await addSource('Color Block', sourceName);
 
   await focusMain();
   t.true(await sourceIsExisting(sourceName));

@@ -32,8 +32,15 @@
   "Source Settings": "來源設定",
   "Audio Tracks": "音訊音軌",
   "Designates which tracks are being recorded": "指定要錄製哪個音軌",
-  "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.",
-  "Streaming Track": "Streaming Track",
-  "Enable Twitch VOD Track": "Enable Twitch VOD Track",
-  "Twitch VOD Track": "Twitch VOD Track"
+  "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "您的直播和 VOD 音軌相同。這可能會導致意外的音訊行為，請到全域設定進行變更。",
+  "Streaming Track": "直播音軌",
+  "Enable Twitch VOD Track": "啟用 Twitch VOD 音軌",
+  "Twitch VOD Track": "Twitch VOD 音軌",
+  "Sample Rate (requires a restart)": "取樣率 (需要重新啟動)",
+  "Channels (requires a restart)": "頻道 (需要重新啟動)",
+  "Desktop Audio Device 1": "桌面音訊裝置 1",
+  "Desktop Audio Device 2": "桌面音訊裝置 2",
+  "Mic/Auxiliary Device 1": "麥克風/輔助裝置 1",
+  "Mic/Auxiliary Device 2": "麥克風/輔助裝置 2",
+  "Mic/Auxiliary Device 3": "麥克風/輔助裝置 3"
 }

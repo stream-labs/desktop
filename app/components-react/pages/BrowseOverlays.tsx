@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import urlLib from 'url';
-import electron from 'electron';
 import { Service } from 'services';
 import { ENotificationType } from 'services/notifications';
 import { $t } from 'services/i18n';
@@ -9,10 +8,9 @@ import { GuestApiHandler } from 'util/guest-api-handler';
 import { IDownloadProgress } from 'util/requests';
 import * as remote from '@electron/remote';
 import { Services } from 'components-react/service-provider';
-import { useVuex } from 'components-react/hooks';
 
 export default function BrowseOverlays(p: {
-  params: { type?: 'overlay' | 'widget-theme'; id?: string };
+  params: { type?: 'overlay' | 'widget-themes' | 'site-themes'; id?: string };
 }) {
   const {
     UserService,
@@ -26,8 +24,18 @@ export default function BrowseOverlays(p: {
     JsonrpcService,
     RestreamService,
   } = Services;
-
   const [downloading, setDownloading] = useState(false);
+  const [overlaysUrl, setOverlaysUrl] = useState('');
+
+  useEffect(() => {
+    async function getOverlaysUrl() {
+      const url = await UserService.actions.return.overlaysUrl(p.params?.type, p.params?.id);
+      if (!url) return;
+      setOverlaysUrl(url);
+    }
+
+    getOverlaysUrl();
+  }, [p.params?.type, p.params?.id]);
 
   function onBrowserViewReady(view: Electron.BrowserView) {
     new GuestApiHandler().exposeApi(view.webContents.id, {
@@ -39,14 +47,14 @@ export default function BrowseOverlays(p: {
       },
     });
 
-    electron.ipcRenderer.send('webContents-preventPopup', view.webContents.id);
-
-    view.webContents.on('new-window', (e, url) => {
-      const protocol = urlLib.parse(url).protocol;
+    view.webContents.setWindowOpenHandler(details => {
+      const protocol = urlLib.parse(details.url).protocol;
 
       if (protocol === 'http:' || protocol === 'https:') {
-        remote.shell.openExternal(url);
+        remote.shell.openExternal(details.url);
       }
+
+      return { action: 'deny' };
     });
   }
 
@@ -126,11 +134,12 @@ export default function BrowseOverlays(p: {
     });
   }
 
+  if (!overlaysUrl) return <></>;
   return (
     <BrowserView
-      style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}
       onReady={onBrowserViewReady}
-      src={UserService.views.overlaysUrl(p.params?.type, p.params?.id)}
+      src={overlaysUrl}
+      style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}
       enableGuestApi
       setLocale
     />

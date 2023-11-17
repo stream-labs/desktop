@@ -103,7 +103,7 @@ export function RemoteControlSettings() {
     <ObsSettingsSection>
       <div>
         {$t(
-          'The free Streamlabs Deck app allows you to control Streamlabs Desktop from your iOS or Android device. Scan the QR code below to begin.',
+          'The free Streamlabs Controller app allows you to control Streamlabs Desktop from your iOS or Android device. Scan the QR code below to begin.',
         )}
         <br />
         <br />

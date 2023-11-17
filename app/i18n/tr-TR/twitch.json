@@ -1,4 +1,7 @@
 {
-  "Twitch Game": "Twitch Oyunu",
-  "Twitch Tags": "Twitch Etiketleri"
+  "Twitch Category": "Twitch Kategorisi",
+  "Twitch Tags": "Twitch Etiketleri",
+  "You need to re-login to access Twitch tags": "Twitch etiketlerine erişmek için yeniden oturum açmanız gerekir",
+  "Do not include special characters or spaces in your tag": "Etiketinize özel karakter veya boşluk eklemeyin",
+  "For example: \"Speedrunning\" or \"FirstPlaythrough\"": "Örneğin: \"HızlıBitirme\" veya \"İlkOynanış\""
 }

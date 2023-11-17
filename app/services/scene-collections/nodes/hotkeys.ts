@@ -23,7 +23,10 @@ export class HotkeysNode extends ArrayNode<IHotkey, IContext, Hotkey> {
     } else if (context.sourceId) {
       items = this.hotkeysService.getSourceHotkeys(context.sourceId);
     } else {
-      items = this.hotkeysService.getGeneralHotkeys();
+      items = [
+        ...this.hotkeysService.getGeneralHotkeys(),
+        ...this.hotkeysService.getMarkerHotkeys(),
+      ];
     }
     return items.filter(hotkey => hotkey.bindings.length);
   }

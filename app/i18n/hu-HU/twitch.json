@@ -1,4 +1,7 @@
 {
-  "Twitch Game": "Twitch Játék",
-  "Twitch Tags": "Twitch Címkék"
+  "Twitch Category": "Twitch kategória",
+  "Twitch Tags": "Twitch címkék",
+  "You need to re-login to access Twitch tags": "You need to re-login to access Twitch tags",
+  "Do not include special characters or spaces in your tag": "Do not include special characters or spaces in your tag",
+  "For example: \"Speedrunning\" or \"FirstPlaythrough\"": "For example: \"Speedrunning\" or \"FirstPlaythrough\""
 }

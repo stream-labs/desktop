@@ -1,0 +1,89 @@
+@import "../../styles/index.less";
+
+.container {
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  width: 100%;
+}
+
+.recordings-container {
+  height: 100%;
+}
+
+.recording {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  border-radius: 4px;
+
+  :global(.fa-youtube):hover {
+    cursor: pointer;
+  }
+
+  &:nth-child(odd) {
+    background: var(--section);
+  }
+}
+
+.action-group {
+  margin-left: auto;
+}
+
+.action {
+  margin-right: 16px;
+  font-weight: 500;
+
+  &:hover {
+    cursor: pointer;
+    text-decoration: underline;
+  }
+}
+
+.upload-button {
+  display: flex !important;
+  align-items: center;
+  padding-right: 0 !important;
+}
+
+.filename {
+  text-align: right;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  display: block;
+  margin-left: 24px;
+  margin-right: 8px;
+  overflow: hidden;
+  direction: rtl;
+  opacity: 0.7;
+  max-width: 500px;
+  font-style: italic;
+
+  &:hover {
+    cursor: pointer;
+    text-decoration: underline;
+  }
+}
+
+.upload-form {
+  width: 200px;
+  margin-left: 16px !important;
+
+  :global(.ant-form-item) {
+    margin-bottom: 0;
+  }
+}
+
+.modal-backdrop {
+  background: var(--modal-overlay);
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  z-index: 10;
+  top: 0;
+  margin-left: -24px;
+
+  & > div {
+    .center();
+  }
+}

@@ -12,12 +12,16 @@ import Message from '../Message';
 // select which features from the antd lib we are going to use
 const ANT_SELECT_FEATURES = ['showSearch', 'loading'] as const;
 
-interface ICustomTagsProps<TValue> extends ICustomListProps<SingleType<TValue>> {
+interface ICustomTagsProps<TValue> extends Omit<ICustomListProps<SingleType<TValue>>, 'options'> {
   max?: number;
   tagRender?: (
     tagProps: TagProps,
     tag: IListOption<SingleType<TValue>>,
   ) => ReactElement<typeof Tag>;
+  options?: IListOption<SingleType<TValue>>[];
+  mode?: 'tags' | 'multiple';
+  tokenSeparators?: string[];
+  dropdownStyle?: React.CSSProperties;
 }
 
 export type TTagsInputProps<TValue> = TSlobsInputProps<
@@ -28,12 +32,14 @@ export type TTagsInputProps<TValue> = TSlobsInputProps<
 >;
 
 export const TagsInput = InputComponent(<T extends any[]>(p: TTagsInputProps<T>) => {
-  const { inputAttrs, wrapperAttrs, forceUpdate } = useInput('tags', p);
-  const options = p.options;
+  const { inputAttrs, wrapperAttrs } = useInput('tags', p, ['tokenSeparators', 'dropdownStyle']);
+  const options = p.options || [];
   const tagsMap = useMemo(() => keyBy(options, 'value'), [options]);
 
   function renderTag(tagProps: TagProps) {
-    const tag = tagsMap[tagProps['value']];
+    const tag = p.options
+      ? tagsMap[tagProps['value']]
+      : { label: tagProps['value'], value: tagProps['value'] };
     if (p.tagRender) {
       return p.tagRender(tagProps, tag);
     }
@@ -61,7 +67,7 @@ export const TagsInput = InputComponent(<T extends any[]>(p: TTagsInputProps<T>)
     inputAttrs.onChange(values as any);
   }
 
-  const displayValue = (inputAttrs.value || []).map((val: string) => tagsMap[val].label);
+  const displayValue = (inputAttrs.value || []).map((val: string) => tagsMap[val]?.label);
 
   return (
     <InputWrapper {...wrapperAttrs}>
@@ -69,17 +75,17 @@ export const TagsInput = InputComponent(<T extends any[]>(p: TTagsInputProps<T>)
         {...inputAttrs}
         // search by label instead value
         optionFilterProp={'label'}
-        mode={'multiple'}
+        mode={p.mode || 'multiple'}
         allowClear
         onChange={val => onChangeHandler((val as unknown) as T)}
         tagRender={renderTag}
-        placeholder={$t('Start typing to search')}
+        placeholder={p.placeholder || $t('Start typing to search')}
         dropdownRender={dropdownRender}
         data-value={JSON.stringify(inputAttrs.value)}
         data-display-value={JSON.stringify(displayValue)}
         data-show-search={inputAttrs['showSearch']}
       >
-        {options && options.map((opt, ind) => renderOption(opt, ind, p))}
+        {options.length > 0 && options.map((opt, ind) => renderOption(opt, ind, p))}
       </Select>
     </InputWrapper>
   );

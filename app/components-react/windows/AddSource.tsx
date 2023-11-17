@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Menu } from 'antd';
 import * as remote from '@electron/remote';
 import cx from 'classnames';
@@ -8,7 +8,7 @@ import { $t } from 'services/i18n';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
 import Display from 'components-react/shared/Display';
 import { Services } from 'components-react/service-provider';
-import { useVuex } from 'components-react/hooks';
+import { useChildWindowParams, useVuex } from 'components-react/hooks';
 import styles from './AddSource.m.less';
 import { TextInput, SwitchInput } from 'components-react/shared/inputs';
 import Form, { useForm } from 'components-react/shared/inputs/Form';
@@ -26,8 +26,8 @@ export default function AddSource() {
     AudioService,
   } = Services;
 
-  const sourceType = WindowsService.getChildWindowQueryParams().sourceType as TSourceType;
-  const sourceAddOptions = (WindowsService.getChildWindowQueryParams().sourceAddOptions || {
+  const sourceType = useChildWindowParams('sourceType') as TSourceType;
+  const sourceAddOptions = (useChildWindowParams('sourceAddOptions') || {
     propertiesManagerSettings: {},
   }) as ISourceAddOptions;
   const widgetType = sourceAddOptions.propertiesManagerSettings?.widgetType;
@@ -98,6 +98,8 @@ export default function AddSource() {
     return overrideExistingSource || !existingSources.length;
   }
 
+  const canCreateNew = existingSources.length > 0 && !['scene'].includes(sourceType);
+
   function addExisting() {
     if (!selectedSourceId || !activeScene) return;
     if (!activeScene.canAddSource(selectedSourceId)) {
@@ -149,7 +151,9 @@ export default function AddSource() {
           sourceAddOptions: {
             propertiesManager: sourceAddOptions.propertiesManager,
             propertiesManagerSettings: sourceAddOptions.propertiesManagerSettings,
+            guestCamStreamId: sourceAddOptions.guestCamStreamId,
           },
+          display: 'horizontal',
         },
       );
       source = item?.source;
@@ -171,7 +175,7 @@ export default function AddSource() {
     return (
       <>
         <div className={styles.newSourceToggle}>
-          {existingSources.length > 0 && sourceType !== 'scene' && (
+          {canCreateNew && (
             <SwitchInput
               value={overrideExistingSource}
               onChange={setOverrideExistingSource}

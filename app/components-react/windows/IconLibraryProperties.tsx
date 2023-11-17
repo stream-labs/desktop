@@ -8,12 +8,13 @@ import { Services } from '../service-provider';
 import { FileInput } from '../shared/inputs';
 import Scrollable from '../shared/Scrollable';
 import styles from './IconLibraryProperties.m.less';
+import { useChildWindowParams } from 'components-react/hooks';
 
 export default () => {
   // inject services
   const { SourcesService, WindowsService, CustomizationService } = Services;
 
-  const sourceId = WindowsService.getChildWindowQueryParams().sourceId;
+  const sourceId = useChildWindowParams('sourceId');
   const source = SourcesService.views.getSource(sourceId);
 
   const [folderPath, setFolderPath] = useState('');

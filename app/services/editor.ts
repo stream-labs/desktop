@@ -3,12 +3,10 @@ import clamp from 'lodash/clamp';
 import { DragHandler } from 'util/DragHandler';
 import { Inject } from 'services/core/injector';
 import { Scene, SceneItem, ScenesService, TSceneNode } from 'services/scenes';
-import { VideoService } from 'services/video';
 import { EditMenu } from 'util/menus/EditMenu';
 import { AnchorPoint, AnchorPositions, ScalableRectangle } from 'util/ScalableRectangle';
 import { WindowsService } from 'services/windows';
 import { SelectionService, Selection } from 'services/selection';
-import { TransitionsService } from 'services/transitions';
 import { CustomizationService } from 'services/customization';
 import { v2 } from '../util/vec2';
 import { EditorCommandsService } from 'services/editor-commands';
@@ -16,7 +14,12 @@ import { mutation } from './core';
 import { byOS, OS } from 'util/operating-systems';
 import { TcpServerService } from './api/tcp-server';
 import { Subject } from 'rxjs';
+import { TDisplayType, VideoSettingsService } from './settings-v2';
 
+/**
+ * Examine scene items props
+ * Examine second set of scene items for dual output
+ */
 interface IResizeRegion {
   name: string;
   x: number;
@@ -50,17 +53,17 @@ export interface IMouseEvent {
   metaKey: boolean;
   button: number;
   buttons: number;
+  display: TDisplayType;
 }
 
 export class EditorService extends StatefulService<IEditorServiceState> {
   @Inject() private scenesService: ScenesService;
   @Inject() private windowsService: WindowsService;
-  @Inject() private videoService: VideoService;
   @Inject() private selectionService: SelectionService;
-  @Inject() private transitionsService: TransitionsService;
   @Inject() private customizationService: CustomizationService;
   @Inject() private editorCommandsService: EditorCommandsService;
   @Inject() private tcpServerService: TcpServerService;
+  @Inject() private videoSettingsService: VideoSettingsService;
 
   /**
    * emit this event when drag or resize have been finished
@@ -72,11 +75,30 @@ export class EditorService extends StatefulService<IEditorServiceState> {
     changingPositionInProgress: false,
   };
 
-  renderedWidth = 0;
-  renderedHeight = 0;
-  renderedOffsetX = 0;
-  renderedOffsetY = 0;
+  /**
+   * Store data for both displays because the difference in dimensions
+   * effects calculations.
+   */
+  renderedWidths = {
+    horizontal: 0,
+    vertical: 0,
+  };
+  renderedHeights = {
+    horizontal: 0,
+    vertical: 0,
+  };
+  renderedOffsetXs = {
+    horizontal: 0,
+    vertical: 0,
+  };
+  renderedOffsetYs = {
+    horizontal: 0,
+    vertical: 0,
+  };
 
+  /**
+   * Store data for both displays for transform calculations
+   */
   dragHandler: DragHandler;
   resizeRegion: IResizeRegion;
   currentX: number;
@@ -84,11 +106,13 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   isCropping: boolean;
   canDrag = true;
 
-  handleOutputResize(region: IRectangle) {
-    this.renderedWidth = region.width;
-    this.renderedHeight = region.height;
-    this.renderedOffsetX = region.x;
-    this.renderedOffsetY = region.y;
+  messageActive = false;
+
+  handleOutputResize(region: IRectangle, display: TDisplayType) {
+    this.renderedWidths[display] = region.width;
+    this.renderedHeights[display] = region.height;
+    this.renderedOffsetXs[display] = region.x;
+    this.renderedOffsetYs[display] = region.y;
   }
 
   /*****************
@@ -129,16 +153,18 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   }
 
   startDragging(event: IMouseEvent) {
-    this.dragHandler = new DragHandler(event, {
+    const dragHandler = new DragHandler(event, {
       displaySize: {
-        x: this.renderedWidth,
-        y: this.renderedHeight,
+        x: this.renderedWidths[event.display],
+        y: this.renderedHeights[event.display],
       },
       displayOffset: {
-        x: this.renderedOffsetX,
-        y: this.renderedOffsetY,
+        x: this.renderedOffsetXs[event.display],
+        y: this.renderedOffsetYs[event.display],
       },
     });
+
+    this.dragHandler = dragHandler;
     this.SET_CHANGING_POSITION_IN_PROGRESS(true);
     this.tcpServerService.stopRequestsHandling(false);
   }
@@ -201,6 +227,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
             selectedSceneId: this.scene.id,
             showSceneItemMenu: true,
             selectedSourceId: overSelected.sourceId,
+            display: event.display,
           });
         } else if (overSources.length) {
           this.selectionService.views.globalSelection.select(overSources[0].sceneItemId);
@@ -208,17 +235,19 @@ export class EditorService extends StatefulService<IEditorServiceState> {
             selectedSceneId: this.scene.id,
             showSceneItemMenu: true,
             selectedSourceId: overSources[0].sourceId,
+            display: event.display,
           });
         } else {
-          menu = new EditMenu({ selectedSceneId: this.scene.id });
+          menu = new EditMenu({ selectedSceneId: this.scene.id, display: event.display });
         }
 
-        menu.popup();
+        menu.popup({ window: this.windowsService.windows.main, x: event.pageX, y: event.pageY });
       }
     }
 
     this.dragHandler = null;
     this.resizeRegion = null;
+
     this.isCropping = false;
     this.SET_CHANGING_POSITION_IN_PROGRESS(false);
     this.positionUpdateFinished.next();
@@ -237,10 +266,10 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   handleMouseMove(event: IMouseEvent) {
     // We don't need to adjust mac coordinates for scale factor
     const factor = byOS({ [OS.Windows]: this.windowsService.state.main.scaleFactor, [OS.Mac]: 1 });
-    const mousePosX = event.offsetX * factor - this.renderedOffsetX;
-    const mousePosY = event.offsetY * factor - this.renderedOffsetY;
+    const mousePosX = event.offsetX * factor - this.renderedOffsetXs[event.display];
+    const mousePosY = event.offsetY * factor - this.renderedOffsetYs[event.display];
 
-    const converted = this.convertScalarToBaseSpace(mousePosX, mousePosY);
+    const converted = this.convertScalarToBaseSpace(mousePosX, mousePosY, event.display);
 
     if (this.resizeRegion) {
       const name = this.resizeRegion.name;
@@ -263,12 +292,13 @@ export class EditorService extends StatefulService<IEditorServiceState> {
       };
 
       if (this.isCropping) {
-        this.crop(converted.x, converted.y, options);
+        this.crop(converted.x, converted.y, options, event.display);
       } else {
-        this.resize(converted.x, converted.y, options);
+        this.resize(converted.x, converted.y, options, event.display);
       }
     } else if (this.dragHandler) {
-      this.dragHandler.move(event);
+      // returns true if the drag handler is stopped to show error message
+      return this.dragHandler.move(event);
     } else if (event.buttons === 1) {
       // We might need to start dragging
       const sourcesInPriorityOrder = this.activeSources
@@ -298,7 +328,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
     this.updateCursor(event);
   }
 
-  crop(x: number, y: number, options: IResizeOptions) {
+  crop(x: number, y: number, options: IResizeOptions, display: TDisplayType) {
     const source = this.resizeRegion.item;
     const rect = new ScalableRectangle(source.rectangle);
 
@@ -309,6 +339,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
           case AnchorPoint.East: {
             const croppableWidth = rect.width - rect.crop.right - 2;
             const distance = croppableWidth * rect.scaleX - (rect.x - x);
+
             rect.crop.left = Math.round(clamp(distance / rect.scaleX, 0, croppableWidth));
             break;
           }
@@ -316,6 +347,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
           case AnchorPoint.West: {
             const croppableWidth = rect.width - rect.crop.left - 2;
             const distance = croppableWidth * rect.scaleX + (rect.x - x);
+
             rect.crop.right = Math.round(clamp(distance / rect.scaleX, 0, croppableWidth));
             break;
           }
@@ -323,6 +355,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
           case AnchorPoint.South: {
             const croppableHeight = rect.height - rect.crop.bottom - 2;
             const distance = croppableHeight * rect.scaleY - (rect.y - y);
+
             rect.crop.top = Math.round(clamp(distance / rect.scaleY, 0, croppableHeight));
             break;
           }
@@ -342,6 +375,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
       new Selection(this.scene.id, source.sceneItemId),
       rect.crop,
       { x: rect.x, y: rect.y },
+      display,
     );
   }
 
@@ -350,6 +384,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
     x: number,
     y: number,
     options: IResizeOptions,
+    display: TDisplayType,
   ) {
     // Set defaults
     const opts = {
@@ -361,7 +396,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
 
     let scaleXDelta = 1;
     let scaleYDelta = 1;
-    const rect = this.selectionService.views.globalSelection.getBoundingRect();
+    const rect = this.selectionService.views.globalSelection.getBoundingRect(display);
     if (!rect) {
       // the source has been unselected/removed
       return;
@@ -414,6 +449,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
       this.selectionService.views.globalSelection,
       { x: scaleXDelta, y: scaleYDelta },
       AnchorPositions[opts.anchor],
+      display,
     );
   }
 
@@ -448,40 +484,95 @@ export class EditorService extends StatefulService<IEditorServiceState> {
     if (this.state.cursor !== cursor) this.SET_CURSOR(cursor);
   }
 
-  // Takes the given mouse event, and determines if it is
-  // over the given box in base resolution space.
-  isOverBox(event: IMouseEvent, x: number, y: number, width: number, height: number) {
+  /**
+   * Determine if the mouse is over the resize box
+   * @remark
+   * Takes the given mouse event, and determines if it is
+   * over the given box in base resolution space.
+   *
+   * @param event - The mouse event
+   * @param x - The x coordinate of the box
+   * @param y - The y coordinate of the box
+   * @param width - The width of the box
+   * @param height - The height of the box
+   * @param borderWidth - Optional, an invisible width of the border, primarily used for the vertical display
+   * @returns - Boolean of whether or not it's over the box
+   */
+
+  isOverBox(
+    event: IMouseEvent,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    borderWidth: number = 0,
+  ): boolean {
     // We don't need to adjust mac coordinates for scale factor
     const factor = byOS({ [OS.Windows]: this.windowsService.state.main.scaleFactor, [OS.Mac]: 1 });
 
-    const mouse = this.convertVectorToBaseSpace(event.offsetX * factor, event.offsetY * factor);
+    const mouse = this.convertVectorToBaseSpace(
+      event.offsetX * factor,
+      event.offsetY * factor,
+      event.display,
+    );
 
     const box = { x, y, width, height };
 
-    if (mouse.x < box.x) {
-      return false;
-    }
+    if (borderWidth > 0) {
+      if (mouse.x < box.x - borderWidth && mouse.x < box.x) {
+        return false;
+      }
 
-    if (mouse.y < box.y) {
-      return false;
-    }
+      if (mouse.y < box.y - borderWidth && mouse.y < box.y) {
+        return false;
+      }
 
-    if (mouse.x > box.x + box.width) {
-      return false;
-    }
+      if (mouse.x > box.x + box.width + borderWidth && mouse.x > box.x + box.width) {
+        return false;
+      }
 
-    if (mouse.y > box.y + box.height) {
-      return false;
+      if (mouse.y > box.y + box.height + borderWidth && mouse.y > box.y + box.height) {
+        return false;
+      }
+    } else {
+      if (mouse.x < box.x) {
+        return false;
+      }
+
+      if (mouse.y < box.y) {
+        return false;
+      }
+
+      if (mouse.x > box.x + box.width) {
+        return false;
+      }
+
+      if (mouse.y > box.y + box.height) {
+        return false;
+      }
     }
 
     return true;
   }
 
   /**
-   * Determines if the given mouse event is over the
-   * given source
+   * Determines if the given mouse event is over the given source
+   *
+   * @remarks
+   * Obs connects all of the scene items to each display, but only renders those
+   * assigned to the display's context. This checks the scene item's display because
+   * dual output scenes will have scene items assigned to the other context and the
+   * mouse can access these scene items even though they are not rendered.
+   *
+   * @param event - The mouse event
+   * @param source - The scene item
+   * @returns Boolean representing if the mouse is over the source
    */
   isOverSource(event: IMouseEvent, source: SceneItem) {
+    if (event.display !== source.display) {
+      return false;
+    }
+
     const rect = new ScalableRectangle(source.rectangle);
     rect.normalize();
 
@@ -497,12 +588,31 @@ export class EditorService extends StatefulService<IEditorServiceState> {
     });
   }
 
-  // Determines if the given mouse event is over any
-  // of the active source's resize regions.
+  /**
+   * Determines if the given mouse event is over any of the active source's resize regions.
+   *
+   * @remarks
+   * Obs connects all of the scene items to each display, but only renders those
+   * assigned to the display's context. This checks the region's display because
+   * dual output scenes will have scene items assigned to the other context and the
+   * mouse can access these scene items even though they are not rendered. Additionally,
+   * this expands the resize region's box for the vertical display because the scaling
+   * can make it difficult to select.
+   *
+   * @param event - The mouse event
+   * @returns Boolean representing if the mouse is over the resize box
+   */
   isOverResize(event: IMouseEvent) {
     if (this.activeSources.length > 0) {
       return this.resizeRegions.find(region => {
-        return this.isOverBox(event, region.x, region.y, region.width, region.height);
+        // obs connects all of the scene items to each display, but only renders those assigned to the display's context
+        // prevent these other scene items from being selectable when they are the opposite context
+        if (event.display !== region.item.display) {
+          return false;
+        }
+
+        const borderWidth = event.display === 'vertical' ? 20 : 0;
+        return this.isOverBox(event, region.x, region.y, region.width, region.height, borderWidth);
       });
     }
 
@@ -512,20 +622,35 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   // Size (width & height) is a scalar value, and
   // only needs to be scaled when converting between
   // spaces.
-  convertScalarToBaseSpace(x: number, y: number) {
+  convertScalarToBaseSpace(x: number, y: number, display: TDisplayType = 'horizontal') {
     return {
-      x: (x * this.baseWidth) / this.renderedWidth,
-      y: (y * this.baseHeight) / this.renderedHeight,
+      x: (x * this.baseResolutions[display].baseWidth) / this.renderedWidths[display],
+      y: (y * this.baseResolutions[display].baseHeight) / this.renderedHeights[display],
     };
   }
 
   // Position is a vector value. When converting between
   // spaces, we have to add positional offsets.
-  convertVectorToBaseSpace(x: number, y: number) {
-    const movedX = x - this.renderedOffsetX;
-    const movedY = y - this.renderedOffsetY;
+  convertVectorToBaseSpace(x: number, y: number, display?: TDisplayType) {
+    const movedX = x - this.renderedOffsetXs[display];
+    const movedY = y - this.renderedOffsetYs[display];
 
-    return this.convertScalarToBaseSpace(movedX, movedY);
+    return this.convertScalarToBaseSpace(movedX, movedY, display);
+  }
+
+  // calculates the scale of sources for the vertical display
+  // so elements retain the same proportions as the horizontal display
+  calculateVerticalScale(itemSize: IVec2) {
+    const x =
+      Math.max(this.renderedWidths.horizontal, itemSize.x) /
+      Math.min(this.renderedWidths.horizontal, itemSize.x);
+    const y =
+      Math.max(this.renderedHeights.vertical, itemSize.y) /
+      Math.min(this.renderedHeights.vertical, itemSize.y);
+    return {
+      x,
+      y,
+    };
   }
 
   // getters
@@ -551,14 +676,9 @@ export class EditorService extends StatefulService<IEditorServiceState> {
     return this.scenesService.views.activeScene;
   }
 
-  get baseWidth() {
-    return this.videoService.baseWidth;
+  get baseResolutions() {
+    return this.videoSettingsService.baseResolutions;
   }
-
-  get baseHeight() {
-    return this.videoService.baseHeight;
-  }
-
   // Using a computed property since it is cached
   get resizeRegions(): IResizeRegion[] {
     let regions: IResizeRegion[] = [];
@@ -574,7 +694,12 @@ export class EditorService extends StatefulService<IEditorServiceState> {
     const renderedRegionRadius = 5;
     // We don't need to adjust mac coordinates for scale factor
     const factor = byOS({ [OS.Windows]: this.windowsService.state.main.scaleFactor, [OS.Mac]: 1 });
-    const regionRadius = (renderedRegionRadius * factor * this.baseWidth) / this.renderedWidth;
+
+    const regionRadius =
+      (renderedRegionRadius *
+        factor *
+        this.baseResolutions[item.display ?? 'horizontal'].baseWidth) /
+      this.baseResolutions[item.display ?? 'horizontal'].baseHeight;
     const width = regionRadius * 2;
     const height = regionRadius * 2;
 

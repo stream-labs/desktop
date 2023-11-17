@@ -1,9 +1,9 @@
-import { test, useSpectron } from '../helpers/spectron';
-import { logIn } from '../helpers/spectron/user';
+import { test, useWebdriver } from '../helpers/webdriver';
+import { logIn } from '../helpers/webdriver/user';
 import { sleep } from '../helpers/sleep';
 import { click, focusMain, isDisplayed } from '../helpers/modules/core';
 
-useSpectron({ skipOnboarding: false });
+useWebdriver({ skipOnboarding: false });
 
 test('Go through the onboarding and autoconfig', async t => {
   const app = t.context.app;
@@ -43,17 +43,18 @@ test('Go through the onboarding and autoconfig', async t => {
   }
 
   // Start auto config
-  t.true(await (await app.client.$('button=Start')).isExisting());
-  await (await app.client.$('button=Start')).click();
+  // temporarily disable auto config until migrate to new api
+  // t.true(await (await app.client.$('button=Start')).isExisting());
+  // await (await app.client.$('button=Start')).click();
 
-  // await (await t.context.app.client.$('div=Choose Free')).waitForDisplayed({ timeout: 60000 });
+  // await (await t.context.app.client.$('div=Choose Starter')).waitForDisplayed({ timeout: 60000 });
   // Skip purchasing prime
-  // if (await (await t.context.app.client.$('div=Choose Free')).isExisting()) {
-  //   await (await t.context.app.client.$('div=Choose Free')).click();
-  //   await sleep(1000);
-  // }
+  if (await (await t.context.app.client.$('div=Choose Starter')).isExisting()) {
+    await (await t.context.app.client.$('div=Choose Starter')).click();
+    await sleep(1000);
+  }
 
-  await (await app.client.$('h2=Sources')).waitForDisplayed({ timeout: 60000 });
+  await (await app.client.$('span=Sources')).waitForDisplayed({ timeout: 60000 });
   // success?
-  t.true(await (await app.client.$('h2=Sources')).isDisplayed(), 'Sources selector is visible');
+  t.true(await (await app.client.$('span=Sources')).isDisplayed(), 'Sources selector is visible');
 });

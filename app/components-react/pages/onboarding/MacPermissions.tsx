@@ -34,13 +34,13 @@ export function MacPermissions() {
         <div>
           {$t('Microphone')}
           {permissions.micPermission && (
-            <i className="fa fa-check" style={{ marginLeft: '8px', color: '#31C3A2' }} />
+            <i className="fa fa-check" style={{ marginLeft: '8px', color: '#80F5D2' }} />
           )}
         </div>
         <div>
           {$t('Webcam')}
           {permissions.webcamPermission && (
-            <i className="fa fa-check" style={{ marginLeft: '8px', color: '#31C3A2' }} />
+            <i className="fa fa-check" style={{ marginLeft: '8px', color: '#80F5D2' }} />
           )}
         </div>
       </div>

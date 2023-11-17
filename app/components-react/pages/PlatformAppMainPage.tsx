@@ -16,7 +16,7 @@ export default function PlatformAppMainPage(p: { params: { appId: string } }) {
   }));
 
   return (
-    <div style={{ height: '100%', width: '100%' }}>
+    <div style={{ height: '100%', width: '100%', margin: poppedOut && '20px' }}>
       {poppedOut ? (
         $t('This app is currently popped out in another window.')
       ) : (

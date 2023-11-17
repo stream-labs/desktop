@@ -1,5 +1,5 @@
 import { MetricsService } from '../../../app/services/metrics';
-import { test, stopApp, startApp, TExecutionContext } from '../../helpers/spectron';
+import { test, stopApp, startApp, TExecutionContext } from '../../helpers/webdriver';
 import { ApiClient, getApiClient } from '../../helpers/api-client';
 import { TSourceType } from '../../../app/services/sources/sources-api';
 import { ScenesService } from '../../../app/services/api/external-api/scenes';
@@ -8,7 +8,7 @@ import { spawnSync } from 'child_process';
 import { sleep } from '../../helpers/sleep';
 import { startRecording, stopRecording } from '../../helpers/modules/streaming';
 import { getCPUUsage, getMemoryUsage, logTiming, usePerformanceTest } from '../tools';
-import { logIn } from '../../helpers/spectron/user';
+import { logIn } from '../../helpers/webdriver/user';
 import { ExecutionContext } from 'ava';
 import { CustomizationService } from '../../../app/services/customization';
 import {

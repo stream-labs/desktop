@@ -7,7 +7,6 @@ import electron from 'electron';
 import { HostsService } from 'services/hosts';
 import {
   getPlatformService,
-  IUserAuth,
   TPlatform,
   IPlatformService,
   EPlatformCallResult,
@@ -46,6 +45,49 @@ export enum EAuthProcessState {
   InProgress = 'progress',
 }
 
+interface IStreamlabsID {
+  id: string;
+  username: string;
+}
+
+export interface IUserAuth {
+  widgetToken: string;
+  apiToken: string; // Streamlabs API Token
+
+  /**
+   * Old key from when SLOBS only supported a single platform account
+   * @deprecated Use `platforms` instead
+   */
+  platform?: IPlatformAuth;
+
+  /**
+   * The primary platform used for chat, go live window, etc
+   */
+  primaryPlatform: TPlatform;
+
+  /**
+   * New key that supports multiple logged in platforms
+   */
+  platforms: { [platform in TPlatform]?: IPlatformAuth };
+
+  /**
+   * Session partition used to separate cookies associated
+   * with this user login.
+   */
+  partition?: string;
+
+  /**
+   * Whether re-login has been forced
+   */
+  hasRelogged: boolean;
+
+  /**
+   * If the user has an attached SLID account, this object
+   * will be present on the user auth.
+   */
+  slid?: IStreamlabsID;
+}
+
 // Eventually we will support authing multiple platforms at once
 interface IUserServiceState {
   loginValidated: boolean;
@@ -70,8 +112,17 @@ interface ILinkedPlatformsResponse {
   youtube_account?: ILinkedPlatform;
   tiktok_account?: ILinkedPlatform;
   trovo_account?: ILinkedPlatform;
+  streamlabs_account?: ILinkedPlatform;
+  twitter_account?: ILinkedPlatform;
   user_id: number;
   created_at: string;
+  widget_token: string;
+
+  /**
+   * When the server sends this back as true, we must force
+   * the user to reauthenticate.
+   */
+  force_login_required: boolean;
 }
 
 export type LoginLifecycleOptions = {
@@ -109,6 +160,15 @@ export function setSentryContext(ctx: ISentryContext) {
 class UserViews extends ViewHandler<IUserServiceState> {
   // Injecting HostsService since it's not stateful
   @Inject() hostsService: HostsService;
+  @Inject() magicLinkService: MagicLinkService;
+
+  get settingsServiceViews() {
+    return this.getServiceViews(SettingsService);
+  }
+
+  get streamSettingsServiceViews() {
+    return this.getServiceViews(StreamSettingsService);
+  }
 
   get customizationServiceViews() {
     return this.getServiceViews(CustomizationService);
@@ -118,7 +178,17 @@ class UserViews extends ViewHandler<IUserServiceState> {
     return !!(this.state.auth && this.state.auth.widgetToken && this.state.loginValidated);
   }
 
+  /**
+   * If the user has an SLID but doesn't have a primary platform, then
+   * the user is in a partially authed state until they have a primary
+   * platform linked.
+   */
+  get isPartialSLAuth() {
+    return this.state.auth && this.state.auth.slid && !this.state.auth.primaryPlatform;
+  }
+
   get isPrime() {
+    if (!this.isLoggedIn) return false;
     return this.state.isPrime;
   }
 
@@ -134,9 +204,9 @@ class UserViews extends ViewHandler<IUserServiceState> {
     }
   }
 
-  get linkedPlatforms() {
-    if (this.isLoggedIn) {
-      return Object.keys(this.state.auth.platforms);
+  get linkedPlatforms(): TPlatform[] {
+    if (this.state.auth && this.state.auth.platforms) {
+      return Object.keys(this.state.auth.platforms) as TPlatform[];
     }
 
     return [];
@@ -146,53 +216,55 @@ class UserViews extends ViewHandler<IUserServiceState> {
     return this.isLoggedIn && this.platform.type === 'twitch';
   }
 
+  /*
+   * The method above doesn't take into account Advanced mode,
+   * resulting in platform-specific functionality (like VOD track on Twitch)
+   * to appear enabled when it shouldn't if the user has set a different Service
+   * in the advanced view.
+   *
+   * Does not modify the above method as we're not sure how many places this
+   * (perhaps more expensive) check is necessary, or whether it'd match the
+   * expected caller behavior.
+   *
+   * TODO: When going back to Recommended Settings, the Service setting here
+   * doesn't get reset.
+   */
+  get isTwitchAuthedAndActive() {
+    return this.streamSettingsServiceViews.state.protectedModeEnabled
+      ? this.isTwitchAuthed
+      : this.settingsServiceViews.streamPlatform === 'Twitch';
+  }
+
   get isFacebookAuthed() {
     return this.isLoggedIn && this.platform.type === 'facebook';
+  }
+
+  get isYoutubeAuthed() {
+    return this.isLoggedIn && this.platform.type === 'youtube';
+  }
+
+  get hasSLID() {
+    return !!this.auth.slid;
   }
 
   get auth() {
     return this.state.auth;
   }
 
-  alertboxLibraryUrl(id?: string) {
-    const uiTheme = this.customizationServiceViews.isDarkTheme ? 'night' : 'day';
-    let url = `https://${this.hostsService.streamlabs}/alertbox-library?mode=${uiTheme}&slobs`;
-
-    if (this.isLoggedIn) {
-      url += `&oauth_token=${this.auth.apiToken}`;
-    }
-
-    if (id) url += `&id=${id}`;
-
-    return url;
-  }
-
-  appStoreUrl(appId?: string) {
+  appStoreUrl(params?: { appId?: string | undefined; type?: string | undefined }) {
     const host = this.hostsService.platform;
     const token = this.auth.apiToken;
     const nightMode = this.customizationServiceViews.isDarkTheme ? 'night' : 'day';
     let url = `https://${host}/slobs-store`;
 
-    if (appId) {
-      url = `${url}/app/${appId}`;
+    if (params?.appId) {
+      url = `${url}/app/${params?.appId}`;
+    }
+    if (params?.type) {
+      url = `${url}/${params?.type}`;
     }
 
     return `${url}?token=${token}&mode=${nightMode}`;
-  }
-
-  overlaysUrl(type?: 'overlay' | 'widget-theme', id?: string) {
-    const uiTheme = this.customizationServiceViews.isDarkTheme ? 'night' : 'day';
-    let url = `https://${this.hostsService.streamlabs}/library?mode=${uiTheme}&slobs`;
-
-    if (this.isLoggedIn) {
-      url += `&oauth_token=${this.auth.apiToken}`;
-    }
-
-    if (type && id) {
-      url += `#/?type=${type}&id=${id}`;
-    }
-
-    return url;
   }
 }
 
@@ -236,6 +308,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     Vue.delete(this.state, 'auth');
     this.state.isPrime = false;
     Vue.delete(this.state, 'userId');
+    this.state.loginValidated = false;
   }
 
   @mutation()
@@ -284,6 +357,28 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     Vue.set(this.state, 'isRelog', isrelog);
   }
 
+  @mutation()
+  private SET_PRIMARY_PLATFORM(primary: string) {
+    Vue.set(this.state.auth, 'primaryPlatform', primary);
+  }
+
+  @mutation()
+  private SET_SLID(slid: IStreamlabsID) {
+    Vue.set(this.state.auth, 'slid', slid);
+  }
+
+  @mutation()
+  private UNLINK_SLID() {
+    Vue.delete(this.state.auth, 'slid');
+  }
+
+  @mutation()
+  private SET_WIDGET_TOKEN(token: string) {
+    if (this.state.auth) {
+      this.state.auth.widgetToken = token;
+    }
+  }
+
   /**
    * Checks for v1 auth schema and migrates if needed
    */
@@ -326,6 +421,23 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.MIGRATE_AUTH();
     this.VALIDATE_LOGIN(false);
     this.SET_AUTH_STATE(EAuthProcessState.Idle);
+
+    // Just in case we somehow saved a partial auth in local storage,
+    // we should clear it out now.
+    if (this.views.isPartialSLAuth) {
+      this.LOGOUT();
+    }
+
+    this.websocketService.socketEvent.subscribe(async event => {
+      if (event.type === 'slid.force_logout') {
+        await this.clearForceLoginStatus();
+        await this.reauthenticate(false, {
+          message: $t(
+            "You've merged a Streamlabs ID to your account, please log back in to ensure you have the right credentials.",
+          ),
+        });
+      }
+    });
   }
 
   get views() {
@@ -362,7 +474,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       if (!allPlatforms.includes(this.state.auth.primaryPlatform)) return;
 
       const service = getPlatformService(this.state.auth.primaryPlatform);
-      return this.login(service, this.state.auth);
+      return this.login(service, this.state.auth, true);
     }
   }
 
@@ -433,6 +545,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     });
   }
 
+  /**
+   * Updates linked platforms and returns true if we need to force log out the user
+   * @returns `true` if the user should be force logged out
+   */
   async updateLinkedPlatforms() {
     const linkedPlatforms = await this.fetchLinkedPlatforms();
 
@@ -441,6 +557,13 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     if (linkedPlatforms.user_id) {
       this.writeUserIdFile(linkedPlatforms.user_id);
       this.SET_USER(linkedPlatforms.user_id, linkedPlatforms.created_at);
+    }
+
+    if (
+      linkedPlatforms.widget_token &&
+      linkedPlatforms.widget_token !== this.state.auth?.widgetToken
+    ) {
+      this.SET_WIDGET_TOKEN(linkedPlatforms.widget_token);
     }
 
     // TODO: Could metaprogram this a bit more
@@ -498,10 +621,32 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     } else if (this.state.auth.primaryPlatform !== 'trovo') {
       this.UNLINK_PLATFORM('trovo');
     }
+
+    if (linkedPlatforms.streamlabs_account) {
+      this.SET_SLID({
+        id: linkedPlatforms.streamlabs_account.platform_id,
+        username: linkedPlatforms.streamlabs_account.platform_name,
+      });
+    } else {
+      this.UNLINK_SLID();
+    }
+
+    if (linkedPlatforms.twitter_account) {
+      this.UPDATE_PLATFORM({
+        type: 'twitter',
+        username: linkedPlatforms.twitter_account.platform_name,
+        id: linkedPlatforms.twitter_account.platform_id,
+        token: linkedPlatforms.twitter_account.access_token,
+      });
+    } else if (this.state.auth.primaryPlatform !== 'twitter') {
+      this.UNLINK_PLATFORM('twitter');
+    }
+
+    if (linkedPlatforms.force_login_required) return true;
   }
 
   fetchLinkedPlatforms() {
-    if (!this.isLoggedIn) return;
+    if (!this.state.auth || !this.state.auth.apiToken) return;
 
     const host = this.hostsService.streamlabs;
     const headers = authorizedHeaders(this.apiToken);
@@ -519,7 +664,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   async setPrimeStatus() {
     const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/prime`;
+    const url = `https://${host}/api/v5/slobs/prime`; // TODO: will this url change?
     const headers = authorizedHeaders(this.apiToken);
     const request = new Request(url, { headers });
     return jfetch<{
@@ -555,7 +700,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       type: ENotificationType.WARNING,
       lifeTime: -1,
       action: this.jsonrpcService.createRequest(Service.getResourceId(this), 'openCreditCardLink'),
-      message: $t('Your credit card expires soon. Click here to retain your Prime benefits'),
+      message: $t('Your credit card expires soon. Click here to retain your Ultra benefits'),
     });
   }
 
@@ -681,9 +826,34 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const i18nService = I18nService.instance as I18nService; // TODO: replace with getResource('I18nService')
     const locale = i18nService.state.locale;
     // eslint-disable-next-line
-    return `https://${
-      this.hostsService.streamlabs
-    }/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}&l=${locale}&hidenav=${hideNav}`;
+    return `https://${this.hostsService.streamlabs}/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}&l=${locale}&hidenav=${hideNav}`;
+  }
+
+  async alertboxLibraryUrl(id?: string) {
+    const uiTheme = this.customizationService.views.isDarkTheme ? 'night' : 'day';
+    let url = `https://${this.hostsService.streamlabs}/alert-box-themes?mode=${uiTheme}&slobs`;
+
+    if (id) url += `&id=${id}`;
+
+    return await this.magicLinkService.actions.return.getMagicSessionUrl(url);
+  }
+
+  async overlaysUrl(type?: 'overlay' | 'widget-themes' | 'site-themes', id?: string) {
+    const uiTheme = this.customizationService.views.isDarkTheme ? 'night' : 'day';
+
+    let url = `https://${this.hostsService.streamlabs}/library`;
+
+    if (type && !id) {
+      url += `/${type}`;
+    }
+
+    url += `?mode=${uiTheme}&slobs`;
+
+    if (type && id) {
+      url += `#/?type=${type}&id=${id}`;
+    }
+
+    return await this.magicLinkService.actions.return.getMagicSessionUrl(url);
   }
 
   getDonationSettings() {
@@ -700,32 +870,69 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.onboardingService.start({ isLogin: true });
   }
 
+  /**
+   * Lets the user know we have forced them to relogin, and will
+   */
+  clearForceLoginStatus() {
+    if (!this.state.auth || !this.state.auth.apiToken) return;
+
+    const host = this.hostsService.streamlabs;
+    const headers = authorizedHeaders(this.apiToken);
+    const url = `https://${host}/api/v5/slobs/clear-force-login-status`;
+    const request = new Request(url, { headers, method: 'POST' });
+
+    return jfetch<unknown>(request);
+  }
+
+  async reauthenticate(onStartup?: boolean, msgConfig?: Partial<Electron.MessageBoxOptions>) {
+    this.SET_IS_RELOG(true);
+    if (onStartup) {
+      this.LOGOUT();
+    } else {
+      await this.logOut();
+    }
+    await remote.dialog.showMessageBox({
+      title: 'Streamlabs Desktop',
+      message: $t(
+        'Your login has expired. Please reauthenticate to continue using Streamlabs Desktop.',
+      ),
+      ...msgConfig,
+    });
+    this.showLogin();
+  }
+
   @RunInLoadingMode()
-  private async login(service: IPlatformService, auth?: IUserAuth) {
+  private async login(service: IPlatformService, auth?: IUserAuth, isOnStartup = false) {
     if (!auth) auth = this.state.auth;
     this.LOGIN(auth);
     this.VALIDATE_LOGIN(true);
     this.setSentryContext();
     this.userLogin.next(auth);
 
-    const [validateLoginResult, validatePlatformResult] = await Promise.all([
-      this.validateLogin(),
+    const forceRelogin = await this.updateLinkedPlatforms();
+
+    if (forceRelogin) {
+      try {
+        await this.clearForceLoginStatus();
+
+        if (isOnStartup) {
+          await this.reauthenticate(true);
+          return;
+        }
+      } catch (e: unknown) {
+        console.error('Error forcing relog');
+        // Intentional that if something goes wrong here, we continue as normal,
+        // since otherwise the user might get stuck in a relog loop.
+      }
+    }
+
+    const [validatePlatformResult] = await Promise.all([
       service.validatePlatform(),
-      this.updateLinkedPlatforms(),
       this.refreshUserInfo(),
       this.sceneCollectionsService.setupNewUser(),
       this.setPrimeStatus(),
     ]);
     this.subscribeToSocketConnection();
-
-    if (!validateLoginResult) {
-      this.logOut();
-      remote.dialog.showMessageBox({
-        title: 'Streamlabs Desktop',
-        message: $t('You have been logged out'),
-      });
-      return;
-    }
 
     // Currently we treat generic errors as success
     if (validatePlatformResult === EPlatformCallResult.TwitchTwoFactor) {
@@ -734,17 +941,21 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     }
 
     if (validatePlatformResult === EPlatformCallResult.TwitchScopeMissing) {
-      await this.logOut();
-      this.showLogin();
-
-      remote.dialog.showMessageBox(remote.getCurrentWindow(), {
-        type: 'warning',
-        title: 'Twitch Error',
-        message: $t(
-          $t('Your Twitch login is expired. Please log in again to continue using Streamlabs'),
-        ),
-        buttons: [$t('Refresh Login')],
-      });
+      // If this is an SLID login, then we'll handle the merge in the LoginModule
+      // Btw - have kind of mixed responsibilities here between the LoginModule and
+      // the user service login method.  Should clean up at some point.
+      if (!this.views.auth.slid) {
+        this.reauthenticate(true, {
+          type: 'warning',
+          title: 'Twitch Error',
+          message: $t(
+            $t(
+              'Streamlabs requires additional permissions from your Twitch account. Please log in with Twitch to continue.',
+            ),
+          ),
+          buttons: [$t('Refresh Login')],
+        });
+      }
 
       return validatePlatformResult;
     }
@@ -780,6 +991,90 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   /**
+   * Streamlabs ID is a special login case.  Once SL ID auth is complete,
+   * we need to make sure they have at least 1 streaming platform linked
+   * before completing the login process.  If they don't have at least 1
+   * platform linked, they will be prompted to merge a platform into their
+   * account before they can be considered fully logged in.
+   */
+  async startSLAuth() {
+    const query = `_=${Date.now()}&skip_splash=true&external=electron&slid&force_verify&origin=slobs`;
+    const url = `https://${this.hostsService.streamlabs}/slobs/login?${query}`;
+
+    this.SET_AUTH_STATE(EAuthProcessState.Loading);
+    const auth = await this.authModule.startExternalAuth(
+      url,
+      () => {
+        this.SET_AUTH_STATE(EAuthProcessState.Idle);
+      },
+      false,
+    );
+
+    this.LOGOUT();
+    this.LOGIN(auth);
+
+    // Find out if the user has any additional platforms linked
+    await this.updateLinkedPlatforms();
+  }
+
+  /**
+   * Should be called to finish an in progress SLID auth. Needs to be called
+   * with the new primary streaming platform, which needs to already be present
+   * in the auth object.
+   * @param primaryPlatform The primary platform to use. If not provided, login
+   * attempt will be canceled.
+   */
+  async finishSLAuth(primaryPlatform?: TPlatform) {
+    if (!this.views.isPartialSLAuth) {
+      console.error('Called finishSLAuth but SL Auth is not in progress');
+      return;
+    }
+
+    if (!primaryPlatform) {
+      this.LOGOUT();
+      return;
+    }
+
+    if (!this.state.auth.platforms[primaryPlatform]) {
+      console.error('Tried to finish SL Auth with platform that does not exist!');
+      this.LOGOUT();
+      return;
+    }
+
+    this.SET_PRIMARY_PLATFORM(primaryPlatform);
+    const service = getPlatformService(primaryPlatform);
+
+    this.SET_AUTH_STATE(EAuthProcessState.Loading);
+    const result = await this.login(service);
+    this.SET_AUTH_STATE(EAuthProcessState.Idle);
+
+    return result;
+  }
+
+  async startSLMerge(): Promise<EPlatformCallResult> {
+    const authUrl = `https://${this.hostsService.streamlabs}/slobs/merge/${this.apiToken}/streamlabs_account`;
+
+    if (!this.isLoggedIn) {
+      throw new Error('Account merging can only be performed while logged in');
+    }
+
+    // Ensure scene collections are updated before the migration begins
+    await this.sceneCollectionsService.save();
+    await this.sceneCollectionsService.safeSync();
+
+    this.SET_AUTH_STATE(EAuthProcessState.Loading);
+    const onWindowShow = () => this.SET_AUTH_STATE(EAuthProcessState.Idle);
+
+    const auth = await this.authModule.startExternalAuth(authUrl, onWindowShow, true);
+
+    this.SET_AUTH_STATE(EAuthProcessState.Loading);
+    this.SET_IS_RELOG(false);
+    this.SET_SLID(auth.slid);
+    this.SET_AUTH_STATE(EAuthProcessState.Idle);
+    return EPlatformCallResult.Success;
+  }
+
+  /**
    * Starts the authentication process.  Multiple callbacks
    * can be passed for various events.
    */
@@ -791,7 +1086,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const service = getPlatformService(platform);
     const authUrl = merge ? service.mergeUrl : service.authUrl;
 
-    if (merge && !this.isLoggedIn) {
+    if (merge && !this.isLoggedIn && !this.views.isPartialSLAuth) {
       throw new Error('Account merging can only be performed while logged in');
     }
 
@@ -804,16 +1099,16 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     const auth =
       mode === 'internal'
-        /* eslint-disable */
-        ? await this.authModule.startInternalAuth(
-          authUrl,
-          service.authWindowOptions,
-          onWindowShow,
-          onWindowClose,
-          merge,
-        )
+        ? /* eslint-disable */
+          await this.authModule.startInternalAuth(
+            authUrl,
+            service.authWindowOptions,
+            onWindowShow,
+            onWindowClose,
+            merge,
+          )
         : await this.authModule.startExternalAuth(authUrl, onWindowShow, merge);
-        /* eslint-enable */
+    /* eslint-enable */
 
     this.SET_AUTH_STATE(EAuthProcessState.Loading);
     this.SET_IS_RELOG(false);

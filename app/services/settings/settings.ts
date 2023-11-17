@@ -24,7 +24,10 @@ import { StreamingService } from 'services/streaming';
 import { byOS, getOS, OS } from 'util/operating-systems';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { SceneCollectionsService } from 'services/scene-collections';
+import { Subject } from 'rxjs';
 import * as remote from '@electron/remote';
+import fs from 'fs';
+import path from 'path';
 
 export interface ISettingsValues {
   General: {
@@ -46,19 +49,28 @@ export interface ISettingsValues {
     service: string;
     server: string;
   };
+  StreamSecond: {
+    key: string;
+    streamType: string;
+    service: string;
+    server: string;
+  };
   Output: {
     Mode: string;
     RecRB?: boolean;
     RecRBTime?: number;
     RecFormat: string;
+    RecFilePath: string;
     RecTracks?: number;
     RecEncoder?: string;
     RecQuality?: string;
     TrackIndex?: string;
     VodTrackEnabled?: boolean;
     VodTrackIndex?: string;
+    keyint_sec?: number;
   };
   Video: {
+    // default video context
     Base: string;
     Output: string;
     ScaleType: string;
@@ -80,7 +92,6 @@ export interface ISettingsValues {
     LowLatencyEnable: boolean;
   };
 }
-
 export interface ISettingsSubCategory {
   nameSubCategory: string;
   codeSubCategory?: string;
@@ -119,6 +130,10 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
     return settingsValues as ISettingsValues;
   }
 
+  get isSimpleOutputMode() {
+    return this.values.Output.Mode === 'Simple';
+  }
+
   get isAdvancedOutput() {
     return this.state.Output.type === 1;
   }
@@ -131,6 +146,10 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
   get recFormat() {
     if (!this.isAdvancedOutput) return;
     return this.values.Output.RecFormat;
+  }
+
+  get recPath() {
+    return this.values.Output.RecFilePath;
   }
 
   get recordingTracks() {
@@ -148,6 +167,10 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
     return Utils.numberToBinnaryArray(this.values.Output.RecTracks, 6).reverse();
   }
 
+  get streamPlatform() {
+    return this.values.Stream.service;
+  }
+
   get vodTrackEnabled() {
     return this.values.Output.VodTrackEnabled;
   }
@@ -160,6 +183,12 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
 
   get advancedAudioSettings() {
     return this.state.Advanced.formData.find(data => data.nameSubCategory === 'Audio');
+  }
+
+  get hasHDRSettings() {
+    const advVideo = this.state.Advanced.formData.find(data => data.nameSubCategory === 'Video');
+    const colorSetting = advVideo.parameters.find(data => data.name === 'ColorFormat');
+    return ['P010', 'I010'].includes(colorSetting.value as string);
   }
 }
 
@@ -179,6 +208,8 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
   @Inject()
   private videoEncodingOptimizationService: VideoEncodingOptimizationService;
 
+  audioRefreshed = new Subject();
+
   get views() {
     return new SettingsViews(this.state);
   }
@@ -187,6 +218,15 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
     this.loadSettingsIntoStore();
     this.ensureValidEncoder();
     this.sceneCollectionsService.collectionSwitched.subscribe(() => this.refreshAudioSettings());
+
+    // TODO: Remove in a week
+    try {
+      if (fs.existsSync(path.join(this.appService.appDataDirectory, 'HADisable'))) {
+        this.usageStatisticsService.recordFeatureUsage('HardwareAccelDisabled');
+      }
+    } catch (e: unknown) {
+      console.error('Error fetching hardware acceleration state', e);
+    }
   }
 
   private fetchSettingsFromObs(categoryName: string): ISettingsCategory {
@@ -269,6 +309,20 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
       type: ESettingsCategoryType.Untabbed,
       formData: this.getAudioSettingsFormData(this.state['Audio'].formData[0]),
     });
+    this.audioRefreshed.next();
+  }
+
+  /**
+   * Guarantee the latest video and output settings are in obs
+   * @remark - This is currently only used to confirm settings before recording because the
+   * video settings use the v2 api and the output settings use the v1 api. This is likely not
+   * necessary when the output settings are moved to the v2 api.
+   */
+  refreshVideoSettings() {
+    const newVideoSettings = this.fetchSettingsFromObs('Video').formData;
+    const newOutputSettings = this.fetchSettingsFromObs('Output').formData;
+    this.setSettings('Video', newVideoSettings, 'Video');
+    this.setSettings('Output', newOutputSettings);
   }
 
   showSettings(categoryName?: string) {
@@ -289,6 +343,8 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
 
   getCategories(): string[] {
     let categories: string[] = obs.NodeObs.OBS_settings_getListCategories();
+    // insert 'Multistreaming' after 'General'
+    categories.splice(1, 0, 'Multistreaming');
     categories = categories.concat([
       'Scene Collections',
       'Notifications',
@@ -438,9 +494,28 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
       },
     ];
   }
-
-  setSettings(categoryName: string, settingsData: ISettingsSubCategory[]) {
+  /**
+   * Set settings in obs.
+   * @remark The forceApplyCategory parameter is currently only used for refreshing
+   * video settings before starting recording. This is because the video settings is using the v2 api
+   * and the output settings are currently using the v1 api. This will no longer be needed when
+   * output settings are migrated to the new api.
+   *
+   * This parameter exists because we need to guarantee that the latest video and output settings
+   * are in the store when recording. Currently, the only time that a value is passed in is in the
+   * refreshVideoSettings function that is called right before starting recording. We need to force
+   * the store to load the video setting but only in this instance.
+   * @param categoryName - name of property
+   * @param settingsData - data to set
+   * @param forceApplyCategory - name of property to force apply settings.
+   */
+  setSettings(
+    categoryName: string,
+    settingsData: ISettingsSubCategory[],
+    forceApplyCategory?: string,
+  ) {
     if (categoryName === 'Audio') this.setAudioSettings([settingsData.pop()]);
+    if (categoryName === 'Video' && forceApplyCategory && forceApplyCategory !== 'Video') return;
 
     const dataToSave = [];
 

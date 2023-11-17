@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import debounce from 'lodash/debounce';
 import { StatefulService } from '../services/core';
+import { Services } from './service-provider';
+import Util from 'services/utils';
 
 /**
  * Creates a reactive state for a React component based on Vuex store
@@ -124,4 +126,19 @@ export function usePromise<TPromiseResult>(
       unmounted = true;
     };
   }, []);
+}
+
+export function useChildWindowParams(key?: string) {
+  const { WindowsService } = Services;
+  const params = useMemo(() => WindowsService.getChildWindowQueryParams(), []);
+  return key ? params[key] : params;
+}
+
+export function useOneOffWindowParams(key?: string) {
+  const { WindowsService } = Services;
+  const params = useMemo(() => {
+    const windowId = Util.getCurrentUrlParams().windowId;
+    return WindowsService.getWindowOptions(windowId);
+  }, []);
+  return key ? params[key] : params;
 }

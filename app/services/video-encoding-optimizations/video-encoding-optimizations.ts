@@ -40,6 +40,13 @@ interface IVideoEncodingOptimizationServiceState {
   lastLoadedGame: string;
   lastLoadedProfiles: IEncoderProfile[];
   lastSelectedProfile: IEncoderProfile;
+
+  /**
+   * This flag exists to essentially grant grandfathered access to
+   * video encoding optimizations. This flag will be set if the user
+   * doesn't currently have the flag and has optimized profiles enabled.
+   */
+  canSeeOptimizedProfile: boolean;
 }
 
 export class VideoEncodingOptimizationService extends PersistentStatefulService<IVideoEncodingOptimizationServiceState> {
@@ -48,6 +55,7 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
     lastLoadedGame: '',
     lastLoadedProfiles: [],
     lastSelectedProfile: null,
+    canSeeOptimizedProfile: null,
   };
 
   private previousSettings: {
@@ -64,6 +72,12 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
 
   init() {
     super.init();
+
+    // Set grandfathered status
+    if (this.state.canSeeOptimizedProfile == null) {
+      this.SET_CAN_SEE_OPTIMIZED_PROFILE(this.state.useOptimizedProfile);
+    }
+
     this.streamingService.streamingStatusChange.subscribe(status => {
       if (status === EStreamingState.Offline && this.isUsingEncodingOptimizations) {
         this.isUsingEncodingOptimizations = false;
@@ -224,6 +238,11 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
   @mutation()
   private SAVE_LAST_SELECTED_PROFILE(profile: IEncoderProfile) {
     this.state.lastSelectedProfile = profile;
+  }
+
+  @mutation()
+  SET_CAN_SEE_OPTIMIZED_PROFILE(val: boolean) {
+    this.state.canSeeOptimizedProfile = val;
   }
 }
 

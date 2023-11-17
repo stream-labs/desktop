@@ -1,5 +1,5 @@
-import { useSpectron, test } from '../helpers/spectron';
-import { logIn } from '../helpers/spectron/user';
+import { useWebdriver, test } from '../helpers/webdriver';
+import { logIn } from '../helpers/webdriver/user';
 import { sleep } from '../helpers/sleep';
 import {
   focusChild,
@@ -9,7 +9,7 @@ import {
   waitForLoader,
 } from '../helpers/modules/core';
 
-useSpectron();
+useWebdriver();
 
 // TODO: Enable this test
 test.skip('Twitch 2FA is disabled', async t => {

@@ -1,9 +1,13 @@
 {
-  "You have been logged out": "You have been logged out",
-  "This element is too small to be displayed": "This element is too small to be displayed",
-  "This element requires Selective Recording to be enabled": "This element requires Selective Recording to be enabled",
-  "Grant Permissions": "Grant Permissions",
-  "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.",
-  "Microphone": "Microphone",
-  "Webcam": "Webcam"
+  "You have been logged out": "U bent uitgelogd",
+  "This element is too small to be displayed": "Dit element is te klein voor weergave",
+  "This element requires Selective Recording to be enabled": "Dit element vereist Selectieve opname om ingeschakeld te worden",
+  "Grant Permissions": "Machtigingen verlenen",
+  "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs heeft aanvullende machtigingen nodig. Verleen machtigingen in de pop-upvensters om door te gaan.",
+  "Microphone": "Microfoon",
+  "Webcam": "Webcam",
+  "You've merged a Streamlabs ID to your account, please log back in to ensure you have the right credentials.": "U heeft een Streamlabs ID toegevoegd aan uw account. Meld u weer aan om, zodat u de juiste aanmeldingsgegevens heeft.",
+  "Enable Live Streaming?": "Livestreaming inschakelen?",
+  "Streamlabs is currently in recording mode, which hides live streaming features. Would you like to enable live streaming features? You can disable them again in General settings.": "Streamlabs staat momenteel in opnamemodus. Hierbij worden de functies voor livestreaming verborgen. Wilt u de functies voor livestreaming inschakelen? U kunt deze weer uitschakelen in Algemene instellingen.",
+  "Enable Streaming": "Streaming inschakelen"
 }

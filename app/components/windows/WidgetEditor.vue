@@ -17,7 +17,7 @@
           </div>
         </div>
         <div v-if="apiSettings.testers" class="button button--action test-button">
-          <test-widgets :componentProps="{ testers: apiSettings.testers }" />
+          <test-widgets />
         </div>
       </div>
 
@@ -199,7 +199,7 @@
 }
 
 .test-button .link {
-  color: var(--white);
+  color: var(--action-button-text);
 }
 </style>
 

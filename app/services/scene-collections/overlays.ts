@@ -22,6 +22,7 @@ import { SceneSourceNode } from './nodes/overlays/scene';
 import { AppService } from 'services/app';
 import { importExtractZip } from '../../util/slow-imports';
 import { downloadFile, IDownloadProgress } from 'util/requests';
+import { NodeMapNode } from './nodes/node-map';
 
 const NODE_TYPES = {
   RootNode,
@@ -37,6 +38,7 @@ const NODE_TYPES = {
   SceneSourceNode,
   GameCaptureNode,
   IconLibraryNode,
+  NodeMapNode,
 };
 
 export class OverlaysPersistenceService extends Service {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { $t } from '../../../services/i18n';
 import { ICustomStreamDestination } from '../../../services/settings/streaming';
 import { EStreamingState } from '../../../services/streaming';
@@ -16,6 +16,21 @@ import { TextInput } from '../../shared/inputs';
 import { ButtonGroup } from '../../shared/ButtonGroup';
 import { FormInstance } from 'antd/lib/form';
 import { injectFormBinding, injectState, mutation, useModule } from 'slap';
+import UltraIcon from 'components-react/shared/UltraIcon';
+import ButtonHighlighted from 'components-react/shared/ButtonHighlighted';
+import { useVuex } from 'components-react/hooks';
+import Translate from 'components-react/shared/Translate';
+import * as remote from '@electron/remote';
+
+function censorWord(str: string) {
+  if (str.length < 3) return str;
+  return str[0] + '*'.repeat(str.length - 2) + str.slice(-1);
+}
+
+function censorEmail(str: string) {
+  const parts = str.split('@');
+  return censorWord(parts[0]) + '@' + censorWord(parts[1]);
+}
 
 /**
  * A Redux module for components in the StreamSetting window
@@ -64,6 +79,12 @@ class StreamSettingsModule {
   private get magicLinkService() {
     return Services.MagicLinkService;
   }
+  private get customizationService() {
+    return Services.CustomizationService;
+  }
+  private get dualOutputService() {
+    return Services.DualOutputService;
+  }
 
   // DEFINE MUTATIONS
 
@@ -74,13 +95,14 @@ class StreamSettingsModule {
   }
 
   @mutation()
-  addCustomDest() {
-    if (!this.userService.isPrime) {
+  addCustomDest(linkToPrime: boolean = false) {
+    if (linkToPrime) {
       this.magicLinkService.actions.linkToPrime('slobs-multistream');
       return;
     }
+    const name: string = this.suggestCustomDestName();
     this.state.customDestForm = {
-      name: this.suggestCustomDestName(),
+      name,
       streamKey: '',
       url: '',
       enabled: false,
@@ -164,6 +186,10 @@ class StreamSettingsModule {
     return this.streamingView.savedSettings.customDestinations;
   }
 
+  get isDarkTheme() {
+    return this.customizationService.isDarkTheme;
+  }
+
   platformMerge(platform: TPlatform) {
     this.navigationService.navigate('PlatformMerge', { platform });
     this.windowsService.actions.closeChildWindow();
@@ -182,15 +208,21 @@ class StreamSettingsModule {
       return;
     }
 
-    this.fixUrl();
+    if (!this.state.customDestForm.url.includes('?')) {
+      // if the url contains parameters, don't add a trailing /
+      this.fixUrl();
+    }
 
     const destinations = cloneDeep(this.customDestinations);
     const isUpdateMode = typeof this.state.editCustomDestMode === 'number';
     if (isUpdateMode) {
       const ind = this.state.editCustomDestMode as number;
-      destinations.splice(ind, 1, this.state.customDestForm);
+      // preserve destination display setting or set to horizontal by default
+      const display = destinations[ind]?.display ?? 'horizontal';
+      destinations.splice(ind, 1, { ...this.state.customDestForm, display });
     } else {
-      destinations.push(this.state.customDestForm);
+      // set display to horizontal by default
+      destinations.push({ ...this.state.customDestForm, display: 'horizontal' });
     }
     this.streamSettingsService.setGoLiveSettings({ customDestinations: destinations });
     this.stopEditing();
@@ -228,6 +260,8 @@ export function StreamSettings() {
       {/* account info */}
       {protectedModeEnabled && (
         <div>
+          <h2>{$t('Streamlabs ID')}</h2>
+          <SLIDBlock />
           <h2>{$t('Stream Destinations')}</h2>
           {platforms.map(platform => (
             <Platform key={platform} platform={platform} />
@@ -275,6 +309,65 @@ export function StreamSettings() {
 
 StreamSettings.page = 'Stream';
 
+function SLIDBlock() {
+  const { UserService } = Services;
+  const { hasSLID, username } = useVuex(() => ({
+    hasSLID: UserService.views.hasSLID,
+    username: UserService.views.auth?.slid?.username,
+  }));
+
+  function openPasswordLink() {
+    remote.shell.openExternal('https://id.streamlabs.com/security/password?companyId=streamlabs');
+  }
+
+  function openTwoFactorLink() {
+    remote.shell.openExternal('https://id.streamlabs.com/security/tfa?companyId=streamlabs');
+  }
+
+  return (
+    <div className="section">
+      <div className="flex">
+        <div className="margin-right--20" style={{ width: '50px' }}>
+          <PlatformLogo className={css.platformLogo} size="medium" platform="streamlabs" />
+        </div>
+        <div>
+          {hasSLID ? (
+            <div>
+              Streamlabs <br />
+              {username && <b>{censorEmail(username)}</b>}
+            </div>
+          ) : (
+            <Translate message={$t('slidConnectMessage')} />
+          )}
+        </div>
+        {!hasSLID && (
+          <Button type="primary" onClick={() => UserService.actions.startSLMerge()}>
+            {$t('Setup')}
+          </Button>
+        )}
+      </div>
+      {hasSLID && (
+        <div
+          style={{ margin: '10px -16px', height: 2, backgroundColor: 'var(--background)' }}
+        ></div>
+      )}
+      {hasSLID && (
+        <div style={{ display: 'flex', justifyContent: 'right' }}>
+          <a
+            style={{ fontWeight: 400, marginRight: 10, textDecoration: 'underline' }}
+            onClick={openPasswordLink}
+          >
+            {$t('Update Password')}
+          </a>
+          <a style={{ fontWeight: 400, textDecoration: 'underline' }} onClick={openTwoFactorLink}>
+            {$t('Update Two-factor Auth')}
+          </a>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /**
  * Renders a Platform placeholder
  */
@@ -284,14 +377,14 @@ function Platform(p: { platform: TPlatform }) {
   const { canEditSettings, platformMerge, platformUnlink } = useStreamSettings();
   const isMerged = StreamingService.views.isPlatformLinked(platform);
   const username = UserService.state.auth!.platforms[platform]?.username;
-  const platformName = getPlatformService(platform).displayName;
+  const platformName = useMemo(() => getPlatformService(platform).displayName, []);
   const isPrimary = StreamingService.views.isPrimaryPlatform(platform);
   const shouldShowPrimaryBtn = isPrimary;
   const shouldShowConnectBtn = !isMerged && canEditSettings;
   const shouldShowUnlinkBtn = !isPrimary && isMerged && canEditSettings;
 
   return (
-    <div className="section flex">
+    <div className="section flex" style={{ marginBottom: 16 }}>
       <div className="margin-right--20" style={{ width: '50px' }}>
         <PlatformLogo className={css.platformLogo} size="medium" platform={platform} />
       </div>
@@ -341,11 +434,12 @@ function Platform(p: { platform: TPlatform }) {
  */
 function CustomDestinationList() {
   const { isPrime, customDestinations, editCustomDestMode, addCustomDest } = useStreamSettings();
-  const shouldShowPrimeLabel = !isPrime;
+
   const destinations = customDestinations;
   const isEditMode = editCustomDestMode !== false;
   const shouldShowAddForm = editCustomDestMode === true;
   const canAddMoreDestinations = destinations.length < 2;
+  const shouldShowPrimeLabel = !isPrime && destinations.length > 0;
 
   return (
     <div>
@@ -353,11 +447,17 @@ function CustomDestinationList() {
         <CustomDestination key={ind} ind={ind} destination={dest} />
       ))}
       {!isEditMode && canAddMoreDestinations && (
-        <a className={css.addDestinationBtn} onClick={addCustomDest}>
-          <i className="fa fa-plus" />
+        <a className={css.addDestinationBtn} onClick={() => addCustomDest(shouldShowPrimeLabel)}>
+          <i className={cx('fa fa-plus', css.plus)} />
           <span>{$t('Add Destination')}</span>
+
           {shouldShowPrimeLabel ? (
-            <b className={css.prime}>prime</b>
+            <ButtonHighlighted
+              onClick={() => addCustomDest(true)}
+              filled
+              text={$t('Ultra')}
+              icon={<UltraIcon type="simple" />}
+            />
           ) : (
             <div className={css.prime} />
           )}

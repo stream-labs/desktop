@@ -5,7 +5,7 @@ import { IWidgetSource, WidgetType, IWidgetData } from './index';
 import { WidgetSettingsService } from 'services/widgets';
 import Utils from '../utils';
 
-@ServiceHelper()
+@ServiceHelper('WidgetsService')
 export class WidgetSource implements IWidgetSource {
   @Inject() private sourcesService: SourcesService;
   @Inject() private widgetsService: WidgetsService;

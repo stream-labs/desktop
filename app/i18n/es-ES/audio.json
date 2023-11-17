@@ -32,8 +32,15 @@
   "Source Settings": "Configuración de fuente",
   "Audio Tracks": "Pistas de audio",
   "Designates which tracks are being recorded": "Define qué pistas se van a grabar",
-  "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.",
-  "Streaming Track": "Streaming Track",
-  "Enable Twitch VOD Track": "Enable Twitch VOD Track",
-  "Twitch VOD Track": "Twitch VOD Track"
+  "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "Las pistas de streaming y VOD son la misma. Esto puede provocar un comportamiento imprevisto del audio. Vaya a los ajustes globales para cambiarlo.",
+  "Streaming Track": "Pista de streaming",
+  "Enable Twitch VOD Track": "Activar pista de VOD de Twitch",
+  "Twitch VOD Track": "Pista de VOD de Twitch",
+  "Sample Rate (requires a restart)": "Frecuencia de muestreo (requiere reinicio)",
+  "Channels (requires a restart)": "Canales (requiere reinicio)",
+  "Desktop Audio Device 1": "Dispositivo de audio de escritorio 1",
+  "Desktop Audio Device 2": "Dispositivo de audio de escritorio 2",
+  "Mic/Auxiliary Device 1": "Micrófono/Dispositivo auxiliar 1",
+  "Mic/Auxiliary Device 2": "Micrófono/Dispositivo auxiliar 2",
+  "Mic/Auxiliary Device 3": "Micrófono/Dispositivo auxiliar 3"
 }

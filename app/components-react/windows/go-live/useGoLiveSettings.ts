@@ -1,5 +1,7 @@
 import { IGoLiveSettings, StreamInfoView } from '../../../services/streaming';
 import { TPlatform } from '../../../services/platforms';
+import { TDisplayDestinations } from 'services/dual-output';
+import { ICustomStreamDestination } from 'services/settings/streaming';
 import { Services } from '../../service-provider';
 import cloneDeep from 'lodash/cloneDeep';
 import { FormInstance } from 'antd/lib/form';
@@ -8,7 +10,8 @@ import { $t } from '../../../services/i18n';
 import { injectState, useModule } from 'slap';
 import { useForm } from '../../shared/inputs/Form';
 import { getDefined } from '../../../util/properties-type-guards';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
+import { TDisplayType } from 'services/settings-v2';
 
 type TCommonFieldName = 'title' | 'description';
 
@@ -24,6 +27,8 @@ class GoLiveSettingsState extends StreamInfoView<IGoLiveSettingsState> {
     prepopulateOptions: undefined,
     ...this.savedSettings,
   };
+
+  isUpdating: boolean;
 
   get settings(): IGoLiveSettingsState {
     return this.state;
@@ -56,6 +61,7 @@ class GoLiveSettingsState extends StreamInfoView<IGoLiveSettingsState> {
       this.updatePlatform(platform, { enabled: enabledPlatforms.includes(platform) });
     });
   }
+
   /**
    * Enable/disable a custom ingest destinations
    */
@@ -64,6 +70,28 @@ class GoLiveSettingsState extends StreamInfoView<IGoLiveSettingsState> {
     customDestinations[destInd].enabled = enabled;
     this.updateSettings({ customDestinations });
   }
+
+  updateCustomDestinationDisplay(destInd: number, display: TDisplayType) {
+    const customDestinations = cloneDeep(this.getView().customDestinations);
+    customDestinations[destInd].display = display;
+    this.updateSettings({ customDestinations });
+  }
+
+  /**
+   * Show/hide custom ingest destination card in go live window
+   */
+  toggleDestination(index: number, enabled: boolean) {
+    // this timeout is to allow for the toggle animation
+    setTimeout(() => this.switchCustomDestination(index, enabled), 500);
+  }
+
+  /**
+   * Get platform enabled status
+   */
+  isEnabled(platform: TPlatform) {
+    return this.enabledPlatforms.includes(platform);
+  }
+
   /**
    * Switch Advanced or Simple mode
    */
@@ -96,7 +124,7 @@ class GoLiveSettingsState extends StreamInfoView<IGoLiveSettingsState> {
 
   get isLoading() {
     const state = this.state;
-    return state.needPrepopulate || this.getViewFromState(state).isLoading;
+    return state.needPrepopulate || this.getViewFromState(state).isLoading || this.isUpdating;
   }
 
   getView() {
@@ -147,8 +175,7 @@ export class GoLiveSettingsModule {
       tweetText: view.getTweetText(view.commonFields.title), // generate a default tweet text
       needPrepopulate: false,
     };
-    // if stream has not been started than we allow to change settings only for a primary platform
-    // so delete other platforms from the settings object
+
     if (this.state.isUpdateMode && !view.isMidStreamMode) {
       Object.keys(settings.platforms).forEach((platform: TPlatform) => {
         if (!this.state.isPrimaryPlatform(platform)) delete settings.platforms[platform];
@@ -160,16 +187,14 @@ export class GoLiveSettingsModule {
       Object.keys(prepopulateOptions).forEach(platform => {
         Object.assign(settings.platforms[platform], prepopulateOptions[platform]);
       });
-
-      // disable non-primary platforms
-      Object.keys(settings.platforms).forEach((platform: TPlatform) => {
-        if (!view.isPrimaryPlatform(platform)) settings.platforms[platform]!.enabled = false;
-      });
     }
 
     this.state.updateSettings(settings);
   }
 
+  /**
+   * Get go live settings
+   */
   getSettings() {
     return this.state.settings;
   }
@@ -194,9 +219,43 @@ export class GoLiveSettingsModule {
   }
 
   /**
+   * Determine if all dual output go live requirements are fulfilled
+   */
+  getCanStreamDualOutput() {
+    const platformDisplays = Services.StreamingService.views.activeDisplayPlatforms;
+
+    // determine which enabled custom destinations use which displays
+    const destinationDisplays = this.state.customDestinations.reduce(
+      (displays: TDisplayDestinations, destination: ICustomStreamDestination, index: number) => {
+        if (destination.enabled && destination?.display) {
+          displays[destination.display].push(destination.name);
+        }
+        return displays;
+      },
+      { horizontal: [], vertical: [] },
+    );
+    // determine if both displays are selected for active platforms
+    const horizontalHasDestinations =
+      platformDisplays.horizontal.length > 0 || destinationDisplays.horizontal.length > 0;
+    const verticalHasDestinations =
+      platformDisplays.vertical.length > 0 || destinationDisplays.vertical.length > 0;
+
+    return horizontalHasDestinations && verticalHasDestinations;
+  }
+
+  /**
    * Validate the form and show an error message
    */
   async validate() {
+    if (Services.DualOutputService.views.dualOutputMode && !this.getCanStreamDualOutput()) {
+      message.error(
+        $t(
+          'To use Dual Output you must stream to at least one horizontal and one vertical platform.',
+        ),
+      );
+      return false;
+    }
+
     try {
       await getDefined(this.form).validateFields();
       return true;

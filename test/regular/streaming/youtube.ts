@@ -1,5 +1,5 @@
 import { logIn } from '../../helpers/modules/user';
-import { skipCheckingErrorsInLog, test, useSpectron } from '../../helpers/spectron';
+import { skipCheckingErrorsInLog, test, useWebdriver } from '../../helpers/webdriver';
 import {
   chatIsVisible,
   clickGoLive,
@@ -23,7 +23,7 @@ import * as moment from 'moment';
 import { useForm } from '../../helpers/modules/forms';
 import { ListInputController } from '../../helpers/modules/forms/list';
 
-useSpectron();
+useWebdriver();
 
 test('Streaming to Youtube', async t => {
   await logIn('youtube', { multistream: false });

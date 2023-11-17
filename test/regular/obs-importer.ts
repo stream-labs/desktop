@@ -1,4 +1,4 @@
-import { debugPause, skipCheckingErrorsInLog, test, useSpectron } from '../helpers/spectron';
+import { debugPause, skipCheckingErrorsInLog, test, useWebdriver } from '../helpers/webdriver';
 import { sceneExisting, switchCollection } from '../helpers/modules/scenes';
 import { sourceIsExisting } from '../helpers/modules/sources';
 import { getApiClient } from '../helpers/api-client';
@@ -13,12 +13,12 @@ import {
   isDisplayed,
   waitForDisplayed,
 } from '../helpers/modules/core';
-import { logIn } from '../helpers/spectron/user';
+import { logIn } from '../helpers/webdriver/user';
 import { sleep } from '../helpers/sleep';
 
 const path = require('path');
 
-useSpectron({ skipOnboarding: false, beforeAppStartCb: installOBSCache });
+useWebdriver({ skipOnboarding: false, beforeAppStartCb: installOBSCache });
 
 async function installOBSCache(t: ExecutionContext) {
   // extract OBS config to the cache dir
@@ -57,9 +57,11 @@ test('OBS Importer', async t => {
   await click('div=Import from OBS Studio');
   await click('div=Start');
 
-  await waitForDisplayed('h1=Optimize');
-  await (await t.context.app.client.$('button=Skip')).click();
-  // await (await t.context.app.client.$('div=Choose Free')).click();
+  // auto config
+  // temporarily disable auto config until migrate to new api
+  // await waitForDisplayed('h1=Optimize');
+  // await (await t.context.app.client.$('button=Skip')).click();
+  await (await t.context.app.client.$('div=Choose Starter')).click();
 
   await waitForDisplayed('[data-name=SceneSelector]');
 
@@ -90,6 +92,6 @@ test('OBS Importer', async t => {
 
   t.deepEqual(
     [EWidgetType.DonationGoal, EWidgetType.EventList, EWidgetType.AlertBox],
-    widgetsService.getWidgetSources().map(widget => (widget.type as unknown) as EWidgetType),
+    widgetsService.widgetSources.map(widget => (widget.type as unknown) as EWidgetType),
   );
 });

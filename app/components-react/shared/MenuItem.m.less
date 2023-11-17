@@ -1,0 +1,28 @@
+@import '../../styles/index';
+@import '../../styles/mixins';
+
+.menuitem-wrapper {
+  :global(span.ant-menu-title-content) {
+    overflow: visible;
+    text-overflow: unset;
+    white-space: normal;
+  }
+
+  :global(div.ant-menu-submenu-title) {
+    height: unset;
+    line-height: unset;
+    min-height: 30px;
+  }
+
+  .root-menu-item {
+    padding-left: 16px !important;
+  }
+
+  .app-sidenav-item {
+    padding-left: 16px !important;
+    &:global(.ant-menu-item) {
+      min-height: unset !important;
+      height: 30px !important;
+    }
+  }
+}
