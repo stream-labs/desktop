@@ -17,7 +17,7 @@ export default function WelcomeToPrime() {
       title: $t('Overlay, Widget, and Site Themes'),
       icon: 'icon-themes',
       description: $t(
-        "Fully customize your stream and your website to represent your brand; or pick from thousands of our pre-made themes. Either way, your stream will look amazing and it's all included with Prime.",
+        "Fully customize your stream and your website to represent your brand; or pick from thousands of our pre-made themes. Either way, your stream will look amazing and it's all included with Ultra.",
       ),
       link: 'BrowseOverlays',
       button: $t('View Themes'),
@@ -52,18 +52,18 @@ export default function WelcomeToPrime() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>{$t('Welcome to Prime!')}</h1>
-      <p>{$t("We've picked out a few Prime benefits to get you started:")}</p>
+      <h1 className={styles.title}>{$t('Welcome to Ultra!')}</h1>
+      <p>{$t("We've picked out a few Ultra benefits to get you started:")}</p>
       <div className={styles.panelContainer}>
         {panelData.map(panel => (
           <Panel panel={panel} key={panel.link} />
         ))}
       </div>
       <div className={styles.themeToggle}>
-        {$t("We've added a new UI theme exclusive to Prime members:")}
+        {$t("We've added a new UI theme exclusive to Ultra members:")}
         <span>{$t('Classic Theme')}</span>
         <SwitchInput value={/prime/.test(theme)} onInput={toggleTheme} />
-        <span>{$t('Prime Theme')}</span>
+        <span>{$t('Ultra Theme')}</span>
       </div>
     </div>
   );

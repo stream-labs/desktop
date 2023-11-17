@@ -24,7 +24,7 @@ export default function TestWidgets(p: { testers?: string[] }) {
       </a>
       <Animation transitionName="ant-slide-right">
         {slideOpen && (
-          <div className="slide-open__menu">
+          <div className="slide-open__menu" style={{ zIndex: 1011 }}>
             {widgetTesters.map(tester => (
               <button
                 className="button button--trans"

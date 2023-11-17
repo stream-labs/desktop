@@ -1,4 +1,7 @@
 {
-  "Twitch Game": "Игра для Twitch",
-  "Twitch Tags": "Теги для Twitch"
+  "Twitch Category": "Категория Twitch",
+  "Twitch Tags": "Теги для Twitch",
+  "You need to re-login to access Twitch tags": "Авторизуйтесь повторно, чтобы получить доступ к тегам Twitch",
+  "Do not include special characters or spaces in your tag": "Не добавляйте в теги специальные символы и пробелы",
+  "For example: \"Speedrunning\" or \"FirstPlaythrough\"": "Например: «Скоростноепрохождение» или «Первоепрохождение»"
 }

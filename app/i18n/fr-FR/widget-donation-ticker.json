@@ -14,5 +14,10 @@
   "Manage List": "Gérer la liste",
   "Font Settings": "Paramètres de la police",
   "A hex color for the text of the": "Une couleur hexadécimale pour le texte du",
-  "token": "jeton"
+  "token": "jeton",
+  "Each donation that shows in the donation ticker will be in this format. Available tokens:": "Tous les dons indiqués dans le bandeau de dons seront affichés dans ce format. Jetons disponibles:",
+  "The maximum amount of donations to show in the ticker. Must be a number greater than 0.": "Le nombre maximum de dons à afficher dans le bandeau. Doit être un nombre supérieur à 0.",
+  "How fast the ticker should scroll between 1 (fastest) and 10 (slowest). Set to 0 for no scrolling.": "À quelle vitesse le bandeau doit défiler entre 1 (plus rapide) et 10 (plus lente). La valeur 0 pour aucun défilement.",
+  "The font size in pixels. Reasonable size typically ranges between 24px and 48px.": "La taille de la police en pixels. La taille raisonnable est généralement comprise entre 24px et 48px.",
+  "How thick to make the font. The value should range between 300 (thinnest) and 900 (thickest)": "L'épaisseur de la police à l'écran. La valeur devrait se situer entre 300 (plus fine) et 900 (plus épaisse)."
 }

@@ -13,11 +13,16 @@ import { FacebookService } from './platforms/facebook';
 import { TiktokService } from './platforms/tiktok';
 import { TrovoService } from './platforms/trovo';
 import * as remote from '@electron/remote';
+import { VideoSettingsService, TDisplayType } from './settings-v2/video';
+import { DualOutputService } from './dual-output';
+import { TwitterPlatformService } from './platforms/twitter';
 
+export type TOutputOrientation = 'landscape' | 'portrait';
 interface IRestreamTarget {
   id: number;
   platform: TPlatform;
   streamKey: string;
+  mode?: TOutputOrientation;
 }
 
 interface IRestreamState {
@@ -48,6 +53,9 @@ export class RestreamService extends StatefulService<IRestreamState> {
   @Inject() facebookService: FacebookService;
   @Inject() tiktokService: TiktokService;
   @Inject() trovoService: TrovoService;
+  @Inject() videoSettingsService: VideoSettingsService;
+  @Inject() dualOutputService: DualOutputService;
+  @Inject('TwitterPlatformService') twitterService: TwitterPlatformService;
 
   settings: IUserSettingsResponse;
 
@@ -93,28 +101,53 @@ export class RestreamService extends StatefulService<IRestreamState> {
   }
 
   get chatUrl() {
-    const hasFBTarget = this.streamInfo.enabledPlatforms.includes('facebook');
+    const hasFBTarget = this.streamInfo.enabledPlatforms.includes('facebook' as TPlatform);
     let fbParams = '';
     if (hasFBTarget) {
       const fbView = this.facebookService.views;
       const videoId = fbView.state.settings.liveVideoId;
       const token = fbView.getDestinationToken();
       fbParams = `&fbVideoId=${videoId}`;
-      // all destinations except "page" require a token
-      if (fbView.state.settings.destinationType !== 'page') {
-        fbParams += `&fbToken=${token}`;
-      }
+      /*
+       * The chat widget on core still passes fbToken to Facebook comments API.
+       * Not sure if this has always been the case but assuming null for pages is no
+       * longer allowed.
+       */
+      fbParams += `&fbToken=${token}`;
     }
-    return `https://streamlabs.com/embed/chat?oauth_token=${this.userService.apiToken}${fbParams}`;
+    return `https://${this.host}/embed/chat?oauth_token=${this.userService.apiToken}${fbParams}`;
   }
 
   get shouldGoLiveWithRestream() {
-    return this.streamInfo.isMultiplatformMode;
+    return this.streamInfo.isMultiplatformMode || this.streamInfo.isDualOutputMode;
   }
 
-  fetchUserSettings(): Promise<IUserSettingsResponse> {
+  /**
+   * Fetches user settings for restream
+   * @remarks
+   * In dual output mode, tell the stream which context to use when streaming
+   *
+   * @param mode - Optional, orientation denoting output context
+   * @returns IUserSettings JSON response
+   */
+  fetchUserSettings(mode?: 'landscape' | 'portrait'): Promise<IUserSettingsResponse> {
     const headers = authorizedHeaders(this.userService.apiToken);
-    const url = `https://${this.host}/api/v1/rst/user/settings`;
+
+    let url;
+    switch (mode) {
+      case 'landscape': {
+        url = `https://${this.host}/api/v1/rst/user/settings?mode=landscape`;
+        break;
+      }
+      case 'portrait': {
+        url = `https://${this.host}/api/v1/rst/user/settings?mode=portrait`;
+        break;
+      }
+      default: {
+        url = `https://${this.host}/api/v1/rst/user/settings`;
+      }
+    }
+
     const request = new Request(url, { headers });
 
     return jfetch(request);
@@ -149,30 +182,55 @@ export class RestreamService extends StatefulService<IRestreamState> {
       dcProtection: false,
       idleTimeout: 30,
     });
+
     const request = new Request(url, { headers, body, method: 'PUT' });
 
     return jfetch(request);
   }
 
-  async beforeGoLive() {
-    await Promise.all([this.setupIngest(), this.setupTargets()]);
+  async beforeGoLive(context?: TDisplayType, mode?: TOutputOrientation) {
+    await Promise.all([this.setupIngest(context, mode), this.setupTargets(!!mode)]);
   }
 
-  async setupIngest() {
+  /**
+   * Setup restream ingest
+   * @remarks
+   * In dual output mode, assign a context to the ingest.
+   * Defaults to the horizontal context.
+   *
+   * @param context - Optional, display to stream
+   * @param mode - Optional, mode which denotes which context to stream
+   */
+  async setupIngest(context?: TDisplayType, mode?: TOutputOrientation) {
     const ingest = (await this.fetchIngest()).server;
+    const settings = mode ? await this.fetchUserSettings(mode) : this.settings;
 
     // We need to move OBS to custom ingest mode before we can set the server
-    this.streamSettingsService.setSettings({
-      streamType: 'rtmp_custom',
-    });
+    this.streamSettingsService.setSettings(
+      {
+        streamType: 'rtmp_custom',
+      },
+      context,
+    );
 
-    this.streamSettingsService.setSettings({
-      key: this.settings.streamKey,
-      server: ingest,
-    });
+    this.streamSettingsService.setSettings(
+      {
+        key: settings.streamKey,
+        server: ingest,
+      },
+      context,
+    );
   }
 
-  async setupTargets() {
+  /**
+   * Setup restream targets
+   * @remarks
+   * In dual output mode, assign a contexts to the ingest targets.
+   * Defaults to the horizontal context.
+   *
+   * @param isDualOutputMode - Optional, boolean denoting if dual output mode is on
+   */
+  async setupTargets(isDualOutputMode?: boolean) {
     // delete existing targets
     const targets = await this.fetchTargets();
     const promises = targets.map(t => this.deleteTarget(t.id));
@@ -180,15 +238,32 @@ export class RestreamService extends StatefulService<IRestreamState> {
 
     // setup new targets
     const newTargets = [
-      ...this.streamInfo.enabledPlatforms.map(platform => {
-        return {
-          platform: platform as TPlatform,
-          streamKey: getPlatformService(platform).state.streamKey,
-        };
-      }),
+      ...this.streamInfo.enabledPlatforms.map(platform =>
+        isDualOutputMode
+          ? {
+              platform,
+              streamKey: getPlatformService(platform).state.streamKey,
+              mode: this.dualOutputService.views.getPlatformMode(platform),
+            }
+          : {
+              platform,
+              streamKey: getPlatformService(platform).state.streamKey,
+            },
+      ),
       ...this.streamInfo.savedSettings.customDestinations
         .filter(dest => dest.enabled)
-        .map(dest => ({ platform: 'relay' as 'relay', streamKey: `${dest.url}${dest.streamKey}` })),
+        .map(dest =>
+          isDualOutputMode
+            ? {
+                platform: 'relay' as 'relay',
+                streamKey: `${dest.url}${dest.streamKey}`,
+                mode: this.dualOutputService.views.getMode(dest.display),
+              }
+            : {
+                platform: 'relay' as 'relay',
+                streamKey: `${dest.url}${dest.streamKey}`,
+              },
+        ),
     ];
 
     // treat tiktok as a custom destination
@@ -197,6 +272,15 @@ export class RestreamService extends StatefulService<IRestreamState> {
       const ttSettings = this.tiktokService.state.settings;
       tikTokTarget.platform = 'relay';
       tikTokTarget.streamKey = `${ttSettings.serverUrl}/${ttSettings.streamKey}`;
+      tikTokTarget.mode = this.dualOutputService.views.getPlatformMode('tiktok');
+    }
+
+    // treat twitter as a custom destination
+    const twitterTarget = newTargets.find(t => t.platform === 'twitter');
+    if (twitterTarget) {
+      twitterTarget.platform = 'relay';
+      twitterTarget.streamKey = `${this.twitterService.state.ingest}/${this.twitterService.state.streamKey}`;
+      twitterTarget.mode = this.dualOutputService.views.getPlatformMode('twitter');
     }
 
     await this.createTargets(newTargets);
@@ -211,7 +295,21 @@ export class RestreamService extends StatefulService<IRestreamState> {
     );
   }
 
-  async createTargets(targets: { platform: TPlatform | 'relay'; streamKey: string }[]) {
+  /**
+   * Create restream targets
+   * @remarks
+   * In dual output mode, assign a context to the ingest using the mode property.
+   * Defaults to the horizontal context.
+   *
+   * @param targets - Object with the platform name/type, stream key, and output mode
+   */
+  async createTargets(
+    targets: {
+      platform: TPlatform | 'relay';
+      streamKey: string;
+      mode?: TOutputOrientation;
+    }[],
+  ) {
     const headers = authorizedHeaders(
       this.userService.apiToken,
       new Headers({ 'Content-Type': 'application/json' }),
@@ -226,9 +324,11 @@ export class RestreamService extends StatefulService<IRestreamState> {
           dcProtection: false,
           idleTimeout: 30,
           label: `${target.platform} target`,
+          mode: target?.mode,
         };
       }),
     );
+
     const request = new Request(url, { headers, body, method: 'POST' });
     const res = await fetch(request);
     if (!res.ok) throw await res.json();
@@ -314,9 +414,11 @@ export class RestreamService extends StatefulService<IRestreamState> {
       },
     });
 
-    this.customizationService.settingsChanged.subscribe(changed => {
-      this.handleSettingsChanged(changed);
-    });
+    this.customizationService.settingsChanged.subscribe(
+      (changed: Partial<ICustomizationServiceState>) => {
+        this.handleSettingsChanged(changed);
+      },
+    );
 
     this.chatView.webContents.loadURL(this.chatUrl);
 

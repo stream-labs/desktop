@@ -10,7 +10,9 @@ import {
   ISceneItemFolder,
   SceneItemFolder,
   ISceneItemNode,
-  isItem,
+  EScaleType,
+  EBlendingMode,
+  EBlendingMethod,
 } from './index';
 import Utils from 'services/utils';
 import * as obs from '../../../obs-api';
@@ -20,9 +22,10 @@ import { TSceneNodeInfo } from 'services/scene-collections/nodes/scene-items';
 import * as fs from 'fs';
 import * as path from 'path';
 import uuid from 'uuid/v4';
-import { SceneNode } from '../api/external-api/scenes';
-import compact from 'lodash/compact';
 import { assertIsDefined } from 'util/properties-type-guards';
+import { VideoSettingsService, TDisplayType } from 'services/settings-v2';
+import { DualOutputService } from 'services/dual-output';
+import { SceneCollectionsService } from 'services/scene-collections';
 
 export type TSceneNode = SceneItem | SceneItemFolder;
 
@@ -30,7 +33,7 @@ export interface ISceneHierarchy extends ISceneItemNode {
   children: ISceneHierarchy[];
 }
 
-@ServiceHelper()
+@ServiceHelper('ScenesService')
 export class Scene {
   id: string;
   name: string;
@@ -42,6 +45,9 @@ export class Scene {
   @Inject() private scenesService: ScenesService;
   @Inject() private sourcesService: SourcesService;
   @Inject() private selectionService: SelectionService;
+  @Inject() private videoSettingsService: VideoSettingsService;
+  @Inject() private dualOutputService: DualOutputService;
+  @Inject() private sceneCollectionsService: SceneCollectionsService;
 
   readonly state: IScene;
 
@@ -75,7 +81,7 @@ export class Scene {
 
   getNode(sceneNodeId: string): TSceneNode | null {
     const nodeModel = this.state.nodes.find(
-      sceneItemModel => sceneItemModel.id === sceneNodeId,
+      sceneItemModel => sceneItemModel && sceneItemModel.id === sceneNodeId,
     ) as ISceneItem;
 
     if (!nodeModel) return null;
@@ -132,8 +138,56 @@ export class Scene {
     return this.state.nodes.map(item => item.id);
   }
 
+  /**
+   * After a scene has been opened in dual output mode, the vertical nodes
+   * must be filtered. Any scene with dual output nodes will use horizontal nodes
+   * to populate the source selector. This is to prevent the vertical nodes
+   * from showing on their own lines.
+   *
+   * In dual output mode, the active displays determine the nodes shown
+   * in the source selector. The only instance where the vertical nodes are used
+   * to populate the source selector is in dual output mode when the horizontal display is hidden.
+   */
+  getSourceSelectorNodes(): TSceneNode[] {
+    let nodes = this.getNodes();
+
+    const populateWithVerticalNodes =
+      !this.dualOutputService.views.activeDisplays.horizontal &&
+      this.dualOutputService.views.activeDisplays.vertical;
+
+    nodes = nodes.filter(node => {
+      // only return vertical nodes if only the vertical display is active
+      if (populateWithVerticalNodes && node?.display === 'vertical') {
+        return node;
+      }
+      // return horizontal nodes if either only the horizontal display is active or both displays are active
+      if (!populateWithVerticalNodes && node?.display === 'horizontal') {
+        return node;
+      }
+    });
+
+    return nodes;
+  }
+
   getSelection(itemsList?: TNodesList): Selection {
     return new Selection(this.id, itemsList);
+  }
+
+  // Required for performance. Using Selection is too slow (Service Helpers)
+  getItemsForNode(sceneNodeId: string): ISceneItem[] {
+    const node = this.state.nodes.find(n => n.id === sceneNodeId);
+    if (!node) return [];
+
+    if (node.sceneNodeType === 'item') {
+      return [node];
+    }
+
+    const children = this.state.nodes.filter(n => n.parentId === sceneNodeId);
+    let childrenItems: ISceneItem[] = [];
+
+    children.forEach(c => (childrenItems = childrenItems.concat(this.getItemsForNode(c.id))));
+
+    return childrenItems;
   }
 
   setName(newName: string) {
@@ -165,8 +219,23 @@ export class Scene {
 
     const obsSceneItem: obs.ISceneItem = this.getObsScene().add(source.getObsInput());
 
-    this.ADD_SOURCE_TO_SCENE(sceneItemId, source.sourceId, obsSceneItem.id);
+    if (source.forceHidden) obsSceneItem.visible = false;
+
+    const display = options?.display ?? 'horizontal';
+    // assign context to scene item
+    const context =
+      this.videoSettingsService.contexts[display] ?? this.videoSettingsService.contexts.horizontal;
+
+    this.ADD_SOURCE_TO_SCENE(
+      sceneItemId,
+      source.sourceId,
+      obsSceneItem.id,
+      display,
+      obsSceneItem.position,
+    );
     const sceneItem = this.getItem(sceneItemId)!;
+
+    sceneItem.setSettings({ ...sceneItem.getSettings(), display, output: context });
 
     // Default is to select
     if (options.select == null) options.select = true;
@@ -186,17 +255,64 @@ export class Scene {
     const fname = path.parse(addPath).name;
 
     if (fstat.isDirectory()) {
-      const folder = this.createFolder(fname);
-      if (folderId) folder.setParent(folderId);
-      const files = fs.readdirSync(addPath).reverse();
-      files.forEach(filePath => this.addFile(path.join(addPath, filePath), folder.id));
-      return folder;
+      if (this.dualOutputService.views.hasNodeMap()) {
+        // create horizontal and vertical folders
+        const horizontalFolder = this.createFolder(fname, { display: 'horizontal' });
+        const verticalFolder = this.createFolder(fname, { display: 'vertical' });
+
+        // create vertical folder
+        if (folderId) {
+          horizontalFolder.setParent(folderId);
+
+          const verticalFolderParentId = this.dualOutputService.views.getVerticalNodeId(folderId);
+          if (verticalFolderParentId) verticalFolder.setParent(verticalFolderParentId);
+        }
+
+        // add entry to node map
+        this.sceneCollectionsService.createNodeMapEntry(
+          this.id,
+          horizontalFolder.id,
+          verticalFolder.id,
+        );
+
+        // create horizontal and vertical nodes
+        const files = fs.readdirSync(addPath).reverse();
+        files.forEach(filePath => {
+          this.addFile(path.join(addPath, filePath), horizontalFolder.id);
+          this.addFile(path.join(addPath, filePath), verticalFolder.id);
+        });
+        return horizontalFolder;
+      } else {
+        const folder = this.createFolder(fname);
+        if (folderId) folder.setParent(folderId);
+        const files = fs.readdirSync(addPath).reverse();
+        files.forEach(filePath => this.addFile(path.join(addPath, filePath), folder.id));
+        return folder;
+      }
     }
 
     const source = this.sourcesService.addFile(addPath);
     if (!source) return null;
-    const item = this.addSource(source.sourceId);
-    if (folderId) item.setParent(folderId);
+    const item = this.addSource(source.sourceId, { display: 'horizontal' });
+    if (folderId) {
+      item.setParent(folderId);
+    }
+    if (this.dualOutputService.views.hasNodeMap()) {
+      Promise.resolve(
+        this.dualOutputService.actions.return.createOrAssignOutputNode(
+          item,
+          'vertical',
+          false,
+          this.id,
+        ),
+      ).then(node => {
+        if (folderId) {
+          const verticalFolderId = this.dualOutputService.views.getVerticalNodeId(folderId);
+          if (node && verticalFolderId) node.setParent(verticalFolderId);
+        }
+        return node;
+      });
+    }
     return item;
   }
 
@@ -209,6 +325,7 @@ export class Scene {
       sceneNodeType: 'folder',
       sceneId: this.id,
       parentId: '',
+      display: options?.display ?? 'horizontal',
     });
     return this.getFolder(id)!;
   }
@@ -347,6 +464,7 @@ export class Scene {
       if (sceneNode.sceneNodeType === 'folder') return true;
       const source = this.sourcesService.views.getSource(sceneNode.sourceId);
       if (!source) return false;
+
       arrayItems.push({
         name: source.sourceId,
         id: sceneNode.id,
@@ -359,8 +477,12 @@ export class Scene {
         y: sceneNode.y == null ? 0 : sceneNode.y,
         locked: sceneNode.locked,
         rotation: sceneNode.rotation || 0,
-        streamVisible: sceneNode.streamVisible,
-        recordingVisible: sceneNode.recordingVisible,
+        streamVisible: sceneNode.streamVisible!,
+        recordingVisible: sceneNode.recordingVisible!,
+        scaleFilter: sceneNode.scaleFilter!,
+        blendingMode: sceneNode.blendingMode!,
+        blendingMethod: sceneNode.blendingMethod,
+        display: sceneNode.display,
       });
       return true;
     });
@@ -370,10 +492,18 @@ export class Scene {
     // create folder and items
     let itemIndex = 0;
     nodes.forEach(nodeModel => {
+      const display = nodeModel?.display ?? 'horizontal';
+      const obsSceneItem = obsSceneItems[itemIndex];
       if (nodeModel.sceneNodeType === 'folder') {
-        this.createFolder(nodeModel.name, { id: nodeModel.id });
+        this.createFolder(nodeModel.name, { id: nodeModel.id, display });
       } else {
-        this.ADD_SOURCE_TO_SCENE(nodeModel.id, nodeModel.sourceId, obsSceneItems[itemIndex].id);
+        this.ADD_SOURCE_TO_SCENE(
+          nodeModel.id,
+          nodeModel.sourceId,
+          obsSceneItem.id,
+          display,
+          obsSceneItem.position,
+        );
         const item = this.getItem(nodeModel.id)!;
         item.loadItemAttributes(nodeModel);
         itemIndex++;
@@ -483,7 +613,13 @@ export class Scene {
   }
 
   @mutation()
-  private ADD_SOURCE_TO_SCENE(sceneItemId: string, sourceId: string, obsSceneItemId: number) {
+  private ADD_SOURCE_TO_SCENE(
+    sceneItemId: string,
+    sourceId: string,
+    obsSceneItemId: number,
+    display: TDisplayType,
+    position: IVec2,
+  ) {
     this.state.nodes.unshift({
       sceneItemId,
       sourceId,
@@ -514,6 +650,11 @@ export class Scene {
       locked: false,
       streamVisible: true,
       recordingVisible: true,
+      scaleFilter: EScaleType.Disable,
+      blendingMode: EBlendingMode.Normal,
+      blendingMethod: EBlendingMethod.Default,
+      display,
+      position,
     });
   }
 

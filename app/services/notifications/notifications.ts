@@ -146,8 +146,8 @@ export class NotificationsService
 
   showNotifications() {
     this.windowsService.showWindow({
-      componentName: 'Notifications',
-      title: $t('Notifications'),
+      componentName: 'NotificationsAndNews',
+      title: $t('Notifications & News'),
       size: {
         width: 600,
         height: 600,

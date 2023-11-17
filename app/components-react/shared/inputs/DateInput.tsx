@@ -2,7 +2,6 @@ import React from 'react';
 import { DatePicker, DatePickerProps } from 'antd';
 import { InputComponent, TSlobsInputProps, useInput, ValuesOf } from './inputs';
 import InputWrapper from './InputWrapper';
-import { Moment } from 'moment';
 
 const ANT_DATEPICKER_FEATURES = [] as const;
 

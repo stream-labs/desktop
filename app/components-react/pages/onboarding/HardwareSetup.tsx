@@ -61,7 +61,7 @@ export function HardwareSetup() {
     DefaultHardwareService.actions.setPresetFilter(value === 'none' ? '' : value);
 
     if (value === 'none') {
-      SourceFiltersService.remove(DefaultHardwareService.selectedVideoSource.sourceId, '__PRESET');
+      SourceFiltersService.removePresetFilter(DefaultHardwareService.selectedVideoSource.sourceId);
     } else {
       SourceFiltersService.addPresetFilter(
         DefaultHardwareService.selectedVideoSource.sourceId,

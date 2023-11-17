@@ -14,5 +14,10 @@
   "Manage List": "Liste verwalten",
   "Font Settings": "Schriftart-Einstellungen",
   "A hex color for the text of the": "Hex-Farbe für den Text des",
-  "token": "Tokens"
+  "token": "Tokens",
+  "Each donation that shows in the donation ticker will be in this format. Available tokens:": "Jede im Spenden-Ticker angezeigte Spende erscheint in diesem Format. Verfügbare Token:",
+  "The maximum amount of donations to show in the ticker. Must be a number greater than 0.": "Die maximale Anzahl der Spenden, die im Ticker angezeigt werden sollen. Die Zahl muss größer als 0 sein.",
+  "How fast the ticker should scroll between 1 (fastest) and 10 (slowest). Set to 0 for no scrolling.": "Wie schnell sich der Ticker bewegen soll. 1 (am langsamsten) und 10 (am schnellsten). Wählen Sie 0 für kein Scrollen.",
+  "The font size in pixels. Reasonable size typically ranges between 24px and 48px.": "Die Schriftgröße in Pixeln. Eine angemessene Größe beträgt in der Regel zwischen 24px und 48px.",
+  "How thick to make the font. The value should range between 300 (thinnest) and 900 (thickest)": "Wie dick die Schrift sein soll. Der Wert sollte zwischen 300 (dünnste) und 900 (dickste) liegen. Bitte benutzen Sie 100er-Schritte."
 }

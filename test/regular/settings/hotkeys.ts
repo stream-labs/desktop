@@ -1,7 +1,7 @@
-import { restartApp, test, TExecutionContext, useSpectron } from '../../helpers/spectron';
+import { restartApp, test, TExecutionContext, useWebdriver } from '../../helpers/webdriver';
 import { focusChild, focusMain } from '../../helpers/modules/core';
 
-useSpectron();
+useWebdriver();
 
 test('Populates essential hotkeys for them to be bound', async t => {
   const { app } = t.context;
@@ -28,10 +28,9 @@ test('Populates essential hotkeys for them to be bound', async t => {
     'Push to Mute',
     'Push to Talk',
   ]) {
-    await t.true(
-      await (await app.client.$(`.Hotkey-description=${hotkey}`)).isExisting(),
-      `Hotkey for ${hotkey} was not found`,
-    );
+    const hotkeyLabel = await app.client.$(`label=${hotkey}`);
+
+    await t.true(await hotkeyLabel.isExisting(), `Hotkey for ${hotkey} was not found`);
   }
 });
 
@@ -43,26 +42,34 @@ test('Binds a hotkey', async t => {
 
   await openHotkeySettings(t);
 
+  const bindingEl = async (root = app) =>
+    await root.client.$('[data-testid=Start_Recording] [data-name=binding]');
+
+  const getBinding = async (root = app) => (await bindingEl(root)).getValue();
+
+  const doneButton = app.client.$('button=Done');
+
   // Bind a hotkey to Start Recording
-  await (await app.client.$('.hotkey[data-test-id=Start_Recording] .Hotkey-bindings')).click();
+  await bindingEl().then(el => el.click());
+
   await app.client.keys(BINDING);
-  await (await app.client.$('button=Done')).click();
+  await doneButton.click();
 
   // Check that the binding persisted
   await openHotkeySettings(t);
-  let binding = await (
-    await app.client.$('.hotkey[data-test-id=Start_Recording] .Hotkey-input')
-  ).getValue();
-  t.is(binding, 'Ctrl+B');
+  let binding = await getBinding();
+
+  // New hotkey bind inputs have a suffix for re-binding
+  const expectedBinding = 'Ctrl+B (Click to re-bind)';
+  //
+  t.is(binding, expectedBinding);
 
   // check hotkey exists after restart
   const restartedApp = await restartApp(t);
   await openHotkeySettings(t);
 
-  binding = await (
-    await restartedApp.client.$('.hotkey[data-test-id=Start_Recording] .Hotkey-input')
-  ).getValue();
-  t.is(binding, 'Ctrl+B');
+  binding = await getBinding(restartedApp);
+  t.is(binding, expectedBinding);
 });
 
 const openHotkeySettings = async (t: TExecutionContext) => {
@@ -74,5 +81,6 @@ const openHotkeySettings = async (t: TExecutionContext) => {
 
   // Wait for hotkeys to populate
   await (await app.client.$('li=Hotkeys')).click();
-  await (await app.client.$('.hotkey')).waitForExist();
+  const startStreamingHotkey = await app.client.$('[data-testid=Start_Streaming]');
+  await startStreamingHotkey.waitForExist();
 };

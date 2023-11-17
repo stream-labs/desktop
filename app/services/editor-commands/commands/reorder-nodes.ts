@@ -46,9 +46,12 @@ export class ReorderNodesCommand extends Command {
   rollback() {
     // TODO: This is a fairly slow way to rollback this operation, but
     // significantly cuts down on excess business logic.
-    this.selection.getNodes().forEach(node => {
-      node.setParent(this.initialParentMap[node.id]);
-    });
-    this.selection.getScene().setNodesOrder(this.initialNodeOrder);
+    const nodes = this.selection.getNodes();
+    if (nodes.length > 0) {
+      this.selection.getNodes().forEach(node => {
+        node.setParent(this.initialParentMap[node.id]);
+      });
+      this.selection.getScene().setNodesOrder(this.initialNodeOrder);
+    }
   }
 }

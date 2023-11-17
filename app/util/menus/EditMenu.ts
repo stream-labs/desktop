@@ -1,7 +1,7 @@
 import { Inject } from '../../services/core/injector';
 import { Menu } from './Menu';
 import { Source, SourcesService } from '../../services/sources';
-import { ScenesService, isItem } from '../../services/scenes';
+import { SceneItem, ScenesService, isItem } from '../../services/scenes';
 import { ClipboardService } from 'services/clipboard';
 import { SourceTransformMenu } from './SourceTransformMenu';
 import { GroupMenu } from './GroupMenu';
@@ -12,19 +12,24 @@ import { SelectionService } from 'services/selection';
 import { ProjectorService } from 'services/projector';
 import { $t } from 'services/i18n';
 import { EditorCommandsService } from 'services/editor-commands';
-import { ERenderingMode } from '../../../obs-api';
 import { StreamingService } from 'services/streaming';
-import Utils from 'services/utils';
+import { TDisplayType } from 'services/settings-v2';
 import * as remote from '@electron/remote';
 import { ProjectorMenu } from './ProjectorMenu';
 import { FiltersMenu } from './FiltersMenu';
 import { AudioService } from 'services/audio';
+import { ScaleFilteringMenu } from './ScaleFilteringMenu';
+import { BlendingModeMenu } from './BlendingModeMenu';
+import { BlendingMethodMenu } from './BlendingMethodMenu';
+import { DeinterlacingModeMenu } from './DeinterlacingModeMenu';
+import { DualOutputService } from 'services/dual-output';
 
 interface IEditMenuOptions {
   selectedSourceId?: string;
   showSceneItemMenu?: boolean;
   selectedSceneId?: string;
   showAudioMixerMenu?: boolean;
+  display?: TDisplayType;
 }
 
 export class EditMenu extends Menu {
@@ -39,8 +44,10 @@ export class EditMenu extends Menu {
   @Inject() private editorCommandsService: EditorCommandsService;
   @Inject() private streamingService: StreamingService;
   @Inject() private audioService: AudioService;
+  @Inject() private dualOutputService: DualOutputService;
 
   private scene = this.scenesService.views.getScene(this.options.selectedSceneId);
+  private showProjectionMenuItem = true;
 
   private readonly source: Source;
 
@@ -55,6 +62,11 @@ export class EditMenu extends Menu {
     ) {
       this.source = this.selectionService.views.globalSelection.getItems()[0].getSource();
     }
+
+    // Selective recording can only be used with horizontal sources
+    this.showProjectionMenuItem =
+      this.options?.display !== 'vertical' &&
+      !this.selectionService.views.globalSelection.getItems('vertical').length;
 
     this.appendEditMenuItems();
   }
@@ -100,7 +112,7 @@ export class EditMenu extends Menu {
 
       this.append({
         label: $t('Transform'),
-        submenu: this.transformSubmenu().menu,
+        submenu: this.transformSubmenu(this.options?.display).menu,
       });
 
       this.append({
@@ -108,7 +120,33 @@ export class EditMenu extends Menu {
         submenu: this.groupSubmenu().menu,
       });
 
+      this.append({ type: 'separator' });
+
+      this.append({
+        label: $t('Scale Filtering'),
+        submenu: this.scaleFilteringSubmenu().menu,
+      });
+
+      this.append({
+        label: $t('Blending Mode'),
+        submenu: this.blendingModeSubmenu().menu,
+      });
+
+      this.append({
+        label: $t('Blending Method'),
+        submenu: this.blendingMethodSubmenu().menu,
+      });
+
       if (selectedItem && isItem(selectedItem)) {
+        if (selectedItem.getSource().async) {
+          this.append({
+            label: $t('Deinterlacing'),
+            submenu: this.deinterlacingSubmenu().menu,
+          });
+
+          this.append({ type: 'separator' });
+        }
+
         const visibilityLabel = selectedItem.visible ? $t('Hide') : $t('Show');
         const streamVisLabel = selectedItem.streamVisible
           ? $t('Hide on Stream')
@@ -177,7 +215,21 @@ export class EditMenu extends Menu {
                 .then(({ filePath }) => {
                   if (!filePath) return;
 
-                  this.widgetsService.saveWidgetFile(filePath, selectedItem.sceneItemId);
+                  /**
+                   * In dual output mode, the edit menu can be opened on either display
+                   * but for the purposes of persisting widget data, only the horizontal
+                   * scene item data should be persisted. Determine the correct sceneItemId
+                   * here.
+                   */
+
+                  const sceneItemId =
+                    this.options?.display === 'vertical'
+                      ? this.dualOutputService.views.getDualOutputNodeId(selectedItem.sceneItemId)
+                      : selectedItem.sceneItemId;
+
+                  console.log('sceneItemId ', sceneItemId);
+
+                  this.widgetsService.saveWidgetFile(filePath, sceneItemId);
                 });
             },
           });
@@ -212,7 +264,17 @@ export class EditMenu extends Menu {
               const itemsToRemoveIds = scene
                 .getItems()
                 .filter(item => item.sourceId === this.source.sourceId)
-                .map(item => item.id);
+                .reduce((itemIds: string[], item: SceneItem) => {
+                  itemIds.push(item.id);
+                  // for dual output scenes, also remove the partner node
+                  if (this.dualOutputService.views.hasSceneNodeMaps) {
+                    const dualOutputNodeId = this.dualOutputService.views.getDualOutputNodeId(
+                      item.id,
+                    );
+                    if (dualOutputNodeId) itemIds.push(dualOutputNodeId);
+                  }
+                  return itemIds;
+                }, []);
 
               this.editorCommandsService.executeCommand(
                 'RemoveNodesCommand',
@@ -291,7 +353,9 @@ export class EditMenu extends Menu {
 
     this.append({ type: 'separator' });
 
-    this.append({ label: $t('Projector'), submenu: this.projectorSubmenu().menu });
+    if (this.showProjectionMenuItem) {
+      this.append({ label: $t('Projector'), submenu: this.projectorSubmenu().menu });
+    }
 
     this.append({
       label: $t('Performance Mode'),
@@ -344,8 +408,8 @@ export class EditMenu extends Menu {
     }
   }
 
-  private transformSubmenu() {
-    return new SourceTransformMenu();
+  private transformSubmenu(display?: TDisplayType) {
+    return new SourceTransformMenu(display);
   }
 
   private groupSubmenu() {
@@ -354,5 +418,21 @@ export class EditMenu extends Menu {
 
   private projectorSubmenu() {
     return new ProjectorMenu();
+  }
+
+  private scaleFilteringSubmenu() {
+    return new ScaleFilteringMenu();
+  }
+
+  private blendingModeSubmenu() {
+    return new BlendingModeMenu();
+  }
+
+  private blendingMethodSubmenu() {
+    return new BlendingMethodMenu();
+  }
+
+  private deinterlacingSubmenu() {
+    return new DeinterlacingModeMenu();
   }
 }

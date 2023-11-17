@@ -11,16 +11,20 @@ import { OutputSettingsService } from './settings';
 import { ObsImporterService } from './obs-importer';
 import Utils from './utils';
 import { RecordingModeService } from './recording-mode';
+import * as remote from '@electron/remote';
+import { Subject } from 'rxjs';
 
 enum EOnboardingSteps {
   MacPermissions = 'MacPermissions',
   SteamingOrRecording = 'StreamingOrRecording',
   Connect = 'Connect',
+  PrimaryPlatformSelect = 'PrimaryPlatformSelect',
   FreshOrImport = 'FreshOrImport',
   ObsImport = 'ObsImport',
   HardwareSetup = 'HardwareSetup',
   ThemeSelector = 'ThemeSelector',
-  Optimize = 'Optimize',
+  // temporarily disable auto config until migrate to new api
+  // Optimize = 'Optimize',
   Prime = 'Prime',
 }
 
@@ -42,6 +46,13 @@ export const ONBOARDING_STEPS = () => ({
   [EOnboardingSteps.Connect]: {
     component: 'Connect',
     disableControls: false,
+    hideSkip: true,
+    hideButton: true,
+    isPreboarding: true,
+  },
+  [EOnboardingSteps.PrimaryPlatformSelect]: {
+    component: 'PrimaryPlatformSelect',
+    disableControls: true,
     hideSkip: true,
     hideButton: true,
     isPreboarding: true,
@@ -74,29 +85,46 @@ export const ONBOARDING_STEPS = () => ({
     hideButton: true,
     label: $t('Add a Theme'),
   },
-  [EOnboardingSteps.Optimize]: {
-    component: 'Optimize',
-    disableControls: false,
-    hideSkip: false,
-    hideButton: true,
-    label: $t('Optimize'),
-  },
+  // temporarily disable auto config until migrate to new api
+  // [EOnboardingSteps.Optimize]: {
+  //   component: 'Optimize',
+  //   disableControls: false,
+  //   hideSkip: false,
+  //   hideButton: true,
+  //   label: $t('Optimize'),
+  // },
   [EOnboardingSteps.Prime]: {
     component: 'Prime',
     disableControls: false,
     hideSkip: false,
     hideButton: true,
-    label: $t('Prime'),
+    label: $t('Ultra'),
   },
 });
 
 const THEME_METADATA = {
-  2560: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/0a2acb8/0a2acb8.overlay',
-  2559: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/6dcbf5f/6dcbf5f.overlay',
-  2624: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/eeeb9e1/eeeb9e1.overlay',
-  2657: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/0697cee/0697cee.overlay',
-  2656: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/59acc9a/59acc9a.overlay',
-  2639: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/a1a4ab0/a1a4ab0.overlay',
+  FREE: {
+    2560: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/0a2acb8/0a2acb8.overlay',
+    2559: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/6dcbf5f/6dcbf5f.overlay',
+    2624: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/eeeb9e1/eeeb9e1.overlay',
+    2657: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/0697cee/0697cee.overlay',
+    2656: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/59acc9a/59acc9a.overlay',
+    2639: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/a1a4ab0/a1a4ab0.overlay',
+  },
+  PAID: {
+    // Waves (paid version), free: 3216
+    2183: 'https://cdn.streamlabs.com/marketplace/overlays/439338/8164789/8164789.overlay',
+    // Esports Legacy (free)
+    3010: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/30a5873/30a5873.overlay',
+    // Scythe (paid version), free: 2561
+    3287: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/de716b6/de716b6.overlay',
+    // Neon Pixel (paid version), free: 2574
+    1445: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/fdb4d16/fdb4d16.overlay',
+    // Talon (paid version), free: 1207
+    1289: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/c5f35e1/c5f35e1.overlay',
+    // Halloween Nights (free)
+    2682: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/1fbce2a/1fbce2a.overlay',
+  },
 };
 
 export interface IOnboardingStep {
@@ -132,8 +160,15 @@ export interface IThemeMetadata {
 
 class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
   get singletonStep(): IOnboardingStep {
-    if (this.state.options.isLogin) return ONBOARDING_STEPS()[EOnboardingSteps.Connect];
-    if (this.state.options.isOptimize) return ONBOARDING_STEPS()[EOnboardingSteps.Optimize];
+    if (this.state.options.isLogin) {
+      if (this.getServiceViews(UserService).isPartialSLAuth) {
+        return ONBOARDING_STEPS()[EOnboardingSteps.PrimaryPlatformSelect];
+      }
+
+      return ONBOARDING_STEPS()[EOnboardingSteps.Connect];
+    }
+    // temporarily disable auto config until migrate to new api
+    // if (this.state.options.isOptimize) return ONBOARDING_STEPS()[EOnboardingSteps.Optimize];
     if (this.state.options.isHardware) return ONBOARDING_STEPS()[EOnboardingSteps.HardwareSetup];
     if (this.state.options.isImport) return ONBOARDING_STEPS()[EOnboardingSteps.ObsImport];
   }
@@ -150,7 +185,11 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
 
     steps.push(ONBOARDING_STEPS()[EOnboardingSteps.SteamingOrRecording]);
 
-    if (!recordingModeEnabled) steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Connect]);
+    steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Connect]);
+
+    if (userViews.auth && userViews.isPartialSLAuth) {
+      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.PrimaryPlatformSelect]);
+    }
 
     if (isOBSinstalled && !recordingModeEnabled) {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.FreshOrImport]);
@@ -173,13 +212,14 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ThemeSelector]);
     }
 
-    if (userViews.isTwitchAuthed) {
-      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Optimize]);
-    }
-
-    // if (userViews.isLoggedIn && !userViews.isPrime) {
-    //   steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Prime]);
+    // temporarily disable auto config until migrate to new api
+    // if (userViews.isTwitchAuthed || userViews.isYoutubeAuthed || recordingModeEnabled) {
+    //   steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Optimize]);
     // }
+
+    if (!userViews.isPrime) {
+      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Prime]);
+    }
 
     return steps;
   }
@@ -199,6 +239,8 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
 
   localStorageKey = 'UserHasBeenOnboarded';
 
+  onboardingCompleted = new Subject();
+
   @Inject() navigationService: NavigationService;
   @Inject() userService: UserService;
   @Inject() sceneCollectionsService: SceneCollectionsService;
@@ -216,7 +258,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
 
   @mutation()
   SET_EXISTING_COLLECTIONS(val: boolean) {
-    // this.state.existingSceneCollections = val;
+    this.state.existingSceneCollections = val;
   }
 
   async fetchThemeData(id: string) {
@@ -225,11 +267,15 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   }
 
   async fetchThemes() {
-    return await Promise.all(Object.keys(THEME_METADATA).map(id => this.fetchThemeData(id)));
+    return await Promise.all(Object.keys(this.themeMetadata).map(this.fetchThemeData));
+  }
+
+  get themeMetadata() {
+    return this.userService.views.isPrime ? THEME_METADATA.PAID : THEME_METADATA.FREE;
   }
 
   themeUrl(id: number) {
-    return THEME_METADATA[id];
+    return this.themeMetadata[id];
   }
 
   get views() {
@@ -248,11 +294,15 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   }
 
   init() {
-    this.SET_EXISTING_COLLECTIONS(this.existingSceneCollections);
+    this.setExistingCollections();
   }
 
   setObsImport(val: boolean) {
     this.SET_OBS_IMPORTED(val);
+  }
+
+  setExistingCollections() {
+    this.SET_EXISTING_COLLECTIONS(this.existingSceneCollections);
   }
 
   // A login attempt is an abbreviated version of the onboarding process,
@@ -273,6 +323,8 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   // Ends the onboarding process
   finish() {
     localStorage.setItem(this.localStorageKey, 'true');
+    remote.session.defaultSession.flushStorageData();
+    console.log('Set onboarding key successful.');
 
     // setup a custom resolution if the platform requires that
     const platformService = getPlatformService(this.userService.views.platform?.type);
@@ -286,6 +338,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
     }
 
     this.navigationService.navigate('Studio');
+    this.onboardingCompleted.next();
   }
 
   get isTwitchAuthed() {

@@ -16,5 +16,16 @@
   "Click to read your unread Notifications": "Okunmamış Bildirimlerinizi okumak için tıklayın",
   "New Notifications": "Yeni Bildirimler",
   "Log": "Günlük",
-  "Streamlabs Desktop has updated! Click here to see what changed.": "Streamlabs Desktop güncellendi! Değişiklikleri görmek için buraya tıklayın."
+  "Streamlabs Desktop has updated! Click here to see what changed.": "Streamlabs Desktop güncellendi! Değişiklikleri görmek için buraya tıklayın.",
+  "Notifications & News": "Bildirimler ve Haberler",
+  "News": "Haberler",
+  "Notifications": "Bildirimler",
+  "A new Recording has been completed. Click for more info": "Bir yeni Kayıt tamamlandı. Daha fazla bilgi için tıklayın",
+  "Recording History": "Kayıt Geçmişi",
+  "Show in folder": "Klasörde göster",
+  "Recordings": "Kayıtlar",
+  "Marker %{label} added at %{timestamp}": "%{label} İşareti %{timestamp} itibariyle eklendi",
+  "File is too large to upload": "Dosya, yüklemek için çok büyük",
+  "File type %{extension} is not supported": "%{extension} dosya türü desteklenmemektedir",
+  "Upload already in progress": "Yükleme henüz tamamlanmadı"
 }

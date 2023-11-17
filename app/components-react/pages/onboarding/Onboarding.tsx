@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styles from './Onboarding.m.less';
 import commonStyles from './Common.m.less';
 import { Services } from 'components-react/service-provider';
@@ -11,7 +11,13 @@ import { IOnboardingStep, ONBOARDING_STEPS } from 'services/onboarding';
 import Scrollable from 'components-react/shared/Scrollable';
 
 export default function Onboarding() {
-  const { currentStep, next, processing, finish } = useModule(OnboardingModule);
+  const { currentStep, next, processing, finish, UsageStatisticsService } = useModule(
+    OnboardingModule,
+  );
+
+  useEffect(() => {
+    UsageStatisticsService.actions.recordShown('Onboarding', currentStep.component);
+  }, [currentStep.component]);
 
   // TODO: Onboarding service needs a refactor away from step index-based.
   // In the meantime, if we run a render cycle and step index is greater
@@ -43,7 +49,7 @@ export default function Onboarding() {
               {$t('Skip')}
             </button>
           )}
-          {<ActionButton />}
+          <ActionButton />
         </div>
       )}
     </div>
@@ -87,7 +93,7 @@ function ActionButton() {
   const { currentStep, next, processing } = useModule(OnboardingModule);
 
   if (currentStep.hideButton) return null;
-  const isPrimeStep = currentStep.label === $t('Prime');
+  const isPrimeStep = currentStep.label === $t('Ultra');
   return (
     <button
       className={cx('button button--action', commonStyles.onboardingButton, {
@@ -96,7 +102,7 @@ function ActionButton() {
       onClick={() => next()}
       disabled={processing}
     >
-      {isPrimeStep ? $t('Go Prime') : $t('Continue')}
+      {isPrimeStep ? $t('Go Ultra') : $t('Continue')}
     </button>
   );
 }
@@ -111,8 +117,16 @@ export class OnboardingModule {
     return Services.OnboardingService;
   }
 
-  get ReocrdingModeService() {
+  get RecordingModeService() {
     return Services.RecordingModeService;
+  }
+
+  get UsageStatisticsService() {
+    return Services.UsageStatisticsService;
+  }
+
+  get UserService() {
+    return Services.UserService;
   }
 
   get steps() {
@@ -137,8 +151,8 @@ export class OnboardingModule {
   }
 
   setRecordingMode() {
-    this.ReocrdingModeService.setRecordingMode(true);
-    this.ReocrdingModeService.setUpRecordingFirstTimeSetup();
+    this.RecordingModeService.setRecordingMode(true);
+    this.RecordingModeService.setUpRecordingFirstTimeSetup();
   }
 
   setImportFromObs() {
@@ -146,6 +160,7 @@ export class OnboardingModule {
   }
 
   finish() {
+    this.UsageStatisticsService.actions.recordShown('Onboarding', 'completed');
     this.OnboardingService.actions.finish();
   }
 
@@ -153,13 +168,17 @@ export class OnboardingModule {
   next(isSkip = false) {
     if (this.state.processing) return;
 
+    if (this.OnboardingService.state.options.isLogin && this.UserService.views.isPartialSLAuth) {
+      return;
+    }
+
     if (
-      this.ReocrdingModeService.views.isRecordingModeEnabled &&
+      this.RecordingModeService.views.isRecordingModeEnabled &&
       this.currentStep.component === 'HardwareSetup' &&
       !this.OnboardingService.state.options.isHardware &&
       !isSkip
     ) {
-      this.ReocrdingModeService.actions.addRecordingWebcam();
+      this.RecordingModeService.actions.addRecordingWebcam();
     }
 
     if (this.state.stepIndex >= this.steps.length - 1 || this.singletonStep) {

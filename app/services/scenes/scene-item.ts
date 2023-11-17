@@ -28,12 +28,17 @@ import { Rect } from '../../util/rect';
 import { TSceneNodeType } from './scenes';
 import { ServiceHelper, ExecuteInWorkerProcess } from 'services/core';
 import { assertIsDefined } from '../../util/properties-type-guards';
+import { VideoSettingsService, TDisplayType } from 'services/settings-v2';
+import { EditorService } from 'services/editor';
 /**
  * A SceneItem is a source that contains
  * all of the information about that source, and
  * how it fits in to the given scene
  */
-@ServiceHelper()
+
+export { EScaleType, EBlendingMode, EBlendingMethod } from '../../../obs-api';
+
+@ServiceHelper('ScenesService')
 export class SceneItem extends SceneItemNode {
   sourceId: string;
   name: string;
@@ -54,8 +59,15 @@ export class SceneItem extends SceneItemNode {
   locked: boolean;
   streamVisible: boolean;
   recordingVisible: boolean;
+  scaleFilter: obs.EScaleType;
+  blendingMode: obs.EBlendingMode;
+  blendingMethod: obs.EBlendingMethod;
 
   sceneNodeType: TSceneNodeType = 'item';
+
+  output?: obs.IVideo;
+  display?: TDisplayType;
+  readonly position: IVec2;
 
   // Some computed attributes
 
@@ -77,6 +89,8 @@ export class SceneItem extends SceneItemNode {
   @Inject() protected scenesService: ScenesService;
   @Inject() private sourcesService: SourcesService;
   @Inject() private videoService: VideoService;
+  @Inject() private videoSettingsService: VideoSettingsService;
+  @Inject() private editorService: EditorService;
 
   constructor(sceneId: string, sceneItemId: string, sourceId: string) {
     super();
@@ -126,6 +140,11 @@ export class SceneItem extends SceneItemNode {
       visible: this.visible,
       streamVisible: this.streamVisible,
       recordingVisible: this.recordingVisible,
+      scaleFilter: this.scaleFilter,
+      blendingMode: this.blendingMode,
+      blendingMethod: this.blendingMethod,
+      output: this.output,
+      display: this.display,
     };
   }
 
@@ -182,7 +201,8 @@ export class SceneItem extends SceneItemNode {
     }
 
     if (changed.visible !== void 0) {
-      this.getObsSceneItem().visible = newSettings.visible;
+      // Do not adjust visibility in OBS while source is force hidden
+      if (!this.source.forceHidden) this.getObsSceneItem().visible = newSettings.visible;
     }
 
     if (changed.streamVisible !== void 0) {
@@ -191,6 +211,22 @@ export class SceneItem extends SceneItemNode {
 
     if (changed.recordingVisible !== void 0) {
       this.getObsSceneItem().recordingVisible = newSettings.recordingVisible;
+    }
+
+    if (changed.scaleFilter !== void 0) {
+      this.getObsSceneItem().scaleFilter = newSettings.scaleFilter;
+    }
+
+    if (changed.blendingMode !== void 0) {
+      this.getObsSceneItem().blendingMode = newSettings.blendingMode;
+    }
+
+    if (changed.blendingMethod !== void 0) {
+      this.getObsSceneItem().blendingMethod = newSettings.blendingMethod;
+    }
+
+    if (changed.output !== void 0 || patch.hasOwnProperty('output')) {
+      this.getObsSceneItem().video = newSettings.output as obs.IVideo;
     }
 
     this.UPDATE({ sceneItemId: this.sceneItemId, ...changed });
@@ -238,10 +274,19 @@ export class SceneItem extends SceneItemNode {
     this.setSettings({ recordingVisible });
   }
 
+  setDisplay(display: TDisplayType) {
+    this.setSettings({ display });
+  }
+
   loadItemAttributes(customSceneItem: ISceneItemInfo) {
     const visible = customSceneItem.visible;
     const position = { x: customSceneItem.x, y: customSceneItem.y };
     const crop = customSceneItem.crop;
+    const display = customSceneItem?.display ?? this?.display ?? 'horizontal';
+    const context = this.videoSettingsService.contexts[display];
+
+    const obsSceneItem = this.getObsSceneItem();
+    obsSceneItem.video = context as obs.IVideo;
 
     this.UPDATE({
       visible,
@@ -255,6 +300,12 @@ export class SceneItem extends SceneItemNode {
       locked: !!customSceneItem.locked,
       streamVisible: !!customSceneItem.streamVisible,
       recordingVisible: !!customSceneItem.recordingVisible,
+      scaleFilter: customSceneItem.scaleFilter,
+      blendingMode: customSceneItem.blendingMode,
+      blendingMethod: customSceneItem.blendingMethod,
+      display,
+      output: context,
+      position: obsSceneItem.position,
     });
   }
 
@@ -338,27 +389,27 @@ export class SceneItem extends SceneItemNode {
     });
   }
 
-  stretchToScreen() {
+  stretchToScreen(display?: TDisplayType) {
     const rect = new ScalableRectangle(this.rectangle);
-    rect.stretchAcross(this.videoService.getScreenRectangle());
+    rect.stretchAcross(this.videoService.getScreenRectangle(display));
     this.setRect(rect);
   }
 
-  fitToScreen() {
+  fitToScreen(display?: TDisplayType) {
     const rect = new ScalableRectangle(this.rectangle);
-    rect.fitTo(this.videoService.getScreenRectangle());
+    rect.fitTo(this.videoService.getScreenRectangle(display));
     this.setRect(rect);
   }
 
-  centerOnScreen() {
+  centerOnScreen(display?: TDisplayType) {
     const rect = new ScalableRectangle(this.rectangle);
-    rect.centerOn(this.videoService.getScreenRectangle());
+    rect.centerOn(this.videoService.getScreenRectangle(display));
     this.setRect(rect);
   }
 
-  centerOnAxis(axis: CenteringAxis) {
+  centerOnAxis(axis: CenteringAxis, display?: TDisplayType) {
     const rect = new ScalableRectangle(this.rectangle);
-    rect.centerOn(this.videoService.getScreenRectangle(), axis);
+    rect.centerOn(this.videoService.getScreenRectangle(display), axis);
     this.setRect(rect);
   }
 
@@ -372,6 +423,18 @@ export class SceneItem extends SceneItemNode {
     return this.getScene()
       .getItems()
       .findIndex(sceneItemModel => sceneItemModel.id === this.id);
+  }
+
+  setScaleFilter(scaleFilter: obs.EScaleType): void {
+    this.setSettings({ scaleFilter });
+  }
+
+  setBlendingMode(blendingMode: obs.EBlendingMode): void {
+    this.setSettings({ blendingMode });
+  }
+
+  setBlendingMethod(blendingMethod: obs.EBlendingMethod): void {
+    this.setSettings({ blendingMethod });
   }
 
   /**

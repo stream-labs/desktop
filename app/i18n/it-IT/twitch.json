@@ -1,4 +1,7 @@
 {
-  "Twitch Game": "Twitch Game",
-  "Twitch Tags": "Tag Twitch"
+  "Twitch Category": "Categoria di Twitch",
+  "Twitch Tags": "Tag Twitch",
+  "You need to re-login to access Twitch tags": "È necessario effettuare nuovamente il login per accedere ai tag di Twitch",
+  "Do not include special characters or spaces in your tag": "Non includere carattere speciali o spazi nel tuo tag",
+  "For example: \"Speedrunning\" or \"FirstPlaythrough\"": "Ad esempio: \"Corsaveloce\" o \"Primoascolto\""
 }

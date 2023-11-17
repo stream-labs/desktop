@@ -13,7 +13,7 @@ export function ExperimentalSettings() {
   }
 
   function showDemoComponents() {
-    WindowsService.showWindow({
+    WindowsService.actions.showWindow({
       title: 'Shared React Components',
       componentName: 'SharedComponentsLibrary',
       size: { width: 1000, height: 1000 },

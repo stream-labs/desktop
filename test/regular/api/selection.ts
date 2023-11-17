@@ -1,4 +1,4 @@
-import { useSpectron, test, afterAppStart } from '../../helpers/spectron';
+import { useWebdriver, test, afterAppStart } from '../../helpers/webdriver';
 import { getApiClient } from '../../helpers/api-client';
 
 import { SceneBuilder } from '../../helpers/scene-builder';
@@ -6,7 +6,7 @@ import { sleep } from '../../helpers/sleep';
 import { SelectionService } from '../../../app/services/api/external-api/selection';
 import { Scene, SceneNode, ScenesService } from '../../../app/services/api/external-api/scenes';
 
-useSpectron({ restartAppAfterEachTest: false });
+useWebdriver({ restartAppAfterEachTest: false });
 
 let sceneBuilder: SceneBuilder;
 let scene: Scene;

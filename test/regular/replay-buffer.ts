@@ -1,5 +1,5 @@
 import { readdir } from 'fs-extra';
-import { test, useSpectron } from '../helpers/spectron';
+import { test, useWebdriver } from '../helpers/webdriver';
 import { sleep } from '../helpers/sleep';
 import {
   setOutputResolution,
@@ -13,7 +13,7 @@ import {
   stopReplayBuffer,
 } from '../helpers/modules/replay-buffer';
 
-useSpectron();
+useWebdriver();
 
 test('Replay Buffer', async t => {
   const tmpDir = await setTemporaryRecordingPath();

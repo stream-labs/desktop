@@ -1,5 +1,7 @@
 import { StatefulService, mutation } from './core/stateful-service';
 import { Subject } from 'rxjs';
+import { Inject } from 'services/core';
+import { SideNavService } from 'app-services';
 
 export type TAppPage =
   | 'Studio'
@@ -15,7 +17,8 @@ export type TAppPage =
   | 'StreamScheduler'
   | 'Highlighter'
   | 'Grow'
-  | 'ThemeAudit';
+  | 'ThemeAudit'
+  | 'RecordingHistory';
 
 interface INavigationState {
   currentPage: TAppPage;
@@ -23,6 +26,7 @@ interface INavigationState {
 }
 
 export class NavigationService extends StatefulService<INavigationState> {
+  @Inject() sideNavService: SideNavService;
   static initialState: INavigationState = {
     currentPage: 'Studio',
     params: {},
@@ -33,6 +37,11 @@ export class NavigationService extends StatefulService<INavigationState> {
   navigate(page: TAppPage, params: Dictionary<string | boolean> = {}) {
     this.NAVIGATE(page, params);
     this.navigated.next(this.state);
+  }
+
+  navigateApp(appId: string, key?: string) {
+    this.navigate('PlatformAppMainPage', { appId });
+    this.sideNavService.setCurrentMenuItem(key ?? appId);
   }
 
   @mutation()

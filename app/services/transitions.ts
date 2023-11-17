@@ -5,6 +5,7 @@ import { TObsValue, TObsFormData } from 'components/obs/inputs/ObsInput';
 import { IListOption } from 'components/shared/inputs';
 import { WindowsService } from 'services/windows';
 import { ScenesService } from 'services/scenes';
+import { Scene } from 'services/scenes/scene';
 import uuid from 'uuid/v4';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { $t } from 'services/i18n';
@@ -14,6 +15,9 @@ import { isUrl } from '../util/requests';
 import { getOS, OS } from 'util/operating-systems';
 import { UsageStatisticsService } from './usage-statistics';
 import { SourcesService } from 'services/sources';
+import { VideoSettingsService } from './settings-v2';
+import { DualOutputService } from './dual-output';
+import { NotificationsService, ENotificationType } from './notifications';
 
 export const TRANSITION_DURATION_MAX = 2_000_000_000;
 
@@ -110,6 +114,9 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
   @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() usageStatisticsService: UsageStatisticsService;
   @Inject() sourcesService: SourcesService;
+  @Inject() videoSettingsService: VideoSettingsService;
+  @Inject() dualOutputService: DualOutputService;
+  @Inject() notificationsService: NotificationsService;
 
   get views() {
     return new TransitionsViews(this.state);
@@ -132,6 +139,11 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
   sceneDuplicate: obs.IScene;
 
   /**
+   * This is an application's id of duplicated scene from above
+   */
+  currentSceneId: string;
+
+  /**
    * Used to prevent studio mode transitions before the current
    * one is complete.
    */
@@ -151,16 +163,31 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     this.sceneCollectionsService.collectionWillSwitch.subscribe(() => {
       this.disableStudioMode();
     });
+
+    // a video context must be initialized before loading the scene transition
+    const establishedContext = this.videoSettingsService.establishedContext.subscribe(() => {
+      if (!this.studioModeTransition) this.createStudioModeTransition();
+      establishedContext.unsubscribe();
+    });
   }
 
   enableStudioMode() {
     if (this.state.studioMode) return;
+    if (this.dualOutputService.views.dualOutputMode) {
+      this.notificationsService.actions.push({
+        message: $t('Cannot toggle Studio Mode in Dual Output Mode.'),
+        type: ENotificationType.WARNING,
+        lifeTime: 2000,
+      });
+      return;
+    }
 
     this.usageStatisticsService.recordFeatureUsage('StudioMode');
     this.SET_STUDIO_MODE(true);
     this.studioModeChanged.next(true);
 
     if (!this.studioModeTransition) this.createStudioModeTransition();
+    this.currentSceneId = this.scenesService.views.activeScene.id;
     const currentScene = this.scenesService.views.activeScene.getObsScene();
     this.sceneDuplicate = currentScene.duplicate(uuid(), obs.ESceneDupType.Copy);
 
@@ -189,10 +216,14 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
 
     this.studioModeLocked = true;
 
-    const currentScene = this.scenesService.views.activeScene.getObsScene();
+    const currentScene = this.scenesService.views.activeScene;
+
+    if (this.currentSceneId !== currentScene.id) {
+      this.playFfmpegSources(currentScene, false);
+    }
 
     const oldDuplicate = this.sceneDuplicate;
-    this.sceneDuplicate = currentScene.duplicate(uuid(), obs.ESceneDupType.Copy);
+    this.sceneDuplicate = currentScene.getObsScene().duplicate(uuid(), obs.ESceneDupType.Copy);
 
     // TODO: Make this a dropdown box
     const transition = this.getDefaultTransition();
@@ -205,12 +236,11 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
       this.sceneDuplicate,
     );
 
-    oldDuplicate.release();
-
-    setTimeout(
-      () => (this.studioModeLocked = false),
-      Math.min(transition.duration, TRANSITION_DURATION_MAX),
-    );
+    setTimeout(() => {
+      oldDuplicate.release();
+      this.studioModeLocked = false;
+      this.currentSceneId = this.scenesService.views.activeScene.id;
+    }, Math.min(transition.duration, TRANSITION_DURATION_MAX));
   }
 
   /**
@@ -247,10 +277,41 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     }
   }
 
+  // This sould be used in 'Studio mode' only.
+  // As ffmpeg sources do not start playing because they are not active when user switches scenes,
+  // we are bypassing this limitation here by forcing to start and stop playback of video files
+  playFfmpegSources(scene: Scene, play: boolean) {
+    if (!this.state.studioMode) {
+      return;
+    }
+
+    for (const source of scene.getNestedSources()) {
+      const settings = source.getSettings();
+      if (settings['restart_on_activate'] !== true) {
+        continue;
+      }
+
+      if (source.type === 'ffmpeg_source') {
+        if (play) {
+          source.getObsInput().play();
+        } else {
+          source.getObsInput().stop();
+        }
+      }
+    }
+  }
+
   transition(sceneAId: string | null, sceneBId: string) {
     if (this.state.studioMode) {
+      if (sceneAId && sceneAId !== this.currentSceneId) {
+        const prevScene = this.scenesService.views.getScene(sceneAId);
+        this.playFfmpegSources(prevScene, false);
+      }
+
       const scene = this.scenesService.views.getScene(sceneBId);
       this.studioModeTransition.set(scene.getObsScene());
+      this.playFfmpegSources(scene, true);
+
       return;
     }
 

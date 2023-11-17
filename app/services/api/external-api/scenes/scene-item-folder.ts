@@ -20,7 +20,7 @@ export interface ISceneItemFolderModel extends ISceneNodeModel {
  * other nodes based on this folder. For further scene item folder operations
  * see {@link SceneNode}, {@link Scene} and {@link SourcesService}.
  */
-@ServiceHelper()
+@ServiceHelper('ScenesService')
 export class SceneItemFolder extends SceneNode implements ISceneItemFolderModel {
   @Fallback() private sceneFolder: InternalSceneItemFolder;
   @InjectFromExternalApi() private sourcesService: SourcesService;

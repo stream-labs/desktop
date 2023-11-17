@@ -9,10 +9,12 @@ import { Row, Col } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { Section } from './Section';
 import PlatformSettings from './PlatformSettings';
-import TwitterInput from './Twitter';
 import OptimizedProfileSwitcher from './OptimizedProfileSwitcher';
 import Spinner from '../../shared/Spinner';
+import ButtonHighlighted from '../../shared/ButtonHighlighted';
+import UltraIcon from '../../shared/UltraIcon';
 import GoLiveError from './GoLiveError';
+import TwitterInput from './Twitter';
 
 const PlusIcon = PlusOutlined as Function;
 
@@ -31,8 +33,16 @@ export default function GoLiveSettings() {
     isLoading,
     canAddDestinations,
     shouldShowPrimeLabel,
+    canUseOptimizedProfile,
+    showTweet,
   } = useGoLiveSettings().extend(module => {
-    const { RestreamService, SettingsService, UserService, MagicLinkService } = Services;
+    const {
+      RestreamService,
+      SettingsService,
+      UserService,
+      MagicLinkService,
+      VideoEncodingOptimizationService,
+    } = Services;
 
     return {
       get canAddDestinations() {
@@ -50,7 +60,13 @@ export default function GoLiveSettings() {
         }
       },
 
-      shouldShowPrimeLabel: !RestreamService.state.grandfathered,
+      shouldShowPrimeLabel: !RestreamService.state.grandfathered && !UserService.views.isPrime,
+
+      canUseOptimizedProfile:
+        VideoEncodingOptimizationService.state.canSeeOptimizedProfile ||
+        VideoEncodingOptimizationService.state.useOptimizedProfile,
+
+      showTweet: UserService.views.auth?.primaryPlatform !== 'twitter',
     };
   });
 
@@ -68,9 +84,11 @@ export default function GoLiveSettings() {
           {/*ADD DESTINATION BUTTON*/}
           {shouldShowAddDestButton && (
             <a className={styles.addDestinationBtn} onClick={addDestination}>
-              <PlusIcon />
-              {$t('Add Destination')}{' '}
-              {shouldShowPrimeLabel && <b className={styles.prime}>prime</b>}
+              <PlusIcon style={{ paddingLeft: '17px', fontSize: '24px' }} />
+              <span style={{ flex: 1 }}>{$t('Add Destination')}</span>
+              {shouldShowPrimeLabel && (
+                <ButtonHighlighted filled text={$t('Ultra')} icon={<UltraIcon type="simple" />} />
+              )}
             </a>
           )}
         </Col>
@@ -78,7 +96,7 @@ export default function GoLiveSettings() {
 
       {/*RIGHT COLUMN*/}
       <Col span={shouldShowLeftCol ? 16 : 24} style={{ height: '100%' }}>
-        <Spinner visible={isLoading} />
+        <Spinner visible={isLoading} relative />
         <GoLiveError />
         {shouldShowSettings && (
           <Scrollable style={{ height: '100%' }} snapToWindowEdge>
@@ -88,8 +106,8 @@ export default function GoLiveSettings() {
             {isAdvancedMode && <div className={styles.spacer} />}
             {/*EXTRAS*/}
             <Section isSimpleMode={!isAdvancedMode} title={$t('Extras')}>
-              <TwitterInput />
-              <OptimizedProfileSwitcher />
+              {showTweet && <TwitterInput />}
+              {!!canUseOptimizedProfile && <OptimizedProfileSwitcher />}
             </Section>
           </Scrollable>
         )}

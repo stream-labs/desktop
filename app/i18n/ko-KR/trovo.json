@@ -1,11 +1,11 @@
 {
-  "Trovo Category": "Trovo Category",
-  "Trovo Raid": "Trovo Raid",
-  "Trovo Follow": "Trovo Follow",
-  "Trovo Subscription": "Trovo Subscription",
-  "Trovo Follows": "Trovo Follows",
-  "Plays an alert for new Trovo followers": "Plays an alert for new Trovo followers",
-  "Plays an alert for new Trovo subscriptions": "Plays an alert for new Trovo subscriptions",
-  "Trovo Resubs": "Trovo Resubs",
-  "Trovo Subs": "Trovo Subs"
+  "Trovo Category": "Trovo 카테고리",
+  "Trovo Raid": "Trovo 레이드",
+  "Trovo Follow": "Trovo 팔로우",
+  "Trovo Subscription": "Trovo 구독",
+  "Trovo Follows": "Trovo 팔로우",
+  "Plays an alert for new Trovo followers": "새로운 Trovo 팔로워 알림 재생",
+  "Plays an alert for new Trovo subscriptions": "새로운 Trovo 구독 알림 재생",
+  "Trovo Resubs": "Trovo 재구독",
+  "Trovo Subs": "Trovo 구독"
 }

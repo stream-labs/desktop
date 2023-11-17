@@ -1,0 +1,40 @@
+@import "../../../../styles/index";
+
+.mixer-item {
+  position: relative;
+  .padding-h-sides(2);
+  .padding-v-sides();
+
+  .source-name {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .db-value {
+    width: 60px;
+    text-align: right;
+  }
+
+  .slider {
+    flex: 1;
+  }
+
+  &.muted .slider {
+    opacity: 0.4;
+  }
+
+  .controls {
+    flex: 0 0 60px;
+    height: 32px;
+    margin-top: 8px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+    .fa-volume-off {
+      color: var(--warning);
+    }
+  }
+}

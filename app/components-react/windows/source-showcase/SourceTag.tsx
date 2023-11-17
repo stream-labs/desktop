@@ -14,14 +14,17 @@ export default function SourceTag(p: {
   appId?: string;
   appSourceId?: string;
   essential?: boolean;
+  excludeWrap?: boolean;
 }) {
-  const {
-    inspectSource,
-    selectInspectedSource,
-    inspectedSource,
-    inspectedAppId,
-    inspectedAppSourceId,
-  } = useSourceShowcaseSettings();
+  const { inspectSource, selectInspectedSource, store } = useSourceShowcaseSettings();
+
+  const { inspectedSource, inspectedAppId, inspectedAppSourceId } = store.useState(s => {
+    return {
+      inspectedSource: s.inspectedSource,
+      inspectedAppId: s.inspectedAppId,
+      inspectedAppSourceId: s.inspectedAppSourceId,
+    };
+  });
   const { UserService } = Services;
   const { platform } = useVuex(() => ({ platform: UserService.views.platform?.type }));
 
@@ -39,6 +42,7 @@ export default function SourceTag(p: {
         className={cx(styles.sourceTag, {
           [styles.active]: active(),
           [styles.essential]: p.essential,
+          [styles.excludeWrap]: p.excludeWrap,
         })}
         onClick={() => inspectSource(p.type, p.appId, p.appSourceId)}
         onDoubleClick={() => selectInspectedSource()}

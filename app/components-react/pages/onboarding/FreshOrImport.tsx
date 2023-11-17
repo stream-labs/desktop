@@ -51,8 +51,14 @@ export function FreshOrImport() {
               onClick={() => data.onClick()}
               style={{ background: `var(${data.color})` }}
             >
-              <h2>{data.title}</h2>
               {data.image}
+              <h2
+                style={{
+                  color: data.color === '--teal' ? 'var(--action-button-text)' : undefined,
+                }}
+              >
+                {data.title}
+              </h2>
             </div>
           </Tooltip>
         ))}

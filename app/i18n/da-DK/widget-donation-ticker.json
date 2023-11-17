@@ -14,5 +14,10 @@
   "Manage List": "Administrer liste",
   "Font Settings": "Skrifttypeindstillinger",
   "A hex color for the text of the": "En hex-farve til teksten på",
-  "token": "token"
+  "token": "token",
+  "Each donation that shows in the donation ticker will be in this format. Available tokens:": "Alle donationer, der vises i donationsrulleteksten, vil være i dette format. Tilgængelige tokens:",
+  "The maximum amount of donations to show in the ticker. Must be a number greater than 0.": "Det maksimale beløb for donationer, der skal vises i rulleteksten. Skal være et tal, der er større end 0.",
+  "How fast the ticker should scroll between 1 (fastest) and 10 (slowest). Set to 0 for no scrolling.": "Hvor hurtigt tekste skal rulle mellem 1 (hurtigst) og 10 (langsomst). Sæt til 0 for at den ikke skal rulle.",
+  "The font size in pixels. Reasonable size typically ranges between 24px and 48px.": "Skriftstørrelse i pixels. Størrelsen ligger typisk mellem 24px og 48px.",
+  "How thick to make the font. The value should range between 300 (thinnest) and 900 (thickest)": "Hvor tyk skrifttypen skal være. Værdien skal være mellem 300 (tyndest) og 900 (tykkest)"
 }

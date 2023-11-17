@@ -1,0 +1,66 @@
+@import '../../styles/index.less';
+
+.add-destination-group {
+  gap: 15px;
+  margin: 15px;
+  padding-bottom: 15px;
+
+  :global(.ant-space-item) {
+    width: 100%;
+  }
+
+  :global(.ant-space) {
+    width: 100%;
+  }
+
+  button.add-destination-btn {
+    width: 100%;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    margin: auto;
+
+    &:global(.ant-btn) {
+      display: flex;
+      font-weight: 500;
+      padding: 20px 10px;
+      background: var(--dropdown-bg);
+
+      &:hover {
+        transition: 0.3s !important;
+      }
+
+      &.default {
+        min-height: 58px;
+        transition: box-shadow 0.3s;
+        border: 1px solid var(--dropdown-bg);
+        border-radius: 4px;
+
+        &:hover {
+          box-shadow: 0 0 50px rgba(255, 255, 255, 0.1) inset;
+        }
+      }
+    }
+
+    i.add-destination-icon {
+      font-size: 18px;
+      margin-right: 10px;
+    }
+
+    .btn-text {
+      display: flex;
+      align-items: center;
+    }
+
+    &.ultra-btn {
+      justify-content: space-between;
+
+      .ultra-icon {
+        height: 15px;
+        width: 15px;
+      }
+    }
+  }
+}

@@ -5,7 +5,9 @@ import {
   useWidget,
   WidgetModule,
 } from './common/useWidget';
-import { values, cloneDeep, intersection } from 'lodash';
+import values from 'lodash/values';
+import cloneDeep from 'lodash/cloneDeep';
+import intersection from 'lodash/intersection';
 import { IAlertConfig, TAlertType } from '../../services/widgets/alerts-config';
 import { createBinding } from '../shared/inputs';
 import { Services } from '../service-provider';

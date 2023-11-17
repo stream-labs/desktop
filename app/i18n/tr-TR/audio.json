@@ -9,7 +9,7 @@
   "Monitor and Output": "Görüntüleme ve Ses Çıkışı",
   "Stream Track": "Yayın Parçası",
   "Stream Tracks": "Yayın Parçaları",
-  "Rec. Tracks": "Kayıt Parçaları",
+  "Rec. Tracks": "Kayıt Parçalar",
   "Advanced Audio Settings": "Gelişmiş Ses Ayarları",
   "Volume ( % )": "Ses Düzeyi ( % )",
   "Sync Offset": "Senk. Dengesi",
@@ -32,8 +32,15 @@
   "Source Settings": "Kaynak Ayarları",
   "Audio Tracks": "Ses Parçaları",
   "Designates which tracks are being recorded": "Hangi parçaların kaydedileceğini belirler",
-  "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.",
-  "Streaming Track": "Streaming Track",
-  "Enable Twitch VOD Track": "Enable Twitch VOD Track",
-  "Twitch VOD Track": "Twitch VOD Track"
+  "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "Yayın ve VOD Parçalarınız aynı. Bu, beklenmeyen ses davranışına neden olabilir; değiştirmek için Global Ayarlara gidin.",
+  "Streaming Track": "Parça Yayınlanıyor",
+  "Enable Twitch VOD Track": "Twitch VOD Parçası’nı etkinleştir",
+  "Twitch VOD Track": "Twitch VOD Parçası",
+  "Sample Rate (requires a restart)": "Örnek Hızı (yeniden başlatma gerektirir)",
+  "Channels (requires a restart)": "Kanallar (yeniden başlatma gerektirir)",
+  "Desktop Audio Device 1": "Masaüstü Ses Cihazı 1",
+  "Desktop Audio Device 2": "Masaüstü Ses Cihazı 2",
+  "Mic/Auxiliary Device 1": "Mik./Yardımcı Cihaz 1",
+  "Mic/Auxiliary Device 2": "Mik./Yardımcı Cihaz 2",
+  "Mic/Auxiliary Device 3": "Mik./Yardımcı Cihaz 3"
 }

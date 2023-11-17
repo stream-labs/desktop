@@ -2,7 +2,7 @@
  * The core module provides methods for the most frequent actions
  */
 
-import { getContext } from '../spectron';
+import { getContext } from '../webdriver';
 import { getApiClient } from '../api-client';
 import { WindowsService } from '../../../app/services/windows';
 import { ClickOptions, WaitForOptions } from 'webdriverio';
@@ -23,6 +23,13 @@ export async function select(selectorOrEl: TSelectorOrEl): Promise<WebdriverIO.E
     return getClient().$(selectorOrEl);
   }
   return selectorOrEl;
+}
+
+/**
+ * A shortcut for client.$$()
+ */
+export async function selectElements(selector: string): Promise<WebdriverIO.Element[]> {
+  return getClient().$$(selector);
 }
 
 export function selectButton(buttonText: string) {
@@ -56,34 +63,38 @@ export async function clickTab(tabText: string) {
   await click(`div[role="tab"]=${tabText}`);
 }
 
+export async function clickCheckbox(dataName: string) {
+  const $checkbox = await select(`input[data-name="${dataName}"]`);
+  await $checkbox.click();
+}
+
 // OTHER SHORTCUTS
 
-export async function isDisplayed(
-  selectorOrEl: TSelectorOrEl,
-  waitForOptions?: WaitForOptions,
-) {
+export async function hoverElement(selector: string, duration?: number) {
+  const element = await select(`${selector}`);
+  await element.moveTo();
+  if (duration) {
+    await getClient().pause(duration);
+  }
+}
+
+export async function isDisplayed(selectorOrEl: TSelectorOrEl, waitForOptions?: WaitForOptions) {
   if (waitForOptions) {
     try {
       await waitForDisplayed(selectorOrEl, waitForOptions);
       return true;
-    } catch (e) {
+    } catch (e: unknown) {
       return false;
     }
   }
   return await (await select(selectorOrEl)).isDisplayed();
 }
 
-export async function waitForDisplayed(
-  selectorOrEl: TSelectorOrEl,
-  options?: WaitForOptions,
-) {
+export async function waitForDisplayed(selectorOrEl: TSelectorOrEl, options?: WaitForOptions) {
   await (await select(selectorOrEl)).waitForDisplayed(options);
 }
 
-export async function waitForClickable(
-  selectorOrEl: TSelectorOrEl,
-  options?: WaitForOptions,
-) {
+export async function waitForClickable(selectorOrEl: TSelectorOrEl, options?: WaitForOptions) {
   await (await select(selectorOrEl)).waitForClickable(options);
 }
 
@@ -91,10 +102,7 @@ export function waitForText(text: string) {
   return waitForDisplayed(`*="${text}"`);
 }
 
-export async function waitForEnabled(
-  selectorOrEl: TSelectorOrEl,
-  options?: WaitForOptions,
-) {
+export async function waitForEnabled(selectorOrEl: TSelectorOrEl, options?: WaitForOptions) {
   await (await select(selectorOrEl)).waitForEnabled(options);
 }
 

@@ -4,7 +4,8 @@ import GoLiveWindow from './windows/go-live/GoLiveWindow';
 import EditStreamWindow from './windows/go-live/EditStreamWindow';
 import IconLibraryProperties from './windows/IconLibraryProperties';
 import ScreenCaptureProperties from './windows/ScreenCaptureProperties';
-import News from './windows/News';
+import GuestCamProperties from './windows/GuestCamProperties';
+import News from './windows/notifications/News';
 import PerformanceMetrics from './shared/PerformanceMetrics';
 import PatchNotes from './pages/PatchNotes';
 import Display from './shared/Display';
@@ -27,6 +28,7 @@ import NotificationsArea from './root/NotificationsArea';
 import StudioEditor from './root/StudioEditor';
 import SharedComponentsLibrary from './windows/sharedComponentsLibrary/SharedComponentsLibrary';
 import { ObsSettings } from './windows/settings/ObsSettings';
+import ManageSceneCollections from './windows/ManageSceneCollections';
 import ThemeAudit from './pages/ThemeAudit';
 import { WidgetWindow } from './widgets/common/WidgetWindow';
 import SafeMode from './windows/SafeMode';
@@ -47,9 +49,12 @@ import LayoutEditor from './pages/layout-editor/LayoutEditor';
 import Projector from './windows/Projector';
 import SceneSelector from './editor/elements/SceneSelector';
 import AddSource from './windows/AddSource';
+import SourceSelector from './editor/elements/SourceSelector';
 import SideNav from './sidebar/SideNav';
 import WelcomeToPrime from './windows/WelcomeToPrime';
-import Notifications from './windows/Notifications';
+import Notifications from './windows/notifications/Notifications';
+import NotificationsAndNews from './windows/notifications';
+import Blank from './windows/Blank';
 import PlatformMerge from './pages/PlatformMerge';
 import AlertboxLibrary from './pages/AlertboxLibrary';
 import PlatformAppStore from './pages/PlatformAppStore';
@@ -57,6 +62,14 @@ import BrowseOverlays from './pages/BrowseOverlays';
 import PlatformAppMainPage from './pages/PlatformAppMainPage';
 import PlatformAppPageView from './shared/PlatformAppPageView';
 import PlatformAppPopOut from './windows/PlatformAppPopOut';
+import RecentEventsWindow from './windows/RecentEvents';
+import NewBadge from './shared/NewBadge';
+import RecordingHistory from './pages/RecordingHistory';
+import UltraIcon from './shared/UltraIcon';
+import EditTransform from './windows/EditTransform';
+import InstalledApps from './windows/settings/InstalledApps';
+import Hotkeys from './windows/settings/Hotkeys';
+import Mixer from './editor/elements/Mixer';
 
 // list of React components to be used inside Vue components
 export const components = {
@@ -69,13 +82,15 @@ export const components = {
   EditStreamWindow: createRoot(EditStreamWindow),
   IconLibraryProperties,
   ScreenCaptureProperties,
+  GuestCamProperties: createRoot(GuestCamProperties),
   News,
   PerformanceMetrics,
+  ManageSceneCollections,
   PatchNotes,
   Display,
   TitleBar,
   Chat,
-  Highlighter,
+  Highlighter: createRoot(Highlighter),
   Grow,
   Loader,
   PlatformLogo,
@@ -110,12 +125,23 @@ export const components = {
   LayoutEditor: createRoot(LayoutEditor),
   SceneSelector: createRoot(SceneSelector),
   AddSource,
+  SourceSelector: createRoot(SourceSelector),
+  RecordingHistory: createRoot(RecordingHistory),
+  RecentEventsWindow,
   SideNav,
   WelcomeToPrime,
   Notifications,
+  NotificationsAndNews,
   PlatformMerge,
   PlatformAppStore,
   PlatformAppMainPage,
   PlatformAppPageView,
   PlatformAppPopOut,
+  NewBadge,
+  UltraIcon,
+  EditTransform,
+  InstalledApps,
+  Blank,
+  Hotkeys,
+  Mixer: createRoot(Mixer),
 };

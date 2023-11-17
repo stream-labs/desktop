@@ -26,7 +26,7 @@ export interface ISceneModel {
  * creating, reordering and removing sources from this scene. For more general
  * scene operations see {@link ScenesService}.
  */
-@ServiceHelper()
+@ServiceHelper('ScenesService')
 export class Scene implements ISceneModel, ISerializable {
   @InjectFromExternalApi() private scenesService: ScenesService;
   @InjectFromExternalApi() private sourcesService: SourcesService;

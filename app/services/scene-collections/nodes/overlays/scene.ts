@@ -22,8 +22,9 @@ export class SceneSourceNode extends Node<ISceneNodeSchema, IContext> {
   async save(context: IContext) {
     this.data = {
       sceneId: context.sceneItem.sourceId,
-      width: this.videoService.baseWidth,
-      height: this.videoService.baseHeight,
+      width: this.videoService.baseResolutions[context.sceneItem.display ?? 'horizontal'].baseWidth,
+      height: this.videoService.baseResolutions[context.sceneItem.display ?? 'horizontal']
+        .baseHeight,
     };
   }
 

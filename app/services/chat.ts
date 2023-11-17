@@ -108,9 +108,9 @@ export class ChatService extends Service {
   }
 
   hasChatHighlightWidget(): boolean {
-    return !!this.widgetsService
-      .getWidgetSources()
-      .find(source => source.type === WidgetType.ChatHighlight);
+    return !!this.widgetsService.views.widgetSources.find(
+      source => source.type === WidgetType.ChatHighlight,
+    );
   }
 
   async mountChat(electronWindowId: number) {
@@ -149,7 +149,8 @@ export class ChatService extends Service {
         partition,
         nodeIntegration: false,
         contextIsolation: true,
-        preload: path.resolve(remote.app.getAppPath(), 'bundles', 'guest-api'),
+        preload: path.resolve(remote.app.getAppPath(), 'bundles', 'guest-api.js'),
+        sandbox: false,
       },
     });
 
@@ -200,8 +201,6 @@ export class ChatService extends Service {
   private bindWindowListener() {
     if (!this.chatView) return; // chat was already deinitialized
 
-    electron.ipcRenderer.send('webContents-preventPopup', this.chatView.webContents.id);
-
     if (this.userService.platformType === 'youtube') {
       // Preventing navigation has to be done in the main process
       ipcRenderer.send('webContents-bindYTChat', this.chatView.webContents.id);
@@ -227,8 +226,8 @@ export class ChatService extends Service {
       });
     }
 
-    this.chatView.webContents.on('new-window', (evt, targetUrl) => {
-      const parsedUrl = url.parse(targetUrl);
+    this.chatView.webContents.setWindowOpenHandler(details => {
+      const parsedUrl = url.parse(details.url);
       const protocol = parsedUrl.protocol;
 
       if (protocol === 'http:' || protocol === 'https:') {
@@ -251,7 +250,7 @@ export class ChatService extends Service {
             'ffz-settings',
           );
           // Recognize trovo login and perform in an embedded window
-        } else if (targetUrl === 'https://trovo.live/?openLogin=1') {
+        } else if (details.url === 'https://trovo.live/?openLogin=1') {
           const loginWindow = new remote.BrowserWindow({
             width: 600,
             height: 800,
@@ -277,11 +276,13 @@ export class ChatService extends Service {
           });
 
           loginWindow.removeMenu();
-          loginWindow.loadURL(targetUrl);
+          loginWindow.loadURL(details.url);
         } else {
-          remote.shell.openExternal(targetUrl);
+          remote.shell.openExternal(details.url);
         }
       }
+
+      return { action: 'deny' };
     });
   }
 
@@ -331,6 +332,8 @@ export class ChatService extends Service {
           );
         }
         if (this.hasChatHighlightWidget()) {
+          // Uncomment to debug chat-highlight-script.js
+          // this.chatView.webContents.openDevTools({ mode: 'detach' });
           setTimeout(() => {
             if (!this.chatView) return;
             const chatHighlightScript = require('!!raw-loader!./widgets/settings/chat-highlight-script.js');
@@ -348,14 +351,18 @@ export class ChatService extends Service {
           this.chatView.webContents
             .executeJavaScript(
               `
-                document.querySelector('html').style.overflowY='hidden !important';
-                var chatContainer = document.querySelector('div[data-pagelet="page"] > div');
+                document.querySelector('html').style = 'overflow-y: hidden !important;';
+
+                var chatContainer = document.querySelector('iframe').contentDocument.querySelector('body > div > div > div');
                 chatContainer.style.marginLeft = '0';
                 chatContainer.style.marginRight = '0';
+                chatContainer.style.maxWidth = 'none';
                 `,
               true,
             )
-            .catch(e => {});
+            .catch(e => {
+              console.error(e);
+            });
         });
       }
     });

@@ -11,9 +11,20 @@
   "Show Top Coin Holder Badges": "Mostrar distintivos de maior possuidor de moedas",
   "Enable BetterTTV Emotes": "Ativar emotes do BetterTTV",
   "Enable FrankerFaceZ Emotes": "Ativar emotes do FrankerFaceZ",
+  "Enable 7TV Emotes": "Ativar emotes do 7TV",
   "Text Color": "Cor do texto",
   "Font Size": "Tamanho da letra",
   "Muted Chatters": "Participantes silenciados do chat",
   "Hide Commands": "Ocultar comandos",
-  "Background Color": "Cor de fundo"
+  "Background Color": "Cor de fundo",
+  "Show Platform Icons": "Mostrar ícones da plataforma",
+  "Theme": "Tema",
+  "Badges": "Distintivos",
+  "Extra Emotes": "Emotes adicionais",
+  "Chat Delay": "Atraso do chat",
+  "Hide Delay": "Ocultar atraso",
+  "Disable Message Animations": "Desativar animações das mensagens",
+  "Hide Characters": "Ocultar carateres",
+  "Hide Common Chat Bots": "Esconder Bots comuns do chat",
+  "Hide commands starting with `!`": "Esconder comandos a começar por '!'"
 }

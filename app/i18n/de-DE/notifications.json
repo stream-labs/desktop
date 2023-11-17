@@ -16,5 +16,16 @@
   "Click to read your unread Notifications": "Klicken, um ungelesene Benachrichtigungen zu lesen",
   "New Notifications": "Neue Benachrichtigungen",
   "Log": "Protokoll",
-  "Streamlabs Desktop has updated! Click here to see what changed.": "Streamlabs Desktop wurde aktualisiert! Klicken Sie hier, um die Änderungen zu sehen."
+  "Streamlabs Desktop has updated! Click here to see what changed.": "Streamlabs Desktop wurde aktualisiert! Klicken Sie hier, um zu sehen, was sich geändert hat.",
+  "Notifications & News": "Benachrichtigungen und Neuigkeiten",
+  "News": "Neuigkeiten",
+  "Notifications": "Benachrichtigungen",
+  "A new Recording has been completed. Click for more info": "Eine neue Aufzeichnung wurde fertiggestellt. Hier klicken für weitere Informationen",
+  "Recording History": "Aufzeichnungsverlauf",
+  "Show in folder": "In Ordner anzeigen",
+  "Recordings": "Aufzeichnungen",
+  "Marker %{label} added at %{timestamp}": "Markierung %{label} hinzugefügt bei %{timestamp}",
+  "File is too large to upload": "Datei ist zu groß zum Hochladen",
+  "File type %{extension} is not supported": "Der Dateityp %{extension} wird nicht unterstützt",
+  "Upload already in progress": "Upload läuft bereits"
 }

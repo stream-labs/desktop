@@ -197,7 +197,8 @@ export class PlatformContainerManager {
         contextIsolation: true,
         nodeIntegration: false,
         partition: this.getAppPartition(app),
-        preload: path.resolve(remote.app.getAppPath(), 'bundles', 'guest-api'),
+        preload: path.resolve(remote.app.getAppPath(), 'bundles', 'guest-api.js'),
+        sandbox: false,
       },
     });
 
@@ -328,6 +329,7 @@ export class PlatformContainerManager {
             'edge.fullstory.com',
             'www.youtube.com',
             'cdn.segment.com',
+            'static.twitchcdn.net',
           ];
 
           const parsed = url.parse(details.url);

@@ -9,11 +9,11 @@ import {
 import { fillForm, useForm } from '../../helpers/modules/forms';
 import { click, clickButton, isDisplayed, waitForDisplayed } from '../../helpers/modules/core';
 import { logIn } from '../../helpers/modules/user';
-import { releaseUserInPool, reserveUserFromPool } from '../../helpers/spectron/user';
+import { releaseUserInPool, reserveUserFromPool } from '../../helpers/webdriver/user';
 import { showSettingsWindow } from '../../helpers/modules/settings/settings';
-import { test, useSpectron } from '../../helpers/spectron';
+import { test, useWebdriver } from '../../helpers/webdriver';
 
-useSpectron();
+useWebdriver();
 
 test('Multistream default mode', async t => {
   // login to via Twitch because it doesn't have strict rate limits
@@ -25,8 +25,8 @@ test('Multistream default mode', async t => {
   // enable all platforms
   await fillForm({
     twitch: true,
-    facebook: true,
     youtube: true,
+    trovo: true,
   });
   await waitForSettingsWindowLoaded();
 
@@ -54,8 +54,8 @@ test('Multistream advanced mode', async t => {
   // enable all platforms
   await fillForm({
     twitch: true,
-    facebook: true,
     youtube: true,
+    trovo: true,
   });
 
   await switchAdvancedMode();
@@ -66,7 +66,8 @@ test('Multistream advanced mode', async t => {
     customEnabled: true,
     title: 'twitch title',
     twitchGame: 'Fortnite',
-    twitchTags: ['100%'],
+    // TODO: Re-enable after reauthing userpool
+    // twitchTags: ['100%'],
   });
 
   const youtubeForm = useForm('youtube-settings');
@@ -76,12 +77,11 @@ test('Multistream advanced mode', async t => {
     description: 'youtube description',
   });
 
-  const facebookForm = useForm('facebook-settings');
-  await facebookForm.fillForm({
+  const trovoForm = useForm('trovo-settings');
+  await trovoForm.fillForm({
     customEnabled: true,
-    facebookGame: 'DOOM',
-    title: 'facebook title',
-    description: 'facebook description',
+    trovoGame: 'Doom',
+    title: 'trovo title',
   });
 
   await submit();

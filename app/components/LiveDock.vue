@@ -84,14 +84,14 @@
             </a>
           </div>
           <div class="flex">
-            <a @click="refreshChat" v-if="isTwitch || isTrovo || (isYoutube && isStreaming) || isFacebook">
+            <a @click="refreshChat" v-if="isTwitch || isTrovo || (isYoutube && isStreaming) || isFacebook || (isTwitter && isStreaming)">
               {{ $t('Refresh Chat') }}
             </a>
           </div>
         </div>
         <div
           class="live-dock-chat"
-          v-if="!hideStyleBlockers && (isTwitch || isTrovo || (isYoutube && isStreaming) || (isFacebook && isStreaming))"
+          v-if="!hideStyleBlockers && (isTwitch || isTrovo || (isYoutube && isStreaming) || (isFacebook && isStreaming) || (isTwitter && isStreaming))"
         >
           <div v-if="hasChatTabs" class="flex">
             <tabs :tabs="chatTabs" v-model="selectedChat" :hideContent="true" />
@@ -145,6 +145,7 @@
     padding-left: 0;
     padding-right: 16px;
     border-right: 1px solid var(--border);
+    background-color: var(--section);
   }
 
   @media (max-width: 1070px) {

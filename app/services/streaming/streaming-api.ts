@@ -7,6 +7,8 @@ import { IStreamError } from './stream-error';
 import { ICustomStreamDestination } from '../settings/streaming';
 import { ITiktokStartStreamOptions } from '../platforms/tiktok';
 import { ITrovoStartStreamOptions } from '../platforms/trovo';
+import { IVideo } from 'obs-studio-node';
+import { ITwitterStartStreamOptions } from 'services/platforms/twitter';
 
 export enum EStreamingState {
   Offline = 'offline',
@@ -21,6 +23,7 @@ export enum ERecordingState {
   Starting = 'starting',
   Recording = 'recording',
   Stopping = 'stopping',
+  Wrote = 'wrote',
 }
 
 export enum EReplayBufferState {
@@ -47,9 +50,10 @@ export interface IStreamInfo {
     facebook: TGoLiveChecklistItemState;
     tiktok: TGoLiveChecklistItemState;
     trovo: TGoLiveChecklistItemState;
+    twitter: TGoLiveChecklistItemState;
     setupMultistream: TGoLiveChecklistItemState;
+    setupDualOutput: TGoLiveChecklistItemState;
     startVideoTransmission: TGoLiveChecklistItemState;
-    postTweet: TGoLiveChecklistItemState;
   };
 }
 
@@ -62,6 +66,7 @@ export interface IStreamSettings {
     facebook?: IPlatformFlags & IFacebookStartStreamOptions;
     tiktok?: IPlatformFlags & ITiktokStartStreamOptions;
     trovo?: IPlatformFlags & ITrovoStartStreamOptions;
+    twitter?: IPlatformFlags & ITwitterStartStreamOptions;
   };
   customDestinations: ICustomStreamDestination[];
   advancedMode: boolean;
@@ -79,6 +84,7 @@ export interface IGoLiveSettings extends IStreamSettings {
 export interface IPlatformFlags {
   enabled: boolean;
   useCustomFields: boolean;
+  video?: IVideo;
 }
 
 export interface IStreamingServiceState {
@@ -89,6 +95,7 @@ export interface IStreamingServiceState {
   replayBufferStatus: EReplayBufferState;
   replayBufferStatusTime: string;
   selectiveRecording: boolean;
+  dualOutputMode: boolean;
   info: IStreamInfo;
 }
 
@@ -106,6 +113,12 @@ export interface IStreamingServiceApi {
    * of the streaming output changes.
    */
   recordingStatusChange: Observable<ERecordingState>;
+
+  /**
+   * Subscribe to be notified when the state
+   * of the streaming output changes.
+   */
+  replayBufferStatusChange: Observable<EReplayBufferState>;
 
   /**
    * This subscription receives no events and
@@ -143,4 +156,14 @@ export interface IStreamingServiceApi {
    * Toggle the recording state
    */
   toggleRecording(): void;
+
+  /**
+   * Start replay buffer state
+   */
+  startReplayBuffer(): void;
+
+  /**
+   * Stop replay buffer state
+   */
+  stopReplayBuffer(): void;
 }

@@ -3,7 +3,11 @@
   "This element is too small to be displayed": "この要素は小さすぎるため、表示できません",
   "This element requires Selective Recording to be enabled": "この要素では、セレクティブレコーディングを有効にする必要があります",
   "Grant Permissions": "許可を付与する",
-  "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs は追加の許可が必要です。ポップアップダイアログで許可を付与して、続行してください。",
+  "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs では追加の許可が必要です。ポップアップダイアログで許可を付与して、続行してください。",
   "Microphone": "マイク",
-  "Webcam": "ウェブカメラ"
+  "Webcam": "ウェブカメラ",
+  "You've merged a Streamlabs ID to your account, please log back in to ensure you have the right credentials.": "Streamlabs ID がアカウントに結合されました。再度ログインして、認証情報が適切であることを確認してください。",
+  "Enable Live Streaming?": "ライブストリーミングを有効化しますか？",
+  "Streamlabs is currently in recording mode, which hides live streaming features. Would you like to enable live streaming features? You can disable them again in General settings.": "Streamlabs は現在録画モードであり、ライブストリーミング機能は非表示になります。ライブストリーミング機能を有効にしますか？これは [全般設定] で再度無効化することができます。",
+  "Enable Streaming": "ストリーミングを有効化"
 }

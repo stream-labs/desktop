@@ -68,7 +68,7 @@ export function alertAsync(p: Omit<ModalFuncProps, 'afterClose'> | string): Prom
  *
  */
 export function promptAsync(
-  p: (ModalFuncProps & { placeholder: string }) | string,
+  p: (ModalFuncProps & { placeholder?: string }) | string,
   value: string = '',
 ): Promise<string> {
   const { WindowsService } = Services;
@@ -142,7 +142,7 @@ export function DefaultPromptForm(
 
   return (
     <Form name="prompt" form={form}>
-      <TextInput name="prompt" value={p.values.prompt} onChange={onChange} />
+      <TextInput name="prompt" value={p.values.prompt} onChange={onChange} nowrap />
     </Form>
   );
 }

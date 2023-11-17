@@ -2,14 +2,15 @@ import { ITwitchStartStreamOptions, TwitchService } from './twitch';
 import { IYoutubeStartStreamOptions, YoutubeService } from './youtube';
 import { FacebookService, IFacebookStartStreamOptions } from './facebook';
 import { ITiktokStartStreamOptions, TiktokService } from './tiktok';
-import { TTwitchTag } from './twitch/tags';
-import { TTwitchOAuthScope } from './twitch/scopes';
+import { TwitterPlatformService } from './twitter';
+import { TTwitchOAuthScope } from './twitch/index';
 import { IGoLiveSettings } from 'services/streaming';
 import { WidgetType } from '../widgets';
 import { ITrovoStartStreamOptions, TrovoService } from './trovo';
-import { Partial } from 'lodash-decorators';
+import { TDisplayType } from 'services/settings-v2';
+import { $t } from 'services/i18n';
 
-export type Tag = TTwitchTag;
+export type Tag = string;
 export interface IGame {
   id: string;
   name: string;
@@ -77,7 +78,6 @@ interface IPlatformCapabilityDescription {
 }
 
 interface IPlatformCapabilityTags {
-  getAllTags: () => Promise<Tag[]>;
   getStreamTags: () => Promise<Tag[]>;
   setStreamTags: () => Promise<any>;
 }
@@ -172,7 +172,7 @@ export interface IPlatformService {
   /**
    * Sets up the stream key and live broadcast info required to go live.
    */
-  beforeGoLive: (options?: IGoLiveSettings) => Promise<void>;
+  beforeGoLive: (options?: IGoLiveSettings, context?: TDisplayType) => Promise<void>;
 
   afterGoLive: () => Promise<void>;
 
@@ -188,6 +188,8 @@ export interface IPlatformService {
     req: IPlatformRequest,
     useToken?: boolean | string,
   ) => Dictionary<string | undefined>;
+
+  setPlatformContext?: (platform: TPlatform) => void;
 
   liveDockEnabled: boolean;
 
@@ -208,38 +210,6 @@ export interface IPlatformService {
   state: IPlatformState;
 }
 
-export interface IUserAuth {
-  widgetToken: string;
-  apiToken: string; // Streamlabs API Token
-
-  /**
-   * Old key from when SLOBS only supported a single platform account
-   * @deprecated Use `platforms` instead
-   */
-  platform?: IPlatformAuth;
-
-  /**
-   * The primary platform used for chat, go live window, etc
-   */
-  primaryPlatform: TPlatform;
-
-  /**
-   * New key that supports multiple logged in platforms
-   */
-  platforms: { [platform in TPlatform]?: IPlatformAuth };
-
-  /**
-   * Session partition used to separate cookies associated
-   * with this user login.
-   */
-  partition?: string;
-
-  /**
-   * Whether re-login has been forced
-   */
-  hasRelogged: boolean;
-}
-
 export interface IPlatformAuth {
   type: TPlatform;
   username: string;
@@ -252,7 +222,35 @@ export interface IUserInfo {
   username?: string;
 }
 
-export type TPlatform = 'twitch' | 'youtube' | 'facebook' | 'tiktok' | 'trovo';
+export enum EPlatform {
+  Twitch = 'twitch',
+  YouTube = 'youtube',
+  Facebook = 'facebook',
+  TikTok = 'tiktok',
+  Trovo = 'trovo',
+  Twitter = 'twitter',
+}
+
+export type TPlatform = 'twitch' | 'youtube' | 'facebook' | 'tiktok' | 'trovo' | 'twitter';
+
+export const platformList = [
+  EPlatform.Facebook,
+  EPlatform.TikTok,
+  EPlatform.Trovo,
+  EPlatform.Twitch,
+  EPlatform.YouTube,
+  EPlatform.Twitter,
+];
+
+export const platformLabels = (platform: TPlatform | string) =>
+  ({
+    [EPlatform.Twitch]: $t('Twitch'),
+    [EPlatform.YouTube]: $t('YouTube'),
+    [EPlatform.Facebook]: $t('Facebook'),
+    [EPlatform.TikTok]: $t('TikTok'),
+    [EPlatform.Trovo]: $t('Trovo'),
+    [EPlatform.Twitter]: 'Twitter',
+  }[platform]);
 
 export function getPlatformService(platform: TPlatform): IPlatformService {
   return {
@@ -261,6 +259,7 @@ export function getPlatformService(platform: TPlatform): IPlatformService {
     facebook: FacebookService.instance,
     tiktok: TiktokService.instance,
     trovo: TrovoService.instance,
+    twitter: TwitterPlatformService.instance,
   }[platform];
 }
 

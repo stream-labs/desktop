@@ -1,14 +1,13 @@
-import React, { useState, useRef } from 'react';
-import Fuse from 'fuse.js';
+import React, { useState, useRef, useMemo } from 'react';
 import cx from 'classnames';
-import { Dropdown, Tooltip, Tree } from 'antd';
+import { Dropdown, Tooltip as AntdTooltip, Tree, message } from 'antd';
+import Tooltip from 'components-react/shared/Tooltip';
 import { DownOutlined } from '@ant-design/icons';
 import * as remote from '@electron/remote';
 import { Menu } from 'util/menus/Menu';
 import { getOS } from 'util/operating-systems';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
-import { TextInput } from 'components-react/shared/inputs';
 import HelpTip from 'components-react/shared/HelpTip';
 import Scrollable from 'components-react/shared/Scrollable';
 import { useTree, IOnDropInfo } from 'components-react/hooks/useTree';
@@ -17,6 +16,8 @@ import { EDismissable } from 'services/dismissables';
 import { ERenderingMode } from '../../../../obs-api';
 import styles from './SceneSelector.m.less';
 import useBaseElement from './hooks';
+import { IScene } from 'services/scenes';
+import { ISceneCollectionsManifestEntry } from 'services/scene-collections';
 
 function SceneSelector() {
   const {
@@ -26,23 +27,45 @@ function SceneSelector() {
     SourceFiltersService,
     ProjectorService,
     EditorCommandsService,
+    StreamingService,
+    DualOutputService,
   } = Services;
+
+  const v = useVuex(() => ({
+    isHorizontal: DualOutputService.views.activeDisplays.horizontal,
+    isVertical: DualOutputService.views.activeDisplays.vertical,
+    toggleDisplay: DualOutputService.actions.toggleDisplay,
+    studioMode: TransitionsService.views.studioMode,
+    isMidStreamMode: StreamingService.views.isMidStreamMode,
+    showDualOutput: DualOutputService.views.dualOutputMode,
+    selectiveRecording: StreamingService.state.selectiveRecording,
+  }));
 
   const { treeSort } = useTree(true);
 
-  const [searchQuery, setSearchQuery] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
-  const { scenes, activeSceneId, collections, activeCollection } = useVuex(() => ({
+  const { scenes, activeSceneId, activeScene, collections, activeCollection } = useVuex(() => ({
     scenes: ScenesService.views.scenes.map(scene => ({
-      title: scene.name,
+      title: <TreeNode scene={scene} removeScene={removeScene} />,
       key: scene.id,
       selectable: true,
       isLeaf: true,
     })),
+    activeScene: ScenesService.views.activeScene,
     activeSceneId: ScenesService.views.activeSceneId,
     activeCollection: SceneCollectionsService.activeCollection,
     collections: SceneCollectionsService.collections,
   }));
+
+  const horizontalTooltip = useMemo(
+    () => (v.isHorizontal ? $t('Hide horizontal display.') : $t('Show horizontal display.')),
+    [v.isHorizontal],
+  );
+
+  const verticalTooltip = useMemo(
+    () => (v.isVertical ? $t('Hide vertical display.') : $t('Show vertical display.')),
+    [v.isVertical],
+  );
 
   function showContextMenu(info: { event: React.MouseEvent }) {
     info.event.preventDefault();
@@ -58,7 +81,7 @@ function SceneSelector() {
     });
     menu.append({
       label: $t('Remove'),
-      click: removeScene,
+      click: () => removeScene(activeScene),
     });
     menu.append({
       label: $t('Filters'),
@@ -85,8 +108,17 @@ function SceneSelector() {
     ScenesService.actions.showNameScene();
   }
 
-  function removeScene() {
-    const name = ScenesService.views.activeScene?.name;
+  function showTransitions() {
+    TransitionsService.actions.showSceneTransitions();
+  }
+
+  function manageCollections() {
+    SceneCollectionsService.actions.showManageWindow();
+  }
+
+  function removeScene(scene: IScene | null) {
+    if (!scene) return;
+    const name = scene.name;
     remote.dialog
       .showMessageBox(remote.getCurrentWindow(), {
         title: 'Streamlabs Desktop',
@@ -104,16 +136,8 @@ function SceneSelector() {
           return;
         }
 
-        EditorCommandsService.actions.executeCommand('RemoveSceneCommand', activeSceneId);
+        EditorCommandsService.actions.executeCommand('RemoveSceneCommand', scene.id);
       });
-  }
-
-  function showTransitions() {
-    TransitionsService.actions.showSceneTransitions();
-  }
-
-  function manageCollections() {
-    SceneCollectionsService.actions.showManageWindow();
   }
 
   function loadCollection(id: string) {
@@ -123,27 +147,37 @@ function SceneSelector() {
     setShowDropdown(false);
   }
 
-  function filteredCollections() {
-    if (!searchQuery) return collections;
-    const fuse = new Fuse(collections, { shouldSort: true, keys: ['name'] });
-    return fuse.search(searchQuery);
+  function showStudioModeErrorMessage() {
+    message.error({
+      content: $t('Cannot toggle dual output in Studio Mode.'),
+      className: styles.toggleError,
+    });
+  }
+
+  function showToggleDisplayErrorMessage() {
+    message.error({
+      content: $t('Cannot change displays while live.'),
+      className: styles.toggleError,
+    });
+  }
+
+  function showSelectiveRecordingMessage() {
+    message.error({
+      content: $t('Selective Recording can only be used with horizontal sources.'),
+      className: styles.toggleError,
+    });
   }
 
   const DropdownMenu = (
     <div className={cx(styles.dropdownContainer, 'react')}>
-      <TextInput
-        placeholder={$t('Search')}
-        value={searchQuery}
-        onChange={setSearchQuery}
-        nowrap
-        uncontrolled={false}
-      />
-      <div className="link link--pointer" onClick={manageCollections} style={{ marginTop: '6px' }}>
-        {$t('Manage All')}
+      <div className={styles.dropdownItem} onClick={manageCollections} style={{ marginTop: '6px' }}>
+        <i className="icon-edit" style={{ marginRight: '6px' }} />
+        {$t('Manage Scene Collections')}
       </div>
       <hr style={{ borderColor: 'var(--border)' }} />
+      <span className={styles.whisper}>{$t('Your Scene Collections')}</span>
       <Scrollable style={{ height: 'calc(100% - 60px)' }}>
-        {filteredCollections().map(collection => (
+        {collections.map(collection => (
           <div
             key={collection.id}
             onClick={() => loadCollection(collection.id)}
@@ -177,19 +211,71 @@ function SceneSelector() {
           placement="bottomLeft"
         >
           <span className={styles.activeSceneContainer} data-name="SceneSelectorDropdown">
+            <DownOutlined style={{ marginRight: '4px' }} />
             <span className={styles.activeScene}>{activeCollection?.name}</span>
-            <DownOutlined style={{ marginLeft: '4px' }} />
           </span>
         </Dropdown>
-        <Tooltip title={$t('Add a new Scene.')} placement="bottom">
-          <i className="icon-add icon-button icon-button--lg" onClick={addScene} />
-        </Tooltip>
-        <Tooltip title={$t('Remove Scene.')} placement="bottom">
-          <i className="icon-subtract icon-button icon-button--lg" onClick={removeScene} />
-        </Tooltip>
-        <Tooltip title={$t('Edit Scene Transitions.')} placement="bottom">
-          <i className="icon-settings icon-button icon-button--lg" onClick={showTransitions} />
-        </Tooltip>
+        <AntdTooltip title={$t('Add a new Scene.')} placement="bottomLeft">
+          <i className="icon-add-circle icon-button icon-button--lg" onClick={addScene} />
+        </AntdTooltip>
+
+        {v.showDualOutput && (
+          <Tooltip
+            id="toggle-horizontal-tooltip"
+            title={horizontalTooltip}
+            className={styles.displayToggle}
+            placement="bottomRight"
+          >
+            <i
+              id="horizontal-display-toggle"
+              onClick={() => {
+                if (v.isMidStreamMode) {
+                  showToggleDisplayErrorMessage();
+                } else if (v.studioMode && v.isVertical) {
+                  showStudioModeErrorMessage();
+                } else {
+                  v.toggleDisplay(!v.isHorizontal, 'horizontal');
+                }
+              }}
+              className={cx('icon-desktop icon-button icon-button--lg', {
+                active: v.isHorizontal,
+              })}
+            />
+          </Tooltip>
+        )}
+
+        {v.showDualOutput && (
+          <Tooltip
+            id="toggle-vertical-tooltip"
+            title={verticalTooltip}
+            className={styles.displayToggle}
+            placement="bottomRight"
+            disabled={v.selectiveRecording}
+          >
+            <i
+              id="vertical-display-toggle"
+              onClick={() => {
+                if (v.isMidStreamMode) {
+                  showToggleDisplayErrorMessage();
+                } else if (v.studioMode && v.isHorizontal) {
+                  showStudioModeErrorMessage();
+                } else if (v.selectiveRecording) {
+                  showSelectiveRecordingMessage();
+                } else {
+                  v.toggleDisplay(!v.isVertical, 'vertical');
+                }
+              }}
+              className={cx('icon-phone-case icon-button icon-button--lg', {
+                active: v.isVertical && !v.selectiveRecording,
+                disabled: v.selectiveRecording,
+              })}
+            />
+          </Tooltip>
+        )}
+
+        <AntdTooltip title={$t('Edit Scene Transitions.')} placement="bottomRight">
+          <i className="icon-transition icon-button icon-button--lg" onClick={showTransitions} />
+        </AntdTooltip>
       </div>
       <Scrollable style={{ height: '100%' }} className={styles.scenesContainer}>
         <Tree
@@ -213,6 +299,17 @@ function SceneSelector() {
         </div>
       </HelpTip>
     </>
+  );
+}
+
+function TreeNode(p: { scene: IScene; removeScene: (scene: IScene) => void }) {
+  return (
+    <div className={styles.sourceTitleContainer} data-name={p.scene.name} data-role="scene">
+      <span className={styles.sourceTitle}>{p.scene.name}</span>
+      <AntdTooltip title={$t('Remove Scene.')} placement="left">
+        <i onClick={() => p.removeScene(p.scene)} className="icon-trash" />
+      </AntdTooltip>
+    </div>
   );
 }
 

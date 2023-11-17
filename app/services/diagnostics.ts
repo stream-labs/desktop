@@ -19,6 +19,9 @@ import { CacheUploaderService } from './cache-uploader';
 import { AudioService, AudioSource, E_AUDIO_CHANNELS } from './audio';
 import { getOS, OS } from 'util/operating-systems';
 import { Source, SourcesService } from './sources';
+import { VideoEncodingOptimizationService } from './video-encoding-optimizations';
+import { RecordingModeService, TransitionsService } from 'app-services';
+import * as remote from '@electron/remote';
 
 interface IStreamDiagnosticInfo {
   startTime: number;
@@ -134,6 +137,9 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
   @Inject() cacheUploaderService: CacheUploaderService;
   @Inject() audioService: AudioService;
   @Inject() sourcesService: SourcesService;
+  @Inject() videoEncodingOptimizationService: VideoEncodingOptimizationService;
+  @Inject() transitionsService: TransitionsService;
+  @Inject() recordingModeService: RecordingModeService;
 
   static defaultState: IDiagnosticsServiceState = {
     streams: [],
@@ -212,11 +218,13 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
     const top = await this.generateTopSection();
     const user = this.generateUserSection();
     const system = this.generateSystemSection();
+    const config = this.generateConfigurationSection();
     const video = this.generateVideoSection();
     const output = this.generateOutputSection();
     const audio = this.generateAudioSection();
     const devices = this.generateDevicesSection();
     const scenes = this.generateScenesSection();
+    const transitions = this.generateTransitionsSection();
     const streams = this.generateStreamsSection();
     const network = this.generateNetworkSection();
 
@@ -229,6 +237,7 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
       problems,
       user,
       system,
+      config,
       streams,
       video,
       output,
@@ -236,6 +245,7 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
       audio,
       devices,
       scenes,
+      transitions,
     ];
 
     return report.join('');
@@ -290,6 +300,12 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
     } else {
       return new Section(title, 'User is not logged in');
     }
+  }
+
+  private generateConfigurationSection() {
+    return new Section('Configuration', {
+      'Recording Mode': this.recordingModeService.state.enabled,
+    });
   }
 
   private generateVideoSection() {
@@ -384,6 +400,7 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
         'Audio Track': this.settingsService.views.streamTrack + 1,
         'VOD Track': this.settingsService.views.vodTrack + 1,
         'VOD Track Enabled': !!this.settingsService.views.vodTrackEnabled,
+        'Keyframe Interval': this.settingsService.views.values.Output.keyint_sec,
       },
       Recording: {
         'Using Stream Encoder': settings.recording.isSameAsStream,
@@ -396,6 +413,8 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
         'Output Resolution': settings.recording.outputResolution,
         'Audio Tracks': this.settingsService.views.recordingTracks.map(t => t + 1).join(', '),
       },
+      'Use Optimizaed Encoder Settings': this.videoEncodingOptimizationService.state
+        .useOptimizedProfile,
     });
   }
 
@@ -440,6 +459,15 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
       },
       Graphics: gpuSection ?? 'This information is not available on macOS reports',
       'Running as Admin': isAdmin,
+      Monitors: remote.screen.getAllDisplays().map(display => {
+        return {
+          Resolution: `${display.size.width}x${display.size.height}`,
+          Scaling: display.scaleFactor,
+          Refresh: display.displayFrequency,
+          Internal: display.internal,
+          Rotation: display.rotation,
+        };
+      }),
     });
   }
 
@@ -448,6 +476,9 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
 
     return new Section('Network', {
       'Bind to IP': settings.Advanced.BindIP,
+      'Bind to IP Options': this.settingsService
+        .findSetting(this.settingsService.state.Advanced.formData, 'Network', 'BindIP')
+        .options.map((opt: any) => opt.description),
       'Dynamic Bitrate': settings.Advanced.DynamicBitrate,
       'New Networking Code': settings.Advanced.NewSocketLoopEnable,
       'Low Latency Mode': settings.Advanced.LowLatencyEnable,
@@ -515,6 +546,28 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
     });
   }
 
+  private generateTransitionsSection() {
+    return new Section('Transitions', {
+      Transitions: this.transitionsService.state.transitions.map(transition => {
+        return {
+          ID: transition.id,
+          Name: transition.name,
+          'Is Default': transition.id === this.transitionsService.state.defaultTransitionId,
+          Type: transition.type,
+          Duration: transition.duration,
+          Settings: this.transitionsService.getSettings(transition.id),
+        };
+      }),
+      Connections: this.transitionsService.state.connections.map(connection => {
+        return {
+          'From Scene ID': connection.fromSceneId,
+          'To Scene ID': connection.toSceneId,
+          'Transition ID': connection.transitionId,
+        };
+      }),
+    });
+  }
+
   private generateScenesSection() {
     const sceneData = {};
 
@@ -555,6 +608,7 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
       'Poll',
       'EmoteWall',
       'ChatHighlight',
+      'CustomWidget',
     ];
 
     const propertiesManagerType = source.getPropertiesManagerType();

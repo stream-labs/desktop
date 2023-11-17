@@ -7,7 +7,9 @@ export type TWidgetType =
   | WidgetType.ViewerCount
   | WidgetType.GameWidget
   | WidgetType.EmoteWall
-  | WidgetType.DonationTicker;
+  | WidgetType.DonationTicker
+  | WidgetType.CustomWidget
+  | WidgetType.ChatBox;
 
 export interface IWidgetConfig {
   type: TWidgetType;
@@ -100,7 +102,7 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
 
       defaultTransform: {
         width: 400,
-        height: 450,
+        height: 750,
         x: 0.5,
         y: 0,
         anchor: AnchorPoint.North,
@@ -174,9 +176,30 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
     //
     // },
 
-    // ChatBox: {
-    //
-    // },
+    [WidgetType.ChatBox]: {
+      type: WidgetType.ChatBox,
+
+      defaultTransform: {
+        width: 600,
+        height: 600,
+        x: 0,
+        y: 0.5,
+        anchor: AnchorPoint.West,
+      },
+
+      settingsWindowSize: {
+        width: 850,
+        height: 700,
+      },
+
+      url: `https://${host}/widgets/chat-box/v1/${token}`,
+      previewUrl: `https://${host}/widgets/chat-box/v1/${token}?simulate=1`,
+      dataFetchUrl: `https://${host}/api/v5/slobs/widget/chatbox`,
+      settingsSaveUrl: `https://${host}/api/v5/slobs/widget/chatbox`,
+      settingsUpdateEvent: 'chatBoxSettingsUpdate',
+      customCodeAllowed: true,
+      customFieldsAllowed: true,
+    },
 
     // ChatHighlight: {
     //
@@ -238,5 +261,30 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
     // TipJar: {
     //
     // },
+
+    [WidgetType.CustomWidget]: {
+      type: WidgetType.CustomWidget,
+
+      defaultTransform: {
+        width: 400,
+        height: 750,
+        x: 0.5,
+        y: 0,
+        anchor: AnchorPoint.North,
+      },
+
+      settingsWindowSize: {
+        width: 850,
+        height: 700,
+      },
+
+      url: `https://${host}/widgets/custom-widget?token=${token}`,
+      previewUrl: `https://${host}/widgets/custom-widget?token=${token}`,
+      dataFetchUrl: `https://${host}/api/v5/slobs/widget/customwidget`,
+      settingsSaveUrl: `https://${host}/api/v5/slobs/widget/customwidget`,
+      settingsUpdateEvent: 'customWidgetSettingsUpdate',
+      customCodeAllowed: true,
+      customFieldsAllowed: true,
+    },
   };
 }

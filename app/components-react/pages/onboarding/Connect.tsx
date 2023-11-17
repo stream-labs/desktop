@@ -24,7 +24,7 @@ export function Connect() {
     setExtraPlatform,
   } = useModule(LoginModule);
   const { next } = useModule(OnboardingModule);
-  const { UsageStatisticsService } = Services;
+  const { UsageStatisticsService, OnboardingService, RecordingModeService } = Services;
 
   if (selectedExtraPlatform) {
     return <ExtraPlatformConnect />;
@@ -37,7 +37,7 @@ export function Connect() {
 
   function onSelectExtraPlatform(val: TExtraPlatform | 'tiktok' | undefined) {
     if (val === 'tiktok') {
-      authPlatform('tiktok', next);
+      authPlatform('tiktok', afterLogin);
       return;
     }
 
@@ -45,7 +45,14 @@ export function Connect() {
     setExtraPlatform(val);
   }
 
-  const platforms = ['twitch', 'youtube', 'facebook', 'trovo'];
+  function afterLogin() {
+    OnboardingService.actions.setExistingCollections();
+    next();
+  }
+
+  const platforms = RecordingModeService.views.isRecordingModeEnabled
+    ? ['streamlabs', 'youtube']
+    : ['streamlabs', 'twitch', 'youtube', 'facebook', 'trovo', 'twitter'];
 
   return (
     <div className={styles.pageContainer}>
@@ -53,12 +60,14 @@ export function Connect() {
         <h1 className={commonStyles.titleContainer}>{$t('Connect')}</h1>
         {!isRelog && (
           <p style={{ marginBottom: 80 }}>
-            {$t('Sign in with your streaming account to get started with Streamlabs')}
+            {$t('Sign in with your content platform to get started with Streamlabs')}
           </p>
         )}
         {isRelog && (
           <h3 style={{ marginBottom: '16px' }}>
-            Your login has expired. Please re-login to continue using Streamlabs
+            {$t(
+              'Your login has expired. Please reauthenticate to continue using Streamlabs Desktop.',
+            )}
           </h3>
         )}
         <div className={styles.signupButtons}>
@@ -66,7 +75,7 @@ export function Connect() {
             <button
               className={cx(`button button--${platform}`, styles.loginButton)}
               disabled={loading || authInProgress}
-              onClick={() => authPlatform(platform, next)}
+              onClick={() => authPlatform(platform, afterLogin)}
               key={platform}
             >
               {loading && <i className="fas fa-spinner fa-spin" />}
@@ -147,11 +156,23 @@ export class LoginModule {
     return this.UserService.state.authProcessState === EAuthProcessState.InProgress;
   }
 
-  async authPlatform(platform: TPlatform, onSuccess: () => void) {
+  get isPartialSLAuth() {
+    return this.UserService.views.isPartialSLAuth;
+  }
+
+  async authPlatform(platform: TPlatform | 'streamlabs', onSuccess: () => void, merge = false) {
     this.UsageStatisticsService.recordAnalyticsEvent('PlatformLogin', platform);
+
+    if (platform === 'streamlabs') {
+      await this.UserService.startSLAuth();
+      onSuccess();
+      return;
+    }
+
     const result = await this.UserService.startAuth(
       platform,
-      platform === 'youtube' ? 'external' : 'internal',
+      ['youtube', 'twitch', 'twitter'].includes(platform) ? 'external' : 'internal',
+      merge,
     );
 
     if (result === EPlatformCallResult.TwitchTwoFactor) {
@@ -174,6 +195,26 @@ export class LoginModule {
       // Currently we do not have special handling for generic errors
       onSuccess();
     }
+  }
+
+  async finishSLAuth(primaryPlatform?: TPlatform) {
+    const result = await this.UserService.finishSLAuth(primaryPlatform);
+
+    if (result === EPlatformCallResult.TwitchScopeMissing) {
+      await remote.dialog.showMessageBox(remote.getCurrentWindow(), {
+        type: 'warning',
+        message: $t(
+          'Streamlabs requires additional permissions from your Twitch account. Please log in with Twitch to continue.',
+        ),
+        title: 'Twitch Error',
+        buttons: [$t('Refresh Login')],
+      });
+
+      // Initiate a Twitch merge to get permissions
+      await this.authPlatform('twitch', () => {}, true);
+    }
+
+    return result;
   }
 
   @mutation()

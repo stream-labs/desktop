@@ -19,6 +19,7 @@ const ANT_SELECT_FEATURES = [
   'onSelect',
   'allowClear',
   'defaultActiveFirstOption',
+  'listHeight',
 ] as const;
 
 // define custom props
@@ -28,7 +29,8 @@ export interface ICustomListProps<TValue> {
   optionRender?: (opt: IListOption<TValue>) => ReactNode;
   labelRender?: (opt: IListOption<TValue>) => ReactNode;
   onBeforeSearch?: (searchStr: string) => unknown;
-  options: IListOption<TValue>[];
+  options?: IListOption<TValue>[];
+  description?: string;
 }
 
 // define a type for the component's props
@@ -45,8 +47,8 @@ export type TListInputProps<TValue> = TSlobsInputProps<
 export interface IListOption<TValue> {
   label: string;
   value: TValue;
-  description?: string; // TODO
-  image?: string;
+  description?: string;
+  image?: string | ReactNode;
 }
 
 export const ListInput = InputComponent(<T extends any>(p: TListInputProps<T>) => {
@@ -79,10 +81,10 @@ export const ListInput = InputComponent(<T extends any>(p: TListInputProps<T>) =
     return $el.closest('.os-content, body')! as HTMLElement;
   }
 
-  const selectedOption = options.find(opt => opt.value === p.value);
+  const selectedOption = options?.find(opt => opt.value === p.value);
 
   return (
-    <InputWrapper {...wrapperAttrs} extra={selectedOption?.description}>
+    <InputWrapper {...wrapperAttrs} extra={p?.description ?? selectedOption?.description}>
       <Select
         ref={$inputRef}
         {...omit(inputAttrs, 'onChange')}
@@ -156,7 +158,12 @@ function renderOptionWithImage<T>(opt: IListOption<T>, inputProps: ICustomListPr
   return (
     <Row gutter={8} align="middle" wrap={false}>
       <Col>
-        {src && <img src={src} alt="" style={imageStyle} />}
+        {src &&
+          (typeof src === 'string' ? (
+            <img src={src} alt="" style={imageStyle} />
+          ) : (
+            <div>{src}</div>
+          ))}
         {!src && <div style={imageStyle} />}
       </Col>
       <Col>{opt.label}</Col>
@@ -174,7 +181,12 @@ function renderLabelWithImage<T>(opt: IListOption<T>) {
   return (
     <Row gutter={8}>
       <Col>
-        {src && <img src={src} alt="" style={imageStyle} />}
+        {src &&
+          (typeof src === 'string' ? (
+            <img src={src} alt="" style={imageStyle} />
+          ) : (
+            <div>{src}</div>
+          ))}
         {!src && <div style={imageStyle} />}
       </Col>
       <Col>{opt.label}</Col>

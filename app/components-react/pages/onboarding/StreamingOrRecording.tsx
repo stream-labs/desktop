@@ -10,7 +10,7 @@ import { Services } from 'components-react/service-provider';
 import { useModule } from 'slap';
 
 export function StreamingOrRecording() {
-  const { next, setRecordingMode } = useModule(OnboardingModule);
+  const { next, setRecordingMode, UsageStatisticsService } = useModule(OnboardingModule);
   const [active, setActive] = useState<'streaming' | 'recording' | null>(null);
 
   async function onContinue() {
@@ -33,8 +33,7 @@ export function StreamingOrRecording() {
 
       setRecordingMode();
     }
-
-    Services.UsageStatisticsService.recordClick('StreamingOrRecording', active);
+    UsageStatisticsService.actions.recordClick('StreamingOrRecording', active);
 
     next();
   }
