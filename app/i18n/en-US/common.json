@@ -34,6 +34,8 @@
   "Save": "Save",
   "Edit": "Edit",
   "Log In": "Log In",
+  "Log in with %{platform}": "Log in with %{platform}",
+  "Log in with <span>%{platform}</span>": "Log in with <span>%{platform}</span>",
   "Yes": "Yes",
   "No": "No",
   "OK": "OK",

@@ -5,7 +5,7 @@ import { $t } from 'services/i18n';
 import { Services } from 'components-react/service-provider';
 import { injectState, useModule, mutation } from 'slap';
 import { ExtraPlatformConnect } from './ExtraPlatformConnect';
-import { EPlatformCallResult, TPlatform } from 'services/platforms';
+import { EPlatform, EPlatformCallResult, TPlatform, platformLabels } from 'services/platforms';
 import cx from 'classnames';
 import * as remote from '@electron/remote';
 import { OnboardingModule } from './Onboarding';
@@ -15,6 +15,8 @@ import { ListInput } from 'components-react/shared/inputs';
 import Form from 'components-react/shared/inputs/Form';
 import Signup from './Signup';
 import { SkipContext } from './OnboardingContext';
+import PlatformButton, { PlatformIconButton } from 'components-react/shared/PlatformButton';
+import Translate from 'components-react/shared/Translate';
 
 export function Connect() {
   const ctx = useContext(SkipContext);
@@ -68,11 +70,37 @@ export function Connect() {
     next();
   }
 
+  // streamlabs and trovo are added separarely on markup below
   const platforms = RecordingModeService.views.isRecordingModeEnabled
-    ? ['streamlabs', 'youtube']
-    : ['streamlabs', 'twitch', 'youtube', 'facebook', 'trovo'];
+    ? ['youtube']
+    : ['twitch', 'youtube', 'facebook'];
 
-  const title = isSignup ? $t('Sign Up') : $t('Connect');
+  const shouldAddTrovo = !RecordingModeService.views.isRecordingModeEnabled;
+
+  const extraPlatforms: {
+    value: 'tiktok' | TExtraPlatform;
+    label: string;
+    image: string;
+  }[] = [
+    {
+      value: 'tiktok',
+      label: 'TikTok',
+      image:
+        'data:image/png;base64,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',
+    },
+    {
+      value: 'dlive',
+      label: 'Dlive',
+      image: require('../../../../media/images/platforms/dlive-logo-small.png'),
+    },
+    {
+      value: 'nimotv',
+      label: 'NimoTV',
+      image: require('../../../../media/images/platforms/nimo-logo-small.png'),
+    },
+  ];
+
+  const title = isSignup ? $t('Sign Up') : $t('Log In');
 
   return (
     <div className={styles.pageContainer}>
@@ -84,11 +112,7 @@ export function Connect() {
           <Signup onSignupLinkClick={() => setIsSignup(false)} />
         ) : (
           <>
-            {!isRelog && (
-              <p style={{ marginBottom: 80 }}>
-                {$t('Sign in with your content platform to get started with Streamlabs')}
-              </p>
-            )}
+            {!isRelog && <p style={{ marginBottom: 20 }}>{$t('Log in with email/password')}</p>}
             {isRelog && (
               <h3 style={{ marginBottom: '16px' }}>
                 {$t(
@@ -96,54 +120,70 @@ export function Connect() {
                 )}
               </h3>
             )}
-            <div className={styles.signupButtons}>
-              {platforms.map((platform: TPlatform) => (
-                <button
-                  className={cx(`button button--${platform}`, styles.loginButton)}
-                  disabled={loading || authInProgress}
-                  onClick={() => authPlatform(platform, afterLogin)}
-                  key={platform}
+            <div className={styles.streamlabsPlatformContainer}>
+              <PlatformButton
+                platform="streamlabs"
+                loading={loading}
+                disabled={loading || authInProgress}
+                onClick={() => authPlatform('streamlabs', afterLogin)}
+              >
+                <Translate
+                  message={$t('Log in with <span>%{platform}</span>', {
+                    platform: 'Streamlabs ID',
+                  })}
                 >
-                  {loading && <i className="fas fa-spinner fa-spin" />}
-                  {!loading && (
-                    <PlatformLogo
-                      platform={platform}
-                      size="medium"
-                      color={platform === 'trovo' ? 'black' : 'white'}
-                    />
-                  )}
-                </button>
-              ))}
+                  <span slot="span" style={{ fontWeight: 'bold' }} />
+                </Translate>
+              </PlatformButton>
             </div>
-            <p className={styles['select-another']}> {$t('or select another platform')} </p>
-            <Form layout="inline" style={{ width: 300 }}>
-              <ListInput
-                style={{ width: '100%' }}
-                placeholder={$t('Select platform')}
-                onChange={onSelectExtraPlatform}
-                allowClear={true}
-                value={selectedExtraPlatform}
-                hasImage={true}
-                options={[
-                  {
-                    value: 'tiktok',
-                    label: 'TikTok',
-                    image:
-                      'data:image/png;base64,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',
-                  },
-                  {
-                    value: 'dlive',
-                    label: 'Dlive',
-                    image: require('../../../../media/images/platforms/dlive-logo-small.png'),
-                  },
-                  {
-                    value: 'nimotv',
-                    label: 'NimoTV',
-                    image: require('../../../../media/images/platforms/nimo-logo-small.png'),
-                  },
-                ]}
-              />
-            </Form>
+
+            <div className={styles.thirdPartyPlatforms}>
+              <p>{$t('Log in with a platform')}</p>
+
+              <div className={styles.thirdPartyPlatformsContainer}>
+                {platforms.map((platform: TPlatform) => (
+                  <PlatformButton
+                    platform={platform}
+                    disabled={loading || authInProgress}
+                    loading={loading}
+                    onClick={() => authPlatform(platform, afterLogin)}
+                    key={platform}
+                  >
+                    <Translate
+                      message={$t('Log in with <span>%{platform}</span>', {
+                        platform: platformLabels(platform),
+                      })}
+                    >
+                      <span slot="span" />
+                    </Translate>
+                  </PlatformButton>
+                ))}
+              </div>
+              <div className={styles.extraPlatformsContainer}>
+                {shouldAddTrovo && (
+                  <PlatformIconButton
+                    platform={EPlatform.Trovo}
+                    disabled={loading || authInProgress}
+                    loading={loading}
+                    onClick={() => authPlatform(EPlatform.Trovo, afterLogin)}
+                    title={$t('Log in with %{platform}', {
+                      platform: platformLabels(EPlatform.Trovo),
+                    })}
+                  />
+                )}
+                {extraPlatforms.map(platform => (
+                  <PlatformIconButton
+                    logo={platform.image}
+                    disabled={loading || authInProgress}
+                    loading={loading}
+                    onClick={() => onSelectExtraPlatform(platform.value)}
+                    title={$t('Log in with %{platform}', {
+                      platform: platform.label,
+                    })}
+                  />
+                ))}
+              </div>
+            </div>
           </>
         )}
       </div>
