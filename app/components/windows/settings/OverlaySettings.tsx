@@ -227,13 +227,13 @@ export default class OverlaySettings extends Vue {
             >
               {$t('Convert')}
             </button>
-            <button
+            {/* <button
               class="button button--soft-warning"
               onClick={async () => await this.convertDualOutputCollection(false, true)}
               disabled={this.busy}
             >
               {$t('Convert and Export Overlay')}
-            </button>
+            </button> */}
           </div>
           {/* <div style={{ marginTop: '10px' }}>
             <h4>{$t('Assign Vertical Sources to Horizontal Display')}</h4>
