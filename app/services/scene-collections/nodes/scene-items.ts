@@ -145,6 +145,8 @@ export class SceneItemsNode extends Node<ISchema, {}> {
 
       const nodeMap = this.dualOutputService.views.sceneNodeMaps[context.scene.id];
 
+      if (!nodeMap) return;
+
       const verticalNodeIds = Object.values(nodeMap);
 
       this.data.items.forEach(item => {
