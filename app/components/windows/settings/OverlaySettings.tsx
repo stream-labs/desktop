@@ -11,7 +11,8 @@ import { ScenesService } from 'services/scenes/index';
 import { $t } from 'services/i18n/index';
 import { BoolInput } from 'components/shared/inputs/inputs';
 import * as remote from '@electron/remote';
-// import { alertAsync } from 'components-react/modals';
+import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
+import { metadata } from 'components/shared/inputs';
 
 @Component({ components: { BoolInput } })
 export default class OverlaySettings extends Vue {
@@ -25,6 +26,11 @@ export default class OverlaySettings extends Vue {
   busy = false;
   message = '';
   error = false;
+  collection = '';
+
+  created() {
+    this.collection = this.sceneCollectionsService.activeCollection.id;
+  }
 
   get mediaBackupOptOut(): boolean {
     return this.customizationService.state.mediaBackupOptOut;
@@ -40,6 +46,13 @@ export default class OverlaySettings extends Vue {
 
   set designerMode(value: boolean) {
     this.customizationService.setSettings({ designerMode: value });
+  }
+
+  get collectionOptions() {
+    return this.sceneCollectionsService.collections.map(collection => ({
+      title: collection.name,
+      value: collection.id,
+    }));
   }
 
   async saveOverlay() {
@@ -154,6 +167,7 @@ export default class OverlaySettings extends Vue {
       // convert collection
       const filePath = await this.sceneCollectionsService.convertDualOutputCollection(
         assignToHorizontal,
+        this.collection,
       );
 
       if (filePath) {
@@ -219,7 +233,18 @@ export default class OverlaySettings extends Vue {
             )}
           </span>
           <div>
-            <h4>{$t('Convert to Vanilla Scene')}</h4>
+            <h4 style="margin-bottom: 8px;">{$t('Convert to Vanilla Scene')}</h4>
+            <VFormGroup
+              value={this.collection}
+              onInput={(value: string) => {
+                this.collection = value;
+              }}
+              metadata={metadata.list({
+                title: $t('Scene Collection'),
+                name: 'collection',
+                options: this.collectionOptions,
+              })}
+            />
             <button
               class="button button--soft-warning"
               onClick={async () => await this.convertDualOutputCollection()}

@@ -349,20 +349,22 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   @RunInLoadingMode()
   async convertDualOutputCollection(
     assignToHorizontal: boolean = false,
+    collectionId?: string,
   ): Promise<string | undefined> {
-    const name = `${this.activeCollection?.name} - Converted`;
+    const collection = this.getCollection(collectionId) || this.activeCollection;
+    const name = `${collection.name} - Converted`;
 
-    const collectionId = await this.duplicate(name);
+    const newCollectionId = await this.duplicate(name, collectionId);
 
-    if (!collectionId) return;
+    if (!newCollectionId) return;
 
     this.dualOutputService.setdualOutputMode(false);
 
-    await this.load(collectionId);
+    await this.load(newCollectionId);
 
     await this.convertToVanillaSceneCollection(assignToHorizontal);
 
-    return this.stateService.getCollectionFilePath(collectionId);
+    return this.stateService.getCollectionFilePath(newCollectionId);
   }
 
   downloadProgress = new Subject<IDownloadProgress>();

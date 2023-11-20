@@ -251,5 +251,6 @@
   "%{fieldName} must be greater than 0": "%{fieldName} must be greater than 0",
   "Markers": "Markers",
   "Manage Dual Output": "Manage Dual Output",
-  "Auto optimizer disabled for dual output scenes": "Auto optimizer disabled for dual output scenes"
+  "Auto optimizer disabled for dual output scenes": "Auto optimizer disabled for dual output scenes",
+  "Scene Collection": "Scene Collection"
 }
