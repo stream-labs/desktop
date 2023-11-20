@@ -352,7 +352,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     collectionId?: string,
   ): Promise<string | undefined> {
     const collection = collectionId ? this.getCollection(collectionId) : this.activeCollection;
-    const name = `${collection.name} - Converted`;
+    const name = `${collection?.name} - Converted`;
 
     const newCollectionId = await this.duplicate(name, collectionId);
 
