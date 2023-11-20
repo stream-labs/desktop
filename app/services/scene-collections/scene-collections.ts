@@ -351,7 +351,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     assignToHorizontal: boolean = false,
     collectionId?: string,
   ): Promise<string | undefined> {
-    const collection = this.getCollection(collectionId) || this.activeCollection;
+    const collection = collectionId ? this.getCollection(collectionId) : this.activeCollection;
     const name = `${collection.name} - Converted`;
 
     const newCollectionId = await this.duplicate(name, collectionId);
