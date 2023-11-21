@@ -12,7 +12,7 @@ import {
 
 function isHash(item: FilterRecord): boolean {
   if (item.type !== 'user') return false;
-  return item.body.match(/[^0-9]/) !== null; // 仮
+  return Boolean(item.isHashed);
 }
 
 function getBody(item: FilterRecord): string {
