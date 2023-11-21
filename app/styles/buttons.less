@@ -9,19 +9,19 @@ button {
   .transition;
   .radius();
 
-  height: @item-generic-size;
-  line-height: normal;
-  font-size: @font-size4;
-  color: var(--color-button-label);
-  background-color: var(--color-button-primary);
-  padding: 0 12px;
-  letter-spacing: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  height: @item-generic-size;
+  padding: 0 16px;
+  font-size: @font-size4;
+  line-height: normal;
+  color: var(--color-button-label);
+  letter-spacing: 0;
+  background-color: var(--color-button-primary);
 
   &:disabled {
-    opacity: .5;
+    opacity: 0.5;
   }
 
   i {
@@ -73,8 +73,8 @@ button {
 
 .button--action,
 .button--accent {
-  background-color: var(--color-button-accent);
   color: var(--color-button-label);
+  background-color: var(--color-button-accent);
 
   &:hover,
   &:focus {
@@ -89,8 +89,8 @@ button {
 
 .button--border {
   color: var(--colorbutton-secondary);
-  border: 1px solid var(--color-button-secondary);
   background-color: transparent;
+  border: 1px solid var(--color-button-secondary);
 
   &:hover,
   &:focus,
@@ -101,12 +101,13 @@ button {
 }
 
 .button--disabled {
-  background-color: @grey;
   cursor: default;
+  background-color: @grey;
 
-  &:hover, &:focus {
-    background-color: @grey;
+  &:hover,
+  &:focus {
     cursor: default;
+    background-color: @grey;
   }
 }
 
@@ -126,15 +127,16 @@ button {
 }
 
 .button--trans {
-  background: transparent;
   color: var(--color-text-light);
+  background: transparent;
 
   i {
     color: @text-primary;
     .transition();
   }
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     color: @white;
     background: transparent;
 
@@ -157,9 +159,9 @@ button {
 .icon-btn {
   .icon-hover();
 
+  margin-left: 12px;
   font-size: @font-size4;
   cursor: pointer;
-  margin-left: 12px;
 
   &:first-child {
     margin-left: inherit;
@@ -175,8 +177,8 @@ button {
 }
 
 .back-arrow {
-  font-size: 16px;
   margin-right: 20px;
+  font-size: 16px;
   .transition;
 }
 
@@ -190,28 +192,29 @@ button {
 
 .button-container {
   display: flex;
-  justify-content: center;
   align-content: center;
+  justify-content: center;
 }
 
 .square-button {
   .radius();
   .transition();
+
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   width: 50px;
   height: 50px;
-  color: @white;
   font-size: 16px;
+  color: @white;
 }
 
 .square-button--skip,
 .button--skip {
-  background: transparent;
-  border: none;
   color: var(--color-text);
   text-decoration: underline;
+  background: transparent;
+  border: none;
 
   &:hover {
     text-decoration: none;
@@ -222,7 +225,6 @@ button {
     background: transparent;
   }
 }
-
 
 .button--go-live,
 .button--start-program {
@@ -257,19 +259,19 @@ button {
 }
 
 .button--default {
-  background: rgba(255, 255, 255, .1) !important;
-  border-color: transparent !important;
   color: @white !important;
+  background: rgb(255 255 255 / 10%) !important;
+  border-color: transparent !important;
 
   &:hover {
-    background: rgba(255, 255, 255, .2) !important;
- }
+    background: rgb(255 255 255 / 20%) !important;
+  }
 
- &:disabled {
-   &:hover {
-    background: rgba(255, 255, 255, .1) !important;
-   }
- }
+  &:disabled {
+    &:hover {
+      background: rgb(255 255 255 / 10%) !important;
+    }
+  }
 }
 
 .button--create-program {
@@ -277,7 +279,7 @@ button {
   background-color: @text-secondary;
 
   &:hover {
-     background-color: @text-tertiary;
+    background-color: @text-tertiary;
   }
 
   &:disabled {
@@ -293,13 +295,13 @@ button {
 
   &:hover {
     background-color: @text-tertiary;
- }
+  }
 
- &:disabled {
-   &:hover {
-     background-color: @text-secondary;
-   }
- }
+  &:disabled {
+    &:hover {
+      background-color: @text-secondary;
+    }
+  }
 }
 
 .button-nicolive--default {
@@ -308,13 +310,13 @@ button {
 }
 
 .button--circle {
-  width: @item-generic-size;
-  height: @item-generic-size;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
+  width: @item-generic-size;
+  height: @item-generic-size;
   cursor: pointer;
+  border-radius: 50%;
   .transition;
 
   i {
@@ -338,5 +340,36 @@ button {
 
   &:hover {
     color: var(--color-button-active);
+  }
+}
+
+.button--tab {
+  position: relative;
+  padding: 8px;
+  font-size: @font-size4;
+  color: var(--color-text);
+  text-align: center;
+
+  &:hover {
+    color: var(--color-text-light);
+  }
+
+  &::after {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    display: block;
+    width: 100%;
+    height: 2px;
+    content: '';
+    background-color: transparent;
+  }
+
+  &.active {
+    color: var(--color-text-light);
+
+    &::after {
+      background-color: var(--color-text-light);
+    }
   }
 }

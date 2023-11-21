@@ -19,7 +19,8 @@ import {
   Segment,
   Statistics,
   UserFollowStatus,
-  UserFollow
+  UserFollow,
+  AddFilterRecord
 } from './ResponseTypes';
 const { BrowserWindow } = remote;
 
@@ -384,7 +385,7 @@ export class NicoliveClient {
 
   async addFilters(
     programID: string,
-    records: Omit<FilterRecord, 'id'>[],
+    records: AddFilterRecord[],
   ): Promise<WrappedResult<Filters['data']>> {
     const session = await this.fetchSession();
     const requestInit = NicoliveClient.createRequest('POST', {
@@ -396,7 +397,7 @@ export class NicoliveClient {
     });
     try {
       const resp = await fetch(
-        `${NicoliveClient.live2BaseURL}/unama/tool/v2/programs/${programID}/ssng`,
+        `${NicoliveClient.live2BaseURL}/unama/tool/v2/programs/${programID}/ssng/create`,
         requestInit,
       );
       return NicoliveClient.wrapResult<Filters['data']>(resp);

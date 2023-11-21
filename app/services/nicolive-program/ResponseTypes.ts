@@ -191,9 +191,14 @@ export type FilterRecord = {
   id: number;
   type: 'word' | 'user' | 'command';
   body: string;
+  createdAt?: string; // NG登録日時: 例: "2023-02-20T00:00:00+09:00"
+  memo?: string; // NG登録時のコメント本文
+  isHashed?: boolean; // type: 'user' 時にユーザーIDが hash化されているかどうか
 };
 
 export type FilterType = FilterRecord['type'];
+
+export type AddFilterRecord = Omit<FilterRecord, 'id'> & { messageId?: string };
 
 export interface Filters {
   meta: {

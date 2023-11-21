@@ -2,39 +2,96 @@
   <div class="container">
     <div class="header">
       <p class="header-title">放送者NG設定</p>
+      <span class="registrations">（登録数 {{ count }}/{{ maxCount }}）</span>
       <i class="icon-close icon-btn" @click="close"></i>
     </div>
     <div class="content">
       <div class="content-header">
-        <button type="button" @click="currentType = 'word'" class="choice" :class="{ active: currentType === 'word' }" >コメント</button>
-        <button type="button" @click="currentType = 'user'" class="choice" :class="{ active: currentType === 'user' }" >ユーザーID</button>
-        <button type="button" @click="currentType = 'command'" class="choice" :class="{ active: currentType === 'command' }" >コマンド</button>
-        <div class="registrations">登録数 {{ count }}/{{ maxCount }}</div>
+        <button
+          type="button"
+          @click="currentType = 'word'"
+          class="button--tab"
+          :class="{ active: currentType === 'word' }"
+        >
+          コメント
+        </button>
+        <button
+          type="button"
+          @click="currentType = 'user'"
+          class="button--tab"
+          :class="{ active: currentType === 'user' }"
+        >
+          ユーザーID
+        </button>
+        <button
+          type="button"
+          @click="currentType = 'command'"
+          class="button--tab"
+          :class="{ active: currentType === 'command' }"
+        >
+          コマンド
+        </button>
       </div>
       <form class="add-form" @submit.prevent="onAdd">
-        <input type="text" ref="input" v-model="newFilterValue" :placeholder="`NGに登録する${FILTER_VALUE[currentType]}を入力`" :disabled="adding" :readonly="adding" />
-        <button type="submit" :disabled="adding" class="button button--secondary">追加</button>
+        <input
+          type="text"
+          ref="input"
+          v-model="newFilterValue"
+          :placeholder="PLACEHOLDER[currentType]"
+          :disabled="adding"
+          :readonly="adding"
+          :class="{ 'is-error': invalid }"
+        />
+        <button
+          type="submit"
+          :disabled="!newFilterValue || adding || invalid"
+          class="button button--secondary"
+        >
+          登録
+        </button>
+        <div class="form-tip floating-wrapper" v-if="invalid">数字以外の文字列は登録できません</div>
       </form>
       <div class="list">
-        <div class="row" v-for="item of currentTypeFilters" :key="item.id">
-          <div class="item-body" :title="item.body">{{ item.body }}</div>
-          <button type="button" class="item-misc icon-btn icon-delete" :disabled="deleting" @click="deleteFilter(item)"></button>
+        <div class="item row" v-for="item of currentTypeFilters" :key="item.id">
+          <div class="item-box">
+            <div class="item-body" :title="item.body">{{ item.body }}</div>
+            <div class="item-comment" v-if="item.comment_body" :title="item.comment_body">
+              {{ item.comment_body }}
+            </div>
+            <div class="item-date" :title="item.register_date">{{ item.register_date }}</div>
+          </div>
+          <button
+            type="button"
+            class="item-misc icon-btn icon-delete"
+            :disabled="deleting"
+            @click="deleteFilter(item)"
+          ></button>
         </div>
       </div>
+      <banner
+        class="banner"
+        title="匿名ユーザーによるNG登録についても、無期限に登録されるようになりました"
+        body=""
+        anchorLabel="詳細はこちら"
+        anchorLink="https://blog.nicovideo.jp/niconews/205517.html"
+        @close="isBannerOpened = false"
+        v-if="isBannerOpened"
+      >
+      </banner>
     </div>
   </div>
 </template>
 
 <script lang="ts" src="./CommentFilter.vue.ts"></script>
 <style lang="less" scoped>
-@import "../../styles/index";
+@import url('../../styles/index');
 
 .container {
   display: flex;
-  flex-direction: column;
-  width: 100%;
-  flex-grow: 1;
   flex-basis: 0;
+  flex-direction: column;
+  flex-grow: 1;
+  width: 100%;
   overflow-y: auto;
 }
 
@@ -45,87 +102,61 @@
   justify-content: center;
   height: 48px;
   padding: 4px 16px;
+  color: var(--color-text-light);
+  .bold;
+
   border-bottom: 1px solid var(--color-border-light);
 
   > .header-title {
+    margin: 0;
     font-size: @font-size4;
     color: var(--color-text-light);
     text-align: center;
-    margin: 0;
   }
 
   > .icon-close {
-    display: flex;
-    align-items: center;
     position: absolute;
     right: 16px;
+    display: flex;
+    align-items: center;
   }
 }
 
 .content {
-  flex-grow: 1;
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
 }
 
 .content-header {
   display: flex;
-  align-items: center;
   flex-shrink: 0;
-  font-size: 12px;
-  padding: 0 8px;
+  align-items: center;
+  height: 44px;
+  padding: 0 16px;
   border-bottom: 1px solid @border;
-  margin-bottom: 8px;
 
   > button {
-    font-size: 12px;
-    color: var(--color-text);
-    margin-right: 8px;
-    padding: 16px 8px;
-    position: relative;
-
-    &:after {
-      display: block;
-      content: '';
-      width: 100%;
-      height: 2px;
-      position: absolute;
-      left: 0;
-      bottom: 0;
-      background-color: transparent;
-    }
-
-    &:hover {
-      color: var(--color-text-light);
-    }
-
-    &.active {
-      color: var(--color-text-active);
-
-      &:after {
-        background-color: var(--color-text-active);
-      }
-    }
-  }
-
-  > .registrations {
-    color: @light-grey;
-    margin-left: auto;
-    margin-right: 8px;
+    flex-grow: 1;
+    height: 100%;
   }
 }
 
 .add-form {
+  position: relative;
   display: flex;
-  justify-content: center;
-  padding: 8px;
   flex-shrink: 0;
+  justify-content: center;
+  height: 72px;
+  padding: 16px;
+  border-bottom: 1px solid var(--color-border-light);
 
   > input {
+    box-sizing: border-box;
     flex-grow: 1;
     width: auto;
-    padding-right: 36px;
-    box-sizing: border-box;
+    height: 100%;
+    padding: 0 12px;
     border-radius: 4px 0 0 4px;
 
     &::placeholder {
@@ -135,8 +166,16 @@
 
   > button {
     flex-shrink: 0;
+    height: 100%;
     border-radius: 0 4px 4px 0;
   }
+}
+
+.floating-wrapper {
+  position: absolute;
+  top: 64px;
+  right: 0;
+  left: 16px;
 }
 
 .list {
@@ -145,12 +184,9 @@
 }
 
 .row {
-  font-size: @font-size4;
-  height: 40px;
-  line-height: 40px;
-
   display: flex;
   flex-direction: row;
+  font-size: @font-size4;
 
   &:hover {
     .bg-hover();
@@ -161,11 +197,31 @@
   }
 }
 
-.item-body {
+.item {
+  padding: 12px 16px;
+}
+
+.item-box {
   .text-ellipsis;
-  margin-left: 16px;
+
+  display: flex;
+  flex-direction: column;
   flex-grow: 1;
+}
+
+.item-body {
   color: var(--color-text);
+}
+
+.item-comment {
+  font-size: @font-size2;
+  color: var(--color-text-dark);
+}
+
+.item-date {
+  flex-shrink: 0;
+  font-size: @font-size2;
+  color: var(--color-text-dark);
 }
 
 .item-misc {
@@ -173,6 +229,13 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  margin-right: 16px;
+}
+
+.banner {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  left: 16px;
+  .shadow;
 }
 </style>

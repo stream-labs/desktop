@@ -13,13 +13,13 @@
         <div class="studio-controls-tabs">
           <a
             @click="compactModeStudioController = 'mixer'"
-            class="studio-controls-tab"
+            class="studio-controls-tab button--tab"
             :class="{ active: compactModeStudioController === 'mixer' }"
             >ミキサー</a
           >
           <a
             @click="compactModeStudioController = 'scenes'"
-            class="studio-controls-tab"
+            class="studio-controls-tab button--tab"
             :class="{ active: compactModeStudioController === 'scenes' }"
             >{{ activeCollection.name }}</a
           >
@@ -42,14 +42,14 @@
 <script lang="ts" src="./StudioControls.vue.ts"></script>
 
 <style lang="less" scoped>
-@import '../styles/index';
+@import url('../styles/index');
 
 .studio-controls {
   .dividing-border;
 
   position: relative;
-  height: 0;
   width: 100%;
+  height: 0;
   padding: @toggle-button-size 8px 0 8px;
   background-color: var(--color-bg-quinary);
 
@@ -60,27 +60,28 @@
 
   .isCompactMode & {
     display: flex;
-    padding-top: 0;
     width: @nicolive-area-width;
+    padding-top: 0;
   }
 }
 
 .studio-controls-toggle-button {
   position: absolute;
-  width: 180px;
-  height: @toggle-button-size;
-  margin: -@toggle-button-size auto 0 auto;
-  left: 0;
   right: 0;
+  left: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 180px;
+  height: @toggle-button-size;
+  margin: -@toggle-button-size auto 0 auto;
 
   > i {
     .icon-hover;
+
+    display: block;
     font-size: @font-size2;
     color: var(--color-text);
-    display: block;
     transform: rotate(-180deg);
   }
 
@@ -93,16 +94,16 @@
 </style>
 
 <style lang="less">
-@import '../styles/index';
+@import url('../styles/index');
 
 .studio-controls-panel {
+  position: relative;
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
   height: 100%;
   min-height: 0;
   padding: 0 8px;
-  position: relative;
-  flex-grow: 1;
 }
 
 .studio-controls-compact {
@@ -114,57 +115,40 @@
 
 .studio-controls-tabs {
   display: flex;
+  height: 48px;
   padding: 0 8px;
 }
 
 .studio-controls-tab {
   .text-ellipsis;
 
+  display: block;
   flex: 1 0 50%;
-  text-align: center;
-  height: 48px;
-  line-height: 48px;
+  line-height: 32px;
   text-decoration: none;
-  color: var(--color-text);
-  position: relative;
-  padding: 0 8px;
-
-  &.active {
-    color: var(--color-primary);
-
-    &:after {
-      content: '';
-      height: 2px;
-      width: 100%;
-      position: absolute;
-      left: 0;
-      bottom: 0;
-      background-color: var(--color-primary);
-    }
-  }
 }
 
 .studio-controls-top {
   display: flex;
+  flex: 0 0 16px;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  flex: 0 0 16px;
   height: 16px;
   margin-bottom: 12px;
 }
 
 .studio-controls__label {
-  color: var(--color-text-light);
   margin-bottom: 0;
   font-size: @font-size4;
+  color: var(--color-text-light);
   .semibold;
 }
 
 .studio-controls-selector {
-  background: var(--color-bg-tertiary);
-  .radius;
   flex-grow: 1;
   overflow-y: auto;
+  background: var(--color-bg-tertiary);
+  .radius;
 }
 </style>
