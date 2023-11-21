@@ -73,7 +73,7 @@
         title="匿名ユーザーによるNG登録についても、無期限に登録されるようになりました"
         body=""
         anchorLabel="詳細はこちら"
-        anchorLink="https://blog.nicovideo.jp/niconews/"
+        anchorLink="https://blog.nicovideo.jp/niconews/205517.html"
         @close="isBannerOpened = false"
         v-if="isBannerOpened"
       >
