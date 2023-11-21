@@ -12,7 +12,7 @@ import {
 
 function isHash(item: FilterRecord): boolean {
   if (item.type !== 'user') return false;
-  return Boolean(item.isHashed);
+  return item.isHashed || false;
 }
 
 function getBody(item: FilterRecord): string {
