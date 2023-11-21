@@ -191,8 +191,8 @@ export type FilterRecord = {
   id: number;
   type: 'word' | 'user' | 'command';
   body: string;
-  createdAt?: string; // 仮: NG登録日時: 例: "2023-02-20T00:00:00+09:00"
-  memo?: string; // 仮: NG登録時のコメント本文
+  createdAt?: string; // NG登録日時: 例: "2023-02-20T00:00:00+09:00"
+  memo?: string; // NG登録時のコメント本文
 };
 
 export type FilterType = FilterRecord['type'];
