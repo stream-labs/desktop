@@ -1,5 +1,5 @@
 <template>
-  <div class="container" @contextmenu.prevent="isBannerOpened = true">
+  <div class="container">
     <div class="header">
       <p class="header-title">放送者NG設定</p>
       <span class="registrations">（登録数 {{ count }}/{{ maxCount }}）</span>
