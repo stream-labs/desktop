@@ -14,7 +14,7 @@ import { assertIsDefined, getDefined } from 'util/properties-type-guards';
 const CHANNEL_HEIGHT = 3;
 const SPACE_BETWEEN_CHANNELS = 2;
 const PADDING_TOP = 39;
-const PADDING_BOTTOM = 51;
+const PADDING_BOTTOM = 49;
 const PEAK_WIDTH = 4;
 const PEAK_HOLD_CYCLES = 100;
 const WARNING_LEVEL = -20;
