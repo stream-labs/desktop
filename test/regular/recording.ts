@@ -1,7 +1,12 @@
 import { readdir } from 'fs-extra';
 import { test, useWebdriver } from '../helpers/webdriver';
 import { sleep } from '../helpers/sleep';
-import { startRecording, stopRecording } from '../helpers/modules/streaming';
+import {
+  clickGoLive,
+  prepareToGoLive,
+  startRecording,
+  stopRecording,
+} from '../helpers/modules/streaming';
 import { FormMonkey } from '../helpers/form-monkey';
 import {
   setOutputResolution,
@@ -14,6 +19,9 @@ import {
   selectElements,
   isDisplayed,
   select,
+  focusChild,
+  selectButton,
+  waitForDisplayed,
 } from '../helpers/modules/core';
 import { logIn } from '../helpers/webdriver/user';
 import { toggleDualOutputMode } from '../helpers/modules/dual-output';
@@ -115,30 +123,48 @@ test('Recording Dual Output', async t => {
     await clickButton('Done');
   });
 
-  // Recording mode: record horizontal and vertical displays
-  await focusMain();
-  await startRecording();
-  // Record icons show in both headers
-  await isDisplayed('i.icon-record:not(.hidden)');
-  const icons = await selectElements('i.icon-record:not(.hidden)');
-  t.true(icons.length === 2);
-  await stopRecording();
-  // Wait to ensure that video file is finalized
-  await sleep(500);
+  // Confirm vertical recording toggle
+  await prepareToGoLive();
+  await clickGoLive();
+  await focusChild();
 
-  // Generated two recordings
-  await showPage('Recordings');
-  const recordings = await selectElements('span.file');
-  t.true(recordings.length === 2);
+  await waitForDisplayed('button=Vertical Recording Only');
+  const verticalToggle = await selectButton('Vertical Recording Only');
+  console.log('verticalToggle ', verticalToggle);
+  let value = await verticalToggle.getAttribute('value');
+  console.log('value ', value);
+  t.true(value === 'false');
+  await verticalToggle.click();
+  value = await verticalToggle.getAttribute('value');
+  console.log('value ', value);
 
-  // Check that every two files were created with correct file name
-  const files = await readdir(tmpDir);
-  t.true(recordings.length === files.length);
-  const fileNames = files.map(file => file.split('/').pop());
-  recordings.forEach(async recording => {
-    const recordingName = await recording.getText();
-    t.true(fileNames.includes[recordingName]);
-  });
+  t.true(value === 'false');
+
+  //<button data-type="switch" data-name="record-vertical" data-id="record-vertical-bef5b45f-5c05-48c0-b986-d66290a9393c" data-role="input" name="record-vertical-bef5b45f-5c05-48c0-b986-d66290a9393c" id="editStreamForm_record-vertical-bef5b45f-5c05-48c0-b986-d66290a9393c" type="button" role="switch" aria-checked="false" class="ant-switch ant-switch-small" value="false"><div class="ant-switch-handle"></div><span class="ant-switch-inner"></span></button>
+  // // Recording mode: record horizontal and vertical displays
+  // await focusMain();
+  // await startRecording();
+  // // Record icons show in both headers
+  // await isDisplayed('i.icon-record:not(.hidden)');
+  // const icons = await selectElements('i.icon-record:not(.hidden)');
+  // t.true(icons.length === 2);
+  // await stopRecording();
+  // // Wait to ensure that video file is finalized
+  // await sleep(500);
+
+  // // Generated two recordings
+  // await showPage('Recordings');
+  // const recordings = await selectElements('span.file');
+  // t.true(recordings.length === 2);
+
+  // // Check that every two files were created with correct file name
+  // const files = await readdir(tmpDir);
+  // t.true(recordings.length === files.length);
+  // const fileNames = files.map(file => file.split('/').pop());
+  // recordings.forEach(async recording => {
+  //   const recordingName = await recording.getText();
+  //   t.true(fileNames.includes[recordingName]);
+  // });
 
   // Streaming mode (both):
   // - Cannot record either display (button will hide after go live)

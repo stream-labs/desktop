@@ -658,6 +658,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     this.state = { ...this.state, isLoading: status };
   }
 
+  @mutation()
   private SET_RECORD_VERTICAL(status: boolean) {
     this.state = {
       ...this.state,
