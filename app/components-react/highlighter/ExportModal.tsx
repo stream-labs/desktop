@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from 'react';
 import { EExportStep, TFPS, TResolution, TPreset } from 'services/highlighter';
 import { Services } from 'components-react/service-provider';
 import { FileInput, TextInput, ListInput } from 'components-react/shared/inputs';
@@ -9,10 +9,8 @@ import YoutubeUpload from './YoutubeUpload';
 import { RadioInput } from 'components-react/shared/inputs/RadioInput';
 import { confirmAsync } from 'components-react/modals';
 import { $t } from 'services/i18n';
-import { injectState, useModule } from 'slap';
 import StorageUpload from './StorageUpload';
 import { useVuex } from 'components-react/hooks';
-import { EAvailableFeatures } from 'services/incremental-rollout';
 import { initStore, useController } from '../hooks/zustand';
 
 class ExportController {
@@ -86,7 +84,7 @@ function ExportModal(p: { close: () => void }) {
 }
 
 function ExportProgress() {
-  const { exportInfo, cancelExport } = useModule(ExportController);
+  const { exportInfo, cancelExport } = useController(ExportModalCtx);
 
   return (
     <div>
