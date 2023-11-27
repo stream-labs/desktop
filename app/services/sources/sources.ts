@@ -93,6 +93,7 @@ export const windowsSources: TSourceType[] = [
   'soundtrack_source',
   'mediasoupconnector',
   'wasapi_process_output_capture',
+  'spout_capture',
 ];
 
 /**
@@ -581,6 +582,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       { description: 'Soundtrack source', value: 'soundtrack_source' },
       { description: 'Collab Cam', value: 'mediasoupconnector' },
       { description: 'Application Audio Capture (BETA)', value: 'wasapi_process_output_capture' },
+      { description: 'Spout2 capture', value: 'spout_capture' },
     ];
 
     const availableAllowlistedTypes = allowlistedTypes.filter(type =>

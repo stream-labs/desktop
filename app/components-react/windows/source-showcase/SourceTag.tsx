@@ -48,9 +48,13 @@ export default function SourceTag(p: {
         onDoubleClick={() => selectInspectedSource()}
         data-name={displayData?.name || p.name}
       >
-        <i className={displayData?.icon} />
-        {displayData?.name || p.name}
-        {p.essential && <div style={{ opacity: '0.5' }}>{displayData?.shortDesc}</div>}
+        <div className={styles.iconWrapper}>
+          {displayData?.icon && <i className={displayData?.icon} />}
+        </div>
+        <div className={styles.displayName}>
+          {displayData?.name || p.name}
+          {p.essential && <div style={{ opacity: '0.5' }}>{displayData?.shortDesc}</div>}
+        </div>
       </div>
     </Col>
   );
