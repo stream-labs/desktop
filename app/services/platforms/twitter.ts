@@ -44,7 +44,7 @@ export class TwitterPlatformService
     ingest: '',
   };
 
-  readonly capabilities = new Set<TPlatformCapability>(['title']);
+  readonly capabilities = new Set<TPlatformCapability>(['title', 'viewerCount']);
   readonly apiBase = 'https://api.twitter.com/2';
   readonly platform = 'twitter';
   readonly displayName = 'X (Twitter)';
@@ -137,6 +137,19 @@ export class TwitterPlatformService
     const request = new Request(url, { headers, method: 'POST' });
 
     return jfetch<{}>(request);
+  }
+
+  async fetchViewerCount(): Promise<number> {
+    if (!this.state.broadcastId) return 0;
+
+    const host = this.hostsService.streamlabs;
+    const url = `https://${host}/api/v5/slobs/twitter/stream/${this.state.broadcastId}/info`;
+    const headers = authorizedHeaders(this.userService.apiToken!);
+    const request = new Request(url, { headers });
+
+    const result = await jfetch<{ viewers: string }>(request);
+
+    return parseInt(result.viewers, 10);
   }
 
   /**

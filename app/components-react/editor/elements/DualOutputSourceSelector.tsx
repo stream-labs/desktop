@@ -29,12 +29,12 @@ export function DualOutputSourceSelector(p: IDualOutputSourceSelector) {
   }));
 
   const showHorizontalToggle = useMemo(() => {
-    return horizontalActive;
-  }, [horizontalActive]);
+    return !v.isLoading && horizontalActive;
+  }, [!v.isLoading, horizontalActive]);
 
   const showVerticalToggle = useMemo(() => {
-    return v?.verticalNodeId && verticalActive;
-  }, [v?.verticalNodeId, verticalActive]);
+    return !v.isLoading && v?.verticalNodeId && verticalActive;
+  }, [!v.isLoading, v?.verticalNodeId, verticalActive]);
 
   return (
     <>
