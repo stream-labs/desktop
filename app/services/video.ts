@@ -1,15 +1,18 @@
 import { Service } from './core/service';
-import { SettingsService } from './settings';
+import { StatefulService, InitAfter, mutation } from 'services/core';
+import { ISettingsSubCategory, SettingsService } from './settings';
 import * as obs from '../../obs-api';
 import { Inject } from './core/injector';
 import Utils from './utils';
 import { WindowsService } from './windows';
 import { ScalableRectangle } from '../util/ScalableRectangle';
 import { Subscription } from 'rxjs';
-import { ISelectionState, SelectionService } from 'services/selection';
+import { DualOutputService } from './dual-output';
 import { byOS, OS, getOS } from 'util/operating-systems';
 import * as remote from '@electron/remote';
 import { onUnload } from 'util/unload';
+import { ScenesService } from './api/external-api/resources';
+import { ISelectionState, SelectionService } from 'services/selection';
 import { TDisplayType, VideoSettingsService } from './settings-v2';
 
 // TODO: There are no typings for nwr
@@ -70,7 +73,7 @@ export class Display {
 
   cancelUnload: () => void;
 
-  type?: TDisplayType;
+  type: TDisplayType;
 
   constructor(public name: string, options: IDisplayOptions = {}) {
     this.sourceId = options.sourceId;
@@ -84,7 +87,7 @@ export class Display {
 
     this.currentScale = this.windowsService.state[this.slobsWindowId].scaleFactor;
 
-    this.type = options?.type ?? 'horizontal';
+    this.type = options.type ?? 'horizontal';
 
     this.videoService.actions.createOBSDisplay(
       this.electronWindowId,
@@ -250,6 +253,7 @@ export class Display {
 
   destroy() {
     const win = remote.BrowserWindow.fromId(this.electronWindowId);
+
     if (win) {
       win.removeListener('close', this.boundClose);
     }
@@ -295,48 +299,76 @@ export class Display {
     this.videoService.actions.setOBSDisplayDrawGuideLines(this.name, enabled);
   }
 }
-
+@InitAfter('UserService')
+@InitAfter('VideoSettingsService')
 export class VideoService extends Service {
   @Inject() settingsService: SettingsService;
+  @Inject() scenesService: ScenesService;
   @Inject() videoSettingsService: VideoSettingsService;
+  @Inject() dualOutputService: DualOutputService;
 
   init() {
     this.settingsService.loadSettingsIntoStore();
   }
 
-  getScreenRectangle() {
+  getScreenRectangle(display: TDisplayType = 'horizontal') {
     return new ScalableRectangle({
       x: 0,
       y: 0,
-      width: this.baseWidth,
-      height: this.baseHeight,
+      width: this.baseResolutions[display].baseWidth,
+      height: this.baseResolutions[display].baseHeight,
     });
   }
 
-  get baseWidth() {
-    return this.baseResolution.width;
-  }
-
-  get baseHeight() {
-    return this.baseResolution.height;
-  }
-
-  get baseResolution() {
-    const width = this.videoSettingsService.baseResolutions.horizontal.baseWidth;
-    const height = this.videoSettingsService.baseResolutions.horizontal.baseHeight;
+  get baseResolutions() {
+    const baseResolutions = this.videoSettingsService.baseResolutions;
 
     return {
-      width,
-      height,
+      horizontal: {
+        baseWidth: baseResolutions.horizontal.baseWidth,
+        baseHeight: baseResolutions.horizontal.baseHeight,
+      },
+      vertical: {
+        baseWidth: baseResolutions.vertical.baseWidth,
+        baseHeight: baseResolutions.vertical.baseHeight,
+      },
     };
   }
 
-  setBaseResolution(resolution: { width: number; height: number }) {
-    this.settingsService.setSettingValue(
-      'Video',
-      'Base',
-      `${resolution.width}x${resolution.height}`,
-    );
+  get baseWidth() {
+    return this.videoSettingsService.baseResolutions.horizontal.baseWidth;
+  }
+
+  get baseHeight() {
+    return this.videoSettingsService.baseResolutions.horizontal.baseHeight;
+  }
+
+  get baseResolution() {
+    return {
+      baseWidth: this.baseWidth,
+      baseHeight: this.baseHeight,
+    };
+  }
+
+  setBaseResolution(resolutions: {
+    horizontal: {
+      baseWidth: number;
+      baseHeight: number;
+    };
+    vertical: {
+      baseWidth: number;
+      baseHeight: number;
+    };
+  }) {
+    // if the context has not been established when the migration for the root node has run,
+    // there will be no base resolution data in the node so access it directly from the service if that is the case
+    const baseWidth =
+      resolutions?.horizontal.baseWidth ??
+      this.videoSettingsService.baseResolutions.horizontal.baseWidth;
+    const baseHeight =
+      resolutions?.horizontal.baseHeight ??
+      this.videoSettingsService.baseResolutions.horizontal.baseHeight;
+    this.settingsService.setSettingValue('Video', 'Base', `${baseWidth}x${baseHeight}`);
   }
 
   /**
@@ -350,7 +382,11 @@ export class VideoService extends Service {
     sourceId?: string,
   ) {
     const electronWindow = remote.BrowserWindow.fromId(electronWindowId);
-    const context = this.videoSettingsService.contexts[type];
+
+    // the display must have a context, otherwise the sources will not identify
+    // which display they belong to
+    const context =
+      this.videoSettingsService.contexts[type] ?? this.videoSettingsService.contexts.horizontal;
 
     if (sourceId) {
       obs.NodeObs.OBS_content_createSourcePreviewDisplay(

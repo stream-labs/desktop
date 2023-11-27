@@ -25,6 +25,13 @@ export async function select(selectorOrEl: TSelectorOrEl): Promise<WebdriverIO.E
   return selectorOrEl;
 }
 
+/**
+ * A shortcut for client.$$()
+ */
+export async function selectElements(selector: string): Promise<WebdriverIO.Element[]> {
+  return getClient().$$(selector);
+}
+
 export function selectButton(buttonText: string) {
   return select(`button=${buttonText}`);
 }
@@ -56,7 +63,20 @@ export async function clickTab(tabText: string) {
   await click(`div[role="tab"]=${tabText}`);
 }
 
+export async function clickCheckbox(dataName: string) {
+  const $checkbox = await select(`input[data-name="${dataName}"]`);
+  await $checkbox.click();
+}
+
 // OTHER SHORTCUTS
+
+export async function hoverElement(selector: string, duration?: number) {
+  const element = await select(`${selector}`);
+  await element.moveTo();
+  if (duration) {
+    await getClient().pause(duration);
+  }
+}
 
 export async function isDisplayed(selectorOrEl: TSelectorOrEl, waitForOptions?: WaitForOptions) {
   if (waitForOptions) {

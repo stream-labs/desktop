@@ -2,11 +2,13 @@ import { ITwitchStartStreamOptions, TwitchService } from './twitch';
 import { IYoutubeStartStreamOptions, YoutubeService } from './youtube';
 import { FacebookService, IFacebookStartStreamOptions } from './facebook';
 import { ITiktokStartStreamOptions, TiktokService } from './tiktok';
+import { TwitterPlatformService } from './twitter';
 import { TTwitchOAuthScope } from './twitch/index';
 import { IGoLiveSettings } from 'services/streaming';
 import { WidgetType } from '../widgets';
 import { ITrovoStartStreamOptions, TrovoService } from './trovo';
-import { TDisplayType } from 'services/settings-v2/video';
+import { TDisplayType } from 'services/settings-v2';
+import { $t } from 'services/i18n';
 
 export type Tag = string;
 export interface IGame {
@@ -220,7 +222,35 @@ export interface IUserInfo {
   username?: string;
 }
 
-export type TPlatform = 'twitch' | 'facebook' | 'youtube' | 'tiktok' | 'trovo';
+export enum EPlatform {
+  Twitch = 'twitch',
+  YouTube = 'youtube',
+  Facebook = 'facebook',
+  TikTok = 'tiktok',
+  Trovo = 'trovo',
+  Twitter = 'twitter',
+}
+
+export type TPlatform = 'twitch' | 'youtube' | 'facebook' | 'tiktok' | 'trovo' | 'twitter';
+
+export const platformList = [
+  EPlatform.Facebook,
+  EPlatform.TikTok,
+  EPlatform.Trovo,
+  EPlatform.Twitch,
+  EPlatform.YouTube,
+  EPlatform.Twitter,
+];
+
+export const platformLabels = (platform: TPlatform | string) =>
+  ({
+    [EPlatform.Twitch]: $t('Twitch'),
+    [EPlatform.YouTube]: $t('YouTube'),
+    [EPlatform.Facebook]: $t('Facebook'),
+    [EPlatform.TikTok]: $t('TikTok'),
+    [EPlatform.Trovo]: $t('Trovo'),
+    [EPlatform.Twitter]: 'Twitter',
+  }[platform]);
 
 export function getPlatformService(platform: TPlatform): IPlatformService {
   return {
@@ -229,6 +259,7 @@ export function getPlatformService(platform: TPlatform): IPlatformService {
     facebook: FacebookService.instance,
     tiktok: TiktokService.instance,
     trovo: TrovoService.instance,
+    twitter: TwitterPlatformService.instance,
   }[platform];
 }
 

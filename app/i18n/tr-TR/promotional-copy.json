@@ -70,5 +70,6 @@
   "No Watermark + 1080p/60fps + More": "Filigransız + 1080p/60fps + Dahası",
   "1 Hour Videos + 250GB Storage + More": "1 Saatlik Videolar + 250GB Depolama + Dahası",
   "Highest Profit Margins": "En Yüksek Kâr Oranları",
-  "%{monthlyPrice}/mo or %{yearlyPrice}/year": "ayda %{monthlyPrice} veya yılda %{yearlyPrice}"
+  "%{monthlyPrice}/mo or %{yearlyPrice}/year": "ayda %{monthlyPrice} veya yılda %{yearlyPrice}",
+  "Text-based editing of VOD content": "VOD içeriği için metin tabanlı düzenleme"
 }

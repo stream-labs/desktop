@@ -114,6 +114,10 @@ export default function StartStreamingButton(p: { disabled?: boolean }) {
 
     if (!primaryPlatform) return false;
 
+    if (StreamingService.views.isDualOutputMode) {
+      return true;
+    }
+
     if (
       !!UserService.state.auth?.platforms &&
       StreamingService.views.isMultiplatformMode &&

@@ -1,6 +1,6 @@
 {
   "Source: %{sourceName}": "Fonte: %{sourceName}",
-  "Collab Cam": "Câmara de colaboração",
+  "Collab Cam": "Collab Cam",
   "Invite a guest to join your stream from a web browser.": "Convide quem quiser para juntar-se à sua transmissão a partir de um browser Web.",
   "Guest Cam is currently listening for connecting guests, but is not broadcasting your microphone and webcam to your guests yet.": "A Câmara de convidados está atualmente a detetar convidados que se liguem, mas ainda não está a transmitir o seu microfone e câmara Web para os seus convidados.",
   "No microphone source is selected. Your guest will not be able to hear you.": "Nenhuma fonte de microfone selecionada. O seu convidado não poderá ouvi-lo.",
@@ -24,7 +24,7 @@
   "Step 3": "Passo 3",
   "Enjoy your stream! Adjust their volume, create new links, and change your mic and camera from the properties window.": "Divirta-se na sua transmissão! Ajuste o volume, crie novas ligações e altere o microfone e câmara dos convidados na janela de propriedades.",
   "Don't share your invite link with anyone you don't want on your stream. You can invalidate an old link by generating a new one. Do not show this window on stream.": "Não partilhe a ligação de convite com pessoas que não quer ver na sua transmissão. Pode anular uma ligação antiga criando uma nova. Não mostrar esta janela na transmissão.",
-  "Start Collab Cam": "Iniciar Câmara de colaboração",
+  "Start Collab Cam": "Iniciar Collab Cam",
   "Collab Cam is not yet sending your video and audio to guests. Start Collab Cam?": "A Câmara de colaboração ainda não está a enviar o seu vídeo e áudio para os seus convidados. Iniciar Câmara de colaboração?",
   "Copy Link": "Copiar link",
   "You're about to join %{name}": "Está prestes a aderir a %{name}",
@@ -47,5 +47,5 @@
   "Collab Cam requires a source": "A Collab Cam requer uma fonte",
   "At least one Collab Cam source is required to use Collab Cam. Would you like to add one now?": "É requerida pelo menos uma fonte Collab Cam para usar a Collab Cam. Pretende adicionar uma agora?",
   "You now have access to Collab Cam!": "Já tem acesso à Collab Cam!",
-  "You must be logged in to use Collab Cam.": "You must be logged in to use Collab Cam."
+  "You must be logged in to use Collab Cam.": "Tem de ter sessão iniciada para usar o Collab Cam."
 }

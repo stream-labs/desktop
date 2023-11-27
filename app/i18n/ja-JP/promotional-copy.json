@@ -70,5 +70,6 @@
   "No Watermark + 1080p/60fps + More": "透かしなし + 1080p/60fps + その他",
   "1 Hour Videos + 250GB Storage + More": "1 時間の動画 + 250GB のストレージ + その他",
   "Highest Profit Margins": "最高の利益幅",
-  "%{monthlyPrice}/mo or %{yearlyPrice}/year": "%{monthlyPrice}/月または %{yearlyPrice}/年"
+  "%{monthlyPrice}/mo or %{yearlyPrice}/year": "%{monthlyPrice}/月または %{yearlyPrice}/年",
+  "Text-based editing of VOD content": "VOD コンテンツのテキストベースの編集"
 }

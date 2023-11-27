@@ -11,6 +11,8 @@ import { ScenesService } from 'services/scenes/index';
 import { $t } from 'services/i18n/index';
 import { BoolInput } from 'components/shared/inputs/inputs';
 import * as remote from '@electron/remote';
+import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
+import { metadata } from 'components/shared/inputs';
 
 @Component({ components: { BoolInput } })
 export default class OverlaySettings extends Vue {
@@ -23,6 +25,12 @@ export default class OverlaySettings extends Vue {
 
   busy = false;
   message = '';
+  error = false;
+  collection = '';
+
+  created() {
+    this.collection = this.sceneCollectionsService.activeCollection.id;
+  }
 
   get mediaBackupOptOut(): boolean {
     return this.customizationService.state.mediaBackupOptOut;
@@ -38,6 +46,13 @@ export default class OverlaySettings extends Vue {
 
   set designerMode(value: boolean) {
     this.customizationService.setSettings({ designerMode: value });
+  }
+
+  get collectionOptions() {
+    return this.sceneCollectionsService.collections.map(collection => ({
+      title: collection.name,
+      value: collection.id,
+    }));
   }
 
   async saveOverlay() {
@@ -99,11 +114,80 @@ export default class OverlaySettings extends Vue {
       });
   }
 
+  /**
+   * Convert a dual output scene collection to a vanilla scene collection
+   * @param assignToHorizontal Boolean for if the vertical sources should be assigned to the
+   * horizontal display or should be deleted
+   * @param exportOverlay Boolean for is the scene collection should be exported upon completion
+   */
+  async convertDualOutputCollection(
+    assignToHorizontal: boolean = false,
+    exportOverlay: boolean = false,
+  ) {
+    // confirm that the active scene collection is a dual output collection
+    if (
+      !this.sceneCollectionsService?.sceneNodeMaps ||
+      (this.sceneCollectionsService?.sceneNodeMaps &&
+        Object.values(this.sceneCollectionsService?.sceneNodeMaps).length === 0)
+    ) {
+      this.error = true;
+      this.message = $t('The active scene collection is not a dual output scene collection.');
+      return;
+    }
+    if (exportOverlay) {
+      const { filePath } = await remote.dialog.showSaveDialog({
+        filters: [{ name: 'Overlay File', extensions: ['overlay'] }],
+      });
+      if (!filePath) return;
+      this.busy = true;
+
+      // convert collection
+      const collectionFilePath = await this.sceneCollectionsService.convertDualOutputCollection(
+        assignToHorizontal,
+      );
+
+      if (!collectionFilePath) {
+        this.error = true;
+        this.message = $t('Unable to convert dual output collection.');
+        return;
+      }
+
+      // save overlay
+      this.overlaysPersistenceService.saveOverlay(filePath).then(() => {
+        this.error = false;
+        this.busy = false;
+        this.message = $t('Successfully saved %{filename} to %{filepath}', {
+          filename: path.parse(collectionFilePath).base,
+          filepath: filePath,
+        });
+      });
+    } else {
+      this.busy = true;
+
+      // convert collection
+      const filePath = await this.sceneCollectionsService.convertDualOutputCollection(
+        assignToHorizontal,
+        this.collection,
+      );
+
+      if (filePath) {
+        this.error = false;
+        this.message = $t('Successfully converted %{filename}', {
+          filename: path.parse(filePath).base,
+        });
+      } else {
+        this.error = true;
+        this.message = $t('Unable to convert dual output collection.');
+      }
+      this.busy = false;
+    }
+  }
+
   button(title: string, fn: () => void) {
     return (
       <button class="button button--action" disabled={this.busy} onClick={fn}>
         {title}
-        {this.busy && <i class="fa fa-spinner fa-pulse" />}
+        {this.busy && <i class="fa fa-spinner fa-pulse" style={{ marginLeft: '5px' }} />}
       </button>
     );
   }
@@ -114,7 +198,7 @@ export default class OverlaySettings extends Vue {
         <div class="section">
           <p>
             {$t(
-              'This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk.',
+              'This feature is intended for overlay designers to export their work for our Overlay Library. Not all sources will be exported, use at your own risk.',
             )}
           </p>
           {this.button($t('Export Overlay File'), () => this.saveOverlay())}
@@ -139,6 +223,61 @@ export default class OverlaySettings extends Vue {
               name="media_backup_opt_out"
             />
           </div>
+        </div>
+        <div class="section">
+          <h1>{$t('Manage Dual Output Scene')}</h1>
+
+          <span>
+            {$t(
+              'The below will create a copy of the active scene collection, set the copy as the active collection, and then apply the function.',
+            )}
+          </span>
+          <div>
+            <h4 style="margin-bottom: 8px;">{$t('Convert to Vanilla Scene')}</h4>
+            <VFormGroup
+              value={this.collection}
+              onInput={(value: string) => {
+                this.collection = value;
+              }}
+              metadata={metadata.list({
+                title: $t('Scene Collection'),
+                name: 'collection',
+                options: this.collectionOptions,
+              })}
+            />
+            <button
+              class="button button--soft-warning"
+              onClick={async () => await this.convertDualOutputCollection()}
+              disabled={this.busy}
+            >
+              {$t('Convert')}
+            </button>
+            {/* <button
+              class="button button--soft-warning"
+              onClick={async () => await this.convertDualOutputCollection(false, true)}
+              disabled={this.busy}
+            >
+              {$t('Convert and Export Overlay')}
+            </button> */}
+          </div>
+          {/* <div style={{ marginTop: '10px' }}>
+            <h4>{$t('Assign Vertical Sources to Horizontal Display')}</h4>
+            <button
+              class="button button--soft-warning"
+              onClick={async () => await this.convertDualOutputCollection(true)}
+              disabled={this.busy}
+            >
+              {$t('Assign')}
+            </button>
+            <button
+              class="button button--soft-warning"
+              onClick={async () => await this.convertDualOutputCollection(true, true)}
+              disabled={this.busy}
+            >
+              {$t('Assign and Export Overlay')}
+            </button>
+          </div> */}
+          <div style={{ color: this.error ? 'red' : 'var(--teal)' }}>{this.message}</div>
         </div>
       </div>
     );

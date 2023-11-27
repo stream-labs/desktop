@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import moment from 'moment';
 import { Inject, mutation, PersistentStatefulService, ViewHandler } from 'services/core';
 import { UsageStatisticsService } from './usage-statistics';
 import { $t } from './i18n';
@@ -80,6 +81,28 @@ export class MarkersService extends PersistentStatefulService<IMarkersServiceSta
     const fileBuffer = Buffer.from(await blob.arrayBuffer());
     fs.writeFile(`${directory}_markers.csv`, fileBuffer, () => {
       this.markers = {};
+    });
+  }
+
+  parseCSV(filepath: string) {
+    const bookmarksArray: { text: string; starts_at: number }[] = [];
+    return new Promise((resolve, reject) => {
+      const stream = fs.createReadStream(filepath, 'utf8');
+      stream.on('data', (data: string) => {
+        data.split('\n').forEach(row => {
+          if (/Timecode In,Timecode Out/.test(row)) return;
+          const els = row.split(',');
+          const timestampArr: string[] = els[1].split(':');
+          timestampArr.pop(); // The last element is always 0 hundredths of a second
+          const ms = moment.duration(timestampArr.join(':')).asMilliseconds();
+          bookmarksArray.push({
+            text: els[8],
+            starts_at: ms,
+          });
+        });
+      });
+      stream.on('error', err => reject(err));
+      stream.on('close', () => resolve(bookmarksArray));
     });
   }
 

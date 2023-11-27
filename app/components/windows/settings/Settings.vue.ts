@@ -180,6 +180,8 @@ export default class Settings extends Vue {
   }
 
   get categoryNames() {
+    // dual output mode returns additional categories for each context
+    // so hide these from the settings list
     return this.settingsService
       .getCategories()
       .filter(category => !category.toLowerCase().startsWith('stream') || category === 'Stream');

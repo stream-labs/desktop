@@ -14,6 +14,7 @@ import { Expensive } from 'services/api/external-api-limits';
 import { EditorService } from '../../../editor';
 import { map } from 'rxjs/operators';
 import { SelectionService } from 'services/selection';
+import { TDisplayType } from 'services/settings-v2';
 
 /**
  * API for scenes management. Contains operations like scene creation, switching
@@ -193,4 +194,5 @@ export class ScenesService {
 export interface ISceneNodeAddOptions {
   id?: string; // A new ID will be assigned if one is not provided
   sourceAddOptions?: ISourceAddOptions;
+  display?: TDisplayType;
 }

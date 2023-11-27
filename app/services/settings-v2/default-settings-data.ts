@@ -1,15 +1,15 @@
 import { EVideoFormat, EColorSpace, ERangeType, EScaleType, EFPSType } from 'obs-studio-node';
 
-export const greenDisplayData = {
-  fpsNum: 60,
-  fpsDen: 2,
-  baseWidth: 400,
-  baseHeight: 700,
-  outputWidth: 400,
-  outputHeight: 700,
+export const verticalDisplayData = {
+  fpsNum: 30,
+  fpsDen: 1,
+  baseWidth: 720,
+  baseHeight: 1280,
+  outputWidth: 720,
+  outputHeight: 1280,
   outputFormat: EVideoFormat.I420,
   colorspace: EColorSpace.CS709,
   range: ERangeType.Full,
-  scaleType: EScaleType.Lanczos,
-  fpsType: EFPSType.Fractional,
+  scaleType: EScaleType.Bilinear,
+  fpsType: EFPSType.Integer,
 };

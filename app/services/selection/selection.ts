@@ -19,6 +19,8 @@ import { EDeinterlaceFieldOrder, EDeinterlaceMode, Source } from 'services/sourc
 import { Rect } from 'util/rect';
 import { AnchorPoint, AnchorPositions, CenteringAxis } from 'util/ScalableRectangle';
 import { ISelectionState, TNodesList } from './index';
+import { DualOutputService } from 'services/dual-output';
+import { TDisplayType } from 'services/settings-v2';
 
 /**
  * Helper for working with multiple sceneItems
@@ -26,6 +28,7 @@ import { ISelectionState, TNodesList } from './index';
 @ServiceHelper('SelectionService')
 export class Selection {
   @Inject() scenesService: ScenesService;
+  @Inject() dualOutputService: DualOutputService;
 
   _resourceId: string;
 
@@ -79,6 +82,7 @@ export class Selection {
     }
 
     let ids = this.resolveItemsList(itemsList);
+
     ids = uniq(ids);
     const scene = this.getScene();
 
@@ -120,12 +124,17 @@ export class Selection {
   }
 
   /**
-   * return items with the order as in the scene
+   * Return items with the order as in the scene
+   *
+   * @param display - Optional, display to filter the selection by,
+   * primarily used for mouse events in the editor
    */
-  getItems(): SceneItem[] {
+  getItems(display?: TDisplayType): SceneItem[] {
     const scene = this.getScene();
     if (!this.getSize()) return [];
-    return scene.getItems().filter(item => this.state.selectedIds.includes(item.id));
+
+    const items = scene.getItems().filter(item => this.state.selectedIds.includes(item.id));
+    return display ? items.filter(item => item.display === display) : items;
   }
 
   /**
@@ -134,7 +143,11 @@ export class Selection {
   getNodes(): TSceneNode[] {
     const scene = this.getScene();
     if (!this.getSize()) return [];
-    return scene.getNodes().filter(node => this.state.selectedIds.includes(node.id));
+
+    const nodes = scene.getNodes();
+    const ids = this.state.selectedIds;
+
+    return nodes.filter(node => node && ids.includes(node.id));
   }
 
   /**
@@ -186,8 +199,14 @@ export class Selection {
     return items.length > 0;
   }
 
-  getVisualItems(): SceneItem[] {
-    return this.getItems().filter(item => item.isVisualSource);
+  getVisualItems(display?: TDisplayType): SceneItem[] {
+    const items = this.getItems().filter(item => item.isVisualSource);
+    return display ? items.filter(item => item.display === display) : items;
+  }
+
+  isGameCaptureSelected(): boolean {
+    const items = this.getItems().filter(item => item.source.type === 'game_capture');
+    return items.length > 0;
   }
 
   /**
@@ -218,8 +237,8 @@ export class Selection {
     return this.state.selectedIds.length;
   }
 
-  getBoundingRect(): Rect {
-    const items = this.getVisualItems();
+  getBoundingRect(display?: TDisplayType): Rect {
+    const items = this.getVisualItems(display);
     if (!items.length) return null;
 
     let minTop = Infinity;
@@ -301,6 +320,7 @@ export class Selection {
           sourcesMap[sceneNode.sourceId]
             ? sourcesMap[sceneNode.sourceId].sourceId
             : sceneNode.sourceId,
+          { display: sceneNode?.display },
         );
         insertedNode.setSettings(sceneNode.getSettings());
         insertedNodes.push(insertedNode);
@@ -512,23 +532,23 @@ export class Selection {
   }
 
   stretchToScreen() {
-    this.getItems().forEach(item => item.stretchToScreen());
+    this.getItems().forEach(item => item.stretchToScreen(item.display));
   }
 
   fitToScreen() {
-    this.getItems().forEach(item => item.fitToScreen());
+    this.getItems().forEach(item => item.fitToScreen(item.display));
   }
 
   centerOnScreen() {
-    this.getItems().forEach(item => item.centerOnScreen());
+    this.getItems().forEach(item => item.centerOnScreen(item.display));
   }
 
   centerOnHorizontal() {
-    this.getItems().forEach(item => item.centerOnAxis(CenteringAxis.X));
+    this.getItems().forEach(item => item.centerOnAxis(CenteringAxis.X, item.display));
   }
 
   centerOnVertical() {
-    this.getItems().forEach(item => item.centerOnAxis(CenteringAxis.Y));
+    this.getItems().forEach(item => item.centerOnAxis(CenteringAxis.Y, item.display));
   }
 
   rotate(deg: number) {

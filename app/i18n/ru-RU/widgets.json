@@ -69,7 +69,7 @@
   "Sparks sent are exactly <amount>": "Отправлено искр: ровно <amount>",
   "Ember amount is at least <amount>": "Количество угольков: не менее <amount>",
   "Ember amount is exactly <amopunt>": "Количество угольков: ровно <amopunt>",
-  "Please note that when advanced media share is enabled, media will no longer play through your alert box widget. Media will only play through this media share widget.": "Обратите внимание, что, если включен расширенный режим обмена медиафайлами, мультимедиа больше не будет воспроизводиться через виджет окна оповещения и будет доступно только через виджет обмена медиафайлами.",
+  "Allow your viewers to donate to share media on your stream.": "Разрешить зрителям вносить пожертвования для демонстрации медиафайлов во время вашей трансляции.",
   "Twitch Subscribers": "Подписчики Twitch",
   "YouTube Members": "Спонсоры YouTube",
   "Media Share": "Обмен медиафайлами",

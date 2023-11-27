@@ -1,20 +1,19 @@
 import Vue from 'vue';
-import uniqBy from 'lodash/uniqBy';
 import without from 'lodash/without';
 import { Subject } from 'rxjs';
 import { mutation, StatefulService } from 'services/core/stateful-service';
 import { TransitionsService } from 'services/transitions';
 import { WindowsService } from 'services/windows';
 import { Scene, SceneItem, TSceneNode, EScaleType, EBlendingMode, EBlendingMethod } from './index';
-import { ISource, SourcesService, ISourceAddOptions } from 'services/sources';
+import { ISource, SourcesService, ISourceAddOptions, TSourceType } from 'services/sources';
 import { Inject } from 'services/core/injector';
-import * as obs from '../../../obs-api';
+import { IVideo, SceneFactory } from '../../../obs-api';
 import { $t } from 'services/i18n';
 import namingHelpers from 'util/NamingHelpers';
 import uuid from 'uuid/v4';
+import { DualOutputService } from 'services/dual-output';
+import { TDisplayType } from 'services/settings-v2/video';
 import { InitAfter, ViewHandler } from 'services/core';
-import { lazyModule } from 'util/lazy-module';
-import { VideoSettingsService } from 'services/settings-v2';
 
 export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
 
@@ -29,6 +28,7 @@ export interface ISceneNodeAddOptions {
   sourceAddOptions?: ISourceAddOptions;
   select?: boolean; // Immediately select this source
   initialTransform?: IPartialTransform;
+  display?: TDisplayType;
 }
 
 export interface ISceneItemInfo {
@@ -47,6 +47,9 @@ export interface ISceneItemInfo {
   scaleFilter?: EScaleType;
   blendingMode?: EBlendingMode;
   blendingMethod?: EBlendingMethod;
+  display?: TDisplayType;
+  output?: IVideo;
+  position?: IVec2;
 }
 
 export interface IScenesState {
@@ -76,6 +79,7 @@ export interface IPartialTransform {
 }
 
 export interface ISceneItemSettings {
+  type?: TSourceType;
   transform: ITransform;
   visible: boolean;
   locked: boolean;
@@ -84,6 +88,8 @@ export interface ISceneItemSettings {
   scaleFilter: EScaleType;
   blendingMode: EBlendingMode;
   blendingMethod: EBlendingMethod;
+  output?: IVideo;
+  display?: TDisplayType;
 }
 
 export interface IPartialSettings {
@@ -95,7 +101,12 @@ export interface IPartialSettings {
   scaleFilter?: EScaleType;
   blendingMode?: EBlendingMode;
   blendingMethod?: EBlendingMethod;
-  output?: obs.IVideo; // for obs.ISceneItem, this property is video
+  /**
+   *  for obs.ISceneItem, the `output` property is `video`
+   */
+  output?: IVideo;
+  display?: TDisplayType;
+  position?: IVec2;
 }
 
 export interface ISceneItem extends ISceneItemSettings, ISceneItemNode {
@@ -103,7 +114,14 @@ export interface ISceneItem extends ISceneItemSettings, ISceneItemNode {
   sourceId: string;
   obsSceneItemId: number;
   sceneNodeType: 'item';
-  output?: obs.IVideo; // for obs.ISceneItem, this property is video
+  scaleFilter: EScaleType;
+  blendingMode: EBlendingMode;
+  blendingMethod: EBlendingMethod;
+  /**
+   *  for obs.ISceneItem, the `output` property is `video`
+   */
+  output?: IVideo;
+  position?: IVec2;
 }
 
 export interface ISceneItemActions {
@@ -140,6 +158,8 @@ export interface ISceneItemNode {
   sceneNodeType: TSceneNodeType;
   parentId?: string;
   isRemoved?: boolean;
+  display?: TDisplayType;
+  output?: IVideo;
 }
 
 export interface ISceneItemFolder extends ISceneItemNode {
@@ -154,6 +174,12 @@ class ScenesViews extends ViewHandler<IScenesState> {
     const sceneModel = this.state.scenes[sceneId];
     if (!sceneModel) return null;
     return new Scene(sceneModel.id);
+  }
+
+  sceneSourcesForScene(sceneId: string): SceneItem[] {
+    const scene = this.getScene(sceneId);
+    if (!scene) return [];
+    return scene.getItems().filter(sceneItem => sceneItem.type === 'scene');
   }
 
   get activeSceneId() {
@@ -184,9 +210,10 @@ class ScenesViews extends ViewHandler<IScenesState> {
     return null;
   }
 
-  getSceneItemsBySceneId(sceneId: string): SceneItem[] {
+  getSceneItemsBySceneId(sceneId: string): SceneItem[] | undefined {
     const scene: Scene | null = this.getScene(sceneId);
-    return scene ? scene.getItems() : ([] as SceneItem[]);
+    if (!scene) return;
+    return scene.getItems();
   }
 
   /**
@@ -216,14 +243,29 @@ class ScenesViews extends ViewHandler<IScenesState> {
     return null;
   }
 
-  getNodeVisibility(sceneNodeId: string) {
+  getNodeVisibility(sceneNodeId: string, sceneId?: string) {
     const nodeModel: TSceneNode | null = this.getSceneNode(sceneNodeId);
-    return nodeModel instanceof SceneItem ? nodeModel?.visible : null;
+    if (!nodeModel) return false;
+
+    if (nodeModel instanceof SceneItem) {
+      return nodeModel?.visible;
+    }
+
+    if (sceneId) {
+      // to determine if a folder is visible, check the visibility of the child nodes
+      const scene = this.getScene(sceneId);
+      if (!scene) return false;
+      return scene.getItemsForNode(sceneNodeId).some(i => i.visible);
+    }
+
+    return false;
   }
 }
 
-@InitAfter('GreenService')
+@InitAfter('DualOutputService')
 export class ScenesService extends StatefulService<IScenesState> {
+  @Inject() private dualOutputService: DualOutputService;
+
   static initialState: IScenesState = {
     activeSceneId: '',
     displayOrder: [],
@@ -244,7 +286,6 @@ export class ScenesService extends StatefulService<IScenesState> {
   @Inject() private windowsService: WindowsService;
   @Inject() private sourcesService: SourcesService;
   @Inject() private transitionsService: TransitionsService;
-  @Inject() private videoSettingsService: VideoSettingsService;
 
   @mutation()
   private ADD_SCENE(id: string, name: string) {
@@ -280,7 +321,7 @@ export class ScenesService extends StatefulService<IScenesState> {
     // Get an id to identify the scene on the frontend
     const id = options.sceneId || `scene_${uuid()}`;
     this.ADD_SCENE(id, name);
-    const obsScene = obs.SceneFactory.create(id);
+    const obsScene = SceneFactory.create(id);
     this.sourcesService.addSource(obsScene.source, name, { sourceId: id });
 
     if (options.duplicateSourcesFromScene) {
@@ -293,12 +334,17 @@ export class ScenesService extends StatefulService<IScenesState> {
         .slice()
         .reverse()
         .forEach(item => {
-          const newItem = newScene.addSource(item.sourceId);
-          const settings = {
-            ...item.getSettings(),
-            output: this.videoSettingsService.contexts.horizontal,
-          };
-          newItem.setSettings(settings);
+          const display = item?.display ?? this.dualOutputService.views.getNodeDisplay(item.id, id);
+
+          const newItem = newScene.addSource(item.sourceId, { display });
+
+          /**
+           * when creating the scene in dual output mode
+           * also create scene items for the vertical display
+           */
+          if (this.dualOutputService.views.dualOutputMode) {
+            this.dualOutputService.actions.createOrAssignOutputNode(newItem, 'vertical', false, id);
+          }
         });
     }
 
@@ -357,6 +403,10 @@ export class ScenesService extends StatefulService<IScenesState> {
     });
 
     return count;
+  }
+
+  getSceneIds(): string[] {
+    return Object.keys(this.state.scenes);
   }
 
   makeSceneActive(id: string): boolean {

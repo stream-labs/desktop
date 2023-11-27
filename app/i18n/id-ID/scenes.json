@@ -49,5 +49,12 @@
   "Choose a template from our theme library": "Pilih sebuah templat dari perpustakaan tema kami",
   "Enter a Scene Collection Name": "Masukkan Nama Koleksi Scene",
   "Copy of %{collectionName}": "Salinan dari %{collectionName}",
-  "Your Scene Collections": "Koleksi Scene Anda"
+  "Your Scene Collections": "Koleksi Scene Anda",
+  "Dual Output Mode": "Dual Output Mode",
+  "Horizontal Output": "Horizontal Output",
+  "Vertical Output": "Vertical Output",
+  "Arrange sources here for a vertical scene layout.": "Arrange sources here for a vertical scene layout.",
+  "Arrange sources here for a horizontal scene layout.": "Arrange sources here for a horizontal scene layout.",
+  "Toggle Dual Output Mode.": "Toggle Dual Output Mode.",
+  "Cannot hide dual output toggles in dual output mode.": "Cannot hide dual output toggles in dual output mode."
 }

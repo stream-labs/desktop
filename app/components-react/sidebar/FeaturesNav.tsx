@@ -8,11 +8,12 @@ import {
   menuTitles,
   compactMenuItemKeys,
 } from 'services/side-nav';
+import { $t } from 'services/i18n';
 import { EAvailableFeatures } from 'services/incremental-rollout';
 import { TAppPage } from 'services/navigation';
 import { useVuex } from 'components-react/hooks';
 import { Services } from 'components-react/service-provider';
-import { Menu } from 'antd';
+import { Menu, message } from 'antd';
 import styles from './SideNav.m.less';
 import SubMenu from 'components-react/shared/SubMenu';
 import MenuItem from 'components-react/shared/MenuItem';
@@ -256,13 +257,14 @@ function FeaturesNavItem(p: {
   handleNavigation: (menuItem: IMenuItem, key?: string) => void;
   className?: string;
 }) {
-  const { SideNavService, TransitionsService } = Services;
+  const { SideNavService, TransitionsService, DualOutputService } = Services;
   const { isSubMenuItem, menuItem, handleNavigation, className } = p;
 
-  const { currentMenuItem, isOpen, studioMode } = useVuex(() => ({
+  const { currentMenuItem, isOpen, studioMode, dualOutputMode } = useVuex(() => ({
     currentMenuItem: SideNavService.views.currentMenuItem,
     isOpen: SideNavService.views.isOpen,
     studioMode: TransitionsService.views.studioMode,
+    dualOutputMode: DualOutputService.views.dualOutputMode,
   }));
 
   function setIcon() {
@@ -276,6 +278,15 @@ function FeaturesNavItem(p: {
   const title = useMemo(() => {
     return menuTitles(menuItem.key);
   }, [menuItem]);
+
+  const disabled = dualOutputMode && menuItem.key === EMenuItemKey.StudioMode;
+
+  function showErrorMessage() {
+    message.error({
+      content: $t('Cannot toggle Studio Mode in Dual Output Mode.'),
+      className: styles.toggleError,
+    });
+  }
 
   return (
     <MenuItem
@@ -291,7 +302,11 @@ function FeaturesNavItem(p: {
       title={title}
       icon={setIcon()}
       onClick={() => {
-        handleNavigation(menuItem);
+        if (disabled) {
+          showErrorMessage();
+        } else {
+          handleNavigation(menuItem);
+        }
       }}
     >
       {title}

@@ -91,11 +91,15 @@
   "An error occurred while reading audio from %{file}": "%{file} からのオーディオ読み込み中にエラーが発生しました",
   "An error occurred while mixing audio": "オーディオのミキシング中にエラーが発生しました",
   "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "Streamlabs 内蔵の無料エディタ Highlighter でリプレイを編集しましょう。",
-  "Upload To": "Upload To",
-  "Upload": "Upload",
-  "This feature requires a Streamlabs ID": "This feature requires a Streamlabs ID",
-  "Sign up for Streamlabs ID": "Sign up for Streamlabs ID",
-  "Add subtitles, transcribe, and more": "Add subtitles, transcribe, and more",
-  "Convert to mobile-friendly short video": "Convert to mobile-friendly short video",
-  "YouTube (private video)": "YouTube (private video)"
+  "Upload To": "アップロード先",
+  "Upload": "アップロード",
+  "This feature requires a Streamlabs ID": "この機能には Streamlabs ID が必要です",
+  "Sign up for Streamlabs ID": "Streamlabs ID にサインアップ",
+  "Add subtitles, transcribe, and more": "字幕の追加、文字起こしなど",
+  "Convert to mobile-friendly short video": "モバイル対応のビデオクリップに変換",
+  "YouTube (private video)": "YouTube（プライベート動画）",
+  "Clip": "クリップ",
+  "Transcribe": "文字起こし",
+  "Record your screen with Streamlabs Desktop. Once recording is complete, it will be displayed here. Access your files or edit further with Streamlabs tools.": "Streamlabs Desktop を使って画面を録画。録画が完了すると、ここに表示されます。ファイルにアクセス、または Streamlabs ツールを使ってさらに編集。",
+  "Recordings": "録画"
 }

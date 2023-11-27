@@ -248,5 +248,8 @@
   "This number is too large for a FPS Denominator of %{fpsDen}, please decrease it or increase the Denominator": "この数字は、%{fpsDen} の FPS 分母には大きすぎます。これを小さくするか、または分母を大きくしてください",
   "This number is too large for a FPS Numerator of %{fpsNum}, please decrease it or increase the Numerator": "この数字は、%{fpsNum} の FPS 分子には大きすぎます。これを小さくするか、または分子を大きくしてください",
   "FPS Value must be between 1 and 1000": "FPS 値は 1～1000 にしてください",
-  "%{fieldName} must be greater than 0": "%{fieldName} は 0 より大きい数字にしてください"
+  "%{fieldName} must be greater than 0": "%{fieldName} は 0 より大きい数字にしてください",
+  "Markers": "マーカー",
+  "Manage Dual Output": "Dual Output の管理",
+  "Auto optimizer disabled for dual output scenes": "Dual Output シーンでは、自動オプティマイザーが無効になっています"
 }

@@ -4,6 +4,7 @@ import useBaseElement from './hooks';
 
 export default function Display() {
   const containerRef = useRef<HTMLDivElement>(null);
+
   const { renderElement } = useBaseElement(<StudioEditor />, { x: 0, y: 0 }, containerRef.current);
 
   return (

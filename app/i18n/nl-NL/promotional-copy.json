@@ -70,5 +70,6 @@
   "No Watermark + 1080p/60fps + More": "Geen watermerk + 1080p/60fps + meer",
   "1 Hour Videos + 250GB Storage + More": "Video's van 1 uur + 250 GB opslag + meer",
   "Highest Profit Margins": "Hoogste winstmarges",
-  "%{monthlyPrice}/mo or %{yearlyPrice}/year": "%{monthlyPrice}/mnd of %{yearlyPrice}/jaar"
+  "%{monthlyPrice}/mo or %{yearlyPrice}/year": "%{monthlyPrice}/mnd of %{yearlyPrice}/jaar",
+  "Text-based editing of VOD content": "Tekstgebaseerde bewerking van VOD-content"
 }

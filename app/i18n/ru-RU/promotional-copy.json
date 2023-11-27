@@ -70,5 +70,6 @@
   "No Watermark + 1080p/60fps + More": "Без водяных знаков + разрешение 1080p при 60 кадрах в секунду + Дополнительно",
   "1 Hour Videos + 250GB Storage + More": "1 час видео + 250 ГБ для хранения + Дополнительно",
   "Highest Profit Margins": "Максимум прибыли",
-  "%{monthlyPrice}/mo or %{yearlyPrice}/year": "%{monthlyPrice}/мес. или %{yearlyPrice}/год"
+  "%{monthlyPrice}/mo or %{yearlyPrice}/year": "%{monthlyPrice}/мес. или %{yearlyPrice}/год",
+  "Text-based editing of VOD content": "Редактирование текста контента VOD"
 }

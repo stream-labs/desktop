@@ -60,14 +60,27 @@ function ExtraSettings() {
   const protectedMode = StreamSettingsService.state.protectedModeEnabled;
   const disableHAFilePath = path.join(AppService.appDataDirectory, 'HADisable');
   const [disableHA, setDisableHA] = useState(() => fs.existsSync(disableHAFilePath));
-  const { isRecordingOrStreaming, recordingMode, updateStreamInfoOnLive } = useVuex(() => ({
+
+  const {
+    isRecordingOrStreaming,
+    recordingMode,
+    updateStreamInfoOnLive,
+    isSimpleOutputMode,
+  } = useVuex(() => ({
     isRecordingOrStreaming: StreamingService.isStreaming || StreamingService.isRecording,
     recordingMode: RecordingModeService.views.isRecordingModeEnabled,
     updateStreamInfoOnLive: CustomizationService.state.updateStreamInfoOnLive,
+    isSimpleOutputMode: SettingsService.views.isSimpleOutputMode,
   }));
-  const canRunOptimizer =
-    // HDR Settings are not compliant with the auto-optimizer
-    !SettingsService.views.hasHDRSettings && isTwitch && !isRecordingOrStreaming && protectedMode;
+
+  // HDR Settings are not compliant with the auto-optimizer
+  // temporarily disable auto config until migrate to new api
+  const canRunOptimizer = false;
+  // !SettingsService.views.hasHDRSettings &&
+  // isTwitch &&
+  // !isRecordingOrStreaming &&
+  // protectedMode &&
+  // isSimpleOutputMode;
 
   function restartStreamlabelsSession() {
     StreamlabelsService.restartSession().then(result => {

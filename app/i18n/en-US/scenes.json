@@ -49,5 +49,14 @@
   "Choose a template from our theme library": "Choose a template from our theme library",
   "Enter a Scene Collection Name": "Enter a Scene Collection Name",
   "Copy of %{collectionName}": "Copy of %{collectionName}",
-  "Your Scene Collections": "Your Scene Collections"
+  "Your Scene Collections": "Your Scene Collections",
+  "Dual Output Mode": "Dual Output Mode",
+  "Horizontal Output": "Horizontal Output",
+  "Vertical Output": "Vertical Output",
+  "Arrange sources here for a vertical scene layout.": "Arrange sources here for a vertical scene layout.",
+  "Arrange sources here for a horizontal scene layout.": "Arrange sources here for a horizontal scene layout.",
+  "Toggle Dual Output Mode.": "Toggle Dual Output Mode.",
+  "Cannot hide dual output toggles in dual output mode.": "Cannot hide dual output toggles in dual output mode.",
+  "Choose a template from our overlay library": "Choose a template from our overlay library",
+  "Log in to choose a template from our overlay library": "Log in to choose a template from our overlay library"
 }

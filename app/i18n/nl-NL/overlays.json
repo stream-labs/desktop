@@ -1,8 +1,20 @@
 {
   "Successfully saved %{filename}": "%{filename} is opgeslagen",
+  "Successfully converted %{filename}": "%{filename} is geconverteerd",
+  "Successfully saved %{filename} to %{filepath}": "%{filename} is opgeslagen naar %{filepath}",
   "Successfully loaded %{filename}.overlay": "%{filename}.overlay is geladen",
   "This is an experimental feature.  Use at your own risk.": "Dit is een experimentele functie.  Op eigen risico gebruiken.",
   "Export Overlay File": "Overlaybestand exporteren",
   "Import Overlay File": "Overlaybestand importeren",
-  "Import Widget File in Current Scene": "Widgetbestand importeren in huidige scène"
+  "Import Widget File in Current Scene": "Widgetbestand importeren in huidige scène",
+  "The active scene collection is not a dual output scene collection.": "De actieve scèneverzameling is geen Dual Output-scèneverzameling.",
+  "Convert to Vanilla Scene": "Converteren naar lege scène",
+  "Convert": "Converteren",
+  "Convert and Export Overlay": "Overlay converteren en exporteren",
+  "Assign": "Toewijzen",
+  "Assign and Export Overlay": "Overlay toewijzen en exporteren",
+  "Assign Vertical Sources to Horizontal Display": "Verticale bronnen aan horizontale weergave toewijzen",
+  "The below will create a copy of the active scene collection, set the copy as the active collection, and then apply the function.": "Hiermee wordt een kopie van de actieve scèneverzameling gemaakt, de kopie ingesteld als de actieve verzameling en de functie toegepast.",
+  "Manage Dual Output Scene": "Dual Output-scène beheren",
+  "Unable to convert dual output collection.": "Kan Dual Output-verzameling niet converteren."
 }

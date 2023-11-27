@@ -91,11 +91,15 @@
   "An error occurred while reading audio from %{file}": "Um erro ocorreu durante a leitura do áudio de %{file}",
   "An error occurred while mixing audio": "Um erro ocorreu enquanto o áudio era mixado",
   "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "Edite suas reprises com Highlighter, um editor gratuito incluído no Streamlabs.",
-  "Upload To": "Upload To",
-  "Upload": "Upload",
-  "This feature requires a Streamlabs ID": "This feature requires a Streamlabs ID",
-  "Sign up for Streamlabs ID": "Sign up for Streamlabs ID",
-  "Add subtitles, transcribe, and more": "Add subtitles, transcribe, and more",
-  "Convert to mobile-friendly short video": "Convert to mobile-friendly short video",
-  "YouTube (private video)": "YouTube (private video)"
+  "Upload To": "Carregar em",
+  "Upload": "Carregar",
+  "This feature requires a Streamlabs ID": "Este recurso requer uma Streamlabs ID",
+  "Sign up for Streamlabs ID": "Inscreva-se na Streamlabs ID",
+  "Add subtitles, transcribe, and more": "Adicionar legendas, transcrição e muito mais",
+  "Convert to mobile-friendly short video": "Converter vídeos curtos compatíveis com dispositivos móveis",
+  "YouTube (private video)": "YouTube (vídeo privado)",
+  "Clip": "Clipe",
+  "Transcribe": "Transcrever",
+  "Record your screen with Streamlabs Desktop. Once recording is complete, it will be displayed here. Access your files or edit further with Streamlabs tools.": "Grave sua tela com o Streamlabs Desktop. Assim que a gravação for concluída, ela será exibida aqui. Acesse seus arquivos ou edite mais com as ferramentas Streamlabs.",
+  "Recordings": "Gravações"
 }

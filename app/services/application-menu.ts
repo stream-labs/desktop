@@ -120,7 +120,7 @@ export class ApplicationMenuService extends Service {
             click: () => {
               if (this.isEditorFocused()) {
                 if (this.appService.state.loading) return;
-                this.selectionService.views.globalSelection.remove();
+                this.selectionService.removeSelected();
               }
             },
           },

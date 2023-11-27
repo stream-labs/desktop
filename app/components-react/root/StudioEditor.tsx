@@ -6,23 +6,47 @@ import cx from 'classnames';
 import Display from 'components-react/shared/Display';
 import { $t } from 'services/i18n';
 import { ERenderingMode } from '../../../obs-api';
+import { TDisplayType } from 'services/settings-v2';
+import AutoProgressBar from 'components-react/shared/AutoProgressBar';
+import { useSubscription } from 'components-react/hooks/useSubscription';
+import { message } from 'antd';
 
 export default function StudioEditor() {
-  const { WindowsService, CustomizationService, EditorService, TransitionsService } = Services;
+  const {
+    WindowsService,
+    CustomizationService,
+    EditorService,
+    TransitionsService,
+    ScenesService,
+    DualOutputService,
+    StreamingService,
+  } = Services;
   const v = useVuex(() => ({
     hideStyleBlockers: WindowsService.state.main.hideStyleBlockers,
     performanceMode: CustomizationService.state.performanceMode,
     cursor: EditorService.state.cursor,
     studioMode: TransitionsService.state.studioMode,
+    dualOutputMode: DualOutputService.views.dualOutputMode,
+    showHorizontalDisplay: DualOutputService.views.showHorizontalDisplay,
+    showVerticalDisplay:
+      DualOutputService.views.showVerticalDisplay && !StreamingService.state.selectiveRecording,
+    activeSceneId: ScenesService.views.activeSceneId,
+    isLoading: DualOutputService.views.isLoading,
   }));
-  const displayEnabled = !v.hideStyleBlockers && !v.performanceMode;
+  const displayEnabled = !v.hideStyleBlockers && !v.performanceMode && !v.isLoading;
   const placeholderRef = useRef<HTMLDivElement>(null);
   const studioModeRef = useRef<HTMLDivElement>(null);
   const [studioModeStacked, setStudioModeStacked] = useState(false);
   const [verticalPlaceholder, setVerticalPlaceholder] = useState(false);
+  const [messageActive, setMessageActive] = useState(false);
   const studioModeTransitionName = useMemo(() => TransitionsService.getStudioTransitionName(), [
     v.studioMode,
   ]);
+
+  const sourceId = useMemo(() => {
+    const dualOutputMode = v.showHorizontalDisplay && v.showVerticalDisplay;
+    return v.studioMode && !dualOutputMode ? studioModeTransitionName : undefined;
+  }, [v.showHorizontalDisplay, v.showVerticalDisplay, v.studioMode]);
 
   // Track vertical orientation for placeholder
   useEffect(() => {
@@ -75,7 +99,7 @@ export default function StudioEditor() {
   // need to be redefined. It also ensures a single closure that never
   // changes for the moveInFlight piece of the mouseMove handler.
   const eventHandlers = useMemo(() => {
-    function getMouseEvent(event: React.MouseEvent) {
+    function getMouseEvent(event: React.MouseEvent, display: TDisplayType) {
       return {
         offsetX: event.nativeEvent.offsetX,
         offsetY: event.nativeEvent.offsetY,
@@ -87,48 +111,52 @@ export default function StudioEditor() {
         metaKey: event.metaKey,
         button: event.button,
         buttons: event.buttons,
+        display,
       };
     }
 
     let moveInFlight = false;
     let lastMoveEvent: React.MouseEvent | null = null;
 
-    function onMouseMove(event: React.MouseEvent) {
+    function onMouseMove(event: React.MouseEvent, display: TDisplayType) {
       if (moveInFlight) {
         lastMoveEvent = event;
         return;
       }
 
       moveInFlight = true;
-      EditorService.actions.return.handleMouseMove(getMouseEvent(event)).then(() => {
+      EditorService.actions.return.handleMouseMove(getMouseEvent(event, display)).then(stopMove => {
+        if (stopMove && !messageActive) {
+          showOutOfBoundsErrorMessage();
+        }
         moveInFlight = false;
 
         if (lastMoveEvent) {
-          onMouseMove(lastMoveEvent);
+          onMouseMove(lastMoveEvent, display);
           lastMoveEvent = null;
         }
       });
     }
 
     return {
-      onOutputResize(rect: IRectangle) {
-        EditorService.actions.handleOutputResize(rect);
+      onOutputResize(rect: IRectangle, display: TDisplayType) {
+        EditorService.actions.handleOutputResize(rect, display);
       },
 
-      onMouseDown(event: React.MouseEvent) {
-        EditorService.actions.handleMouseDown(getMouseEvent(event));
+      onMouseDown(event: React.MouseEvent, display: TDisplayType) {
+        EditorService.actions.handleMouseDown(getMouseEvent(event, display));
       },
 
-      onMouseUp(event: React.MouseEvent) {
-        EditorService.actions.handleMouseUp(getMouseEvent(event));
+      onMouseUp(event: React.MouseEvent, display: TDisplayType) {
+        EditorService.actions.handleMouseUp(getMouseEvent(event, display));
       },
 
-      onMouseEnter(event: React.MouseEvent) {
-        EditorService.actions.handleMouseEnter(getMouseEvent(event));
+      onMouseEnter(event: React.MouseEvent, display: TDisplayType) {
+        EditorService.actions.handleMouseEnter(getMouseEvent(event, display));
       },
 
-      onMouseDblClick(event: React.MouseEvent) {
-        EditorService.actions.handleMouseDblClick(getMouseEvent(event));
+      onMouseDblClick(event: React.MouseEvent, display: TDisplayType) {
+        EditorService.actions.handleMouseDblClick(getMouseEvent(event, display));
       },
 
       onMouseMove,
@@ -143,40 +171,111 @@ export default function StudioEditor() {
     };
   }, []);
 
+  /**
+   * Show error message in dual output mode when the user
+   * attempts to drag a source out of the display.
+   * Prevent continual calls using the messageActive state variable.
+   */
+  function showOutOfBoundsErrorMessage() {
+    setMessageActive(true);
+    message.error({
+      content: $t('Cannot move source outside canvas in Dual Output Mode.'),
+      duration: 2,
+      className: styles.toggleError,
+    });
+
+    setTimeout(() => setMessageActive(false), 2000);
+  }
+
   return (
     <div className={styles.mainContainer} ref={studioModeRef}>
       {displayEnabled && (
         <div className={cx(styles.studioModeContainer, { [styles.stacked]: studioModeStacked })}>
           {v.studioMode && <StudioModeControls stacked={studioModeStacked} />}
+          {v.dualOutputMode && <DualOutputControls stacked={studioModeStacked} />}
           <div
             className={cx(styles.studioDisplayContainer, { [styles.stacked]: studioModeStacked })}
           >
-            <div
-              className={cx(styles.studioEditorDisplayContainer, 'noselect')}
-              style={{ cursor: v.cursor }}
-              onMouseDown={eventHandlers.onMouseDown}
-              onMouseUp={eventHandlers.onMouseUp}
-              onMouseEnter={eventHandlers.onMouseEnter}
-              onMouseMove={eventHandlers.onMouseMove}
-              onDoubleClick={eventHandlers.onMouseDblClick}
-              onContextMenu={eventHandlers.onContextMenu}
-            >
-              <Display
-                drawUI={true}
-                paddingSize={10}
-                onOutputResize={eventHandlers.onOutputResize}
-                renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
-                sourceId={v.studioMode ? studioModeTransitionName : undefined}
-              />
-            </div>
-            {v.studioMode && (
-              <div className={styles.studioModeDisplayContainer}>
-                <Display paddingSize={10} />
+            {v.showHorizontalDisplay && (
+              <div
+                className={cx(styles.studioEditorDisplayContainer, 'noselect')}
+                style={{ cursor: v.cursor }}
+                onMouseDown={(event: React.MouseEvent) =>
+                  eventHandlers.onMouseDown(event, 'horizontal')
+                }
+                onMouseUp={(event: React.MouseEvent) =>
+                  eventHandlers.onMouseUp(event, 'horizontal')
+                }
+                onMouseEnter={(event: React.MouseEvent) =>
+                  eventHandlers.onMouseEnter(event, 'horizontal')
+                }
+                onMouseMove={(event: React.MouseEvent) =>
+                  eventHandlers.onMouseMove(event, 'horizontal')
+                }
+                onDoubleClick={(event: React.MouseEvent) =>
+                  eventHandlers.onMouseDblClick(event, 'horizontal')
+                }
+                onContextMenu={eventHandlers.onContextMenu}
+              >
+                <Display
+                  id="horizontal-display"
+                  type="horizontal"
+                  drawUI={true}
+                  paddingSize={10}
+                  onOutputResize={(rect: IRectangle) =>
+                    eventHandlers.onOutputResize(rect, 'horizontal')
+                  }
+                  renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
+                  sourceId={sourceId}
+                />
+              </div>
+            )}
+            {v.showVerticalDisplay && (
+              <div
+                className={cx(styles.studioEditorDisplayContainer, 'noselect')}
+                style={{ cursor: v.cursor }}
+                onMouseDown={(event: React.MouseEvent) =>
+                  eventHandlers.onMouseDown(event, 'vertical')
+                }
+                onMouseUp={(event: React.MouseEvent) => eventHandlers.onMouseUp(event, 'vertical')}
+                onMouseEnter={(event: React.MouseEvent) =>
+                  eventHandlers.onMouseEnter(event, 'vertical')
+                }
+                onMouseMove={(event: React.MouseEvent) =>
+                  eventHandlers.onMouseMove(event, 'vertical')
+                }
+                onDoubleClick={(event: React.MouseEvent) =>
+                  eventHandlers.onMouseDblClick(event, 'vertical')
+                }
+                onContextMenu={eventHandlers.onContextMenu}
+              >
+                <Display
+                  id="vertical-display"
+                  type="vertical"
+                  drawUI={true}
+                  paddingSize={10}
+                  onOutputResize={(rect: IRectangle) =>
+                    eventHandlers.onOutputResize(rect, 'vertical')
+                  }
+                  renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
+                  sourceId={sourceId}
+                />
+              </div>
+            )}
+            {v.showHorizontalDisplay && !v.showVerticalDisplay && v.studioMode && (
+              <div id="horizontal-display-studio" className={styles.studioModeDisplayContainer}>
+                <Display paddingSize={10} type="horizontal" />
+              </div>
+            )}
+            {!v.showHorizontalDisplay && v.showVerticalDisplay && v.studioMode && (
+              <div id="vertical-display-studio" className={styles.studioModeDisplayContainer}>
+                <Display paddingSize={10} type="vertical" />
               </div>
             )}
           </div>
         </div>
       )}
+      {v.isLoading && <DualOutputProgressBar sceneId={v.activeSceneId} />}
       {!displayEnabled && (
         <div className={styles.noPreview}>
           {v.performanceMode && (
@@ -243,6 +342,59 @@ function StudioModeControls(p: { stacked: boolean }) {
         )}
       </button>
       <span className={styles.studioModeControl}>{$t('Live')}</span>
+    </div>
+  );
+}
+
+function DualOutputControls(p: { stacked: boolean }) {
+  function openSettingsWindow() {
+    Services.SettingsService.actions.showSettings('Video');
+  }
+  const showHorizontal = Services.DualOutputService.views.showHorizontalDisplay;
+  const showVertical =
+    Services.DualOutputService.views.showVerticalDisplay &&
+    !Services.StreamingService.state.selectiveRecording;
+
+  return (
+    <div
+      id="dual-output-header"
+      className={cx(styles.dualOutputHeader, { [styles.stacked]: p.stacked })}
+    >
+      {showHorizontal && (
+        <div className={styles.horizontalHeader}>
+          <i className="icon-desktop" />
+          <span>{$t('Horizontal Output')}</span>
+        </div>
+      )}
+
+      {showVertical && (
+        <div className={styles.verticalHeader}>
+          <i className="icon-phone-case" />
+          <span>{$t('Vertical Output')}</span>
+        </div>
+      )}
+      <div className={styles.manageLink}>
+        <a onClick={openSettingsWindow}>{$t('Manage Dual Output')}</a>
+      </div>
+    </div>
+  );
+}
+
+function DualOutputProgressBar(p: { sceneId: string }) {
+  const { DualOutputService, ScenesService } = Services;
+
+  const [current, setCurrent] = useState(0);
+
+  const v = useVuex(() => ({
+    total: ScenesService.views.getSceneItemsBySceneId(p.sceneId)?.length ?? 1,
+  }));
+
+  useSubscription(DualOutputService.sceneNodeHandled, index => setCurrent(index));
+
+  return (
+    <div className={styles.progressBar}>
+      <AutoProgressBar percent={(current / v.total) * 100} timeTarget={10 * 1000} />
+      <p>{$t('Loading scene...')}</p>
     </div>
   );
 }

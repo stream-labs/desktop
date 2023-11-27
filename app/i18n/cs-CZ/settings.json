@@ -248,5 +248,8 @@
   "This number is too large for a FPS Denominator of %{fpsDen}, please decrease it or increase the Denominator": "Toto číslo je příliš velké pro jmenovatele FPS %{fpsDen}, snižte jej nebo zvyšte jmenovatele",
   "This number is too large for a FPS Numerator of %{fpsNum}, please decrease it or increase the Numerator": "Toto číslo je příliš velké pro čitatele FPS %{fpsNum}, snižte jej nebo zvyšte čitatele",
   "FPS Value must be between 1 and 1000": "Hodnota FPS musí být v rozsahu 1 až 1000",
-  "%{fieldName} must be greater than 0": "%{fieldName} musí být větší než 0"
+  "%{fieldName} must be greater than 0": "%{fieldName} musí být větší než 0",
+  "Markers": "Markers",
+  "Manage Dual Output": "Manage Dual Output",
+  "Auto optimizer disabled for dual output scenes": "Auto optimizer disabled for dual output scenes"
 }

@@ -34,10 +34,15 @@ export class GameCaptureNode extends Node<ISchema, IContext> {
       fs.writeFileSync(destination, fs.readFileSync(settings.user_placeholder_image));
     }
 
+    const width = this.videoService.baseResolutions[context.sceneItem.display ?? 'horizontal']
+      .baseWidth;
+    const height = this.videoService.baseResolutions[context.sceneItem.display ?? 'vertical']
+      .baseHeight;
+
     this.data = {
       placeholderFile,
-      width: this.videoService.baseWidth,
-      height: this.videoService.baseHeight,
+      width,
+      height,
     };
   }
 

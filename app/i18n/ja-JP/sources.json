@@ -354,5 +354,8 @@
   "Set scale filter 'Bicubic'": "スケールフィルターを「バイキュービック」に設定",
   "Set scale filter 'Bilinear'": "スケールフィルターを「バイリニア」に設定",
   "Set scale filter 'Lanczos'": "スケールフィルターを「ランチョス」に設定",
-  "Set scale filter 'Area'": "スケールフィルターを「面積」に設定"
+  "Set scale filter 'Area'": "スケールフィルターを「面積」に設定",
+  "You currently have the same source on both canvases selected. Please select the source in the canvas to edit it independently.": "現在、両方のキャンバスで同じソースが選択されています。キャンバス内でソースを選択して、ソースを個別に編集してください。",
+  "Selective Recording can only be used with horizontal sources.": "セレクティブレコーディングは横方向ソースでのみ使用できます。",
+  "Cannot move source outside canvas in Dual Output Mode.": "Dual Output モードでは、ソースをキャンバス外に移動できません。"
 }
