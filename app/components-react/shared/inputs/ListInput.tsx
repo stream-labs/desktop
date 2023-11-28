@@ -116,7 +116,7 @@ export function renderOption<T>(
 ) {
   const attrs = {
     'data-option-list': inputProps.name,
-    'data-option-label': opt.originalLabel || opt.label,
+    'data-option-label': opt.originalLabel ?? opt.label,
     'data-option-value': opt.value,
     label: opt.label,
     value: (opt.value as unknown) as string,
