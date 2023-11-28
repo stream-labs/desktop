@@ -83,17 +83,7 @@ export class NicoliveCommentFilterService extends StatefulService<INicoliveComme
     if (!isOk(result)) {
       throw NicoliveFailure.fromClientError('addFilters', result);
     }
-
-    const resultRecord = result.value.find(
-      (rec: FilterRecord) => rec.type === record.type && rec.body === record.body,
-    );
-
-    if (!resultRecord) {
-      // conflictしているので再取得しないとIDがわからない
-      return this.fetchFilters();
-    }
-    const filters = this.state.filters.concat(resultRecord);
-    this.updateFilters(filters);
+    return this.fetchFilters();
   }
 
   async deleteFilters(ids: number[]) {
