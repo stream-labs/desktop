@@ -34,6 +34,7 @@ export default function GoLiveSettings() {
     canAddDestinations,
     shouldShowPrimeLabel,
     canUseOptimizedProfile,
+    showTweet,
   } = useGoLiveSettings().extend(module => {
     const {
       RestreamService,
@@ -59,11 +60,13 @@ export default function GoLiveSettings() {
         }
       },
 
-      shouldShowPrimeLabel: !RestreamService.state.grandfathered,
+      shouldShowPrimeLabel: !RestreamService.state.grandfathered && !UserService.views.isPrime,
 
       canUseOptimizedProfile:
         VideoEncodingOptimizationService.state.canSeeOptimizedProfile ||
         VideoEncodingOptimizationService.state.useOptimizedProfile,
+
+      showTweet: UserService.views.auth?.primaryPlatform !== 'twitter',
     };
   });
 
@@ -82,7 +85,7 @@ export default function GoLiveSettings() {
           {shouldShowAddDestButton && (
             <a className={styles.addDestinationBtn} onClick={addDestination}>
               <PlusIcon style={{ paddingLeft: '17px', fontSize: '24px' }} />
-              {$t('Add Destination')}
+              <span style={{ flex: 1 }}>{$t('Add Destination')}</span>
               {shouldShowPrimeLabel && (
                 <ButtonHighlighted filled text={$t('Ultra')} icon={<UltraIcon type="simple" />} />
               )}
@@ -93,7 +96,7 @@ export default function GoLiveSettings() {
 
       {/*RIGHT COLUMN*/}
       <Col span={shouldShowLeftCol ? 16 : 24} style={{ height: '100%' }}>
-        <Spinner visible={isLoading} />
+        <Spinner visible={isLoading} relative />
         <GoLiveError />
         {shouldShowSettings && (
           <Scrollable style={{ height: '100%' }} snapToWindowEdge>
@@ -103,7 +106,7 @@ export default function GoLiveSettings() {
             {isAdvancedMode && <div className={styles.spacer} />}
             {/*EXTRAS*/}
             <Section isSimpleMode={!isAdvancedMode} title={$t('Extras')}>
-              <TwitterInput />
+              {showTweet && <TwitterInput />}
               {!!canUseOptimizedProfile && <OptimizedProfileSwitcher />}
             </Section>
           </Scrollable>

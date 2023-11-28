@@ -12,6 +12,8 @@ import { SceneItemFolder } from './scene-item-folder';
 import { SceneItem } from './scene-item';
 import { ServiceHelper } from 'services';
 import { ISerializable } from '../../rpc-api';
+import { TDisplayType } from 'services/settings-v2';
+import { IVideo } from 'obs-studio-node';
 
 /**
  * Available scene node types.
@@ -27,6 +29,8 @@ export interface ISceneNodeModel {
   sceneNodeType: TSceneNodeType;
   parentId?: string;
   childrenIds?: string[];
+  output?: IVideo;
+  display?: TDisplayType;
 }
 
 /**

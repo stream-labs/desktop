@@ -69,7 +69,7 @@
   "Sparks sent are exactly <amount>": "Verzonden sparks zijn exact <amount>",
   "Ember amount is at least <amount>": "Ember-hoeveelheid is ten minste <amount>",
   "Ember amount is exactly <amopunt>": "Ember-hoeveelheid is exact <amopunt>",
-  "Please note that when advanced media share is enabled, media will no longer play through your alert box widget. Media will only play through this media share widget.": "Houd er rekening mee dat wanneer geavanceerd delen van media is ingeschakeld, media niet langer worden afgespeeld via uw widget voor meldingenvensters. Media worden alleen afgespeeld via deze widget voor media delen.",
+  "Allow your viewers to donate to share media on your stream.": "Geef kijkers de mogelijkheid om te doneren en media in uw stream te delen.",
   "Twitch Subscribers": "Twitch-abonnees",
   "YouTube Members": "YouTube-leden",
   "Media Share": "Mediashare",

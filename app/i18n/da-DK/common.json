@@ -141,6 +141,12 @@
   "Revert Changes": "Annuller ændringer",
   "Animations": "Animationer",
   "Multistreaming": "Multistreaming",
+  "Upgrade to Ultra": "Opgrader til Ultra",
+  "Twitch": "Twitch",
+  "Facebook": "Facebook",
+  "YouTube": "YouTube",
+  "Trovo": "Trovo",
+  "TikTok": "TikTok",
   "Alert Box": "Notifikationsboks",
   "Widget": "Widget",
   "Creator Sites": "Websteder for indholdsskabere",
@@ -151,6 +157,5 @@
   "Apps Store Home": "Apps Store-startside",
   "Dashboard Home": "Dashboard-startside",
   "Alert Box Library": "Bibliotek for notifikationsbokse",
-  "Alert Box Settings": "Indstillinger for notifikationsbokse",
-  "Upgrade to Ultra": "Opgrader til Ultra"
+  "Alert Box Settings": "Indstillinger for notifikationsbokse"
 }

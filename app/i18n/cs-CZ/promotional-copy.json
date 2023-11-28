@@ -70,5 +70,6 @@
   "No Watermark + 1080p/60fps + More": "Žádné vodoznaky + 1080p / 60 fps + další",
   "1 Hour Videos + 250GB Storage + More": "1 hodinová videa + 250 GB úložiště + další",
   "Highest Profit Margins": "Nejlepší ziskové marže",
-  "%{monthlyPrice}/mo or %{yearlyPrice}/year": "%{monthlyPrice}/měs nebo %{yearlyPrice}/rok"
+  "%{monthlyPrice}/mo or %{yearlyPrice}/year": "%{monthlyPrice}/měs nebo %{yearlyPrice}/rok",
+  "Text-based editing of VOD content": "Text-based editing of VOD content"
 }

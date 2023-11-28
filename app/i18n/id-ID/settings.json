@@ -248,5 +248,8 @@
   "This number is too large for a FPS Denominator of %{fpsDen}, please decrease it or increase the Denominator": "Angka ini terlalu besar untuk Denominator FPS sebesar %{fpsDen}, perkecil angkanya atau tambah angka Denominator",
   "This number is too large for a FPS Numerator of %{fpsNum}, please decrease it or increase the Numerator": "Angka ini terlalu besar untuk Numerator FPS sebesar %{fpsNum}, kurangi perkecil atau tambah angka Numerator",
   "FPS Value must be between 1 and 1000": "Nilai FPS harus antara 1 hingga 1.000",
-  "%{fieldName} must be greater than 0": "%{fieldName} harus lebih besar dari 0"
+  "%{fieldName} must be greater than 0": "%{fieldName} harus lebih besar dari 0",
+  "Markers": "Markers",
+  "Manage Dual Output": "Manage Dual Output",
+  "Auto optimizer disabled for dual output scenes": "Auto optimizer disabled for dual output scenes"
 }

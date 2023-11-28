@@ -992,7 +992,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
 
         this.SET_UPLOAD_INFO({ error: true });
         this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
-          type: 'UploadError',
+          type: 'UploadYouTubeError',
         });
       }
     }
@@ -1006,7 +1006,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
 
     if (result) {
       this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
-        type: 'UploadSuccess',
+        type: 'UploadYouTubeSuccess',
         privacy: options.privacyStatus,
         videoLink:
           options.privacyStatus === 'public'
@@ -1016,10 +1016,10 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     }
   }
 
-  async uploadStorage() {
+  async uploadStorage(platform: string) {
     this.SET_UPLOAD_INFO({ uploading: true, cancelRequested: false, error: false });
 
-    const { cancel, complete } = await this.sharedStorageService.actions.return.uploadFile(
+    const { cancel, complete, size } = await this.sharedStorageService.actions.return.uploadFile(
       this.views.exportInfo.file,
       progress => {
         this.SET_UPLOAD_INFO({
@@ -1043,7 +1043,9 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       } else {
         this.SET_UPLOAD_INFO({ uploading: false, error: true });
         this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
-          type: 'SharedStorageUploadError',
+          type: 'UploadStorageError',
+          fileSize: size,
+          platform,
         });
       }
     }
@@ -1052,7 +1054,9 @@ export class HighlighterService extends StatefulService<IHighligherState> {
 
     if (id) {
       this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
-        type: 'SharedStorageUploadSuccess',
+        type: 'UploadStorageSuccess',
+        fileSize: size,
+        platform,
       });
     }
 

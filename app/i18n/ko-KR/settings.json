@@ -248,5 +248,8 @@
   "This number is too large for a FPS Denominator of %{fpsDen}, please decrease it or increase the Denominator": "%{fpsDen}의 FPS 분모로 사용하기에 너무 큰 숫자입니다. 숫자를 줄이거나 분모를 높이세요.",
   "This number is too large for a FPS Numerator of %{fpsNum}, please decrease it or increase the Numerator": "%{fpsNum}의 FPS 분자로 사용하기에 너무 큰 숫자입니다. 숫자를 줄이거나 분자를 높이세요.",
   "FPS Value must be between 1 and 1000": "FPS 값은 1~1000 사이여야 합니다.",
-  "%{fieldName} must be greater than 0": "%{fieldName}에는 0보다 큰 숫자를 입력해야 합니다"
+  "%{fieldName} must be greater than 0": "%{fieldName}에는 0보다 큰 숫자를 입력해야 합니다",
+  "Markers": "Markers",
+  "Manage Dual Output": "Manage Dual Output",
+  "Auto optimizer disabled for dual output scenes": "Auto optimizer disabled for dual output scenes"
 }

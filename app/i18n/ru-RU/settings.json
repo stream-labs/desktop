@@ -248,5 +248,8 @@
   "This number is too large for a FPS Denominator of %{fpsDen}, please decrease it or increase the Denominator": "Для знаменателя FPS, равного %{fpsDen}, это слишком большое значение. Уменьшите его или увеличьте знаменатель.",
   "This number is too large for a FPS Numerator of %{fpsNum}, please decrease it or increase the Numerator": "Для числителя FPS, равного %{fpsNum}, это слишком большое значение. Уменьшите его или увеличьте числитель.",
   "FPS Value must be between 1 and 1000": "Значение FPS должно быть между 1 и 1000",
-  "%{fieldName} must be greater than 0": "%{fieldName} должен быть больше нуля"
+  "%{fieldName} must be greater than 0": "%{fieldName} должен быть больше нуля",
+  "Markers": "Маркеры",
+  "Manage Dual Output": "Управление Dual Output",
+  "Auto optimizer disabled for dual output scenes": "Автоматическая оптимизация отключена для сцен Dual Output"
 }

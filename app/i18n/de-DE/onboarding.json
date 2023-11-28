@@ -124,7 +124,7 @@
   "Basic Chatbot": "Basic Chatbot",
   "Basic Features": "Grundfunktionen",
   "Access to All Overlays and Themes (%{themeNumber})": "Zugriff auf alle Overlays und Themen (%{themeNumber})",
-  "Add Up To 11 Guests or Cameras": "Add Up To 11 Guests or Cameras",
+  "Add Up To 11 Guests or Cameras": "Bis zu 11 Gäste oder Kameras hinzufügen",
   "Access Full App Library (%{appNumber})": "Zugriff auf vollständige App-Bibliothek (%{appNumber})",
   "Custom Tip Page and Domain": "Benutzerdefinierte Spendenseite und Domäne",
   "Custom Named Chatbot": "Chatbot mit benutzerdefiniertem Namen",
@@ -136,5 +136,8 @@
   "Connect a Content Platform": "Inhaltsplattform verbinden",
   "Streamlabs Desktop requires that you have a connected platform account in order to use all of its features. By skipping this step, you will be logged out and some features may be unavailable.": "Für Streamlabs Desktop benötigen Sie ein verbundenes Plattformkonto, um alle Funktionen nutzen zu können. Wenn Sie diesen Schritt überspringst, werden Sie ausgeloggt und einige Funktionen sind dann eventuell nicht verfügbar.",
   "Your Streamlabs account has multiple connected content platforms. Please select the primary platform you will be streaming to using Streamlabs Desktop.": "Mit Ihrem Streamlabs Konto sind mehrere Inhaltsplattformen verbunden. Bitte wählen Sie die primäre Plattform, auf der Sie mit Streamlabs Desktop streamen wollen.",
-  "Streamlabs Desktop requires you to connect a content platform to your Streamlabs account": "Für Streamlabs Desktop müssen Sie eine Inhaltsplattform mit Ihrem Streamlabs Konto verbinden."
+  "Streamlabs Desktop requires you to connect a content platform to your Streamlabs account": "Für Streamlabs Desktop müssen Sie eine Inhaltsplattform mit Ihrem Streamlabs Konto verbinden.",
+  "Error": "Fehler",
+  "Ok": "OK",
+  "An error has occurred during optimization attempt. Only default settings are applied": "Beim Optimierungsversuch ist ein Fehler aufgetreten. Nur Standardeinstellungen werden angewendet"
 }

@@ -1,0 +1,76 @@
+.tooltip-wrapper {
+  :global(div.ant-tooltip-content div.ant-tooltip-arrow) {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    z-index: 1;
+
+    :global(.ant-tooltip-arrow-content) {
+      position: relative;
+      width: 12px;
+      height: 12px;
+      z-index: 1;
+    }
+  }
+
+  &:global(.ant-tooltip-placement-topLeft .ant-tooltip-arrow) {
+    bottom: -2px;
+    right: -12px;
+  }
+  &:global(.ant-tooltip-placement-top .ant-tooltip-arrow) {
+    bottom: -2px;
+  }
+
+  &:global(.ant-tooltip-placement-topRight .ant-tooltip-arrow) {
+    bottom: -2px;
+    right: 12px;
+  }
+
+  &:global(.ant-tooltip-placement-leftTop .ant-tooltip-arrow) {
+    bottom: -12px;
+    right: -2px;
+  }
+
+  &:global(.ant-tooltip-placement-leftBottom .ant-tooltip-arrow) {
+    bottom: 6px;
+    right: -2px;
+  }
+
+  &:global(.ant-tooltip-placement-left .ant-tooltip-arrow) {
+    right: -2px;
+  }
+
+  &:global(.ant-tooltip-placement-bottomLeft .ant-tooltip-arrow) {
+    right: -12px;
+    top: -2px;
+  }
+
+  &:global(.ant-tooltip-placement-bottom .ant-tooltip-arrow) {
+    top: -2px;
+  }
+
+  &:global(.ant-tooltip-placement-bottomRight .ant-tooltip-arrow) {
+    right: 12px;
+    top: -2px;
+  }
+
+  &:global(.ant-tooltip-placement-rightTop .ant-tooltip-arrow) {
+    bottom: 12px;
+    left: -2px;
+  }
+
+  &:global(.ant-tooltip-placement-right .ant-tooltip-arrow) {
+    left: -2px;
+  }
+
+  &:global(.ant-tooltip-placement-rightBottom .ant-tooltip-arrow) {
+    top: 12px;
+    left: -2px;
+  }
+}
+
+.light-shadow {
+  :global(div.ant-tooltip) {
+    filter: drop-shadow(0 0 0.5rem var(--tooltip-hover)) !important;
+  }
+}

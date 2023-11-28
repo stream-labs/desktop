@@ -124,7 +124,7 @@
   "Basic Chatbot": "Chatbot básico",
   "Basic Features": "Funcionalidades básicas",
   "Access to All Overlays and Themes (%{themeNumber})": "Acesso a todas as sobreposições e temas (%{themeNumber})",
-  "Add Up To 11 Guests or Cameras": "Add Up To 11 Guests or Cameras",
+  "Add Up To 11 Guests or Cameras": "Adicione até 11 convidados ou câmaras",
   "Access Full App Library (%{appNumber})": "Acesso à Biblioteca completa de aplicações (%{appNumber})",
   "Custom Tip Page and Domain": "Página de gorjetas e domínio personalizados",
   "Custom Named Chatbot": "Chatbot com nome personalizado",
@@ -136,5 +136,8 @@
   "Connect a Content Platform": "Associar uma Plataforma de Conteúdos",
   "Streamlabs Desktop requires that you have a connected platform account in order to use all of its features. By skipping this step, you will be logged out and some features may be unavailable.": "O Streamlabs Desktop necessita que tenhas uma conta da plataforma associada para poder usares todas as suas funcionalidades. Ao ignorar este passo, a tua sessão terminará e algumas funcionalidades podem estar indisponíveis.",
   "Your Streamlabs account has multiple connected content platforms. Please select the primary platform you will be streaming to using Streamlabs Desktop.": "A tua conta Streamlabs tem várias plataformas de conteúdos associadas. Selecciona a plataforma primária com que transmitirás para usar o Streamlabs Desktop.",
-  "Streamlabs Desktop requires you to connect a content platform to your Streamlabs account": "O Streamlabs Desktop necessita que associes uma plataforma de conteúdos à tua conta Streamlabs."
+  "Streamlabs Desktop requires you to connect a content platform to your Streamlabs account": "O Streamlabs Desktop necessita que associes uma plataforma de conteúdos à tua conta Streamlabs.",
+  "Error": "Erro",
+  "Ok": "OK",
+  "An error has occurred during optimization attempt. Only default settings are applied": "Ocorreu um erro durante a tentativa de otimização. Apenas são aplicadas as predefinições"
 }

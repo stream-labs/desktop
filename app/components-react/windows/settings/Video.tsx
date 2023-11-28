@@ -2,15 +2,24 @@ import * as remote from '@electron/remote';
 import React from 'react';
 import { useModule, injectState } from 'slap';
 import { Services } from '../../service-provider';
+import { Button, Form, Modal, message } from 'antd';
 import FormFactory, { TInputValue } from 'components-react/shared/inputs/FormFactory';
-import * as obs from '../../../../obs-api';
+import { CheckboxInput } from 'components-react/shared/inputs';
+import Tooltip from 'components-react/shared/Tooltip';
+import { EScaleType, EFPSType } from '../../../../obs-api';
 import { $t } from 'services/i18n';
 import styles from './Common.m.less';
+import Tabs from 'components-react/shared/Tabs';
 import { invalidFps, TDisplayType } from 'services/settings-v2/video';
 
 const CANVAS_RES_OPTIONS = [
   { label: '1920x1080', value: '1920x1080' },
   { label: '1280x720', value: '1280x720' },
+];
+
+const VERTICAL_CANVAS_OPTIONS = [
+  { label: '720x1280', value: '720x1280' },
+  { label: '1080x1920', value: '1080x1920' },
 ];
 
 const OUTPUT_RES_OPTIONS = [
@@ -27,6 +36,11 @@ const OUTPUT_RES_OPTIONS = [
   { label: '640x360', value: '640x360' },
 ];
 
+const VERTICAL_OUTPUT_RES_OPTIONS = [
+  { label: '720x1280', value: '720x1280' },
+  { label: '1080x1920', value: '1080x1920' },
+];
+
 const FPS_OPTIONS = [
   { label: '10', value: '10-1' },
   { label: '20', value: '20-1' },
@@ -41,17 +55,23 @@ const FPS_OPTIONS = [
 
 class VideoSettingsModule {
   service = Services.VideoSettingsService;
+  userService = Services.UserService;
+  dualOutputService = Services.DualOutputService;
 
   get display(): TDisplayType {
     return this.state.display;
   }
 
+  get isLoggedIn(): boolean {
+    return this.userService.isLoggedIn;
+  }
+
   get values(): Dictionary<TInputValue> {
     const display = this.state.display;
     const vals = this.service.values[display];
-    const baseRes = display !== 'green' && this.state?.customBaseRes ? 'custom' : vals.baseRes;
+    const baseRes = display !== 'vertical' && this.state?.customBaseRes ? 'custom' : vals.baseRes;
     const outputRes =
-      display !== 'green' && this.state?.customOutputRes ? 'custom' : vals.outputRes;
+      display !== 'vertical' && this.state?.customOutputRes ? 'custom' : vals.outputRes;
     return {
       ...vals,
       baseRes,
@@ -66,6 +86,8 @@ class VideoSettingsModule {
 
   state = injectState({
     display: 'horizontal' as TDisplayType,
+    showModal: false,
+    showDualOutputSettings: this.dualOutputService.views.dualOutputMode,
     customBaseRes: !this.baseResOptions.find(
       opt => opt.value === this.service.values.horizontal.baseRes,
     ),
@@ -114,23 +136,24 @@ class VideoSettingsModule {
       scaleType: {
         type: 'list',
         label: $t('Downscale Filter'),
+        onChange: (val: EScaleType) => this.setScaleType(val),
         options: [
           {
             label: $t('Bilinear (Fastest, but blurry if scaling)'),
-            value: obs.EScaleType.Bilinear,
+            value: EScaleType.Bilinear,
           },
-          { label: $t('Bicubic (Sharpened scaling, 16 samples)'), value: obs.EScaleType.Bicubic },
-          { label: $t('Lanczos (Sharpened scaling, 32 samples)'), value: obs.EScaleType.Lanczos },
+          { label: $t('Bicubic (Sharpened scaling, 16 samples)'), value: EScaleType.Bicubic },
+          { label: $t('Lanczos (Sharpened scaling, 32 samples)'), value: EScaleType.Lanczos },
         ],
       },
       fpsType: {
         type: 'list',
         label: $t('FPS Type'),
-        onChange: (val: obs.EFPSType) => this.setFPSType(val),
+        onChange: (val: EFPSType) => this.setFPSType(val),
         options: [
-          { label: $t('Common FPS Values'), value: obs.EFPSType.Common },
-          { label: $t('Integer FPS Values'), value: obs.EFPSType.Integer },
-          { label: $t('Fractional FPS Values'), value: obs.EFPSType.Fractional },
+          { label: $t('Common FPS Values'), value: EFPSType.Common },
+          { label: $t('Integer FPS Values'), value: EFPSType.Integer },
+          { label: $t('Fractional FPS Values'), value: EFPSType.Fractional },
         ],
 
         children: {
@@ -139,14 +162,14 @@ class VideoSettingsModule {
             label: $t('Common FPS Values'),
             options: FPS_OPTIONS,
             onChange: (val: string) => this.setCommonFPS(val),
-            displayed: this.values.fpsType === obs.EFPSType.Common,
+            displayed: this.values.fpsType === EFPSType.Common,
           },
           fpsInt: {
             type: 'number',
             label: $t('FPS Value'),
             onChange: (val: string) => this.setIntegerFPS(val),
             rules: [{ max: 1000, min: 1, message: $t('FPS Value must be between 1 and 1000') }],
-            displayed: this.values.fpsType === obs.EFPSType.Integer,
+            displayed: this.values.fpsType === EFPSType.Integer,
           },
           fpsNum: {
             type: 'number',
@@ -161,7 +184,7 @@ class VideoSettingsModule {
                 }),
               },
             ],
-            displayed: this.values.fpsType === obs.EFPSType.Fractional,
+            displayed: this.values.fpsType === EFPSType.Fractional,
           },
           fpsDen: {
             type: 'number',
@@ -176,7 +199,7 @@ class VideoSettingsModule {
                 }),
               },
             ],
-            displayed: this.values.fpsType === obs.EFPSType.Fractional,
+            displayed: this.values.fpsType === EFPSType.Fractional,
           },
         },
       },
@@ -184,12 +207,20 @@ class VideoSettingsModule {
   }
 
   get baseResOptions() {
+    if (this.state?.display === 'vertical') {
+      return VERTICAL_CANVAS_OPTIONS;
+    }
+
     return CANVAS_RES_OPTIONS.concat(this.monitorResolutions).concat([
       { label: $t('Custom'), value: 'custom' },
     ]);
   }
 
   get outputResOptions() {
+    if (this.state?.display === 'vertical') {
+      return VERTICAL_OUTPUT_RES_OPTIONS;
+    }
+
     const baseRes = `${this.service.state.horizontal.baseWidth}x${this.service.state.horizontal.baseHeight}`;
     if (!OUTPUT_RES_OPTIONS.find(opt => opt.value === baseRes)) {
       return [{ label: baseRes, value: baseRes }]
@@ -282,39 +313,79 @@ class VideoSettingsModule {
     }
   }
 
-  setFPSType(value: obs.EFPSType) {
-    const display = this.state.display;
-    this.service.actions.setVideoSetting('fpsType', value, display);
-    this.service.actions.setVideoSetting('fpsNum', 30, display);
-    this.service.actions.setVideoSetting('fpsDen', 1, display);
-  }
+  /**
+   * Sets the Scale Type
+   * @remark set the same FPS type for both displays
+   * If there is a vertical context, update it as well.
+   * Otherwise, update the vertical display persisted settings.
+   */
 
-  setCommonFPS(value: string) {
-    const display = this.state.display;
-    const [fpsNum, fpsDen] = value.split('-');
-    this.service.actions.setVideoSetting('fpsNum', Number(fpsNum), display);
-    this.service.actions.setVideoSetting('fpsDen', Number(fpsDen), display);
-  }
+  setScaleType(value: EScaleType) {
+    this.service.actions.setVideoSetting('scaleType', value, 'horizontal');
 
-  setIntegerFPS(value: string) {
-    const display = this.state.display;
-    this.state.setFpsInt(Number(value));
-    if (Number(value) > 0 && Number(value) < 1001) {
-      this.service.actions.setVideoSetting('fpsNum', Number(value), display);
-      this.service.actions.setVideoSetting('fpsDen', 1, display);
+    if (this.service.contexts.vertical) {
+      this.service.actions.setVideoSetting('scaleType', value, 'vertical');
+    } else {
+      this.dualOutputService.actions.setVideoSetting({ scaleType: value }, 'vertical');
     }
   }
 
+  /**
+   * Sets the FPS type
+   * @remark set the same FPS type for both displays
+   * If there is a vertical context, update it as well.
+   * Otherwise, update the vertical display persisted settings.
+   */
+  setFPSType(value: EFPSType) {
+    this.service.actions.setVideoSetting('fpsType', value, 'horizontal');
+    this.service.actions.setVideoSetting('fpsNum', 30, 'horizontal');
+    this.service.actions.setVideoSetting('fpsDen', 1, 'horizontal');
+    this.service.actions.syncFPSSettings();
+  }
+
+  /**
+   * Sets Common FPS
+   * @remark set the same Common FPS for both displays
+   * If there is a vertical context, update it as well.
+   * Otherwise, update the vertical display persisted settings.
+   */
+  setCommonFPS(value: string) {
+    const [fpsNum, fpsDen] = value.split('-');
+
+    this.service.actions.setVideoSetting('fpsNum', Number(fpsNum), 'horizontal');
+    this.service.actions.setVideoSetting('fpsDen', Number(fpsDen), 'horizontal');
+    this.service.actions.syncFPSSettings();
+  }
+  /**
+   * Sets Integer FPS
+   * @remark set the same Integer FPS for both displays
+   * If there is a vertical context, update it as well.
+   * Otherwise, update the vertical display persisted settings.
+   */
+  setIntegerFPS(value: string) {
+    this.state.setFpsInt(Number(value));
+    if (Number(value) > 0 && Number(value) < 1001) {
+      this.service.actions.setVideoSetting('fpsNum', Number(value), 'horizontal');
+      this.service.actions.setVideoSetting('fpsDen', 1, 'horizontal');
+      this.service.actions.syncFPSSettings();
+    }
+  }
+
+  /**
+   * Sets FPS
+   * @remark Set the same FPS for both displays.
+   * If there is a vertical context, update it as well.
+   * Otherwise, update the vertical display persisted settings.
+   */
   setFPS(key: 'fpsNum' | 'fpsDen', value: string) {
-    const display = this.state.display;
     if (key === 'fpsNum') {
       this.state.setFpsNum(Number(value));
     } else {
       this.state.setFpsDen(Number(value));
     }
-
     if (!invalidFps(this.state.fpsNum, this.state.fpsDen) && Number(value) > 0) {
-      this.service.actions.setVideoSetting(key, Number(value), display);
+      this.service.actions.setVideoSetting(key, Number(value), 'horizontal');
+      this.service.actions.syncFPSSettings();
     }
   }
 
@@ -339,14 +410,100 @@ class VideoSettingsModule {
     this.state.setFpsDen(this.service.values[display].fpsDen);
     this.state.setFpsInt(this.service.values[display].fpsInt);
   }
+
+  setShowDualOutput() {
+    if (Services.StreamingService.views.isMidStreamMode) {
+      message.error({
+        content: $t('Cannot toggle Dual Output while live.'),
+      });
+    } else if (Services.TransitionsService.views.studioMode) {
+      message.error({
+        content: $t('Cannot toggle Dual Output while in Studio Mode.'),
+      });
+    } else {
+      // toggle dual output
+      this.dualOutputService.actions.setdualOutputMode();
+      this.state.setShowDualOutputSettings(!this.state.showDualOutputSettings);
+      Services.UsageStatisticsService.recordFeatureUsage('DualOutput');
+      Services.UsageStatisticsService.recordAnalyticsEvent('DualOutput', {
+        type: 'ToggleOnDualOutput',
+      });
+
+      // show warning message if selective recording is active
+      if (
+        Services.StreamingService.state.selectiveRecording &&
+        !this.dualOutputService.views.dualOutputMode
+      ) {
+        remote.dialog.showMessageBox({
+          title: 'Vertical Display Disabled',
+          message: $t(
+            'Dual Output can’t be displayed - Selective Recording only works with horizontal sources and disables editing the vertical output scene. Please disable selective recording from Sources to set up Dual Output.',
+          ),
+        });
+      }
+    }
+  }
+
+  handleShowModal(status: boolean) {
+    Services.WindowsService.actions.updateStyleBlockers('child', status);
+    this.state.setShowModal(status);
+  }
+
+  handleAuth() {
+    Services.WindowsService.actions.closeChildWindow();
+    this.userService.actions.showLogin();
+    const onboardingCompleted = Services.OnboardingService.onboardingCompleted.subscribe(() => {
+      Services.DualOutputService.actions.setdualOutputMode();
+      Services.SettingsService.actions.showSettings('Video');
+      onboardingCompleted.unsubscribe();
+    });
+  }
 }
 
 export function VideoSettings() {
-  const { values, metadata, onChange } = useModule(VideoSettingsModule);
+  const {
+    values,
+    metadata,
+    showDualOutputSettings,
+    showModal,
+    isLoggedIn,
+    onChange,
+    setDisplay,
+    setShowDualOutput,
+    handleShowModal,
+    handleAuth,
+  } = useModule(VideoSettingsModule);
 
   return (
     <>
-      <h2>{$t('Video')}</h2>
+      <div className={styles.videoSettingsHeader}>
+        <h2>{$t('Video')}</h2>
+        <div className={styles.doToggle}>
+          {/* THIS CHECKBOX TOGGLES DUAL OUTPUT MODE FOR THE ENTIRE APP */}
+          <CheckboxInput
+            id="dual-output-checkbox"
+            name="dual-output-checkbox"
+            data-name="dual-output-checkbox"
+            label="Dual Output Checkbox"
+            value={showDualOutputSettings}
+            onChange={(val: boolean) => (isLoggedIn ? setShowDualOutput() : handleShowModal(val))}
+            className={styles.doCheckbox}
+          />
+          {$t('Enable Dual Output')}
+          <Tooltip
+            title={$t(
+              'Stream to horizontal and vertical platforms simultaneously. Recordings will be in horizontal only.',
+            )}
+            className={styles.doTooltip}
+            placement="bottomRight"
+            lightShadow
+          >
+            <i className="icon-information" />
+          </Tooltip>
+        </div>
+        {/* )} */}
+      </div>
+      {showDualOutputSettings && <Tabs onChange={setDisplay} />}
 
       <div className={styles.formSection}>
         <FormFactory
@@ -357,7 +514,37 @@ export function VideoSettings() {
           name="video-settings"
         />
       </div>
+      <LoginPromptModal
+        showModal={showModal}
+        handleAuth={handleAuth}
+        handleShowModal={handleShowModal}
+      />
     </>
+  );
+}
+
+function LoginPromptModal(p: {
+  showModal: boolean;
+  handleAuth: () => void;
+  handleShowModal: (status: boolean) => void;
+}) {
+  return (
+    <Modal
+      footer={null}
+      visible={p.showModal}
+      onCancel={() => p.handleShowModal(false)}
+      getContainer={false}
+      className={styles.confirmLogout}
+    >
+      <Form id="login-modal" className={styles.confirmLogout}>
+        <h2>{$t('Login')}</h2>
+        {$t('Please log in to enable dual output. Would you like to log in now?')}
+        <div className={styles.buttons}>
+          <Button onClick={() => p.handleAuth()}>{$t('Yes')}</Button>
+          <Button onClick={() => p.handleShowModal(false)}>{$t('No')}</Button>
+        </div>
+      </Form>
+    </Modal>
   );
 }
 

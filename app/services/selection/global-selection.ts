@@ -74,6 +74,19 @@ export class GlobalSelection extends Selection {
   }
 
   /**
+   * Filter dual output nodes from selection
+   * @remarks Primarily used when toggling on Selective Recording
+   */
+  filterDualOutputNodes() {
+    const dualOutputItems = this.clone().getItems('vertical');
+    if (!dualOutputItems.length) return;
+
+    const dualOutputSelection = new Selection(this._sceneId, dualOutputItems);
+
+    this.editorCommandsService.executeCommand('RemoveNodesCommand', dualOutputSelection);
+  }
+
+  /**
    * Selects items in the global selection
    * @param items The list of items to select
    * @param sync Whether to select synchronously (use only to resolve race conditions)

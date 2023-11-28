@@ -5,21 +5,22 @@ import { $t } from 'services/i18n';
 import { EditorCommandsService } from 'services/editor-commands';
 import { ECenteringType } from 'services/editor-commands/commands/center-items';
 import { EFlipAxis } from 'services/editor-commands/commands/flip-items';
+import { TDisplayType } from 'services/settings-v2';
 
 export class SourceTransformMenu extends Menu {
   @Inject() private selectionService: SelectionService;
   @Inject() private editorCommandsService: EditorCommandsService;
 
-  constructor() {
+  constructor(private display?: TDisplayType) {
     super();
 
-    this.appendMenuItems();
+    this.appendMenuItems(this.display);
   }
 
-  appendMenuItems() {
+  appendMenuItems(display?: TDisplayType) {
     this.append({
       label: $t('Edit Transform'),
-      click: () => this.selectionService.openEditTransform(),
+      click: () => this.selectionService.openEditTransform(display),
     });
 
     this.append({

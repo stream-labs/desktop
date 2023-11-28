@@ -248,5 +248,8 @@
   "This number is too large for a FPS Denominator of %{fpsDen}, please decrease it or increase the Denominator": "Bu sayı, %{fpsDen} FPS Paydası için çok büyük; lütfen azaltın veya Paydayı artırın",
   "This number is too large for a FPS Numerator of %{fpsNum}, please decrease it or increase the Numerator": "Bu sayı, %{fpsNum} FPS Sayacı için çok büyük; lütfen azaltın veya Sayacı artırın",
   "FPS Value must be between 1 and 1000": "FPS Değeri 1 ila 1000 arasında olmalıdır",
-  "%{fieldName} must be greater than 0": "%{fieldName}, 0’dan büyük olmalıdır"
+  "%{fieldName} must be greater than 0": "%{fieldName}, 0’dan büyük olmalıdır",
+  "Markers": "İşaretler",
+  "Manage Dual Output": "Dual Output’u Yönet",
+  "Auto optimizer disabled for dual output scenes": "Otomatik optimizasyon Dual Output sahneleri için devre dışı bırakıldı"
 }

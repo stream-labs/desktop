@@ -124,7 +124,7 @@
   "Basic Chatbot": "Chatbot di base",
   "Basic Features": "Funzioni di base",
   "Access to All Overlays and Themes (%{themeNumber})": "Accesso a tutte le sovrapposizioni e a tutti i temi (%{themeNumber})",
-  "Add Up To 11 Guests or Cameras": "Add Up To 11 Guests or Cameras",
+  "Add Up To 11 Guests or Cameras": "Aggiungi fino a 11 ospiti o videocamere",
   "Access Full App Library (%{appNumber})": "Accedi alla libreria delle app completa (%{appNumber})",
   "Custom Tip Page and Domain": "Pagina donazioni personalizzata e dominio",
   "Custom Named Chatbot": "Chatbot denominato personalizzato",
@@ -136,5 +136,8 @@
   "Connect a Content Platform": "Connetti una piattaforma di contenuti",
   "Streamlabs Desktop requires that you have a connected platform account in order to use all of its features. By skipping this step, you will be logged out and some features may be unavailable.": "Streamlabs Desktop richiede un account collegato alla piattaforma per poter utilizzare tutte le funzioni. Saltando questo passaggio, verrai disconnesso e alcune funzioni potrebbero non essere disponibili.",
   "Your Streamlabs account has multiple connected content platforms. Please select the primary platform you will be streaming to using Streamlabs Desktop.": "Il tuo account Streamlabs ha più piattaforme di contenuti connesse. Seleziona la piattaforma principale su cui eseguirai lo streaming con Streamlabs Desktop.",
-  "Streamlabs Desktop requires you to connect a content platform to your Streamlabs account": "Streamlabs Desktop ti richiede di connettere una piattaforma di contenuti al tuo account Streamlabs"
+  "Streamlabs Desktop requires you to connect a content platform to your Streamlabs account": "Streamlabs Desktop ti richiede di connettere una piattaforma di contenuti al tuo account Streamlabs",
+  "Error": "Errore",
+  "Ok": "OK",
+  "An error has occurred during optimization attempt. Only default settings are applied": "Si è verificato un errore durante il tentativo di ottimizzazione. Sono state applicate solo le impostazioni predefinite"
 }

@@ -20,4 +20,5 @@ export { FontWeightInput } from './FontWeightInput';
 export { ColorInput } from './ColorInput';
 export { CardInput } from './CardInput';
 export { AutocompleteInput } from './AutocompleteInput';
+export { RadioInput } from './RadioInput';
 export { CheckboxGroup } from './CheckboxGroup';

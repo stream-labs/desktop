@@ -137,7 +137,7 @@ export const menuTitles = (item: EMenuItemKey | ESubMenuItemKey | string) => {
     [EMenuItemKey.Editor]: $t('Editor'),
     [EMenuItemKey.LayoutEditor]: $t('Layout Editor'),
     [EMenuItemKey.StudioMode]: $t('Studio Mode'),
-    [EMenuItemKey.Themes]: $t('Themes'),
+    [EMenuItemKey.Themes]: $t('Overlays'),
     [EMenuItemKey.AppStore]: $t('App Store'),
     [EMenuItemKey.Highlighter]: $t('Highlighter'),
     [EMenuItemKey.RecordingHistory]: $t('Recordings'),

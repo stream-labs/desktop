@@ -248,5 +248,8 @@
   "This number is too large for a FPS Denominator of %{fpsDen}, please decrease it or increase the Denominator": "这个数字对于 FPS 分母 %{fpsDen} 来说太大了，请减少值或增加分母",
   "This number is too large for a FPS Numerator of %{fpsNum}, please decrease it or increase the Numerator": "这个数字对于 FPS 分子 %{fpsNum} 来说太大了，请减少值或增加分子",
   "FPS Value must be between 1 and 1000": "FPS 值必须介于 1 到 1000 之间",
-  "%{fieldName} must be greater than 0": "%{fieldName} 必须大于 0"
+  "%{fieldName} must be greater than 0": "%{fieldName} 必须大于 0",
+  "Markers": "标记",
+  "Manage Dual Output": "管理 Dual Output",
+  "Auto optimizer disabled for dual output scenes": "Dual Output 场景禁用自动优化"
 }

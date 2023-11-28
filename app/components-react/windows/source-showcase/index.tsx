@@ -15,7 +15,7 @@ import {
 import styles from './SourceShowcase.m.less';
 import SourceGrid from './SourceGrid';
 import Scrollable from 'components-react/shared/Scrollable';
-import pick from 'lodash/pick';
+import * as remote from '@electron/remote';
 
 const { Content, Sider } = Layout;
 
@@ -30,8 +30,6 @@ export default function SourcesShowcase() {
 
 function SourcesShowcaseModal() {
   const { selectInspectedSource, availableAppSources, store } = useSourceShowcaseSettings();
-
-  const inspectedSource = store.useState(s => s.inspectedSource);
 
   const [activeTab, setActiveTab] = useState('all');
 
@@ -83,12 +81,18 @@ function SideBar() {
         demoFilename: source.about.bannerImage,
         demoVideo: false,
         name: source.name,
+        link: null,
+        linkText: null,
       };
     }
   }, [inspectedAppId]);
 
   function widgetData(type: string | WidgetType) {
     return WidgetDisplayData(platform)[WidgetType[type]];
+  }
+
+  function openLink(url: string) {
+    remote.shell.openExternal(url);
   }
 
   const displayData =
@@ -128,6 +132,11 @@ function SideBar() {
               <li key={support}>{support}</li>
             ))}
           </ul>
+          {displayData?.link && displayData?.linkText && (
+            <span className={styles.infoLink} onClick={() => openLink(displayData.link!)}>
+              {displayData?.linkText}
+            </span>
+          )}
         </Scrollable>
       </div>
     </Sider>

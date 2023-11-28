@@ -70,5 +70,6 @@
   "No Watermark + 1080p/60fps + More": "Kein Wasserzeichen + 1080p/60 fps + mehr",
   "1 Hour Videos + 250GB Storage + More": "1 Stunde Videos + 250 GB Speicherplatz + mehr",
   "Highest Profit Margins": "Höchste Profitmargen",
-  "%{monthlyPrice}/mo or %{yearlyPrice}/year": "%{monthlyPrice}/Mon. oder %{yearlyPrice}/Jahr"
+  "%{monthlyPrice}/mo or %{yearlyPrice}/year": "%{monthlyPrice}/Mon. oder %{yearlyPrice}/Jahr",
+  "Text-based editing of VOD content": "Textbasierte Bearbeitung von VOD-Inhalten"
 }

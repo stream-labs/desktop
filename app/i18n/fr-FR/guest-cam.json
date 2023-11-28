@@ -16,7 +16,7 @@
   "Guest %{num}": "Invité %{num}",
   "Collab Cam Properties": "Propriétés de Collab Cam",
   "A guest has joined - click to show": "Un invité vous a rejoint: cliquez pour l'afficher",
-  "Welcome to Collab Cam": "Bienvenue à Collab Cam",
+  "Welcome to Collab Cam": "Bienvenue dans Collab Cam",
   "Step 1": "Étape 1",
   "Copy and share a link with your guest. When they join, they'll be able to see and hear you.": "Copiez et partagez ce lien avec votre invité. Lors de la connexion, il pourra vous voir et vous entendre.",
   "Step 2": "Étape 2",
@@ -47,5 +47,5 @@
   "Collab Cam requires a source": "Collab Cam nécessite une source",
   "At least one Collab Cam source is required to use Collab Cam. Would you like to add one now?": "Au moins une source Collab Cam est nécessaire pour utiliser Collab Cam. Voulez-vous en ajouter une maintenant?",
   "You now have access to Collab Cam!": "Vous avez maintenant accès à Collab Cam!",
-  "You must be logged in to use Collab Cam.": "You must be logged in to use Collab Cam."
+  "You must be logged in to use Collab Cam.": "Vous devez être connectés pour utiliser Collab Cam."
 }

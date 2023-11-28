@@ -91,11 +91,15 @@
   "An error occurred while reading audio from %{file}": "Er is een fout opgetreden bij het lezen van audio uit %{file}",
   "An error occurred while mixing audio": "Er is een fout opgetreden bij het mengen van audio",
   "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "Bewerk uw replays met Highlighter, een gratis editor ingebouwd in Streamlabs.",
-  "Upload To": "Upload To",
-  "Upload": "Upload",
-  "This feature requires a Streamlabs ID": "This feature requires a Streamlabs ID",
-  "Sign up for Streamlabs ID": "Sign up for Streamlabs ID",
-  "Add subtitles, transcribe, and more": "Add subtitles, transcribe, and more",
-  "Convert to mobile-friendly short video": "Convert to mobile-friendly short video",
-  "YouTube (private video)": "YouTube (private video)"
+  "Upload To": "Uploaden naar",
+  "Upload": "Uploaden",
+  "This feature requires a Streamlabs ID": "Deze functie vereist een Streamlabs ID",
+  "Sign up for Streamlabs ID": "Aanmelden voor Streamlabs ID",
+  "Add subtitles, transcribe, and more": "Ondertiteling toevoegen, transcriberen en meer",
+  "Convert to mobile-friendly short video": "Converteren naar mobielvriendelijke korte video",
+  "YouTube (private video)": "YouTube (privévideo)",
+  "Clip": "Clip",
+  "Transcribe": "Transcriberen",
+  "Record your screen with Streamlabs Desktop. Once recording is complete, it will be displayed here. Access your files or edit further with Streamlabs tools.": "Neem uw scherm op met Streamlabs Desktop. Zodra de opname is voltooid, wordt deze hier weergegeven. Open uw bestanden of bewerk ze verder met Streamlabs-tools.",
+  "Recordings": "Opnames"
 }

@@ -49,5 +49,12 @@
   "Choose a template from our theme library": "Tema kütüphanesinden bir şablon seçin",
   "Enter a Scene Collection Name": "Sahne Koleksiyon Adı Girin",
   "Copy of %{collectionName}": "%{collectionName} Kopyası",
-  "Your Scene Collections": "Sahne Koleksiyonlarınız"
+  "Your Scene Collections": "Sahne Koleksiyonlarınız",
+  "Dual Output Mode": "Dual Output Modu",
+  "Horizontal Output": "Yatay Çıkış",
+  "Vertical Output": "Dikey Çıkış",
+  "Arrange sources here for a vertical scene layout.": "Dikey sahne düzeni için kaynakları buraya ekleyin.",
+  "Arrange sources here for a horizontal scene layout.": "Yatay sahne düzeni için kaynakları buraya ekleyin.",
+  "Toggle Dual Output Mode.": "Dual Output Modunu Değiştir.",
+  "Cannot hide dual output toggles in dual output mode.": "Dual Output modundayken Dual Output değişiklileri gizlenemez."
 }

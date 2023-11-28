@@ -91,11 +91,15 @@
   "An error occurred while reading audio from %{file}": "從 %{file} 讀取音訊時發生錯誤",
   "An error occurred while mixing audio": "混音音訊時發生錯誤",
   "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "使用精彩片段工具編輯您的重播，這是內建於 Streamlabs 的免費編輯器。",
-  "Upload To": "Upload To",
-  "Upload": "Upload",
-  "This feature requires a Streamlabs ID": "This feature requires a Streamlabs ID",
-  "Sign up for Streamlabs ID": "Sign up for Streamlabs ID",
-  "Add subtitles, transcribe, and more": "Add subtitles, transcribe, and more",
-  "Convert to mobile-friendly short video": "Convert to mobile-friendly short video",
-  "YouTube (private video)": "YouTube (private video)"
+  "Upload To": "上傳到",
+  "Upload": "上傳",
+  "This feature requires a Streamlabs ID": "此功能需要 Streamlabs ID",
+  "Sign up for Streamlabs ID": "註冊 Streamlabs ID",
+  "Add subtitles, transcribe, and more": "新增字幕、轉錄等等",
+  "Convert to mobile-friendly short video": "轉換為適合行動裝置使用的短片",
+  "YouTube (private video)": "YouTube (私有視訊)",
+  "Clip": "剪輯",
+  "Transcribe": "轉錄",
+  "Record your screen with Streamlabs Desktop. Once recording is complete, it will be displayed here. Access your files or edit further with Streamlabs tools.": "使用 Streamlabs Desktop 錄製您的螢幕。錄製完成後會顯示在這裡。使用 Streamlabs 工具存取您的檔案或進一步編輯。",
+  "Recordings": "錄影"
 }

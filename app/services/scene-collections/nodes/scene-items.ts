@@ -1,16 +1,10 @@
 import { Node } from './node';
-import {
-  EBlendingMethod,
-  EBlendingMode,
-  EScaleType,
-  ISceneItemFolder,
-  Scene,
-  ScenesService,
-  TSceneNodeType,
-} from '../../scenes';
+import { EBlendingMethod, EBlendingMode, EScaleType, Scene, ScenesService } from '../../scenes';
 import { HotkeysNode } from './hotkeys';
 import { SourcesService } from '../../sources';
 import { Inject } from '../../core/injector';
+import { TDisplayType, VideoSettingsService } from 'services/settings-v2';
+import { DualOutputService } from 'services/dual-output';
 
 interface ISchema {
   items: TSceneNodeInfo[];
@@ -44,6 +38,7 @@ interface ISceneItemFolderInfo extends ISceneNodeInfo {
 interface ISceneNodeInfo {
   id: string;
   sceneNodeType: 'item' | 'folder';
+  display?: TDisplayType;
 }
 
 export type TSceneNodeInfo = ISceneItemInfo | ISceneItemFolderInfo;
@@ -61,6 +56,12 @@ export class SceneItemsNode extends Node<ISchema, {}> {
   @Inject('ScenesService')
   scenesService: ScenesService;
 
+  @Inject('DualOutputService')
+  dualOutputService: DualOutputService;
+
+  @Inject('VideoSettingsService')
+  videoSettingsService: VideoSettingsService;
+
   getItems(context: IContext) {
     return context.scene.getNodes().slice().reverse();
   }
@@ -71,6 +72,11 @@ export class SceneItemsNode extends Node<ISchema, {}> {
         const hotkeys = new HotkeysNode();
 
         if (sceneItem.isItem()) {
+          const display =
+            sceneItem?.display ??
+            this.dualOutputService.views.getNodeDisplay(sceneItem.sceneItemId, sceneItem.sceneId);
+          const context = this.videoSettingsService.contexts[display];
+
           hotkeys.save({ sceneItemId: sceneItem.sceneItemId }).then(() => {
             const transform = sceneItem.transform;
             resolve({
@@ -91,6 +97,7 @@ export class SceneItemsNode extends Node<ISchema, {}> {
               blendingMode: sceneItem.blendingMode,
               blendingMethod: sceneItem.blendingMethod,
               sceneNodeType: 'item',
+              display,
             });
           });
         } else {
@@ -128,12 +135,40 @@ export class SceneItemsNode extends Node<ISchema, {}> {
   load(context: IContext): Promise<void> {
     this.sanitizeIds();
 
-    this.data.items.forEach(item => {
-      if (item.sceneNodeType === 'item') {
-        if (item.streamVisible == null) item.streamVisible = true;
-        if (item.recordingVisible == null) item.recordingVisible = true;
+    // on first load, a dual output scene needs to assign displays and contexts to the scene items
+    // but if the scene item already has a display assigned, skip it
+    if (this.dualOutputService.views.hasNodeMap(context.scene.id)) {
+      // nodes must be assigned to a context, so if it doesn't exist, establish it
+      if (!this.videoSettingsService.contexts.vertical) {
+        this.videoSettingsService.establishVideoContext('vertical');
       }
-    });
+
+      const nodeMap = this.dualOutputService.views.sceneNodeMaps[context.scene.id];
+
+      const verticalNodeIds = Object.values(nodeMap);
+
+      this.data.items.forEach(item => {
+        if (!item?.display) {
+          item.display = verticalNodeIds.includes(item.id) ? 'vertical' : 'horizontal';
+        }
+
+        if (item.sceneNodeType === 'item') {
+          if (item.streamVisible == null) item.streamVisible = true;
+          if (item.recordingVisible == null) item.recordingVisible = true;
+        }
+      });
+    } else {
+      // for vanilla scenes, assign all items to the horizontal display
+      this.data.items.forEach(item => {
+        if (!item?.display) {
+          item.display = 'horizontal';
+        }
+        if (item.sceneNodeType === 'item') {
+          if (item.streamVisible == null) item.streamVisible = true;
+          if (item.recordingVisible == null) item.recordingVisible = true;
+        }
+      });
+    }
 
     context.scene.addSources(this.data.items);
 

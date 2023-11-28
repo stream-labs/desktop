@@ -19,8 +19,9 @@ import { message } from 'antd';
 import { $t } from '../../../services/i18n';
 import { IStreamError } from '../../../services/streaming/stream-error';
 import { IGoLiveSettings } from '../../../services/streaming';
-import { injectState, useModule, mutation } from 'slap';
 import styles from './StreamScheduler.m.less';
+import React from 'react';
+import { initStore, useController } from '../../hooks/zustand';
 
 /**
  * Represents a single stream event
@@ -65,20 +66,22 @@ interface ISchedulerPlatformSettings extends Partial<Record<TPlatform, Object>> 
   facebook?: IFacebookStartStreamOptions;
 }
 
+export const StreamSchedulerCtx = React.createContext<StreamSchedulerController | null>(null);
+
 /**
  * A hook for using the StreamSchedulerModule module in components
  */
 export function useStreamScheduler() {
   // call `.select()` so all getters and state returned from the hook will be reactive
-  return useModule(StreamSchedulerModule);
+  return useController(StreamSchedulerCtx);
 }
 
 /**
  * A module for the StreamScheduler component
  * The module controls the components' state and provides actions
  */
-class StreamSchedulerModule {
-  state = injectState({
+export class StreamSchedulerController {
+  store = initStore({
     /**
      * `true` if should show a spinner in the modal window
      */
@@ -151,7 +154,7 @@ class StreamSchedulerModule {
   }
 
   get selectedEvent() {
-    return this.state.events.find(ev => this.state.selectedEventId === ev.id);
+    return this.store.events.find(ev => this.store.selectedEventId === ev.id);
   }
 
   /**
@@ -206,15 +209,15 @@ class StreamSchedulerModule {
   }
 
   get isUpdateMode() {
-    return !!this.state.selectedEventId;
+    return !!this.store.selectedEventId;
   }
 
   get fbSettings(): IFacebookStartStreamOptions {
-    return getDefined(this.state.platformSettings.facebook);
+    return getDefined(this.store.platformSettings.facebook);
   }
 
   get ytSettings(): IYoutubeStartStreamOptions {
-    return getDefined(this.state.platformSettings.youtube);
+    return getDefined(this.store.platformSettings.youtube);
   }
 
   get primaryPlatform() {
@@ -232,10 +235,9 @@ class StreamSchedulerModule {
   /**
    * Shows a modal for creating a new event
    */
-  @mutation()
   showNewEventModal(platform: TPlatform, selectedTime?: number) {
     const today = new Date().setHours(0, 0, 0, 0);
-    const time = selectedTime || this.state.time;
+    const time = selectedTime || this.store.time;
     const isPastDate = time < today;
     if (isPastDate) {
       message.error({
@@ -244,8 +246,10 @@ class StreamSchedulerModule {
       });
       return;
     }
-    this.state.selectedPlatform = platform;
-    this.state.isModalVisible = true;
+    this.store.setState(s => {
+      s.selectedPlatform = platform;
+      s.isModalVisible = true;
+    });
     this.setTime(time.valueOf());
   }
 
@@ -254,7 +258,7 @@ class StreamSchedulerModule {
    */
   async showEditEventModal(eventId: string) {
     this.recordFeatureUsage('StreamSchedulerView');
-    const event = getDefined(this.state.events.find(ev => eventId === ev.id));
+    const event = getDefined(this.store.events.find(ev => eventId === ev.id));
     if (event.platform === 'youtube') {
       const ytSettings = await Services.YoutubeService.actions.return.fetchStartStreamOptionsForBroadcast(
         event.id,
@@ -300,13 +304,13 @@ class StreamSchedulerModule {
    * Saves the existing event via platform's API
    */
   private async saveExistingEvent() {
-    const { selectedPlatform, selectedEventId } = this.state;
-    const streamSettings = getDefined(this.state.platformSettings[selectedPlatform]);
+    const { selectedPlatform, selectedEventId } = this.store;
+    const streamSettings = getDefined(this.store.platformSettings[selectedPlatform]);
 
     if (selectedPlatform === 'youtube') {
       // update YT event
       const ytSettings = cloneDeep(streamSettings) as IYoutubeStartStreamOptions;
-      ytSettings.scheduledStartTime = this.state.time;
+      ytSettings.scheduledStartTime = this.store.time;
       const video = await Services.YoutubeService.actions.return.updateBroadcast(
         selectedEventId,
         ytSettings,
@@ -335,8 +339,8 @@ class StreamSchedulerModule {
    * Create a new event via platform's API
    */
   private async saveNewEvent() {
-    const { selectedPlatform, time } = this.state;
-    const streamSettings = getDefined(this.state.platformSettings[selectedPlatform]);
+    const { selectedPlatform, time } = this.store;
+    const streamSettings = getDefined(this.store.platformSettings[selectedPlatform]);
     const service = getPlatformService(selectedPlatform);
 
     assertIsDefined(service.scheduleStream);
@@ -368,7 +372,7 @@ class StreamSchedulerModule {
    * Handles errors from the platform's API
    */
   private handleError(err: IStreamError) {
-    if (this.state.selectedPlatform === 'facebook') {
+    if (this.store.selectedPlatform === 'facebook') {
       message.error({
         content: $t(
           'Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.',
@@ -391,7 +395,7 @@ class StreamSchedulerModule {
     this.recordFeatureUsage('StreamSchedulerGoLive');
     const event = getDefined(this.selectedEvent);
     const prepopulateOptions = {
-      [event.platform]: this.state.platformSettings[event.platform],
+      [event.platform]: this.store.platformSettings[event.platform],
     } as IGoLiveSettings['prepopulateOptions'];
 
     // save the form
@@ -406,7 +410,7 @@ class StreamSchedulerModule {
    * also deletes it from the module's state
    */
   remove() {
-    const { selectedPlatform, selectedEventId } = this.state;
+    const { selectedPlatform, selectedEventId } = this.store;
     this.showLoader();
     if (selectedPlatform === 'youtube') {
       Services.YoutubeService.actions.return.removeBroadcast(selectedEventId);
@@ -419,83 +423,94 @@ class StreamSchedulerModule {
     this.closeModal();
   }
 
-  @mutation()
   private SHOW_EDIT_EVENT_MODAL(
     event: IStreamEvent,
     platformSettings: IYoutubeStartStreamOptions | IFacebookStartStreamOptions,
   ) {
-    this.state.selectedEventId = event.id;
-    this.state.selectedPlatform = event.platform;
-    this.state.platformSettings[event.platform] = platformSettings as any;
-    this.state.isModalVisible = true;
-    this.state.time = event.date;
+    this.store.setState(s => {
+      s.selectedEventId = event.id;
+      s.selectedPlatform = event.platform;
+      s.platformSettings[event.platform] = platformSettings as any;
+      s.isModalVisible = true;
+      s.time = event.date;
+    });
   }
 
-  @mutation()
   closeModal() {
-    this.state.selectedEventId = '';
-    this.state.isModalVisible = false;
-    this.state.platformSettings = this.defaultPlatformSettings;
-    this.state.isLoading = false;
+    this.store.setState(s => {
+      s.selectedEventId = '';
+      s.isModalVisible = false;
+      s.platformSettings = this.defaultPlatformSettings;
+      s.isLoading = false;
+    });
   }
 
-  @mutation()
   updatePlatform<T extends TPlatform>(platform: T, patch: ISchedulerPlatformSettings[T]) {
-    Object.assign(this.state.platformSettings[platform], patch);
+    this.store.setState(s => {
+      Object.assign(s.platformSettings[platform], patch);
+    });
   }
 
-  @mutation()
   setTime(time: number) {
-    this.state.time = time;
-    if (this.state.selectedPlatform === 'facebook') {
-      getDefined(this.state.platformSettings.facebook).event_params.start_time = time;
-    } else {
-      getDefined(this.state.platformSettings.youtube).scheduledStartTime = time;
-    }
+    this.store.setState(s => {
+      s.time = time;
+      if (s.selectedPlatform === 'facebook') {
+        getDefined(s.platformSettings.facebook).event_params.start_time = time;
+      } else {
+        getDefined(s.platformSettings.youtube).scheduledStartTime = time;
+      }
+    });
   }
 
-  @mutation()
   private reset() {
-    this.state.events = [];
-    this.state.platformSettings = this.defaultPlatformSettings;
+    this.store.setState(s => {
+      s.events = [];
+      s.platformSettings = this.defaultPlatformSettings;
+    });
   }
 
-  @mutation()
   private setEvents(events: IStreamEvent[]) {
-    this.state.isEventsLoaded = true;
-    this.state.events = events;
+    this.store.setState(s => {
+      s.isEventsLoaded = true;
+      s.events = events;
+    });
   }
 
-  @mutation()
   private addEvent(event: IStreamEvent) {
-    this.state.events.push(event);
+    this.store.setState(s => {
+      s.events.push(event);
+    });
   }
 
-  @mutation()
   private setEvent(id: string, event: IStreamEvent) {
-    const ind = this.state.events.findIndex(ev => ev.id === id);
-    this.state.events.splice(ind, 1, event);
+    this.store.setState(s => {
+      const ind = s.events.findIndex(ev => ev.id === id);
+      s.events.splice(ind, 1, event);
+    });
   }
 
-  @mutation()
   private REMOVE_EVENT(id: string) {
-    this.state.events = this.state.events.filter(ev => ev.id !== id);
+    this.store.setState(s => {
+      s.events = s.events.filter(ev => ev.id !== id);
+    });
   }
 
   /**
    * Shows a spinner in the modal window
    */
-  @mutation()
   private showLoader() {
-    this.state.isLoading = true;
+    this.store.setState(s => {
+      s.isLoading = true;
+    });
   }
 
   /**
    * Shows a spinner in the modal window
    */
-  @mutation()
   private hideLoader() {
-    this.state.isLoading = false;
+    this.store.setState(s => {
+      s.isLoading = false;
+    });
   }
 }
 

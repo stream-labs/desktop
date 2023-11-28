@@ -1,6 +1,6 @@
 {
   "Source: %{sourceName}": "Kaynak: %{sourceName}",
-  "Collab Cam": "İş Birliği Kamerası",
+  "Collab Cam": "Collab Cam",
   "Invite a guest to join your stream from a web browser.": "Bir web tarayıcısından yayınınıza katılması için bir konuk davet edin.",
   "Guest Cam is currently listening for connecting guests, but is not broadcasting your microphone and webcam to your guests yet.": "Konuk Kamerası şu anda bağlanan konukları dinliyor ancak mikrofonunuz ve web kameranız henüz konuklarınıza açık değil.",
   "No microphone source is selected. Your guest will not be able to hear you.": "Mikrofon kaynağı seçilmedi. Konuğunuz sizi duyamaz.",
@@ -47,5 +47,5 @@
   "Collab Cam requires a source": "Collab Cam bir kaynağa ihtiyaç duyar",
   "At least one Collab Cam source is required to use Collab Cam. Would you like to add one now?": "Collab Cam’i kullanmak için en azından bir Collab Cam kaynağı gereklidir. Şimdi bir kaynak eklemek ister misiniz?",
   "You now have access to Collab Cam!": "Artık, Collab Cam’e erişebilirsiniz!",
-  "You must be logged in to use Collab Cam.": "You must be logged in to use Collab Cam."
+  "You must be logged in to use Collab Cam.": "Collab Cam’ı kullanmak için oturum açmanız gereklidir."
 }

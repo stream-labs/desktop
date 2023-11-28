@@ -2,6 +2,7 @@ import { Module, EApiPermissions, apiMethod, IApiContext } from './module';
 import { Inject } from 'services/core/injector';
 import { NavigationService } from 'services/navigation';
 import { EAppPageSlot, PlatformAppsService } from 'services/platform-apps';
+import { IAppProtocolLink, ProtocolLinksService } from 'services/protocol-links';
 import { IWindowOptions } from 'services/windows';
 
 interface INavigation {
@@ -25,6 +26,7 @@ export class AppModule extends Module {
 
   @Inject() navigationService: NavigationService;
   @Inject() platformAppsService: PlatformAppsService;
+  @Inject() protocolLinksService: ProtocolLinksService;
 
   callbacks: Dictionary<TNavigationCallback> = {};
 
@@ -39,6 +41,14 @@ export class AppModule extends Module {
 
           this.callbacks[nav.params.appId as string](data);
         }
+      }
+    });
+
+    this.protocolLinksService.appProtocolLink.subscribe(info => {
+      if (this.deepLinkCallbacks[info.appId]) {
+        this.deepLinkCallbacks[info.appId](info.url);
+      } else {
+        this.pendingDeepLinks[info.appId] = info;
       }
     });
   }
@@ -82,5 +92,23 @@ export class AppModule extends Module {
       title: windowOptions.title,
       size,
     });
+  }
+
+  /**
+   * Used to handle the situation where the app was started with a deep
+   * app link, or one came in early enough before the app was initialized.
+   */
+  pendingDeepLinks: Dictionary<IAppProtocolLink> = {};
+
+  deepLinkCallbacks: Dictionary<(url: string) => void> = {};
+
+  @apiMethod()
+  onDeepLink(ctx: IApiContext, cb: (url: string) => void) {
+    this.deepLinkCallbacks[ctx.app.id] = cb;
+
+    if (this.pendingDeepLinks[ctx.app.id]) {
+      cb(this.pendingDeepLinks[ctx.app.id].url);
+      delete this.pendingDeepLinks[ctx.app.id];
+    }
   }
 }

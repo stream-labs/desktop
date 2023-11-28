@@ -248,5 +248,8 @@
   "This number is too large for a FPS Denominator of %{fpsDen}, please decrease it or increase the Denominator": "Questo numero è troppo elevato per un denominatore FPS di %{fpsDen}. Diminuiscilo o incrementa il denominatore",
   "This number is too large for a FPS Numerator of %{fpsNum}, please decrease it or increase the Numerator": "Questo numero è troppo elevato per un numeratore FPS di %{fpsNum}. Diminuiscilo o incrementa il numeratore",
   "FPS Value must be between 1 and 1000": "Il valore FPS deve essere compreso tra 1 e 1000",
-  "%{fieldName} must be greater than 0": "%{fieldName} deve essere maggiore di 0"
+  "%{fieldName} must be greater than 0": "%{fieldName} deve essere maggiore di 0",
+  "Markers": "Marcatori",
+  "Manage Dual Output": "Gestisci Dual Output",
+  "Auto optimizer disabled for dual output scenes": "Ottimizzatore automatico disabilitato per le scene Dual Output"
 }

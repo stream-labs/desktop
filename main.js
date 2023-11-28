@@ -251,9 +251,9 @@ let appShutdownTimeout;
 global.indexUrl = `file://${__dirname}/index.html`;
 
 function openDevTools() {
-  childWindow.webContents.openDevTools({ mode: 'undocked' });
-  mainWindow.webContents.openDevTools({ mode: 'undocked' });
-  workerWindow.webContents.openDevTools({ mode: 'undocked' });
+  childWindow.webContents.openDevTools({ mode: 'detach' });
+  mainWindow.webContents.openDevTools({ mode: 'detach' });
+  workerWindow.webContents.openDevTools({ mode: 'detach' });
 }
 
 // TODO: Clean this up
@@ -325,7 +325,7 @@ async function startApp() {
         },
         globalExtra: {
           'sentry[release]': pjson.version,
-          'sentry[user][ip]': '{{auto}}',
+          'sentry[user][ip_address]': '{{auto}}',
         },
       });
     }
@@ -341,6 +341,12 @@ async function startApp() {
   // setTimeout(() => {
   workerWindow.loadURL(`${global.indexUrl}?windowId=worker`);
   // }, 10 * 1000);
+
+  if (process.env.SLOBS_PRODUCTION_DEBUG) {
+    workerWindow.webContents.once('dom-ready', () => {
+      workerWindow.webContents.openDevTools({ mode: 'detach' });
+    });
+  }
 
   // All renderers should use ipcRenderer.sendTo to send to communicate with
   // the worker.  This still gets proxied via the main process, but eventually
@@ -379,6 +385,12 @@ async function startApp() {
   // setTimeout(() => {
   mainWindow.loadURL(`${global.indexUrl}?windowId=main`);
   // }, 5 * 1000)
+
+  if (process.env.SLOBS_PRODUCTION_DEBUG) {
+    mainWindow.webContents.once('dom-ready', () => {
+      mainWindow.webContents.openDevTools({ mode: 'detach' });
+    });
+  }
 
   mainWindowState.manage(mainWindow);
 
@@ -454,6 +466,12 @@ async function startApp() {
 
   childWindow.loadURL(`${global.indexUrl}?windowId=child`);
 
+  if (process.env.SLOBS_PRODUCTION_DEBUG) {
+    childWindow.webContents.once('dom-ready', () => {
+      childWindow.webContents.openDevTools({ mode: 'detach' });
+    });
+  }
+
   // The child window is never closed, it just hides in the
   // background until it is needed.
   childWindow.on('close', e => {
@@ -464,8 +482,6 @@ async function startApp() {
       e.preventDefault();
     }
   });
-
-  if (process.env.SLOBS_PRODUCTION_DEBUG) openDevTools();
 
   // simple messaging system for services between windows
   // WARNING! renderer windows use synchronous requests and will be frozen
