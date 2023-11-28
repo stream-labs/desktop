@@ -22,6 +22,7 @@ import GiftComment from './comment/GiftComment.vue';
 import NicoadComment from './comment/NicoadComment.vue';
 import SystemMessage from './comment/SystemMessage.vue';
 import { getDisplayName } from 'services/nicolive-program/ChatMessage/getDisplayName';
+import { NicoliveFailure, openErrorDialogFromFailure } from 'services/nicolive-program/NicoliveFailure';
 
 const componentMap: { [type in ChatComponentType]: Vue.Component } = {
   common: CommonComment,
@@ -193,14 +194,24 @@ export default class CommentViewer extends Vue {
         id: 'Ban comment content',
         label: 'コメントをNGに追加',
         click: () => {
-          this.nicoliveCommentFilterService.addFilter({ type: 'word', body: item.value.content });
+          this.nicoliveCommentFilterService.addFilter({ type: 'word', body: item.value.content })
+            .catch(e => {
+              if (e instanceof NicoliveFailure) {
+                openErrorDialogFromFailure(e);
+              }
+            });
         },
       });
       menu.append({
         id: 'Ban comment owner',
         label: 'ユーザーIDをNGに追加',
         click: () => {
-          this.nicoliveCommentFilterService.addFilter({ type: 'user', body: item.value.user_id, messageId: `${item.value.no}` });
+          this.nicoliveCommentFilterService.addFilter({ type: 'user', body: item.value.user_id, messageId: `${item.value.no}`, memo: item.value.content })
+            .catch(e => {
+              if (e instanceof NicoliveFailure) {
+                openErrorDialogFromFailure(e);
+              }
+            });
         },
       });
     }
