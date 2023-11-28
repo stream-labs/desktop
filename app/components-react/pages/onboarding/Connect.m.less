@@ -23,6 +23,12 @@
 
   :global(.list-input),
   :global(.section) { width: 400px; }
+
+  @media (max-height: 600px) {
+    & > h1, & > p {
+      display: none;
+    }
+  }
 }
 
 .select-another {
@@ -143,4 +149,17 @@
   column-gap: 20px;
   margin-top: 20px;
   justify-content: center;
+}
+
+.signup-link-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+
+  a {
+    &, &:hover, &:focus, &:active {
+      text-decoration: underline;
+    }
+  }
 }

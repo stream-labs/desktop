@@ -184,6 +184,11 @@ export function Connect() {
                 ))}
               </div>
             </div>
+            <div className={styles.signupLinkContainer}>
+              <Translate message={$t("Don't have an account yet? <span>Sign up</span>")}>
+                <a slot="span" onClick={() => setIsSignup(true)} />
+              </Translate>
+            </div>
           </>
         )}
       </div>
