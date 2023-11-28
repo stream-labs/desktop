@@ -209,7 +209,6 @@ export default class CommentViewer extends Vue {
           this.nicoliveCommentFilterService.addFilter({ type: 'user', body: item.value.user_id, messageId: `${item.value.no}`, memo: item.value.content })
             .catch(e => {
               if (e instanceof NicoliveFailure) {
-                console.log('failed to add filter', e); // DEBUG
                 openErrorDialogFromFailure(e);
               }
             });
