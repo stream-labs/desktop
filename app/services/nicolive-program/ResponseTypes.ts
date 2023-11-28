@@ -207,6 +207,15 @@ export interface Filters {
   data: FilterRecord[];
 }
 
+export interface AddFilterResult {
+  meta: {
+    status: 200;
+  };
+  data: {
+    id: number;
+  };
+}
+
 export type OnairUserProgramData = {
   programId?: string;
   nextProgramId?: string;

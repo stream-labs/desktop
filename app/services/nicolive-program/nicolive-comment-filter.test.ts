@@ -85,8 +85,12 @@ test('addFilters/通常成功', async () => {
 
   const addFilters = jest
     .fn()
-    .mockResolvedValue({ ok: true, value: [{ type: 'word', body: '810', id: 114514 }] });
+    .mockResolvedValue({ ok: true, value: { id: 114514 } });
   (instance as any).client.addFilters = addFilters;
+  const fetchFilters = jest
+    .fn()
+    .mockResolvedValue({ ok: true, value: [{ type: 'word', body: '810', id: 114514 }] });
+  (instance as any).client.fetchFilters = fetchFilters;
 
   const UPDATE_FILTERS = jest.fn();
   (instance as any).UPDATE_FILTERS = UPDATE_FILTERS;
