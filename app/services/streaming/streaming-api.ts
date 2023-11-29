@@ -80,7 +80,7 @@ export interface IGoLiveSettings extends IStreamSettings {
     youtube?: Partial<IYoutubeStartStreamOptions>;
     facebook?: Partial<IFacebookStartStreamOptions>;
   };
-  primaryPlatform: TPlatform;
+  primaryPlatform?: TPlatform;
 }
 
 export interface IPlatformFlags {
