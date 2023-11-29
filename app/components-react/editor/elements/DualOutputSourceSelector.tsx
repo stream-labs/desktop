@@ -49,31 +49,27 @@ export function DualOutputSourceSelector(p: IDualOutputSourceSelector) {
   return (
     <>
       {showHorizontalToggle && (
-        <Tooltip title={horizontalToggleMessage} placement="topRight">
+        <Tooltip title={horizontalToggleMessage} placement="left">
           <i
             onClick={() => {
               toggleVisibility(p.nodeId);
               makeActive(p.nodeId);
             }}
             className={v.isHorizontalVisible ? 'icon-desktop' : 'icon-desktop-hide'}
-            style={{ marginRight: '5px' }}
+            style={{ marginRight: '8px' }}
           />
         </Tooltip>
       )}
 
       {showVerticalToggle && (
-        <Tooltip
-          title={verticalToggleMessage}
-          placement="topRight"
-          // style={{ visibility: 'inherit' }}
-        >
+        <Tooltip title={verticalToggleMessage} placement="left">
           <i
             onClick={() => {
               toggleVisibility(v.verticalNodeId);
               makeActive(v.verticalNodeId);
             }}
             className={v.isVerticalVisible ? 'icon-phone-case' : 'icon-phone-case-hide'}
-            style={{ marginRight: '5px' }}
+            style={{ marginRight: '8px' }}
           />
         </Tooltip>
       )}
