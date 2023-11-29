@@ -9,6 +9,7 @@ import { ITiktokStartStreamOptions } from '../platforms/tiktok';
 import { ITrovoStartStreamOptions } from '../platforms/trovo';
 import { IVideo } from 'obs-studio-node';
 import { ITwitterStartStreamOptions } from 'services/platforms/twitter';
+import { TPlatform } from 'services/platforms';
 
 export enum EStreamingState {
   Offline = 'offline',
@@ -79,6 +80,7 @@ export interface IGoLiveSettings extends IStreamSettings {
     youtube?: Partial<IYoutubeStartStreamOptions>;
     facebook?: Partial<IFacebookStartStreamOptions>;
   };
+  primaryPlatform: TPlatform;
 }
 
 export interface IPlatformFlags {

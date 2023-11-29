@@ -224,6 +224,17 @@ export class GoLiveSettingsModule {
   getCanStreamDualOutput() {
     // if not streaming, recording must be toggled on
     if (Services.DualOutputService.views.recordVertical) {
+      // cannot have vertical recording toggled on with the primary platform or streaming to vertical
+      const primaryPlatform = this.state.primaryPlatform;
+      if (primaryPlatform) {
+        const primaryPlatformDestination = Services.DualOutputService.views.getPlatformDisplay(
+          primaryPlatform,
+        );
+        if (primaryPlatformDestination === 'vertical') {
+          return false;
+        }
+      }
+
       return true;
     }
 
@@ -254,12 +265,19 @@ export class GoLiveSettingsModule {
    */
   async validate() {
     if (Services.DualOutputService.views.dualOutputMode && !this.getCanStreamDualOutput()) {
-      // @@@ TODO: update error message for recording
-      message.error(
-        $t(
-          'To use Dual Output you must stream to at least one horizontal and one vertical platform.',
-        ),
-      );
+      if (Services.DualOutputService.views.recordVertical) {
+        message.error(
+          $t(
+            'Switch primary destination to horizontal output to proceed or toggle vertical recording off.',
+          ),
+        );
+      } else {
+        message.error(
+          $t(
+            'To use Dual Output you must stream to at least one horizontal and one vertical platform.',
+          ),
+        );
+      }
       return false;
     }
 

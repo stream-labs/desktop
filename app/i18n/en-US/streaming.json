@@ -207,5 +207,6 @@
   "Set up Go Live Settings for Dual Output Mode in the Go Live window.": "Set up Go Live Settings for Dual Output Mode in the Go Live window.",
   "Cannot toggle Studio Mode in Dual Output Mode.": "Cannot toggle Studio Mode in Dual Output Mode.",
   "Vertical Recording Only": "Vertical Recording Only",
-  "Upgrade your stream with premium overlays with <ultra>Streamlabs Ultra</ultra>.": "Upgrade your stream with premium overlays with <ultra>Streamlabs Ultra</ultra>."
+  "Upgrade your stream with premium overlays with <ultra>Streamlabs Ultra</ultra>.": "Upgrade your stream with premium overlays with <ultra>Streamlabs Ultra</ultra>.",
+  "Switch primary destination to horizontal output to proceed or toggle vertical recording off.": "Switch primary destination to horizontal output to proceed or toggle vertical recording off."
 }
