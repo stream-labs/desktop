@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
 import { useModule } from 'slap';
@@ -15,6 +15,8 @@ export function DualOutputSourceSelector(p: IDualOutputSourceSelector) {
     SourceSelectorModule,
   );
   const { DualOutputService } = Services;
+
+  const [hoveredIcon, setHoveredIcon] = useState('');
 
   const v = useVuex(() => ({
     verticalNodeId:
@@ -49,7 +51,11 @@ export function DualOutputSourceSelector(p: IDualOutputSourceSelector) {
   return (
     <>
       {showHorizontalToggle && (
-        <Tooltip title={horizontalToggleMessage} placement="left">
+        <Tooltip
+          title={horizontalToggleMessage}
+          placement="left"
+          visible={['icon-desktop', 'icon-desktop-hide'].includes(hoveredIcon)}
+        >
           <i
             onClick={() => {
               toggleVisibility(p.nodeId);
@@ -57,12 +63,20 @@ export function DualOutputSourceSelector(p: IDualOutputSourceSelector) {
             }}
             className={v.isHorizontalVisible ? 'icon-desktop' : 'icon-desktop-hide'}
             style={{ marginRight: '8px' }}
+            onMouseEnter={() =>
+              setHoveredIcon(v.isVerticalVisible ? 'icon-desktop' : 'icon-desktop-hide')
+            }
+            onMouseLeave={() => setHoveredIcon('')}
           />
         </Tooltip>
       )}
 
       {showVerticalToggle && (
-        <Tooltip title={verticalToggleMessage} placement="left">
+        <Tooltip
+          title={verticalToggleMessage}
+          placement="left"
+          visible={['icon-phone-case', 'icon-phone-case-hide'].includes(hoveredIcon)}
+        >
           <i
             onClick={() => {
               toggleVisibility(v.verticalNodeId);
@@ -70,6 +84,10 @@ export function DualOutputSourceSelector(p: IDualOutputSourceSelector) {
             }}
             className={v.isVerticalVisible ? 'icon-phone-case' : 'icon-phone-case-hide'}
             style={{ marginRight: '8px' }}
+            onMouseEnter={() =>
+              setHoveredIcon(v.isVerticalVisible ? 'icon-phone-case' : 'icon-phone-case-hide')
+            }
+            onMouseLeave={() => setHoveredIcon('')}
           />
         </Tooltip>
       )}
