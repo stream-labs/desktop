@@ -15,7 +15,7 @@ export default function StreamOptions() {
 
   const v = useVuex(() => ({
     recordVertical: DualOutputService.views.recordVertical,
-    setRecordVertical: DualOutputService.actions.setRecordVertical,
+    setRecordVertical: DualOutputService.actions.return.setRecordVertical,
   }));
 
   return (
