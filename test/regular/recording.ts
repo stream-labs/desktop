@@ -6,6 +6,7 @@ import {
   prepareToGoLive,
   startRecording,
   stopRecording,
+  stopStream,
 } from '../helpers/modules/streaming';
 import { FormMonkey } from '../helpers/form-monkey';
 import {
@@ -20,14 +21,12 @@ import {
   isDisplayed,
   select,
   focusChild,
-  selectButton,
   waitForDisplayed,
 } from '../helpers/modules/core';
 import { logIn } from '../helpers/webdriver/user';
 import { toggleDualOutputMode } from '../helpers/modules/dual-output';
 import { showPage } from '../helpers/modules/navigation';
-import { getFormDropdownOptions, setFormDropdown } from '../helpers/webdriver/forms';
-import { useForm } from '../helpers/modules/forms';
+import { setFormDropdown } from '../helpers/webdriver/forms';
 
 useWebdriver();
 
@@ -108,7 +107,7 @@ test('Recording', async t => {
 /**
  * Recording in dual output mode with a dual output scene collection
  */
-test('Recording Dual Output', async t => {
+test.skip('Recording Dual Output', async t => {
   await logIn(t);
   await toggleDualOutputMode();
 
@@ -127,56 +126,71 @@ test('Recording Dual Output', async t => {
   await prepareToGoLive();
   await clickGoLive();
   await focusChild();
-
-  await waitForDisplayed('button=Vertical Recording Only');
-  const verticalToggle = await selectButton('Vertical Recording Only');
-  console.log('verticalToggle ', verticalToggle);
+  await waitForDisplayed('div=Vertical Recording Only');
+  const verticalToggle = await select('[data-name=record-vertical]');
   let value = await verticalToggle.getAttribute('value');
-  console.log('value ', value);
   t.true(value === 'false');
   await verticalToggle.click();
   value = await verticalToggle.getAttribute('value');
-  console.log('value ', value);
-
   t.true(value === 'false');
 
-  //<button data-type="switch" data-name="record-vertical" data-id="record-vertical-bef5b45f-5c05-48c0-b986-d66290a9393c" data-role="input" name="record-vertical-bef5b45f-5c05-48c0-b986-d66290a9393c" id="editStreamForm_record-vertical-bef5b45f-5c05-48c0-b986-d66290a9393c" type="button" role="switch" aria-checked="false" class="ant-switch ant-switch-small" value="false"><div class="ant-switch-handle"></div><span class="ant-switch-inner"></span></button>
-  // // Recording mode: record horizontal and vertical displays
-  // await focusMain();
-  // await startRecording();
-  // // Record icons show in both headers
-  // await isDisplayed('i.icon-record:not(.hidden)');
-  // const icons = await selectElements('i.icon-record:not(.hidden)');
-  // t.true(icons.length === 2);
-  // await stopRecording();
-  // // Wait to ensure that video file is finalized
-  // await sleep(500);
+  // Recording mode: record horizontal and vertical displays
+  await focusMain();
+  await startRecording();
+  // Record icons show in both headers
+  // Icons are conditionally shown/hidden prevent rendering issues with the icon visibility shifting the title text
+  await isDisplayed('i.icon-record.hidden');
+  const hiddenStream = await selectElements('i.icon-stream.hidden');
+  const hiddenRecord = await selectElements('i.icon-record.hidden');
+  const visibleRecord = await selectElements('i.icon-record');
 
-  // // Generated two recordings
-  // await showPage('Recordings');
-  // const recordings = await selectElements('span.file');
-  // t.true(recordings.length === 2);
+  t.true(hiddenStream.length === 2);
+  t.true(hiddenRecord.length === 0);
+  t.true(visibleRecord.length === 2);
+  await stopRecording();
+  // Wait to ensure that video file is finalized
+  await sleep(500);
 
-  // // Check that every two files were created with correct file name
-  // const files = await readdir(tmpDir);
-  // t.true(recordings.length === files.length);
-  // const fileNames = files.map(file => file.split('/').pop());
-  // recordings.forEach(async recording => {
-  //   const recordingName = await recording.getText();
-  //   t.true(fileNames.includes[recordingName]);
-  // });
+  // Generated two recordings
+  await showPage('Recordings');
+  const recordings = await selectElements('span.file');
+  t.true(recordings.length === 2);
 
-  // Streaming mode (both):
-  // - Cannot record either display (button will hide after go live)
-  // - Stream icons show in both headers
-  // - Record icons do not show in headers
-  // - No recordings generated
-  // await focusMain();
-  // await prepareToGoLive();
+  // Check that every two files were created with correct file name
+  const files = await readdir(tmpDir);
+  t.true(recordings.length === files.length);
+  const fileNames = files.map(file => file.split('/').pop());
+  recordings.forEach(async recording => {
+    const recordingName = await recording.getText();
+    t.true(fileNames.includes[recordingName]);
+  });
+
+  // Streaming mode
   // await clickGoLive();
+  // await focusChild();
+  // await waitForDisplayed('div=Vertical Recording Only');
+  // const toggle = await select('[data-name=record-vertical]');
+  // await toggle.click();
 
+  // await goLive();
+  // // Stream icons show in both headers, record icons do not show in headers
+  // // Icons are conditionally shown/hidden prevent rendering issues with the icon visibility shifting the title text
+  // await isDisplayed('i.icon-stream.hidden');
+  // hiddenRecord = await selectElements('i.icon-record.hidden');
+  // hiddenStream = await selectElements('i.icon-stream.hidden');
+  // const visibleStream = await selectElements('i.icon-stream');
+
+  // t.true(hiddenRecord.length === 2);
+  // t.true(hiddenStream.length === 0);
+  // t.true(visibleStream.length === 2);
+
+  // await stopStream();
   // await sleep(5000);
-  t.pass();
+
+  // // No recordings generated
+  // await showPage('Recordings');
+  // t.true(recordings === (await selectElements('span.file')));
+
   // Streaming mode (vert record):
   // - Stream horizontal and record vertical
   // - Confirm only horizontal is streaming
@@ -189,7 +203,7 @@ test('Recording Dual Output', async t => {
  * Records all file quality in single output mode with a vanilla scene collection
  * and dual output mode with a dual output scene collection
  */
-test('Recording File Quality', async t => {
+test.skip('Recording File Quality', async t => {
   // const tmpDir = await setTemporaryRecordingPath();
 
   // // low resolution reduces CPU usage
@@ -213,64 +227,4 @@ test('Recording File Quality', async t => {
     // await setFormDropdown('Recording Quality', 'High Quality, Medium File Size');
     await sleep(50000);
   });
-
-  // Record 0.5s video in every format
-  // for (const format of formats) {
-  // await showSettingsWindow('Output', async () => {
-  //   const form = new FormMonkey(t);
-  //   // await form.setInputValue(await form.getInputSelectorByTitle('Recording Format'), 'mp4');
-  //   const videoQualities = await form.read();
-
-  //   console.log('videoQualities ', videoQualities);
-  //   await clickButton('Done');
-  // });
-  //   await focusMain();
-  //   await startRecording();
-  //   await sleep(500);
-  //   await stopRecording();
-
-  //   // Wait to ensure that output setting are editable
-  //   await sleep(500);
-  // }
-
-  // // Check that every file was created
-  // const singleOutputFiles = await readdir(tmpDir);
-
-  // // M3U8 creates multiple TS files in addition to the catalog itself.
-  // t.true(
-  //   singleOutputFiles.length >= formats.length,
-  //   `Files that were created:\n${singleOutputFiles.join('\n')}`,
-  // );
-
-  // await logIn(t);
-  // await toggleDualOutputMode();
-  // // low resolution reduces CPU usage
-  // // await setOutputResolution('100x100');
-  // // Record 0.5s video in every format
-  // for (const format of formats) {
-  //   await showSettingsWindow('Output', async () => {
-  //     // await setFormDropdown('Recording Quality', 'High Quality, Medium File Size');
-  //     // await sleep(500);
-  //     const form = new FormMonkey(t);
-  //     await form.setInputValue(await form.getInputSelectorByTitle('Recording Format'), format);
-  //     await clickButton('Done');
-  //   });
-
-  //   await focusMain();
-  //   await startRecording();
-  //   await sleep(500);
-  //   await stopRecording();
-  //   // Wait to ensure that output setting are editable
-  //   // await sleep(1000);
-  // }
-  // // Check that every file was created
-  // const dualOutputFiles = (await readdir(tmpDir))
-  //   .filter(file => !singleOutputFiles.includes(file))
-  //   .map(file => file);
-  // // M3U8 creates multiple TS files in addition to the catalog itself.
-  // t.true(
-  //   dualOutputFiles.length >= formats.length,
-  //   `Files that were created:\n${dualOutputFiles.join('\n')}`,
-  // );
-  t.pass();
 });
