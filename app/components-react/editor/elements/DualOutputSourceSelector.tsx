@@ -3,6 +3,8 @@ import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
 import { useModule } from 'slap';
 import { SourceSelectorModule } from './SourceSelector';
+import { Tooltip } from 'antd';
+import { $t } from 'services/i18n';
 
 interface IDualOutputSourceSelector {
   nodeId: string;
@@ -36,26 +38,44 @@ export function DualOutputSourceSelector(p: IDualOutputSourceSelector) {
     return !v.isLoading && v?.verticalNodeId && verticalActive;
   }, [!v.isLoading, v?.verticalNodeId, verticalActive]);
 
+  const horizontalToggleMessage = useMemo(() => {
+    return v.isHorizontalVisible ? $t('Hide from Horizontal') : $t('Show in Horizontal');
+  }, [v.isHorizontalVisible]);
+
+  const verticalToggleMessage = useMemo(() => {
+    return v.isVerticalVisible ? $t('Hide from Vertical') : $t('Show in Vertical');
+  }, [v.isVerticalVisible]);
+
   return (
     <>
       {showHorizontalToggle && (
-        <i
-          onClick={() => {
-            toggleVisibility(p.nodeId);
-            makeActive(p.nodeId);
-          }}
-          className={v.isHorizontalVisible ? 'icon-desktop' : 'icon-desktop-hide'}
-        />
+        <Tooltip title={horizontalToggleMessage} placement="topRight">
+          <i
+            onClick={() => {
+              toggleVisibility(p.nodeId);
+              makeActive(p.nodeId);
+            }}
+            className={v.isHorizontalVisible ? 'icon-desktop' : 'icon-desktop-hide'}
+            style={{ marginRight: '5px' }}
+          />
+        </Tooltip>
       )}
 
       {showVerticalToggle && (
-        <i
-          onClick={() => {
-            toggleVisibility(v.verticalNodeId);
-            makeActive(v.verticalNodeId);
-          }}
-          className={v.isVerticalVisible ? 'icon-phone-case' : 'icon-phone-case-hide'}
-        />
+        <Tooltip
+          title={verticalToggleMessage}
+          placement="topRight"
+          // style={{ visibility: 'inherit' }}
+        >
+          <i
+            onClick={() => {
+              toggleVisibility(v.verticalNodeId);
+              makeActive(v.verticalNodeId);
+            }}
+            className={v.isVerticalVisible ? 'icon-phone-case' : 'icon-phone-case-hide'}
+            style={{ marginRight: '5px' }}
+          />
+        </Tooltip>
       )}
     </>
   );
