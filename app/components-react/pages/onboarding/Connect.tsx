@@ -173,6 +173,7 @@ export function Connect() {
                 )}
                 {extraPlatforms.map(platform => (
                   <PlatformIconButton
+                    key={platform.value}
                     logo={platform.image}
                     disabled={loading || authInProgress}
                     loading={loading}
