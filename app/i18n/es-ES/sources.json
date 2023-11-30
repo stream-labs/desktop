@@ -357,9 +357,5 @@
   "Set scale filter 'Area'": "Establecer filtro de escala 'Área'",
   "You currently have the same source on both canvases selected. Please select the source in the canvas to edit it independently.": "Actualmente tiene seleccionada la misma fuente en ambos lienzos. Seleccione la fuente en el lienzo para editarla independientemente.",
   "Selective Recording can only be used with horizontal sources.": "La grabación selectiva sólo se puede utilizar con fuentes horizontales.",
-  "Cannot move source outside canvas in Dual Output Mode.": "No se puede mover la fuente fuera del lienzo en modo Dual Output.",
-  "Hide from Horizontal": "Hide from Horizontal",
-  "Show in Horizontal": "Show in Horizontal",
-  "Hide from Vertical": "Hide from Vertical",
-  "Show in Vertical": "Show in Vertical"
+  "Cannot move source outside canvas in Dual Output Mode.": "No se puede mover la fuente fuera del lienzo en modo Dual Output."
 }
