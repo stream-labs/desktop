@@ -120,7 +120,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     if (this.activeCollection && this.activeCollection.operatingSystem === getOS()) {
       await this.load(this.activeCollection.id, true);
     } else if (this.loadableCollections.length > 0) {
-      console.log('does not have active');
       let latestId = this.loadableCollections[0].id;
       let latestModified = this.loadableCollections[0].modified;
 
@@ -220,6 +219,9 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   async create(
     options: ISceneCollectionInternalCreateOptions = {},
   ): Promise<ISceneCollectionsManifestEntry> {
+    if (this.dualOutputService.views.dualOutputMode) {
+      this.dualOutputService.actions.setIsCollectionOrSceneLoading(true);
+    }
     await this.deloadCurrentApplicationState();
 
     const name = options.name || this.suggestName(DEFAULT_COLLECTION_NAME);
@@ -344,22 +346,25 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * @params Boolean for if the vertical sources should be assigned to the horizontal display
    * @returns String filepath for new collection
    */
+  @RunInLoadingMode()
   async convertDualOutputCollection(
     assignToHorizontal: boolean = false,
+    collectionId?: string,
   ): Promise<string | undefined> {
-    const name = `${this.activeCollection?.name} - Converted`;
+    const collection = collectionId ? this.getCollection(collectionId) : this.activeCollection;
+    const name = `${collection?.name} - Converted`;
 
-    const collectionId = await this.duplicate(name);
+    const newCollectionId = await this.duplicate(name, collectionId);
 
-    if (!collectionId) return;
+    if (!newCollectionId) return;
 
     this.dualOutputService.setdualOutputMode(false);
 
-    await this.load(collectionId);
+    await this.load(newCollectionId);
 
     await this.convertToVanillaSceneCollection(assignToHorizontal);
 
-    return this.stateService.getCollectionFilePath(collectionId);
+    return this.stateService.getCollectionFilePath(newCollectionId);
   }
 
   downloadProgress = new Subject<IDownloadProgress>();
