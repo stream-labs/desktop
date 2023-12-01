@@ -2,9 +2,10 @@ import React from 'react';
 import styles from './StreamOptions.m.less';
 import { Services } from 'components-react/service-provider';
 import { $t } from 'services/i18n';
-import { Row } from 'antd';
+import { Row, Select } from 'antd';
 import { SwitchInput } from 'components-react/shared/inputs';
 import { useVuex } from 'components-react/hooks';
+import { ERecordingQuality } from 'obs-studio-node';
 
 /**
  * Renders options for the stream
@@ -13,22 +14,69 @@ import { useVuex } from 'components-react/hooks';
 export default function StreamOptions() {
   const { DualOutputService } = Services;
 
+  const { Option } = Select;
+
+  const recordingQualities = [
+    {
+      quality: ERecordingQuality.HighQuality,
+      name: 'High, Medium File Size',
+    },
+    {
+      quality: ERecordingQuality.HigherQuality,
+      name: 'Indistinguishable, Large File Size',
+    },
+    {
+      quality: ERecordingQuality.Lossless,
+      name: 'Lossless, Tremendously Large File Size',
+    },
+  ];
+
   const v = useVuex(() => ({
     recordVertical: DualOutputService.views.recordVertical,
     setRecordVertical: DualOutputService.actions.return.setRecordVertical,
+    recordingQuality: DualOutputService.views.recordingQuality,
+    setRecordingQuality: DualOutputService.actions.setDualOutputRecordingQuality,
   }));
 
   return (
-    <Row gutter={16} className={styles.settingsRow}>
-      <div className={styles.switcherLabel}>{$t('Vertical Recording Only')}</div>
-      <SwitchInput
-        value={v.recordVertical}
-        name={'record-vertical'}
-        onChange={v.setRecordVertical}
-        uncontrolled
-        className={styles.recordingSwitcher}
-        checkedChildren={<i className="icon-check-mark" />}
-      />
-    </Row>
+    <div className={styles.streamOptions}>
+      <Row
+        gutter={16}
+        className={styles.settingsRow}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          paddingBottom: '0px',
+        }}
+      >
+        <div className={styles.switcherLabel} style={{ marginBottom: '2px' }}>
+          {$t('Recording Quality')}
+        </div>
+        <Select
+          defaultValue={v.recordingQuality}
+          style={{ flex: 1, width: '100%' }}
+          onChange={v.setRecordingQuality}
+          value={v.recordingQuality}
+        >
+          {recordingQualities.map(option => (
+            <Option key={option.quality} value={option.quality}>
+              {option.name}
+            </Option>
+          ))}
+        </Select>
+      </Row>
+      <Row gutter={16} className={styles.settingsRow}>
+        <div className={styles.switcherLabel}>{$t('Vertical Recording Only')}</div>
+        <SwitchInput
+          value={v.recordVertical}
+          name={'record-vertical'}
+          onChange={v.setRecordVertical}
+          uncontrolled
+          className={styles.recordingSwitcher}
+          checkedChildren={<i className="icon-check-mark" />}
+        />
+      </Row>
+    </div>
   );
 }

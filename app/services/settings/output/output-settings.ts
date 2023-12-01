@@ -4,7 +4,7 @@ import { VideoSettingsService } from 'services/settings-v2/video';
 import { HighlighterService } from 'services/highlighter';
 import { Inject } from 'services/core/injector';
 import { Dictionary } from 'vuex';
-import { AudioService } from 'app-services';
+import { AudioService, DualOutputService } from 'app-services';
 import { ERecordingQuality, ERecordingFormat } from 'obs-studio-node';
 
 /**
@@ -185,6 +185,7 @@ export class OutputSettingsService extends Service {
   @Inject() private audioService: AudioService;
   @Inject() private videoSettingsService: VideoSettingsService;
   @Inject() private highlighterService: HighlighterService;
+  @Inject() private dualOutputService: DualOutputService;
 
   /**
    * returns unified settings for the Streaming and Recording encoder
@@ -242,7 +243,11 @@ export class OutputSettingsService extends Service {
       'RecFormat',
     ) as ERecordingFormat;
 
-    const oldQualityName = this.settingsService.findSettingValue(output, 'Recording', 'RecQuality');
+    let oldQualityName = this.settingsService.findSettingValue(output, 'Recording', 'RecQuality');
+    // brittle, remove when backend fix implemented
+    if (oldQualityName === 'Stream') {
+      oldQualityName = this.dualOutputService.views.recordingQuality;
+    }
     let quality: ERecordingQuality = ERecordingQuality.HigherQuality;
     switch (oldQualityName) {
       case 'Small':

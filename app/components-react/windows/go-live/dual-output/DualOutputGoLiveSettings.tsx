@@ -43,7 +43,7 @@ export default function DualOutputGoLiveSettings() {
     <Row gutter={16} className={styles.settingsRow}>
       {/*LEFT COLUMN*/}
       <Col span={8} className={styles.leftColumn}>
-        <Scrollable style={{ minHeight: '92%', flexGrow: 1 }}>
+        <Scrollable style={{ minHeight: '82%', flexGrow: 1 }}>
           {isPrime && <UserSettingsUltra />}
           {!isPrime && <UserSettingsNonUltra />}
         </Scrollable>

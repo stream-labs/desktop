@@ -12,7 +12,7 @@ import { EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
 import { EditorCommandsService } from 'services/editor-commands';
 import { Subject } from 'rxjs';
 import { TOutputOrientation } from 'services/restream';
-import { IVideoInfo } from 'obs-studio-node';
+import { IVideoInfo, ERecordingQuality } from 'obs-studio-node';
 import { ICustomStreamDestination, StreamSettingsService } from 'services/settings/streaming';
 import {
   ISceneCollectionsManifestEntry,
@@ -41,6 +41,7 @@ interface IDualOutputServiceState {
   recordVertical: boolean;
   streamVertical: boolean;
   videoSettings: IDisplayVideoSettings;
+  recordingQuality: ERecordingQuality;
   isLoading: boolean;
 }
 
@@ -150,6 +151,10 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
 
   get onlyVerticalDisplayActive() {
     return this.activeDisplays.vertical && !this.activeDisplays.horizontal;
+  }
+
+  get recordingQuality() {
+    return this.state.recordingQuality;
   }
 
   getPlatformDisplay(platform: TPlatform) {
@@ -306,6 +311,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         vertical: false,
       },
     },
+    recordingQuality: ERecordingQuality.HigherQuality,
     isLoading: false,
   };
 
@@ -596,6 +602,10 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     this.SET_IS_LOADING(status);
   }
 
+  setDualOutputRecordingQuality(quality: ERecordingQuality) {
+    this.SET_RECORDING_QUALITY(quality);
+  }
+
   @mutation()
   private UPDATE_PLATFORM_SETTING(platform: TPlatform | string, display: TDisplayType) {
     this.state.platformSettings = {
@@ -672,5 +682,10 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       ...this.state,
       streamVertical: status,
     };
+  }
+
+  @mutation()
+  private SET_RECORDING_QUALITY(quality: ERecordingQuality) {
+    this.state.recordingQuality = quality;
   }
 }
