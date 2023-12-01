@@ -266,6 +266,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     description: $t(
       'Invite guests to join your stream from a web browser or their Streamlabs Desktop. Stream games or IRL broadcasts together, use as additional camera angles and more.',
     ),
+    demoFilename: 'source-collab-cam.png',
     icon: 'icon-team-2',
   },
   wasapi_process_output_capture: {
