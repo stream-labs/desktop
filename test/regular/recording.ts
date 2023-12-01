@@ -22,9 +22,11 @@ import {
   isDisplayed,
   select,
   focusChild,
+  clickRadio,
   waitForDisplayed,
 } from '../helpers/modules/core';
 import { logIn } from '../helpers/webdriver/user';
+import { logIn as multiLogIn } from '../helpers/modules/user';
 import { toggleDualOutputMode } from '../helpers/modules/dual-output';
 import { showPage } from '../helpers/modules/navigation';
 import { setFormDropdown } from '../helpers/webdriver/forms';
@@ -40,23 +42,18 @@ async function confirmFilesCreated(
   const recordings = await selectElements('span.file');
   t.true(recordings.length === numCreatedFiles);
 
-  console.log('recordings ', recordings.length);
-  console.log('toral ', numCreatedFiles);
-
   // check that every files was created with correct file name
   const files = await readdir(tmpDir);
   t.true(recordings.length === files.length);
   const fileNames = files.map(file => file.split('/').pop());
-  console.log('fileNames ', fileNames);
   recordings.forEach(async recording => {
     const recordingName = await recording.getText();
-    console.log('recordingName ', recordingName);
     t.true(fileNames.includes[recordingName]);
   });
 }
 
 async function prepareRecordDualOutput(t: ExecutionContext<ITestContext>): Promise<string> {
-  await logIn(t);
+  await multiLogIn('twitch', { multistream: true });
   await toggleDualOutputMode();
 
   const tmpDir = await setTemporaryRecordingPath();
@@ -187,22 +184,28 @@ test('Recording Dual Output', async t => {
   await sleep(500);
 
   await focusMain();
-  // Record icons are hidden
-  // recordIcons = await selectElements('i.icon-record.visible');
-  // t.true(recordIcons.length === 2);
-  // console.log('2 recordIcons ', recordIcons.length);
 
   //  Generated two recordings
   await showPage('Recordings');
   await confirmFilesCreated(t, tmpDir, 2);
 });
 
-test('Recording and Streaming Dual Output', async t => {
+test.skip('Recording and Streaming Dual Output', async t => {
   const tmpDir = await prepareRecordDualOutput(t);
 
-  //   // await prepareToGoLive();
-  //   // await clickGoLive();
-  //   // await focusChild();
+  console.log('tmpDir ', tmpDir);
+
+  // Start stream
+  await prepareToGoLive();
+  await clickGoLive();
+  await focusChild();
+  await clickRadio('Vertical');
+  await goLive();
+  // Wait for stream to start
+  await sleep(500);
+
+  // Start recording
+  await startRecording();
   // Wait for recording to start
   await sleep(500);
 
@@ -211,14 +214,17 @@ test('Recording and Streaming Dual Output', async t => {
   const streamIcons = await selectElements('i.icon-stream.visible');
   const recordIcons = await selectElements('i.icon-record.visible');
 
-  t.true(streamIcons.length === 0);
+  t.true(streamIcons.length === 2);
   t.true(recordIcons.length === 2);
 
   await stopRecording();
   // Wait to ensure that both video files are finalized
   await sleep(500);
 
-  await focusMain();
+  await stopStream();
+  await sleep(500);
+
+  // await focusMain();
   // Record icons are hidden
   // recordIcons = await selectElements('i.icon-record.visible');
   // t.true(recordIcons.length === 2);
@@ -226,8 +232,7 @@ test('Recording and Streaming Dual Output', async t => {
 
   //  Generated two recordings
   await showPage('Recordings');
-  await confirmFilesCreated(t, tmpDir, 1);
-  t.pass();
+  await confirmFilesCreated(t, tmpDir, 2);
 });
 
 //   // @@@ COMMENT

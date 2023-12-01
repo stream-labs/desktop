@@ -68,6 +68,12 @@ export async function clickCheckbox(dataName: string) {
   await $checkbox.click();
 }
 
+// @@@ TODO WIP
+export async function clickRadio(radioText: string) {
+  const $radio = await select(`input[type="radio"]=${radioText}`);
+  await $radio.click();
+}
+
 // OTHER SHORTCUTS
 
 export async function hoverElement(selector: string, duration?: number) {
