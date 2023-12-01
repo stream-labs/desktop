@@ -362,6 +362,9 @@ function DualOutputControls(p: { stacked: boolean }) {
     isVerticalStreaming: StreamingService.views.isVerticalStreaming,
   }));
 
+  const horizontalIconVisible = v.isHorizontalStreaming || v.isHorizontalRecording;
+  const verticalIconVisible = v.isVerticalStreaming || v.isVerticalRecording;
+
   /**
    * Note for the streaming and recording icons:
    * To maintain the horizontal and vertical header icon and text positioning centered,
@@ -380,17 +383,22 @@ function DualOutputControls(p: { stacked: boolean }) {
           <i className="icon-desktop" />
           <span>{$t('Horizontal Output')}</span>
           <DualOutputIcons
+            className={cx('icon-horizontal', horizontalIconVisible && 'visible')}
             showStream={v.isHorizontalStreaming}
             showRecord={v.isHorizontalRecording}
           />
         </div>
       )}
-
+      {}
       {v.showVertical && (
         <div className={styles.verticalHeader}>
           <i className="icon-phone-case" />
           <span>{$t('Vertical Output')}</span>
-          <DualOutputIcons showStream={v.isVerticalStreaming} showRecord={v.isVerticalRecording} />
+          <DualOutputIcons
+            className={cx('icon-vertical', verticalIconVisible && 'visible')}
+            showStream={v.isVerticalStreaming}
+            showRecord={v.isVerticalRecording}
+          />
         </div>
       )}
       <div className={styles.manageLink}>
@@ -400,15 +408,29 @@ function DualOutputControls(p: { stacked: boolean }) {
   );
 }
 
-function DualOutputIcons(p: { showStream: boolean; showRecord: boolean }) {
+function DualOutputIcons(p: { className: string; showStream: boolean; showRecord: boolean }) {
   return (
     <>
       {!p.showStream && p.showRecord ? (
-        <i className={cx(styles.recordIcon, 'icon-record')} />
+        <i className={cx(p.className, styles.recordIcon, 'icon-record')} />
       ) : (
         <>
-          <i className={cx(styles.streamIcon, { [styles.hidden]: !p.showStream }, 'icon-studio')} />
-          <i className={cx(styles.recordIcon, { [styles.hidden]: !p.showRecord }, 'icon-record')} />
+          <i
+            className={cx(
+              p.className,
+              styles.streamIcon,
+              { [styles.hidden]: !p.showStream },
+              'icon-studio',
+            )}
+          />
+          <i
+            className={cx(
+              p.className,
+              styles.recordIcon,
+              { [styles.hidden]: !p.showRecord },
+              'icon-record',
+            )}
+          />
         </>
       )}
     </>
