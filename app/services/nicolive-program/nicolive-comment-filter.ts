@@ -1,8 +1,9 @@
 import { StatefulService, mutation } from 'services/core/stateful-service';
 import { NicoliveClient, isOk } from './NicoliveClient';
-import { FilterRecord } from './ResponseTypes';
+import { AddFilterRecord, FilterRecord } from './ResponseTypes';
 import { Inject } from 'services/core/injector';
 import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
+import { NicoliveProgramStateService } from 'services/nicolive-program/state';
 import { map, distinctUntilChanged } from 'rxjs/operators';
 import { NicoliveFailure } from './NicoliveFailure';
 import { WrappedChat } from './WrappedChat';
@@ -14,6 +15,8 @@ interface INicoliveCommentFilterState {
 
 export class NicoliveCommentFilterService extends StatefulService<INicoliveCommentFilterState> {
   @Inject() private nicoliveProgramService: NicoliveProgramService;
+  @Inject('NicoliveProgramStateService') private stateService: NicoliveProgramStateService;
+
   private client = new NicoliveClient();
 
   static initialState = {
@@ -75,22 +78,12 @@ export class NicoliveCommentFilterService extends StatefulService<INicoliveComme
     this.updateFilters(result.value);
   }
 
-  async addFilter(record: Omit<FilterRecord, 'id'>) {
+  async addFilter(record: AddFilterRecord) {
     const result = await this.client.addFilters(this.programID, [record]);
     if (!isOk(result)) {
       throw NicoliveFailure.fromClientError('addFilters', result);
     }
-
-    const resultRecord = result.value.find(
-      (rec: FilterRecord) => rec.type === record.type && rec.body === record.body,
-    );
-
-    if (!resultRecord) {
-      // conflictしているので再取得しないとIDがわからない
-      return this.fetchFilters();
-    }
-    const filters = this.state.filters.concat(resultRecord);
-    this.updateFilters(filters);
+    return this.fetchFilters();
   }
 
   async deleteFilters(ids: number[]) {
@@ -111,5 +104,12 @@ export class NicoliveCommentFilterService extends StatefulService<INicoliveComme
   @mutation()
   private UPDATE_FILTERS(filters: FilterRecord[]) {
     this.state = { filters };
+  }
+
+  get ngPanelInfoCoachingClosed() {
+    return this.stateService.state.ngPanelInfoCoachingClosed;
+  }
+  set ngPanelInfoCoachingClosed(value: boolean) {
+    this.stateService.updateNgPanelInfoCoachingClosed(value);
   }
 }

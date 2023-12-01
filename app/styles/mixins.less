@@ -1,11 +1,11 @@
 // Positioning
 .absolute (@top: auto, @right: auto, @bottom: auto, @left: auto) {
-  display: block;
   position: absolute;
   top: @top;
   right: @right;
   bottom: @bottom;
   left: @left;
+  display: block;
 }
 
 .flex() {
@@ -48,27 +48,27 @@
 .flex__column() {
   display: flex;
   flex-flow: column;
-  height: 100%;
   width: 100%;
+  height: 100%;
 }
 
 // Aspect ratio for responsive height/width
 .aspect-ratio(@width, @height) {
   position: relative;
 
-  &:before {
+  &::before {
     display: block;
-    content: "";
     width: 100%;
     padding-top: (@height / @width) * 100%;
+    content: '';
   }
 
   > .content {
     position: absolute;
     top: 0;
-    left: 0;
     right: 0;
     bottom: 0;
+    left: 0;
   }
 }
 
@@ -109,7 +109,7 @@
 }
 
 .letter-spacing() {
-  letter-spacing: .8px;
+  letter-spacing: 0.8px;
 }
 
 // Hovers
@@ -201,7 +201,7 @@
 
 // margins
 .margin--none {
-  margin: 0 0 0 0;
+  margin: 0;
 }
 
 .margin--10 {
@@ -219,7 +219,6 @@
 .margin-vertical--10 {
   margin: 10px 0;
 }
-
 
 // widths
 .width--100 {
@@ -271,7 +270,6 @@
   justify-content: space-around;
 }
 
-
 // text align
 .text-align--right {
   text-align: right !important;
@@ -296,8 +294,9 @@
 }
 
 // Shadows
+@shadow: 0 8px 16px rgba(@black, 0.4);
 .shadow() {
-  box-shadow: 0 6px 14px 1px rgba(0, 8, 16, .4);
+  box-shadow: @shadow;
 }
 
 // Transitiions
@@ -307,17 +306,18 @@
 
 .bg-hover {
   .transition;
+
   background-color: var(--color-bg-active);
 }
 
 .bg-active(@color: @black) {
-  background-color: rgba(@color, .25);
+  background-color: rgb(@color 0.25);
 }
 
 .text-ellipsis {
+  overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  overflow: hidden;
 }
 
 .dividing-border(@direction: top) {
@@ -326,28 +326,30 @@
 
 .time-styling {
   .semibold;
+
   font-size: @font-size2;
-  white-space: nowrap;
-  letter-spacing: .08em;
   color: var(--color-text-light);
+  letter-spacing: 0.08em;
+  white-space: nowrap;
 }
 
 .popper-styling {
   .shadow;
+
   z-index: @z-index-popper;
-  border-radius: 4px;
+  padding: 0;
   background-color: var(--color-popper-bg-light);
   border: 1px solid var(--color-border-light);
-  padding: 0;
+  border-radius: 4px;
 
   & /deep/ .popper__arrow {
     display: none;
   }
 
   .popup-menu-list {
-    list-style: none;
-    margin: 0;
     padding: 8px 0;
+    margin: 0;
+    list-style: none;
 
     &:not(:first-child) {
       border-top: 1px solid var(--color-border-light);
@@ -355,23 +357,24 @@
   }
 
   .popup-menu-head {
-    color: var(--color-text-light);
+    padding: 16px;
     font-size: @font-size4;
     font-weight: @font-weight-bold;
+    color: var(--color-text-light);
     text-align: left;
-    padding: 16px;
     word-wrap: break-word;
   }
 
   .popup-menu-item {
     > * {
       width: 100%;
-      line-height: 32px;
       padding: 0 16px;
       font-size: @font-size2;
+      line-height: 32px;
     }
 
-    a, button {
+    a,
+    button {
       &:not(:disabled):hover {
         color: var(--color-text-light);
         background-color: var(--color-bg-active);

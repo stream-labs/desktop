@@ -56,13 +56,17 @@ export default class OptimizeNiconico extends Vue {
     this.streamingService.toggleStreamingAsync({ mustShowOptimizationDialog: true });
   }
 
+  isStarting = false;
+
   optimizeAndGoLive() {
+    this.isStarting = true;
     this.settingsService.optimizeForNiconico(this.settings.best);
     this.streamingService.toggleStreaming();
     this.windowsService.closeChildWindow();
   }
 
   skip() {
+    this.isStarting = true;
     if (this.doNotShowAgain.value) {
       this.customizationService.setOptimizeForNiconico(false);
     }

@@ -17,6 +17,10 @@ module.exports = {
         ignoreFontFamilies: 'n-air',
       },
     ],
+    'function-no-unknown': [
+      true,
+      { ignoreFunctions: ['lighten', 'darken', 'fade', 'fadein', 'fadeout'] },
+    ],
   },
   overrides: [
     {
