@@ -188,6 +188,14 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     return this.dualOutputView.dualOutputMode && this.userView.isLoggedIn;
   }
 
+  get isVerticalSecondDestination(): boolean {
+    return (
+      this.isDualOutputMode &&
+      this.dualOutputView.recordVertical &&
+      this.streamingState.streamingStatus !== EStreamingState.Offline
+    );
+  }
+
   get shouldMultistreamDisplay(): { horizontal: boolean; vertical: boolean } {
     const numHorizontal =
       this.activeDisplayPlatforms.horizontal.length +
