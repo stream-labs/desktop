@@ -147,6 +147,16 @@ export class WindowsService extends StatefulService<IWindowsState> {
     if (window) {
       const bounds = window.getBounds();
       const currentDisplay = electron.remote.screen.getDisplayMatching(bounds);
+      if (!currentDisplay) {
+        Sentry.withScope(scope => {
+          scope.setExtra('windowId', windowId);
+          scope.setExtra('bounds', bounds);
+          scope.setTag('module', 'windows');
+          scope.setTag('function', 'updateScaleFactor');
+          Sentry.captureMessage('Could not find display for window');
+        });
+        return;
+      }
       this.UPDATE_SCALE_FACTOR(windowId, currentDisplay.scaleFactor);
     }
   }
