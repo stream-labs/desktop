@@ -54,10 +54,10 @@ export default function StreamOptions() {
           {$t('Recording Quality')}
         </div>
         <Select
-          defaultValue={v.recordingQuality}
+          defaultValue={v.recordingQuality.dualOutput}
           style={{ flex: 1, width: '100%' }}
-          onChange={v.setRecordingQuality}
-          value={v.recordingQuality}
+          onChange={option => v.setRecordingQuality('dual', option)}
+          value={v.recordingQuality.dualOutput}
         >
           {recordingQualities.map(option => (
             <Option key={option.quality} value={option.quality}>

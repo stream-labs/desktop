@@ -231,6 +231,11 @@ export class OutputSettingsService extends Service {
     };
   }
 
+  getRecordingQuality() {
+    const output = this.settingsService.state.Output.formData;
+    return this.settingsService.findSettingValue(output, 'Recording', 'RecQuality');
+  }
+
   getSimpleRecordingSettings() {
     const output = this.settingsService.state.Output.formData;
     const advanced = this.settingsService.state.Advanced.formData;

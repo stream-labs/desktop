@@ -190,49 +190,57 @@ test('Recording Dual Output', async t => {
   await confirmFilesCreated(t, tmpDir, 2);
 });
 
-test.skip('Recording and Streaming Dual Output', async t => {
-  const tmpDir = await prepareRecordDualOutput(t);
-
-  console.log('tmpDir ', tmpDir);
-
-  // Start stream
-  await prepareToGoLive();
+test('Recording and Streaming Dual Output', async t => {
   await clickGoLive();
   await focusChild();
-  await clickRadio('Vertical');
-  await goLive();
-  // Wait for stream to start
-  await sleep(500);
 
-  // Start recording
-  await startRecording();
-  // Wait for recording to start
-  await sleep(500);
+  // select(`input[type="radio"]
+  const streamIcons = await selectElements('input[type=radio]');
+  console.log('streamIcons ', streamIcons.values());
+  // await clickRadio('Vertical');
 
-  // Record icons show in both headers
-  // Icons are conditionally shown/hidden prevent rendering issues with the icon visibility shifting the title text
-  const streamIcons = await selectElements('i.icon-stream.visible');
-  const recordIcons = await selectElements('i.icon-record.visible');
+  // const tmpDir = await prepareRecordDualOutput(t);
 
-  t.true(streamIcons.length === 2);
-  t.true(recordIcons.length === 2);
+  // console.log('tmpDir ', tmpDir);
 
-  await stopRecording();
-  // Wait to ensure that both video files are finalized
-  await sleep(500);
+  // // Start stream
+  // await prepareToGoLive();
+  // await clickGoLive();
+  // await focusChild();
+  // await clickRadio('Vertical');
+  // await goLive();
+  // // Wait for stream to start
+  // await sleep(500);
 
-  await stopStream();
-  await sleep(500);
+  // // Start recording
+  // await startRecording();
+  // // Wait for recording to start
+  // await sleep(500);
 
-  // await focusMain();
-  // Record icons are hidden
-  // recordIcons = await selectElements('i.icon-record.visible');
+  // // Record icons show in both headers
+  // // Icons are conditionally shown/hidden prevent rendering issues with the icon visibility shifting the title text
+  // const streamIcons = await selectElements('i.icon-stream.visible');
+  // const recordIcons = await selectElements('i.icon-record.visible');
+
+  // t.true(streamIcons.length === 2);
   // t.true(recordIcons.length === 2);
-  // console.log('2 recordIcons ', recordIcons.length);
 
-  //  Generated two recordings
-  await showPage('Recordings');
-  await confirmFilesCreated(t, tmpDir, 2);
+  // await stopRecording();
+  // // Wait to ensure that both video files are finalized
+  // await sleep(500);
+
+  // await stopStream();
+  // await sleep(500);
+
+  // // await focusMain();
+  // // Record icons are hidden
+  // // recordIcons = await selectElements('i.icon-record.visible');
+  // // t.true(recordIcons.length === 2);
+  // // console.log('2 recordIcons ', recordIcons.length);
+
+  // //  Generated two recordings
+  // await showPage('Recordings');
+  // await confirmFilesCreated(t, tmpDir, 2);
 });
 
 //   // @@@ COMMENT

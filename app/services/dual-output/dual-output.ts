@@ -21,7 +21,7 @@ import {
 import { UserService } from 'services/user';
 import { SelectionService } from 'services/selection';
 import { StreamingService } from 'services/streaming';
-import { SettingsService } from 'services/settings';
+import { OutputSettingsService, SettingsService } from 'services/settings';
 import { RunInLoadingMode } from 'services/app/app-decorators';
 
 interface IDisplayVideoSettings {
@@ -33,6 +33,11 @@ interface IDisplayVideoSettings {
     vertical: boolean;
   };
 }
+
+interface IRecordingQuality {
+  singleOutput: ERecordingQuality;
+  dualOutput: ERecordingQuality;
+}
 interface IDualOutputServiceState {
   displays: TDisplayType[];
   platformSettings: TDualOutputPlatformSettings;
@@ -41,7 +46,7 @@ interface IDualOutputServiceState {
   recordVertical: boolean;
   streamVertical: boolean;
   videoSettings: IDisplayVideoSettings;
-  recordingQuality: ERecordingQuality;
+  recordingQuality: IRecordingQuality;
   isLoading: boolean;
 }
 
@@ -294,6 +299,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   @Inject() private selectionService: SelectionService;
   @Inject() private streamingService: StreamingService;
   @Inject() private settingsService: SettingsService;
+  @Inject() private outputSettingsService: OutputSettingsService;
 
   static defaultState: IDualOutputServiceState = {
     displays: ['horizontal', 'vertical'],
@@ -311,7 +317,10 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         vertical: false,
       },
     },
-    recordingQuality: ERecordingQuality.HigherQuality,
+    recordingQuality: {
+      singleOutput: ERecordingQuality.HigherQuality,
+      dualOutput: ERecordingQuality.HigherQuality,
+    },
     isLoading: false,
   };
 
@@ -358,6 +367,11 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         this.setdualOutputMode();
       }
     });
+
+    /**
+     * TODO: once backend fix implemented, remove dual output quality settings
+     */
+    this.SET_RECORDING_QUALITY('single', this.outputSettingsService.getRecordingQuality());
   }
 
   /**
@@ -602,8 +616,14 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     this.SET_IS_LOADING(status);
   }
 
-  setDualOutputRecordingQuality(quality: ERecordingQuality) {
-    this.SET_RECORDING_QUALITY(quality);
+  /**
+   * Part of a workaround to set recording quality on the frontend to avoid a backend bug
+   * @remark TODO: remove when migrate output and stream settings to new API
+   * @param mode - single or dual output
+   * @param quality - recording quality
+   */
+  setDualOutputRecordingQuality(mode: 'single' | 'dual', quality: ERecordingQuality) {
+    this.SET_RECORDING_QUALITY(mode, quality);
   }
 
   @mutation()
@@ -685,7 +705,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   }
 
   @mutation()
-  private SET_RECORDING_QUALITY(quality: ERecordingQuality) {
-    this.state.recordingQuality = quality;
+  private SET_RECORDING_QUALITY(mode: 'single' | 'dual', quality: ERecordingQuality) {
+    const outputMode = `${mode}Output`;
+    this.state.recordingQuality = { ...this.state.recordingQuality, [outputMode]: quality };
   }
 }
