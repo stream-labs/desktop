@@ -12,6 +12,7 @@ import RenameSource from 'components/windows/RenameSource.vue';
 import NameScene from 'components/windows/NameScene.vue';
 import NameFolder from 'components/windows/NameFolder.vue';
 import SourceProperties from 'components/windows/SourceProperties.vue';
+import RtvcSourceProperties from 'components/windows/RtvcSourceProperties.vue';
 import SourceFilters from 'components/windows/SourceFilters.vue';
 import AddSourceFilter from 'components/windows/AddSourceFilter.vue';
 import AdvancedAudio from 'components/windows/AdvancedAudio.vue';
@@ -51,6 +52,7 @@ export function getComponents() {
     NameScene,
     NameFolder,
     SourceProperties,
+    RtvcSourceProperties,
     SourceFilters,
     AddSourceFilter,
     Blank,

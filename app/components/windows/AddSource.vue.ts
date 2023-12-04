@@ -28,6 +28,8 @@ export default class AddSource extends Vue {
   sourceAddOptions = this.windowsService.getChildWindowQueryParams()
     .sourceAddOptions as ISourceAddOptions;
 
+  canAddNew = true
+
   get nVoiceCharacterType(): NVoiceCharacterType {
     return this.sourceAddOptions.propertiesManagerSettings.nVoiceCharacterType || 'near';
   }
@@ -68,6 +70,10 @@ export default class AddSource extends Vue {
 
       this.name = this.sourcesService.suggestName(this.sourceType && sourceType.description);
     }
+
+    if (this.sourceType === 'scene') this.canAddNew = false
+    // ソースとしては1つだけ登録可能とする
+    if (this.sources.length > 0 && this.sources[0].type === 'nair-rtvc-source') this.canAddNew = false
   }
 
   addExisting() {

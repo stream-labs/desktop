@@ -410,6 +410,10 @@
     "name": "アプリ音声キャプチャ(β版)",
     "description": "特定のアプリケーションからのオーディオをキャプチャします。"
   },
+  "nair-rtvc-source": {
+    "name": "Voice changer",
+    "description": "Voice change"
+  },
   "vlc_source": {
     "name": "VLCソース",
     "description": "ビデオのプレイリストをシーンに追加します。"

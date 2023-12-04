@@ -149,6 +149,9 @@ async function runScript() {
       });
     await Promise.all(promises);
 
+    console.log('copy plugins');
+    sh.cp('../plugins/*', 'obs-studio-node/obs-plugins/64bit/');
+
     if (process.platform === 'win32') {
       sh.cd('../scripts');
     }

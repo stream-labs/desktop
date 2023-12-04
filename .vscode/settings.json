@@ -139,5 +139,12 @@
   },
   "css.validate": false,
   "less.validate": false,
-  "stylelint.validate": ["css", "less", "vue"]
+  "stylelint.validate": [
+    "css",
+    "less",
+    "vue"
+  ],
+  "[vue]": {
+    "editor.defaultFormatter": "Vue.volar"
+  }
 }

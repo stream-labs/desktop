@@ -352,6 +352,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       'ovrstream_dc_source',
       'vlc_source',
       'wasapi_process_output_capture',
+      'nair-rtvc-source', // voice changer
     ];
 
     const availableWhitelistedType = whitelistedTypes.filter(type =>
@@ -503,6 +504,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
         height: 600,
       },
     };
+
+    if (source.type === 'nair-rtvc-source') baseConfig.componentName = 'RtvcSourceProperties'
 
     // HACK: childWindow で表示してしまうとウィンドウキャプチャでクラッシュするので OneOffWindow で代替している
     // StreamLabs 1.3.0 まで追従したらこのワークアラウンドはなくせる
