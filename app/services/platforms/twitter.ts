@@ -75,7 +75,9 @@ export class TwitterPlatformService
   }
 
   async beforeGoLive(goLiveSettings: IGoLiveSettings, context?: TDisplayType) {
-    const streamInfo = await this.startStream(goLiveSettings.platforms.twitter);
+    const streamInfo = await this.startStream(
+      goLiveSettings.platforms.twitter ?? this.state.settings,
+    );
 
     this.SET_STREAM_KEY(streamInfo.key);
     this.SET_BROADCAST_ID(streamInfo.id);
