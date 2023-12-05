@@ -383,19 +383,19 @@ function DualOutputControls(p: { stacked: boolean }) {
           <i className="icon-desktop" />
           <span>{$t('Horizontal Output')}</span>
           <DualOutputIcons
-            className={cx('icon-horizontal', horizontalIconVisible && 'visible')}
+            className={cx('icon-horizontal', { visible: horizontalIconVisible })}
             showStream={v.isHorizontalStreaming}
             showRecord={v.isHorizontalRecording}
           />
         </div>
       )}
-      {}
+
       {v.showVertical && (
         <div className={styles.verticalHeader}>
           <i className="icon-phone-case" />
           <span>{$t('Vertical Output')}</span>
           <DualOutputIcons
-            className={cx('icon-vertical', verticalIconVisible && 'visible')}
+            className={cx('icon-vertical', { visible: verticalIconVisible })}
             showStream={v.isVerticalStreaming}
             showRecord={v.isVerticalRecording}
           />

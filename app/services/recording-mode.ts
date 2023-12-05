@@ -201,7 +201,9 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
     this.ADD_RECORDING_ENTRY(timestamp, filename);
 
     const message = display
-      ? $t(`A new ${capitalize(display)} Recording has been completed. Click for more info`)
+      ? $t('A new %{displayType} Recording has been completed. Click for more info', {
+          displayType: $t(capitalize(display)),
+        })
       : $t('A new Recording has been completed. Click for more info');
 
     this.notificationsService.actions.push({

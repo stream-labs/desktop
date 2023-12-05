@@ -19,15 +19,15 @@ export default function StreamOptions() {
   const recordingQualities = [
     {
       quality: ERecordingQuality.HighQuality,
-      name: 'High, Medium File Size',
+      name: $t('High, Medium File Size'),
     },
     {
       quality: ERecordingQuality.HigherQuality,
-      name: 'Indistinguishable, Large File Size',
+      name: $t('Indistinguishable, Large File Size'),
     },
     {
       quality: ERecordingQuality.Lossless,
-      name: 'Lossless, Tremendously Large File Size',
+      name: $t('Lossless, Tremendously Large File Size'),
     },
   ];
 
@@ -71,7 +71,7 @@ export default function StreamOptions() {
         <div className={styles.switcherLabel}>{$t('Vertical Recording Only')}</div>
         <SwitchInput
           value={v.recordVertical}
-          name={'record-vertical'}
+          name="record-vertical"
           onChange={v.setRecordVertical}
           uncontrolled
           className={styles.recordingSwitcher}

@@ -58,7 +58,7 @@ import * as remote from '@electron/remote';
 import { RecordingModeService } from 'services/recording-mode';
 import { MarkersService } from 'services/markers';
 import { byOS, OS } from 'util/operating-systems';
-import { DualOutputService } from 'services/dual-output';
+import { DualOutputService, TStreamMode } from 'services/dual-output';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -1068,7 +1068,7 @@ export class StreamingService
    * the recording quality on the frontend
    * @param mode - single output or dual output
    */
-  beforeStartRecording(mode: 'single' | 'dual') {
+  beforeStartRecording(mode: TStreamMode) {
     /**
      * When going live in dual output mode, `Same as stream` is a not valid setting because of a bug in the backend in the new API.
     * To prevent errors, if the recording quality set on the old API object is `Same as Stream`
@@ -1272,7 +1272,10 @@ export class StreamingService
     } as Dictionary<ERecordingState>)[info.signal];
 
     // We received a signal we didn't recognize
-    if (!nextState) return;
+    if (!nextState) {
+      console.error('Received unrecognized signal: ', nextState);
+      return;
+    }
 
     if (nextState === ERecordingState.Recording) {
       const mode = this.views.isDualOutputMode ? 'dual' : 'single';
@@ -1621,7 +1624,10 @@ export class StreamingService
       } as Dictionary<ERecordingState>)[info.signal];
 
       // We received a signal we didn't recognize
-      if (!nextState) return;
+      if (!nextState) {
+        console.error('Received unrecognized signal: ', nextState);
+        return;
+      }
 
       if (info.signal === EOBSOutputSignal.Start) {
         this.usageStatisticsService.recordFeatureUsage('Recording');

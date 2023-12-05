@@ -17,6 +17,10 @@ enum EStreamingState {
 
 /**
  * Possible recording states.
+ * @remark For consistency with the values in the new API, the properties `start` and `stop` are added.
+ * The old API has some different values. Because we use the old API for single output and the new API
+ * for dual output, we currently keep both as options. After fully migrating to the new API, the old API
+ * values will be removed.
  */
 enum ERecordingState {
   Offline = 'offline',

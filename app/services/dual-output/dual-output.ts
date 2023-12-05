@@ -50,6 +50,8 @@ interface IDualOutputServiceState {
   isLoading: boolean;
 }
 
+export type TStreamMode = 'single' | 'dual';
+
 class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   @Inject() private scenesService: ScenesService;
   @Inject() private videoSettingsService: VideoSettingsService;
@@ -639,7 +641,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    * @param mode - single or dual output
    * @param quality - recording quality
    */
-  setDualOutputRecordingQuality(mode: 'single' | 'dual', quality: ERecordingQuality) {
+  setDualOutputRecordingQuality(mode: TStreamMode, quality: ERecordingQuality) {
     this.SET_RECORDING_QUALITY(mode, quality);
   }
 
@@ -722,7 +724,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   }
 
   @mutation()
-  private SET_RECORDING_QUALITY(mode: 'single' | 'dual', quality: ERecordingQuality) {
+  private SET_RECORDING_QUALITY(mode: TStreamMode, quality: ERecordingQuality) {
     const outputMode = `${mode}Output`;
     this.state.recordingQuality = { ...this.state.recordingQuality, [outputMode]: quality };
   }

@@ -52,10 +52,8 @@ async function recordAndConfirmRecordings(
   tmpDir: string,
   qualities: string[],
   setSettings: (setting: string) => Promise<void>,
-  additionalRecordings: number = 0,
+  numExpectedRecordings: number,
 ) {
-  const minExpectedFiles = qualities.length + additionalRecordings;
-
   for (const quality of qualities) {
     await setSettings(quality);
     await focusMain();
@@ -73,7 +71,7 @@ async function recordAndConfirmRecordings(
   console.log('files length ', files.length);
 
   // M3U8 creates multiple TS files in addition to the catalog itself.
-  t.true(files.length >= minExpectedFiles, `Files that were created:\n${files.join('\n')}`);
+  t.true(files.length === numExpectedRecordings, `Files that were created:\n${files.join('\n')}`);
 }
 
 async function prepareRecordDualOutput(t: ExecutionContext<ITestContext>): Promise<string> {
@@ -266,7 +264,7 @@ test.skip('Recording and Streaming Dual Output', async t => {
  *
  * TODO: refactor for `Same as stream` as valid dual output quality when backend fix is implemented
  */
-test.skip('Recording File Quality', async t => {
+test('Recording File Quality', async t => {
   const tmpDir = await setTemporaryRecordingPath();
 
   // low resolution reduces CPU usage
@@ -287,12 +285,18 @@ test.skip('Recording File Quality', async t => {
   ];
 
   // single output recording quality
-  await recordAndConfirmRecordings(t, tmpDir, singleOutputQualities, async (quality: string) => {
-    await showSettingsWindow('Output', async () => {
-      await setFormDropdown('Recording Quality', quality);
-      await clickButton('Done');
-    });
-  });
+  await recordAndConfirmRecordings(
+    t,
+    tmpDir,
+    singleOutputQualities,
+    async (quality: string) => {
+      await showSettingsWindow('Output', async () => {
+        await setFormDropdown('Recording Quality', quality);
+        await clickButton('Done');
+      });
+    },
+    singleOutputQualities.length,
+  );
 
   // dual output recording quality
   await logIn(t);
@@ -300,7 +304,9 @@ test.skip('Recording File Quality', async t => {
   await prepareToGoLive();
   await focusMain();
 
-  const numAdditionalRecordings = singleOutputQualities.length * 2 + dualOutputQualities.length;
+  // the single output recordings already exist in the directory
+  // so account for them in the number of expected recordings
+  const numExpectedRecordings = singleOutputQualities.length + dualOutputQualities.length * 2;
 
   await recordAndConfirmRecordings(
     t,
@@ -313,7 +319,7 @@ test.skip('Recording File Quality', async t => {
       await form.setInputValue('[data-name="recording-quality"]', quality);
       await closeWindow('child');
     },
-    numAdditionalRecordings,
+    numExpectedRecordings,
   );
 
   await toggleDualOutputMode();
