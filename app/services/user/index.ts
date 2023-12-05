@@ -113,6 +113,7 @@ interface ILinkedPlatformsResponse {
   tiktok_account?: ILinkedPlatform;
   trovo_account?: ILinkedPlatform;
   streamlabs_account?: ILinkedPlatform;
+  twitter_account?: ILinkedPlatform;
   user_id: number;
   created_at: string;
   widget_token: string;
@@ -632,6 +633,17 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       });
     } else {
       this.UNLINK_SLID();
+    }
+
+    if (linkedPlatforms.twitter_account) {
+      this.UPDATE_PLATFORM({
+        type: 'twitter',
+        username: linkedPlatforms.twitter_account.platform_name,
+        id: linkedPlatforms.twitter_account.platform_id,
+        token: linkedPlatforms.twitter_account.access_token,
+      });
+    } else if (this.state.auth.primaryPlatform !== 'twitter') {
+      this.UNLINK_PLATFORM('twitter');
     }
 
     if (linkedPlatforms.force_login_required) return true;

@@ -1,8 +1,20 @@
 {
   "Successfully saved %{filename}": "%{filename} guardado com êxito",
+  "Successfully converted %{filename}": "%{filename} convertido com sucesso",
+  "Successfully saved %{filename} to %{filepath}": "%{filename} guardado com êxito em %{filepath}",
   "Successfully loaded %{filename}.overlay": "%{filename}.overlay carregado com êxito",
   "This is an experimental feature.  Use at your own risk.": "Esta é uma funcionalidade experimental. Use por sua conta e risco.",
   "Export Overlay File": "Exportar ficheiro de sobreposição",
   "Import Overlay File": "Importar ficheiro de sobreposição",
-  "Import Widget File in Current Scene": "Importar ficheiro de widget na cena atual"
+  "Import Widget File in Current Scene": "Importar ficheiro de widget na cena atual",
+  "The active scene collection is not a dual output scene collection.": "A coleção de cenas ativa não é uma coleção de cenas de Dual Output.",
+  "Convert to Vanilla Scene": "Converter para Vanilla Scene",
+  "Convert": "Converter",
+  "Convert and Export Overlay": "Converter e exportar sobreposição",
+  "Assign": "Atribuir",
+  "Assign and Export Overlay": "Atribuir e exportar sobreposição",
+  "Assign Vertical Sources to Horizontal Display": "Atribuir fontes verticais ao ecrã horizontal",
+  "The below will create a copy of the active scene collection, set the copy as the active collection, and then apply the function.": "O procedimento abaixo cria uma cópia da coleção de cenas ativas, define a cópia como a coleção ativa e, em seguida, aplica a função.",
+  "Manage Dual Output Scene": "Gerir a cena de Dual Output",
+  "Unable to convert dual output collection.": "Não é possível converter a coleção de Dual Output."
 }

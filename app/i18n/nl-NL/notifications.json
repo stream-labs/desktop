@@ -25,7 +25,7 @@
   "Show in folder": "Weergeven in map",
   "Recordings": "Opnames",
   "Marker %{label} added at %{timestamp}": "Markering %{label} toegevoegd op %{timestamp}",
-  "File is too large to upload": "File is too large to upload",
-  "File type %{extension} is not supported": "File type %{extension} is not supported",
-  "Upload already in progress": "Upload already in progress"
+  "File is too large to upload": "Bestand is te groot om te uploaden",
+  "File type %{extension} is not supported": "Bestandstype %{extension} wordt niet ondersteund",
+  "Upload already in progress": "Uploaden is al in voortgang"
 }

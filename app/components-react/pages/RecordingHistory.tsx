@@ -1,8 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import cx from 'classnames';
 import * as remote from '@electron/remote';
 import { Tooltip, Menu, Button, message, Dropdown } from 'antd';
-import { inject, injectState, useModule } from 'slap';
 import { $t } from 'services/i18n';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
 import {
@@ -17,15 +16,21 @@ import styles from './RecordingHistory.m.less';
 import AutoProgressBar from 'components-react/shared/AutoProgressBar';
 import { GetSLID } from 'components-react/highlighter/StorageUpload';
 import { ENotificationType } from 'services/notifications';
+import Scrollable from 'components-react/shared/Scrollable';
+import { Services } from '../service-provider';
+import { initStore, useController } from '../hooks/zustand';
+import { useVuex } from '../hooks';
 
-class RecordingHistoryModule {
-  private RecordingModeService = inject(RecordingModeService);
-  private UserService = inject(UserService);
-  private SharedStorageService = inject(SharedStorageService);
-  private OnboardingService = inject(OnboardingService);
-  private WindowsService = inject(WindowsService);
-  private NotificationsService = inject(NotificationsService);
-  state = injectState({ showSLIDModal: false });
+const RecordingHistoryCtx = React.createContext<RecordingHistoryController | null>(null);
+
+class RecordingHistoryController {
+  private RecordingModeService = Services.RecordingModeService;
+  private UserService = Services.UserService;
+  private SharedStorageService = Services.SharedStorageService;
+  private OnboardingService = Services.OnboardingService;
+  private WindowsService = Services.WindowsService;
+  private NotificationsService = Services.NotificationsService;
+  store = initStore({ showSLIDModal: false });
 
   get recordings() {
     return this.RecordingModeService.views.sortedRecordings;
@@ -54,6 +59,11 @@ class RecordingHistoryModule {
         label: $t('Transcribe'),
         value: 'typestudio',
         icon: 'icon-mic',
+      },
+      {
+        label: $t('Edit'),
+        value: 'videoeditor',
+        icon: 'icon-play-round',
       },
     ];
     if (this.hasYoutube) {
@@ -89,7 +99,9 @@ class RecordingHistoryModule {
     if (this.hasSLID) {
       this.uploadToStorage(filename, platform);
     } else {
-      this.state.setShowSLIDModal(true);
+      this.store.setState(s => {
+        s.showSLIDModal = true;
+      });
     }
   }
 
@@ -118,16 +130,23 @@ class RecordingHistoryModule {
   }
 }
 
-export default function RecordingHistory() {
-  const {
-    recordings,
-    formattedTimestamp,
-    showFile,
-    uploadOptions,
-    handleSelect,
-    uploadInfo,
-    postError,
-  } = useModule(RecordingHistoryModule);
+export default function RecordingHistoryPage() {
+  const controller = useMemo(() => new RecordingHistoryController(), []);
+  return (
+    <RecordingHistoryCtx.Provider value={controller}>
+      <RecordingHistory />
+    </RecordingHistoryCtx.Provider>
+  );
+}
+
+export function RecordingHistory() {
+  const controller = useController(RecordingHistoryCtx);
+  const { formattedTimestamp, showFile, handleSelect, postError } = controller;
+  const { uploadInfo, uploadOptions, recordings } = useVuex(() => ({
+    recordings: controller.recordings,
+    uploadOptions: controller.uploadOptions,
+    uploadInfo: controller.uploadInfo,
+  }));
 
   useEffect(() => {
     if (
@@ -168,17 +187,19 @@ export default function RecordingHistory() {
         )}
       </div>
       <div className={styles.recordingsContainer} id="recordingHistory">
-        {recordings.map(recording => (
-          <div className={styles.recording} key={recording.timestamp}>
-            <span style={{ marginRight: '8px' }}>{formattedTimestamp(recording.timestamp)}</span>
-            <Tooltip title={$t('Show in folder')}>
-              <span onClick={() => showFile(recording.filename)} className={styles.filename}>
-                {recording.filename}
-              </span>
-            </Tooltip>
-            {uploadOptions.length > 0 && <UploadActions filename={recording.filename} />}
-          </div>
-        ))}
+        <Scrollable style={{ height: '100%' }}>
+          {recordings.map(recording => (
+            <div className={styles.recording} key={recording.timestamp}>
+              <span style={{ marginRight: '8px' }}>{formattedTimestamp(recording.timestamp)}</span>
+              <Tooltip title={$t('Show in folder')}>
+                <span onClick={() => showFile(recording.filename)} className={styles.filename}>
+                  {recording.filename}
+                </span>
+              </Tooltip>
+              {uploadOptions.length > 0 && <UploadActions filename={recording.filename} />}
+            </div>
+          ))}
+        </Scrollable>
       </div>
       <ExportModal />
       <SLIDModal />
@@ -187,7 +208,9 @@ export default function RecordingHistory() {
 }
 
 function SLIDModal() {
-  const { showSLIDModal, connectSLID } = useModule(RecordingHistoryModule);
+  const { store, connectSLID } = useController(RecordingHistoryCtx);
+  const showSLIDModal = store.useState(s => s.showSLIDModal);
+
   if (!showSLIDModal) return <></>;
 
   return (
@@ -212,7 +235,7 @@ function SLIDModal() {
 }
 
 function ExportModal() {
-  const { uploadInfo, cancelUpload } = useModule(RecordingHistoryModule);
+  const { uploadInfo, cancelUpload } = useController(RecordingHistoryCtx);
   const { uploadedBytes, totalBytes } = uploadInfo;
 
   if (!uploadedBytes || !totalBytes) return <></>;

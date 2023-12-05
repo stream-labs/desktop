@@ -167,7 +167,7 @@ export class StreamBossService extends BaseGoalService<IStreamBossData, IStreamB
   }
 
   multipliersByPlatform(): { key: string; title: string; isInteger: boolean }[] {
-    const platform = this.userService.platform.type as Exclude<TPlatform, 'tiktok'>;
+    const platform = this.userService.platform.type as Exclude<TPlatform, 'tiktok' | 'twitter'>;
     return {
       twitch: [
         { key: 'bit_multiplier', title: $t('Damage Per Bit'), isInteger: true },

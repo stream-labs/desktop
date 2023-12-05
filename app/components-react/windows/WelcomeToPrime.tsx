@@ -17,7 +17,7 @@ export default function WelcomeToPrime() {
       title: $t('Overlay, Widget, and Site Themes'),
       icon: 'icon-themes',
       description: $t(
-        "Fully customize your stream and your website to represent your brand; or pick from thousands of our pre-made themes. Either way, your stream will look amazing and it's all included with Ultra.",
+        "Fully customize your stream and your website to represent your brand; or pick from thousands of our pre-made overlays. Either way, your stream will look amazing and it's all included with Ultra.",
       ),
       link: 'BrowseOverlays',
       button: $t('View Themes'),

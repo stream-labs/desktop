@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { EExportStep, TFPS, TResolution, TPreset } from 'services/highlighter';
 import { Services } from 'components-react/service-provider';
 import { FileInput, TextInput, ListInput } from 'components-react/shared/inputs';
@@ -9,17 +9,16 @@ import YoutubeUpload from './YoutubeUpload';
 import { RadioInput } from 'components-react/shared/inputs/RadioInput';
 import { confirmAsync } from 'components-react/modals';
 import { $t } from 'services/i18n';
-import { injectState, useModule } from 'slap';
 import StorageUpload from './StorageUpload';
 import { useVuex } from 'components-react/hooks';
-import { EAvailableFeatures } from 'services/incremental-rollout';
+import { initStore, useController } from '../hooks/zustand';
 
-class ExportModule {
+class ExportController {
   get service() {
     return Services.HighlighterService;
   }
 
-  state = injectState({ videoName: 'My Video' });
+  store = initStore({ videoName: 'My Video' });
 
   get exportInfo() {
     return this.service.views.exportInfo;
@@ -62,8 +61,19 @@ class ExportModule {
   }
 }
 
-export default function ExportModal(p: { close: () => void }) {
-  const { exportInfo, dismissError } = useModule(ExportModule);
+export const ExportModalCtx = React.createContext<ExportController | null>(null);
+
+export default function ExportModalProvider(p: { close: () => void }) {
+  const controller = useMemo(() => new ExportController(), []);
+  return (
+    <ExportModalCtx.Provider value={controller}>
+      <ExportModal close={p.close} />
+    </ExportModalCtx.Provider>
+  );
+}
+
+function ExportModal(p: { close: () => void }) {
+  const { exportInfo, dismissError } = useController(ExportModalCtx);
 
   // Clear all errors when this component unmounts
   useEffect(dismissError, []);
@@ -74,7 +84,7 @@ export default function ExportModal(p: { close: () => void }) {
 }
 
 function ExportProgress() {
-  const { exportInfo, cancelExport } = useModule(ExportModule);
+  const { exportInfo, cancelExport } = useController(ExportModalCtx);
 
   return (
     <div>
@@ -116,8 +126,6 @@ function ExportOptions(p: { close: () => void }) {
   const { UsageStatisticsService } = Services;
   const {
     exportInfo,
-    videoName,
-    setVideoName,
     dismissError,
     setResolution,
     setFps,
@@ -125,7 +133,10 @@ function ExportOptions(p: { close: () => void }) {
     fileExists,
     setExport,
     exportCurrentFile,
-  } = useModule(ExportModule);
+    store,
+  } = useController(ExportModalCtx);
+
+  const videoName = store.useState(s => s.videoName);
   function getExportFileFromVideoName(videoName: string) {
     const parsed = path.parse(exportInfo.file);
     const sanitized = videoName.replace(/[/\\?%*:|"<>\.,;=#]/g, '');
@@ -146,7 +157,9 @@ function ExportOptions(p: { close: () => void }) {
           label={$t('Video Name')}
           value={videoName}
           onInput={name => {
-            setVideoName(name);
+            store.setState(s => {
+              s.videoName = name;
+            });
             setExportFile(getExportFileFromVideoName(name));
           }}
           uncontrolled={false}
@@ -159,7 +172,9 @@ function ExportOptions(p: { close: () => void }) {
           value={exportFile}
           onChange={file => {
             setExportFile(file);
-            setVideoName(getVideoNameFromExportFile(file));
+            store.setState(s => {
+              s.videoName = getVideoNameFromExportFile(file);
+            });
           }}
         />
         <RadioInput
@@ -239,7 +254,8 @@ function ExportOptions(p: { close: () => void }) {
 }
 
 function PlatformSelect(p: { onClose: () => void }) {
-  const { videoName, clearUpload } = useModule(ExportModule);
+  const { store, clearUpload } = useController(ExportModalCtx);
+  const videoName = store.useState(s => s.videoName);
   const { UserService } = Services;
   const { isYoutubeLinked } = useVuex(() => ({
     isYoutubeLinked: !!UserService.state.auth?.platforms.youtube,
@@ -255,6 +271,7 @@ function PlatformSelect(p: { onClose: () => void }) {
     { label: 'YouTube', value: 'youtube' },
     { label: 'Cross Clip', value: 'crossclip' },
     { label: 'Podcast Editor', value: 'typestudio' },
+    { label: 'Video Editor', value: 'videoeditor' },
   ];
 
   return (

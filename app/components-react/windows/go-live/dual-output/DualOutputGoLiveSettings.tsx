@@ -28,9 +28,12 @@ export default function DualOutputGoLiveSettings() {
       return {
         isPrime: UserService.views.isPrime,
 
-        canUseOptimizedProfile:
-          VideoEncodingOptimizationService.state.canSeeOptimizedProfile ||
-          VideoEncodingOptimizationService.state.useOptimizedProfile,
+        // temporarily hide the checkbox until streaming and output settings
+        // are migrated to the new API
+        canUseOptimizedProfile: false,
+        // canUseOptimizedProfile:
+        //   VideoEncodingOptimizationService.state.canSeeOptimizedProfile ||
+        //   VideoEncodingOptimizationService.state.useOptimizedProfile,
       };
     },
   );

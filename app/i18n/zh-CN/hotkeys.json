@@ -23,5 +23,6 @@
   "Next Slide": "下一张幻灯片",
   "Previous Slide": "上一张幻灯片",
   "Toggle Performance Mode": "切换性能模式",
-  "Skip Alert": "跳过通知"
+  "Skip Alert": "跳过通知",
+  "To use hotkeys on Mac, go to System Settings > Security > Accessibility and toggle on for Streamlabs Desktop.": "To use hotkeys on Mac, go to System Settings > Security > Accessibility and toggle on for Streamlabs Desktop."
 }

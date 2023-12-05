@@ -11,6 +11,8 @@ export interface IWidgetDisplayData {
   supportList: string[];
   icon: string;
   shortDesc?: string;
+  link?: string;
+  linkText?: string;
 }
 // Do not alter the order of this enum, it is coupled to the user's local config
 export enum WidgetType {

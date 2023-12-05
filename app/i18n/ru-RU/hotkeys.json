@@ -23,5 +23,6 @@
   "Next Slide": "Следующий слайд",
   "Previous Slide": "Предыдущий слайд",
   "Toggle Performance Mode": "Включить режим повышенной производительности",
-  "Skip Alert": "Пропустить оповещение"
+  "Skip Alert": "Пропустить оповещение",
+  "To use hotkeys on Mac, go to System Settings > Security > Accessibility and toggle on for Streamlabs Desktop.": "To use hotkeys on Mac, go to System Settings > Security > Accessibility and toggle on for Streamlabs Desktop."
 }

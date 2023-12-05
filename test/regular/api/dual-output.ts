@@ -1,7 +1,11 @@
 import { DualOutputService } from 'services/dual-output';
 import { getApiClient } from '../../helpers/api-client';
 import { test, useWebdriver, TExecutionContext } from '../../helpers/webdriver';
-import { ScenesService } from 'services/scenes/scenes';
+import { AutoConfigService } from 'services/auto-config';
+import { ScenesService } from 'services/scenes';
+import { VideoSettingsService } from 'services/settings-v2/video';
+import { logIn } from '../../helpers/modules/user';
+import { SettingsService } from 'services/settings';
 
 useWebdriver();
 
