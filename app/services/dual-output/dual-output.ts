@@ -394,7 +394,24 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       if (!this.streamingService.state.selectiveRecording) {
         this.toggleDisplay(true, 'vertical');
       }
+      // TODO: remove when backed fix for new API recording is implemented
+      // save single output recording quality on the frontend
+      const recordingQuality = this.outputSettingsService.getRecordingQuality();
+      this.setDualOutputRecordingQuality('single', recordingQuality);
+      // to prevent errors, set old API settings to match dual output recording settings
+      this.settingsService.setSettingValue(
+        'Recording',
+        'RecQuality',
+        this.views.recordingQuality.dualOutput,
+      );
     } else {
+      // restore single output recording settings
+      this.settingsService.setSettingValue(
+        'Recording',
+        'RecQuality',
+        this.views.recordingQuality.singleOutput,
+      );
+
       this.selectionService.views.globalSelection.reset();
     }
 

@@ -45,33 +45,6 @@ export async function setFormDropdown(label: string, value: string, index = 0) {
   await $li.click();
 }
 
-export async function getFormDropdownOptions(label: string, name: string) {
-  await waitForDisplayed('label');
-  const $el = (await getClient().$$(`label=${label}`))[0];
-  const $multiselect = await (await $el.$('../..')).$('.multiselect__option');
-
-  console.log('multiselect', $multiselect);
-
-  return $multiselect;
-  // await $multiselect.click();
-  // await waitForDisplayed('[data-name]');
-
-  // const $labels = await getClient()
-  //   .$$(`[data-name]=${name}`)
-  //   .map(element => element);
-
-  // console.log('labels', $labels);
-
-  // return $labels;
-  // return Promise.resolve(labels);
-  // const $el = (await getClient().$$(`label=${label}`))[index];
-  // const $multiselect = await (await $el.$('../..')).$('.multiselect');
-  // await $multiselect.click();
-
-  // const $li = await (await $el.$('../..')).$(`li=${value}`);
-  // await $li.click();
-}
-
 // Percent is a value between 0 and 1
 export async function setSliderPercent(
   t: TExecutionContext,

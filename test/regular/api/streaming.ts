@@ -58,10 +58,6 @@ test('Recording via API', async (t: TExecutionContext) => {
   outputSettings.forEach(subcategory => {
     subcategory.parameters.forEach(setting => {
       if (setting.name === 'FilePath') setting.value = t.context.cacheDir;
-      // @@@ TODO: remove when use stream settings bug is fixed
-      if (setting.name === 'RecQuality') {
-        setting.value = 'Small';
-      }
     });
   });
   settingsService.setSettings('Output', outputSettings);

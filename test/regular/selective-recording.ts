@@ -21,12 +21,6 @@ test('Selective Recording', async t => {
   // set lower resolution for better performance in CI
   await setOutputResolution('100x100');
 
-  await showSettingsWindow('Output', async () => {
-    await setFormDropdown('Recording Quality', 'High Quality, Medium File Size');
-    await sleep(500);
-    await clickButton('Done');
-  });
-
   // Add a browser source
   await addSource(sourceType, sourceName);
 
