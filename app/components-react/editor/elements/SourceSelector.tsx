@@ -825,8 +825,30 @@ const TreeNode = React.forwardRef(
                 />
               </Tooltip>
             )}
-            <i onClick={p.toggleLock} className={p.isLocked ? 'icon-lock' : 'icon-unlock'} />
-            <i onClick={p.toggleVisibility} className={p.isVisible ? 'icon-view' : 'icon-hide'} />
+            <Tooltip
+              title={$t('Lock/Unlock Source')}
+              placement="left"
+              visible={['icon-lock', 'icon-unlock'].includes(hoveredIcon)}
+            >
+              <i
+                onClick={p.toggleLock}
+                className={p.isLocked ? 'icon-lock' : 'icon-unlock'}
+                onMouseEnter={() => setHoveredIcon(p.isLocked ? 'icon-lock' : 'icon-unlock')}
+                onMouseLeave={() => setHoveredIcon('')}
+              />
+            </Tooltip>
+            <Tooltip
+              title={$t('Hide/Unhide')}
+              placement="left"
+              visible={['icon-view', 'icon-hide'].includes(hoveredIcon)}
+            >
+              <i
+                onClick={p.toggleVisibility}
+                className={p.isVisible ? 'icon-view' : 'icon-hide'}
+                onMouseEnter={() => setHoveredIcon(p.isVisible ? 'icon-view' : 'icon-hide')}
+                onMouseLeave={() => setHoveredIcon('')}
+              />
+            </Tooltip>
           </>
         )}
         <Tooltip
