@@ -2,47 +2,30 @@
 <template>
   <div class="modal-layout">
     <multiselect v-model="deviceModel" :options="deviceList" label="description" trackBy="value" :allow-empty="false" />
-    <div class="aaa">
+    <div class="content">
       <div>
-
-        <!-- <NavMenu v-model="currentIndex" class="side-menu" data-test="SideMenu">
-          <div>プリセットボイス</div>
-          <NavItem v-for="v in presetList" :key="v.value" :to="v.value">{{ v.name }} </NavItem>
-
-          <div>オリジナルボイス
-          </div>
-          <NavItem v-for="v in orginalList" :key="v.value" :to="v.value">{{ v.name }} </NavItem>
-
-          <div>
-            <div> temp conrols </div>
-            <button @click="onAdd">[add]</button>
-            <li v-for="v in orginalList">{{ v.name }}
-              <button @click="onDelete(v.value)">[del]</button>
-              <button @click="onCopy(v.value)">[copy]</button>
-            </li>
-          </div>
-        </NavMenu> -->
-
-
         <ul class="nav-menu">
-          <div>プリセットボイス</div>
+          <div style="padding: 0 0 4px; font-weight: bold; color: white;">プリセットボイス</div>
           <li v-for="v in presetList" :key="v.value" class="nav-item" :class="{ active: v.value === currentIndex }">
-            <div class=" nav-item__content" @click="onSelect(v.value)">
+            <div class="nav-item-content" @click="onSelect(v.value)">
+              <img :src="v.icon" style="padding-right: 4px;">
               {{ v.name }}
             </div>
           </li>
 
-          <div>オリジナルボイス ({{ manualList.length }}/{{ manualMax }})
-            <div @click="onAdd()">[+]</div>
+          <div style=" display: flex;padding: 16px 0 4px; font-weight: bold; color: white;">
+            <div>オリジナルボイス ({{ manualList.length }}/{{ manualMax }})</div>
+            <div @click="onAdd()" style=" width:30px;margin-left: auto; text-align: center;">＋</div>
           </div>
           <li v-for="v in manualList" :key="v.value" class="nav-item" :class="{ active: v.value === currentIndex }">
-            <div class="nav-item__content" @click="onSelect(v.value)"> {{ v.name }}</div>
-            <div class="nav-item__right">
+            <div class="nav-item-content" @click="onSelect(v.value)"> <img :src="v.icon" style="padding-right: 4px;">
+              {{ v.name }}</div>
+            <div class="nav-item-right">
               <div class="dropdown">
-                <span>... </span>
+                <span>︙</span>
                 <div class="dropdown-content">
-                  <div @click="onDelete(v.value)">削除</div>
-                  <div @click="onCopy(v.value)">複製</div>
+                  <div @click="onDelete(v.value)" style="color: red;">削除</div>
+                  <div @click="onCopy(v.value)" style="color:white">複製</div>
                 </div>
               </div>
             </div>
@@ -79,13 +62,11 @@
                 <VueSlider v-model="pitchShift" :min="-6.00" :max="6.00" :interval="0.1" tooltip="none" />
               </div>
 
-
               <div class="input-label"><label>ボイス1</label></div>
               <div class="input-wrapper">
                 <multiselect v-model="primaryVoiceModel" :options="primaryVoiceList" label="description" trackBy="value"
                   :allow-empty="false" />
               </div>
-
 
               <div class="input-label"><label>ボイス2</label></div>
               <div class="input-wrapper">
@@ -106,12 +87,12 @@
     </div>
 
     <div class="modal-layout-controls">
-      <div style="width: 100px; padding: 4px;">
+      <div style="width: 100px;">
         <multiselect v-model="deviceModel" :options="deviceList" label="description" trackBy="value"
           :allow-empty="false" />
       </div>
 
-      <div style="margin-right: auto;"><span>適用音声を聞く</span>
+      <div style="margin-right: auto; margin-left: 16px;"><span>適用音声を聞く</span>
         <input v-model="isMonitor" type="checkbox" class="toggle-button" />
       </div>
 
@@ -135,27 +116,12 @@
   background-color: var(--color-bg-quinary);
 }
 
-.ModalLayout-fixed {
-  z-index: 1;
-  flex-shrink: 0;
-}
-
-.modal-layout-content {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  height: 100%;
-  padding: 16px;
-  overflow-x: hidden;
-  overflow-y: auto;
-}
-
 .modal-layout-controls {
   .dividing-border(top);
 
   z-index: @z-index-default-content;
   display: flex;
-  flex-shrink: 0;
+  align-items: center;
   justify-content: flex-end;
   text-align: right;
   background-color: var(--color-bg-primary);
@@ -175,7 +141,7 @@
 }
 
 
-.aaa {
+.content {
   display: flex;
   align-content: stretch;
   align-items: stretch;
@@ -183,7 +149,7 @@
   overflow: hidden;
 }
 
-.side-menu {
+.content-menu {
   width: 200px;
   overflow-y: auto;
 }
@@ -213,12 +179,8 @@
 }
 
 .nav-menu {
-  display: flex;
-  flex: 0 0 232px;
-  flex-direction: column;
   width: 200px;
-  padding: 8px 0;
-  padding-right: 4px;
+  padding: 8px;
   margin: 0;
 }
 
@@ -228,8 +190,9 @@
   justify-content: flex-start;
   height: 40px;
   padding: 0;
-  padding-left: 16px;
+  padding-left: 2px;
   font-size: @font-size4;
+  line-height: 40px;
   color: var(--color-text);
   list-style: none;
   cursor: pointer;
@@ -243,17 +206,14 @@
   }
 }
 
-.nav-item__content {
-  overflow: hidden;
-  line-height: 14px;
-  // max-width: calc(~"100% - 20px");
-  // width: 100%;
-  // max-width: 100%;
+.nav-item-content {
+  width: 100%;
+  height: 100%;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.nav-item__right {
+.nav-item-right {
   margin-left: auto;
 }
 
@@ -261,16 +221,19 @@
   position: relative;
   display: inline-block;
   width: 30px;
-  height: 30px;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
 }
 
 .dropdown-content {
   position: absolute;
   z-index: 10;
   display: none;
-  min-width: 160px;
+  width: 80px;
   padding: 12px 16px;
-  background-color: gray;
+  line-height: 30px;
+  background-color: var(--color-bg-primary);
 }
 
 .dropdown:hover .dropdown-content {
