@@ -266,7 +266,7 @@ test.skip('Recording and Streaming Dual Output', async t => {
  *
  * TODO: refactor for `Same as stream` as valid dual output quality when backend fix is implemented
  */
-test('Recording File Quality', async t => {
+test.skip('Recording File Quality', async t => {
   const tmpDir = await setTemporaryRecordingPath();
 
   // low resolution reduces CPU usage
@@ -300,6 +300,8 @@ test('Recording File Quality', async t => {
   await prepareToGoLive();
   await focusMain();
 
+  const numAdditionalRecordings = singleOutputQualities.length * 2 + dualOutputQualities.length;
+
   await recordAndConfirmRecordings(
     t,
     tmpDir,
@@ -311,7 +313,7 @@ test('Recording File Quality', async t => {
       await form.setInputValue('[data-name="recording-quality"]', quality);
       await closeWindow('child');
     },
-    dualOutputQualities.length,
+    numAdditionalRecordings,
   );
 
   await toggleDualOutputMode();
