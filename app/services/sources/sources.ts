@@ -388,6 +388,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
       this.usageStatisticsService.recordFeatureUsage('DisplayCapture');
     } else if (type === 'game_capture') {
       this.usageStatisticsService.recordFeatureUsage('GameCapture');
+    } else if (type === 'spout_capture') {
+      this.usageStatisticsService.recordFeatureUsage('SpoutCapture');
     }
 
     const managerKlass = PROPERTIES_MANAGER_TYPES[managerType];
