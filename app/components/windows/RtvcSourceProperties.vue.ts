@@ -25,6 +25,7 @@ interface ManualParam {
   // pitchShiftMode
 }
 
+// RtvcStateService保持用
 interface StateParam {
   currentIndex: string
   manuals: ManualParam[]
@@ -101,7 +102,6 @@ export default class RtvcSourceProperties extends SourceProperties {
 
   @Watch('currentIndex')
   onChangeIndex() {
-    console.log(`-- index changed to ${this.currentIndex}`)
     const idx = this.getCurrentManualIndex()
     if (idx >= 0) { // for manuals
       this.name = this.getManualParam('name')
@@ -227,8 +227,6 @@ export default class RtvcSourceProperties extends SourceProperties {
     prop.value = value
     const source = this.sourcesService.getSource(this.sourceId);
     source.setPropertiesFormData([prop]);
-
-    console.log(`set property ${key} ${value}`)
     this.tainted = true // restote on cancel 
   }
 
@@ -302,7 +300,7 @@ export default class RtvcSourceProperties extends SourceProperties {
 
   onAdd() {
     if (this.manuals.length >= this.manualMax) return
-    const index = 'manual/' + (this.manuals.length)
+    const index = `manual/${this.manuals.length}`
     this.manuals.push(
       { name: `オリジナル${this.manuals.length + 1}`, pitchShift: 0, amount: 0, primaryVoice: 0, secondaryVoice: -1 },
     )
@@ -324,10 +322,10 @@ export default class RtvcSourceProperties extends SourceProperties {
     const idx = this.getManualIndexNum(index)
     if (idx < 0) return
     const v = this.manuals[idx]
-    const newIndex = 'manual/' + (this.manuals.length)
+    const newIndex = `manual/${this.manuals.length}`
 
     this.manuals.push(
-      { name: v.name + 'のコピー', pitchShift: v.pitchShift, amount: v.amount, primaryVoice: v.primaryVoice, secondaryVoice: v.secondaryVoice },
+      { name: `${v.name}のコピー`, pitchShift: v.pitchShift, amount: v.amount, primaryVoice: v.primaryVoice, secondaryVoice: v.secondaryVoice },
     )
 
     this.updateManualList()
