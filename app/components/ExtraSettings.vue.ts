@@ -11,7 +11,7 @@ import { UserService } from 'services/user';
 import { StreamingService } from 'services/streaming';
 import { AppService } from 'services/app';
 import { $t } from 'services/i18n';
-import { QuestionaireService } from 'services/questionaire';
+import { QuestionaireService } from 'services/uuid';
 import ClipBoardCopy from '../../media/images/clipboard-copy.svg';
 
 @Component({

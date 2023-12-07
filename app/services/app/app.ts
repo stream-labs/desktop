@@ -19,7 +19,7 @@ import { FileManagerService } from 'services/file-manager';
 import { PatchNotesService } from 'services/patch-notes';
 import { ProtocolLinksService } from 'services/protocol-links';
 import { WindowsService } from 'services/windows';
-import { QuestionaireService } from 'services/questionaire';
+import { QuestionaireService } from 'services/uuid';
 import { InformationsService } from 'services/informations';
 import { CrashReporterService } from 'services/crash-reporter';
 import * as obs from '../../../obs-api';

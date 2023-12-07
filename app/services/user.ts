@@ -34,7 +34,7 @@ import { memoryUsage as nodeMemUsage } from 'process';
 import { $t } from 'services/i18n';
 import uuid from 'uuid/v4';
 import { OnboardingService } from './onboarding';
-import { QuestionaireService } from './questionaire';
+import { QuestionaireService } from './uuid';
 import { addClipboardMenu } from 'util/addClipboardMenu';
 
 // Eventually we will support authing multiple platforms at once

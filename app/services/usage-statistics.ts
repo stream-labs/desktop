@@ -6,7 +6,7 @@ import { Inject } from './core/injector';
 import { Service } from './core/service';
 import { HostsService } from './hosts';
 import { SynthesizerId, SynthesizerSelector } from './nicolive-program/state';
-import { QuestionaireService } from './questionaire';
+import { QuestionaireService } from './uuid';
 import { EncoderType } from './settings/optimizer';
 import { UserService } from './user';
 
