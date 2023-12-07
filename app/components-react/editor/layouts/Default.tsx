@@ -6,7 +6,7 @@ import styles from './Layouts.m.less';
 
 export function Default(p: React.PropsWithChildren<LayoutProps>) {
   const { mins, bars, resizes, calculateMax, setBar, componentRef } = useLayout(
-    ['1', '2', ['3', '4', '5']],
+    [['1'], ['2'], ['3', '4', '5']],
     false,
     p.childrenMins,
     p.onTotalWidth,

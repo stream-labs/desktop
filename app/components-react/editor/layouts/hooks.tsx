@@ -16,8 +16,16 @@ export interface IResizeMins {
 
 export interface ILayoutSlotArray extends Array<ILayoutSlotArray | LayoutSlot> {}
 
+/**
+ * Just a note on some of the more unique params
+ * @param vectors is a two-dimensional array that describes the shape of the layout.
+ * the primary array describes the primary, resizable portions of the layout,
+ * while the inner arrays describe non-resizable subdivisions of each resizable slice.
+ * @param isColumns determines whether the layout in question has vertical
+ * or horizontal resize bars and thus is either primarily column or row based
+ */
 export default function useLayout(
-  vectors: ILayoutSlotArray,
+  vectors: ILayoutSlotArray[],
   isColumns: boolean,
   childrenMins: Dictionary<IVec2>,
   onTotalWidth: (slots: IVec2Array, isColumns: boolean) => void = () => {},
@@ -36,7 +44,10 @@ export default function useLayout(
   });
 
   const mins = useMemo(() => {
-    const [restSlots, bar1Slots, bar2Slots] = vectorsToSlots();
+    // Each layout has a maximum of three primary sections
+    // and a minimum of two, so restSlots and bar1Slots
+    // will always have values
+    const [restSlots, bar1Slots, bar2Slots] = vectors;
     const rest = calculateMinimum(restSlots);
     const bar1 = calculateMinimum(bar1Slots);
     let bar2 = 0;
@@ -56,6 +67,7 @@ export default function useLayout(
 
   const componentEl = useRef<HTMLDivElement | null>(null);
 
+  // Callback ref used due to reactivity issues
   const componentRef = useCallback(node => {
     if (node) {
       componentEl.current = node;
@@ -64,56 +76,60 @@ export default function useLayout(
     }
   }, []);
 
-  function vectorsToSlots() {
-    const slotArray: Array<ILayoutSlotArray> = [];
-    vectors.forEach(vector => {
-      if (typeof vector === 'string') slotArray.push([vector]);
-      else if (Array.isArray(vector)) slotArray.push(vector);
-    });
-    return slotArray;
-  }
-
-  function getBarPixels(bar: 'bar1' | 'bar2', offset: number) {
+  /**
+   * Because we store resize positions as proportions in state,
+   * we need to derive pixel values to render based on the size
+   * of the current window
+   */
+  const getBarPixels = useCallback((bar: 'bar1' | 'bar2', offset: number) => {
     if (!componentEl.current) return;
     // Migrate from pixels to proportions
     if ((resizes[bar] as number) >= 1) setBar(bar, resizes[bar] as number);
     const { height, width } = componentEl.current.getBoundingClientRect();
     const offsetSize = isColumns ? width - offset : height;
     return Math.round(offsetSize * (resizes[bar] as number));
-  }
+  }, []);
 
-  function setBar(bar: 'bar1' | 'bar2', val: number) {
+  const setBar = useCallback((bar: 'bar1' | 'bar2', val: number) => {
     if (val === 0 || !componentEl.current) return;
     setBars(oldState => ({ ...oldState, [bar]: val }));
     const { height, width } = componentEl.current.getBoundingClientRect();
     const totalSize = isColumns ? width : height;
     const proportion = parseFloat((val / totalSize).toFixed(2));
     LayoutService.actions.setBarResize(bar, proportion);
-  }
+  }, []);
 
-  function minsFromSlot(slot: LayoutSlot) {
+  const minsFromSlot = useCallback((slot: LayoutSlot) => {
     // If there is no component slotted we return no minimum
     if (!childrenMins || !childrenMins[slot]) return { x: 0, y: 0 };
     return childrenMins[slot];
-  }
+  }, []);
 
-  function calculateMinimum(slots: ILayoutSlotArray) {
+  /**
+   * calculates the aggregate minimum value of all components of a given
+   * subset or set of layout slots
+   */
+  const calculateMinimum = useCallback((slots: ILayoutSlotArray) => {
     const mins = mapVectors(slots);
-    return calculateMin(mins);
-  }
+    return LayoutService.views.calculateMinimum(isColumns ? 'x' : 'y', mins);
+  }, []);
 
-  function mapVectors(slots: ILayoutSlotArray): IVec2Array {
+  /**
+   * @returns a map of the ILayoutSlotArray provided with the minimum
+   * sizes of components in each slot
+   */
+  const mapVectors = useCallback((slots: ILayoutSlotArray): IVec2Array => {
     return slots.map(slot => {
       if (Array.isArray(slot)) return mapVectors(slot);
       return minsFromSlot(slot);
     });
-  }
+  }, []);
 
-  function calculateMin(slots: IVec2Array) {
-    return LayoutService.views.calculateMinimum(isColumns ? 'x' : 'y', slots);
-  }
-
-  function updateSize(chatCollapsed = true, oldChatCollapsed?: boolean) {
+  /**
+   * Updates the total proportions of the resizable areas as a result of
+   * non-resize actions such as window resizing or expanding chat
+   */
+  const updateSize = useCallback((chatCollapsed = true, oldChatCollapsed?: boolean) => {
     let offset = chatCollapsed ? 0 : livedockSize;
     // Reverse offset if chat is collapsed from an uncollapsed state
     if (chatCollapsed && oldChatCollapsed === false) {
@@ -125,14 +141,18 @@ export default function useLayout(
       const bar2 = getBarPixels('bar2', offset);
       if (bar2) setBar('bar2', bar2);
     }
-  }
+  }, []);
 
-  function calculateMax(restMin: number) {
+  /**
+   * Calculates the maximum area a bar can expand two given the min
+   * constraints of the other resizable area(s)
+   */
+  const calculateMax = useCallback((restMin: number) => {
     if (!componentEl.current) return 0;
     const { height, width } = componentEl.current.getBoundingClientRect();
     const max = isColumns ? width : height;
     return max - restMin;
-  }
+  }, []);
 
   return { componentRef, calculateMax, setBar, mins, bars, resizes };
 }

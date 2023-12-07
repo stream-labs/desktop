@@ -6,7 +6,7 @@ import styles from './Layouts.m.less';
 
 export function OnePane(p: React.PropsWithChildren<LayoutProps>) {
   const { mins, bars, resizes, calculateMax, setBar, componentRef } = useLayout(
-    ['2', ['1', ['3', '4', '5']]],
+    [['2'], ['1', ['3', '4', '5']]],
     true,
     p.childrenMins,
     p.onTotalWidth,

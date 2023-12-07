@@ -6,7 +6,7 @@ import styles from './Layouts.m.less';
 
 export function TwoPane(p: React.PropsWithChildren<LayoutProps>) {
   const { mins, bars, resizes, calculateMax, setBar, componentRef } = useLayout(
-    ['2', '5', ['1', ['3', '4']]],
+    [['2'], ['5'], ['1', ['3', '4']]],
     true,
     p.childrenMins,
     p.onTotalWidth,

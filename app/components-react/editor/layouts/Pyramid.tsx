@@ -6,7 +6,7 @@ import styles from './Layouts.m.less';
 
 export function Pyramid(p: React.PropsWithChildren<LayoutProps>) {
   const { mins, bars, resizes, calculateMax, setBar, componentRef } = useLayout(
-    ['1', ['2', '3']],
+    [['1'], ['2', '3']],
     false,
     p.childrenMins,
     p.onTotalWidth,
