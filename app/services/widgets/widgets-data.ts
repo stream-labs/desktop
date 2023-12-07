@@ -75,7 +75,7 @@ export const WidgetTesters: IWidgetTester[] = [
   },
   {
     type: 'donations',
-    name: 'Donation',
+    name: 'Tip',
     url(host) {
       return `https://${host}/api/v5/slobs/test/streamlabs/donation`;
     },
@@ -172,7 +172,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
   },
 
   [WidgetType.DonationGoal]: {
-    name: 'Donation Goal',
+    name: 'Tip Goal',
     url(host, token) {
       return `https://${host}/widgets/donation-goal?token=${token}`;
     },
@@ -495,11 +495,11 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     shortDesc: $t('Dynamic, live alerts'),
   },
   [WidgetType.DonationGoal]: {
-    name: $t('Donation Goal'),
+    name: $t('Tip Goal'),
     description: $t('Set a goal for your viewers to help you reach.'),
-    demoVideo: true,
+    demoVideo: false,
     demoFilename: 'source-donation-goal.gif',
-    supportList: [$t('Donations')],
+    supportList: [$t('Tips')],
     icon: 'fas fa-calendar',
   },
   [WidgetType.FollowerGoal]: {
@@ -555,7 +555,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
   [WidgetType.CharityGoal]: {
     name: $t('Streamlabs Charity Goal'),
     description: $t('Set a goal for your viewers to help you reach.'),
-    demoVideo: true,
+    demoVideo: false,
     demoFilename: 'source-charity-goal.gif',
     supportList: [$t('Streamlabs Charity Donations')],
     icon: 'fas fa-calendar',
