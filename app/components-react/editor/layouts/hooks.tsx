@@ -30,7 +30,7 @@ export default function useLayout(
   childrenMins: Dictionary<IVec2>,
   onTotalWidth: (slots: IVec2Array, isColumns: boolean) => void = () => {},
 ) {
-  const { CustomizationService, LayoutService, WindowsService } = Services;
+  const { CustomizationService, LayoutService } = Services;
 
   const { livedockSize, resizes, chatCollapsed } = useVuex(() => ({
     livedockSize: CustomizationService.state.livedockSize,
@@ -109,10 +109,10 @@ export default function useLayout(
    * calculates the aggregate minimum value of all components of a given
    * subset or set of layout slots
    */
-  const calculateMinimum = useCallback((slots: ILayoutSlotArray) => {
+  function calculateMinimum(slots: ILayoutSlotArray) {
     const mins = mapVectors(slots);
     return LayoutService.views.calculateMinimum(isColumns ? 'x' : 'y', mins);
-  }, []);
+  }
 
   /**
    * @returns a map of the ILayoutSlotArray provided with the minimum
