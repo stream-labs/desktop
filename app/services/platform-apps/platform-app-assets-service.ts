@@ -123,10 +123,14 @@ export class PlatformAppAssetsService extends PersistentStatefulService<AssetsSe
    * @see {ADD_ASSET}
    */
   async addPlatformAppAsset(appId: string, assetUrl: string) {
+    console.log('adding platform asset');
     const { originalUrl, filePath } = await this.getAssetDiskInfo(appId, assetUrl);
+    console.log('downloading file');
     await downloadFile(originalUrl, filePath);
+    console.log('file downloaded');
 
     const checksum = await getChecksum(filePath);
+    console.log('checksum', checksum);
 
     this.ADD_ASSET(appId, assetUrl, checksum);
 
@@ -134,7 +138,9 @@ export class PlatformAppAssetsService extends PersistentStatefulService<AssetsSe
   }
 
   async getAssetDiskInfo(appId: string, assetUrl: string) {
+    console.log('getting asset disk info');
     const assetsDir = await this.getAssetsTargetDirectory(appId);
+    console.log('assetsDir', assetsDir);
     const filePath = path.join(assetsDir, path.basename(assetUrl));
 
     return { filePath, originalUrl: assetUrl };
@@ -195,7 +201,7 @@ export class PlatformAppAssetsService extends PersistentStatefulService<AssetsSe
    * @param appId Application ID
    */
   async getAssetsTargetDirectory(appId: string): Promise<string> {
-    return this.ensureAssetsDir(this.getApp(appId));
+    return await this.ensureAssetsDir(this.getApp(appId));
   }
 
   /**
@@ -206,8 +212,11 @@ export class PlatformAppAssetsService extends PersistentStatefulService<AssetsSe
    */
   async ensureAssetsDir(app: ILoadedApp): Promise<string> {
     const appAssetsDir = path.join(this.appService.appDataDirectory, 'Media', 'Apps', app.id);
+    console.log('appAssetsDir', appAssetsDir);
 
     await mkdirp(appAssetsDir);
+
+    console.log('made directory');
 
     return appAssetsDir;
   }

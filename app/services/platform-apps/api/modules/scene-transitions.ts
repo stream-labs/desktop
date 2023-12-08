@@ -99,6 +99,7 @@ export class SceneTransitionsModule extends Module {
    */
   @apiMethod()
   async createTransition(ctx: IApiContext, options: TransitionOptions): Promise<ITransition> {
+    console.log('creating transition request', options);
     if (options.type === 'stinger') {
       const appId = ctx.app.id;
 
@@ -131,11 +132,15 @@ export class SceneTransitionsModule extends Module {
         ...settings,
       } as TransitionOptions);
 
+      console.log('transition options', transitionOptions);
+
       const transition = this.transitionsService.createTransition(
         ETransitionType.Stinger,
         name,
         transitionOptions,
       );
+
+      console.log('created transition', transition);
 
       this.platformAppAssetsService.linkAsset(appId, assetUrl, 'transition', transition.id);
 
@@ -254,6 +259,7 @@ export class SceneTransitionsModule extends Module {
     shouldLock: boolean,
     options: TransitionOptions,
   ): ITransitionCreateOptions {
+    console.log('creating transition options');
     const obsKeyMapping = {
       audioFadeStyle: 'audio_fade_style',
       transitionPointType: 'tp_type',

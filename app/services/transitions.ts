@@ -412,6 +412,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
   }
 
   createTransition(type: ETransitionType, name: string, options: ITransitionCreateOptions = {}) {
+    console.log('creating transition', options);
     const id = options.id || uuid();
     const transition = obs.TransitionFactory.create(type, id, options.settings || {});
     const manager = new DefaultManager(transition, options.propertiesManagerSettings || {});
