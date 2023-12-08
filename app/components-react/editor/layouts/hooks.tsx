@@ -77,6 +77,32 @@ export default function useLayout(
   }, []);
 
   /**
+   * calculates the aggregate minimum value of all components of a given
+   * subset or set of layout slots
+   */
+  function calculateMinimum(slots: ILayoutSlotArray) {
+    const mins = mapVectors(slots);
+    return LayoutService.views.calculateMinimum(isColumns ? 'x' : 'y', mins);
+  }
+
+  /**
+   * @returns a map of the ILayoutSlotArray provided with the minimum
+   * sizes of components in each slot
+   */
+  function mapVectors(slots: ILayoutSlotArray): IVec2Array {
+    return slots.map(slot => {
+      if (Array.isArray(slot)) return mapVectors(slot);
+      return minsFromSlot(slot);
+    });
+  }
+
+  function minsFromSlot(slot: LayoutSlot) {
+    // If there is no component slotted we return no minimum
+    if (!childrenMins || !childrenMins[slot]) return { x: 0, y: 0 };
+    return childrenMins[slot];
+  }
+
+  /**
    * Because we store resize positions as proportions in state,
    * we need to derive pixel values to render based on the size
    * of the current window
@@ -97,32 +123,6 @@ export default function useLayout(
     const totalSize = isColumns ? width : height;
     const proportion = parseFloat((val / totalSize).toFixed(2));
     LayoutService.actions.setBarResize(bar, proportion);
-  }, []);
-
-  const minsFromSlot = useCallback((slot: LayoutSlot) => {
-    // If there is no component slotted we return no minimum
-    if (!childrenMins || !childrenMins[slot]) return { x: 0, y: 0 };
-    return childrenMins[slot];
-  }, []);
-
-  /**
-   * calculates the aggregate minimum value of all components of a given
-   * subset or set of layout slots
-   */
-  function calculateMinimum(slots: ILayoutSlotArray) {
-    const mins = mapVectors(slots);
-    return LayoutService.views.calculateMinimum(isColumns ? 'x' : 'y', mins);
-  }
-
-  /**
-   * @returns a map of the ILayoutSlotArray provided with the minimum
-   * sizes of components in each slot
-   */
-  const mapVectors = useCallback((slots: ILayoutSlotArray): IVec2Array => {
-    return slots.map(slot => {
-      if (Array.isArray(slot)) return mapVectors(slot);
-      return minsFromSlot(slot);
-    });
   }, []);
 
   /**
