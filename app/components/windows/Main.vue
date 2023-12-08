@@ -40,7 +40,7 @@
           v-if="!showLoadingSpinner"
           :is="page"
           :params="params"
-          :component-props="{ params }"
+          :component-props="{ onTotalWidth: width => handleEditorWidth(width), params }"
           @totalWidth="width => handleEditorWidth(width)"
           style="grid-row: 1 / span 1"
         />

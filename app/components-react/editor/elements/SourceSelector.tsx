@@ -880,13 +880,11 @@ const TreeNode = React.forwardRef(
   },
 );
 
-export default function SourceSelectorElement() {
+const mins = { x: 200, y: 120 };
+
+export function SourceSelectorElement() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { renderElement } = useBaseElement(
-    <SourceSelector />,
-    { x: 200, y: 120 },
-    containerRef.current,
-  );
+  const { renderElement } = useBaseElement(<SourceSelector />, mins, containerRef.current);
 
   return (
     <div
@@ -898,3 +896,5 @@ export default function SourceSelectorElement() {
     </div>
   );
 }
+
+SourceSelectorElement.mins = mins;

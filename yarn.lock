@@ -2821,6 +2821,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/react-resizable@npm:3.0.6":
+  version: 3.0.6
+  resolution: "@types/react-resizable@npm:3.0.6"
+  dependencies:
+    "@types/react": "*"
+  checksum: da5594b42ae5ab0c6ce27abb54cc3f1d5738e6905c2dac2beb2b12f941b47469d94dc3309274627b9d8a3ee9cc7bdf2c463d73e2a61a098dc80326c2d83ea237
+  languageName: node
+  linkType: hard
+
 "@types/react@npm:*, @types/react@npm:17.0.8":
   version: 17.0.8
   resolution: "@types/react@npm:17.0.8"
@@ -5213,6 +5222,13 @@ __metadata:
   version: 1.0.2
   resolution: "clone@npm:1.0.2"
   checksum: e883f0b4cea3a81fef05badae689fd30d9dc8d3aa2d87156b245f412a1767cd59b18d113d77c61d765e1a22de04b251518993861e013d8ddb64aadfa1e975efb
+  languageName: node
+  linkType: hard
+
+"clsx@npm:^1.1.1":
+  version: 1.2.1
+  resolution: "clsx@npm:1.2.1"
+  checksum: 30befca8019b2eb7dbad38cff6266cf543091dae2825c856a62a8ccf2c3ab9c2907c4d12b288b73101196767f66812365400a227581484a05f968b0307cfaf12
   languageName: node
   linkType: hard
 
@@ -11339,6 +11355,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"prop-types@npm:15.x, prop-types@npm:^15.8.1":
+  version: 15.8.1
+  resolution: "prop-types@npm:15.8.1"
+  dependencies:
+    loose-envify: ^1.4.0
+    object-assign: ^4.1.1
+    react-is: ^16.13.1
+  checksum: c056d3f1c057cb7ff8344c645450e14f088a915d078dcda795041765047fa080d38e5d626560ccaac94a4e16e3aa15f3557c1a9a8d1174530955e992c675e459
+  languageName: node
+  linkType: hard
+
 "prop-types@npm:^15.5.10, prop-types@npm:^15.6.0, prop-types@npm:^15.6.2":
   version: 15.7.2
   resolution: "prop-types@npm:15.7.2"
@@ -12122,7 +12149,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-is@npm:^16.12.0, react-is@npm:^16.8.1":
+"react-draggable@npm:^4.0.3":
+  version: 4.4.6
+  resolution: "react-draggable@npm:4.4.6"
+  dependencies:
+    clsx: ^1.1.1
+    prop-types: ^15.8.1
+  peerDependencies:
+    react: ">= 16.3.0"
+    react-dom: ">= 16.3.0"
+  checksum: 9b15aac59244873ac4561c5a2bead43a56e18d406e0a5f242bd4f9d151c074530c02b99387983104bf43417292f9cf8d063e554ed08d88792235e3fbc965f1b8
+  languageName: node
+  linkType: hard
+
+"react-is@npm:^16.12.0, react-is@npm:^16.13.1, react-is@npm:^16.8.1":
   version: 16.13.1
   resolution: "react-is@npm:16.13.1"
   checksum: f7a19ac3496de32ca9ae12aa030f00f14a3d45374f1ceca0af707c831b2a6098ef0d6bdae51bd437b0a306d7f01d4677fcc8de7c0d331eb47ad0f46130e53c5f
@@ -12133,6 +12173,18 @@ __metadata:
   version: 3.0.4
   resolution: "react-lifecycles-compat@npm:3.0.4"
   checksum: a904b0fc0a8eeb15a148c9feb7bc17cec7ef96e71188280061fc340043fd6d8ee3ff233381f0e8f95c1cf926210b2c4a31f38182c8f35ac55057e453d6df204f
+  languageName: node
+  linkType: hard
+
+"react-resizable@npm:3.0.1":
+  version: 3.0.1
+  resolution: "react-resizable@npm:3.0.1"
+  dependencies:
+    prop-types: 15.x
+    react-draggable: ^4.0.3
+  peerDependencies:
+    react: ">= 16.3"
+  checksum: 1ff2a89660ef477a4e58a9065d6fe2e740eaf08a3cddab18fd11224afc225bd0243033b630add58c92c2e5f309c70dc7f43fca427e2bdb9f0c58a214aeaa25ab
   languageName: node
   linkType: hard
 
@@ -13110,6 +13162,7 @@ __metadata:
     "@types/overlayscrollbars": 1.12.0
     "@types/qrcode.react": 1.0.2
     "@types/react": 17.0.8
+    "@types/react-resizable": 3.0.6
     "@types/request": 2.48.5
     "@types/semver": 6.2.1
     "@types/socket.io-client": 1.4.32
@@ -13196,6 +13249,7 @@ __metadata:
     react-colorful: ^5.5.0
     react-devtools-electron: ^4.7.0
     react-dom: 17.0.2
+    react-resizable: 3.0.1
     react-sortablejs: 6.0.0
     react-transition-group: ^4.4.1
     recursive-readdir: 2.2.2
