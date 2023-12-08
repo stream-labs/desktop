@@ -19,8 +19,5 @@
   "sceneCollectionsImportDescription": "The scene collection has been imported.",
 
   "updateHeader": "Update Information.",
-  "updateDone": "Done",
-
-  "questionaireSkipWarningTitle": "Confirm to terminate N Air",
-  "questionaireSkipWarning": "Questionaire is not yet submitted. are you sure?"
+  "updateDone": "Done"
 }

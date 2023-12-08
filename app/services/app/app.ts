@@ -19,7 +19,6 @@ import { FileManagerService } from 'services/file-manager';
 import { PatchNotesService } from 'services/patch-notes';
 import { ProtocolLinksService } from 'services/protocol-links';
 import { WindowsService } from 'services/windows';
-import { QuestionaireService } from 'services/questionaire';
 import { InformationsService } from 'services/informations';
 import { CrashReporterService } from 'services/crash-reporter';
 import * as obs from '../../../obs-api';
@@ -63,7 +62,6 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private performanceMonitorService: PerformanceMonitorService;
   @Inject() private fileManagerService: FileManagerService;
   @Inject() private protocolLinksService: ProtocolLinksService;
-  @Inject() private questionaireService: QuestionaireService;
   @Inject() private informationsService: InformationsService;
   @Inject() private crashReporterService: CrashReporterService;
   private loadingPromises: Dictionary<Promise<any>> = {};
@@ -95,9 +93,8 @@ export class AppService extends StatefulService<IAppState> {
     // await this.platformAppsService.initialize();
 
     await this.sceneCollectionsService.initialize();
-    const questionaireStarted = await this.questionaireService.startIfRequired();
 
-    const onboarded = !questionaireStarted && this.onboardingService.startOnboardingIfRequired();
+    const onboarded = this.onboardingService.startOnboardingIfRequired();
 
     electron.ipcRenderer.on('shutdown', () => {
       electron.ipcRenderer.send('acknowledgeShutdown');

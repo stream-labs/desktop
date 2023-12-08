@@ -11,7 +11,7 @@ import { UserService } from 'services/user';
 import { StreamingService } from 'services/streaming';
 import { AppService } from 'services/app';
 import { $t } from 'services/i18n';
-import { QuestionaireService } from 'services/questionaire';
+import { UuidService } from 'services/uuid';
 import ClipBoardCopy from '../../media/images/clipboard-copy.svg';
 
 @Component({
@@ -27,13 +27,13 @@ export default class ExtraSettings extends Vue {
   @Inject() userService: UserService;
   @Inject() streamingService: StreamingService;
   @Inject() appService: AppService;
-  @Inject() questionaireService: QuestionaireService;
+  @Inject() uuidService: UuidService;
 
   cacheUploading = false;
   showCacheId = false;
 
   get cacheId(): string {
-    return this.questionaireService.uuid;
+    return this.uuidService.uuid;
   }
 
   copyToClipboard(text: string) {

@@ -34,7 +34,7 @@ import { memoryUsage as nodeMemUsage } from 'process';
 import { $t } from 'services/i18n';
 import uuid from 'uuid/v4';
 import { OnboardingService } from './onboarding';
-import { QuestionaireService } from './questionaire';
+import { UuidService } from './uuid';
 import { addClipboardMenu } from 'util/addClipboardMenu';
 
 // Eventually we will support authing multiple platforms at once
@@ -47,7 +47,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private sceneCollectionsService: SceneCollectionsService;
   @Inject() private onboardingService: OnboardingService;
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
-  @Inject() private questionaireService: QuestionaireService;
+  @Inject() private uuidService: UuidService;
 
   @mutation()
   LOGIN(auth: IPlatformAuth) {
@@ -355,7 +355,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         scope.setUser({});
         scope.setExtra('platform', null);
       }
-      scope.setExtra('uuid', this.questionaireService.uuid);
+      scope.setExtra('uuid', this.uuidService.uuid);
     });
   }
 
