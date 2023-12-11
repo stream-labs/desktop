@@ -56,6 +56,7 @@ export default class RtvcSourceProperties extends SourceProperties {
   // primary=100 secondary=-1 amonut=0.0
 
   initialMonitoringType: obs.EMonitoringType
+  currentMonitoringType: obs.EMonitoringType
 
   manuals: ManualParam[]
   currentIndex: string = "preset/0"
@@ -178,6 +179,7 @@ export default class RtvcSourceProperties extends SourceProperties {
     const onValue = this.initialMonitoringType !== obs.EMonitoringType.None ? this.initialMonitoringType : obs.EMonitoringType.MonitoringOnly
     const monitoringType = this.isMonitor ? onValue : obs.EMonitoringType.None
     this.audioService.setSettings(this.sourceId, { monitoringType })
+    this.currentMonitoringType = monitoringType
   }
 
   // -- manual param in/out
@@ -252,6 +254,7 @@ export default class RtvcSourceProperties extends SourceProperties {
     if (audio) {
       const m = audio.monitoringType
       this.initialMonitoringType = m
+      this.currentMonitoringType = m
       this.isMonitor = m !== obs.EMonitoringType.None
     }
     this.device = this.getPropertyValue('device')
@@ -272,6 +275,11 @@ export default class RtvcSourceProperties extends SourceProperties {
 
   // 右上xではOKという感じらしい
   beforeDestroy() {
+
+    // モニタリング状態はもとの値に戻す
+    if(this.initialMonitoringType !== this.currentMonitoringType)
+    this.audioService.setSettings(this.sourceId, { monitoringType:this.initialMonitoringType })
+
     if (this.canceled) {
       if (this.tainted) {
         const source = this.sourcesService.getSource(this.sourceId);
