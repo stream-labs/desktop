@@ -61,11 +61,10 @@ export function ColorInput(p: TSlobsInputProps<{}, string | IRGBAColor>) {
   const alphaMode = typeof inputAttrs.value !== 'string';
 
   useEffect(() => {
-    console.log('*** value', inputAttrs.value);
     setTextInputVal(colorToHex(inputAttrs.value));
   }, [inputAttrs.value]);
 
-  // open eydrop picker
+  // open eyedrop picker
   async function eyedrop(e: React.MouseEvent) {
     e.stopPropagation();
     const colorPicker = (await loadColorPicker()).default;
