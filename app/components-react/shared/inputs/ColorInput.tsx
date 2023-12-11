@@ -61,6 +61,7 @@ export function ColorInput(p: TSlobsInputProps<{}, string | IRGBAColor>) {
   const alphaMode = typeof inputAttrs.value !== 'string';
 
   useEffect(() => {
+    console.log('*** value', inputAttrs.value);
     setTextInputVal(colorToHex(inputAttrs.value));
   }, [inputAttrs.value]);
 
@@ -112,6 +113,14 @@ export function ColorInput(p: TSlobsInputProps<{}, string | IRGBAColor>) {
     if (typeof inputAttrs.value === 'string') {
       inputAttrs.onChange(color.toLowerCase());
     } else {
+      // Prevent calculating alpha if the user is in the middle of typing
+      // the alpha portion of the hex. In this situation, colors are rendered opaque.
+      if (ev.target.value?.length === 6 || ev.target.value?.length === 7) {
+        const opaqueColor = color.concat('ff');
+        inputAttrs.onChange(opaqueColor.toLowerCase());
+        return;
+      }
+
       const rgbaColor = hexToRGBA(color);
       inputAttrs.onChange(rgbaColor);
     }
