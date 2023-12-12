@@ -1307,7 +1307,7 @@ export class StreamingService
         // -4 is used for generic unknown messages in OBS. Both -4 and any other code
         // we don't recognize should fall into this branch and show a generic error.
         errorText = $t(
-          'An error occurred with the output. Please check your streaming and recording settings.',
+          'An error occurred with the output. Please check and switch encoders in your streaming and recording Output settings.',
         );
         if (info.error) {
           showNativeErrorMessage = true;
