@@ -67,11 +67,11 @@ export class StreamlabelsManager extends DefaultManager {
     }
   }
 
-  normalizeText(text: string) {
+  normalizeText(text: string | undefined) {
     // When using `item_separator` for list items, it would appear that streamlabels will
     // send output like `foo\\nbar` instead of `foo\nbar`, normalize here.
     // We don't want to do it in settings since it would be sent to the backend
-    return text.replace('\\n', '\n');
+    return text?.replace('\\n', '\n');
   }
 
   applySettings(settings: Dictionary<any>) {
