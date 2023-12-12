@@ -25,7 +25,7 @@ import {
 import cloneDeep from 'lodash/cloneDeep';
 import { Button } from 'antd';
 import InputWrapper from '../shared/inputs/InputWrapper';
-import { $t, $translateIfExist } from '../../services/i18n';
+import { $t, $translateIfExist, $translateIfExistWithCheck } from '../../services/i18n';
 import Utils from 'services/utils';
 
 interface IExtraInputProps {
@@ -128,9 +128,11 @@ function ObsInput(p: IObsInputProps) {
         if (opt.value === 0 && opt.description === '') {
           return { label: $t('Select Option'), value: 0 };
         }
+
         return {
           value: opt.value,
-          label: opt.description,
+          label: $translateIfExistWithCheck(opt.description),
+          originalLabel: opt.description,
         };
       });
       return <ListInput {...inputProps} options={options} allowClear={false} />;
