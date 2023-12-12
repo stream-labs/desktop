@@ -426,6 +426,9 @@ export class StartStreamingButton extends ReactComponent {}
 @Component({ props: { name: { default: 'StreamScheduler' } } })
 export class StreamScheduler extends ReactComponent {}
 
+@Component({ props: { name: { default: 'Studio' } } })
+export class Studio extends ReactComponent {}
+
 @Component({ props: { name: { default: 'StudioEditor' } } })
 export class StudioEditor extends ReactComponent {}
 

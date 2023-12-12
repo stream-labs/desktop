@@ -106,6 +106,23 @@ export async function waitForEnabled(selectorOrEl: TSelectorOrEl, options?: Wait
   await (await select(selectorOrEl)).waitForEnabled(options);
 }
 
+/**
+ * Get number of elements displayed
+ * @remark This is needed because arrays of WebdriverIO.Element cannot use array methods and properties
+ */
+export async function getNumElements(selector: string): Promise<number> {
+  const elements = (await selectElements(selector)).values();
+  let numElements = 0;
+
+  if (elements) {
+    for await (const element of elements) {
+      numElements++;
+    }
+  }
+
+  return numElements;
+}
+
 // WINDOW FOCUS
 
 export async function getFocusedWindowId(): Promise<string> {

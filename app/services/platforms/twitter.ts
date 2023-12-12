@@ -23,8 +23,17 @@ interface ITwitterServiceState extends IPlatformState {
   ingest: string;
 }
 
+export enum ETwitterChatType {
+  Off = 1,
+  Everyone = 2,
+  VerifiedOnly = 3,
+  FollowedOnly = 4,
+  SubscribersOnly = 5,
+}
+
 export interface ITwitterStartStreamOptions {
   title: string;
+  chatType: ETwitterChatType;
 }
 
 interface ITwitterStartStreamResponse {
@@ -39,12 +48,12 @@ export class TwitterPlatformService
   implements IPlatformService {
   static initialState: ITwitterServiceState = {
     ...BasePlatformService.initialState,
-    settings: { title: '' },
+    settings: { title: '', chatType: ETwitterChatType.Everyone },
     broadcastId: '',
     ingest: '',
   };
 
-  readonly capabilities = new Set<TPlatformCapability>(['title']);
+  readonly capabilities = new Set<TPlatformCapability>(['title', 'viewerCount']);
   readonly apiBase = 'https://api.twitter.com/2';
   readonly platform = 'twitter';
   readonly displayName = 'X (Twitter)';
@@ -66,8 +75,9 @@ export class TwitterPlatformService
   }
 
   async beforeGoLive(goLiveSettings: IGoLiveSettings, context?: TDisplayType) {
-    const title = getDefined(goLiveSettings.platforms.twitter).title;
-    const streamInfo = await this.startStream(title);
+    const streamInfo = await this.startStream(
+      goLiveSettings.platforms.twitter ?? this.state.settings,
+    );
 
     this.SET_STREAM_KEY(streamInfo.key);
     this.SET_BROADCAST_ID(streamInfo.id);
@@ -119,12 +129,13 @@ export class TwitterPlatformService
     }
   }
 
-  async startStream(title: string) {
+  async startStream(opts: ITwitterStartStreamOptions) {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/twitter/stream/start`;
     const headers = authorizedHeaders(this.userService.apiToken!);
     const body = new FormData();
-    body.append('title', title);
+    body.append('title', opts.title);
+    body.append('chat_option', opts.chatType.toString());
     const request = new Request(url, { headers, method: 'POST', body });
 
     return jfetch<ITwitterStartStreamResponse>(request);
@@ -137,6 +148,19 @@ export class TwitterPlatformService
     const request = new Request(url, { headers, method: 'POST' });
 
     return jfetch<{}>(request);
+  }
+
+  async fetchViewerCount(): Promise<number> {
+    if (!this.state.broadcastId) return 0;
+
+    const host = this.hostsService.streamlabs;
+    const url = `https://${host}/api/v5/slobs/twitter/stream/${this.state.broadcastId}/info`;
+    const headers = authorizedHeaders(this.userService.apiToken!);
+    const request = new Request(url, { headers });
+
+    const result = await jfetch<{ viewers: string }>(request);
+
+    return parseInt(result.viewers, 10);
   }
 
   /**
@@ -165,7 +189,9 @@ export class TwitterPlatformService
   }
 
   get chatUrl() {
-    return '';
+    const broadcastId = this.state.broadcastId;
+    if (!broadcastId) return '';
+    return `https://twitter.com/i/broadcasts/${broadcastId}/chat`;
   }
 
   @mutation()

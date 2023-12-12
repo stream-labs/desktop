@@ -21,6 +21,7 @@ interface ITooltipTipProps {
   title: string;
   id?: string;
   className?: HTMLAttributes<HTMLElement> | string;
+  wrapperStyle?: CSSProperties;
   style?: CSSProperties;
   lightShadow?: boolean;
   placement?: TTipPosition;
@@ -34,6 +35,7 @@ export default function Tooltip(props: PropsWithChildren<ITooltipTipProps>) {
     id,
     className = undefined,
     style,
+    wrapperStyle,
     lightShadow,
     placement = 'bottom',
     content,
@@ -44,6 +46,7 @@ export default function Tooltip(props: PropsWithChildren<ITooltipTipProps>) {
     <div
       id={id}
       className={className ? cx(className, styles.tooltipWrapper) : styles.tooltipWrapper}
+      style={wrapperStyle}
     >
       {disabled ? (
         <>
