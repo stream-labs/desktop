@@ -489,7 +489,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     name: $t('Alertbox'),
     description: $t('Thanks viewers with notification popups.'),
     demoVideo: false,
-    demoFilename: 'source-alertbox.gif',
+    demoFilename: 'source-alertbox.png',
     supportList: [$t('Donations'), $t('Subscriptions'), $t('Follows'), $t('Bits'), $t('Hosts')],
     icon: 'fas fa-bell',
     shortDesc: $t('Dynamic, live alerts'),
