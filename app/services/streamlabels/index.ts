@@ -244,10 +244,6 @@ export class StreamlabelsService extends StatefulService<IStreamlabelsServiceSta
   getSettingsForStat(statname: string) {
     const settings = { ...this.settings[statname] };
 
-    if (settings.item_separator) {
-      settings.item_separator = this.escapeNewline(settings.item_separator);
-    }
-
     if (settings.format) {
       settings.format = this.escapeNewline(settings.format);
     }
