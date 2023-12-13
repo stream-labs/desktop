@@ -514,6 +514,7 @@ export function VideoSettings() {
           name="video-settings"
         />
       </div>
+
       <LoginPromptModal
         showModal={showModal}
         handleAuth={handleAuth}

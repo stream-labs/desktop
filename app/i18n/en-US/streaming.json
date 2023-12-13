@@ -206,5 +206,11 @@
   "Selective Recording can only be used with horizontal sources.": "Selective Recording can only be used with horizontal sources.",
   "Set up Go Live Settings for Dual Output Mode in the Go Live window.": "Set up Go Live Settings for Dual Output Mode in the Go Live window.",
   "Cannot toggle Studio Mode in Dual Output Mode.": "Cannot toggle Studio Mode in Dual Output Mode.",
-  "Upgrade your stream with premium overlays with <ultra>Streamlabs Ultra</ultra>.": "Upgrade your stream with premium overlays with <ultra>Streamlabs Ultra</ultra>."
+  "Vertical Recording Only": "Vertical Recording Only",
+  "Upgrade your stream with premium overlays with <ultra>Streamlabs Ultra</ultra>.": "Upgrade your stream with premium overlays with <ultra>Streamlabs Ultra</ultra>.",
+  "Switch primary destination to horizontal output to proceed or toggle vertical recording off.": "Switch primary destination to horizontal output to proceed or toggle vertical recording off.",
+  "High, Medium File Size": "High, Medium File Size",
+  "Indistinguishable, Large File Size": "Indistinguishable, Large File Size",
+  "Lossless, Tremendously Large File Size": "Lossless, Tremendously Large File Size",
+  "A new %{displayType} Recording has been completed. Click for more info": "A new %{displayType} Recording has been completed. Click for more info"
 }

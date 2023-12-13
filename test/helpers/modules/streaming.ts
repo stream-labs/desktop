@@ -7,7 +7,8 @@ import { getApiClient } from '../api-client';
 import {
   click,
   clickButton,
-  focusChild, getFocusedWindowId,
+  focusChild,
+  getFocusedWindowId,
   isDisplayed,
   select,
   selectButton,
@@ -118,6 +119,10 @@ export async function chatIsVisible() {
 
 export async function startRecording() {
   await click('.record-button');
+  // Refactor when migrate output and stream settings to new API
+  // currently, because of the data mapping from the old api
+  // that is needed to work with the new api, it take a little longer to start the recording
+  await sleep(500);
   await waitForDisplayed('.record-button.active');
 }
 

@@ -13,6 +13,7 @@ import Spinner from 'components-react/shared/Spinner';
 import GoLiveError from '../GoLiveError';
 import UserSettingsUltra from './UserSettingsUltra';
 import UserSettingsNonUltra from './UserSettingsNonUltra';
+import StreamOptions from '../StreamOptions';
 
 /**
  * Renders settings for starting the stream
@@ -42,10 +43,11 @@ export default function DualOutputGoLiveSettings() {
     <Row gutter={16} className={styles.settingsRow}>
       {/*LEFT COLUMN*/}
       <Col span={8} className={styles.leftColumn}>
-        <Scrollable style={{ height: '100%' }}>
+        <Scrollable style={{ minHeight: '82%', flexGrow: 1 }}>
           {isPrime && <UserSettingsUltra />}
           {!isPrime && <UserSettingsNonUltra />}
         </Scrollable>
+        <StreamOptions />
       </Col>
 
       {/*RIGHT COLUMN*/}

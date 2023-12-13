@@ -567,9 +567,16 @@ export class FormMonkey {
   /**
    * returns selector for the input element by a title
    */
-  async getInputSelectorByTitle(inputTitle: string): Promise<string> {
+  async getInputSelectorByTitle(inputTitle: string, isDataName: boolean = false): Promise<string> {
     const name = await this.getInputNameByTitle(inputTitle);
     return `[data-role="input"][data-name="${name}"]`;
+  }
+
+  /**
+   * returns selector for the input element by a title
+   */
+  async getInputSelectorByName(name: string): Promise<string> {
+    return `[data-name="${name}"]`;
   }
 
   /**
@@ -604,7 +611,7 @@ export function selectTitle(optionTitle: string): FNValueSetter {
     await form.waitForLoading(input.name);
 
     // click on the first option
-    await click( `${input.selector} .multiselect__element`);
+    await click(`${input.selector} .multiselect__element`);
   };
 }
 

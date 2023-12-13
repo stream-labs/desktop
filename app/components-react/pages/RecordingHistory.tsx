@@ -192,7 +192,10 @@ export function RecordingHistory() {
             <div className={styles.recording} key={recording.timestamp}>
               <span style={{ marginRight: '8px' }}>{formattedTimestamp(recording.timestamp)}</span>
               <Tooltip title={$t('Show in folder')}>
-                <span onClick={() => showFile(recording.filename)} className={styles.filename}>
+                <span
+                  onClick={() => showFile(recording.filename)}
+                  className={cx(styles.filename, 'file')}
+                >
                   {recording.filename}
                 </span>
               </Tooltip>

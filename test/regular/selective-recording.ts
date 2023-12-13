@@ -4,8 +4,11 @@ import { addSource } from '../helpers/modules/sources';
 import {
   setOutputResolution,
   setTemporaryRecordingPath,
+  showSettingsWindow,
 } from '../helpers/modules/settings/settings';
-import { focusMain } from '../helpers/modules/core';
+import { clickButton, focusMain } from '../helpers/modules/core';
+import { sleep } from '../helpers/sleep';
+import { setFormDropdown } from '../helpers/webdriver/forms';
 
 useWebdriver();
 
