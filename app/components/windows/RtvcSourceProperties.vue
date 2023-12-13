@@ -59,7 +59,7 @@
 
               <div class="input-label"><label>声の高さ {{ pitchShift.toFixed(2) + 'cent' }} </label></div>
               <div class="input-wrapper">
-                <VueSlider v-model="pitchShift" :min="-6.00" :max="6.00" :interval="0.1" tooltip="none" />
+                <VueSlider v-model="pitchShift" :min="-1200.00" :max="1200.00" :interval="0.1" tooltip="none" />
               </div>
 
               <div class="input-label"><label>ボイス1</label></div>
