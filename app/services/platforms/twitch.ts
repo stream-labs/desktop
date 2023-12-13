@@ -28,6 +28,8 @@ export interface ITwitchStartStreamOptions {
   video?: IVideo;
   tags: string[];
   mode?: TOutputOrientation;
+  content_classification_labels?: { id: string; is_enabled: boolean }[];
+  is_branded_content?: boolean;
 }
 
 export interface ITwitchChannelInfo extends ITwitchStartStreamOptions {
@@ -53,6 +55,16 @@ interface ITwitchOAuthValidateResponse {
   login: string;
   scopes: string[];
   user_id: string;
+}
+
+interface ITwitchContentClassificationLabelsResponse {
+  data: {
+    content_classification_labels: {
+      id: string;
+      description: string;
+      name: string;
+    }[];
+  }
 }
 
 interface ITwitchServiceState extends IPlatformState {
@@ -383,6 +395,11 @@ export class TwitchService
   async validatePollsScope() {
     const hasPollsPermission = await this.hasScope('channel:manage:polls');
     this.SET_HAS_POLLS_PERMISSION(hasPollsPermission);
+  }
+
+  async getClassificationLabels() {
+    const response = await platformAuthorizedRequest<ITwitchContentClassificationLabelsResponse>('twitch', 'https://api.twitch.tv/helix/content_classification_labels');
+    return response.data?.content_classification_labels.map((lbl: { id: string, name: string }) => ({ label: lbl.name, value: lbl.id }));
   }
 
   hasScope(scope: TTwitchOAuthScope): Promise<boolean> {
