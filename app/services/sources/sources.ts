@@ -49,6 +49,7 @@ const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
 const AsyncFlag = obs.ESourceOutputFlags.Async;
 const DoNotDuplicateFlag = obs.ESourceOutputFlags.DoNotDuplicate;
+const ForceUiRefresh = obs.ESourceOutputFlags.ForceUiRefresh;
 
 export const PROPERTIES_MANAGER_TYPES = {
   default: DefaultManager,
@@ -248,6 +249,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       video: false,
       async: false,
       doNotDuplicate: false,
+      forceUiRefresh: false,
 
       configurable: addOptions.configurable,
 
@@ -356,7 +358,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
     const source = this.views.getSource(id)!;
     const muted = obsInput.muted;
     this.UPDATE_SOURCE({ id, muted });
-    this.updateSourceFlags(source.state, obsInput.outputFlags, true);
+    this.updateSourceFlags(source, obsInput.outputFlags, true);
 
     if (type === 'ndi_source') {
       this.usageStatisticsService.recordFeatureUsage('NDI');
@@ -616,16 +618,28 @@ export class SourcesService extends StatefulService<ISourcesState> {
     });
   }
 
-  private updateSourceFlags(source: ISource, flags: number, doNotEmit?: boolean) {
+  private updateSourceFlags(source: Source, flags: number, doNotEmit?: boolean) {
     const audio = !!(AudioFlag & flags);
     const video = !!(VideoFlag & flags);
     const async = !!(AsyncFlag & flags);
     const doNotDuplicate = !!(DoNotDuplicateFlag & flags);
+    const forceUiRefresh = !!(ForceUiRefresh & flags);
 
-    if (source.audio !== audio || source.video !== video) {
-      this.UPDATE_SOURCE({ audio, video, async, doNotDuplicate, id: source.sourceId });
+    if (
+      source.audio !== audio ||
+      source.video !== video ||
+      source.forceUiRefresh !== forceUiRefresh
+    ) {
+      this.UPDATE_SOURCE({
+        audio,
+        video,
+        async,
+        doNotDuplicate,
+        forceUiRefresh,
+        id: source.sourceId,
+      });
 
-      if (!doNotEmit) this.sourceUpdated.next(source);
+      if (!doNotEmit) this.sourceUpdated.next(source.getModel());
     }
   }
 
