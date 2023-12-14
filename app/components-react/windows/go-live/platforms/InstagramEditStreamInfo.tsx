@@ -28,11 +28,12 @@ export function InstagramEditStreamInfo(p: IPlatformComponentParams<'instagram'>
         required
         label={$t('Instagram Stream Key')}
         isPassword
+        placeholder={$t('Please update your Stream Key')}
         addonAfter={<PasteButton onPaste={bind.streamKey.onChange} />}
       />
       <Alert
         message={$t(
-          'You are ready to stream, but Instagram requires you to Go Live on their website after starting your stream',
+          'Remember to open Instagram in browser and click "Go Live" to start streaming!',
         )}
         type="warning"
         showIcon
