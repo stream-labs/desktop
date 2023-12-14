@@ -285,6 +285,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
     if (twitterTarget) {
       twitterTarget.platform = 'relay';
       twitterTarget.streamKey = `${this.twitterService.state.ingest}/${this.twitterService.state.streamKey}`;
+      // FIXME: see comment above
       twitterTarget.mode = this.dualOutputService.views.getPlatformMode('twitter');
     }
 
