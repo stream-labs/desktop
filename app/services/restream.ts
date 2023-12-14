@@ -295,7 +295,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
       instagramTarget.streamKey = `${this.instagramService.state.settings.streamUrl}${this.instagramService.state.streamKey}`;
       instagramTarget.mode = isDualOutputMode
         ? this.dualOutputService.views.getPlatformMode('instagram')
-        : 'portrait';
+        : 'landscape';
     }
 
     await this.createTargets(newTargets);
