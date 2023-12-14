@@ -568,6 +568,10 @@ export class StreamingService
     if (settings.platforms.tiktok?.enabled) {
       this.usageStatisticsService.recordFeatureUsage('StreamToTikTok');
     }
+
+    if (settings.platforms.instagram?.enabled) {
+      this.usageStatisticsService.recordFeatureUsage('StreamToInstagram');
+    }
   }
 
   /**
