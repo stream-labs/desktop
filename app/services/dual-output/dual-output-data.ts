@@ -55,7 +55,7 @@ export const DualOutputPlatformSettings: TDualOutputPlatformSettings = {
   },
   [EPlatform.Instagram]: {
     platform: EPlatform.Instagram,
-    display: EOutputDisplayType.Horizontal,
+    display: EOutputDisplayType.Vertical,
   },
 };
 
