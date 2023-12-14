@@ -1090,6 +1090,28 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       throw new Error('Account merging can only be performed while logged in');
     }
 
+    // HACK: faking instagram login
+    if (platform === 'instagram') {
+      const auth = {
+        widgetToken: '',
+        apiToken: '',
+        primaryPlatform: 'instagram' as TPlatform,
+        platforms: {
+          instagram: {
+            type: 'instagram' as TPlatform,
+            // HACK: faking instagram username
+            username: 'linked',
+            token: '',
+            id: 'instagram',
+          },
+        },
+        hasRelogged: true,
+      };
+
+      this.UPDATE_PLATFORM(auth.platforms[auth.primaryPlatform]);
+      return EPlatformCallResult.Success;
+    }
+
     this.SET_AUTH_STATE(EAuthProcessState.Loading);
     const onWindowShow = () =>
       this.SET_AUTH_STATE(

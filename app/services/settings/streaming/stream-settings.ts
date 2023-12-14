@@ -95,6 +95,7 @@ const platformToServiceNameMap: { [key in TPlatform]: string } = {
   trovo: 'Trovo',
   tiktok: 'Custom',
   twitter: 'Custom',
+  instagram: 'Custom',
 };
 
 /**

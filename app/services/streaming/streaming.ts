@@ -128,6 +128,7 @@ export class StreamingService
         tiktok: 'not-started',
         trovo: 'not-started',
         twitter: 'not-started',
+        instagram: 'not-started',
         setupMultistream: 'not-started',
         setupDualOutput: 'not-started',
         startVideoTransmission: 'not-started',
@@ -307,6 +308,8 @@ export class StreamingService
 
     // save current settings in store so we can re-use them if something will go wrong
     this.SET_GO_LIVE_SETTINGS(settings);
+
+    console.log('going live with settings', settings);
 
     // show the GoLive checklist
     this.UPDATE_STREAM_INFO({ lifecycle: 'runChecklist' });

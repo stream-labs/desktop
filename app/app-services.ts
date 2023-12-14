@@ -72,6 +72,7 @@ export { TrovoService } from 'services/platforms/trovo';
 export { RestreamService } from 'services/restream';
 export { TwitterService } from 'services/integrations/twitter';
 export { TwitterPlatformService } from 'services/platforms/twitter';
+export { InstagramService } from 'services/platforms/instagram';
 export { UsageStatisticsService } from './services/usage-statistics';
 export { GameOverlayService } from 'services/game-overlay';
 export { SharedStorageService } from 'services/integrations/shared-storage';
@@ -192,6 +193,7 @@ import { SettingsManagerService } from 'services/settings-manager';
 import { DualOutputService } from 'services/dual-output';
 import { MarkersService } from 'services/markers';
 import { SharedStorageService } from 'services/integrations/shared-storage';
+import { InstagramService } from 'services/platforms/instagram';
 
 export const AppServices = {
   AppService,
@@ -222,6 +224,7 @@ export const AppServices = {
   TwitterPlatformService,
   TwitchTagsService,
   TrovoService,
+  InstagramService,
   DismissablesService,
   HighlighterService,
   GrowService,

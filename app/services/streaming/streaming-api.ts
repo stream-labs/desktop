@@ -9,6 +9,7 @@ import { ITiktokStartStreamOptions } from '../platforms/tiktok';
 import { ITrovoStartStreamOptions } from '../platforms/trovo';
 import { IVideo } from 'obs-studio-node';
 import { ITwitterStartStreamOptions } from 'services/platforms/twitter';
+import { IInstagramStartStreamOptions } from 'services/platforms/instagram';
 
 export enum EStreamingState {
   Offline = 'offline',
@@ -51,6 +52,7 @@ export interface IStreamInfo {
     tiktok: TGoLiveChecklistItemState;
     trovo: TGoLiveChecklistItemState;
     twitter: TGoLiveChecklistItemState;
+    instagram: TGoLiveChecklistItemState;
     setupMultistream: TGoLiveChecklistItemState;
     setupDualOutput: TGoLiveChecklistItemState;
     startVideoTransmission: TGoLiveChecklistItemState;
@@ -67,6 +69,7 @@ export interface IStreamSettings {
     tiktok?: IPlatformFlags & ITiktokStartStreamOptions;
     trovo?: IPlatformFlags & ITrovoStartStreamOptions;
     twitter?: IPlatformFlags & ITwitterStartStreamOptions;
+    instagram?: IPlatformFlags & IInstagramStartStreamOptions;
   };
   customDestinations: ICustomStreamDestination[];
   advancedMode: boolean;
