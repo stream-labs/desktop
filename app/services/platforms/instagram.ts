@@ -70,7 +70,7 @@ export class InstagramService
 
     console.log('beforeGoLive', settings.streamKey, settings.streamUrl);
     this.SET_STREAM_KEY(settings.streamKey);
-    this.SET_STREAM_SETTINGS(settings);
+    this.UPDATE_STREAM_SETTINGS(settings);
     this.setPlatformContext('instagram');
   }
 

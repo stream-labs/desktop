@@ -14,9 +14,6 @@ export function InstagramEditStreamInfo(p: IPlatformComponentParams<'instagram'>
     p.onChange({ ...p.value, ...updatedSettings }),
   );
 
-  // Only show warning after the user has populated both stream URL and key
-  const shouldShowWarning = !!(bind.streamUrl.value.length && bind.streamKey.value.length);
-
   return (
     <Form name="instagram-settings">
       <TextInput
@@ -33,16 +30,14 @@ export function InstagramEditStreamInfo(p: IPlatformComponentParams<'instagram'>
         isPassword
         addonAfter={<PasteButton onPaste={bind.streamKey.onChange} />}
       />
-      {shouldShowWarning && (
-        <Alert
-          message={$t(
-            'You are ready to stream, but Instagram requires you to Go Live on their website after starting your stream',
-          )}
-          type="warning"
-          showIcon
-          closable
-        />
-      )}
+      <Alert
+        message={$t(
+          'You are ready to stream, but Instagram requires you to Go Live on their website after starting your stream',
+        )}
+        type="warning"
+        showIcon
+        closable
+      />
     </Form>
   );
 }

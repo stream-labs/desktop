@@ -16,6 +16,7 @@ import * as remote from '@electron/remote';
 import { VideoSettingsService, TDisplayType } from './settings-v2/video';
 import { DualOutputService } from './dual-output';
 import { TwitterPlatformService } from './platforms/twitter';
+import { InstagramService } from './platforms/instagram';
 
 export type TOutputOrientation = 'landscape' | 'portrait';
 interface IRestreamTarget {
@@ -53,6 +54,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
   @Inject() facebookService: FacebookService;
   @Inject() tiktokService: TiktokService;
   @Inject() trovoService: TrovoService;
+  @Inject() instagramService: InstagramService;
   @Inject() videoSettingsService: VideoSettingsService;
   @Inject() dualOutputService: DualOutputService;
   @Inject('TwitterPlatformService') twitterService: TwitterPlatformService;
@@ -281,6 +283,14 @@ export class RestreamService extends StatefulService<IRestreamState> {
       twitterTarget.platform = 'relay';
       twitterTarget.streamKey = `${this.twitterService.state.ingest}/${this.twitterService.state.streamKey}`;
       twitterTarget.mode = this.dualOutputService.views.getPlatformMode('twitter');
+    }
+
+    // treat instagram as a custom destination
+    const instagramTarget = newTargets.find(t => t.platform === 'instagram');
+    if (instagramTarget) {
+      instagramTarget.platform = 'relay';
+      instagramTarget.streamKey = `${this.instagramService.state.settings.streamUrl}/${this.instagramService.state.streamKey}`;
+      instagramTarget.mode = this.dualOutputService.views.getPlatformMode('instagram');
     }
 
     await this.createTargets(newTargets);
