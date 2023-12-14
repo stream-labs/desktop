@@ -14,6 +14,7 @@ import { IGoLiveSettings } from 'services/streaming';
 import { TDisplayType } from 'services/settings-v2';
 import { WidgetType } from 'services/widgets';
 import { InheritMutations, mutation } from 'services/core';
+import Utils from 'services/utils';
 
 export interface IInstagramStartStreamOptions {
   streamUrl: string;
@@ -52,6 +53,7 @@ export class InstagramService
     return Promise.resolve();
   }
 
+  // FIXME: failing to go live doesn't seem to trigger an error, is there a way to detect it?
   async beforeGoLive(goLiveSettings: IGoLiveSettings, context?: TDisplayType) {
     const settings = getDefined(goLiveSettings.platforms.instagram);
 
@@ -67,6 +69,7 @@ export class InstagramService
     }
 
     console.log('beforeGoLive', settings.streamKey, settings.streamUrl);
+    this.SET_STREAM_KEY(settings.streamKey);
     this.SET_STREAM_SETTINGS(settings);
     this.setPlatformContext('instagram');
   }
