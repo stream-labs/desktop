@@ -12,6 +12,7 @@ import { IPlatformComponentParams, TLayoutMode } from './platforms/PlatformSetti
 import { getDefined } from '../../../util/properties-type-guards';
 import { TrovoEditStreamInfo } from './platforms/TrovoEditStreamInfo';
 import { TwitterEditStreamInfo } from './platforms/TwitterEditStreamInfo';
+import { InstagramEditStreamInfo } from './platforms/InstagramEditStreamInfo';
 
 export default function PlatformSettings() {
   const {
@@ -97,6 +98,9 @@ export default function PlatformSettings() {
               {platform === 'trovo' && <TrovoEditStreamInfo {...createPlatformBinding('trovo')} />}
               {platform === 'twitter' && (
                 <TwitterEditStreamInfo {...createPlatformBinding('twitter')} />
+              )}
+              {platform === 'instagram' && (
+                <InstagramEditStreamInfo {...createPlatformBinding('instagram')} />
               )}
             </Section>
           ))}

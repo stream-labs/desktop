@@ -16,6 +16,7 @@ import * as remote from '@electron/remote';
 import { VideoSettingsService, TDisplayType } from './settings-v2/video';
 import { DualOutputService } from './dual-output';
 import { TwitterPlatformService } from './platforms/twitter';
+import { InstagramService } from './platforms/instagram';
 
 export type TOutputOrientation = 'landscape' | 'portrait';
 interface IRestreamTarget {
@@ -53,6 +54,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
   @Inject() facebookService: FacebookService;
   @Inject() tiktokService: TiktokService;
   @Inject() trovoService: TrovoService;
+  @Inject() instagramService: InstagramService;
   @Inject() videoSettingsService: VideoSettingsService;
   @Inject() dualOutputService: DualOutputService;
   @Inject('TwitterPlatformService') twitterService: TwitterPlatformService;
@@ -272,6 +274,9 @@ export class RestreamService extends StatefulService<IRestreamState> {
       const ttSettings = this.tiktokService.state.settings;
       tikTokTarget.platform = 'relay';
       tikTokTarget.streamKey = `${ttSettings.serverUrl}/${ttSettings.streamKey}`;
+      // FIXME: this might need fixing, since not checking for dual output mode might make it
+      // request horizontal stream keys from restream which means this can't be streamed with
+      // an horizontal context (such as Twitch)
       tikTokTarget.mode = this.dualOutputService.views.getPlatformMode('tiktok');
     }
 
@@ -280,7 +285,18 @@ export class RestreamService extends StatefulService<IRestreamState> {
     if (twitterTarget) {
       twitterTarget.platform = 'relay';
       twitterTarget.streamKey = `${this.twitterService.state.ingest}/${this.twitterService.state.streamKey}`;
+      // FIXME: see comment above
       twitterTarget.mode = this.dualOutputService.views.getPlatformMode('twitter');
+    }
+
+    // treat instagram as a custom destination
+    const instagramTarget = newTargets.find(t => t.platform === 'instagram');
+    if (instagramTarget) {
+      instagramTarget.platform = 'relay';
+      instagramTarget.streamKey = `${this.instagramService.state.settings.streamUrl}${this.instagramService.state.streamKey}`;
+      instagramTarget.mode = isDualOutputMode
+        ? this.dualOutputService.views.getPlatformMode('instagram')
+        : 'landscape';
     }
 
     await this.createTargets(newTargets);

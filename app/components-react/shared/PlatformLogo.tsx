@@ -11,7 +11,7 @@ const sizeMap = {
 };
 
 interface IProps {
-  platform: TPlatform | 'nimotv' | 'dlive' | 'streamlabs';
+  platform: TPlatform | 'nimotv' | 'dlive' | 'instagram' | 'streamlabs';
   size?: keyof typeof sizeMap | number;
   color?: string;
   nocolor?: boolean;
@@ -38,6 +38,7 @@ export default function PlatformLogo(p: IProps & HTMLAttributes<unknown>) {
       nimotv: 'nimotv',
       twitter: 'twitter',
       streamlabs: 'icon-streamlabs',
+      instagram: 'fab fa-instagram',
     }[p.platform];
   }
   const size = p.size && (sizeMap[p.size] ?? p.size);

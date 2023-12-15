@@ -206,5 +206,10 @@
   "Selective Recording can only be used with horizontal sources.": "Selective Recording can only be used with horizontal sources.",
   "Set up Go Live Settings for Dual Output Mode in the Go Live window.": "Set up Go Live Settings for Dual Output Mode in the Go Live window.",
   "Cannot toggle Studio Mode in Dual Output Mode.": "Cannot toggle Studio Mode in Dual Output Mode.",
-  "Upgrade your stream with premium overlays with <ultra>Streamlabs Ultra</ultra>.": "Upgrade your stream with premium overlays with <ultra>Streamlabs Ultra</ultra>."
+  "Upgrade your stream with premium overlays with <ultra>Streamlabs Ultra</ultra>.": "Upgrade your stream with premium overlays with <ultra>Streamlabs Ultra</ultra>.",
+  "Instagram Stream Key": "Instagram Stream Key",
+  "Instagram Stream URL": "Instagram Stream URL",
+  "Remember to open Instagram in browser and click \"Go Live\" to start streaming!": "Remember to open Instagram in browser and click \"Go Live\" to start streaming!",
+  "Remember to update your Stream Key": "Remember to update your Stream Key",
+  "Stream URL": "Stream URL"
 }

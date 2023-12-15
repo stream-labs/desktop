@@ -22,6 +22,7 @@ export default class PlatformLogo extends TsxComponent<LogoProps> {
       streamlabs: 'icon-streamlabs',
       trovo: 'trovo',
       twitter: 'twitter',
+      instagram: 'fab fa-instagram',
     }[this.props.platform];
   }
 
