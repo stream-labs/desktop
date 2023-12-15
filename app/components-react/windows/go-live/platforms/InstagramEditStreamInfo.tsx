@@ -9,36 +9,46 @@ import GameSelector from '../GameSelector';
 import { $t } from 'services/i18n';
 import InputWrapper from 'components-react/shared/inputs/InputWrapper';
 
-export function InstagramEditStreamInfo(p: IPlatformComponentParams<'instagram'>) {
+type Props = IPlatformComponentParams<'instagram'> & {
+  isStreamSettingsWindow?: boolean;
+};
+
+export function InstagramEditStreamInfo(p: Props) {
   const bind = createBinding(p.value, updatedSettings =>
     p.onChange({ ...p.value, ...updatedSettings }),
   );
+
+  const { isStreamSettingsWindow } = p;
+  const streamKeyLabel = $t(isStreamSettingsWindow ? 'Stream Key' : 'Instagram Stream Key');
+  const streamUrlLabel = $t(isStreamSettingsWindow ? 'Stream URL' : 'Instagram Stream URL');
 
   return (
     <Form name="instagram-settings">
       <TextInput
         {...bind.streamUrl}
         required
-        label={$t('Instagram Stream URL')}
+        label={streamUrlLabel}
         addonAfter={<PasteButton onPaste={bind.streamUrl.onChange} />}
       />
 
       <TextInput
         {...bind.streamKey}
         required
-        label={$t('Instagram Stream Key')}
+        label={streamKeyLabel}
         isPassword
-        placeholder={$t('Please update your Stream Key')}
+        placeholder={$t('Remember to update your Stream Key')}
         addonAfter={<PasteButton onPaste={bind.streamKey.onChange} />}
       />
-      <Alert
-        message={$t(
-          'Remember to open Instagram in browser and click "Go Live" to start streaming!',
-        )}
-        type="warning"
-        showIcon
-        closable
-      />
+      {!isStreamSettingsWindow && (
+        <Alert
+          message={$t(
+            'Remember to open Instagram in browser and click "Go Live" to start streaming!',
+          )}
+          type="warning"
+          showIcon
+          closable
+        />
+      )}
     </Form>
   );
 }

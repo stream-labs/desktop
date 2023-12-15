@@ -117,4 +117,8 @@ export class InstagramService
   unlink() {
     this.userService.UNLINK_PLATFORM('instagram');
   }
+
+  updateSettings(settings: IInstagramStartStreamOptions) {
+    this.UPDATE_STREAM_SETTINGS(settings);
+  }
 }
