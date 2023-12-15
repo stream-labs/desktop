@@ -15,21 +15,13 @@ import Form, { useForm } from '../../shared/inputs/Form';
 import { TextInput } from '../../shared/inputs';
 import { ButtonGroup } from '../../shared/ButtonGroup';
 import { FormInstance } from 'antd/lib/form';
-import {
-  GetUseComponentViewResult,
-  injectFormBinding,
-  injectState,
-  mutation,
-  useModule,
-} from 'slap';
+import { injectFormBinding, injectState, mutation, useModule } from 'slap';
 import UltraIcon from 'components-react/shared/UltraIcon';
 import ButtonHighlighted from 'components-react/shared/ButtonHighlighted';
 import { useVuex } from 'components-react/hooks';
 import Translate from 'components-react/shared/Translate';
 import * as remote from '@electron/remote';
 import { InstagramEditStreamInfo } from '../go-live/platforms/InstagramEditStreamInfo';
-import { GoLiveSettingsModule, useGoLiveSettings } from '../go-live/useGoLiveSettings';
-import { getDefined } from 'util/properties-type-guards';
 import { IInstagramStartStreamOptions } from 'services/platforms/instagram';
 
 function censorWord(str: string) {
@@ -265,8 +257,6 @@ export function StreamSettings() {
     enableProtectedMode,
   } = useModule(StreamSettingsModule, [form]);
 
-  const goLiveSettingsModule = useGoLiveSettings();
-
   return (
     <div>
       {/* account info */}
@@ -276,11 +266,7 @@ export function StreamSettings() {
           <SLIDBlock />
           <h2>{$t('Stream Destinations')}</h2>
           {platforms.map(platform => (
-            <Platform
-              key={platform}
-              platform={platform}
-              goLiveSettingsModule={goLiveSettingsModule}
-            />
+            <Platform key={platform} platform={platform} />
           ))}
 
           <CustomDestinationList />
@@ -387,10 +373,7 @@ function SLIDBlock() {
 /**
  * Renders a Platform placeholder
  */
-function Platform(p: {
-  platform: TPlatform;
-  goLiveSettingsModule: GetUseComponentViewResult<GoLiveSettingsModule>;
-}) {
+function Platform(p: { platform: TPlatform }) {
   const platform = p.platform;
   const { UserService, StreamingService, InstagramService } = Services;
   const { canEditSettings, platformMerge, platformUnlink } = useStreamSettings();
@@ -415,7 +398,6 @@ function Platform(p: {
 
   const [showInstagramFields, setShowInstagramFields] = useState(isInstagram && isMerged);
   const shouldShowUsername = !isInstagram;
-  const { settings: goLiveSettings, updatePlatform: updateGoLiveSettings } = p.goLiveSettingsModule;
   const usernameOrBlank = shouldShowUsername ? (
     <>
       <br />
