@@ -409,6 +409,10 @@ function Platform(p: {
    * but since we're adding it, might as well make other small changes to make it look better
    */
   const isInstagram = platform === 'instagram';
+  const { instagramSettings } = useVuex(() => ({
+    instagramSettings: InstagramService.state.settings,
+  }));
+
   const [showInstagramFields, setShowInstagramFields] = useState(isInstagram && isMerged);
   const shouldShowUsername = !isInstagram;
   const { settings: goLiveSettings, updatePlatform: updateGoLiveSettings } = p.goLiveSettingsModule;
@@ -424,7 +428,6 @@ function Platform(p: {
 
   const instagramConnect = async () => {
     await UserService.actions.return.startAuth(platform, 'internal', true);
-    updateGoLiveSettings(platform, InstagramService.state.settings);
     setShowInstagramFields(true);
   };
 
@@ -453,10 +456,7 @@ function Platform(p: {
   );
 
   const updateInstagramSettings = (newSettings: IInstagramStartStreamOptions) => {
-    updateGoLiveSettings(platform, newSettings);
-    // The method above doesn't seem to persist unless we go live, so we need the
-    // service, but for some reason updating at the service isn't enough
-    InstagramService.updateSettings(newSettings);
+    InstagramService.actions.updateSettings(newSettings);
   };
 
   const ExtraFieldsSection = () => {
@@ -465,7 +465,7 @@ function Platform(p: {
         <div className={cx(css.extraFieldsSection)}>
           <InstagramEditStreamInfo
             onChange={updateInstagramSettings}
-            value={getDefined(goLiveSettings.platforms[platform])}
+            value={instagramSettings}
             layoutMode="singlePlatform"
             isStreamSettingsWindow
           />
