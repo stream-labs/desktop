@@ -429,7 +429,7 @@ function Platform(p: { platform: TPlatform }) {
         style={{
           backgroundColor: `var(--${platform})`,
           borderColor: 'transparent',
-          color: platform === 'trovo' ? 'black' : 'inherit',
+          color: ['trovo', 'instagram'].includes(platform) ? 'black' : 'inherit',
         }}
       >
         {$t('Connect')}
