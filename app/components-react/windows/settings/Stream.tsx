@@ -396,6 +396,7 @@ function Platform(p: { platform: TPlatform }) {
   const isInstagram = platform === 'instagram';
   const [showInstagramFields, setShowInstagramFields] = useState(isInstagram && isMerged);
   const shouldShowUsername = !isInstagram;
+  const { settings: goLiveSettings, updatePlatform: updateGoLiveSettings } = useGoLiveSettings();
   const usernameOrBlank = shouldShowUsername ? (
     <>
       <br />
@@ -408,7 +409,17 @@ function Platform(p: { platform: TPlatform }) {
 
   const instagramConnect = async () => {
     await UserService.actions.return.startAuth(platform, 'internal', true);
+    updateGoLiveSettings(platform, InstagramService.state.settings);
     setShowInstagramFields(true);
+  };
+
+  const instagramUnlink = () => {
+    // 1. reset stream key and url after unlinking if the user chooses to re-link immediately
+    updateInstagramSettings({ title: '', streamKey: '', streamUrl: '' });
+    // 2. hide extra fields
+    setShowInstagramFields(false);
+    // 3. unlink platform
+    platformUnlink(platform);
   };
 
   const ConnectButton = () => (
@@ -426,10 +437,8 @@ function Platform(p: { platform: TPlatform }) {
     </span>
   );
 
-  const { settings, updatePlatform } = useGoLiveSettings();
-
   const updateInstagramSettings = (newSettings: IInstagramStartStreamOptions) => {
-    updatePlatform(platform, newSettings);
+    updateGoLiveSettings(platform, newSettings);
     // The method above doesn't seem to persist unless we go live, so we need the
     // service, but for some reason updating at the service isn't enough
     InstagramService.updateSettings(newSettings);
@@ -441,7 +450,7 @@ function Platform(p: { platform: TPlatform }) {
         <div className={cx(css.extraFieldsSection)}>
           <InstagramEditStreamInfo
             onChange={updateInstagramSettings}
-            value={getDefined(settings.platforms[platform])}
+            value={getDefined(goLiveSettings.platforms[platform])}
             layoutMode="singlePlatform"
             isStreamSettingsWindow
           />
@@ -474,7 +483,10 @@ function Platform(p: { platform: TPlatform }) {
         <div style={{ marginLeft: 'auto' }}>
           {shouldShowConnectBtn && <ConnectButton />}
           {shouldShowUnlinkBtn && (
-            <Button danger onClick={() => platformUnlink(platform)}>
+            <Button
+              danger
+              onClick={() => (isInstagram ? instagramUnlink() : platformUnlink(platform))}
+            >
               {$t('Unlink')}
             </Button>
           )}
