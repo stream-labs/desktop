@@ -68,7 +68,6 @@ export class InstagramService
       );
     }
 
-    console.log('beforeGoLive', settings.streamKey, settings.streamUrl);
     this.SET_STREAM_KEY(settings.streamKey);
     this.UPDATE_STREAM_SETTINGS(settings);
     this.setPlatformContext('instagram');
