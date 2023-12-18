@@ -174,6 +174,14 @@ export class LegacyEvents extends ReactComponent {}
 
 @Component({
   props: {
+    name: { default: LiveDock },
+    componentProps: { default: () => ({ onLeft: false }) },
+  },
+})
+export class LiveDock extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'ManageSceneCollections' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
   },
