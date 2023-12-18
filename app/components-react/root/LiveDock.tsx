@@ -2,16 +2,17 @@ import React, { useEffect, useMemo } from 'react';
 import * as remote from '@electron/remote';
 import cx from 'classnames';
 import Animation from 'rc-animate';
-// import Tabs, { ITab } from 'components/Tabs.vue';
+import { Menu } from 'antd';
 import { initStore, useController } from 'components-react/hooks/zustand';
 import { EStreamingState } from 'services/streaming';
 import { EAppPageSlot, ILoadedApp } from 'services/platform-apps';
-import { EPlatform, TPlatform, getPlatformService } from 'services/platforms';
+import { TPlatform, getPlatformService } from 'services/platforms';
 import { $t } from 'services/i18n';
 import { Services } from '../service-provider';
 import Chat from './Chat';
 import styles from './LiveDock.m.less';
 import Tooltip from 'components-react/shared/Tooltip';
+import PlatformAppPageView from 'components-react/shared/PlatformAppPageView';
 
 const LiveDockCtx = React.createContext<LiveDockController | null>(null);
 
@@ -28,27 +29,34 @@ class LiveDockController {
   private windowsService = Services.WindowsService;
   private restreamService = Services.RestreamService;
 
-  store = initStore({ elapsedStreamTime: '', canAnimate: false, slot: EAppPageSlot.Chat });
+  store = initStore({
+    elapsedStreamTime: '',
+    canAnimate: false,
+    slot: EAppPageSlot.Chat,
+    underlyingSelectedChat: 'default',
+  });
 
   // Safe getter/setter prevents getting stuck on the chat
   // for an app that was unloaded.
-  private underlyingSelectedChat = 'default';
+  setChat(key: string) {
+    this.store.setState(s => (s.underlyingSelectedChat = key));
+  }
 
   get selectedChat() {
     if (
-      this.underlyingSelectedChat === 'default' &&
+      this.store.underlyingSelectedChat === 'default' &&
       this.isPlatform('twitter') &&
       this.isRestreaming
     ) {
       return 'restream';
     }
-    if (this.underlyingSelectedChat === 'default') return 'default';
-    if (this.underlyingSelectedChat === 'restream') {
+    if (this.store.underlyingSelectedChat === 'default') return 'default';
+    if (this.store.underlyingSelectedChat === 'restream') {
       if (this.restreamService.shouldGoLiveWithRestream) return 'restream';
       return 'default';
     }
-    return this.chatApps.find(app => app.id === this.underlyingSelectedChat)
-      ? this.underlyingSelectedChat
+    return this.chatApps.find(app => app.id === this.store.underlyingSelectedChat)
+      ? this.store.underlyingSelectedChat
       : 'default';
   }
 
@@ -124,9 +132,9 @@ class LiveDockController {
     });
   }
 
-  get chatTabs(): ITab[] {
+  get chatTabs(): { name: string; value: string }[] {
     if (!this.userService.state.auth) return [];
-    const tabs: ITab[] = [
+    const tabs: { name: string; value: string }[] = [
       {
         name: getPlatformService(this.userService.state.auth.primaryPlatform).displayName,
         value: 'default',
@@ -217,7 +225,7 @@ class LiveDockController {
 
   popOut() {
     this.platformAppsService.popOutAppPage(this.selectedChat, this.store.slot);
-    this.underlyingSelectedChat = 'default';
+    this.setChat('default');
   }
 
   setCollapsed(livedockCollapsed: boolean) {
@@ -362,7 +370,15 @@ function LiveDock(p: { onLeft: boolean } = { onLeft: false }) {
                 <div className={styles.liveDockChat}>
                   {ctrl.hasChatTabs && (
                     <div className="flex">
-                      {/* <tabs :tabs="chatTabs" v-model="selectedChat" :hideContent="true" /> */}
+                      <Menu
+                        selectedKeys={[ctrl.selectedChat]}
+                        onClick={ev => ctrl.setChat(ev.key)}
+                        mode="horizontal"
+                      >
+                        {ctrl.chatTabs.map(tab => (
+                          <Menu.Item key={tab.value}>{tab.name}</Menu.Item>
+                        ))}
+                      </Menu>
                       {ctrl.isPopOutAllowed && (
                         <Tooltip title={$t('Pop out to new window')} placement="left">
                           <i
@@ -373,7 +389,6 @@ function LiveDock(p: { onLeft: boolean } = { onLeft: false }) {
                       )}
                     </div>
                   )}
-                  {/* <!-- v-if is required because left-side chat will not properly load on application startup --> */}
                   {!ctrl.applicationLoading && !collapsed && (
                     <Chat restream={ctrl.selectedChat === 'restream'} />
                   )}
