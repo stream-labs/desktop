@@ -90,7 +90,7 @@ class LiveDockController {
 
   get offlineImageSrc() {
     const mode = this.customizationService.isDarkTheme ? 'night' : 'day';
-    return require(`../../media/images/sleeping-kevin-${mode}.png`);
+    return require(`../../../media/images/sleeping-kevin-${mode}.png`);
   }
 
   get hideViewerCount() {
