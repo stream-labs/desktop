@@ -113,6 +113,7 @@ interface ILinkedPlatformsResponse {
   tiktok_account?: ILinkedPlatform;
   trovo_account?: ILinkedPlatform;
   streamlabs_account?: ILinkedPlatform;
+  twitter_account?: ILinkedPlatform;
   user_id: number;
   created_at: string;
   widget_token: string;
@@ -630,6 +631,17 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       this.UNLINK_SLID();
     }
 
+    if (linkedPlatforms.twitter_account) {
+      this.UPDATE_PLATFORM({
+        type: 'twitter',
+        username: linkedPlatforms.twitter_account.platform_name,
+        id: linkedPlatforms.twitter_account.platform_id,
+        token: linkedPlatforms.twitter_account.access_token,
+      });
+    } else if (this.state.auth.primaryPlatform !== 'twitter') {
+      this.UNLINK_PLATFORM('twitter');
+    }
+
     if (linkedPlatforms.force_login_required) return true;
   }
 
@@ -1076,6 +1088,28 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     if (merge && !this.isLoggedIn && !this.views.isPartialSLAuth) {
       throw new Error('Account merging can only be performed while logged in');
+    }
+
+    // HACK: faking instagram login
+    if (platform === 'instagram') {
+      const auth = {
+        widgetToken: '',
+        apiToken: '',
+        primaryPlatform: 'instagram' as TPlatform,
+        platforms: {
+          instagram: {
+            type: 'instagram' as TPlatform,
+            // HACK: faking instagram username
+            username: 'linked',
+            token: '',
+            id: 'instagram',
+          },
+        },
+        hasRelogged: true,
+      };
+
+      this.UPDATE_PLATFORM(auth.platforms[auth.primaryPlatform]);
+      return EPlatformCallResult.Success;
     }
 
     this.SET_AUTH_STATE(EAuthProcessState.Loading);

@@ -236,6 +236,14 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     Video.video = this.state.horizontal;
     Video.legacySettings = this.state.horizontal;
 
+    // ensure vertical context as the same fps settings as the horizontal context
+    if (display === 'vertical') {
+      const updated = this.syncFPSSettings();
+      if (updated) {
+        this.settingsService.refreshVideoSettings();
+      }
+    }
+
     return !!this.contexts[display];
   }
 
@@ -309,6 +317,8 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
 
   @debounce(200)
   updateObsSettings(display: TDisplayType = 'horizontal') {
+    // confirm all vertical fps settings are synced to the horizontal fps settings
+    // update contexts to values on state
     this.contexts[display].video = this.state[display];
     this.contexts[display].legacySettings = this.state[display];
   }
@@ -329,6 +339,62 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
 
     // also update the persisted settings
     this.dualOutputService.setVideoSetting({ [key]: value }, display);
+
+    // refresh v1 settings
+    this.settingsService.refreshVideoSettings();
+  }
+
+  /**
+   * Sync FPS settings between contexts
+   * @remark - If the fps settings are not the same for both contexts, the output settings
+   * is working with mismatched values, which contributes to an issue with speed and duration
+   * being out of sync. The other factor in this issue is if the latest obs settings are not
+   * loaded into the store. When a context is created, the dual output service syncs the vertical
+   * fps settings with the horizontal one. But any time we make a change to the fps settings,
+   * we need to apply this change to both contexts to keep them synced.
+   * @param - Currently, we must confirm fps settings are synced before start streaming
+   */
+  syncFPSSettings(updateContexts?: boolean): boolean {
+    const fpsSettings = ['scaleType', 'fpsType', 'fpsCom', 'fpsNum', 'fpsDen', 'fpsInt'];
+
+    // update persisted local settings if the vertical context does not exist
+    const verticalVideoSetting = this.contexts.vertical
+      ? this.contexts.vertical.video
+      : this.dualOutputService.views.videoSettings.vertical;
+
+    let updated = false;
+
+    fpsSettings.forEach((setting: string) => {
+      const hasSameVideoSetting = this.contexts.horizontal.video[setting] === verticalVideoSetting;
+      let shouldUpdate = hasSameVideoSetting;
+      // if the vertical context has been established, also compare legacy settings
+      if (this.contexts.vertical) {
+        const hasSameLegacySetting =
+          this.contexts.horizontal.legacySettings[setting] ===
+          this.contexts.vertical.legacySettings[setting];
+        shouldUpdate = !hasSameVideoSetting || !hasSameLegacySetting;
+      }
+      // sync the horizontal setting to the vertical setting if they are not the same
+      if (shouldUpdate) {
+        const value = this.state.horizontal[setting];
+        // always update persisted setting
+        this.dualOutputService.setVideoSetting({ [setting]: value }, 'vertical');
+
+        // update state if the vertical context exists
+        if (this.contexts.vertical) {
+          this.SET_VIDEO_SETTING(setting, value, 'vertical');
+        }
+
+        updated = true;
+      }
+    });
+
+    // only update the vertical context if it exists
+    if ((updateContexts || updated) && this.contexts.vertical) {
+      this.contexts.vertical.video = this.state.vertical;
+      this.contexts.vertical.legacySettings = this.state.vertical;
+    }
+    return updated;
   }
 
   /**

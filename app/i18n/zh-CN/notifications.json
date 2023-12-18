@@ -25,7 +25,7 @@
   "Show in folder": "在文件夹中显示",
   "Recordings": "录制",
   "Marker %{label} added at %{timestamp}": "标记 %{label} 添加于 %{timestamp}",
-  "File is too large to upload": "File is too large to upload",
-  "File type %{extension} is not supported": "File type %{extension} is not supported",
-  "Upload already in progress": "Upload already in progress"
+  "File is too large to upload": "文件过大，无法上传",
+  "File type %{extension} is not supported": "不支持文件类型 %{extension}",
+  "Upload already in progress": "正在上传"
 }

@@ -11,6 +11,8 @@ export interface IWidgetDisplayData {
   supportList: string[];
   icon: string;
   shortDesc?: string;
+  link?: string;
+  linkText?: string;
 }
 // Do not alter the order of this enum, it is coupled to the user's local config
 export enum WidgetType {
@@ -73,7 +75,7 @@ export const WidgetTesters: IWidgetTester[] = [
   },
   {
     type: 'donations',
-    name: 'Donation',
+    name: 'Tip',
     url(host) {
       return `https://${host}/api/v5/slobs/test/streamlabs/donation`;
     },
@@ -170,7 +172,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
   },
 
   [WidgetType.DonationGoal]: {
-    name: 'Donation Goal',
+    name: 'Tip Goal',
     url(host, token) {
       return `https://${host}/widgets/donation-goal?token=${token}`;
     },
@@ -487,17 +489,17 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     name: $t('Alertbox'),
     description: $t('Thanks viewers with notification popups.'),
     demoVideo: false,
-    demoFilename: 'source-alertbox.gif',
+    demoFilename: 'source-alertbox.png',
     supportList: [$t('Donations'), $t('Subscriptions'), $t('Follows'), $t('Bits'), $t('Hosts')],
     icon: 'fas fa-bell',
     shortDesc: $t('Dynamic, live alerts'),
   },
   [WidgetType.DonationGoal]: {
-    name: $t('Donation Goal'),
+    name: $t('Tip Goal'),
     description: $t('Set a goal for your viewers to help you reach.'),
-    demoVideo: true,
+    demoVideo: false,
     demoFilename: 'source-donation-goal.gif',
-    supportList: [$t('Donations')],
+    supportList: [$t('Tips')],
     icon: 'fas fa-calendar',
   },
   [WidgetType.FollowerGoal]: {
@@ -553,7 +555,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
   [WidgetType.CharityGoal]: {
     name: $t('Streamlabs Charity Goal'),
     description: $t('Set a goal for your viewers to help you reach.'),
-    demoVideo: true,
+    demoVideo: false,
     demoFilename: 'source-charity-goal.gif',
     supportList: [$t('Streamlabs Charity Donations')],
     icon: 'fas fa-calendar',

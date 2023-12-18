@@ -1,8 +1,20 @@
 {
   "Successfully saved %{filename}": "已成功儲存 %{filename}",
+  "Successfully converted %{filename}": "已成功轉換 %{filename}",
+  "Successfully saved %{filename} to %{filepath}": "已成功將 %{filename} 儲存到 %{filepath}",
   "Successfully loaded %{filename}.overlay": "已成功載入 %{filename}.疊層",
   "This is an experimental feature.  Use at your own risk.": "這是實驗性功能。使用時需自行承擔風險。",
   "Export Overlay File": "匯出疊層檔案",
   "Import Overlay File": "匯入疊層檔案",
-  "Import Widget File in Current Scene": "在目前的場景匯入小程式檔案"
+  "Import Widget File in Current Scene": "在目前的場景匯入小程式檔案",
+  "The active scene collection is not a dual output scene collection.": "作用中的場景集合不是 Dual Output 場景集合。",
+  "Convert to Vanilla Scene": "轉換為 Vanilla 場景",
+  "Convert": "轉換",
+  "Convert and Export Overlay": "轉換與匯出疊層",
+  "Assign": "指派",
+  "Assign and Export Overlay": "指定與匯出疊層",
+  "Assign Vertical Sources to Horizontal Display": "將垂直來源指派到水平顯示器",
+  "The below will create a copy of the active scene collection, set the copy as the active collection, and then apply the function.": "下列項目會建立作用中場景集合的副本，將副本設定為作用中的集合，然後套用功能。",
+  "Manage Dual Output Scene": "管理 Dual Output 場景",
+  "Unable to convert dual output collection.": "無法轉換 Dual Output 集合。"
 }

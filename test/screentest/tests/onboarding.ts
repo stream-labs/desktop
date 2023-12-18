@@ -33,11 +33,12 @@ test('Onboarding steps', async t => {
   await makeScreenshots(t, 'Add a Theme');
   await (await app.client.$('button=Skip')).click();
 
-  await (await app.client.$('h1=Optimize')).waitForDisplayed();
-  await makeScreenshots(t, 'Before optimize');
-  await (await app.client.$('button=Start')).click();
-  await (await app.client.$('h1=Optimizing... 33%')).waitForDisplayed();
-  await makeScreenshots(t, 'Optimization progress');
+  // temporarily disable auto config until migrate to new api
+  // await (await app.client.$('h1=Optimize')).waitForDisplayed();
+  // await makeScreenshots(t, 'Before optimize');
+  // await (await app.client.$('button=Start')).click();
+  // await (await app.client.$('h1=Optimizing... 33%')).waitForDisplayed();
+  // await makeScreenshots(t, 'Optimization progress');
 
   await (await app.client.$('h1=Choose your Streamlabs plan')).waitForDisplayed({ timeout: 15000 });
   await makeScreenshots(t, 'Ultra');

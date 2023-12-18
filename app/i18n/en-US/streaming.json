@@ -81,7 +81,7 @@
   "Tweet to let your followers know you're going live": "Tweet to let your followers know you're going live",
   "Optimized encoding provides better quality and/or lower cpu/gpu usage. Depending on the game, resolution may be changed for a better quality of experience": "Optimized encoding provides better quality and/or lower cpu/gpu usage. Depending on the game, resolution may be changed for a better quality of experience",
   "An error occurred with the output. This is usually caused by out of date video drivers. Please ensure your Nvidia or AMD drivers are up to date and try again.": "An error occurred with the output. This is usually caused by out of date video drivers. Please ensure your Nvidia or AMD drivers are up to date and try again.",
-  "An error occurred with the output. Please check your streaming and recording settings.": "An error occurred with the output. Please check your streaming and recording settings.",
+  "An error occurred with the output. Please check and switch encoders in your streaming and recording Output settings.": "An error occurred with the output. Please check and switch encoders in your streaming and recording Output settings.",
   "OK": "OK",
   "Streaming Error": "Streaming Error",
   "Recording Error": "Recording Error",
@@ -205,5 +205,12 @@
   "Dual Output can’t be displayed - Selective Recording only works with horizontal sources and disables editing the vertical output scene. Please disable selective recording from Sources to set up Dual Output.": "Dual Output can’t be displayed - Selective Recording only works with horizontal sources and disables editing the vertical output scene. Please disable selective recording from Sources to set up Dual Output.",
   "Selective Recording can only be used with horizontal sources.": "Selective Recording can only be used with horizontal sources.",
   "Set up Go Live Settings for Dual Output Mode in the Go Live window.": "Set up Go Live Settings for Dual Output Mode in the Go Live window.",
-  "Cannot toggle Studio Mode in Dual Output Mode.": "Cannot toggle Studio Mode in Dual Output Mode."
+  "Cannot toggle Studio Mode in Dual Output Mode.": "Cannot toggle Studio Mode in Dual Output Mode.",
+  "Upgrade your stream with premium overlays with <ultra>Streamlabs Ultra</ultra>.": "Upgrade your stream with premium overlays with <ultra>Streamlabs Ultra</ultra>.",
+  "Instagram Stream Key": "Instagram Stream Key",
+  "Instagram Stream URL": "Instagram Stream URL",
+  "Remember to open Instagram in browser and click \"Go Live\" to start streaming!": "Remember to open Instagram in browser and click \"Go Live\" to start streaming!",
+  "Remember to update your Stream Key": "Remember to update your Stream Key",
+  "Stream URL": "Stream URL",
+  "Tweet": "Tweet"
 }

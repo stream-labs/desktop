@@ -1016,7 +1016,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     }
   }
 
-  async uploadStorage() {
+  async uploadStorage(platform: string) {
     this.SET_UPLOAD_INFO({ uploading: true, cancelRequested: false, error: false });
 
     const { cancel, complete, size } = await this.sharedStorageService.actions.return.uploadFile(
@@ -1045,6 +1045,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
         this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
           type: 'UploadStorageError',
           fileSize: size,
+          platform,
         });
       }
     }
@@ -1055,6 +1056,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
         type: 'UploadStorageSuccess',
         fileSize: size,
+        platform,
       });
     }
 

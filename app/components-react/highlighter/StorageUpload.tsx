@@ -22,7 +22,7 @@ export default function StorageUpload(p: { onClose: () => void; platform: string
   }
 
   function uploadStorage() {
-    HighlighterService.actions.uploadStorage();
+    HighlighterService.actions.uploadStorage(p.platform);
   }
 
   useEffect(() => {

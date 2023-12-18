@@ -74,12 +74,13 @@ function ExtraSettings() {
   }));
 
   // HDR Settings are not compliant with the auto-optimizer
-  const canRunOptimizer =
-    !SettingsService.views.hasHDRSettings &&
-    isTwitch &&
-    !isRecordingOrStreaming &&
-    protectedMode &&
-    isSimpleOutputMode;
+  // temporarily disable auto config until migrate to new api
+  const canRunOptimizer = false;
+  // !SettingsService.views.hasHDRSettings &&
+  // isTwitch &&
+  // !isRecordingOrStreaming &&
+  // protectedMode &&
+  // isSimpleOutputMode;
 
   function restartStreamlabelsSession() {
     StreamlabelsService.restartSession().then(result => {

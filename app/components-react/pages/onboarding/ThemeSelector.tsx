@@ -11,7 +11,8 @@ import AutoProgressBar from 'components-react/shared/AutoProgressBar';
 import { usePromise } from 'components-react/hooks';
 
 export function ThemeSelector() {
-  const { OnboardingService, SceneCollectionsService } = Services;
+  const { OnboardingService, SceneCollectionsService, UserService } = Services;
+  const { isPrime } = UserService;
   const [themesMetadata, setThemesMetadata] = useState<IThemeMetadata[]>([]);
   const [installing, setInstalling] = useState(false);
   const [showDetail, setShowDetail] = useState<number | null>(null);
@@ -72,6 +73,15 @@ export function ThemeSelector() {
   return (
     <div style={{ width: '100%' }}>
       <h1 className={commonStyles.titleContainer}>{$t('Add a Theme')}</h1>
+
+      {isPrime && (
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          {$t(
+            'You unlocked hundreds of Ultra overlays! Choose from the ones below or navigate to the Overlays tab later to personalize your scenes.',
+          )}
+        </div>
+      )}
+
       <div>
         {!installing ? (
           <div className={styles.container}>

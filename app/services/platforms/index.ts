@@ -2,6 +2,8 @@ import { ITwitchStartStreamOptions, TwitchService } from './twitch';
 import { IYoutubeStartStreamOptions, YoutubeService } from './youtube';
 import { FacebookService, IFacebookStartStreamOptions } from './facebook';
 import { ITiktokStartStreamOptions, TiktokService } from './tiktok';
+import { InstagramService, IInstagramStartStreamOptions } from './instagram';
+import { TwitterPlatformService } from './twitter';
 import { TTwitchOAuthScope } from './twitch/index';
 import { IGoLiveSettings } from 'services/streaming';
 import { WidgetType } from '../widgets';
@@ -138,7 +140,8 @@ export type TStartStreamOptions =
   | IYoutubeStartStreamOptions
   | Partial<IFacebookStartStreamOptions>
   | Partial<ITiktokStartStreamOptions>
-  | Partial<ITrovoStartStreamOptions>;
+  | Partial<ITrovoStartStreamOptions>
+  | Partial<IInstagramStartStreamOptions>;
 
 // state applicable for all platforms
 export interface IPlatformState {
@@ -227,9 +230,18 @@ export enum EPlatform {
   Facebook = 'facebook',
   TikTok = 'tiktok',
   Trovo = 'trovo',
+  Twitter = 'twitter',
+  Instagram = 'instagram',
 }
 
-export type TPlatform = 'twitch' | 'youtube' | 'facebook' | 'tiktok' | 'trovo';
+export type TPlatform =
+  | 'twitch'
+  | 'youtube'
+  | 'facebook'
+  | 'tiktok'
+  | 'trovo'
+  | 'twitter'
+  | 'instagram';
 
 export const platformList = [
   EPlatform.Facebook,
@@ -237,6 +249,8 @@ export const platformList = [
   EPlatform.Trovo,
   EPlatform.Twitch,
   EPlatform.YouTube,
+  EPlatform.Twitter,
+  EPlatform.Instagram,
 ];
 
 export const platformLabels = (platform: TPlatform | string) =>
@@ -246,6 +260,9 @@ export const platformLabels = (platform: TPlatform | string) =>
     [EPlatform.Facebook]: $t('Facebook'),
     [EPlatform.TikTok]: $t('TikTok'),
     [EPlatform.Trovo]: $t('Trovo'),
+    // TODO: translate
+    [EPlatform.Twitter]: 'Twitter',
+    [EPlatform.Instagram]: $t('Instagram'),
   }[platform]);
 
 export function getPlatformService(platform: TPlatform): IPlatformService {
@@ -255,6 +272,8 @@ export function getPlatformService(platform: TPlatform): IPlatformService {
     facebook: FacebookService.instance,
     tiktok: TiktokService.instance,
     trovo: TrovoService.instance,
+    twitter: TwitterPlatformService.instance,
+    instagram: InstagramService.instance,
   }[platform];
 }
 

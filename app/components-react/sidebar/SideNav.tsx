@@ -11,13 +11,12 @@ import styles from './SideNav.m.less';
 import { Layout, Button } from 'antd';
 import Scrollable from 'components-react/shared/Scrollable';
 import HelpTip from 'components-react/shared/HelpTip';
-import NewBadge from 'components-react/shared/NewBadge';
 import FeaturesNav from './FeaturesNav';
 
 const { Sider } = Layout;
 
 export default function SideNav() {
-  const { CustomizationService, SideNavService, WindowsService, DismissablesService } = Services;
+  const { CustomizationService, SideNavService, WindowsService } = Services;
 
   function updateSubMenu() {
     // when opening/closing the navbar swap the submenu current menu item
@@ -40,8 +39,6 @@ export default function SideNav() {
     isOpen,
     toggleMenuStatus,
     updateStyleBlockers,
-    dismiss,
-    showNewBadge,
   } = useVuex(() => ({
     currentMenuItem: SideNavService.views.currentMenuItem,
     setCurrentMenuItem: SideNavService.actions.setCurrentMenuItem,
@@ -49,10 +46,6 @@ export default function SideNav() {
     isOpen: SideNavService.views.isOpen,
     toggleMenuStatus: SideNavService.actions.toggleMenuStatus,
     updateStyleBlockers: WindowsService.actions.updateStyleBlockers,
-    dismiss: DismissablesService.actions.dismiss,
-    showNewBadge:
-      DismissablesService.views.shouldShow(EDismissable.NewSideNav) &&
-      SideNavService.views.hasLegacyMenu,
   }));
 
   const sider = useRef<HTMLDivElement | null>(null);
@@ -110,7 +103,6 @@ export default function SideNav() {
           leftDock && styles.leftDock,
         )}
         onClick={() => {
-          showNewBadge && dismiss(EDismissable.NewSideNav);
           updateSubMenu();
           toggleMenuStatus();
           updateStyleBlockers('main', true); // hide style blockers
@@ -118,14 +110,6 @@ export default function SideNav() {
       >
         <i className="icon-back" />
       </Button>
-
-      {/* if it's a legacy menu, show new badge */}
-      <NewBadge
-        dismissableKey={EDismissable.NewSideNav}
-        size="small"
-        absolute
-        style={{ left: 'calc(100% / 20px)', top: 'calc(100% / 2)' }}
-      />
     </Layout>
   );
 }
