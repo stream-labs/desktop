@@ -256,14 +256,15 @@ class LiveDockController {
 
 export default function LiveDockWithContext(p: { onLeft?: boolean }) {
   const controller = useMemo(() => new LiveDockController(), []);
+  const onLeft = p.onLeft || false;
   return (
     <LiveDockCtx.Provider value={controller}>
-      <LiveDock onLeft />
+      <LiveDock onLeft={onLeft} />
     </LiveDockCtx.Provider>
   );
 }
 
-function LiveDock(p: { onLeft: boolean } = { onLeft: false }) {
+function LiveDock(p: { onLeft: boolean }) {
   const ctrl = useController(LiveDockCtx);
 
   useEffect(() => {
