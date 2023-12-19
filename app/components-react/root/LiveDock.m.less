@@ -6,6 +6,7 @@
   z-index: 1000;
   width: 28%;
   box-sizing: border-box;
+  height: 100%;
   border-left: 1px solid var(--border);
 
   &.can-animate {
@@ -61,7 +62,7 @@
 
     font-size: 12px;
 
-    &.icon-right {
+    &:global(.icon-right) {
       transform: translate(-50%, -50%) rotate(-90deg);
     }
   }

@@ -13,6 +13,7 @@ import Chat from './Chat';
 import styles from './LiveDock.m.less';
 import Tooltip from 'components-react/shared/Tooltip';
 import PlatformAppPageView from 'components-react/shared/PlatformAppPageView';
+import { useVuex } from 'components-react/hooks';
 
 const LiveDockCtx = React.createContext<LiveDockController | null>(null);
 
@@ -294,26 +295,46 @@ function LiveDock(p: { onLeft: boolean } = { onLeft: false }) {
     ctrl.collapsed ? ctrl.setCollapsed(false) : ctrl.setCollapsed(true);
   }
 
-  const { collapsed, isPlatform, isStreaming } = ctrl;
+  const {
+    collapsed,
+    isPlatform,
+    isStreaming,
+    hasChatTabs,
+    chatTabs,
+    selectedChat,
+    liveDockSize,
+    applicationLoading,
+    hideStyleBlockers,
+  } = useVuex(() => ({
+    collapsed: ctrl.collapsed,
+    isPlatform: ctrl.isPlatform,
+    isStreaming: ctrl.isStreaming,
+    hasChatTabs: ctrl.hasChatTabs,
+    chatTabs: ctrl.chatTabs,
+    selectedChat: ctrl.selectedChat,
+    liveDockSize: ctrl.liveDockSize,
+    applicationLoading: ctrl.applicationLoading,
+    hideStyleBlockers: ctrl.hideStyleBlockers,
+  }));
 
   return (
     <div
       className={cx(styles.liveDock, {
+        [styles.collapsed]: collapsed,
         [styles.canAnimate]: ctrl.store.canAnimate,
         [styles.liveDockLeft]: p.onLeft,
       })}
-      style={{ width: ctrl.liveDockSize + 'px' }}
+      style={{ width: liveDockSize + 'px' }}
     >
       <div className={styles.liveDockChevron} onClick={toggleCollapsed}>
         <i
           className={cx({
-            [styles.iconBack]: (!p.onLeft && collapsed) || (p.onLeft && !collapsed),
-            [`${styles.iconDown} ${styles.iconRight}`]:
-              (p.onLeft && collapsed) || (!p.onLeft && !collapsed),
+            'icon-back': (!p.onLeft && collapsed) || (p.onLeft && !collapsed),
+            ['icon-down icon-right']: (p.onLeft && collapsed) || (!p.onLeft && !collapsed),
           })}
         />
       </div>
-      <Animation transitionName={p.onLeft ? 'ant-slide-right' : 'ant-slide-left'}>
+      <Animation transitionName={p.onLeft ? 'ant-slide-right' : 'ant-slide'}>
         {!collapsed && (
           <div className={styles.liveDockExpandedContents}>
             <div className={styles.liveDockHeader}>
@@ -364,18 +385,18 @@ function LiveDock(p: { onLeft: boolean } = { onLeft: false }) {
                 )}
               </div>
             </div>
-            {!ctrl.hideStyleBlockers &&
+            {!hideStyleBlockers &&
               (isPlatform(['twitch', 'trovo']) ||
                 (isStreaming && isPlatform(['youtube', 'facebook', 'twitter']))) && (
                 <div className={styles.liveDockChat}>
-                  {ctrl.hasChatTabs && (
+                  {hasChatTabs && (
                     <div className="flex">
                       <Menu
-                        selectedKeys={[ctrl.selectedChat]}
+                        selectedKeys={[selectedChat]}
                         onClick={ev => ctrl.setChat(ev.key)}
                         mode="horizontal"
                       >
-                        {ctrl.chatTabs.map(tab => (
+                        {chatTabs.map(tab => (
                           <Menu.Item key={tab.value}>{tab.name}</Menu.Item>
                         ))}
                       </Menu>
@@ -389,15 +410,15 @@ function LiveDock(p: { onLeft: boolean } = { onLeft: false }) {
                       )}
                     </div>
                   )}
-                  {!ctrl.applicationLoading && !collapsed && (
-                    <Chat restream={ctrl.selectedChat === 'restream'} />
+                  {!applicationLoading && !collapsed && (
+                    <Chat restream={selectedChat === 'restream'} />
                   )}
-                  {!['default', 'restream'].includes(ctrl.selectedChat) && (
+                  {!['default', 'restream'].includes(selectedChat) && (
                     <PlatformAppPageView
                       className={styles.liveDockPlatformAppWebview}
-                      appId={ctrl.selectedChat}
+                      appId={selectedChat}
                       pageSlot={ctrl.store.slot}
-                      key={ctrl.selectedChat}
+                      key={selectedChat}
                     />
                   )}
                 </div>
@@ -409,7 +430,7 @@ function LiveDock(p: { onLeft: boolean } = { onLeft: false }) {
                 v-else
               >
                 <img className={styles.liveDockChatImgOffline} src={ctrl.offlineImageSrc} />
-                {!ctrl.hideStyleBlockers && <span>{$t('Your chat is currently offline')}</span>}
+                {!hideStyleBlockers && <span>{$t('Your chat is currently offline')}</span>}
               </div>
             )}
           </div>
