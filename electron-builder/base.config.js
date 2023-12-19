@@ -112,6 +112,7 @@ const base = {
     sentryBackendClientURL: process.env.SLD_SENTRY_BACKEND_CLIENT_URL,
     sentryBackendClientPreviewURL: process.env.SLD_SENTRY_BACKEND_CLIENT_PREVIEW_URL,
   },
+  beforePack: './electron-builder/beforePack.js',
   afterPack: './electron-builder/afterPack.js',
   afterSign: './electron-builder/notarize.js',
 };
