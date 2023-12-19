@@ -174,7 +174,7 @@ export class LegacyEvents extends ReactComponent {}
 
 @Component({
   props: {
-    name: { default: LiveDock },
+    name: { default: 'LiveDock' },
     componentProps: { default: () => ({ onLeft: false }) },
   },
 })
