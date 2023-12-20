@@ -1,11 +1,17 @@
 
 <template>
   <div class="modal-layout">
-    <multiselect v-model="deviceModel" :options="deviceList" label="description" trackBy="value" :allow-empty="false" />
-    <div class="content">
+    <div class="tab">
+      <button class="item" :class="{ 'active': tab == 0 }" @click="onTab(0)">
+        ボイス設定</button>
+      <button class="item" :class="{ 'active': tab == 1 }" @click="onTab(1)">
+        マイク設定</button>
+    </div>
+
+    <div v-if="tab == 0" class="content">
       <div>
         <ul class="nav-menu">
-          <div style="padding: 0 0 4px; font-weight: bold; color: white;">プリセットボイス</div>
+          <div style="padding-left:4px; font-weight: bold; color: white;">プリセットボイス</div>
           <li v-for="v in presetList" :key="v.value" class="nav-item" :class="{ active: v.value === currentIndex }">
             <div class="nav-item-content" @click="onSelect(v.value)">
               <img :src="v.icon" style="padding-right: 4px;">
@@ -13,19 +19,23 @@
             </div>
           </li>
 
-          <div style=" display: flex;padding: 16px 0 4px; font-weight: bold; color: white;">
-            <div>オリジナルボイス ({{ manualList.length }}/{{ manualMax }})</div>
-            <div @click="onAdd()" style=" width:30px;margin-left: auto; text-align: center;">＋</div>
+          <div style="display: flex; padding-top: 16px; ">
+            <div style="width:100%;padding-left:4px; font-weight: bold; color: white;">オリジナルボイス ({{ manualList.length
+            }}/{{ manualMax }})
+            </div>
+            <button v-if="canAdd" @click="onAdd()" style=" width:30px; color:white; text-align: center">＋</button>
+            <button v-else style=" width:30px; color:gray; text-align: center">＋</button>
+
           </div>
           <li v-for="v in manualList" :key="v.value" class="nav-item" :class="{ active: v.value === currentIndex }">
             <div class="nav-item-content" @click="onSelect(v.value)"> <img :src="v.icon" style="padding-right: 4px;">
               {{ v.name }}</div>
             <div class="nav-item-right">
               <div class="dropdown">
-                <span>︙</span>
+                <button style="color:white">︙</button>
                 <div class="dropdown-content">
-                  <div @click="onDelete(v.value)" style="color: red;">削除</div>
-                  <div @click="onCopy(v.value)" style="color:white">複製</div>
+                  <div @click="onDelete(v.value)" style="color: red;">ボイスを削除</div>
+                  <div @click="onCopy(v.value)" style="color:white">ボイスを複製</div>
                 </div>
               </div>
             </div>
@@ -44,7 +54,7 @@
           <div class="section">
             <div class="input-container">
 
-              <div class="input-label"><label>名前</label></div>
+              <div style=" width: 100%; padding-bottom: 4px;font-weight: bold; color: white;">名前</div>
               <div class="input-wrapper">
                 <input type="text" v-model="name" />
               </div>
@@ -55,9 +65,18 @@
           <div class="section">
             <div class="input-container">
 
-              <div class="input-label"><label>音声設定</label></div>
+              <div style="display:flex; width: 100%; padding-bottom: 8px;">
+                <div style=" width: 100%;font-weight: bold; color: white;">音声設定 </div>
+                <button class="button-inline" @click="onRandom">ランダムで生成 </button>
+                <i class="icon-help icon-btn tooltip1" style="color:var(--color-button-primary)">
+                  <div class="tooltip1_text" style="left: -100px;">へるぷです</div>
+                </i>
+              </div>
 
-              <div class="input-label"><label>声の高さ {{ pitchShift.toFixed(2) + 'cent' }} </label></div>
+              <div class="input-label">
+                <label>声の高さ</label>
+                <label> {{ pitchShift.toFixed(0) + ' cent' }} </label>
+              </div>
               <div class="input-wrapper">
                 <VueSlider v-model="pitchShift" :min="-1200.00" :max="1200.00" :interval="0.1" tooltip="none" />
               </div>
@@ -74,9 +93,17 @@
                   trackBy="value" :allow-empty="false" />
               </div>
 
-              <div class="input-label"><label>割合 {{ amount.toFixed(2) + '%' }}</label></div>
+              <div class="input-label">
+                <div style="display: flex;">
+                  <label>割合 </label>
+                  <i class="icon-help icon-btn tooltip1" style="color:var(--color-button-primary)">
+                    <div class="tooltip1_text">へるぷです</div>
+                  </i>
+                </div>
+                <label> {{ amount.toFixed(0) + '%' }}</label>
+              </div>
               <div class="input-wrapper">
-                <VueSlider v-model="amount" :min="0" :max="100" :interval="0.1" tooltip="none" />
+                <VueSlider v-model="amount" :min="0" :max="100" :interval="0.1" tooltip="わりあい" />
               </div>
 
             </div>
@@ -86,11 +113,29 @@
       </div>
     </div>
 
-    <div class="modal-layout-controls">
-      <div style="width: 100px;">
-        <multiselect v-model="deviceModel" :options="deviceList" label="description" trackBy="value"
-          :allow-empty="false" />
+    <div v-if="tab == 1" class="content">
+      <div class="content-container">
+        <div class="section">
+          <div class="input-container">
+
+            <div class="input-label"><label>入力デバイス</label></div>
+            <div class="input-wrapper">
+              <multiselect v-model="deviceModel" :options="deviceList" label="description" trackBy="value"
+                :allow-empty="false" />
+            </div>
+
+            <div class="input-label"><label>latency</label></div>
+            <div class="input-wrapper">
+              <multiselect v-model="deviceModel" :options="deviceList" label="description" trackBy="value"
+                :allow-empty="false" />
+            </div>
+
+          </div>
+        </div>
       </div>
+    </div>
+
+    <div class="modal-layout-controls">
 
       <div style="margin-right: auto; margin-left: 16px;"><span>適用音声を聞く</span>
         <input v-model="isMonitor" type="checkbox" class="toggle-button" />
@@ -171,8 +216,13 @@
     }
 
     .input-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+      color: var(--color-text);
+
       label {
-        margin-bottom: 4px;
+        color: var(--color-text);
       }
     }
   }
@@ -209,6 +259,7 @@
 .nav-item-content {
   width: 100%;
   height: 100%;
+  overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -228,15 +279,63 @@
 
 .dropdown-content {
   position: absolute;
+  top: 0;
   z-index: 10;
   display: none;
-  width: 80px;
+  width: 140px;
   padding: 12px 16px;
   line-height: 30px;
   background-color: var(--color-bg-primary);
 }
 
 .dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.tab {
+  display: flex;
+  padding: 16px 4px;
+
+  .item {
+    flex: 1;
+    font-weight: bold;
+    line-height: 25px;
+    color: var(--color-text-dark);
+    text-align: center;
+    border-bottom: 2px solid var(--color-text-dark);
+
+    &.active {
+      color: var(--color-text-light);
+      border-bottom: 2px solid var(--color-text-light);
+    }
+  }
+}
+
+.button-inline {
+  font-weight: bold;
+  color: var(--color-button-primary);
+  white-space: nowrap;
+}
+
+.tooltip1 {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.tooltip1_text {
+  position: absolute;
+  display: none;
+  width: 100px;
+  padding: 10px;
+  font-size: 12px;
+  line-height: 1.6em;
+  color: var(--color-text-light);
+  background: var(--color-bg-primary);
+  border-radius: 5px;
+}
+
+.tooltip1:hover .tooltip1_text {
   display: block;
 }
 </style>

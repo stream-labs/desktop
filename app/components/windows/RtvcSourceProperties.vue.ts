@@ -42,6 +42,8 @@ export default class RtvcSourceProperties extends SourceProperties {
   @Inject() rtvcStateService: RtvcStateService
   @Inject() audioService: AudioService;
 
+  advancedSettingsTooltip = 'audio.advancedSettingsTooltip';
+
   readonly manualMax = 5
 
   readonly presetValues = [
@@ -72,6 +74,9 @@ export default class RtvcSourceProperties extends SourceProperties {
   pitchShift: TObsValue = 0
   amount: TObsValue = 0
 
+  tab = 0
+  canAdd = false
+
   // v-modelが {} での値で更新されるので噛ませる
   primaryVoiceModel: IObsListOption<number> = { description: '', value: 0 }
   secondaryVoiceModel: IObsListOption<number> = { description: '', value: 0 }
@@ -82,6 +87,7 @@ export default class RtvcSourceProperties extends SourceProperties {
   updateManualList() {
     // add,delに反応しないのでコード側から変更指示
     this.manualList = this.manuals.map((a, idx) => { return { value: `manual/${idx}`, name: a.name, icon: "./media/images/test_icon.png" } })
+    this.canAdd = this.manualList.length < this.manualMax 
   }
   //  get manualList() { return this.manuals.map((a, idx) => { return { value: `manual/${idx}`, name: a.name, icon: "" } }) }
 
@@ -294,12 +300,24 @@ export default class RtvcSourceProperties extends SourceProperties {
 
   // --- event
 
+  onTab(idx:number){
+    this.tab = idx
+  }
+
   done() {
     this.closeWindow()
   }
   cancel() {
     this.canceled = true
     this.closeWindow()
+  }
+
+  onRandom(){
+    const list = this.primaryVoiceList
+    const idx = Math.floor(Math.random() * list.length)
+    this.primaryVoiceModel = list[idx]
+    this.secondaryVoiceModel = this.secondaryVoiceList[0]
+    this.amount = 0
   }
 
   onSelect(index: string) {
@@ -319,6 +337,8 @@ export default class RtvcSourceProperties extends SourceProperties {
   onDelete(index: string) {
     const idx = this.getManualIndexNum(index)
     if (idx < 0) return
+    if (!confirm("削除しますか？")) return
+
     this.manuals.splice(idx, 1)
     this.updateManualList()
     if (index !== this.currentIndex) return
