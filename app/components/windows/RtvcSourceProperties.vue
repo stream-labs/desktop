@@ -135,7 +135,7 @@
 
             <div class="input-label"><label>latency</label></div>
             <div class="input-wrapper">
-              <multiselect v-model="deviceModel" :options="deviceList" label="description" trackBy="value"
+              <multiselect v-model="latencyModel" :options="latencyList" label="description" trackBy="value"
                 :allow-empty="false" />
             </div>
 
