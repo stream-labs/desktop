@@ -142,11 +142,24 @@ export class RealmObject {
    * @see https://www.mongodb.com/docs/realm/sdk/node/model-data/define-a-realm-object-model/
    */
   static schema: Realm.ObjectSchema;
+
+  /**
+   * Subclasses should override this function to perform migrations
+   * @param oldRealm A reference to the old realm
+   * @param newRealm A new realm matching the new schema
+   */
+  static onMigration(oldRealm: Realm, newRealm: Realm) {
+    // By default, is a no-op
+  }
 }
 
 interface IRealmOptions {
   persist?: boolean;
 }
+
+// WARNING: When you increment this number, you are responsible for
+// implementing a migration that handles the data change!
+const REALM_SCHEMA_VERSION = 2;
 
 export class RealmService extends Service {
   persistentDb: Realm;
@@ -168,6 +181,8 @@ export class RealmService extends Service {
     return {
       schema: RealmService.persistentSchemas,
       path: realmPath,
+      schemaVersion: REALM_SCHEMA_VERSION,
+      onMigration: this.executeMigrations,
     };
   }
 
@@ -180,6 +195,12 @@ export class RealmService extends Service {
     this.ephemeralDb = await Realm.open(this.ephemeralConfig as any);
 
     console.log('REALM INITED');
+  }
+
+  executeMigrations(oldRealm: Realm, newRealm: Realm) {
+    Object.values(RealmService.registeredClasses).forEach(klass => {
+      klass.onMigration(oldRealm, newRealm);
+    });
   }
 
   static persistentSchemas: typeof Realm.Object[] = [];

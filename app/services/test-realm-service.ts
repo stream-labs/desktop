@@ -10,13 +10,27 @@ class SomePersistentState extends RealmObject {
     properties: {
       // Defaults if there isn't an entry in the DB
       first: { type: 'string', default: 'Taylor' },
-      last: { type: 'string', default: 'Swift' },
+      lastName: { type: 'string', default: 'Swift' },
     },
   };
 
   // Example of a computed property (can potentially replace Views)
   get fullName() {
     return `${this.first} ${this.last}`;
+  }
+
+  static onMigration(oldRealm: Realm, newRealm: Realm): void {
+    if (oldRealm.schemaVersion < 2) {
+      console.log('RUNNING MIGRATION');
+      const oldObjects = oldRealm.objects('SomePersistentState');
+      const newObjects = newRealm.objects('SomePersistentState');
+
+      for (const objectIndex in oldObjects) {
+        const oldObject = oldObjects[objectIndex];
+        const newObject = newObjects[objectIndex];
+        newObject['lastName'] = oldObject['last'];
+      }
+    }
   }
 }
 
