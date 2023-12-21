@@ -47,7 +47,16 @@
 
       <div class="content-container">
         <div v-if="isPreset">
-          <img :src="image">
+          <img :src="image" style="max-height: 350px;">
+          <div class="input-container">
+            <div class="input-label">
+              <label>声の高さ</label>
+              <label> {{ pitchShift.toFixed(0) + ' cent' }} </label>
+            </div>
+            <div class="input-wrapper">
+              <VueSlider v-model="pitchShift" :min="-1200.00" :max="1200.00" :interval="0.1" tooltip="none" />
+            </div>
+          </div>
         </div>
 
         <div v-else>
@@ -69,7 +78,7 @@
                 <div style=" width: 100%;font-weight: bold; color: white;">音声設定 </div>
                 <button class="button-inline" @click="onRandom">ランダムで生成 </button>
                 <i class="icon-help icon-btn tooltip1" style="color:var(--color-button-primary)">
-                  <div class="tooltip1_text" style="left: -100px;">へるぷです</div>
+                  <div class="tooltip1_text" style="left: -100px;">ランダムで設定して生成します</div>
                 </i>
               </div>
 
@@ -97,13 +106,13 @@
                 <div style="display: flex;">
                   <label>割合 </label>
                   <i class="icon-help icon-btn tooltip1" style="color:var(--color-button-primary)">
-                    <div class="tooltip1_text">へるぷです</div>
+                    <div class="tooltip1_text">ボイス１の割合を設定します</div>
                   </i>
                 </div>
                 <label> {{ amount.toFixed(0) + '%' }}</label>
               </div>
               <div class="input-wrapper">
-                <VueSlider v-model="amount" :min="0" :max="100" :interval="0.1" tooltip="わりあい" />
+                <VueSlider v-model="amount" :min="0" :max="100" :interval="0.1" tooltip="none" />
               </div>
 
             </div>

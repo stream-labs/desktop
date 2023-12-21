@@ -11,24 +11,39 @@ import { IObsListInput, IObsListOption, TObsValue } from 'components/obs/inputs/
 // source用
 type SourcePropKey = 'device' | 'input_gain' | 'output_gain' | 'pitch_shift' | 'pitch_shift_mode' | 'pitch_snap' | 'primary_voice' | 'secondary_voice' | 'amount'
 
-// manual保持用
-type ManualParamKey = 'name' | 'inputGain' | 'pitchShift' | 'amount' | 'primaryVoice' | 'secondaryVoice';
+type ParamKey = 'name' | 'inputGain' | 'pitchShift' | 'amount' | 'primaryVoice' | 'secondaryVoice';
 
+interface Param {
+  name: string
+  image: string
+  icon: string
 
+  pitchShift: number
+  amount: number
+  primaryVoice: number
+  secondaryVoice: number
+
+  // inputGain: number
+  // pitchShiftMode
+}
+
+// RtvcStateService保持用
 interface ManualParam {
   name: string
   pitchShift: number
   amount: number
   primaryVoice: number
   secondaryVoice: number
-  // inputGain: number
-  // pitchShiftMode
 }
 
-// RtvcStateService保持用
+interface PresetParam {
+  pitchShift: number
+}
+
 interface StateParam {
   currentIndex: string
   manuals: ManualParam[]
+  presets: PresetParam[]
 }
 
 @Component({
@@ -60,7 +75,9 @@ export default class RtvcSourceProperties extends SourceProperties {
   initialMonitoringType: obs.EMonitoringType
   currentMonitoringType: obs.EMonitoringType
 
-  manuals: ManualParam[]
+  manualParams: ManualParam[]
+  presetParams: PresetParam[]
+
   currentIndex: string = "preset/0"
   isMonitor: boolean = false
   canceled = false
@@ -86,10 +103,9 @@ export default class RtvcSourceProperties extends SourceProperties {
   manualList: { value: string, name: string, icon: string }[] = []
   updateManualList() {
     // add,delに反応しないのでコード側から変更指示
-    this.manualList = this.manuals.map((a, idx) => { return { value: `manual/${idx}`, name: a.name, icon: "./media/images/test_icon.png" } })
-    this.canAdd = this.manualList.length < this.manualMax 
+    this.manualList = this.manualParams.map((a, idx) => { return { value: `manual/${idx}`, name: a.name, icon: "./media/images/test_icon.png" } })
+    this.canAdd = this.manualList.length < this.manualMax
   }
-  //  get manualList() { return this.manuals.map((a, idx) => { return { value: `manual/${idx}`, name: a.name, icon: "" } }) }
 
   // マニュアル操作で選べないvoice
   // value,description (indexはsecondaryなどでずれるのでvalueでチェックすること)
@@ -109,22 +125,15 @@ export default class RtvcSourceProperties extends SourceProperties {
 
   @Watch('currentIndex')
   onChangeIndex() {
-    const idx = this.getCurrentManualIndex()
-    if (idx >= 0) { // for manuals
-      this.name = this.getManualParam('name')
-      this.pitchShift = this.getManualParam('pitchShift')
-      this.amount = this.getManualParam('amount')
-      this.primaryVoice = this.getManualParam('primaryVoice')
-      this.secondaryVoice = this.getManualParam('secondaryVoice')
-    } else { // for presets
-      const p = this.presetValues.find(a => a.index === this.currentIndex)
-      if (!p) return
-      this.pitchShift = p.pitchShift
-      this.amount = p.amount
-      this.primaryVoice = p.primaryVoice
-      this.secondaryVoice = p.secondaryVoice
-      this.image = p.image
-    }
+    const p = this.getParams()
+
+    this.name = p.name
+    this.image = p.image
+
+    this.pitchShift = p.pitchShift
+    this.amount = p.amount
+    this.primaryVoice = p.primaryVoice
+    this.secondaryVoice = p.secondaryVoice
 
     this.primaryVoiceModel = this.getPropertyOptionByValue('primary_voice', this.primaryVoice)
     this.secondaryVoiceModel = this.getPropertyOptionByValue('secondary_voice', this.secondaryVoice)
@@ -137,39 +146,36 @@ export default class RtvcSourceProperties extends SourceProperties {
     this.setPropertyValue('secondary_voice', this.secondaryVoice)
   }
 
-  // GET,SETのCOMPUTEDではへんな動きするのでWATCH主体で
-  // readonlyはgetでも
-
   @Watch('name')
   onChangeName() {
-    this.setManualParam('name', this.name)
-    const idx = this.getCurrentManualIndex()
+    this.setParam('name', this.name)
+    const idx = this.getManualIndexNum(this.currentIndex)
     if (idx >= 0) this.manualList[idx].name = this.name // 画面反映
   }
 
   @Watch('pitchShift')
   onChangePitchShift() {
-    this.setManualParam('pitchShift', this.pitchShift)
+    this.setParam('pitchShift', this.pitchShift)
     this.setPropertyValue('pitch_shift', this.pitchShift)
   }
 
   @Watch('amount')
   onChangeAmount() {
-    this.setManualParam('amount', this.amount)
+    this.setParam('amount', this.amount)
     this.setPropertyValue('amount', this.amount)
   }
 
   @Watch('primaryVoiceModel')
   onChangePrimaryVoice() {
     this.primaryVoice = this.primaryVoiceModel.value
-    this.setManualParam('primaryVoice', this.primaryVoice)
+    this.setParam('primaryVoice', this.primaryVoice)
     this.setPropertyValue('primary_voice', this.primaryVoice)
   }
 
   @Watch('secondaryVoiceModel')
   onChangeSecondaryVoice() {
     this.secondaryVoice = this.secondaryVoiceModel.value
-    this.setManualParam('secondaryVoice', this.secondaryVoice)
+    this.setParam('secondaryVoice', this.secondaryVoice)
     this.setPropertyValue('secondary_voice', this.secondaryVoice)
   }
 
@@ -188,29 +194,58 @@ export default class RtvcSourceProperties extends SourceProperties {
     this.currentMonitoringType = monitoringType
   }
 
-  // -- manual param in/out
+  // --  param in/out
 
-  getManualParam(key: ManualParamKey): any {
-    const idx = this.getCurrentManualIndex()
-    if (idx < 0) return undefined
-    return this.manuals[idx][key]
+  getParams(): Param {
+    const p = this.indexToNum(this.currentIndex)
+    if (p.isManual) {
+      const v = this.manualParams[p.idx]
+      return {
+        name: v.name, icon: '', image: '',
+        pitchShift: v.pitchShift,
+        amount: v.amount,
+        primaryVoice: v.primaryVoice,
+        secondaryVoice: v.secondaryVoice
+      }
+    }
+
+    const v = this.presetValues[p.idx]
+    const m = this.presetParams[p.idx]
+
+    return {
+      name: '', icon: v.icon, image: v.image,
+      pitchShift: m.pitchShift,
+      amount: v.amount,
+      primaryVoice: v.primaryVoice,
+      secondaryVoice: v.secondaryVoice
+    }
   }
 
-  setManualParam(key: ManualParamKey, value: any) {
-    const idx = this.getCurrentManualIndex()
-    if (idx < 0) return
-    this.manuals[idx][key as any] = value
+  setParam(key: ParamKey, value: any) {
+    const p = this.indexToNum(this.currentIndex)
+    if (p.isManual) {
+      this.manualParams[p.idx][key] = value
+      return
+    }
+    this.presetParams[p.idx][key] = value
   }
 
-  getCurrentManualIndex(): number {
-    return this.getManualIndexNum(this.currentIndex)
+  indexToNum(index: string): { isManual: boolean, idx: number } {
+    const s = index.split('/')
+    if (s.length === 2) {
+      const num = Number(s[1])
+      if (s[0] === 'manual' && num >= 0 && num < this.manualParams.length) return { isManual: true, idx: num }
+      if (s[0] === 'preset' && num >= 0 && num < this.presetList.length) return { isManual: false, idx: num }
+    }
+    return { isManual: false, idx: 0 }
   }
 
   getManualIndexNum(index: string): number {
-    const s = index.split('/')
-    if (s.length === 2 && s[0] === 'manual') return Number(s[1])
+    const r = this.indexToNum(index)
+    if (r.isManual) return r.idx
     return -1
   }
+
 
   // -- sources in/out
 
@@ -238,12 +273,13 @@ export default class RtvcSourceProperties extends SourceProperties {
     this.tainted = true // restote on cancel 
   }
 
-  // --- rutine
+  // --- update
 
   update() {
     const p: StateParam = {
       currentIndex: this.currentIndex,
-      manuals: this.manuals
+      manuals: this.manualParams,
+      presets: this.presetParams
     }
 
     this.rtvcStateService.setValue(p)
@@ -265,14 +301,20 @@ export default class RtvcSourceProperties extends SourceProperties {
     }
     this.device = this.getPropertyValue('device')
 
-    // default values
-    this.manuals = [{ name: 'オリジナル1', pitchShift: 0, amount: 0, primaryVoice: 0, secondaryVoice: -1 },
-    { name: 'オリジナル2', pitchShift: 0, amount: 0, primaryVoice: 0, secondaryVoice: -1 },
-    { name: 'オリジナル3', pitchShift: 0, amount: 0, primaryVoice: 0, secondaryVoice: -1 }]
-
     const p = this.rtvcStateService.getValue() as StateParam
 
-    if (Array.isArray(p.manuals)) this.manuals = p.manuals
+    this.presetParams = []
+    if (Array.isArray(p.presets)) this.presetParams = p.presets
+    while (this.presetParams.length < this.presetValues.length) this.presetParams.push({ pitchShift: 0 })
+
+    // default values
+    this.manualParams = [
+      { name: 'オリジナル1', pitchShift: 0, amount: 0, primaryVoice: 0, secondaryVoice: -1 },
+      { name: 'オリジナル2', pitchShift: 0, amount: 0, primaryVoice: 0, secondaryVoice: -1 },
+      { name: 'オリジナル3', pitchShift: 0, amount: 0, primaryVoice: 0, secondaryVoice: -1 }
+    ]
+
+    if (Array.isArray(p.manuals)) this.manualParams = p.manuals
     this.updateManualList()
 
     this.currentIndex = p.currentIndex ?? 'preset/0'
@@ -283,8 +325,8 @@ export default class RtvcSourceProperties extends SourceProperties {
   beforeDestroy() {
 
     // モニタリング状態はもとの値に戻す
-    if(this.initialMonitoringType !== this.currentMonitoringType)
-    this.audioService.setSettings(this.sourceId, { monitoringType:this.initialMonitoringType })
+    if (this.initialMonitoringType !== this.currentMonitoringType)
+      this.audioService.setSettings(this.sourceId, { monitoringType: this.initialMonitoringType })
 
     if (this.canceled) {
       if (this.tainted) {
@@ -300,7 +342,15 @@ export default class RtvcSourceProperties extends SourceProperties {
 
   // --- event
 
-  onTab(idx:number){
+  onRandom() {
+    const list = this.primaryVoiceList
+    const idx = Math.floor(Math.random() * list.length)
+    this.primaryVoiceModel = list[idx]
+    this.secondaryVoiceModel = this.secondaryVoiceList[0]
+    this.amount = 0
+  }
+
+  onTab(idx: number) {
     this.tab = idx
   }
 
@@ -312,23 +362,15 @@ export default class RtvcSourceProperties extends SourceProperties {
     this.closeWindow()
   }
 
-  onRandom(){
-    const list = this.primaryVoiceList
-    const idx = Math.floor(Math.random() * list.length)
-    this.primaryVoiceModel = list[idx]
-    this.secondaryVoiceModel = this.secondaryVoiceList[0]
-    this.amount = 0
-  }
-
   onSelect(index: string) {
     this.currentIndex = index
   }
 
   onAdd() {
-    if (this.manuals.length >= this.manualMax) return
-    const index = `manual/${this.manuals.length}`
-    this.manuals.push(
-      { name: `オリジナル${this.manuals.length + 1}`, pitchShift: 0, amount: 0, primaryVoice: 0, secondaryVoice: -1 },
+    if (this.manualParams.length >= this.manualMax) return
+    const index = `manual/${this.manualParams.length}`
+    this.manualParams.push(
+      { name: `オリジナル${this.manualParams.length + 1}`, pitchShift: 0, amount: 0, primaryVoice: 0, secondaryVoice: -1 },
     )
     this.updateManualList()
     this.currentIndex = index
@@ -339,20 +381,20 @@ export default class RtvcSourceProperties extends SourceProperties {
     if (idx < 0) return
     if (!confirm("削除しますか？")) return
 
-    this.manuals.splice(idx, 1)
+    this.manualParams.splice(idx, 1)
     this.updateManualList()
     if (index !== this.currentIndex) return
     this.currentIndex = 'preset/0'
   }
 
   onCopy(index: string) {
-    if (this.manuals.length >= this.manualMax) return
+    if (this.manualParams.length >= this.manualMax) return
     const idx = this.getManualIndexNum(index)
     if (idx < 0) return
-    const v = this.manuals[idx]
-    const newIndex = `manual/${this.manuals.length}`
+    const v = this.manualParams[idx]
+    const newIndex = `manual/${this.manualParams.length}`
 
-    this.manuals.push(
+    this.manualParams.push(
       { name: `${v.name}のコピー`, pitchShift: v.pitchShift, amount: v.amount, primaryVoice: v.primaryVoice, secondaryVoice: v.secondaryVoice },
     )
 
