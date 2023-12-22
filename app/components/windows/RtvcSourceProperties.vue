@@ -58,7 +58,7 @@
               <label> {{ pitchShift.toFixed(0) + ' cent' }} </label>
             </div>
             <div class="input-wrapper">
-              <VueSlider v-model="pitchShift" :min="-1200.00" :max="1200.00" :interval="0.1" tooltip="none" />
+              <VueSlider v-model="pitchShift" :min="-1200" :max="1200" :interval="1" tooltip="none" />
             </div>
           </div>
         </div>
@@ -95,7 +95,7 @@
                 <label> {{ pitchShift.toFixed(0) + ' cent' }} </label>
               </div>
               <div class="input-wrapper">
-                <VueSlider v-model="pitchShift" :min="-1200.00" :max="1200.00" :interval="0.1" tooltip="none" />
+                <VueSlider v-model="pitchShift" :min="-1200" :max="1200" :interval="1" tooltip="none" />
               </div>
 
               <div class="input-label"><label>{{ $t('source-props.nair-rtvc-source.primary_voice.name') }}</label></div>
@@ -121,7 +121,7 @@
                   <label> {{ amount.toFixed(0) + '%' }}</label>
                 </div>
                 <div class="input-wrapper">
-                  <VueSlider v-model="amount" :min="0" :max="100" :interval="0.1" tooltip="none" />
+                  <VueSlider v-model="amount" :min="0" :max="100" :interval="1" tooltip="none" />
                 </div>
               </div>
 
