@@ -78,7 +78,7 @@
                 <div style=" width: 100%;font-weight: bold; color: white;">音声設定 </div>
                 <button class="button-inline" @click="onRandom">ランダムで生成 </button>
                 <i class="icon-help icon-btn tooltip1" style="color:var(--color-button-primary)">
-                  <div class="tooltip1_text" style="left: -100px;">ランダムで設定して生成します</div>
+                  <div class="tooltip1_text" style="left: -200px;">ランダムで設定して生成します</div>
                 </i>
               </div>
 
@@ -93,26 +93,28 @@
               <div class="input-label"><label>ボイス1</label></div>
               <div class="input-wrapper">
                 <multiselect v-model="primaryVoiceModel" :options="primaryVoiceList" label="description" trackBy="value"
-                  :allow-empty="false" />
+                  :allow-empty="false" :placeholder="$t('settings.listPlaceholder')" />
               </div>
 
               <div class="input-label"><label>ボイス2</label></div>
               <div class="input-wrapper">
                 <multiselect v-model="secondaryVoiceModel" :options="secondaryVoiceList" label="description"
-                  trackBy="value" :allow-empty="false" />
+                  trackBy="value" :allow-empty="false" :placeholder="$t('settings.listPlaceholder')" />
               </div>
 
-              <div class="input-label">
-                <div style="display: flex;">
-                  <label>割合 </label>
-                  <i class="icon-help icon-btn tooltip1" style="color:var(--color-button-primary)">
-                    <div class="tooltip1_text">ボイス１の割合を設定します</div>
-                  </i>
+              <div v-if="secondaryVoice >= 0" style="width: 100%;">
+                <div class="input-label">
+                  <div style="display: flex;">
+                    <label>割合 </label>
+                    <i class="icon-help icon-btn tooltip1" style="color:var(--color-button-primary)">
+                      <div class="tooltip1_text">ボイス１の割合を設定します</div>
+                    </i>
+                  </div>
+                  <label> {{ amount.toFixed(0) + '%' }}</label>
                 </div>
-                <label> {{ amount.toFixed(0) + '%' }}</label>
-              </div>
-              <div class="input-wrapper">
-                <VueSlider v-model="amount" :min="0" :max="100" :interval="0.1" tooltip="none" />
+                <div class="input-wrapper">
+                  <VueSlider v-model="amount" :min="0" :max="100" :interval="0.1" tooltip="none" />
+                </div>
               </div>
 
             </div>
@@ -130,13 +132,13 @@
             <div class="input-label"><label>入力デバイス</label></div>
             <div class="input-wrapper">
               <multiselect v-model="deviceModel" :options="deviceList" label="description" trackBy="value"
-                :allow-empty="false" />
+                :allow-empty="false" :placeholder="$t('settings.listPlaceholder')" />
             </div>
 
             <div class="input-label"><label>latency</label></div>
             <div class="input-wrapper">
               <multiselect v-model="latencyModel" :options="latencyList" label="description" trackBy="value"
-                :allow-empty="false" />
+                :allow-empty="false" :placeholder="$t('settings.listPlaceholder')" />
             </div>
 
           </div>
@@ -335,12 +337,13 @@
 .tooltip1_text {
   position: absolute;
   display: none;
-  width: 100px;
+  width: 200px;
   padding: 10px;
   font-size: 12px;
   line-height: 1.6em;
   color: var(--color-text-light);
-  background: var(--color-bg-primary);
+  background: black;
+  // background: var(--color-bg-primary);
   border-radius: 5px;
 }
 
