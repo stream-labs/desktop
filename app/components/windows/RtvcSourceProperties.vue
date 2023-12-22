@@ -3,15 +3,16 @@
   <div class="modal-layout">
     <div class="tab">
       <button class="item" :class="{ 'active': tab == 0 }" @click="onTab(0)">
-        ボイス設定</button>
+        {{ $t('source-props.nair-rtvc-source.nav.voice_setting') }}</button>
       <button class="item" :class="{ 'active': tab == 1 }" @click="onTab(1)">
-        マイク設定</button>
+        {{ $t('source-props.nair-rtvc-source.nav.mic_setting') }}</button>
     </div>
 
     <div v-if="tab == 0" class="content">
       <div>
         <ul class="nav-menu">
-          <div style="padding-left:4px; font-weight: bold; color: white;">プリセットボイス</div>
+          <div style="padding-left:4px; font-weight: bold; color: white;">{{
+            $t('source-props.nair-rtvc-source.nav.preset_voice') }}</div>
           <li v-for="v in presetList" :key="v.value" class="nav-item" :class="{ active: v.value === currentIndex }">
             <div class="nav-item-content" @click="onSelect(v.value)">
               <img :src="v.icon" style="padding-right: 4px;">
@@ -20,8 +21,9 @@
           </li>
 
           <div style="display: flex; padding-top: 16px; ">
-            <div style="width:100%;padding-left:4px; font-weight: bold; color: white;">オリジナルボイス ({{ manualList.length
-            }}/{{ manualMax }})
+            <div style="width:100%;padding-left:4px; font-weight: bold; color: white;">{{
+              $t('source-props.nair-rtvc-source.nav.original_voice') }} ({{ manualList.length
+  }}/{{ manualMax }})
             </div>
             <button v-if="canAdd" @click="onAdd()" style=" width:30px; color:white; text-align: center">＋</button>
             <button v-else style=" width:30px; color:gray; text-align: center">＋</button>
@@ -34,8 +36,10 @@
               <div class="dropdown">
                 <button style="color:white">︙</button>
                 <div class="dropdown-content">
-                  <div @click="onDelete(v.value)" style="color: red;">ボイスを削除</div>
-                  <div @click="onCopy(v.value)" style="color:white">ボイスを複製</div>
+                  <div @click="onDelete(v.value)" style="color: red;">{{
+                    $t('source-props.nair-rtvc-source.nav.remove_voice') }}</div>
+                  <div @click="onCopy(v.value)" style="color:white">{{ $t('source-props.nair-rtvc-source.nav.copy_voice')
+                  }}</div>
                 </div>
               </div>
             </div>
@@ -63,7 +67,8 @@
           <div class="section">
             <div class="input-container">
 
-              <div style=" width: 100%; padding-bottom: 4px;font-weight: bold; color: white;">名前</div>
+              <div style=" width: 100%; padding-bottom: 4px;font-weight: bold; color: white;">{{
+                $t('source-props.nair-rtvc-source.container.voice_name') }}</div>
               <div class="input-wrapper">
                 <input type="text" v-model="name" />
               </div>
@@ -75,10 +80,13 @@
             <div class="input-container">
 
               <div style="display:flex; width: 100%; padding-bottom: 8px;">
-                <div style=" width: 100%;font-weight: bold; color: white;">音声設定 </div>
-                <button class="button-inline" @click="onRandom">ランダムで生成 </button>
+                <div style=" width: 100%;font-weight: bold; color: white;">{{
+                  $t('source-props.nair-rtvc-source.container.voice_setting') }} </div>
+                <button class="button-inline" @click="onRandom">{{
+                  $t('source-props.nair-rtvc-source.container.make_random.name') }} </button>
                 <i class="icon-help icon-btn tooltip1" style="color:var(--color-button-primary)">
-                  <div class="tooltip1_text" style="left: -200px;">ランダムで設定して生成します</div>
+                  <div class="tooltip1_text" style="left: -200px;">
+                    {{ $t('source-props.nair-rtvc-source.container.make_random.description') }}</div>
                 </i>
               </div>
 
@@ -90,13 +98,13 @@
                 <VueSlider v-model="pitchShift" :min="-1200.00" :max="1200.00" :interval="0.1" tooltip="none" />
               </div>
 
-              <div class="input-label"><label>{{ primaryVoiceModelLabel }}</label></div>
+              <div class="input-label"><label>{{ $t('source-props.nair-rtvc-source.primary_voice.name') }}</label></div>
               <div class="input-wrapper">
                 <multiselect v-model="primaryVoiceModel" :options="primaryVoiceList" label="description" trackBy="value"
                   :allow-empty="false" :placeholder="$t('settings.listPlaceholder')" />
               </div>
 
-              <div class="input-label"><label>{{ secondaryVoiceModelLabel }}</label></div>
+              <div class="input-label"><label>{{ $t('source-props.nair-rtvc-source.secondary_voice.name') }}</label></div>
               <div class="input-wrapper">
                 <multiselect v-model="secondaryVoiceModel" :options="secondaryVoiceList" label="description"
                   trackBy="value" :allow-empty="false" :placeholder="$t('settings.listPlaceholder')" />
@@ -107,7 +115,7 @@
                   <div style="display: flex;">
                     <label>{{ $t('source-props.nair-rtvc-source.amount.name') }}</label>
                     <i class="icon-help icon-btn tooltip1" style="color:var(--color-button-primary)">
-                      <div class="tooltip1_text">{{ amountDescription }}</div>
+                      <div class="tooltip1_text">{{ $t('source-props.nair-rtvc-source.amount.description') }}</div>
                     </i>
                   </div>
                   <label> {{ amount.toFixed(0) + '%' }}</label>
@@ -129,13 +137,13 @@
         <div class="section">
           <div class="input-container">
 
-            <div class="input-label"><label>{{ deviceModelLabel }}</label></div>
+            <div class="input-label"><label>{{ $t('source-props.nair-rtvc-source.device.name') }}</label></div>
             <div class="input-wrapper">
               <multiselect v-model="deviceModel" :options="deviceList" label="description" trackBy="value"
                 :allow-empty="false" :placeholder="$t('settings.listPlaceholder')" />
             </div>
 
-            <div class="input-label"><label>{{ latencyModelLabel }}</label></div>
+            <div class="input-label"><label>{{ $t('source-props.nair-rtvc-source.latency.name') }}</label></div>
             <div class="input-wrapper">
               <multiselect v-model="latencyModel" :options="latencyList" label="description" trackBy="value"
                 :allow-empty="false" :placeholder="$t('settings.listPlaceholder')" />
@@ -148,7 +156,8 @@
 
     <div class="modal-layout-controls">
 
-      <div style="margin-right: auto; margin-left: 16px;"><span>適用音声を聞く</span>
+      <div style="margin-right: auto; margin-left: 16px;"><span>{{ $t('source-props.nair-rtvc-source.nav.check_voice')
+      }}</span>
         <input v-model="isMonitor" type="checkbox" class="toggle-button" />
       </div>
 

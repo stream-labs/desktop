@@ -96,15 +96,6 @@ export default class RtvcSourceProperties extends SourceProperties {
     tab = 0
     canAdd = false
 
-    // 各ラベルの文言。コンストラクト時だとまだ値が入ってないので参照時に行う
-    get primaryVoiceModelLabel() { return $t(`source-props.${this.source.type}.primary_voice.name`); }
-    get secondaryVoiceModelLabel() { return $t(`source-props.${this.source.type}.secondary_voice.name`); }
-    get deviceModelLabel() { return $t(`source-props.${this.source.type}.device.name`); }
-    get latencyModelLabel() { return $t(`source-props.${this.source.type}.latency.name`); }
-    get amountLabel() { return $t(`source-props.${this.source.type}.amount.name`); }
-    get amountDescription() { return $t(`source-props.${this.source.type}.amount.description`); }
-    get pitchShiftLabel() { return $t(`source-props.${this.source.type}.pitch_shift.name`); }
-
     // v-modelが {} での値で更新されるので噛ませる
     primaryVoiceModel: IObsListOption<number> = { description: '', value: 0 }
     secondaryVoiceModel: IObsListOption<number> = { description: '', value: 0 }

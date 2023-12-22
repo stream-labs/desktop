@@ -413,14 +413,34 @@
   "nair-rtvc-source": {
     "name": "ボイスチェンジャー",
     "description": "ボイスチェンジャーをシーンに追加します。",
+    "nav": {
+      "voice_setting": "ボイス設定",
+      "mic_setting": "マイク設定",
+      "preset_voice": "プリセットボイス",
+      "original_voice": "オリジナルボイス",
+      "remove_voice": "ボイスを削除",
+      "copy_voice": "ボイスを複製",
+      "check_voice": "適用音声を聞く"
+    },
+    "container": {
+      "voice_name": "名前",
+      "voice_setting": "音声設定",
+      "make_random": {
+        "name": "ランダムで生成",
+        "description": "ランダムで設定して生成します"
+      }
+    },
     "pitch_shift": {
       "name": "声の高さ"
     },
     "primary_voice": {
-      "name": "ボイス1"
+      "name": "ボイス1",
+      "0": "jvs_001"
     },
     "secondary_voice": {
-      "name": "ボイス2"
+      "name": "ボイス2",
+      "-1": "なし",
+      "0": "jvs_001"
     },
     "amount": {
       "name": "割合",

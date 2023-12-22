@@ -413,14 +413,34 @@
   "nair-rtvc-source": {
     "name": "Voice changer",
     "description": "Voice change",
+    "nav": {
+      "voice_setting": "Voice",
+      "mic_setting": "Input",
+      "preset_voice": "Presets",
+      "original_voice": "Originals",
+      "remove_voice": "remove",
+      "copy_voice": "copy",
+      "check_voice": "Check Voice"
+    },
+    "container": {
+      "voice_name": "Name",
+      "voice_setting": "Parameters",
+      "make_random": {
+        "name": "Make random",
+        "description": "ランダムで設定して生成します"
+      }
+    },
     "pitch_shift": {
       "name": "声の高さ(要翻訳)"
     },
     "primary_voice": {
-      "name": "ボイス1(要翻訳)"
+      "name": "ボイス1(要翻訳)",
+      "0": "jvs_001"
     },
     "secondary_voice": {
-      "name": "ボイス2(要翻訳)"
+      "name": "ボイス2(要翻訳)",
+      "-1": "none",
+      "0": "jvs_001"
     },
     "amount": {
       "name": "割合(要翻訳)",
