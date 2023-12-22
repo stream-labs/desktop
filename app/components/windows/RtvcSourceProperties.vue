@@ -50,7 +50,7 @@
           <img :src="image" style="max-height: 350px;">
           <div class="input-container">
             <div class="input-label">
-              <label>声の高さ</label>
+              <label>{{ $t('source-props.nair-rtvc-source.pitch_shift.name') }}</label>
               <label> {{ pitchShift.toFixed(0) + ' cent' }} </label>
             </div>
             <div class="input-wrapper">
@@ -83,7 +83,7 @@
               </div>
 
               <div class="input-label">
-                <label>{{ pitchShiftLabel }}</label>
+                <label>{{ $t('source-props.nair-rtvc-source.pitch_shift.name') }}</label>
                 <label> {{ pitchShift.toFixed(0) + ' cent' }} </label>
               </div>
               <div class="input-wrapper">
@@ -105,9 +105,9 @@
               <div v-if="secondaryVoice >= 0" style="width: 100%;">
                 <div class="input-label">
                   <div style="display: flex;">
-                  <label>{{ amountLabel }}</label>
+                    <label>{{ $t('source-props.nair-rtvc-source.amount.name') }}</label>
                     <i class="icon-help icon-btn tooltip1" style="color:var(--color-button-primary)">
-                    <div class="tooltip1_text">{{ amountDescription }}</div>
+                      <div class="tooltip1_text">{{ amountDescription }}</div>
                     </i>
                   </div>
                   <label> {{ amount.toFixed(0) + '%' }}</label>
@@ -153,9 +153,9 @@
       </div>
 
       <button class="button button--secondary" @click="cancel">
-        キャンセル </button>
+        {{ $t('common.cancel') }} </button>
       <button class="button button--primary" @click="done">
-        完了 </button>
+        {{ $t('common.done') }} </button>
     </div>
   </div>
 </template>
