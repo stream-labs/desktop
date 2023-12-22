@@ -83,20 +83,20 @@
               </div>
 
               <div class="input-label">
-                <label>声の高さ</label>
+                <label>{{ pitchShiftLabel }}</label>
                 <label> {{ pitchShift.toFixed(0) + ' cent' }} </label>
               </div>
               <div class="input-wrapper">
                 <VueSlider v-model="pitchShift" :min="-1200.00" :max="1200.00" :interval="0.1" tooltip="none" />
               </div>
 
-              <div class="input-label"><label>ボイス1</label></div>
+              <div class="input-label"><label>{{ primaryVoiceModelLabel }}</label></div>
               <div class="input-wrapper">
                 <multiselect v-model="primaryVoiceModel" :options="primaryVoiceList" label="description" trackBy="value"
                   :allow-empty="false" />
               </div>
 
-              <div class="input-label"><label>ボイス2</label></div>
+              <div class="input-label"><label>{{ secondaryVoiceModelLabel }}</label></div>
               <div class="input-wrapper">
                 <multiselect v-model="secondaryVoiceModel" :options="secondaryVoiceList" label="description"
                   trackBy="value" :allow-empty="false" />
@@ -104,9 +104,9 @@
 
               <div class="input-label">
                 <div style="display: flex;">
-                  <label>割合 </label>
+                  <label>{{ amountLabel }}</label>
                   <i class="icon-help icon-btn tooltip1" style="color:var(--color-button-primary)">
-                    <div class="tooltip1_text">ボイス１の割合を設定します</div>
+                    <div class="tooltip1_text">{{ amountDescription }}</div>
                   </i>
                 </div>
                 <label> {{ amount.toFixed(0) + '%' }}</label>
@@ -127,13 +127,13 @@
         <div class="section">
           <div class="input-container">
 
-            <div class="input-label"><label>入力デバイス</label></div>
+            <div class="input-label"><label>{{ deviceModelLabel }}</label></div>
             <div class="input-wrapper">
               <multiselect v-model="deviceModel" :options="deviceList" label="description" trackBy="value"
                 :allow-empty="false" />
             </div>
 
-            <div class="input-label"><label>latency</label></div>
+            <div class="input-label"><label>{{ latencyModelLabel }}</label></div>
             <div class="input-wrapper">
               <multiselect v-model="latencyModel" :options="latencyList" label="description" trackBy="value"
                 :allow-empty="false" />

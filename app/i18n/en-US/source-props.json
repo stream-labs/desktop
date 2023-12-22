@@ -412,7 +412,39 @@
   },
   "nair-rtvc-source": {
     "name": "Voice changer",
-    "description": "Voice change"
+    "description": "Voice change",
+    "pitch_shift": {
+      "name": "声の高さ(要翻訳)"
+    },
+    "primary_voice": {
+      "name": "ボイス1(要翻訳)"
+    },
+    "secondary_voice": {
+      "name": "ボイス2(要翻訳)"
+    },
+    "amount": {
+      "name": "割合(要翻訳)",
+      "description": "ボイス1の割合を設定します。(要翻訳)"
+    },
+    "device": {
+      "name": "入力デバイス(要翻訳)"
+    },
+    "latency": {
+      "name": "遅延(要翻訳)",
+      "1": "1:低遅延(不安定になるかもれません)(要翻訳)",
+      "2": "2",
+      "3": "3",
+      "4": "4",
+      "5": "5",
+      "6": "6",
+      "7": "7",
+      "8": "8",
+      "9": "9",
+      "10": "10",
+      "11": "11",
+      "12": "12",
+      "13": "13:高遅延(安定)(要翻訳)"
+    }
   },
   "vlc_source": {
     "name": "VLC Source",

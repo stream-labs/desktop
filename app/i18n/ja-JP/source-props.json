@@ -411,8 +411,40 @@
     "description": "特定のアプリケーションからのオーディオをキャプチャします。"
   },
   "nair-rtvc-source": {
-    "name": "Voice changer",
-    "description": "Voice change"
+    "name": "ボイスチェンジャー",
+    "description": "ボイスチェンジャーをシーンに追加します。",
+    "pitch_shift": {
+      "name": "声の高さ"
+    },
+    "primary_voice": {
+      "name": "ボイス1"
+    },
+    "secondary_voice": {
+      "name": "ボイス2"
+    },
+    "amount": {
+      "name": "割合",
+      "description": "ボイス1の割合を設定します。"
+    },
+    "device": {
+      "name": "入力デバイス"
+    },
+    "latency": {
+      "name": "遅延",
+      "1": "1:低遅延(不安定になるかもれません)",
+      "2": "2",
+      "3": "3",
+      "4": "4",
+      "5": "5",
+      "6": "6",
+      "7": "7",
+      "8": "8",
+      "9": "9",
+      "10": "10",
+      "11": "11",
+      "12": "12",
+      "13": "13:高遅延(安定)"
+    }
   },
   "vlc_source": {
     "name": "VLCソース",
