@@ -54,7 +54,12 @@
           <img :src="image" style="max-height: 350px;">
           <div class="input-container">
             <div class="input-label">
-              <label>{{ $t('source-props.nair-rtvc-source.pitch_shift.name') }}</label>
+              <div style="display: flex;">
+                <label>{{ $t('source-props.nair-rtvc-source.pitch_shift.name') }} </label>
+                <i class="icon-help icon-btn tooltip1" style="color:var(--color-button-primary)">
+                  <div class="tooltip1_text">ヘルプ</div>
+                </i>
+              </div>
               <label> {{ pitchShift.toFixed(0) + ' cent' }} </label>
             </div>
             <div class="input-wrapper">
@@ -345,15 +350,18 @@
 
 .tooltip1_text {
   position: absolute;
+  z-index: 10;
   display: none;
   width: 200px;
-  padding: 10px;
-  font-size: 12px;
-  line-height: 1.6em;
-  color: var(--color-text-light);
-  background: black;
-  // background: var(--color-bg-primary);
-  border-radius: 5px;
+  padding: 8px 12px;
+  font-size: @font-size2;
+  color: var(--color-tooltip-text);
+  word-wrap: break-word;
+  background-color: var(--color-tooltip-bg);
+  border: 1px solid var(--color-tooltip-border);
+
+  .shadow;
+  .radius;
 }
 
 .tooltip1:hover .tooltip1_text {
