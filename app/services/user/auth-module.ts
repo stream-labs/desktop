@@ -7,6 +7,9 @@ import URI from 'urijs';
 import http from 'http';
 import Utils from 'services/utils';
 import * as remote from '@electron/remote';
+import crypto from 'crypto';
+import { Inject } from 'services/core';
+import { HostsService } from 'app-services';
 
 /**
  * Responsible for secure handling of platform OAuth flows.
@@ -15,6 +18,8 @@ import * as remote from '@electron/remote';
  * - External Auth: Login happens in the user's default web browser.
  */
 export class AuthModule {
+  @Inject() hostsService: HostsService;
+
   /**
    * Starts the authentication process in an electron window.
    */
@@ -167,5 +172,74 @@ export class AuthModule {
         hasRelogged: true,
       };
     }
+  }
+
+  /**
+   * Starts an external auth using PKCE for credential exchange
+   */
+  async startPkceAuth(authUrl: string, onWindowShow: () => void, merge = false) {
+    const codeVerifier = crypto.randomBytes(64).toString('hex');
+    const hash = crypto.createHash('sha256');
+    hash.update(codeVerifier);
+    const codeChallenge = encodeURIComponent(hash.digest('base64'));
+
+    await new Promise<void>(resolve => {
+      if (this.authServer) {
+        this.authServer.close();
+        this.authServer.unref();
+      }
+
+      this.authServer = http.createServer((request, response) => {
+        const query = URI.parseQuery(URI.parse(request.url).query) as Dictionary<string>;
+
+        if (query['success']) {
+          response.writeHead(302, {
+            Location: 'https://streamlabs.com/streamlabs-obs/login-success',
+          });
+          response.end();
+
+          this.authServer.close();
+          this.authServer.unref();
+          this.authServer = null;
+
+          resolve();
+        } else {
+          // All other requests we respond with a generic 200
+          response.writeHead(200);
+          response.write('Success');
+          response.end();
+        }
+      });
+
+      this.authServer.on('listening', () => {
+        const address = this.authServer.address();
+
+        if (address && typeof address !== 'string') {
+          const paramSeparator = merge ? '?' : '&';
+          const url = `${authUrl}${paramSeparator}port=${address.port}&code_challenge=${codeChallenge}`;
+
+          console.log('OPENING URL', url);
+
+          electron.shell.openExternal(url);
+          onWindowShow();
+        }
+      });
+
+      // Specifying port 0 lets the OS know we want a free port assigned
+      this.authServer.listen(0, '127.0.0.1');
+    });
+
+    const win = Utils.getMainWindow();
+
+    // A little hack to bring the window back to the front
+    win.setAlwaysOnTop(true);
+    win.show();
+    win.focus();
+    win.setAlwaysOnTop(false);
+
+    const host = this.hostsService.streamlabs;
+    const url = `/api/v5/slobs/auth/data?code_verifier=${codeVerifier}`;
+
+    await fetch(url);
   }
 }

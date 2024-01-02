@@ -1129,7 +1129,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
             onWindowClose,
             merge,
           )
-        : await this.authModule.startExternalAuth(authUrl, onWindowShow, merge);
+        : await this.authModule.startPkceAuth(authUrl, onWindowShow, merge); //await this.authModule.startExternalAuth(authUrl, onWindowShow, merge);
     /* eslint-enable */
 
     this.SET_AUTH_STATE(EAuthProcessState.Loading);
