@@ -14,8 +14,8 @@ import { jfetch } from 'util/requests';
 
 interface IPkceAuthResponse {
   data: {
-    auth_token: string;
-    platform: TPlatform;
+    oauth_token: string;
+    platform: TPlatform | 'slid';
     platform_id: string;
     platform_token: string;
     platform_username: string;
@@ -75,9 +75,23 @@ export class AuthModule {
 
     const resp = await jfetch<IPkceAuthResponse>(url);
 
+    if (resp.data.platform === 'slid') {
+      return {
+        widgetToken: resp.data.token,
+        apiToken: resp.data.oauth_token,
+        primaryPlatform: null,
+        platforms: {},
+        slid: {
+          id: resp.data.platform_id,
+          username: resp.data.platform_username,
+        },
+        hasRelogged: true,
+      };
+    }
+
     return {
       widgetToken: resp.data.token,
-      apiToken: resp.data.auth_token,
+      apiToken: resp.data.oauth_token,
       primaryPlatform: resp.data.platform,
       platforms: {
         [resp.data.platform]: {
