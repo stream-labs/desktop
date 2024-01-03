@@ -1002,13 +1002,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const url = `https://${this.hostsService.streamlabs}/slobs/login?${query}`;
 
     this.SET_AUTH_STATE(EAuthProcessState.Loading);
-    // const auth = await this.authModule.startExternalAuth(
-    //   url,
-    //   () => {
-    //     this.SET_AUTH_STATE(EAuthProcessState.Idle);
-    //   },
-    //   false,
-    // );
 
     const auth = await this.authModule.startPkceAuth(url, () => {
       this.SET_AUTH_STATE(EAuthProcessState.Idle);
