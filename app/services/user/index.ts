@@ -1002,13 +1002,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const url = `https://${this.hostsService.streamlabs}/slobs/login?${query}`;
 
     this.SET_AUTH_STATE(EAuthProcessState.Loading);
-    const auth = await this.authModule.startExternalAuth(
-      url,
-      () => {
-        this.SET_AUTH_STATE(EAuthProcessState.Idle);
-      },
-      false,
-    );
+
+    const auth = await this.authModule.startPkceAuth(url, () => {
+      this.SET_AUTH_STATE(EAuthProcessState.Idle);
+    });
 
     this.LOGOUT();
     this.LOGIN(auth);
@@ -1065,7 +1062,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.SET_AUTH_STATE(EAuthProcessState.Loading);
     const onWindowShow = () => this.SET_AUTH_STATE(EAuthProcessState.Idle);
 
-    const auth = await this.authModule.startExternalAuth(authUrl, onWindowShow, true);
+    const auth = await this.authModule.startPkceAuth(authUrl, onWindowShow, () => {}, true);
 
     this.SET_AUTH_STATE(EAuthProcessState.Loading);
     this.SET_IS_RELOG(false);
@@ -1119,18 +1116,14 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       );
     const onWindowClose = () => this.SET_AUTH_STATE(EAuthProcessState.Idle);
 
-    const auth =
-      mode === 'internal'
-        ? /* eslint-disable */
-          await this.authModule.startInternalAuth(
-            authUrl,
-            service.authWindowOptions,
-            onWindowShow,
-            onWindowClose,
-            merge,
-          )
-        : await this.authModule.startExternalAuth(authUrl, onWindowShow, merge);
-    /* eslint-enable */
+    const auth = await this.authModule.startPkceAuth(
+      authUrl,
+      onWindowShow,
+      onWindowClose,
+      merge,
+      mode === 'external',
+      service.authWindowOptions,
+    );
 
     this.SET_AUTH_STATE(EAuthProcessState.Loading);
     this.SET_IS_RELOG(false);
