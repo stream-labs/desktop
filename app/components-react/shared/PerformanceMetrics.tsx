@@ -15,18 +15,12 @@ export default function PerformanceMetrics(props: {
   className?: string;
 }) {
   const { CustomizationService, PerformanceService } = Services;
-
-  const v = useVuex(
-    () => ({
-      pinnedStats: CustomizationService.views.pinnedStatistics,
-    }),
-    false,
-  );
+  const pinnedStats = useRealmObject(CustomizationService.state.pinnedStatistics);
 
   const stats = useRealmObject(PerformanceService.state);
 
   function showAttribute(attribute: string) {
-    return props.mode === 'full' || v.pinnedStats[attribute];
+    return props.mode === 'full' || pinnedStats[attribute];
   }
 
   function pinTooltip(stat: string) {
@@ -35,14 +29,12 @@ export default function PerformanceMetrics(props: {
 
   function classForStat(stat: string) {
     if (props.mode === 'limited') return '';
-    return `clickable ${v.pinnedStats[stat] ? 'active' : ''}`;
+    return `clickable ${pinnedStats[stat] ? 'active' : ''}`;
   }
 
   function updatePinnedStats(key: string, value: boolean) {
     if (props.mode === 'limited') return;
-    const newStats = cloneDeep(v.pinnedStats);
-    newStats[key] = value;
-    CustomizationService.actions.setPinnedStatistics(newStats);
+    CustomizationService.actions.setSettings({ pinnedStatistics: { [key]: value } });
   }
 
   const metadata = {
@@ -84,7 +76,7 @@ export default function PerformanceMetrics(props: {
                 classForStat(attribute),
                 'performance-metric-wrapper',
               )}
-              onClick={() => updatePinnedStats(attribute, !v.pinnedStats[attribute])}
+              onClick={() => updatePinnedStats(attribute, !pinnedStats[attribute])}
             >
               <i className={cx(styles.performanceMetricIcon, data.icon)} />
               <span className={styles.performanceMetric}>

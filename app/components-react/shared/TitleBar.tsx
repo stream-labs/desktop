@@ -19,24 +19,15 @@ export default function TitleBar(props: { windowId: string }) {
   const isMac = byOS({ [OS.Windows]: false, [OS.Mac]: true });
   const v = useVuex(
     () => ({
-      theme: CustomizationService.views.currentTheme,
       title: WindowsService.state[props.windowId]?.title,
     }),
     false,
   );
-
-  // NOT reactive
-  const name = TestRealmService.state1.fullName;
-
-  // Reactive
-  const title = useRealmObject(TestRealmService.state2).title;
-
-  // const title = useRealmObject(TestRealmService.state1).fullName;
-  // const ephem = useRealmObject(TestRealmService.state2).title;
+  const theme = useRealmObject(CustomizationService.state).theme;
 
   const isDev = useMemo(() => Utils.isDevMode(), []);
 
-  const primeTheme = /prime/.test(v.theme);
+  const primeTheme = /prime/.test(theme);
   const [errorState, setErrorState] = useState(false);
 
   useEffect(lifecycle, []);
@@ -72,7 +63,7 @@ export default function TitleBar(props: { windowId: string }) {
   return (
     <>
       <div
-        className={cx(styles.titlebar, v.theme, {
+        className={cx(styles.titlebar, theme, {
           [styles['titlebar-mac']]: isMac,
           [styles.titlebarError]: errorState,
         })}
@@ -82,7 +73,7 @@ export default function TitleBar(props: { windowId: string }) {
         )}
         {primeTheme && !isMac && <KevinSvg className={styles.titlebarIcon} />}
         <div className={styles.titlebarTitle} onDoubleClick={maximize}>
-          {title}
+          {v.title}
         </div>
         {!isMac && (
           <div className={styles.titlebarActions}>

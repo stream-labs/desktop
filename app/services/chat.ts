@@ -368,7 +368,7 @@ export class ChatService extends Service {
     });
   }
 
-  private handleSettingsChanged(changed: Partial<ICustomizationServiceState>) {
+  private handleSettingsChanged(changed: DeepPartial<ICustomizationServiceState>) {
     if (!this.chatView) return;
     if (changed.chatZoomFactor) {
       this.chatView.webContents.setZoomFactor(changed.chatZoomFactor);

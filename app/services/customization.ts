@@ -9,7 +9,7 @@ import {
 } from 'components/obs/inputs/ObsInput';
 import Utils from 'services/utils';
 import { $t } from 'services/i18n';
-import { Inject } from 'services/core';
+import { Inject, Service } from 'services/core';
 import { UserService } from 'services/user';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import fs from 'fs-extra';
@@ -98,7 +98,7 @@ class PinnedStatistics extends RealmObject {
 
 PinnedStatistics.register({ persist: true });
 
-class CustomizationState extends RealmObject {
+export class CustomizationState extends RealmObject {
   theme: string;
   updateStreamInfoOnLive: boolean;
   livePreviewEnabled: boolean;
@@ -116,16 +116,12 @@ class CustomizationState extends RealmObject {
   enableFFZEmotes: boolean;
   mediaBackupOptOut: boolean;
   navigateToLiveOnStreamStart: boolean;
-  experimental?: {
-    volmetersFPSLimit?: number;
-  };
   designerMode: boolean;
   legacyEvents: boolean;
-  pinnedStatistics: IPinnedStatistics;
+  pinnedStatistics: PinnedStatistics;
   enableCrashDumps: boolean;
   enableAnnouncements: boolean;
 
-  // TODO: Finish
   static schema = {
     name: 'CustomizationState',
     properties: {
@@ -146,97 +142,132 @@ class CustomizationState extends RealmObject {
       enableFFZEmotes: { type: 'bool', default: false },
       mediaBackupOptOut: { type: 'bool', default: false },
       navigateToLiveOnStreamStart: { type: 'bool', default: true },
+      legacyEvents: { type: 'bool', default: false },
+      designerMode: { type: 'bool', default: false },
+      pinnedStatistics: { type: 'PinnedStatistics', default: {} },
+      enableCrashDumps: { type: 'bool', default: true },
+      enableAnnouncements: { type: 'bool', default: true },
     },
   };
-}
 
-class CustomizationViews extends ViewHandler<ICustomizationServiceState> {
-  get experimentalSettingsFormData(): TObsFormData {
-    return [];
-  }
+  protected onCreated(): void {
+    const data = localStorage.getItem('PersistentStatefulService-CustomizationService');
 
-  get pinnedStatistics() {
-    return this.state.pinnedStatistics;
-  }
+    if (data) {
+      const parsed = JSON.parse(data);
+      const oldDefaults = {
+        theme: 'night-theme',
+        updateStreamInfoOnLive: true,
+        livePreviewEnabled: true,
+        leftDock: false,
+        hideViewerCount: false,
+        livedockCollapsed: true,
+        livedockSize: 0,
+        eventsSize: 156,
+        controlsSize: 240,
+        performanceMode: false,
+        chatZoomFactor: 1,
+        enableBTTVEmotes: false,
+        enableFFZEmotes: false,
+        mediaBackupOptOut: false,
+        folderSelection: false,
+        navigateToLiveOnStreamStart: true,
+        legacyEvents: false,
+        designerMode: false,
+        pinnedStatistics: {
+          cpu: false,
+          fps: false,
+          droppedFrames: false,
+          bandwidth: false,
+        },
+        legacyAlertbox: false,
+        experimental: {
+          // put experimental features here
+        },
+        enableCrashDumps: true,
+        enableAnnouncements: true,
+      };
 
-  get displayBackground() {
-    return DISPLAY_BACKGROUNDS[this.state.theme];
-  }
+      const oldData = Utils.getDeepChangedParams(oldDefaults, parsed);
 
-  get currentTheme() {
-    return this.state.theme;
+      this.theme = oldData.theme;
+      this.updateStreamInfoOnLive = oldData.updateStreamInfoOnLive;
+      this.livePreviewEnabled = oldData.livePreviewEnabled;
+      this.leftDock = oldData.leftDock;
+      this.hideViewerCount = oldData.hideViewerCount;
+      this.livedockCollapsed = oldData.livedockCollapsed;
+      this.livedockSize - oldData.livedockSize;
+      this.eventsSize = oldData.eventsSize;
+      this.controlsSize = oldData.controlsSize;
+      this.performanceMode = oldData.performanceMode;
+      this.chatZoomFactor = oldData.chatZoomFactor;
+      this.enableBTTVEmotes = oldData.enableBTTVEmotes;
+      this.enableFFZEmotes = oldData.enableFFZEmotes;
+      this.mediaBackupOptOut = oldData.mediaBackupOptOut;
+      this.folderSelection = oldData.folderSelection;
+      this.navigateToLiveOnStreamStart = oldData.navigateToLiveOnStreamStart;
+      this.legacyEvents = oldData.legacyEvents;
+      this.designerMode = oldData.designerMode;
+      this.pinnedStatistics.cpu = oldData.pinnedStatistics.cpu;
+      this.pinnedStatistics.fps = oldData.pinnedStatistics.fps;
+      this.pinnedStatistics.droppedFrames = oldData.pinnedStatistics.droppedFrames;
+      this.pinnedStatistics.bandwidth = oldData.pinnedStatistics.bandwidth;
+      this.legacyAlertbox = oldData.legacyAlertbox;
+      this.enableCrashDumps = oldData.enableCrashDumps;
+      this.enableAnnouncements = oldData.enableAnnouncements;
+    }
   }
 
   get isDarkTheme() {
-    return ['night-theme', 'prime-dark'].includes(this.currentTheme);
+    return ['night-theme', 'prime-dark'].includes(this.theme);
   }
 
-  get designerMode() {
-    return this.state.designerMode;
+  get displayBackground() {
+    return DISPLAY_BACKGROUNDS[this.theme];
   }
 }
+
+CustomizationState.register({ persist: true });
+
+// class CustomizationViews extends ViewHandler<ICustomizationServiceState> {
+//   get experimentalSettingsFormData(): TObsFormData {
+//     return [];
+//   }
+
+//   get pinnedStatistics() {
+//     return this.state.pinnedStatistics;
+//   }
+
+//   get displayBackground() {
+//     return DISPLAY_BACKGROUNDS[this.state.theme];
+//   }
+
+//   get currentTheme() {
+//     return this.state.theme;
+//   }
+
+
+
+//   get designerMode() {
+//     return this.state.designerMode;
+//   }
+// }
 
 /**
  * This class is used to store general UI behavior flags
  * that are sticky across application runtimes.
  */
-export class CustomizationService extends PersistentStatefulService<ICustomizationServiceState> {
+export class CustomizationService extends Service {
   @Inject() userService: UserService;
   @Inject() usageStatisticsService: UsageStatisticsService;
   @Inject() appService: AppService;
 
-  static get migrations() {
-    return [
-      {
-        oldKey: 'nightMode',
-        newKey: 'theme',
-        transform: (val: boolean) => (val ? 'night-theme' : 'day-theme'),
-      },
-    ];
-  }
+  settingsChanged = new Subject<DeepPartial<CustomizationState>>();
 
-  static defaultState: ICustomizationServiceState = {
-    theme: 'night-theme',
-    updateStreamInfoOnLive: true,
-    livePreviewEnabled: true,
-    leftDock: false,
-    hideViewerCount: false,
-    livedockCollapsed: true,
-    livedockSize: 0,
-    eventsSize: 156,
-    controlsSize: 240,
-    performanceMode: false,
-    chatZoomFactor: 1,
-    enableBTTVEmotes: false,
-    enableFFZEmotes: false,
-    mediaBackupOptOut: false,
-    folderSelection: false,
-    navigateToLiveOnStreamStart: true,
-    legacyEvents: false,
-    designerMode: false,
-    pinnedStatistics: {
-      cpu: false,
-      fps: false,
-      droppedFrames: false,
-      bandwidth: false,
-    },
-    legacyAlertbox: null,
-    experimental: {
-      // put experimental features here
-    },
-    enableCrashDumps: true,
-    enableAnnouncements: true,
-  };
-
-  settingsChanged = new Subject<Partial<ICustomizationServiceState>>();
-
-  get views() {
-    return new CustomizationViews(this.state);
-  }
+  state = CustomizationState.inject();
 
   init() {
     super.init();
-    this.setSettings(this.runMigrations(this.state, CustomizationService.migrations));
     this.setLiveDockCollapsed(true); // livedock is always collapsed on app start
     this.ensureCrashDumpFolder();
     this.setObsTheme();
@@ -264,13 +295,14 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     }
   }
 
-  setSettings(settingsPatch: Partial<ICustomizationServiceState>) {
-    const changedSettings = Utils.getChangedParams(this.state, settingsPatch);
-    this.SET_SETTINGS(changedSettings);
+  setSettings(settingsPatch: DeepPartial<CustomizationState>) {
+    this.state.db.write(() => {
+      this.state.deepPatch(settingsPatch);
+    });
 
-    if (changedSettings.enableCrashDumps != null) this.ensureCrashDumpFolder();
+    if (settingsPatch.enableCrashDumps != null) this.ensureCrashDumpFolder();
 
-    this.settingsChanged.next(changedSettings);
+    this.settingsChanged.next(settingsPatch);
   }
 
   get currentTheme() {
@@ -291,7 +323,7 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
   }
 
   get isDarkTheme() {
-    return ['night-theme', 'prime-dark'].includes(this.currentTheme);
+    return this.state.isDarkTheme;
   }
 
   setUpdateStreamInfoOnLive(update: boolean) {
@@ -318,10 +350,6 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     this.setSettings({ mediaBackupOptOut: optOut });
   }
 
-  setPinnedStatistics(pinned: IPinnedStatistics) {
-    this.setSettings({ pinnedStatistics: pinned });
-  }
-
   togglePerformanceMode() {
     this.setSettings({ performanceMode: !this.state.performanceMode });
   }
@@ -346,7 +374,9 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
   }
 
   restoreDefaults() {
-    this.setSettings(CustomizationService.defaultState);
+    // TODO: Implement
+
+    // this.setSettings(CustomizationService.defaultState);
   }
 
   /**
@@ -361,10 +391,5 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     } else {
       fs.remove(crashDumpDirectory);
     }
-  }
-
-  @mutation()
-  private SET_SETTINGS(settingsPatch: Partial<ICustomizationServiceState>) {
-    Object.assign(this.state, settingsPatch);
   }
 }

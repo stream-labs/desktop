@@ -14,6 +14,7 @@ import cx from 'classnames';
 import { EAppPageSlot } from 'services/platform-apps';
 import Scrollable from 'components-react/shared/Scrollable';
 import UltraIcon from 'components-react/shared/UltraIcon';
+import { CustomizationState } from 'services/customization';
 
 const { Option } = Select;
 
@@ -30,11 +31,11 @@ export function AppearanceSettings() {
 
   const { bind } = useModule(() => {
     function getSettings() {
-      return CustomizationService.state;
+      return CustomizationService.state.toObject() as CustomizationState;
     }
 
-    function setSettings(newSettings: typeof CustomizationService.state) {
-      CustomizationService.actions.setSettings(newSettings);
+    function setSettings(newSettings: CustomizationState) {
+      CustomizationService.actions.setSettings(newSettings as any);
     }
 
     return { bind: injectFormBinding(getSettings, setSettings) };
