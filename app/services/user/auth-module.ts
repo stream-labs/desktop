@@ -149,8 +149,6 @@ export class AuthModule {
           const paramSeparator = merge ? '?' : '&';
           const url = `${authUrl}${paramSeparator}port=${address.port}&code_challenge=${codeChallenge}`;
 
-          console.log('OPENING URL', url);
-
           electron.shell.openExternal(url);
           onWindowShow();
         }
@@ -193,8 +191,6 @@ export class AuthModule {
       authWindow.webContents.on('did-navigate', async (e, url) => {
         const query = URI.parseQuery(URI.parse(url).query) as Dictionary<string>;
 
-        console.log(url);
-
         if (query['success']) {
           completed = true;
           authWindow.close();
@@ -213,8 +209,6 @@ export class AuthModule {
 
       const paramSeparator = merge ? '?' : '&';
       const url = `${authUrl}${paramSeparator}code_challenge=${codeChallenge}`;
-
-      console.log('OPENING INTERNAL URL', url);
 
       authWindow.removeMenu();
       authWindow.loadURL(url);
