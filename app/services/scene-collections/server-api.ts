@@ -37,6 +37,17 @@ export class SceneCollectionsServerApiService extends Service {
   }
 
   /**
+   * Fetches a list of scene collections with provided ids (includes JSON)
+   */
+  fetchSceneCollectionsById(ids: number[]): Promise<ISceneCollectionsResponse> {
+    const queryString = ids.map(id => `ids[]=${id}`).join('&');
+    const url = `${this.baseUrl}/scene-collection/get-by-ids?${queryString}`;
+    const request = new Request(url, { headers: this.headers });
+
+    return jfetch(request);
+  }
+
+  /**
    * Fetch a single scene collection (includes JSON)
    */
   fetchSceneCollection(id: number): Promise<{ scene_collection: IServerSceneCollection }> {
