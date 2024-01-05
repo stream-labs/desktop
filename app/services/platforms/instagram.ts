@@ -53,6 +53,12 @@ export class InstagramService
     return Promise.resolve();
   }
 
+  protected init() {
+    this.syncSettingsWithLocalStorage();
+    // Need to reset stream key here as well since it might've been persisted if filled in but didn't stream (we clear after stream)
+    this.state.settings.streamKey = '';
+  }
+
   // FIXME: failing to go live doesn't seem to trigger an error, is there a way to detect it?
   async beforeGoLive(goLiveSettings: IGoLiveSettings, context?: TDisplayType) {
     const settings = getDefined(goLiveSettings.platforms.instagram);
