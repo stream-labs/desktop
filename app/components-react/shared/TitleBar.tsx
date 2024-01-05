@@ -13,7 +13,7 @@ import Banner from 'components-react/root/Banner';
 import { useRealmObject } from 'components-react/hooks/realm';
 
 export default function TitleBar(props: { windowId: string }) {
-  const { CustomizationService, StreamingService, WindowsService, TestRealmService } = Services;
+  const { CustomizationService, StreamingService, WindowsService } = Services;
 
   const isMaximizable = remote.getCurrentWindow().isMaximizable() !== false;
   const isMac = byOS({ [OS.Windows]: false, [OS.Mac]: true });

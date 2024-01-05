@@ -46,8 +46,6 @@ export class RealmObject {
     }
 
     if (!this._realmModel) {
-      console.log('GOT DB', this.db);
-
       // Check the db
       let result = this.db.objects(this.schema.name);
 
@@ -144,6 +142,16 @@ export class RealmObject {
     return obj;
   }
 
+  /**
+   * Deletes this model in the database and restores defaults
+   */
+  reset() {
+    this.db.write(() => {
+      this.db.delete(this.realmModel);
+    });
+    this._realmModel = null;
+  }
+
   private _initWithId: Realm.BSON.UUID;
 
   constructor(public schema: Realm.ObjectSchema, id?: Realm.BSON.UUID, realmModel?: Realm.Object) {
@@ -169,6 +177,7 @@ export class RealmObject {
             this.realmModel[key] = val.realmModel;
           } else {
             this.realmModel[key] = val;
+            // console.trace('REALM SET', key, val);
           }
         },
       });
@@ -272,12 +281,8 @@ export class RealmService extends Service {
   // Every process needs its own realm connections
   @ExecuteInCurrentWindow()
   async connect() {
-    console.log('REALM SERVICE INIT');
-
     this.persistentDb = await Realm.open(this.persistentConfig as any);
     this.ephemeralDb = await Realm.open(this.ephemeralConfig as any);
-
-    console.log('REALM INITED');
   }
 
   executeMigrations(oldRealm: Realm, newRealm: Realm) {

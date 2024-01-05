@@ -188,33 +188,35 @@ export class CustomizationState extends RealmObject {
         enableAnnouncements: true,
       };
 
-      const oldData = Utils.getDeepChangedParams(oldDefaults, parsed);
+      const oldData = { ...oldDefaults, ...parsed };
 
-      this.theme = oldData.theme;
-      this.updateStreamInfoOnLive = oldData.updateStreamInfoOnLive;
-      this.livePreviewEnabled = oldData.livePreviewEnabled;
-      this.leftDock = oldData.leftDock;
-      this.hideViewerCount = oldData.hideViewerCount;
-      this.livedockCollapsed = oldData.livedockCollapsed;
-      this.livedockSize - oldData.livedockSize;
-      this.eventsSize = oldData.eventsSize;
-      this.controlsSize = oldData.controlsSize;
-      this.performanceMode = oldData.performanceMode;
-      this.chatZoomFactor = oldData.chatZoomFactor;
-      this.enableBTTVEmotes = oldData.enableBTTVEmotes;
-      this.enableFFZEmotes = oldData.enableFFZEmotes;
-      this.mediaBackupOptOut = oldData.mediaBackupOptOut;
-      this.folderSelection = oldData.folderSelection;
-      this.navigateToLiveOnStreamStart = oldData.navigateToLiveOnStreamStart;
-      this.legacyEvents = oldData.legacyEvents;
-      this.designerMode = oldData.designerMode;
-      this.pinnedStatistics.cpu = oldData.pinnedStatistics.cpu;
-      this.pinnedStatistics.fps = oldData.pinnedStatistics.fps;
-      this.pinnedStatistics.droppedFrames = oldData.pinnedStatistics.droppedFrames;
-      this.pinnedStatistics.bandwidth = oldData.pinnedStatistics.bandwidth;
-      this.legacyAlertbox = oldData.legacyAlertbox;
-      this.enableCrashDumps = oldData.enableCrashDumps;
-      this.enableAnnouncements = oldData.enableAnnouncements;
+      this.db.write(() => {
+        this.theme = oldData.theme;
+        this.updateStreamInfoOnLive = oldData.updateStreamInfoOnLive;
+        this.livePreviewEnabled = oldData.livePreviewEnabled;
+        this.leftDock = oldData.leftDock;
+        this.hideViewerCount = oldData.hideViewerCount;
+        this.livedockCollapsed = oldData.livedockCollapsed;
+        this.livedockSize = oldData.livedockSize;
+        this.eventsSize = oldData.eventsSize;
+        this.controlsSize = oldData.controlsSize;
+        this.performanceMode = oldData.performanceMode;
+        this.chatZoomFactor = oldData.chatZoomFactor;
+        this.enableBTTVEmotes = oldData.enableBTTVEmotes;
+        this.enableFFZEmotes = oldData.enableFFZEmotes;
+        this.mediaBackupOptOut = oldData.mediaBackupOptOut;
+        this.folderSelection = oldData.folderSelection;
+        this.navigateToLiveOnStreamStart = oldData.navigateToLiveOnStreamStart;
+        this.legacyEvents = oldData.legacyEvents;
+        this.designerMode = oldData.designerMode;
+        this.pinnedStatistics.cpu = oldData.pinnedStatistics.cpu;
+        this.pinnedStatistics.fps = oldData.pinnedStatistics.fps;
+        this.pinnedStatistics.droppedFrames = oldData.pinnedStatistics.droppedFrames;
+        this.pinnedStatistics.bandwidth = oldData.pinnedStatistics.bandwidth;
+        this.legacyAlertbox = oldData.legacyAlertbox;
+        this.enableCrashDumps = oldData.enableCrashDumps;
+        this.enableAnnouncements = oldData.enableAnnouncements;
+      });
     }
   }
 
@@ -228,30 +230,6 @@ export class CustomizationState extends RealmObject {
 }
 
 CustomizationState.register({ persist: true });
-
-// class CustomizationViews extends ViewHandler<ICustomizationServiceState> {
-//   get experimentalSettingsFormData(): TObsFormData {
-//     return [];
-//   }
-
-//   get pinnedStatistics() {
-//     return this.state.pinnedStatistics;
-//   }
-
-//   get displayBackground() {
-//     return DISPLAY_BACKGROUNDS[this.state.theme];
-//   }
-
-//   get currentTheme() {
-//     return this.state.theme;
-//   }
-
-
-
-//   get designerMode() {
-//     return this.state.designerMode;
-//   }
-// }
 
 /**
  * This class is used to store general UI behavior flags
@@ -374,9 +352,7 @@ export class CustomizationService extends Service {
   }
 
   restoreDefaults() {
-    // TODO: Implement
-
-    // this.setSettings(CustomizationService.defaultState);
+    this.state.reset();
   }
 
   /**
