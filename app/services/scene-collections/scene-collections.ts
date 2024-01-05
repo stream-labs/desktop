@@ -870,7 +870,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
       );
 
       const success = await this.performSyncStep('Update from Server', async () => {
-        this.updateCollectionsFromServer(serverCollectionsToUpdate.data);
+        this.updateCollectionsFromServer(serverCollectionsToUpdate.scene_collections);
       });
 
       if (!success) failed = true;
@@ -882,7 +882,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
       );
 
       const success = await this.performSyncStep('Insert from Server', async () => {
-        this.insertCollectionsFromServer(serverCollectionsToInsert.data);
+        this.insertCollectionsFromServer(serverCollectionsToInsert.scene_collections);
       });
 
       if (!success) failed = true;
