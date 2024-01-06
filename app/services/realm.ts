@@ -278,6 +278,13 @@ export class RealmService extends Service {
     };
   }
 
+  dumpEphemeralToDisk() {
+    this.ephemeralDb.writeCopyTo({
+      schema: RealmService.ephemeralSchemas,
+      path: path.join(remote.app.getPath('userData'), 'ephemeral-copy.realm'),
+    } as any);
+  }
+
   // Every process needs its own realm connections
   @ExecuteInCurrentWindow()
   async connect() {
