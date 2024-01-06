@@ -86,6 +86,18 @@ class AnnouncementsServicePersistedState extends RealmObject {
       lastReadId: { type: 'int', default: 145 },
     },
   };
+
+  protected onCreated(): void {
+    const data = localStorage.getItem('PersistentStatefulService-AnnouncementsService');
+
+    if (data) {
+      const parsed = JSON.parse(data);
+
+      this.db.write(() => {
+        Object.assign(this, parsed);
+      });
+    }
+  }
 }
 
 AnnouncementsServicePersistedState.register({ persist: true });
