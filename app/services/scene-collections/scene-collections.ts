@@ -940,6 +940,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
       const inManifest = this.stateService.state.collections.find(
         coll => coll.serverId === collection.id,
       );
+      if (!inManifest) return console.error('Scene Collection not found');
       if (collection.data) {
         this.stateService.writeDataToCollectionFile(inManifest.id, collection.data);
       } else {
