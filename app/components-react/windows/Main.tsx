@@ -6,6 +6,7 @@ import Animation from 'rc-animate';
 import { $t } from 'services/i18n';
 import { getPlatformService } from 'services/platforms';
 import ResizeBar from 'components-react/root/ResizeBar';
+import * as appPages from 'components-react/pages';
 import TitleBar from 'components-react/shared/TitleBar';
 import ModalWrapper from 'components-react/shared/modals/ModalWrapper';
 import { Services } from 'components-react/service-provider';
@@ -21,6 +22,13 @@ import Loader from 'components-react/pages/Loader';
 
 const MainCtx = React.createContext<MainController | null>(null);
 
+const loadedTheme = () => {
+  const customizationState = localStorage.getItem('PersistentStatefulService-CustomizationService');
+  if (customizationState) {
+    return JSON.parse(customizationState)?.theme;
+  }
+};
+
 class MainController {
   private customizationService = Services.CustomizationService;
   private navigationService = Services.NavigationService;
@@ -35,7 +43,7 @@ class MainController {
   //   mainMiddle: HTMLDivElement;
   // };
 
-  private modalOptions: IModalOptions = {
+  modalOptions: IModalOptions = {
     renderFn: null,
   };
 
@@ -51,11 +59,6 @@ class MainController {
     maxDockWidth: 290,
     minEditorWidth: 500,
   });
-
-  get uiReady() {
-    // return this.$store.state.bulkLoadFinished && this.$store.state.i18nReady;
-    return false;
-  }
 
   get dockWidth() {
     return this.customizationService.state.livedockSize;
@@ -73,13 +76,12 @@ class MainController {
     return this.navigationService.state.params;
   }
 
-  get theme() {
-    // if (this.$store.state.bulkLoadFinished) {
-    //   return this.customizationService.currentTheme;
-    // }
+  theme(bulkLoadFinished: boolean) {
+    if (bulkLoadFinished) {
+      return this.customizationService.currentTheme;
+    }
 
-    // return loadedTheme() || 'night-theme';
-    return '';
+    return loadedTheme() || 'night-theme';
   }
 
   get applicationLoading() {
@@ -151,7 +153,7 @@ class MainController {
     });
   }
 
-  async onDropHandler(event: DragEvent) {
+  async onDropHandler(event: React.DragEvent) {
     if (this.page !== 'Studio') return;
 
     const fileList = event.dataTransfer?.files;
@@ -160,7 +162,7 @@ class MainController {
 
     const files: string[] = [];
     let fi = fileList.length;
-    while (fi--) files.push(fileList.item(fi).path);
+    while (fi--) files.push(fileList.item(fi)!.path);
 
     const isDirectory = await this.isDirectory(files[0]).catch(err => {
       console.error('Error checking if drop is directory', err);
@@ -259,23 +261,53 @@ class MainController {
   }
 }
 
-export default function MainWithContext() {
+export default function MainWithContext(p: { bulkLoadFinished: boolean; i18nReady: boolean }) {
   const controller = useMemo(() => new MainController(), []);
   return (
     <MainCtx.Provider value={controller}>
-      <Main />
+      <Main {...p} />
     </MainCtx.Provider>
   );
 }
 
-function Main() {
+function Main(p: { bulkLoadFinished: boolean; i18nReady: boolean }) {
   const ctrl = useController(MainCtx);
-  const { theme, uiReady, dockWidth, showLoadingSpinner } = useVuex(() => ({
-    theme: ctrl.theme,
-    uiReady: ctrl.uiReady,
+  const {
+    theme,
+    dockWidth,
+    showLoadingSpinner,
+    errorAlert,
+    hasLiveDock,
+    renderDock,
+    leftDock,
+    applicationLoading,
+    page,
+    isDockCollapsed,
+    liveDockSize,
+    maxDockWidth,
+    minDockWidth,
+    mainResponsiveClasses,
+  } = useVuex(() => ({
+    theme: ctrl.theme(p.bulkLoadFinished),
     dockWidth: ctrl.dockWidth,
     showLoadingSpinner: ctrl.showLoadingSpinner,
+    errorAlert: ctrl.errorAlert,
+    renderDock: ctrl.renderDock,
+    leftDock: ctrl.leftDock,
+    hasLiveDock: ctrl.store.hasLiveDock,
+    applicationLoading: ctrl.applicationLoading,
+    page: ctrl.page,
+    isDockCollapsed: ctrl.isDockCollapsed,
+    liveDockSize: ctrl.liveDockSize,
+    maxDockWidth: ctrl.store.maxDockWidth,
+    minDockWidth: ctrl.store.minDockWidth,
+    mainResponsiveClasses: ctrl.mainResponsiveClasses,
   }));
+
+  const uiReady = p.bulkLoadFinished && p.i18nReady;
+
+  const mainWindowEl = useRef<HTMLDivElement | null>(null);
+  const mainMiddleEl = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     window.addEventListener('resize', () => ctrl.windowSizeHandler);
@@ -307,8 +339,15 @@ function Main() {
 
   if (!uiReady) return <div className={cx(styles.main, theme)} />;
 
+  const Component: React.ReactNode = appPages[page];
+
   return (
-    <div className={cx(styles.main, theme)} id="mainWrapper" onDrop="onDropHandler">
+    <div
+      className={cx(styles.main, theme)}
+      id="mainWrapper"
+      ref={mainWindowEl}
+      onDrop={ctrl.onDropHandler}
+    >
       <TitleBar windowId="main" className={cx({ [styles.titlebarError]: errorAlert })} />
       <div
         className={cx(styles.mainContents, {
@@ -337,17 +376,16 @@ function Main() {
           </div>
         )}
 
-        <div className={cx(styles.mainMiddle, mainResponsiveClasses)} ref="mainMiddle">
+        <div className={cx(styles.mainMiddle, mainResponsiveClasses)} ref={mainMiddleEl}>
           {/* <resize-observer @notify="handleResize" /> */}
-          {/* <component
-            class="main-page-container"
-            v-if="!showLoadingSpinner"
-            :is="page"
-            :params="params"
-            :component-props="{ onTotalWidth: width => handleEditorWidth(width), params }"
-            @totalWidth="width => handleEditorWidth(width)"
-            style="grid-row: 1 / span 1"
-          /> */}
+          {!showLoadingSpinner && (
+            <Component
+              className={styles.mainPageContainer}
+              params={ctrl.params}
+              onTotalWidth={(width: number) => ctrl.handleEditorWidth(width)}
+              style={{ gridRow: '1 / span 1' }}
+            />
+          )}
           {!applicationLoading && page !== 'Onboarding' && <StudioFooter />}
         </div>
 
