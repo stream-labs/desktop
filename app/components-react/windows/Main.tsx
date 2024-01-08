@@ -200,13 +200,8 @@ class MainController {
     this.store.setState(s => (s.minEditorWidth = width));
   }
 
-  onResizeStartHandler() {
-    this.windowsService.actions.updateStyleBlockers('main', true);
-  }
-
-  onResizeStopHandler(offset: number) {
+  onResize(offset: number) {
     this.setLiveDockWidth(this.customizationService.state.livedockSize + offset);
-    this.windowsService.actions.updateStyleBlockers('main', false);
   }
 
   setLiveDockWidth(width: number) {
@@ -295,7 +290,7 @@ function Main(p: { bulkLoadFinished: boolean; i18nReady: boolean }) {
 
   function windowSizeHandler() {
     if (!hideStyleBlockers) {
-      ctrl.onResizeStartHandler();
+      ctrl.updateStyleBlockers(true);
     }
     ctrl.store.setState(s => (s.windowWidth = window.innerWidth));
 
@@ -365,7 +360,7 @@ function Main(p: { bulkLoadFinished: boolean; i18nReady: boolean }) {
       className={cx(styles.main, theme)}
       id="mainWrapper"
       ref={mainWindowEl}
-      onDrop={ctrl.onDropHandler}
+      onDrop={(ev: React.DragEvent) => ctrl.onDropHandler(ev)}
     >
       <TitleBar windowId="main" className={cx({ [styles.titlebarError]: errorAlert })} />
       <div
@@ -383,8 +378,7 @@ function Main(p: { bulkLoadFinished: boolean; i18nReady: boolean }) {
               <ResizeBar
                 className={cx(styles.liveDockResizeBar, styles.liveDockResizeBarLeft)}
                 position="right"
-                onResizeStart={ctrl.onResizeStartHandler}
-                onResizeStop={ctrl.onResizeStopHandler}
+                onInput={(val: number) => ctrl.onResize(val)}
                 max={maxDockWidth}
                 min={minDockWidth}
                 value={liveDockSize}
@@ -411,8 +405,7 @@ function Main(p: { bulkLoadFinished: boolean; i18nReady: boolean }) {
               <ResizeBar
                 className={styles.liveDockResizeBar}
                 position="left"
-                onResizeStart={ctrl.onResizeStartHandler}
-                onResizeStop={ctrl.onResizeStopHandler}
+                onInput={(val: number) => ctrl.onResize(val)}
                 max={maxDockWidth}
                 min={minDockWidth}
                 value={liveDockSize}
