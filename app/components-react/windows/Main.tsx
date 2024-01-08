@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import fs from 'fs';
 import * as remote from '@electron/remote';
 import cx from 'classnames';
@@ -39,10 +39,6 @@ class MainController {
   private platformAppsService = Services.PlatformAppsService;
   private editorCommandsService = Services.EditorCommandsService;
 
-  // $refs: {
-  //   mainMiddle: HTMLDivElement;
-  // };
-
   modalOptions: IModalOptions = {
     renderFn: null,
   };
@@ -50,6 +46,8 @@ class MainController {
   setModalOptions(opts: IModalOptions) {
     this.modalOptions = opts;
   }
+
+  windowResizeTimeout: number | null = null;
 
   store = initStore({
     compactView: false,
@@ -74,6 +72,10 @@ class MainController {
 
   get params() {
     return this.navigationService.state.params;
+  }
+
+  get hideStyleBlockers() {
+    return this.windowsService.state.mian.hideStyleBlockers;
   }
 
   theme(bulkLoadFinished: boolean) {
@@ -194,35 +196,6 @@ class MainController {
     );
   }
 
-  // updateLiveDockContraints() {
-  //   const appRect = this.$root.$el.getBoundingClientRect();
-  //   this.maxDockWidth = Math.min(appRect.width - this.minEditorWidth, appRect.width / 2);
-  //   this.minDockWidth = Math.min(290, this.maxDockWidth);
-  // }
-
-  // windowSizeHandler() {
-  //   if (!this.windowsService.state.main.hideStyleBlockers) {
-  //     this.onResizeStartHandler();
-  //   }
-  //   this.windowWidth = window.innerWidth;
-
-  //   clearTimeout(this.windowResizeTimeout);
-
-  //   this.hasLiveDock = this.windowWidth >= 1070;
-  //   if (this.page === 'Studio') {
-  //     this.hasLiveDock = this.windowWidth >= this.minEditorWidth + 100;
-  //   }
-  //   this.windowResizeTimeout = window.setTimeout(() => {
-  //     this.windowsService.actions.updateStyleBlockers('main', false);
-  //     this.updateLiveDockContraints();
-  //     this.updateWidth();
-  //   }, 200);
-  // }
-
-  handleResize() {
-    // this.compactView = this.$refs.mainMiddle.clientWidth < 1200;
-  }
-
   handleEditorWidth(width: number) {
     this.store.setState(s => (s.minEditorWidth = width));
   }
@@ -248,16 +221,25 @@ class MainController {
     return constrainedWidth;
   }
 
+  updateWidth() {
+    const width = this.customizationService.state.livedockSize;
+    if (width !== this.validateWidth(width)) this.setWidth(width);
+  }
+
   updateLiveDockWidth() {
     if (this.liveDockSize !== this.validateWidth(this.liveDockSize)) {
       this.setLiveDockWidth(this.liveDockSize);
     }
   }
 
-  resetWidth() {
-    // const appRect = this.$root.$el.getBoundingClientRect();
-    // const defaultWidth = appRect.width * 0.28;
-    // this.setWidth(defaultWidth);
+  updateStyleBlockers(val: boolean) {
+    this.windowsService.actions.updateStyleBlockers('main', val);
+  }
+
+  setWidth(width: number) {
+    this.customizationService.actions.setSettings({
+      livedockSize: this.validateWidth(width),
+    });
   }
 }
 
@@ -287,6 +269,7 @@ function Main(p: { bulkLoadFinished: boolean; i18nReady: boolean }) {
     maxDockWidth,
     minDockWidth,
     mainResponsiveClasses,
+    hideStyleBlockers,
   } = useVuex(() => ({
     theme: ctrl.theme(p.bulkLoadFinished),
     dockWidth: ctrl.dockWidth,
@@ -302,6 +285,7 @@ function Main(p: { bulkLoadFinished: boolean; i18nReady: boolean }) {
     maxDockWidth: ctrl.store.maxDockWidth,
     minDockWidth: ctrl.store.minDockWidth,
     mainResponsiveClasses: ctrl.mainResponsiveClasses,
+    hideStyleBlockers: ctrl.hideStyleBlockers,
   }));
 
   const uiReady = p.bulkLoadFinished && p.i18nReady;
@@ -309,14 +293,38 @@ function Main(p: { bulkLoadFinished: boolean; i18nReady: boolean }) {
   const mainWindowEl = useRef<HTMLDivElement | null>(null);
   const mainMiddleEl = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    window.addEventListener('resize', () => ctrl.windowSizeHandler);
+  function windowSizeHandler() {
+    if (!hideStyleBlockers) {
+      ctrl.onResizeStartHandler();
+    }
+    ctrl.store.setState(s => (s.windowWidth = window.innerWidth));
+
+    if (ctrl.windowResizeTimeout) clearTimeout(ctrl.windowResizeTimeout);
+
+    ctrl.store.setState(s => (s.hasLiveDock = s.windowWidth >= 1070));
+    if (ctrl.page === 'Studio') {
+      ctrl.store.setState(s => (s.hasLiveDock = s.windowWidth >= s.minEditorWidth + 100));
+    }
+    ctrl.windowResizeTimeout = window.setTimeout(() => {
+      ctrl.updateStyleBlockers(false);
+      const appRect = mainWindowEl.current?.getBoundingClientRect();
+      if (!appRect) return;
+      ctrl.store.setState(s => {
+        s.maxDockWidth = Math.min(appRect.width - s.minEditorWidth, appRect.width / 2);
+        s.minDockWidth = Math.min(290, s.maxDockWidth);
+      });
+      ctrl.updateWidth();
+    }, 200);
+  }
+
+  useLayoutEffect(() => {
+    window.addEventListener('resize', windowSizeHandler);
     const modalChangedSub = WindowsService.modalChanged.subscribe(modalOptions => {
       ctrl.setModalOptions(modalOptions);
     });
 
     return () => {
-      window.removeEventListener('resize', () => ctrl.windowSizeHandler);
+      window.removeEventListener('resize', windowSizeHandler);
       modalChangedSub.unsubscribe();
     };
   }, []);
@@ -330,16 +338,27 @@ function Main(p: { bulkLoadFinished: boolean; i18nReady: boolean }) {
   }, [theme]);
 
   useEffect(() => {
-    if (dockWidth < 1) {
+    if (dockWidth < 1 && mainWindowEl.current) {
       // migrate from old percentage value to the pixel value
-      ctrl.resetWidth();
+      const appRect = mainWindowEl.current.getBoundingClientRect();
+      const defaultWidth = appRect.width * 0.28;
+      ctrl.setWidth(defaultWidth);
     }
-    ctrl.handleResize();
   }, [uiReady]);
+
+  useLayoutEffect(() => {
+    ctrl.store.setState(
+      s => (s.compactView = !!mainMiddleEl.current && mainMiddleEl.current.clientWidth < 1200),
+    );
+  }, [uiReady, hideStyleBlockers]);
 
   if (!uiReady) return <div className={cx(styles.main, theme)} />;
 
-  const Component: React.ReactNode = appPages[page];
+  const Component: React.FunctionComponent<{
+    className: string;
+    params: any;
+    onTotalWidth: (width: number) => void;
+  }> = appPages[page];
 
   return (
     <div
@@ -356,9 +375,7 @@ function Main(p: { bulkLoadFinished: boolean; i18nReady: boolean }) {
           [styles.mainContentsOnboarding]: page === 'Onboarding',
         })}
       >
-        {page !== 'Onboarding' && !showLoadingSpinner && (
-          <SideNav locked={applicationLoading} className={styles.sidenav} />
-        )}
+        {page !== 'Onboarding' && !showLoadingSpinner && <SideNav />}
         {renderDock && leftDock && (
           <div className={styles.liveDockWrapper}>
             <LiveDock onLeft />
@@ -383,7 +400,6 @@ function Main(p: { bulkLoadFinished: boolean; i18nReady: boolean }) {
               className={styles.mainPageContainer}
               params={ctrl.params}
               onTotalWidth={(width: number) => ctrl.handleEditorWidth(width)}
-              style={{ gridRow: '1 / span 1' }}
             />
           )}
           {!applicationLoading && page !== 'Onboarding' && <StudioFooter />}
