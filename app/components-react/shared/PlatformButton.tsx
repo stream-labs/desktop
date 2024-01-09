@@ -57,8 +57,12 @@ export default function PlatformButton({
   children,
   onClick,
 }: PlatformButtonProps) {
-  // TODO: use loading indicator, it's causing relayout issues atm
   const logoProps = platform === 'streamlabs' ? { color: 'black' } : {};
+
+  const Loading = () => <i className="fas fa-spinner fa-spin" />;
+  const Logo = () => (
+    <PlatformLogo platform={platform} className={styles.platformIcon} {...logoProps} />
+  );
 
   return (
     <Button
@@ -67,7 +71,7 @@ export default function PlatformButton({
       onClick={onClick}
       disabled={disabled}
     >
-      <PlatformLogo platform={platform} className={styles.platformIcon} {...logoProps} />
+      {loading ? <Loading /> : <Logo />}
       {children}
       <i className={cx('fa fa-arrow-right', styles.arrowIcon)} aria-hidden="true"></i>
     </Button>

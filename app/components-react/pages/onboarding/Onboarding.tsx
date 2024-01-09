@@ -24,6 +24,7 @@ export default function Onboarding() {
     processing,
     finish,
     UsageStatisticsService,
+    singletonStep,
   } = useModule(OnboardingModule);
 
   // This would probably be easier with Vuex or RxJS but not sure how easy is to rely on return values
@@ -62,12 +63,16 @@ export default function Onboarding() {
   // In the meantime, if we run a render cycle and step index is greater
   // than the total number of steps, we just need to end the onboarding
   // immediately. Render side effects are bad btw.
+  // TODO: we might not need this anymore, can't find instance where currentStep === null
   if (currentStep == null) {
     finish();
     return <></>;
   }
 
   const Component = stepComponents[currentStep.component];
+
+  // Hide footer on singleton steps
+  const shouldShowFooter = !singletonStep;
 
   return (
     <div className={cx(styles.onboardingContainer)}>
@@ -80,13 +85,15 @@ export default function Onboarding() {
         </Scrollable>
       </div>
 
-      <Footer
-        onSkip={skip}
-        currentStep={currentStep}
-        currentStepIndex={currentStepIndex}
-        isProcessing={processing}
-        totalSteps={totalSteps}
-      />
+      {shouldShowFooter && (
+        <Footer
+          onSkip={skip}
+          currentStep={currentStep}
+          currentStepIndex={currentStepIndex}
+          isProcessing={processing}
+          totalSteps={totalSteps}
+        />
+      )}
     </div>
   );
 }
@@ -223,6 +230,10 @@ export class OnboardingModule {
 
   get streamerKnowledgeMode() {
     return this.OnboardingService.views.streamerKnowledgeMode;
+  }
+
+  get isLogin() {
+    return this.OnboardingService.state.options.isLogin;
   }
 
   setRecordingMode(val: boolean) {

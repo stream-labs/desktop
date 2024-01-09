@@ -29,8 +29,9 @@ export function Connect() {
     authPlatform,
     setExtraPlatform,
   } = useModule(LoginModule);
-  const [isSignup, setIsSignup] = useState(true);
-  const { next } = useModule(OnboardingModule);
+  const { next, isLogin } = useModule(OnboardingModule);
+  // If we come from login singleton view, default to false
+  const [isSignup, setIsSignup] = useState(() => !isLogin);
   const { UsageStatisticsService, OnboardingService, RecordingModeService } = Services;
 
   if (selectedExtraPlatform) {
@@ -42,7 +43,6 @@ export function Connect() {
       return;
     }
 
-    console.log('running next from connect skip');
     next();
 
     // Do not run default skip
@@ -63,8 +63,8 @@ export function Connect() {
 
   function afterLogin() {
     OnboardingService.actions.setExistingCollections();
-    /* Since this is the only component that uses custom skip step, might be fine do this this reset default here
-     * but revisit if this ever changes
+    /* Since this is the only component that uses custom skip step, might be fine
+     * do this this reset default here but revisit if this ever changes
      */
     ctx.onSkip = () => true;
     next();
