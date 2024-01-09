@@ -116,6 +116,9 @@ export class RealmObject {
    */
   deepPatch(patch: DeepPartial<this>) {
     Object.keys(patch).forEach(key => {
+      if (!patch.hasOwnProperty(key)) return;
+      if (key === '__proto__' || key === 'constructor') return;
+
       const val = this[key];
 
       if (val instanceof RealmObject) {
@@ -177,7 +180,6 @@ export class RealmObject {
             this.realmModel[key] = val.realmModel;
           } else {
             this.realmModel[key] = val;
-            // console.trace('REALM SET', key, val);
           }
         },
       });
