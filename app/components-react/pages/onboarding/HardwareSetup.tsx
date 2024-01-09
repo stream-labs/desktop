@@ -78,7 +78,8 @@ export function HardwareSetup() {
         alignItems: 'center',
         justifyContent: 'center',
         flex: 1,
-        height: '100%',
+        // Otherwise default continue button gets offscreen
+        height: '85%',
         flexDirection: 'column',
       }}
     >
