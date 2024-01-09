@@ -76,7 +76,7 @@ class MainController {
   }
 
   get hideStyleBlockers() {
-    return this.windowsService.state.mian.hideStyleBlockers;
+    return this.windowsService.state.main.hideStyleBlockers;
   }
 
   theme(bulkLoadFinished: boolean) {
@@ -198,7 +198,9 @@ class MainController {
   }
 
   handleEditorWidth(width: number) {
-    this.store.setState(s => (s.minEditorWidth = width));
+    this.store.setState(s => {
+      s.minEditorWidth = width;
+    });
   }
 
   onResize(offset: number) {
@@ -293,14 +295,18 @@ function Main(p: { bulkLoadFinished: boolean; i18nReady: boolean }) {
     if (!hideStyleBlockers) {
       ctrl.updateStyleBlockers(true);
     }
-    ctrl.store.setState(s => (s.windowWidth = window.innerWidth));
+    ctrl.store.setState(s => {
+      s.windowWidth = window.innerWidth;
+    });
 
     if (ctrl.windowResizeTimeout) clearTimeout(ctrl.windowResizeTimeout);
 
-    ctrl.store.setState(s => (s.hasLiveDock = s.windowWidth >= 1070));
-    if (ctrl.page === 'Studio') {
-      ctrl.store.setState(s => (s.hasLiveDock = s.windowWidth >= s.minEditorWidth + 100));
-    }
+    ctrl.store.setState(s => {
+      s.hasLiveDock = s.windowWidth >= 1070;
+      if (ctrl.page === 'Studio') {
+        s.hasLiveDock = s.windowWidth >= s.minEditorWidth + 100;
+      }
+    });
     ctrl.windowResizeTimeout = window.setTimeout(() => {
       ctrl.updateStyleBlockers(false);
       const appRect = mainWindowEl.current?.getBoundingClientRect();
@@ -343,9 +349,9 @@ function Main(p: { bulkLoadFinished: boolean; i18nReady: boolean }) {
   }, [uiReady]);
 
   useLayoutEffect(() => {
-    ctrl.store.setState(
-      s => (s.compactView = !!mainMiddleEl.current && mainMiddleEl.current.clientWidth < 1200),
-    );
+    ctrl.store.setState(s => {
+      s.compactView = !!mainMiddleEl.current && mainMiddleEl.current.clientWidth < 1200;
+    });
   }, [uiReady, hideStyleBlockers]);
 
   if (!uiReady) return <div className={cx(styles.main, theme)} />;
