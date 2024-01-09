@@ -4,21 +4,22 @@ import * as remote from '@electron/remote';
 import cx from 'classnames';
 import Animation from 'rc-animate';
 import { $t } from 'services/i18n';
-import { getPlatformService } from 'services/platforms';
+import { initStore, useController } from 'components-react/hooks/zustand';
+import { useVuex } from 'components-react/hooks';
 import ResizeBar from 'components-react/root/ResizeBar';
 import * as appPages from 'components-react/pages';
 import TitleBar from 'components-react/shared/TitleBar';
 import ModalWrapper from 'components-react/shared/modals/ModalWrapper';
 import { Services } from 'components-react/service-provider';
 import { WindowsService } from 'app-services';
-import { initStore, useController } from 'components-react/hooks/zustand';
-import { useVuex } from 'components-react/hooks';
-import antdThemes from 'styles/antd/index';
-import styles from './Main.m.less';
 import SideNav from 'components-react/sidebar/SideNav';
 import LiveDock from 'components-react/root/LiveDock';
 import StudioFooter from 'components-react/root/StudioFooter';
 import Loader from 'components-react/pages/Loader';
+import antdThemes from 'styles/antd/index';
+import { getPlatformService } from 'services/platforms';
+import { IModalOptions } from 'services/windows';
+import styles from './Main.m.less';
 
 const MainCtx = React.createContext<MainController | null>(null);
 
@@ -43,8 +44,8 @@ class MainController {
     renderFn: null,
   };
 
-  setModalOptions(opts: IModalOptions) {
-    this.modalOptions = opts;
+  setModalOptions(opts: Partial<IModalOptions>) {
+    this.modalOptions = { ...this.modalOptions, ...opts };
   }
 
   windowResizeTimeout: number | null = null;
@@ -388,7 +389,6 @@ function Main(p: { bulkLoadFinished: boolean; i18nReady: boolean }) {
         )}
 
         <div className={cx(styles.mainMiddle, mainResponsiveClasses)} ref={mainMiddleEl}>
-          {/* <resize-observer @notify="handleResize" /> */}
           {!showLoadingSpinner && (
             <Component
               className={styles.mainPageContainer}
