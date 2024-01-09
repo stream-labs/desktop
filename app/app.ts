@@ -31,7 +31,7 @@ import * as obs from '../obs-api';
 import path from 'path';
 import util from 'util';
 import uuid from 'uuid/v4';
-import Main from 'components/windows/Main.vue';
+import Main from 'components/windows/Main';
 import { Loader, Blank } from 'components/shared/ReactComponentList';
 import process from 'process';
 import { MetricsService } from 'services/metrics';
