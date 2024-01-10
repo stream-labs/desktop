@@ -6,7 +6,7 @@ import { Inject } from './core/injector';
 import { Service } from './core/service';
 import { HostsService } from './hosts';
 import { SynthesizerId, SynthesizerSelector } from './nicolive-program/state';
-import { QuestionaireService } from './questionaire';
+import { UuidService } from './uuid';
 import { EncoderType } from './settings/optimizer';
 import { UserService } from './user';
 
@@ -88,7 +88,7 @@ export function track(event: TUsageEvent) {
 export class UsageStatisticsService extends Service {
   @Inject() userService: UserService;
   @Inject() hostsService: HostsService;
-  @Inject() questionaireService: QuestionaireService;
+  @Inject() uuidService: UuidService;
 
   version = electron.remote.process.env.NAIR_VERSION;
 
@@ -113,7 +113,7 @@ export class UsageStatisticsService extends Service {
       headers.append('Content-Type', 'application/json');
       const body = JSON.stringify({
         ...event,
-        uuid: this.questionaireService.uuid, // inject UUID
+        uuid: this.uuidService.uuid, // inject UUID
         user_id: this.userService.isLoggedIn() ? this.userService.platformId : null,
       });
 
@@ -136,7 +136,7 @@ export class UsageStatisticsService extends Service {
           method: 'POST',
           body: JSON.stringify({
             ...event,
-            uuid: this.questionaireService.uuid, // inject UUID
+            uuid: this.uuidService.uuid, // inject UUID
             user_id: this.userService.isLoggedIn() ? this.userService.platformId : null,
           }),
         });

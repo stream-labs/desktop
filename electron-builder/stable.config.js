@@ -41,9 +41,6 @@ const config = {
   },
 };
 
-if (process.env.NAIR_LICENSE_API_KEY) {
-  config.extraMetadata.getlicensenair_key = process.env.NAIR_LICENSE_API_KEY;
-}
 if (process.env.CERTIFICATE_SUBJECT_NAME) {
   config.win.certificateSubjectName = process.env.CERTIFICATE_SUBJECT_NAME;
 }

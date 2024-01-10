@@ -49,7 +49,7 @@ export { UsageStatisticsService } from './services/usage-statistics';
 
 // nicolive
 export { CompactModeService } from 'services/compact-mode';
-export { QuestionaireService } from 'services/questionaire';
+export { UuidService } from 'services/uuid';
 export { MonitorCaptureCroppingService } from 'services/sources/monitor-capture-cropping';
 export { InformationsService } from 'services/informations';
 export { InformationsStateService } from 'services/informations/state';
