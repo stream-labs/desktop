@@ -3,7 +3,7 @@ import { TPlatform } from '../../services/platforms';
 import cx from 'classnames';
 import css from './PlatformLogo.m.less';
 import { Services } from 'components-react/service-provider';
-import { useVuex } from 'components-react/hooks';
+import { useRealmObject } from 'components-react/hooks/realm';
 
 const sizeMap = {
   small: 14,
@@ -21,11 +21,7 @@ interface IProps {
 
 export default function PlatformLogo(p: IProps & HTMLAttributes<unknown>) {
   const { CustomizationService } = Services;
-  const { isDark } = useVuex(() => {
-    return {
-      isDark: CustomizationService.views.isDarkTheme,
-    };
-  });
+  const isDark = useRealmObject(CustomizationService.state).isDarkTheme;
 
   function iconForPlatform() {
     return {

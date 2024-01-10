@@ -75,7 +75,16 @@ export default class LiveDock extends Vue {
   controlRoomTooltip = $t('Go to YouTube Live Dashboard');
   liveProducerTooltip = $t('Go to the Facebook Live Producer Dashboard');
 
+  unbind: () => void;
+
   mounted() {
+    this.unbind = this.customizationService.state.bindProps(this, {
+      collapsed: 'livedockCollapsed',
+      liveDockSize: 'livedockSize',
+      hideViewerCount: 'hideViewerCount',
+      isDarkTheme: 'isDarkTheme',
+    });
+
     this.elapsedInterval = window.setInterval(() => {
       if (this.streamingStatus === EStreamingState.Live) {
         this.elapsedStreamTime = this.getElapsedStreamTime();
@@ -91,6 +100,7 @@ export default class LiveDock extends Vue {
 
   beforeDestroy() {
     clearInterval(this.elapsedInterval);
+    this.unbind();
   }
 
   get streamingStatus() {
@@ -108,9 +118,7 @@ export default class LiveDock extends Vue {
     return this.streamingService.formattedDurationInCurrentStreamingState;
   }
 
-  get collapsed() {
-    return this.customizationService.state.livedockCollapsed;
-  }
+  collapsed = false;
 
   setCollapsed(livedockCollapsed: boolean) {
     this.canAnimate = true;
@@ -142,8 +150,10 @@ export default class LiveDock extends Vue {
     return this.streamingService.views.viewerCount.toString();
   }
 
+  isDarkTheme = false;
+
   get offlineImageSrc() {
-    const mode = this.customizationService.isDarkTheme ? 'night' : 'day';
+    const mode = this.isDarkTheme ? 'night' : 'day';
     return require(`../../media/images/sleeping-kevin-${mode}.png`);
   }
 
@@ -191,13 +201,8 @@ export default class LiveDock extends Vue {
     return this.userService.platform.type === 'twitter';
   }
 
-  get hideViewerCount() {
-    return this.customizationService.state.hideViewerCount;
-  }
-
-  get liveDockSize() {
-    return this.customizationService.state.livedockSize;
-  }
+  hideViewerCount = false;
+  liveDockSize = 0;
 
   toggleViewerCount() {
     this.customizationService.setHiddenViewerCount(

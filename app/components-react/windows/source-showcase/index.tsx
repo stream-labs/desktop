@@ -17,6 +17,7 @@ import SourceGrid from './SourceGrid';
 import Scrollable from 'components-react/shared/Scrollable';
 import pick from 'lodash/pick';
 import * as remote from '@electron/remote';
+import { useRealmObject } from 'components-react/hooks/realm';
 
 const { Content, Sider } = Layout;
 
@@ -68,10 +69,11 @@ function SideBar() {
   const { store } = useSourceShowcaseSettings();
   const { inspectedSource, inspectedAppId, inspectedAppSourceId } = store.useState();
 
-  const { demoMode, platform } = useVuex(() => ({
-    demoMode: CustomizationService.views.isDarkTheme ? 'night' : 'day',
+  const { platform } = useVuex(() => ({
     platform: UserService.views.platform?.type,
   }));
+
+  const demoMode = useRealmObject(CustomizationService.state).isDarkTheme ? 'night' : 'day';
 
   const appData = useMemo(() => {
     if (!inspectedAppId) return;

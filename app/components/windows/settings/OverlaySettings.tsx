@@ -3,7 +3,7 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { SceneCollectionsService } from 'services/scene-collections/index';
 import { OverlaysPersistenceService } from 'services/scene-collections/overlays';
-import { CustomizationService } from 'services/customization';
+import { CustomizationService, CustomizationState } from 'services/customization';
 import path from 'path';
 import { AppService } from 'services/app/index';
 import { WidgetsService } from 'services/widgets/index';
@@ -13,8 +13,9 @@ import { BoolInput } from 'components/shared/inputs/inputs';
 import * as remote from '@electron/remote';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { metadata } from 'components/shared/inputs';
+import { realmReactive } from 'components/shared/RealmReactive';
 
-@Component({ components: { BoolInput } })
+@Component({ components: { BoolInput }, mixins: [realmReactive(CustomizationState)] })
 export default class OverlaySettings extends Vue {
   @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() overlaysPersistenceService: OverlaysPersistenceService;
@@ -40,11 +41,11 @@ export default class OverlaySettings extends Vue {
     this.customizationService.setMediaBackupOptOut(value);
   }
 
-  get designerMode() {
-    return this.customizationService.views.designerMode;
+  designerMode() {
+    return this.customizationService.state.designerMode;
   }
 
-  set designerMode(value: boolean) {
+  setDesignerMode(value: boolean) {
     this.customizationService.setSettings({ designerMode: value });
   }
 
@@ -205,7 +206,8 @@ export default class OverlaySettings extends Vue {
           {this.button($t('Import Overlay File'), () => this.loadOverlay())}
           <BoolInput
             style="margin-top: 8px;"
-            vModel={this.designerMode}
+            value={this.designerMode()}
+            onInput={(v: boolean) => this.setDesignerMode(v)}
             title={$t('Enable Designer Mode')}
             name="designer_mode"
           />

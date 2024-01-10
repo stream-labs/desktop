@@ -17,6 +17,7 @@ import { StreamingService, EStreamingState } from 'services/streaming';
 import { VideoSettingsService } from 'services/settings-v2/video';
 import { UsageStatisticsService } from './usage-statistics';
 import { ViewHandler } from './core';
+import { RealmObject } from './realm';
 
 interface IPerformanceState {
   CPU: number;
@@ -31,6 +32,77 @@ interface IPerformanceState {
   streamingBandwidth: number;
   frameRate: number;
 }
+
+export class PerformanceState extends RealmObject implements IPerformanceState {
+  CPU: number;
+  numberDroppedFrames: number;
+  percentageDroppedFrames: number;
+  numberSkippedFrames: number;
+  percentageSkippedFrames: number;
+  numberLaggedFrames: number;
+  percentageLaggedFrames: number;
+  numberEncodedFrames: number;
+  numberRenderedFrames: number;
+  streamingBandwidth: number;
+  frameRate: number;
+
+  static schema = {
+    name: 'PerformanceState',
+    properties: {
+      CPU: { type: 'double', default: 0 },
+      numberDroppedFrames: { type: 'double', default: 0 },
+      percentageDroppedFrames: { type: 'double', default: 0 },
+      numberSkippedFrames: { type: 'double', default: 0 },
+      percentageSkippedFrames: { type: 'double', default: 0 },
+      numberLaggedFrames: { type: 'double', default: 0 },
+      percentageLaggedFrames: { type: 'double', default: 0 },
+      numberEncodedFrames: { type: 'double', default: 0 },
+      numberRenderedFrames: { type: 'double', default: 0 },
+      streamingBandwidth: { type: 'double', default: 0 },
+      frameRate: { type: 'double', default: 0 },
+    },
+  };
+
+  get cpuPercent() {
+    return this.CPU.toFixed(1);
+  }
+
+  get frameRateFixed() {
+    return this.frameRate.toFixed(2);
+  }
+
+  get droppedFrames() {
+    return this.numberDroppedFrames;
+  }
+
+  get percentDropped() {
+    return (this.percentageDroppedFrames || 0).toFixed(1);
+  }
+
+  get bandwidth() {
+    return this.streamingBandwidth.toFixed(0);
+  }
+
+  get streamQuality() {
+    if (
+      this.percentageDroppedFrames > 50 ||
+      this.percentageLaggedFrames > 50 ||
+      this.percentageSkippedFrames > 50
+    ) {
+      return EStreamQuality.POOR;
+    }
+    if (
+      this.percentageDroppedFrames > 30 ||
+      this.percentageLaggedFrames > 30 ||
+      this.percentageSkippedFrames > 30
+    ) {
+      return EStreamQuality.FAIR;
+    }
+    return EStreamQuality.GOOD;
+  }
+}
+
+PerformanceState.register();
 
 interface INextStats {
   framesSkipped: number;
@@ -64,54 +136,16 @@ interface IMonitorState {
   framesEncoded: number;
 }
 
-class PerformanceServiceViews extends ViewHandler<IPerformanceState> {
-  get cpuPercent() {
-    return this.state.CPU.toFixed(1);
-  }
-
-  get frameRate() {
-    return this.state.frameRate.toFixed(2);
-  }
-
-  get droppedFrames() {
-    return this.state.numberDroppedFrames;
-  }
-
-  get percentDropped() {
-    return (this.state.percentageDroppedFrames || 0).toFixed(1);
-  }
-
-  get bandwidth() {
-    return this.state.streamingBandwidth.toFixed(0);
-  }
-
-  get streamQuality() {
-    if (
-      this.state.percentageDroppedFrames > 50 ||
-      this.state.percentageLaggedFrames > 50 ||
-      this.state.percentageSkippedFrames > 50
-    ) {
-      return EStreamQuality.POOR;
-    }
-    if (
-      this.state.percentageDroppedFrames > 30 ||
-      this.state.percentageLaggedFrames > 30 ||
-      this.state.percentageSkippedFrames > 30
-    ) {
-      return EStreamQuality.FAIR;
-    }
-    return EStreamQuality.GOOD;
-  }
-}
-
 // Keeps a store of up-to-date performance metrics
-export class PerformanceService extends StatefulService<IPerformanceState> {
+export class PerformanceService extends Service {
   @Inject() private notificationsService: NotificationsService;
   @Inject() private jsonrpcService: JsonrpcService;
   @Inject() private troubleshooterService: TroubleshooterService;
   @Inject() private streamingService: StreamingService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject() private videoSettingsService: VideoSettingsService;
+
+  state = PerformanceState.inject();
 
   static initialState: IPerformanceState = {
     CPU: 0,
@@ -142,10 +176,11 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
 
   statisticsUpdated = new Subject<IPerformanceState>();
 
-  @mutation()
-  private SET_PERFORMANCE_STATS(stats: Partial<IPerformanceState>) {
-    Object.keys(stats).forEach(stat => {
-      Vue.set(this.state, stat, stats[stat]);
+  private setStats(stats: Partial<IPerformanceState>) {
+    this.state.db.write(() => {
+      Object.keys(stats).forEach(stat => {
+        this.state[stat] = stats[stat];
+      });
     });
   }
 
@@ -154,10 +189,6 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
       if (state === EStreamingState.Live) this.startStreamQualityMonitoring();
       if (state === EStreamingState.Ending) this.stopStreamQualityMonitoring();
     });
-  }
-
-  get views() {
-    return new PerformanceServiceViews(this.state);
   }
 
   // Starts interval to poll updates from OBS
@@ -186,7 +217,7 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
           })
           .reduce((sum, usage) => sum + usage);
 
-        this.SET_PERFORMANCE_STATS(stats);
+        this.setStats(stats);
         this.monitorAndUpdateStats();
         this.statisticsUpdated.next(this.state);
         this.statsRequestInProgress = false;
@@ -247,7 +278,7 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
 
     this.sendNotifications(currentStats, nextStats);
 
-    this.SET_PERFORMANCE_STATS({
+    this.setStats({
       numberSkippedFrames: currentStats.framesSkipped,
       percentageSkippedFrames: nextStats.skippedFactor * 100,
       numberLaggedFrames: currentStats.framesLagged,
@@ -388,6 +419,6 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
 
   stop() {
     this.shutdown = true;
-    this.SET_PERFORMANCE_STATS(PerformanceService.initialState);
+    this.setStats(PerformanceService.initialState);
   }
 }
