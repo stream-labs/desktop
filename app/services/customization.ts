@@ -155,67 +155,8 @@ export class CustomizationState extends RealmObject {
 
     if (data) {
       const parsed = JSON.parse(data);
-      const oldDefaults = {
-        theme: 'night-theme',
-        updateStreamInfoOnLive: true,
-        livePreviewEnabled: true,
-        leftDock: false,
-        hideViewerCount: false,
-        livedockCollapsed: true,
-        livedockSize: 0,
-        eventsSize: 156,
-        controlsSize: 240,
-        performanceMode: false,
-        chatZoomFactor: 1,
-        enableBTTVEmotes: false,
-        enableFFZEmotes: false,
-        mediaBackupOptOut: false,
-        folderSelection: false,
-        navigateToLiveOnStreamStart: true,
-        legacyEvents: false,
-        designerMode: false,
-        pinnedStatistics: {
-          cpu: false,
-          fps: false,
-          droppedFrames: false,
-          bandwidth: false,
-        },
-        legacyAlertbox: false,
-        experimental: {
-          // put experimental features here
-        },
-        enableCrashDumps: true,
-        enableAnnouncements: true,
-      };
-
-      const oldData = { ...oldDefaults, ...parsed };
-
       this.db.write(() => {
-        this.theme = oldData.theme;
-        this.updateStreamInfoOnLive = oldData.updateStreamInfoOnLive;
-        this.livePreviewEnabled = oldData.livePreviewEnabled;
-        this.leftDock = oldData.leftDock;
-        this.hideViewerCount = oldData.hideViewerCount;
-        this.livedockCollapsed = oldData.livedockCollapsed;
-        this.livedockSize = oldData.livedockSize;
-        this.eventsSize = oldData.eventsSize;
-        this.controlsSize = oldData.controlsSize;
-        this.performanceMode = oldData.performanceMode;
-        this.chatZoomFactor = oldData.chatZoomFactor;
-        this.enableBTTVEmotes = oldData.enableBTTVEmotes;
-        this.enableFFZEmotes = oldData.enableFFZEmotes;
-        this.mediaBackupOptOut = oldData.mediaBackupOptOut;
-        this.folderSelection = oldData.folderSelection;
-        this.navigateToLiveOnStreamStart = oldData.navigateToLiveOnStreamStart;
-        this.legacyEvents = oldData.legacyEvents;
-        this.designerMode = oldData.designerMode;
-        this.pinnedStatistics.cpu = oldData.pinnedStatistics.cpu;
-        this.pinnedStatistics.fps = oldData.pinnedStatistics.fps;
-        this.pinnedStatistics.droppedFrames = oldData.pinnedStatistics.droppedFrames;
-        this.pinnedStatistics.bandwidth = oldData.pinnedStatistics.bandwidth;
-        this.legacyAlertbox = oldData.legacyAlertbox;
-        this.enableCrashDumps = oldData.enableCrashDumps;
-        this.enableAnnouncements = oldData.enableAnnouncements;
+        Object.assign(this, parsed);
       });
     }
   }
