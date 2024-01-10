@@ -52,7 +52,6 @@ class MainController {
 
   store = initStore({
     compactView: false,
-    windowWidth: 0,
     hasLiveDock: true,
     minDockWidth: 290,
     maxDockWidth: 290,
@@ -295,17 +294,13 @@ function Main(p: { bulkLoadFinished: boolean; i18nReady: boolean }) {
     if (!hideStyleBlockers) {
       ctrl.updateStyleBlockers(true);
     }
-    ctrl.store.setState(s => {
-      s.windowWidth = window.innerWidth;
-    });
+    const windowWidth = window.innerWidth;
 
     if (ctrl.windowResizeTimeout) clearTimeout(ctrl.windowResizeTimeout);
 
     ctrl.store.setState(s => {
-      s.hasLiveDock = s.windowWidth >= 1070;
-      if (ctrl.page === 'Studio') {
-        s.hasLiveDock = s.windowWidth >= s.minEditorWidth + 100;
-      }
+      s.hasLiveDock =
+        ctrl.page === 'Studio' ? windowWidth >= s.minEditorWidth + 100 : windowWidth >= 1070;
     });
     ctrl.windowResizeTimeout = window.setTimeout(() => {
       ctrl.updateStyleBlockers(false);
