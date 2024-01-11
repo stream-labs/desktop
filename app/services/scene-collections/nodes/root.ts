@@ -3,6 +3,10 @@ import { SourcesNode } from './sources';
 import { ScenesNode } from './scenes';
 import { TransitionsNode } from './transitions';
 import { HotkeysNode } from './hotkeys';
+import { Inject } from 'services/core';
+import { VideoService } from 'services/video';
+
+import { VideoSettingsService } from 'services/settings-v2/video';
 
 interface ISchema {
   sources: SourcesNode;
@@ -14,6 +18,9 @@ interface ISchema {
 // This is the root node of the config file
 export class RootNode extends Node<ISchema, {}> {
   schemaVersion = 2;
+
+  @Inject() videoService: VideoService;
+  @Inject() videoSettingsService: VideoSettingsService;
 
   async save(): Promise<void> {
     const sources = new SourcesNode();
@@ -35,6 +42,9 @@ export class RootNode extends Node<ISchema, {}> {
   }
 
   async load(): Promise<void> {
+    const wh = this.videoSettingsService.baseResolutions.horizontal;
+    this.videoService.setBaseResolution({ width: wh.baseWidth, height: wh.baseHeight });
+
     await this.data.transitions.load();
     await this.data.sources.load({});
     await this.data.scenes.load({});

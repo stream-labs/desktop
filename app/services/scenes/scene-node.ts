@@ -14,6 +14,8 @@ import {
 } from './index';
 import { SelectionService } from 'services/selection';
 import { assertIsDefined } from 'util/properties-type-guards';
+import { IVideo } from 'obs-studio-node';
+import { TDisplayType } from 'services/settings-v2';
 
 export function isFolder(node: SceneItemNode): node is SceneItemFolder {
   return node.sceneNodeType === 'folder';
@@ -30,6 +32,8 @@ export abstract class SceneItemNode implements ISceneItemNode {
   abstract sceneNodeType: TSceneNodeType;
   resourceId: string;
   sceneId: string;
+  output?: IVideo;
+  display?: TDisplayType = 'horizontal';
 
   private _resourceId: string;
 

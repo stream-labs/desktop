@@ -54,8 +54,15 @@ export {
   addItems,
   createSources,
   getSourcesSize,
+  IVideo,
+  IVideoInfo,
+  EFPSType,
+  EVideoFormat,
+  EColorSpace,
+  ERangeType,
+  Video,
 } from 'obs-studio-node/module';
-import { EOutputCode, EVideoCodes } from 'obs-studio-node/module';
+import { EOutputCode, EVideoCodes, IVideo } from 'obs-studio-node/module';
 
 export interface IGetSettingsData {
   nameSubCategory: string;
@@ -88,21 +95,28 @@ export interface ISaveSettingsData {
 
 export const NodeObs: {
   // https://github.com/stream-labs/obs-studio-node/blob/0.23.59/obs-studio-client/source/nodeobs_api.hpp
-  OBS_API_initAPI(locale: string, directory: string, version: string, sentryUrl: string): EVideoCodes;
+  OBS_API_initAPI(
+    locale: string,
+    directory: string,
+    version: string,
+    sentryUrl: string,
+  ): EVideoCodes;
   // OBS_API_destroyOBS_API(): void;
-  OBS_API_getPerformanceStatistics(): {
-    CPU: number;
-    numberDroppedFrames: number;
-    percentageDroppedFrames: number;
-    streamingBandwidth: number;
-    streamingDataOutput: number;
-    recordingBandwidth: number;
-    recordingDataOutput: number;
-    frameRate: number;
-    averageTimeToRenderFrame: number;
-    memoryUsage: number;
-    diskSpaceAvailable: string;
-  } | undefined;
+  OBS_API_getPerformanceStatistics():
+    | {
+        CPU: number;
+        numberDroppedFrames: number;
+        percentageDroppedFrames: number;
+        streamingBandwidth: number;
+        streamingDataOutput: number;
+        recordingBandwidth: number;
+        recordingDataOutput: number;
+        frameRate: number;
+        averageTimeToRenderFrame: number;
+        memoryUsage: number;
+        diskSpaceAvailable: string;
+      }
+    | undefined;
   SetWorkingDirectory(path: string): void;
   InitShutdownSequence(): void;
   /* OBS_API_QueryHotkeys(): {
@@ -145,16 +159,18 @@ export const NodeObs: {
   // SetLowLatencyAudioBuffering(lowLatencyAudioBuffering: boolean): void;
   // GetLowLatencyAudioBufferingLegacy(): boolean | undefined;
 
-
   // https://github.com/stream-labs/obs-studio-node/blob/0.23.59/obs-studio-client/source/callback-manager.cpp
-  RegisterSourceCallback(callback: (objs: {
-    name: string;
-    width: number;
-    height: number;
-    flags: number;
-  }[]) => void): void;
+  RegisterSourceCallback(
+    callback: (
+      objs: {
+        name: string;
+        width: number;
+        height: number;
+        flags: number;
+      }[],
+    ) => void,
+  ): void;
   RemoveSourceCallback(): void;
-
 
   // https://github.com/stream-labs/obs-studio-node/blob/0.23.59/obs-studio-client/source/nodeobs_service.hpp
   OBS_service_resetAudioContext(): void;
@@ -166,13 +182,16 @@ export const NodeObs: {
   OBS_service_stopStreaming(forceStop: boolean): void;
   OBS_service_stopRecording(): void;
   OBS_service_stopReplayBuffer(forceStop: boolean): void;
+  OBS_service_setVideoInfo(video: IVideo, display: string): void;
 
-  OBS_service_connectOutputSignals(callback: (info: {
-    type: any; // 'streaming' | 'recording' | 'replay-buffer';
-    signal: any; // 'starting' | 'start' | 'stopping' | 'stop' | 'reconnect' | 'reconnect_success' | 'wrote' | 'writing_error';
-    code: EOutputCode;
-    error: string;
-  }) => void): boolean;
+  OBS_service_connectOutputSignals(
+    callback: (info: {
+      type: any; // 'streaming' | 'recording' | 'replay-buffer';
+      signal: any; // 'starting' | 'start' | 'stopping' | 'stop' | 'reconnect' | 'reconnect_success' | 'wrote' | 'writing_error';
+      code: EOutputCode;
+      error: string;
+    }) => void,
+  ): boolean;
   OBS_service_removeCallback(): void;
   OBS_service_processReplayBufferHotkey(): void;
   OBS_service_getLastReplay(): string;
@@ -187,14 +206,25 @@ export const NodeObs: {
   // OBS_service_uninstallVirtualCamPlugin(): void;
   // OBS_service_isVirtualCamPluginInstalled(): number; // VcamInstalledStatus
 
-
   // https://github.com/stream-labs/obs-studio-node/blob/0.23.59/obs-studio-client/source/nodeobs_display.hpp
   // OBS_content_setDayTheme(dayTheme: boolean): void;
-  OBS_content_createDisplay(window: Buffer, key: string, mode: number, renderAtBottom?: boolean): void;
+  OBS_content_createDisplay(
+    window: Buffer,
+    key: string,
+    mode: number,
+    renderAtBottom: boolean,
+    context: IVideo,
+  ): void;
   OBS_content_destroyDisplay(key: string): void;
   OBS_content_getDisplayPreviewOffset(key: string): IVec2 | undefined;
   OBS_content_getDisplayPreviewSize(key: string): { width: number; height: number } | undefined;
-  OBS_content_createSourcePreviewDisplay(window: Buffer, sourceName: string, key: string, renderAtBottom?: boolean): void;
+  OBS_content_createSourcePreviewDisplay(
+    window: Buffer,
+    sourceName: string,
+    key: string,
+    renderAtBottom: boolean,
+    context: IVideo,
+  ): void;
   OBS_content_resizeDisplay(key: string, width: number, height: number): void;
   OBS_content_moveDisplay(key: string, x: number, y: number): void;
   OBS_content_setPaddingSize(key: string, paddingSize: number): void;
@@ -205,7 +235,6 @@ export const NodeObs: {
   OBS_content_setDrawGuideLines(key: string, drawGuideLines: boolean): void;
   // OBS_content_setDrawRotationHandle(key: string, drawRotationHandle: boolean): void;
   // OBS_content_createIOSurface(key: string): number | undefined;
-
 
   // https://github.com/stream-labs/obs-studio-node/blob/0.23.59/obs-studio-client/source/nodeobs_settings.hpp
   OBS_settings_getSettings(category: string): {
@@ -218,4 +247,3 @@ export const NodeObs: {
   // OBS_settings_getOutputAudioDevices(): { description: string; id: string; }[];
   // OBS_settings_getVideoDevices(): { description: string; id: string; }[];
 };
-

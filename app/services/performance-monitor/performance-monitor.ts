@@ -7,6 +7,7 @@ import { Subscription } from 'rxjs';
 import { JsonrpcService } from '../api/jsonrpc/jsonrpc';
 import { TroubleshooterService, TIssueCode } from 'services/troubleshooter';
 import { $t } from 'services/i18n';
+import { VideoSettingsService } from 'services/settings-v2';
 
 const INTERVAL = 2 * 60 * 1000;
 
@@ -36,6 +37,8 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
   @Inject() private performanceService: PerformanceService;
   @Inject() private jsonrpcService: JsonrpcService;
   @Inject() private troubleshooterService: TroubleshooterService;
+  @Inject() videoSettingsService: VideoSettingsService;
+
   servicesManager: ServicesManager = ServicesManager.instance;
 
   private intervalId: number = null;
@@ -66,8 +69,8 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
     const currentStats: IMonitorState = {
       framesLagged: obs.Global.laggedFrames,
       framesRendered: obs.Global.totalFrames,
-      framesSkipped: obs.VideoFactory.skippedFrames,
-      framesEncoded: obs.VideoFactory.encodedFrames,
+      framesSkipped: this.videoSettingsService.contexts.horizontal.skippedFrames,
+      framesEncoded: this.videoSettingsService.contexts.horizontal.encodedFrames,
     };
 
     const {
