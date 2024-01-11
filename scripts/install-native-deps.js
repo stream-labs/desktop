@@ -69,6 +69,20 @@ function downloadFile(srcUrl, dstPath) {
   });
 }
 
+async function rtvc(){
+  // cwd is node_modules
+  console.log('copy rtvc');
+  const name = 'nair-rtvc'
+  const zip = path.join(process.cwd(), `${name}.zip`);
+  console.log(zip)
+
+  sh.cp('../nair-rtvc.zip',zip) // await downloadFile(url,zip)
+  executeCmd(`tar -xzvf ${zip}`, { silent: true });
+  sh.cp('-R',`./${name}/*`, 'obs-studio-node/obs-plugins/64bit/');
+  sh.rm(zip)
+  sh.rm('-rf',`./${name}`)
+}
+
 async function runScript() {
   colors.blue('----Streamlabs Desktop native dependecies installation----');
 
@@ -149,8 +163,7 @@ async function runScript() {
       });
     await Promise.all(promises);
 
-    console.log('copy plugins');
-    sh.cp('../plugins/*', 'obs-studio-node/obs-plugins/64bit/');
+    await rtvc()
 
     if (process.platform === 'win32') {
       sh.cd('../scripts');
