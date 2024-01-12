@@ -15,6 +15,7 @@ import { EAppPageSlot } from 'services/platform-apps';
 import Scrollable from 'components-react/shared/Scrollable';
 import UltraIcon from 'components-react/shared/UltraIcon';
 import { CustomizationState } from 'services/customization';
+import { useRealmObject } from 'components-react/hooks/realm';
 
 const { Option } = Select;
 
@@ -28,6 +29,9 @@ export function AppearanceSettings() {
     PlatformAppsService,
     LayoutService,
   } = Services;
+
+  // Hooks up reactivity for Customization state
+  useRealmObject(CustomizationService.state);
 
   const { bind } = useModule(() => {
     function getSettings() {
