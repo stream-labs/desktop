@@ -72,7 +72,7 @@
       </add-source-info>
 
       <add-source-info v-if="inspectedSource === 'wasapi_process_output_capture'"
-        sourceType="wasapi_proccess_output_capture" key="17">
+        sourceType="wasapi_process_output_capture" key="17">
         <AppAudioCaptureSourceIcon slot="media" />
       </add-source-info>
 
