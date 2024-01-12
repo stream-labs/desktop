@@ -351,11 +351,15 @@ export default class RtvcSourceProperties extends SourceProperties {
     // --- event
 
     onRandom() {
-        const list = this.primaryVoiceList
-        const idx = Math.floor(Math.random() * list.length)
-        this.primaryVoiceModel = list[idx]
-        this.secondaryVoiceModel = this.secondaryVoiceList[0]
-        this.amount = 0
+        const list0 = this.primaryVoiceList
+        const idx0 = Math.floor(Math.random() * list0.length)
+        this.primaryVoiceModel = list0[idx0]
+
+        const list1 = this.primaryVoiceList
+        const idx1 = Math.floor(Math.random() * list1.length)
+        this.secondaryVoiceModel= list1[idx1]
+
+        this.amount = Math.floor(Math.random() * 50)
     }
 
     onTab(idx: number) {
