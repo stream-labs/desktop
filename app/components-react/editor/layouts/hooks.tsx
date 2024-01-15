@@ -110,10 +110,11 @@ export default function useLayout(
   const getBarPixels = useCallback((bar: 'bar1' | 'bar2', offset: number) => {
     if (!componentEl.current) return;
     // Migrate from pixels to proportions
-    if ((resizes[bar] as number) >= 1) setBar(bar, resizes[bar] as number);
+    const migratedResize =
+      (resizes[bar] as number) >= 1 ? setBar(bar, resizes[bar] as number) : resizes[bar];
     const { height, width } = componentEl.current.getBoundingClientRect();
     const offsetSize = isColumns ? width - offset : height;
-    return Math.round(offsetSize * (resizes[bar] as number));
+    return Math.round(offsetSize * (migratedResize as number));
   }, []);
 
   const setBar = useCallback((bar: 'bar1' | 'bar2', val: number) => {
@@ -123,6 +124,7 @@ export default function useLayout(
     const totalSize = isColumns ? width : height;
     const proportion = parseFloat((val / totalSize).toFixed(2));
     LayoutService.actions.setBarResize(bar, proportion);
+    return proportion;
   }, []);
 
   /**
