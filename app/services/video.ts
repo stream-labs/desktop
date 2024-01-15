@@ -8,6 +8,8 @@ import { WindowsService } from './windows';
 import { ScalableRectangle } from '../util/ScalableRectangle';
 import { Subscription } from 'rxjs';
 import { SelectionService } from 'services/selection';
+import { VideoSettingsService } from './settings-v2';
+import { InitAfter } from 'services/core';
 
 const { remote } = electron;
 
@@ -194,8 +196,10 @@ export class Display {
   }
 }
 
+@InitAfter('VideoSettingsService')
 export class VideoService extends Service {
   @Inject() settingsService: SettingsService;
+  @Inject() videoSettingsService: VideoSettingsService;
 
   init() {
     this.settingsService.loadSettingsIntoStore();
@@ -219,14 +223,19 @@ export class VideoService extends Service {
   }
 
   get baseResolution() {
-    const [widthStr, heightStr] = this.settingsService.state.Video.Base.split('x');
-    const width = parseInt(widthStr, 10);
-    const height = parseInt(heightStr, 10);
-
+    const baseResolutions = this.videoSettingsService.baseResolutions;
     return {
-      width,
-      height,
+      width: baseResolutions.horizontal.baseWidth,
+      height: baseResolutions.horizontal.baseHeight,
     };
+    // const [widthStr, heightStr] = this.settingsService.state.Video.Base.split('x');
+    // const width = parseInt(widthStr, 10);
+    // const height = parseInt(heightStr, 10);
+
+    // return {
+    //   width,
+    //   height,
+    // };
   }
 
   setBaseResolution(resolution: { width: number; height: number }) {
@@ -247,18 +256,23 @@ export class VideoService extends Service {
     sourceId?: string,
   ) {
     const electronWindow = remote.BrowserWindow.fromId(electronWindowId);
+    const context = this.videoSettingsService.contexts.horizontal;
 
     if (sourceId) {
       obs.NodeObs.OBS_content_createSourcePreviewDisplay(
         electronWindow.getNativeWindowHandle(),
         sourceId,
         name,
+        false,
+        context,
       );
     } else {
       obs.NodeObs.OBS_content_createDisplay(
         electronWindow.getNativeWindowHandle(),
         name,
         renderingMode,
+        false,
+        context,
       );
     }
   }

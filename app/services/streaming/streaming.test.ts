@@ -96,6 +96,9 @@ const createInjectee = ({
     },
     fetchProgram: noop,
   },
+  VideoSettingsService: {
+    contexts: { horizontal: '' },
+  },
   CustomcastUsageService: {
     state: {
       isCustomcastUsed: false,
@@ -129,12 +132,14 @@ test('get instance', () => {
 test('toggleStreamingでstreamingStatusがofflineの場合', () => {
   const OBS_service_startStreaming = jest.fn();
   const OBS_service_stopStreaming = jest.fn();
+  const OBS_service_setVideoInfo = jest.fn();
 
   jest.mock('../../../obs-api', () => ({
     NodeObs: {
       OBS_service_startStreaming,
       OBS_service_stopStreaming,
       OBS_service_connectOutputSignals: noop,
+      OBS_service_setVideoInfo,
     },
   }));
 
@@ -163,12 +168,14 @@ test('toggleStreamingでstreamingStatusがofflineの場合', () => {
 test('toggleStreamingでstreamingStatusがoffline、配信開始時に確認して、配信開始をやめる場合', () => {
   const OBS_service_startStreaming = jest.fn();
   const OBS_service_stopStreaming = jest.fn();
+  const OBS_service_setVideoInfo = jest.fn();
 
   jest.mock('../../../obs-api', () => ({
     NodeObs: {
       OBS_service_startStreaming,
       OBS_service_stopStreaming,
       OBS_service_connectOutputSignals: noop,
+      OBS_service_setVideoInfo,
     },
   }));
 
@@ -200,12 +207,14 @@ test('toggleStreamingでstreamingStatusがoffline、配信開始時に確認し�
 test('toggleStreamingでstreamingStatusがoffline、配信開始時に確認して、配信を始める場合', () => {
   const OBS_service_startStreaming = jest.fn();
   const OBS_service_stopStreaming = jest.fn();
+  const OBS_service_setVideoInfo = jest.fn();
 
   jest.mock('../../../obs-api', () => ({
     NodeObs: {
       OBS_service_startStreaming,
       OBS_service_stopStreaming,
       OBS_service_connectOutputSignals: noop,
+      OBS_service_setVideoInfo,
     },
   }));
 
@@ -239,12 +248,14 @@ test('toggleStreamingでstreamingStatusがoffline、配信開始と同時に録�
   const OBS_service_startStreaming = jest.fn();
   const OBS_service_stopStreaming = jest.fn();
   const OBS_service_connectOutputSignals = jest.fn();
+  const OBS_service_setVideoInfo = jest.fn();
 
   jest.mock('../../../obs-api', () => ({
     NodeObs: {
       OBS_service_startStreaming,
       OBS_service_stopStreaming,
       OBS_service_connectOutputSignals,
+      OBS_service_setVideoInfo,
     },
   }));
 

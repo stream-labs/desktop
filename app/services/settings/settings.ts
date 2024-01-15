@@ -31,6 +31,7 @@ import {
 } from './optimizer';
 import { getBestSettingsForNiconico } from './niconico-optimization';
 import { TcpServerService } from 'services/api/tcp-server';
+import { VideoSettingsService } from '../settings-v2';
 
 export interface ISettingsState {
   General: {
@@ -122,6 +123,8 @@ export class SettingsService
   @Inject()
   private videoEncodingOptimizationService: VideoEncodingOptimizationService;
 
+  @Inject() videoSettingsService: VideoSettingsService;
+
   init() {
     this.loadSettingsIntoStore();
   }
@@ -167,6 +170,9 @@ export class SettingsService
 
   getCategories(): string[] {
     let categories: string[] = obs.NodeObs.OBS_settings_getListCategories();
+
+    // 0.23.74で追加された分の非表示
+    categories = categories.filter(a => a !== 'StreamSecond');
 
     if (this.userService.isLoggedIn()) {
       categories = categories.concat(['Comment', 'SpeechEngine']);
@@ -431,10 +437,9 @@ export class SettingsService
     const isSimple = outputMode === 'Simple';
     const streamingURL = this.findSettingValue(stream, 'Untitled', 'server') as string;
 
-    const encoder = isSimple ?
-      (this.findSettingValue(output, 'Streaming', 'StreamEncoder') as string)
-      :
-      (this.findSettingValue(output, 'Streaming', 'Encoder') as string);
+    const encoder = isSimple
+      ? (this.findSettingValue(output, 'Streaming', 'StreamEncoder') as string)
+      : (this.findSettingValue(output, 'Streaming', 'Encoder') as string);
     const preset =
       (this.findSettingValue(output, 'Streaming', 'preset') as string) ||
       (this.findSettingValue(output, 'Streaming', 'Preset') as string) ||
@@ -443,14 +448,16 @@ export class SettingsService
       (this.findSettingValue(output, 'Streaming', 'target_usage') as string) ||
       (this.findSettingValue(output, 'Streaming', 'QualityPreset') as string) ||
       (this.findSettingValue(output, 'Streaming', 'AMDPreset') as string);
-    const bitrate = isSimple ?
-      (this.findSettingValue(output, 'Streaming', 'VBitrate') as number)
-      :
-      (this.findSettingValue(output, 'Streaming', 'bitrate') as number);
+    const bitrate = isSimple
+      ? (this.findSettingValue(output, 'Streaming', 'VBitrate') as number)
+      : (this.findSettingValue(output, 'Streaming', 'bitrate') as number);
     const baseResolution = this.findSettingValue(video, 'Untitled', 'Base') as string;
     const outputResolution = this.findSettingValue(video, 'Untitled', 'Output') as string;
 
-    const fpsType = this.findSettingValue(video, 'Untitled', 'FPSType') as 'Fractional FPS Value' | 'Integer FPS Value' | 'Common FPS Values';
+    const fpsType = this.findSettingValue(video, 'Untitled', 'FPSType') as
+      | 'Fractional FPS Value'
+      | 'Integer FPS Value'
+      | 'Common FPS Values';
     let fps = '';
     switch (fpsType) {
       case 'Fractional FPS Value':
@@ -474,15 +481,18 @@ export class SettingsService
         break;
     }
 
-    const audio_bitrate = isSimple ?
-      this.findSettingValue(output, 'Streaming', 'ABitrate') as string
-      :
-      this.findSettingValue(output, 'Audio - Track 1', 'Track1Bitrate') as string;
-    const rate_control = !isSimple ?
-      this.findSettingValue(output, 'Streaming', 'rate_control') as 'CBR' | 'VBR' | 'ABR' | 'CRF'
+    const audio_bitrate = isSimple
+      ? (this.findSettingValue(output, 'Streaming', 'ABitrate') as string)
+      : (this.findSettingValue(output, 'Audio - Track 1', 'Track1Bitrate') as string);
+    const rate_control = !isSimple
+      ? (this.findSettingValue(output, 'Streaming', 'rate_control') as
+        | 'CBR'
+        | 'VBR'
+        | 'ABR'
+        | 'CRF')
       : null;
-    const profile = !isSimple ?
-      this.findSettingValue(output, 'Streaming', 'profile') as 'high' | 'main' | 'baseline'
+    const profile = !isSimple
+      ? (this.findSettingValue(output, 'Streaming', 'profile') as 'high' | 'main' | 'baseline')
       : null;
 
     const sample_rate = this.findSettingValue(audio, 'Untitled', 'SampleRate') as 44100 | 48000;
@@ -501,7 +511,7 @@ export class SettingsService
         bitrate: audio_bitrate,
         sampleRate: sample_rate,
         rateControl: rate_control,
-      }
+      },
     };
   }
 
@@ -591,14 +601,14 @@ export class SettingsService
             scope.setTag('optimizeForNiconico', 'retry');
             scope.setTag('retry', `${retry}`);
             scope.setFingerprint(['optimizeForNiconico', 'retry']);
-            Sentry.captureMessage('optimizeForNiconico: リトライで成功')
+            Sentry.captureMessage('optimizeForNiconico: リトライで成功');
           });
         } else {
           Sentry.withScope(scope => {
             scope.setLevel('info');
             scope.setTag('optimizeForNiconico', 'success');
             scope.setFingerprint(['optimizeForNiconico', 'success']);
-            Sentry.captureMessage('optimizeForNiconico: 一発で成功')
+            Sentry.captureMessage('optimizeForNiconico: 一発で成功');
           });
         }
         return;
@@ -792,6 +802,11 @@ export class SettingsService
 
     obs.NodeObs.OBS_settings_saveSettings(categoryName, dataToSave);
     this.SET_SETTINGS(SettingsService.convertFormDataToState({ [categoryName]: settingsData }));
+
+    // video_settingsに設定を伝える
+    if (categoryName === 'Video') {
+      this.videoSettingsService.refrectLegacy()
+    }
   }
 
   private setAudioSettings(settingsData: ISettingsSubCategory[]) {

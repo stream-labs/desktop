@@ -12,10 +12,7 @@ import { NicoliveProgramService } from 'services/nicolive-program/nicolive-progr
 import { isOk, NicoliveClient } from 'services/nicolive-program/NicoliveClient';
 import { ENotificationType, INotification, NotificationsService } from 'services/notifications';
 import { SettingsService } from 'services/settings';
-import {
-  EncoderType,
-  OptimizedSettings,
-} from 'services/settings/optimizer';
+import { EncoderType, OptimizedSettings } from 'services/settings/optimizer';
 import { TUsageEvent, UsageStatisticsService } from 'services/usage-statistics';
 import { UserService } from 'services/user';
 import { WindowsService } from 'services/windows';
@@ -30,6 +27,8 @@ import {
   IStreamingServiceState,
 } from './streaming-api';
 import { CustomcastUsageService } from '../custom-cast-usage';
+
+import { VideoSettingsService, TDisplayType } from 'services/settings-v2/video';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -57,7 +56,8 @@ interface IOBSOutputSignalInfo {
 
 export class StreamingService
   extends StatefulService<IStreamingServiceState>
-  implements IStreamingServiceApi {
+  implements IStreamingServiceApi
+{
   @Inject() settingsService: SettingsService;
   @Inject() userService: UserService;
   @Inject() windowsService: WindowsService;
@@ -66,6 +66,7 @@ export class StreamingService
   @Inject() notificationsService: NotificationsService;
   @Inject() private nicoliveCommentSynthesizerService: NicoliveCommentSynthesizerService;
   @Inject() private nicoliveProgramService: NicoliveProgramService;
+  @Inject() private videoSettingsService: VideoSettingsService;
   @Inject() private customcastUsageService: CustomcastUsageService;
 
   streamingStatusChange = new Subject<EStreamingState>();
@@ -224,8 +225,8 @@ export class StreamingService
         // ユーザー番組については、即時番組があればそれを優先し、なければ予約番組の番組IDを採用する。
         const programId =
           opts.nicoliveProgramSelectorResult &&
-            opts.nicoliveProgramSelectorResult.providerType === 'channel' &&
-            opts.nicoliveProgramSelectorResult.channelProgramId
+          opts.nicoliveProgramSelectorResult.providerType === 'channel' &&
+          opts.nicoliveProgramSelectorResult.channelProgramId
             ? opts.nicoliveProgramSelectorResult.channelProgramId
             : broadcastableUserProgram.programId || broadcastableUserProgram.nextProgramId;
 
@@ -254,7 +255,7 @@ export class StreamingService
             scope.setTag('method', 'fetchProgram');
             scope.setFingerprint(['StreamingService', 'fetchProgram', 'niconico', 'exception']);
             Sentry.captureException(e);
-          })
+          });
         }
 
         if (this.customizationService.optimizeForNiconico) {
@@ -268,7 +269,12 @@ export class StreamingService
           scope.setLevel('error');
           scope.setTag('service', 'StreamingService');
           scope.setTag('method', 'toggleStreamingAsync');
-          scope.setFingerprint(['StreamingService', 'toggleStreamingAsync', 'niconico', 'exception']);
+          scope.setFingerprint([
+            'StreamingService',
+            'toggleStreamingAsync',
+            'niconico',
+            'exception',
+          ]);
           Sentry.captureException(e);
         });
         let message: string;
@@ -276,11 +282,10 @@ export class StreamingService
           if (e.status === 401) {
             message = $t('streaming.invalidSessionError');
           } else {
-            message = $t('streaming.broadcastStatusFetchingError.httpError',
-              {
-                requestURL: e.url,
-                statusText: e.statusText,
-              });
+            message = $t('streaming.broadcastStatusFetchingError.httpError', {
+              requestURL: e.url,
+              statusText: e.statusText,
+            });
           }
         } else {
           message = $t('streaming.broadcastStatusFetchingError.default');
@@ -316,6 +321,8 @@ export class StreamingService
           category: 'obs',
           message: 'OBS_service_startStreaming',
         });
+        const horizontalContext = this.videoSettingsService.contexts.horizontal;
+        obs.NodeObs.OBS_service_setVideoInfo(horizontalContext, 'horizontal');
         obs.NodeObs.OBS_service_startStreaming();
       } catch (e) {
         Sentry.withScope(scope => {
@@ -432,7 +439,12 @@ export class StreamingService
         scope.setLevel('error');
         scope.setTag('service', 'StreamingService');
         scope.setTag('method', 'optimizeForNiconicoAndStartStreaming');
-        scope.setFingerprint(['StreamingService', 'optimizeForNiconicoAndStartStreaming', 'niconico', 'exception']);
+        scope.setFingerprint([
+          'StreamingService',
+          'optimizeForNiconicoAndStartStreaming',
+          'niconico',
+          'exception',
+        ]);
         Sentry.captureException(new Error('StreamingSetting.quality is undefined'));
       });
       return new Promise(resolve => {
@@ -574,7 +586,12 @@ export class StreamingService
           scope.setLevel('error');
           scope.setTag('service', 'StreamingService');
           scope.setTag('method', 'stopReplayBuffer');
-          scope.setFingerprint(['StreamingService', 'stopReplayBuffer(running)', 'obs', 'exception']);
+          scope.setFingerprint([
+            'StreamingService',
+            'stopReplayBuffer(running)',
+            'obs',
+            'exception',
+          ]);
           Sentry.captureException(e);
         });
       }
@@ -590,7 +607,12 @@ export class StreamingService
           scope.setLevel('error');
           scope.setTag('service', 'StreamingService');
           scope.setTag('method', 'stopReplayBuffer');
-          scope.setFingerprint(['StreamingService', 'stopReplayBuffer(stopping)', 'obs', 'exception']);
+          scope.setFingerprint([
+            'StreamingService',
+            'stopReplayBuffer(stopping)',
+            'obs',
+            'exception',
+          ]);
           Sentry.captureException(e);
         });
       }
@@ -718,10 +740,13 @@ export class StreamingService
         bitrate: Number(settings.audio.bitrate),
         sample_rate: settings.audio.sampleRate,
       },
-      advanced: settings.outputMode === 'Advanced' ? {
-        rate_control: settings.audio.rateControl,
-        profile: settings.profile,
-      } : undefined,
+      advanced:
+        settings.outputMode === 'Advanced'
+          ? {
+              rate_control: settings.audio.rateControl,
+              profile: settings.profile,
+            }
+          : undefined,
       encoder: {
         encoder_type: settings.encoder as unknown as EncoderType,
         preset: settings.preset,
@@ -740,7 +765,7 @@ export class StreamingService
           normal: this.nicoliveCommentSynthesizerService.normal,
           operator: this.nicoliveCommentSynthesizerService.operator,
           system: this.nicoliveCommentSynthesizerService.system,
-        }
+        },
       },
       compact_mode: {
         auto_compact_mode: this.customizationService.state.autoCompactMode,

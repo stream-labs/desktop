@@ -10,6 +10,7 @@ import { TSceneNodeType } from './scenes';
 import { SceneItemNode } from './scene-node';
 import { ISceneItemFolder } from '.';
 import { assertIsDefined } from 'util/properties-type-guards';
+import { TDisplayType } from 'services/settings-v2';
 
 @ServiceHelper()
 export class SceneItemFolder extends SceneItemNode {
@@ -141,6 +142,9 @@ export class SceneItemFolder extends SceneItemNode {
     this.UPDATE({ id: this.id, name });
   }
 
+  setDisplay(display: TDisplayType) {
+    this.UPDATE({ display, id: this.id });
+  }
   remove() {
     this.getScene().removeFolder(this.id);
   }

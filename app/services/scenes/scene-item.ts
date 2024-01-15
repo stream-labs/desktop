@@ -20,6 +20,7 @@ import {
 import { SceneItemNode } from './scene-node';
 import { TSceneNodeType } from './scenes';
 import { assertIsDefined } from 'util/properties-type-guards';
+import { VideoSettingsService, TDisplayType } from 'services/settings-v2';
 
 export { EScaleType, EBlendingMode, EBlendingMethod } from '../../../obs-api';
 
@@ -58,6 +59,9 @@ export class SceneItem extends SceneItemNode {
   deinterlaceMode: obs.EDeinterlaceMode;
   deinterlaceFieldOrder: obs.EDeinterlaceFieldOrder;
 
+  output?: obs.IVideo;
+  display?: TDisplayType;
+  readonly position: IVec2;
   // Some computed attributes
 
   get scaledWidth(): number {
@@ -78,6 +82,7 @@ export class SceneItem extends SceneItemNode {
   @Inject() protected scenesService: ScenesService;
   @Inject() private sourcesService: SourcesService;
   @Inject() private videoService: VideoService;
+  @Inject() private videoSettingsService: VideoSettingsService;
 
   constructor(sceneId: string, sceneItemId: string, sourceId: string) {
     super();
@@ -127,6 +132,8 @@ export class SceneItem extends SceneItemNode {
       scaleFilter: this.scaleFilter,
       blendingMode: this.blendingMode,
       blendingMethod: this.blendingMethod,
+      output: this.output,
+      display: this.display,
     };
   }
 
@@ -191,6 +198,10 @@ export class SceneItem extends SceneItemNode {
       this.getObsSceneItem().blendingMethod = newSettings.blendingMethod;
     }
 
+    if (changed.output !== void 0 || patch.hasOwnProperty('output')) {
+      this.getObsSceneItem().video = newSettings.output as obs.IVideo;
+    }
+
     this.UPDATE({ sceneItemId: this.sceneItemId, ...changed });
 
     this.scenesService.itemUpdated.next(this.getModel());
@@ -224,6 +235,10 @@ export class SceneItem extends SceneItemNode {
     this.setSettings({ locked });
   }
 
+  setDisplay(display: TDisplayType) {
+    this.setSettings({ display });
+  }
+
   loadAttributes() {
     const { position, scale, visible, crop, rotation, scaleFilter, blendingMode, blendingMethod } =
       this.getObsSceneItem();
@@ -247,6 +262,11 @@ export class SceneItem extends SceneItemNode {
     const position = { x: customSceneItem.x, y: customSceneItem.y };
     const crop = customSceneItem.crop;
 
+    const display = 'horizontal';
+    const context = this.videoSettingsService.contexts.horizontal;
+    const obsSceneItem = this.getObsSceneItem();
+    obsSceneItem.video = context as obs.IVideo;
+
     this.UPDATE({
       sceneItemId: this.sceneItemId,
       transform: {
@@ -260,6 +280,9 @@ export class SceneItem extends SceneItemNode {
       scaleFilter: customSceneItem.scaleFilter,
       blendingMode: customSceneItem.blendingMode,
       blendingMethod: customSceneItem.blendingMethod,
+      display,
+      output: context,
+      position: obsSceneItem.position,
     });
   }
 

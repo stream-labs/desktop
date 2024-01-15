@@ -7,10 +7,13 @@ import { WindowsService } from 'services/windows';
 import { Scene, SceneItem, EScaleType, EBlendingMode, EBlendingMethod } from './index';
 import { ISource, SourcesService, ISourceAddOptions } from 'services/sources';
 import { Inject } from 'services/core/injector';
+import { IVideo, SceneFactory } from '../../../obs-api';
 import * as obs from '../../../obs-api';
 import { $t } from 'services/i18n';
 import namingHelpers from 'util/NamingHelpers';
 import uuid from 'uuid/v4';
+import { TDisplayType } from 'services/settings-v2/video';
+import { InitAfter } from 'services/core';
 
 export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
 
@@ -41,6 +44,10 @@ export interface ISceneItemInfo {
   scaleFilter?: EScaleType;
   blendingMode?: EBlendingMode;
   blendingMethod?: EBlendingMethod;
+
+  display?: TDisplayType;
+  output?: IVideo;
+  position?: IVec2;
 }
 
 export interface IScenesState {
@@ -76,6 +83,10 @@ export interface ISceneItemSettings {
   scaleFilter: EScaleType;
   blendingMode: EBlendingMode;
   blendingMethod: EBlendingMethod;
+
+  output?: IVideo;
+  display?: TDisplayType;
+  position?: IVec2;
 }
 
 export interface IPartialSettings {
@@ -85,6 +96,12 @@ export interface IPartialSettings {
   scaleFilter?: EScaleType;
   blendingMode?: EBlendingMode;
   blendingMethod?: EBlendingMethod;
+  /**
+   *  for obs.ISceneItem, the `output` property is `video`
+   */
+  output?: IVideo;
+  display?: TDisplayType;
+  position?: IVec2;
 }
 
 export interface ISceneItem extends ISceneItemSettings, ISceneItemNode {
@@ -92,6 +109,13 @@ export interface ISceneItem extends ISceneItemSettings, ISceneItemNode {
   sourceId: string;
   obsSceneItemId: number;
   sceneNodeType: 'item';
+  blendingMode: EBlendingMode;
+  blendingMethod: EBlendingMethod;
+  /**
+   *  for obs.ISceneItem, the `output` property is `video`
+   */
+  output?: IVideo;
+  position?: IVec2;
 }
 
 export type TSceneNodeType = 'item' | 'folder';
@@ -101,6 +125,10 @@ export interface ISceneItemNode extends IResource {
   sceneId: string;
   sceneNodeType: TSceneNodeType;
   parentId?: string;
+
+  isRemoved?: boolean;
+  display?: TDisplayType;
+  output?: IVideo;
 }
 
 export interface ISceneItemFolder extends ISceneItemNode {
@@ -108,6 +136,7 @@ export interface ISceneItemFolder extends ISceneItemNode {
   sceneNodeType: 'folder';
 }
 
+@InitAfter('VideoSettingsService')
 export class ScenesService extends StatefulService<IScenesState> {
   static initialState: IScenesState = {
     activeSceneId: '',

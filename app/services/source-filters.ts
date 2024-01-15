@@ -17,6 +17,7 @@ import namingHelpers from '../util/NamingHelpers';
 import { $t } from 'services/i18n';
 import { EOrderMovement } from 'obs-studio-node';
 import { TcpServerService } from './api/tcp-server';
+import { InitAfter } from './core';
 
 export type TSourceFilterType =
   | 'mask_filter'
@@ -50,7 +51,7 @@ export interface ISourceFilter {
   visible: boolean;
   settings: Dictionary<TObsValue>;
 }
-
+@InitAfter('SourcesService')
 export class SourceFiltersService extends Service {
   @Inject()
   sourcesService: SourcesService;
@@ -173,15 +174,17 @@ export class SourceFiltersService extends Service {
   }
 
   getFilters(sourceId: string): ISourceFilter[] {
-    return this.sourcesService
-      .getSource(sourceId)
-      ?.getObsInput()
-      .filters.map(obsFilter => ({
-        visible: obsFilter.enabled,
-        name: obsFilter.name,
-        type: obsFilter.id as TSourceFilterType,
-        settings: obsFilter.settings,
-      })) || [];
+    return (
+      this.sourcesService
+        .getSource(sourceId)
+        ?.getObsInput()
+        .filters.map(obsFilter => ({
+          visible: obsFilter.enabled,
+          name: obsFilter.name,
+          type: obsFilter.id as TSourceFilterType,
+          settings: obsFilter.settings,
+        })) || []
+    );
   }
 
   setVisibility(sourceId: string, filterName: string, visible: boolean) {
