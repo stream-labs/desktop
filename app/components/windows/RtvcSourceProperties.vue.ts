@@ -60,9 +60,9 @@ export default class RtvcSourceProperties extends SourceProperties {
     readonly manualMax = 5
 
     readonly presetValues = [
-        { index: 'preset/0', name: "琴詠ニア", image: "./media/images/nvoice.png", icon: "./media/images/test_icon.png", pitchShift: 0, primaryVoice: 100, secondaryVoice: -1, amount: 0 },
-        { index: 'preset/1', name: "ずんだもん", image: "./media/images/nvoice_bg.png", icon: "./media/images/test_icon.png", pitchShift: 0, primaryVoice: 101, secondaryVoice: -1, amount: 0 },
-        { index: 'preset/2', name: "春日部つむぎ", image: "./media/images/windows_bg.png", icon: "./media/images/test_icon.png", pitchShift: 0, primaryVoice: 102, secondaryVoice: -1, amount: 0 },
+        { index: 'preset/0', name: "琴詠ニア", image: "preset-bg0", icon: "icon-0", pitchShift: 0, primaryVoice: 100, secondaryVoice: -1, amount: 0 },
+        { index: 'preset/1', name: "ずんだもん", image: "preset-bg1", icon: "icon-0", pitchShift: 0, primaryVoice: 101, secondaryVoice: -1, amount: 0 },
+        { index: 'preset/2', name: "春日部つむぎ", image: "preset-bg2", icon: "icon-0", pitchShift: 0, primaryVoice: 102, secondaryVoice: -1, amount: 0 },
         //仮値 "../../../media/images/nvoice.png" だがvueがpath変換するので
     ]
 
@@ -102,7 +102,7 @@ export default class RtvcSourceProperties extends SourceProperties {
     manualList: { value: string, name: string, icon: string }[] = []
     updateManualList() {
         // add,delに反応しないのでコード側から変更指示
-        this.manualList = this.manualParams.map((a, idx) => { return { value: `manual/${idx}`, name: a.name, icon: "./media/images/test_icon.png" } })
+        this.manualList = this.manualParams.map((a, idx) => { return { value: `manual/${idx}`, name: a.name, icon: "icon-0" } })
         this.canAdd = this.manualList.length < this.manualMax
     }
 

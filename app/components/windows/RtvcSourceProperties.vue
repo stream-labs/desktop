@@ -15,8 +15,8 @@
             $t('source-props.nair-rtvc-source.nav.preset_voice') }}</div>
           <li v-for="v in presetList" :key="v.value" class="nav-item" :class="{ active: v.value === currentIndex }">
             <div class="nav-item-content" @click="onSelect(v.value)">
-              <img :src="v.icon" style="padding-right: 4px;">
-              {{ v.name }}
+              <div class="icon" :class="v.icon"></div>
+              <div> {{ v.name }}</div>
             </div>
           </li>
 
@@ -30,8 +30,10 @@
 
           </div>
           <li v-for="v in manualList" :key="v.value" class="nav-item" :class="{ active: v.value === currentIndex }">
-            <div class="nav-item-content" @click="onSelect(v.value)"> <img :src="v.icon" style="padding-right: 4px;">
-              {{ v.name }}</div>
+            <div class="nav-item-content" @click="onSelect(v.value)">
+              <div class="icon" :class="v.icon"></div>
+              <div> {{ v.name }}</div>
+            </div>
             <div class="nav-item-right">
               <div class="dropdown">
                 <button style="color:white">︙</button>
@@ -51,7 +53,7 @@
 
       <div class="content-container">
         <div v-if="isPreset">
-          <img :src="image" style="max-height: 350px;">
+          <div class="preset-bg" :class="image"></div>
           <div class="input-container">
             <div class="input-label">
               <div style="display: flex;">
@@ -232,6 +234,7 @@
   overflow-x: auto;
   overflow-y: scroll;
 
+
   .input-container {
     flex-direction: column;
 
@@ -282,6 +285,8 @@
 }
 
 .nav-item-content {
+  display: flex;
+  align-items: center;
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -366,6 +371,34 @@
 
 .tooltip1:hover .tooltip1_text {
   display: block;
+}
+
+
+.preset-bg {
+  height: 350px;
+  padding-right: 4px;
+}
+
+.preset-bg0 {
+  background: url('../../../media/images/nvoice.png') no-repeat center/ 100% auto;
+}
+
+.preset-bg1 {
+  background: url('../../../media/images/nvoice_bg.png') no-repeat center/ 100% auto;
+}
+
+.preset-bg2 {
+  background: url('../../../media/images/windows_bg.png') no-repeat center/ 100% auto;
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+}
+
+.icon-0 {
+  background: url('../../../media/images/test_icon.png') no-repeat;
 }
 </style>
 
