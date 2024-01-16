@@ -49,6 +49,7 @@ export function Triplets(p: React.PropsWithChildren<LayoutProps>) {
         onInput={(value: number) => setBar('bar2', value)}
         max={calculateMax(mins.rest + mins.bar1)}
         min={mins.bar2}
+        transformScale={1}
       >
         <div className={styles.stacked} style={{ width: `${resizes.bar2 * 100}%` }}>
           {['3', '6'].map(slot => (
