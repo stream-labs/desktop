@@ -59,8 +59,6 @@ export default class LiveDock extends Vue {
 
     return this.chatApps.find(app => {
       if (app.id === this.underlyingSelectedChat) {
-        console.log('found ', app.id === this.underlyingSelectedChat);
-
         return app.id === this.underlyingSelectedChat;
       }
     })
