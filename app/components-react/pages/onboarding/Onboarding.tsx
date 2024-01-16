@@ -31,7 +31,6 @@ export default function Onboarding() {
   const ctx = useContext(SkipContext);
 
   const skip = () => {
-    console.log('running on skip', ctx.onSkip);
     // Return false from skip function to avoid running the default skip logic
     const result = ctx.onSkip();
 
