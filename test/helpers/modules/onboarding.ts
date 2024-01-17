@@ -3,12 +3,15 @@ import { click, clickButton, clickIfDisplayed, isDisplayed, useMainWindow } from
 export async function skipOnboarding() {
   await useMainWindow(async () => {
     if (!(await isDisplayed('h2=Live Streaming'))) return;
+    // Uses advanced onboarding
     await click('h2=Live Streaming');
+    await click('h2=Advanced');
     await click('button=Continue');
-    await click('span=Skip');
+    // OBS import
     await clickIfDisplayed('div=Start Fresh');
-    await clickButton('Skip');
-    await clickIfDisplayed('button=Skip');
-    await clickIfDisplayed('div=Choose Starter');
+    // Hardware setup
+    await click('button=Skip');
+    // Ultra
+    await click('button=Skip');
   });
 }
