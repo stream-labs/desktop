@@ -7,7 +7,9 @@ import { Services } from 'components-react/service-provider';
 import BrowserView from 'components-react/shared/BrowserView';
 import styles from './RecentEvents.m.less';
 
-export default function LegacyEvents(p: { onPopout: () => void }) {
+const mins = { x: 360, y: 150 };
+
+export function LegacyEvents(p: { onPopout: () => void }) {
   const { UserService, RecentEventsService, MagicLinkService } = Services;
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -47,7 +49,7 @@ export default function LegacyEvents(p: { onPopout: () => void }) {
     });
   }
 
-  const { renderElement } = useBaseElement(<Element />, { x: 360, y: 150 }, containerRef.current);
+  const { renderElement } = useBaseElement(<Element />, mins, containerRef.current);
 
   function Element() {
     if (!UserService.isLoggedIn) {
@@ -76,3 +78,5 @@ export default function LegacyEvents(p: { onPopout: () => void }) {
     </div>
   );
 }
+
+LegacyEvents.mins = mins;

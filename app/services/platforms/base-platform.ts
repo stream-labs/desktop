@@ -92,7 +92,7 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
     //   .then(_ => this.userService.updateLinkedPlatforms());
 
     remote.shell.openExternal(
-      `https://${this.hostsService.streamlabs}/dashboard#/settings/account-settings`,
+      `https://${this.hostsService.streamlabs}/dashboard#/settings/account-settings/platforms`,
     );
   }
 

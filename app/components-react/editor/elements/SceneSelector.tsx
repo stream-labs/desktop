@@ -313,13 +313,11 @@ function TreeNode(p: { scene: IScene; removeScene: (scene: IScene) => void }) {
   );
 }
 
-export default function SceneSelectorElement() {
+const mins = { x: 200, y: 120 };
+
+export function SceneSelectorElement() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { renderElement } = useBaseElement(
-    <SceneSelector />,
-    { x: 200, y: 120 },
-    containerRef.current,
-  );
+  const { renderElement } = useBaseElement(<SceneSelector />, mins, containerRef.current);
 
   return (
     <div
@@ -331,3 +329,5 @@ export default function SceneSelectorElement() {
     </div>
   );
 }
+
+SceneSelectorElement.mins = mins;

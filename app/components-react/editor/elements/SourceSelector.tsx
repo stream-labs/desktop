@@ -443,10 +443,6 @@ export class SourceSelectorModule {
     return this.dualOutputService.views.activeDisplays.vertical;
   }
 
-  get isDualOutputLoading() {
-    return this.dualOutputService.views.isLoading && !this.dualOutputService.views.hasVerticalNodes;
-  }
-
   watchSelected = injectWatch(() => this.lastSelectedId, this.expandSelectedFolders);
 
   async expandSelectedFolders() {
@@ -829,8 +825,30 @@ const TreeNode = React.forwardRef(
                 />
               </Tooltip>
             )}
-            <i onClick={p.toggleLock} className={p.isLocked ? 'icon-lock' : 'icon-unlock'} />
-            <i onClick={p.toggleVisibility} className={p.isVisible ? 'icon-view' : 'icon-hide'} />
+            <Tooltip
+              title={$t('Lock/Unlock Source')}
+              placement="left"
+              visible={['icon-lock', 'icon-unlock'].includes(hoveredIcon)}
+            >
+              <i
+                onClick={p.toggleLock}
+                className={p.isLocked ? 'icon-lock' : 'icon-unlock'}
+                onMouseEnter={() => setHoveredIcon(p.isLocked ? 'icon-lock' : 'icon-unlock')}
+                onMouseLeave={() => setHoveredIcon('')}
+              />
+            </Tooltip>
+            <Tooltip
+              title={$t('Hide/Unhide')}
+              placement="left"
+              visible={['icon-view', 'icon-hide'].includes(hoveredIcon)}
+            >
+              <i
+                onClick={p.toggleVisibility}
+                className={p.isVisible ? 'icon-view' : 'icon-hide'}
+                onMouseEnter={() => setHoveredIcon(p.isVisible ? 'icon-view' : 'icon-hide')}
+                onMouseLeave={() => setHoveredIcon('')}
+              />
+            </Tooltip>
           </>
         )}
         <Tooltip
@@ -862,13 +880,11 @@ const TreeNode = React.forwardRef(
   },
 );
 
-export default function SourceSelectorElement() {
+const mins = { x: 200, y: 120 };
+
+export function SourceSelectorElement() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { renderElement } = useBaseElement(
-    <SourceSelector />,
-    { x: 200, y: 120 },
-    containerRef.current,
-  );
+  const { renderElement } = useBaseElement(<SourceSelector />, mins, containerRef.current);
 
   return (
     <div
@@ -880,3 +896,5 @@ export default function SourceSelectorElement() {
     </div>
   );
 }
+
+SourceSelectorElement.mins = mins;

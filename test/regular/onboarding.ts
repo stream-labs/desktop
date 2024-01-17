@@ -216,8 +216,8 @@ test.skip('Go through the onboarding and autoconfig', async t => {
   await waitForDisplayed('h1=Add an Overlay');
   await clickIfDisplayed('button=Skip');
 
-  // Temporarily skip auto config test until migration to new API
   // Start auto config
+  // temporarily disable auto config until migrate to new api
   // t.true(await (await app.client.$('button=Start')).isExisting());
   // await (await app.client.$('button=Start')).click();
 

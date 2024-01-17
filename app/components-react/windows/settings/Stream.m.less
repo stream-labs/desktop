@@ -53,3 +53,22 @@
     font-size: 18px;
   }
 }
+
+
+.extra-fields-section {
+  margin-top: 10px;
+  // HACK: fixes the margin of the Instagram component using 8 columns or so
+  margin-left: -128px;
+
+
+  // Fix password input adding vertical height
+  :global(.ant-input-affix-wrapper) {
+    padding: 0 11px;
+  }
+
+  :global(input[type="password"]) {
+    height: 30px;
+    // FIXME: this input has a hover effect but the stream URL one doesn't.
+    // can't right click on devtools to inspect since last electron update
+  }
+}

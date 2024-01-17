@@ -33,7 +33,7 @@ test('Onboarding steps', async t => {
   await makeScreenshots(t, 'Add a Theme');
   await (await app.client.$('button=Skip')).click();
 
-  // Temporarily skip auto config test until migration to new API
+  // temporarily disable auto config until migrate to new api
   // await (await app.client.$('h1=Optimize')).waitForDisplayed();
   // await makeScreenshots(t, 'Before optimize');
   // await (await app.client.$('button=Start')).click();

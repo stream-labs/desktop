@@ -6,6 +6,8 @@ import { $t } from '../../../services/i18n';
 import mapValues from 'lodash/mapValues';
 import Fuse from 'fuse.js';
 import type { Scene, Source } from 'app-services';
+import Tooltip from 'components-react/shared/Tooltip';
+import { getOS, OS } from 'util/operating-systems';
 
 interface IAugmentedHotkey extends IHotkey {
   // Will be scene or source name
@@ -48,7 +50,7 @@ const setCategoryNameFrom = (srcOrScene: Source | Scene | null) => (hotkey: IAug
 
 export default function Hotkeys(props: HotkeysProps) {
   const { globalSearchStr: searchString, scanning, highlightSearch } = props;
-  const { HotkeysService, SourcesService, ScenesService } = Services;
+  const { HotkeysService, SourcesService, ScenesService, DualOutputService } = Services;
   const [hotkeySet, setHotkeysSet] = useState<IHotkeysSet | null>(null);
 
   useEffect(() => {
@@ -121,6 +123,7 @@ export default function Hotkeys(props: HotkeysProps) {
     return <div />;
   }
   const isSearch = !!searchString || scanning;
+  const isDualOutputMode = DualOutputService.views.dualOutputMode;
 
   const generalHotkeys = filteredHotkeySet.general;
   const hasGeneralHotkeys = !!generalHotkeys.length;
@@ -134,15 +137,31 @@ export default function Hotkeys(props: HotkeysProps) {
   const markerHotkeys = filteredHotkeySet.markers;
   const hasMarkers = !!markerHotkeys.length;
 
-  function renderHotkeyGroup(id: string, hotkeys: any, title: string) {
-    return <HotkeyGroup key={id} title={title} hotkeys={hotkeys} isSearch={isSearch} />;
+  function renderHotkeyGroup(
+    id: string,
+    hotkeys: any,
+    title: string,
+    isDualOutputScene: boolean = false,
+  ) {
+    return (
+      <HotkeyGroup
+        key={id}
+        title={title}
+        hotkeys={hotkeys}
+        isSearch={isSearch}
+        hasSceneHotkeys={hasSceneHotkeys}
+        isDualOutputMode={isDualOutputMode}
+        isDualOutputScene={isDualOutputScene}
+      />
+    );
   }
 
   function renderScenesHotkeyGroup(sceneId: string) {
     const sceneHotkeys = filteredHotkeySet.scenes[sceneId];
     const scene = ScenesService.views.getScene(sceneId);
+    const isDualOutputScene = scene?.getIsDualOutputScene();
 
-    return scene ? renderHotkeyGroup(sceneId, sceneHotkeys, scene.name) : null;
+    return scene ? renderHotkeyGroup(sceneId, sceneHotkeys, scene.name, isDualOutputScene) : null;
   }
 
   function renderSourcesHotkeyGroup(sourceId: string) {
@@ -155,7 +174,29 @@ export default function Hotkeys(props: HotkeysProps) {
   return (
     <div>
       {hasGeneralHotkeys && (
-        <HotkeyGroup hotkeys={generalHotkeys} isSearch={isSearch} title={null} />
+        <>
+          {getOS() === OS.Mac && (
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <h2>{$t('Hotkeys')}</h2>
+              <Tooltip
+                title={$t(
+                  'To use hotkeys on Mac, go to System Settings > Security > Accessibility and toggle on for Streamlabs Desktop.',
+                )}
+                lightShadow
+                wrapperStyle={{ marginBottom: '4px' }}
+                placement="leftTop"
+              >
+                <i className="icon-information" style={{ padding: '0 0 4px 5px' }} />
+              </Tooltip>
+            </div>
+          )}
+          <HotkeyGroup
+            hotkeys={generalHotkeys}
+            isSearch={isSearch}
+            title={null}
+            isDualOutputMode={isDualOutputMode}
+          />
+        </>
       )}
       {hasSceneHotkeys && (
         <>
@@ -172,7 +213,12 @@ export default function Hotkeys(props: HotkeysProps) {
       {hasMarkers && (
         <>
           <h2>{$t('Markers')}</h2>
-          <HotkeyGroup hotkeys={markerHotkeys} isSearch={isSearch} title={null} />
+          <HotkeyGroup
+            hotkeys={markerHotkeys}
+            isSearch={isSearch}
+            title={null}
+            isDualOutputMode={isDualOutputMode}
+          />
         </>
       )}
     </div>

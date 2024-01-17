@@ -1,4 +1,4 @@
-import React, { MouseEvent, useEffect } from 'react';
+import React, { MouseEvent, useEffect, useMemo } from 'react';
 import moment, { Moment } from 'moment';
 import css from './StreamScheduler.m.less';
 import cx from 'classnames';
@@ -9,14 +9,29 @@ import FacebookEditStreamInfo from '../../windows/go-live/platforms/FacebookEdit
 import { ListInput, TimeInput } from '../../shared/inputs';
 import Form, { useForm } from '../../shared/inputs/Form';
 import { confirmAsync } from '../../modals';
-import { IStreamEvent, useStreamScheduler } from './useStreamScheduler';
+import {
+  IStreamEvent,
+  StreamSchedulerController,
+  StreamSchedulerCtx,
+  useStreamScheduler,
+} from './useStreamScheduler';
 import Scrollable from '../../shared/Scrollable';
+import { getDefined } from '../../../util/properties-type-guards';
 
 /**
  * StreamScheduler page layout
  */
-export default function StreamScheduler() {
-  const { isEventsLoaded } = useStreamScheduler();
+export default function StreamSchedulerPage() {
+  const controller = useMemo(() => new StreamSchedulerController(), []);
+  return (
+    <StreamSchedulerCtx.Provider value={controller}>
+      <StreamScheduler />
+    </StreamSchedulerCtx.Provider>
+  );
+}
+function StreamScheduler() {
+  const { store } = useStreamScheduler();
+  const isEventsLoaded = store.useState(s => s.isEventsLoaded);
   return (
     <Scrollable className={cx(css.streamSchedulerPage)}>
       <Spin tip="Loading..." spinning={!isEventsLoaded}>
@@ -31,8 +46,11 @@ export default function StreamScheduler() {
  * Calendar component
  */
 function SchedulerCalendar() {
-  const { showEditEventModal, showNewEventModal, selectedPlatform, events } = useStreamScheduler();
-
+  const { showEditEventModal, showNewEventModal, store } = useStreamScheduler();
+  const { selectedPlatform, events } = store.useState(s => ({
+    selectedPlatform: s.selectedPlatform,
+    events: s.events,
+  }));
   /**
    * Renders a day cell in the calendar
    */
@@ -110,22 +128,33 @@ function SchedulerCalendar() {
  */
 function EventSettingsModal() {
   const {
-    isUpdateMode,
-    time,
-    isModalVisible,
     submit,
     closeModal,
     setForm,
-    isLoading,
-    selectedPlatform,
-    platforms,
     getPlatformDisplayName,
     showNewEventModal,
     setTime,
+    updatePlatform,
+    platforms,
+    isUpdateMode,
+    store,
+  } = useStreamScheduler();
+
+  const {
+    time,
+    isModalVisible,
+    isLoading,
+    selectedPlatform,
     ytSettings,
     fbSettings,
-    updatePlatform,
-  } = useStreamScheduler();
+  } = store.useState(s => ({
+    time: s.time,
+    isModalVisible: s.isModalVisible,
+    isLoading: s.isLoading,
+    selectedPlatform: s.selectedPlatform,
+    ytSettings: getDefined(s.platformSettings.youtube),
+    fbSettings: getDefined(s.platformSettings.facebook),
+  }));
 
   // initialize the form
   const form = useForm();
@@ -212,14 +241,11 @@ function EventSettingsModal() {
  * Renders Schedule/Save/Delete buttons
  */
 function ModalButtons() {
-  const {
-    selectedEvent,
-    remove,
-    submit,
-    goLive,
-    isLoading,
-    primaryPlatform,
-  } = useStreamScheduler();
+  const controller = useStreamScheduler();
+  const { selectedEvent, remove, submit, goLive, primaryPlatform, store } = controller;
+  const { isLoading } = store.useState(s => ({
+    isLoading: s.isLoading,
+  }));
   const shouldShowSave = !!selectedEvent;
   const shouldShowSchedule = !selectedEvent;
   const shouldShowGoLive =

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { $t } from '../../../services/i18n';
 import { ICustomStreamDestination } from '../../../services/settings/streaming';
 import { EStreamingState } from '../../../services/streaming';
@@ -21,6 +21,8 @@ import ButtonHighlighted from 'components-react/shared/ButtonHighlighted';
 import { useVuex } from 'components-react/hooks';
 import Translate from 'components-react/shared/Translate';
 import * as remote from '@electron/remote';
+import { InstagramEditStreamInfo } from '../go-live/platforms/InstagramEditStreamInfo';
+import { IInstagramStartStreamOptions } from 'services/platforms/instagram';
 
 function censorWord(str: string) {
   if (str.length < 3) return str;
@@ -373,58 +375,133 @@ function SLIDBlock() {
  */
 function Platform(p: { platform: TPlatform }) {
   const platform = p.platform;
-  const { UserService, StreamingService } = Services;
+  const { UserService, StreamingService, InstagramService } = Services;
   const { canEditSettings, platformMerge, platformUnlink } = useStreamSettings();
   const isMerged = StreamingService.views.isPlatformLinked(platform);
-  const username = UserService.state.auth!.platforms[platform]?.username;
+  const platformObj = UserService.state.auth!.platforms[platform];
+  const username = platformObj?.username;
   const platformName = useMemo(() => getPlatformService(platform).displayName, []);
   const isPrimary = StreamingService.views.isPrimaryPlatform(platform);
   const shouldShowPrimaryBtn = isPrimary;
   const shouldShowConnectBtn = !isMerged && canEditSettings;
   const shouldShowUnlinkBtn = !isPrimary && isMerged && canEditSettings;
 
+  /*
+   * TODO: don't really see much value in having Instagram text boxes here, since
+   * user needs to re-enter stream key every time they go live anyways, makes code brittle,
+   * but since we're adding it, might as well make other small changes to make it look better
+   */
+  const isInstagram = platform === 'instagram';
+  const { instagramSettings } = useVuex(() => ({
+    instagramSettings: InstagramService.state.settings,
+  }));
+
+  const [showInstagramFields, setShowInstagramFields] = useState(isInstagram && isMerged);
+  const shouldShowUsername = !isInstagram;
+  const usernameOrBlank = shouldShowUsername ? (
+    <>
+      <br />
+      {username}
+      <br />
+    </>
+  ) : (
+    ''
+  );
+
+  const instagramConnect = async () => {
+    await UserService.actions.return.startAuth(platform, 'internal', true);
+    setShowInstagramFields(true);
+  };
+
+  const instagramUnlink = () => {
+    // 1. reset stream key and url after unlinking if the user chooses to re-link immediately
+    updateInstagramSettings({ title: '', streamKey: '', streamUrl: '' });
+    // 2. hide extra fields
+    setShowInstagramFields(false);
+    // 3. unlink platform
+    platformUnlink(platform);
+  };
+
+  const ConnectButton = () => (
+    <span>
+      <Button
+        onClick={isInstagram ? instagramConnect : () => platformMerge(platform)}
+        style={{
+          backgroundColor: `var(--${platform})`,
+          borderColor: 'transparent',
+          color: ['trovo', 'instagram'].includes(platform) ? 'black' : 'inherit',
+        }}
+      >
+        {$t('Connect')}
+      </Button>
+    </span>
+  );
+
+  const updateInstagramSettings = (newSettings: IInstagramStartStreamOptions) => {
+    InstagramService.actions.updateSettings(newSettings);
+  };
+
+  const ExtraFieldsSection = () => {
+    if (isInstagram && showInstagramFields) {
+      return (
+        <div className={cx(css.extraFieldsSection)}>
+          <InstagramEditStreamInfo
+            onChange={updateInstagramSettings}
+            value={instagramSettings}
+            layoutMode="singlePlatform"
+            isStreamSettingsWindow
+          />
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
-    <div className="section flex" style={{ marginBottom: 16 }}>
-      <div className="margin-right--20" style={{ width: '50px' }}>
-        <PlatformLogo className={css.platformLogo} size="medium" platform={platform} />
-      </div>
-      <div>
-        {platformName} <br />
-        {isMerged ? username : <span style={{ opacity: '0.5' }}>{$t('unlinked')}</span>} <br />
+    <div className="section flex" style={{ marginBottom: 16, flexDirection: 'column' }}>
+      <div className="flex">
+        <div className="margin-right--20" style={{ width: '50px' }}>
+          <PlatformLogo className={css.platformLogo} size="medium" platform={platform} />
+        </div>
+
+        <div style={{ alignSelf: 'center' }}>
+          {platformName}
+          {isMerged ? (
+            usernameOrBlank
+          ) : (
+            <>
+              <br />
+              <span style={{ opacity: '0.5' }}>{$t('unlinked')}</span>
+              <br />
+            </>
+          )}
+        </div>
+
+        <div style={{ marginLeft: 'auto' }}>
+          {shouldShowConnectBtn && <ConnectButton />}
+          {shouldShowUnlinkBtn && (
+            <Button
+              danger
+              onClick={() => (isInstagram ? instagramUnlink() : platformUnlink(platform))}
+            >
+              {$t('Unlink')}
+            </Button>
+          )}
+          {shouldShowPrimaryBtn && (
+            <Tooltip
+              title={$t(
+                'You cannot unlink the platform you used to sign in to Streamlabs Desktop. If you want to unlink this platform, please sign in with a different platform.',
+              )}
+            >
+              <Button disabled={true} type="primary">
+                {$t('Logged in')}
+              </Button>
+            </Tooltip>
+          )}
+        </div>
       </div>
 
-      <div style={{ marginLeft: 'auto' }}>
-        {shouldShowConnectBtn && (
-          <span>
-            <Button
-              onClick={() => platformMerge(platform)}
-              style={{
-                backgroundColor: `var(--${platform})`,
-                borderColor: 'transparent',
-                color: platform === 'trovo' ? 'black' : 'inherit',
-              }}
-            >
-              {$t('Connect')}
-            </Button>
-          </span>
-        )}
-        {shouldShowUnlinkBtn && (
-          <Button danger onClick={() => platformUnlink(platform)}>
-            {$t('Unlink')}
-          </Button>
-        )}
-        {shouldShowPrimaryBtn && (
-          <Tooltip
-            title={$t(
-              'You cannot unlink the platform you used to sign in to Streamlabs Desktop. If you want to unlink this platform, please sign in with a different platform.',
-            )}
-          >
-            <Button disabled={true} type="primary">
-              {$t('Logged in')}
-            </Button>
-          </Tooltip>
-        )}
-      </div>
+      <ExtraFieldsSection />
     </div>
   );
 }

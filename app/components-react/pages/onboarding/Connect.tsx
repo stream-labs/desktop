@@ -73,7 +73,7 @@ export function Connect() {
   // streamlabs and trovo are added separarely on markup below
   const platforms = RecordingModeService.views.isRecordingModeEnabled
     ? ['youtube']
-    : ['twitch', 'youtube', 'facebook'];
+    : ['twitch', 'youtube', 'facebook', 'twitter'];
 
   const shouldAddTrovo = !RecordingModeService.views.isRecordingModeEnabled;
 
@@ -275,7 +275,7 @@ export class LoginModule {
 
     const result = await this.UserService.startAuth(
       platform,
-      ['youtube', 'twitch'].includes(platform) ? 'external' : 'internal',
+      ['youtube', 'twitch', 'twitter'].includes(platform) ? 'external' : 'internal',
       merge,
     );
 

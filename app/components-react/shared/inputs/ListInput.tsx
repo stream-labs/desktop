@@ -46,6 +46,8 @@ export type TListInputProps<TValue> = TSlobsInputProps<
  */
 export interface IListOption<TValue> {
   label: string;
+  /** The untranslated original label */
+  originalLabel?: string;
   value: TValue;
   description?: string;
   image?: string | ReactNode;
@@ -114,7 +116,7 @@ export function renderOption<T>(
 ) {
   const attrs = {
     'data-option-list': inputProps.name,
-    'data-option-label': opt.label,
+    'data-option-label': opt.originalLabel ?? opt.label,
     'data-option-value': opt.value,
     label: opt.label,
     value: (opt.value as unknown) as string,

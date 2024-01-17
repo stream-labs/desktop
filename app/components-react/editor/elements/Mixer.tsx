@@ -9,12 +9,14 @@ import { Services } from 'components-react/service-provider';
 import { Menu } from 'util/menus/Menu';
 import { $t } from 'services/i18n';
 
-export default function Mixer() {
+const mins = { x: 150, y: 120 };
+
+export function Mixer() {
   const { EditorCommandsService, AudioService, CustomizationService } = Services;
 
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const { renderElement } = useBaseElement(<Element />, { x: 150, y: 120 }, containerRef.current);
+  const { renderElement } = useBaseElement(<Element />, mins, containerRef.current);
 
   const needToRenderVolmeters: boolean = useMemo(() => {
     // render volmeters without hardware acceleration only if we don't have the webgl context
@@ -85,3 +87,5 @@ export default function Mixer() {
     </div>
   );
 }
+
+Mixer.mins = mins;

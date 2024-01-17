@@ -16,13 +16,15 @@ export default function SourceTag(p: {
   essential?: boolean;
   excludeWrap?: boolean;
 }) {
-  const {
-    inspectSource,
-    selectInspectedSource,
-    inspectedSource,
-    inspectedAppId,
-    inspectedAppSourceId,
-  } = useSourceShowcaseSettings();
+  const { inspectSource, selectInspectedSource, store } = useSourceShowcaseSettings();
+
+  const { inspectedSource, inspectedAppId, inspectedAppSourceId } = store.useState(s => {
+    return {
+      inspectedSource: s.inspectedSource,
+      inspectedAppId: s.inspectedAppId,
+      inspectedAppSourceId: s.inspectedAppSourceId,
+    };
+  });
   const { UserService } = Services;
   const { platform } = useVuex(() => ({ platform: UserService.views.platform?.type }));
 
@@ -46,9 +48,13 @@ export default function SourceTag(p: {
         onDoubleClick={() => selectInspectedSource()}
         data-name={displayData?.name || p.name}
       >
-        <i className={displayData?.icon} />
-        {displayData?.name || p.name}
-        {p.essential && <div style={{ opacity: '0.5' }}>{displayData?.shortDesc}</div>}
+        <div className={styles.iconWrapper}>
+          {displayData?.icon && <i className={displayData?.icon} />}
+        </div>
+        <div className={styles.displayName}>
+          {displayData?.name || p.name}
+          {p.essential && <div style={{ opacity: '0.5' }}>{displayData?.shortDesc}</div>}
+        </div>
       </div>
     </Col>
   );

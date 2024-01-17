@@ -57,7 +57,11 @@ export default class LiveDock extends Vue {
       return 'default';
     }
 
-    return this.chatApps.find(app => app.id === this.underlyingSelectedChat)
+    return this.chatApps.find(app => {
+      if (app.id === this.underlyingSelectedChat) {
+        return app.id === this.underlyingSelectedChat;
+      }
+    })
       ? this.underlyingSelectedChat
       : 'default';
   }
@@ -183,6 +187,10 @@ export default class LiveDock extends Vue {
     return this.userService.platform.type === 'trovo';
   }
 
+  get isTwitter() {
+    return this.userService.platform.type === 'twitter';
+  }
+
   get hideViewerCount() {
     return this.customizationService.state.hideViewerCount;
   }
@@ -262,6 +270,10 @@ export default class LiveDock extends Vue {
     return tabs;
   }
 
+  get isRestreaming() {
+    return this.restreamService.shouldGoLiveWithRestream;
+  }
+
   get isPopOutAllowed() {
     if (this.showDefaultPlatformChat) return false;
     if (this.selectedChat === 'restream') return false;
@@ -281,6 +293,9 @@ export default class LiveDock extends Vue {
   }
 
   get canEditChannelInfo(): boolean {
+    // Twitter doesn't support editing title after going live
+    if (this.isTwitter && !this.isRestreaming) return false;
+
     return (
       this.streamingService.views.isMidStreamMode ||
       this.userService.state.auth?.primaryPlatform === 'twitch'

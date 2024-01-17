@@ -93,6 +93,7 @@ export const windowsSources: TSourceType[] = [
   'soundtrack_source',
   'mediasoupconnector',
   'wasapi_process_output_capture',
+  'spout_capture',
 ];
 
 /**
@@ -387,6 +388,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
       this.usageStatisticsService.recordFeatureUsage('DisplayCapture');
     } else if (type === 'game_capture') {
       this.usageStatisticsService.recordFeatureUsage('GameCapture');
+    } else if (type === 'spout_capture') {
+      this.usageStatisticsService.recordFeatureUsage('SpoutCapture');
     }
 
     const managerKlass = PROPERTIES_MANAGER_TYPES[managerType];
@@ -581,6 +584,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       { description: 'Soundtrack source', value: 'soundtrack_source' },
       { description: 'Collab Cam', value: 'mediasoupconnector' },
       { description: 'Application Audio Capture (BETA)', value: 'wasapi_process_output_capture' },
+      { description: 'Spout2 capture', value: 'spout_capture' },
     ];
 
     const availableAllowlistedTypes = allowlistedTypes.filter(type =>

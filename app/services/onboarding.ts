@@ -31,7 +31,8 @@ enum EOnboardingSteps {
   ObsImport = 'ObsImport',
   HardwareSetup = 'HardwareSetup',
   ThemeSelector = 'ThemeSelector',
-  Optimize = 'Optimize',
+  // temporarily disable auto config until migrate to new api
+  // Optimize = 'Optimize',
   Prime = 'Prime',
   Tips = 'Tips',
 }
@@ -102,7 +103,7 @@ export const ONBOARDING_STEPS = () => ({
       ((isLoggedIn && platformSupportsThemes) || !isLoggedIn),
     isSkippable: true,
   },
-  // Temporarily skip auto config until migration to new API
+  // temporarily disable auto config until migrate to new api
   // [EOnboardingSteps.Optimize]: {
   //   component: 'Optimize' as const,
   //   disableControls: false,
@@ -184,7 +185,8 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
 
       return ONBOARDING_STEPS()[EOnboardingSteps.Connect];
     }
-    if (this.state.options.isOptimize) return ONBOARDING_STEPS()[EOnboardingSteps.Optimize];
+    // temporarily disable auto config until migrate to new api
+    // if (this.state.options.isOptimize) return ONBOARDING_STEPS()[EOnboardingSteps.Optimize];
     if (this.state.options.isHardware) return ONBOARDING_STEPS()[EOnboardingSteps.HardwareSetup];
     if (this.state.options.isImport) return ONBOARDING_STEPS()[EOnboardingSteps.ObsImport];
   }

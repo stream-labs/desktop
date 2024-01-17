@@ -2,6 +2,8 @@ import React, { HTMLAttributes } from 'react';
 import { TPlatform } from '../../services/platforms';
 import cx from 'classnames';
 import css from './PlatformLogo.m.less';
+import { Services } from 'components-react/service-provider';
+import { useVuex } from 'components-react/hooks';
 
 const sizeMap = {
   small: 14,
@@ -9,7 +11,7 @@ const sizeMap = {
 };
 
 interface IProps {
-  platform: TPlatform | 'nimotv' | 'dlive' | 'streamlabs';
+  platform: TPlatform | 'nimotv' | 'dlive' | 'instagram' | 'streamlabs';
   size?: keyof typeof sizeMap | number;
   color?: string;
   nocolor?: boolean;
@@ -18,6 +20,13 @@ interface IProps {
 }
 
 export default function PlatformLogo(p: IProps & HTMLAttributes<unknown>) {
+  const { CustomizationService } = Services;
+  const { isDark } = useVuex(() => {
+    return {
+      isDark: CustomizationService.views.isDarkTheme,
+    };
+  });
+
   function iconForPlatform() {
     return {
       twitch: 'fab fa-twitch',
@@ -27,7 +36,9 @@ export default function PlatformLogo(p: IProps & HTMLAttributes<unknown>) {
       trovo: 'fab fa-trovo',
       dlive: 'dlive',
       nimotv: 'nimotv',
+      twitter: 'twitter',
       streamlabs: 'icon-streamlabs',
+      instagram: 'fab fa-instagram',
     }[p.platform];
   }
   const size = p.size && (sizeMap[p.size] ?? p.size);
@@ -36,6 +47,14 @@ export default function PlatformLogo(p: IProps & HTMLAttributes<unknown>) {
     : undefined;
   const colorStyle = p.color ? { color: p.color } : undefined;
   const style = { ...sizeStyle, ...colorStyle };
+
+  let color = p.color;
+
+  // This might be a hack - but handle twitter logo for different themes
+  if (p.platform === 'twitter' && !isDark) {
+    color = 'black';
+  }
+
   return (
     <>
       {p.trovo ? (
@@ -45,6 +64,7 @@ export default function PlatformLogo(p: IProps & HTMLAttributes<unknown>) {
           className={cx(iconForPlatform(), !p.nocolor && css[p.platform], p.className, {
             // Trovo doesn't provide an SVG, so just use different colored PNGs
             [css['trovo--black']]: p.platform === 'trovo' && p.color === 'black',
+            [css['twitter--black']]: p.platform === 'twitter' && color === 'black',
           })}
           style={style}
         />
