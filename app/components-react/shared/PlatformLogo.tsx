@@ -38,7 +38,7 @@ export default function PlatformLogo(p: IProps & HTMLAttributes<unknown>) {
       nimotv: 'nimotv',
       twitter: 'twitter',
       streamlabs: 'icon-streamlabs',
-      instagram: 'fab fa-instagram',
+      instagram: 'instagram',
     }[p.platform];
   }
   const size = p.size && (sizeMap[p.size] ?? p.size);
