@@ -6,10 +6,10 @@ import { WidgetType } from '../widgets';
 import { getDefined } from '../../util/properties-type-guards';
 import { TDisplayType } from 'services/settings-v2';
 import { TOutputOrientation } from 'services/restream';
-
 export interface ITiktokStartStreamOptions {
   serverUrl: string;
   streamKey: string;
+  canStream: boolean;
   mode?: TOutputOrientation;
 }
 
@@ -77,10 +77,12 @@ export class TiktokService
 
   async putChannelInfo(): Promise<void> {
     // no API
+    // @@@ TODO: what channel info do we want to add?
   }
 
   get chatUrl(): string {
     // no API
+    // @@@ TODO: we need the chat url
     return '';
   }
 

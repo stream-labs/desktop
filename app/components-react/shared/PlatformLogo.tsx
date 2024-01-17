@@ -32,7 +32,7 @@ export default function PlatformLogo(p: IProps & HTMLAttributes<unknown>) {
       twitch: 'fab fa-twitch',
       youtube: 'fab fa-youtube',
       facebook: 'fab fa-facebook',
-      tiktok: 'fab fa-tiktok',
+      tiktok: 'tiktok',
       trovo: 'fab fa-trovo',
       dlive: 'dlive',
       nimotv: 'nimotv',
@@ -50,8 +50,8 @@ export default function PlatformLogo(p: IProps & HTMLAttributes<unknown>) {
 
   let color = p.color;
 
-  // This might be a hack - but handle twitter logo for different themes
-  if (p.platform === 'twitter' && !isDark) {
+  // This might be a hack - but handle twitter and tiktok logo for different themes
+  if (['twitter', 'tiktok'].includes(p.platform) && !isDark) {
     color = 'black';
   }
 
@@ -65,6 +65,7 @@ export default function PlatformLogo(p: IProps & HTMLAttributes<unknown>) {
             // Trovo doesn't provide an SVG, so just use different colored PNGs
             [css['trovo--black']]: p.platform === 'trovo' && p.color === 'black',
             [css['twitter--black']]: p.platform === 'twitter' && color === 'black',
+            [css['tiktok--black']]: p.platform === 'tiktok' && color === 'black',
           })}
           style={style}
         />

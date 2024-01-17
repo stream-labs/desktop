@@ -192,10 +192,54 @@ export function Connect() {
             </div>
           </>
         )}
-      </div>
-      <div className={styles.svgBackgrounds}>
-        <SVGOvalLeftBackground />
-        <SVGOvalRightBackground />
+        <div className={styles.signupButtons}>
+          {platforms.map((platform: TPlatform) => (
+            <button
+              className={cx(`button button--${platform}`, styles.loginButton)}
+              disabled={loading || authInProgress}
+              onClick={() => authPlatform(platform, afterLogin)}
+              key={platform}
+            >
+              {loading && <i className="fas fa-spinner fa-spin" />}
+              {!loading && (
+                <PlatformLogo
+                  platform={platform}
+                  size="medium"
+                  color={platform === 'trovo' ? 'black' : 'white'}
+                />
+              )}
+            </button>
+          ))}
+        </div>
+        <p className={styles['select-another']}> {$t('or select another platform')} </p>
+        <Form layout="inline" style={{ width: 300 }}>
+          <ListInput
+            style={{ width: '100%' }}
+            placeholder={$t('Select platform')}
+            onChange={onSelectExtraPlatform}
+            allowClear={true}
+            value={selectedExtraPlatform}
+            hasImage={true}
+            options={[
+              {
+                value: 'dlive',
+                label: 'Dlive',
+                image: require('../../../../media/images/platforms/dlive-logo-small.png'),
+              },
+              {
+                value: 'nimotv',
+                label: 'NimoTV',
+                image: require('../../../../media/images/platforms/nimo-logo-small.png'),
+              },
+            ]}
+          />
+        </Form>
+        <p>
+          <br />
+          <span className={styles['link-button']} onClick={onSkip}>
+            {$t('Skip')}
+          </span>
+        </p>
       </div>
     </div>
   );

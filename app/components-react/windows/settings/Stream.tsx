@@ -143,11 +143,6 @@ class StreamSettingsModule {
 
   get platforms() {
     return this.streamingView.allPlatforms.filter(platform => {
-      // Only show tiktok if it's already linked
-      if (platform === 'tiktok') {
-        return !!this.userService.views.auth?.platforms?.tiktok;
-      }
-
       return true;
     });
   }
@@ -426,6 +421,7 @@ function Platform(p: { platform: TPlatform }) {
     <span>
       <Button
         onClick={isInstagram ? instagramConnect : () => platformMerge(platform)}
+        className={cx({ [css.tiktokConnectBtn]: platform === 'tiktok' })}
         style={{
           backgroundColor: `var(--${platform})`,
           borderColor: 'transparent',

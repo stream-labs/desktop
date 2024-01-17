@@ -21,7 +21,7 @@ export function PrimaryPlatformSelect() {
     isLogin: OnboardingService.state.options.isLogin,
   }));
   const { loading, authInProgress, authPlatform, finishSLAuth } = useModule(LoginModule);
-  const platforms = ['twitch', 'youtube', 'facebook', 'trovo', 'twitter'];
+  const platforms = ['twitch', 'youtube', 'facebook', 'twitter', 'tiktok', 'trovo'];
   const platformOptions = [
     {
       value: 'twitch',
@@ -47,6 +47,11 @@ export function PrimaryPlatformSelect() {
       value: 'twitter',
       label: 'X (Twitter)',
       image: <PlatformLogo platform="twitter" size={14} />,
+    },
+    {
+      value: 'tiktok',
+      label: 'Tiktok',
+      image: <PlatformLogo platform="tiktok" size={14} />,
     },
   ].filter(opt => {
     return linkedPlatforms.includes(opt.value as TPlatform);
