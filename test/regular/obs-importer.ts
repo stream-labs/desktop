@@ -47,11 +47,12 @@ test('OBS Importer', async t => {
 
   if (!(await isDisplayed('h2=Live Streaming'))) return;
   await click('h2=Live Streaming');
+  await click('h2=Advanced');
   await click('button=Continue');
 
   await logIn(t, 'twitch', { prime: false }, false, true);
   await sleep(1000);
-  await (await t.context.app.client.$('span=Skip')).click();
+  await click('button=Skip');
 
   // import from OBS
   await click('div=Import from OBS Studio');
