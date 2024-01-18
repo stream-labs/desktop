@@ -58,11 +58,8 @@ test('OBS Importer', async t => {
   await click('div=Import from OBS Studio');
   await click('div=Start');
 
-  // auto config
-  // temporarily disable auto config until migrate to new api
-  // await waitForDisplayed('h1=Optimize');
-  // await (await t.context.app.client.$('button=Skip')).click();
-  await (await t.context.app.client.$('div=Choose Starter')).click();
+  // skip Ultra
+  await click('button=Skip');
 
   await waitForDisplayed('[data-name=SceneSelector]');
 

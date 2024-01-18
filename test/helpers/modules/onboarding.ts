@@ -1,6 +1,7 @@
 import { click, clickButton, clickIfDisplayed, isDisplayed, useMainWindow } from './core';
 
 export async function skipOnboarding() {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   await useMainWindow(async () => {
     if (!(await isDisplayed('h2=Live Streaming'))) return;
     // Uses advanced onboarding
