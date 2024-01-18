@@ -430,6 +430,9 @@
         "description": "ランダムで設定して生成します"
       }
     },
+    "preset":{
+      "description": "ヘルプ1"
+    },
     "pitch_shift": {
       "name": "声の高さ"
     },

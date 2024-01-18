@@ -1,6 +1,6 @@
 
 <template>
-  <div class="modal-layout">
+  <div id="mainWrapper" class="modal-layout">
     <div class="tab">
       <button class="item" :class="{ 'active': tab == 0 }" @click="onTab(0)">
         {{ $t('source-props.nair-rtvc-source.nav.voice_setting') }}</button>
@@ -58,9 +58,7 @@
             <div class="input-label">
               <div style="display: flex;">
                 <label>{{ $t('source-props.nair-rtvc-source.pitch_shift.name') }} </label>
-                <i class="icon-help icon-btn tooltip1" style="color:var(--color-button-primary)">
-                  <div class="tooltip1_text">ヘルプ</div>
-                </i>
+                <i class="icon-help icon-btn" v-tooltip.top="$t('source-props.nair-rtvc-source.preset.description')"></i>
               </div>
               <label> {{ pitchShift.toFixed(0) + ' cent' }} </label>
             </div>
@@ -91,10 +89,10 @@
                   $t('source-props.nair-rtvc-source.container.voice_setting') }} </div>
                 <button class="button-inline" @click="onRandom">{{
                   $t('source-props.nair-rtvc-source.container.make_random.name') }} </button>
-                <i class="icon-help icon-btn tooltip1" style="color:var(--color-button-primary)">
-                  <div class="tooltip1_text" style="left: -200px;">
-                    {{ $t('source-props.nair-rtvc-source.container.make_random.description') }}</div>
-                </i>
+
+                <i class="icon-help icon-btn"
+                  v-tooltip.top="$t('source-props.nair-rtvc-source.container.make_random.description')"></i>
+
               </div>
 
               <div class="input-label">
@@ -121,9 +119,8 @@
                 <div class="input-label">
                   <div style="display: flex;">
                     <label>{{ $t('source-props.nair-rtvc-source.amount.name') }}</label>
-                    <i class="icon-help icon-btn tooltip1" style="color:var(--color-button-primary)">
-                      <div class="tooltip1_text">{{ $t('source-props.nair-rtvc-source.amount.description') }}</div>
-                    </i>
+                    <i class="icon-help icon-btn"
+                      v-tooltip.top="$t('source-props.nair-rtvc-source.amount.description')"></i>
                   </div>
                   <label> {{ amount.toFixed(0) + '%' }}</label>
                 </div>
@@ -346,33 +343,6 @@
   color: var(--color-button-primary);
   white-space: nowrap;
 }
-
-.tooltip1 {
-  position: relative;
-  display: inline-block;
-  cursor: pointer;
-}
-
-.tooltip1_text {
-  position: absolute;
-  z-index: 10;
-  display: none;
-  width: 200px;
-  padding: 8px 12px;
-  font-size: @font-size2;
-  color: var(--color-tooltip-text);
-  word-wrap: break-word;
-  background-color: var(--color-tooltip-bg);
-  border: 1px solid var(--color-tooltip-border);
-
-  .shadow;
-  .radius;
-}
-
-.tooltip1:hover .tooltip1_text {
-  display: block;
-}
-
 
 .preset-bg {
   height: 350px;

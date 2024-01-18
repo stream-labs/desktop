@@ -55,15 +55,13 @@ export default class RtvcSourceProperties extends SourceProperties {
     @Inject() rtvcStateService: RtvcStateService
     @Inject() audioService: AudioService;
 
-    advancedSettingsTooltip = 'audio.advancedSettingsTooltip';
-
     readonly manualMax = 5
 
     readonly presetValues = [
         { index: 'preset/0', name: "琴詠ニア", image: "preset-bg0", icon: "icon-0", pitchShift: 0, primaryVoice: 100, secondaryVoice: -1, amount: 0 },
         { index: 'preset/1', name: "ずんだもん", image: "preset-bg1", icon: "icon-0", pitchShift: 0, primaryVoice: 101, secondaryVoice: -1, amount: 0 },
         { index: 'preset/2', name: "春日部つむぎ", image: "preset-bg2", icon: "icon-0", pitchShift: 0, primaryVoice: 102, secondaryVoice: -1, amount: 0 },
-        //仮値 "../../../media/images/nvoice.png" だがvueがpath変換するので
+        //仮値 css での宣言値で
     ]
 
     // default
