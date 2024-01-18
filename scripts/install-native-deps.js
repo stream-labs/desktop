@@ -73,10 +73,10 @@ async function rtvc(){
   // cwd is node_modules
   console.log('copy rtvc');
   const name = 'nair-rtvc'
-  const zip = path.join(process.cwd(), `${name}.zip`);
+  const zip = path.join(process.cwd(), `${name}.tar.gz`);
   console.log(zip)
 
-  sh.cp('../nair-rtvc.zip',zip) // await downloadFile(url,zip)
+  sh.cp('../nair-rtvc.tar.gz',zip) // 実際はURLでのダウンロードで先に配置 await downloadFile(url,zip)
   executeCmd(`tar -xzvf ${zip}`, { silent: true });
   sh.cp('-R',`./${name}/*`, 'obs-studio-node/obs-plugins/64bit/');
   sh.rm(zip)
