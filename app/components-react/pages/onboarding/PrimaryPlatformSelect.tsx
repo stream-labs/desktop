@@ -50,7 +50,7 @@ export function PrimaryPlatformSelect() {
     },
     {
       value: 'tiktok',
-      label: 'Tiktok',
+      label: 'TikTok',
       image: <PlatformLogo platform="tiktok" size={14} />,
     },
   ].filter(opt => {

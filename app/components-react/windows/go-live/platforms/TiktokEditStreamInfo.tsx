@@ -8,7 +8,7 @@ import InputWrapper from '../../../shared/inputs/InputWrapper';
 import { IPlatformComponentParams } from './PlatformSettingsLayout';
 import * as remote from '@electron/remote';
 
-export function TiktokEditStreamInfo(p: IPlatformComponentParams<'tiktok'>) {
+export function TikTokEditStreamInfo(p: IPlatformComponentParams<'tiktok'>) {
   const bind = createBinding(p.value, updatedSettings =>
     p.onChange({ ...p.value, ...updatedSettings }),
   );

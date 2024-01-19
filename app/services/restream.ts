@@ -10,7 +10,7 @@ import { IncrementalRolloutService } from './incremental-rollout';
 import electron from 'electron';
 import { StreamingService } from './streaming';
 import { FacebookService } from './platforms/facebook';
-import { TiktokService } from './platforms/tiktok';
+import { TikTokService } from './platforms/tiktok';
 import { TrovoService } from './platforms/trovo';
 import * as remote from '@electron/remote';
 import { VideoSettingsService, TDisplayType } from './settings-v2/video';
@@ -52,7 +52,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
   @Inject() streamingService: StreamingService;
   @Inject() incrementalRolloutService: IncrementalRolloutService;
   @Inject() facebookService: FacebookService;
-  @Inject() tiktokService: TiktokService;
+  @Inject() tiktokService: TikTokService;
   @Inject() trovoService: TrovoService;
   @Inject() instagramService: InstagramService;
   @Inject() videoSettingsService: VideoSettingsService;

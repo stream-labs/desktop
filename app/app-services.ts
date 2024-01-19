@@ -67,7 +67,7 @@ export { YoutubeService } from 'services/platforms/youtube';
 export { TwitchService } from 'services/platforms/twitch';
 export { TwitchTagsService } from 'services/platforms/twitch/index';
 export { FacebookService } from 'services/platforms/facebook';
-export { TiktokService } from 'services/platforms/tiktok';
+export { TikTokService } from 'services/platforms/tiktok';
 export { TrovoService } from 'services/platforms/trovo';
 export { RestreamService } from 'services/restream';
 export { TwitterService } from 'services/integrations/twitter';
