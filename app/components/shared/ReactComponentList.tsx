@@ -111,7 +111,6 @@ export class Loader extends ReactComponent {}
   props: {
     name: { default: 'Main' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
-    componentProps: { default: () => ({ bulkLoadFinished: false, i18nReady: false }) },
   },
 })
 export class Main extends ReactComponent {}

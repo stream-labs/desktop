@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import fs from 'fs';
 import * as remote from '@electron/remote';
 import cx from 'classnames';
@@ -20,6 +20,7 @@ import antdThemes from 'styles/antd/index';
 import { getPlatformService } from 'services/platforms';
 import { IModalOptions } from 'services/windows';
 import styles from './Main.m.less';
+import { StatefulService } from 'services';
 
 const MainCtx = React.createContext<MainController | null>(null);
 
@@ -240,17 +241,26 @@ class MainController {
   }
 }
 
-export default function MainWithContext(p: { bulkLoadFinished: boolean; i18nReady: boolean }) {
+export default function MainWithContext() {
   const controller = useMemo(() => new MainController(), []);
   return (
     <MainCtx.Provider value={controller}>
-      <Main {...p} />
+      <Main />
     </MainCtx.Provider>
   );
 }
 
-function Main(p: { bulkLoadFinished: boolean; i18nReady: boolean }) {
+function Main() {
   const ctrl = useController(MainCtx);
+
+  const mainWindowEl = useRef<HTMLDivElement | null>(null);
+  const mainMiddleEl = useRef<HTMLDivElement | null>(null);
+
+  const [bulkLoadFinished, setBulkLoadFinished] = useState(false);
+  const [i18nReady, seti18nReady] = useState(false);
+
+  const uiReady = bulkLoadFinished && i18nReady;
+
   const {
     theme,
     dockWidth,
@@ -268,7 +278,7 @@ function Main(p: { bulkLoadFinished: boolean; i18nReady: boolean }) {
     mainResponsiveClasses,
     hideStyleBlockers,
   } = useVuex(() => ({
-    theme: ctrl.theme(p.bulkLoadFinished),
+    theme: ctrl.theme(bulkLoadFinished),
     dockWidth: ctrl.dockWidth,
     showLoadingSpinner: ctrl.showLoadingSpinner,
     errorAlert: ctrl.errorAlert,
@@ -285,10 +295,14 @@ function Main(p: { bulkLoadFinished: boolean; i18nReady: boolean }) {
     hideStyleBlockers: ctrl.hideStyleBlockers,
   }));
 
-  const uiReady = p.bulkLoadFinished && p.i18nReady;
+  useEffect(() => {
+    const unsubscribe = StatefulService.store.subscribe((_, state) => {
+      if (state.bulkLoadFinished) setBulkLoadFinished(true);
+      if (state.i18nReady) seti18nReady(true);
+    });
 
-  const mainWindowEl = useRef<HTMLDivElement | null>(null);
-  const mainMiddleEl = useRef<HTMLDivElement | null>(null);
+    return unsubscribe;
+  }, []);
 
   function windowSizeHandler() {
     if (!hideStyleBlockers) {
@@ -375,7 +389,6 @@ function Main(p: { bulkLoadFinished: boolean; i18nReady: boolean }) {
         {page !== 'Onboarding' && !showLoadingSpinner && <SideNav />}
         {renderDock && leftDock && (
           <div className={styles.liveDockWrapper}>
-            <LiveDock onLeft />
             {!isDockCollapsed && (
               <ResizeBar
                 className={cx(styles.liveDockResizeBar, styles.liveDockResizeBarLeft)}
@@ -384,7 +397,9 @@ function Main(p: { bulkLoadFinished: boolean; i18nReady: boolean }) {
                 max={maxDockWidth}
                 min={minDockWidth}
                 value={liveDockSize}
-              />
+              >
+                <LiveDock onLeft />
+              </ResizeBar>
             )}
           </div>
         )}
@@ -410,9 +425,10 @@ function Main(p: { bulkLoadFinished: boolean; i18nReady: boolean }) {
                 max={maxDockWidth}
                 min={minDockWidth}
                 value={liveDockSize}
-              />
+              >
+                <LiveDock />
+              </ResizeBar>
             )}
-            <LiveDock />
           </div>
         )}
       </div>
