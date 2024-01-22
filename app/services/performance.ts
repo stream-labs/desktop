@@ -1,22 +1,20 @@
 import Vue from 'vue';
-import { Subject, Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 import electron from 'electron';
 import * as obs from '../../obs-api';
-import { StatefulService, mutation, Service, Inject } from 'services';
+import { Service, Inject } from 'services';
 import { throttle } from 'lodash-decorators';
 import {
   NotificationsService,
   ENotificationType,
   ENotificationSubType,
 } from 'services/notifications';
-import { ServicesManager } from '../services-manager';
 import { JsonrpcService } from './api/jsonrpc';
 import { TroubleshooterService, TIssueCode } from 'services/troubleshooter';
 import { $t } from 'services/i18n';
 import { StreamingService, EStreamingState } from 'services/streaming';
 import { VideoSettingsService } from 'services/settings-v2/video';
 import { UsageStatisticsService } from './usage-statistics';
-import { ViewHandler } from './core';
 import { RealmObject } from './realm';
 
 interface IPerformanceState {
@@ -33,55 +31,44 @@ interface IPerformanceState {
   frameRate: number;
 }
 
-export class PerformanceState extends RealmObject implements IPerformanceState {
-  CPU: number;
-  numberDroppedFrames: number;
-  percentageDroppedFrames: number;
-  numberSkippedFrames: number;
-  percentageSkippedFrames: number;
-  numberLaggedFrames: number;
-  percentageLaggedFrames: number;
-  numberEncodedFrames: number;
-  numberRenderedFrames: number;
-  streamingBandwidth: number;
-  frameRate: number;
+export enum EStreamQuality {
+  GOOD = 'GOOD',
+  FAIR = 'FAIR',
+  POOR = 'POOR',
+}
 
-  static schema = {
-    name: 'PerformanceState',
-    properties: {
-      CPU: { type: 'double', default: 0 },
-      numberDroppedFrames: { type: 'double', default: 0 },
-      percentageDroppedFrames: { type: 'double', default: 0 },
-      numberSkippedFrames: { type: 'double', default: 0 },
-      percentageSkippedFrames: { type: 'double', default: 0 },
-      numberLaggedFrames: { type: 'double', default: 0 },
-      percentageLaggedFrames: { type: 'double', default: 0 },
-      numberEncodedFrames: { type: 'double', default: 0 },
-      numberRenderedFrames: { type: 'double', default: 0 },
-      streamingBandwidth: { type: 'double', default: 0 },
-      frameRate: { type: 'double', default: 0 },
-    },
-  };
+const injectState = RealmObject.build('PerformanceState', {
+  CPU: 0,
+  numberDroppedFrames: 0,
+  percentageDroppedFrames: 0,
+  numberSkippedFrames: 0,
+  percentageSkippedFrames: 0,
+  numberLaggedFrames: 0,
+  percentageLaggedFrames: 0,
+  numberEncodedFrames: 0,
+  numberRenderedFrames: 0,
+  streamingBandwidth: 0,
+  frameRate: 0,
 
   get cpuPercent() {
     return this.CPU.toFixed(1);
-  }
+  },
 
   get frameRateFixed() {
     return this.frameRate.toFixed(2);
-  }
+  },
 
   get droppedFrames() {
     return this.numberDroppedFrames;
-  }
+  },
 
   get percentDropped() {
     return (this.percentageDroppedFrames || 0).toFixed(1);
-  }
+  },
 
   get bandwidth() {
     return this.streamingBandwidth.toFixed(0);
-  }
+  },
 
   get streamQuality() {
     if (
@@ -99,10 +86,8 @@ export class PerformanceState extends RealmObject implements IPerformanceState {
       return EStreamQuality.FAIR;
     }
     return EStreamQuality.GOOD;
-  }
-}
-
-PerformanceState.register();
+  },
+});
 
 interface INextStats {
   framesSkipped: number;
@@ -112,12 +97,6 @@ interface INextStats {
   framesRendered: number;
   laggedFactor: number;
   droppedFramesFactor: number;
-}
-
-export enum EStreamQuality {
-  GOOD = 'GOOD',
-  FAIR = 'FAIR',
-  POOR = 'POOR',
 }
 
 // How frequently parformance stats should be updated
@@ -145,21 +124,7 @@ export class PerformanceService extends Service {
   @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject() private videoSettingsService: VideoSettingsService;
 
-  state = PerformanceState.inject();
-
-  static initialState: IPerformanceState = {
-    CPU: 0,
-    numberDroppedFrames: 0,
-    percentageDroppedFrames: 0,
-    numberSkippedFrames: 0,
-    percentageSkippedFrames: 0,
-    numberLaggedFrames: 0,
-    percentageLaggedFrames: 0,
-    numberEncodedFrames: 0,
-    numberRenderedFrames: 0,
-    streamingBandwidth: 0,
-    frameRate: 0,
-  };
+  state = injectState();
 
   private historicalDroppedFrames: number[] = [];
   private historicalSkippedFrames: number[] = [];
@@ -419,6 +384,5 @@ export class PerformanceService extends Service {
 
   stop() {
     this.shutdown = true;
-    this.setStats(PerformanceService.initialState);
   }
 }
