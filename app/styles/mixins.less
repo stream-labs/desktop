@@ -117,7 +117,7 @@
   color: var(--color-text);
   transition: all 275ms;
 
-  &:hover {
+  &:not(.disabled):hover {
     color: var(--color-text-light);
   }
 }
@@ -369,7 +369,7 @@
     > * {
       width: 100%;
       padding: 0 16px;
-      font-size: @font-size2;
+      font-size: @font-size4;
       line-height: 32px;
     }
 
@@ -378,6 +378,14 @@
       &:not(:disabled):hover {
         color: var(--color-text-light);
         background-color: var(--color-bg-active);
+      }
+
+      &.text--red {
+        color: var(--color-red-light);
+
+        &:hover {
+          color: var(--color-red-light);
+        }
       }
     }
 

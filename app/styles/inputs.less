@@ -85,10 +85,11 @@ textarea {
   width: 45%;
   margin-bottom: 16px;
   font-size: @font-size4;
-  font-weight: @font-weight-bold;
 
   label {
-    line-height: inherit;
+    display: flex;
+    align-items: center;
+    line-height: 1.5;
     color: var(--color-text-light);
   }
 }
@@ -257,6 +258,11 @@ textarea {
       background-color: var(--color-primary);
     }
   }
+}
+
+.toggle-wrapper {
+  display: flex;
+  align-items: center;
 }
 
 .multiselect {
