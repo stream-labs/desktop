@@ -286,14 +286,6 @@ export class RealmObject {
   }
 }
 
-type TMethodObjectMethod<TState> = (
-  this: TState & RealmObject & TMethodObjectMethod<TState>,
-) => any;
-
-type TMethodObject<TState> = {
-  [method: string]: TMethodObjectMethod<TState>;
-};
-
 type DynamicRealmObject<TInit extends object> = RealmObject & TInit;
 
 interface IRealmOptions {
