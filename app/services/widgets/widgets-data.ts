@@ -486,7 +486,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
 export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisplayData } => ({
   [WidgetType.AlertBox]: {
-    name: $t('Alertbox'),
+    name: $t('Alert Box'),
     description: $t('Thanks viewers with notification popups.'),
     demoVideo: false,
     demoFilename: 'source-alertbox.png',
@@ -578,7 +578,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     icon: 'fas fa-ellipsis-h',
   },
   [WidgetType.ChatBox]: {
-    name: $t('Chatbox'),
+    name: $t('Chat Box'),
     description: $t("Include your channel's chat into your stream."),
     demoVideo: false,
     demoFilename: 'source-chatbox.png',
