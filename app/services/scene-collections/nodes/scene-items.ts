@@ -75,7 +75,6 @@ export class SceneItemsNode extends Node<ISchema, {}> {
           const display =
             sceneItem?.display ??
             this.dualOutputService.views.getNodeDisplay(sceneItem.sceneItemId, sceneItem.sceneId);
-          const context = this.videoSettingsService.contexts[display];
 
           hotkeys.save({ sceneItemId: sceneItem.sceneItemId }).then(() => {
             const transform = sceneItem.transform;
@@ -101,9 +100,14 @@ export class SceneItemsNode extends Node<ISchema, {}> {
             });
           });
         } else {
+          const display =
+            sceneItem?.display ??
+            this.dualOutputService.views.getNodeDisplay(sceneItem.id, sceneItem.sceneId);
+
           resolve({
             ...sceneItem.getModel(),
             childrenIds: sceneItem.childrenIds,
+            display,
           });
         }
       });
