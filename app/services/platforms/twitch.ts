@@ -199,16 +199,6 @@ export class TwitchService
   }
 
   async validatePlatform() {
-    const hasScopeCheck = this.hasScope('channel_read')
-      .then(result => {
-        if (!result) return EPlatformCallResult.TwitchScopeMissing;
-        return EPlatformCallResult.Success;
-      })
-      .catch(e => {
-        console.error('Error checking Twitch OAuth scopes', e);
-        return EPlatformCallResult.Error;
-      });
-
     const twitchTwoFactorCheck = this.fetchStreamKey()
       .then(key => {
         return EPlatformCallResult.Success;
@@ -223,7 +213,7 @@ export class TwitchService
         return EPlatformCallResult.Error;
       });
 
-    const results = await Promise.all([hasScopeCheck, twitchTwoFactorCheck]);
+    const results = await Promise.all([twitchTwoFactorCheck]);
     const failedResults = results.filter(result => result !== EPlatformCallResult.Success);
     if (failedResults.length) return failedResults[0];
     return EPlatformCallResult.Success;
