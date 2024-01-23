@@ -420,7 +420,8 @@
       "original_voice": "Originals",
       "remove_voice": "remove",
       "copy_voice": "copy",
-      "check_voice": "Check Voice"
+      "check_voice": "Check Voice",
+      "original_voice_add": "オリジナルボイスを登録"
     },
     "container": {
       "voice_name": "Name",
@@ -430,7 +431,7 @@
         "description": "ランダムで設定して生成します"
       }
     },
-    "preset":{
+    "preset": {
       "description": "ヘルプ1"
     },
     "pitch_shift": {
@@ -453,8 +454,8 @@
       "name": "入力デバイス(要翻訳)"
     },
     "latency": {
-      "name": "遅延(要翻訳)",
-      "1": "1:低遅延(不安定になるかもれません)(要翻訳)",
+      "name": "遅延",
+      "1": "1:変換時間が短い（出力が不安定になる場合があります）",
       "2": "2",
       "3": "3",
       "4": "4",
@@ -466,7 +467,8 @@
       "10": "10",
       "11": "11",
       "12": "12",
-      "13": "13:高遅延(安定)(要翻訳)"
+      "13": "13:変換時間が長い（出力が安定します）",
+      "description": "この値が小さいほど変換時間が短くなりますが、出力が不安定になることがあります"
     }
   },
   "vlc_source": {
