@@ -30,11 +30,16 @@ import { getResource } from 'services';
 import * as obs from '../obs-api';
 import path from 'path';
 import util from 'util';
-import { Loader, Blank, Main } from 'components/shared/ReactComponentList';
+import { Loader, Blank } from 'components/shared/ReactComponentList';
 import process from 'process';
 import { MetricsService } from 'services/metrics';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import * as remote from '@electron/remote';
+
+// For React Windows
+import React from 'react';
+import ReactDOM from 'react-dom';
+import Main from 'components-react/windows/Main';
 
 const { ipcRenderer } = electron;
 const slobsVersion = Utils.env.SLOBS_VERSION;
@@ -330,42 +335,54 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // create a root Vue component
   const windowId = Utils.getCurrentUrlParams().windowId;
-  const vm = new Vue({
-    i18n,
-    store,
-    el: '#app',
-    data: { isRefreshing: false },
-    methods: {
-      // refresh current window
-      startWindowRefresh() {
-        // set isRefreshing to true to unmount all components and destroy Displays
-        this.isRefreshing = true;
 
-        // unregister current window from the crash handler
-        ipcRenderer.send('unregister-in-crash-handler', { pid: process.pid });
+  if (windowId !== 'main') {
+    // create a root Vue component
+    const vm = new Vue({
+      i18n,
+      store,
+      el: '#app',
+      data: { isRefreshing: false },
+      methods: {
+        // refresh current window
+        startWindowRefresh() {
+          // set isRefreshing to true to unmount all components and destroy Displays
+          this.isRefreshing = true;
 
-        // give the window some time to finish unmounting before reload
-        Utils.sleep(100).then(() => {
-          window.location.reload();
-        });
+          // unregister current window from the crash handler
+          ipcRenderer.send('unregister-in-crash-handler', { pid: process.pid });
+
+          // give the window some time to finish unmounting before reload
+          Utils.sleep(100).then(() => {
+            window.location.reload();
+          });
+        },
       },
-    },
-    render(h) {
-      if (this.isRefreshing) return h(Blank);
-      if (windowId === 'worker') return h(Blank);
-      if (windowId === 'child') {
-        if (store.state.bulkLoadFinished && store.state.i18nReady) {
-          return h(ChildWindow);
-        }
+      render(h) {
+        if (this.isRefreshing) return h(Blank);
+        if (windowId === 'worker') return h(Blank);
+        if (windowId === 'child') {
+          if (store.state.bulkLoadFinished && store.state.i18nReady) {
+            return h(ChildWindow);
+          }
 
-        return h(Loader);
-      }
-      if (windowId === 'main') return h(Main);
-      return h(OneOffWindow);
-    },
-  });
+          return h(Loader);
+        }
+        return h(OneOffWindow);
+      },
+    });
+
+    // allow to refresh the window by pressing `F5` in the DevMode
+    if (Utils.isDevMode()) {
+      window.addEventListener('keyup', ev => {
+        if (ev.key === 'F5') vm.startWindowRefresh();
+      });
+    }
+  } else {
+    // create a roote React component
+    ReactDOM.render(React.createElement(Main), document.getElementById('app'));
+  }
 
   let mainWindowShowTime = 0;
   if (Utils.isMainWindow()) {
@@ -392,13 +409,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       const ctx = userService.getSentryContext();
       if (ctx) setSentryContext(ctx);
       userService.sentryContext.subscribe(setSentryContext);
-    }
-
-    // allow to refresh the window by pressing `F5` in the DevMode
-    if (Utils.isDevMode()) {
-      window.addEventListener('keyup', ev => {
-        if (ev.key === 'F5') vm.startWindowRefresh();
-      });
     }
   });
 });

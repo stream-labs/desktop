@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { ReactElement, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import fs from 'fs';
 import * as remote from '@electron/remote';
 import cx from 'classnames';
@@ -241,7 +241,7 @@ class MainController {
   }
 }
 
-export default function MainWithContext() {
+export default function MainWithContext(): ReactElement<{}> {
   const controller = useMemo(() => new MainController(), []);
   return (
     <MainCtx.Provider value={controller}>
@@ -371,6 +371,8 @@ function Main() {
     onTotalWidth: (width: number) => void;
   }> = appPages[page];
 
+  console.log(uiReady);
+
   return (
     <div
       className={cx(styles.main, theme)}
@@ -433,7 +435,7 @@ function Main() {
         )}
       </div>
       <ModalWrapper renderFn={ctrl.modalOptions.renderFn} />
-      <Animation transitionName="antd-fade">
+      <Animation transitionName="ant-fade">
         {(!uiReady || showLoadingSpinner) && (
           <div className={cx(styles.mainLoading, { [styles.initialLoading]: !uiReady })}>
             <Loader />
