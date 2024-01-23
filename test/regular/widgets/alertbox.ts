@@ -16,9 +16,9 @@ import { sleep } from '../../helpers/sleep';
 
 useWebdriver({ pauseIfFailed: false });
 
-test('AlertBox for Twitch', t => testAlertbox(t, 'twitch'));
-test('AlertBox for YouTube', t => testAlertbox(t, 'youtube'));
-test('AlertBox for Facebook', t => testAlertbox(t, 'facebook'));
+test('Alert Box for Twitch', t => testAlertbox(t, 'twitch'));
+test('Alert Box for YouTube', t => testAlertbox(t, 'youtube'));
+test('Alert Box for Facebook', t => testAlertbox(t, 'facebook'));
 
 const commonAlerts = ['Donation', 'Merch'];
 
@@ -40,7 +40,7 @@ async function testAlertbox(t: TExecutionContext, platform: TPlatform) {
 
   // create alertbox
   await enableNewAlertbox();
-  await addSource('Alertbox', 'Alertbox');
+  await addSource('Alert Box', 'Alert Box');
   await sleep(500);
   await openAlertboxSettings();
 
@@ -94,7 +94,7 @@ async function testDonationAlert() {
 
 async function openAlertboxSettings() {
   await focusMain();
-  await openSourceProperties('Alertbox');
+  await openSourceProperties('Alert Box');
   await focusChild();
   await waitForDisplayed('span=General Settings');
 }

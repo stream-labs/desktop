@@ -519,38 +519,42 @@ export class FacebookService
     } else {
       sourceParam = '&source=target';
     }
+    try {
+      let videos = (
+        await this.requestFacebook<{ data: IFacebookEvent[] }>(
+          `${this.apiBase}/${destinationId}/events`,
+          token,
+        )
+      ).data;
 
-    let videos = (
-      await this.requestFacebook<{ data: IFacebookEvent[] }>(
-        `${this.apiBase}/${destinationId}/events`,
-        token,
-      )
-    ).data;
+      if (onlyUpcoming) {
+        videos = videos.filter(v => {
+          // some videos created in the new Live Producer don't have `planned_start_time`
+          if (!v.start_time) return true;
 
-    if (onlyUpcoming) {
-      videos = videos.filter(v => {
-        // some videos created in the new Live Producer don't have `planned_start_time`
-        if (!v.start_time) return true;
-
-        const videoDate = new Date(v.start_time).valueOf();
-        return videoDate >= minDate && videoDate <= maxDate;
-      });
-    }
-    return videos.map(v => ({
-      id: v.id,
-      title: v.name,
-      stream_url: '',
-      permalink_url: '',
-      event_params: {
-        start_time: moment(v.start_time).unix(),
+          const videoDate = new Date(v.start_time).valueOf();
+          return videoDate >= minDate && videoDate <= maxDate;
+        });
+      }
+      return videos.map(v => ({
+        id: v.id,
+        title: v.name,
+        stream_url: '',
+        permalink_url: '',
+        event_params: {
+          start_time: moment(v.start_time).unix(),
+          status: 'SCHEDULED_UNPUBLISHED',
+        },
+        description: v.description,
         status: 'SCHEDULED_UNPUBLISHED',
-      },
-      description: v.description,
-      status: 'SCHEDULED_UNPUBLISHED',
-      game: '',
-      video: { id: v.id },
-      broadcast_start_time: v.start_time,
-    }));
+        game: '',
+        video: { id: v.id },
+        broadcast_start_time: v.start_time,
+      }));
+    } catch (e: unknown) {
+      // don't break fetching all if user permissions don't exist (403 response)
+      return [];
+    }
   }
 
   /**
@@ -566,14 +570,28 @@ export class FacebookService
       const destinationId = page.id;
       requests.push(
         this.fetchScheduledVideos(destinationType, destinationId, onlyUpcoming).then(videos =>
-          videos.map(video => ({
-            ...video,
-            destinationType,
-            destinationId,
-          })),
+          videos.map(video => ({ ...video, destinationType, destinationId })),
         ),
       );
     });
+
+    // fetch videos from groups
+    this.state.facebookGroups.forEach(group => {
+      const destinationType = 'group';
+      const destinationId = group.id;
+      requests.push(
+        this.fetchScheduledVideos(destinationType, destinationId, onlyUpcoming).then(videos =>
+          videos.map(video => ({ ...video, destinationType, destinationId })),
+        ),
+      );
+    });
+
+    // fetch videos from timeline
+    requests.push(
+      this.fetchScheduledVideos('me', 'me', onlyUpcoming).then(videos =>
+        videos.map(video => ({ ...video, destinationType: 'me', destinationId: 'me' })),
+      ),
+    );
 
     // wait for all requests
     const videoCollections = await Promise.all(requests);
