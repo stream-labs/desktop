@@ -69,23 +69,23 @@ function downloadFile(srcUrl, dstPath) {
   });
 }
 
-async function rtvc(){
+async function rtvc() {
   // cwd is node_modules
   console.log('copy rtvc');
-  const name = 'nair-rtvc'
-  const p = path.join(node_modules, '/obs-studio-node/obs-plugins/64bit/')
-  const zip = path.join(p, `${name}.tar.gz`);
+  const name = 'nair-rtvc';
+  const p = './obs-studio-node/obs-plugins/64bit/';
+  const zip = `${name}.tar.gz`;
 
-  sh.cp(path.join(node_modules,'../nair-rtvc.tar.gz'),zip) // 実際はURLでのダウンロードで先に配置 await downloadFile(url,zip)
+  sh.cp('../nair-rtvc.tar.gz', path.join(p, zip)); // 実際はURLでのダウンロードで先に配置 await downloadFile(url,zip)
 
-  sh.pushd(p)
+  sh.pushd(p);
   executeCmd(`tar -xzvf ${zip}`, { silent: false });
 
-  sh.mv(`${name}/*`, `.`) // ディレクトリ付きで圧縮してしまっているため移動、実際にはディレクトリ無し圧縮の方が展開が楽かも
-  sh.rm('-r', name) // 空ディレクトリ削除
+  sh.mv(`${name}/*`, `.`); // ディレクトリ付きで圧縮してしまっているため移動、実際にはディレクトリ無し圧縮の方が展開が楽かも
+  sh.rm('-r', name); // 空ディレクトリ削除
 
-  sh.rm(zip)
-  sh.popd()
+  sh.rm(zip);
+  sh.popd();
 }
 
 async function runScript() {
@@ -156,7 +156,7 @@ async function runScript() {
           }
         } catch {}
 
-        sh.rm('-rf', path.join(node_modules, dependency['name']));
+        sh.rm('-rf', dependency['name']);
 
         log_info('Downloading ' + fileName);
         await downloadFile(url, filePath);
@@ -168,7 +168,7 @@ async function runScript() {
       });
     await Promise.all(promises);
 
-    await rtvc()
+    await rtvc();
 
     if (process.platform === 'win32') {
       sh.cd('../scripts');
