@@ -73,14 +73,19 @@ async function rtvc(){
   // cwd is node_modules
   console.log('copy rtvc');
   const name = 'nair-rtvc'
-  const zip = path.join(process.cwd(), `${name}.tar.gz`);
-  console.log(zip)
+  const p = path.join(node_modules, '/obs-studio-node/obs-plugins/64bit/')
+  const zip = path.join(p, `${name}.tar.gz`);
 
-  sh.cp('../nair-rtvc.tar.gz',zip) // 実際はURLでのダウンロードで先に配置 await downloadFile(url,zip)
-  executeCmd(`tar -xzvf ${zip}`, { silent: true });
-  sh.cp('-R',`./${name}/*`, 'obs-studio-node/obs-plugins/64bit/');
+  sh.cp(path.join(node_modules,'../nair-rtvc.tar.gz'),zip) // 実際はURLでのダウンロードで先に配置 await downloadFile(url,zip)
+
+  sh.pushd(p)
+  executeCmd(`tar -xzvf ${zip}`, { silent: false });
+
+  sh.mv(`${name}/*`, `.`) // ディレクトリ付きで圧縮してしまっているため移動、実際にはディレクトリ無し圧縮の方が展開が楽かも
+  sh.rm('-r', name) // 空ディレクトリ削除
+
   sh.rm(zip)
-  sh.rm('-rf',`./${name}`)
+  sh.popd()
 }
 
 async function runScript() {
