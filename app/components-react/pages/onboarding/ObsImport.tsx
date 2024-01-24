@@ -40,9 +40,7 @@ export function ObsImport() {
 
 function PreImport() {
   const { setProcessing, next } = useModule(OnboardingModule);
-  const { profiles, selectedProfile, setSelectedProfile, startImport } = useModule(
-    ObsImportModule,
-  );
+  const { profiles, selectedProfile, setSelectedProfile, startImport } = useModule(ObsImportModule);
 
   return (
     <div>
@@ -80,7 +78,7 @@ function PreImport() {
             });
         }}
       >
-        <h2>{$t('Start')}</h2>
+        <h2 style={{ color: 'var(--action-button-text)' }}>{$t('Start')}</h2>
       </button>
     </div>
   );
