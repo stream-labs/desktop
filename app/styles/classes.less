@@ -34,8 +34,8 @@
 .flex__column {
   display: flex;
   flex-flow: column;
-  height: 100%;
   width: 100%;
+  height: 100%;
 }
 
 .margin-right--20 {
@@ -45,12 +45,25 @@
 .section {
   display: flex;
   flex-direction: column;
+  padding: 16px 16px 8px;
   margin-bottom: 16px;
-  padding: 16px 16px 0;
   background-color: var(--color-bg-secondary);
   border-radius: 4px;
 
-  p, label {
+  .section-heading-wrapper {
+    display: flex;
+    width: 100%;
+    margin-bottom: 16px;
+
+    .section-heading {
+      margin-right: auto;
+      line-height: 1.5;
+      color: var(--color-text-light);
+    }
+  }
+
+  p,
+  label {
     font-size: @font-size4;
     color: var(--color-text);
   }
@@ -70,8 +83,8 @@
 
 .section-title--dropdown {
   h4 {
-    cursor: pointer;
     margin-bottom: 16px;
+    cursor: pointer;
   }
 }
 
@@ -92,8 +105,9 @@
 .section-title__icon {
   .radius();
   .margin-right();
-  font-size: 10px;
+
   padding: 4px;
+  font-size: 10px;
   vertical-align: text-bottom;
 }
 

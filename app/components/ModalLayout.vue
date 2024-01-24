@@ -35,18 +35,18 @@
 <script lang="ts" src="./ModalLayout.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import url("../styles/index");
 
 .modal-layout {
-  height: 100%;
   display: flex;
   flex-direction: column;
+  height: 100%;
   background-color: var(--color-bg-quinary);
 }
 
 .ModalLayout-fixed {
-  flex-shrink: 0;
   z-index: 1;
+  flex-shrink: 0;
 }
 
 .modal-layout-content {
@@ -55,8 +55,8 @@
   flex-grow: 1;
   height: 100%;
   padding: 16px;
-  overflow-y: auto;
   overflow-x: hidden;
+  overflow-y: auto;
 
   &.bareContent {
     padding: 0;
@@ -69,26 +69,29 @@
 
 .spinner-container {
   position: absolute;
-  width: auto;
   top: 50%;
   left: 50%;
+  width: auto;
   transform: translate(-50%, -50%);
 }
 
 .modal-layout-spinner {
-  font-size: 36px;
   display: inline-block;
   height: 36px;
+  font-size: 36px;
 }
 
 .modal-layout-controls {
   .dividing-border(top);
-  display: flex;
-  justify-content: flex-end;
-  background-color: var(--color-bg-primary);
-  text-align: right;
-  flex-shrink: 0;
+
   z-index: @z-index-default-content;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: flex-end;
+  height: 56px;
+  text-align: right;
+  background-color: var(--color-bg-primary);
 
   div {
     display: flex;
@@ -112,6 +115,7 @@
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(359deg);
   }
