@@ -51,8 +51,12 @@
             >
               <div class="popper">
                 <ul class="popup-menu-list">
-                  <li class="popup-menu-item"><button class="link" :disabled="{true : !canAdd}" @click="onCopy(v.value)">
-                    {{ $t('source-props.nair-rtvc-source.nav.copy_voice') }}</button></li>
+                  <li class="popup-menu-item">
+                    <button v-if="canAdd" class="link" @click="onCopy(v.value)">
+                    {{ $t('source-props.nair-rtvc-source.nav.copy_voice') }}</button>
+                    <button v-else class="link" disabled>
+                    {{ $t('source-props.nair-rtvc-source.nav.copy_voice') }}</button>
+                  </li>
                 </ul>
                 <ul class="popup-menu-list">
                   <li class="popup-menu-item"><button class="link text--red" @click="onDelete(v.value)">
