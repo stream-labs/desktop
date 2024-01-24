@@ -17,7 +17,7 @@
             <div class="nav-item-content" @click="onSelect(v.value)">
               <div class="icon-wrapper">
                 <div class="icon" :data-label="v.label"></div>
-                <div class="icon-badge"><i class="icon-speech-engine"></i></div>
+                <div class="icon-badge" v-show="v.value === currentIndex"><i class="icon-speech-engine"></i></div>
               </div>
               <span class="name">{{ v.name }}</span>
             </div>
@@ -39,7 +39,7 @@
             <div class="nav-item-content" @click="onSelect(v.value)">
               <div class="icon-wrapper">
                 <div class="icon" :data-label="v.label"></div>
-                <div class="icon-badge"><i class="icon-speech-engine"></i></div>
+                <div class="icon-badge" v-show="v.value === currentIndex"><i class="icon-speech-engine"></i></div>
               </div>
               <span class="name">{{ v.name }}</span>
             </div>
@@ -451,7 +451,7 @@
       position: absolute;
       right: -6px;
       bottom: -6px;
-      display: none;
+      display: flex;
       align-items: center;
       justify-content: center;
       width: 16px;
@@ -463,10 +463,6 @@
       i {
         font-size: 8px;
         color: var(--color-bg-quinary);
-      }
-
-      .active & {
-        display: flex;
       }
     }
 
