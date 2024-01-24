@@ -1,4 +1,4 @@
-import { Button } from 'antd';
+import { Button, Divider } from 'antd';
 import React, { useState } from 'react';
 import { $t } from 'services/i18n';
 import { $i } from 'services/utils';
@@ -8,9 +8,17 @@ import cx from 'classnames';
 import { confirmAsync } from 'components-react/modals';
 import { Services } from 'components-react/service-provider';
 import { useModule } from 'slap';
+import { StreamerKnowledgeMode } from 'services/onboarding';
 
 export function StreamingOrRecording() {
-  const { next, setRecordingMode, UsageStatisticsService } = useModule(OnboardingModule);
+  const {
+    next,
+    setRecordingMode,
+    UsageStatisticsService,
+    streamerKnowledgeMode,
+    setStreamerKnowledgeMode,
+    isRecordingModeEnabled,
+  } = useModule(OnboardingModule);
   const [active, setActive] = useState<'streaming' | 'recording' | null>(null);
 
   async function onContinue() {
@@ -31,12 +39,33 @@ export function StreamingOrRecording() {
 
       if (!result) return;
 
-      setRecordingMode();
+      setStreamerKnowledgeMode(null);
+      setRecordingMode(true);
     }
+
+    /*
+     * Edge case as users shouldn't go multiple times through onboarding,
+     * but after selecting recording mode, it gets enabled and picking
+     * streaming mode subsequently does not disable it, preventing you from logging
+     * with Twitch, etc.
+     */
+    if (active === 'streaming' && isRecordingModeEnabled) {
+      setRecordingMode(false);
+    }
+
     UsageStatisticsService.actions.recordClick('StreamingOrRecording', active);
+
+    UsageStatisticsService.actions.recordClick(
+      'StreamingOrRecording',
+      streamerKnowledgeMode || 'knowledgeModeNotSelected',
+    );
 
     next();
   }
+
+  const hasSelectedStreamerKnowledgeMode = streamerKnowledgeMode != null;
+  const shouldShowContinue =
+    (active === 'streaming' && hasSelectedStreamerKnowledgeMode) || active === 'recording';
 
   return (
     <div>
@@ -45,33 +74,74 @@ export function StreamingOrRecording() {
         <img src={$i('images/onboarding/splash.png')} />
       </div>
       <div className={styles.titleContainer}>
-        <h1 className={styles.title}>{$t('Welcome to Streamlabs')}</h1>
-        <h3 className={styles.subtitle}>{$t('How do you plan to use Streamlabs Desktop?')}</h3>
-        <div className={styles.optionContainer}>
-          <div
-            className={cx(styles.option, { [styles.active]: active === 'streaming' })}
-            onClick={() => setActive('streaming')}
-          >
-            <i className="icon-broadcast"></i>
-            <h2>{$t('Live Streaming')}</h2>
-            <p className={styles.optionDescription}>
-              {$t(
-                'I want to live stream to a platform. I may also want to record my live streams.',
-              )}
-            </p>
+        <h1 className={styles.title}>{$t('Welcome to Streamlabs!')}</h1>
+        <div>
+          <h3 className={styles.subtitle}>{$t('How do you plan to use Streamlabs Desktop?')}</h3>
+          <div className={styles.optionContainer}>
+            <div
+              className={cx(styles.option, { [styles.active]: active === 'streaming' })}
+              onClick={() => setActive('streaming')}
+            >
+              <i className="icon-broadcast"></i>
+              <h2>{$t('Live Streaming')}</h2>
+            </div>
+            <div
+              className={cx(styles.option, { [styles.active]: active === 'recording' })}
+              onClick={() => setActive('recording')}
+            >
+              <i className="icon-studio"></i>
+              <h2>{$t('Recording Only')}</h2>
+            </div>
           </div>
           <div
-            className={cx(styles.option, { [styles.active]: active === 'recording' })}
-            onClick={() => setActive('recording')}
+            className={cx(styles.streamerKnowledgeModeContainer, {
+              [styles.active]: active === 'streaming',
+            })}
           >
-            <i className="icon-studio"></i>
-            <h2>{$t('Recording Only')}</h2>
-            <p className={styles.optionDescription}>
-              {$t('I want to record my screen or camera. I will not be live streaming.')}
-            </p>
+            <Divider />
+            <h3 className={styles.subtitle}>{$t('What type of creator are you?')}</h3>
+
+            <div className={styles.optionContainer}>
+              <div
+                className={cx(styles.option, {
+                  [styles.active]: streamerKnowledgeMode === StreamerKnowledgeMode.BEGINNER,
+                })}
+                onClick={() => setStreamerKnowledgeMode(StreamerKnowledgeMode.BEGINNER)}
+              >
+                <div>
+                  <i className="icon-broadcast"></i>
+                  <h2>{$t('Beginner')}</h2>
+                </div>
+                <p>{$t('I want to be guided step by step.')}</p>
+              </div>
+              <div
+                className={cx(styles.option, {
+                  [styles.active]: streamerKnowledgeMode === StreamerKnowledgeMode.INTERMEDIATE,
+                })}
+                onClick={() => setStreamerKnowledgeMode(StreamerKnowledgeMode.INTERMEDIATE)}
+              >
+                <div>
+                  <i className="icon-broadcast"></i>
+                  <h2>{$t('Intermediate')}</h2>
+                </div>
+                <p>{$t('I need a little help getting started')}</p>
+              </div>
+              <div
+                className={cx(styles.option, {
+                  [styles.active]: streamerKnowledgeMode === StreamerKnowledgeMode.ADVANCED,
+                })}
+                onClick={() => setStreamerKnowledgeMode(StreamerKnowledgeMode.ADVANCED)}
+              >
+                <div>
+                  <i className="icon-broadcast"></i>
+                  <h2>{$t('Advanced')}</h2>
+                </div>
+                <p>{$t('I like to setup things myself')}</p>
+              </div>
+            </div>
           </div>
         </div>
-        <div className={cx(styles.buttonContainer, { [styles.active]: active })}>
+        <div className={cx(styles.buttonContainer, { [styles.active]: shouldShowContinue })}>
           <Button
             type="primary"
             shape="round"
@@ -88,7 +158,12 @@ export function StreamingOrRecording() {
 }
 
 const SvgBackground = () => (
-  <svg width="100%" height="100%" viewBox="0 0 1083 720" xmlns="http://www.w3.org/2000/svg">
+  <svg
+    width="100%"
+    height="100%"
+    viewBox="0 0 900 720"
+    xmlns="http://www.w3.org/2000/svg"
+  >
     <path d="M918.999 140.5C971.667 9.75951 1187.91 -68.6629 1230.5 -54.9996L1253.58 124.762L1253.58 819.511L-0.000563148 726C81.0237 473.471 374.649 724.719 519 457C604.999 297.5 776.499 494.238 918.999 140.5Z" />
   </svg>
 );
