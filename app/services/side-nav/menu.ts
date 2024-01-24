@@ -335,7 +335,6 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
 
   @mutation()
   private UPDATE_ALL_APPS(currentApps: ILoadedApp[]) {
-    console.log('currentApps ', currentApps);
     this.state.apps = this.state.apps.map(app => {
       const activeApp = currentApps.find(currentApp => currentApp.id === app?.id);
       if (!activeApp) return null;
