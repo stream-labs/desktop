@@ -111,8 +111,14 @@ export default class RtvcSourceProperties extends SourceProperties {
     // 103 kasukabe_tsumugi
     readonly nonManualVoiceValues = [100, 101, 102]
 
-    get primaryVoiceList() { return this.getPropertyOptions('primary_voice').filter(a => !this.nonManualVoiceValues.includes(a.value)) }
-    get secondaryVoiceList() { return this.getPropertyOptions('secondary_voice').filter(a => !this.nonManualVoiceValues.includes(a.value)) }
+    get primaryVoiceList() {
+        return jvsList
+        //return this.getPropertyOptions('primary_voice').filter(a => !this.nonManualVoiceValues.includes(a.value))
+    }
+    get secondaryVoiceList() {
+        return [{ description: 'なし', value: -1 }, ...jvsList]
+        //return this.getPropertyOptions('secondary_voice').filter(a => !this.nonManualVoiceValues.includes(a.value))
+    }
     get deviceList() { return this.getPropertyOptions('device') }
     get latencyList() { return this.getPropertyOptions('latency') }
 
@@ -133,8 +139,10 @@ export default class RtvcSourceProperties extends SourceProperties {
         this.primaryVoice = p.primaryVoice
         this.secondaryVoice = p.secondaryVoice
 
-        this.primaryVoiceModel = this.getPropertyOptionByValue('primary_voice', this.primaryVoice)
-        this.secondaryVoiceModel = this.getPropertyOptionByValue('secondary_voice', this.secondaryVoice)
+        const optionInList = (list: IObsListOption<number>[], value: number, def: number) => list.find(a => a.value === value) ?? list[def]
+
+        this.primaryVoiceModel = optionInList(this.primaryVoiceList, this.primaryVoice, 0)//this.getPropertyOptionByValue('primary_voice', this.primaryVoice)
+        this.secondaryVoiceModel = optionInList(this.secondaryVoiceList, this.secondaryVoice, -1)//this.getPropertyOptionByValue('secondary_voice', this.secondaryVoice)
         this.deviceModel = this.getPropertyOptionByValue('device', this.device)
         this.latencyModel = this.getPropertyOptionByValue('latency', this.latency)
 
@@ -355,7 +363,7 @@ export default class RtvcSourceProperties extends SourceProperties {
 
         const list1 = this.primaryVoiceList
         const idx1 = Math.floor(Math.random() * list1.length)
-        this.secondaryVoiceModel= list1[idx1]
+        this.secondaryVoiceModel = list1[idx1]
 
         this.amount = Math.floor(Math.random() * 50)
     }
@@ -414,3 +422,105 @@ export default class RtvcSourceProperties extends SourceProperties {
 
 }
 
+const jvsList = [
+    { description: "男性/低め/1  jvs006", value: 5 },
+    { description: "男性/低め/2  jvs021", value: 20 },
+    { description: "男性/低め/3  jvs042", value: 41 },
+    { description: "男性/低め/4  jvs078", value: 77 },
+    { description: "男性/低め/5  jvs071", value: 70 },
+    { description: "男性/低め/6  jvs009", value: 8 },
+    { description: "男性/低め/7  jvs012", value: 11 },
+    { description: "男性/低め/8  jvs037", value: 36 },
+    { description: "男性/低め/9  jvs044", value: 43 },
+    { description: "男性/低め/10  jvs048", value: 47 },
+    { description: "男性/低め/11  jvs079", value: 78 },
+    { description: "男性/低め/12  jvs089", value: 88 },
+    { description: "男性/低め/13  jvs100", value: 99 },
+    { description: "男性/普通/1  jvs022", value: 21 },
+    { description: "男性/普通/2  jvs033", value: 32 },
+    { description: "男性/普通/3  jvs034", value: 33 },
+    { description: "男性/普通/4  jvs049", value: 48 },
+    { description: "男性/普通/5  jvs081", value: 80 },
+    { description: "男性/普通/6  jvs023", value: 22 },
+    { description: "男性/普通/7  jvs068", value: 67 },
+    { description: "男性/普通/8  jvs088", value: 87 },
+    { description: "男性/普通/9  jvs003", value: 2 },
+    { description: "男性/普通/10  jvs020", value: 19 },
+    { description: "男性/普通/11  jvs028", value: 27 },
+    { description: "男性/普通/12  jvs045", value: 44 },
+    { description: "男性/普通/13  jvs073", value: 72 },
+    { description: "男性/普通/14  jvs074", value: 73 },
+    { description: "男性/普通/15  jvs077", value: 76 },
+    { description: "男性/普通/16  jvs005", value: 4 },
+    { description: "男性/高め/1  jvs013", value: 12 },
+    { description: "男性/高め/2  jvs031", value: 30 },
+    { description: "男性/高め/3  jvs046", value: 45 },
+    { description: "男性/高め/4  jvs070", value: 69 },
+    { description: "男性/高め/5  jvs076", value: 75 },
+    { description: "男性/高め/6  jvs086", value: 85 },
+    { description: "男性/高め/7  jvs001", value: 0 },
+    { description: "男性/高め/8  jvs041", value: 40 },
+    { description: "男性/高め/9  jvs050", value: 49 },
+    { description: "男性/高め/10  jvs052", value: 51 },
+    { description: "男性/高め/11  jvs075", value: 74 },
+    { description: "男性/高め/12  jvs080", value: 79 },
+    { description: "男性/高め/13  jvs087", value: 86 },
+    { description: "男性/高め/14  jvs099", value: 98 },
+    { description: "男性/高め/15  jvs097", value: 96 },
+    { description: "男性/高め/16  jvs011", value: 10 },
+    { description: "男性/高め/17  jvs054", value: 53 },
+    { description: "男性/高め/18  jvs047", value: 46 },
+    { description: "男性/高め/19  jvs032", value: 31 },
+    { description: "男性/高め/20  jvs098", value: 97 },
+    { description: "女性/低め/1  jvs091", value: 90 },
+    { description: "女性/低め/2  jvs016", value: 15 },
+    { description: "女性/低め/3  jvs035", value: 34 },
+    { description: "女性/低め/4  jvs043", value: 42 },
+    { description: "女性/低め/5  jvs064", value: 63 },
+    { description: "女性/低め/6  jvs029", value: 28 },
+    { description: "女性/低め/7  jvs025", value: 24 },
+    { description: "女性/低め/8  jvs092", value: 91 },
+    { description: "女性/低め/9  jvs018", value: 17 },
+    { description: "女性/低め/10  jvs082", value: 81 },
+    { description: "女性/低め/11  jvs095", value: 94 },
+    { description: "女性/低め/12  jvs062", value: 61 },
+    { description: "女性/低め/13  jvs017", value: 16 },
+    { description: "女性/普通/1  jvs008", value: 7 },
+    { description: "女性/普通/2  jvs084", value: 83 },
+    { description: "女性/普通/3  jvs007", value: 6 },
+    { description: "女性/普通/4  jvs094", value: 93 },
+    { description: "女性/普通/5  jvs027", value: 26 },
+    { description: "女性/普通/6  jvs002", value: 1 },
+    { description: "女性/普通/7  jvs063", value: 62 },
+    { description: "女性/普通/8  jvs058", value: 57 },
+    { description: "女性/普通/9  jvs055", value: 54 },
+    { description: "女性/普通/10  jvs056", value: 55 },
+    { description: "女性/普通/11  jvs057", value: 56 },
+    { description: "女性/普通/12  jvs090", value: 89 },
+    { description: "女性/普通/13  jvs059", value: 58 },
+    { description: "女性/普通/14  jvs019", value: 18 },
+    { description: "女性/普通/15  jvs085", value: 84 },
+    { description: "女性/普通/16  jvs069", value: 68 },
+    { description: "女性/普通/17  jvs038", value: 37 },
+    { description: "女性/普通/18  jvs053", value: 52 },
+    { description: "女性/普通/19  jvs072", value: 71 },
+    { description: "女性/普通/20  jvs096", value: 95 },
+    { description: "女性/高め/1  jvs039", value: 38 },
+    { description: "女性/高め/2  jvs040", value: 39 },
+    { description: "女性/高め/3  jvs030", value: 29 },
+    { description: "女性/高め/4  jvs051", value: 50 },
+    { description: "女性/高め/5  jvs083", value: 82 },
+    { description: "女性/高め/6  jvs004", value: 3 },
+    { description: "女性/高め/7  jvs015", value: 14 },
+    { description: "女性/高め/8  jvs067", value: 66 },
+    { description: "女性/高め/9  jvs024", value: 23 },
+    { description: "女性/高め/10  jvs060", value: 59 },
+    { description: "女性/高め/11  jvs036", value: 35 },
+    { description: "女性/高め/12  jvs026", value: 25 },
+    { description: "女性/高め/13  jvs065", value: 64 },
+    { description: "女性/高め/14  jvs066", value: 65 },
+    { description: "女性/高め/15  jvs014", value: 13 },
+    { description: "女性/高め/16  jvs093", value: 92 },
+    { description: "女性/高め/17  jvs010", value: 9 },
+    { description: "女性/高め/18  jvs061", value: 60 },
+]
