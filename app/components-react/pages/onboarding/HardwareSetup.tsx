@@ -71,8 +71,21 @@ export function HardwareSetup() {
   }
 
   return (
-    <div style={{ width: '100%' }}>
-      <h1 className={commonStyles.titleContainer}>{$t('Set Up Mic and Webcam')}</h1>
+    <div
+      style={{
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 1,
+        // Otherwise default continue button gets offscreen
+        height: '85%',
+        flexDirection: 'column',
+      }}
+    >
+      <h1 className={commonStyles.titleContainer} style={{ marginBottom: 0 }}>
+        {$t('Set Up Mic and Webcam')}
+      </h1>
       <div className={styles.contentContainer}>
         <DisplaySection />
         {!!v.videoDevices.length && (
@@ -127,11 +140,10 @@ function DisplaySection() {
     return (
       <div className={cx(styles.display, 'section')}>
         <Display
-          style={{ height: 200 }}
           sourceId={v.selectedVideoSource.sourceId}
           renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
         />
-        <div>
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 8 }}>
           <canvas ref={canvasRef} style={{ backgroundColor: 'var(--border)', width: '100%' }} />
         </div>
       </div>

@@ -12,6 +12,7 @@ import { logIn } from '../../helpers/modules/user';
 import { releaseUserInPool, reserveUserFromPool } from '../../helpers/webdriver/user';
 import { showSettingsWindow } from '../../helpers/modules/settings/settings';
 import { test, useWebdriver } from '../../helpers/webdriver';
+import { sleep } from '../../helpers/sleep';
 
 useWebdriver();
 
@@ -138,6 +139,10 @@ test('Custom stream destinations', async t => {
   await click('span=MyCustomDest'); // switch the destination on
 
   // try to stream
+
+  // Wait for Twitch categories to be loaded, TODO: check if we're logged with Twitch and abstract (using assertion)
+  await sleep(1000);
+
   await submit();
   await waitForDisplayed('span=Configure the Multistream service');
   await waitForDisplayed("h1=You're live!", { timeout: 60000 });
