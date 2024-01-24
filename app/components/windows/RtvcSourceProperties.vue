@@ -25,13 +25,14 @@
         </ul>
 
         <div class="nav-menu-heading">{{
-            $t('source-props.nair-rtvc-source.nav.original_voice') }} ({{ manualList.length
-}}/{{ manualMax }})
-          <button v-if="canAdd" @click="onAdd()" class="indicator" v-tooltip.bottom="$t('source-props.nair-rtvc-source.nav.original_voice_add')">
-             <i class="icon-add icon-btn" />
+          $t('source-props.nair-rtvc-source.nav.original_voice') }} ({{ manualList.length
+  }}/{{ manualMax }})
+          <button v-if="canAdd" @click="onAdd()" class="indicator"
+            v-tooltip.bottom="$t('source-props.nair-rtvc-source.nav.original_voice_add')">
+            <i class="icon-add icon-btn" />
           </button>
           <button v-else class="indicator" disabled>
-             <i class="icon-add icon-btn disabled" />
+            <i class="icon-add icon-btn disabled" />
           </button>
         </div>
         <ul class="nav-menu-child">
@@ -43,24 +44,20 @@
               </div>
               <span class="name">{{ v.name }}</span>
             </div>
-            <popper
-              trigger="click"
-              :options="{ placement: 'bottom-end' }"
-              @show="showPopupMenu = true"
-              @hide="showPopupMenu = false"
-            >
+            <popper trigger="click" :options="{ placement: 'bottom-end' }" @show="showPopupMenu = true"
+              @hide="showPopupMenu = false">
               <div class="popper">
                 <ul class="popup-menu-list">
                   <li class="popup-menu-item">
                     <button v-if="canAdd" class="link" @click="onCopy(v.value)">
-                    {{ $t('source-props.nair-rtvc-source.nav.copy_voice') }}</button>
+                      {{ $t('source-props.nair-rtvc-source.nav.copy_voice') }}</button>
                     <button v-else class="link" disabled>
-                    {{ $t('source-props.nair-rtvc-source.nav.copy_voice') }}</button>
+                      {{ $t('source-props.nair-rtvc-source.nav.copy_voice') }}</button>
                   </li>
                 </ul>
                 <ul class="popup-menu-list">
                   <li class="popup-menu-item"><button class="link text--red" @click="onDelete(v.value)">
-                    {{ $t('source-props.nair-rtvc-source.nav.remove_voice') }}</button></li>
+                      {{ $t('source-props.nair-rtvc-source.nav.remove_voice') }}</button></li>
                 </ul>
               </div>
               <div class="indicator" :class="{ 'is-show': showPopupMenu }" slot="reference">
@@ -88,7 +85,8 @@
             <div class="input-container">
               <div class="input-label">
                 <label>{{ $t('source-props.nair-rtvc-source.pitch_shift.name') }}
-                  <i class="icon-help icon-tooltip" v-tooltip.bottom="$t('source-props.nair-rtvc-source.preset.description')"></i>
+                  <i class="icon-help icon-tooltip"
+                    v-tooltip.bottom="$t('source-props.nair-rtvc-source.preset.description')"></i>
                 </label>
                 <label> {{ pitchShift.toFixed(0) + ' cent' }} </label>
               </div>
@@ -117,7 +115,8 @@
               <div class="button-wrapper">
                 <button class="button--text" @click="onRandom">{{
                   $t('source-props.nair-rtvc-source.container.make_random.name') }} </button>
-                  <i class="icon-help icon-tooltip" v-tooltip.bottom="$t('source-props.nair-rtvc-source.container.make_random.description')"></i>
+                <i class="icon-help icon-tooltip"
+                  v-tooltip.bottom="$t('source-props.nair-rtvc-source.container.make_random.description')"></i>
               </div>
             </div>
 
@@ -135,7 +134,8 @@
                   :allow-empty="false" :placeholder="$t('settings.listPlaceholder')" />
               </div>
               <div class="input-wrapper">
-                <div class="input-label"><label>{{ $t('source-props.nair-rtvc-source.secondary_voice.name') }}</label></div>
+                <div class="input-label"><label>{{ $t('source-props.nair-rtvc-source.secondary_voice.name') }}</label>
+                </div>
                 <multiselect v-model="secondaryVoiceModel" :options="secondaryVoiceList" label="description"
                   trackBy="value" :allow-empty="false" :placeholder="$t('settings.listPlaceholder')" />
               </div>
@@ -143,7 +143,8 @@
               <div class="input-wrapper" v-if="secondaryVoice >= 0">
                 <div class="input-label">
                   <label>{{ $t('source-props.nair-rtvc-source.amount.name') }}
-                    <i class="icon-help icon-tooltip" v-tooltip.top="$t('source-props.nair-rtvc-source.amount.description')"></i></label>
+                    <i class="icon-help icon-tooltip"
+                      v-tooltip.top="$t('source-props.nair-rtvc-source.amount.description')"></i></label>
                   <label> {{ amount.toFixed(0) + '%' }}</label>
                 </div>
                 <VueSlider class="slider" v-model="amount" :min="0" :max="100" :interval="1" tooltip="none" />
@@ -169,7 +170,8 @@
 
             <div class="input-label">
               <label>{{ $t('source-props.nair-rtvc-source.latency.name') }}
-              <i class="icon-help icon-tooltip wide" v-tooltip.top="$t('source-props.nair-rtvc-source.latency.description')"></i></label>
+                <i class="icon-help icon-tooltip wide"
+                  v-tooltip.top="$t('source-props.nair-rtvc-source.latency.description')"></i></label>
             </div>
             <div class="input-wrapper">
               <multiselect v-model="latencyModel" :options="latencyList" label="description" trackBy="value"
@@ -253,7 +255,7 @@
   margin: 0;
   overflow-y: scroll;
 
-  .nav-menu + & {
+  .nav-menu+& {
     padding-left: 0;
   }
 
@@ -323,7 +325,7 @@
 
   // 琴詠ニア
   &[data-label="near"] {
-    background: radial-gradient(100% 100% at 50% 100%, var(--color-white) 0%, var( --color-brand-rtvc-near) 100%);
+    background: radial-gradient(100% 100% at 50% 100%, var(--color-white) 0%, var(--color-brand-rtvc-near) 100%);
 
     .image {
       top: -6px;
@@ -336,7 +338,7 @@
 
   // ずんだもん
   &[data-label="zundamon"] {
-    background: radial-gradient(100% 100% at 50% 100%, var(--color-white) 0%, var( --color-brand-rtvc-zundamon) 100%);
+    background: radial-gradient(100% 100% at 50% 100%, var(--color-white) 0%, var(--color-brand-rtvc-zundamon) 100%);
 
     .image {
       bottom: -292px;
@@ -349,7 +351,7 @@
 
   //春日部つむぎ
   &[data-label="tsumugi"] {
-    background: radial-gradient(100% 100% at 50% 100%, var(--color-white) 0%, var( --color-brand-rtvc-tsumugi) 100%);
+    background: radial-gradient(100% 100% at 50% 100%, var(--color-white) 0%, var(--color-brand-rtvc-tsumugi) 100%);
 
     .image {
       bottom: -408px;
@@ -391,7 +393,7 @@
 }
 
 .section {
-  .character-image + & {
+  .character-image+& {
     border-radius: 0 0 4px 4px;
   }
 }
@@ -500,7 +502,7 @@
 
     // 琴詠ニア
     &[data-label="near"] {
-      background: radial-gradient(100% 100% at 50% 100%, var(--color-white) 0%, var( --color-brand-rtvc-near) 100%);
+      background: radial-gradient(100% 100% at 50% 100%, var(--color-white) 0%, var(--color-brand-rtvc-near) 100%);
 
       &::before {
         bottom: -112px;
