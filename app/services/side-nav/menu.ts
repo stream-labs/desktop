@@ -113,13 +113,6 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
 
     this.handleDismissables();
 
-    const allAppsLoaded = this.platformAppsService.allAppsLoaded.subscribe(
-      (loadedApps: ILoadedApp[]) => {
-        this.updateAllApps(loadedApps);
-        allAppsLoaded.unsubscribe();
-      },
-    );
-
     /**
      * Determine if the user has the recording history menu item
      */
@@ -342,6 +335,7 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
 
   @mutation()
   private UPDATE_ALL_APPS(currentApps: ILoadedApp[]) {
+    console.log('currentApps ', currentApps);
     this.state.apps = this.state.apps.map(app => {
       const activeApp = currentApps.find(currentApp => currentApp.id === app?.id);
       if (!activeApp) return null;
