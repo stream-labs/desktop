@@ -30,6 +30,7 @@ const sourceIconMap = {
   'decklink-input': 'icon-blackmagic',
   vlc_source: 'icon-play',
   wasapi_process_output_capture: 'icon-app-speaker',
+  'nair-rtvc-source': 'icon-speech-engine'
 };
 
 @Component({
