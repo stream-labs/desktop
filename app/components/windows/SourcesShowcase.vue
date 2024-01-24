@@ -95,7 +95,7 @@
       </add-source-info>
 
       <add-source-info v-if="inspectedSource === 'nair-rtvc-source'" sourceType="nair-rtvc-source" key="21">
-        <AppAudioCaptureSourceIcon slot="media" />
+        <SpeechEngineIcon slot="media" />
       </add-source-info>
 
       <div class="source-info" v-if="inspectedSource === null">
@@ -180,6 +180,7 @@
 
   .desc {
     color: var(--color-text-light);
+    white-space: pre-wrap;
   }
 }
 </style>
