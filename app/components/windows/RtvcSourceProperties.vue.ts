@@ -190,15 +190,16 @@ export default class RtvcSourceProperties extends SourceProperties {
     this.primaryVoice = p.primaryVoice;
     this.secondaryVoice = p.secondaryVoice;
 
-    const optionInList = (list: IObsListOption<number>[], value: number, def: number) =>
-      list.find(a => a.value === value) ?? list[def];
+    const optionInList = (list: IObsListOption<number>[], value: number) =>
+      list.find(a => a.value === value) ?? { description: '', value }; // 100以上等はリストにないのでスルー
 
-    this.primaryVoiceModel = optionInList(this.primaryVoiceList, this.primaryVoice, 0); //this.getPropertyOptionByValue('primary_voice', this.primaryVoice)
-    this.secondaryVoiceModel = optionInList(this.secondaryVoiceList, this.secondaryVoice, -1); //this.getPropertyOptionByValue('secondary_voice', this.secondaryVoice)
+    this.primaryVoiceModel = optionInList(this.primaryVoiceList, this.primaryVoice); //this.getPropertyOptionByValue('primary_voice', this.primaryVoice)
+    this.secondaryVoiceModel = optionInList(this.secondaryVoiceList, this.secondaryVoice); //this.getPropertyOptionByValue('secondary_voice', this.secondaryVoice)
     this.deviceModel = this.getPropertyOptionByValue('device', this.device);
     this.latencyModel = this.getPropertyOptionByValue('latency', this.latency);
 
     // sourcesへも反映
+    //console.log('---');
     this.setPropertyValue('pitch_shift', this.pitchShift);
     this.setPropertyValue('amount', this.amount);
     this.setPropertyValue('primary_voice', this.primaryVoice);
@@ -340,6 +341,7 @@ export default class RtvcSourceProperties extends SourceProperties {
   setPropertyValue(key: SourcePropKey, value: TObsValue) {
     const prop = this.properties.find(a => a.name === key);
     if (!prop || prop.value === value) return; // no need change
+    //    console.log(`${key} change ${prop.value} to ${value}`);
     prop.value = value;
     const source = this.sourcesService.getSource(this.sourceId);
     source.setPropertiesFormData([prop]);
