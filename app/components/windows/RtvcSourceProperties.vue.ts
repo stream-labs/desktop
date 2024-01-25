@@ -27,8 +27,6 @@ type ParamKey = 'name' | 'inputGain' | 'pitchShift' | 'amount' | 'primaryVoice' 
 
 interface CommonParam {
   name: string;
-  image: string;
-  icon: string;
   label: string;
   description: string;
 
@@ -75,8 +73,6 @@ export default class RtvcSourceProperties extends SourceProperties {
     {
       index: 'preset/0',
       name: '琴詠ニア',
-      image: 'preset-bg0',
-      icon: 'icon-0',
       pitchShift: 0,
       primaryVoice: 100,
       secondaryVoice: -1,
@@ -87,8 +83,6 @@ export default class RtvcSourceProperties extends SourceProperties {
     {
       index: 'preset/1',
       name: 'ずんだもん',
-      image: 'preset-bg1',
-      icon: 'icon-0',
       pitchShift: 0,
       primaryVoice: 101,
       secondaryVoice: -1,
@@ -99,8 +93,6 @@ export default class RtvcSourceProperties extends SourceProperties {
     {
       index: 'preset/2',
       name: '春日部つむぎ',
-      image: 'preset-bg2',
-      icon: 'icon-0',
       pitchShift: 0,
       primaryVoice: 102,
       secondaryVoice: -1,
@@ -121,12 +113,11 @@ export default class RtvcSourceProperties extends SourceProperties {
   manualParams: ManualParam[];
   presetParams: PresetParam[];
 
-  currentIndex: string = 'preset/0';
-  isMonitor: boolean = false;
+  currentIndex = 'preset/0';
+  isMonitor = false;
   canceled = false;
 
   name = '';
-  image = '';
   label = '';
   description = '';
   device: TObsValue = 0;
@@ -147,14 +138,14 @@ export default class RtvcSourceProperties extends SourceProperties {
 
   get presetList() {
     return this.presetValues.map(a => {
-      return { value: a.index, name: a.name, icon: a.icon, label: a.label };
+      return { value: a.index, name: a.name, label: a.label };
     });
   }
-  manualList: { value: string; name: string; icon: string }[] = [];
+  manualList: { value: string; name: string }[] = [];
   updateManualList() {
     // add,delに反応しないのでコード側から変更指示
     this.manualList = this.manualParams.map((a, idx) => {
-      return { value: `manual/${idx}`, name: a.name, icon: 'icon-0', label: `manual${idx}` };
+      return { value: `manual/${idx}`, name: a.name, label: `manual${idx}` };
     });
     this.canAdd = this.manualList.length < this.manualMax;
   }
@@ -164,7 +155,7 @@ export default class RtvcSourceProperties extends SourceProperties {
   // 100 kotoyomi_nia
   // 101 zundamon
   // 103 kasukabe_tsumugi
-  readonly nonManualVoiceValues = [100, 101, 102];
+  //readonly nonManualVoiceValues = [100, 101, 102];
 
   get primaryVoiceList() {
     return jvsList;
@@ -191,7 +182,6 @@ export default class RtvcSourceProperties extends SourceProperties {
     const p = this.getParams();
 
     this.name = p.name;
-    this.image = p.image;
     this.label = p.label;
     this.description = p.description;
 
@@ -280,8 +270,6 @@ export default class RtvcSourceProperties extends SourceProperties {
       const v = this.manualParams[p.idx];
       return {
         name: v.name,
-        icon: '',
-        image: '',
         label: '',
         description: '',
         pitchShift: v.pitchShift,
@@ -296,8 +284,6 @@ export default class RtvcSourceProperties extends SourceProperties {
 
     return {
       name: v.name,
-      icon: v.icon,
-      image: v.image,
       label: v.label,
       description: v.description,
       pitchShift: m.pitchShift,
