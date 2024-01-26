@@ -16,11 +16,11 @@ import Vue from 'vue';
 import { PerformanceService } from './performance';
 import { jfetch } from 'util/requests';
 import { CacheUploaderService } from './cache-uploader';
-import { AudioService, AudioSource, E_AUDIO_CHANNELS } from './audio';
+import { AudioService } from './audio';
 import { getOS, OS } from 'util/operating-systems';
 import { Source, SourcesService } from './sources';
 import { VideoEncodingOptimizationService } from './video-encoding-optimizations';
-import { RecordingModeService, TransitionsService } from 'app-services';
+import { DualOutputService, RecordingModeService, TransitionsService } from 'app-services';
 import * as remote from '@electron/remote';
 
 interface IStreamDiagnosticInfo {
@@ -140,6 +140,7 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
   @Inject() videoEncodingOptimizationService: VideoEncodingOptimizationService;
   @Inject() transitionsService: TransitionsService;
   @Inject() recordingModeService: RecordingModeService;
+  @Inject() dualOutputService: DualOutputService;
 
   static defaultState: IDiagnosticsServiceState = {
     streams: [],
@@ -310,6 +311,12 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
 
   private generateVideoSection() {
     const settings = this.settingsService.views.values;
+    const dualOutputSettings = {
+      hasToggledDualOutput: this.dualOutputService.views.hasSceneNodeMaps,
+      dualOutputSceneCollection: this.dualOutputService.views.hasNodeMap(),
+      dualOutputMode: this.dualOutputService.views.dualOutputMode,
+    };
+
     const fpsObj = { Type: settings.Video.FPSType };
 
     if (fpsObj.Type === 'Common FPS Values') {
@@ -357,6 +364,22 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
 
     if (baseRes.y < 720) {
       this.logProblem(`Low Base resolution: ${baseRes.x}x${baseRes.y}`);
+    }
+
+    if (baseRes.y < 720) {
+      this.logProblem(`Low Base resolution: ${baseRes.x}x${baseRes.y}`);
+    }
+
+    if (dualOutputSettings.hasToggledDualOutput) {
+      this.logProblem('User has enabled Dual Output at some point.');
+
+      if (dualOutputSettings.dualOutputSceneCollection) {
+        this.logProblem('A Dual Output scene collection is the active scene collection.');
+      }
+
+      if (dualOutputSettings.dualOutputMode) {
+        this.logProblem('Dual Output currently enabled.');
+      }
     }
 
     return new Section('Video', {
