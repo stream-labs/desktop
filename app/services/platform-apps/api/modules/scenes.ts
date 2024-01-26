@@ -214,6 +214,7 @@ export class ScenesModule extends Module {
         type: ESceneNodeType.Folder,
         name: node.name,
         childrenIds: node.childrenIds,
+        display: node?.display,
       } as ISceneItemFolder;
     }
     if (node.isItem()) {
@@ -224,6 +225,7 @@ export class ScenesModule extends Module {
         visible: node.visible,
         locked: node.locked,
         transform: node.transform,
+        display: node?.display,
       } as ISceneItem;
     }
   }

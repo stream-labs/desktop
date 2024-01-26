@@ -20,7 +20,7 @@ import { AudioService } from './audio';
 import { getOS, OS } from 'util/operating-systems';
 import { Source, SourcesService } from './sources';
 import { VideoEncodingOptimizationService } from './video-encoding-optimizations';
-import { RecordingModeService, TransitionsService } from 'app-services';
+import { DualOutputService, RecordingModeService, TransitionsService } from 'app-services';
 import * as remote from '@electron/remote';
 import { AppService } from 'services/app';
 import fs from 'fs';
@@ -144,6 +144,7 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
   @Inject() transitionsService: TransitionsService;
   @Inject() recordingModeService: RecordingModeService;
   @Inject() appService: AppService;
+  @Inject() dualOutputService: DualOutputService;
 
   get cacheDir() {
     return this.appService.appDataDirectory;
@@ -320,6 +321,12 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
 
   private generateVideoSection() {
     const settings = this.settingsService.views.values;
+    const dualOutputSettings = {
+      hasToggledDualOutput: this.dualOutputService.views.hasSceneNodeMaps,
+      dualOutputSceneCollection: this.dualOutputService.views.hasNodeMap(),
+      dualOutputMode: this.dualOutputService.views.dualOutputMode,
+    };
+
     const fpsObj = { Type: settings.Video.FPSType };
 
     if (fpsObj.Type === 'Common FPS Values') {
@@ -367,6 +374,22 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
 
     if (baseRes.y < 720) {
       this.logProblem(`Low Base resolution: ${baseRes.x}x${baseRes.y}`);
+    }
+
+    if (baseRes.y < 720) {
+      this.logProblem(`Low Base resolution: ${baseRes.x}x${baseRes.y}`);
+    }
+
+    if (dualOutputSettings.hasToggledDualOutput) {
+      this.logProblem('User has enabled Dual Output at some point.');
+
+      if (dualOutputSettings.dualOutputSceneCollection) {
+        this.logProblem('A Dual Output scene collection is the active scene collection.');
+      }
+
+      if (dualOutputSettings.dualOutputMode) {
+        this.logProblem('Dual Output currently enabled.');
+      }
     }
 
     return new Section('Video', {

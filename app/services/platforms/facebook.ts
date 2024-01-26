@@ -211,7 +211,7 @@ export class FacebookService
     this.state.videoId = id;
   }
 
-  apiBase = 'https://graph.facebook.com';
+  apiBase = 'https://graph.facebook.com/v16.0';
 
   get authUrl() {
     const host = this.hostsService.streamlabs;
@@ -677,7 +677,7 @@ export class FacebookService
   async searchGames(searchString: string): Promise<IGame[]> {
     if (searchString.length < 2) return [];
     const gamesResponse = await this.requestFacebook<{ data: { name: string; id: string }[] }>(
-      `${this.apiBase}/v3.2/search?type=game&q=${searchString}`,
+      `${this.apiBase}/search?type=game&q=${searchString}`,
     );
     return gamesResponse.data.slice(0, 15).map(g => ({ id: g.id, name: g.name }));
   }
