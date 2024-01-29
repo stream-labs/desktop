@@ -134,6 +134,13 @@ export default class SourcesShowcase extends Vue {
   }
 
   get readyToAdd() {
+    if (this.inspectedSource === 'nair-rtvc-source') {
+      // 同一scene上では複数禁止
+      for (const s of this.scenesService.activeScene.items) {
+        if (this.sourcesService.getSourceById(s.sourceId).type === 'nair-rtvc-source') return false;
+      }
+    }
+
     return this.inspectedSource !== null && this.inspectedSource !== 'custom_cast_ndi_guide';
   }
 }
