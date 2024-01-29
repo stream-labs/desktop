@@ -8,6 +8,8 @@ import { AudioService } from '../../services/audio';
 import * as obs from '../../../obs-api';
 import { IObsListInput, IObsListOption, TObsValue } from 'components/obs/inputs/ObsInput';
 import Popper from 'vue-popperjs';
+import { ManualParam, PresetParam, StateParam } from 'services/rtvcStateService';
+import { ScenesService } from 'services/scenes';
 
 // for source properties
 type SourcePropKey =
@@ -36,25 +38,6 @@ interface CommonParam {
   secondaryVoice: number;
 }
 
-// RtvcStateService保持用
-interface ManualParam {
-  name: string;
-  pitchShift: number;
-  amount: number;
-  primaryVoice: number;
-  secondaryVoice: number;
-}
-
-interface PresetParam {
-  pitchShift: number;
-}
-
-interface StateParam {
-  currentIndex: string;
-  manuals: ManualParam[];
-  presets: PresetParam[];
-}
-
 @Component({
   components: {
     VueSlider,
@@ -65,6 +48,7 @@ interface StateParam {
 export default class RtvcSourceProperties extends SourceProperties {
   @Inject() rtvcStateService: RtvcStateService;
   @Inject() audioService: AudioService;
+  @Inject() private scenesService: ScenesService;
 
   readonly manualMax = 5;
   showPopupMenu: boolean = false;
@@ -351,10 +335,24 @@ export default class RtvcSourceProperties extends SourceProperties {
   // --- update
 
   update() {
+    const s = this.rtvcStateService.getValue();
+    const scenes = s.scenes ?? {};
+    const sceneId = this.scenesService.activeScene.id;
+    if (sceneId) {
+      scenes[sceneId] = {
+        index: this.currentIndex,
+        pitchShift: this.pitchShift as number,
+        amount: this.amount as number,
+        primaryVoice: this.primaryVoice as number,
+        secondaryVoice: this.secondaryVoice as number,
+      };
+    }
+
     const p: StateParam = {
       currentIndex: this.currentIndex,
       manuals: this.manualParams,
       presets: this.presetParams,
+      scenes,
     };
 
     this.rtvcStateService.setValue(p);
@@ -376,7 +374,7 @@ export default class RtvcSourceProperties extends SourceProperties {
     this.device = this.getPropertyValue('device');
     this.latency = this.getPropertyValue('latency');
 
-    const p = this.rtvcStateService.getValue() as StateParam;
+    const p = this.rtvcStateService.getValue();
 
     this.presetParams = [];
     if (Array.isArray(p.presets)) this.presetParams = p.presets;
