@@ -8,7 +8,7 @@ import { AudioService } from '../../services/audio';
 import * as obs from '../../../obs-api';
 import { IObsListInput, IObsListOption, TObsValue } from 'components/obs/inputs/ObsInput';
 import Popper from 'vue-popperjs';
-import { ManualParam, PresetParam, StateParam } from 'services/rtvcStateService';
+import { PresetValues, StateParam, CommonParam } from 'services/rtvcStateService';
 import { ScenesService } from 'services/scenes';
 
 // for source properties
@@ -27,17 +27,6 @@ type SourcePropKey =
 // for save params
 type ParamKey = 'name' | 'inputGain' | 'pitchShift' | 'amount' | 'primaryVoice' | 'secondaryVoice';
 
-interface CommonParam {
-  name: string;
-  label: string;
-  description: string;
-
-  pitchShift: number;
-  amount: number;
-  primaryVoice: number;
-  secondaryVoice: number;
-}
-
 @Component({
   components: {
     VueSlider,
@@ -53,40 +42,6 @@ export default class RtvcSourceProperties extends SourceProperties {
   readonly manualMax = 5;
   showPopupMenu: boolean = false;
 
-  readonly presetValues = [
-    {
-      index: 'preset/0',
-      name: '琴詠ニア',
-      pitchShift: 0,
-      primaryVoice: 100,
-      secondaryVoice: -1,
-      amount: 0,
-      label: 'near',
-      description: '滑らかで無機質な声',
-    },
-    {
-      index: 'preset/1',
-      name: 'ずんだもん',
-      pitchShift: 0,
-      primaryVoice: 101,
-      secondaryVoice: -1,
-      amount: 0,
-      label: 'zundamon',
-      description: '子供っぽい明るい声',
-    },
-    {
-      index: 'preset/2',
-      name: '春日部つむぎ',
-      pitchShift: 0,
-      primaryVoice: 102,
-      secondaryVoice: -1,
-      amount: 0,
-      label: 'tsumugi',
-      description: '元気な明るい声',
-    },
-    //仮値 css での宣言値で
-  ];
-
   // default
   // input_gain=0.0 output_gain=0.0 pitch_shift:0.0 picth_shift_mode=1 snap=0.0
   // primary=100 secondary=-1 amonut=0.0
@@ -94,8 +49,7 @@ export default class RtvcSourceProperties extends SourceProperties {
   initialMonitoringType: obs.EMonitoringType;
   currentMonitoringType: obs.EMonitoringType;
 
-  manualParams: ManualParam[];
-  presetParams: PresetParam[];
+  state: StateParam;
 
   currentIndex = 'preset/0';
   isMonitor = false;
@@ -121,16 +75,18 @@ export default class RtvcSourceProperties extends SourceProperties {
   latencyModel: IObsListOption<number> = { description: '', value: 0 };
 
   get presetList() {
-    return this.presetValues.map(a => {
-      return { value: a.index, name: a.name, label: a.label };
-    });
+    return PresetValues.map(a => ({ value: a.index, name: a.name, label: a.label }));
   }
-  manualList: { value: string; name: string }[] = [];
+
+  manualList: { value: string; name: string; label: string }[] = [];
+
   updateManualList() {
     // add,delに反応しないのでコード側から変更指示
-    this.manualList = this.manualParams.map((a, idx) => {
-      return { value: `manual/${idx}`, name: a.name, label: `manual${idx}` };
-    });
+    this.manualList = this.state.manuals.map((a, idx) => ({
+      value: `manual/${idx}`,
+      name: a.name,
+      label: `manual${idx}`,
+    }));
     this.canAdd = this.manualList.length < this.manualMax;
   }
 
@@ -250,53 +206,20 @@ export default class RtvcSourceProperties extends SourceProperties {
   // --  param in/out
 
   getParams(): CommonParam {
-    const p = this.indexToNum(this.currentIndex);
-    if (p.isManual) {
-      const v = this.manualParams[p.idx];
-      return {
-        name: v.name,
-        label: '',
-        description: '',
-        pitchShift: v.pitchShift,
-        amount: v.amount,
-        primaryVoice: v.primaryVoice,
-        secondaryVoice: v.secondaryVoice,
-      };
-    }
-
-    const v = this.presetValues[p.idx];
-    const m = this.presetParams[p.idx];
-
-    return {
-      name: v.name,
-      label: v.label,
-      description: v.description,
-      pitchShift: m.pitchShift,
-      amount: v.amount,
-      primaryVoice: v.primaryVoice,
-      secondaryVoice: v.secondaryVoice,
-    };
+    return this.rtvcStateService.getParams(this.state, this.currentIndex);
   }
 
   setParam(key: ParamKey, value: any) {
     const p = this.indexToNum(this.currentIndex);
     if (p.isManual) {
-      this.manualParams[p.idx][key] = value;
+      this.state.manuals[p.idx][key] = value;
       return;
     }
-    this.presetParams[p.idx][key] = value;
+    this.state.presets[p.idx][key] = value;
   }
 
   indexToNum(index: string): { isManual: boolean; idx: number } {
-    const s = index.split('/');
-    if (s.length === 2) {
-      const num = Number(s[1]);
-      if (s[0] === 'manual' && num >= 0 && num < this.manualParams.length)
-        return { isManual: true, idx: num };
-      if (s[0] === 'preset' && num >= 0 && num < this.presetList.length)
-        return { isManual: false, idx: num };
-    }
-    return { isManual: false, idx: 0 };
+    return this.rtvcStateService.indexToNum(this.state, index);
   }
 
   getManualIndexNum(index: string): number {
@@ -335,27 +258,12 @@ export default class RtvcSourceProperties extends SourceProperties {
   // --- update
 
   update() {
-    const s = this.rtvcStateService.getValue();
-    const scenes = s.scenes ?? {};
+    this.state.currentIndex = this.currentIndex;
+    const scenes = this.state.scenes ?? {};
     const sceneId = this.scenesService.activeScene.id;
-    if (sceneId) {
-      scenes[sceneId] = {
-        index: this.currentIndex,
-        pitchShift: this.pitchShift as number,
-        amount: this.amount as number,
-        primaryVoice: this.primaryVoice as number,
-        secondaryVoice: this.secondaryVoice as number,
-      };
-    }
-
-    const p: StateParam = {
-      currentIndex: this.currentIndex,
-      manuals: this.manualParams,
-      presets: this.presetParams,
-      scenes,
-    };
-
-    this.rtvcStateService.setValue(p);
+    if (sceneId) scenes[sceneId] = this.currentIndex;
+    this.state.scenes = scenes;
+    this.rtvcStateService.setState(this.state);
   }
 
   // -- vue lifecycle
@@ -374,24 +282,23 @@ export default class RtvcSourceProperties extends SourceProperties {
     this.device = this.getPropertyValue('device');
     this.latency = this.getPropertyValue('latency');
 
-    const p = this.rtvcStateService.getValue();
+    this.state = this.rtvcStateService.getState();
 
-    this.presetParams = [];
-    if (Array.isArray(p.presets)) this.presetParams = p.presets;
-    while (this.presetParams.length < this.presetValues.length)
-      this.presetParams.push({ pitchShift: 0 });
+    if (!this.state.presets) this.state.presets = [];
+    while (this.state.presets.length < PresetValues.length)
+      this.state.presets.push({ pitchShift: 0 });
 
     // default values
-    this.manualParams = [
-      { name: 'オリジナル1', pitchShift: 0, amount: 0, primaryVoice: 0, secondaryVoice: -1 },
-      { name: 'オリジナル2', pitchShift: 0, amount: 0, primaryVoice: 0, secondaryVoice: -1 },
-      { name: 'オリジナル3', pitchShift: 0, amount: 0, primaryVoice: 0, secondaryVoice: -1 },
-    ];
+    if (!this.state.manuals)
+      this.state.manuals = [
+        { name: 'オリジナル1', pitchShift: 0, amount: 0, primaryVoice: 0, secondaryVoice: -1 },
+        { name: 'オリジナル2', pitchShift: 0, amount: 0, primaryVoice: 0, secondaryVoice: -1 },
+        { name: 'オリジナル3', pitchShift: 0, amount: 0, primaryVoice: 0, secondaryVoice: -1 },
+      ];
 
-    if (Array.isArray(p.manuals)) this.manualParams = p.manuals;
     this.updateManualList();
 
-    this.currentIndex = p.currentIndex ?? 'preset/0';
+    this.currentIndex = this.state.currentIndex;
     this.onChangeIndex();
   }
 
@@ -444,10 +351,10 @@ export default class RtvcSourceProperties extends SourceProperties {
   }
 
   onAdd() {
-    if (this.manualParams.length >= this.manualMax) return;
-    const index = `manual/${this.manualParams.length}`;
-    this.manualParams.push({
-      name: `オリジナル${this.manualParams.length + 1}`,
+    if (this.state.manuals.length >= this.manualMax) return;
+    const index = `manual/${this.state.manuals.length}`;
+    this.state.manuals.push({
+      name: `オリジナル${this.state.manuals.length + 1}`,
       pitchShift: 0,
       amount: 0,
       primaryVoice: 0,
@@ -462,20 +369,20 @@ export default class RtvcSourceProperties extends SourceProperties {
     if (idx < 0) return;
     if (!confirm('削除しますか？')) return;
 
-    this.manualParams.splice(idx, 1);
+    this.state.manuals.splice(idx, 1);
     this.updateManualList();
     if (index !== this.currentIndex) return;
     this.currentIndex = 'preset/0';
   }
 
   onCopy(index: string) {
-    if (this.manualParams.length >= this.manualMax) return;
+    if (this.state.manuals.length >= this.manualMax) return;
     const idx = this.getManualIndexNum(index);
     if (idx < 0) return;
-    const v = this.manualParams[idx];
-    const newIndex = `manual/${this.manualParams.length}`;
+    const v = this.state.manuals[idx];
+    const newIndex = `manual/${this.state.manuals.length}`;
 
-    this.manualParams.push({
+    this.state.manuals.push({
       name: `${v.name}のコピー`,
       pitchShift: v.pitchShift,
       amount: v.amount,
