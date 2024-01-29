@@ -1,4 +1,4 @@
-import { StatefulService, mutation } from './core/stateful-service';
+import { mutation } from './core/stateful-service';
 import { PersistentStatefulService } from './core/persistent-stateful-service';
 import { SourcesService } from './sources';
 

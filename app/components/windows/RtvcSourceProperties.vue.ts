@@ -1,6 +1,5 @@
 import { Component, Watch } from 'vue-property-decorator';
 import SourceProperties from './SourceProperties.vue';
-import { RtvcStateService } from 'app-services';
 import { Inject } from 'services/core/injector';
 import VueSlider from 'vue-slider-component';
 import Multiselect from 'vue-multiselect';
@@ -8,7 +7,7 @@ import { AudioService } from '../../services/audio';
 import * as obs from '../../../obs-api';
 import { IObsListInput, IObsListOption, TObsValue } from 'components/obs/inputs/ObsInput';
 import Popper from 'vue-popperjs';
-import { PresetValues, StateParam, CommonParam } from 'services/rtvcStateService';
+import { RtvcStateService, PresetValues, StateParam, CommonParam } from 'services/rtvcStateService';
 import { ScenesService } from 'services/scenes';
 
 // for source properties
