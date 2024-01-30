@@ -116,7 +116,7 @@ export default class RtvcSourceProperties extends SourceProperties {
 
   @Watch('currentIndex')
   onChangeIndex() {
-    const p = this.getParams();
+    const p = this.rtvcStateService.stateToCommonParam(this.state, this.currentIndex);
 
     this.name = p.name;
     this.label = p.label;
@@ -135,7 +135,7 @@ export default class RtvcSourceProperties extends SourceProperties {
     this.deviceModel = this.getSourcePropertyOption('device', this.device);
     this.latencyModel = this.getSourcePropertyOption('latency', this.latency);
 
-    this.rtvcStateService.setSourcePropertiesByCommon(this.source, p);
+    this.rtvcStateService.setSourcePropertiesByCommonParam(this.source, p);
   }
 
   @Watch('name')
@@ -197,8 +197,14 @@ export default class RtvcSourceProperties extends SourceProperties {
 
   // --  param in/out
 
-  getParams() {
-    return this.rtvcStateService.getParams(this.state, this.currentIndex);
+  indexToNum(index: string): { isManual: boolean; idx: number } {
+    return this.rtvcStateService.indexToNum(this.state, index);
+  }
+
+  getManualIndexNum(index: string): number {
+    const r = this.indexToNum(index);
+    if (r.isManual) return r.idx;
+    return -1;
   }
 
   setParam(key: SetParamKey, value: any) {
@@ -208,16 +214,6 @@ export default class RtvcSourceProperties extends SourceProperties {
       return;
     }
     this.state.presets[p.idx][key] = value;
-  }
-
-  indexToNum(index: string): { isManual: boolean; idx: number } {
-    return this.rtvcStateService.indexToNum(this.state, index);
-  }
-
-  getManualIndexNum(index: string): number {
-    const r = this.indexToNum(index);
-    if (r.isManual) return r.idx;
-    return -1;
   }
 
   // -- sources in/out

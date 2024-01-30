@@ -109,7 +109,7 @@ export class RtvcStateService extends PersistentStatefulService<IRtvcState> {
     source.setPropertiesFormData(props);
   }
 
-  setSourcePropertiesByCommon(source: ISourceApi, p: CommonParam) {
+  setSourcePropertiesByCommonParam(source: ISourceApi, p: CommonParam) {
     this.setSourceProperties(source, [
       { key: 'pitch_shift', value: p.pitchShift },
       { key: 'amount', value: p.amount },
@@ -156,7 +156,7 @@ export class RtvcStateService extends PersistentStatefulService<IRtvcState> {
     return def;
   }
 
-  getParams(state: StateParam, index: string) {
+  stateToCommonParam(state: StateParam, index: string): CommonParam {
     const p = this.indexToNum(state, index);
     if (p.isManual) {
       const v = state.manuals[p.idx];
@@ -192,13 +192,13 @@ export class RtvcStateService extends PersistentStatefulService<IRtvcState> {
     if (!v.scenes || !v.scenes[sceneId]) return;
     const idx = v.scenes[sceneId];
     if (v.currentIndex === idx) return; // no change
-    const p = this.getParams(v, idx);
+    const p = this.stateToCommonParam(v, idx);
 
     const sl = sourceService.getSourcesByType('nair-rtvc-source');
     if (!sl || !sl.length) return;
     const source = sl[0];
 
-    this.setSourcePropertiesByCommon(source, p);
+    this.setSourcePropertiesByCommonParam(source, p);
     v.currentIndex = idx;
     this.setState(v);
   }
