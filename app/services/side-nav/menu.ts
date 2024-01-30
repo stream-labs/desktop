@@ -113,13 +113,6 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
 
     this.handleDismissables();
 
-    const allAppsLoaded = this.platformAppsService.allAppsLoaded.subscribe(
-      (loadedApps: ILoadedApp[]) => {
-        this.updateAllApps(loadedApps);
-        allAppsLoaded.unsubscribe();
-      },
-    );
-
     /**
      * Determine if the user has the recording history menu item
      */

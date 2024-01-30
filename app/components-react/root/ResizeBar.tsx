@@ -14,6 +14,7 @@ interface ResizeBarProps {
   onResizestop?: (offset?: number) => void;
   onInput: (val: number) => void;
   className?: string;
+  transformScale?: number;
 }
 
 interface ResizableData {
@@ -77,7 +78,7 @@ export default function ResizeBar(p: React.PropsWithChildren<ResizeBarProps>) {
       onResizeStart={handleResize(resizeStart)}
       onResizeStop={handleResize(resizeStop)}
       onResize={handleResize(p.onInput)}
-      transformScale={2}
+      transformScale={p.transformScale ?? 2}
       {...resizableProps}
       handle={
         <div className={cx(styles.resizeBar, styles[p.position], p.className)}>

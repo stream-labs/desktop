@@ -44,19 +44,17 @@ class LiveDockController {
   }
 
   get selectedChat() {
-    if (
-      this.store.underlyingSelectedChat === 'default' &&
-      this.isPlatform('twitter') &&
-      this.isRestreaming
-    ) {
-      return 'restream';
-    }
     if (this.store.underlyingSelectedChat === 'default') return 'default';
     if (this.store.underlyingSelectedChat === 'restream') {
       if (this.restreamService.shouldGoLiveWithRestream) return 'restream';
       return 'default';
     }
-    return this.chatApps.find(app => app.id === this.store.underlyingSelectedChat)
+
+    return this.chatApps.find(app => {
+      if (app.id === this.store.underlyingSelectedChat) {
+        return app.id === this.store.underlyingSelectedChat;
+      }
+    })
       ? this.store.underlyingSelectedChat
       : 'default';
   }

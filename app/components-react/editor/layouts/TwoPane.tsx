@@ -43,6 +43,7 @@ export function TwoPane(p: React.PropsWithChildren<LayoutProps>) {
         onInput={(value: number) => setBar('bar2', value)}
         max={calculateMax(mins.rest + mins.bar1)}
         min={mins.bar2}
+        transformScale={1}
       >
         <div style={{ width: `${resizes.bar2 * 100}%` }} className={styles.cell}>
           {p.children?.['5'] || <></>}

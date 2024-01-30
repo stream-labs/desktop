@@ -8,7 +8,7 @@ import { Tooltip } from 'antd';
 
 interface ITableHeader {
   text: string;
-  icon: string;
+  icon: string | JSX.Element;
   tooltip?: string;
   whisper?: string;
 }
@@ -27,48 +27,60 @@ interface IUltraComparisonProps {
 export function UltraComparison(p: IUltraComparisonProps) {
   const { MagicLinkService } = Services;
   const tableHeaders = p.tableHeaders || [
-    { text: $t('Themes and Overlays'), icon: 'icon-themes' },
-    { text: $t('Alerts and Widgets'), icon: 'icon-alert-box' },
     { text: $t('Streamlabs Desktop'), icon: 'icon-desktop' },
+    { text: $t('Themes and Overlays'), icon: 'icon-themes' },
     { text: $t('Multistream'), icon: 'icon-multistream' },
-    { text: $t('Collab Cam'), icon: 'icon-team-2' },
+    { text: $t('Dual Output'), icon: <DualOutputIcon /> },
+    { text: $t('Seamless Creator Workflow'), icon: 'icon-user' },
     { text: $t('Desktop App Store'), icon: 'icon-store' },
+    { text: $t('Collab Cam'), icon: 'icon-team-2' },
+    { text: $t('Cloudbot'), icon: 'icon-cloudbot' },
+    { text: $t('Alerts and Widgets'), icon: 'icon-alert-box' },
+    { text: $t('Streamlabs Mobile'), icon: 'icon-phone' },
+    { text: $t('Streamlabs Console'), icon: 'icon-console' },
     { text: $t('Tips'), icon: 'icon-donation-settings' },
     { text: $t('Storage'), icon: 'icon-cloud-backup' },
-    { text: $t('Cloudbot'), icon: 'icon-cloudbot' },
     {
       text: $t('All Streamlabs Pro Tools'),
       icon: 'icon-streamlabs',
-      whisper: 'Console, Cross Clip, Video Editor, & Podcast Editor',
+      whisper: 'Cross Clip, Talk Studio, Video Editor, Podcast Editor',
     },
   ];
   const tableData = p.tableData || {
     standard: [
-      { text: $t('Access to Free Overlays and Themes') },
       { text: '✓', key: 'check1' },
+      { text: $t('Access to Free Overlays and Themes') },
+      { text: '—', key: 'dash1' },
+      { text: $t('%{destinationsNumber} Destinations', { destinationsNumber: '2' }) },
       { text: '✓', key: 'check2' },
-      { text: '—' },
-      { text: $t('Add 1 Guest') },
       { text: $t('Limited Free Apps') },
+      { text: $t('Add 1 Guest') },
+      { text: $t('Basic Chatbot') },
+      { text: '✓', key: 'check3' },
+      { text: '✓', key: 'check4' },
+      { text: '—', key: 'dash2' },
       { text: $t('No-fee Tipping') },
       { text: '1GB' },
-      { text: $t('Basic Chatbot') },
       { text: $t('Basic Features') },
     ],
     prime: [
+      { text: '✓', key: 'check1' },
       {
         text: p.condensed
           ? $t('Access to All Overlays and Themes')
           : $t('Access to All Overlays and Themes (%{themeNumber})', { themeNumber: '1000+' }),
       },
-      { text: '✓', key: 'check1' },
       { text: '✓', key: 'check2' },
+      { text: $t('%{destinationsNumber} Destinations', { destinationsNumber: '3+' }) },
       { text: '✓', key: 'check3' },
-      { text: $t('Add Up To 11 Guests or Cameras') },
       { text: $t('Access Full App Library (%{appNumber})', { appNumber: '60+' }) },
+      { text: $t('Add Up To 11 Guests or Cameras') },
+      { text: $t('Custom Named Chatbot') },
+      { text: '✓', key: 'check4' },
+      { text: '✓  ' + $t('+ Disconnect Protection') },
+      { text: '✓', key: 'check5' },
       { text: $t('Custom Tip Page and Domain') },
       { text: '10GB' },
-      { text: $t('Custom Named Chatbot') },
       { text: $t('Pro Upgrade') },
     ],
   };
@@ -157,8 +169,14 @@ export function UltraComparison(p: IUltraComparisonProps) {
 function TableHeader(p: { header: ITableHeader }) {
   const cell = (
     <div className={styles.tableHeader} key={p.header.text}>
-      <i className={p.header.icon} />
-      <span style={{ display: 'flex', flexDirection: 'column' }}>
+      {typeof p.header.icon === 'string' ? <i className={p.header.icon} /> : p.header.icon}
+      <span
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          ...(typeof p.header.icon === 'string' ? {} : { marginLeft: 8 }),
+        }}
+      >
         {p.header.text}
         {p.header.whisper && <div className={styles.whisper}>{p.header.whisper}</div>}
       </span>
@@ -174,3 +192,14 @@ function TableHeader(p: { header: ITableHeader }) {
     );
   } else return cell;
 }
+
+const DualOutputIcon = ({ color = '#bdc2c4' }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M6 1C6 0.4 5.6 0 5 0H4H2H1C0.4 0 0 0.4 0 1V8C0 8.6 0.4 9 1 9H2V13C2 13.6 2.4 14 3 14H11C11.6 14 12 13.6 12 13V9H13C13.6 9 14 8.6 14 8V1C14 0.4 13.6 0 13 0H12H10H9C8.4 0 8 0.4 8 1V8C8 8.6 8.4 9 9 9H10V12H4V9H5C5.6 9 6 8.6 6 8V1Z"
+      fill={color}
+    />
+  </svg>
+);
