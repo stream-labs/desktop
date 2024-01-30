@@ -26,6 +26,7 @@ export function Default(p: React.PropsWithChildren<LayoutProps>) {
         onInput={(value: number) => setBar('bar1', value)}
         max={calculateMax(mins.rest + bars.bar2)}
         min={mins.bar1}
+        transformScale={1}
       >
         <div
           style={{ height: `${resizes.bar1 * 100}%` }}
