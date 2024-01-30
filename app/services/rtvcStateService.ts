@@ -1,10 +1,20 @@
 import { mutation } from './core/stateful-service';
 import { PersistentStatefulService } from './core/persistent-stateful-service';
-import { SourcesService } from './sources';
+import { SourcesService, Source, ISourceApi } from './sources';
+import { TObsValue } from 'components/obs/inputs/ObsInput';
 
-export interface IRtvcState {
-  value: any;
-}
+// for source properties
+export type SourcePropKey =
+  | 'device'
+  | 'latency'
+  | 'input_gain'
+  | 'output_gain'
+  | 'pitch_shift'
+  | 'pitch_shift_mode'
+  | 'pitch_snap'
+  | 'primary_voice'
+  | 'secondary_voice'
+  | 'amount';
 
 export const PresetValues = [
   {
@@ -37,7 +47,6 @@ export const PresetValues = [
     label: 'tsumugi',
     description: '元気な明るい声',
   },
-  //仮値 css での宣言値で
 ];
 
 // RtvcStateService保持用
@@ -71,6 +80,10 @@ export interface CommonParam {
   secondaryVoice: number;
 }
 
+interface IRtvcState {
+  value: any;
+}
+
 export class RtvcStateService extends PersistentStatefulService<IRtvcState> {
   setState(v: StateParam) {
     this.SET_STATE(v);
@@ -80,6 +93,32 @@ export class RtvcStateService extends PersistentStatefulService<IRtvcState> {
   private SET_STATE(v: any): void {
     this.state = { value: v };
   }
+
+  // --- source properties
+
+  setSourceProperties(source: ISourceApi, values: { key: SourcePropKey; value: TObsValue }[]) {
+    const props = source.getPropertiesFormData();
+
+    for (const v of values) {
+      const prop = props.find(a => a.name === v.key);
+      if (!prop || prop.value === v.value) continue; // no need change
+      //console.log(`${v.key} change ${prop.value} to ${v.value}`);
+      prop.value = v.value;
+    }
+
+    source.setPropertiesFormData(props);
+  }
+
+  setSourcePropertiesByCommon(source: ISourceApi, p: CommonParam) {
+    this.setSourceProperties(source, [
+      { key: 'pitch_shift', value: p.pitchShift },
+      { key: 'amount', value: p.amount },
+      { key: 'primary_voice', value: p.primaryVoice },
+      { key: 'secondary_voice', value: p.secondaryVoice },
+    ]);
+  }
+
+  // -- state params
 
   getState(): StateParam {
     let r = this.state.value as StateParam;
@@ -101,8 +140,6 @@ export class RtvcStateService extends PersistentStatefulService<IRtvcState> {
 
     return r;
   }
-
-  // -- params
 
   indexToNum(state: StateParam, index: string): { isManual: boolean; idx: number } {
     const def = { isManual: false, idx: 0 };
@@ -161,20 +198,7 @@ export class RtvcStateService extends PersistentStatefulService<IRtvcState> {
     if (!sl || !sl.length) return;
     const source = sl[0];
 
-    const props = source.getPropertiesFormData();
-
-    const setProp = (key: any, value: any) => {
-      const prop = props.find(a => a.name === key);
-      if (!prop || prop.value === value) return; // no need change
-      prop.value = value;
-    };
-
-    setProp('pitch_shift', p.pitchShift);
-    setProp('amount', p.amount);
-    setProp('primary_voice', p.primaryVoice);
-    setProp('secondary_voice', p.secondaryVoice);
-
-    source.setPropertiesFormData(props);
+    this.setSourcePropertiesByCommon(source, p);
     v.currentIndex = idx;
     this.setState(v);
   }

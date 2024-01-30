@@ -1,30 +1,28 @@
 import { Component, Watch } from 'vue-property-decorator';
-import SourceProperties from './SourceProperties.vue';
 import { Inject } from 'services/core/injector';
+import { AudioService } from '../../services/audio';
+import { ScenesService } from 'services/scenes';
 import VueSlider from 'vue-slider-component';
 import Multiselect from 'vue-multiselect';
-import { AudioService } from '../../services/audio';
+import Popper from 'vue-popperjs';
+import SourceProperties from './SourceProperties.vue';
 import * as obs from '../../../obs-api';
 import { IObsListInput, IObsListOption, TObsValue } from 'components/obs/inputs/ObsInput';
-import Popper from 'vue-popperjs';
-import { RtvcStateService, PresetValues, StateParam, CommonParam } from 'services/rtvcStateService';
-import { ScenesService } from 'services/scenes';
+import {
+  RtvcStateService,
+  PresetValues,
+  StateParam,
+  SourcePropKey,
+} from 'services/rtvcStateService';
 
-// for source properties
-type SourcePropKey =
-  | 'device'
-  | 'latency'
-  | 'input_gain'
-  | 'output_gain'
-  | 'pitch_shift'
-  | 'pitch_shift_mode'
-  | 'pitch_snap'
-  | 'primary_voice'
-  | 'secondary_voice'
-  | 'amount';
-
-// for save params
-type ParamKey = 'name' | 'inputGain' | 'pitchShift' | 'amount' | 'primaryVoice' | 'secondaryVoice';
+// for set param
+type SetParamKey =
+  | 'name'
+  | 'inputGain'
+  | 'pitchShift'
+  | 'amount'
+  | 'primaryVoice'
+  | 'secondaryVoice';
 
 @Component({
   components: {
@@ -39,7 +37,6 @@ export default class RtvcSourceProperties extends SourceProperties {
   @Inject() private scenesService: ScenesService;
 
   readonly manualMax = 5;
-  showPopupMenu: boolean = false;
 
   // default
   // input_gain=0.0 output_gain=0.0 pitch_shift:0.0 picth_shift_mode=1 snap=0.0
@@ -65,6 +62,7 @@ export default class RtvcSourceProperties extends SourceProperties {
   pitchShift: TObsValue = 0;
   amount: TObsValue = 0;
 
+  showPopupMenu: boolean = false;
   tab = 0;
   canAdd = false;
 
@@ -105,10 +103,10 @@ export default class RtvcSourceProperties extends SourceProperties {
     //return this.getPropertyOptions('secondary_voice').filter(a => !this.nonManualVoiceValues.includes(a.value))
   }
   get deviceList() {
-    return this.getPropertyOptions('device');
+    return this.getSourcePropertyOptions('device');
   }
   get latencyList() {
-    return this.getPropertyOptions('latency');
+    return this.getSourcePropertyOptions('latency');
   }
 
   get isPreset() {
@@ -134,15 +132,10 @@ export default class RtvcSourceProperties extends SourceProperties {
 
     this.primaryVoiceModel = optionInList(this.primaryVoiceList, this.primaryVoice); //this.getPropertyOptionByValue('primary_voice', this.primaryVoice)
     this.secondaryVoiceModel = optionInList(this.secondaryVoiceList, this.secondaryVoice); //this.getPropertyOptionByValue('secondary_voice', this.secondaryVoice)
-    this.deviceModel = this.getPropertyOptionByValue('device', this.device);
-    this.latencyModel = this.getPropertyOptionByValue('latency', this.latency);
+    this.deviceModel = this.getSourcePropertyOption('device', this.device);
+    this.latencyModel = this.getSourcePropertyOption('latency', this.latency);
 
-    // sourcesへも反映
-    //console.log('---');
-    this.setPropertyValue('pitch_shift', this.pitchShift);
-    this.setPropertyValue('amount', this.amount);
-    this.setPropertyValue('primary_voice', this.primaryVoice);
-    this.setPropertyValue('secondary_voice', this.secondaryVoice);
+    this.rtvcStateService.setSourcePropertiesByCommon(this.source, p);
   }
 
   @Watch('name')
@@ -155,39 +148,39 @@ export default class RtvcSourceProperties extends SourceProperties {
   @Watch('pitchShift')
   onChangePitchShift() {
     this.setParam('pitchShift', this.pitchShift);
-    this.setPropertyValue('pitch_shift', this.pitchShift);
+    this.setSourcePropertyValue('pitch_shift', this.pitchShift);
   }
 
   @Watch('amount')
   onChangeAmount() {
     this.setParam('amount', this.amount);
-    this.setPropertyValue('amount', this.amount);
+    this.setSourcePropertyValue('amount', this.amount);
   }
 
   @Watch('primaryVoiceModel')
   onChangePrimaryVoice() {
     this.primaryVoice = this.primaryVoiceModel.value;
     this.setParam('primaryVoice', this.primaryVoice);
-    this.setPropertyValue('primary_voice', this.primaryVoice);
+    this.setSourcePropertyValue('primary_voice', this.primaryVoice);
   }
 
   @Watch('secondaryVoiceModel')
   onChangeSecondaryVoice() {
     this.secondaryVoice = this.secondaryVoiceModel.value;
     this.setParam('secondaryVoice', this.secondaryVoice);
-    this.setPropertyValue('secondary_voice', this.secondaryVoice);
+    this.setSourcePropertyValue('secondary_voice', this.secondaryVoice);
   }
 
   @Watch('deviceModel')
   onChangeDevice() {
     this.device = this.deviceModel.value;
-    this.setPropertyValue('device', this.device);
+    this.setSourcePropertyValue('device', this.device);
   }
 
   @Watch('latencyModel')
   onChangeLatency() {
     this.latency = this.latencyModel.value;
-    this.setPropertyValue('latency', this.latency);
+    this.setSourcePropertyValue('latency', this.latency);
   }
 
   @Watch('isMonitor')
@@ -204,11 +197,11 @@ export default class RtvcSourceProperties extends SourceProperties {
 
   // --  param in/out
 
-  getParams(): CommonParam {
+  getParams() {
     return this.rtvcStateService.getParams(this.state, this.currentIndex);
   }
 
-  setParam(key: ParamKey, value: any) {
+  setParam(key: SetParamKey, value: any) {
     const p = this.indexToNum(this.currentIndex);
     if (p.isManual) {
       this.state.manuals[p.idx][key] = value;
@@ -229,29 +222,23 @@ export default class RtvcSourceProperties extends SourceProperties {
 
   // -- sources in/out
 
-  getPropertyValue(key: SourcePropKey): TObsValue {
+  getSourcePropertyValue(key: SourcePropKey): TObsValue {
     const p = this.properties.find(a => a.name === key);
     return p ? p.value : undefined;
   }
 
-  getPropertyOptions(key: SourcePropKey): IObsListOption<number>[] {
+  getSourcePropertyOptions(key: SourcePropKey): IObsListOption<number>[] {
     const p = this.properties.find(a => a.name === key) as IObsListInput<any>;
     return p ? p.options : [];
   }
 
-  getPropertyOptionByValue(key: SourcePropKey, value: any): IObsListOption<number> {
-    const list = this.getPropertyOptions(key);
+  getSourcePropertyOption(key: SourcePropKey, value: any): IObsListOption<number> {
+    const list = this.getSourcePropertyOptions(key);
     return list.find(a => a.value === value) ?? { description: '', value: 0 };
   }
 
-  setPropertyValue(key: SourcePropKey, value: TObsValue) {
-    const prop = this.properties.find(a => a.name === key);
-    if (!prop || prop.value === value) return; // no need change
-    //    console.log(`${key} change ${prop.value} to ${value}`);
-    prop.value = value;
-    const source = this.sourcesService.getSource(this.sourceId);
-    source.setPropertiesFormData([prop]);
-    this.tainted = true; // restote on cancel
+  setSourcePropertyValue(key: SourcePropKey, value: TObsValue) {
+    this.rtvcStateService.setSourceProperties(this.source, [{ key, value }]);
   }
 
   // --- update
@@ -278,8 +265,8 @@ export default class RtvcSourceProperties extends SourceProperties {
       this.currentMonitoringType = m;
       this.isMonitor = m !== obs.EMonitoringType.None;
     }
-    this.device = this.getPropertyValue('device');
-    this.latency = this.getPropertyValue('latency');
+    this.device = this.getSourcePropertyValue('device');
+    this.latency = this.getSourcePropertyValue('latency');
 
     this.state = this.rtvcStateService.getState();
 
@@ -309,8 +296,7 @@ export default class RtvcSourceProperties extends SourceProperties {
 
     if (this.canceled) {
       if (this.tainted) {
-        const source = this.sourcesService.getSource(this.sourceId);
-        source.setPropertiesFormData(this.initialProperties);
+        this.source.setPropertiesFormData(this.initialProperties);
       }
       return;
     }
