@@ -164,6 +164,8 @@ export class GoLiveSettingsModule {
    */
   async prepopulate() {
     const { StreamingService } = Services;
+    const { isMultiplatformMode } = StreamingService.views;
+
     this.state.setNeedPrepopulate(true);
     await StreamingService.actions.return.prepopulateInfo();
     // TODO investigate mutation order issue
@@ -179,7 +181,12 @@ export class GoLiveSettingsModule {
 
     if (this.state.isUpdateMode && !view.isMidStreamMode) {
       Object.keys(settings.platforms).forEach((platform: TPlatform) => {
-        if (!this.state.isPrimaryPlatform(platform)) delete settings.platforms[platform];
+        // In multi-platform mode, allow deleting all platform settings, including primary
+        if (!isMultiplatformMode && this.state.isPrimaryPlatform(platform)) {
+          return;
+        }
+
+        delete settings.platforms[platform];
       });
     }
 

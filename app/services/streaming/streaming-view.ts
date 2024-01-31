@@ -464,8 +464,8 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
 
     return {
       ...settings,
+      enabled,
       useCustomFields,
-      enabled: enabled || this.isPrimaryPlatform(platform),
     };
   }
 
