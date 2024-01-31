@@ -14,6 +14,7 @@ import Spinner from '../../shared/Spinner';
 import GoLiveError from './GoLiveError';
 import TwitterInput from './Twitter';
 import AddDestinationButton from 'components-react/shared/AddDestinationButton';
+import EmptyDestinations from './EmptyDestinations';
 
 const PlusIcon = PlusOutlined as Function;
 
@@ -35,6 +36,7 @@ export default function GoLiveSettings() {
     showSelector,
     showTweet,
     addDestination,
+    hasDestinations,
   } = useGoLiveSettings().extend(module => {
     const { UserService, VideoEncodingOptimizationService, SettingsService } = Services;
 
@@ -66,7 +68,7 @@ export default function GoLiveSettings() {
     };
   });
 
-  const shouldShowSettings = !error && !isLoading;
+  const shouldShowSettings = !error && !isLoading && hasDestinations;
   const shouldShowLeftCol = protectedModeEnabled;
   const shouldShowAddDestButton = canAddDestinations && isPrime;
 
@@ -95,6 +97,7 @@ export default function GoLiveSettings() {
       <Col span={shouldShowLeftCol ? 16 : 24} style={{ height: '100%' }}>
         <Spinner visible={isLoading} relative />
         <GoLiveError />
+        {!hasDestinations && <EmptyDestinations />}
         {shouldShowSettings && (
           <Scrollable style={{ height: '100%' }} snapToWindowEdge>
             {/*PLATFORM SETTINGS*/}
@@ -102,10 +105,12 @@ export default function GoLiveSettings() {
             {/*ADD SOME SPACE IN ADVANCED MODE*/}
             {isAdvancedMode && <div className={styles.spacer} />}
             {/*EXTRAS*/}
-            <Section isSimpleMode={!isAdvancedMode} title={$t('Extras')}>
-              {showTweet && <TwitterInput />}
-              {!!canUseOptimizedProfile && <OptimizedProfileSwitcher />}
-            </Section>
+            {hasDestinations && (
+              <Section isSimpleMode={!isAdvancedMode} title={$t('Extras')}>
+                {showTweet && <TwitterInput />}
+                {!!canUseOptimizedProfile && <OptimizedProfileSwitcher />}
+              </Section>
+            )}
           </Scrollable>
         )}
       </Col>

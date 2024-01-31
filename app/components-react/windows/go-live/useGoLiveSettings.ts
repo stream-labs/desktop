@@ -313,6 +313,13 @@ export class GoLiveSettingsModule {
       message.success($t('Successfully updated'));
     }
   }
+
+  /**
+   * Returns whether the user has any active destinations, be it an enabled platform or a custom destination
+   */
+  get hasDestinations() {
+    return this.state.enabledPlatforms.length > 0 || this.state.customDestinations.length > 0;
+  }
 }
 
 export function useGoLiveSettings() {

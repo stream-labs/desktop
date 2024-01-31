@@ -66,6 +66,7 @@ function ModalFooter() {
     close,
     goBackToSettings,
     isLoading,
+    hasDestinations,
   } = useGoLiveSettings().extend(module => ({
     windowsService: inject(WindowsService),
 
@@ -106,7 +107,7 @@ function ModalFooter() {
 
       {/* GO LIVE BUTTON */}
       {shouldShowConfirm && (
-        <Button type="primary" onClick={goLive} disabled={isLoading || !!error}>
+        <Button type="primary" onClick={goLive} disabled={isLoading || !!error || !hasDestinations}>
           {$t('Confirm & Go Live')}
         </Button>
       )}
