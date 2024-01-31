@@ -41,6 +41,7 @@ interface ICustomizationServiceState {
 }
 
 /** API for getting and setting properties on the Customization service. */
+@Singleton()
 export class CustomizationService implements ISerializable {
   @Fallback()
   @Inject()

@@ -24,6 +24,7 @@ interface EGameOverlayModel {
 }
 
 /** API for controlling and getting state of the game overlay. */
+@Singleton()
 export class GameOverlayService implements ISerializable {
   @Fallback()
   @Inject()

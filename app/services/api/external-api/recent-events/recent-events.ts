@@ -17,6 +17,7 @@ interface ERecentEventsModel {
 }
 
 /** API for interacting with Recent Events, at the moment includes only Safe Mode state and toggle methods */
+@Singleton()
 export class RecentEventsService implements ISerializable {
   @Fallback()
   @Inject()
