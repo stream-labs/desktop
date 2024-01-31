@@ -17,7 +17,6 @@ import { DisplayModule } from './modules/display';
 import { SceneTransitionsModule } from './modules/scene-transitions';
 import { ReplayModule } from './modules/replay';
 import { StreamlabelsModule } from './modules/streamlabels';
-import { GameOverlayModule } from './modules/game-overlay';
 
 export class PlatformAppsApi {
   modules: Dictionary<Module> = {};
@@ -40,7 +39,6 @@ export class PlatformAppsApi {
     this.registerModule(new SceneTransitionsModule());
     this.registerModule(new ReplayModule());
     this.registerModule(new StreamlabelsModule());
-    this.registerModule(new GameOverlayModule());
   }
 
   private registerModule(module: Module) {
