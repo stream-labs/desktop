@@ -261,23 +261,11 @@ export default class RtvcSourceProperties extends SourceProperties {
       this.currentMonitoringType = m;
       this.isMonitor = m !== obs.EMonitoringType.None;
     }
+
     this.device = this.getSourcePropertyValue('device');
     this.latency = this.getSourcePropertyValue('latency');
 
     this.state = this.rtvcStateService.getState();
-
-    if (!this.state.presets) this.state.presets = [];
-    while (this.state.presets.length < PresetValues.length)
-      this.state.presets.push({ pitchShift: 0 });
-
-    // default values
-    if (!this.state.manuals)
-      this.state.manuals = [
-        { name: 'オリジナル1', pitchShift: 0, amount: 0, primaryVoice: 0, secondaryVoice: -1 },
-        { name: 'オリジナル2', pitchShift: 0, amount: 0, primaryVoice: 0, secondaryVoice: -1 },
-        { name: 'オリジナル3', pitchShift: 0, amount: 0, primaryVoice: 0, secondaryVoice: -1 },
-      ];
-
     this.updateManualList();
 
     this.currentIndex = this.state.currentIndex;

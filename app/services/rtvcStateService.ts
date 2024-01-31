@@ -1,6 +1,6 @@
 import { mutation } from './core/stateful-service';
 import { PersistentStatefulService } from './core/persistent-stateful-service';
-import { SourcesService, Source, ISourceApi } from './sources';
+import { SourcesService, ISourceApi } from './sources';
 import { TObsValue } from 'components/obs/inputs/ObsInput';
 
 // for source properties
