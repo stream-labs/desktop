@@ -3,6 +3,7 @@ import { Inject } from 'services/core/injector';
 import { Fallback, Singleton } from 'services/api/external-api';
 import { Observable } from 'rxjs';
 import { ISerializable } from 'services/api/rpc-api';
+import pick from 'lodash/pick';
 
 interface IPinnedStatistics {
   cpu: boolean;
@@ -12,32 +13,18 @@ interface IPinnedStatistics {
 }
 
 interface ICustomizationServiceState {
-  nightMode?: string;
-  theme: string;
-  updateStreamInfoOnLive: boolean;
-  livePreviewEnabled: boolean;
-  leftDock: boolean;
   hideViewerCount: boolean;
-  folderSelection: boolean;
-  legacyAlertbox: boolean | null;
   livedockCollapsed: boolean;
-  livedockSize: number;
-  eventsSize: number;
-  controlsSize: number;
   performanceMode: boolean;
   chatZoomFactor: number;
-  enableBTTVEmotes: boolean;
-  enableFFZEmotes: boolean;
-  mediaBackupOptOut: boolean;
-  navigateToLiveOnStreamStart: boolean;
-  experimental?: {
-    volmetersFPSLimit?: number;
-  };
-  designerMode: boolean;
-  legacyEvents: boolean;
   pinnedStatistics: IPinnedStatistics;
-  enableCrashDumps: boolean;
-  enableAnnouncements: boolean;
+  theme: string;
+}
+
+interface ICustomizationServiceStateUpdateSettings {
+  hideViewerCount?: boolean;
+  livedockCollapsed?: boolean;
+  performanceMode?: boolean;
 }
 
 /** API for getting and setting properties on the Customization service. */
@@ -60,25 +47,39 @@ export class CustomizationService implements ISerializable {
     return this.customizationService.settingsChanged;
   }
 
-  // TODO: do we want to expose entire state like this, we didn't get more specific requirements
   /**
    * Returns the current settings state represented.
    *
    * @returns A serialized representation of {@link CustomizationService}
+   *
+   * @see {@link ICustomizationServiceState}
    */
   getModel(): ICustomizationServiceState {
     const state = this.customizationService.state;
 
-    return state;
+    return pick(state, [
+      'hideViewerCount',
+      'livedockCollapsed',
+      'performanceMode',
+      'chatZoomFactor',
+      'pinnedStatistics',
+      'theme',
+    ]);
   }
 
   /**
    * Update the customization settings
    *
    * @param settingsPatch Customization settings to update
-   * @see {@link ICustomizationServiceState}
+   * @see {@link ICustomizationServiceStateUpdateSettings}
    */
-  setSettings(settingsPatch: Partial<ICustomizationServiceState>) {
-    this.customizationService.setSettings(settingsPatch);
+  setSettings(settingsPatch: Partial<ICustomizationServiceStateUpdateSettings>) {
+    const settings = pick(settingsPatch, [
+      'hideViewerCount',
+      'livedockCollapsed',
+      'performanceMode',
+    ]);
+
+    this.customizationService.setSettings(settings);
   }
 }
