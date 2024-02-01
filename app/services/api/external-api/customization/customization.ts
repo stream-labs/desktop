@@ -1,7 +1,7 @@
 import { CustomizationService as InternalCustomizationService } from 'services/customization';
 import { Inject } from 'services/core/injector';
 import { Fallback, Singleton } from 'services/api/external-api';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { ISerializable } from 'services/api/rpc-api';
 import pick from 'lodash/pick';
 
@@ -43,9 +43,16 @@ export class CustomizationService implements ISerializable {
    *
    * @see ICustomizationServiceState
    */
-  get settingsChanged(): Observable<Partial<ICustomizationServiceState>> {
-    return this.customizationService.settingsChanged;
-  }
+  // TODO: Can we do this on a constructor, instead of this IIFE pattern? Also, are we leaking
+  settingsChanged: Subject<ICustomizationServiceState> = (() => {
+    const settingsChanged = new Subject<ICustomizationServiceState>();
+
+    this.customizationService.settingsChanged.subscribe(() => {
+      this.settingsChanged.next(this.getModel());
+    });
+
+    return settingsChanged;
+  })();
 
   /**
    * Returns the current settings state represented.
