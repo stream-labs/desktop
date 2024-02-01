@@ -20,6 +20,7 @@ interface ICustomizationServiceState {
   chatZoomFactor: number;
   pinnedStatistics: IPinnedStatistics;
   theme: string;
+  legacyAlertbox: boolean;
 }
 
 interface ICustomizationServiceStateUpdateSettings {
@@ -63,6 +64,7 @@ export class CustomizationService implements ISerializable {
       'chatZoomFactor',
       'pinnedStatistics',
       'theme',
+      'legacyAlertbox',
     ]);
   }
 
@@ -77,6 +79,7 @@ export class CustomizationService implements ISerializable {
       'hideViewerCount',
       'livedockCollapsed',
       'performanceMode',
+      'legacyAlertbox',
     ]);
 
     this.customizationService.setSettings(settings);
