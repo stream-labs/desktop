@@ -4,6 +4,7 @@ import { Fallback, Singleton } from 'services/api/external-api';
 import { Observable, Subject } from 'rxjs';
 import { ISerializable } from 'services/api/rpc-api';
 import pick from 'lodash/pick';
+import { map } from 'rxjs/operators';
 
 interface IPinnedStatistics {
   cpu: boolean;
@@ -32,7 +33,7 @@ interface ICustomizationServiceStateUpdateSettings {
 export class CustomizationService implements ISerializable {
   @Fallback()
   @Inject()
-  private customizationService: InternalCustomizationService;
+  private customizationService!: InternalCustomizationService;
 
   /**
    * Observable event that is triggered whenever the customization settings
@@ -43,16 +44,7 @@ export class CustomizationService implements ISerializable {
    *
    * @see ICustomizationServiceState
    */
-  // TODO: Can we do this on a constructor, instead of this IIFE pattern? Also, are we leaking
-  settingsChanged: Subject<ICustomizationServiceState> = (() => {
-    const settingsChanged = new Subject<ICustomizationServiceState>();
-
-    this.customizationService.settingsChanged.subscribe(() => {
-      this.settingsChanged.next(this.getModel());
-    });
-
-    return settingsChanged;
-  })();
+  settingsChanged = this.customizationService.settingsChanged.pipe(map(_ => this.getModel()));
 
   /**
    * Returns the current settings state represented.
