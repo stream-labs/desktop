@@ -53,14 +53,14 @@ export class RecentEventsService implements ISerializable {
   /**
    * Enables safe mode.
    */
-  enable(): void {
+  enableSafeMode(): void {
     this.recentEventsService.activateSafeMode();
   }
 
   /**
    * Disables safe mode.
    */
-  disable(): void {
+  disableSafeMode(): void {
     this.recentEventsService.disableSafeMode();
   }
 }
