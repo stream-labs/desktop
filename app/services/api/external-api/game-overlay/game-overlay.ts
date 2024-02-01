@@ -28,7 +28,7 @@ interface EGameOverlayModel {
 export class GameOverlayService implements ISerializable {
   @Fallback()
   @Inject()
-  private internalGameOverlayService: InternalGameOverlayService;
+  private gameOverlayService: InternalGameOverlayService;
 
   /**
    * Observable event that is triggered whenever the game overlay
@@ -40,7 +40,7 @@ export class GameOverlayService implements ISerializable {
    * @see EGameOverlayState
    */
   get overlayStatusChanged(): Observable<EGameOverlayState> {
-    return this.internalGameOverlayService.overlayStatusChanged;
+    return this.gameOverlayService.overlayStatusChanged;
   }
 
   /**
@@ -53,7 +53,7 @@ export class GameOverlayService implements ISerializable {
    * @see EGameOverlayVisibility
    */
   get overlayVisibilityChanged(): Observable<EGameOverlayVisibility> {
-    return this.internalGameOverlayService.overlayVisibilityChanged;
+    return this.gameOverlayService.overlayVisibilityChanged;
   }
 
   /**
@@ -62,7 +62,7 @@ export class GameOverlayService implements ISerializable {
    * @returns A serialized representation of {@link GameOverlayService}
    */
   getModel(): EGameOverlayModel {
-    const state = this.internalGameOverlayService.state;
+    const state = this.gameOverlayService.state;
     return {
       isEnabled: state.isEnabled,
       isPreviewEnabled: state.isPreviewEnabled,
@@ -74,14 +74,14 @@ export class GameOverlayService implements ISerializable {
    * Enables the game overlay.
    */
   enable(): void {
-    this.internalGameOverlayService.setEnabled(true);
+    this.gameOverlayService.setEnabled(true);
   }
 
   /**
    * Disables the game overlay.
    */
   disable(): void {
-    this.internalGameOverlayService.setEnabled(false);
+    this.gameOverlayService.setEnabled(false);
   }
 
   /**
@@ -90,7 +90,7 @@ export class GameOverlayService implements ISerializable {
    * Has no effect if the overlay isn't enabled.
    */
   show(): void {
-    this.internalGameOverlayService.showOverlay();
+    this.gameOverlayService.showOverlay();
   }
 
   /**
@@ -99,6 +99,6 @@ export class GameOverlayService implements ISerializable {
    * Has no effect if the overlay isn't enabled.
    */
   hide(): void {
-    this.internalGameOverlayService.hideOverlay();
+    this.gameOverlayService.hideOverlay();
   }
 }

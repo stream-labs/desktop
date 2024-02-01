@@ -45,7 +45,7 @@ interface ICustomizationServiceState {
 export class CustomizationService implements ISerializable {
   @Fallback()
   @Inject()
-  private internalCustomizationService: InternalCustomizationService;
+  private customizationService: InternalCustomizationService;
 
   /**
    * Observable event that is triggered whenever the customization settings
@@ -57,7 +57,7 @@ export class CustomizationService implements ISerializable {
    * @see ICustomizationServiceState
    */
   get settingsChanged(): Observable<Partial<ICustomizationServiceState>> {
-    return this.internalCustomizationService.settingsChanged;
+    return this.customizationService.settingsChanged;
   }
 
   // TODO: do we want to expose entire state like this, we didn't get more specific requirements
@@ -67,7 +67,7 @@ export class CustomizationService implements ISerializable {
    * @returns A serialized representation of {@link CustomizationService}
    */
   getModel(): ICustomizationServiceState {
-    const state = this.internalCustomizationService.state;
+    const state = this.customizationService.state;
 
     return state;
   }
@@ -79,6 +79,6 @@ export class CustomizationService implements ISerializable {
    * @see {@link ICustomizationServiceState}
    */
   setSettings(settingsPatch: Partial<ICustomizationServiceState>) {
-    this.internalCustomizationService.setSettings(settingsPatch);
+    this.customizationService.setSettings(settingsPatch);
   }
 }

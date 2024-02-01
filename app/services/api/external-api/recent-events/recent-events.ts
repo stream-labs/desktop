@@ -21,7 +21,7 @@ interface ERecentEventsModel {
 export class RecentEventsService implements ISerializable {
   @Fallback()
   @Inject()
-  private internalRecentEventsService: InternalRecentEventsService;
+  private recentEventsService: InternalRecentEventsService;
 
   /**
    * Observable event that is triggered whenever the safe mode status
@@ -34,7 +34,7 @@ export class RecentEventsService implements ISerializable {
    * @see ESafeModeStatus
    */
   get safeModeStatusChanged(): Observable<ESafeModeStatus> {
-    return this.internalRecentEventsService.safeModeStatusChanged;
+    return this.recentEventsService.safeModeStatusChanged;
   }
 
   /**
@@ -43,7 +43,7 @@ export class RecentEventsService implements ISerializable {
    * @returns A serialized representation of {@link RecentEventsService}
    */
   getModel(): ERecentEventsModel {
-    const state = this.internalRecentEventsService.state;
+    const state = this.recentEventsService.state;
 
     return {
       isSafeModeEnabled: state.safeMode.enabled,
@@ -54,13 +54,13 @@ export class RecentEventsService implements ISerializable {
    * Enables safe mode.
    */
   enable(): void {
-    this.internalRecentEventsService.activateSafeMode();
+    this.recentEventsService.activateSafeMode();
   }
 
   /**
    * Disables safe mode.
    */
   disable(): void {
-    this.internalRecentEventsService.disableSafeMode();
+    this.recentEventsService.disableSafeMode();
   }
 }
