@@ -262,10 +262,19 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
 
   /**
    * Chat url of a primary platform
+   * If the primary platform is not enabled, and we're on single stream mode,
+   * returns the URL of the first enabled platform
    */
   get chatUrl(): string {
     if (!this.userView.isLoggedIn || !this.userView.auth) return '';
-    return getPlatformService(this.userView.auth.primaryPlatform)?.chatUrl;
+    // TODO: transition away from primaryPlatform completely when possible
+    // TODO: handle custom destinations
+    const enabledPlatforms = this.enabledPlatforms;
+    const platform = this.enabledPlatforms.includes(this.userView.auth.primaryPlatform)
+      ? this.userView.auth.primaryPlatform
+      : enabledPlatforms[0];
+
+    return getPlatformService(platform)?.chatUrl;
   }
 
   getTweetText(streamTitle: string) {
