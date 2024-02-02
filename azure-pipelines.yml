@@ -4,6 +4,7 @@ trigger:
 
 variables:
   CI: true
+  TEMP_DIR: $(Build.SourcesDirectory)/temp
 
 jobs:
   - job: Test
@@ -17,6 +18,13 @@ jobs:
       parallel: 4
 
     steps:
+      # Step to create temp directory and set TEMP & TMP environment variables on Windows
+      - powershell: |
+          New-Item -ItemType Directory -Force -Path $(TEMP_DIR)
+          echo "##vso[task.setvariable variable=TEMP]$(TEMP_DIR)"
+          echo "##vso[task.setvariable variable=TMP]$(TEMP_DIR)"
+        displayName: 'Set TEMP and TMP environment variables'
+
       - powershell: echo "IP for RDP connections:" $(Invoke-RestMethod ipinfo.io/ip)
         displayName: 'Get RDP address'
 
@@ -42,7 +50,7 @@ jobs:
       - publish: $(Build.SourcesDirectory)/
         displayName: 'Publish Build Artifacts on Test Failure'
         condition: failed()
-        artifact: test_fail_build
+        artifact: failed-test-build-$(Build.BuildId)
 
   - job: Check_eslint_and_strict_nulls_regression
 
