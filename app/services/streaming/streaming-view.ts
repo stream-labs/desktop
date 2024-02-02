@@ -269,6 +269,8 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     if (!this.userView.isLoggedIn || !this.userView.auth) return '';
     // TODO: transition away from primaryPlatform completely when possible
     // TODO: handle custom destinations
+    // TODO: handle all platforms disabled, if we can even get to that state when going live
+    // TODO: handle selected platform not supporting chat
     const enabledPlatforms = this.enabledPlatforms;
     const platform = this.enabledPlatforms.includes(this.userView.auth.primaryPlatform)
       ? this.userView.auth.primaryPlatform
