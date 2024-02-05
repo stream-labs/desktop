@@ -14,7 +14,7 @@ import namingHelpers from 'util/NamingHelpers';
 import uuid from 'uuid/v4';
 import { TDisplayType } from 'services/settings-v2/video';
 import { InitAfter } from 'services/core';
-import { RtvcStateService } from 'app-services';
+import { RtvcStateService } from '../../services/rtvcStateService';
 
 export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
 
@@ -222,7 +222,7 @@ export class ScenesService extends StatefulService<IScenesState> {
     }
     const sceneModel = this.state.scenes[id];
 
-    if (!force) this.rtvcStateService.removeScene(id);
+    if (!force) this.rtvcStateService.didRemoveScene(id);
 
     // remove all sources from scene
     scene.getItems().forEach(sceneItem => scene.removeItem(sceneItem.sceneItemId));
@@ -275,7 +275,7 @@ export class ScenesService extends StatefulService<IScenesState> {
     this.MAKE_SCENE_ACTIVE(id);
     this.sceneSwitched.next(scene.getModel());
 
-    this.rtvcStateService.changeScene(id, this.sourcesService);
+    this.rtvcStateService.didChangeScene(id, this.sourcesService);
 
     return true;
   }

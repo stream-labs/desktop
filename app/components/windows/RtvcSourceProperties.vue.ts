@@ -246,6 +246,7 @@ export default class RtvcSourceProperties extends SourceProperties {
     if (sceneId) scenes[sceneId] = this.currentIndex;
     this.state.scenes = scenes;
     this.rtvcStateService.setState(this.state);
+    this.rtvcStateService.modifyEventLog();
   }
 
   // -- vue lifecycle

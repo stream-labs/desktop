@@ -2,6 +2,7 @@ import { mutation } from './core/stateful-service';
 import { PersistentStatefulService } from './core/persistent-stateful-service';
 import { SourcesService, ISourceApi } from './sources';
 import { TObsValue } from 'components/obs/inputs/ObsInput';
+import { RtvcEventLog } from 'services/usage-statistics';
 
 // for source properties
 export type SourcePropKey =
@@ -84,6 +85,22 @@ interface IRtvcState {
   value: any;
 }
 
+interface RtvcActiveLog {
+  used: boolean;
+  latency: number;
+  param: {
+    [name: string]:
+      | { pitchShift: number }
+      | {
+          name: string;
+          pitchShift: number;
+          amount: number;
+          primaryVoice: number;
+          secondaryVoice: number;
+        };
+  };
+}
+
 export class RtvcStateService extends PersistentStatefulService<IRtvcState> {
   setState(v: StateParam) {
     this.SET_STATE(v);
@@ -100,6 +117,7 @@ export class RtvcStateService extends PersistentStatefulService<IRtvcState> {
     const props = source.getPropertiesFormData();
 
     for (const v of values) {
+      if (v.key === 'latency') this.eventLog.latency = v.value as number;
       const prop = props.find(a => a.name === v.key);
       if (!prop || prop.value === v.value) continue; // no need change
       //console.log(`${v.key} change ${prop.value} to ${v.value}`);
@@ -185,28 +203,83 @@ export class RtvcStateService extends PersistentStatefulService<IRtvcState> {
     };
   }
 
-  // -- scene
+  // -- scene : in accordance with scene,change index
 
-  changeScene(sceneId: string, sourceService: SourcesService) {
-    const v = this.getState();
-    if (!v.scenes || !v.scenes[sceneId]) return;
-    const idx = v.scenes[sceneId];
-    if (v.currentIndex === idx) return; // no change
-    const p = this.stateToCommonParam(v, idx);
-
+  didChangeScene(sceneId: string, sourceService: SourcesService) {
     const sl = sourceService.getSourcesByType('nair-rtvc-source');
     if (!sl || !sl.length) return;
     const source = sl[0];
 
+    const state = this.getState();
+    if (!state.scenes || !state.scenes[sceneId]) return;
+    const idx = state.scenes[sceneId];
+    if (state.currentIndex === idx) return; // no change
+    const p = this.stateToCommonParam(state, idx);
+
     this.setSourcePropertiesByCommonParam(source, p);
-    v.currentIndex = idx;
-    this.setState(v);
+    state.currentIndex = idx;
+    this.setState(state);
+
+    this.modifyEventLog();
   }
 
-  removeScene(sceneId: string) {
-    const v = this.getState();
-    if (!v.scenes || !v.scenes[sceneId]) return;
-    delete v.scenes[sceneId];
-    this.setState(v);
+  didRemoveScene(sceneId: string) {
+    const state = this.getState();
+    if (!state.scenes || !state.scenes[sceneId]) return;
+    delete state.scenes[sceneId];
+    this.setState(state);
+  }
+
+  // -- for action log
+
+  eventLog: RtvcEventLog = { used: false, latency: 0, param: {} };
+  isSouceActive = false;
+
+  modifyEventLog() {
+    if (!this.isSouceActive) return;
+
+    this.eventLog.used = true;
+
+    const state = this.getState();
+    const index = state.currentIndex;
+    const { isManual, idx } = this.indexToNum(state, index);
+    if (isManual) {
+      const p = state.manuals[idx];
+      this.eventLog.param[`manual${idx}`] = {
+        name: p.name,
+        pitchShift: p.pitchShift,
+        amount: p.amount,
+        primaryVoice: p.primaryVoice,
+        secondaryVoice: p.secondaryVoice,
+      };
+    } else {
+      const p = state.presets[idx];
+      this.eventLog.param[`preset${idx}`] = { pitchShift: p.pitchShift };
+    }
+  }
+
+  didAddSource(source: ISourceApi) {
+    //console.log('didAddSource');
+    const props = source.getPropertiesFormData();
+    const p = props.find(a => a.name === 'latency');
+    if (p) this.eventLog.latency = p.value as number;
+    this.isSouceActive = true;
+    this.modifyEventLog();
+  }
+
+  didRemoveSource(source: ISourceApi) {
+    //console.log('didRemoveSource');
+    this.isSouceActive = false;
+  }
+
+  startStreaming() {
+    //console.log('startStreaming');
+    this.eventLog.used = this.isSouceActive;
+    this.eventLog.param = {}; // once reset
+    this.modifyEventLog();
+  }
+
+  stopStreaming() {
+    //console.log('stopStreaming');
   }
 }
