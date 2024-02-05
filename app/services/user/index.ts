@@ -162,6 +162,7 @@ class UserViews extends ViewHandler<IUserServiceState> {
   @Inject() hostsService: HostsService;
   @Inject() magicLinkService: MagicLinkService;
   @Inject() customizationService: CustomizationService;
+  @Inject() userService: UserService;
 
   get settingsServiceViews() {
     return this.getServiceViews(SettingsService);
@@ -262,6 +263,10 @@ class UserViews extends ViewHandler<IUserServiceState> {
     }
 
     return `${url}?token=${token}&mode=${nightMode}`;
+  }
+
+  setPrimaryPlatform(platform: TPlatform) {
+    this.userService.setPrimaryPlatform(platform);
   }
 }
 

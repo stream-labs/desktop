@@ -61,6 +61,15 @@ class GoLiveSettingsState extends StreamInfoView<IGoLiveSettingsState> {
     this.linkedPlatforms.forEach(platform => {
       this.updatePlatform(platform, { enabled: enabledPlatforms.includes(platform) });
     });
+
+    /*
+     * When there's exactly 1 enabled platform, update the primary platform/chat
+     * so that the when deselecting every platform but one correctly updates the
+     * primary platform without re-opening the Go Live window.
+     */
+    if (enabledPlatforms.length === 1) {
+      this.setPrimaryPlatform(enabledPlatforms[0]);
+    }
   }
 
   /**

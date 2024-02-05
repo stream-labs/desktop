@@ -450,6 +450,10 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     return this.settings.platforms[platform];
   }
 
+  setPrimaryPlatform(platform: TPlatform) {
+    this.userView.setPrimaryPlatform(platform);
+  }
+
   /**
    * Returns Go-Live settings for a given platform
    */
