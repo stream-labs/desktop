@@ -5,7 +5,7 @@ import { Services } from '../../service-provider';
 import { useGoLiveSettings } from './useGoLiveSettings';
 import { DestinationSwitchers } from './DestinationSwitchers';
 import { $t } from '../../../services/i18n';
-import { Row, Col } from 'antd';
+import { Row, Col, Divider } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { Section } from './Section';
 import PlatformSettings from './PlatformSettings';
@@ -15,6 +15,10 @@ import GoLiveError from './GoLiveError';
 import TwitterInput from './Twitter';
 import AddDestinationButton from 'components-react/shared/AddDestinationButton';
 import EmptyDestinations from './EmptyDestinations';
+import { TPlatform, getPlatformService } from 'services/platforms';
+import { ListInput } from 'components-react/shared/inputs';
+import Form from 'components-react/shared/inputs/Form';
+import PlatformLogo from 'components-react/shared/PlatformLogo';
 
 const PlusIcon = PlusOutlined as Function;
 
@@ -37,6 +41,7 @@ export default function GoLiveSettings() {
     showTweet,
     addDestination,
     hasDestinations,
+    enabledPlatforms,
   } = useGoLiveSettings().extend(module => {
     const { UserService, VideoEncodingOptimizationService, SettingsService } = Services;
 
@@ -71,13 +76,43 @@ export default function GoLiveSettings() {
   const shouldShowSettings = !error && !isLoading && hasDestinations;
   const shouldShowLeftCol = protectedModeEnabled;
   const shouldShowAddDestButton = canAddDestinations && isPrime;
+  const shouldShowPrimaryChatSwitcher = true;
+
+  const primaryChatOptions = enabledPlatforms.map(platform => {
+    const service = getPlatformService(platform);
+    return {
+      label: service.displayName,
+      value: platform,
+    };
+  });
+
+  const renderPrimaryChatOption = (option: { label: string; value: TPlatform }) => {
+    /*
+     * TODO: antd's new version has a new Flex component that should make
+     * spacing (`gap` here) more consistent. Also, less typing.
+     * https://ant.design/components/flex
+     */
+    return (
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: '8px',
+        }}
+      >
+        <PlatformLogo platform={option.value} size={16} />
+        <div>{option.label}</div>
+      </div>
+    );
+  };
 
   return (
     <Row gutter={16} style={{ height: 'calc(100% + 24px)' }}>
       {/*LEFT COLUMN*/}
       {shouldShowLeftCol && (
-        <Col span={8} className={styles.leftColumn}>
-          <Scrollable style={{ height: '100%', margin: '15px' }}>
+        <Col span={8}>
+          <Scrollable style={{ height: '81%' }} snapToWindowEdge>
             {/*DESTINATION SWITCHERS*/}
             <DestinationSwitchers showSelector={showSelector} />
             {/*ADD DESTINATION BUTTON*/}
@@ -90,6 +125,23 @@ export default function GoLiveSettings() {
               <AddDestinationButton />
             )}
           </Scrollable>
+          {shouldShowPrimaryChatSwitcher && (
+            <div>
+              <Divider style={{ marginBottom: '8px' }} />
+              <Form layout="vertical">
+                <ListInput
+                  name="primaryChat"
+                  label={$t('Primary Chat')}
+                  options={primaryChatOptions}
+                  labelRender={renderPrimaryChatOption}
+                  optionRender={renderPrimaryChatOption}
+                  defaultValue={primaryChatOptions[0].value}
+                  onBeforeSearch={() => {}}
+                  onChange={() => {}}
+                />
+              </Form>
+            </div>
+          )}
         </Col>
       )}
 

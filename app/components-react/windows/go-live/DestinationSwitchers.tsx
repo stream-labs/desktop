@@ -1,11 +1,12 @@
 import React, { useRef, MouseEvent } from 'react';
 import { getPlatformService, TPlatform } from '../../../services/platforms';
 import cx from 'classnames';
+import { Divider } from 'antd';
 import { $t } from '../../../services/i18n';
 import styles from './DestinationSwitchers.m.less';
 import { ICustomStreamDestination } from '../../../services/settings/streaming';
 import { Services } from '../../service-provider';
-import { SwitchInput } from '../../shared/inputs';
+import { ListInput, SwitchInput } from '../../shared/inputs';
 import PlatformLogo from '../../shared/PlatformLogo';
 import { assertIsDefined } from '../../../util/properties-type-guards';
 import { useDebounce } from '../../hooks';
@@ -74,27 +75,29 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
   }
 
   return (
-    <div className={styles.switchWrapper}>
-      {linkedPlatforms.map(platform => (
-        <DestinationSwitcher
-          key={platform}
-          destination={platform}
-          enabled={isEnabled(platform)}
-          onChange={enabled => togglePlatform(platform, enabled)}
-          isPrimary={isPrimaryPlatform(platform)}
-          promptConnectTikTok={platform === 'tiktok' && promptConnectTikTok}
-          disabled={disableSwitchers && !isEnabled(platform)}
-        />
-      ))}
-      {customDestinations?.map((dest, ind) => (
-        <DestinationSwitcher
-          key={ind}
-          destination={dest}
-          enabled={isEnabled(ind)}
-          onChange={enabled => toggleDest(ind, enabled)}
-          disabled={disableSwitchers && !isEnabled(ind)}
-        />
-      ))}
+    <div>
+      <div>
+        {linkedPlatforms.map(platform => (
+          <DestinationSwitcher
+            key={platform}
+            destination={platform}
+            enabled={isEnabled(platform)}
+            onChange={enabled => togglePlatform(platform, enabled)}
+            promptConnectTikTok={platform === 'tiktok' && promptConnectTikTok}
+            isPrimary={isPrimaryPlatform(platform)}
+            disabled={disableSwitchers && !isEnabled(platform)}
+          />
+        ))}
+        {customDestinations?.map((dest, ind) => (
+          <DestinationSwitcher
+            key={ind}
+            destination={dest}
+            enabled={customDestinations[ind].enabled}
+            onChange={enabled => switchCustomDestination(ind, enabled)}
+            disabled={disableSwitchers && !isEnabled(ind)}
+          />
+        ))}
+      </div>
     </div>
   );
 }
@@ -154,7 +157,7 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
       return;
     }
 
-    if (canEnableRestream || !p.promptConnectTiktok) {
+    if (canEnableRestream || !p.promptConnectTikTok) {
       const enable = !p.enabled;
       p.onChange(enable);
       // always proxy the click to the SwitchInput
