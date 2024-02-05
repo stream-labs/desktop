@@ -337,6 +337,10 @@ export class GoLiveSettingsModule {
   get hasDestinations() {
     return this.state.enabledPlatforms.length > 0 || this.state.customDestinations.length > 0;
   }
+
+  get hasMultiplePlatforms() {
+    return this.state.enabledPlatforms.length > 1;
+  }
 }
 
 export function useGoLiveSettings() {

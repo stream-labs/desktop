@@ -41,6 +41,7 @@ export default function GoLiveSettings() {
     showTweet,
     addDestination,
     hasDestinations,
+    hasMultiplePlatforms,
     enabledPlatforms,
     primaryChat,
     setPrimaryChat,
@@ -78,7 +79,7 @@ export default function GoLiveSettings() {
   const shouldShowSettings = !error && !isLoading && hasDestinations;
   const shouldShowLeftCol = protectedModeEnabled;
   const shouldShowAddDestButton = canAddDestinations && isPrime;
-  const shouldShowPrimaryChatSwitcher = hasDestinations;
+  const shouldShowPrimaryChatSwitcher = hasMultiplePlatforms && !isAdvancedMode;
 
   const primaryChatOptions = enabledPlatforms.map(platform => {
     const service = getPlatformService(platform);
