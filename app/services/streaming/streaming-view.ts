@@ -368,15 +368,13 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
 
   /**
    * Sort the platform list
-   * - the primary platform is always first
    * - linked platforms are always on the top of the list
    * - the rest has an alphabetic sort
    */
   getSortedPlatforms(platforms: TPlatform[]): TPlatform[] {
     platforms = platforms.sort();
     return [
-      ...platforms.filter(p => this.isPrimaryPlatform(p)),
-      ...platforms.filter(p => !this.isPrimaryPlatform(p) && this.isPlatformLinked(p)),
+      ...platforms.filter(p => this.isPlatformLinked(p)),
       ...platforms.filter(p => !this.isPlatformLinked(p)),
     ];
   }
