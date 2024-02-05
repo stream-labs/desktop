@@ -8,6 +8,13 @@ import { CustomizationService } from 'app-services';
 import antdThemes from 'styles/antd/index';
 import styles from 'components-react/windows/Main.m.less';
 
+const loadedTheme = () => {
+  const customizationState = localStorage.getItem('PersistentStatefulService-CustomizationService');
+  if (customizationState) {
+    return JSON.parse(customizationState)?.theme;
+  }
+};
+
 @Component({})
 export default class MainWindow extends TsxComponent {
   @Inject() customizationService: CustomizationService;
@@ -17,7 +24,11 @@ export default class MainWindow extends TsxComponent {
   }
 
   get theme() {
-    return this.customizationService.views.currentTheme;
+    if (this.$store.state.bulkLoadFinished) {
+      return this.customizationService.currentTheme;
+    }
+
+    return loadedTheme() || 'night-theme';
   }
 
   mounted() {

@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { ReactElement, useEffect, useMemo, useRef, useState } from 'react';
 import fs from 'fs';
 import * as remote from '@electron/remote';
 import cx from 'classnames';
@@ -135,16 +135,6 @@ class MainController {
     return this.appService.state.errorAlert;
   }
 
-  get mainResponsiveClasses() {
-    const classes = [];
-
-    if (this.store.compactView) {
-      classes.push('main-middle--compact');
-    }
-
-    return classes.join(' ');
-  }
-
   async isDirectory(path: string) {
     return new Promise<boolean>((resolve, reject) => {
       fs.lstat(path, (err, stats) => {
@@ -275,25 +265,28 @@ function Main() {
     liveDockSize,
     maxDockWidth,
     minDockWidth,
-    mainResponsiveClasses,
     hideStyleBlockers,
-  } = useVuex(() => ({
-    theme: ctrl.theme(bulkLoadFinished),
-    dockWidth: ctrl.dockWidth,
-    showLoadingSpinner: ctrl.showLoadingSpinner,
-    errorAlert: ctrl.errorAlert,
-    renderDock: ctrl.renderDock,
-    leftDock: ctrl.leftDock,
-    hasLiveDock: ctrl.store.hasLiveDock,
-    applicationLoading: ctrl.applicationLoading,
-    page: ctrl.page,
-    isDockCollapsed: ctrl.isDockCollapsed,
-    liveDockSize: ctrl.liveDockSize,
-    maxDockWidth: ctrl.store.maxDockWidth,
-    minDockWidth: ctrl.store.minDockWidth,
-    mainResponsiveClasses: ctrl.mainResponsiveClasses,
-    hideStyleBlockers: ctrl.hideStyleBlockers,
-  }));
+    compactView,
+  } = useVuex(
+    () => ({
+      theme: ctrl.theme(bulkLoadFinished),
+      dockWidth: ctrl.dockWidth,
+      showLoadingSpinner: ctrl.showLoadingSpinner,
+      errorAlert: ctrl.errorAlert,
+      renderDock: ctrl.renderDock,
+      leftDock: ctrl.leftDock,
+      hasLiveDock: ctrl.store.hasLiveDock,
+      applicationLoading: ctrl.applicationLoading,
+      page: ctrl.page,
+      isDockCollapsed: ctrl.isDockCollapsed,
+      liveDockSize: ctrl.liveDockSize,
+      maxDockWidth: ctrl.store.maxDockWidth,
+      minDockWidth: ctrl.store.minDockWidth,
+      hideStyleBlockers: ctrl.hideStyleBlockers,
+      compactView: ctrl.store.compactView,
+    }),
+    true,
+  );
 
   useEffect(() => {
     const unsubscribe = StatefulService.store.subscribe((_, state) => {
@@ -328,7 +321,7 @@ function Main() {
     }, 200);
   }
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     window.addEventListener('resize', windowSizeHandler);
     const modalChangedSub = WindowsService.modalChanged.subscribe(modalOptions => {
       ctrl.setModalOptions(modalOptions);
@@ -338,7 +331,7 @@ function Main() {
       window.removeEventListener('resize', windowSizeHandler);
       modalChangedSub.unsubscribe();
     };
-  }, []);
+  }, [hideStyleBlockers]);
 
   const oldTheme = useRef<string | null>(null);
   useEffect(() => {
@@ -357,7 +350,7 @@ function Main() {
     }
   }, [uiReady]);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     ctrl.store.setState(s => {
       s.compactView = !!mainMiddleEl.current && mainMiddleEl.current.clientWidth < 1200;
     });
@@ -370,8 +363,6 @@ function Main() {
     params: any;
     onTotalWidth: (width: number) => void;
   }> = appPages[page];
-
-  console.log(uiReady);
 
   return (
     <div
@@ -406,7 +397,10 @@ function Main() {
           </div>
         )}
 
-        <div className={cx(styles.mainMiddle, mainResponsiveClasses)} ref={mainMiddleEl}>
+        <div
+          className={cx(styles.mainMiddle, { [styles.mainMiddleCompact]: compactView })}
+          ref={mainMiddleEl}
+        >
           {!showLoadingSpinner && (
             <Component
               className={styles.mainPageContainer}
