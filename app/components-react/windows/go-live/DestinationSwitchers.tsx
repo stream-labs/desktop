@@ -12,6 +12,7 @@ import { assertIsDefined } from '../../../util/properties-type-guards';
 import { useDebounce } from '../../hooks';
 import { useGoLiveSettings } from './useGoLiveSettings';
 import { alertAsync } from '../../modals';
+import { platform } from 'os';
 
 /**
  * Allows enabling/disabling platforms and custom destinations for the stream
@@ -66,6 +67,7 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
     emitSwitch();
   }
 
+<<<<<<< HEAD
   function toggleDest(ind: number, enabled: boolean) {
     enabledDestRef.current = enabledDestRef.current.filter(index => index !== ind);
     if (enabled) {
@@ -73,6 +75,11 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
     }
     emitSwitch(ind, enabled);
   }
+=======
+  // TODO: find a cleaner way to do this
+  const isPrimary = (platform: TPlatform) =>
+    linkedPlatforms.length === 1 ? true : isPrimaryPlatform(platform);
+>>>>>>> 2b52be1bb (fix(streaming): initial attempt of fixing locked-out state)
 
   return (
     <div>
@@ -83,9 +90,13 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
             destination={platform}
             enabled={isEnabled(platform)}
             onChange={enabled => togglePlatform(platform, enabled)}
+<<<<<<< HEAD
             promptConnectTikTok={platform === 'tiktok' && promptConnectTikTok}
             isPrimary={isPrimaryPlatform(platform)}
             disabled={disableSwitchers && !isEnabled(platform)}
+=======
+            isPrimary={isPrimary(platform)}
+>>>>>>> 2b52be1bb (fix(streaming): initial attempt of fixing locked-out state)
           />
         ))}
         {customDestinations?.map((dest, ind) => (

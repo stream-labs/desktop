@@ -298,6 +298,15 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
 
     const savedGoLiveSettings = this.streamSettingsView.state.goLiveSettings;
 
+    // TODO: this should be done as a migration, if needed
+    const areNoPlatformsEnabled = () => Object.values(platforms).every(p => !p.enabled);
+    if (!this.restreamView.canEnableRestream && areNoPlatformsEnabled()) {
+      const primaryPlatform = this.userView.auth?.primaryPlatform;
+      if (primaryPlatform) {
+        platforms[primaryPlatform].enabled = true;
+      }
+    }
+
     return {
       platforms,
       advancedMode: !!this.streamSettingsView.state.goLiveSettings?.advancedMode,
