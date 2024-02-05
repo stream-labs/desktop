@@ -42,6 +42,8 @@ export default function GoLiveSettings() {
     addDestination,
     hasDestinations,
     enabledPlatforms,
+    primaryChat,
+    setPrimaryChat,
   } = useGoLiveSettings().extend(module => {
     const { UserService, VideoEncodingOptimizationService, SettingsService } = Services;
 
@@ -135,9 +137,8 @@ export default function GoLiveSettings() {
                   options={primaryChatOptions}
                   labelRender={renderPrimaryChatOption}
                   optionRender={renderPrimaryChatOption}
-                  defaultValue={primaryChatOptions[0].value}
-                  onBeforeSearch={() => {}}
-                  onChange={() => {}}
+                  defaultValue={primaryChat || primaryChatOptions[0].value}
+                  onChange={setPrimaryChat}
                 />
               </Form>
             </div>

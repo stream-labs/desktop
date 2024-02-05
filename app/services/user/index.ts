@@ -282,6 +282,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private notificationsService: NotificationsService;
   @Inject() private jsonrpcService: JsonrpcService;
 
+  setPrimaryPlatform(platform: TPlatform) {
+    this.SET_PRIMARY_PLATFORM(platform);
+  }
+
   @mutation()
   LOGIN(auth: IUserAuth) {
     Vue.set(this.state, 'auth', auth);
