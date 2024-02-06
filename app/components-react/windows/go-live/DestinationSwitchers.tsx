@@ -1,7 +1,6 @@
 import React, { useRef, MouseEvent } from 'react';
 import { getPlatformService, TPlatform } from '../../../services/platforms';
 import cx from 'classnames';
-import { Divider } from 'antd';
 import { $t } from '../../../services/i18n';
 import styles from './DestinationSwitchers.m.less';
 import { ICustomStreamDestination } from '../../../services/settings/streaming';
@@ -12,7 +11,6 @@ import { assertIsDefined } from '../../../util/properties-type-guards';
 import { useDebounce } from '../../hooks';
 import { useGoLiveSettings } from './useGoLiveSettings';
 import { alertAsync } from '../../modals';
-import { platform } from 'os';
 
 /**
  * Allows enabling/disabling platforms and custom destinations for the stream
