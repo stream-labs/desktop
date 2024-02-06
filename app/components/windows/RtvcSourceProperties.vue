@@ -190,9 +190,9 @@
         <input v-model="isMonitor" type="checkbox" class="toggle-button" />
       </div>
 
-      <button class="button button--secondary" @click="cancel">
+      <button class="button button--secondary" @click="cancel" data-test="Cancel">
         {{ $t('common.cancel') }} </button>
-      <button class="button button--primary" @click="done">
+      <button class="button button--primary" @click="done" data-test="Done">
         {{ $t('common.done') }} </button>
     </div>
   </div>
