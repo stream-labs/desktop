@@ -8,6 +8,8 @@ export async function skipOnboarding() {
     await click('h2=Live Streaming');
     await click('h2=Advanced');
     await click('button=Continue');
+    // Auth
+    await click('button=Skip');
     // OBS import
     await clickIfDisplayed('div=Start Fresh');
     // Hardware setup
