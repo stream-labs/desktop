@@ -261,6 +261,7 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
           EOnboardingSteps.MacPermissions,
           EOnboardingSteps.StreamingOrRecording,
           EOnboardingSteps.Connect,
+          EOnboardingSteps.PrimaryPlatformSelect,
           EOnboardingSteps.FreshOrImport,
           EOnboardingSteps.ObsImport,
           EOnboardingSteps.HardwareSetup,
