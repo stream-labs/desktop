@@ -50,6 +50,7 @@ test('OBS Importer', async t => {
   await click('h2=Live Streaming');
   await click('h2=Advanced');
   await click('button=Continue');
+  await click('button=Skip');
 
   /*
   await click('a=Login');
@@ -91,9 +92,9 @@ test('OBS Importer', async t => {
   await switchCollection('Collection 2');
 
   // check settings
-  await(await client.$('.side-nav .icon-settings')).click();
+  await (await client.$('.side-nav .icon-settings')).click();
   await focusChild();
-  await(await client.$('li=Output')).click();
+  await (await client.$('li=Output')).click();
   const form = new FormMonkey(t);
   await form.setInputValue(await form.getInputSelectorByTitle('Video Bitrate'), '5000');
   await form.setInputValue(await form.getInputSelectorByTitle('Encoder'), 'Software (x264)');

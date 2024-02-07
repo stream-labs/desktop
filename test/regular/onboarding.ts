@@ -164,6 +164,16 @@ test('Go through onboarding as advanced user', async t => {
   await click('h2=Advanced');
   await click('button=Continue');
 
+  // Click on Login on the signup page, then wait for the auth screen to appear
+  await click('a=Login');
+  await isDisplayed('button=Log in with Twitch');
+
+  await logIn(t, 'twitch', { prime: false }, false, true);
+  await sleep(1000);
+
+  // We seem to skip the login step after login internally
+  await clickIfDisplayed('button=Skip');
+
   // Don't Import from OBS
   await clickIfDisplayed('div=Start Fresh');
 
@@ -236,5 +246,5 @@ test.skip('Go through the onboarding and autoconfig', async t => {
   await waitForDisplayed('span=Sources', { timeout: 60000 });
 
   // success?
-  t.true(await(await app.client.$('span=Sources')).isDisplayed(), 'Sources selector is visible');
+  t.true(await (await app.client.$('span=Sources')).isDisplayed(), 'Sources selector is visible');
 });
