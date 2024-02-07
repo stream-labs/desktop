@@ -151,10 +151,8 @@ export function RecordingHistory() {
     }
   }, [uploadInfo.error]);
 
-  function openMarkersInfoPage() {
-    remote.shell.openExternal(
-      'https://streamlabs.com/content-hub/post/bookmarking-for-streamlabs-desktop',
-    );
+  function openMarkersSettings() {
+    Services.SettingsService.actions.showSettings('Hotkeys');
   }
 
   function UploadActions(p: { filename: string }) {
@@ -185,7 +183,7 @@ export function RecordingHistory() {
         )}
         <Translate message="<color>Pro tip:</color> set Markers in Hotkeys settings to timestamp your recordings. <link>Set up here</link>">
           <span slot="color" className={styles.tipHighlight} />
-          <a slot="link" onClick={openMarkersInfoPage} className={styles.tipLink} />
+          <a slot="link" onClick={openMarkersSettings} className={styles.tipLink} />
         </Translate>
       </div>
       <div className={styles.recordingsContainer} id="recordingHistory">
