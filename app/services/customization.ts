@@ -155,7 +155,6 @@ export class CustomizationState extends RealmObject {
 
     if (data) {
       const parsed = JSON.parse(data);
-
       this.db.write(() => {
         Object.assign(this, parsed);
       });
