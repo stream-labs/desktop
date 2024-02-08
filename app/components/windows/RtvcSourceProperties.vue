@@ -341,7 +341,8 @@
     background: radial-gradient(100% 100% at 50% 100%, var(--color-white) 0%, var(--color-brand-rtvc-zundamon) 100%);
 
     .image {
-      bottom: -292px;
+      top: -48px;
+      // bottom: -292px;
       width: 372px;
       height: 644px;
       background-image: url('../../../media/images/rtvc/zundamon.png');
@@ -354,7 +355,8 @@
     background: radial-gradient(100% 100% at 50% 100%, var(--color-white) 0%, var(--color-brand-rtvc-tsumugi) 100%);
 
     .image {
-      bottom: -408px;
+      top: -4px;
+      // bottom: -408px;
       width: 725px;
       height: 728px;
       margin-left: -34px;
