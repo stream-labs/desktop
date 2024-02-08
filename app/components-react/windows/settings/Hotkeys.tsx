@@ -8,6 +8,7 @@ import Fuse from 'fuse.js';
 import type { Scene, Source } from 'app-services';
 import Tooltip from 'components-react/shared/Tooltip';
 import { getOS, OS } from 'util/operating-systems';
+import * as remote from '@electron/remote';
 
 interface IAugmentedHotkey extends IHotkey {
   // Will be scene or source name
@@ -171,6 +172,12 @@ export default function Hotkeys(props: HotkeysProps) {
     return source ? renderHotkeyGroup(sourceId, sourceHotkeys, source.name) : null;
   }
 
+  function openMarkersInfoPage() {
+    remote.shell.openExternal(
+      'https://streamlabs.com/content-hub/post/bookmarking-for-streamlabs-desktop',
+    );
+  }
+
   return (
     <div>
       {hasGeneralHotkeys && (
@@ -212,7 +219,19 @@ export default function Hotkeys(props: HotkeysProps) {
       )}
       {hasMarkers && (
         <>
-          <h2>{$t('Markers')}</h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <h2>{$t('Markers')}</h2>
+            <a
+              onClick={openMarkersInfoPage}
+              style={{
+                fontWeight: 'normal',
+                textDecoration: 'underline',
+                color: 'var(--paragraph)',
+              }}
+            >
+              {$t('Learn more here')}
+            </a>
+          </div>
           <HotkeyGroup
             hotkeys={markerHotkeys}
             isSearch={isSearch}
