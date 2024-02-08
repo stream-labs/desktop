@@ -31,6 +31,7 @@ export function UltraDestinationSwitchers(p: IUltraDestinationSwitchers) {
     isPlatformLinked,
     switchPlatforms,
     switchCustomDestination,
+    isRestreamEnabled,
   } = useGoLiveSettings();
   const enabledPlatformsRef = useRef(enabledPlatforms);
   enabledPlatformsRef.current = enabledPlatforms;
@@ -80,6 +81,7 @@ export function UltraDestinationSwitchers(p: IUltraDestinationSwitchers) {
           onChange={enabled => togglePlatform(platform, enabled)}
           isPrimary={isPrimaryPlatform(platform)}
           promptConnectTikTok={platform === 'tiktok' && promptConnectTikTok}
+          canDisablePrimary={isRestreamEnabled}
           index={index}
         />
       ))}
@@ -102,6 +104,7 @@ interface IDestinationSwitcherProps {
   onChange: (enabled: boolean) => unknown;
   isPrimary?: boolean;
   promptConnectTikTok?: boolean;
+  canDisablePrimary?: boolean;
   index: number;
 }
 
@@ -114,6 +117,7 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
   const platform = typeof p.destination === 'string' ? (p.destination as TPlatform) : null;
   const enable = !p.enabled ?? (p.promptConnectTikTok && p.promptConnectTikTok === true);
   const { RestreamService, MagicLinkService } = Services;
+  const canDisablePrimary = p.canDisablePrimary;
 
   function showTikTokConnectModal() {
     alertAsync({
@@ -135,8 +139,9 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
     });
   }
 
-  function onClickHandler() {
-    if (p.isPrimary) {
+  function onClickHandler(ev: MouseEvent) {
+    // TODO: do we need this check if we're on an Ultra DestinationSwitcher
+    if (p.isPrimary && p.canDisablePrimary !== true) {
       alertAsync(
         $t(
           'You cannot disable the platform you used to sign in to Streamlabs Desktop. Please sign in with a different platform to disable streaming to this destination.',
@@ -184,7 +189,11 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
             inputRef={switchInputRef}
             value={p.enabled}
             name={platform}
-            disabled={p?.isPrimary || (p.promptConnectTikTok && platform === 'tiktok')}
+            disabled={
+              canDisablePrimary
+                ? false
+                : p?.isPrimary || (p.promptConnectTikTok && platform === 'tiktok')
+            }
             uncontrolled
             className={styles.platformSwitch}
             checkedChildren={<i className="icon-check-mark" />}
@@ -240,7 +249,7 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
               e.stopPropagation();
               return;
             } else {
-              onClickHandler();
+              onClickHandler(e);
             }
           }}
         >
