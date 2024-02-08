@@ -6,13 +6,12 @@ import { useVuex } from 'components-react/hooks';
 import { TAppPage } from 'services/navigation';
 import { IAnnouncementsInfo } from 'services/announcements';
 import styles from './News.m.less';
+import { useRealmObject } from 'components-react/hooks/realm';
 
 export default function News() {
   const { WindowsService, SettingsService, NavigationService, AnnouncementsService } = Services;
 
-  const { newsItems } = useVuex(() => ({
-    newsItems: AnnouncementsService.state.news,
-  }));
+  const newsItems = useRealmObject(AnnouncementsService.currentAnnouncements).news;
 
   useEffect(() => {
     AnnouncementsService.actions.getNews();
