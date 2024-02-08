@@ -290,7 +290,7 @@ export class Volmeter2d {
   }
 
   unsubscribeVolmeter() {
-    electron.ipcRenderer.removeListener(`volmeter-${this.audioSource.sourceId}`, this.listener);
+    electron.ipcRenderer.removeAllListeners(`volmeter-${this.audioSource.sourceId}`);
     electron.ipcRenderer.sendTo(this.workerId, 'volmeterUnsubscribe', this.audioSource.sourceId);
   }
 }

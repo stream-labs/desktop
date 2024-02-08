@@ -205,10 +205,7 @@ class GLVolmetersModule {
   }
 
   private unsubscribeVolmeter(sourceId: string) {
-    electron.ipcRenderer.removeListener(
-      `volmeter-${sourceId}`,
-      this.subscriptions[sourceId].listener,
-    );
+    electron.ipcRenderer.removeAllListeners(`volmeter-${sourceId}`);
     electron.ipcRenderer.sendTo(this.workerId, 'volmeterUnsubscribe', sourceId);
     delete this.subscriptions[sourceId];
   }
