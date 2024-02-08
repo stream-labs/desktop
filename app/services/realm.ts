@@ -245,7 +245,48 @@ export class RealmObject {
   static onMigration(oldRealm: Realm, newRealm: Realm) {
     // By default, is a no-op
   }
+
+  static build<TInit extends object>(
+    name: string,
+    initObject: TInit,
+  ): () => DynamicRealmObject<TInit> {
+    const propMap: { [key: string]: { type: string; default: any } } = {};
+
+    const klass = class extends RealmObject {};
+
+    Object.keys(initObject).forEach(k => {
+      const descriptor = Object.getOwnPropertyDescriptor(initObject, k);
+
+      if (typeof initObject[k] === 'function' || descriptor.get) {
+        Object.defineProperty(klass.prototype, k, descriptor);
+      } else {
+        const t = typeof initObject[k];
+
+        // All else are schema properties
+        if (t === 'number') {
+          propMap[k] = { type: 'double', default: initObject[k] };
+        } else if (t === 'boolean') {
+          propMap[k] = { type: 'bool', default: initObject[k] };
+        } else if (t === 'string') {
+          propMap[k] = { type: 'string', default: initObject[k] };
+        }
+
+        // TODO: Support dates?
+      }
+    });
+
+    klass.schema = {
+      name,
+      properties: propMap,
+    };
+
+    klass.register();
+
+    return () => klass.inject() as any;
+  }
 }
+
+type DynamicRealmObject<TInit extends object> = RealmObject & TInit;
 
 interface IRealmOptions {
   persist?: boolean;
