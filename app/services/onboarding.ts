@@ -260,6 +260,8 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
         return getSteps([
           EOnboardingSteps.MacPermissions,
           EOnboardingSteps.StreamingOrRecording,
+          EOnboardingSteps.Connect,
+          EOnboardingSteps.PrimaryPlatformSelect,
           EOnboardingSteps.FreshOrImport,
           EOnboardingSteps.ObsImport,
           EOnboardingSteps.HardwareSetup,
