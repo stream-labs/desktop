@@ -203,6 +203,8 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     this.SET_STUDIO_MODE(false);
     this.studioModeChanged.next(false);
 
+    obs.Global.removeSceneFromBackstage(this.studioModeTransition.getActiveSource());
+
     this.getCurrentTransition().set(this.scenesService.views.activeScene.getObsScene());
     this.releaseStudioModeObjects();
   }
@@ -219,7 +221,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     const currentScene = this.scenesService.views.activeScene;
 
     if (this.currentSceneId !== currentScene.id) {
-      this.playFfmpegSources(currentScene, false);
+      obs.Global.removeSceneFromBackstage(currentScene.getSource().getObsInput());
     }
 
     const oldDuplicate = this.sceneDuplicate;
@@ -277,40 +279,16 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     }
   }
 
-  // This sould be used in 'Studio mode' only.
-  // As ffmpeg sources do not start playing because they are not active when user switches scenes,
-  // we are bypassing this limitation here by forcing to start and stop playback of video files
-  playFfmpegSources(scene: Scene, play: boolean) {
-    if (!this.state.studioMode) {
-      return;
-    }
-
-    for (const source of scene.getNestedSources()) {
-      const settings = source.getSettings();
-      if (settings['restart_on_activate'] !== true) {
-        continue;
-      }
-
-      if (source.type === 'ffmpeg_source') {
-        if (play) {
-          source.getObsInput().play();
-        } else {
-          source.getObsInput().stop();
-        }
-      }
-    }
-  }
-
   transition(sceneAId: string | null, sceneBId: string) {
     if (this.state.studioMode) {
       if (sceneAId && sceneAId !== this.currentSceneId) {
         const prevScene = this.scenesService.views.getScene(sceneAId);
-        this.playFfmpegSources(prevScene, false);
+        obs.Global.removeSceneFromBackstage(prevScene.getSource().getObsInput());
       }
 
       const scene = this.scenesService.views.getScene(sceneBId);
       this.studioModeTransition.set(scene.getObsScene());
-      this.playFfmpegSources(scene, true);
+      obs.Global.addSceneToBackstage(scene.getSource().getObsInput());
 
       return;
     }
