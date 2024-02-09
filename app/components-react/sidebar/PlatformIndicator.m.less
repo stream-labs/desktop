@@ -58,10 +58,14 @@
       transition: none !important;
     }
   }
-
-  .fa-globe {
-    &:hover {
-      color: inherit !important;
+  // Custom destination icon
+  // TODO: why does this need to be global?
+  :global(.fa-globe) {
+    &,
+    &:hover,
+    &:focus,
+    &:active {
+      color: var(--icon) !important;
     }
   }
 }
