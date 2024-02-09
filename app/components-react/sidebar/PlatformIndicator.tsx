@@ -94,7 +94,7 @@ const MultiPlatformIndicator = ({
         {hasCustomDestinations && <i className="fa fa-globe" />}
       </div>
       {displayedDestinations < 4 && (
-        <div className={styles.username} style={{ flex: 1 }}>
+        <div className={styles.username} style={{ flex: 1, marginLeft: '8px' }}>
           {$t('Logged In')}
         </div>
       )}
