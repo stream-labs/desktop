@@ -3,6 +3,7 @@ import * as remote from '@electron/remote';
 import cx from 'classnames';
 import Animation from 'rc-animate';
 import { Menu } from 'antd';
+import pick from 'lodash/pick';
 import { initStore, useController } from 'components-react/hooks/zustand';
 import { EStreamingState } from 'services/streaming';
 import { EAppPageSlot, ILoadedApp } from 'services/platform-apps';
@@ -102,7 +103,7 @@ class LiveDockController {
 
   get viewerCount() {
     if (this.hideViewerCount) {
-      return 'viewers hidden';
+      return $t('Viewers Hidden');
     }
     return this.streamingService.views.viewerCount.toString();
   }
@@ -115,7 +116,7 @@ class LiveDockController {
     return this.chatTabs.length > 1;
   }
 
-  get showDefaultPlatformChat() {
+  get defaultPlatformChatVisible() {
     return this.selectedChat === 'default';
   }
 
@@ -166,7 +167,7 @@ class LiveDockController {
   }
 
   get isPopOutAllowed() {
-    if (this.showDefaultPlatformChat) return false;
+    if (this.defaultPlatformChatVisible) return false;
     if (this.selectedChat === 'restream') return false;
     const chatPage = this.platformAppsService.views
       .getApp(this.selectedChat)
@@ -304,17 +305,19 @@ function LiveDock(p: { onLeft: boolean }) {
     liveDockSize,
     applicationLoading,
     hideStyleBlockers,
-  } = useVuex(() => ({
-    collapsed: ctrl.collapsed,
-    isPlatform: ctrl.isPlatform,
-    isStreaming: ctrl.isStreaming,
-    hasChatTabs: ctrl.hasChatTabs,
-    chatTabs: ctrl.chatTabs,
-    selectedChat: ctrl.selectedChat,
-    liveDockSize: ctrl.liveDockSize,
-    applicationLoading: ctrl.applicationLoading,
-    hideStyleBlockers: ctrl.hideStyleBlockers,
-  }));
+  } = useVuex(() =>
+    pick(ctrl, [
+      'collapsed',
+      'isPlatform',
+      'isStreaming',
+      'hasChatTabs',
+      'selectedChat',
+      'chatTabs',
+      'liveDockSize',
+      'applicationLoading',
+      'hideStyleBlockers',
+    ]),
+  );
 
   return (
     <div
