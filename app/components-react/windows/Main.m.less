@@ -19,14 +19,15 @@
   grid-template-columns: auto 1fr;
   flex-grow: 1;
   height: 100%;
+  position: relative;
 }
 
 .main-contents--right {
-  grid-template-columns: auto auto 1fr;
+  grid-template-columns: [sidebar] auto [page] auto [livedock] 1fr;
 }
 
 .main-contents--left {
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: [sidebar] auto [livedock] 1fr [page] auto;
 }
 
 .main-contents--onboarding {
@@ -38,7 +39,6 @@
 }
 
 .main-middle {
-  flex-grow: 1;
   display: grid;
   grid-template-rows: minmax(0, 1fr) 48px;
   position: relative;

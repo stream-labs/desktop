@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import * as remote from '@electron/remote';
+import cx from 'classnames';
 import { Tooltip } from 'antd';
 import { $t } from 'services/i18n';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
