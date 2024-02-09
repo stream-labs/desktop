@@ -424,10 +424,7 @@ function LiveDock(p: { onLeft: boolean }) {
               )}
             {(!ctrl.platform ||
               (isPlatform(['youtube', 'facebook', 'twitter']) && !isStreaming)) && (
-              <div
-                className={cx('flex flex--center flex--column', styles.liveDockChatOffline)}
-                v-else
-              >
+              <div className={cx('flex flex--center flex--column', styles.liveDockChatOffline)}>
                 <img className={styles.liveDockChatImgOffline} src={ctrl.offlineImageSrc} />
                 {!hideStyleBlockers && <span>{$t('Your chat is currently offline')}</span>}
               </div>
