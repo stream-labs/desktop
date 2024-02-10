@@ -19,6 +19,7 @@ import {
   PlatformAppMainPage,
   RecordingHistory,
   Studio,
+  LiveDock,
 } from 'components/shared/ReactComponentList';
 import { ScenesService } from 'services/scenes';
 import { PlatformAppsService } from 'services/platform-apps';
@@ -36,7 +37,6 @@ import { NavigationService } from 'services/navigation';
 import { AppService } from 'services/app';
 import { UserService } from 'services/user';
 import { IModalOptions, WindowsService } from 'services/windows';
-import LiveDock from '../LiveDock.vue';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 import { getPlatformService } from 'services/platforms';
 import ModalWrapper from '../shared/modals/ModalWrapper';

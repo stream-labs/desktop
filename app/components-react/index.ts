@@ -62,6 +62,7 @@ import EditTransform from './windows/EditTransform';
 import InstalledApps from './windows/settings/InstalledApps';
 import Hotkeys from './windows/settings/Hotkeys';
 import Studio from './pages/Studio';
+import LiveDock from './root/LiveDock';
 
 // list of React components to be used inside Vue components
 export const components = {
@@ -127,5 +128,6 @@ export const components = {
   InstalledApps,
   Blank,
   Hotkeys,
+  LiveDock: createRoot(LiveDock),
   Studio: createRoot(Studio),
 };
