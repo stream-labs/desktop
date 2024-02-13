@@ -7,7 +7,6 @@ import { onUnload } from 'util/unload';
 
 export default function Chat(props: { restream: boolean }) {
   const { ChatService, RestreamService } = Services;
-  console.log(props.restream);
 
   const chatEl = useRef<HTMLDivElement>(null);
 
