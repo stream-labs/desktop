@@ -112,6 +112,11 @@ export default function StartStreamingButton(p: { disabled?: boolean }) {
     const primaryPlatform = UserService.state.auth?.primaryPlatform;
     const updateStreamInfoOnLive = CustomizationService.state.updateStreamInfoOnLive;
 
+    // Prevent attempting to go live without destinations
+    if (!StreamingService.views.hasDestinations) {
+      return true;
+    }
+
     if (!primaryPlatform) return false;
 
     if (StreamingService.views.isDualOutputMode) {
