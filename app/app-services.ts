@@ -145,6 +145,7 @@ import { TwitchTagsService } from './services/platforms/twitch/index';
 import { TrovoService } from './services/platforms/trovo';
 import { YoutubeService } from './services/platforms/youtube';
 import { FacebookService } from './services/platforms/facebook';
+import { TikTokService } from './services/platforms/tiktok';
 import { DismissablesService } from './services/dismissables';
 import { NavigationService } from './services/navigation';
 import { AnnouncementsService } from './services/announcements';
@@ -219,6 +220,7 @@ export const AppServices = {
   TwitterService,
   YoutubeService,
   FacebookService,
+  TikTokService,
   UserService,
   TwitchService,
   TwitterPlatformService,

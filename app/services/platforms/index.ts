@@ -133,6 +133,11 @@ export enum EPlatformCallResult {
    * The user is missing an essential Twitch scope.
    */
   TwitchScopeMissing,
+
+  /**
+   * The user is not authorized for livestreaming by TikTok.
+   */
+  TikTokStreamScopeMissing,
 }
 
 export type TStartStreamOptions =

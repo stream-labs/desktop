@@ -23,6 +23,7 @@ class LiveDockController {
   private youtubeService = Services.YoutubeService;
   private facebookService = Services.FacebookService;
   private trovoService = Services.TrovoService;
+  private tiktokService = Services.TikTokService;
   private userService = Services.UserService;
   private customizationService = Services.CustomizationService;
   private platformAppsService = Services.PlatformAppsService;
@@ -201,6 +202,7 @@ class LiveDockController {
     if (this.platform === 'youtube') url = this.youtubeService.streamPageUrl;
     if (this.platform === 'facebook') url = this.facebookService.streamPageUrl;
     if (this.platform === 'trovo') url = this.trovoService.streamPageUrl;
+    if (this.platform === 'tiktok') url = this.tiktokService.streamPageUrl;
     remote.shell.openExternal(url);
   }
 
@@ -208,6 +210,7 @@ class LiveDockController {
     let url = '';
     if (this.platform === 'youtube') url = this.youtubeService.dashboardUrl;
     if (this.platform === 'facebook') url = this.facebookService.streamDashboardUrl;
+    if (this.platform === 'tiktok') url = this.tiktokService.dashboardUrl;
     remote.shell.openExternal(url);
   }
 
@@ -374,7 +377,7 @@ function LiveDock(p: { onLeft: boolean }) {
                     <i onClick={() => ctrl.openPlatformStream()} className="icon-studio" />
                   </Tooltip>
                 )}
-                {isPlatform(['youtube', 'facebook']) && isStreaming && (
+                {isPlatform(['youtube', 'facebook', 'tiktok']) && isStreaming && (
                   <Tooltip title={$t('Go to Live Dashboard')} placement="right">
                     <i onClick={() => ctrl.openPlatformDash()} className="icon-settings" />
                   </Tooltip>
