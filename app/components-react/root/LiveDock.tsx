@@ -179,8 +179,10 @@ class LiveDockController {
   }
 
   get canEditChannelInfo(): boolean {
-    // Twitter doesn't support editing title after going live
+    // Twitter & Tiktok don't support editing title after going live
     if (this.isPlatform('twitter') && !this.isRestreaming) return false;
+    if (this.isPlatform('tiktok') && !this.isRestreaming) return false;
+
     return (
       this.streamingService.views.isMidStreamMode ||
       this.userService.state.auth?.primaryPlatform === 'twitch'
@@ -372,7 +374,7 @@ function LiveDock(p: { onLeft: boolean }) {
                     <i onClick={() => ctrl.showEditStreamInfo()} className="icon-edit" />
                   </Tooltip>
                 )}
-                {isPlatform(['youtube', 'facebook', 'trovo']) && isStreaming && (
+                {isPlatform(['youtube', 'facebook', 'trovo', 'tiktok']) && isStreaming && (
                   <Tooltip title={$t('View your live stream in a web browser')} placement="right">
                     <i onClick={() => ctrl.openPlatformStream()} className="icon-studio" />
                   </Tooltip>

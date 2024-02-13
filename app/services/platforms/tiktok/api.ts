@@ -1,3 +1,5 @@
+import { IPlatformRequest } from '..';
+
 export type TTikTokScope =
   | 'live.room.info'
   | 'live.room.manage'
@@ -20,6 +22,14 @@ enum ETikTokLiveScopeReason {
   NOT_APPROVED = 0,
   APPROVED = 1,
   APPROVED_OBS = 2,
+}
+
+export interface ITikTokUserInfoResponse {
+  data: {
+    user: {
+      profile_deep_link: string;
+    };
+  };
 }
 
 export interface ITikTokLiveScopeResponse {

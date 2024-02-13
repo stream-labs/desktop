@@ -16,7 +16,7 @@ import { IGoLiveSettings } from '../streaming';
 import { TOutputOrientation } from 'services/restream';
 import { IVideo } from 'obs-studio-node';
 import { TDisplayType } from 'services/settings-v2';
-import { ITikTokError, ITikTokLiveScopeResponse } from './tiktok/api';
+import { ITikTokError, ITikTokLiveScopeResponse, ITikTokUserInfoResponse } from './tiktok/api';
 import { I18nService } from 'services/i18n';
 import { getDefined } from 'util/properties-type-guards';
 import * as remote from '@electron/remote';
@@ -24,6 +24,7 @@ import * as remote from '@electron/remote';
 interface ITikTokServiceState extends IPlatformState {
   settings: ITikTokStartStreamSettings;
   broadcastId: string;
+  streamPageUrl: string;
 }
 
 interface ITikTokStartStreamSettings {
@@ -53,30 +54,11 @@ interface ITikTokEndStreamResponse {
   success: boolean;
 }
 
-// interface ITikTokServiceState extends IPlatformState {
-//   settings: ITikTokStartStreamOptions;
-//   broadcastId: string;
-//   ingest: string;
-// }
-
-// export enum ETikTokChatType {
-//   Off = 1,
-//   Everyone = 2,
-//   VerifiedOnly = 3,
-//   FollowedOnly = 4,
-//   SubscribersOnly = 5,
-// }
-
-// export interface ITikTokStartStreamOptions {
-//   title: string;
-//   chatType: ETikTokChatType;
-// }
-
-// interface ITikTokStartStreamResponse {
-//   id: string;
-//   key: string;
-//   rtmp: string;
-// }
+interface ITikTokRequestHeaders extends Dictionary<string> {
+  Accept: string;
+  'Content-Type': string;
+  Authorization: string;
+}
 
 @InheritMutations()
 export class TikTokService
@@ -93,9 +75,10 @@ export class TikTokService
       streamKey: '',
     },
     broadcastId: '',
+    streamPageUrl: '',
   };
 
-  readonly apiBase = 'https://open.tiktokapis.com';
+  readonly apiBase = 'https://open-api.tiktok.com';
   readonly platform = 'tiktok';
   readonly displayName = 'TikTok';
   readonly capabilities = new Set<TPlatformCapability>(['title', 'viewerCount']);
@@ -113,6 +96,10 @@ export class TikTokService
     const host = this.hostsService.streamlabs;
     const query = `_=${Date.now()}&skip_splash=true&external=electron&tiktok&force_verify&origin=slobs`;
     return `https://${host}/slobs/login?${query}`;
+  }
+
+  private get oauthToken() {
+    return this.userService.views.state.auth?.platforms?.tiktok?.token;
   }
 
   get username(): string {
@@ -140,7 +127,10 @@ export class TikTokService
 
     if (streamInfo?.id) {
       // open urls if stream successfully started
-      remote.shell.openExternal(this.streamPageUrl);
+      const streamPageUrl = await this.fetchProfileUrl();
+      this.SET_STREAM_PAGE_URL(streamPageUrl);
+
+      remote.shell.openExternal(streamPageUrl);
       remote.shell.openExternal(this.dashboardUrl);
     } else {
       this.SET_ENABLED_STATUS(false);
@@ -268,6 +258,25 @@ export class TikTokService
       console.warn('Error fetching TikTok Live Access status.');
     });
   }
+
+  async fetchProfileUrl(): Promise<string> {
+    const url = `${this.apiBase}/user/info/`;
+    const headers = this.getHeaders({ url });
+
+    return this.requestTikTok<ITikTokUserInfoResponse>({
+      headers,
+      url,
+      method: 'POST',
+      body: JSON.stringify({
+        access_token: this.oauthToken,
+        fields: ['profile_deep_link'],
+      }),
+    }).then(json => {
+      console.log('json ', json);
+      return json.data.user.profile_deep_link;
+    });
+  }
+
   /**
    * prepopulate channel info and save it to the store
    */
@@ -280,8 +289,12 @@ export class TikTokService
     this.UPDATE_STREAM_SETTINGS(settings);
   }
 
-  getHeaders() {
-    return {};
+  getHeaders(req: IPlatformRequest, useToken?: string | boolean): ITikTokRequestHeaders {
+    return {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.oauthToken}`,
+    };
   }
 
   getErrorMessage(error?: any) {
@@ -302,8 +315,7 @@ export class TikTokService
   }
 
   get streamPageUrl(): string {
-    console.log(`https://www.tiktok.com/@${this.username}/live`);
-    return `https://www.tiktok.com/@${this.username}/live`;
+    return this.state.streamPageUrl;
   }
 
   get chatUrl(): string {
@@ -326,15 +338,19 @@ export class TikTokService
 
   @mutation()
   protected SET_BROADCAST_ID(id: string) {
-    console.log('id ', id);
     this.state.broadcastId = id;
   }
 
   @mutation()
   SET_ENABLED_STATUS(status: boolean) {
-    console.log('status ', status);
     const updatedSettings = { ...this.state.settings, liveStreamingEnabled: status };
     this.state.settings = updatedSettings;
+  }
+
+  @mutation()
+  protected SET_STREAM_PAGE_URL(streamPageUrl: string) {
+    console.log('streamPageUrl ', streamPageUrl);
+    this.state.streamPageUrl = streamPageUrl;
   }
 }
 
