@@ -274,10 +274,9 @@ export class RestreamService extends StatefulService<IRestreamState> {
       const ttSettings = this.tiktokService.state.settings;
       tikTokTarget.platform = 'relay';
       tikTokTarget.streamKey = `${ttSettings.serverUrl}/${ttSettings.streamKey}`;
-      // FIXME: this might need fixing, since not checking for dual output mode might make it
-      // request horizontal stream keys from restream which means this can't be streamed with
-      // an horizontal context (such as Twitch)
-      tikTokTarget.mode = this.dualOutputService.views.getPlatformMode('tiktok');
+      tikTokTarget.mode = isDualOutputMode
+        ? this.dualOutputService.views.getPlatformMode('tiktok')
+        : 'landscape';
     }
 
     // treat twitter as a custom destination
@@ -285,8 +284,9 @@ export class RestreamService extends StatefulService<IRestreamState> {
     if (twitterTarget) {
       twitterTarget.platform = 'relay';
       twitterTarget.streamKey = `${this.twitterService.state.ingest}/${this.twitterService.state.streamKey}`;
-      // FIXME: see comment above
-      twitterTarget.mode = this.dualOutputService.views.getPlatformMode('twitter');
+      twitterTarget.mode = isDualOutputMode
+        ? this.dualOutputService.views.getPlatformMode('twitter')
+        : 'landscape';
     }
 
     // treat instagram as a custom destination

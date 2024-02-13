@@ -227,10 +227,6 @@ export class TikTokService
         const status = response as ITikTokLiveScopeResponse;
         this.SET_ENABLED_STATUS(status?.can_be_live);
 
-        // fetch stream page url to open
-        const streamPageUrl = await this.fetchProfileUrl();
-        this.SET_STREAM_PAGE_URL(streamPageUrl);
-
         return EPlatformCallResult.Success;
       } else {
         this.SET_ENABLED_STATUS(false);
@@ -281,7 +277,10 @@ export class TikTokService
    * prepopulate channel info and save it to the store
    */
   async prepopulateInfo(): Promise<void> {
-    // Currently not enabled in API
+    // fetch stream page url to open
+    const streamPageUrl = await this.fetchProfileUrl();
+    this.SET_STREAM_PAGE_URL(streamPageUrl);
+
     this.SET_PREPOPULATED(true);
   }
 
