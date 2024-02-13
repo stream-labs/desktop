@@ -457,7 +457,7 @@ function Platform(p: { platform: TPlatform }) {
     <div className="section flex" style={{ marginBottom: 16, flexDirection: 'column' }}>
       <div className="flex">
         <div className="margin-right--20" style={{ width: '50px' }}>
-          <PlatformLogo className={css.platformLogo} size="medium" platform={platform} />
+          <PlatformLogo className={css.platformLogo} size={50} platform={platform} />
         </div>
 
         <div style={{ alignSelf: 'center' }}>

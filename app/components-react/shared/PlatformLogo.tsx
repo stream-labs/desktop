@@ -5,7 +5,7 @@ import css from './PlatformLogo.m.less';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
 
-const sizeMap = {
+export const sizeMap = {
   small: 14,
   medium: 40,
 };
@@ -43,7 +43,13 @@ export default function PlatformLogo(p: IProps & HTMLAttributes<unknown>) {
   }
   const size = p.size && (sizeMap[p.size] ?? p.size);
   const sizeStyle = size
-    ? { fontSize: `${size}px`, maxHeight: `${size}px`, maxWidth: `${size}px` }
+    ? {
+        fontSize: `${size}px`,
+        width: `${size}px`,
+        height: `${size}px`,
+        maxHeight: `${size}px`,
+        maxWidth: `${size}px`,
+      }
     : undefined;
   const colorStyle = p.color ? { color: p.color } : undefined;
   const style = { ...sizeStyle, ...colorStyle };
@@ -58,11 +64,11 @@ export default function PlatformLogo(p: IProps & HTMLAttributes<unknown>) {
   return (
     <>
       {p.trovo ? (
-        <i className={cx('icon-trovo', p.className)} />
+        <i className={cx('icon-trovo', p.className)} style={style} />
       ) : (
         <i
           className={cx(iconForPlatform(), !p.nocolor && css[p.platform], p.className, {
-            // Trovo doesn't provide an SVG, so just use different colored PNGs
+            // The platforms below don't provide an SVG, so just use different colored PNGs
             [css['trovo--black']]: p.platform === 'trovo' && p.color === 'black',
             [css['twitter--black']]: p.platform === 'twitter' && color === 'black',
             [css['tiktok--black']]: p.platform === 'tiktok' && color === 'black',
