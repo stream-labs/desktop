@@ -127,10 +127,7 @@ export class TikTokService
 
     if (streamInfo?.id) {
       // open urls if stream successfully started
-      const streamPageUrl = await this.fetchProfileUrl();
-      this.SET_STREAM_PAGE_URL(streamPageUrl);
-
-      remote.shell.openExternal(streamPageUrl);
+      remote.shell.openExternal(this.streamPageUrl);
       remote.shell.openExternal(this.dashboardUrl);
     } else {
       this.SET_ENABLED_STATUS(false);
@@ -228,8 +225,12 @@ export class TikTokService
       const response = await this.fetchLiveAccessStatus();
       if (response) {
         const status = response as ITikTokLiveScopeResponse;
-        console.log('status ', JSON.stringify(status, null, 2));
         this.SET_ENABLED_STATUS(status?.can_be_live);
+
+        // fetch stream page url to open
+        const streamPageUrl = await this.fetchProfileUrl();
+        this.SET_STREAM_PAGE_URL(streamPageUrl);
+
         return EPlatformCallResult.Success;
       } else {
         this.SET_ENABLED_STATUS(false);
@@ -272,7 +273,6 @@ export class TikTokService
         fields: ['profile_deep_link'],
       }),
     }).then(json => {
-      console.log('json ', json);
       return json.data.user.profile_deep_link;
     });
   }
@@ -323,7 +323,6 @@ export class TikTokService
   }
 
   get dashboardUrl(): string {
-    console.log(`https://livecenter.tiktok.com/live_monitor?lang=${this.locale}`);
     return `https://livecenter.tiktok.com/live_monitor?lang=${this.locale}`;
   }
 
@@ -349,7 +348,6 @@ export class TikTokService
 
   @mutation()
   protected SET_STREAM_PAGE_URL(streamPageUrl: string) {
-    console.log('streamPageUrl ', streamPageUrl);
     this.state.streamPageUrl = streamPageUrl;
   }
 }

@@ -52,8 +52,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
   @Inject() streamingService: StreamingService;
   @Inject() incrementalRolloutService: IncrementalRolloutService;
   @Inject() facebookService: FacebookService;
-  @Inject() tiktokService: TikTokService;
-  // @Inject('TikTokService') tiktokService: TikTokService;
+  @Inject('TikTokService') tiktokService: TikTokService;
   @Inject() trovoService: TrovoService;
   @Inject() instagramService: InstagramService;
   @Inject() videoSettingsService: VideoSettingsService;
