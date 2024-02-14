@@ -248,7 +248,7 @@ export class GoLiveSettingsModule {
    */
   async validate() {
     // tiktok live authorization error
-    if (this.state.isEnabled('tiktok') && !Services.TikTokService.getLiveStreamEnabled()) {
+    if (this.state.isEnabled('tiktok') && !Services.TikTokService.liveStreamingEnabled) {
       message.error($t('Streaming to TikTok not approved.'));
       return false;
     }

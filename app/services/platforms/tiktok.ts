@@ -88,10 +88,6 @@ export class TikTokService
     height: 800,
   };
 
-  get views() {
-    return new TikTokView(this.state);
-  }
-
   get authUrl() {
     const host = this.hostsService.streamlabs;
     const query = `_=${Date.now()}&skip_splash=true&external=electron&tiktok&force_verify&origin=slobs`;
@@ -102,8 +98,8 @@ export class TikTokService
     return this.userService.views.state.auth?.platforms?.tiktok?.token;
   }
 
-  get username(): string {
-    return this.userService.state.auth?.platforms?.tiktok?.username || '';
+  get liveStreamingEnabled() {
+    return this.state.settings?.liveStreamingEnabled;
   }
 
   /**
@@ -114,24 +110,23 @@ export class TikTokService
     return 0;
   }
 
-  getLiveStreamEnabled(): boolean {
-    return this.state.settings?.liveStreamingEnabled === true;
-  }
-
   async beforeGoLive(goLiveSettings: IGoLiveSettings, display?: TDisplayType) {
     const ttSettings = getDefined(goLiveSettings.platforms.tiktok);
 
     let streamInfo = {} as ITikTokStartStreamResponse;
 
-    streamInfo = await this.startStream(ttSettings);
-
-    if (streamInfo?.id) {
-      // open urls if stream successfully started
-      remote.shell.openExternal(this.streamPageUrl);
-      remote.shell.openExternal(this.dashboardUrl);
-    } else {
+    try {
+      streamInfo = await this.startStream(ttSettings);
+      if (streamInfo?.id) {
+        // open url if stream successfully started
+        remote.shell.openExternal(this.dashboardUrl, { activate: false });
+      } else {
+        this.SET_ENABLED_STATUS(false);
+        throwStreamError('PLATFORM_REQUEST_FAILED');
+      }
+    } catch (error: unknown) {
       this.SET_ENABLED_STATUS(false);
-      throw throwStreamError('TIKTOK_START_STREAM_FAILED');
+      throwStreamError('PLATFORM_REQUEST_FAILED', error as any);
     }
 
     const context = display ?? ttSettings?.display;
@@ -277,6 +272,9 @@ export class TikTokService
    * prepopulate channel info and save it to the store
    */
   async prepopulateInfo(): Promise<void> {
+    // fetch user live access status
+    await this.validatePlatform();
+
     // fetch stream page url to open
     const streamPageUrl = await this.fetchProfileUrl();
     this.SET_STREAM_PAGE_URL(streamPageUrl);
@@ -325,11 +323,19 @@ export class TikTokService
     return `https://livecenter.tiktok.com/live_monitor?lang=${this.locale}`;
   }
 
+  get infoUrl(): string {
+    return `https://streamlabs.com/content-hub/post/how-to-livestream-from-your-tiktok-account-using-streamlabs-from-web?lang=${this.locale}`;
+  }
+
+  get applicationUrl(): string {
+    return `https://www.tiktok.com/falcon/live_g/live_access_pc_apply/intro/index.html?id=${this.id}&lang=${this.locale}`;
+  }
+
   get locale(): string {
     return I18nService.instance.state.locale;
   }
 
-  // TODO: replace temporary string with id
+  // TODO: replace temporary string with `official activity ID`
   get id(): string {
     return 'GL6399433079641606942';
   }
@@ -348,11 +354,5 @@ export class TikTokService
   @mutation()
   protected SET_STREAM_PAGE_URL(streamPageUrl: string) {
     this.state.streamPageUrl = streamPageUrl;
-  }
-}
-
-export class TikTokView extends ViewHandler<ITikTokServiceState> {
-  get liveStreamingEnabled() {
-    return this.state.settings?.liveStreamingEnabled;
   }
 }

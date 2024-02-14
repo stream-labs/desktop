@@ -1,6 +1,4 @@
-//TikTokEditStrean
-
-import React, { useEffect } from 'react';
+import React from 'react';
 import Form from '../../../shared/inputs/Form';
 import { $t } from '../../../../services/i18n';
 import { Services } from '../../../service-provider';
@@ -12,19 +10,12 @@ import { CommonPlatformFields } from '../CommonPlatformFields';
 import { ITikTokStartStreamOptions } from 'services/platforms/tiktok';
 
 export function TikTokEditStreamInfo(p: IPlatformComponentParams<'tiktok'>) {
-  const { TikTokService } = Services;
   const ttSettings = p.value;
-  const liveStreamingEnabled = TikTokService.views.liveStreamingEnabled;
-
-  const { locale, id } = TikTokService;
+  const liveStreamingEnabled = Services.TikTokService.liveStreamingEnabled;
 
   function updateSettings(patch: Partial<ITikTokStartStreamOptions>) {
     p.onChange({ ...ttSettings, ...patch });
   }
-
-  useEffect(() => {
-    TikTokService.actions.validatePlatform();
-  }, []);
 
   return (
     <Form name="tiktok-settings">
@@ -43,25 +34,21 @@ export function TikTokEditStreamInfo(p: IPlatformComponentParams<'tiktok'>) {
           requiredFields={<div key={'empty-tiktok'} />}
         />
       ) : (
-        <TikTokStreamApplicationInfo ttId={id} locale={locale} />
+        <TikTokStreamApplicationInfo />
       )}
     </Form>
   );
 }
 
-function openInfoPage() {
-  remote.shell.openExternal(
-    'https://streamlabs.com/content-hub/post/how-to-livestream-from-your-tiktok-account-using-streamlabs-from-web',
-  );
-}
+function TikTokStreamApplicationInfo() {
+  function openInfoPage() {
+    remote.shell.openExternal(Services.TikTokService.infoUrl);
+  }
 
-function openApplicationInfoPage(id: string, locale: string) {
-  remote.shell.openExternal(
-    `https://www.tiktok.com/falcon/live_g/live_access_pc_apply/intro/index.html?${id}&lang=${locale}`,
-  );
-}
+  function openApplicationInfoPage() {
+    remote.shell.openExternal(Services.TikTokService.applicationUrl);
+  }
 
-function TikTokStreamApplicationInfo(p: { ttId: string; locale: string }) {
   return (
     <InputWrapper
       extra={
@@ -74,10 +61,7 @@ function TikTokStreamApplicationInfo(p: { ttId: string; locale: string }) {
         <div style={{ marginBottom: '5px' }}>
           {$t('You do not have permission to stream live to TikTok.')}
         </div>
-        <Button
-          onClick={() => openApplicationInfoPage(p.ttId, p.locale)}
-          style={{ marginBottom: '10px' }}
-        >
+        <Button onClick={openApplicationInfoPage} style={{ marginBottom: '10px' }}>
           {$t('Apply for TikTok Live Permission')}
         </Button>
       </div>

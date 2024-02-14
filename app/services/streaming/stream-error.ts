@@ -20,11 +20,6 @@ export const errorTypes = {
       return $t('Your stream title or description contain banned words');
     },
   },
-  TIKTOK_START_STREAM_FAILED: {
-    get message() {
-      return $t('Failed to start TikTok stream');
-    },
-  },
   PREPOPULATE_FAILED: {
     get message() {
       return $t('Failed to fetch platform settings');
