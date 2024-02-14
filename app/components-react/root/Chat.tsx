@@ -10,8 +10,6 @@ export default function Chat(props: { restream: boolean }) {
 
   const chatEl = useRef<HTMLDivElement>(null);
 
-  const service = props.restream ? RestreamService : ChatService;
-
   let currentPosition: IVec2 | null;
   let currentSize: IVec2 | null;
   let resizeInterval: number;
@@ -43,10 +41,12 @@ export default function Chat(props: { restream: boolean }) {
         remote.getCurrentWindow().removeListener('leave-full-screen', leaveFullScreenTrigger);
       }
     };
-  }, []);
+  }, [props.restream]);
 
   // Mount/switch chat
   useEffect(() => {
+    const service = props.restream ? RestreamService : ChatService;
+
     setupChat();
     const cancelUnload = onUnload(() => service.actions.unmountChat(remote.getCurrentWindow().id));
 
@@ -57,6 +57,7 @@ export default function Chat(props: { restream: boolean }) {
   }, [props.restream]);
 
   function setupChat() {
+    const service = props.restream ? RestreamService : ChatService;
     const windowId = remote.getCurrentWindow().id;
 
     ChatService.actions.unmountChat();
@@ -69,6 +70,8 @@ export default function Chat(props: { restream: boolean }) {
   }
 
   function checkResize() {
+    const service = props.restream ? RestreamService : ChatService;
+
     if (!chatEl.current) return;
 
     const rect = chatEl.current.getBoundingClientRect();
