@@ -261,7 +261,7 @@ export class LoginModule {
 
     const result = await this.UserService.startAuth(
       platform,
-      ['youtube', 'twitch', 'twitter'].includes(platform) ? 'external' : 'internal',
+      ['youtube', 'twitch', 'twitter', 'tiktok'].includes(platform) ? 'external' : 'internal',
       merge,
     );
 
