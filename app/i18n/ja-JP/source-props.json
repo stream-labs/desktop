@@ -421,7 +421,9 @@
       "remove_voice": "ボイスを削除",
       "copy_voice": "ボイスを複製",
       "check_voice": "変換後音声を聞く",
-      "original_voice_add": "オリジナルボイスを登録"
+      "original_voice_add": "オリジナルボイスを登録",
+      "remove_confirm": "削除しますか？",
+      "original": "オリジナル"
     },
     "container": {
       "voice_name": "名前",
