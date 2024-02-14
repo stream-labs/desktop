@@ -97,7 +97,7 @@
           </div>
         </div>
 
-        <div v-else>
+        <div class="section-wrapper" v-else>
           <div class="section">
             <div class="section-heading-wrapper">
               <div class="section-heading">{{ $t('source-props.nair-rtvc-source.container.voice_name') }}</div>
@@ -287,7 +287,7 @@
 
 .character-header {
   position: relative;
-  flex-grow: 1;
+  height: 304px;
   overflow: hidden;
   border-radius: 4px 4px 0 0;
 
@@ -394,7 +394,17 @@
   }
 }
 
+.section-wrapper {
+  display:flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
 .section {
+  &:last-of-type {
+    flex-grow: 1;
+  }
+
   .character-image+& {
     border-radius: 0 0 4px 4px;
   }
