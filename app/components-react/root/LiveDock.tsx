@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import * as remote from '@electron/remote';
 import cx from 'classnames';
 import Animation from 'rc-animate';
@@ -35,36 +35,8 @@ class LiveDockController {
   store = initStore({
     elapsedStreamTime: '',
     canAnimate: false,
-    slot: EAppPageSlot.Chat,
-    underlyingSelectedChat: 'default',
+    selectedChat: 'default',
   });
-
-  // Safe getter/setter prevents getting stuck on the chat
-  // for an app that was unloaded.
-  setChat(key: string) {
-    console.log('key ', key);
-    this.store.setState(s => (s.underlyingSelectedChat = key));
-  }
-
-  get selectedChat() {
-    if (this.store.underlyingSelectedChat === 'default') return 'default';
-    if (this.store.underlyingSelectedChat === 'default' && this.isTikTok && this.isRestreaming) {
-      return 'restream';
-    }
-
-    if (this.store.underlyingSelectedChat === 'restream') {
-      if (this.restreamService.shouldGoLiveWithRestream) return 'restream';
-      return 'default';
-    }
-
-    return this.chatApps.find(app => {
-      if (app.id === this.store.underlyingSelectedChat) {
-        return app.id === this.store.underlyingSelectedChat;
-      }
-    })
-      ? this.store.underlyingSelectedChat
-      : 'default';
-  }
 
   get applicationLoading() {
     return this.appService.state.loading;
@@ -80,6 +52,22 @@ class LiveDockController {
 
   get collapsed() {
     return this.customizationService.state.livedockCollapsed;
+  }
+
+  get pageSlot() {
+    return EAppPageSlot.Chat;
+  }
+
+  get canAnimate() {
+    return this.store.canAnimate;
+  }
+
+  get elapsedStreamTime() {
+    return this.store.elapsedStreamTime;
+  }
+
+  get selectedChat() {
+    return this.store.selectedChat;
   }
 
   get liveText() {
@@ -123,7 +111,7 @@ class LiveDockController {
   }
 
   get defaultPlatformChatVisible() {
-    return this.selectedChat === 'default';
+    return this.store.selectedChat === 'default';
   }
 
   get restreamChatUrl() {
@@ -147,7 +135,7 @@ class LiveDockController {
       },
     ].concat(
       this.chatApps
-        .filter(app => !app.poppedOutSlots.includes(this.store.slot))
+        .filter(app => !app.poppedOutSlots.includes(this.pageSlot))
         .map(app => {
           return {
             name: app.manifest.name,
@@ -161,10 +149,6 @@ class LiveDockController {
         value: 'restream',
       });
     }
-    if (this.userService.state.auth.primaryPlatform === 'twitter') {
-      // Twitter is the only primary platform without a chat
-      return tabs.slice(1);
-    }
     return tabs;
   }
 
@@ -174,9 +158,9 @@ class LiveDockController {
 
   get isPopOutAllowed() {
     if (this.defaultPlatformChatVisible) return false;
-    if (this.selectedChat === 'restream') return false;
+    if (this.store.selectedChat === 'restream') return false;
     const chatPage = this.platformAppsService.views
-      .getApp(this.selectedChat)
+      .getApp(this.store.selectedChat)
       .manifest.pages.find(page => page.slot === EAppPageSlot.Chat);
     if (!chatPage) return false;
     // Default result is true
@@ -226,20 +210,22 @@ class LiveDockController {
   }
 
   refreshChat() {
-    if (this.selectedChat === 'default') {
+    if (this.store.selectedChat === 'default') {
       this.chatService.refreshChat();
       return;
     }
-    if (this.selectedChat === 'restream') {
+    if (this.store.selectedChat === 'restream') {
       this.restreamService.refreshChat();
       return;
     }
-    this.platformAppsService.refreshApp(this.selectedChat);
+    this.platformAppsService.refreshApp(this.store.selectedChat);
   }
 
   popOut() {
-    this.platformAppsService.popOutAppPage(this.selectedChat, this.store.slot);
-    this.setChat('default');
+    this.platformAppsService.popOutAppPage(this.store.selectedChat, this.pageSlot);
+    this.store.setState(s => {
+      s.selectedChat = 'default';
+    });
   }
 
   setCollapsed(livedockCollapsed: boolean) {
@@ -257,7 +243,7 @@ class LiveDockController {
   }
 
   toggleViewerCount() {
-    this.customizationService.setHiddenViewerCount(
+    this.customizationService.actions.setHiddenViewerCount(
       !this.customizationService.state.hideViewerCount,
     );
   }
@@ -280,9 +266,55 @@ export default function LiveDockWithContext(p: { onLeft?: boolean }) {
 function LiveDock(p: { onLeft: boolean }) {
   const ctrl = useController(LiveDockCtx);
 
+  const [visibleChat, setVisibleChat] = useState('default');
+
+  const {
+    collapsed,
+    isPlatform,
+    isStreaming,
+    isRestreaming,
+    hasChatTabs,
+    chatTabs,
+    liveDockSize,
+    applicationLoading,
+    hideStyleBlockers,
+    hideViewerCount,
+    viewerCount,
+    pageSlot,
+    canAnimate,
+    elapsedStreamTime,
+    liveText,
+    isPopOutAllowed,
+    streamingStatus,
+  } = useVuex(() =>
+    pick(ctrl, [
+      'collapsed',
+      'isPlatform',
+      'isStreaming',
+      'isRestreaming',
+      'hasChatTabs',
+      'chatTabs',
+      'liveDockSize',
+      'applicationLoading',
+      'hideStyleBlockers',
+      'hideViewerCount',
+      'viewerCount',
+      'pageSlot',
+      'canAnimate',
+      'elapsedStreamTime',
+      'liveText',
+      'isPopOutAllowed',
+      'streamingStatus',
+    ]),
+  );
+
   useEffect(() => {
+    if (streamingStatus === EStreamingState.Starting && ctrl.collapsed) {
+      ctrl.setCollapsed(false);
+    }
+
     const elapsedInterval = window.setInterval(() => {
-      if (ctrl.streamingStatus === EStreamingState.Live) {
+      if (streamingStatus === EStreamingState.Live) {
         ctrl.store.setState(s => {
           s.elapsedStreamTime = ctrl.getElapsedStreamTime();
         });
@@ -294,52 +326,31 @@ function LiveDock(p: { onLeft: boolean }) {
     }, 100);
 
     return () => clearInterval(elapsedInterval);
-  }, []);
-
-  useEffect(() => {
-    if (ctrl.streamingStatus === EStreamingState.Starting && ctrl.collapsed) {
-      ctrl.setCollapsed(false);
-    }
-  }, [ctrl.streamingStatus]);
-
-  // controlRoomTooltip = $t('Go to YouTube Live Dashboard');
-  // liveProducerTooltip = $t('Go to the Facebook Live Producer Dashboard');
+  }, [streamingStatus]);
 
   function toggleCollapsed() {
-    ctrl.collapsed ? ctrl.setCollapsed(false) : ctrl.setCollapsed(true);
+    collapsed ? ctrl.setCollapsed(false) : ctrl.setCollapsed(true);
   }
 
-  const {
-    collapsed,
-    isPlatform,
-    isStreaming,
-    isRestreaming,
-    hasChatTabs,
-    chatTabs,
-    selectedChat,
-    liveDockSize,
-    applicationLoading,
-    hideStyleBlockers,
-  } = useVuex(() =>
-    pick(ctrl, [
-      'collapsed',
-      'isPlatform',
-      'isStreaming',
-      'isRestreaming',
-      'hasChatTabs',
-      'selectedChat',
-      'chatTabs',
-      'liveDockSize',
-      'applicationLoading',
-      'hideStyleBlockers',
-    ]),
-  );
+  // Safe getter/setter prevents getting stuck on the chat
+  // for an app that was unloaded.
+  function setChat(key: string) {
+    ctrl.store.setState(s => {
+      if (!ctrl.chatApps.find(app => app.id === key) && !['default', 'restream'].includes(key)) {
+        s.selectedChat = 'default';
+        setVisibleChat('default');
+      } else {
+        s.selectedChat = key;
+        setVisibleChat(key);
+      }
+    });
+  }
 
   return (
     <div
       className={cx(styles.liveDock, {
         [styles.collapsed]: collapsed,
-        [styles.canAnimate]: ctrl.store.canAnimate,
+        [styles.canAnimate]: canAnimate,
         [styles.liveDockLeft]: p.onLeft,
       })}
       style={{ width: liveDockSize + 'px' }}
@@ -362,19 +373,19 @@ function LiveDock(p: { onLeft: boolean }) {
                     [styles.liveDockOffline]: !isStreaming,
                   })}
                 />
-                <span className={styles.liveDockText}>{ctrl.liveText}</span>
-                <span className={styles.liveDockTimer}>{ctrl.store.elapsedStreamTime}</span>
+                <span className={styles.liveDockText}>{liveText}</span>
+                <span className={styles.liveDockTimer}>{elapsedStreamTime}</span>
               </div>
               <div className={styles.liveDockViewerCount}>
                 <i
                   className={cx({
-                    [styles.iconView]: !ctrl.hideViewerCount,
-                    [styles.iconHide]: ctrl.hideViewerCount,
+                    ['icon-view']: !hideViewerCount,
+                    ['icon-hide']: hideViewerCount,
                   })}
                   onClick={() => ctrl.toggleViewerCount()}
                 />
-                <span className={styles.liveDockViewerCountCount}>{ctrl.viewerCount}</span>
-                {Number(ctrl.viewerCount) >= 0 && <span>{$t('viewers')}</span>}
+                <span className={styles.liveDockViewerCountCount}>{viewerCount}</span>
+                {Number(viewerCount) >= 0 && <span>{$t('viewers')}</span>}
               </div>
             </div>
 
@@ -411,15 +422,15 @@ function LiveDock(p: { onLeft: boolean }) {
                   {hasChatTabs && (
                     <div className="flex">
                       <Menu
-                        selectedKeys={[selectedChat]}
-                        onClick={ev => ctrl.setChat(ev.key)}
+                        defaultSelectedKeys={[visibleChat]}
+                        onClick={ev => setChat(ev.key)}
                         mode="horizontal"
                       >
                         {chatTabs.map(tab => (
                           <Menu.Item key={tab.value}>{tab.name}</Menu.Item>
                         ))}
                       </Menu>
-                      {ctrl.isPopOutAllowed && (
+                      {isPopOutAllowed && (
                         <Tooltip title={$t('Pop out to new window')} placement="left">
                           <i
                             className={cx(styles.liveDockChatAppsPopout, 'icon-pop-out-1')}
@@ -430,14 +441,14 @@ function LiveDock(p: { onLeft: boolean }) {
                     </div>
                   )}
                   {!applicationLoading && !collapsed && (
-                    <Chat restream={selectedChat === 'restream'} />
+                    <Chat restream={visibleChat === 'restream'} key={visibleChat} />
                   )}
-                  {!['default', 'restream'].includes(selectedChat) && (
+                  {!['default', 'restream'].includes(visibleChat) && (
                     <PlatformAppPageView
                       className={styles.liveDockPlatformAppWebview}
-                      appId={selectedChat}
-                      pageSlot={ctrl.store.slot}
-                      key={selectedChat}
+                      appId={visibleChat}
+                      pageSlot={pageSlot}
+                      key={visibleChat}
                     />
                   )}
                 </div>
