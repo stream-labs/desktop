@@ -27,7 +27,7 @@ enum ETikTokLiveScopeReason {
 export interface ITikTokUserInfoResponse {
   data: {
     user: {
-      profile_deep_link: string;
+      username: string;
     };
   };
 }

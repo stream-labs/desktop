@@ -24,7 +24,7 @@ import * as remote from '@electron/remote';
 interface ITikTokServiceState extends IPlatformState {
   settings: ITikTokStartStreamSettings;
   broadcastId: string;
-  streamPageUrl: string;
+  username: string;
 }
 
 interface ITikTokStartStreamSettings {
@@ -75,7 +75,7 @@ export class TikTokService
       streamKey: '',
     },
     broadcastId: '',
-    streamPageUrl: '',
+    username: '',
   };
 
   readonly apiBase = 'https://open-api.tiktok.com';
@@ -249,7 +249,7 @@ export class TikTokService
     });
   }
 
-  async fetchProfileUrl(): Promise<string> {
+  async fetchUsername(): Promise<string> {
     const url = `${this.apiBase}/user/info/`;
     const headers = this.getHeaders({ url });
 
@@ -259,10 +259,10 @@ export class TikTokService
       method: 'POST',
       body: JSON.stringify({
         access_token: this.oauthToken,
-        fields: ['profile_deep_link'],
+        fields: ['username'],
       }),
     }).then(json => {
-      return json.data.user.profile_deep_link;
+      return json.data.user.username;
     });
   }
 
@@ -273,9 +273,9 @@ export class TikTokService
     // fetch user live access status
     await this.validatePlatform();
 
-    // fetch stream page url to open
-    const streamPageUrl = await this.fetchProfileUrl();
-    this.SET_STREAM_PAGE_URL(streamPageUrl);
+    // fetch username for stream page url
+    const username = await this.fetchUsername();
+    this.SET_USERNAME(username);
 
     this.SET_PREPOPULATED(true);
   }
@@ -310,7 +310,7 @@ export class TikTokService
   }
 
   get streamPageUrl(): string {
-    return this.state.streamPageUrl;
+    return `https://www.tiktok.com/@${this.state.username}/live`;
   }
 
   get chatUrl(): string {
@@ -344,13 +344,13 @@ export class TikTokService
   }
 
   @mutation()
-  SET_ENABLED_STATUS(status: boolean) {
-    const updatedSettings = { ...this.state.settings, liveStreamingEnabled: status };
-    this.state.settings = updatedSettings;
+  protected SET_USERNAME(username: string) {
+    this.state.username = username;
   }
 
   @mutation()
-  protected SET_STREAM_PAGE_URL(streamPageUrl: string) {
-    this.state.streamPageUrl = streamPageUrl;
+  SET_ENABLED_STATUS(status: boolean) {
+    const updatedSettings = { ...this.state.settings, liveStreamingEnabled: status };
+    this.state.settings = updatedSettings;
   }
 }

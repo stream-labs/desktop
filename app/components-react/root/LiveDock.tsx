@@ -441,7 +441,11 @@ function LiveDock(p: { onLeft: boolean }) {
                     </div>
                   )}
                   {!applicationLoading && !collapsed && (
-                    <Chat restream={visibleChat === 'restream'} key={visibleChat} />
+                    <Chat
+                      restream={visibleChat === 'restream'}
+                      key={visibleChat}
+                      visibleChat={visibleChat}
+                    />
                   )}
                   {!['default', 'restream'].includes(visibleChat) && (
                     <PlatformAppPageView
