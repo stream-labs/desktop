@@ -23,7 +23,6 @@ export function DestinationSwitchers() {
     switchPlatforms,
     switchCustomDestination,
     isPrimaryPlatform,
-    componentView,
   } = useGoLiveSettings();
   const enabledPlatformsRef = useRef(enabledPlatforms);
   enabledPlatformsRef.current = enabledPlatforms;
@@ -90,7 +89,7 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
       );
       return;
     }
-    if (RestreamService.views.canEnableRestream) {
+    if (RestreamService.views.canEnableRestream || p.destination === 'tiktok') {
       const enable = !p.enabled;
       p.onChange(enable);
       // always proxy the click to the SwitchInput

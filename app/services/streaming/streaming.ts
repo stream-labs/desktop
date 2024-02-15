@@ -183,27 +183,13 @@ export class StreamingService
 
         // check eligibility for restream
         // primary platform is always available to stream into
-        // prime users are eligeble for streaming to any platform
-        let primeRequired = false;
-        if (!this.views.isPrimaryPlatform(platform) && !this.userService.isPrime) {
-          const primaryPlatform = this.userService.state.auth?.primaryPlatform;
+        // prime users are eligible for streaming to any platform
+        const primeRequired = this.isPrimeRequired(platform);
 
-          // grandfathared users allowed to stream primary + FB
-          if (!this.restreamService.state.grandfathered) {
-            primeRequired = true;
-          } else if (
-            isEqual([primaryPlatform, platform], ['twitch', 'facebook']) ||
-            isEqual([primaryPlatform, platform], ['youtube', 'facebook'])
-          ) {
-            primeRequired = false;
-          } else {
-            primeRequired = true;
-          }
-          if (primeRequired && !this.views.isDualOutputMode) {
-            this.setError('PRIME_REQUIRED');
-            this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
-            return;
-          }
+        if (primeRequired && !this.views.isDualOutputMode) {
+          this.setError('PRIME_REQUIRED');
+          this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
+          return;
         }
 
         try {
@@ -229,6 +215,34 @@ export class StreamingService
 
     // successfully prepopulated
     this.UPDATE_STREAM_INFO({ lifecycle: 'waitForNewSettings' });
+  }
+
+  /**
+   * Determine if platform requires an ultra subscription for streaming
+   */
+  isPrimeRequired(platform: TPlatform): boolean {
+    // users can always stream to tiktok
+    if (platform === 'tiktok') return false;
+
+    if (!this.views.isPrimaryPlatform(platform) && !this.userService.isPrime) {
+      const primaryPlatform = this.userService.state.auth?.primaryPlatform;
+
+      // grandfathered users allowed to stream primary + FB
+      if (!this.restreamService.state.grandfathered) {
+        return false;
+      } else if (!this.restreamService.state.grandfathered) {
+        return true;
+      } else if (
+        isEqual([primaryPlatform, platform], ['twitch', 'facebook']) ||
+        isEqual([primaryPlatform, platform], ['youtube', 'facebook'])
+      ) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**

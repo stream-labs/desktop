@@ -121,6 +121,13 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
       (!this.restreamView.canEnableRestream || !this.protectedModeEnabled) &&
       !this.isDualOutputMode
     ) {
+      // users can always stream to tiktok
+      const forceStreamToTikTok =
+        this.isPlatformLinked('tiktok') && this.userView.auth!.primaryPlatform !== 'tiktok';
+
+      if (forceStreamToTikTok) {
+        return [this.userView.auth!.primaryPlatform, 'tiktok'];
+      }
       return [this.userView.auth!.primaryPlatform];
     }
 

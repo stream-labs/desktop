@@ -162,8 +162,6 @@ export class TikTokService
     }
   }
 
-  // Note, this needs to be here but should never be called, because we
-  // currently don't make any calls directly to TikTok
   fetchNewToken(): Promise<void> {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/tiktok/refresh`;
