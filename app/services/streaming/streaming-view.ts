@@ -301,8 +301,11 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
 
     const savedGoLiveSettings = this.streamSettingsView.state.goLiveSettings;
 
-    // TODO: this should be done as a migration, if needed
-    // TODO: we would ideally run this only if restream can be enabled, but multistream tests fail if we get that specific
+    /*
+     * TODO: this should be done as a migration, if needed, but having it
+     * here seems to ensure we always have a primary platform, no app restart needed.
+     * we would ideally run this only if restream can be enabled, but multistream tests fail if we get that specific
+     */
     const areNoPlatformsEnabled = () => Object.values(platforms!).every(p => !p.enabled);
 
     if (areNoPlatformsEnabled()) {
