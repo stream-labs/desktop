@@ -117,6 +117,15 @@ export class Main extends ReactComponent {}
 
 @Component({
   props: {
+    name: { default: 'LiveDock' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+    componentProps: { default: () => ({ onLeft: false }) },
+  },
+})
+export class LiveDock extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'ManageSceneCollections' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
   },
