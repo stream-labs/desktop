@@ -421,7 +421,7 @@
       "remove_voice": "remove",
       "copy_voice": "copy",
       "check_voice": "Check Voice",
-      "original_voice_add": "Register voice",
+      "original_voice_add": "Add new voice",
       "remove_confirm": "Remove?",
       "original": "Original"
     },
@@ -430,7 +430,7 @@
       "voice_setting": "Parameters",
       "make_random": {
         "name": "Make random",
-        "description": "make parameter as random"
+        "description": "Generate voice 1, voice 2, and set the amount randomly."
       }
     },
     "preset": {
@@ -449,7 +449,7 @@
       "0": "jvs_001"
     },
     "amount": {
-      "name": "amount",
+      "name": "voice 2 amount",
       "description": "Set the percentage of voice 1"
     },
     "device": {

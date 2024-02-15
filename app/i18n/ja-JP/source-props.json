@@ -421,7 +421,7 @@
       "remove_voice": "ボイスを削除",
       "copy_voice": "ボイスを複製",
       "check_voice": "変換後音声を聞く",
-      "original_voice_add": "オリジナルボイスを登録",
+      "original_voice_add": "オリジナルボイスを追加",
       "remove_confirm": "削除しますか？",
       "original": "オリジナル"
     },
@@ -430,7 +430,7 @@
       "voice_setting": "音声設定",
       "make_random": {
         "name": "ランダムで生成",
-        "description": "ランダムで設定して生成します"
+        "description": "ボイス1、ボイス2、割合をランダムで設定して生成します"
       }
     },
     "preset": {
@@ -449,7 +449,7 @@
       "0": "jvs_001"
     },
     "amount": {
-      "name": "割合",
+      "name": "ボイス2の割合",
       "description": "ボイス1の割合を設定します。"
     },
     "device": {

@@ -143,8 +143,7 @@
               <div class="input-wrapper" v-if="secondaryVoice >= 0">
                 <div class="input-label">
                   <label>{{ $t('source-props.nair-rtvc-source.amount.name') }}
-                    <i class="icon-help icon-tooltip"
-                      v-tooltip.top="$t('source-props.nair-rtvc-source.amount.description')"></i></label>
+                  </label>
                   <label> {{ amount.toFixed(0) + '%' }}</label>
                 </div>
                 <VueSlider class="slider" v-model="amount" :min="0" :max="100" :interval="1" tooltip="none" />
@@ -395,7 +394,7 @@
 }
 
 .section-wrapper {
-  display:flex;
+  display: flex;
   flex-direction: column;
   flex-grow: 1;
 }
