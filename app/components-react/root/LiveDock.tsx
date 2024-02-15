@@ -42,11 +42,16 @@ class LiveDockController {
   // Safe getter/setter prevents getting stuck on the chat
   // for an app that was unloaded.
   setChat(key: string) {
+    console.log('key ', key);
     this.store.setState(s => (s.underlyingSelectedChat = key));
   }
 
   get selectedChat() {
     if (this.store.underlyingSelectedChat === 'default') return 'default';
+    if (this.store.underlyingSelectedChat === 'default' && this.isTikTok && this.isRestreaming) {
+      return 'restream';
+    }
+
     if (this.store.underlyingSelectedChat === 'restream') {
       if (this.restreamService.shouldGoLiveWithRestream) return 'restream';
       return 'default';
@@ -178,6 +183,10 @@ class LiveDockController {
     return chatPage.allowPopout == null ? true : chatPage.allowPopout;
   }
 
+  get isTikTok() {
+    return this.userService.platform?.type === 'tiktok';
+  }
+
   get canEditChannelInfo(): boolean {
     // Twitter & Tiktok don't support editing title after going live
     if (this.isPlatform('twitter') && !this.isRestreaming) return false;
@@ -304,6 +313,7 @@ function LiveDock(p: { onLeft: boolean }) {
     collapsed,
     isPlatform,
     isStreaming,
+    isRestreaming,
     hasChatTabs,
     chatTabs,
     selectedChat,
@@ -315,6 +325,7 @@ function LiveDock(p: { onLeft: boolean }) {
       'collapsed',
       'isPlatform',
       'isStreaming',
+      'isRestreaming',
       'hasChatTabs',
       'selectedChat',
       'chatTabs',
@@ -387,14 +398,15 @@ function LiveDock(p: { onLeft: boolean }) {
               </div>
               <div className="flex">
                 {(isPlatform(['twitch', 'trovo', 'facebook']) ||
-                  (isPlatform(['youtube', 'twitter']) && isStreaming)) && (
+                  (isPlatform(['youtube', 'twitter']) && isStreaming) ||
+                  (isPlatform(['tiktok']) && isRestreaming)) && (
                   <a onClick={() => ctrl.refreshChat()}>{$t('Refresh Chat')}</a>
                 )}
               </div>
             </div>
             {!hideStyleBlockers &&
               (isPlatform(['twitch', 'trovo']) ||
-                (isStreaming && isPlatform(['youtube', 'facebook', 'twitter']))) && (
+                (isStreaming && isPlatform(['youtube', 'facebook', 'twitter', 'tiktok']))) && (
                 <div className={styles.liveDockChat}>
                   {hasChatTabs && (
                     <div className="flex">
