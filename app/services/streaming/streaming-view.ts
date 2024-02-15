@@ -387,6 +387,8 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
    * Sort the platform list
    * - linked platforms are always on the top of the list
    * - the rest has an alphabetic sort
+   *
+   * We no longer put primary platform on top since we're allowing it to be switched
    */
   getSortedPlatforms(platforms: TPlatform[]): TPlatform[] {
     platforms = platforms.sort();
