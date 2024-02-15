@@ -449,8 +449,7 @@
       "0": "jvs_001"
     },
     "amount": {
-      "name": "voice 2 amount",
-      "description": "Set the percentage of voice 1"
+      "name": "voice 2 amount"
     },
     "device": {
       "name": "Input device"
