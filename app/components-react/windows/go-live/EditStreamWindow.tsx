@@ -14,6 +14,7 @@ import PlatformSettings from './PlatformSettings';
 import Scrollable from '../../shared/Scrollable';
 import Spinner from '../../shared/Spinner';
 import GoLiveError from './GoLiveError';
+import PrimaryChatSwitcher from './PrimaryChatSwitcher';
 
 export default function EditStreamWindow() {
   const { StreamingService, WindowsService } = Services;
@@ -28,6 +29,11 @@ export default function EditStreamWindow() {
     prepopulate,
     isLoading,
     form,
+    enabledPlatforms,
+    hasMultiplePlatforms,
+    isRestreamEnabled,
+    primaryChat,
+    setPrimaryChat,
   } = useGoLiveSettingsRoot({ isUpdateMode: true });
 
   const shouldShowChecklist = lifecycle === 'runChecklist';
@@ -83,6 +89,8 @@ export default function EditStreamWindow() {
     );
   }
 
+  const shouldShowPrimaryChatSwitcher = isRestreamEnabled && hasMultiplePlatforms;
+
   return (
     <ModalLayout footer={renderFooter()}>
       <Form
@@ -98,6 +106,13 @@ export default function EditStreamWindow() {
             <Scrollable key={'settings'} style={{ height: '100%' }} snapToWindowEdge>
               <GoLiveError />
               <PlatformSettings />
+              {shouldShowPrimaryChatSwitcher && (
+                <PrimaryChatSwitcher
+                  enabledPlatforms={enabledPlatforms}
+                  primaryChat={primaryChat}
+                  onSetPrimaryChat={setPrimaryChat}
+                />
+              )}
             </Scrollable>
           )}
 
