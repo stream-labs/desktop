@@ -15,6 +15,7 @@ import {
   SourcePropKey,
 } from 'services/rtvcStateService';
 import electron from 'electron';
+import { $t } from 'services/i18n';
 
 // for set param
 type SetParamKey =
@@ -340,10 +341,12 @@ export default class RtvcSourceProperties extends SourceProperties {
     if (idx < 0) return;
 
     const r = await electron.remote.dialog.showMessageBox(electron.remote.getCurrentWindow(), {
-      message: this.$t('source-props.nair-rtvc-source.nav.remove_confirm') as string,
-      buttons: [this.$t('common.cancel') as string, this.$t('common.remove') as string],
+      type: 'warning',
+      message: $t('source-props.nair-rtvc-source.nav.remove_confirm'),
+      buttons: [$t('common.cancel'), $t('common.remove')],
+      noLink: true,
     });
-    if (r.response !== 1) return;
+    if (!r.response) return;
 
     this.state.manuals.splice(idx, 1);
     this.updateManualList();
