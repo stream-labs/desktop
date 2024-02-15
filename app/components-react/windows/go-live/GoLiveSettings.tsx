@@ -14,7 +14,6 @@ import Spinner from '../../shared/Spinner';
 import GoLiveError from './GoLiveError';
 import TwitterInput from './Twitter';
 import AddDestinationButton from 'components-react/shared/AddDestinationButton';
-import EmptyDestinations from './EmptyDestinations';
 import { TPlatform, getPlatformService } from 'services/platforms';
 import { ListInput } from 'components-react/shared/inputs';
 import Form from 'components-react/shared/inputs/Form';
@@ -76,7 +75,7 @@ export default function GoLiveSettings() {
     };
   });
 
-  const shouldShowSettings = !error && !isLoading && hasDestinations;
+  const shouldShowSettings = !error && !isLoading;
   const shouldShowLeftCol = protectedModeEnabled;
   const shouldShowAddDestButton = canAddDestinations && isPrime;
   const shouldShowPrimaryChatSwitcher = hasMultiplePlatforms;
@@ -151,7 +150,6 @@ export default function GoLiveSettings() {
       <Col span={shouldShowLeftCol ? 16 : 24} style={{ height: '100%' }}>
         <Spinner visible={isLoading} relative />
         <GoLiveError />
-        {!hasDestinations && <EmptyDestinations />}
         {shouldShowSettings && (
           <Scrollable style={{ height: '100%' }} snapToWindowEdge>
             {/*PLATFORM SETTINGS*/}
@@ -159,12 +157,10 @@ export default function GoLiveSettings() {
             {/*ADD SOME SPACE IN ADVANCED MODE*/}
             {isAdvancedMode && <div className={styles.spacer} />}
             {/*EXTRAS*/}
-            {hasDestinations && (
-              <Section isSimpleMode={!isAdvancedMode} title={$t('Extras')}>
-                {showTweet && <TwitterInput />}
-                {!!canUseOptimizedProfile && <OptimizedProfileSwitcher />}
-              </Section>
-            )}
+            <Section isSimpleMode={!isAdvancedMode} title={$t('Extras')}>
+              {showTweet && <TwitterInput />}
+              {!!canUseOptimizedProfile && <OptimizedProfileSwitcher />}
+            </Section>
           </Scrollable>
         )}
       </Col>

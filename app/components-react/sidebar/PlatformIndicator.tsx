@@ -2,11 +2,11 @@ import React from 'react';
 import cx from 'classnames';
 import { IPlatformAuth, TPlatform } from 'services/platforms';
 import { $t } from 'services/i18n';
+import { useVuex } from 'components-react/hooks';
 import { Services } from 'components-react/service-provider';
 import PlatformLogo from 'components-react/shared/PlatformLogo';
-import styles from './PlatformIndicator.m.less';
-import { useVuex } from 'components-react/hooks';
 import { IPlatformFlags } from 'services/streaming';
+import styles from './PlatformIndicator.m.less';
 
 interface IPlatformIndicatorProps {
   platform: IPlatformAuth | undefined;

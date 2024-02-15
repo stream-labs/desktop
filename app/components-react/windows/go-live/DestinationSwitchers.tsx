@@ -5,7 +5,7 @@ import { $t } from '../../../services/i18n';
 import styles from './DestinationSwitchers.m.less';
 import { ICustomStreamDestination } from '../../../services/settings/streaming';
 import { Services } from '../../service-provider';
-import { ListInput, SwitchInput } from '../../shared/inputs';
+import { SwitchInput } from '../../shared/inputs';
 import PlatformLogo from '../../shared/PlatformLogo';
 import { assertIsDefined } from '../../../util/properties-type-guards';
 import { useDebounce } from '../../hooks';
@@ -65,7 +65,6 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
     emitSwitch();
   }
 
-<<<<<<< HEAD
   function toggleDest(ind: number, enabled: boolean) {
     enabledDestRef.current = enabledDestRef.current.filter(index => index !== ind);
     if (enabled) {
@@ -73,11 +72,10 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
     }
     emitSwitch(ind, enabled);
   }
-=======
+
   // TODO: find a cleaner way to do this
   const isPrimary = (platform: TPlatform) =>
     linkedPlatforms.length === 1 ? true : isPrimaryPlatform(platform);
->>>>>>> 2b52be1bb (fix(streaming): initial attempt of fixing locked-out state)
 
   return (
     <div>
@@ -88,13 +86,9 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
             destination={platform}
             enabled={isEnabled(platform)}
             onChange={enabled => togglePlatform(platform, enabled)}
-<<<<<<< HEAD
             promptConnectTikTok={platform === 'tiktok' && promptConnectTikTok}
             isPrimary={isPrimaryPlatform(platform)}
             disabled={disableSwitchers && !isEnabled(platform)}
-=======
-            isPrimary={isPrimary(platform)}
->>>>>>> 2b52be1bb (fix(streaming): initial attempt of fixing locked-out state)
           />
         ))}
         {customDestinations?.map((dest, ind) => (
