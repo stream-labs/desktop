@@ -135,7 +135,7 @@ export default class SourcesShowcase extends Vue {
 
   get readyToAdd() {
     if (this.inspectedSource === 'nair-rtvc-source') {
-      // 同一scene上では複数禁止
+      // 同一scene上では1つだけ
       for (const s of this.scenesService.activeScene.items) {
         if (this.sourcesService.getSourceById(s.sourceId).type === 'nair-rtvc-source') return false;
       }

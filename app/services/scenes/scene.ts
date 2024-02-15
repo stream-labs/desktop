@@ -409,6 +409,13 @@ export class Scene {
     const source = this.sourcesService.getSource(sourceId);
     if (!source) return false;
 
+    // 同一scene上では1つだけ
+    if (source.type === 'nair-rtvc-source') {
+      for (const s of this.scenesService.activeScene.items) {
+        if (this.sourcesService.getSourceById(s.sourceId).type === 'nair-rtvc-source') return false;
+      }
+    }
+
     // if source is scene then traverse the scenes tree to detect possible infinity scenes loop
     if (source.type !== 'scene') return true;
     if (this.id === source.sourceId) return false;
