@@ -5,7 +5,7 @@ import { Services } from '../../service-provider';
 import { useGoLiveSettings } from './useGoLiveSettings';
 import { DestinationSwitchers } from './DestinationSwitchers';
 import { $t } from '../../../services/i18n';
-import { Row, Col, Divider } from 'antd';
+import { Row, Col } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { Section } from './Section';
 import PlatformSettings from './PlatformSettings';
