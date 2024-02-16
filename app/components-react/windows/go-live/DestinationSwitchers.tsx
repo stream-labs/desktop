@@ -126,11 +126,11 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
   const platform = typeof p.destination === 'string' ? (p.destination as TPlatform) : null;
   const { RestreamService, MagicLinkService, NavigationService, WindowsService } = Services;
   const canEnableRestream = RestreamService.views.canEnableRestream;
-  const canDisableDestination = canEnableRestream ? true : !p.isPrimary;
+  const cannotDisableDestination = p.isPrimary && !canEnableRestream;
 
   function onClickHandler(ev: MouseEvent) {
     // If re-stream isn't enabled, don't allow disabling the primary platform
-    if (!canDisableDestination) {
+    if (cannotDisableDestination) {
       alertAsync(
         $t(
           'You cannot disable the platform you used to sign in to Streamlabs Desktop. Please sign in with a different platform to disable streaming to this destination.',
@@ -212,7 +212,7 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
             inputRef={switchInputRef}
             value={p.enabled}
             name={platform}
-            disabled={!canDisableDestination}
+            disabled={cannotDisableDestination}
             uncontrolled
           />
         ),
