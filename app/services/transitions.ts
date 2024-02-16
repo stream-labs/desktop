@@ -25,6 +25,7 @@ export enum ETransitionType {
   Cut = 'cut_transition',
   Fade = 'fade_transition',
   Swipe = 'swipe_transition',
+  Shuffle = 'shuffle_transition',
   Slide = 'slide_transition',
   FadeToColor = 'fade_to_color_transition',
   LumaWipe = 'wipe_transition',
@@ -68,6 +69,7 @@ class TransitionsViews extends ViewHandler<ITransitionsState> {
       { title: $t('Swipe'), value: ETransitionType.Swipe },
       { title: $t('Slide'), value: ETransitionType.Slide },
       { title: $t('Fade to Color'), value: ETransitionType.FadeToColor },
+      { title: $t('Shuffle'), value: ETransitionType.Shuffle },
       { title: $t('Luma Wipe'), value: ETransitionType.LumaWipe },
       { title: $t('Stinger'), value: ETransitionType.Stinger },
     ];
