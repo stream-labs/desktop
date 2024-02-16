@@ -75,7 +75,7 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
 
   // TODO: find a cleaner way to do this
   const isPrimary = (platform: TPlatform) =>
-    linkedPlatforms.length === 1 ? true : isPrimaryPlatform(platform);
+    isPrimaryPlatform(platform) || linkedPlatforms.length === 1;
 
   return (
     <div>
