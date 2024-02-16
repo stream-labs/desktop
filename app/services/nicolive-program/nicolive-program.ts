@@ -11,7 +11,7 @@ import { NicoliveProgramStateService } from './state';
 type Schedules = ProgramSchedules['data'];
 type Schedule = Schedules[0];
 
-const CREATED_NOTICE_DURATION = 5000; // 番組作成通知の表示時間(ミリ秒)
+const MAX_PROGRAM_DURATION_SECONDS = 24 * 60 * 60; // 番組の最大放送時間(秒)
 
 type ProgramState = {
   programID: string;
@@ -176,7 +176,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   }
 
   static isProgramExtendable(state: INicoliveProgramState): boolean {
-    return state.status === 'onAir' && state.endTime - state.startTime < 6 * 60 * 60;
+    return state.status === 'onAir' && state.endTime - state.startTime < MAX_PROGRAM_DURATION_SECONDS;
   }
 
   static format(timeInSeconds: number): string {
