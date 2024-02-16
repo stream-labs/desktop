@@ -232,7 +232,7 @@ export class GoLiveSettingsModule {
      * deselects all but one
      */
     if (this.state.enabledPlatforms.length === 1) {
-      this.setPrimaryChat(this.primaryChat);
+      this.setPrimaryChat(this.state.enabledPlatforms[0]);
     }
     this.save(this.state.settings);
     this.prepopulate();
