@@ -79,28 +79,26 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
 
   return (
     <div>
-      <div>
-        {linkedPlatforms.map(platform => (
-          <DestinationSwitcher
-            key={platform}
-            destination={platform}
-            enabled={isEnabled(platform)}
-            onChange={enabled => togglePlatform(platform, enabled)}
-            promptConnectTikTok={platform === 'tiktok' && promptConnectTikTok}
-            isPrimary={isPrimaryPlatform(platform)}
-            disabled={disableSwitchers && !isEnabled(platform)}
-          />
-        ))}
-        {customDestinations?.map((dest, ind) => (
-          <DestinationSwitcher
-            key={ind}
-            destination={dest}
-            enabled={customDestinations[ind].enabled}
-            onChange={enabled => switchCustomDestination(ind, enabled)}
-            disabled={disableSwitchers && !isEnabled(ind)}
-          />
-        ))}
-      </div>
+      {linkedPlatforms.map(platform => (
+        <DestinationSwitcher
+          key={platform}
+          destination={platform}
+          enabled={isEnabled(platform)}
+          onChange={enabled => togglePlatform(platform, enabled)}
+          promptConnectTikTok={platform === 'tiktok' && promptConnectTikTok}
+          isPrimary={isPrimaryPlatform(platform)}
+          disabled={disableSwitchers && !isEnabled(platform)}
+        />
+      ))}
+      {customDestinations?.map((dest, ind) => (
+        <DestinationSwitcher
+          key={ind}
+          destination={dest}
+          enabled={customDestinations[ind].enabled}
+          onChange={enabled => switchCustomDestination(ind, enabled)}
+          disabled={disableSwitchers && !isEnabled(ind)}
+        />
+      ))}
     </div>
   );
 }
