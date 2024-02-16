@@ -7,11 +7,10 @@ import { CreateResult, EditResult, isOk, NicoliveClient } from './NicoliveClient
 import { NicoliveFailure, openErrorDialogFromFailure } from './NicoliveFailure';
 import { Community, ProgramSchedules } from './ResponseTypes';
 import { NicoliveProgramStateService } from './state';
+import { MAX_PROGRAM_DURATION_SECONDS } from './nicolive-constants';
 
 type Schedules = ProgramSchedules['data'];
 type Schedule = Schedules[0];
-
-const MAX_PROGRAM_DURATION_SECONDS = 24 * 60 * 60; // 番組の最大放送時間(秒)
 
 type ProgramState = {
   programID: string;
