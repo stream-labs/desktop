@@ -122,10 +122,7 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
       !this.isDualOutputMode
     ) {
       // users can always stream to tiktok
-      const forceStreamToTikTok =
-        this.isPlatformLinked('tiktok') && this.userView.auth!.primaryPlatform !== 'tiktok';
-
-      if (forceStreamToTikTok) {
+      if (this.forceStreamToTikTok) {
         return [this.userView.auth!.primaryPlatform, 'tiktok'];
       }
       return [this.userView.auth!.primaryPlatform];
@@ -164,6 +161,14 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
       (platform: TPlatform) =>
         this.linkedPlatforms.includes(platform) && platforms[platform]?.enabled,
     ) as TPlatform[];
+  }
+
+  get forceStreamToTikTok() {
+    return (
+      this.isPlatformLinked('tiktok') &&
+      this.userView.auth!.primaryPlatform !== 'tiktok' &&
+      !this.userView.isPrime
+    );
   }
 
   /**

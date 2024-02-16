@@ -110,13 +110,10 @@ function TikTokChatInfo() {
   return (
     <div
       className={styles.chat}
-      style={{ display: 'flex', flexDirection: 'column', marginTop: '15px' }}
+      style={{ display: 'flex', flexDirection: 'column', marginTop: '30px' }}
     >
       <div style={{ marginBottom: '5px' }}>
         {$t('Access chat for TikTok in the TikTok Live Center.')}
-      </div>
-      <div style={{ marginBottom: '5px' }}>
-        {$t("Don't see the Live Center? Log in to TikTok on your browser.")}
       </div>
       <Button style={{ width: '200px', marginBottom: '10px' }} onClick={openPlatformDash}>
         {$t('Open TikTok Live Center')}

@@ -27,6 +27,7 @@ export function UltraDestinationSwitchers(p: IUltraDestinationSwitchers) {
     enabledPlatforms,
     linkedPlatforms,
     customDestinations,
+    isDualOutputMode,
     isPrimaryPlatform,
     switchPlatforms,
     switchCustomDestination,
@@ -56,14 +57,16 @@ export function UltraDestinationSwitchers(p: IUltraDestinationSwitchers) {
 
   return (
     <div className={styles.switchWrapper}>
-      <InfoBadge
-        content={
-          <Translate message="<dualoutput>Dual Output</dualoutput> is enabled - you must stream to one horizontal and one vertical platform.">
-            <u slot="dualoutput" />
-          </Translate>
-        }
-        hasMargin={true}
-      />
+      {isDualOutputMode && (
+        <InfoBadge
+          content={
+            <Translate message="<dualoutput>Dual Output</dualoutput> is enabled - you must stream to one horizontal and one vertical platform.">
+              <u slot="dualoutput" />
+            </Translate>
+          }
+          style={{ marginBottom: '15px' }}
+        />
+      )}
       {linkedPlatforms.map((platform: TPlatform, index: number) => (
         <DestinationSwitcher
           key={platform}

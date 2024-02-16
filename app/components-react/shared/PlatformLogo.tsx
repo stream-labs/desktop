@@ -16,7 +16,7 @@ interface IProps {
   color?: string;
   nocolor?: boolean;
   unwrapped?: boolean;
-  trovo?: boolean;
+  fontIcon?: string;
 }
 
 export default function PlatformLogo(p: IProps & HTMLAttributes<unknown>) {
@@ -63,8 +63,8 @@ export default function PlatformLogo(p: IProps & HTMLAttributes<unknown>) {
 
   return (
     <>
-      {p.trovo ? (
-        <i className={cx('icon-trovo', p.className)} style={style} />
+      {p?.fontIcon ? (
+        <i className={cx(`icon-${p?.fontIcon}`, p.className)} style={style} />
       ) : (
         <i
           className={cx(iconForPlatform(), !p.nocolor && css[p.platform], p.className, {
