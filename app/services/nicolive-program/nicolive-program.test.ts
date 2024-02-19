@@ -1,6 +1,7 @@
 import { createSetupFunction } from 'util/test-setup';
 import { WrappedResult } from './NicoliveClient';
 import { Community } from './ResponseTypes';
+import { MAX_PROGRAM_DURATION_SECONDS } from './nicolive-constants';
 
 type NicoliveProgramService = import('./nicolive-program').NicoliveProgramService;
 
@@ -140,13 +141,14 @@ test('isProgramExtendable', () => {
   const { NicoliveProgramService } = require('./nicolive-program');
   const { isProgramExtendable } = NicoliveProgramService;
 
-  expect(isProgramExtendable({ status: 'reserved', startTime: 0, endTime: 5.5 * 60 * 60 })).toBe(
+  const SAFE_TIME = MAX_PROGRAM_DURATION_SECONDS - 30 * 60;
+  expect(isProgramExtendable({ status: 'reserved', startTime: 0, endTime: SAFE_TIME })).toBe(
     false,
   );
-  expect(isProgramExtendable({ status: 'test', startTime: 0, endTime: 5.5 * 60 * 60 })).toBe(false);
-  expect(isProgramExtendable({ status: 'onAir', startTime: 0, endTime: 5.5 * 60 * 60 })).toBe(true);
-  expect(isProgramExtendable({ status: 'end', startTime: 0, endTime: 5.5 * 60 * 60 })).toBe(false);
-  expect(isProgramExtendable({ status: 'onAir', startTime: 0, endTime: 6 * 60 * 60 })).toBe(false);
+  expect(isProgramExtendable({ status: 'test', startTime: 0, endTime: SAFE_TIME })).toBe(false);
+  expect(isProgramExtendable({ status: 'onAir', startTime: 0, endTime: SAFE_TIME })).toBe(true);
+  expect(isProgramExtendable({ status: 'end', startTime: 0, endTime: SAFE_TIME })).toBe(false);
+  expect(isProgramExtendable({ status: 'onAir', startTime: 0, endTime: MAX_PROGRAM_DURATION_SECONDS })).toBe(false);
 });
 
 test('findSuitableProgram', () => {

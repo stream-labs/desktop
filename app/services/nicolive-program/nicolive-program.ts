@@ -7,11 +7,10 @@ import { CreateResult, EditResult, isOk, NicoliveClient } from './NicoliveClient
 import { NicoliveFailure, openErrorDialogFromFailure } from './NicoliveFailure';
 import { Community, ProgramSchedules } from './ResponseTypes';
 import { NicoliveProgramStateService } from './state';
+import { MAX_PROGRAM_DURATION_SECONDS } from './nicolive-constants';
 
 type Schedules = ProgramSchedules['data'];
 type Schedule = Schedules[0];
-
-const CREATED_NOTICE_DURATION = 5000; // 番組作成通知の表示時間(ミリ秒)
 
 type ProgramState = {
   programID: string;
@@ -176,7 +175,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   }
 
   static isProgramExtendable(state: INicoliveProgramState): boolean {
-    return state.status === 'onAir' && state.endTime - state.startTime < 6 * 60 * 60;
+    return state.status === 'onAir' && state.endTime - state.startTime < MAX_PROGRAM_DURATION_SECONDS;
   }
 
   static format(timeInSeconds: number): string {
