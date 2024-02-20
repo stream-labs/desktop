@@ -1,4 +1,4 @@
-import { InheritMutations, ViewHandler, mutation } from '../core';
+import { InheritMutations, Inject, ViewHandler, mutation } from '../core';
 import { BasePlatformService } from './base-platform';
 import {
   EPlatformCallResult,
@@ -23,6 +23,7 @@ import {
 import { I18nService } from 'services/i18n';
 import { getDefined } from 'util/properties-type-guards';
 import * as remote from '@electron/remote';
+import { WindowsService } from 'services/windows';
 
 interface ITikTokServiceState extends IPlatformState {
   settings: ITikTokStartStreamSettings;
@@ -81,6 +82,8 @@ export class TikTokService
     username: '',
   };
 
+  @Inject() windowsService: WindowsService;
+
   readonly apiBase = 'https://open-api.tiktok.com';
   readonly platform = 'tiktok';
   readonly displayName = 'TikTok';
@@ -122,7 +125,12 @@ export class TikTokService
       streamInfo = await this.startStream(ttSettings);
       if (streamInfo?.id) {
         // open url if stream successfully started
-        remote.shell.openExternal(this.dashboardUrl, { activate: false });
+        await remote.shell.openExternal(this.dashboardUrl, { activate: false });
+
+        setTimeout(async () => {
+          this.windowsService.setMainWindowOnTop();
+          return Promise.resolve();
+        }, 1000);
       } else {
         this.SET_ENABLED_STATUS(false);
         throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED');
