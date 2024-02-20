@@ -9,7 +9,9 @@ import { useThrottle } from '../../hooks';
 // select which features from the antd lib we are going to use
 const ANT_SLIDER_FEATURES = ['min', 'max', 'step', 'tooltipPlacement', 'tipFormatter'] as const;
 
-export type TSliderInputProps = TSlobsInputProps<
+// Debounce doesn't make really sense for the slider and is not implemented at the moment
+// That's why it is in the Omit list below
+export type TSliderInputProps = Omit<TSlobsInputProps<
   {
     hasNumberInput?: boolean;
     slimNumberInput?: boolean;
@@ -19,7 +21,7 @@ export type TSliderInputProps = TSlobsInputProps<
   number,
   SliderSingleProps,
   ValuesOf<typeof ANT_SLIDER_FEATURES>
->;
+>, 'debounce'>;
 
 export const SliderInput = InputComponent((partialProps: TSliderInputProps) => {
   // apply default props
