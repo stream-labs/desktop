@@ -1044,6 +1044,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.LOGOUT();
     this.LOGIN(auth);
 
+    // We need to fetch prime status to skip onboarding step for
+    // picking a primary platform if the user has Ultra, as we'll
+    // auto-select the first one in that case.
+    this.setPrimeStatus();
+
     // Find out if the user has any additional platforms linked
     await this.updateLinkedPlatforms();
     return EPlatformCallResult.Success;
