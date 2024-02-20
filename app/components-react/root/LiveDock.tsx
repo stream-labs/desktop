@@ -33,7 +33,6 @@ class LiveDockController {
   private restreamService = Services.RestreamService;
 
   store = initStore({
-    elapsedStreamTime: '',
     canAnimate: false,
     selectedChat: 'default',
   });
@@ -60,10 +59,6 @@ class LiveDockController {
 
   get canAnimate() {
     return this.store.canAnimate;
-  }
-
-  get elapsedStreamTime() {
-    return this.store.elapsedStreamTime;
   }
 
   get selectedChat() {
@@ -267,6 +262,7 @@ function LiveDock(p: { onLeft: boolean }) {
   const ctrl = useController(LiveDockCtx);
 
   const [visibleChat, setVisibleChat] = useState('default');
+  const [elapsedStreamTime, setElapsedStreamTime] = useState('');
 
   const {
     collapsed,
@@ -282,7 +278,6 @@ function LiveDock(p: { onLeft: boolean }) {
     viewerCount,
     pageSlot,
     canAnimate,
-    elapsedStreamTime,
     liveText,
     isPopOutAllowed,
     streamingStatus,
@@ -301,7 +296,6 @@ function LiveDock(p: { onLeft: boolean }) {
       'viewerCount',
       'pageSlot',
       'canAnimate',
-      'elapsedStreamTime',
       'liveText',
       'isPopOutAllowed',
       'streamingStatus',
@@ -315,15 +309,11 @@ function LiveDock(p: { onLeft: boolean }) {
 
     const elapsedInterval = window.setInterval(() => {
       if (streamingStatus === EStreamingState.Live) {
-        ctrl.store.setState(s => {
-          s.elapsedStreamTime = ctrl.getElapsedStreamTime();
-        });
+        setElapsedStreamTime(ctrl.getElapsedStreamTime());
       } else {
-        ctrl.store.setState(s => {
-          s.elapsedStreamTime = '';
-        });
+        setElapsedStreamTime('');
       }
-    }, 100);
+    }, 200);
 
     return () => clearInterval(elapsedInterval);
   }, [streamingStatus]);
