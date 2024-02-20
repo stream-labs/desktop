@@ -24,6 +24,7 @@ import { I18nService } from 'services/i18n';
 import { getDefined } from 'util/properties-type-guards';
 import * as remote from '@electron/remote';
 import { WindowsService } from 'services/windows';
+import Utils from 'services/utils';
 
 interface ITikTokServiceState extends IPlatformState {
   settings: ITikTokStartStreamSettings;
@@ -125,10 +126,19 @@ export class TikTokService
       streamInfo = await this.startStream(ttSettings);
       if (streamInfo?.id) {
         // open url if stream successfully started
+
+        // keep main window on top to prevent flicker when opening url
+        const win = Utils.getMainWindow();
+        win.setAlwaysOnTop(true);
+
+        // open url
         await remote.shell.openExternal(this.dashboardUrl, { activate: false });
 
+        // give the browser a second to open before shifting focus back to the main window
         setTimeout(async () => {
-          this.windowsService.setMainWindowOnTop();
+          win.show();
+          win.focus();
+          win.setAlwaysOnTop(false);
           return Promise.resolve();
         }, 1000);
       } else {
