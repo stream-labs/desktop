@@ -24,16 +24,16 @@ export type RtvcEventLog = {
   param?:
     | {
         [name in 'preset0' | 'preset1' | 'preset2']: {
-          pitchShift: number;
+          pitch_shift: number;
         };
       }
     | {
         [name in 'manual0' | 'manual1' | 'manual2' | 'manual3' | 'manual4']: {
           name: string;
-          pitchShift: number;
+          pitch_shift: number;
           amount: number;
-          primaryVoice: number;
-          secondaryVoice: number;
+          primary_voice: number;
+          secondary_voice: number;
         };
       }
     | {};

@@ -247,14 +247,14 @@ export class RtvcStateService extends PersistentStatefulService<IRtvcState> {
       const p = state.manuals[idx];
       this.eventLog.param[`manual${idx}`] = {
         name: p.name,
-        pitchShift: p.pitchShift,
+        pitch_shift: p.pitchShift,
         amount: p.amount,
-        primaryVoice: p.primaryVoice,
-        secondaryVoice: p.secondaryVoice,
+        primary_voice: p.primaryVoice,
+        secondary_voice: p.secondaryVoice,
       };
     } else {
       const p = state.presets[idx];
-      this.eventLog.param[`preset${idx}`] = { pitchShift: p.pitchShift };
+      this.eventLog.param[`preset${idx}`] = { pitch_shift: p.pitchShift };
     }
   }
 
