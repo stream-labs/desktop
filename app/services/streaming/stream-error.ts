@@ -1,8 +1,6 @@
-import { ServiceHelper } from 'services/core';
 import { getPlatformService, TPlatform } from '../platforms';
 import { $t } from 'services/i18n';
 import { Services } from '../../components-react/service-provider';
-import { platform } from 'os';
 
 export const errorTypes = {
   PLATFORM_REQUEST_FAILED: {
@@ -58,6 +56,16 @@ export const errorTypes = {
   YOUTUBE_THUMBNAIL_UPLOAD_FAILED: {
     get message() {
       return $t('Failed to upload the thumbnail');
+    },
+  },
+  TIKTOK_STREAM_SCOPE_MISSING: {
+    get message() {
+      return $t('Your TikTok account is not enabled for live streaming');
+    },
+  },
+  TIKTOK_GENERATE_CREDENTIALS_FAILED: {
+    get message() {
+      return $t('Error generating TikTok stream credentials');
     },
   },
   PRIME_REQUIRED: {

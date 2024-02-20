@@ -1,5 +1,3 @@
-// tiktok.ts
-
 import { InheritMutations, ViewHandler, mutation } from '../core';
 import { BasePlatformService } from './base-platform';
 import {
@@ -16,7 +14,12 @@ import { IGoLiveSettings } from '../streaming';
 import { TOutputOrientation } from 'services/restream';
 import { IVideo } from 'obs-studio-node';
 import { TDisplayType } from 'services/settings-v2';
-import { ITikTokError, ITikTokLiveScopeResponse, ITikTokUserInfoResponse } from './tiktok/api';
+import {
+  ETikTokErrorTypes,
+  ITikTokError,
+  ITikTokLiveScopeResponse,
+  ITikTokUserInfoResponse,
+} from './tiktok/api';
 import { I18nService } from 'services/i18n';
 import { getDefined } from 'util/properties-type-guards';
 import * as remote from '@electron/remote';
@@ -122,11 +125,11 @@ export class TikTokService
         remote.shell.openExternal(this.dashboardUrl, { activate: false });
       } else {
         this.SET_ENABLED_STATUS(false);
-        throwStreamError('PLATFORM_REQUEST_FAILED');
+        throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED');
       }
     } catch (error: unknown) {
       this.SET_ENABLED_STATUS(false);
-      throwStreamError('PLATFORM_REQUEST_FAILED', error as any);
+      throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED', error as any);
     }
 
     const context = display ?? ttSettings?.display;
@@ -180,9 +183,22 @@ export class TikTokService
     try {
       return await platformAuthorizedRequest<T>('tiktok', reqInfo);
     } catch (e: unknown) {
-      let details = (e as any).message;
-      if (!details) details = 'connection failed';
-      throwStreamError('PLATFORM_REQUEST_FAILED', e as any, details);
+      const code = (e as any).result?.error?.code;
+      const notApproved = [
+        ETikTokErrorTypes.SCOPE_NOT_AUTHORIZED,
+        ETikTokErrorTypes.SCOPE_PERMISSION_MISSED,
+        ETikTokErrorTypes.USER_HAS_NO_LIVE_AUTH,
+      ].includes(code);
+
+      const message = notApproved
+        ? 'The user is not enabled for live streaming'
+        : 'Error validating TikTok live access';
+
+      console.warn(
+        this.getErrorMessage({
+          message,
+        }),
+      );
     }
   }
 

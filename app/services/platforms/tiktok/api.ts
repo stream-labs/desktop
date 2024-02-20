@@ -1,5 +1,3 @@
-import { IPlatformRequest } from '..';
-
 export type TTikTokScope =
   | 'live.room.info'
   | 'live.room.manage'
@@ -62,13 +60,14 @@ export interface ITikTokError {
   http_status_code: number;
 }
 
-export enum ETikTokErrorCodes {
-  ACCESS_TOKEN_INVALID = 401,
-  INTERNAL_ERROR = 500,
-  INVALID_FILE_UPLOAD = 400,
-  INVALID_PARAMS = 400,
-  RATE_LIMIT_EXCEEDED = 429,
-  SCOPE_NOT_AUTHORIZED = 401,
-  SCOPE_PERMISSION_MISSED = 400,
-  USER_HAS_NO_LIVE_AUTH = 401,
+export enum ETikTokErrorTypes {
+  ACCESS_TOKEN_INVALID = 'access_token_invalid',
+  INTERNAL_ERROR = 'internal_error',
+  INVALID_FILE_UPLOAD = 'invalid_file_upload',
+  INVALID_PARAMS = 'invalid_params',
+  RATE_LIMIT_EXCEEDED = 'rate_limit_exceeded',
+  SCOPE_NOT_AUTHORIZED = 'scope_not_authorized',
+  SCOPE_PERMISSION_MISSED = 'scope_permission_missed',
+  USER_HAS_NO_LIVE_AUTH = 'user_has_no_live_auth',
+  OK = 'ok',
 }

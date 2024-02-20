@@ -31,6 +31,7 @@ interface IStreamDiagnosticInfo {
   pctDropped?: number;
   avgFps?: number;
   avgCpu?: number;
+  error?: string;
 }
 
 interface IDiagnosticsServiceState {
@@ -192,6 +193,10 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
       this.accumulators.dropped.sample(stats.percentageDroppedFrames);
       this.accumulators.cpu.sample(stats.CPU);
       this.accumulators.fps.sample(stats.frameRate);
+    });
+
+    this.streamingService.streamErrorCreated.subscribe((error: string) => {
+      this.UPDATE_STREAM({ error });
     });
 
     setInterval(() => {
@@ -726,6 +731,7 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
           'Dropped Frames': `${s.pctDropped?.toFixed(2)}%`,
           'Average CPU': `${s.avgCpu?.toFixed(2)}%`,
           'Average FPS': s.avgFps?.toFixed(2),
+          'Stream Error': s?.error ?? 'None',
         };
       }),
     );

@@ -46,6 +46,8 @@ export default function GoLiveError() {
         return renderDualOutputError(error);
       case 'YOUTUBE_STREAMING_DISABLED':
         return renderYoutubeStreamingDisabled(error);
+      case 'TIKTOK_GENERATE_CREDENTIALS_FAILED':
+        return renderTikTokCredentialsFailedError(error);
       case 'MACHINE_LOCKED':
         return renderMachineLockedError(error);
       default:
@@ -183,6 +185,17 @@ export default function GoLiveError() {
           {$t('Enable Live Streaming')}
         </button>
       </MessageLayout>
+    );
+  }
+
+  function renderTikTokCredentialsFailedError(error: IStreamError) {
+    return (
+      <MessageLayout
+        error={error}
+        message={$t(
+          'Failed to generate TikTok stream credentials. Confirm Live Access with TikTok.',
+        )}
+      ></MessageLayout>
     );
   }
 

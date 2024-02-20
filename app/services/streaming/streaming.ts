@@ -97,6 +97,7 @@ export class StreamingService
   replayBufferFileWrite = new Subject<string>();
   streamInfoChanged = new Subject<StreamInfoView<any>>();
   signalInfoChanged = new Subject<IOBSOutputSignalInfo>();
+  streamErrorCreated = new Subject<string>();
 
   // Dummy subscription for stream deck
   streamingStateChange = new Subject<void>();
@@ -694,6 +695,7 @@ export class StreamingService
     const error = this.state.info.error;
     assertIsDefined(error);
     console.error(`Streaming Error: ${error.message}`, error);
+    this.streamErrorCreated.next(`${error.message} for ${platform ?? 'custom destination'}`);
   }
 
   resetInfo() {
