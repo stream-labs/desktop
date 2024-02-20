@@ -78,7 +78,7 @@ export function PrimaryPlatformSelect() {
     if (linkedPlatforms.length) {
       setSelectedPlatform(linkedPlatforms[0]);
     }
-  }, [linkedPlatforms.length]);
+  }, [linkedPlatforms.length, UserService.views.isPrime]);
 
   // You may be confused why this component doesn't ever call `next()` to
   // continue to the next step.  The index-based step system makes this more
