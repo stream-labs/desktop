@@ -63,6 +63,7 @@ export function PrimaryPlatformSelect() {
 
   // There's probably a better way to do this
   useEffect(() => {
+    console.log('PrimaryPlatform', 'isPrime', isPrime);
     // If user has exactly one streaming platform linked, we can proceed straight
     // to a logged in state.
     // If the user has Ultra, auto-select the first platform as well, even if they
