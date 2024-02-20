@@ -19,7 +19,7 @@ export function PrimaryPlatformSelect() {
   const { linkedPlatforms, isLogin, isPrime } = useVuex(() => ({
     linkedPlatforms: UserService.views.linkedPlatforms,
     isLogin: OnboardingService.state.options.isLogin,
-    isPrime: UserService.views.isPrime,
+    isPrime: UserService.state.isPrime,
   }));
   const { loading, authInProgress, authPlatform, finishSLAuth } = useModule(LoginModule);
   const platforms = ['twitch', 'youtube', 'facebook', 'twitter', 'tiktok', 'trovo'];
