@@ -70,7 +70,7 @@ export function PrimaryPlatformSelect() {
     // TODO: we're still doing render side-effects here, which is not ideal
     if (
       UserService.views.linkedPlatforms.length === 1 ||
-      (UserService.views.isPrime && UserService.views.linkedPlatforms.length)
+      (isPrime && UserService.views.linkedPlatforms.length)
     ) {
       selectPrimary(UserService.views.linkedPlatforms[0]);
       return;
