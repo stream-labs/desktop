@@ -64,7 +64,13 @@ export function PrimaryPlatformSelect() {
   useEffect(() => {
     // If user has exactly one streaming platform linked, we can proceed straight
     // to a logged in state.
-    if (UserService.views.linkedPlatforms.length === 1) {
+    // If the user is Prime, auto select the first platform as well, even if they
+    // have multiple platforms linked, as they'd now be able to disable/enable it
+    // TODO: we're still doing render side-effects here, which is not ideal
+    if (
+      UserService.views.linkedPlatforms.length === 1 ||
+      (UserService.views.isPrime && UserService.views.linkedPlatforms.length)
+    ) {
       selectPrimary(UserService.views.linkedPlatforms[0]);
       return;
     }
