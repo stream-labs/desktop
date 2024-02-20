@@ -61,7 +61,14 @@ function TikTokStreamApplicationInfo() {
         <div style={{ marginBottom: '5px' }}>
           {$t('You do not have permission to stream live to TikTok.')}
         </div>
-        <Button onClick={openApplicationInfoPage} style={{ marginBottom: '10px' }}>
+        <Button
+          onClick={openApplicationInfoPage}
+          style={{
+            marginBottom: '10px',
+            background: 'var(--tiktok-btn)',
+            color: 'var(--black)',
+          }}
+        >
           {$t('Apply for TikTok Live Permission')}
         </Button>
       </div>
