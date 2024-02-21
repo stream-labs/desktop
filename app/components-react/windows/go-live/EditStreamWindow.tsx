@@ -108,6 +108,7 @@ export default function EditStreamWindow() {
               <PlatformSettings />
               {shouldShowPrimaryChatSwitcher && (
                 <PrimaryChatSwitcher
+                  layout="horizontal"
                   enabledPlatforms={enabledPlatforms}
                   primaryChat={primaryChat}
                   onSetPrimaryChat={setPrimaryChat}
