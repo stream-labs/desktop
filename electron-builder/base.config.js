@@ -83,6 +83,8 @@ const base = {
     entitlements: 'electron-builder/entitlements.plist',
     entitlementsInherit: 'electron-builder/entitlements.plist',
     extendInfo: {
+      NSAppleEventsUsageDescription: 'Allow Streamlabs Desktop to run Apple scripts.',
+      NSAppleScriptEnabled: 'YES',
       CFBundleURLTypes: [
         {
           CFBundleURLName: 'Streamlabs OBS Link',
