@@ -250,9 +250,10 @@ export class TikTokService
   async validatePlatform(): Promise<EPlatformCallResult> {
     try {
       const response = await this.fetchLiveAccessStatus();
-      if (response) {
-        const status = response as ITikTokLiveScopeResponse;
-        this.SET_ENABLED_STATUS(status?.can_be_live);
+      const status = response as ITikTokLiveScopeResponse;
+
+      if (status?.can_be_live) {
+        this.SET_ENABLED_STATUS(true);
 
         return EPlatformCallResult.Success;
       } else {
