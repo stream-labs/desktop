@@ -46,6 +46,8 @@ export default function GoLiveError() {
         return renderDualOutputError(error);
       case 'YOUTUBE_STREAMING_DISABLED':
         return renderYoutubeStreamingDisabled(error);
+      case 'TIKTOK_STREAM_SCOPE_MISSING':
+        return renderTikTokScopeMissingError(error);
       case 'TIKTOK_GENERATE_CREDENTIALS_FAILED':
         return renderTikTokCredentialsFailedError(error);
       case 'MACHINE_LOCKED':
@@ -195,6 +197,15 @@ export default function GoLiveError() {
         message={$t(
           'Failed to generate TikTok stream credentials. Confirm Live Access with TikTok.',
         )}
+      ></MessageLayout>
+    );
+  }
+
+  function renderTikTokScopeMissingError(error: IStreamError) {
+    return (
+      <MessageLayout
+        error={error}
+        message={$t('Your TikTok account is not enabled for live streaming.')}
       ></MessageLayout>
     );
   }

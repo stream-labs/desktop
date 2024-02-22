@@ -111,6 +111,10 @@ export class TikTokService
   async beforeGoLive(goLiveSettings: IGoLiveSettings, display?: TDisplayType) {
     const ttSettings = getDefined(goLiveSettings.platforms.tiktok);
 
+    if (!this.liveStreamingEnabled) {
+      throwStreamError('TIKTOK_STREAM_SCOPE_MISSING');
+    }
+
     let streamInfo = {} as ITikTokStartStreamResponse;
 
     try {
@@ -199,6 +203,10 @@ export class TikTokService
         ETikTokErrorTypes.USER_HAS_NO_LIVE_AUTH,
       ].includes(code);
 
+      if (notApproved) {
+        this.SET_ENABLED_STATUS(false);
+      }
+
       const message = notApproved
         ? 'The user is not enabled for live streaming'
         : 'Error validating TikTok live access';
@@ -243,17 +251,13 @@ export class TikTokService
       const response = await this.fetchLiveAccessStatus();
       const status = response as ITikTokLiveScopeResponse;
 
-      if (status?.can_be_live) {
-        this.SET_ENABLED_STATUS(true);
-
+      if (status?.can_be_live === true) {
         return EPlatformCallResult.Success;
       } else {
-        this.SET_ENABLED_STATUS(false);
         return EPlatformCallResult.TikTokStreamScopeMissing;
       }
     } catch (e: unknown) {
       console.warn(this.getErrorMessage(e));
-      this.SET_ENABLED_STATUS(false);
       return EPlatformCallResult.TikTokStreamScopeMissing;
     }
   }
@@ -297,7 +301,13 @@ export class TikTokService
    */
   async prepopulateInfo(): Promise<void> {
     // fetch user live access status
-    await this.validatePlatform();
+    const result = await this.validatePlatform();
+
+    if (result === EPlatformCallResult.TikTokStreamScopeMissing) {
+      this.SET_ENABLED_STATUS(false);
+    } else {
+      this.SET_ENABLED_STATUS(true);
+    }
 
     // fetch username for stream page url
     const username = await this.fetchUsername();
