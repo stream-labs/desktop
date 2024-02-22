@@ -1,3 +1,5 @@
+import { TPlatform } from '..';
+
 export type TTikTokScope =
   | 'live.room.info'
   | 'live.room.manage'
@@ -33,24 +35,7 @@ export interface ITikTokUserInfoResponse {
 export interface ITikTokLiveScopeResponse {
   can_be_live: boolean;
   reason: ETikTokLiveScopeReason;
-}
-
-export interface ITikTokLiveRoomCreateResponse {
-  stream_url: {
-    name: string;
-    push_url: string;
-    push_key: string;
-    origin_flv_pull_url: string;
-    origin_hls_pull_url: string;
-  };
-}
-
-export interface ITikTokLiveRoomFinishResponse {}
-
-export enum ITikTokLiveRoomFinishReason {
-  NORMAL = 0,
-  PUNISH = 1,
-  PUSH_ON_OTHER_DEVICE = 2,
+  platform: TPlatform | string;
 }
 
 export interface ITikTokError {
@@ -70,4 +55,14 @@ export enum ETikTokErrorTypes {
   SCOPE_PERMISSION_MISSED = 'scope_permission_missed',
   USER_HAS_NO_LIVE_AUTH = 'user_has_no_live_auth',
   OK = 'ok',
+}
+
+export interface ITikTokStartStreamResponse {
+  key: string;
+  rtmp: string;
+  id: string;
+}
+
+export interface ITikTokEndStreamResponse {
+  success: boolean;
 }

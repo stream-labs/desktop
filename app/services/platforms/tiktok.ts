@@ -1,4 +1,4 @@
-import { InheritMutations, Inject, ViewHandler, mutation } from '../core';
+import { InheritMutations, Inject, mutation } from '../core';
 import { BasePlatformService } from './base-platform';
 import {
   EPlatformCallResult,
@@ -16,8 +16,10 @@ import { IVideo } from 'obs-studio-node';
 import { TDisplayType } from 'services/settings-v2';
 import {
   ETikTokErrorTypes,
+  ITikTokEndStreamResponse,
   ITikTokError,
   ITikTokLiveScopeResponse,
+  ITikTokStartStreamResponse,
   ITikTokUserInfoResponse,
 } from './tiktok/api';
 import { I18nService } from 'services/i18n';
@@ -41,24 +43,13 @@ interface ITikTokStartStreamSettings {
   video?: IVideo;
   mode?: TOutputOrientation;
 }
+
 export interface ITikTokStartStreamOptions {
   title: string;
   serverUrl: string;
   streamKey: string;
   display: TDisplayType;
 }
-
-interface ITikTokStartStreamResponse {
-  name: string;
-  push_key: string;
-  push_url: string;
-  id: string;
-}
-
-interface ITikTokEndStreamResponse {
-  success: boolean;
-}
-
 interface ITikTokRequestHeaders extends Dictionary<string> {
   Accept: string;
   'Content-Type': string;
@@ -154,8 +145,8 @@ export class TikTokService
 
     const updatedTTSettings = {
       ...ttSettings,
-      serverUrl: streamInfo.push_url,
-      streamKey: streamInfo.push_key,
+      serverUrl: streamInfo.rtmp,
+      streamKey: streamInfo.key,
     };
 
     if (!this.streamingService.views.isMultiplatformMode) {
