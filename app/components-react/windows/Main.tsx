@@ -6,7 +6,6 @@ import Animation from 'rc-animate';
 import { $t } from 'services/i18n';
 import { initStore, useController } from 'components-react/hooks/zustand';
 import { useVuex } from 'components-react/hooks';
-import ResizeBar from 'components-react/root/ResizeBar';
 import * as appPages from 'components-react/pages';
 import TitleBar from 'components-react/shared/TitleBar';
 import ModalWrapper from 'components-react/shared/modals/ModalWrapper';
@@ -193,27 +192,6 @@ class MainController {
     });
   }
 
-  onResize(offset: number) {
-    this.setLiveDockWidth(this.customizationService.state.livedockSize + offset);
-  }
-
-  setLiveDockWidth(width: number) {
-    this.customizationService.actions.setSettings({
-      livedockSize: this.validateWidth(width),
-    });
-  }
-
-  validateWidth(width: number): number {
-    let constrainedWidth = Math.max(this.store.minDockWidth, width);
-    constrainedWidth = Math.min(this.store.maxDockWidth, width);
-    return constrainedWidth;
-  }
-
-  updateWidth() {
-    const width = this.customizationService.state.livedockSize;
-    if (width !== this.validateWidth(width)) this.setWidth(width);
-  }
-
   updateLiveDockWidth() {
     if (this.liveDockSize !== this.validateWidth(this.liveDockSize)) {
       this.setLiveDockWidth(this.liveDockSize);
@@ -222,12 +200,6 @@ class MainController {
 
   updateStyleBlockers(val: boolean) {
     this.windowsService.actions.updateStyleBlockers('main', val);
-  }
-
-  setWidth(width: number) {
-    this.customizationService.actions.setSettings({
-      livedockSize: this.validateWidth(width),
-    });
   }
 }
 
@@ -317,7 +289,7 @@ function Main() {
         s.maxDockWidth = Math.min(appRect.width - s.minEditorWidth, appRect.width / 2);
         s.minDockWidth = Math.min(290, s.maxDockWidth);
       });
-      ctrl.updateWidth();
+      ctrl.updateLiveDockWidth();
     }, 200);
   }
 
@@ -346,7 +318,7 @@ function Main() {
       // migrate from old percentage value to the pixel value
       const appRect = mainWindowEl.current.getBoundingClientRect();
       const defaultWidth = appRect.width * 0.28;
-      ctrl.setWidth(defaultWidth);
+      ctrl.setLiveDockWidth(defaultWidth);
     }
   }, [uiReady]);
 
@@ -380,22 +352,7 @@ function Main() {
         })}
       >
         {page !== 'Onboarding' && !showLoadingSpinner && <SideNav />}
-        {renderDock && leftDock && (
-          <div className={styles.liveDockWrapper}>
-            {!isDockCollapsed && (
-              <ResizeBar
-                className={cx(styles.liveDockResizeBar, styles.liveDockResizeBarLeft)}
-                position="right"
-                onInput={(val: number) => ctrl.onResize(val)}
-                max={maxDockWidth}
-                min={minDockWidth}
-                value={liveDockSize}
-              >
-                <LiveDock onLeft />
-              </ResizeBar>
-            )}
-          </div>
-        )}
+        {renderDock && leftDock && <LiveDock onLeft />}
 
         <div
           className={cx(styles.mainMiddle, { [styles.mainMiddleCompact]: compactView })}
@@ -411,22 +368,7 @@ function Main() {
           {!applicationLoading && page !== 'Onboarding' && <StudioFooter />}
         </div>
 
-        {renderDock && !leftDock && (
-          <div className={styles.liveDockWrapper}>
-            {!isDockCollapsed && (
-              <ResizeBar
-                className={styles.liveDockResizeBar}
-                position="left"
-                onInput={(val: number) => ctrl.onResize(val)}
-                max={maxDockWidth}
-                min={minDockWidth}
-                value={liveDockSize}
-              >
-                <LiveDock />
-              </ResizeBar>
-            )}
-          </div>
-        )}
+        {renderDock && !leftDock && <LiveDock />}
       </div>
       <ModalWrapper renderFn={ctrl.modalOptions.renderFn} />
       <Animation transitionName="ant-fade">
