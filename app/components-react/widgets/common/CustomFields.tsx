@@ -72,7 +72,7 @@ function CustomField(p: ICustomField & { name: string; onChange: (val: any) => u
       return <ColorInput {...commonProps} />;
 
     case 'slider':
-      return <SliderInput {...commonProps} min={p.min} max={p.max} step={p.steps} debounce={500} />;
+      return <SliderInput {...commonProps} min={p.min} max={p.max} step={p.steps} throttle={40} />;
 
     case 'textfield':
       return <TextInput {...commonProps} />;

@@ -240,10 +240,10 @@ function Examples() {
           {...bind.sliderVal}
         />
         <SliderInput
-          label="Debounced"
+          label="Throttled"
           min={0}
           max={10}
-          debounce={300}
+          throttle={40}
           {...globalProps}
           {...bind.sliderVal}
         />
