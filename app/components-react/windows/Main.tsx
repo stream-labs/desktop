@@ -198,6 +198,18 @@ class MainController {
     }
   }
 
+  setLiveDockWidth(width: number) {
+    this.customizationService.actions.setSettings({
+      livedockSize: this.validateWidth(width),
+    });
+  }
+
+  validateWidth(width: number): number {
+    let constrainedWidth = Math.max(this.store.minDockWidth, width);
+    constrainedWidth = Math.min(this.store.maxDockWidth, width);
+    return constrainedWidth;
+  }
+
   updateStyleBlockers(val: boolean) {
     this.windowsService.actions.updateStyleBlockers('main', val);
   }
@@ -233,8 +245,6 @@ function Main() {
     leftDock,
     applicationLoading,
     page,
-    isDockCollapsed,
-    liveDockSize,
     maxDockWidth,
     minDockWidth,
     hideStyleBlockers,
@@ -250,8 +260,6 @@ function Main() {
       hasLiveDock: ctrl.store.hasLiveDock,
       applicationLoading: ctrl.applicationLoading,
       page: ctrl.page,
-      isDockCollapsed: ctrl.isDockCollapsed,
-      liveDockSize: ctrl.liveDockSize,
       maxDockWidth: ctrl.store.maxDockWidth,
       minDockWidth: ctrl.store.minDockWidth,
       hideStyleBlockers: ctrl.hideStyleBlockers,
@@ -352,7 +360,14 @@ function Main() {
         })}
       >
         {page !== 'Onboarding' && !showLoadingSpinner && <SideNav />}
-        {renderDock && leftDock && <LiveDock onLeft />}
+        {renderDock && leftDock && (
+          <LiveDock
+            onLeft
+            setLiveDockWidth={(width: number) => ctrl.setLiveDockWidth(width)}
+            minDockWidth={minDockWidth}
+            maxDockWidth={maxDockWidth}
+          />
+        )}
 
         <div
           className={cx(styles.mainMiddle, { [styles.mainMiddleCompact]: compactView })}
@@ -368,7 +383,13 @@ function Main() {
           {!applicationLoading && page !== 'Onboarding' && <StudioFooter />}
         </div>
 
-        {renderDock && !leftDock && <LiveDock />}
+        {renderDock && !leftDock && (
+          <LiveDock
+            setLiveDockWidth={(width: number) => ctrl.setLiveDockWidth(width)}
+            minDockWidth={minDockWidth}
+            maxDockWidth={maxDockWidth}
+          />
+        )}
       </div>
       <ModalWrapper renderFn={ctrl.modalOptions.renderFn} />
       <Animation transitionName="ant-fade">

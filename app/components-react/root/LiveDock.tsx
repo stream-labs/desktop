@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import * as remote from '@electron/remote';
 import cx from 'classnames';
 import Animation from 'rc-animate';
@@ -238,35 +238,26 @@ class LiveDockController {
   showEditStreamInfo() {
     this.streamingService.actions.showEditStream();
   }
-
-  onResize(offset: number) {
-    this.setLiveDockWidth(this.customizationService.state.livedockSize + offset);
-  }
-
-  setLiveDockWidth(width: number) {
-    this.customizationService.actions.setSettings({
-      livedockSize: this.validateWidth(width),
-    });
-  }
-
-  validateWidth(width: number): number {
-    let constrainedWidth = Math.max(this.store.minDockWidth, width);
-    constrainedWidth = Math.min(this.store.maxDockWidth, width);
-    return constrainedWidth;
-  }
 }
 
-export default function LiveDockWithContext(p: { onLeft?: boolean }) {
+interface ILiveDockProps {
+  maxDockWidth: number;
+  minDockWidth: number;
+  setLiveDockWidth: (offset: number) => void;
+  onLeft?: boolean;
+}
+
+export default function LiveDockWithContext(p: ILiveDockProps) {
   const controller = useMemo(() => new LiveDockController(), []);
   const onLeft = p.onLeft || false;
   return (
     <LiveDockCtx.Provider value={controller}>
-      <LiveDock onLeft={onLeft} />
+      <LiveDock {...p} />
     </LiveDockCtx.Provider>
   );
 }
 
-function LiveDock(p: { onLeft: boolean }) {
+function LiveDock(p: ILiveDockProps) {
   const ctrl = useController(LiveDockCtx);
 
   const [visibleChat, setVisibleChat] = useState('default');
@@ -307,6 +298,10 @@ function LiveDock(p: { onLeft: boolean }) {
       'streamingStatus',
     ]),
   );
+
+  const onResize = useCallback((offset: number) => {
+    p.setLiveDockWidth(liveDockSize + offset);
+  }, []);
 
   useEffect(() => {
     if (streamingStatus === EStreamingState.Starting && ctrl.collapsed) {
@@ -364,9 +359,9 @@ function LiveDock(p: { onLeft: boolean }) {
           <ResizeBar
             className={cx(styles.liveDockResizeBar, styles.liveDockResizeBarLeft)}
             position="right"
-            onInput={(val: number) => ctrl.onResize(val)}
-            max={maxDockWidth}
-            min={minDockWidth}
+            onInput={(val: number) => onResize(val)}
+            max={p.maxDockWidth}
+            min={p.minDockWidth}
             value={liveDockSize}
           >
             <div className={styles.liveDockExpandedContents}>
