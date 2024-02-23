@@ -113,7 +113,6 @@ function PanelHeader(p: { source: AudioSource }) {
           value={Math.floor(fader.deflection * 100)}
           max={100}
           min={0}
-          throttle={40}
           name="deflection"
           onInput={onDeflectionInput}
           hasNumberInput
