@@ -181,7 +181,7 @@ function ObsInput(p: IObsInputProps) {
           min={sliderVal.minVal}
           max={sliderVal.maxVal}
           hasNumberInput={true}
-          debounce={500}
+          throttle={40}
           tooltipPlacement="right"
         />
       );

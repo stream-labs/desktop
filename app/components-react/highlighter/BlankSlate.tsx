@@ -129,7 +129,7 @@ export default function BlankSlate(p: { close: () => void }) {
                     min={1}
                     max={120}
                     step={1}
-                    debounce={200}
+                    throttle={40}
                     hasNumberInput={false}
                     tooltipPlacement="top"
                     tipFormatter={v => `${v}s`}
