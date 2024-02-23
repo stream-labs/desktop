@@ -126,7 +126,7 @@ export default function Highlighter() {
             min={0.5}
             max={5}
             step={0.1}
-            throttle={40}
+            debounce={200}
             hasNumberInput={false}
             tooltipPlacement="top"
             tipFormatter={v => `${v}s`}
@@ -152,7 +152,7 @@ export default function Highlighter() {
                   min={0}
                   max={100}
                   step={1}
-                  throttle={40}
+                  debounce={200}
                   hasNumberInput={false}
                   tooltipPlacement="top"
                   tipFormatter={v => `${v}%`}

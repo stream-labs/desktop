@@ -91,7 +91,7 @@ function GeneralSettings() {
         min={0}
         max={30000}
         tipFormatter={(ms: number) => `${ms / 1000}s`}
-        throttle={200}
+        debounce={500}
       />
 
       <Info
@@ -214,7 +214,7 @@ function CommonAlertSettings(p: { type: TAlertType; hiddenFields?: string[] }) {
       <MediaUrlInput {...bind.image_href} />
       {!isCustomCodeEnabled && <LayoutInput {...bind.layout} />}
       <AudioUrlInput {...bind.sound_href} />
-      <SliderInput throttle={200} {...bind.sound_volume} />
+      <SliderInput debounce={500} {...bind.sound_volume} />
       <TextInput {...bind.message_template} />
       {isCustomCodeEnabled && <SliderInput {...bind.alert_duration} />}
       {bindMinAmount && <NumberInput {...bindMinAmount} />}
@@ -362,10 +362,10 @@ function AdvancedSettingsPanel() {
     <Collapse bordered={false} style={{ marginBottom: '8px' }}>
       <Collapse.Panel header={$t('Advanced')} key={1}>
         <SwitchInput {...bind.interrupt_mode} />
-        {bind.interrupt_mode.value && <SliderInput {...bind.interrupt_mode_delay} throttle={200} />}
+        {bind.interrupt_mode.value && <SliderInput {...bind.interrupt_mode_delay} debounce={500} />}
         <InputWrapper label={$t('Alert Moderation delay')}>
           {!isUnlimitedModerationDelay && (
-            <SliderInput {...bind.moderation_delay} min={0} throttle={200} nowrap />
+            <SliderInput {...bind.moderation_delay} min={0} debounce={500} nowrap />
           )}
           <CheckboxInput
             label={$t('Use unlimited delay')}
