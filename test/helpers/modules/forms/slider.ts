@@ -81,6 +81,8 @@ export class SliderInputController extends BaseInputController<number> {
       let xOffset = Math.round(moveOffset);
       if (value < currentValue) xOffset *= -1;
 
+      // wait for throttle before performing action
+      await sleep(200);
       await client.performActions([
         {
           type: 'pointer',

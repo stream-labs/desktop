@@ -50,6 +50,7 @@ export interface IInputCommonProps<TValue> {
   disabled?: boolean;
   readOnly?: boolean;
   debounce?: number;
+  throttle?: number;
   /**
    * true if the input is in the uncontrolled mode
    * all input components except text inputs are controlled by default
