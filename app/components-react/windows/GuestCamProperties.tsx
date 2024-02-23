@@ -733,7 +733,7 @@ function GuestPane(p: { guest: IGuest }) {
                 onChange={setVolume}
                 min={0}
                 max={1}
-                throttle={40}
+                debounce={500}
                 step={0.01}
                 tipFormatter={v => `${(v * 100).toFixed(0)}%`}
                 tooltipPlacement="bottom"
