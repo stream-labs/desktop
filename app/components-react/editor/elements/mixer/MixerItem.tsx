@@ -54,11 +54,11 @@ export default function MixerItem(p: { audioSourceId: string; volmetersEnabled?:
         <div style={{ width: '100%', marginTop: '8px', marginBottom: '8px' }}>
           <SliderInput
             value={deflection}
-            onInput={onSliderChangeHandler}
+            onChange={onSliderChangeHandler}
             min={0}
             max={1}
             step={0.01}
-            throttle={40}
+            debounce={500}
             nowrap
           />
         </div>
