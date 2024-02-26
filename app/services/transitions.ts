@@ -412,6 +412,9 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
   }
 
   createTransition(type: ETransitionType, name: string, options: ITransitionCreateOptions = {}) {
+    if (!this.views.getTypes().find(t => t.value === type)) {
+      type = ETransitionType.Cut;
+    }
     const id = options.id || uuid();
     const transition = obs.TransitionFactory.create(type, id, options.settings || {});
     const manager = new DefaultManager(transition, options.propertiesManagerSettings || {});
