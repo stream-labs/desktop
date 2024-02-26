@@ -255,7 +255,9 @@ export class OnboardingModule {
   }
 
   finish() {
-    this.UsageStatisticsService.actions.recordShown('Onboarding', 'completed');
+    if (!this.singletonStep) {
+      this.UsageStatisticsService.actions.recordShown('Onboarding', 'completed');
+    }
     this.OnboardingService.actions.finish();
   }
 
