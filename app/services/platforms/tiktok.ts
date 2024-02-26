@@ -119,24 +119,7 @@ export class TikTokService
 
     try {
       streamInfo = await this.startStream(ttSettings);
-      if (streamInfo?.id) {
-        // open url if stream successfully started
-
-        // keep main window on top to prevent flicker when opening url
-        const win = Utils.getMainWindow();
-        win.setAlwaysOnTop(true);
-
-        // open url
-        await remote.shell.openExternal(this.dashboardUrl, { activate: false });
-
-        // give the browser a second to open before shifting focus back to the main window
-        setTimeout(async () => {
-          win.show();
-          win.focus();
-          win.setAlwaysOnTop(false);
-          return Promise.resolve();
-        }, 1000);
-      } else {
+      if (!streamInfo?.id) {
         this.SET_ENABLED_STATUS(false);
         throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED');
       }
@@ -172,6 +155,25 @@ export class TikTokService
     this.setPlatformContext('tiktok');
   }
 
+  async afterGoLive(): Promise<void> {
+    // open url if stream successfully started
+
+    // keep main window on top to prevent flicker when opening url
+    const win = Utils.getMainWindow();
+    win.setAlwaysOnTop(true);
+
+    // open url
+    await remote.shell.openExternal(this.dashboardUrl, { activate: false });
+
+    // give the browser a second to open before shifting focus back to the main window
+    setTimeout(async () => {
+      win.show();
+      win.focus();
+      win.setAlwaysOnTop(false);
+      return Promise.resolve();
+    }, 1000);
+  }
+
   async afterStopStream(): Promise<void> {
     if (this.state.broadcastId) {
       await this.endStream(this.state.broadcastId);
@@ -203,19 +205,25 @@ export class TikTokService
         ETikTokErrorTypes.USER_HAS_NO_LIVE_AUTH,
       ].includes(code);
 
-      if (notApproved) {
-        this.SET_ENABLED_STATUS(false);
-      }
-
       const message = notApproved
         ? 'The user is not enabled for live streaming'
-        : 'Error validating TikTok live access';
+        : 'Connection error with TikTok';
 
       console.warn(
         this.getErrorMessage({
           message,
         }),
       );
+
+      if (notApproved) {
+        this.SET_ENABLED_STATUS(false);
+      } else {
+        const details = (e as any).result?.error
+          ? `${(e as any).result.error.type} ${(e as any).result.error.message}`
+          : 'Connection failed';
+        this.SET_ENABLED_STATUS(false);
+        throwStreamError('TIKTOK_OAUTH_EXPIRED', e as any, details);
+      }
     }
   }
 

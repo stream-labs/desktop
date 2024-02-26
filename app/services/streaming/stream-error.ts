@@ -58,6 +58,11 @@ export const errorTypes = {
       return $t('Failed to upload the thumbnail');
     },
   },
+  TIKTOK_OAUTH_EXPIRED: {
+    get message() {
+      return $t('Failed to authenticate with TikTok, re-login required');
+    },
+  },
   TIKTOK_STREAM_SCOPE_MISSING: {
     get message() {
       return $t('Your TikTok account is not enabled for live streaming');
@@ -65,7 +70,7 @@ export const errorTypes = {
   },
   TIKTOK_GENERATE_CREDENTIALS_FAILED: {
     get message() {
-      return $t('Error generating TikTok stream credentials');
+      return $t('Error generating TikTok stream credentials, confirm access with TikTok');
     },
   },
   PRIME_REQUIRED: {
