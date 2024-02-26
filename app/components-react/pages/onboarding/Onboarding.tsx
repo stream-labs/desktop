@@ -47,7 +47,9 @@ export default function Onboarding() {
   };
 
   useEffect(() => {
-    UsageStatisticsService.actions.recordShown('Onboarding', currentStep.component);
+    if (!singletonStep) {
+      UsageStatisticsService.actions.recordShown('Onboarding', currentStep.component);
+    }
   }, [currentStep.component]);
 
   const currentStepIndex = useMemo(() => {
