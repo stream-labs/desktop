@@ -435,6 +435,7 @@ function LiveDock(p: { onLeft: boolean }) {
                       restream={visibleChat === 'restream'}
                       key={visibleChat}
                       visibleChat={visibleChat}
+                      setChat={setChat}
                     />
                   )}
                   {!['default', 'restream'].includes(visibleChat) && (

@@ -7,7 +7,11 @@ import { onUnload } from 'util/unload';
 import { Button } from 'antd';
 import { $t } from 'services/i18n';
 
-export default function Chat(props: { restream: boolean; visibleChat: string }) {
+export default function Chat(props: {
+  restream: boolean;
+  visibleChat: string;
+  setChat: (key: string) => void;
+}) {
   const { ChatService, RestreamService } = Services;
 
   const chatEl = useRef<HTMLDivElement>(null);
@@ -22,6 +26,10 @@ export default function Chat(props: { restream: boolean; visibleChat: string }) 
     props.visibleChat === 'tiktok' ||
     (props.visibleChat === 'default' &&
       Services.UserService.state.auth?.primaryPlatform === 'tiktok');
+
+  const setTikTokChat =
+    Services.UserService.state.auth?.primaryPlatform === 'tiktok' &&
+    props.visibleChat === 'restream';
 
   // Setup resize/fullscreen listeners
   useEffect(() => {
@@ -58,6 +66,9 @@ export default function Chat(props: { restream: boolean; visibleChat: string }) 
     const cancelUnload = onUnload(() => service.actions.unmountChat(remote.getCurrentWindow().id));
 
     return () => {
+      if (setTikTokChat) {
+        props.setChat('tiktok');
+      }
       service.actions.unmountChat(remote.getCurrentWindow().id);
       cancelUnload();
     };
@@ -100,10 +111,14 @@ export default function Chat(props: { restream: boolean; visibleChat: string }) 
     );
   }
 
-  return showTikTokInfo ? <TikTokChatInfo /> : <div className={styles.chat} ref={chatEl} />;
+  return showTikTokInfo ? (
+    <TikTokChatInfo ref={chatEl} />
+  ) : (
+    <div className={styles.chat} ref={chatEl} />
+  );
 }
 
-function TikTokChatInfo() {
+const TikTokChatInfo = React.forwardRef((p, ref: React.RefObject<HTMLDivElement>) => {
   function openPlatformDash() {
     remote.shell.openExternal(Services.TikTokService.dashboardUrl);
   }
@@ -111,6 +126,7 @@ function TikTokChatInfo() {
     <div
       className={styles.chat}
       style={{ display: 'flex', flexDirection: 'column', marginTop: '30px' }}
+      ref={ref}
     >
       <div style={{ marginBottom: '5px' }}>
         {$t('Access chat for TikTok in the TikTok Live Center.')}
@@ -120,4 +136,4 @@ function TikTokChatInfo() {
       </Button>
     </div>
   );
-}
+});
