@@ -410,6 +410,10 @@ export class ScenesService extends StatefulService<IScenesState> {
   }
 
   makeSceneActive(id: string): boolean {
+    if (this.dualOutputService.views.dualOutputMode) {
+      this.dualOutputService.setIsLoading(true);
+    }
+
     const scene = this.views.getScene(id);
     if (!scene) return false;
 
