@@ -103,7 +103,7 @@ export class EditMenu extends Menu {
        * work, we can only assume the commands use `lastSelectedId` or similar access method
        * to determine which node to work with. Needs to be confirmed with testing.
        */
-      if (this.dualOutputService.views.dualOutputMode && this.options.display) {
+      if (this.dualOutputService.views.dualOutputMode) {
         const size = this.selectionService.views.globalSelection.getSize();
 
         if (size !== 2) {
