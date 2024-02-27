@@ -111,29 +111,21 @@ export default function Chat(props: {
     );
   }
 
-  return showTikTokInfo ? (
-    <TikTokChatInfo ref={chatEl} />
-  ) : (
-    <div className={styles.chat} ref={chatEl} />
-  );
+  return showTikTokInfo ? <TikTokChatInfo /> : <div className={styles.chat} ref={chatEl} />;
 }
 
-const TikTokChatInfo = React.forwardRef((p, ref: React.RefObject<HTMLDivElement>) => {
+function TikTokChatInfo() {
   function openPlatformDash() {
     remote.shell.openExternal(Services.TikTokService.dashboardUrl);
   }
   return (
-    <div
-      className={styles.chat}
-      style={{ display: 'flex', flexDirection: 'column', marginTop: '30px' }}
-      ref={ref}
-    >
+    <div style={{ display: 'flex', flexDirection: 'column', marginTop: '30px' }}>
       <div style={{ marginBottom: '5px' }}>
         {$t('Access chat for TikTok in the TikTok Live Center.')}
       </div>
-      <Button style={{ width: '200px', marginBottom: '10px' }} onClick={openPlatformDash}>
+      <Button style={{ width: '200px', marginBottom: '10px' }} onClick={() => openPlatformDash()}>
         {$t('Open TikTok Live Center')}
       </Button>
     </div>
   );
-});
+}
