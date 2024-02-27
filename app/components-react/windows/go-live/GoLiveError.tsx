@@ -198,10 +198,7 @@ export default function GoLiveError() {
     const platformName = getPlatformService(error.platform).displayName;
 
     return (
-      <MessageLayout
-        error={error}
-        message={$t('Failed to fetch settings from %{platformName}', { platformName })}
-      >
+      <MessageLayout error={error} hasButton={true}>
         <Translate message={$t('tiktokReAuthError')}>
           <button
             slot="connectButton"
