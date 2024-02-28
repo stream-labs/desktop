@@ -99,6 +99,10 @@ export class TikTokService
     return this.userService.views.state.auth?.platforms?.tiktok?.token;
   }
 
+  get username(): string {
+    return this.state.username;
+  }
+
   get liveStreamingEnabled(): boolean {
     const scope = this.state.settings?.liveScope ?? 'denied';
     return ['approved', 'legacy'].includes(scope);

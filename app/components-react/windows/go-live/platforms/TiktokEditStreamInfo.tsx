@@ -2,7 +2,8 @@ import React from 'react';
 import Form from '../../../shared/inputs/Form';
 import { $t } from '../../../../services/i18n';
 import { Services } from '../../../service-provider';
-import { Button } from 'antd';
+import { Button, Tooltip } from 'antd';
+// import Tooltip from 'components-react/shared/Tooltip';
 import InputWrapper from '../../../shared/inputs/InputWrapper';
 import PlatformSettingsLayout, { IPlatformComponentParams } from './PlatformSettingsLayout';
 import * as remote from '@electron/remote';
@@ -77,8 +78,26 @@ export function TikTokEnterCredentialsFormInfo(p: IPlatformComponentParams<'tikt
 
   return (
     <>
-      <TextInput label={$t('TikTok Server URL')} required {...bind.serverUrl} />
-      <TextInput label={$t('TikTok Stream Key')} required {...bind.streamKey} />
+      <TextInput
+        label={
+          <Tooltip title={$t('Generate with "Locate my Stream Key"')} placement="right">
+            {$t('TikTok Server URL ')}
+            <i className="icon-information" />
+          </Tooltip>
+        }
+        required
+        {...bind.serverUrl}
+      />
+      <TextInput
+        label={
+          <Tooltip title={$t('Generate with "Locate my Stream Key"')} placement="right">
+            {$t('TikTok Stream Key ')}
+            <i className="icon-information" />
+          </Tooltip>
+        }
+        required
+        {...bind.streamKey}
+      />
       <InputWrapper
         extra={
           <>
@@ -100,7 +119,7 @@ export function TikTokEnterCredentialsFormInfo(p: IPlatformComponentParams<'tikt
           </>
         }
       >
-        <Button onClick={openStreamPage} style={{ marginBottom: '10px' }}>
+        <Button onClick={openProducer} style={{ marginBottom: '10px' }}>
           {$t('Locate my Stream Key')}
         </Button>
       </InputWrapper>
@@ -109,7 +128,7 @@ export function TikTokEnterCredentialsFormInfo(p: IPlatformComponentParams<'tikt
 }
 
 function openStreamPage() {
-  const username = Services.UserService.state.auth?.platforms.tiktok?.username;
+  const username = Services.TikTokService.username;
   remote.shell.openExternal(`https://www.tiktok.com/@${username}/live`);
 }
 
@@ -119,4 +138,9 @@ function openInfoPage() {
 
 function openApplicationInfoPage() {
   remote.shell.openExternal(Services.TikTokService.applicationUrl);
+}
+
+function openProducer() {
+  const locale = Services.TikTokService.locale;
+  remote.shell.openExternal(`https://livecenter.tiktok.com/producer?lang=${locale}`);
 }
