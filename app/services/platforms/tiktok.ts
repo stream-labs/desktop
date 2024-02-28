@@ -6,6 +6,7 @@ import {
   IPlatformService,
   IPlatformState,
   TPlatformCapability,
+  TStartStreamOptions,
 } from './index';
 import { authorizedHeaders, jfetch } from '../../util/requests';
 import { throwStreamError } from '../streaming/stream-error';
@@ -16,11 +17,13 @@ import { IVideo } from 'obs-studio-node';
 import { TDisplayType } from 'services/settings-v2';
 import {
   ETikTokErrorTypes,
+  ETikTokLiveScopeReason,
   ITikTokEndStreamResponse,
   ITikTokError,
   ITikTokLiveScopeResponse,
   ITikTokStartStreamResponse,
   ITikTokUserInfoResponse,
+  TTikTokLiveScopeTypes,
 } from './tiktok/api';
 import { I18nService } from 'services/i18n';
 import { getDefined } from 'util/properties-type-guards';
@@ -38,7 +41,7 @@ interface ITikTokStartStreamSettings {
   serverUrl: string;
   streamKey: string;
   title: string;
-  liveStreamingEnabled: boolean;
+  liveScope: TTikTokLiveScopeTypes;
   display: TDisplayType;
   video?: IVideo;
   mode?: TOutputOrientation;
@@ -65,7 +68,7 @@ export class TikTokService
     settings: {
       title: '',
       display: 'vertical',
-      liveStreamingEnabled: false,
+      liveScope: 'denied',
       mode: 'portrait',
       serverUrl: '',
       streamKey: '',
@@ -96,8 +99,18 @@ export class TikTokService
     return this.userService.views.state.auth?.platforms?.tiktok?.token;
   }
 
-  get liveStreamingEnabled() {
-    return this.state.settings?.liveStreamingEnabled;
+  get liveStreamingEnabled(): boolean {
+    const scope = this.state.settings?.liveScope ?? 'denied';
+    return ['approved', 'legacy'].includes(scope);
+  }
+
+  /**
+   * Whether the user is approved to generate a server url & stream key outside of Live Access
+   * @remark Before the implementation of TikTok's Live Access API, users approved for live streaming
+   * generated server urls and stream keys that they added in the Go Live window. Until
+   */
+  getHasScope(type: TTikTokLiveScopeTypes): boolean {
+    return this.state.settings?.liveScope === type;
   }
 
   /**
@@ -120,11 +133,13 @@ export class TikTokService
     try {
       streamInfo = await this.startStream(ttSettings);
       if (!streamInfo?.id) {
-        this.SET_ENABLED_STATUS(false);
+        this.SET_LIVE_SCOPE('denied');
+        await this.handleOpenLiveManager(true);
         throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED');
       }
     } catch (error: unknown) {
-      this.SET_ENABLED_STATUS(false);
+      this.SET_LIVE_SCOPE('denied');
+      await this.handleOpenLiveManager(true);
       throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED', error as any);
     }
 
@@ -159,25 +174,20 @@ export class TikTokService
     // open url if stream successfully started
 
     // keep main window on top to prevent flicker when opening url
-    const win = Utils.getMainWindow();
-    win.setAlwaysOnTop(true);
-
-    // open url
-    await remote.shell.openExternal(this.dashboardUrl, { activate: false });
-
-    // give the browser a second to open before shifting focus back to the main window
-    setTimeout(async () => {
-      win.show();
-      win.focus();
-      win.setAlwaysOnTop(false);
-      return Promise.resolve();
-    }, 1000);
+    await this.handleOpenLiveManager();
   }
 
   async afterStopStream(): Promise<void> {
     if (this.state.broadcastId) {
       await this.endStream(this.state.broadcastId);
     }
+
+    // clear server url and stream key
+    await this.putChannelInfo({
+      ...this.state.settings,
+      serverUrl: '',
+      streamKey: '',
+    });
   }
 
   fetchNewToken(): Promise<void> {
@@ -216,12 +226,12 @@ export class TikTokService
       );
 
       if (notApproved) {
-        this.SET_ENABLED_STATUS(false);
+        this.SET_LIVE_SCOPE('denied');
       } else {
         const details = (e as any).result?.error
           ? `${(e as any).result.error.type} ${(e as any).result.error.message}`
           : 'Connection failed';
-        this.SET_ENABLED_STATUS(false);
+        this.SET_LIVE_SCOPE('denied');
         throwStreamError('TIKTOK_OAUTH_EXPIRED', e as any, details);
       }
     }
@@ -259,11 +269,25 @@ export class TikTokService
       const response = await this.fetchLiveAccessStatus();
       const status = response as ITikTokLiveScopeResponse;
 
-      if (status?.can_be_live === true) {
-        return EPlatformCallResult.Success;
+      if (status?.reason) {
+        const scope = this.convertScope(status.reason);
+        this.SET_LIVE_SCOPE(scope);
       } else {
-        return EPlatformCallResult.TikTokStreamScopeMissing;
+        this.SET_LIVE_SCOPE('denied');
       }
+
+      // clear any leftover server url or stream key
+      if (this.state.settings?.serverUrl || this.state.settings?.streamKey) {
+        await this.putChannelInfo({
+          ...this.state.settings,
+          serverUrl: '',
+          streamKey: '',
+        });
+      }
+
+      return this.liveStreamingEnabled
+        ? EPlatformCallResult.Success
+        : EPlatformCallResult.TikTokStreamScopeMissing;
     } catch (e: unknown) {
       console.warn(this.getErrorMessage(e));
       return EPlatformCallResult.TikTokStreamScopeMissing;
@@ -309,13 +333,7 @@ export class TikTokService
    */
   async prepopulateInfo(): Promise<void> {
     // fetch user live access status
-    const result = await this.validatePlatform();
-
-    if (result === EPlatformCallResult.TikTokStreamScopeMissing) {
-      this.SET_ENABLED_STATUS(false);
-    } else {
-      this.SET_ENABLED_STATUS(true);
-    }
+    await this.validatePlatform();
 
     // fetch username for stream page url
     const username = await this.fetchUsername();
@@ -382,6 +400,48 @@ export class TikTokService
     return 'GL6399433079641606942';
   }
 
+  convertScope(scope: number) {
+    switch (scope) {
+      case ETikTokLiveScopeReason.APPROVED: {
+        return 'approved';
+      }
+      case ETikTokLiveScopeReason.APPROVED_OBS: {
+        return 'legacy';
+      }
+      default:
+        return 'denied';
+    }
+  }
+
+  async handleOpenLiveManager(childOpen: boolean = false): Promise<void> {
+    // keep main window on top to prevent flicker when opening url
+    const win = Utils.getMainWindow();
+    win.setAlwaysOnTop(true);
+
+    // open url
+    await remote.shell.openExternal(this.dashboardUrl, { activate: false });
+
+    // give the browser a second to open before shifting focus back to the main window
+    setTimeout(async () => {
+      win.show();
+      win.focus();
+      win.setAlwaysOnTop(false);
+      return Promise.resolve();
+    }, 1000);
+
+    if (childOpen) {
+      this.windowsService.setWindowOnTop(true);
+    }
+  }
+
+  @mutation()
+  protected UPDATE_STREAM_SETTINGS(settingsPatch: Partial<TStartStreamOptions>): void {}
+
+  @mutation()
+  SET_LIVE_SCOPE(scope: TTikTokLiveScopeTypes) {
+    this.state.settings.liveScope = scope;
+  }
+
   @mutation()
   protected SET_BROADCAST_ID(id: string) {
     this.state.broadcastId = id;
@@ -390,11 +450,5 @@ export class TikTokService
   @mutation()
   protected SET_USERNAME(username: string) {
     this.state.username = username;
-  }
-
-  @mutation()
-  SET_ENABLED_STATUS(status: boolean) {
-    const updatedSettings = { ...this.state.settings, liveStreamingEnabled: status };
-    this.state.settings = updatedSettings;
   }
 }

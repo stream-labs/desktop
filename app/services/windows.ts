@@ -355,11 +355,12 @@ export class WindowsService extends StatefulService<IWindowsState> {
   }
 
   /**
-   * A little hack to bring the window back to the front
+   * A little hack to bring a window back to the front
    * @remark copied from the external auth function
+   * @param child bring child window to front
    */
-  setMainWindowOnTop() {
-    const win = Utils.getMainWindow();
+  setWindowOnTop(child: boolean = false) {
+    const win = child ? Utils.getChildWindow() : Utils.getMainWindow();
     win.setAlwaysOnTop(true);
     win.show();
     win.focus();
