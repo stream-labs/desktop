@@ -375,7 +375,6 @@ export class SourceSelectorModule {
        * clicking on the source selector selects both sources
        */
       if (
-        this.dualOutputService.views.dualOutputMode &&
         this.dualOutputService.views.hasNodeMap(this.scene.id) &&
         this.dualOutputService.views.activeDisplays.horizontal &&
         this.dualOutputService.views.activeDisplays.vertical
