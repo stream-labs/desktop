@@ -127,51 +127,65 @@ export class TikTokService
 
   async beforeGoLive(goLiveSettings: IGoLiveSettings, display?: TDisplayType) {
     const ttSettings = getDefined(goLiveSettings.platforms.tiktok);
+    const context = display ?? ttSettings?.display;
 
     if (!this.liveStreamingEnabled) {
       throwStreamError('TIKTOK_STREAM_SCOPE_MISSING');
     }
 
-    let streamInfo = {} as ITikTokStartStreamResponse;
-
-    try {
-      streamInfo = await this.startStream(ttSettings);
-      if (!streamInfo?.id) {
-        this.SET_LIVE_SCOPE('denied');
-        await this.handleOpenLiveManager(true);
-        throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED');
+    if (this.getHasScope('legacy')) {
+      // handle streaming with server url and stream key input
+      if (!this.streamingService.views.isMultiplatformMode) {
+        this.streamSettingsService.setSettings(
+          {
+            streamType: 'rtmp_custom',
+            key: ttSettings.streamKey,
+            server: ttSettings.serverUrl,
+          },
+          context,
+        );
       }
-    } catch (error: unknown) {
-      this.SET_LIVE_SCOPE('denied');
-      await this.handleOpenLiveManager(true);
-      throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED', error as any);
+      this.SET_STREAM_SETTINGS(ttSettings);
+      this.setPlatformContext('tiktok');
+    } else {
+      // handle streaming via API
+      let streamInfo = {} as ITikTokStartStreamResponse;
+
+      try {
+        streamInfo = await this.startStream(ttSettings);
+        if (!streamInfo?.id) {
+          throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED');
+        }
+      } catch (error: unknown) {
+        this.SET_LIVE_SCOPE('denied');
+        await this.handleOpenLiveManager();
+        throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED', error as any);
+      }
+
+      const updatedTTSettings = {
+        ...ttSettings,
+        serverUrl: streamInfo.rtmp,
+        streamKey: streamInfo.key,
+      };
+
+      if (!this.streamingService.views.isMultiplatformMode) {
+        this.streamSettingsService.setSettings(
+          {
+            streamType: 'rtmp_custom',
+            key: updatedTTSettings.streamKey,
+            server: updatedTTSettings.serverUrl,
+          },
+          context,
+        );
+      }
+
+      await this.putChannelInfo(updatedTTSettings);
+
+      this.SET_STREAM_KEY(updatedTTSettings.streamKey);
+      this.SET_BROADCAST_ID(streamInfo.id);
+
+      this.setPlatformContext('tiktok');
     }
-
-    const context = display ?? ttSettings?.display;
-
-    const updatedTTSettings = {
-      ...ttSettings,
-      serverUrl: streamInfo.rtmp,
-      streamKey: streamInfo.key,
-    };
-
-    if (!this.streamingService.views.isMultiplatformMode) {
-      this.streamSettingsService.setSettings(
-        {
-          streamType: 'rtmp_custom',
-          key: updatedTTSettings.streamKey,
-          server: updatedTTSettings.serverUrl,
-        },
-        context,
-      );
-    }
-
-    await this.putChannelInfo(updatedTTSettings);
-
-    this.SET_STREAM_KEY(updatedTTSettings.streamKey);
-    this.SET_BROADCAST_ID(streamInfo.id);
-
-    this.setPlatformContext('tiktok');
   }
 
   async afterGoLive(): Promise<void> {
@@ -417,7 +431,7 @@ export class TikTokService
     }
   }
 
-  async handleOpenLiveManager(childOpen: boolean = false): Promise<void> {
+  async handleOpenLiveManager(): Promise<void> {
     // keep main window on top to prevent flicker when opening url
     const win = Utils.getMainWindow();
     win.setAlwaysOnTop(true);
@@ -432,10 +446,6 @@ export class TikTokService
       win.setAlwaysOnTop(false);
       return Promise.resolve();
     }, 1000);
-
-    if (childOpen) {
-      this.windowsService.setWindowOnTop(true);
-    }
   }
 
   @mutation()
