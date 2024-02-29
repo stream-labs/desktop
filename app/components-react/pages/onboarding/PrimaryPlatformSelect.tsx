@@ -163,7 +163,7 @@ export function PrimaryPlatformSelect() {
                 <PlatformLogo
                   platform={platform}
                   size="medium"
-                  color={platform === 'trovo' ? 'black' : 'white'}
+                  color={['tiktok', 'trovo'].includes(platform) ? 'black' : 'white'}
                 />
               )}
             </button>
