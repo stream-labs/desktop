@@ -4,10 +4,17 @@ import Translate from 'components-react/shared/Translate';
 import PlatformButton from 'components-react/shared/PlatformButton';
 import { shell } from 'electron';
 import styles from './Signup.m.less';
-
-const openSLIDSignup = () => shell.openExternal('https://streamlabs.com/signup?electron=1');
+import { Services } from 'components-react/service-provider';
 
 export default function Signup({ onSignupLinkClick }: { onSignupLinkClick: () => void }) {
+  const { HostsService } = Services;
+  const host = HostsService.streamlabs;
+
+  // TODO: port is hardcoded, shouldn't be an issue
+  const query = 'skip_splash=true&external=electron&slid&force_verify&origin=slobs&port=51591';
+  const url = `https://${host}/slobs/signup?${query}`;
+  const openSLIDSignup = () => shell.openExternal(url);
+
   return (
     <>
       <p className={styles.signupSubtitle}>
