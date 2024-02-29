@@ -695,7 +695,15 @@ export class StreamingService
     const error = this.state.info.error;
     assertIsDefined(error);
     console.error(`Streaming Error: ${error.message}`, error);
-    this.streamErrorCreated.next(`${error.message} for ${platform ?? 'custom destination'}`);
+
+    const target = platform ? this.views.getPlatformDisplayName(platform) : 'Custom destination';
+
+    // add follow-up action to report if there is an action
+    const diagReportMessage = error?.action
+      ? [`${target}: ${error.message}`, error?.action].join(', ')
+      : `${target}: ${error.message}`;
+
+    this.streamErrorCreated.next(diagReportMessage);
   }
 
   resetInfo() {

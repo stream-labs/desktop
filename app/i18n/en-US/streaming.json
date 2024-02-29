@@ -213,5 +213,9 @@
   "Remember to update your Stream Key": "Remember to update your Stream Key",
   "Stream URL": "Stream URL",
   "Tweet": "Tweet",
-  "Viewers Hidden": "Viewers Hidden"
+  "Viewers Hidden": "Viewers Hidden",
+  "Failed to upload the thumbnail": "Failed to upload the thumbnail",
+  "Failed to authenticate with TikTok": "Failed to authenticate with TikTok",
+  "Your TikTok account is not enabled for live streaming": "Your TikTok account is not enabled for live streaming",
+  "Error generating TikTok stream credentials": "Error generating TikTok stream credentials"
 }

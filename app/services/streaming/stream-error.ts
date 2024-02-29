@@ -60,17 +60,34 @@ export const errorTypes = {
   },
   TIKTOK_OAUTH_EXPIRED: {
     get message() {
-      return $t('Failed to authenticate with TikTok, re-login required');
+      return $t('Failed to authenticate with TikTok');
+    },
+    get action() {
+      return 're-login or re-merge TikTok account';
     },
   },
   TIKTOK_STREAM_SCOPE_MISSING: {
     get message() {
       return $t('Your TikTok account is not enabled for live streaming');
     },
+    get action() {
+      return 'confirm Live Access status with TikTok';
+    },
+  },
+  TIKTOK_STREAM_ACTIVE: {
+    get message() {
+      return $t('You are already live on a another device');
+    },
+    get action() {
+      return 'end stream on other device to start';
+    },
   },
   TIKTOK_GENERATE_CREDENTIALS_FAILED: {
     get message() {
-      return $t('Error generating TikTok stream credentials, confirm access with TikTok');
+      return $t('Error generating TikTok stream credentials');
+    },
+    get action() {
+      return 'confirm Live Access status with TikTok';
     },
   },
   PRIME_REQUIRED: {
@@ -103,6 +120,7 @@ export interface IStreamError extends IRejectedRequest {
   platform?: TPlatform;
   type: TStreamErrorType;
   details?: string;
+  action?: string;
 }
 
 export class StreamError extends Error implements IRejectedRequest {

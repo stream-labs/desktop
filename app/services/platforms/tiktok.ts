@@ -227,11 +227,13 @@ export class TikTokService
       return await platformAuthorizedRequest<T>('tiktok', reqInfo);
     } catch (e: unknown) {
       const code = (e as any).result?.error?.code;
+
       const notApproved = [
         ETikTokErrorTypes.SCOPE_NOT_AUTHORIZED,
         ETikTokErrorTypes.SCOPE_PERMISSION_MISSED,
         ETikTokErrorTypes.USER_HAS_NO_LIVE_AUTH,
       ].includes(code);
+      const hasStream = ETikTokErrorTypes.TIKTOK_STREAM_ACTIVE;
 
       const message = notApproved
         ? 'The user is not enabled for live streaming'
@@ -243,12 +245,16 @@ export class TikTokService
         }),
       );
 
+      const details = (e as any).result?.error
+        ? `${(e as any).result.error.type} ${(e as any).result.error.message}`
+        : 'Connection failed';
+
       if (notApproved) {
         this.SET_LIVE_SCOPE('denied');
+      } else if (hasStream) {
+        // show error stream exists
+        throwStreamError('TIKTOK_STREAM_ACTIVE', e as any, details);
       } else {
-        const details = (e as any).result?.error
-          ? `${(e as any).result.error.type} ${(e as any).result.error.message}`
-          : 'Connection failed';
         this.SET_LIVE_SCOPE('denied');
         throwStreamError('TIKTOK_OAUTH_EXPIRED', e as any, details);
       }
