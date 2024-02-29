@@ -38,10 +38,10 @@ function executeCmd(cmd, options) {
   return result.stdout;
 }
 
-function downloadFile(srcUrl, dstPath) {
+function downloadFile(srcUrl, dstPath, param) {
   const tmpPath = `${dstPath}.tmp`;
   return new Promise((resolve, reject) => {
-    fetch(srcUrl)
+    fetch(srcUrl, param)
       .then(response => {
         if (response.ok) return response;
         log_error(`Got ${response.status} response from ${srcUrl}`);
@@ -55,6 +55,7 @@ function downloadFile(srcUrl, dstPath) {
             reject(e);
           } else {
             fs.rename(tmpPath, dstPath, e => {
+              console.log(dstPath);
               if (e) {
                 reject(e);
                 return;
@@ -71,10 +72,20 @@ function downloadFile(srcUrl, dstPath) {
 
 async function rtvc() {
   // cwd is node_modules
-  console.log('copy rtvc');
-  const zip = `./nair-rtvc.tar.gz`;
+  log_info('copy rtvc');
+
+  const token = process.env['ghtoken'];
+
+  const param = { headers: { Accept: 'application/octet-stream' } };
+  if (token) param.headers.Authorization = `Bearer ${token}`;
+
+  const url = 'https://api.github.com/repos/n-air-app/private/releases/assets/147646233';
+  const zip = './nair-rtvc.tar.gz';
   const dst = './obs-studio-node/obs-plugins/64bit/';
-  sh.cp('../nair-rtvc.tar.gz', zip); // 実際はURLからのダウンロード await downloadFile(url,zip)
+  log_info('downloading..');
+  await downloadFile(url, zip, param);
+
+  log_info('extracting..');
   executeCmd(`tar -xzvf ${zip} -C ${dst}`, { silent: false });
   sh.rm(zip);
 }
