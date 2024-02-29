@@ -87,7 +87,7 @@ export class EditMenu extends Menu {
       });
     }
 
-    const isSelectionSameNodeAcrossDisplays = () => {
+    const isSelectionSameNodeAcrossDisplays = (selectionSize: number) => {
       /*
        * Check that selection is only two nodes (same node, one for each display), this only
        * seems to happen when clicking a source from the source selector which selects the
@@ -103,32 +103,26 @@ export class EditMenu extends Menu {
        * work, we can only assume the commands use `lastSelectedId` or similar access method
        * to determine which node to work with. Needs to be confirmed with testing.
        */
-      if (this.dualOutputService.views.dualOutputMode) {
-        const size = this.selectionService.views.globalSelection.getSize();
-
-        if (size !== 2) {
-          return false;
-        }
-
-        const selectedItems = this.selectionService.views.globalSelection
-          .getItems()
-          .map(item => this.scenesService.views.getSceneItem(item.id));
-
-        const [first, second] = selectedItems;
-
-        const bothNodesHaveSameSourceId = first.sourceId === second.sourceId;
-
-        const bothNodesHaveDifferentDisplay = first.display !== second.display;
-
-        return bothNodesHaveSameSourceId && bothNodesHaveDifferentDisplay;
+      if (selectionSize !== 2) {
+        return false;
       }
 
-      return false;
+      const selectedItems = this.selectionService.views.globalSelection
+        .getItems()
+        .map(item => this.scenesService.views.getSceneItem(item.id));
+
+      const [first, second] = selectedItems;
+
+      const bothNodesHaveSameSourceId = first.sourceId === second.sourceId;
+
+      const bothNodesHaveDifferentDisplay = first.display !== second.display;
+
+      return bothNodesHaveSameSourceId && bothNodesHaveDifferentDisplay;
     };
 
+    const selectionSize = this.selectionService.views.globalSelection.getSize();
     const isMultipleSelection =
-      this.selectionService.views.globalSelection.getSize() > 1 &&
-      !isSelectionSameNodeAcrossDisplays();
+      selectionSize > 1 && !isSelectionSameNodeAcrossDisplays(selectionSize);
 
     if (this.options.showSceneItemMenu) {
       const selectedItem = this.selectionService.views.globalSelection.getLastSelected();
