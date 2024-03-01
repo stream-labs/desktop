@@ -7,13 +7,9 @@ import styles from './Signup.m.less';
 import { Services } from 'components-react/service-provider';
 
 export default function Signup({ onSignupLinkClick }: { onSignupLinkClick: () => void }) {
-  const { HostsService } = Services;
-  const host = HostsService.streamlabs;
+  const { UserService } = Services;
 
-  // TODO: port is hardcoded, shouldn't be an issue
-  const query = 'skip_splash=true&external=electron&slid&force_verify&origin=slobs&port=51591';
-  const url = `https://${host}/slobs/signup?${query}`;
-  const openSLIDSignup = () => shell.openExternal(url);
+  const openSLIDSignup = () => UserService.startSLAuth({ signup: true });
 
   return (
     <>
