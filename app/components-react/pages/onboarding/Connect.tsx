@@ -109,7 +109,7 @@ export function Connect() {
           {title}
         </h1>
         {isSignup ? (
-          <Signup onSignupLinkClick={() => setIsSignup(false)} />
+          <Signup onSignupLinkClick={() => setIsSignup(false)} onSuccess={afterLogin} />
         ) : (
           <>
             {!isRelog && <p style={{ marginBottom: 20 }}>{$t('Log in with email/password')}</p>}

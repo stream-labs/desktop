@@ -6,10 +6,16 @@ import { shell } from 'electron';
 import styles from './Signup.m.less';
 import { Services } from 'components-react/service-provider';
 
-export default function Signup({ onSignupLinkClick }: { onSignupLinkClick: () => void }) {
+export default function Signup({
+  onSignupLinkClick,
+  onSuccess,
+}: {
+  onSignupLinkClick: () => void;
+  onSuccess: () => void;
+}) {
   const { UserService } = Services;
 
-  const openSLIDSignup = () => UserService.startSLAuth({ signup: true });
+  const openSLIDSignup = () => UserService.startSLAuth({ signup: true }).then(onSuccess);
 
   return (
     <>
