@@ -76,6 +76,8 @@
             <div class="text">
               <p class="name">{{ name }}</p>
               <p class="description">{{ description }}</p>
+              <button class="button button--secondary" @click="playSample(label)"><i class="icon-speaker"></i>{{
+                $t('source-props.nair-rtvc-source.preset.play_sample') }}</button>
             </div>
           </div>
           <div class="section">

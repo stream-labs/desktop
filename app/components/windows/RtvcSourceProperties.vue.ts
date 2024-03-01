@@ -372,6 +372,19 @@ export default class RtvcSourceProperties extends SourceProperties {
     this.updateManualList();
     this.currentIndex = newIndex;
   }
+
+  playSample(label: string) {
+    const assets: { [name: string]: string } = {
+      near: require('../../../media/sound/rtvc_sample_near.mp3'),
+      zundamon: require('../../../media/sound/rtvc_sample_zundamon.mp3'),
+      tsumugi: require('../../../media/sound/rtvc_sample_tsumugi.mp3'),
+    };
+
+    const asset = assets[label];
+    if (!asset) return;
+    const audio = new Audio(asset);
+    audio.play();
+  }
 }
 
 const jvsList = [

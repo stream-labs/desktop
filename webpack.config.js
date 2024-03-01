@@ -162,7 +162,7 @@ module.exports = {
         ],
       },
       {
-        test: /\.(png|jpe?g|gif|mp4|ico|wav|webm)(\?.*)?$/,
+        test: /\.(png|jpe?g|gif|mp4|mp3|ico|wav|webm)(\?.*)?$/,
         loader: 'file-loader',
         options: {
           name: '[name]-[hash].[ext]',

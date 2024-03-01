@@ -434,6 +434,7 @@
       }
     },
     "preset": {
+      "play_sample": "Play sample audio",
       "description": "While listening to the converted audio, adjust the pitch so that it is close to the character's voice."
     },
     "pitch_shift": {
