@@ -56,13 +56,13 @@ export default class RtvcSourceProperties extends SourceProperties {
   name = '';
   label = '';
   description = '';
-  device: TObsValue = 0;
-  latency: TObsValue = 0;
+  device: Extract<TObsValue, number> = 0;
+  latency: Extract<TObsValue, number> = 0;
 
-  primaryVoice: TObsValue = 0;
-  secondaryVoice: TObsValue = 0;
-  pitchShift: TObsValue = 0;
-  amount: TObsValue = 0;
+  primaryVoice: Extract<TObsValue, number> = 0;
+  secondaryVoice: Extract<TObsValue, number> = 0;
+  pitchShift: Extract<TObsValue, number> = 0;
+  amount: Extract<TObsValue, number> = 0;
 
   showPopupMenu: boolean = false;
   tab = 0;
@@ -72,6 +72,8 @@ export default class RtvcSourceProperties extends SourceProperties {
   secondaryVoiceModel: IObsListOption<number> = { description: '', value: 0 };
   deviceModel: IObsListOption<number> = { description: '', value: 0 };
   latencyModel: IObsListOption<number> = { description: '', value: 0 };
+
+  audio = new Audio();
 
   get presetList() {
     return PresetValues.map(a => ({ value: a.index, name: a.name, label: a.label }));
@@ -138,6 +140,7 @@ export default class RtvcSourceProperties extends SourceProperties {
     this.latencyModel = this.getSourcePropertyOption('latency', this.latency);
 
     this.rtvcStateService.setSourcePropertiesByCommonParam(this.source, p);
+    this.audio.pause();
   }
 
   @Watch('name')
@@ -265,8 +268,8 @@ export default class RtvcSourceProperties extends SourceProperties {
       this.isMonitor = m !== obs.EMonitoringType.None;
     }
 
-    this.device = this.getSourcePropertyValue('device');
-    this.latency = this.getSourcePropertyValue('latency');
+    this.device = this.getSourcePropertyValue('device') as number;
+    this.latency = this.getSourcePropertyValue('latency') as number;
 
     this.state = this.rtvcStateService.getState();
     this.updateManualList();
@@ -277,6 +280,8 @@ export default class RtvcSourceProperties extends SourceProperties {
 
   // 右上xではOKという感じらしい
   beforeDestroy() {
+    this.audio.pause();
+
     // モニタリング状態は元の値に戻す
     if (this.initialMonitoringType !== this.currentMonitoringType)
       this.audioService.setSettings(this.sourceId, { monitoringType: this.initialMonitoringType });
@@ -382,8 +387,9 @@ export default class RtvcSourceProperties extends SourceProperties {
 
     const asset = assets[label];
     if (!asset) return;
-    const audio = new Audio(asset);
-    audio.play();
+    this.audio.pause();
+    this.audio.src = asset;
+    this.audio.play();
   }
 }
 
