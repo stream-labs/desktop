@@ -342,7 +342,7 @@
     background: radial-gradient(100% 100% at 50% 100%, var(--color-white) 0%, var(--color-brand-rtvc-zundamon) 100%);
 
     .image {
-      top: -48px;
+      top: -64px;
       // bottom: -292px;
       width: 372px;
       height: 644px;
@@ -356,11 +356,11 @@
     background: radial-gradient(100% 100% at 50% 100%, var(--color-white) 0%, var(--color-brand-rtvc-tsumugi) 100%);
 
     .image {
-      top: -4px;
+      top: -22px;
       // bottom: -408px;
       width: 725px;
       height: 728px;
-      margin-left: -34px;
+      margin-left: -45px;
       background-image: url('../../../media/images/rtvc/tsumugi.png');
       filter: drop-shadow(8px 6px 0 #E1B52B);
     }
@@ -376,14 +376,14 @@
     align-items: center;
     justify-content: center;
     width: 100%;
-    padding: 44px 0 24px;
+    padding: 40px 0 24px;
     clip-path: polygon(0 40px, 100% 0, 100% 100%, 0 100%);
     background-color: var(--color-white);
     transform: translateX(-50%);
 
     .name {
       margin: 0;
-      font-size: 20px;
+      font-size: 18px;
       color: var(--color-black);
     }
 
@@ -391,6 +391,10 @@
       margin: 0;
       font-size: 12px;
       color: var(--color-black);
+    }
+
+    .button {
+      margin-top: 16px;
     }
   }
 }
