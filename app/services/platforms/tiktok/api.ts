@@ -19,12 +19,12 @@ export enum ETikTokLiveRoomDestinations {
 
 export enum ETikTokLiveScopeReason {
   DENIED = -1,
-  // NOT_APPROVED = 0,
+  NOT_APPROVED = 0,
   APPROVED = 1,
   APPROVED_OBS = 2,
 }
 
-export type TTikTokLiveScopeTypes = 'approved' | 'legacy' | 'denied';
+export type TTikTokLiveScopeTypes = 'approved' | 'not-approved' | 'legacy' | 'denied';
 
 export interface ITikTokUserInfoResponse {
   data: {

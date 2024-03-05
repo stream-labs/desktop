@@ -296,6 +296,7 @@ export class TikTokService
         : EPlatformCallResult.TikTokStreamScopeMissing;
     } catch (e: unknown) {
       console.warn(this.getErrorMessage(e));
+      this.SET_LIVE_SCOPE('denied');
       return EPlatformCallResult.TikTokStreamScopeMissing;
     }
   }
@@ -410,6 +411,9 @@ export class TikTokService
     switch (scope) {
       case ETikTokLiveScopeReason.APPROVED: {
         return 'approved';
+      }
+      case ETikTokLiveScopeReason.NOT_APPROVED: {
+        return 'not-approved';
       }
       case ETikTokLiveScopeReason.APPROVED_OBS: {
         return 'legacy';
