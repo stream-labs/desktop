@@ -113,22 +113,21 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
 
   /**
    * Returns a list of linked platforms available for restream
+   * @remark If TikTok is linked, users can always stream to it
    */
   get linkedPlatforms(): TPlatform[] {
     if (!this.userView.state.auth) return [];
 
-    if (
+    if (this.isPlatformLinked('tiktok')) {
+      return this.allPlatforms.filter(p => this.isPlatformLinked(p)).concat();
+    } else if (
       (!this.restreamView.canEnableRestream || !this.protectedModeEnabled) &&
       !this.isDualOutputMode
     ) {
-      // users can always stream to tiktok
-      if (this.forceStreamToTikTok) {
-        return [this.userView.auth!.primaryPlatform, 'tiktok'];
-      }
       return [this.userView.auth!.primaryPlatform];
+    } else {
+      return this.allPlatforms.filter(p => this.isPlatformLinked(p));
     }
-
-    return this.allPlatforms.filter(p => this.isPlatformLinked(p));
   }
 
   get protectedModeEnabled() {
@@ -161,14 +160,6 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
       (platform: TPlatform) =>
         this.linkedPlatforms.includes(platform) && platforms[platform]?.enabled,
     ) as TPlatform[];
-  }
-
-  get forceStreamToTikTok() {
-    return (
-      this.isPlatformLinked('tiktok') &&
-      this.userView.auth!.primaryPlatform !== 'tiktok' &&
-      !this.userView.isPrime
-    );
   }
 
   /**

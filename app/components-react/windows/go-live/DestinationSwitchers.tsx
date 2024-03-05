@@ -24,7 +24,6 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
     switchPlatforms,
     switchCustomDestination,
     isPrimaryPlatform,
-    forceStreamToTikTok,
   } = useGoLiveSettings();
   const enabledPlatformsRef = useRef(enabledPlatforms);
   enabledPlatformsRef.current = enabledPlatforms;
@@ -55,28 +54,14 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
           isPrimary={isPrimaryPlatform(platform)}
         />
       ))}
-      {!forceStreamToTikTok &&
-        customDestinations?.map((dest, ind) => (
-          <DestinationSwitcher
-            key={ind}
-            destination={dest}
-            enabled={customDestinations[ind].enabled}
-            onChange={enabled => switchCustomDestination(ind, enabled)}
-          />
-        ))}
-      {p?.showSelector && (
-        <DualOutputPlatformSelector
-          togglePlatform={platform => {
-            togglePlatform(platform, true);
-            destinationSwitcherRef.current.addClass();
-          }}
-          showSwitcher={destinationSwitcherRef.current.addClass}
-          switchDestination={index => {
-            switchCustomDestination(index, true);
-            destinationSwitcherRef.current.addClass();
-          }}
+      {customDestinations?.map((dest, ind) => (
+        <DestinationSwitcher
+          key={ind}
+          destination={dest}
+          enabled={customDestinations[ind].enabled}
+          onChange={enabled => switchCustomDestination(ind, enabled)}
         />
-      )}
+      ))}
     </div>
   );
 }
@@ -117,7 +102,7 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
         );
         return;
       }
-      if (RestreamService.views.canEnableRestream || StreamingService.views.forceStreamToTikTok) {
+      if (RestreamService.views.canEnableRestream) {
         const enable = !p.enabled;
         p.onChange(enable);
         // always proxy the click to the SwitchInput
