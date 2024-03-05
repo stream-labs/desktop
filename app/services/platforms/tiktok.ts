@@ -133,22 +133,9 @@ export class TikTokService
       throwStreamError('TIKTOK_STREAM_SCOPE_MISSING');
     }
 
-    if (this.getHasScope('legacy')) {
-      // handle streaming with server url and stream key input
-      if (!this.streamingService.views.isMultiplatformMode) {
-        this.streamSettingsService.setSettings(
-          {
-            streamType: 'rtmp_custom',
-            key: ttSettings.streamKey,
-            server: ttSettings.serverUrl,
-          },
-          context,
-        );
-      }
-      this.SET_STREAM_SETTINGS(ttSettings);
-      this.setPlatformContext('tiktok');
-    } else {
-      // handle streaming via API
+    if (!this.getHasScope('legacy')) {
+      // update server url and stream key if handling streaming via API
+      // streaming with server url and stream key is default
       let streamInfo = {} as ITikTokStartStreamResponse;
 
       try {
@@ -162,30 +149,25 @@ export class TikTokService
         throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED', error as any);
       }
 
-      const updatedTTSettings = {
-        ...ttSettings,
-        serverUrl: streamInfo.rtmp,
-        streamKey: streamInfo.key,
-      };
+      ttSettings.serverUrl = streamInfo.rtmp;
+      ttSettings.streamKey = streamInfo.key;
 
-      if (!this.streamingService.views.isMultiplatformMode) {
-        this.streamSettingsService.setSettings(
-          {
-            streamType: 'rtmp_custom',
-            key: updatedTTSettings.streamKey,
-            server: updatedTTSettings.serverUrl,
-          },
-          context,
-        );
-      }
-
-      await this.putChannelInfo(updatedTTSettings);
-
-      this.SET_STREAM_KEY(updatedTTSettings.streamKey);
       this.SET_BROADCAST_ID(streamInfo.id);
-
-      this.setPlatformContext('tiktok');
     }
+
+    if (!this.streamingService.views.isMultiplatformMode) {
+      this.streamSettingsService.setSettings(
+        {
+          streamType: 'rtmp_custom',
+          key: ttSettings.streamKey,
+          server: ttSettings.serverUrl,
+        },
+        context,
+      );
+    }
+
+    await this.putChannelInfo(ttSettings);
+    this.setPlatformContext('tiktok');
   }
 
   async afterGoLive(): Promise<void> {
@@ -367,7 +349,7 @@ export class TikTokService
   }
 
   async putChannelInfo(settings: ITikTokStartStreamOptions): Promise<void> {
-    this.UPDATE_STREAM_SETTINGS(settings);
+    this.SET_STREAM_SETTINGS(settings);
   }
 
   getHeaders(req: IPlatformRequest, useToken?: string | boolean): ITikTokRequestHeaders {
@@ -453,9 +435,6 @@ export class TikTokService
       return Promise.resolve();
     }, 1000);
   }
-
-  @mutation()
-  protected UPDATE_STREAM_SETTINGS(settingsPatch: Partial<TStartStreamOptions>): void {}
 
   @mutation()
   SET_LIVE_SCOPE(scope: TTikTokLiveScopeTypes) {
