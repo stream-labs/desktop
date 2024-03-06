@@ -48,7 +48,7 @@ class RecordingHistoryController {
         icon: 'icon-editor-7',
       },
       {
-        label: $t('Transcribe'),
+        label: $t('Subtitle'),
         value: 'typestudio',
         icon: 'icon-mic',
       },
