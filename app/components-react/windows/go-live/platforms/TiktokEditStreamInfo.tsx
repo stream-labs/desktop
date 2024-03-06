@@ -81,8 +81,8 @@ export function TikTokEnterCredentialsFormInfo(p: IPlatformComponentParams<'tikt
       <TextInput
         label={
           <Tooltip title={$t('Generate with "Locate my Stream Key"')} placement="right">
-            {$t('TikTok Server URL ')}
-            <i className="icon-information" />
+            {$t('TikTok Server URL')}
+            <i className="icon-information" style={{ marginLeft: '5px' }} />
           </Tooltip>
         }
         required
@@ -90,9 +90,10 @@ export function TikTokEnterCredentialsFormInfo(p: IPlatformComponentParams<'tikt
       />
       <TextInput
         label={
+          // eslint-disable-next-line prettier/prettier
           <Tooltip title={$t('Generate with "Locate my Stream Key"')} placement="right">
-            {$t('TikTok Stream Key ')}
-            <i className="icon-information" />
+            {$t('TikTok Stream Key')}
+            <i className="icon-information" style={{ marginLeft: '5px' }} />
           </Tooltip>
         }
         required

@@ -190,15 +190,20 @@ export class TikTokService
     });
   }
 
-  fetchNewToken(): Promise<void> {
+  async fetchNewToken(): Promise<void> {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/tiktok/refresh`;
     const headers = authorizedHeaders(this.userService.apiToken!);
     const request = new Request(url, { headers });
 
-    return jfetch<{ access_token: string }>(request).then(response =>
-      this.userService.updatePlatformToken('tiktok', response.access_token),
-    );
+    return jfetch<{ access_token: string }>(request)
+      .then(response => {
+        return this.userService.updatePlatformToken('tiktok', response.access_token);
+      })
+      .catch(e => {
+        console.error('Error fetching new token.');
+        return Promise.reject(e);
+      });
   }
 
   /**
@@ -210,12 +215,41 @@ export class TikTokService
     } catch (e: unknown) {
       const code = (e as any).result?.error?.code;
 
+      if (
+        (e as any)?.status === 405 ||
+        (e as any)?.status === 401 ||
+        !code ||
+        code === ETikTokErrorTypes.ACCESS_TOKEN_INVALID
+      ) {
+        console.error('Token invalid or missing. Unable to process request.');
+
+        // refresh token and attempt again
+        return await this.fetchNewToken().then(() => {
+          if (typeof reqInfo !== 'string') {
+            const req = reqInfo as IPlatformRequest;
+            // updated token on request body
+            const reqInfoBody = req.body as string;
+            const body = JSON.parse(reqInfoBody);
+
+            const updatedReqInfo = {
+              ...req,
+              body: { ...body, access_token: this.oauthToken },
+            };
+
+            return this.requestTikTok(updatedReqInfo);
+          } else {
+            console.log('Failed platform request', reqInfo);
+            return Promise.reject(e);
+          }
+        });
+      }
+
       const notApproved = [
         ETikTokErrorTypes.SCOPE_NOT_AUTHORIZED,
         ETikTokErrorTypes.SCOPE_PERMISSION_MISSED,
         ETikTokErrorTypes.USER_HAS_NO_LIVE_AUTH,
       ].includes(code);
-      const hasStream = ETikTokErrorTypes.TIKTOK_STREAM_ACTIVE;
+      const hasStream = code === ETikTokErrorTypes.TIKTOK_STREAM_ACTIVE;
 
       const message = notApproved
         ? 'The user is not enabled for live streaming'
@@ -236,9 +270,6 @@ export class TikTokService
       } else if (hasStream) {
         // show error stream exists
         throwStreamError('TIKTOK_STREAM_ACTIVE', e as any, details);
-      } else {
-        this.SET_LIVE_SCOPE('denied');
-        throwStreamError('TIKTOK_OAUTH_EXPIRED', e as any, details);
       }
     }
   }

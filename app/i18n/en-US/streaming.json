@@ -217,5 +217,6 @@
   "Failed to upload the thumbnail": "Failed to upload the thumbnail",
   "Failed to authenticate with TikTok": "Failed to authenticate with TikTok",
   "Your TikTok account is not enabled for live streaming": "Your TikTok account is not enabled for live streaming",
-  "Error generating TikTok stream credentials": "Error generating TikTok stream credentials"
+  "Error generating TikTok stream credentials": "Error generating TikTok stream credentials",
+  "You are already live on a another device": "You are already live on a another device"
 }
