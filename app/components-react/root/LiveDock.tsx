@@ -386,7 +386,7 @@ function LiveDock(p: { onLeft: boolean }) {
                     <i onClick={() => ctrl.showEditStreamInfo()} className="icon-edit" />
                   </Tooltip>
                 )}
-                {isPlatform(['youtube', 'facebook', 'trovo', 'tiktok']) && isStreaming && (
+                {isPlatform(['youtube', 'facebook', 'trovo']) && isStreaming && (
                   <Tooltip title={$t('View your live stream in a web browser')} placement="right">
                     <i onClick={() => ctrl.openPlatformStream()} className="icon-studio" />
                   </Tooltip>

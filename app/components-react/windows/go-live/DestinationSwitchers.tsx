@@ -27,7 +27,6 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
   } = useGoLiveSettings();
   const enabledPlatformsRef = useRef(enabledPlatforms);
   enabledPlatformsRef.current = enabledPlatforms;
-  const destinationSwitcherRef = useRef({ addClass: () => undefined });
 
   const emitSwitch = useDebounce(500, () => {
     switchPlatforms(enabledPlatformsRef.current);
@@ -91,7 +90,7 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
     const switchInputRef = useRef<HTMLInputElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const platform = typeof p.destination === 'string' ? (p.destination as TPlatform) : null;
-    const { RestreamService, MagicLinkService, StreamingService } = Services;
+    const { RestreamService, MagicLinkService } = Services;
 
     function onClickHandler(ev: MouseEvent) {
       if (p.isPrimary) {
@@ -102,7 +101,7 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
         );
         return;
       }
-      if (RestreamService.views.canEnableRestream) {
+      if (RestreamService.views.canEnableRestream || platform === 'tiktok') {
         const enable = !p.enabled;
         p.onChange(enable);
         // always proxy the click to the SwitchInput
