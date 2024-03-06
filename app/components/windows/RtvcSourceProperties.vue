@@ -1,4 +1,3 @@
-
 <template>
   <div class="modal-layout" id="mainWrapper">
     <div class="tab">
@@ -11,7 +10,7 @@
     <div v-if="tab == 0" class="content">
       <div class="nav-menu">
         <div class="nav-menu-heading">{{
-          $t('source-props.nair-rtvc-source.nav.preset_voice') }}</div>
+        $t('source-props.nair-rtvc-source.nav.preset_voice') }}</div>
         <ul class="nav-menu-child">
           <li v-for="v in presetList" :key="v.value" class="nav-item" :class="{ active: v.value === currentIndex }">
             <div class="nav-item-content" @click="onSelect(v.value)">
@@ -25,8 +24,8 @@
         </ul>
 
         <div class="nav-menu-heading">{{
-          $t('source-props.nair-rtvc-source.nav.original_voice') }} ({{ manualList.length
-  }}/{{ manualMax }})
+        $t('source-props.nair-rtvc-source.nav.original_voice') }} ({{ manualList.length
+          }}/{{ manualMax }})
           <button v-if="canAdd" @click="onAdd()" class="indicator"
             v-tooltip.bottom="$t('source-props.nair-rtvc-source.nav.original_voice_add')">
             <i class="icon-add icon-btn" />
@@ -44,8 +43,9 @@
               </div>
               <span class="name">{{ v.name }}</span>
             </div>
-            <popper trigger="click" :options="{ placement: 'bottom-end' }" @show="showPopupMenu = true"
-              @hide="showPopupMenu = false">
+            <popper trigger="click" :options="{ placement: 'bottom-end' }"
+              @show="showPopupMenu = true; currentPopupMenu = $event"
+              @hide="showPopupMenu = false; currentPopupMenu = undefined">
               <div class="popper">
                 <ul class="popup-menu-list">
                   <li class="popup-menu-item">
@@ -77,7 +77,7 @@
               <p class="name">{{ name }}</p>
               <p class="description">{{ description }}</p>
               <button class="button button--secondary" @click="playSample(label)"><i class="icon-speaker"></i>{{
-                $t('source-props.nair-rtvc-source.preset.play_sample') }}</button>
+        $t('source-props.nair-rtvc-source.preset.play_sample') }}</button>
             </div>
           </div>
           <div class="section">
@@ -116,7 +116,7 @@
               <div class="section-heading">{{ $t('source-props.nair-rtvc-source.container.voice_setting') }}</div>
               <div class="button-wrapper">
                 <button class="button--text" @click="onRandom">{{
-                  $t('source-props.nair-rtvc-source.container.make_random.name') }} </button>
+        $t('source-props.nair-rtvc-source.container.make_random.name') }} </button>
                 <i class="icon-help icon-tooltip"
                   v-tooltip.bottom="$t('source-props.nair-rtvc-source.container.make_random.description')"></i>
               </div>
@@ -131,7 +131,8 @@
                 <VueSlider class="slider" v-model="pitchShift" :min="-1200" :max="1200" :interval="1" tooltip="none" />
               </div>
               <div class="input-wrapper">
-                <div class="input-label"><label>{{ $t('source-props.nair-rtvc-source.primary_voice.name') }}</label></div>
+                <div class="input-label"><label>{{ $t('source-props.nair-rtvc-source.primary_voice.name') }}</label>
+                </div>
                 <multiselect v-model="primaryVoiceModel" :options="primaryVoiceList" label="description" trackBy="value"
                   :allow-empty="false" :placeholder="$t('settings.listPlaceholder')" />
               </div>
@@ -644,5 +645,3 @@
   margin-right: auto;
 }
 </style>
-
-

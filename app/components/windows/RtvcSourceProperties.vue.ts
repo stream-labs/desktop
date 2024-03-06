@@ -64,9 +64,11 @@ export default class RtvcSourceProperties extends SourceProperties {
   pitchShift: Extract<TObsValue, number> = 0;
   amount: Extract<TObsValue, number> = 0;
 
-  showPopupMenu: boolean = false;
   tab = 0;
   canAdd = false;
+
+  showPopupMenu = false;
+  currentPopupMenu: any = undefined;
 
   primaryVoiceModel: IObsListOption<number> = { description: '', value: 0 };
   secondaryVoiceModel: IObsListOption<number> = { description: '', value: 0 };
@@ -341,7 +343,14 @@ export default class RtvcSourceProperties extends SourceProperties {
     this.currentIndex = index;
   }
 
+  closePopupMenu() {
+    if (!this.currentPopupMenu) return;
+    this.currentPopupMenu.doClose();
+    this.currentPopupMenu = undefined;
+  }
+
   async onDelete(index: string) {
+    this.closePopupMenu();
     const idx = this.getManualIndexNum(index);
     if (idx < 0) return;
 
@@ -360,6 +369,7 @@ export default class RtvcSourceProperties extends SourceProperties {
   }
 
   onCopy(index: string) {
+    this.closePopupMenu();
     if (this.state.manuals.length >= this.manualMax) return;
     const idx = this.getManualIndexNum(index);
     if (idx < 0) return;
