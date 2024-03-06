@@ -277,6 +277,7 @@ export class TikTokService
 
       if (status?.reason) {
         const scope = this.convertScope(status.reason);
+        // this.SET_USERNAME(status.username);
         this.SET_LIVE_SCOPE(scope);
       } else {
         this.SET_LIVE_SCOPE('denied');
@@ -318,22 +319,22 @@ export class TikTokService
     });
   }
 
-  async fetchUsername(): Promise<string> {
-    const url = `${this.apiBase}/user/info/`;
-    const headers = this.getHeaders({ url });
+  // async fetchUsername(): Promise<string> {
+  //   const url = `${this.apiBase}/user/info/`;
+  //   const headers = this.getHeaders({ url });
 
-    return this.requestTikTok<ITikTokUserInfoResponse>({
-      headers,
-      url,
-      method: 'POST',
-      body: JSON.stringify({
-        access_token: this.oauthToken,
-        fields: ['username'],
-      }),
-    }).then(json => {
-      return json.data.user.username;
-    });
-  }
+  //   return this.requestTikTok<ITikTokUserInfoResponse>({
+  //     headers,
+  //     url,
+  //     method: 'POST',
+  //     body: JSON.stringify({
+  //       access_token: this.oauthToken,
+  //       fields: ['username'],
+  //     }),
+  //   }).then(json => {
+  //     return json.data.user.username;
+  //   });
+  // }
 
   /**
    * prepopulate channel info and save it to the store
@@ -343,8 +344,8 @@ export class TikTokService
     await this.validatePlatform();
 
     // fetch username for stream page url
-    const username = await this.fetchUsername();
-    this.SET_USERNAME(username);
+    // const username = await this.fetchUsername();
+    // this.SET_USERNAME(username);
 
     this.SET_PREPOPULATED(true);
   }
