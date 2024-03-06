@@ -192,6 +192,10 @@ export class GoLiveSettingsModule {
     this.state.updateSettings(settings);
   }
 
+  get isPrime() {
+    return Services.UserService.isPrime;
+  }
+
   /**
    * Get go live settings
    */

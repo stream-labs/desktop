@@ -11,7 +11,6 @@ import { assertIsDefined } from '../../../util/properties-type-guards';
 import { useDebounce } from '../../hooks';
 import { useGoLiveSettings } from './useGoLiveSettings';
 import { alertAsync } from '../../modals';
-import DualOutputPlatformSelector from './dual-output/DualOutputPlatformSelector';
 
 /**
  * Allows enabling/disabling platforms and custom destinations for the stream
@@ -24,9 +23,11 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
     switchPlatforms,
     switchCustomDestination,
     isPrimaryPlatform,
+    isPrime,
   } = useGoLiveSettings();
   const enabledPlatformsRef = useRef(enabledPlatforms);
   enabledPlatformsRef.current = enabledPlatforms;
+  const disableSwitchers = !isPrime && isPrimaryPlatform('tiktok') && enabledPlatforms.length > 1;
 
   const emitSwitch = useDebounce(500, () => {
     switchPlatforms(enabledPlatformsRef.current);
@@ -51,6 +52,8 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
           enabled={isEnabled(platform)}
           onChange={enabled => togglePlatform(platform, enabled)}
           isPrimary={isPrimaryPlatform(platform)}
+          tiktokPrimary={isPrimaryPlatform('tiktok')}
+          disabled={disableSwitchers && !enabledPlatforms.includes(platform)}
         />
       ))}
       {customDestinations?.map((dest, ind) => (
@@ -70,6 +73,8 @@ interface IDestinationSwitcherProps {
   enabled: boolean;
   onChange: (enabled: boolean) => unknown;
   isPrimary?: boolean;
+  tiktokPrimary?: boolean;
+  disabled?: boolean;
 }
 
 /**
@@ -101,7 +106,7 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
         );
         return;
       }
-      if (RestreamService.views.canEnableRestream || platform === 'tiktok') {
+      if (RestreamService.views.canEnableRestream || platform === 'tiktok' || p.tiktokPrimary) {
         const enable = !p.enabled;
         p.onChange(enable);
         // always proxy the click to the SwitchInput
@@ -153,7 +158,7 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
               inputRef={switchInputRef}
               value={p.enabled}
               name={platform}
-              disabled={p.isPrimary}
+              disabled={p.isPrimary || p.disabled}
               uncontrolled
             />
           ),
