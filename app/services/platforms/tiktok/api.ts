@@ -38,6 +38,9 @@ export interface ITikTokLiveScopeResponse {
   can_be_live: boolean;
   reason: ETikTokLiveScopeReason;
   platform: TPlatform | string;
+  user: {
+    username: string;
+  };
 }
 
 export interface ITikTokError {

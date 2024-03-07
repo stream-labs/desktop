@@ -117,6 +117,10 @@ export class TikTokService
     return this.state.settings?.liveScope === type;
   }
 
+  get scope(): TTikTokLiveScopeTypes {
+    return this.state.settings?.liveScope;
+  }
+
   /**
    * TikTok's API currently does not provide viewer count.
    * To prevent errors, return 0 for now;
@@ -306,9 +310,13 @@ export class TikTokService
       const response = await this.fetchLiveAccessStatus();
       const status = response as ITikTokLiveScopeResponse;
 
+      // Note on the 'denied' response: If a user needs to reauthenticate with TikTok
+      // due a change in the scope for our api, on the frontend it will show that they do not
+      // have access. Special handling for this case could be implemented to show that the user
+      // needs to reauthenticate.
       if (status?.reason) {
         const scope = this.convertScope(status.reason);
-        // this.SET_USERNAME(status.username);
+        this.SET_USERNAME(status.user.username);
         this.SET_LIVE_SCOPE(scope);
       } else {
         this.SET_LIVE_SCOPE('denied');
@@ -350,33 +358,12 @@ export class TikTokService
     });
   }
 
-  // async fetchUsername(): Promise<string> {
-  //   const url = `${this.apiBase}/user/info/`;
-  //   const headers = this.getHeaders({ url });
-
-  //   return this.requestTikTok<ITikTokUserInfoResponse>({
-  //     headers,
-  //     url,
-  //     method: 'POST',
-  //     body: JSON.stringify({
-  //       access_token: this.oauthToken,
-  //       fields: ['username'],
-  //     }),
-  //   }).then(json => {
-  //     return json.data.user.username;
-  //   });
-  // }
-
   /**
    * prepopulate channel info and save it to the store
    */
   async prepopulateInfo(): Promise<void> {
     // fetch user live access status
     await this.validatePlatform();
-
-    // fetch username for stream page url
-    // const username = await this.fetchUsername();
-    // this.SET_USERNAME(username);
 
     this.SET_PREPOPULATED(true);
   }

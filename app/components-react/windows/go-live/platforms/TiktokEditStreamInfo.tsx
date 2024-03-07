@@ -14,7 +14,7 @@ import { TextInput, createBinding } from 'components-react/shared/inputs';
 export function TikTokEditStreamInfo(p: IPlatformComponentParams<'tiktok'>) {
   const ttSettings = p.value;
   const liveStreamingEnabled = Services.TikTokService.liveStreamingEnabled;
-  const legacy = Services.TikTokService.getHasScope('legacy');
+  const legacy = Services.TikTokService.scope === 'legacy';
 
   function updateSettings(patch: Partial<ITikTokStartStreamOptions>) {
     p.onChange({ ...ttSettings, ...patch });

@@ -192,7 +192,7 @@ class LiveDockController {
     if (this.platform === 'youtube') url = this.youtubeService.streamPageUrl;
     if (this.platform === 'facebook') url = this.facebookService.streamPageUrl;
     if (this.platform === 'trovo') url = this.trovoService.streamPageUrl;
-    // if (this.platform === 'tiktok') url = this.tiktokService.streamPageUrl;
+    if (this.platform === 'tiktok') url = this.tiktokService.streamPageUrl;
     remote.shell.openExternal(url);
   }
 
@@ -386,7 +386,7 @@ function LiveDock(p: { onLeft: boolean }) {
                     <i onClick={() => ctrl.showEditStreamInfo()} className="icon-edit" />
                   </Tooltip>
                 )}
-                {isPlatform(['youtube', 'facebook', 'trovo']) && isStreaming && (
+                {isPlatform(['youtube', 'facebook', 'trovo', 'tiktok']) && isStreaming && (
                   <Tooltip title={$t('View your live stream in a web browser')} placement="right">
                     <i onClick={() => ctrl.openPlatformStream()} className="icon-studio" />
                   </Tooltip>
