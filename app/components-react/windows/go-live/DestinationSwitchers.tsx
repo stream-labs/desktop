@@ -20,6 +20,7 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
     linkedPlatforms,
     enabledPlatforms,
     customDestinations,
+    enabledDestinations,
     switchPlatforms,
     switchCustomDestination,
     isPrimaryPlatform,
@@ -27,9 +28,16 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
   } = useGoLiveSettings();
   const enabledPlatformsRef = useRef(enabledPlatforms);
   enabledPlatformsRef.current = enabledPlatforms;
-  const disableSwitchers = !isPrime && isPrimaryPlatform('tiktok') && enabledPlatforms.length > 1;
 
-  const emitSwitch = useDebounce(500, () => {
+  const enabledDestRef = useRef(enabledDestinations);
+  enabledDestRef.current = enabledDestinations;
+
+  const disableSwitchers =
+    !isPrime &&
+    isPrimaryPlatform('tiktok') &&
+    (enabledPlatforms.length > 1 || enabledDestinations.length > 0);
+
+  const emitPlatformSwitch = useDebounce(500, () => {
     switchPlatforms(enabledPlatformsRef.current);
   });
 
@@ -40,7 +48,23 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
   function togglePlatform(platform: TPlatform, enabled: boolean) {
     enabledPlatformsRef.current = enabledPlatformsRef.current.filter(p => p !== platform);
     if (enabled) enabledPlatformsRef.current.push(platform);
-    emitSwitch();
+    emitPlatformSwitch();
+  }
+
+  const emitDestSwitch = useDebounce(500, (ind: number, enabled: boolean) => {
+    switchCustomDestination(ind, enabled);
+  });
+
+  function isDestEnabled(ind: number) {
+    return enabledDestRef.current.includes(ind);
+  }
+
+  function toggleDest(ind: number, enabled: boolean) {
+    enabledDestRef.current = enabledDestRef.current.filter(index => index !== ind);
+    if (enabled) {
+      enabledDestRef.current.push(ind);
+    }
+    emitDestSwitch(ind, enabled);
   }
 
   return (
@@ -60,8 +84,9 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
         <DestinationSwitcher
           key={ind}
           destination={dest}
-          enabled={customDestinations[ind].enabled}
-          onChange={enabled => switchCustomDestination(ind, enabled)}
+          enabled={isDestEnabled(ind)}
+          onChange={enabled => toggleDest(ind, enabled)}
+          disabled={disableSwitchers && !isDestEnabled(ind)}
         />
       ))}
     </div>
@@ -83,126 +108,130 @@ interface IDestinationSwitcherProps {
 // disable `func-call-spacing` and `no-spaced-func` rules
 // to pass back reference to addClass function
 // eslint-disable-next-line
-const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinationSwitcherProps>(
-  (p, ref) => {
-    React.useImperativeHandle(ref, () => {
+const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, ref) => {
+  const switchInputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const platform = typeof p.destination === 'string' ? (p.destination as TPlatform) : null;
+  const { RestreamService, MagicLinkService } = Services;
+
+  function onClickHandler(ev: MouseEvent) {
+    if (p.isPrimary) {
+      alertAsync(
+        $t(
+          'You cannot disable the platform you used to sign in to Streamlabs Desktop. Please sign in with a different platform to disable streaming to this destination.',
+        ),
+      );
+      return;
+    }
+
+    if (p.disabled) {
+      alertAsync($t('Subscribe to Ultra to add more destinations.'));
+      MagicLinkService.actions.linkToPrime('slobs-multistream');
+      return;
+    }
+
+    if (
+      RestreamService.views.canEnableRestream ||
+      platform === 'tiktok' ||
+      p.tiktokPrimary ||
+      (!platform && !p.disabled)
+    ) {
+      const enable = !p.enabled;
+      p.onChange(enable);
+      // always proxy the click to the SwitchInput
+      // so it can play a transition animation
+      switchInputRef.current?.click();
+      // switch the container class without re-rendering to not stop the animation
+      if (enable) {
+        containerRef.current?.classList.remove(styles.platformDisabled);
+      } else {
+        containerRef.current?.classList.add(styles.platformDisabled);
+      }
+    } else {
+      MagicLinkService.actions.linkToPrime('slobs-multistream');
+    }
+  }
+
+  function addClass() {
+    containerRef.current?.classList.remove(styles.platformDisabled);
+  }
+
+  function removeClass() {
+    if (p.isPrimary) {
+      alertAsync(
+        $t(
+          'You cannot disable the platform you used to sign in to Streamlabs Desktop. Please sign in with a different platform to disable streaming to this destination.',
+        ),
+      );
+      return;
+    }
+    p.onChange(false);
+    containerRef.current?.classList.add(styles.platformDisabled);
+  }
+
+  const { title, description, Switch, Logo } = (() => {
+    if (platform) {
+      // define slots for a platform switcher
+      const { UserService } = Services;
+      const service = getPlatformService(platform);
+      const platformAuthData = UserService.state.auth?.platforms[platform];
+      assertIsDefined(platformAuthData);
       return {
-        addClass() {
-          addClass();
-        },
+        title: $t('Stream to %{platformName}', { platformName: service.displayName }),
+        description: platformAuthData.username,
+        Logo: () => (
+          <PlatformLogo platform={platform} className={styles[`platform-logo-${platform}`]} />
+        ),
+        Switch: () => (
+          <SwitchInput
+            inputRef={switchInputRef}
+            value={p.enabled}
+            name={platform}
+            disabled={p.isPrimary || p.disabled}
+            uncontrolled
+          />
+        ),
       };
-    });
-    const switchInputRef = useRef<HTMLInputElement>(null);
-    const containerRef = useRef<HTMLDivElement>(null);
-    const platform = typeof p.destination === 'string' ? (p.destination as TPlatform) : null;
-    const { RestreamService, MagicLinkService } = Services;
-
-    function onClickHandler(ev: MouseEvent) {
-      if (p.isPrimary) {
-        alertAsync(
-          $t(
-            'You cannot disable the platform you used to sign in to Streamlabs Desktop. Please sign in with a different platform to disable streaming to this destination.',
-          ),
-        );
-        return;
-      }
-      if (RestreamService.views.canEnableRestream || platform === 'tiktok' || p.tiktokPrimary) {
-        const enable = !p.enabled;
-        p.onChange(enable);
-        // always proxy the click to the SwitchInput
-        // so it can play a transition animation
-        switchInputRef.current?.click();
-        // switch the container class without re-rendering to not stop the animation
-        if (enable) {
-          containerRef.current?.classList.remove(styles.platformDisabled);
-        } else {
-          containerRef.current?.classList.add(styles.platformDisabled);
-        }
-      } else {
-        MagicLinkService.actions.linkToPrime('slobs-multistream');
-      }
+    } else {
+      // define slots for a custom destination switcher
+      const destination = p.destination as ICustomStreamDestination;
+      return {
+        title: destination.name,
+        description: destination.url,
+        Logo: () => <i className={cx(styles.destinationLogo, 'fa fa-globe')} />,
+        Switch: () => (
+          <SwitchInput
+            inputRef={switchInputRef}
+            value={destination.enabled}
+            name={`destination_${destination.name}`}
+            disabled={p.disabled}
+            uncontrolled
+          />
+        ),
+      };
     }
+  })();
 
-    function addClass() {
-      containerRef.current?.classList.remove(styles.platformDisabled);
-    }
-
-    function removeClass() {
-      if (p.isPrimary) {
-        alertAsync(
-          $t(
-            'You cannot disable the platform you used to sign in to Streamlabs Desktop. Please sign in with a different platform to disable streaming to this destination.',
-          ),
-        );
-        return;
-      }
-      p.onChange(false);
-      containerRef.current?.classList.add(styles.platformDisabled);
-    }
-
-    const { title, description, Switch, Logo } = (() => {
-      if (platform) {
-        // define slots for a platform switcher
-        const { UserService } = Services;
-        const service = getPlatformService(platform);
-        const platformAuthData = UserService.state.auth?.platforms[platform];
-        assertIsDefined(platformAuthData);
-        return {
-          title: $t('Stream to %{platformName}', { platformName: service.displayName }),
-          description: platformAuthData.username,
-          Logo: () => (
-            <PlatformLogo platform={platform} className={styles[`platform-logo-${platform}`]} />
-          ),
-          Switch: () => (
-            <SwitchInput
-              inputRef={switchInputRef}
-              value={p.enabled}
-              name={platform}
-              disabled={p.isPrimary || p.disabled}
-              uncontrolled
-            />
-          ),
-        };
-      } else {
-        // define slots for a custom destination switcher
-        const destination = p.destination as ICustomStreamDestination;
-        return {
-          title: destination.name,
-          description: destination.url,
-          Logo: () => <i className={cx(styles.destinationLogo, 'fa fa-globe')} />,
-          Switch: () => (
-            <SwitchInput
-              inputRef={switchInputRef}
-              value={destination.enabled}
-              name={`destination_${destination.name}`}
-              uncontrolled
-            />
-          ),
-        };
-      }
-    })();
-
-    return (
-      <div
-        ref={containerRef}
-        className={cx(styles.platformSwitcher, { [styles.platformDisabled]: !p.enabled })}
-        onClick={onClickHandler}
-      >
-        <div className={cx(styles.colInput)}>
-          <Switch />
-        </div>
-
-        {/* PLATFORM LOGO */}
-        <div className="logo margin-right--20">
-          <Logo />
-        </div>
-
-        {/* PLATFORM TITLE AND ACCOUNT/URL */}
-        <div className={styles.colAccount}>
-          <span className={styles.platformName}>{title}</span> <br />
-          {description} <br />
-        </div>
+  return (
+    <div
+      ref={containerRef}
+      className={cx(styles.platformSwitcher, { [styles.platformDisabled]: !p.enabled })}
+      onClick={onClickHandler}
+    >
+      <div className={cx(styles.colInput)}>
+        <Switch />
       </div>
-    );
-  },
-);
+
+      {/* PLATFORM LOGO */}
+      <div className="logo margin-right--20">
+        <Logo />
+      </div>
+
+      {/* PLATFORM TITLE AND ACCOUNT/URL */}
+      <div className={styles.colAccount}>
+        <span className={styles.platformName}>{title}</span> <br />
+        {description} <br />
+      </div>
+    </div>
+  );
+});
