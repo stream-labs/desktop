@@ -556,6 +556,10 @@ export class StreamingService
   private recordAfterStreamStartAnalytics(settings: IGoLiveSettings) {
     if (settings.customDestinations.filter(dest => dest.enabled).length) {
       this.usageStatisticsService.recordFeatureUsage('CustomStreamDestination');
+      this.usageStatisticsService.recordAnalyticsEvent('StreamCustomDestinations', {
+        type: 'stream',
+        destinations: this.views.enabledCustomDestinationHosts,
+      });
     }
 
     // send analytics for Facebook
@@ -580,6 +584,13 @@ export class StreamingService
     // send analytics for TikTok
     if (settings.platforms.tiktok?.enabled) {
       this.usageStatisticsService.recordFeatureUsage('StreamToTikTok');
+      this.usageStatisticsService.recordAnalyticsEvent('StreamToTikTokSettings', {
+        type: 'stream',
+        connectedPlatforms: this.views.linkedPlatforms,
+        enabledPlatforms: this.views.enabledPlatforms,
+        enabledDestinations: this.views.enabledCustomDestinationHosts,
+        dualOutputMode: this.views.isDualOutputMode,
+      });
     }
 
     if (settings.platforms.instagram?.enabled) {

@@ -22,7 +22,6 @@ import {
   ITikTokError,
   ITikTokLiveScopeResponse,
   ITikTokStartStreamResponse,
-  ITikTokUserInfoResponse,
   TTikTokLiveScopeTypes,
 } from './tiktok/api';
 import { I18nService } from 'services/i18n';
@@ -30,6 +29,7 @@ import { getDefined } from 'util/properties-type-guards';
 import * as remote from '@electron/remote';
 import { WindowsService } from 'services/windows';
 import Utils from 'services/utils';
+import { UsageStatisticsService } from 'services/usage-statistics';
 
 interface ITikTokServiceState extends IPlatformState {
   settings: ITikTokStartStreamSettings;
@@ -78,6 +78,7 @@ export class TikTokService
   };
 
   @Inject() windowsService: WindowsService;
+  @Inject() private usageStatisticsService: UsageStatisticsService;
 
   readonly apiBase = 'https://open-api.tiktok.com';
   readonly platform = 'tiktok';
@@ -364,6 +365,9 @@ export class TikTokService
   async prepopulateInfo(): Promise<void> {
     // fetch user live access status
     await this.validatePlatform();
+    this.usageStatisticsService.recordAnalyticsEvent('TikTokLiveAccess', {
+      status: this.scope,
+    });
 
     this.SET_PREPOPULATED(true);
   }

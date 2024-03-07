@@ -142,6 +142,17 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
   }
 
   /**
+   * Returns the host from the rtmp url
+   */
+  get enabledCustomDestinationHosts() {
+    return (
+      this.settings.customDestinations
+        .filter(dest => dest.enabled)
+        .map(dest => dest.url.split[2]) || []
+    );
+  }
+
+  /**
    * Returns a list of enabled platforms with useCustomFields==false
    */
   get platformsWithoutCustomFields(): TPlatform[] {
