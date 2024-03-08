@@ -4,10 +4,19 @@ import Translate from 'components-react/shared/Translate';
 import PlatformButton from 'components-react/shared/PlatformButton';
 import { shell } from 'electron';
 import styles from './Signup.m.less';
+import { Services } from 'components-react/service-provider';
 
-const openSLIDSignup = () => shell.openExternal('https://streamlabs.com/signup?electron=1');
+export default function Signup({
+  onSignupLinkClick,
+  onSuccess,
+}: {
+  onSignupLinkClick: () => void;
+  onSuccess: () => void;
+}) {
+  const { UserService } = Services;
 
-export default function Signup({ onSignupLinkClick }: { onSignupLinkClick: () => void }) {
+  const openSLIDSignup = () => UserService.startSLAuth({ signup: true }).then(onSuccess);
+
   return (
     <>
       <p className={styles.signupSubtitle}>
