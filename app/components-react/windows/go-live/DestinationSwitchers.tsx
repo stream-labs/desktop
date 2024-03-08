@@ -26,37 +26,39 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
     isPrimaryPlatform,
     isPrime,
   } = useGoLiveSettings();
+  // use these references to apply debounce
+  // for error handling and switch animation
   const enabledPlatformsRef = useRef(enabledPlatforms);
   enabledPlatformsRef.current = enabledPlatforms;
-
   const enabledDestRef = useRef(enabledDestinations);
   enabledDestRef.current = enabledDestinations;
 
+  // special handling for TikTok for non-ultra users
+  // to disable/enable platforms and open ultra link
+  const handleTikTok = !isPrime && linkedPlatforms.includes('tiktok');
   const disableSwitchers =
-    !isPrime &&
-    isPrimaryPlatform('tiktok') &&
-    (enabledPlatforms.length > 1 || enabledDestinations.length > 0);
+    handleTikTok && (enabledPlatforms.length > 1 || enabledDestinations.length > 0);
 
-  const emitPlatformSwitch = useDebounce(500, () => {
-    switchPlatforms(enabledPlatformsRef.current);
+  const emitSwitch = useDebounce(500, (ind?: number, enabled?: boolean) => {
+    if (ind !== undefined && enabled !== undefined) {
+      switchCustomDestination(ind, enabled);
+    } else {
+      switchPlatforms(enabledPlatformsRef.current);
+    }
   });
 
-  function isEnabled(platform: TPlatform) {
-    return enabledPlatformsRef.current.includes(platform);
+  function isEnabled(target: TPlatform | number) {
+    if (typeof target === 'number') {
+      return enabledDestRef.current.includes(target);
+    } else {
+      return enabledPlatformsRef.current.includes(target);
+    }
   }
 
   function togglePlatform(platform: TPlatform, enabled: boolean) {
     enabledPlatformsRef.current = enabledPlatformsRef.current.filter(p => p !== platform);
     if (enabled) enabledPlatformsRef.current.push(platform);
-    emitPlatformSwitch();
-  }
-
-  const emitDestSwitch = useDebounce(500, (ind: number, enabled: boolean) => {
-    switchCustomDestination(ind, enabled);
-  });
-
-  function isDestEnabled(ind: number) {
-    return enabledDestRef.current.includes(ind);
+    emitSwitch();
   }
 
   function toggleDest(ind: number, enabled: boolean) {
@@ -64,7 +66,7 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
     if (enabled) {
       enabledDestRef.current.push(ind);
     }
-    emitDestSwitch(ind, enabled);
+    emitSwitch(ind, enabled);
   }
 
   return (
@@ -76,17 +78,17 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
           enabled={isEnabled(platform)}
           onChange={enabled => togglePlatform(platform, enabled)}
           isPrimary={isPrimaryPlatform(platform)}
-          tiktokPrimary={isPrimaryPlatform('tiktok')}
-          disabled={disableSwitchers && !enabledPlatforms.includes(platform)}
+          handleTikTok={handleTikTok}
+          disabled={disableSwitchers && !isEnabled(platform)}
         />
       ))}
       {customDestinations?.map((dest, ind) => (
         <DestinationSwitcher
           key={ind}
           destination={dest}
-          enabled={isDestEnabled(ind)}
+          enabled={isEnabled(ind)}
           onChange={enabled => toggleDest(ind, enabled)}
-          disabled={disableSwitchers && !isDestEnabled(ind)}
+          disabled={disableSwitchers && !isEnabled(ind)}
         />
       ))}
     </div>
@@ -98,7 +100,7 @@ interface IDestinationSwitcherProps {
   enabled: boolean;
   onChange: (enabled: boolean) => unknown;
   isPrimary?: boolean;
-  tiktokPrimary?: boolean;
+  handleTikTok?: boolean;
   disabled?: boolean;
 }
 
@@ -133,8 +135,7 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
     if (
       RestreamService.views.canEnableRestream ||
       platform === 'tiktok' ||
-      p.tiktokPrimary ||
-      (!platform && !p.disabled)
+      ((p.handleTikTok || !platform) && !p.disabled)
     ) {
       const enable = !p.enabled;
       p.onChange(enable);
