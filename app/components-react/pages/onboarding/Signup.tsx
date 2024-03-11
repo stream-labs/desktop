@@ -15,7 +15,13 @@ export default function Signup({
 }) {
   const { UserService } = Services;
 
-  const openSLIDSignup = () => UserService.startSLAuth({ signup: true }).then(onSuccess);
+  const openSLIDSignup = () =>
+    UserService.startSLAuth({ signup: true })
+      .then((success: boolean) => {
+        if (!success) return;
+        onSuccess();
+      })
+      .catch(e => console.error('Signup Error: ', e));
 
   return (
     <>

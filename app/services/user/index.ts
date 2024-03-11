@@ -1009,11 +1009,14 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       this.SET_AUTH_STATE(EAuthProcessState.Idle);
     });
 
+    if (!auth) return false;
+
     this.LOGOUT();
     this.LOGIN(auth);
 
     // Find out if the user has any additional platforms linked
     await this.updateLinkedPlatforms();
+    return true;
   }
 
   /**
@@ -1064,13 +1067,17 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.SET_AUTH_STATE(EAuthProcessState.Loading);
     const onWindowShow = () => this.SET_AUTH_STATE(EAuthProcessState.Idle);
 
-    const auth = await this.authModule.startPkceAuth(authUrl, onWindowShow, () => {}, true);
-
-    this.SET_AUTH_STATE(EAuthProcessState.Loading);
-    this.SET_IS_RELOG(false);
-    this.SET_SLID(auth.slid);
-    this.SET_AUTH_STATE(EAuthProcessState.Idle);
-    return EPlatformCallResult.Success;
+    try {
+      const auth = await this.authModule.startPkceAuth(authUrl, onWindowShow, () => {}, true);
+      this.SET_AUTH_STATE(EAuthProcessState.Loading);
+      this.SET_IS_RELOG(false);
+      this.SET_SLID(auth.slid);
+      this.SET_AUTH_STATE(EAuthProcessState.Idle);
+      return EPlatformCallResult.Success;
+    } catch (e: unknown) {
+      console.error('Merge Account Error: ', e);
+      return EPlatformCallResult.Error;
+    }
   }
 
   /**

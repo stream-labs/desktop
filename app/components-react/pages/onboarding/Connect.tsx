@@ -254,8 +254,13 @@ export class LoginModule {
     this.UsageStatisticsService.recordAnalyticsEvent('PlatformLogin', platform);
 
     if (platform === 'streamlabs') {
-      await this.UserService.startSLAuth();
-      onSuccess();
+      await this.UserService.startSLAuth()
+        .then((success: boolean) => {
+          if (!success) return;
+          onSuccess();
+        })
+        .catch(e => console.error('Onboarding Authentication Error: ', e));
+
       return;
     }
 
@@ -283,6 +288,7 @@ export class LoginModule {
         });
     } else {
       // Currently we do not have special handling for generic errors
+      if (!result) return;
       onSuccess();
     }
   }

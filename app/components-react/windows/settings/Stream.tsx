@@ -404,7 +404,8 @@ function Platform(p: { platform: TPlatform }) {
   );
 
   const instagramConnect = async () => {
-    await UserService.actions.return.startAuth(platform, 'internal', true);
+    const success = await UserService.actions.return.startAuth(platform, 'internal', true);
+    if (!success) return;
     setShowInstagramFields(true);
   };
 
