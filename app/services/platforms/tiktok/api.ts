@@ -38,9 +38,21 @@ export interface ITikTokLiveScopeResponse {
   can_be_live: boolean;
   reason: ETikTokLiveScopeReason;
   platform: TPlatform | string;
-  user: {
-    username: string;
-  };
+  user: ITikTokUserData;
+}
+
+export interface ITikTokUserData {
+  open_id?: string;
+  union_id?: string;
+  username: string;
+  avatar_url?: string;
+  is_verified?: false;
+  likes_count?: number;
+  video_count?: number;
+  display_name?: string;
+  follower_count?: number;
+  following_count?: number;
+  profile_deep_link?: string;
 }
 
 export interface ITikTokError {

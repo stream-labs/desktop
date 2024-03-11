@@ -128,11 +128,6 @@ export function TikTokEnterCredentialsFormInfo(p: IPlatformComponentParams<'tikt
   );
 }
 
-function openStreamPage() {
-  const username = Services.TikTokService.username;
-  remote.shell.openExternal(`https://www.tiktok.com/@${username}/live`);
-}
-
 function openInfoPage() {
   remote.shell.openExternal(Services.TikTokService.infoUrl);
 }
@@ -143,5 +138,5 @@ function openApplicationInfoPage() {
 
 function openProducer() {
   const locale = Services.TikTokService.locale;
-  remote.shell.openExternal(`https://livecenter.tiktok.com/producer?lang=${locale}`);
+  remote.shell.openExternal(Services.TikTokService.legacyDashboardUrl);
 }

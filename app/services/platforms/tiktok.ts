@@ -409,12 +409,18 @@ export class TikTokService
     return '';
   }
 
+  // opens the live center for users with approved live access accounts
   get dashboardUrl(): string {
     return `https://livecenter.tiktok.com/live_monitor?lang=${this.locale}`;
   }
 
+  // opens the producer for legacy users with approval for stream keys and server urls
+  get legacyDashboardUrl(): string {
+    return `https://livecenter.tiktok.com/producer?lang=${this.locale}`;
+  }
+
   get infoUrl(): string {
-    return `https://streamlabs.com/content-hub/post/how-to-livestream-from-your-tiktok-account-using-streamlabs-from-web?lang=${this.locale}`;
+    return 'https://streamlabs.com/content-hub/post/streamlabs-announces-integration-with-tiktok';
   }
 
   get applicationUrl(): string {
@@ -425,7 +431,7 @@ export class TikTokService
     return I18nService.instance.state.locale;
   }
 
-  // TODO: replace temporary string with `official activity ID`
+  // this is Streamlabs' app id
   get id(): string {
     return 'GL6399433079641606942';
   }
