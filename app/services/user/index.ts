@@ -1009,14 +1009,14 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       this.SET_AUTH_STATE(EAuthProcessState.Idle);
     });
 
-    if (!auth) return false;
+    if (!auth) return EPlatformCallResult.Error;
 
     this.LOGOUT();
     this.LOGIN(auth);
 
     // Find out if the user has any additional platforms linked
     await this.updateLinkedPlatforms();
-    return true;
+    return EPlatformCallResult.Success;
   }
 
   /**

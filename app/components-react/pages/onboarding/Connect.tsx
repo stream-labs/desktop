@@ -255,8 +255,8 @@ export class LoginModule {
 
     if (platform === 'streamlabs') {
       await this.UserService.startSLAuth()
-        .then((success: boolean) => {
-          if (!success) return;
+        .then((success: EPlatformCallResult) => {
+          if (success !== EPlatformCallResult.Success) return;
           onSuccess();
         })
         .catch(e => console.error('Onboarding Authentication Error: ', e));
@@ -288,7 +288,6 @@ export class LoginModule {
         });
     } else {
       // Currently we do not have special handling for generic errors
-      if (!result) return;
       onSuccess();
     }
   }

@@ -11,7 +11,6 @@ import crypto from 'crypto';
 import { Inject } from 'services/core';
 import { HostsService } from 'app-services';
 import { jfetch } from 'util/requests';
-import { $t } from 'services/i18n';
 
 interface IPkceAuthResponse {
   data: {
@@ -58,20 +57,7 @@ export class AuthModule {
     const partition = `persist:${uuid()}`;
 
     if (external) {
-      const success = await this.externalLogin(authUrl, codeChallenge, merge, onWindowShow);
-
-      if (!success) {
-        remote.dialog.showErrorBox(
-          $t('Error'),
-          $t(
-            'This account is already linked to another Streamlabs Account. Please use a different account.',
-          ),
-        );
-        const win = Utils.getMainWindow();
-        win.setAlwaysOnTop(true);
-        win.show();
-        win.focus();
-      }
+      await this.externalLogin(authUrl, codeChallenge, merge, onWindowShow);
     } else {
       await this.internalLogin(
         authUrl,
@@ -133,8 +119,7 @@ export class AuthModule {
     codeChallenge: string,
     merge: boolean,
     onWindowShow: () => void,
-  ): Promise<boolean> {
-    let success = false;
+  ) {
     await new Promise<void>(resolve => {
       if (this.authServer) {
         this.authServer.close();
@@ -150,8 +135,6 @@ export class AuthModule {
             query['success'] === 'false' ||
             ['connected_with_another_account', 'unknown'].includes(query['reason'])
           ) {
-            success = false;
-            // redirect
             response.writeHead(302, {
               Location: 'https://streamlabs.com/dashboard#/settings/account-settings/platforms',
             });
@@ -199,8 +182,6 @@ export class AuthModule {
     win.show();
     win.focus();
     win.setAlwaysOnTop(false);
-
-    return success;
   }
 
   private async internalLogin(

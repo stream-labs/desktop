@@ -4,7 +4,7 @@ import { $t } from 'services/i18n';
 import { EPlatformCallResult, getPlatformService, TPlatform } from '../../services/platforms';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
-import Utils from 'services/utils';
+import { alertAsync } from 'components-react/modals';
 
 interface IPlatformMergeProps {
   params: {
@@ -45,9 +45,14 @@ export default function PlatformMerge(p: IPlatformMergeProps) {
       .startAuth(platform, mode, true)
       .then(res => {
         if (res === EPlatformCallResult.Error) {
-          NavigationService.actions.navigate('Studio');
-          const win = Utils.getMainWindow();
-          win.setAlwaysOnTop(false);
+          WindowsService.actions.setWindowOnTop();
+          alertAsync(
+            $t(
+              'This account is already linked to another Streamlabs Account. Please use a different account.',
+            ),
+          ).then(() => {
+            NavigationService.actions.navigate('Studio');
+          });
           return;
         }
 
