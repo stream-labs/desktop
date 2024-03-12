@@ -74,7 +74,7 @@ async function rtvc() {
   // cwd is node_modules
   log_info('copy rtvc');
 
-  const url = 'https://api.github.com/repos/n-air-app/private/releases/assets/147646233';
+  const url = 'https://api.github.com/repos/n-air-app/rtvc_runtime/releases/assets/156223196';
   const zip = './nair-rtvc.tar.gz';
   const dst = './obs-studio-node/obs-plugins/64bit/';
 
@@ -82,7 +82,7 @@ async function rtvc() {
     log_info('use existing file');
     sh.cp('../nair-rtvc.tar.gz', zip);
   } else {
-    const token = process.env['ghtoken'];
+    const token = process.env['github_token'];
 
     const param = { headers: { Accept: 'application/octet-stream' } };
     if (token) param.headers.Authorization = `Bearer ${token}`;
