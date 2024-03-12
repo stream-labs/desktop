@@ -64,7 +64,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   @Inject() private windowsService: WindowsService;
   @Inject() private audioService: AudioService;
   @Inject() private userService: UserService;
-  @Inject() rtvcStateService: RtvcStateService;
+  @Inject() private rtvcStateService: RtvcStateService;
 
   /**
    * Maps a source id to a property manager

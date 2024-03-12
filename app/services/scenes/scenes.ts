@@ -155,7 +155,7 @@ export class ScenesService extends StatefulService<IScenesState> {
   @Inject() private windowsService: WindowsService;
   @Inject() private sourcesService: SourcesService;
   @Inject() private transitionsService: TransitionsService;
-  @Inject() rtvcStateService: RtvcStateService;
+  @Inject() private rtvcStateService: RtvcStateService;
 
   @mutation()
   private ADD_SCENE(id: string, name: string) {

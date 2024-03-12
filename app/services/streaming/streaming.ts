@@ -69,7 +69,7 @@ export class StreamingService
   @Inject() private nicoliveProgramService: NicoliveProgramService;
   @Inject() private videoSettingsService: VideoSettingsService;
   @Inject() private customcastUsageService: CustomcastUsageService;
-  @Inject() rtvcStateService: RtvcStateService;
+  @Inject() private rtvcStateService: RtvcStateService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
