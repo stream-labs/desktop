@@ -49,6 +49,7 @@
     animation: live-color 3s infinite;
   }
 }
+
 @keyframes live-color {
   0% {
     fill: @red;
@@ -62,17 +63,18 @@
     fill: @red;
   }
 }
+
 @keyframes live-shadow {
   0% {
-    box-shadow: 0 0 3px 3px rgb(255 0 0 / 40%);
+    box-shadow: 0 0 3px 3px rgba(255, 0, 0, 40%);
   }
 
   50% {
-    box-shadow: 0 0 0 0 rgb(255 0 0 / 0%);
+    box-shadow: 0 0 0 0 rgba(255, 0, 0, 0%);
   }
 
   100% {
-    box-shadow: 0 0 3px 3px rgb(255 0 0 / 40%);
+    box-shadow: 0 0 3px 3px rgba(255, 0, 0, 40%);
   }
 }
 
