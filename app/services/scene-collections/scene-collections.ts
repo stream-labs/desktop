@@ -43,6 +43,7 @@ import * as remote from '@electron/remote';
 import { GuestCamNode } from './nodes/guest-cam';
 import { DualOutputService } from 'services/dual-output';
 import { NodeMapNode } from './nodes/node-map';
+import { VideoSettingsService } from 'services/settings-v2';
 
 const uuid = window['require']('uuid/v4');
 
@@ -91,6 +92,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   @Inject() transitionsService: TransitionsService;
   @Inject() streamingService: StreamingService;
   @Inject() dualOutputService: DualOutputService;
+  @Inject() videoSettingsService: VideoSettingsService;
   @Inject() private defaultHardwareService: DefaultHardwareService;
 
   collectionAdded = new Subject<ISceneCollectionsManifestEntry>();
@@ -130,14 +132,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
         if (collection.modified > latestModified) {
           latestModified = collection.modified;
           latestId = collection.id;
-        }
-
-        /**
-         * before dual output, collections did not have the scene node map property
-         * so add it here on load
-         */
-        if (!collection.hasOwnProperty('sceneNodeMaps')) {
-          collection.sceneNodeMaps = {};
         }
       });
 
@@ -222,9 +216,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   async create(
     options: ISceneCollectionInternalCreateOptions = {},
   ): Promise<ISceneCollectionsManifestEntry> {
-    if (this.dualOutputService.views.dualOutputMode) {
-      this.dualOutputService.actions.setIsCollectionOrSceneLoading(true);
-    }
     await this.deloadCurrentApplicationState();
 
     const name = options.name || this.suggestName(DEFAULT_COLLECTION_NAME);
@@ -1023,6 +1014,10 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    */
 
   initNodeMaps(sceneNodeMap?: { [sceneId: string]: Dictionary<string> }) {
+    if (!this.videoSettingsService.contexts.vertical) {
+      this.videoSettingsService.establishVideoContext('vertical');
+    }
+
     if (!this.activeCollection) return;
 
     this.stateService.initNodeMaps(sceneNodeMap);
