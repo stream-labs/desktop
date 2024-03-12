@@ -34,15 +34,11 @@ type SetParamKey =
   },
 })
 export default class RtvcSourceProperties extends SourceProperties {
-  @Inject() rtvcStateService: RtvcStateService;
-  @Inject() audioService: AudioService;
+  @Inject() private rtvcStateService: RtvcStateService;
+  @Inject() private audioService: AudioService;
   @Inject() private scenesService: ScenesService;
 
   readonly manualMax = 5;
-
-  // default
-  // input_gain=0.0 output_gain=0.0 pitch_shift:0.0 picth_shift_mode=1 snap=0.0
-  // primary=100 secondary=-1 amonut=0.0
 
   initialMonitoringType: obs.EMonitoringType;
   currentMonitoringType: obs.EMonitoringType;
@@ -93,24 +89,23 @@ export default class RtvcSourceProperties extends SourceProperties {
     this.canAdd = this.manualList.length < this.manualMax;
   }
 
-  // マニュアル操作で選べないvoice
-  // value,description (indexはsecondaryなどでずれるのでvalueでチェックすること)
+  // preset voices
   // 100 kotoyomi_nia
   // 101 zundamon
   // 103 kasukabe_tsumugi
-  //readonly nonManualVoiceValues = [100, 101, 102];
 
   get primaryVoiceList() {
     return jvsList;
-    //return this.getPropertyOptions('primary_voice').filter(a => !this.nonManualVoiceValues.includes(a.value))
   }
+
   get secondaryVoiceList() {
     return [{ description: 'なし', value: -1 }, ...jvsList];
-    //return this.getPropertyOptions('secondary_voice').filter(a => !this.nonManualVoiceValues.includes(a.value))
   }
+
   get deviceList() {
     return this.getSourcePropertyOptions('device');
   }
+
   get latencyList() {
     return this.getSourcePropertyOptions('latency');
   }
@@ -136,8 +131,8 @@ export default class RtvcSourceProperties extends SourceProperties {
     const optionInList = (list: IObsListOption<number>[], value: number) =>
       list.find(a => a.value === value) ?? { description: '', value }; // 100以上等はリストにないのでスルー
 
-    this.primaryVoiceModel = optionInList(this.primaryVoiceList, this.primaryVoice); //this.getPropertyOptionByValue('primary_voice', this.primaryVoice)
-    this.secondaryVoiceModel = optionInList(this.secondaryVoiceList, this.secondaryVoice); //this.getPropertyOptionByValue('secondary_voice', this.secondaryVoice)
+    this.primaryVoiceModel = optionInList(this.primaryVoiceList, this.primaryVoice);
+    this.secondaryVoiceModel = optionInList(this.secondaryVoiceList, this.secondaryVoice);
     this.deviceModel = this.getSourcePropertyOption('device', this.device);
     this.latencyModel = this.getSourcePropertyOption('latency', this.latency);
 

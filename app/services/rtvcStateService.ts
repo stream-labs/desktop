@@ -120,7 +120,6 @@ export class RtvcStateService extends PersistentStatefulService<IRtvcState> {
       if (v.key === 'latency') this.eventLog.latency = v.value as number;
       const prop = props.find(a => a.name === v.key);
       if (!prop || prop.value === v.value) continue; // no need change
-      //console.log(`${v.key} change ${prop.value} to ${v.value}`);
       prop.value = v.value;
     }
 
@@ -259,7 +258,6 @@ export class RtvcStateService extends PersistentStatefulService<IRtvcState> {
   }
 
   didAddSource(source: ISourceApi) {
-    //console.log('didAddSource');
     const props = source.getPropertiesFormData();
     const p = props.find(a => a.name === 'latency');
     if (p) this.eventLog.latency = p.value as number;
@@ -268,18 +266,14 @@ export class RtvcStateService extends PersistentStatefulService<IRtvcState> {
   }
 
   didRemoveSource(source: ISourceApi) {
-    //console.log('didRemoveSource');
     this.isSouceActive = false;
   }
 
   startStreaming() {
-    //console.log('startStreaming');
     this.eventLog.used = this.isSouceActive;
     this.eventLog.param = {}; // once reset
     this.modifyEventLog();
   }
 
-  stopStreaming() {
-    //console.log('stopStreaming');
-  }
+  stopStreaming() {}
 }
