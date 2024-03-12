@@ -59,6 +59,7 @@ interface IItemSchema {
 
   visible?: boolean;
   display?: TDisplayType;
+  locked: boolean;
 }
 
 export interface IFolderSchema {
@@ -122,6 +123,7 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
           settings: filter.settings,
         };
       }),
+      locked: sceneNode.locked,
     };
 
     if (sceneNode.getObsInput().audioMixers) {
@@ -338,6 +340,8 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
     }
 
     this.adjustTransform(sceneItem, obj);
+    this.setLockedStatus(sceneItem, obj);
+
     if (!existing) {
       await obj.content.load({
         sceneItem,
@@ -375,5 +379,11 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
       crop: obj.crop,
       rotation: obj.rotation,
     });
+  }
+
+  setLockedStatus(item: SceneItem, obj: IItemSchema) {
+    if (obj.locked === true) {
+      item.setLocked(true);
+    }
   }
 }
