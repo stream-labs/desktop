@@ -67,6 +67,10 @@ export class AuthModule {
             'This account is already linked to another Streamlabs Account. Please use a different account.',
           ),
         );
+        const win = Utils.getMainWindow();
+        win.setAlwaysOnTop(true);
+        win.show();
+        win.focus();
       }
     } else {
       await this.internalLogin(
@@ -147,7 +151,8 @@ export class AuthModule {
             ['connected_with_another_account', 'unknown'].includes(query['reason'])
           ) {
             success = false;
-            response.writeHead(401, {
+            // redirect
+            response.writeHead(302, {
               Location: 'https://streamlabs.com/dashboard#/settings/account-settings/platforms',
             });
             response.end();

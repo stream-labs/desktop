@@ -71,7 +71,7 @@ export enum ETikTokErrorTypes {
   SCOPE_NOT_AUTHORIZED = 'scope_not_authorized',
   SCOPE_PERMISSION_MISSED = 'scope_permission_missed',
   USER_HAS_NO_LIVE_AUTH = 'user_has_no_live_auth',
-  TIKTOK_STREAM_ACTIVE = 'user_hold_living_room_in_TikTok_Platform',
+  TIKTOK_ALREADY_LIVE = 'user_already_live',
   OK = 'ok',
 }
 

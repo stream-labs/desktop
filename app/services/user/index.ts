@@ -1145,8 +1145,12 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
       result = await this.login(service, auth);
     } else {
-      this.UPDATE_PLATFORM(auth.platforms[auth.primaryPlatform]);
-      result = EPlatformCallResult.Success;
+      if (auth) {
+        this.UPDATE_PLATFORM(auth.platforms[auth.primaryPlatform]);
+        result = EPlatformCallResult.Success;
+      } else {
+        result = EPlatformCallResult.Error;
+      }
     }
 
     this.SET_AUTH_STATE(EAuthProcessState.Idle);

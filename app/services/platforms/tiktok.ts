@@ -6,11 +6,11 @@ import {
   IPlatformService,
   IPlatformState,
   TPlatformCapability,
-  TStartStreamOptions,
 } from './index';
 import { authorizedHeaders, jfetch } from '../../util/requests';
 import { throwStreamError } from '../streaming/stream-error';
 import { platformAuthorizedRequest } from './utils';
+import { getOS } from 'util/operating-systems';
 import { IGoLiveSettings } from '../streaming';
 import { TOutputOrientation } from 'services/restream';
 import { IVideo } from 'obs-studio-node';
@@ -80,7 +80,7 @@ export class TikTokService
   @Inject() windowsService: WindowsService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
 
-  readonly apiBase = 'https://open-api.tiktok.com';
+  readonly apiBase = 'https://open.tiktokapis.com/v2';
   readonly platform = 'tiktok';
   readonly displayName = 'TikTok';
   readonly capabilities = new Set<TPlatformCapability>(['title', 'viewerCount']);
@@ -195,6 +195,8 @@ export class TikTokService
     });
   }
 
+  // Note, this needs to be here but should never be called, because we
+  // currently don't make any calls directly to TikTok
   async fetchNewToken(): Promise<void> {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/tiktok/refresh`;
@@ -254,7 +256,7 @@ export class TikTokService
         ETikTokErrorTypes.SCOPE_PERMISSION_MISSED,
         ETikTokErrorTypes.USER_HAS_NO_LIVE_AUTH,
       ].includes(code);
-      const hasStream = code === ETikTokErrorTypes.TIKTOK_STREAM_ACTIVE;
+      const hasStream = code === ETikTokErrorTypes.TIKTOK_ALREADY_LIVE;
 
       const message = notApproved
         ? 'The user is not enabled for live streaming'
@@ -279,12 +281,21 @@ export class TikTokService
     }
   }
 
+  /**
+   * Starts the stream
+   * @remark If a user is live and attempts to go live via another
+   * another streaming method such as TikTok's app, this stream will continue
+   * and the other stream will be prevented from going live. If another instance
+   * of Streamlabs attempts to go live to TikTok, the first stream will be ended
+   * and Desktop will enter a reconnecting state, which eventually times out.
+   */
   async startStream(opts: ITikTokStartStreamOptions) {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/tiktok/stream/start`;
     const headers = authorizedHeaders(this.userService.apiToken!);
     const body = new FormData();
     body.append('title', opts.title);
+    body.append('device_platform', getOS());
     const request = new Request(url, { headers, method: 'POST', body });
 
     return jfetch<ITikTokStartStreamResponse>(request);

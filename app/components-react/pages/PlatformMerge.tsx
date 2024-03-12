@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { EAuthProcessState } from 'services/user';
 import { $t } from 'services/i18n';
-import { getPlatformService, TPlatform } from '../../services/platforms';
+import { EPlatformCallResult, getPlatformService, TPlatform } from '../../services/platforms';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
+import Utils from 'services/utils';
 
 interface IPlatformMergeProps {
   params: {
@@ -20,6 +21,7 @@ export default function PlatformMerge(p: IPlatformMergeProps) {
     NavigationService,
     StreamSettingsService,
     SceneCollectionsService,
+    WindowsService,
   } = Services;
 
   const [showOverlay, setShowOverlay] = useState(false);
@@ -39,20 +41,33 @@ export default function PlatformMerge(p: IPlatformMergeProps) {
     const mode = ['youtube', 'twitch', 'twitter', 'tiktok'].includes(platform)
       ? 'external'
       : 'internal';
-    await UserService.actions.return.startAuth(platform, mode, true);
+    await UserService.actions.return
+      .startAuth(platform, mode, true)
+      .then(res => {
+        if (res === EPlatformCallResult.Error) {
+          NavigationService.actions.navigate('Studio');
+          const win = Utils.getMainWindow();
+          win.setAlwaysOnTop(false);
+          return;
+        }
 
-    if (p.params.highlighter) {
-      NavigationService.actions.navigate('Highlighter');
-      return;
-    }
+        if (p.params.highlighter) {
+          NavigationService.actions.navigate('Highlighter');
+          return;
+        }
 
-    StreamSettingsService.actions.setSettings({ protectedModeEnabled: true });
+        StreamSettingsService.actions.setSettings({ protectedModeEnabled: true });
 
-    if (p.params.overlayUrl) {
-      setShowOverlay(true);
-    } else {
-      NavigationService.actions.navigate('Studio');
-    }
+        if (p.params.overlayUrl) {
+          setShowOverlay(true);
+        } else {
+          NavigationService.actions.navigate('Studio');
+        }
+      })
+      .catch(e => {
+        NavigationService.actions.navigate('Studio');
+        WindowsService.actions.setWindowOnTop();
+      });
   }
 
   async function installOverlay() {
