@@ -41,7 +41,8 @@ class GoLiveSettingsState extends StreamInfoView<IGoLiveSettingsState> {
     const newSettings = { ...this.state, ...patch };
     // we should re-calculate common fields before applying new settings
     const platforms = this.getViewFromState(newSettings).applyCommonFields(newSettings.platforms);
-    Object.assign(this.state, { ...newSettings, platforms });
+    const customDestinations = newSettings?.customDestinations;
+    Object.assign(this.state, { ...newSettings, platforms, customDestinations });
   }
   /**
    * Update settings for a specific platforms
@@ -192,6 +193,10 @@ export class GoLiveSettingsModule {
     this.state.updateSettings(settings);
   }
 
+  get isPrime() {
+    return Services.UserService.isPrime;
+  }
+
   /**
    * Get go live settings
    */
@@ -216,6 +221,16 @@ export class GoLiveSettingsModule {
     });
     this.save(this.state.settings);
     this.prepopulate();
+  }
+
+  get enabledDestinations() {
+    return this.state.customDestinations.reduce(
+      (enabled: number[], dest: ICustomStreamDestination, index: number) => {
+        if (dest.enabled) enabled.push(index);
+        return enabled;
+      },
+      [],
+    );
   }
 
   /**
@@ -247,6 +262,12 @@ export class GoLiveSettingsModule {
    * Validate the form and show an error message
    */
   async validate() {
+    // tiktok live authorization error
+    if (this.state.isEnabled('tiktok') && !Services.TikTokService.liveStreamingEnabled) {
+      message.error($t('Streaming to TikTok not approved.'));
+      return false;
+    }
+
     if (Services.DualOutputService.views.dualOutputMode && !this.getCanStreamDualOutput()) {
       message.error(
         $t(

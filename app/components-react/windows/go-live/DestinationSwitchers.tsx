@@ -15,25 +15,44 @@ import { alertAsync } from '../../modals';
 /**
  * Allows enabling/disabling platforms and custom destinations for the stream
  */
-export function DestinationSwitchers() {
+export function DestinationSwitchers(p: { showSelector?: boolean }) {
   const {
     linkedPlatforms,
     enabledPlatforms,
     customDestinations,
+    enabledDestinations,
     switchPlatforms,
     switchCustomDestination,
     isPrimaryPlatform,
-    componentView,
+    isPrime,
   } = useGoLiveSettings();
+  // use these references to apply debounce
+  // for error handling and switch animation
   const enabledPlatformsRef = useRef(enabledPlatforms);
   enabledPlatformsRef.current = enabledPlatforms;
+  const enabledDestRef = useRef(enabledDestinations);
+  enabledDestRef.current = enabledDestinations;
 
-  const emitSwitch = useDebounce(500, () => {
-    switchPlatforms(enabledPlatformsRef.current);
+  // special handling for TikTok for non-ultra users
+  // to disable/enable platforms and open ultra link
+  const handleTikTok = !isPrime && linkedPlatforms.includes('tiktok');
+  const disableSwitchers =
+    handleTikTok && (enabledPlatforms.length > 1 || enabledDestinations.length > 0);
+
+  const emitSwitch = useDebounce(500, (ind?: number, enabled?: boolean) => {
+    if (ind !== undefined && enabled !== undefined) {
+      switchCustomDestination(ind, enabled);
+    } else {
+      switchPlatforms(enabledPlatformsRef.current);
+    }
   });
 
-  function isEnabled(platform: TPlatform) {
-    return enabledPlatformsRef.current.includes(platform);
+  function isEnabled(target: TPlatform | number) {
+    if (typeof target === 'number') {
+      return enabledDestRef.current.includes(target);
+    } else {
+      return enabledPlatformsRef.current.includes(target);
+    }
   }
 
   function togglePlatform(platform: TPlatform, enabled: boolean) {
@@ -42,8 +61,16 @@ export function DestinationSwitchers() {
     emitSwitch();
   }
 
+  function toggleDest(ind: number, enabled: boolean) {
+    enabledDestRef.current = enabledDestRef.current.filter(index => index !== ind);
+    if (enabled) {
+      enabledDestRef.current.push(ind);
+    }
+    emitSwitch(ind, enabled);
+  }
+
   return (
-    <div>
+    <div className={styles.switchWrapper}>
       {linkedPlatforms.map(platform => (
         <DestinationSwitcher
           key={platform}
@@ -51,14 +78,17 @@ export function DestinationSwitchers() {
           enabled={isEnabled(platform)}
           onChange={enabled => togglePlatform(platform, enabled)}
           isPrimary={isPrimaryPlatform(platform)}
+          handleTikTok={handleTikTok}
+          disabled={disableSwitchers && !isEnabled(platform)}
         />
       ))}
       {customDestinations?.map((dest, ind) => (
         <DestinationSwitcher
           key={ind}
           destination={dest}
-          enabled={customDestinations[ind].enabled}
-          onChange={enabled => switchCustomDestination(ind, enabled)}
+          enabled={isEnabled(ind)}
+          onChange={enabled => toggleDest(ind, enabled)}
+          disabled={disableSwitchers && !isEnabled(ind)}
         />
       ))}
     </div>
@@ -70,12 +100,17 @@ interface IDestinationSwitcherProps {
   enabled: boolean;
   onChange: (enabled: boolean) => unknown;
   isPrimary?: boolean;
+  handleTikTok?: boolean;
+  disabled?: boolean;
 }
 
 /**
  * Render a single switcher
  */
-function DestinationSwitcher(p: IDestinationSwitcherProps) {
+// disable `func-call-spacing` and `no-spaced-func` rules
+// to pass back reference to addClass function
+// eslint-disable-next-line
+const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, ref) => {
   const switchInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const platform = typeof p.destination === 'string' ? (p.destination as TPlatform) : null;
@@ -90,7 +125,18 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
       );
       return;
     }
-    if (RestreamService.views.canEnableRestream) {
+
+    if (p.disabled) {
+      alertAsync($t('Subscribe to Ultra to add more destinations.'));
+      MagicLinkService.actions.linkToPrime('slobs-multistream');
+      return;
+    }
+
+    if (
+      RestreamService.views.canEnableRestream ||
+      platform === 'tiktok' ||
+      ((p.handleTikTok || !platform) && !p.disabled)
+    ) {
       const enable = !p.enabled;
       p.onChange(enable);
       // always proxy the click to the SwitchInput
@@ -105,6 +151,23 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
     } else {
       MagicLinkService.actions.linkToPrime('slobs-multistream');
     }
+  }
+
+  function addClass() {
+    containerRef.current?.classList.remove(styles.platformDisabled);
+  }
+
+  function removeClass() {
+    if (p.isPrimary) {
+      alertAsync(
+        $t(
+          'You cannot disable the platform you used to sign in to Streamlabs Desktop. Please sign in with a different platform to disable streaming to this destination.',
+        ),
+      );
+      return;
+    }
+    p.onChange(false);
+    containerRef.current?.classList.add(styles.platformDisabled);
   }
 
   const { title, description, Switch, Logo } = (() => {
@@ -125,7 +188,7 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
             inputRef={switchInputRef}
             value={p.enabled}
             name={platform}
-            disabled={p.isPrimary}
+            disabled={p.isPrimary || p.disabled}
             uncontrolled
           />
         ),
@@ -142,6 +205,7 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
             inputRef={switchInputRef}
             value={destination.enabled}
             name={`destination_${destination.name}`}
+            disabled={p.disabled}
             uncontrolled
           />
         ),
@@ -171,4 +235,4 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
       </div>
     </div>
   );
-}
+});

@@ -67,7 +67,7 @@ export { YoutubeService } from 'services/platforms/youtube';
 export { TwitchService } from 'services/platforms/twitch';
 export { TwitchTagsService } from 'services/platforms/twitch/index';
 export { FacebookService } from 'services/platforms/facebook';
-export { TiktokService } from 'services/platforms/tiktok';
+export { TikTokService } from 'services/platforms/tiktok';
 export { TrovoService } from 'services/platforms/trovo';
 export { RestreamService } from 'services/restream';
 export { TwitterService } from 'services/integrations/twitter';
@@ -145,6 +145,7 @@ import { TwitchTagsService } from './services/platforms/twitch/index';
 import { TrovoService } from './services/platforms/trovo';
 import { YoutubeService } from './services/platforms/youtube';
 import { FacebookService } from './services/platforms/facebook';
+import { TikTokService } from './services/platforms/tiktok';
 import { DismissablesService } from './services/dismissables';
 import { NavigationService } from './services/navigation';
 import { AnnouncementsService } from './services/announcements';
@@ -219,6 +220,7 @@ export const AppServices = {
   TwitterService,
   YoutubeService,
   FacebookService,
+  TikTokService,
   UserService,
   TwitchService,
   TwitterPlatformService,

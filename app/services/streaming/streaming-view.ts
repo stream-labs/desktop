@@ -113,18 +113,21 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
 
   /**
    * Returns a list of linked platforms available for restream
+   * @remark If TikTok is linked, users can always stream to it
    */
   get linkedPlatforms(): TPlatform[] {
     if (!this.userView.state.auth) return [];
 
-    if (
+    if (this.isPlatformLinked('tiktok')) {
+      return this.allPlatforms.filter(p => this.isPlatformLinked(p)).concat();
+    } else if (
       (!this.restreamView.canEnableRestream || !this.protectedModeEnabled) &&
       !this.isDualOutputMode
     ) {
       return [this.userView.auth!.primaryPlatform];
+    } else {
+      return this.allPlatforms.filter(p => this.isPlatformLinked(p));
     }
-
-    return this.allPlatforms.filter(p => this.isPlatformLinked(p));
   }
 
   get protectedModeEnabled() {
@@ -136,6 +139,17 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
    */
   get enabledPlatforms(): TPlatform[] {
     return this.getEnabledPlatforms(this.settings.platforms);
+  }
+
+  /**
+   * Returns the host from the rtmp url
+   */
+  get enabledCustomDestinationHosts() {
+    return (
+      this.settings.customDestinations
+        .filter(dest => dest.enabled)
+        .map(dest => dest.url.split[2]) || []
+    );
   }
 
   /**
