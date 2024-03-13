@@ -2,6 +2,9 @@ import { getPlatformService, TPlatform } from '../platforms';
 import { $t } from 'services/i18n';
 import { Services } from '../../components-react/service-provider';
 
+// the `message` is shown to the user in the error notification
+// the `action` is included in the diag report for further specificity
+// about the error for debugging and support
 export const errorTypes = {
   PLATFORM_REQUEST_FAILED: {
     get message() {

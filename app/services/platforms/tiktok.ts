@@ -245,7 +245,7 @@ export class TikTokService
 
             return this.requestTikTok(updatedReqInfo);
           } else {
-            console.log('Failed platform request', reqInfo);
+            console.error('Failed platform request', reqInfo);
             return Promise.reject(e);
           }
         });
@@ -278,6 +278,8 @@ export class TikTokService
         // show error stream exists
         throwStreamError('TIKTOK_STREAM_ACTIVE', e as any, details);
       }
+
+      return Promise.reject(e);
     }
   }
 
