@@ -101,14 +101,23 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
       };
     }
 
+    const baseWidth =
+      sceneNode.display === 'vertical' && this.videoService.baseResolutions.vertical
+        ? this.videoService.baseResolutions.vertical.baseWidth
+        : this.videoService.baseWidth;
+    const baseHeight =
+      sceneNode.display === 'vertical' && this.videoService.baseResolutions.vertical
+        ? this.videoService.baseResolutions.vertical.baseHeight
+        : this.videoService.baseHeight;
+
     const details: Partial<IItemSchema> = {
       id: sceneNode.id,
       sceneNodeType: 'item',
       name: sceneNode.name,
-      x: sceneNode.transform.position.x / this.videoService.baseWidth,
-      y: sceneNode.transform.position.y / this.videoService.baseHeight,
-      scaleX: sceneNode.transform.scale.x / this.videoService.baseWidth,
-      scaleY: sceneNode.transform.scale.y / this.videoService.baseHeight,
+      x: sceneNode.transform.position.x / baseWidth,
+      y: sceneNode.transform.position.y / baseHeight,
+      scaleX: sceneNode.transform.scale.x / baseWidth,
+      scaleY: sceneNode.transform.scale.y / baseHeight,
       crop: sceneNode.transform.crop,
       rotation: sceneNode.transform.rotation,
       visible: sceneNode.visible,
