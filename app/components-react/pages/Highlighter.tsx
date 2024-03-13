@@ -1,5 +1,6 @@
-import { useVuex } from 'components-react/hooks';
 import React, { useEffect, useState } from 'react';
+import cx from 'classnames';
+import { useVuex } from 'components-react/hooks';
 import { Services } from 'components-react/service-provider';
 import styles from './Highlighter.m.less';
 import { IClip } from 'services/highlighter';
@@ -25,7 +26,7 @@ import * as remote from '@electron/remote';
 
 type TModal = 'trim' | 'export' | 'preview' | 'remove';
 
-export default function Highlighter() {
+export default function Highlighter(p: { className?: string }) {
   const { HighlighterService, HotkeysService, UsageStatisticsService } = Services;
   const v = useVuex(() => ({
     clips: HighlighterService.views.clips as IClip[],
@@ -228,7 +229,7 @@ export default function Highlighter() {
     return (
       <div
         style={{ width: '100%', display: 'flex' }}
-        className={styles.clipsViewRoot}
+        className={cx(styles.clipsViewRoot, p.className)}
         onDrop={onDrop}
       >
         <Scrollable style={{ flexGrow: 1, padding: '20px 0 20px 20px' }}>

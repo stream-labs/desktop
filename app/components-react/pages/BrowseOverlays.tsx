@@ -11,6 +11,7 @@ import { Services } from 'components-react/service-provider';
 
 export default function BrowseOverlays(p: {
   params: { type?: 'overlay' | 'widget-themes' | 'site-themes'; id?: string };
+  className?: string;
 }) {
   const {
     UserService,
@@ -137,6 +138,7 @@ export default function BrowseOverlays(p: {
   if (!overlaysUrl) return <></>;
   return (
     <BrowserView
+      className={p.className}
       onReady={onBrowserViewReady}
       src={overlaysUrl}
       style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}

@@ -11,7 +11,7 @@ import styles from './TitleBar.m.less';
 import * as remote from '@electron/remote';
 import Banner from 'components-react/root/Banner';
 
-export default function TitleBar(props: { windowId: string }) {
+export default function TitleBar(props: { windowId: string; className?: string }) {
   const { CustomizationService, StreamingService, WindowsService } = Services;
 
   const isMaximizable = remote.getCurrentWindow().isMaximizable() !== false;
@@ -62,7 +62,7 @@ export default function TitleBar(props: { windowId: string }) {
   return (
     <>
       <div
-        className={cx(styles.titlebar, v.theme, {
+        className={cx(styles.titlebar, v.theme, props.className, {
           [styles['titlebar-mac']]: isMac,
           [styles.titlebarError]: errorState,
         })}
