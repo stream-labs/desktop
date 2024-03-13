@@ -13,6 +13,7 @@ import Spinner from 'components-react/shared/Spinner';
 import GoLiveError from '../GoLiveError';
 import UserSettingsUltra from './UserSettingsUltra';
 import UserSettingsNonUltra from './UserSettingsNonUltra';
+import PrimaryChatSwitcher from '../PrimaryChatSwitcher';
 
 /**
  * Renders settings for starting the stream
@@ -21,31 +22,51 @@ import UserSettingsNonUltra from './UserSettingsNonUltra';
  * - Extras settings
  **/
 export default function DualOutputGoLiveSettings() {
-  const { isAdvancedMode, isLoading, isPrime, canUseOptimizedProfile } = useGoLiveSettings().extend(
-    module => {
-      const { UserService, VideoEncodingOptimizationService } = Services;
+  const {
+    isAdvancedMode,
+    isLoading,
+    isPrime,
+    canUseOptimizedProfile,
+    isRestreamEnabled,
+    hasMultiplePlatforms,
+    enabledPlatforms,
+    primaryChat,
+    setPrimaryChat,
+  } = useGoLiveSettings().extend(module => {
+    const { UserService, VideoEncodingOptimizationService } = Services;
 
-      return {
-        isPrime: UserService.views.isPrime,
+    return {
+      isPrime: UserService.views.isPrime,
 
-        // temporarily hide the checkbox until streaming and output settings
-        // are migrated to the new API
-        canUseOptimizedProfile: false,
-        // canUseOptimizedProfile:
-        //   VideoEncodingOptimizationService.state.canSeeOptimizedProfile ||
-        //   VideoEncodingOptimizationService.state.useOptimizedProfile,
-      };
-    },
-  );
+      // temporarily hide the checkbox until streaming and output settings
+      // are migrated to the new API
+      canUseOptimizedProfile: false,
+      // canUseOptimizedProfile:
+      //   VideoEncodingOptimizationService.state.canSeeOptimizedProfile ||
+      //   VideoEncodingOptimizationService.state.useOptimizedProfile,
+    };
+  });
+
+  const shouldShowPrimaryChatSwitcher = isRestreamEnabled && hasMultiplePlatforms;
+  // TODO: make sure this doesn't jank the UI
+  const leftPaneHeight = shouldShowPrimaryChatSwitcher ? '82%' : '100%';
 
   return (
     <Row gutter={16} className={styles.settingsRow}>
       {/*LEFT COLUMN*/}
       <Col span={8} className={styles.leftColumn}>
-        <Scrollable style={{ height: '100%' }}>
+        <Scrollable style={{ height: leftPaneHeight }}>
           {isPrime && <UserSettingsUltra />}
           {!isPrime && <UserSettingsNonUltra />}
         </Scrollable>
+        {shouldShowPrimaryChatSwitcher && (
+          <PrimaryChatSwitcher
+            style={{ padding: '0 16px' }}
+            enabledPlatforms={enabledPlatforms}
+            primaryChat={primaryChat}
+            onSetPrimaryChat={setPrimaryChat}
+          />
+        )}
       </Col>
 
       {/*RIGHT COLUMN*/}

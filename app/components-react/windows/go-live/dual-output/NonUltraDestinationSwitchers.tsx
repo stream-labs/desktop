@@ -27,6 +27,7 @@ export function NonUltraDestinationSwitchers(p: INonUltraDestinationSwitchers) {
     switchCustomDestination,
     isEnabled,
     isPrimaryPlatform,
+    isRestreamEnabled,
   } = useGoLiveSettings();
   const enabledPlatformsRef = useRef(enabledPlatforms);
   enabledPlatformsRef.current = enabledPlatforms;
@@ -60,6 +61,7 @@ export function NonUltraDestinationSwitchers(p: INonUltraDestinationSwitchers) {
           enabled={isEnabled(platform)}
           onChange={enabled => togglePlatform(platform, enabled)}
           isPrimary={isPrimaryPlatform(platform)}
+          canDisablePrimary={isRestreamEnabled}
           index={index}
         />
       ))}
@@ -99,6 +101,7 @@ interface IDestinationSwitcherProps {
   onChange: (enabled: boolean) => unknown;
   isPrimary?: boolean;
   index: number;
+  canDisablePrimary?: boolean;
 }
 
 /**
@@ -125,7 +128,7 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
     }
 
     function removeClass() {
-      if (p.isPrimary) {
+      if (p.isPrimary && p.canDisablePrimary !== true) {
         alertAsync(
           $t(
             'You cannot disable the platform you used to sign in to Streamlabs Desktop. Please sign in with a different platform to disable streaming to this destination.',

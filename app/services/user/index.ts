@@ -161,6 +161,7 @@ class UserViews extends ViewHandler<IUserServiceState> {
   // Injecting HostsService since it's not stateful
   @Inject() hostsService: HostsService;
   @Inject() magicLinkService: MagicLinkService;
+  @Inject() userService: UserService;
 
   get settingsServiceViews() {
     return this.getServiceViews(SettingsService);
@@ -266,6 +267,10 @@ class UserViews extends ViewHandler<IUserServiceState> {
 
     return `${url}?token=${token}&mode=${nightMode}`;
   }
+
+  setPrimaryPlatform(platform: TPlatform) {
+    this.userService.setPrimaryPlatform(platform);
+  }
 }
 
 export class UserService extends PersistentStatefulService<IUserServiceState> {
@@ -284,6 +289,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject() private notificationsService: NotificationsService;
   @Inject() private jsonrpcService: JsonrpcService;
+
+  setPrimaryPlatform(platform: TPlatform) {
+    this.SET_PRIMARY_PLATFORM(platform);
+  }
 
   @mutation()
   LOGIN(auth: IUserAuth) {
@@ -1011,6 +1020,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     this.LOGOUT();
     this.LOGIN(auth);
+
+    // We need to fetch prime status to skip onboarding step for
+    // picking a primary platform if the user has Ultra, as we'll
+    // auto-select the first one in that case.
+    await this.setPrimeStatus();
 
     // Find out if the user has any additional platforms linked
     await this.updateLinkedPlatforms();

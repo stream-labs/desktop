@@ -30,6 +30,7 @@ export function UltraDestinationSwitchers(p: IUltraDestinationSwitchers) {
     isPrimaryPlatform,
     switchPlatforms,
     switchCustomDestination,
+    isRestreamEnabled,
   } = useGoLiveSettings();
   const enabledPlatformsRef = useRef(enabledPlatforms);
   enabledPlatformsRef.current = enabledPlatforms;
@@ -71,6 +72,7 @@ export function UltraDestinationSwitchers(p: IUltraDestinationSwitchers) {
           enabled={isEnabled(platform)}
           onChange={enabled => togglePlatform(platform, enabled)}
           isPrimary={isPrimaryPlatform(platform)}
+          canDisablePrimary={isRestreamEnabled}
           index={index}
         />
       ))}
@@ -92,6 +94,7 @@ interface IDestinationSwitcherProps {
   enabled: boolean;
   onChange: (enabled: boolean) => unknown;
   isPrimary?: boolean;
+  canDisablePrimary?: boolean;
   index: number;
 }
 
@@ -103,9 +106,11 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const platform = typeof p.destination === 'string' ? (p.destination as TPlatform) : null;
   const { RestreamService, MagicLinkService } = Services;
+  const canDisablePrimary = p.canDisablePrimary;
 
   function onClickHandler(ev: MouseEvent) {
-    if (p.isPrimary) {
+    // TODO: do we need this check if we're on an Ultra DestinationSwitcher
+    if (p.isPrimary && p.canDisablePrimary !== true) {
       alertAsync(
         $t(
           'You cannot disable the platform you used to sign in to Streamlabs Desktop. Please sign in with a different platform to disable streaming to this destination.',
@@ -153,7 +158,7 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
             inputRef={switchInputRef}
             value={p.enabled}
             name={platform}
-            disabled={p?.isPrimary}
+            disabled={canDisablePrimary ? false : p?.isPrimary}
             uncontrolled
             className={styles.platformSwitch}
             checkedChildren={<i className="icon-check-mark" />}

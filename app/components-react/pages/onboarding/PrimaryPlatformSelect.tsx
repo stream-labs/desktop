@@ -16,9 +16,10 @@ import { useVuex, useWatchVuex } from 'components-react/hooks';
 
 export function PrimaryPlatformSelect() {
   const { UserService, OnboardingService } = Services;
-  const { linkedPlatforms, isLogin } = useVuex(() => ({
+  const { linkedPlatforms, isLogin, isPrime } = useVuex(() => ({
     linkedPlatforms: UserService.views.linkedPlatforms,
     isLogin: OnboardingService.state.options.isLogin,
+    isPrime: UserService.state.isPrime,
   }));
   const { loading, authInProgress, authPlatform, finishSLAuth } = useModule(LoginModule);
   const platforms = ['twitch', 'youtube', 'facebook', 'trovo', 'twitter'];
@@ -57,9 +58,16 @@ export function PrimaryPlatformSelect() {
 
   // There's probably a better way to do this
   useEffect(() => {
+    console.log('PrimaryPlatform', 'isPrime', isPrime);
     // If user has exactly one streaming platform linked, we can proceed straight
     // to a logged in state.
-    if (UserService.views.linkedPlatforms.length === 1) {
+    // If the user has Ultra, auto-select the first platform as well, even if they
+    // have multiple platforms linked, as they'd now be able to disable/enable it
+    // TODO: we're still doing render side-effects here, which is not ideal
+    if (
+      UserService.views.linkedPlatforms.length === 1 ||
+      (isPrime && UserService.views.linkedPlatforms.length)
+    ) {
       selectPrimary(UserService.views.linkedPlatforms[0]);
       return;
     }
@@ -67,7 +75,7 @@ export function PrimaryPlatformSelect() {
     if (linkedPlatforms.length) {
       setSelectedPlatform(linkedPlatforms[0]);
     }
-  }, [linkedPlatforms.length]);
+  }, [linkedPlatforms.length, isPrime]);
 
   // You may be confused why this component doesn't ever call `next()` to
   // continue to the next step.  The index-based step system makes this more

@@ -14,6 +14,7 @@ import PlatformLogo from 'components-react/shared/PlatformLogo';
 import SubMenu from 'components-react/shared/SubMenu';
 import MenuItem from 'components-react/shared/MenuItem';
 import UltraIcon from 'components-react/shared/UltraIcon';
+import PlatformIndicator from './PlatformIndicator';
 
 export default function SideNav() {
   const {
@@ -307,22 +308,7 @@ function LoginMenuItem(p: {
       {!isLoggedIn ? (
         <span className={styles.loggedOut}>{menuTitles(menuItem.key)}</span>
       ) : (
-        isOpen && (
-          <>
-            {platform && (
-              <PlatformLogo
-                platform={platform?.type!}
-                className={cx(
-                  styles.platformLogo,
-                  styles[`platform-logo-${platform?.type ?? 'default'}`],
-                )}
-                size={platform.type === 'twitter' ? 20 : undefined}
-              />
-            )}
-            <span className={styles.username}>{platform?.username || $t('Log Out')}</span>
-            <i className={cx('icon-logout', styles.loginArrow)} />
-          </>
-        )
+        isOpen && <PlatformIndicator platform={platform} />
       )}
     </MenuItem>
   );

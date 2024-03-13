@@ -1,5 +1,5 @@
 import { IGoLiveSettings, StreamInfoView } from '../../../services/streaming';
-import { TPlatform } from '../../../services/platforms';
+import { TPlatform, getPlatformService } from '../../../services/platforms';
 import { TDisplayDestinations } from 'services/dual-output';
 import { ICustomStreamDestination } from 'services/settings/streaming';
 import { Services } from '../../service-provider';
@@ -163,6 +163,8 @@ export class GoLiveSettingsModule {
    */
   async prepopulate() {
     const { StreamingService } = Services;
+    const { isMultiplatformMode } = StreamingService.views;
+
     this.state.setNeedPrepopulate(true);
     await StreamingService.actions.return.prepopulateInfo();
     // TODO investigate mutation order issue
@@ -178,7 +180,12 @@ export class GoLiveSettingsModule {
 
     if (this.state.isUpdateMode && !view.isMidStreamMode) {
       Object.keys(settings.platforms).forEach((platform: TPlatform) => {
-        if (!this.state.isPrimaryPlatform(platform)) delete settings.platforms[platform];
+        // In multi-platform mode, allow deleting all platform settings, including primary
+        if (!isMultiplatformMode && this.state.isPrimaryPlatform(platform)) {
+          return;
+        }
+
+        delete settings.platforms[platform];
       });
     }
 
@@ -214,8 +221,35 @@ export class GoLiveSettingsModule {
     this.state.linkedPlatforms.forEach(platform => {
       this.state.updatePlatform(platform, { enabled: enabledPlatforms.includes(platform) });
     });
+    /*
+     * If there's exactly one enabled platform, set primaryChat to it,
+     * ensures there's a primary platform if the user has multiple selected and then
+     * deselects all but one
+     */
+    if (this.state.enabledPlatforms.length === 1) {
+      this.setPrimaryChat(this.state.enabledPlatforms[0]);
+    }
     this.save(this.state.settings);
     this.prepopulate();
+  }
+
+  get primaryChat() {
+    const primaryPlatform = Services.UserService.views.platform!;
+    // this is migration-like code for users with old primary platform deselected (i.e me)
+    if (!this.state.enabledPlatforms.includes(primaryPlatform.type)) {
+      // return the first enabled platform that supports chat
+      // FIXME: what if there are no enabled platforms that support chat?
+      const chatPlatform = this.state.enabledPlatforms.find(platform => {
+        return getPlatformService(platform).hasCapability('chat');
+      });
+      return chatPlatform!;
+    }
+
+    return Services.UserService.views.platform!.type;
+  }
+
+  setPrimaryChat(platform: TPlatform) {
+    Services.UserService.actions.setPrimaryPlatform(platform);
   }
 
   /**
@@ -283,6 +317,21 @@ export class GoLiveSettingsModule {
     ) {
       message.success($t('Successfully updated'));
     }
+  }
+
+  /**
+   * Returns whether the user has any active destinations, be it an enabled platform or a custom destination
+   */
+  get hasDestinations() {
+    return this.state.enabledPlatforms.length > 0 || this.state.customDestinations.length > 0;
+  }
+
+  get hasMultiplePlatforms() {
+    return this.state.enabledPlatforms.length > 1;
+  }
+
+  get isRestreamEnabled() {
+    return Services.RestreamService.views.canEnableRestream;
   }
 }
 

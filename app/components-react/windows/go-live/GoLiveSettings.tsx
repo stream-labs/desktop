@@ -15,6 +15,7 @@ import ButtonHighlighted from '../../shared/ButtonHighlighted';
 import UltraIcon from '../../shared/UltraIcon';
 import GoLiveError from './GoLiveError';
 import TwitterInput from './Twitter';
+import PrimaryChatSwitcher from './PrimaryChatSwitcher';
 
 const PlusIcon = PlusOutlined as Function;
 
@@ -35,6 +36,10 @@ export default function GoLiveSettings() {
     shouldShowPrimeLabel,
     canUseOptimizedProfile,
     showTweet,
+    hasMultiplePlatforms,
+    enabledPlatforms,
+    primaryChat,
+    setPrimaryChat,
   } = useGoLiveSettings().extend(module => {
     const {
       RestreamService,
@@ -73,23 +78,33 @@ export default function GoLiveSettings() {
   const shouldShowSettings = !error && !isLoading;
   const shouldShowLeftCol = protectedModeEnabled;
   const shouldShowAddDestButton = canAddDestinations;
+  const shouldShowPrimaryChatSwitcher = hasMultiplePlatforms;
 
   return (
     <Row gutter={16} style={{ height: 'calc(100% + 24px)' }}>
       {/*LEFT COLUMN*/}
       {shouldShowLeftCol && (
         <Col span={8}>
-          {/*DESTINATION SWITCHERS*/}
-          <DestinationSwitchers />
-          {/*ADD DESTINATION BUTTON*/}
-          {shouldShowAddDestButton && (
-            <a className={styles.addDestinationBtn} onClick={addDestination}>
-              <PlusIcon style={{ paddingLeft: '17px', fontSize: '24px' }} />
-              <span style={{ flex: 1 }}>{$t('Add Destination')}</span>
-              {shouldShowPrimeLabel && (
-                <ButtonHighlighted filled text={$t('Ultra')} icon={<UltraIcon type="simple" />} />
-              )}
-            </a>
+          <Scrollable style={{ height: '81%' }} snapToWindowEdge>
+            {/*DESTINATION SWITCHERS*/}
+            <DestinationSwitchers />
+            {/*ADD DESTINATION BUTTON*/}
+            {shouldShowAddDestButton && (
+              <a className={styles.addDestinationBtn} onClick={addDestination}>
+                <PlusIcon style={{ paddingLeft: '17px', fontSize: '24px' }} />
+                <span style={{ flex: 1 }}>{$t('Add Destination')}</span>
+                {shouldShowPrimeLabel && (
+                  <ButtonHighlighted filled text={$t('Ultra')} icon={<UltraIcon type="simple" />} />
+                )}
+              </a>
+            )}
+          </Scrollable>
+          {shouldShowPrimaryChatSwitcher && (
+            <PrimaryChatSwitcher
+              enabledPlatforms={enabledPlatforms}
+              onSetPrimaryChat={setPrimaryChat}
+              primaryChat={primaryChat}
+            />
           )}
         </Col>
       )}

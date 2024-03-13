@@ -23,7 +23,6 @@ export function DestinationSwitchers() {
     switchPlatforms,
     switchCustomDestination,
     isPrimaryPlatform,
-    componentView,
   } = useGoLiveSettings();
   const enabledPlatformsRef = useRef(enabledPlatforms);
   enabledPlatformsRef.current = enabledPlatforms;
@@ -42,6 +41,9 @@ export function DestinationSwitchers() {
     emitSwitch();
   }
 
+  const isPrimary = (platform: TPlatform) =>
+    isPrimaryPlatform(platform) || linkedPlatforms.length === 1;
+
   return (
     <div>
       {linkedPlatforms.map(platform => (
@@ -50,7 +52,7 @@ export function DestinationSwitchers() {
           destination={platform}
           enabled={isEnabled(platform)}
           onChange={enabled => togglePlatform(platform, enabled)}
-          isPrimary={isPrimaryPlatform(platform)}
+          isPrimary={isPrimary(platform)}
         />
       ))}
       {customDestinations?.map((dest, ind) => (
@@ -80,9 +82,11 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const platform = typeof p.destination === 'string' ? (p.destination as TPlatform) : null;
   const { RestreamService, MagicLinkService } = Services;
+  const canEnableRestream = RestreamService.views.canEnableRestream;
+  const cannotDisableDestination = p.isPrimary && !canEnableRestream;
 
   function onClickHandler(ev: MouseEvent) {
-    if (p.isPrimary) {
+    if (cannotDisableDestination) {
       alertAsync(
         $t(
           'You cannot disable the platform you used to sign in to Streamlabs Desktop. Please sign in with a different platform to disable streaming to this destination.',
@@ -90,7 +94,8 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
       );
       return;
     }
-    if (RestreamService.views.canEnableRestream) {
+
+    if (canEnableRestream) {
       const enable = !p.enabled;
       p.onChange(enable);
       // always proxy the click to the SwitchInput
@@ -125,7 +130,7 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
             inputRef={switchInputRef}
             value={p.enabled}
             name={platform}
-            disabled={p.isPrimary}
+            disabled={cannotDisableDestination}
             uncontrolled
           />
         ),
