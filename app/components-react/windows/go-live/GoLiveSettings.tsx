@@ -14,7 +14,6 @@ import Spinner from '../../shared/Spinner';
 import GoLiveError from './GoLiveError';
 import TwitterInput from './Twitter';
 import AddDestinationButton from 'components-react/shared/AddDestinationButton';
-import ButtonHighlighted from 'components-react/shared/ButtonHighlighted';
 
 const PlusIcon = PlusOutlined as Function;
 
@@ -75,18 +74,20 @@ export default function GoLiveSettings() {
     <Row gutter={16} style={{ height: 'calc(100% + 24px)' }}>
       {/*LEFT COLUMN*/}
       {shouldShowLeftCol && (
-        <Col span={8}>
-          {/*DESTINATION SWITCHERS*/}
-          <DestinationSwitchers showSelector={showSelector} />
-          {/*ADD DESTINATION BUTTON*/}
-          {shouldShowAddDestButton ? (
-            <a className={styles.addDestinationBtn} onClick={addDestination}>
-              <PlusIcon style={{ paddingLeft: '17px', fontSize: '24px' }} />
-              <span style={{ flex: 1 }}>{$t('Add Destination')}</span>
-            </a>
-          ) : (
-            <AddDestinationButton />
-          )}
+        <Col span={8} className={styles.leftColumn}>
+          <Scrollable style={{ height: '100%', margin: '15px' }}>
+            {/*DESTINATION SWITCHERS*/}
+            <DestinationSwitchers showSelector={showSelector} />
+            {/*ADD DESTINATION BUTTON*/}
+            {shouldShowAddDestButton ? (
+              <a className={styles.addDestinationBtn} onClick={addDestination}>
+                <PlusIcon style={{ paddingLeft: '17px', fontSize: '24px' }} />
+                <span style={{ flex: 1 }}>{$t('Add Destination')}</span>
+              </a>
+            ) : (
+              <AddDestinationButton />
+            )}
+          </Scrollable>
         </Col>
       )}
 

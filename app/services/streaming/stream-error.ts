@@ -87,7 +87,7 @@ export const errorTypes = {
       return $t('Error generating TikTok stream credentials');
     },
     get action() {
-      return 'confirm Live Access status with TikTok';
+      return 'confirm streaming approval status with TikTok';
     },
   },
   PRIME_REQUIRED: {

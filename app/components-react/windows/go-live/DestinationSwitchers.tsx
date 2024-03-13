@@ -70,7 +70,7 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
   }
 
   return (
-    <div>
+    <div className={styles.switchWrapper}>
       {linkedPlatforms.map(platform => (
         <DestinationSwitcher
           key={platform}
