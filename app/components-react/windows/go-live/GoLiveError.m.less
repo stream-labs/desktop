@@ -1,4 +1,4 @@
-@import "../../../styles/index.less";
+@import '../../../styles/index.less';
 
 .container {
   // allow to select errors text
@@ -18,8 +18,23 @@
 
 .details {
   font-family: monospace;
+  text-align: right;
+  align-self: center !important;
 }
 
 .go-prime-btn {
   background-color: var(--prime-hover);
+}
+
+.cta-btn {
+  display: grid;
+  flex-direction: row;
+  justify-content: space-between;
+
+  p {
+    justify-self: flex-end;
+    align-self: flex-end;
+    margin: 0px;
+    position: absolute;
+  }
 }
