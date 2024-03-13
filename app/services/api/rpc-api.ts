@@ -147,9 +147,13 @@ export abstract class RpcApi extends Service {
     responsePayload: any,
     request: IJsonRpcRequest,
   ): IJsonRpcResponse<any> {
+    // If there is a window assigned to the request, carry it over to the response
+    const params: { windowId?: string } = {};
+    if (request.params.windowId) params.windowId = request.params.windowId;
+
     // primitive types are serializable so send them as is
     if (!(responsePayload instanceof Object)) {
-      return this.jsonrpc.createResponse(request.id, responsePayload);
+      return this.jsonrpc.createResponse(request.id, { ...responsePayload, params });
     }
 
     // if response is RxJs Observable then subscribe to it and return subscription
@@ -172,6 +176,7 @@ export abstract class RpcApi extends Service {
         _type: 'SUBSCRIPTION',
         resourceId: subscriptionId,
         emitter: 'STREAM',
+        params,
       });
     }
 
@@ -205,6 +210,7 @@ export abstract class RpcApi extends Service {
         _type: 'SUBSCRIPTION',
         resourceId: promiseId,
         emitter: 'PROMISE',
+        params,
       });
     }
 
@@ -214,6 +220,7 @@ export abstract class RpcApi extends Service {
         _type: 'SERVICE',
         resourceId: responsePayload.serviceName,
         ...(!request.params.compactMode ? this.getResourceModel(responsePayload) : {}),
+        params,
       });
     }
 
@@ -223,6 +230,7 @@ export abstract class RpcApi extends Service {
         _type: 'HELPER',
         resourceId: responsePayload._resourceId,
         ...(!request.params.compactMode ? this.getResourceModel(responsePayload) : {}),
+        params,
       });
     }
 
@@ -238,7 +246,7 @@ export abstract class RpcApi extends Service {
         };
       }
     });
-    return this.jsonrpc.createResponse(request.id, responsePayload);
+    return this.jsonrpc.createResponse(request.id, { ...responsePayload, params });
   }
 
   /**
