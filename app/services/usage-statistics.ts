@@ -1,11 +1,9 @@
 import { randomBytes } from 'crypto';
 import electron from 'electron';
-import fs from 'fs';
-import path from 'path';
 import { Inject } from './core/injector';
 import { Service } from './core/service';
 import { HostsService } from './hosts';
-import { SynthesizerId, SynthesizerSelector } from './nicolive-program/state';
+import { SynthesizerSelector } from './nicolive-program/state';
 import { UuidService } from './uuid';
 import { EncoderType } from './settings/optimizer';
 import { UserService } from './user';
@@ -36,7 +34,7 @@ export type RtvcEventLog = {
           secondary_voice: number;
         };
       }
-    | {};
+    | Record<string, never>;
 };
 
 export type TUsageEvent =
