@@ -106,6 +106,7 @@
   "prepopulateStreamSettingsError": "There was an error fetching your channel information. You can try <fetch-again-link>fetching the information again</fetch-again-link> or you can <just-go-live-link>just go live</just-go-live-link>. If this error persists, you can try logging out and back in.",
   "updateStreamSettingsError": "Something went wrong while updating your stream info. You can <try-again-link>try again</try-again-link>, or you can <just-go-live-link>just go live</just-go-live-link>. If this error persists, you can try logging out and back in.",
   "twitchMissedScopeError": "<p>It looks like you connected your Twitch account on the streamlabs.com website. To start streaming you should connect it again via Streamlabs Desktop</p><connect-button>Connect Twitch</connect-button>",
+  "tiktokReAuthError": "<p>There was an authentication error with TikTok. Please re-login with TikTok.</p><connect-button>Connect TikTok</connect-button>",
   "Multistreaming to these platforms requires Ultra": "Multistreaming to these platforms requires Ultra",
   "Become a Ultra member": "Become a Ultra member",
   "You must select a game for %{platformName}": "You must select a game for %{platformName}",
@@ -212,5 +213,11 @@
   "Remember to update your Stream Key": "Remember to update your Stream Key",
   "Stream URL": "Stream URL",
   "Tweet": "Tweet",
-  "Viewers Hidden": "Viewers Hidden"
+  "Viewers Hidden": "Viewers Hidden",
+  "Failed to upload the thumbnail": "Failed to upload the thumbnail",
+  "Failed to authenticate with TikTok": "Failed to authenticate with TikTok",
+  "Your TikTok account is not enabled for live streaming": "Your TikTok account is not enabled for live streaming",
+  "Error generating TikTok stream credentials": "Error generating TikTok stream credentials",
+  "You are already live on a another device": "You are already live on a another device",
+  "Subscribe to Ultra to add more destinations.": "Subscribe to Ultra to add more destinations."
 }

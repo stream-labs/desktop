@@ -46,6 +46,12 @@ export default function GoLiveError() {
         return renderDualOutputError(error);
       case 'YOUTUBE_STREAMING_DISABLED':
         return renderYoutubeStreamingDisabled(error);
+      case 'TIKTOK_OAUTH_EXPIRED':
+        return renderTikTokOAuthExpiredError(error);
+      case 'TIKTOK_STREAM_SCOPE_MISSING':
+        return renderTikTokScopeMissingError(error);
+      case 'TIKTOK_GENERATE_CREDENTIALS_FAILED':
+        return renderTikTokCredentialsFailedError(error);
       case 'MACHINE_LOCKED':
         return renderMachineLockedError(error);
       default:
@@ -53,14 +59,19 @@ export default function GoLiveError() {
     }
   }
 
-  function renderPrepopulateError(error: IStreamError) {
+  function navigatePlatformMerge(platform: TPlatform) {
+    NavigationService.actions.navigate('PlatformMerge', { platform });
+    WindowsService.actions.closeChildWindow();
+  }
+
+  function renderPrepopulateError(error: IStreamError, message?: string) {
     assertIsDefined(error.platform);
     const platformName = getPlatformService(error.platform).displayName;
     const actions = StreamingService.actions;
     return (
       <MessageLayout
         error={error}
-        message={$t('Failed to fetch settings from %{platformName}', { platformName })}
+        message={message ?? $t('Failed to fetch settings from %{platformName}', { platformName })}
       >
         <Translate message={$t('prepopulateStreamSettingsError')}>
           <a slot="fetchAgainLink" className={css.link} onClick={() => actions.prepopulateInfo()} />
@@ -92,11 +103,6 @@ export default function GoLiveError() {
       return renderPrepopulateError(error);
     }
 
-    function navigatePlatformMerge() {
-      NavigationService.actions.navigate('PlatformMerge', { platform: 'twitch' });
-      WindowsService.actions.closeChildWindow();
-    }
-
     // If not primary platform than ask to connect platform again from SLOBS
     assertIsDefined(error.platform);
     const platformName = getPlatformService(error.platform).displayName;
@@ -108,7 +114,7 @@ export default function GoLiveError() {
           <button
             slot="connectButton"
             className="button button--twitch"
-            onClick={navigatePlatformMerge}
+            onClick={() => navigatePlatformMerge('twitch')}
           />
         </Translate>
       </MessageLayout>
@@ -183,6 +189,44 @@ export default function GoLiveError() {
           {$t('Enable Live Streaming')}
         </button>
       </MessageLayout>
+    );
+  }
+
+  function renderTikTokOAuthExpiredError(error: IStreamError) {
+    // If error authenticating with TikTok, prompt re-login
+    assertIsDefined(error.platform);
+    const platformName = getPlatformService(error.platform).displayName;
+
+    return (
+      <MessageLayout error={error} hasButton={true}>
+        <Translate message={$t('tiktokReAuthError')}>
+          <button
+            slot="connectButton"
+            className="button button--warn"
+            onClick={() => navigatePlatformMerge('tiktok')}
+          />
+        </Translate>
+      </MessageLayout>
+    );
+  }
+
+  function renderTikTokCredentialsFailedError(error: IStreamError) {
+    return (
+      <MessageLayout
+        error={error}
+        message={$t(
+          'Failed to generate TikTok stream credentials. Confirm Live Access with TikTok.',
+        )}
+      ></MessageLayout>
+    );
+  }
+
+  function renderTikTokScopeMissingError(error: IStreamError) {
+    return (
+      <MessageLayout
+        error={error}
+        message={$t('Your TikTok account is not enabled for live streaming.')}
+      ></MessageLayout>
     );
   }
 

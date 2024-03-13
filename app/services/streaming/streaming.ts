@@ -97,6 +97,7 @@ export class StreamingService
   replayBufferFileWrite = new Subject<string>();
   streamInfoChanged = new Subject<StreamInfoView<any>>();
   signalInfoChanged = new Subject<IOBSOutputSignalInfo>();
+  streamErrorCreated = new Subject<string>();
 
   // Dummy subscription for stream deck
   streamingStateChange = new Subject<void>();
@@ -183,27 +184,13 @@ export class StreamingService
 
         // check eligibility for restream
         // primary platform is always available to stream into
-        // prime users are eligeble for streaming to any platform
-        let primeRequired = false;
-        if (!this.views.isPrimaryPlatform(platform) && !this.userService.isPrime) {
-          const primaryPlatform = this.userService.state.auth?.primaryPlatform;
+        // prime users are eligible for streaming to any platform
+        const primeRequired = this.isPrimeRequired(platform);
 
-          // grandfathared users allowed to stream primary + FB
-          if (!this.restreamService.state.grandfathered) {
-            primeRequired = true;
-          } else if (
-            isEqual([primaryPlatform, platform], ['twitch', 'facebook']) ||
-            isEqual([primaryPlatform, platform], ['youtube', 'facebook'])
-          ) {
-            primeRequired = false;
-          } else {
-            primeRequired = true;
-          }
-          if (primeRequired && !this.views.isDualOutputMode) {
-            this.setError('PRIME_REQUIRED');
-            this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
-            return;
-          }
+        if (primeRequired && !this.views.isDualOutputMode) {
+          this.setError('PRIME_REQUIRED');
+          this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
+          return;
         }
 
         try {
@@ -229,6 +216,34 @@ export class StreamingService
 
     // successfully prepopulated
     this.UPDATE_STREAM_INFO({ lifecycle: 'waitForNewSettings' });
+  }
+
+  /**
+   * Determine if platform requires an ultra subscription for streaming
+   */
+  isPrimeRequired(platform: TPlatform): boolean {
+    // users can always stream to tiktok
+    if (platform === 'tiktok') return false;
+
+    if (!this.views.isPrimaryPlatform(platform) && !this.userService.isPrime) {
+      const primaryPlatform = this.userService.state.auth?.primaryPlatform;
+
+      // grandfathered users allowed to stream primary + FB
+      if (!this.restreamService.state.grandfathered) {
+        return false;
+      } else if (!this.restreamService.state.grandfathered) {
+        return true;
+      } else if (
+        isEqual([primaryPlatform, platform], ['twitch', 'facebook']) ||
+        isEqual([primaryPlatform, platform], ['youtube', 'facebook'])
+      ) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**
@@ -541,6 +556,10 @@ export class StreamingService
   private recordAfterStreamStartAnalytics(settings: IGoLiveSettings) {
     if (settings.customDestinations.filter(dest => dest.enabled).length) {
       this.usageStatisticsService.recordFeatureUsage('CustomStreamDestination');
+      this.usageStatisticsService.recordAnalyticsEvent('StreamCustomDestinations', {
+        type: 'stream',
+        destinations: this.views.enabledCustomDestinationHosts,
+      });
     }
 
     // send analytics for Facebook
@@ -565,6 +584,13 @@ export class StreamingService
     // send analytics for TikTok
     if (settings.platforms.tiktok?.enabled) {
       this.usageStatisticsService.recordFeatureUsage('StreamToTikTok');
+      this.usageStatisticsService.recordAnalyticsEvent('StreamToTikTokSettings', {
+        type: 'stream',
+        connectedPlatforms: this.views.linkedPlatforms,
+        enabledPlatforms: this.views.enabledPlatforms,
+        enabledDestinations: this.views.enabledCustomDestinationHosts,
+        dualOutputMode: this.views.isDualOutputMode,
+      });
     }
 
     if (settings.platforms.instagram?.enabled) {
@@ -680,6 +706,15 @@ export class StreamingService
     const error = this.state.info.error;
     assertIsDefined(error);
     console.error(`Streaming Error: ${error.message}`, error);
+
+    const target = platform ? this.views.getPlatformDisplayName(platform) : 'Custom destination';
+
+    // add follow-up action to report if there is an action
+    const diagReportMessage = error?.action
+      ? [`${target}: ${error.message}`, error?.action].join(', ')
+      : `${target}: ${error.message}`;
+
+    this.streamErrorCreated.next(diagReportMessage);
   }
 
   resetInfo() {

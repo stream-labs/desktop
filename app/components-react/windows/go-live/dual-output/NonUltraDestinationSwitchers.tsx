@@ -23,6 +23,7 @@ export function NonUltraDestinationSwitchers(p: INonUltraDestinationSwitchers) {
   const {
     enabledPlatforms,
     customDestinations,
+    isDualOutputMode,
     switchPlatforms,
     switchCustomDestination,
     isEnabled,
@@ -44,15 +45,17 @@ export function NonUltraDestinationSwitchers(p: INonUltraDestinationSwitchers) {
   }, []);
 
   return (
-    <>
-      <InfoBadge
-        content={
-          <Translate message="<dualoutput>Dual Output</dualoutput> is enabled - you must stream to one horizontal and one vertical platform.">
-            <u slot="dualoutput" />
-          </Translate>
-        }
-        hasMargin={true}
-      />
+    <div className={styles.switchWrapper}>
+      {isDualOutputMode && (
+        <InfoBadge
+          content={
+            <Translate message="<dualoutput>Dual Output</dualoutput> is enabled - you must stream to one horizontal and one vertical platform.">
+              <u slot="dualoutput" />
+            </Translate>
+          }
+          style={{ marginBottom: '15px' }}
+        />
+      )}
       {enabledPlatforms.map((platform: TPlatform, index: number) => (
         <DestinationSwitcher
           key={platform}
@@ -89,7 +92,7 @@ export function NonUltraDestinationSwitchers(p: INonUltraDestinationSwitchers) {
           }}
         />
       )}
-    </>
+    </div>
   );
 }
 

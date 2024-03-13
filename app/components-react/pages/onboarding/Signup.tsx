@@ -2,9 +2,9 @@ import React from 'react';
 import { $t } from 'services/i18n';
 import Translate from 'components-react/shared/Translate';
 import PlatformButton from 'components-react/shared/PlatformButton';
-import { shell } from 'electron';
 import styles from './Signup.m.less';
 import { Services } from 'components-react/service-provider';
+import { EPlatformCallResult } from 'services/platforms';
 
 export default function Signup({
   onSignupLinkClick,
@@ -15,7 +15,13 @@ export default function Signup({
 }) {
   const { UserService } = Services;
 
-  const openSLIDSignup = () => UserService.startSLAuth({ signup: true }).then(onSuccess);
+  const openSLIDSignup = () =>
+    UserService.startSLAuth({ signup: true })
+      .then((success: EPlatformCallResult) => {
+        if (success !== EPlatformCallResult.Success) return;
+        onSuccess();
+      })
+      .catch(e => console.error('Signup Error: ', e));
 
   return (
     <>
