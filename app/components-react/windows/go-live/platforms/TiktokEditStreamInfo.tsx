@@ -45,7 +45,13 @@ export function TikTokEditStreamInfo(p: IPlatformComponentParams<'tiktok'>) {
 
 function TikTokStreamApplicationInfo() {
   return (
-    <InputWrapper extra={<p>{$t('Go live to TikTok with a single click with Live Access.')}</p>}>
+    <InputWrapper
+      extra={
+        <a onClick={() => openInfoPage()}>
+          {$t('Go live to TikTok with a single click. Click here to learn more.')}
+        </a>
+      }
+    >
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         <div style={{ marginBottom: '5px' }}>
           {$t('You do not have permission to stream live to TikTok.')}
@@ -106,7 +112,9 @@ export function TikTokEnterCredentialsFormInfo(p: IPlatformComponentParams<'tikt
             >
               {$t('Apply for TikTok Live Permission')}
             </Button>
-            <p>{$t('Go live to TikTok with a single click with Live Access.')}</p>
+            <a onClick={() => openInfoPage()}>
+              {$t('Go live to TikTok with a single click. Click here to learn more.')}
+            </a>
           </>
         }
       >

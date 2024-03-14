@@ -175,6 +175,10 @@ export class StreamingService
    */
   async prepopulateInfo() {
     const platforms = this.views.enabledPlatforms;
+    if (!platforms.includes('tiktok')) {
+      platforms.push('tiktok');
+    }
+
     this.UPDATE_STREAM_INFO({ lifecycle: 'prepopulate', error: null });
 
     // prepopulate settings for all platforms in parallel mode
@@ -196,6 +200,7 @@ export class StreamingService
         try {
           await service.prepopulateInfo();
         } catch (e: unknown) {
+          console.log('e ', e);
           // cast all PLATFORM_REQUEST_FAILED errors to PREPOPULATE_FAILED
           if (e instanceof StreamError) {
             e.type =
