@@ -69,12 +69,14 @@ class TransitionsViews extends ViewHandler<ITransitionsState> {
       { title: $t('Swipe'), value: ETransitionType.Swipe },
       { title: $t('Slide'), value: ETransitionType.Slide },
       { title: $t('Fade to Color'), value: ETransitionType.FadeToColor },
-      { title: $t('Shuffle'), value: ETransitionType.Shuffle },
       { title: $t('Luma Wipe'), value: ETransitionType.LumaWipe },
       { title: $t('Stinger'), value: ETransitionType.Stinger },
     ];
 
-    if (getOS() === OS.Windows) types.push({ title: $t('Motion'), value: ETransitionType.Motion });
+    if (getOS() === OS.Windows) {
+      types.push({ title: $t('Motion'), value: ETransitionType.Motion });
+      types.push({ title: $t('Shuffle'), value: ETransitionType.Shuffle });
+    }
 
     return types;
   }
