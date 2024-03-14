@@ -138,6 +138,11 @@ export enum EPlatformCallResult {
    * The user is not authorized for livestreaming by TikTok.
    */
   TikTokStreamScopeMissing,
+
+  /**
+   * The user needs to re-merge their to update Live Access status.
+   */
+  TikTokScopeOutdated,
 }
 
 export type TStartStreamOptions =
