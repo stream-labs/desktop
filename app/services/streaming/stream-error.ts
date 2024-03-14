@@ -63,10 +63,18 @@ export const errorTypes = {
   },
   TIKTOK_OAUTH_EXPIRED: {
     get message() {
-      return $t('Failed to authenticate with TikTok');
+      return $t('Failed to authenticate with TikTok, re-login or re-merge TikTok account');
     },
     get action() {
       return 're-login or re-merge TikTok account';
+    },
+  },
+  TIKTOK_SCOPE_OUTDATED: {
+    get message() {
+      return $t('Failed to update TikTok account');
+    },
+    get action() {
+      return 'unlink and re-merge TikTok account, then restart Desktop';
     },
   },
   TIKTOK_STREAM_SCOPE_MISSING: {
