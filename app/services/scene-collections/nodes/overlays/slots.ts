@@ -340,7 +340,7 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
     }
 
     this.adjustTransform(sceneItem, obj);
-    this.setLockedStatus(sceneItem, obj);
+    this.setExtraSettings(sceneItem, obj);
 
     if (!existing) {
       await obj.content.load({
@@ -381,9 +381,14 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
     });
   }
 
-  setLockedStatus(item: SceneItem, obj: IItemSchema) {
-    if (obj.locked === true) {
-      item.setLocked(true);
-    }
+  /*
+   * TODO: this is probably better than doing it individually on every source type
+   * branch, but might impact performance.
+   */
+  setExtraSettings(item: SceneItem, obj: IItemSchema) {
+    item.setSettings({
+      visible: obj.visible ?? true,
+      locked: obj.locked ?? false,
+    });
   }
 }
