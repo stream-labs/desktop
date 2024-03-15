@@ -411,7 +411,7 @@
     "description": "Capture the audio coming from a specific application."
   },
   "nair-rtvc-source": {
-    "name": "Voice changer",
+    "name": "Voice Changer",
     "description": "Converts your own voice. You can blend 100 different voices to become your own original voice, or become the voice of \"Kotoyomi Near\", \"Zundamon\", or \"Kasukabe Tsumugi\".",
     "nav": {
       "voice_setting": "Voice",
