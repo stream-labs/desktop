@@ -22,23 +22,21 @@ export function TikTokEditStreamInfo(p: IPlatformComponentParams<'tiktok'>) {
 
   return (
     <Form name="tiktok-settings">
-      {liveStreamingEnabled && (
-        <PlatformSettingsLayout
-          layoutMode={p.layoutMode}
-          commonFields={
-            <CommonPlatformFields
-              key="common"
-              platform="tiktok"
-              layoutMode={p.layoutMode}
-              value={ttSettings}
-              onChange={updateSettings}
-            />
-          }
-          requiredFields={<div key={'empty-tiktok'} />}
-        />
-      )}
-      {legacy && <TikTokEnterCredentialsFormInfo {...p} />}
-      {!liveStreamingEnabled && <TikTokStreamApplicationInfo />}
+      <PlatformSettingsLayout
+        layoutMode={p.layoutMode}
+        commonFields={
+          <CommonPlatformFields
+            key="common"
+            platform="tiktok"
+            layoutMode={p.layoutMode}
+            value={ttSettings}
+            onChange={updateSettings}
+          />
+        }
+        requiredFields={<div key={'empty-tiktok'} />}
+      />
+
+      {(!liveStreamingEnabled || legacy) && <TikTokEnterCredentialsFormInfo {...p} />}
     </Form>
   );
 }
@@ -101,7 +99,7 @@ export function TikTokEnterCredentialsFormInfo(p: IPlatformComponentParams<'tikt
       />
       <InputWrapper
         extra={
-          <>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
             <Button
               onClick={openApplicationInfoPage}
               style={{
@@ -115,7 +113,7 @@ export function TikTokEnterCredentialsFormInfo(p: IPlatformComponentParams<'tikt
             <a onClick={() => openInfoPage()}>
               {$t('Go live to TikTok with a single click. Click here to learn more.')}
             </a>
-          </>
+          </div>
         }
       >
         <Button onClick={openProducer} style={{ marginBottom: '10px' }}>
@@ -135,6 +133,5 @@ function openApplicationInfoPage() {
 }
 
 function openProducer() {
-  const locale = Services.TikTokService.locale;
   remote.shell.openExternal(Services.TikTokService.legacyDashboardUrl);
 }
