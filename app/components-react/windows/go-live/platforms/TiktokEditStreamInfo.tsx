@@ -22,21 +22,20 @@ export function TikTokEditStreamInfo(p: IPlatformComponentParams<'tiktok'>) {
 
   return (
     <Form name="tiktok-settings">
-      {liveStreamingEnabled && (
-        <PlatformSettingsLayout
-          layoutMode={p.layoutMode}
-          commonFields={
-            <CommonPlatformFields
-              key="common"
-              platform="tiktok"
-              layoutMode={p.layoutMode}
-              value={ttSettings}
-              onChange={updateSettings}
-            />
-          }
-          requiredFields={<div key={'empty-tiktok'} />}
-        />
-      )}
+      <PlatformSettingsLayout
+        layoutMode={p.layoutMode}
+        commonFields={
+          <CommonPlatformFields
+            key="common"
+            platform="tiktok"
+            layoutMode={p.layoutMode}
+            value={ttSettings}
+            onChange={updateSettings}
+          />
+        }
+        requiredFields={<div key={'empty-tiktok'} />}
+      />
+
       {(!liveStreamingEnabled || legacy) && <TikTokEnterCredentialsFormInfo {...p} />}
     </Form>
   );
