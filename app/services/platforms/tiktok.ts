@@ -134,11 +134,7 @@ export class TikTokService
     const ttSettings = getDefined(goLiveSettings.platforms.tiktok);
     const context = display ?? ttSettings?.display;
 
-    if (!this.liveStreamingEnabled) {
-      throwStreamError('TIKTOK_STREAM_SCOPE_MISSING');
-    }
-
-    if (!this.getHasScope('legacy')) {
+    if (this.getHasScope('approved')) {
       // update server url and stream key if handling streaming via API
       // streaming with server url and stream key is default
       let streamInfo = {} as ITikTokStartStreamResponse;
@@ -173,13 +169,56 @@ export class TikTokService
 
     await this.putChannelInfo(ttSettings);
     this.setPlatformContext('tiktok');
+
+    // TODO: comment in after legacy flow handled
+    // if (!this.liveStreamingEnabled) {
+    //   throwStreamError('TIKTOK_STREAM_SCOPE_MISSING');
+    // }
+
+    // if (!this.getHasScope('legacy')) {
+    //   // update server url and stream key if handling streaming via API
+    //   // streaming with server url and stream key is default
+    //   let streamInfo = {} as ITikTokStartStreamResponse;
+
+    //   try {
+    //     streamInfo = await this.startStream(ttSettings);
+    //     if (!streamInfo?.id) {
+    //       throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED');
+    //     }
+    //   } catch (error: unknown) {
+    //     this.SET_LIVE_SCOPE('denied');
+    //     await this.handleOpenLiveManager();
+    //     throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED', error as any);
+    //   }
+
+    //   ttSettings.serverUrl = streamInfo.rtmp;
+    //   ttSettings.streamKey = streamInfo.key;
+
+    //   this.SET_BROADCAST_ID(streamInfo.id);
+    // }
+
+    // if (!this.streamingService.views.isMultiplatformMode) {
+    //   this.streamSettingsService.setSettings(
+    //     {
+    //       streamType: 'rtmp_custom',
+    //       key: ttSettings.streamKey,
+    //       server: ttSettings.serverUrl,
+    //     },
+    //     context,
+    //   );
+    // }
+
+    // await this.putChannelInfo(ttSettings);
+    // this.setPlatformContext('tiktok');
   }
 
   async afterGoLive(): Promise<void> {
     // open url if stream successfully started
 
     // keep main window on top to prevent flicker when opening url
-    await this.handleOpenLiveManager();
+    if (this.getHasScope('approved')) {
+      await this.handleOpenLiveManager();
+    }
   }
 
   async afterStopStream(): Promise<void> {
