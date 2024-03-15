@@ -363,17 +363,30 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
   }
 
   adjustTransform(item: SceneItem, obj: IItemSchema) {
-    item.setTransform({
-      position: {
-        x: obj.x * this.videoService.baseWidth,
-        y: obj.y * this.videoService.baseHeight,
-      },
-      scale: {
-        x: obj.scaleX * this.videoService.baseWidth,
-        y: obj.scaleY * this.videoService.baseHeight,
-      },
-      crop: obj.crop,
-      rotation: obj.rotation,
-    });
+    // special handling for game capture to show same dimensions on the vertical display as the horizontal
+
+    if (item.type === 'game_capture') {
+      item.setTransform({
+        position: {
+          x: obj.x * this.videoService.baseWidth,
+          y: obj.y * this.videoService.baseHeight,
+        },
+        crop: obj.crop,
+        rotation: obj.rotation,
+      });
+    } else {
+      item.setTransform({
+        position: {
+          x: obj.x * this.videoService.baseWidth,
+          y: obj.y * this.videoService.baseHeight,
+        },
+        scale: {
+          x: obj.scaleX * this.videoService.baseWidth,
+          y: obj.scaleY * this.videoService.baseHeight,
+        },
+        crop: obj.crop,
+        rotation: obj.rotation,
+      });
+    }
   }
 }
