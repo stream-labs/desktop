@@ -573,7 +573,18 @@ export class EditorService extends StatefulService<IEditorServiceState> {
       return false;
     }
 
-    const rect = new ScalableRectangle(source.rectangle);
+    let sourceRect = source.rectangle;
+
+    // guarantee that the scene source is selected
+    if (source.type === 'scene' && source.display === 'horizontal') {
+      sourceRect = {
+        ...sourceRect,
+        width: this.videoSettingsService.baseResolutions.horizontal.baseWidth,
+        height: this.videoSettingsService.baseResolutions.horizontal.baseHeight,
+      };
+    }
+
+    const rect = new ScalableRectangle(sourceRect);
     rect.normalize();
 
     return this.isOverBox(event, rect.x, rect.y, rect.scaledWidth, rect.scaledHeight);
