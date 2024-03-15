@@ -1,15 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Form from '../../../shared/inputs/Form';
 import { $t } from '../../../../services/i18n';
 import { Services } from '../../../service-provider';
-import { Button, Tooltip } from 'antd';
+import { Button, Tooltip, Switch } from 'antd';
 // import Tooltip from 'components-react/shared/Tooltip';
 import InputWrapper from '../../../shared/inputs/InputWrapper';
 import PlatformSettingsLayout, { IPlatformComponentParams } from './PlatformSettingsLayout';
 import * as remote from '@electron/remote';
 import { CommonPlatformFields } from '../CommonPlatformFields';
 import { ITikTokStartStreamOptions } from 'services/platforms/tiktok';
-import { TextInput, createBinding } from 'components-react/shared/inputs';
+import { SwitchInput, TextInput, createBinding } from 'components-react/shared/inputs';
 
 export function TikTokEditStreamInfo(p: IPlatformComponentParams<'tiktok'>) {
   const ttSettings = p.value;
@@ -37,37 +37,92 @@ export function TikTokEditStreamInfo(p: IPlatformComponentParams<'tiktok'>) {
           requiredFields={<div key={'empty-tiktok'} />}
         />
       )}
-      {legacy && <TikTokEnterCredentialsFormInfo {...p} />}
-      {!liveStreamingEnabled && <TikTokStreamApplicationInfo />}
+      {/* {legacy && <TikTokEnterCredentialsFormInfo {...p} />} */}
+      {!liveStreamingEnabled && <TikTokStreamApplicationInfo {...p} />}
     </Form>
   );
 }
 
-function TikTokStreamApplicationInfo() {
+function TikTokStreamApplicationInfo(p: IPlatformComponentParams<'tiktok'>) {
+  const bind = createBinding(p.value, updatedSettings =>
+    p.onChange({ ...p.value, ...updatedSettings }),
+  );
+  const [showForm, setShowForm] = useState(false);
+
+  const message = showForm
+    ? $t('Hide Stream Credentials Form')
+    : $t('Show Stream Credentials Form');
+
+  console.log('updating');
   return (
-    <InputWrapper
-      extra={
-        <a onClick={() => openInfoPage()}>
-          {$t('Go live to TikTok with a single click. Click here to learn more.')}
-        </a>
-      }
-    >
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <div style={{ marginBottom: '5px' }}>
-          {$t('You do not have permission to stream live to TikTok.')}
+    <>
+      <InputWrapper
+        extra={
+          <>
+            <a onClick={() => openInfoPage()}>
+              {$t('Go live to TikTok with a single click. Click here to learn more.')}
+            </a>
+            <p style={{ marginTop: '10px' }}>
+              <Switch
+                onChange={setShowForm}
+                checked={showForm}
+                defaultChecked={false}
+                size="small"
+                style={{ marginRight: '5px' }}
+              />
+              {message}
+            </p>
+          </>
+        }
+      >
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <div style={{ marginBottom: '5px' }}>
+            {$t('You do not have permission to stream live to TikTok.')}
+          </div>
+          <Button
+            onClick={openApplicationInfoPage}
+            style={{
+              marginBottom: '10px',
+              background: 'var(--tiktok-btn)',
+              color: 'var(--black)',
+            }}
+          >
+            {$t('Apply for TikTok Live Permission')}
+          </Button>
         </div>
-        <Button
-          onClick={openApplicationInfoPage}
-          style={{
-            marginBottom: '10px',
-            background: 'var(--tiktok-btn)',
-            color: 'var(--black)',
-          }}
-        >
-          {$t('Apply for TikTok Live Permission')}
-        </Button>
-      </div>
-    </InputWrapper>
+      </InputWrapper>
+
+      {showForm && (
+        <>
+          <TextInput
+            label={
+              <Tooltip title={$t('Generate with "Locate my Stream Key"')} placement="right">
+                {$t('TikTok Server URL')}
+                <i className="icon-information" style={{ marginLeft: '5px' }} />
+              </Tooltip>
+            }
+            required
+            {...bind.serverUrl}
+          />
+          <TextInput
+            label={
+              // eslint-disable-next-line prettier/prettier
+              <Tooltip title={$t('Generate with "Locate my Stream Key"')} placement="right">
+                {$t('TikTok Stream Key')}
+                <i className="icon-information" style={{ marginLeft: '5px' }} />
+              </Tooltip>
+            }
+            required
+            {...bind.streamKey}
+          />
+          <InputWrapper>
+            <Button onClick={openProducer} style={{ marginBottom: '10px' }}>
+              {$t('Locate my Stream Key')}
+            </Button>
+          </InputWrapper>
+        </>
+      )}
+    </>
   );
 }
 
