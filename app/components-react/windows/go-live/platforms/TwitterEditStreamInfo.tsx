@@ -18,7 +18,6 @@ export function TwitterEditStreamInfo(p: IPlatformComponentParams<'twitter'>) {
   }
 
   const bind = createBinding(twSettings, updatedSettings => updateSettings(updatedSettings));
-  console.log('twSettings', twSettings);
 
   return (
     <Form name="twitter-settings">

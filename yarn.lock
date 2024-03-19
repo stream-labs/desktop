@@ -1861,6 +1861,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@electron/notarize@npm:^2.3.0":
+  version: 2.3.0
+  resolution: "@electron/notarize@npm:2.3.0"
+  dependencies:
+    debug: ^4.1.1
+    fs-extra: ^9.0.1
+    promise-retry: ^2.0.1
+  checksum: 03e23005a42087150089ac6fb4176b81880392be06d0b3136107c0d6490beb99678ddd0d0e07185abd31b13384ebaf3fa06a29b16baa80ccebdc2a17abe0acd3
+  languageName: node
+  linkType: hard
+
 "@electron/remote@npm:2.0.8":
   version: 2.0.8
   resolution: "@electron/remote@npm:2.0.8"
@@ -6498,16 +6509,6 @@ __metadata:
     semver: ^7.2.1
     unzip-crx-3: ^0.2.0
   checksum: 408b717bc173169d8ba1b5e0c52442189633e86112d58932f8a2d85c0ad1a9e372c5f2e4f310e41db5046bed718479162967efabf9159782fd12ab9891dd3927
-  languageName: node
-  linkType: hard
-
-"electron-notarize@npm:1.0.0":
-  version: 1.0.0
-  resolution: "electron-notarize@npm:1.0.0"
-  dependencies:
-    debug: ^4.1.1
-    fs-extra: ^9.0.1
-  checksum: 93d22c2ddf5f63430fb72df15ce617107435c00f8f9d2a7b9512aba23e26a80c0f2c48e687bf9aec05a958c68389112250342df9be3ce41587fddeea351db42d
   languageName: node
   linkType: hard
 
@@ -13725,6 +13726,7 @@ __metadata:
     "@babel/core": 7.17.2
     "@babel/plugin-proposal-decorators": 7.17.2
     "@babel/preset-env": 7.22.10
+    "@electron/notarize": ^2.3.0
     "@electron/remote": 2.0.8
     "@octokit/app": 14.0.0
     "@octokit/request": 8.1.1
@@ -13781,7 +13783,6 @@ __metadata:
     electron-builder: 22.14.5
     electron-chromedriver: 25.1.1
     electron-devtools-installer: 3.1.1
-    electron-notarize: 1.0.0
     electron-react-devtools: ^0.5.3
     electron-updater: ^4.2.0
     electron-window-state: 5.0.3

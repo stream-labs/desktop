@@ -22,23 +22,39 @@ interface IPlatformSelectorProps {
  */
 
 export default function DualOutputPlatformSelector(p: IPlatformSelectorProps) {
-  const { linkedPlatforms, enabledPlatforms, customDestinations, isEnabled } = useGoLiveSettings();
+  const {
+    linkedPlatforms,
+    shouldAddTikTok,
+    enabledPlatforms,
+    customDestinations,
+    isDualOutputMode,
+    isEnabled,
+  } = useGoLiveSettings().extend(module => {
+    return {
+      get shouldAddTikTok() {
+        return !module.isPlatformLinked('tiktok') && !module.isDualOutputMode;
+      },
+    };
+  });
 
   function showStreamSettings() {
     Services.SettingsService.actions.showSettings('Stream');
   }
 
+  // force tiktok to always show as an option
+  const platformTargets = shouldAddTikTok ? ['tiktok' as TPlatform] : linkedPlatforms;
+
   const options = useMemo(() => {
-    const platforms = linkedPlatforms
-      .filter(platform => !isEnabled(platform as TPlatform))
-      .map(platform => ({
+    const platforms = platformTargets
+      .filter((platform: TPlatform) => !isEnabled(platform))
+      .map((platform: TPlatform) => ({
         value: platform as string,
         label: (
           <>
             <PlatformLogo
               platform={platform as TPlatform}
               className={styles.selectorIcon}
-              trovo={platform === 'trovo'}
+              fontIcon={['tiktok', 'trovo'].includes(platform) ? platform : undefined}
               nocolor
             />
             {platformLabels(platform)}
@@ -77,9 +93,12 @@ export default function DualOutputPlatformSelector(p: IPlatformSelectorProps) {
   return (
     <Select
       defaultValue={defaultLabel[0]}
-      className={styles.platformsSelector}
+      className={cx(styles.platformsSelector, { [styles.dualOutputSelector]: isDualOutputMode })}
       onChange={(option: { value: string; label: React.ReactNode }) => {
-        if (option.value === 'add') {
+        if (
+          option.value === 'add' ||
+          (option.value === 'tiktok' && !isEnabled('tiktok') && !isDualOutputMode)
+        ) {
           // navigate to stream settings
           showStreamSettings();
         } else {
