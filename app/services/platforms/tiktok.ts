@@ -216,9 +216,7 @@ export class TikTokService
     // open url if stream successfully started
 
     // keep main window on top to prevent flicker when opening url
-    if (this.getHasScope('approved')) {
-      await this.handleOpenLiveManager();
-    }
+    await this.handleOpenLiveManager();
   }
 
   async afterStopStream(): Promise<void> {
