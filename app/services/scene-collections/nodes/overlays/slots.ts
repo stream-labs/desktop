@@ -59,6 +59,7 @@ interface IItemSchema {
 
   visible?: boolean;
   display?: TDisplayType;
+  locked: boolean;
 }
 
 export interface IFolderSchema {
@@ -122,6 +123,7 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
           settings: filter.settings,
         };
       }),
+      locked: sceneNode.locked,
     };
 
     if (sceneNode.getObsInput().audioMixers) {
@@ -338,6 +340,8 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
     }
 
     this.adjustTransform(sceneItem, obj);
+    this.setExtraSettings(sceneItem, obj);
+
     if (!existing) {
       await obj.content.load({
         sceneItem,
@@ -388,5 +392,16 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
         rotation: obj.rotation,
       });
     }
+  }
+
+  /*
+   * TODO: this is probably better than doing it individually on every source type
+   * branch, but might impact performance.
+   */
+  setExtraSettings(item: SceneItem, obj: IItemSchema) {
+    item.setSettings({
+      visible: obj.visible ?? true,
+      locked: obj.locked ?? false,
+    });
   }
 }

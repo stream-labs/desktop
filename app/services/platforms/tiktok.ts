@@ -134,11 +134,7 @@ export class TikTokService
     const ttSettings = getDefined(goLiveSettings.platforms.tiktok);
     const context = display ?? ttSettings?.display;
 
-    if (!this.liveStreamingEnabled) {
-      throwStreamError('TIKTOK_STREAM_SCOPE_MISSING');
-    }
-
-    if (!this.getHasScope('legacy')) {
+    if (this.getHasScope('approved')) {
       // update server url and stream key if handling streaming via API
       // streaming with server url and stream key is default
       let streamInfo = {} as ITikTokStartStreamResponse;
@@ -173,13 +169,56 @@ export class TikTokService
 
     await this.putChannelInfo(ttSettings);
     this.setPlatformContext('tiktok');
+
+    // TODO: comment in after legacy flow handled
+    // if (!this.liveStreamingEnabled) {
+    //   throwStreamError('TIKTOK_STREAM_SCOPE_MISSING');
+    // }
+
+    // if (!this.getHasScope('legacy')) {
+    //   // update server url and stream key if handling streaming via API
+    //   // streaming with server url and stream key is default
+    //   let streamInfo = {} as ITikTokStartStreamResponse;
+
+    //   try {
+    //     streamInfo = await this.startStream(ttSettings);
+    //     if (!streamInfo?.id) {
+    //       throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED');
+    //     }
+    //   } catch (error: unknown) {
+    //     this.SET_LIVE_SCOPE('denied');
+    //     await this.handleOpenLiveManager();
+    //     throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED', error as any);
+    //   }
+
+    //   ttSettings.serverUrl = streamInfo.rtmp;
+    //   ttSettings.streamKey = streamInfo.key;
+
+    //   this.SET_BROADCAST_ID(streamInfo.id);
+    // }
+
+    // if (!this.streamingService.views.isMultiplatformMode) {
+    //   this.streamSettingsService.setSettings(
+    //     {
+    //       streamType: 'rtmp_custom',
+    //       key: ttSettings.streamKey,
+    //       server: ttSettings.serverUrl,
+    //     },
+    //     context,
+    //   );
+    // }
+
+    // await this.putChannelInfo(ttSettings);
+    // this.setPlatformContext('tiktok');
   }
 
   async afterGoLive(): Promise<void> {
     // open url if stream successfully started
 
     // keep main window on top to prevent flicker when opening url
-    await this.handleOpenLiveManager();
+    if (this.getHasScope('approved')) {
+      await this.handleOpenLiveManager();
+    }
   }
 
   async afterStopStream(): Promise<void> {
@@ -324,14 +363,16 @@ export class TikTokService
       const response = await this.fetchLiveAccessStatus();
       const status = response as ITikTokLiveScopeResponse;
 
-      // Note on the 'denied' response: If a user needs to reauthenticate with TikTok
-      // due a change in the scope for our api, on the frontend it will show that they do not
-      // have access. Special handling for this case could be implemented to show that the user
-      // needs to reauthenticate.
       if (status?.reason) {
         const scope = this.convertScope(status.reason);
         this.SET_USERNAME(status.user.username);
         this.SET_LIVE_SCOPE(scope);
+
+        // Note on the 'denied' response: A user who needs to reauthenticate with TikTok
+        // due a change in the scope for our api, needs to be told to unlink and remerge their account.
+        if (scope === 'denied') {
+          return EPlatformCallResult.TikTokScopeOutdated;
+        }
       } else {
         this.SET_LIVE_SCOPE('denied');
       }
@@ -377,10 +418,16 @@ export class TikTokService
    */
   async prepopulateInfo(): Promise<void> {
     // fetch user live access status
-    await this.validatePlatform();
+    const status = await this.validatePlatform();
     this.usageStatisticsService.recordAnalyticsEvent('TikTokLiveAccess', {
       status: this.scope,
     });
+
+    console.debug('TikTok stream status: ', status);
+
+    if (status === EPlatformCallResult.TikTokScopeOutdated) {
+      throwStreamError('TIKTOK_SCOPE_OUTDATED');
+    }
 
     this.SET_PREPOPULATED(true);
   }
@@ -433,11 +480,15 @@ export class TikTokService
   }
 
   get infoUrl(): string {
-    return 'https://streamlabs.com/content-hub/post/streamlabs-announces-integration-with-tiktok';
+    return 'https://streamlabs.com/content-hub/post/how-to-go-live-on-tiktok';
   }
 
   get applicationUrl(): string {
     return `https://www.tiktok.com/falcon/live_g/live_access_pc_apply/intro/index.html?id=${this.id}&lang=${this.locale}`;
+  }
+
+  get mergeUrl(): string {
+    return 'https://streamlabs.com/dashboard#/settings/account-settings/platforms';
   }
 
   get locale(): string {
