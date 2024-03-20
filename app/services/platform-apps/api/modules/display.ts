@@ -30,6 +30,8 @@ export class DisplayModule extends Module {
   create(ctx: IApiContext, options: IDisplayCreateOptions) {
     const displayId = uuid();
 
+    console.info(`DisplayModule - create, displayId: ${displayId}, options: ${options}`);
+
     this.displays[displayId] = {
       displayId,
       options,
@@ -65,6 +67,7 @@ export class DisplayModule extends Module {
 
   @apiMethod()
   destroy(ctx: IApiContext, displayId: string) {
+    console.info(`DisplayModule - destroy, displayId: ${displayId}`);
     this.destroyDisplay(displayId);
   }
 

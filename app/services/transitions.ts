@@ -190,8 +190,19 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
 
     if (!this.studioModeTransition) this.createStudioModeTransition();
     this.currentSceneId = this.scenesService.views.activeScene.id;
+    console.info(`enableStudioMode - currentSceneId: ${this.currentSceneId}`);
+
     const currentScene = this.scenesService.views.activeScene.getObsScene();
     this.sceneDuplicate = currentScene.duplicate(uuid(), obs.ESceneDupType.Copy);
+    if (!this.sceneDuplicate) {
+      console.error(`enableStudioMode - failed to duplicate scene ${this.currentSceneId}`);
+    } else if (!this.sceneDuplicate.enabled) {
+      console.error(`enableStudioMode - duplicate scene ${this.currentSceneId} is disabled`);
+    }
+
+    if (!currentScene.enabled) {
+      console.error(`enableStudioMode - current scene ${this.currentSceneId} is disabled`);
+    }
 
     // Immediately switch to the duplicated scene
     this.getCurrentTransition().set(this.sceneDuplicate);
@@ -201,6 +212,8 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
 
   disableStudioMode() {
     if (!this.state.studioMode) return;
+
+    console.info('disableStudioMode');
 
     this.SET_STUDIO_MODE(false);
     this.studioModeChanged.next(false);
@@ -262,6 +275,10 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
       ETransitionType.Cut,
       `studio_transition_${uuid()}`,
     );
+
+    if (!this.studioModeTransition) {
+      console.error('createStudioModeTransition - failed');
+    }
   }
 
   releaseStudioModeObjects() {
@@ -283,6 +300,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
 
   transition(sceneAId: string | null, sceneBId: string) {
     if (this.state.studioMode) {
+      console.info(`studioMode transition - sceneAId: ${sceneAId}, sceneBId: ${sceneBId}`);
       if (sceneAId && sceneAId !== this.currentSceneId) {
         const prevScene = this.scenesService.views.getScene(sceneAId);
         obs.Global.removeSceneFromBackstage(prevScene.getSource().getObsInput());

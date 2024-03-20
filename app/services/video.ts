@@ -84,6 +84,8 @@ export class Display {
       ? options.renderingMode
       : obs.ERenderingMode.OBS_MAIN_RENDERING;
 
+    console.info('Display - constructor, name:', name, this);
+
     const electronWindow = remote.BrowserWindow.fromId(this.electronWindowId);
 
     this.currentScale = this.windowsService.state[this.slobsWindowId].scaleFactor;
@@ -145,6 +147,8 @@ export class Display {
    */
   trackElement(element: HTMLElement) {
     if (this.trackingInterval) clearInterval(this.trackingInterval);
+
+    console.info('Display - trackElement, element:', element.id);
 
     this.trackingFun = () => {
       const rect = this.getScaledRectangle(element.getBoundingClientRect());
@@ -237,6 +241,7 @@ export class Display {
   }
 
   remoteClose() {
+    console.info('Display - remoteClose, name: ', this.name);
     this.outputRegionCallbacks = [];
     if (this.trackingInterval) clearInterval(this.trackingInterval);
     if (this.selectionSubscription) this.selectionSubscription.unsubscribe();
@@ -254,6 +259,9 @@ export class Display {
   }
 
   destroy() {
+    console.info(
+      `Display - destroy, electronWindowId: ${this.electronWindowId}, name: ${this.name}, sourceId: ${this.sourceId}`,
+    );
     const win = remote.BrowserWindow.fromId(this.electronWindowId);
 
     if (win) {
@@ -271,12 +279,13 @@ export class Display {
   async refreshOutputRegion() {
     if (this.displayDestroyed) return;
 
-    const position = await this.videoService.actions.return.getOBSDisplayPreviewOffset(this.name);
+    const [position, size] = await Promise.all([
+      this.videoService.actions.return.getOBSDisplayPreviewOffset(this.name),
+      this.videoService.actions.return.getOBSDisplayPreviewSize(this.name),
+    ]);
 
-    // This can happen while we were async fetching the offset
+    // This can happen while we were async fetching the values
     if (this.displayDestroyed) return;
-
-    const size = await this.videoService.actions.return.getOBSDisplayPreviewSize(this.name);
 
     this.outputRegion = {
       ...position,
@@ -388,6 +397,10 @@ export class VideoService extends Service {
   ) {
     const electronWindow = remote.BrowserWindow.fromId(electronWindowId);
 
+    console.info(
+      `VideoService - createOBSDisplay, electronWindowId: ${electronWindowId}, name: ${name}, renderingMode: ${renderingMode}, type: ${type}, sourceId: ${sourceId}`,
+    );
+
     // the display must have a context, otherwise the sources will not identify
     // which display they belong to
     const context =
@@ -435,6 +448,7 @@ export class VideoService extends Service {
   }
 
   destroyOBSDisplay(name: string) {
+    console.info(`VideoService - destroyOBSDisplay, name: ${name}`);
     obs.NodeObs.OBS_content_destroyDisplay(name);
 
     const sourceId = this.displayNameToSceneSourceIdMap.get(name);
