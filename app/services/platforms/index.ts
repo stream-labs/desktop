@@ -1,7 +1,7 @@
 import { ITwitchStartStreamOptions, TwitchService } from './twitch';
 import { IYoutubeStartStreamOptions, YoutubeService } from './youtube';
 import { FacebookService, IFacebookStartStreamOptions } from './facebook';
-import { ITiktokStartStreamOptions, TiktokService } from './tiktok';
+import { ITikTokStartStreamOptions, TikTokService } from './tiktok';
 import { InstagramService, IInstagramStartStreamOptions } from './instagram';
 import { TwitterPlatformService } from './twitter';
 import { TTwitchOAuthScope } from './twitch/index';
@@ -133,13 +133,23 @@ export enum EPlatformCallResult {
    * The user is missing an essential Twitch scope.
    */
   TwitchScopeMissing,
+
+  /**
+   * The user is not authorized for livestreaming by TikTok.
+   */
+  TikTokStreamScopeMissing,
+
+  /**
+   * The user needs to re-merge their to update Live Access status.
+   */
+  TikTokScopeOutdated,
 }
 
 export type TStartStreamOptions =
   | ITwitchStartStreamOptions
   | IYoutubeStartStreamOptions
   | Partial<IFacebookStartStreamOptions>
-  | Partial<ITiktokStartStreamOptions>
+  | Partial<ITikTokStartStreamOptions>
   | Partial<ITrovoStartStreamOptions>
   | Partial<IInstagramStartStreamOptions>;
 
@@ -271,7 +281,7 @@ export function getPlatformService(platform?: TPlatform): IPlatformService {
     twitch: TwitchService.instance,
     youtube: YoutubeService.instance,
     facebook: FacebookService.instance,
-    tiktok: TiktokService.instance,
+    tiktok: TikTokService.instance,
     trovo: TrovoService.instance,
     twitter: TwitterPlatformService.instance,
     instagram: InstagramService.instance,

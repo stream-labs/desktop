@@ -7,7 +7,7 @@ import { TwitchEditStreamInfo } from './platforms/TwitchEditStreamInfo';
 import { Section } from './Section';
 import { YoutubeEditStreamInfo } from './platforms/YoutubeEditStreamInfo';
 import FacebookEditStreamInfo from './platforms/FacebookEditStreamInfo';
-import { TiktokEditStreamInfo } from './platforms/TiktokEditStreamInfo';
+import { TikTokEditStreamInfo } from './platforms/TikTokEditStreamInfo';
 import { IPlatformComponentParams, TLayoutMode } from './platforms/PlatformSettingsLayout';
 import { getDefined } from '../../../util/properties-type-guards';
 import { TrovoEditStreamInfo } from './platforms/TrovoEditStreamInfo';
@@ -93,7 +93,7 @@ export default function PlatformSettings() {
                 <YoutubeEditStreamInfo {...createPlatformBinding('youtube')} />
               )}
               {platform === 'tiktok' && (
-                <TiktokEditStreamInfo {...createPlatformBinding('tiktok')} />
+                <TikTokEditStreamInfo {...createPlatformBinding('tiktok')} />
               )}
               {platform === 'trovo' && <TrovoEditStreamInfo {...createPlatformBinding('trovo')} />}
               {platform === 'twitter' && (

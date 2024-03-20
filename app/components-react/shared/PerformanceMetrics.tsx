@@ -6,6 +6,7 @@ import { Services } from '../service-provider';
 import cloneDeep from 'lodash/cloneDeep';
 import styles from './PerformanceMetrics.m.less';
 import { $t } from '../../services/i18n';
+import { useRealmObject } from 'components-react/hooks/realm';
 
 type TPerformanceMetricsMode = 'full' | 'limited';
 
@@ -14,21 +15,12 @@ export default function PerformanceMetrics(props: {
   className?: string;
 }) {
   const { CustomizationService, PerformanceService } = Services;
+  const pinnedStats = useRealmObject(CustomizationService.state.pinnedStatistics);
 
-  const v = useVuex(
-    () => ({
-      pinnedStats: CustomizationService.views.pinnedStatistics,
-      cpuPercent: PerformanceService.views.cpuPercent,
-      frameRate: PerformanceService.views.frameRate,
-      droppedFrames: PerformanceService.views.droppedFrames,
-      percentDropped: PerformanceService.views.percentDropped,
-      bandwidth: PerformanceService.views.bandwidth,
-    }),
-    false,
-  );
+  const stats = useRealmObject(PerformanceService.state);
 
   function showAttribute(attribute: string) {
-    return props.mode === 'full' || v.pinnedStats[attribute];
+    return props.mode === 'full' || pinnedStats[attribute];
   }
 
   function pinTooltip(stat: string) {
@@ -37,25 +29,23 @@ export default function PerformanceMetrics(props: {
 
   function classForStat(stat: string) {
     if (props.mode === 'limited') return '';
-    return `clickable ${v.pinnedStats[stat] ? 'active' : ''}`;
+    return `clickable ${pinnedStats[stat] ? 'active' : ''}`;
   }
 
   function updatePinnedStats(key: string, value: boolean) {
     if (props.mode === 'limited') return;
-    const newStats = cloneDeep(v.pinnedStats);
-    newStats[key] = value;
-    CustomizationService.actions.setPinnedStatistics(newStats);
+    CustomizationService.actions.setSettings({ pinnedStatistics: { [key]: value } });
   }
 
   const metadata = {
-    cpu: { value: `${v.cpuPercent}%`, label: $t('CPU'), icon: 'icon-cpu' },
-    fps: { value: v.frameRate, label: 'FPS', icon: 'icon-fps' },
+    cpu: { value: `${stats.cpuPercent}%`, label: $t('CPU'), icon: 'icon-cpu' },
+    fps: { value: stats.frameRateFixed, label: 'FPS', icon: 'icon-fps' },
     droppedFrames: {
-      value: `${v.droppedFrames} (${v.percentDropped}%)`,
+      value: `${stats.droppedFrames} (${stats.percentDropped}%)`,
       label: $t('Dropped Frames'),
       icon: 'icon-dropped-frames',
     },
-    bandwidth: { value: v.bandwidth, label: 'kb/s', icon: 'icon-bitrate' },
+    bandwidth: { value: stats.bandwidth, label: 'kb/s', icon: 'icon-bitrate' },
   };
 
   const shownCells = ['cpu', 'fps', 'droppedFrames', 'bandwidth'].filter((val: string) =>
@@ -86,7 +76,7 @@ export default function PerformanceMetrics(props: {
                 classForStat(attribute),
                 'performance-metric-wrapper',
               )}
-              onClick={() => updatePinnedStats(attribute, !v.pinnedStats[attribute])}
+              onClick={() => updatePinnedStats(attribute, !pinnedStats[attribute])}
             >
               <i className={cx(styles.performanceMetricIcon, data.icon)} />
               <span className={styles.performanceMetric}>

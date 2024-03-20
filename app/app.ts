@@ -36,6 +36,7 @@ import process from 'process';
 import { MetricsService } from 'services/metrics';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import * as remote from '@electron/remote';
+import { RealmService } from 'app-services';
 
 // // TODO: commented until we remove slap library
 // // For React Windows
@@ -259,6 +260,8 @@ const showDialog = (message: string): void => {
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
+  await RealmService.instance.connect();
+
   const store = createStore();
 
   // setup VueI18n plugin

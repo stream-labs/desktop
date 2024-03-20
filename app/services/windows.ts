@@ -352,6 +352,19 @@ export class WindowsService extends StatefulService<IWindowsState> {
     return remote.screen.getDisplayMatching(bounds);
   }
 
+  /**
+   * A little hack to bring a window back to the front
+   * @remark copied from the external auth function
+   * @param child bring child window to front
+   */
+  setWindowOnTop(child: boolean = false) {
+    const win = child ? Utils.getChildWindow() : Utils.getMainWindow();
+    win.setAlwaysOnTop(true);
+    win.show();
+    win.focus();
+    win.setAlwaysOnTop(false);
+  }
+
   async closeChildWindow() {
     const windowOptions = this.state.child;
 

@@ -47,7 +47,9 @@ export default function Onboarding() {
   };
 
   useEffect(() => {
-    UsageStatisticsService.actions.recordShown('Onboarding', currentStep.component);
+    if (!singletonStep) {
+      UsageStatisticsService.actions.recordShown('Onboarding', currentStep.component);
+    }
   }, [currentStep.component]);
 
   const currentStepIndex = useMemo(() => {
@@ -255,7 +257,9 @@ export class OnboardingModule {
   }
 
   finish() {
-    this.UsageStatisticsService.actions.recordShown('Onboarding', 'completed');
+    if (!this.singletonStep) {
+      this.UsageStatisticsService.actions.recordShown('Onboarding', 'completed');
+    }
     this.OnboardingService.actions.finish();
   }
 

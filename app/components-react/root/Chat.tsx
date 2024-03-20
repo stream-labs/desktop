@@ -4,8 +4,14 @@ import { Services } from '../service-provider';
 import styles from './Chat.m.less';
 import { OS, getOS } from '../../util/operating-systems';
 import { onUnload } from 'util/unload';
+import { Button } from 'antd';
+import { $t } from 'services/i18n';
 
-export default function Chat(props: { restream: boolean }) {
+export default function Chat(props: {
+  restream: boolean;
+  visibleChat: string;
+  setChat: (key: string) => void;
+}) {
   const { ChatService, RestreamService } = Services;
 
   const chatEl = useRef<HTMLDivElement>(null);
@@ -15,6 +21,15 @@ export default function Chat(props: { restream: boolean }) {
   let resizeInterval: number;
 
   let leaveFullScreenTrigger: Function;
+
+  const showTikTokInfo =
+    props.visibleChat === 'tiktok' ||
+    (props.visibleChat === 'default' &&
+      Services.UserService.state.auth?.primaryPlatform === 'tiktok');
+
+  const setTikTokChat =
+    Services.UserService.state.auth?.primaryPlatform === 'tiktok' &&
+    props.visibleChat === 'restream';
 
   // Setup resize/fullscreen listeners
   useEffect(() => {
@@ -51,6 +66,9 @@ export default function Chat(props: { restream: boolean }) {
     const cancelUnload = onUnload(() => service.actions.unmountChat(remote.getCurrentWindow().id));
 
     return () => {
+      if (setTikTokChat) {
+        props.setChat('tiktok');
+      }
       service.actions.unmountChat(remote.getCurrentWindow().id);
       cancelUnload();
     };
@@ -93,5 +111,21 @@ export default function Chat(props: { restream: boolean }) {
     );
   }
 
-  return <div className={styles.chat} ref={chatEl} />;
+  return showTikTokInfo ? <TikTokChatInfo /> : <div className={styles.chat} ref={chatEl} />;
+}
+
+function TikTokChatInfo() {
+  function openPlatformDash() {
+    remote.shell.openExternal(Services.TikTokService.dashboardUrl);
+  }
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', marginTop: '30px' }}>
+      <div style={{ marginBottom: '5px' }}>
+        {$t('Access chat for TikTok in the TikTok Live Center.')}
+      </div>
+      <Button style={{ width: '200px', marginBottom: '10px' }} onClick={() => openPlatformDash()}>
+        {$t('Open TikTok Live Center')}
+      </Button>
+    </div>
+  );
 }

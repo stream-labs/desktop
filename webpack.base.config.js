@@ -78,6 +78,7 @@ module.exports = {
     'font-manager': 'require("font-manager")',
     'color-picker': 'require("color-picker")',
     '@electron/remote': 'require("@electron/remote")',
+    realm: 'require("realm")',
 
     // Not actually a native addons, but for one reason or another
     // we don't want them compiled in our webpack bundle.

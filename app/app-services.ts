@@ -60,6 +60,7 @@ export { SideNavService } from 'services/side-nav';
 export { VideoSettingsService } from 'services/settings-v2/video';
 export { SettingsManagerService } from 'services/settings-manager';
 export { MarkersService } from 'services/markers';
+export { RealmService } from 'services/realm';
 
 // ONLINE SERVICES
 export { UserService } from './services/user';
@@ -67,7 +68,7 @@ export { YoutubeService } from 'services/platforms/youtube';
 export { TwitchService } from 'services/platforms/twitch';
 export { TwitchTagsService } from 'services/platforms/twitch/index';
 export { FacebookService } from 'services/platforms/facebook';
-export { TiktokService } from 'services/platforms/tiktok';
+export { TikTokService } from 'services/platforms/tiktok';
 export { TrovoService } from 'services/platforms/trovo';
 export { RestreamService } from 'services/restream';
 export { TwitterService } from 'services/integrations/twitter';
@@ -145,6 +146,7 @@ import { TwitchTagsService } from './services/platforms/twitch/index';
 import { TrovoService } from './services/platforms/trovo';
 import { YoutubeService } from './services/platforms/youtube';
 import { FacebookService } from './services/platforms/facebook';
+import { TikTokService } from './services/platforms/tiktok';
 import { DismissablesService } from './services/dismissables';
 import { NavigationService } from './services/navigation';
 import { AnnouncementsService } from './services/announcements';
@@ -193,6 +195,7 @@ import { SettingsManagerService } from 'services/settings-manager';
 import { DualOutputService } from 'services/dual-output';
 import { MarkersService } from 'services/markers';
 import { SharedStorageService } from 'services/integrations/shared-storage';
+import { RealmService } from 'services/realm';
 import { InstagramService } from 'services/platforms/instagram';
 
 export const AppServices = {
@@ -219,6 +222,7 @@ export const AppServices = {
   TwitterService,
   YoutubeService,
   FacebookService,
+  TikTokService,
   UserService,
   TwitchService,
   TwitterPlatformService,
@@ -268,4 +272,5 @@ export const AppServices = {
   DualOutputService,
   MarkersService,
   SharedStorageService,
+  RealmService,
 };

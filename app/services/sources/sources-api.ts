@@ -17,6 +17,7 @@ export interface ISource {
   height: number;
   doNotDuplicate: boolean;
   configurable: boolean;
+  forceUiRefresh: boolean;
   propertiesManagerType: TPropertiesManager;
   propertiesManagerSettings?: Dictionary<any>;
   channel?: number;

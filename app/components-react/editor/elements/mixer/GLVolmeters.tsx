@@ -119,16 +119,7 @@ class GLVolmetersModule {
     this.workerId = electron.ipcRenderer.sendSync('getWorkerWindowId');
     this.subscribeVolmeters();
     this.bg = this.customizationService.sectionBackground;
-    this.fpsLimit = this.customizationService.state.experimental!.volmetersFPSLimit! || 30;
-
-    // update FPS limit if settings have changed
-    this.customizationServiceSubscription = this.customizationService.settingsChanged.subscribe(
-      settings => {
-        if (settings.experimental?.volmetersFPSLimit) {
-          this.fpsLimit = settings.experimental.volmetersFPSLimit;
-        }
-      },
-    );
+    this.fpsLimit = 30;
   }
 
   $refs = {
@@ -321,7 +312,7 @@ class GLVolmetersModule {
     this.gl.uniform1f(dangerLocation, this.dbToUnitScalar(DANGER_LEVEL));
 
     // Set colors
-    const green = this.customizationService.views.isDarkTheme ? GREEN : LIGHT_MODE_GREEN;
+    const green = this.customizationService.isDarkTheme ? GREEN : LIGHT_MODE_GREEN;
     this.setColorUniform('u_green', green);
     this.setColorUniform('u_yellow', YELLOW);
     this.setColorUniform('u_red', RED);

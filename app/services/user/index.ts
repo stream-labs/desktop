@@ -161,6 +161,7 @@ class UserViews extends ViewHandler<IUserServiceState> {
   // Injecting HostsService since it's not stateful
   @Inject() hostsService: HostsService;
   @Inject() magicLinkService: MagicLinkService;
+  @Inject() customizationService: CustomizationService;
 
   get settingsServiceViews() {
     return this.getServiceViews(SettingsService);
@@ -168,10 +169,6 @@ class UserViews extends ViewHandler<IUserServiceState> {
 
   get streamSettingsServiceViews() {
     return this.getServiceViews(StreamSettingsService);
-  }
-
-  get customizationServiceViews() {
-    return this.getServiceViews(CustomizationService);
   }
 
   get isLoggedIn() {
@@ -254,7 +251,7 @@ class UserViews extends ViewHandler<IUserServiceState> {
   appStoreUrl(params?: { appId?: string | undefined; type?: string | undefined }) {
     const host = this.hostsService.platform;
     const token = this.auth.apiToken;
-    const nightMode = this.customizationServiceViews.isDarkTheme ? 'night' : 'day';
+    const nightMode = this.customizationService.isDarkTheme ? 'night' : 'day';
     let url = `https://${host}/slobs-store`;
 
     if (params?.appId) {
@@ -830,7 +827,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   async alertboxLibraryUrl(id?: string) {
-    const uiTheme = this.customizationService.views.isDarkTheme ? 'night' : 'day';
+    const uiTheme = this.customizationService.isDarkTheme ? 'night' : 'day';
     let url = `https://${this.hostsService.streamlabs}/alert-box-themes?mode=${uiTheme}&slobs`;
 
     if (id) url += `&id=${id}`;
@@ -839,7 +836,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   async overlaysUrl(type?: 'overlay' | 'widget-themes' | 'site-themes', id?: string) {
-    const uiTheme = this.customizationService.views.isDarkTheme ? 'night' : 'day';
+    const uiTheme = this.customizationService.isDarkTheme ? 'night' : 'day';
 
     let url = `https://${this.hostsService.streamlabs}/library`;
 
@@ -997,9 +994,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    * platform linked, they will be prompted to merge a platform into their
    * account before they can be considered fully logged in.
    */
-  async startSLAuth() {
+  async startSLAuth({ signup = false } = {}) {
     const query = `_=${Date.now()}&skip_splash=true&external=electron&slid&force_verify&origin=slobs`;
-    const url = `https://${this.hostsService.streamlabs}/slobs/login?${query}`;
+    const url = `https://${this.hostsService.streamlabs}/slobs/${
+      signup ? 'signup' : 'login'
+    }?${query}`;
 
     this.SET_AUTH_STATE(EAuthProcessState.Loading);
 
@@ -1007,11 +1006,14 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       this.SET_AUTH_STATE(EAuthProcessState.Idle);
     });
 
+    if (!auth) return EPlatformCallResult.Error;
+
     this.LOGOUT();
     this.LOGIN(auth);
 
     // Find out if the user has any additional platforms linked
     await this.updateLinkedPlatforms();
+    return EPlatformCallResult.Success;
   }
 
   /**
@@ -1062,13 +1064,17 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.SET_AUTH_STATE(EAuthProcessState.Loading);
     const onWindowShow = () => this.SET_AUTH_STATE(EAuthProcessState.Idle);
 
-    const auth = await this.authModule.startPkceAuth(authUrl, onWindowShow, () => {}, true);
-
-    this.SET_AUTH_STATE(EAuthProcessState.Loading);
-    this.SET_IS_RELOG(false);
-    this.SET_SLID(auth.slid);
-    this.SET_AUTH_STATE(EAuthProcessState.Idle);
-    return EPlatformCallResult.Success;
+    try {
+      const auth = await this.authModule.startPkceAuth(authUrl, onWindowShow, () => {}, true);
+      this.SET_AUTH_STATE(EAuthProcessState.Loading);
+      this.SET_IS_RELOG(false);
+      this.SET_SLID(auth.slid);
+      this.SET_AUTH_STATE(EAuthProcessState.Idle);
+      return EPlatformCallResult.Success;
+    } catch (e: unknown) {
+      console.error('Merge Account Error: ', e);
+      return EPlatformCallResult.Error;
+    }
   }
 
   /**
@@ -1136,8 +1142,12 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
       result = await this.login(service, auth);
     } else {
-      this.UPDATE_PLATFORM(auth.platforms[auth.primaryPlatform]);
-      result = EPlatformCallResult.Success;
+      if (auth) {
+        this.UPDATE_PLATFORM(auth.platforms[auth.primaryPlatform]);
+        result = EPlatformCallResult.Success;
+      } else {
+        result = EPlatformCallResult.Error;
+      }
     }
 
     this.SET_AUTH_STATE(EAuthProcessState.Idle);
