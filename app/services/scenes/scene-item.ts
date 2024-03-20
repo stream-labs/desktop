@@ -108,8 +108,13 @@ export class SceneItem extends SceneItemNode {
     Utils.applyProxy(this, this.state);
 
     if (this.type === 'scene') {
-      this.baseWidth = this.videoSettingsService.baseResolutions[this.display].baseWidth;
-      this.baseHeight = this.videoSettingsService.baseResolutions[this.display].baseHeight;
+      const baseResolutions = this.videoSettingsService.baseResolutions[
+        this.display ?? 'horizontal'
+      ];
+      assertIsDefined(baseResolutions);
+
+      this.baseWidth = baseResolutions.baseWidth ?? this.width;
+      this.baseHeight = baseResolutions.baseHeight ?? this.height;
     }
   }
 
