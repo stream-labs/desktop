@@ -1,4 +1,4 @@
-import { TPlatform, EPlatformCallResult, getPlatformService } from 'services/platforms';
+import { TPlatform } from 'services/platforms';
 import { IUserAuth } from '.';
 import uuid from 'uuid/v4';
 import electron from 'electron';
@@ -70,40 +70,46 @@ export class AuthModule {
       );
     }
 
-    const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/auth/data?code_verifier=${codeVerifier}`;
+    try {
+      const host = this.hostsService.streamlabs;
+      const url = `https://${host}/api/v5/slobs/auth/data?code_verifier=${codeVerifier}`;
 
-    const resp = await jfetch<IPkceAuthResponse>(url);
+      const resp = await jfetch<IPkceAuthResponse>(url);
 
-    if (resp.data.platform === 'slid') {
+      if (resp.data.platform === 'slid') {
+        return {
+          widgetToken: resp.data.token,
+          apiToken: resp.data.oauth_token,
+          primaryPlatform: null,
+          platforms: {},
+          slid: {
+            id: resp.data.platform_id,
+            username: resp.data.platform_username,
+          },
+          hasRelogged: true,
+        };
+      }
+
       return {
         widgetToken: resp.data.token,
         apiToken: resp.data.oauth_token,
-        primaryPlatform: null,
-        platforms: {},
-        slid: {
-          id: resp.data.platform_id,
-          username: resp.data.platform_username,
+        primaryPlatform: resp.data.platform,
+        platforms: {
+          [resp.data.platform]: {
+            type: resp.data.platform,
+            username: resp.data.platform_username,
+            token: resp.data.platform_token,
+            id: resp.data.platform_id,
+          },
         },
+        partition,
         hasRelogged: true,
       };
-    }
+    } catch (error: unknown) {
+      console.error('Authentication Error: ', error);
 
-    return {
-      widgetToken: resp.data.token,
-      apiToken: resp.data.oauth_token,
-      primaryPlatform: resp.data.platform,
-      platforms: {
-        [resp.data.platform]: {
-          type: resp.data.platform,
-          username: resp.data.platform_username,
-          token: resp.data.platform_token,
-          id: resp.data.platform_id,
-        },
-      },
-      partition,
-      hasRelogged: true,
-    };
+      return;
+    }
   }
 
   private authServer: http.Server;
@@ -124,10 +130,21 @@ export class AuthModule {
         const query = URI.parseQuery(URI.parse(request.url).query) as Dictionary<string>;
 
         if (query['success']) {
-          response.writeHead(302, {
-            Location: 'https://streamlabs.com/streamlabs-obs/login-success',
-          });
-          response.end();
+          // handle account already merged to another account
+          if (
+            query['success'] === 'false' ||
+            ['connected_with_another_account', 'unknown'].includes(query['reason'])
+          ) {
+            response.writeHead(302, {
+              Location: 'https://streamlabs.com/dashboard#/settings/account-settings/platforms',
+            });
+            response.end();
+          } else {
+            response.writeHead(302, {
+              Location: 'https://streamlabs.com/streamlabs-obs/login-success',
+            });
+            response.end();
+          }
 
           this.authServer.close();
           this.authServer.unref();

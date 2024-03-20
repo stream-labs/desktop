@@ -143,11 +143,6 @@ class StreamSettingsModule {
 
   get platforms() {
     return this.streamingView.allPlatforms.filter(platform => {
-      // Only show tiktok if it's already linked
-      if (platform === 'tiktok') {
-        return !!this.userService.views.auth?.platforms?.tiktok;
-      }
-
       return true;
     });
   }
@@ -409,7 +404,8 @@ function Platform(p: { platform: TPlatform }) {
   );
 
   const instagramConnect = async () => {
-    await UserService.actions.return.startAuth(platform, 'internal', true);
+    const success = await UserService.actions.return.startAuth(platform, 'internal', true);
+    if (!success) return;
     setShowInstagramFields(true);
   };
 
@@ -426,6 +422,7 @@ function Platform(p: { platform: TPlatform }) {
     <span>
       <Button
         onClick={isInstagram ? instagramConnect : () => platformMerge(platform)}
+        className={cx({ [css.tiktokConnectBtn]: platform === 'tiktok' })}
         style={{
           backgroundColor: `var(--${platform})`,
           borderColor: 'transparent',
@@ -461,7 +458,7 @@ function Platform(p: { platform: TPlatform }) {
     <div className="section flex" style={{ marginBottom: 16, flexDirection: 'column' }}>
       <div className="flex">
         <div className="margin-right--20" style={{ width: '50px' }}>
-          <PlatformLogo className={css.platformLogo} size="medium" platform={platform} />
+          <PlatformLogo className={css.platformLogo} size={50} platform={platform} />
         </div>
 
         <div style={{ alignSelf: 'center' }}>

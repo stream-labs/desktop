@@ -88,6 +88,7 @@ interface IStreamSettings extends IStreamSettingsState {
   delaySec: number;
 }
 
+// TikTok, X (Twitter), and Instagram all map to Custom because they require entering in stream keys
 const platformToServiceNameMap: { [key in TPlatform]: string } = {
   twitch: 'Twitch',
   youtube: 'YouTube / YouTube Gaming',

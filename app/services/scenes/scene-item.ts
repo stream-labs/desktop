@@ -1,7 +1,7 @@
 import merge from 'lodash/merge';
 import { mutation, Inject } from 'services';
 import Utils from '../utils';
-import { SourcesService, TSourceType, ISource, Source } from 'services/sources';
+import { SourcesService, TSourceType, ISource } from 'services/sources';
 import { VideoService } from 'services/video';
 import {
   ScalableRectangle,
@@ -23,7 +23,7 @@ import {
   ISceneItemInfo,
 } from './index';
 import { SceneItemNode } from './scene-node';
-import { v2, Vec2 } from '../../util/vec2';
+import { v2 } from '../../util/vec2';
 import { Rect } from '../../util/rect';
 import { TSceneNodeType } from './scenes';
 import { ServiceHelper, ExecuteInWorkerProcess } from 'services/core';
@@ -283,6 +283,11 @@ export class SceneItem extends SceneItemNode {
     const position = { x: customSceneItem.x, y: customSceneItem.y };
     const crop = customSceneItem.crop;
     const display = customSceneItem?.display ?? this?.display ?? 'horizontal';
+
+    // guarantee vertical context exists to prevent null errors
+    if (display === 'vertical' && !this.videoSettingsService.contexts.vertical) {
+      this.videoSettingsService.establishVideoContext('vertical');
+    }
     const context = this.videoSettingsService.contexts[display];
 
     const obsSceneItem = this.getObsSceneItem();

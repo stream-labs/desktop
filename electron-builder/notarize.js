@@ -1,4 +1,4 @@
-const { notarize } = require('electron-notarize');
+const { notarize } = require('@electron/notarize');
 const fs = require('fs');
 
 exports.default = async function notarizing(context) {
@@ -20,7 +20,8 @@ exports.default = async function notarizing(context) {
     appBundleId: 'com.streamlabs.slobs',
     appleId: process.env['APPLE_ID'],
     appleIdPassword: process.env['APPLE_APP_PASSWORD'],
-    ascProvider: process.env['APPLE_ASC_PROVIDER']
+    ascProvider: process.env['APPLE_ASC_PROVIDER'],
+    teamId: process.env['APPLE_TEAM_ID'],
   });
 
   console.log('Notarization finished.');
