@@ -29,6 +29,7 @@ import {
 import { CustomcastUsageService } from '../custom-cast-usage';
 
 import { VideoSettingsService, TDisplayType } from 'services/settings-v2/video';
+import { RtvcStateService } from '../../services/rtvcStateService';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -68,6 +69,7 @@ export class StreamingService
   @Inject() private nicoliveProgramService: NicoliveProgramService;
   @Inject() private videoSettingsService: VideoSettingsService;
   @Inject() private customcastUsageService: CustomcastUsageService;
+  @Inject() private rtvcStateService: RtvcStateService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
@@ -712,6 +714,7 @@ export class StreamingService
     this.SET_STREAMING_TRACK_ID(streamingTrackId);
     this.actionLog('stream_start', streamingTrackId);
     this.customcastUsageService.startStreaming();
+    this.rtvcStateService.startStreaming();
   }
 
   private logStreamEnd() {
@@ -719,6 +722,7 @@ export class StreamingService
     this.SET_STREAMING_TRACK_ID('');
     this.actionLog('stream_end', streamingTrackId);
     this.customcastUsageService.stopStreaming();
+    this.rtvcStateService.stopStreaming();
   }
 
   private actionLog(eventType: 'stream_start' | 'stream_end', streamingTrackId: string) {
@@ -771,6 +775,7 @@ export class StreamingService
         auto_compact_mode: this.customizationService.state.autoCompactMode,
         current: this.customizationService.state.compactMode,
       },
+      rtvc: eventType === 'stream_end' ? this.rtvcStateService.eventLog : {},
     };
 
     this.usageStatisticsService.recordEvent(event);

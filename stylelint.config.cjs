@@ -21,6 +21,7 @@ module.exports = {
       true,
       { ignoreFunctions: ['lighten', 'darken', 'fade', 'fadein', 'fadeout'] },
     ],
+    'color-function-notation': 'legacy',
   },
   overrides: [
     {

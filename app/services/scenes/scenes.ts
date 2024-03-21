@@ -14,6 +14,7 @@ import namingHelpers from 'util/NamingHelpers';
 import uuid from 'uuid/v4';
 import { TDisplayType } from 'services/settings-v2/video';
 import { InitAfter } from 'services/core';
+import { RtvcStateService } from '../../services/rtvcStateService';
 
 export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
 
@@ -154,6 +155,7 @@ export class ScenesService extends StatefulService<IScenesState> {
   @Inject() private windowsService: WindowsService;
   @Inject() private sourcesService: SourcesService;
   @Inject() private transitionsService: TransitionsService;
+  @Inject() private rtvcStateService: RtvcStateService;
 
   @mutation()
   private ADD_SCENE(id: string, name: string) {
@@ -220,6 +222,8 @@ export class ScenesService extends StatefulService<IScenesState> {
     }
     const sceneModel = this.state.scenes[id];
 
+    if (!force) this.rtvcStateService.didRemoveScene(id);
+
     // remove all sources from scene
     scene.getItems().forEach(sceneItem => scene.removeItem(sceneItem.sceneItemId));
 
@@ -270,6 +274,9 @@ export class ScenesService extends StatefulService<IScenesState> {
 
     this.MAKE_SCENE_ACTIVE(id);
     this.sceneSwitched.next(scene.getModel());
+
+    this.rtvcStateService.didChangeScene(id, this.sourcesService);
+
     return true;
   }
 

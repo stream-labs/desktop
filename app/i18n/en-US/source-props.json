@@ -410,6 +410,69 @@
     "name": "Application Audio Capture (BETA)",
     "description": "Capture the audio coming from a specific application."
   },
+  "nair-rtvc-source": {
+    "name": "Voice Changer",
+    "description": "Converts your own voice. You can blend 100 different voices to become your own original voice, or become the voice of \"Kotoyomi Near\", \"Zundamon\", or \"Kasukabe Tsumugi\".",
+    "nav": {
+      "voice_setting": "Voice",
+      "mic_setting": "Input",
+      "preset_voice": "Presets",
+      "original_voice": "Originals",
+      "remove_voice": "Remove",
+      "copy_voice": "Copy",
+      "check_voice": "Check Voice",
+      "original_voice_add": "Add new voice",
+      "remove_confirm": "Remove?",
+      "original": "Original"
+    },
+    "container": {
+      "voice_name": "Name",
+      "voice_setting": "Parameters",
+      "make_random": {
+        "name": "Make random",
+        "description": "Generate voice 1, voice 2, and set the amount randomly."
+      }
+    },
+    "preset": {
+      "play_sample": "Play sample audio",
+      "description": "While listening to the converted audio, adjust the pitch so that it is close to the character's voice."
+    },
+    "pitch_shift": {
+      "name": "pitch"
+    },
+    "primary_voice": {
+      "name": "voice 1",
+      "0": "jvs_001"
+    },
+    "secondary_voice": {
+      "name": "voice 2",
+      "-1": "none",
+      "0": "jvs_001"
+    },
+    "amount": {
+      "name": "voice 2 amount"
+    },
+    "device": {
+      "name": "Input device"
+    },
+    "latency": {
+      "name": "Latency",
+      "1": "1: Conversion time is short",
+      "2": "2",
+      "3": "3",
+      "4": "4",
+      "5": "5",
+      "6": "6",
+      "7": "7",
+      "8": "8",
+      "9": "9",
+      "10": "10",
+      "11": "11",
+      "12": "12",
+      "13": "13: Conversion time is long",
+      "description": "The smaller this value, the faster the conversion time, but the output may become unstable."
+    }
+  },
   "vlc_source": {
     "name": "VLC Source",
     "description": "Add playlists of videos to your scene."

@@ -28,6 +28,7 @@ import BlackmagicSourceIcon from '../../../media/images/blackmagic-icon.svg';
 import CharacterSourceIcon from '../../../media/images/character-source-icon.svg';
 import AppAudioCaptureSourceIcon from '../../../media/images/app-speaker.svg';
 import VLCSourceIcon from '../../../media/images/play.svg';
+import SpeechEngineIcon from '../../../media/images/speech-engine.svg';
 import { NVoiceCharacterType, NVoiceCharacterTypes } from 'services/nvoice-character';
 import { omit } from 'lodash';
 import { remote } from 'electron';
@@ -62,6 +63,7 @@ interface ISelectSourceOptions {
     CharacterSourceIcon,
     AppAudioCaptureSourceIcon,
     VLCSourceIcon,
+    SpeechEngineIcon,
   },
 })
 export default class SourcesShowcase extends Vue {
@@ -132,6 +134,13 @@ export default class SourcesShowcase extends Vue {
   }
 
   get readyToAdd() {
+    if (this.inspectedSource === 'nair-rtvc-source') {
+      // 同一scene上では1つだけ
+      for (const s of this.scenesService.activeScene.items) {
+        if (this.sourcesService.getSourceById(s.sourceId).type === 'nair-rtvc-source') return false;
+      }
+    }
+
     return this.inspectedSource !== null && this.inspectedSource !== 'custom_cast_ndi_guide';
   }
 }

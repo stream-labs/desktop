@@ -106,7 +106,11 @@ const createInjectee = ({
     },
     startStreaming: noop,
     stopStreaming: noop,
-  }
+  },
+  RtvcStateService: {
+    startStreaming: noop,
+    stopStreaming: noop,
+  },
 });
 
 const setup = createSetupFunction({

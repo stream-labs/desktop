@@ -230,7 +230,6 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  z-index: @z-index-expand-content; // AreaSwitcherのheaderより大きく
   display: flex;
   flex-direction: column;
   align-items: center;

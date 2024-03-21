@@ -28,6 +28,7 @@ import uuid from 'uuid/v4';
 import { UserService } from 'services/user';
 import { NVoiceCharacterTypes } from 'services/nvoice-character';
 import { InitAfter } from 'services/core';
+import { RtvcStateService } from '../../services/rtvcStateService';
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
@@ -63,6 +64,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   @Inject() private windowsService: WindowsService;
   @Inject() private audioService: AudioService;
   @Inject() private userService: UserService;
+  @Inject() private rtvcStateService: RtvcStateService;
 
   /**
    * Maps a source id to a property manager
@@ -184,15 +186,19 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     this.UPDATE_SOURCE({ id, muted });
     this.updateSourceFlags(source.state, obsInput.outputFlags, true);
 
-
     if (!PROPERTIES_MANAGER_TYPES.hasOwnProperty(managerType)) {
-      console.error(`Unknown properties manager type ${managerType} of source id:${id} ('${source.name}'). fallback to default.`);
+      console.error(
+        `Unknown properties manager type ${managerType} of source id:${id} ('${source.name}'). fallback to default.`,
+      );
     }
-    const managerKlass = PROPERTIES_MANAGER_TYPES[managerType] ?? PROPERTIES_MANAGER_TYPES['default'];
+    const managerKlass =
+      PROPERTIES_MANAGER_TYPES[managerType] ?? PROPERTIES_MANAGER_TYPES['default'];
     this.propertiesManagers[id] = {
       manager: new managerKlass(obsInput, options.propertiesManagerSettings || {}),
       type: managerType,
     };
+
+    if (source.type === 'nair-rtvc-source') this.rtvcStateService.didAddSource(source);
 
     this.sourceAdded.next(source.state);
     if (options.audioSettings) {
@@ -212,6 +218,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     if (source.channel !== void 0) {
       obs.Global.setOutputSource(source.channel, null);
     }
+
+    if (source.type === 'nair-rtvc-source') this.rtvcStateService.didRemoveSource(source);
 
     source.getObsInput().release();
     this.propertiesManagers[id].manager.destroy();
@@ -353,6 +361,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       'ovrstream_dc_source',
       'vlc_source',
       'wasapi_process_output_capture',
+      'nair-rtvc-source', // voice changer
     ];
 
     const availableWhitelistedType = whitelistedTypes.filter(type =>
@@ -504,6 +513,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
         height: 600,
       },
     };
+
+    if (source.type === 'nair-rtvc-source') baseConfig.componentName = 'RtvcSourceProperties';
 
     // HACK: childWindow で表示してしまうとウィンドウキャプチャでクラッシュするので OneOffWindow で代替している
     // StreamLabs 1.3.0 まで追従したらこのワークアラウンドはなくせる

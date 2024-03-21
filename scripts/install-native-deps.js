@@ -38,10 +38,10 @@ function executeCmd(cmd, options) {
   return result.stdout;
 }
 
-function downloadFile(srcUrl, dstPath) {
+function downloadFile(srcUrl, dstPath, param) {
   const tmpPath = `${dstPath}.tmp`;
   return new Promise((resolve, reject) => {
-    fetch(srcUrl)
+    fetch(srcUrl, param)
       .then(response => {
         if (response.ok) return response;
         log_error(`Got ${response.status} response from ${srcUrl}`);
@@ -55,6 +55,7 @@ function downloadFile(srcUrl, dstPath) {
             reject(e);
           } else {
             fs.rename(tmpPath, dstPath, e => {
+              console.log(dstPath);
               if (e) {
                 reject(e);
                 return;
@@ -67,6 +68,32 @@ function downloadFile(srcUrl, dstPath) {
       })
       .catch(e => reject(e));
   });
+}
+
+async function rtvc() {
+  // cwd is node_modules
+  log_info('copy rtvc');
+
+  const url = 'https://api.github.com/repos/n-air-app/rtvc_runtime/releases/assets/156223196';
+  const zip = './nair-rtvc.tar.gz';
+  const dst = './obs-studio-node/obs-plugins/64bit/';
+
+  if (fs.existsSync('../nair-rtvc.tar.gz')) {
+    log_info('use existing file');
+    sh.cp('../nair-rtvc.tar.gz', zip);
+  } else {
+    const token = process.env['github_token'];
+
+    const param = { headers: { Accept: 'application/octet-stream' } };
+    if (token) param.headers.Authorization = `Bearer ${token}`;
+
+    log_info('downloading..');
+    await downloadFile(url, zip, param);
+  }
+
+  log_info('extracting..');
+  executeCmd(`tar -xzvf ${zip} -C ${dst}`, { silent: false });
+  sh.rm(zip);
 }
 
 async function runScript() {
@@ -137,7 +164,7 @@ async function runScript() {
           }
         } catch {}
 
-        sh.rm('-rf', path.join(node_modules, dependency['name']));
+        sh.rm('-rf', dependency['name']);
 
         log_info('Downloading ' + fileName);
         await downloadFile(url, filePath);
@@ -148,6 +175,8 @@ async function runScript() {
         fs.writeFileSync(checkFile, url);
       });
     await Promise.all(promises);
+
+    await rtvc();
 
     if (process.platform === 'win32') {
       sh.cd('../scripts');

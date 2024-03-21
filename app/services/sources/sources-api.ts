@@ -113,6 +113,7 @@ export type TSourceType =
   | 'wasapi_process_output_capture'
   | 'custom_cast_ndi_source'
   | 'custom_cast_ndi_guide'
+  | 'nair-rtvc-source'
   ;
 
 // Register new properties manager here
