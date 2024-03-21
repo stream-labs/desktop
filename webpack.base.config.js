@@ -3,7 +3,7 @@ const webpack = require('webpack');
 const cp = require('child_process');
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const VueLoaderPlugin = require('vue-loader/lib/plugin');
+const { VueLoaderPlugin } = require('vue-loader');
 const fs = require('fs');
 
 const plugins = [];
