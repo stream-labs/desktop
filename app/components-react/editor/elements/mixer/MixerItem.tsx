@@ -58,7 +58,7 @@ export default function MixerItem(p: { audioSourceId: string; volmetersEnabled?:
             min={0}
             max={1}
             step={0.01}
-            debounce={500}
+            throttle={100}
             nowrap
           />
         </div>
