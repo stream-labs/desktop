@@ -62,9 +62,8 @@ function ExtraSettings() {
   const disableHAFilePath = path.join(AppService.appDataDirectory, 'HADisable');
   const [disableHA, setDisableHA] = useState(() => fs.existsSync(disableHAFilePath));
 
+  // TODO: unused fields
   const { isRecordingOrStreaming, recordingMode, isSimpleOutputMode } = useVuex(() => {
-    console.log('updateStreamInfoOnLive', CustomizationService.state.updateStreamInfoOnLive);
-    console.log('recordingMode', RecordingModeService.views.isRecordingModeEnabled);
     return {
       isRecordingOrStreaming: StreamingService.isStreaming || StreamingService.isRecording,
       recordingMode: RecordingModeService.views.isRecordingModeEnabled,
