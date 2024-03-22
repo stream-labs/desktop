@@ -63,13 +63,11 @@ function ExtraSettings() {
   const [disableHA, setDisableHA] = useState(() => fs.existsSync(disableHAFilePath));
 
   // TODO: unused fields
-  const { isRecordingOrStreaming, recordingMode, isSimpleOutputMode } = useVuex(() => {
-    return {
-      isRecordingOrStreaming: StreamingService.isStreaming || StreamingService.isRecording,
-      recordingMode: RecordingModeService.views.isRecordingModeEnabled,
-      isSimpleOutputMode: SettingsService.views.isSimpleOutputMode,
-    };
-  });
+  const { isRecordingOrStreaming, recordingMode, isSimpleOutputMode } = useVuex(() => ({
+    isRecordingOrStreaming: StreamingService.isStreaming || StreamingService.isRecording,
+    recordingMode: RecordingModeService.views.isRecordingModeEnabled,
+    isSimpleOutputMode: SettingsService.views.isSimpleOutputMode,
+  }));
 
   const updateStreamInfoOnLive = useRealmObject(CustomizationService.state).updateStreamInfoOnLive;
 
