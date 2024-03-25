@@ -322,7 +322,7 @@ export class ScenesService extends StatefulService<IScenesState> {
     const id = options.sceneId || `scene_${uuid()}`;
     this.ADD_SCENE(id, name);
     const obsScene = SceneFactory.create(id);
-    this.sourcesService.addSource(obsScene.source, name, { sourceId: id });
+    this.sourcesService.addSource(obsScene.source, name, { sourceId: id, display: 'horizontal' });
 
     if (options.duplicateSourcesFromScene) {
       const newScene = this.views.getScene(id)!;
