@@ -3,7 +3,7 @@
  */
 import React, { useEffect, useContext, ChangeEvent, FocusEvent, useCallback, useRef } from 'react';
 import { FormContext } from './Form';
-import { useDebounce } from '../../hooks';
+import { useDebounce, useThrottle } from '../../hooks';
 import { useOnCreate, useForceUpdate, createFormBinding } from 'slap';
 import uuid from 'uuid';
 import { FormItemProps } from 'antd/lib/form';
@@ -50,6 +50,7 @@ export interface IInputCommonProps<TValue> {
   disabled?: boolean;
   readOnly?: boolean;
   debounce?: number;
+  throttle?: number;
   /**
    * true if the input is in the uncontrolled mode
    * all input components except text inputs are controlled by default
@@ -178,6 +179,7 @@ export function useInput<
     inputPropsRef.current.onChange && inputPropsRef.current.onChange(newVal);
   }
   const emitChangeDebounced = useDebounce(inputProps.debounce, emitChange);
+  const emitChangeThrottled = useThrottle(inputProps.throttle, emitChange);
 
   // create onChange handler
   const onChange = useCallback((newVal: TValue) => {
@@ -196,6 +198,8 @@ export function useInput<
     if (!props.onChange) return;
     if (props.debounce) {
       emitChangeDebounced(newVal);
+    } else if (props.throttle) {
+      emitChangeThrottled(newVal);
     } else {
       emitChange(newVal);
     }
