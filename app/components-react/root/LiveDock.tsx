@@ -382,17 +382,29 @@ function LiveDock(p: { onLeft: boolean }) {
             <div className={styles.liveDockInfo}>
               <div className={styles.liveDockPlatformTools}>
                 {ctrl.canEditChannelInfo && (
-                  <Tooltip title={$t('Edit your stream title and description')} placement="right">
+                  <Tooltip
+                    title={$t('Edit your stream title and description')}
+                    placement="right"
+                    autoAdjustOverflow={false}
+                  >
                     <i onClick={() => ctrl.showEditStreamInfo()} className="icon-edit" />
                   </Tooltip>
                 )}
                 {isPlatform(['youtube', 'facebook', 'trovo', 'tiktok']) && isStreaming && (
-                  <Tooltip title={$t('View your live stream in a web browser')} placement="right">
+                  <Tooltip
+                    title={$t('View your live stream in a web browser')}
+                    placement="right"
+                    autoAdjustOverflow={false}
+                  >
                     <i onClick={() => ctrl.openPlatformStream()} className="icon-studio" />
                   </Tooltip>
                 )}
                 {isPlatform(['youtube', 'facebook', 'tiktok']) && isStreaming && (
-                  <Tooltip title={$t('Go to Live Dashboard')} placement="right">
+                  <Tooltip
+                    title={$t('Go to Live Dashboard')}
+                    placement="right"
+                    autoAdjustOverflow={false}
+                  >
                     <i onClick={() => ctrl.openPlatformDash()} className="icon-settings" />
                   </Tooltip>
                 )}
