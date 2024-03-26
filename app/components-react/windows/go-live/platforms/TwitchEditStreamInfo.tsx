@@ -5,10 +5,13 @@ import { TwitchTagsInput } from './TwitchTagsInput';
 import GameSelector from '../GameSelector';
 import Form from '../../../shared/inputs/Form';
 import PlatformSettingsLayout, { IPlatformComponentParams } from './PlatformSettingsLayout';
-import { createBinding } from '../../../shared/inputs';
+import { CheckboxInput, ListInput, createBinding } from '../../../shared/inputs';
 import { ITwitchStartStreamOptions } from '../../../../services/platforms/twitch';
+import InputWrapper from 'components-react/shared/inputs/InputWrapper';
 import Message from '../../../shared/Message';
-import { Row, Col } from 'antd';
+import { Row, Col, Select } from 'antd';
+import { IListOption } from 'components/shared/inputs';
+import TwitchContentClassificationInput from './TwitchContentClassificationInput';
 
 export function TwitchEditStreamInfo(p: IPlatformComponentParams<'twitch'>) {
   const twSettings = p.value;
@@ -19,6 +22,15 @@ export function TwitchEditStreamInfo(p: IPlatformComponentParams<'twitch'>) {
 
   const bind = createBinding(twSettings, updatedSettings => updateSettings(updatedSettings));
 
+  const optionalFields = (
+    <div key="optional">
+      <TwitchTagsInput label={$t('Twitch Tags')} {...bind.tags} />
+      <TwitchContentClassificationInput {...bind.contentClassificationLabels} />
+      <InputWrapper>
+        <CheckboxInput label={$t('Stream features branded content')} {...bind.isBrandedContent} />
+      </InputWrapper>
+    </div>
+  );
   return (
     <Form name="twitch-settings">
       <PlatformSettingsLayout
@@ -33,7 +45,7 @@ export function TwitchEditStreamInfo(p: IPlatformComponentParams<'twitch'>) {
           />
         }
         requiredFields={<GameSelector key="required" platform={'twitch'} {...bind.game} />}
-        optionalFields={<TwitchTagsInput key="optional" label={$t('Twitch Tags')} {...bind.tags} />}
+        optionalFields={optionalFields}
       />
     </Form>
   );

@@ -66,7 +66,10 @@ export { RealmService } from 'services/realm';
 export { UserService } from './services/user';
 export { YoutubeService } from 'services/platforms/youtube';
 export { TwitchService } from 'services/platforms/twitch';
-export { TwitchTagsService } from 'services/platforms/twitch/index';
+export {
+  TwitchTagsService,
+  TwitchContentClassificationService,
+} from 'services/platforms/twitch/index';
 export { FacebookService } from 'services/platforms/facebook';
 export { TikTokService } from 'services/platforms/tiktok';
 export { TrovoService } from 'services/platforms/trovo';
@@ -142,7 +145,10 @@ import { SettingsService } from './services/settings';
 import { UserService } from './services/user';
 import { TwitchService } from './services/platforms/twitch';
 import { TwitterPlatformService } from './services/platforms/twitter';
-import { TwitchTagsService } from './services/platforms/twitch/index';
+import {
+  TwitchTagsService,
+  TwitchContentClassificationService,
+} from './services/platforms/twitch/index';
 import { TrovoService } from './services/platforms/trovo';
 import { YoutubeService } from './services/platforms/youtube';
 import { FacebookService } from './services/platforms/facebook';
@@ -227,6 +233,7 @@ export const AppServices = {
   TwitchService,
   TwitterPlatformService,
   TwitchTagsService,
+  TwitchContentClassificationService,
   TrovoService,
   InstagramService,
   DismissablesService,

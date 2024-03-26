@@ -21,6 +21,10 @@ import Utils from '../utils';
 import { IVideo } from 'obs-studio-node';
 import { TDisplayType } from 'services/settings-v2';
 import { TOutputOrientation } from 'services/restream';
+import {
+  ITwitchContentClassificationLabelsRootResponse,
+  TwitchContentClassificationService,
+} from './twitch/content-classification';
 
 export interface ITwitchStartStreamOptions {
   title: string;
@@ -28,6 +32,8 @@ export interface ITwitchStartStreamOptions {
   video?: IVideo;
   tags: string[];
   mode?: TOutputOrientation;
+  contentClassificationLabels: string[];
+  isBrandedContent: boolean;
 }
 
 export interface ITwitchChannelInfo extends ITwitchStartStreamOptions {
@@ -71,6 +77,7 @@ export class TwitchService
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
   @Inject() twitchTagsService: TwitchTagsService;
+  @Inject() twitchContentClassificationService: TwitchContentClassificationService;
 
   static initialState: ITwitchServiceState = {
     ...BasePlatformService.initialState,
@@ -82,6 +89,8 @@ export class TwitchService
       video: undefined,
       mode: undefined,
       tags: [],
+      contentClassificationLabels: [],
+      isBrandedContent: false,
     },
   };
 
@@ -266,19 +275,37 @@ export class TwitchService
    */
   async prepopulateInfo(): Promise<void> {
     const [channelInfo] = await Promise.all([
-      this.requestTwitch<{ data: { title: string; game_name: string }[] }>(
-        `${this.apiBase}/helix/channels?broadcaster_id=${this.twitchId}`,
-      ).then(json => ({
-        title: json.data[0].title,
-        game: json.data[0].game_name,
-      })),
+      this.requestTwitch<{
+        data: {
+          title: string;
+          game_name: string;
+          is_branded_content: boolean;
+          content_classification_labels: string[];
+        }[];
+      }>(`${this.apiBase}/helix/channels?broadcaster_id=${this.twitchId}`).then(json => {
+        return {
+          title: json.data[0].title,
+          game: json.data[0].game_name,
+          is_branded_content: json.data[0].is_branded_content,
+          content_classification_labels: json.data[0].content_classification_labels,
+        };
+      }),
+      this.requestTwitch<ITwitchContentClassificationLabelsRootResponse>(
+        `${this.apiBase}/helix/content_classification_labels`,
+      ).then(json => this.twitchContentClassificationService.setLabels(json)),
     ]);
 
     const tags: string[] = this.twitchTagsService.views.hasTags
       ? this.twitchTagsService.views.tags
       : [];
     this.SET_PREPOPULATED(true);
-    this.SET_STREAM_SETTINGS({ tags, title: channelInfo.title, game: channelInfo.game });
+    this.SET_STREAM_SETTINGS({
+      tags,
+      title: channelInfo.title,
+      game: channelInfo.game,
+      isBrandedContent: channelInfo.is_branded_content,
+      contentClassificationLabels: channelInfo.content_classification_labels,
+    });
   }
 
   fetchUserInfo() {
@@ -301,7 +328,13 @@ export class TwitchService
     }).then(json => json.total);
   }
 
-  async putChannelInfo({ title, game, tags = [] }: ITwitchStartStreamOptions): Promise<void> {
+  async putChannelInfo({
+    title,
+    game,
+    tags = [],
+    contentClassificationLabels = [],
+    isBrandedContent = false,
+  }: ITwitchStartStreamOptions): Promise<void> {
     let gameId = '';
     const isUnlisted = game === UNLISTED_GAME_CATEGORY.name;
     if (isUnlisted) gameId = '0';
@@ -313,11 +346,24 @@ export class TwitchService
     this.twitchTagsService.actions.setTags(tags);
     const hasPermission = await this.hasScope('channel:manage:broadcast');
     const scopedTags = hasPermission ? tags : undefined;
+
+    // Twitch seems to require you to add a label with disabled to remove it
+    const labels = this.twitchContentClassificationService.options.map(option => ({
+      id: option.value,
+      is_enabled: contentClassificationLabels.includes(option.value),
+    }));
+
     await Promise.all([
       this.requestTwitch({
         url: `${this.apiBase}/helix/channels?broadcaster_id=${this.twitchId}`,
         method: 'PATCH',
-        body: JSON.stringify({ game_id: gameId, title, tags: scopedTags }),
+        body: JSON.stringify({
+          game_id: gameId,
+          title,
+          tags: scopedTags,
+          is_branded_content: isBrandedContent,
+          content_classification_labels: labels,
+        }),
       }),
     ]);
     this.SET_STREAM_SETTINGS({ title, game, tags });
