@@ -6,7 +6,7 @@
   "version": "0.0.1",
   "dependencies": {
     "@octokit/rest": "^16.28.1",
-    "@sentry/cli": "^2.28.6",
+    "@sentry/cli": "^2.30.2",
     "node-fetch": "2"
   },
   "devDependencies": {
