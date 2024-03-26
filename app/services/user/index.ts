@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
-import { handleResponse, authorizedHeaders, jfetch } from 'util/requests';
+import { authorizedHeaders, jfetch } from 'util/requests';
 import { mutation } from 'services/core/stateful-service';
 import { Service, Inject, ViewHandler } from 'services/core';
 import electron from 'electron';
@@ -33,11 +33,12 @@ import { MagicLinkService } from 'services/magic-link';
 import fs from 'fs';
 import path from 'path';
 import { AppService } from 'services/app';
-import { UsageStatisticsService } from 'services/usage-statistics';
 import { StreamingService } from 'services/streaming';
 import { NotificationsService, ENotificationType } from 'services/notifications';
 import { JsonrpcService } from 'services/api/jsonrpc';
 import * as remote from '@electron/remote';
+import { TikTokService } from 'services/platforms/tiktok';
+import { TTikTokLiveScopeTypes } from 'services/platforms/tiktok/api';
 
 export enum EAuthProcessState {
   Idle = 'idle',
@@ -281,9 +282,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private websocketService: WebsocketService;
   @Inject() private magicLinkService: MagicLinkService;
   @Inject() private appService: AppService;
-  @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject() private notificationsService: NotificationsService;
   @Inject() private jsonrpcService: JsonrpcService;
+  @Inject('TikTokService') tiktokService: TikTokService;
 
   @mutation()
   LOGIN(auth: IUserAuth) {
@@ -454,6 +455,26 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.streamSettingsService.resetStreamSettings();
     await this.login(service, auth);
     if (!isOnboardingTest) this.onboardingService.finish();
+  }
+
+  /**
+   * This is also allows us to use dummy accounts for tests.
+   * @remark Use for tests where test accounts are not available.
+   */
+  async addDummyAccount(
+    dummyAcct: IPlatformAuth,
+    tiktokLiveScope: TTikTokLiveScopeTypes,
+  ): Promise<EPlatformCallResult> {
+    if (!Utils.isTestMode()) return;
+
+    this.UPDATE_PLATFORM(dummyAcct);
+
+    // for tiktok, also update live access status
+    if (tiktokLiveScope) {
+      this.tiktokService.setLiveScope(tiktokLiveScope);
+    }
+
+    return EPlatformCallResult.Success;
   }
 
   async autoLogin() {

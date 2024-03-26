@@ -417,6 +417,12 @@ export class TikTokService
    * prepopulate channel info and save it to the store
    */
   async prepopulateInfo(): Promise<void> {
+    // skip validation call when running tests
+    if (Utils.isTestMode()) {
+      this.SET_PREPOPULATED(true);
+      return;
+    }
+
     // fetch user live access status
     const status = await this.validatePlatform();
     this.usageStatisticsService.recordAnalyticsEvent('TikTokLiveAccess', {
@@ -531,6 +537,10 @@ export class TikTokService
       win.setAlwaysOnTop(false);
       return Promise.resolve();
     }, 1000);
+  }
+
+  setLiveScope(scope: TTikTokLiveScopeTypes) {
+    this.SET_LIVE_SCOPE(scope);
   }
 
   @mutation()
