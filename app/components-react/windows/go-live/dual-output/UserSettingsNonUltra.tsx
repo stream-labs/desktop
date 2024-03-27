@@ -23,7 +23,7 @@ export default function UserSettingsNonUltra() {
       {!isLoading && <NonUltraDestinationSwitchers showSelector={canAddDestinations} />}
       {/*ADD DESTINATION BUTTON*/}
       {!isLoading && !canAddDestinations && (
-        <AddDestinationButton style={{ margin: '0px 15px 15px 15px' }} />
+        <AddDestinationButton data-test="add-dest-btn" style={{ margin: '0px 15px 15px 15px' }} />
       )}
     </>
   );

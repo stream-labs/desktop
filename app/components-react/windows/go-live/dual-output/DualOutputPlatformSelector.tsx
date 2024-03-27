@@ -92,6 +92,7 @@ export default function DualOutputPlatformSelector(p: IPlatformSelectorProps) {
 
   return (
     <Select
+      data-test="do-platform-selector"
       defaultValue={defaultLabel[0]}
       className={cx(styles.platformsSelector, { [styles.dualOutputSelector]: isDualOutputMode })}
       onChange={(option: { value: string; label: React.ReactNode }) => {

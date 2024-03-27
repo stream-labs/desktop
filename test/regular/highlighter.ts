@@ -1,16 +1,8 @@
 import { test, useWebdriver } from '../helpers/webdriver';
-import { sleep } from '../helpers/sleep';
 import { setTemporaryRecordingPath } from '../helpers/modules/settings/settings';
-import {
-  click,
-  clickButton,
-  focusMain,
-  getClient,
-  select,
-  waitForDisplayed,
-} from '../helpers/modules/core';
+import { click, clickButton, focusMain, select, waitForDisplayed } from '../helpers/modules/core';
 import { showPage } from '../helpers/modules/navigation';
-import { goLive, stopStream } from '../helpers/modules/streaming';
+import { goLive, stopStream, waitForStreamStart } from '../helpers/modules/streaming';
 import { logIn } from '../helpers/modules/user';
 import { saveReplayBuffer } from '../helpers/modules/replay-buffer';
 import { fillForm } from '../helpers/modules/forms';
@@ -27,7 +19,7 @@ test('Highlighter save and export', async t => {
   await clickButton('Configure');
 
   await goLive();
-  await sleep(2000);
+  await waitForStreamStart();
   await saveReplayBuffer();
   await stopStream();
 

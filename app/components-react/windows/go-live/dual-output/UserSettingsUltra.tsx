@@ -21,7 +21,7 @@ export default function UserSettingsUltra() {
       <UltraDestinationSwitchers />
       {/*ADD DESTINATION BUTTON*/}
       {shouldShowAddDestButton && (
-        <AddDestinationButton style={{ padding: '0px 15px 15px 15px' }} />
+        <AddDestinationButton data-type="add-dest-btn" style={{ padding: '0px 15px 15px 15px' }} />
       )}
     </>
   );
