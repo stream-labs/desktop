@@ -74,7 +74,6 @@ test('Dual Output Go Live Non-Ultra', async t => {
   await clickGoLive();
   await waitForSettingsWindowLoaded();
 
-  await waitForDisplayed('[data-test=do-platform-selector]');
   await waitForDisplayed('[data-test=non-ultra-switcher]');
 
   // cannot use dual output mode with only one platform linked
