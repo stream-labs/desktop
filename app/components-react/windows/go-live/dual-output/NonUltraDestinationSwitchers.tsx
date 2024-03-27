@@ -72,7 +72,7 @@ export function NonUltraDestinationSwitchers(p: INonUltraDestinationSwitchers) {
           enabled={isEnabled(platform)}
           onChange={enabled => togglePlatform(platform, enabled)}
           isPrimary={isPrimaryPlatform(platform)}
-          promptConnectTikTok={promptConnectTikTok}
+          promptConnectTikTok={platform === 'tiktok' && promptConnectTikTok}
           index={index}
         />
       ))}

@@ -82,7 +82,7 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
           enabled={isEnabled(platform)}
           onChange={enabled => togglePlatform(platform, enabled)}
           isPrimary={isPrimaryPlatform(platform)}
-          promptConnectTikTok={promptConnectTikTok}
+          promptConnectTikTok={platform === 'tiktok' && promptConnectTikTok}
           disabled={disableSwitchers && !isEnabled(platform)}
         />
       ))}
