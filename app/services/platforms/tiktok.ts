@@ -135,6 +135,13 @@ export class TikTokService
     const context = display ?? ttSettings?.display;
 
     if (this.getHasScope('approved')) {
+      // skip generate stream keys for tests
+      if (Utils.isTestMode()) {
+        await this.putChannelInfo(ttSettings);
+        this.setPlatformContext('tiktok');
+        return;
+      }
+
       // update server url and stream key if handling streaming via API
       // streaming with server url and stream key is default
       let streamInfo = {} as ITikTokStartStreamResponse;
@@ -523,6 +530,9 @@ export class TikTokService
   }
 
   async handleOpenLiveManager(): Promise<void> {
+    // no need to open window for tests
+    if (Utils.isTestMode()) return;
+
     // keep main window on top to prevent flicker when opening url
     const win = Utils.getMainWindow();
     win.setAlwaysOnTop(true);
