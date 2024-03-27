@@ -3,26 +3,38 @@ import { logIn } from '../../helpers/modules/user';
 import {
   clickGoLive,
   prepareToGoLive,
+  stopStream,
+  submit,
   waitForSettingsWindowLoaded,
+  waitForStreamStart,
 } from '../../helpers/modules/streaming';
-import { addDummyAccount } from '../../helpers/webdriver/user';
-import { readFields } from '../../helpers/modules/forms';
+import { addDummyAccount, releaseUserInPool } from '../../helpers/webdriver/user';
+import { fillForm } from '../../helpers/modules/forms';
+import { waitForDisplayed } from '../../helpers/modules/core';
 
 useWebdriver();
 
 test('Streaming to X', async t => {
-  await logIn('twitch', { multistream: true });
-
-  // test approved status
+  const user = await logIn('twitch', { multistream: true });
   await addDummyAccount('twitter');
 
   await prepareToGoLive();
   await clickGoLive();
   await waitForSettingsWindowLoaded();
+  await fillForm({
+    twitter: true,
+  });
+  await waitForSettingsWindowLoaded();
 
-  const fields = await readFields();
+  await fillForm({
+    title: 'Test stream',
+    twitchGame: 'Fortnite',
+  });
+  await submit();
+  await waitForDisplayed('span=Update settings for X (Twitter)');
+  await waitForStreamStart();
+  await stopStream();
 
-  t.true(fields.hasOwnProperty('twitter'));
-
+  await releaseUserInPool(user);
   t.pass();
 });

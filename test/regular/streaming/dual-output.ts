@@ -14,6 +14,7 @@ import {
 import { logIn } from '../../helpers/modules/user';
 import { toggleDualOutputMode, toggleDisplay } from '../../helpers/modules/dual-output';
 import { test, useWebdriver, TExecutionContext } from '../../helpers/webdriver';
+import { releaseUserInPool } from '../../helpers/webdriver/user';
 
 useWebdriver();
 
@@ -27,7 +28,7 @@ test('User must be logged in to use Dual Output', async (t: TExecutionContext) =
 });
 
 test('Dual output checkbox toggles Dual Output mode', async (t: TExecutionContext) => {
-  await logIn();
+  const user = await logIn();
 
   await toggleDualOutputMode();
   await focusMain();
@@ -36,22 +37,26 @@ test('Dual output checkbox toggles Dual Output mode', async (t: TExecutionContex
   await toggleDualOutputMode();
   await focusMain();
   t.false(await isDisplayed('div#vertical-display'));
+
+  await releaseUserInPool(user);
 });
 
 test('Cannot toggle Dual Output in Studio Mode', async (t: TExecutionContext) => {
   const { app } = t.context;
-  await logIn();
+  const user = await logIn();
   await toggleDualOutputMode();
 
   // attempt toggle studio mode from side nav
   await focusMain();
   await (await app.client.$('.side-nav .icon-studio-mode-3')).click();
   t.true(await isDisplayed('div=Cannot toggle Studio Mode in Dual Output Mode.'));
+
+  await releaseUserInPool(user);
 });
 
 test('Dual Output Selective Recording is Horizontal Only', async (t: TExecutionContext) => {
   const { app } = t.context;
-  await logIn();
+  const user = await logIn();
   await toggleDualOutputMode();
   await focusMain();
   await (await app.client.$('[data-name=sourcesControls] .icon-smart-record')).click();
@@ -60,6 +65,8 @@ test('Dual Output Selective Recording is Horizontal Only', async (t: TExecutionC
   await (await app.client.$('.icon-smart-record.active')).waitForExist();
 
   t.false(await isDisplayed('div#vertical-display'));
+
+  await releaseUserInPool(user);
 });
 
 /**
@@ -68,7 +75,7 @@ test('Dual Output Selective Recording is Horizontal Only', async (t: TExecutionC
 
 test('Dual Output Go Live Non-Ultra', async t => {
   // non-ultra user
-  await logIn('twitch');
+  const user = await logIn('twitch');
   await toggleDualOutputMode();
   await prepareToGoLive();
   await clickGoLive();
@@ -82,12 +89,13 @@ test('Dual Output Go Live Non-Ultra', async t => {
     'div=To use Dual Output you must stream to at least one horizontal and one vertical platform.',
   );
 
+  await releaseUserInPool(user);
   t.pass();
 });
 
 test('Dual Output Go Live Ultra', async (t: TExecutionContext) => {
   // test going live with ultra
-  await logIn('twitch', { multistream: true });
+  const user = await logIn('twitch', { multistream: true });
   await toggleDualOutputMode();
   await prepareToGoLive();
   await clickGoLive();
@@ -101,6 +109,7 @@ test('Dual Output Go Live Ultra', async (t: TExecutionContext) => {
     'div=To use Dual Output you must stream to at least one horizontal and one vertical platform.',
   );
 
+  await releaseUserInPool(user);
   t.pass();
 });
 
@@ -109,7 +118,7 @@ test('Dual Output Go Live Ultra', async (t: TExecutionContext) => {
  */
 
 test('Dual output display toggles', async (t: TExecutionContext) => {
-  await logIn();
+  const user = await logIn();
   await toggleDualOutputMode();
   await focusMain();
 
@@ -147,4 +156,6 @@ test('Dual output display toggles', async (t: TExecutionContext) => {
   await toggleDisplay('horizontal');
   t.true(await isDisplayed('div#horizontal-display'));
   t.true(await isDisplayed('div#vertical-display'));
+
+  await releaseUserInPool(user);
 });

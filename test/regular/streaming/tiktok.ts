@@ -3,17 +3,21 @@ import { logIn } from '../../helpers/modules/user';
 import {
   clickGoLive,
   prepareToGoLive,
+  stopStream,
+  submit,
   waitForSettingsWindowLoaded,
+  waitForStreamStart,
 } from '../../helpers/modules/streaming';
-import { addDummyAccount } from '../../helpers/webdriver/user';
-import { assertFormContains, fillForm, readFields } from '../../helpers/modules/forms';
+import { addDummyAccount, releaseUserInPool } from '../../helpers/webdriver/user';
+import { fillForm, readFields } from '../../helpers/modules/forms';
 import { IDummyTestUser } from '../../data/dummy-accounts';
 import { TTikTokLiveScopeTypes } from 'services/platforms/tiktok/api';
+import { waitForDisplayed } from '../../helpers/modules/core';
 
 useWebdriver();
 
 test('Streaming to TikTok', async t => {
-  await logIn('twitch');
+  const user = await logIn('twitch', { multistream: false, prime: false });
 
   // test approved status
   await addDummyAccount('tiktok', { tiktokLiveScope: 'approved' });
@@ -36,10 +40,22 @@ test('Streaming to TikTok', async t => {
   t.false(fields.hasOwnProperty('serverUrl'));
   t.false(fields.hasOwnProperty('streamKey'));
 
+  await fillForm({
+    title: 'Test stream',
+    twitchGame: 'Fortnite',
+  });
+  await submit();
+  await waitForDisplayed('span=Update settings for TikTok');
+  await waitForStreamStart();
+  await stopStream();
+
   // test all other tiktok statuses
   await testLiveScope(t, 'not-approved');
   await testLiveScope(t, 'legacy');
   await testLiveScope(t, 'denied');
+
+  await releaseUserInPool(user);
+  t.pass();
 });
 
 async function testLiveScope(t: TExecutionContext, scope: TTikTokLiveScopeTypes) {
@@ -48,7 +64,6 @@ async function testLiveScope(t: TExecutionContext, scope: TTikTokLiveScopeTypes)
   await clickGoLive();
   await waitForSettingsWindowLoaded();
 
-  // enable all platforms
   await fillForm({
     tiktok: true,
   });
@@ -61,11 +76,10 @@ async function testLiveScope(t: TExecutionContext, scope: TTikTokLiveScopeTypes)
     streamKey: user.streamKey,
   };
 
-  // add settings
+  // show server url and stream key fields for all other account scopes
   await fillForm(settings);
-  await waitForSettingsWindowLoaded();
-  const fields: any = await readFields();
-
-  t.is(fields.serverUrl, user.serverUrl);
-  t.is(fields.serverUrl, user.serverUrl);
+  await submit();
+  await waitForDisplayed('span=Update settings for TikTok');
+  await waitForStreamStart();
+  await stopStream();
 }
