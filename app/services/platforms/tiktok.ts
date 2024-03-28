@@ -216,9 +216,7 @@ export class TikTokService
     // open url if stream successfully started
 
     // keep main window on top to prevent flicker when opening url
-    if (this.getHasScope('approved')) {
-      await this.handleOpenLiveManager();
-    }
+    await this.handleOpenLiveManager();
   }
 
   async afterStopStream(): Promise<void> {
@@ -471,7 +469,9 @@ export class TikTokService
 
   // opens the live center for users with approved live access accounts
   get dashboardUrl(): string {
-    return `https://livecenter.tiktok.com/live_monitor?lang=${this.locale}`;
+    return this.liveStreamingEnabled
+      ? `https://livecenter.tiktok.com/live_monitor?lang=${this.locale}`
+      : this.legacyDashboardUrl;
   }
 
   // opens the producer for legacy users with approval for stream keys and server urls
