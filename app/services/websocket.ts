@@ -22,7 +22,9 @@ export type TSocketEvent =
   | IPrimeSubEvent
   | ISafeModeEnabledSocketEvent
   | ISafeModeDisabledSocketEvent
-  | ISLIDMerged;
+  | ISLIDMerged
+  | IUserAccountMerged
+  | IUserAccountUnlinked;
 
 interface IStreamlabelsSocketEvent {
   type: 'streamlabels';
@@ -118,6 +120,15 @@ interface ISafeModeDisabledSocketEvent {
 
 interface ISLIDMerged {
   type: 'slid.force_logout';
+  for: string;
+}
+
+interface IUserAccountMerged {
+  type: 'account_merged';
+  for: string;
+}
+interface IUserAccountUnlinked {
+  type: 'account_unlinked';
   for: string;
 }
 

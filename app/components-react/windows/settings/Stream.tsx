@@ -38,7 +38,15 @@ function censorEmail(str: string) {
  * A Redux module for components in the StreamSetting window
  */
 class StreamSettingsModule {
-  constructor(private form: FormInstance) {}
+  constructor(private form: FormInstance) {
+    Services.UserService.refreshedLinkedAccounts.subscribe((confirmation: string) => {
+      message.config({
+        duration: 6,
+        maxCount: 1,
+      });
+      message.success(confirmation);
+    });
+  }
 
   // DEFINE A STATE
   state = injectState({
@@ -83,9 +91,6 @@ class StreamSettingsModule {
   }
   private get customizationService() {
     return Services.CustomizationService;
-  }
-  private get dualOutputService() {
-    return Services.DualOutputService;
   }
 
   // DEFINE MUTATIONS
