@@ -118,16 +118,16 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
   get linkedPlatforms(): TPlatform[] {
     if (!this.userView.state.auth) return [];
 
-    if (this.isPlatformLinked('tiktok')) {
-      return this.allPlatforms.filter(p => this.isPlatformLinked(p)).concat();
-    } else if (
+    if (
       (!this.restreamView.canEnableRestream || !this.protectedModeEnabled) &&
       !this.isDualOutputMode
     ) {
-      return [this.userView.auth!.primaryPlatform];
-    } else {
-      return this.allPlatforms.filter(p => this.isPlatformLinked(p));
+      return this.userView.auth!.primaryPlatform === 'tiktok'
+        ? [this.userView.auth!.primaryPlatform]
+        : [this.userView.auth!.primaryPlatform, 'tiktok'];
     }
+
+    return this.allPlatforms.filter(p => this.isPlatformLinked(p) || p === 'tiktok');
   }
 
   get protectedModeEnabled() {
