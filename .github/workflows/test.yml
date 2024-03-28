@@ -1,0 +1,69 @@
+name: Test
+
+on:
+  push:
+    paths:
+      - package.json
+      - yarn.lock
+      - installer.nsh
+      - tsconfig.json
+      - webpack.config.js
+      - main.js
+      - app/**
+      - media/**
+      - nvoice/**
+      - obs-api/**
+      - scripts/**
+      - test/**
+      - updater/**
+      - vendor/**
+      - .github/workflows/test.yml
+
+  pull_request:
+    branches:
+      - n-air_development
+    paths:
+      - package.json
+      - yarn.lock
+      - installer.nsh
+      - tsconfig.json
+      - webpack.config.js
+      - main.js
+      - app/**
+      - media/**
+      - nvoice/**
+      - obs-api/**
+      - scripts/**
+      - test/**
+      - updater/**
+      - vendor/**
+      - .github/workflows/test.yml
+
+jobs:
+  test:
+    runs-on: windows-2019
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: npm login
+        run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" >> $env:USERPROFILE\.npmrc
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile --check-files
+
+      - name: Compile
+        run: yarn compile:ci
+
+      - name: Run unit tests
+        run: yarn test:unit
+
+      - name: Run e2e tests
+        run: yarn test

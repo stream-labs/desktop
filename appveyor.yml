@@ -2,7 +2,7 @@ build: off
 
 skip_commits:
   files:
-    - .github/*
+    # - .github/*
     - README.md
 
 install:
