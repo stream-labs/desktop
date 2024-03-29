@@ -88,7 +88,7 @@ export default class CommentFilter extends Vue {
   }
 
   get maxCount() {
-    return this.userService.isPremium ? 500 : 40;
+    return 500;
   }
 
   get invalid(): boolean {
