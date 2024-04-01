@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
+import pick from 'lodash/pick';
 import { Tooltip, Tree } from 'antd';
 import { DataNode } from 'rc-tree/lib/interface';
 import { TreeProps } from 'rc-tree/lib/Tree';
@@ -17,6 +18,7 @@ import Translate from 'components-react/shared/Translate';
 import { DualOutputSourceSelector } from './DualOutputSourceSelector';
 import { Services } from 'components-react/service-provider';
 import { initStore, useController } from 'components-react/hooks/zustand';
+import { useVuex } from 'components-react/hooks';
 
 interface ISourceMetadata {
   id: string;
@@ -48,14 +50,8 @@ class SourceSelectorController {
   private guestCamService = Services.GuestCamService;
   private dualOutputService = Services.DualOutputService;
 
-  sourcesTooltip = $t('The building blocks of your scene. Also contains widgets.');
-  addSourceTooltip = $t('Add a new Source to your Scene. Includes widgets.');
-  openSourcePropertiesTooltip = $t('Open the Source Properties.');
-  addGroupTooltip = $t('Add a Group so you can move multiple Sources at the same time.');
-
   store = initStore({
     expandedFoldersIds: [] as string[],
-    showTreeMask: true,
   });
 
   nodeRefs = {};
@@ -205,7 +201,7 @@ class SourceSelectorController {
 
   addSource() {
     if (this.scenesService.views.activeScene) {
-      this.sourcesService.showShowcase();
+      this.sourcesService.actions.showShowcase();
     }
   }
 
@@ -218,7 +214,7 @@ class SourceSelectorController {
         const parent = this.selectionService.views.globalSelection.getClosestParent();
         if (parent) parentId = parent.id;
       }
-      this.scenesService.showNameFolder({
+      this.scenesService.actions.showNameFolder({
         itemsToGroup,
         parentId,
         sceneId: this.scenesService.views.activeScene.id,
@@ -408,16 +404,6 @@ class SourceSelectorController {
 
   get expandedFoldersIds() {
     return this.store.expandedFoldersIds;
-  }
-
-  get showTreeMask() {
-    return this.store.showTreeMask;
-  }
-
-  setShowTreeMask(value: boolean) {
-    this.store.setState(s => {
-      s.showTreeMask = value;
-    });
   }
 
   get lastSelectedId() {
@@ -687,16 +673,14 @@ function SourceSelector() {
 }
 
 function StudioControls() {
-  const {
-    sourcesTooltip,
-    addGroupTooltip,
-    addSourceTooltip,
-    selectiveRecordingEnabled,
-    selectiveRecordingLocked,
-    addSource,
-    addFolder,
-    toggleSelectiveRecording,
-  } = useController(SourceSelectorCtx);
+  const ctrl = useController(SourceSelectorCtx);
+  const { selectiveRecordingEnabled, selectiveRecordingLocked } = useVuex(() =>
+    pick(ctrl, ['selectiveRecordingEnabled', 'selectiveRecordingLocked']),
+  );
+
+  const sourcesTooltip = $t('The building blocks of your scene. Also contains widgets.');
+  const addSourceTooltip = $t('Add a new Source to your Scene. Includes widgets.');
+  const addGroupTooltip = $t('Add a Group so you can move multiple Sources at the same time.');
 
   return (
     <div className={styles.topContainer} data-name="sourcesControls">
@@ -706,7 +690,10 @@ function StudioControls() {
         </Tooltip>
       </div>
       <Tooltip title={addSourceTooltip} placement="bottomLeft">
-        <i className="icon-add-circle icon-button icon-button--lg" onClick={addSource} />
+        <i
+          className="icon-add-circle icon-button icon-button--lg"
+          onClick={() => ctrl.addSource()}
+        />
       </Tooltip>
 
       <Tooltip title={$t('Toggle Selective Recording')} placement="bottomRight">
@@ -715,32 +702,38 @@ function StudioControls() {
             active: selectiveRecordingEnabled,
             disabled: selectiveRecordingLocked,
           })}
-          onClick={toggleSelectiveRecording}
+          onClick={() => ctrl.toggleSelectiveRecording()}
         />
       </Tooltip>
       <Tooltip title={addGroupTooltip} placement="bottomRight">
-        <i className="icon-add-folder icon-button icon-button--lg" onClick={addFolder} />
+        <i
+          className="icon-add-folder icon-button icon-button--lg"
+          onClick={() => ctrl.addFolder()}
+        />
       </Tooltip>
     </div>
   );
 }
 
 function ItemsTree() {
+  const ctrl = useController(SourceSelectorCtx);
   const {
     nodeData,
-    getTreeData,
     selectionItemIds,
     expandedFoldersIds,
     selectiveRecordingEnabled,
     lastSelectedId,
-    expandSelectedFolders,
-    showContextMenu,
-    makeActive,
-    toggleFolder,
-    handleSort,
-    showTreeMask,
-    setShowTreeMask,
-  } = useController(SourceSelectorCtx);
+  } = useVuex(() =>
+    pick(ctrl, [
+      'nodeData',
+      'selectionItemIds',
+      'expandedFoldersIds',
+      'selectiveRecordingEnabled',
+      'lastSelectedId',
+    ]),
+  );
+
+  const [showTreeMask, setShowTreeMask] = useState(true);
 
   // Force a rerender when the state of selective recording changes
   const [selectiveRecordingToggled, setSelectiveRecordingToggled] = useState(false);
@@ -749,10 +742,10 @@ function ItemsTree() {
   ]);
 
   useEffect(() => {
-    expandSelectedFolders();
+    ctrl.expandSelectedFolders();
   }, [lastSelectedId]);
 
-  const treeData = getTreeData(nodeData);
+  const treeData = ctrl.getTreeData(nodeData);
 
   return (
     <div
@@ -767,16 +760,16 @@ function ItemsTree() {
     >
       <Scrollable
         className={cx(styles.scenesContainer, styles.sourcesContainer)}
-        onContextMenu={(e: React.MouseEvent) => showContextMenu('', e)}
+        onContextMenu={(e: React.MouseEvent) => ctrl.showContextMenu('', e)}
       >
         {showTreeMask && <div className={styles.treeMask} data-name="treeMask" />}
         <Tree
           selectedKeys={selectionItemIds}
           expandedKeys={expandedFoldersIds}
-          onSelect={(selectedKeys, info) => makeActive(info)}
-          onExpand={(selectedKeys, info) => toggleFolder(info.node.key as string)}
-          onRightClick={info => showContextMenu(info.node.key as string, info.event)}
-          onDrop={handleSort}
+          onSelect={(selectedKeys, info) => ctrl.makeActive(info)}
+          onExpand={(selectedKeys, info) => ctrl.toggleFolder(info.node.key as string)}
+          onRightClick={info => ctrl.showContextMenu(info.node.key as string, info.event)}
+          onDrop={(info: Parameters<Required<TreeProps>['onDrop']>[0]) => ctrl.handleSort(info)}
           treeData={treeData}
           draggable
           multiple
