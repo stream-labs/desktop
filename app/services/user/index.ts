@@ -843,7 +843,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     // let url = `https://${this.hostsService.streamlabs}/library`;
     // let url = 'http://overlays.streamlabs.site:5173';
-    let url = 'https://marketplace-staging.streamlabs.com';
+    let url = 'https://beta.streamlabs.com/library';
     if (type && !id) {
       url += `/${type}`;
     }
