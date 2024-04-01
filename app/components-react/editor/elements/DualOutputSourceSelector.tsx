@@ -1,18 +1,18 @@
 import React, { useMemo, useState } from 'react';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
-import { useModule } from 'slap';
-import { SourceSelectorModule } from './SourceSelector';
+import { SourceSelectorCtx } from './SourceSelector';
 import { Tooltip } from 'antd';
 import { $t } from 'services/i18n';
+import { useController } from 'components-react/hooks/zustand';
 
 interface IDualOutputSourceSelector {
   nodeId: string;
   sceneId?: string;
 }
 export function DualOutputSourceSelector(p: IDualOutputSourceSelector) {
-  const { toggleVisibility, makeActive, horizontalActive, verticalActive } = useModule(
-    SourceSelectorModule,
+  const { toggleVisibility, makeActive, horizontalActive, verticalActive } = useController(
+    SourceSelectorCtx,
   );
   const { DualOutputService } = Services;
 
