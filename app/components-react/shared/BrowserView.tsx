@@ -50,6 +50,7 @@ export default function BrowserView(p: BrowserViewProps) {
       );
       opts.webPreferences.sandbox = false;
     }
+    opts.webPreferences.devTools = true;
     return opts;
   }, [p.options]);
 
@@ -66,6 +67,7 @@ export default function BrowserView(p: BrowserViewProps) {
     if (p.setLocale) I18nService.setBrowserViewLocale(browserView.current);
 
     browserView.current.webContents.on('did-finish-load', () => setLoading(false));
+    browserView.current.webContents.openDevTools(); // temp
     remote.getCurrentWindow().addBrowserView(browserView.current);
 
     const shutdownSubscription = AppService.shutdownStarted.subscribe(destroyBrowserView);

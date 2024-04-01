@@ -347,7 +347,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // unregister current window from the crash handler
         ipcRenderer.send('unregister-in-crash-handler', { pid: process.pid });
-
         // give the window some time to finish unmounting before reload
         Utils.sleep(100).then(() => {
           window.location.reload();
