@@ -38,6 +38,7 @@ export class Scene {
   id: string;
   name: string;
   nodes: (ISceneItem | ISceneItemFolder)[];
+  nodeMap?: Dictionary<string>;
   resourceId: string;
 
   private _resourceId: string;
@@ -136,6 +137,10 @@ export class Scene {
 
   getNodesIds(): string[] {
     return this.state.nodes.map(item => item.id);
+  }
+
+  getNodeMap(): Dictionary<string> {
+    return this.state.nodeMap;
   }
 
   /**
@@ -434,6 +439,10 @@ export class Scene {
     this.reconcileNodeOrderWithObs();
   }
 
+  setNodeMap(nodeMap: Dictionary<string>) {
+    this.SET_NODE_MAP(nodeMap);
+  }
+
   /**
    * Makes sure all scene items are in the correct order in OBS.
    */
@@ -697,5 +706,10 @@ export class Scene {
     const childNodeState = this.state.nodes.find(node => node.id === childNodeId);
     assertIsDefined(childNodeState);
     childNodeState.parentId = parentFolderId;
+  }
+
+  @mutation()
+  private SET_NODE_MAP(nodeMap: Dictionary<string>) {
+    this.state.nodeMap = nodeMap;
   }
 }
