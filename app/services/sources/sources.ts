@@ -29,6 +29,8 @@ import { UserService } from 'services/user';
 import { NVoiceCharacterTypes } from 'services/nvoice-character';
 import { InitAfter } from 'services/core';
 import { RtvcStateService } from '../../services/rtvcStateService';
+import * as Sentry from '@sentry/vue';
+import { ipcRenderer } from 'electron';
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
@@ -367,6 +369,44 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     const availableWhitelistedType = whitelistedTypes.filter(type =>
       obsAvailableTypes.includes(type),
     );
+
+    // for investigation: if 'nair-rtvc-source' is not in the list, send a log via Sentry
+    if (!availableWhitelistedType.includes('nair-rtvc-source')) {
+      console.info('nair-rtvc-source is not available');
+      const audioDevices = this.audioService
+        .getVisibleSourcesForCurrentScene()
+        .map(source => source.name);
+      const obsLog = ipcRenderer.sendSync('get-latest-obs-log');
+      const obsPluginFiles = ipcRenderer.sendSync('get-obs-plugin-files-list');
+      console.info({
+        audioDevices,
+        obsLog: { filename: obsLog.filename, length: obsLog.data.length, obsPluginFiles },
+      });
+
+      Sentry.withScope(scope => {
+        scope.setLevel('error');
+        scope.setTags({
+          'nair-rtvc-source': 'not-available',
+          audioDevices: audioDevices.length,
+        });
+
+        // attach obs log
+        scope.addAttachment({
+          filename: obsLog.filename,
+          data: obsLog.data,
+          contentType: 'text/plain',
+        });
+
+        // list of available audio sources
+        scope.setExtra('audioSource', audioDevices);
+        // list of OBS plugin files
+        scope.setExtra('obsPluginFiles', obsPluginFiles);
+
+        scope.setFingerprint(['nair-rtvc-source']);
+        Sentry.captureMessage('nair-rtvc-source is not available');
+      });
+    }
+
     // 'scene' is not an obs input type so we have to set it manually
     availableWhitelistedType.push('scene');
 

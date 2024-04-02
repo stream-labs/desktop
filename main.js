@@ -147,6 +147,59 @@ function initialize(crashHandler) {
     });
   }
 
+  ipcMain.on('get-latest-obs-log', e => {
+    const logDir = path.join(app.getPath('userData'), 'node-obs', 'logs');
+
+    // get the latest log file pattern: 'yyyy-mm-dd hh-mm-ss.txt'; sort by name
+    const files = fs.readdirSync(logDir);
+    if (files.length === 0) {
+      e.returnValue = {
+        filename: 'no log file found',
+        data: null,
+      };
+      return;
+    }
+
+    files.sort();
+    const latestFilename = files.pop();
+    const latestPathname = path.join(logDir, latestFilename);
+
+    // get file body and return
+    const data = fs.readFileSync(latestPathname, 'utf8');
+    console.log('Read OBS log file:', latestPathname, data.length, 'bytes');
+    e.returnValue = {
+      filename: latestFilename,
+      data,
+    };
+  });
+
+  function getFileListRecursive(dir, prefix = '') {
+    const files = fs.readdirSync(path.join(dir, prefix));
+    return files.flatMap(file => {
+      const pathname = path.join(dir, prefix, file);
+      const stat = fs.statSync(pathname);
+      if (stat.isDirectory()) {
+        return getFileListRecursive(dir, path.join(prefix, file));
+      } else {
+        return [path.join(prefix, file)];
+      }
+    });
+  }
+
+  ipcMain.on('get-obs-plugin-files-list', e => {
+    const pluginDir = path.join(
+      app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
+      'node_modules',
+      'obs-studio-node',
+      'obs-plugins',
+      '64bit',
+    );
+    console.log('get-obs-plugin-files-list:', pluginDir);
+
+    const files = getFileListRecursive(pluginDir);
+    e.returnValue = { path: pluginDir, files };
+  });
+
   const consoleLog = console.log;
   console.log = (...args) => {
     if (!process.env.NAIR_DISABLE_MAIN_LOGGING) {
