@@ -377,9 +377,10 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
         .getVisibleSourcesForCurrentScene()
         .map(source => source.name);
       const obsLog = ipcRenderer.sendSync('get-latest-obs-log');
+      const obsPluginFiles = ipcRenderer.sendSync('get-obs-plugin-files-list');
       console.info({
         audioDevices,
-        obsLog: { filename: obsLog.filename, length: obsLog.data.length },
+        obsLog: { filename: obsLog.filename, length: obsLog.data.length, obsPluginFiles },
       });
 
       Sentry.withScope(scope => {
@@ -396,8 +397,10 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
           contentType: 'text/plain',
         });
 
-        // get list of available audio sources
+        // list of available audio sources
         scope.setExtra('audioSource', audioDevices);
+        // list of OBS plugin files
+        scope.setExtra('obsPluginFiles', obsPluginFiles);
 
         scope.setFingerprint(['nair-rtvc-source']);
         Sentry.captureMessage('nair-rtvc-source is not available');

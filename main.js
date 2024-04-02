@@ -173,6 +173,32 @@ function initialize(crashHandler) {
     };
   });
 
+  function getFileListRecursive(dir, prefix = '') {
+    const files = fs.readdirSync(path.join(dir, prefix));
+    return files.flatMap(file => {
+      const pathname = path.join(dir, prefix, file);
+      const stat = fs.statSync(pathname);
+      if (stat.isDirectory()) {
+        return getFileListRecursive(dir, path.join(prefix, file));
+      } else {
+        return [path.join(prefix, file)];
+      }
+    });
+  }
+
+  ipcMain.on('get-obs-plugin-files-list', e => {
+    const pluginDir = path.join(
+      app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
+      'node_modules',
+      'obs-studio-node',
+      'obs-plugins',
+      '64bit',
+    );
+
+    const files = getFileListRecursive(pluginDir);
+    e.returnValue = files;
+  });
+
   const consoleLog = console.log;
   console.log = (...args) => {
     if (!process.env.NAIR_DISABLE_MAIN_LOGGING) {
