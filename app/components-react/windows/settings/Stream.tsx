@@ -39,13 +39,20 @@ function censorEmail(str: string) {
  */
 class StreamSettingsModule {
   constructor(private form: FormInstance) {
-    Services.UserService.refreshedLinkedAccounts.subscribe((confirmation: string) => {
-      message.config({
-        duration: 6,
-        maxCount: 1,
-      });
-      message.success(confirmation);
-    });
+    Services.UserService.refreshedLinkedAccounts.subscribe(
+      (res: { success: boolean; message: string }) => {
+        message.config({
+          duration: 6,
+          maxCount: 1,
+        });
+
+        if (res.success) {
+          message.success(res.message);
+        } else {
+          message.error(res.message);
+        }
+      },
+    );
   }
 
   // DEFINE A STATE

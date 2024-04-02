@@ -450,7 +450,13 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
         this.windowsService.setWindowOnTop();
         this.settingsService.showSettings('Stream');
-        this.refreshedLinkedAccounts.next(message);
+        this.refreshedLinkedAccounts.next({ success: true, message });
+      }
+
+      if (event.type === 'account_merge_error') {
+        this.windowsService.setWindowOnTop();
+        this.settingsService.showSettings('Stream');
+        this.refreshedLinkedAccounts.next({ success: false, message: $t('Account merge error') });
       }
     });
   }
