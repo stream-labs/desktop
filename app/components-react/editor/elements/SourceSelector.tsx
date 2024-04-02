@@ -388,22 +388,13 @@ class SourceSelectorController {
   }
 
   toggleFolder(nodeId: string) {
-    if (this.store.expandedFoldersIds.includes(nodeId)) {
-      this.store.setState(s => {
-        s.expandedFoldersIds = [...s.expandedFoldersIds].splice(
-          s.expandedFoldersIds.indexOf(nodeId),
-          1,
-        );
-      });
-    } else {
-      this.store.setState(s => {
+    this.store.setState(s => {
+      if (s.expandedFoldersIds.includes(nodeId)) {
+        s.expandedFoldersIds = s.expandedFoldersIds.filter(id => id !== nodeId);
+      } else {
         s.expandedFoldersIds = [...s.expandedFoldersIds, nodeId];
-      });
-    }
-  }
-
-  get expandedFoldersIds() {
-    return this.store.expandedFoldersIds;
+      }
+    });
   }
 
   get lastSelectedId() {
@@ -717,21 +708,10 @@ function StudioControls() {
 
 function ItemsTree() {
   const ctrl = useController(SourceSelectorCtx);
-  const {
-    nodeData,
-    selectionItemIds,
-    expandedFoldersIds,
-    selectiveRecordingEnabled,
-    lastSelectedId,
-  } = useVuex(() =>
-    pick(ctrl, [
-      'nodeData',
-      'selectionItemIds',
-      'expandedFoldersIds',
-      'selectiveRecordingEnabled',
-      'lastSelectedId',
-    ]),
+  const { nodeData, selectionItemIds, selectiveRecordingEnabled, lastSelectedId } = useVuex(() =>
+    pick(ctrl, ['nodeData', 'selectionItemIds', 'selectiveRecordingEnabled', 'lastSelectedId']),
   );
+  const expandedFoldersIds = ctrl.store.useState(s => s.expandedFoldersIds);
 
   const [showTreeMask, setShowTreeMask] = useState(true);
 
