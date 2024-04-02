@@ -152,6 +152,14 @@ function initialize(crashHandler) {
 
     // get the latest log file pattern: 'yyyy-mm-dd hh-mm-ss.txt'; sort by name
     const files = fs.readdirSync(logDir);
+    if (files.length === 0) {
+      e.returnValue = {
+        filename: 'no log file found',
+        data: null,
+      };
+      return;
+    }
+
     files.sort();
     const latestFilename = files.pop();
     const latestPathname = path.join(logDir, latestFilename);
