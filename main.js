@@ -194,9 +194,10 @@ function initialize(crashHandler) {
       'obs-plugins',
       '64bit',
     );
+    console.log('get-obs-plugin-files-list:', pluginDir);
 
     const files = getFileListRecursive(pluginDir);
-    e.returnValue = files;
+    e.returnValue = { path: pluginDir, files };
   });
 
   const consoleLog = console.log;
