@@ -58,8 +58,7 @@
       "test-dist/test/e2e/*.js",
       "test-dist/test/api/*.js"
     ],
-    "timeout": "3min",
-    "serial": true
+    "timeout": "3min"
   },
   "prettier": {
     "singleQuote": true,
