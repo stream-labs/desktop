@@ -407,6 +407,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   private socketConnection: Subscription = null;
 
   /**
+   * Primarily used for frontend confirmations
+   */
+  refreshedLinkedAccounts = new Subject();
+
+  /**
    * Used by child and 1-off windows to update their sentry contexts
    */
   sentryContext = new Subject<ISentryContext>();
@@ -433,6 +438,25 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
             "You've merged a Streamlabs ID to your account, please log back in to ensure you have the right credentials.",
           ),
         });
+      }
+
+      if (['account_merged', 'account_unlinked'].includes(event.type)) {
+        await this.updateLinkedPlatforms();
+
+        const message =
+          event.type === 'account_merged'
+            ? $t('Successfully merged account')
+            : $t('Successfully unlinked account');
+
+        this.windowsService.setWindowOnTop();
+        this.settingsService.showSettings('Stream');
+        this.refreshedLinkedAccounts.next({ success: true, message });
+      }
+
+      if (event.type === 'account_merge_error') {
+        this.windowsService.setWindowOnTop();
+        this.settingsService.showSettings('Stream');
+        this.refreshedLinkedAccounts.next({ success: false, message: $t('Account merge error') });
       }
     });
   }
