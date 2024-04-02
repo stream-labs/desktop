@@ -509,7 +509,12 @@ export class Scene {
     let itemIndex = 0;
     nodes.forEach(nodeModel => {
       const display = nodeModel?.display ?? 'horizontal';
+      if (display === 'vertical' && !this.videoSettingsService.contexts.vertical) {
+        this.videoSettingsService.establishVideoContext('vertical');
+      }
+
       const obsSceneItem = obsSceneItems[itemIndex];
+
       if (nodeModel.sceneNodeType === 'folder') {
         this.createFolder(nodeModel.name, { id: nodeModel.id, display });
       } else {
@@ -520,6 +525,12 @@ export class Scene {
           display,
           obsSceneItem.position,
         );
+
+        const context = this.videoSettingsService.contexts[display];
+        obsSceneItem.video = context as obs.IVideo;
+
+        nodeModel.position = obsSceneItem.position;
+
         const item = this.getItem(nodeModel.id)!;
         item.loadItemAttributes(nodeModel);
         itemIndex++;

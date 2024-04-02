@@ -27,6 +27,7 @@ export interface ISceneItemInfo extends ISceneNodeInfo {
   blendingMode?: EBlendingMode;
   blendingMethod?: EBlendingMethod;
   sceneNodeType: 'item';
+  position?: IVec2;
 }
 
 interface ISceneItemFolderInfo extends ISceneNodeInfo {
@@ -139,16 +140,10 @@ export class SceneItemsNode extends Node<ISchema, {}> {
   load(context: IContext): Promise<void> {
     this.sanitizeIds();
 
-    let hasVerticalNodes = false;
-
     this.data.items.forEach(item => {
       if (!item?.display) {
         // single output scene's items are assigned to the horizontal display by default
         item.display = item?.display ?? 'horizontal';
-      }
-
-      if (!hasVerticalNodes) {
-        hasVerticalNodes = item.display === 'vertical';
       }
 
       if (item.sceneNodeType === 'item') {
