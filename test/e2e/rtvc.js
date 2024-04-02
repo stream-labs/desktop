@@ -16,8 +16,7 @@ useSpectron();
 
 const sourceType = 'nair-rtvc-source';
 
-// CI対応のため一時的に中止
-test.skip('rtvc Adding and removing source', async t => {
+test('rtvc Adding and removing source', async t => {
   const sourceName = `Example ${sourceType}`;
   await addSource(t, sourceType, sourceName);
 
@@ -31,8 +30,7 @@ test.skip('rtvc Adding and removing source', async t => {
   await waitForSourceExist(t, sourceName, true);
 });
 
-// CI対応のため一時的に中止
-test.skip('rtvc Check conditions that can be added', async t => {
+test('rtvc Check conditions that can be added', async t => {
   const sourceName = `Example ${sourceType}`;
 
   // add rtvc source
