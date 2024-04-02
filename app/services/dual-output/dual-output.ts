@@ -25,7 +25,6 @@ import { SettingsService } from 'services/settings';
 import { RunInLoadingMode } from 'services/app/app-decorators';
 
 interface IDisplayVideoSettings {
-  defaultDisplay: TDisplayType;
   horizontal: IVideoInfo;
   vertical: IVideoInfo;
   activeDisplays: {
@@ -34,7 +33,6 @@ interface IDisplayVideoSettings {
   };
 }
 interface IDualOutputServiceState {
-  displays: TDisplayType[];
   platformSettings: TDualOutputPlatformSettings;
   destinationSettings: Dictionary<IDualOutputDestinationSetting>;
   dualOutputMode: boolean;
@@ -114,20 +112,12 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return Object.values(this.activeSceneNodeMap);
   }
 
-  get displays() {
-    return this.state.displays;
-  }
-
   get videoSettings() {
     return this.state.videoSettings;
   }
 
   get activeDisplays() {
     return this.state.videoSettings.activeDisplays;
-  }
-
-  get defaultDisplay() {
-    return this.state.videoSettings.defaultDisplay;
   }
 
   get showHorizontalDisplay() {
@@ -281,12 +271,10 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   @Inject() private settingsService: SettingsService;
 
   static defaultState: IDualOutputServiceState = {
-    displays: ['horizontal', 'vertical'],
     platformSettings: DualOutputPlatformSettings,
     destinationSettings: {},
     dualOutputMode: false,
     videoSettings: {
-      defaultDisplay: 'horizontal',
       horizontal: null,
       vertical: verticalDisplayData, // get settings for horizontal display from obs directly
       activeDisplays: {
