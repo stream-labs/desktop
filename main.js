@@ -147,6 +147,24 @@ function initialize(crashHandler) {
     });
   }
 
+  ipcMain.on('get-latest-obs-log', e => {
+    const logDir = path.join(app.getPath('userData'), 'node-obs', 'logs');
+
+    // get the latest log file pattern: 'yyyy-mm-dd hh-mm-ss.txt'; sort by name
+    const files = fs.readdirSync(logDir);
+    files.sort();
+    const latestFilename = files.pop();
+    const latestPathname = path.join(logDir, latestFilename);
+
+    // get file body and return
+    const data = fs.readFileSync(latestPathname, 'utf8');
+    console.log('Read OBS log file:', latestPathname, data.length, 'bytes');
+    e.returnValue = {
+      filename: latestFilename,
+      data,
+    };
+  });
+
   const consoleLog = console.log;
   console.log = (...args) => {
     if (!process.env.NAIR_DISABLE_MAIN_LOGGING) {
