@@ -7,6 +7,7 @@ import { WindowsService } from 'services/windows';
 import { Scene, SceneItem, TSceneNode, EScaleType, EBlendingMode, EBlendingMethod } from './index';
 import { ISource, SourcesService, ISourceAddOptions, TSourceType } from 'services/sources';
 import { Inject } from 'services/core/injector';
+import { EditorService } from 'services/editor';
 import { IVideo, SceneFactory } from '../../../obs-api';
 import { $t } from 'services/i18n';
 import namingHelpers from 'util/NamingHelpers';
@@ -14,6 +15,7 @@ import uuid from 'uuid/v4';
 import { DualOutputService } from 'services/dual-output';
 import { TDisplayType } from 'services/settings-v2/video';
 import { ViewHandler } from 'services/core';
+import { SceneCollectionsService } from 'services/scene-collections';
 
 export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
 
@@ -22,6 +24,7 @@ export interface IScene {
   name: string;
   nodes: (ISceneItem | ISceneItemFolder)[];
   nodeMap?: Dictionary<string>;
+  dualOutputSceneSourceId?: string;
 }
 
 export interface ISceneNodeAddOptions {
@@ -195,7 +198,11 @@ class ScenesViews extends ViewHandler<IScenesState> {
   }
 
   get scenes(): Scene[] {
-    return this.state.displayOrder.map(id => this.getScene(id)!);
+    return (
+      this.state.displayOrder
+        // .filter(id => !this.getScene(id)?.dualOutputSceneSourceId)
+        .map(id => this.getScene(id)!)
+    );
   }
 
   getSceneItems(): SceneItem[] {
@@ -270,6 +277,8 @@ class ScenesViews extends ViewHandler<IScenesState> {
 
 export class ScenesService extends StatefulService<IScenesState> {
   @Inject() private dualOutputService: DualOutputService;
+  @Inject() private sceneCollectionsService: SceneCollectionsService;
+  @Inject() private editorService: EditorService;
 
   static initialState: IScenesState = {
     activeSceneId: '',
@@ -341,14 +350,10 @@ export class ScenesService extends StatefulService<IScenesState> {
         .forEach(item => {
           const display = item?.display ?? this.dualOutputService.views.getNodeDisplay(item.id, id);
 
-          const newItem = newScene.addSource(item.sourceId, { display });
+          newScene.addSource(item.sourceId, { display });
 
-          /**
-           * when creating the scene in dual output mode
-           * also create scene items for the vertical display
-           */
-          if (this.dualOutputService.views.dualOutputMode) {
-            this.dualOutputService.actions.createOrAssignOutputNode(newItem, 'vertical', false, id);
+          if (oldScene?.nodeMap) {
+            this.sceneCollectionsService.restoreNodeMap(newScene.id, oldScene?.nodeMap);
           }
         });
     }
@@ -357,6 +362,103 @@ export class ScenesService extends StatefulService<IScenesState> {
     if (options.makeActive) this.makeSceneActive(id);
 
     return this.views.getScene(id);
+  }
+
+  createDualOutputSceneSource(sceneSourceId: string) {
+    const sceneSource = this.views.getScene(sceneSourceId);
+    if (!sceneSource) return;
+
+    const id = `scene_${uuid()}`;
+    const name = `horizontal_${sceneSourceId}`;
+    this.ADD_SCENE(id, name);
+    const obsScene = SceneFactory.create(id);
+    this.sourcesService.addSource(obsScene.source, name, { sourceId: id, display: 'horizontal' });
+    const dualOutputSceneSource = this.views.getScene(id)!;
+    dualOutputSceneSource.setDualOutputSceneSourceId(sceneSourceId);
+
+    sceneSource
+      .getItems()
+      .slice()
+      .reverse()
+      .forEach(item => {
+        console.log('item.display', item.display);
+        if (item?.display === 'vertical') return;
+        const horizontalItem = dualOutputSceneSource.addSource(item.sourceId, {
+          display: 'horizontal',
+        });
+
+        const transformX =
+          this.editorService.renderedWidths.horizontal / horizontalItem.transform.position.x;
+        const transformY =
+          this.editorService.renderedHeights.horizontal / horizontalItem.transform.position.y;
+        const scale = this.editorService.renderedWidths.horizontal / horizontalItem.width;
+
+        console.log('transformX', transformX);
+        console.log('transformY', transformY);
+
+        const verticalItem = dualOutputSceneSource.addSource(item.sourceId, {
+          display: 'vertical',
+        });
+
+        verticalItem.setTransform({
+          // position: { x: transformX, y: transformY },
+          scale: { x: scale, y: scale },
+        });
+
+        this.sceneCollectionsService.createNodeMapEntry(id, horizontalItem.id, verticalItem.id);
+      });
+    //     if (item?.display === 'vertical') return;
+    //     // console.log('item', JSON.stringify(item.transform, null, 2));
+    //     const horizontalItem = dualOutputSceneSource.addSource(item.sourceId, {
+    //       display: 'horizontal',
+    //     });
+    //     // add vertical source scaled for horizontal output
+
+    //     // console.log('horizontalItem.width', horizontalItem.width);
+    //     // console.log('horizontalItem.height', horizontalItem.height);
+
+    //     console.log('horizontalItem.transform', JSON.stringify(horizontalItem.transform, null, 2));
+    //     // console.log('verticalItem.width', verticalItem.width);
+    //     // console.log('verticalItem.height', verticalItem.height);
+    //     console.log('verticalItem.transform', JSON.stringify(verticalItem.transform, null, 2));
+
+    //     const scale = this.editorService.renderedWidths.vertical / verticalItem.width;
+
+    //     console.log('scale', scale);
+    //     // console.log('scaleY', scaleY);
+
+    //     // const scaleX = Math.max(baseWidth, renderedWidth) / Math.min(baseWidth, renderedWidth);
+    //     // const scaleY = Math.max(baseWidth, renderedWidth) / Math.min(baseWidth, renderedWidth);
+
+    //     // scale to display width
+    //     verticalItem.setTransform({ scale: { x: scale, y: scale } });
+    //     console.log('verticalItem.transform', JSON.stringify(verticalItem.transform, null, 2));
+    //     // item.setTransform({ position: { x: 0, y: guestCamYPosition } });
+
+    //     //     // set position of guest cam item
+    //     //     item.setTransform({ position: { x: 0, y: guestCamYPosition } });
+    //     //     guestCamYPosition += item.height;
+
+    //     // console.log('vertical', JSON.stringify(verticalItem.transform, null, 2));
+    //   });
+
+    // return this.views.getScene(id);
+    // if (options.dualOutputSceneSourceId) {
+    //   this.setDualOutputSceneSourceId(options.dualOutputSceneSourceId);
+    //   oldScene
+    //     .getItems()
+    //     .slice()
+    //     .reverse()
+    //     .forEach(item => {
+    //       if (item?.display === 'vertical') return;
+    //       newScene.addSource(item.sourceId, { display: 'horizontal' });
+    //     });
+
+    //   if (oldScene?.nodeMap) {
+    //     this.sceneCollectionsService.restoreNodeMap(newScene.id, oldScene?.nodeMap);
+    //   }
+    // } else {
+    // }
   }
 
   canRemoveScene() {
@@ -387,6 +489,10 @@ export class ScenesService extends StatefulService<IScenesState> {
       if (sceneIds[0]) {
         this.makeSceneActive(sceneIds[0]);
       }
+    }
+
+    if (scene.nodeMap) {
+      this.sceneCollectionsService.removeNodeMap(id);
     }
 
     this.REMOVE_SCENE(id);

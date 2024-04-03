@@ -23,7 +23,6 @@ export class RemoveSceneCommand extends Command {
 
   private sceneName: string;
   private sceneOrder: string[];
-  private hasSceneNodeMap: boolean;
 
   private removeNodesSubcommand: RemoveNodesCommand;
   private removeItemSubcommands: RemoveItemCommand[];
@@ -44,8 +43,6 @@ export class RemoveSceneCommand extends Command {
     // Remove this scene from any other scenes
     this.removeItemSubcommands = [];
 
-    this.hasSceneNodeMap = this.dualOutputService.views.hasNodeMap(this.sceneId);
-
     for (const item of this.scenesService.views.getSceneItemsBySourceId(this.sceneId)) {
       const command = new RemoveItemCommand(item.id);
       await command.execute();
@@ -58,22 +55,12 @@ export class RemoveSceneCommand extends Command {
       await this.removeNodesSubcommand.execute();
     }
 
-    // remove scene node map from collection
-    if (this.hasSceneNodeMap) {
-      this.sceneCollectionsService.removeNodeMap(scene.id);
-    }
-
     scene.remove();
   }
 
   async rollback() {
     this.scenesService.createScene(this.sceneName, { sceneId: this.sceneId });
     this.scenesService.setSceneOrder(this.sceneOrder.slice());
-
-    // restore scene node map to collection
-    if (this.hasSceneNodeMap) {
-      this.sceneCollectionsService.restoreNodeMap(this.sceneId);
-    }
 
     if (this.removeNodesSubcommand) await this.removeNodesSubcommand.rollback();
 

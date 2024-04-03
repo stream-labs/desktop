@@ -312,14 +312,10 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       // if a scene collection is added in dual output mode, automatically add the
       // scene collection as a dual output scene collection
       if (!this.views?.sceneNodeMaps && this.state.dualOutputMode) {
-        // @@@ TODO: this.convertSceneSources(this.scenesService.views.activeSceneId);
-
         // handle convert single output collection to dual output collection
         // if adding a scene collection in dual output mode
         this.createSceneNodes(this.views.activeSceneId);
       } else if (this.views?.sceneNodeMaps && !this.views?.sceneNodeMaps[scene.id]) {
-        // @@@ TODO: this.convertSceneSources(this.scenesService.views.activeSceneId);
-
         // handle convert single output scene to a dual output scene in a dual output collection
         // scenes are converted when the scene is made active for optimization
         this.createSceneNodes(scene.id);
@@ -329,6 +325,22 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       }
 
       if (this.state.isLoading) this.setIsLoading(false);
+    });
+
+    this.sceneCollectionsService.collectionWillSwitch.subscribe(() => {
+      // remove and reassign scene sources
+      this.scenesService.views.sceneSourcesForScene(this.views.activeSceneId).forEach(scene => {
+        const dualOutputSceneSource = this.scenesService.views.getScene(scene.sourceId);
+        console.log('dualOutputSceneSource', JSON.stringify(dualOutputSceneSource, null, 2));
+        if (!dualOutputSceneSource) return;
+
+        const originSceneSource = this.scenesService.views.getScene(
+          dualOutputSceneSource.dualOutputSceneSourceId,
+        );
+        console.log('originSceneSource', JSON.stringify(originSceneSource, null, 2));
+
+        if (!originSceneSource) return;
+      });
     });
 
     /**
@@ -396,10 +408,32 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     }
   }
 
+  /**
+   * Create scenes to render scene source nodes in the vertical display
+   * @remark Because scene items are assigned to individual output contexts
+   * a scene source will render the nodes assigned to those contexts.
+   * In order to have the horizontal scene node render in the vertical display
+   * as an exact copy of the horizontal display, create and destroy the scene that
+   * is the source for the dual output scene node.
+   *
+   * The scene for a dual output scene source must be different because otherwise
+   * the scene's nodes in the vertical display will show as the scene source in the
+   * vertical display. This means that it will not be a copy of the scene in the horizontal
+   * display in the vertical display.
+   *
+   * The scene node's source is reassigned to the original scene when switching the
+   * scene collection and the temporary scene will be destroyed. This is so any changes
+   * in the original scene are shown.
+   * @param sceneId - Id of the scene to create scene sources
+   */
   convertSceneSources(sceneId: string) {
     const sceneSources = this.scenesService.views.sceneSourcesForScene(sceneId);
     if (sceneSources.length > 0) {
-      sceneSources.forEach(scene => this.confirmOrCreateVerticalNodes(scene.sourceId));
+      sceneSources.forEach(scene => {
+        if (!this.scenesService.views.getScene(scene.sourceId).dualOutputSceneSourceId) {
+          this.scenesService.createDualOutputSceneSource(scene.sourceId);
+        }
+      });
     }
   }
 
@@ -549,6 +583,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
   createSceneNodes(sceneId: string) {
     this.SET_IS_LOADING(true);
+    this.convertSceneSources(sceneId);
+
     // establish vertical context if it doesn't exist
     if (this.state.dualOutputMode && !this.videoSettingsService.contexts.vertical) {
       this.videoSettingsService.establishVideoContext('vertical');
@@ -580,6 +616,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    * @returns
    */
   confirmSceneNodeMap(sceneId: string, nodeMap: Dictionary<string>) {
+    this.convertSceneSources(sceneId);
+
     // establish vertical context if it doesn't exist
     if (!this.videoSettingsService.contexts.vertical) {
       this.videoSettingsService.establishVideoContext('vertical');
