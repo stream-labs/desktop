@@ -25,12 +25,11 @@ export function DualOutputSourceSelector(p: IDualOutputSourceSelector) {
         : p.nodeId,
     isHorizontalVisible: DualOutputService.views.getIsHorizontalVisible(p.nodeId, p?.sceneId),
     isVerticalVisible: DualOutputService.views.getIsVerticalVisible(p.nodeId, p?.sceneId),
-    isLoading: DualOutputService.views.isLoading,
   }));
 
   const showHorizontalToggle = horizontalActive;
 
-  const showVerticalToggle = v.isLoading && v.verticalNodeId && verticalActive;
+  const showVerticalToggle = v.verticalNodeId && verticalActive;
 
   const horizontalToggleMessage = useMemo(() => {
     return v.isHorizontalVisible ? $t('Hide from Horizontal') : $t('Show in Horizontal');

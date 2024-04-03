@@ -423,118 +423,26 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
     if (sceneSources.length > 0) {
       sceneSources.forEach(sceneSourceSceneItem => {
-        // check for horizontal node id and horizontal scene item
-        // this will skip all horizontal scene sources so only vertical scene sources are updated
-        const horizontalNodeId = this.views.getHorizontalNodeId(sceneSourceSceneItem.id, sceneId);
+        const options = {
+          id: this.views.getVerticalNodeId(sceneSourceSceneItem.id, sceneId),
+          display: 'vertical' as TDisplayType,
+        };
 
-        // refresh vertical scene sources
-        if (horizontalNodeId) {
-          const horizontalSceneSourceItem = sceneSources.find(
-            sceneSource => sceneSource.id === horizontalNodeId,
-          );
-          if (!horizontalSceneSourceItem) return;
+        // otherwise, create the vertical scene source and add node map entry
 
-          // get the scenes that are the sources
-          const verticalSceneSourceId = sceneSourceSceneItem.sourceId;
-          const verticalSceneSource = this.scenesService.views.getScene(verticalSceneSourceId);
-          const horizontalSceneSource = this.scenesService.views.getScene(
-            horizontalSceneSourceItem.sourceId,
-          );
-          if (!horizontalSceneSource || !verticalSceneSource) return;
+        const verticalSceneSource = this.scenesService.createVerticalSceneSource(
+          sceneSourceSceneItem.sourceId,
+        );
 
-          // remove sources
-          verticalSceneSource
-            .getItems()
-            .forEach(sceneItem => verticalSceneSource.removeItem(sceneItem.sceneItemId));
+        const verticalSourceSceneItem = this.scenesService.views
+          .getScene(sceneId)
+          .addSource(verticalSceneSource.id, options);
 
-          // add updated sources
-          horizontalSceneSource
-            .getItems()
-            .slice()
-            .reverse()
-            .forEach(item => {
-              // only copy horizontal nodes
-              if (item?.display === 'vertical') return;
-
-              // create horizontal source
-              const horizontalItem = verticalSceneSource.addSource(item.sourceId, {
-                display: 'horizontal',
-                initialTransform: item.transform,
-              });
-
-              horizontalItem.setVisibility(false);
-
-              // create vertical source and apply transforms so that the source
-              // is the same width as the vertical display
-              const scale =
-                this.editorService.baseResolutions.vertical.baseWidth /
-                this.editorService.baseResolutions.horizontal.baseWidth;
-
-              const position = {
-                x: item.transform.position.x * scale,
-                y: item.transform.position.y * scale,
-              };
-
-              const verticalTransform = {
-                ...item.transform,
-                position,
-                scale: {
-                  x: scale,
-                  y: scale,
-                },
-              };
-
-              const verticalItem = verticalSceneSource.addSource(item.sourceId, {
-                display: 'vertical',
-                initialTransform: verticalTransform,
-              });
-
-              this.sceneCollectionsService.createNodeMapEntry(
-                sceneSourceSceneItem.id,
-                horizontalItem.id,
-                verticalItem.id,
-              );
-            });
-
-          this.sceneCollectionsService.createNodeMapEntry(
-            sceneId,
-            sceneSourceSceneItem.id,
-            verticalSceneSource.id,
-          );
-        } else {
-          // or create a new vertical scene source if it doesn't exist
-          const verticalNodeId = this.views.getVerticalNodeId(sceneSourceSceneItem.id, sceneId);
-          if (verticalNodeId) {
-            const verticalSceneSource = this.scenesService.views.getScene(verticalNodeId);
-            // if the scene exists but is missing a node map entry, add the entry
-            if (verticalSceneSource) {
-              this.sceneCollectionsService.createNodeMapEntry(
-                sceneId,
-                sceneSourceSceneItem.id,
-                verticalSceneSource.id,
-              );
-            } else {
-              // otherwise, create the vertical scene source and add node map entry
-
-              const verticalSceneSource = this.scenesService.createVerticalSceneSource(
-                sceneSourceSceneItem.sourceId,
-              );
-
-              const verticalSourceSceneItem = this.scenesService.views
-                .getScene(sceneId)
-                .addSource(verticalSceneSource.id, {
-                  id: verticalSceneSource.id,
-                  display: 'vertical',
-                });
-
-              this.sceneCollectionsService.createNodeMapEntry(
-                sceneId,
-                sceneSourceSceneItem.id,
-                verticalSourceSceneItem.id,
-              );
-            }
-          }
-        }
+        this.sceneCollectionsService.createNodeMapEntry(
+          sceneId,
+          sceneSourceSceneItem.id,
+          verticalSourceSceneItem.id,
+        );
       });
     }
   }

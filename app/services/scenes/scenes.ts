@@ -184,7 +184,9 @@ class ScenesViews extends ViewHandler<IScenesState> {
   sceneSourcesForScene(sceneId: string): SceneItem[] {
     const scene = this.getScene(sceneId);
     if (!scene) return [];
-    return scene.getItems().filter(sceneItem => sceneItem.type === 'scene');
+    return scene
+      .getItems()
+      .filter(sceneItem => sceneItem.type === 'scene' && sceneItem?.display === 'horizontal');
   }
 
   get activeSceneId() {
