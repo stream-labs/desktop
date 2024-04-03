@@ -364,7 +364,7 @@ export class ScenesService extends StatefulService<IScenesState> {
     return this.views.getScene(id);
   }
 
-  createDualOutputSceneSource(sceneSourceId: string) {
+  createDualOutputSceneSource(sceneSourceId: string, options: ISceneCreateOptions = {}) {
     const sceneSource = this.views.getScene(sceneSourceId);
     if (!sceneSource) return;
 
@@ -381,84 +381,101 @@ export class ScenesService extends StatefulService<IScenesState> {
       .slice()
       .reverse()
       .forEach(item => {
-        console.log('item.display', item.display);
+        // only copy horizontal nodes
         if (item?.display === 'vertical') return;
+
+        // create horizontal source
         const horizontalItem = dualOutputSceneSource.addSource(item.sourceId, {
           display: 'horizontal',
+          initialTransform: item.transform,
         });
 
-        const transformX =
-          this.editorService.renderedWidths.horizontal / horizontalItem.transform.position.x;
-        const transformY =
-          this.editorService.renderedHeights.horizontal / horizontalItem.transform.position.y;
-        const scale = this.editorService.renderedWidths.horizontal / horizontalItem.width;
+        // create vertical source and apply transforms so that the source
+        // is the same width as the vertical display
+        const scale =
+          this.editorService.baseResolutions.vertical.baseWidth /
+          this.editorService.baseResolutions.horizontal.baseWidth;
 
-        console.log('transformX', transformX);
-        console.log('transformY', transformY);
+        const position = {
+          x: item.transform.position.x * scale,
+          y: item.transform.position.y * scale,
+        };
+
+        const verticalTransform = {
+          ...item.transform,
+          position,
+          scale: {
+            x: scale,
+            y: scale,
+          },
+        };
 
         const verticalItem = dualOutputSceneSource.addSource(item.sourceId, {
           display: 'vertical',
-        });
-
-        verticalItem.setTransform({
-          // position: { x: transformX, y: transformY },
-          scale: { x: scale, y: scale },
+          initialTransform: verticalTransform,
         });
 
         this.sceneCollectionsService.createNodeMapEntry(id, horizontalItem.id, verticalItem.id);
       });
-    //     if (item?.display === 'vertical') return;
-    //     // console.log('item', JSON.stringify(item.transform, null, 2));
-    //     const horizontalItem = dualOutputSceneSource.addSource(item.sourceId, {
-    //       display: 'horizontal',
-    //     });
-    //     // add vertical source scaled for horizontal output
+    return this.views.getScene(id);
+  }
 
-    //     // console.log('horizontalItem.width', horizontalItem.width);
-    //     // console.log('horizontalItem.height', horizontalItem.height);
+  createVerticalSceneSource(sceneSourceId: string, options: ISceneCreateOptions = {}) {
+    const sceneSource = this.views.getScene(sceneSourceId);
+    if (!sceneSource) return;
 
-    //     console.log('horizontalItem.transform', JSON.stringify(horizontalItem.transform, null, 2));
-    //     // console.log('verticalItem.width', verticalItem.width);
-    //     // console.log('verticalItem.height', verticalItem.height);
-    //     console.log('verticalItem.transform', JSON.stringify(verticalItem.transform, null, 2));
+    const id = `scene_${uuid()}`;
+    const name = `vertical_${sceneSourceId}`;
+    this.ADD_SCENE(id, name);
+    const obsScene = SceneFactory.create(id);
+    this.sourcesService.addSource(obsScene.source, name, { sourceId: id, display: 'horizontal' });
+    const dualOutputSceneSource = this.views.getScene(id)!;
+    dualOutputSceneSource.setDualOutputSceneSourceId(sceneSourceId);
 
-    //     const scale = this.editorService.renderedWidths.vertical / verticalItem.width;
+    sceneSource
+      .getItems()
+      .slice()
+      .reverse()
+      .forEach(item => {
+        // only copy horizontal nodes
+        if (item?.display === 'vertical') return;
 
-    //     console.log('scale', scale);
-    //     // console.log('scaleY', scaleY);
+        // create horizontal source
+        const horizontalItem = dualOutputSceneSource.addSource(item.sourceId, {
+          display: 'horizontal',
+          initialTransform: item.transform,
+        });
 
-    //     // const scaleX = Math.max(baseWidth, renderedWidth) / Math.min(baseWidth, renderedWidth);
-    //     // const scaleY = Math.max(baseWidth, renderedWidth) / Math.min(baseWidth, renderedWidth);
+        horizontalItem.setVisibility(false);
 
-    //     // scale to display width
-    //     verticalItem.setTransform({ scale: { x: scale, y: scale } });
-    //     console.log('verticalItem.transform', JSON.stringify(verticalItem.transform, null, 2));
-    //     // item.setTransform({ position: { x: 0, y: guestCamYPosition } });
+        // create vertical source and apply transforms so that the source
+        // is the same width as the vertical display
+        const scale =
+          this.editorService.baseResolutions.vertical.baseWidth /
+          this.editorService.baseResolutions.horizontal.baseWidth;
 
-    //     //     // set position of guest cam item
-    //     //     item.setTransform({ position: { x: 0, y: guestCamYPosition } });
-    //     //     guestCamYPosition += item.height;
+        const position = {
+          x: item.transform.position.x * scale,
+          y: item.transform.position.y * scale,
+        };
 
-    //     // console.log('vertical', JSON.stringify(verticalItem.transform, null, 2));
-    //   });
+        const verticalTransform = {
+          ...item.transform,
+          position,
+          scale: {
+            x: scale,
+            y: scale,
+          },
+        };
 
-    // return this.views.getScene(id);
-    // if (options.dualOutputSceneSourceId) {
-    //   this.setDualOutputSceneSourceId(options.dualOutputSceneSourceId);
-    //   oldScene
-    //     .getItems()
-    //     .slice()
-    //     .reverse()
-    //     .forEach(item => {
-    //       if (item?.display === 'vertical') return;
-    //       newScene.addSource(item.sourceId, { display: 'horizontal' });
-    //     });
+        const verticalItem = dualOutputSceneSource.addSource(item.sourceId, {
+          display: 'vertical',
+          initialTransform: verticalTransform,
+        });
 
-    //   if (oldScene?.nodeMap) {
-    //     this.sceneCollectionsService.restoreNodeMap(newScene.id, oldScene?.nodeMap);
-    //   }
-    // } else {
-    // }
+        this.sceneCollectionsService.createNodeMapEntry(id, horizontalItem.id, verticalItem.id);
+      });
+    return this.views.getScene(id);
   }
 
   canRemoveScene() {

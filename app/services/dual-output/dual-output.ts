@@ -430,9 +430,10 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     const sceneSources = this.scenesService.views.sceneSourcesForScene(sceneId);
     if (sceneSources.length > 0) {
       sceneSources.forEach(scene => {
-        if (!this.scenesService.views.getScene(scene.sourceId).dualOutputSceneSourceId) {
-          this.scenesService.createDualOutputSceneSource(scene.sourceId);
-        }
+        console.log('scene source', JSON.stringify(scene.id, null, 2), '\n**\n');
+        // if (!this.scenesService.views.getScene(scene.sourceId).dualOutputSceneSourceId) {
+        //   this.scenesService.createDualOutputSceneSource(scene.sourceId);
+        // }
       });
     }
   }

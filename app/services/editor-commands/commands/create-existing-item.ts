@@ -42,28 +42,40 @@ export class CreateExistingItemCommand extends Command {
       .getScene(this.sceneId)
       .addSource(this.sourceId, { id: this.sceneItemId, display: 'horizontal' });
 
-    // check the existence of all scene node maps because the scene may not have a
-    // node map created for it
-    if (this.dualOutputService.views.hasSceneNodeMaps) {
-      if (this.dualOutputVerticalNodeId) {
-        Promise.resolve(
-          this.dualOutputService.actions.return.createOrAssignOutputNode(
-            item,
-            'vertical',
-            false,
-            this.sceneId,
-            this.dualOutputVerticalNodeId,
-          ),
-        );
-      } else {
-        Promise.resolve(
-          this.dualOutputService.actions.return.createOrAssignOutputNode(
-            item,
-            'vertical',
-            false,
-            this.sceneId,
-          ),
-        ).then(node => (this.dualOutputVerticalNodeId = node.id));
+    // special handling for dual output scene sources
+    if (item.type === 'scene') {
+      const verticalScene = this.scenesService.createVerticalSceneSource(this.sourceId);
+      const verticalSceneItem = this.scenesService.views
+        .getScene(this.sceneId)
+        .addSource(verticalScene.id, { id: this.dualOutputVerticalNodeId, display: 'vertical' });
+
+      this.sceneCollectionsService.createNodeMapEntry(this.sceneId, item.id, verticalSceneItem.id);
+
+      this.dualOutputVerticalNodeId = verticalSceneItem.id;
+    } else {
+      // check the existence of all scene node maps because the scene may not have a
+      // node map created for it
+      if (this.dualOutputService.views.hasSceneNodeMaps) {
+        if (this.dualOutputVerticalNodeId) {
+          Promise.resolve(
+            this.dualOutputService.actions.return.createOrAssignOutputNode(
+              item,
+              'vertical',
+              false,
+              this.sceneId,
+              this.dualOutputVerticalNodeId,
+            ),
+          );
+        } else {
+          Promise.resolve(
+            this.dualOutputService.actions.return.createOrAssignOutputNode(
+              item,
+              'vertical',
+              false,
+              this.sceneId,
+            ),
+          ).then(node => (this.dualOutputVerticalNodeId = node.id));
+        }
       }
     }
 
