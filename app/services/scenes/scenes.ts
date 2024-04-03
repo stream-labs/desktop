@@ -24,7 +24,7 @@ export interface IScene {
   name: string;
   nodes: (ISceneItem | ISceneItemFolder)[];
   nodeMap?: Dictionary<string>;
-  dualOutputSceneSourceId?: string;
+  dualOutputSceneSource?: boolean;
 }
 
 export interface ISceneNodeAddOptions {
@@ -198,11 +198,9 @@ class ScenesViews extends ViewHandler<IScenesState> {
   }
 
   get scenes(): Scene[] {
-    return (
-      this.state.displayOrder
-        // .filter(id => !this.getScene(id)?.dualOutputSceneSourceId)
-        .map(id => this.getScene(id)!)
-    );
+    return this.state.displayOrder
+      .filter(id => !this.getScene(id)?.dualOutputSceneSource)
+      .map(id => this.getScene(id)!);
   }
 
   getSceneItems(): SceneItem[] {
@@ -302,11 +300,12 @@ export class ScenesService extends StatefulService<IScenesState> {
   @Inject() private transitionsService: TransitionsService;
 
   @mutation()
-  private ADD_SCENE(id: string, name: string) {
+  private ADD_SCENE(id: string, name: string, dualOutputSceneSource?: boolean) {
     Vue.set<IScene>(this.state.scenes, id, {
       id,
       name,
       nodes: [],
+      dualOutputSceneSource,
     });
     this.state.displayOrder.push(id);
   }
@@ -364,73 +363,16 @@ export class ScenesService extends StatefulService<IScenesState> {
     return this.views.getScene(id);
   }
 
-  createDualOutputSceneSource(sceneSourceId: string, options: ISceneCreateOptions = {}) {
-    const sceneSource = this.views.getScene(sceneSourceId);
-    if (!sceneSource) return;
-
-    const id = `scene_${uuid()}`;
-    const name = `horizontal_${sceneSourceId}`;
-    this.ADD_SCENE(id, name);
-    const obsScene = SceneFactory.create(id);
-    this.sourcesService.addSource(obsScene.source, name, { sourceId: id, display: 'horizontal' });
-    const dualOutputSceneSource = this.views.getScene(id)!;
-    dualOutputSceneSource.setDualOutputSceneSourceId(sceneSourceId);
-
-    sceneSource
-      .getItems()
-      .slice()
-      .reverse()
-      .forEach(item => {
-        // only copy horizontal nodes
-        if (item?.display === 'vertical') return;
-
-        // create horizontal source
-        const horizontalItem = dualOutputSceneSource.addSource(item.sourceId, {
-          display: 'horizontal',
-          initialTransform: item.transform,
-        });
-
-        // create vertical source and apply transforms so that the source
-        // is the same width as the vertical display
-        const scale =
-          this.editorService.baseResolutions.vertical.baseWidth /
-          this.editorService.baseResolutions.horizontal.baseWidth;
-
-        const position = {
-          x: item.transform.position.x * scale,
-          y: item.transform.position.y * scale,
-        };
-
-        const verticalTransform = {
-          ...item.transform,
-          position,
-          scale: {
-            x: scale,
-            y: scale,
-          },
-        };
-
-        const verticalItem = dualOutputSceneSource.addSource(item.sourceId, {
-          display: 'vertical',
-          initialTransform: verticalTransform,
-        });
-
-        this.sceneCollectionsService.createNodeMapEntry(id, horizontalItem.id, verticalItem.id);
-      });
-    return this.views.getScene(id);
-  }
-
   createVerticalSceneSource(sceneSourceId: string, options: ISceneCreateOptions = {}) {
     const sceneSource = this.views.getScene(sceneSourceId);
     if (!sceneSource) return;
 
-    const id = `scene_${uuid()}`;
+    const id = options.sceneId || `scene_${uuid()}`;
     const name = `vertical_${sceneSourceId}`;
-    this.ADD_SCENE(id, name);
+    this.ADD_SCENE(id, name, true);
     const obsScene = SceneFactory.create(id);
     this.sourcesService.addSource(obsScene.source, name, { sourceId: id, display: 'horizontal' });
     const dualOutputSceneSource = this.views.getScene(id)!;
-    dualOutputSceneSource.setDualOutputSceneSourceId(sceneSourceId);
 
     sceneSource
       .getItems()

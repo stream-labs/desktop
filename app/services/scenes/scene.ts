@@ -39,7 +39,7 @@ export class Scene {
   name: string;
   nodes: (ISceneItem | ISceneItemFolder)[];
   nodeMap?: Dictionary<string>;
-  dualOutputSceneSourceId?: string;
+  dualOutputSceneSource?: boolean;
   resourceId: string;
 
   private _resourceId: string;
@@ -207,10 +207,6 @@ export class Scene {
     const sceneSource = this.getSource();
     sceneSource.setName(newName);
     this.SET_NAME(newName);
-  }
-
-  setDualOutputSceneSourceId(id: string) {
-    this.SET_SOURCE_ID(id);
   }
 
   createAndAddSource(
@@ -727,10 +723,5 @@ export class Scene {
   @mutation()
   private SET_NODE_MAP(nodeMap: Dictionary<string>) {
     this.state.nodeMap = nodeMap;
-  }
-
-  @mutation()
-  private SET_SOURCE_ID(id: string) {
-    this.state.dualOutputSceneSourceId = id;
   }
 }

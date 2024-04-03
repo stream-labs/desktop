@@ -23,6 +23,7 @@ import { SelectionService } from 'services/selection';
 import { StreamingService } from 'services/streaming';
 import { SettingsService } from 'services/settings';
 import { RunInLoadingMode } from 'services/app/app-decorators';
+import { EditorService } from 'services/editor';
 import compact from 'lodash/compact';
 
 interface IDisplayVideoSettings {
@@ -270,6 +271,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   @Inject() private selectionService: SelectionService;
   @Inject() private streamingService: StreamingService;
   @Inject() private settingsService: SettingsService;
+  @Inject() private editorService: EditorService;
 
   static defaultState: IDualOutputServiceState = {
     platformSettings: DualOutputPlatformSettings,
@@ -302,10 +304,15 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
      * Ensures that the scene nodes are assigned a context
      */
     this.scenesService.sceneSwitched.subscribe(scene => {
-      if (scene?.nodes.length === 0 || scene?.nodeMap || !this.views?.sceneNodeMaps) {
+      if (scene?.nodes.length === 0 || !this.views?.sceneNodeMaps) {
         this.setIsLoading(false);
         return;
       }
+      if (scene?.nodeMap) {
+        // update vertical scene sources to reflect latest changes in the horizontal scene sources
+        this.convertSceneSources(scene.id);
+      }
+
       // do nothing for vanilla scene collections
       if (!this.views?.sceneNodeMaps) return;
 
@@ -325,22 +332,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       }
 
       if (this.state.isLoading) this.setIsLoading(false);
-    });
-
-    this.sceneCollectionsService.collectionWillSwitch.subscribe(() => {
-      // remove and reassign scene sources
-      this.scenesService.views.sceneSourcesForScene(this.views.activeSceneId).forEach(scene => {
-        const dualOutputSceneSource = this.scenesService.views.getScene(scene.sourceId);
-        console.log('dualOutputSceneSource', JSON.stringify(dualOutputSceneSource, null, 2));
-        if (!dualOutputSceneSource) return;
-
-        const originSceneSource = this.scenesService.views.getScene(
-          dualOutputSceneSource.dualOutputSceneSourceId,
-        );
-        console.log('originSceneSource', JSON.stringify(originSceneSource, null, 2));
-
-        if (!originSceneSource) return;
-      });
     });
 
     /**
@@ -413,27 +404,82 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    * @remark Because scene items are assigned to individual output contexts
    * a scene source will render the nodes assigned to those contexts.
    * In order to have the horizontal scene node render in the vertical display
-   * as an exact copy of the horizontal display, create and destroy the scene that
-   * is the source for the dual output scene node.
+   * as an exact copy of the horizontal display, re-create the scene source rendered
+   * in the vertical display.
    *
-   * The scene for a dual output scene source must be different because otherwise
-   * the scene's nodes in the vertical display will show as the scene source in the
-   * vertical display. This means that it will not be a copy of the scene in the horizontal
-   * display in the vertical display.
+   * The scene for the vertical display must be recreated every time the scene is switched
+   * to ensure that the scene source is up-to-date. An alternative is to apply any updates
+   * in real time to scene nodes in the scene source to the dual output scene source, but
+   * the cost and complication of doing so has not been explored.
    *
-   * The scene node's source is reassigned to the original scene when switching the
-   * scene collection and the temporary scene will be destroyed. This is so any changes
-   * in the original scene are shown.
    * @param sceneId - Id of the scene to create scene sources
    */
   convertSceneSources(sceneId: string) {
     const sceneSources = this.scenesService.views.sceneSourcesForScene(sceneId);
+    console.log('length', sceneSources.length);
     if (sceneSources.length > 0) {
-      sceneSources.forEach(scene => {
-        console.log('scene source', JSON.stringify(scene.id, null, 2), '\n**\n');
-        // if (!this.scenesService.views.getScene(scene.sourceId).dualOutputSceneSourceId) {
-        //   this.scenesService.createDualOutputSceneSource(scene.sourceId);
-        // }
+      sceneSources.forEach(sceneSource => {
+        const horizontalNodeId = this.views.getHorizontalNodeId(sceneSource.id);
+        if (!horizontalNodeId) return;
+
+        const sceneId = sceneSource.id;
+        const verticalScene = this.scenesService.views.getScene(sceneId);
+        const horizontalScene = this.scenesService.views.getScene(horizontalNodeId);
+        if (!horizontalScene || !verticalScene) return;
+
+        console.log('refreshing');
+
+        verticalScene
+          .getItems()
+          .forEach(sceneItem => verticalScene.removeItem(sceneItem.sceneItemId));
+
+        horizontalScene
+          .getItems()
+          .slice()
+          .reverse()
+          .forEach(item => {
+            // only copy horizontal nodes
+            if (item?.display === 'vertical') return;
+
+            // create horizontal source
+            const horizontalItem = verticalScene.addSource(item.sourceId, {
+              display: 'horizontal',
+              initialTransform: item.transform,
+            });
+
+            horizontalItem.setVisibility(false);
+
+            // create vertical source and apply transforms so that the source
+            // is the same width as the vertical display
+            const scale =
+              this.editorService.baseResolutions.vertical.baseWidth /
+              this.editorService.baseResolutions.horizontal.baseWidth;
+
+            const position = {
+              x: item.transform.position.x * scale,
+              y: item.transform.position.y * scale,
+            };
+
+            const verticalTransform = {
+              ...item.transform,
+              position,
+              scale: {
+                x: scale,
+                y: scale,
+              },
+            };
+
+            const verticalItem = verticalScene.addSource(item.sourceId, {
+              display: 'vertical',
+              initialTransform: verticalTransform,
+            });
+
+            this.sceneCollectionsService.createNodeMapEntry(
+              sceneId,
+              horizontalItem.id,
+              verticalItem.id,
+            );
+          });
       });
     }
   }
