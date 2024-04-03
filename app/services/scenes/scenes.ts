@@ -189,6 +189,18 @@ class ScenesViews extends ViewHandler<IScenesState> {
       .filter(sceneItem => sceneItem.type === 'scene' && sceneItem?.display === 'horizontal');
   }
 
+  getSceneItemBySourceId(sourceId: string): SceneItem | null {
+    return Object.values(this.state.scenes).reduce((item: SceneItem, scene: IScene) => {
+      const sceneModel = new Scene(scene.id);
+      sceneModel.getItems().forEach(node => {
+        if (node.sourceId === sourceId) {
+          item = node;
+        }
+      });
+      return item;
+    }, null);
+  }
+
   get activeSceneId() {
     return this.state.activeSceneId;
   }

@@ -113,6 +113,17 @@ export class Source implements ISourceApi {
     );
   }
 
+  /**
+   * Denotes if the source exists solely to render a scene source
+   * in the vertical display
+   * @returns boolean
+   */
+  isDualOutputSceneSource(): boolean {
+    if (this.type !== 'scene') return false;
+
+    return this.scenesService.views.getSceneItemBySourceId(this.sourceId) !== null;
+  }
+
   getComparisonDetails(): ISourceComparison {
     const details: ISourceComparison = {
       type: this.type,
