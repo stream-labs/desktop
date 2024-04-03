@@ -19,7 +19,7 @@ import {
   SceneCollectionsService,
 } from 'services/scene-collections';
 import { UserService } from 'services/user';
-import { SelectionService } from 'services/selection';
+import { SelectionService, Selection } from 'services/selection';
 import { StreamingService } from 'services/streaming';
 import { SettingsService } from 'services/settings';
 import { RunInLoadingMode } from 'services/app/app-decorators';
@@ -311,6 +311,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       if (scene?.nodeMap) {
         // update vertical scene sources to reflect latest changes in the horizontal scene sources
         this.convertSceneSources(scene.id);
+        if (this.state.isLoading) this.setIsLoading(false);
       }
 
       // do nothing for vanilla scene collections
@@ -326,9 +327,12 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         // handle convert single output scene to a dual output scene in a dual output collection
         // scenes are converted when the scene is made active for optimization
         this.createSceneNodes(scene.id);
-      } else if (this.views?.sceneNodeMaps[scene.id]) {
-        // confirm node map
-        this.confirmSceneNodeMap(scene.id, this.views?.sceneNodeMaps[scene.id]);
+      } else if (this.views?.sceneNodeMaps[scene.id] && !scene?.nodeMap) {
+        // confirm node map only on first load of the scene
+        this.confirmSceneNodeMap(scene.id);
+      } else {
+        // update the scene sources for any scene source items in this scene
+        this.convertSceneSources(scene.id);
       }
 
       if (this.state.isLoading) this.setIsLoading(false);
@@ -421,7 +425,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       sceneSources.forEach(sceneSourceSceneItem => {
         // check for horizontal node id and horizontal scene item
         // this will skip all horizontal scene sources so only vertical scene sources are updated
-        const horizontalNodeId = this.views.getHorizontalNodeId(sceneSourceSceneItem.id);
+        const horizontalNodeId = this.views.getHorizontalNodeId(sceneSourceSceneItem.id, sceneId);
 
         // refresh vertical scene sources
         if (horizontalNodeId) {
@@ -486,18 +490,50 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
               });
 
               this.sceneCollectionsService.createNodeMapEntry(
-                verticalSceneSourceId,
+                sceneSourceSceneItem.id,
                 horizontalItem.id,
                 verticalItem.id,
               );
             });
+
+          this.sceneCollectionsService.createNodeMapEntry(
+            sceneId,
+            sceneSourceSceneItem.id,
+            verticalSceneSource.id,
+          );
         } else {
           // or create a new vertical scene source if it doesn't exist
-          const verticalNodeId = this.views.getVerticalNodeId(sceneSourceSceneItem.id);
-          console.log('verticalNodeId', verticalNodeId);
-          if (verticalNodeId) return;
+          const verticalNodeId = this.views.getVerticalNodeId(sceneSourceSceneItem.id, sceneId);
+          if (verticalNodeId) {
+            const verticalSceneSource = this.scenesService.views.getScene(verticalNodeId);
+            // if the scene exists but is missing a node map entry, add the entry
+            if (verticalSceneSource) {
+              this.sceneCollectionsService.createNodeMapEntry(
+                sceneId,
+                sceneSourceSceneItem.id,
+                verticalSceneSource.id,
+              );
+            } else {
+              // otherwise, create the vertical scene source and add node map entry
 
-          this.scenesService.createVerticalSceneSource(sceneSourceSceneItem.sourceId);
+              const verticalSceneSource = this.scenesService.createVerticalSceneSource(
+                sceneSourceSceneItem.sourceId,
+              );
+
+              const verticalSourceSceneItem = this.scenesService.views
+                .getScene(sceneId)
+                .addSource(verticalSceneSource.id, {
+                  id: verticalSceneSource.id,
+                  display: 'vertical',
+                });
+
+              this.sceneCollectionsService.createNodeMapEntry(
+                sceneId,
+                sceneSourceSceneItem.id,
+                verticalSourceSceneItem.id,
+              );
+            }
+          }
         }
       });
     }
@@ -638,7 +674,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     sceneItems.forEach((sceneItem: SceneItem, index: number) => {
       // Item already has a context assigned
       if (sceneItem?.output) return;
-      console.log('noOutput');
 
       const display = verticalNodeIds?.has(sceneItem.id) ? 'vertical' : 'horizontal';
       this.assignNodeContext(sceneItem, sceneItem?.display ?? display);
@@ -681,7 +716,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    * @param nodeMap - node map to confirm
    * @returns
    */
-  confirmSceneNodeMap(sceneId: string, nodeMap: Dictionary<string>) {
+  confirmSceneNodeMap(sceneId: string) {
+    this.SET_IS_LOADING(true);
     this.convertSceneSources(sceneId);
 
     // establish vertical context if it doesn't exist
@@ -691,6 +727,13 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
     const nodes = this.scenesService.views.getSceneNodesBySceneId(sceneId);
     if (!nodes) return;
+    const nodesSelection = new Selection(sceneId, nodes);
+
+    // init node map if it doesn't exist
+    if (!this.views.sceneNodeMaps[sceneId]) {
+      this.sceneCollectionsService.initNodeMaps();
+    }
+    const nodeMap = this.views.sceneNodeMaps[sceneId];
 
     // the keys in the nodemap are the ids for the horizontal nodes
     const keys = Object.keys(nodeMap);
@@ -702,7 +745,18 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     const nodeOrder: string[] = [];
     const nodeIdsMap: Dictionary<string> = {};
 
-    nodes.forEach((sceneNode: TSceneNode, index: number) => {
+    nodesSelection.getNodes().forEach((sceneNode: TSceneNode, index: number) => {
+      if (sceneNode.isItem() && sceneNode.type === 'scene') {
+        const scene = this.scenesService.views.getScene(sceneNode.sourceId);
+        if (!scene) {
+          sceneNode.remove();
+        } else {
+          const verticalNodeId = this.views.getVerticalNodeId(sceneNode.id);
+          if (!verticalNodeId) {
+          }
+        }
+      }
+
       if (sceneNode?.display === 'horizontal') {
         nodeOrder.push(sceneNode.id);
         const verticalNodeId = nodeMap[sceneNode.id];
@@ -754,15 +808,25 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
     // confirm nodes have correct order in the scene
     const scene = this.scenesService.views.getScene(sceneId);
+
+    // Recreate parent/child relationships
+    nodesSelection.getNodes().forEach(node => {
+      const mappedNode = scene.getNode(nodeIdsMap[node.id]);
+      const mappedParent = nodeIdsMap[node.parentId]
+        ? scene.getNode(nodeIdsMap[node.parentId])
+        : null;
+
+      if (mappedParent) {
+        mappedNode.setParent(mappedParent.id);
+      }
+    });
+
     const order = compact(nodeOrder.map(origNodeId => nodeIdsMap[origNodeId]));
     scene.setNodesOrder(order.concat(nodeOrder));
 
-    // ensure that any source that is a scene has vertical nodes created
-    // so that the scene source will correctly render in the vertical display
-    // this.convertSceneSources(sceneId);
-
     // load node map into scene to show map was confirmed
     scene.setNodeMap(this.views?.sceneNodeMaps[sceneId]);
+    this.SET_IS_LOADING(false);
   }
 
   /**
