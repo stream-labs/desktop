@@ -385,6 +385,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
         obsLog: { filename: obsLog.filename, length: obsLog.data.length, obsPluginFiles },
         notLoadedDlls,
       });
+      const rtvcRelatedLines = [...obsLog.data.matchAll(/.*nair-rtvc-source.*/g)].map(m => m[0]);
+      console.log('ObsLog.rtvcRelatedLines', rtvcRelatedLines);
 
       Sentry.withScope(scope => {
         scope.setLevel('error');
