@@ -104,6 +104,7 @@ interface ILinkedPlatform {
   access_token: string;
   platform_id: string;
   platform_name: string;
+  validation_error?: 'invalid' | 'missing_scope' | null;
 }
 
 interface ILinkedPlatformsResponse {
@@ -606,6 +607,21 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         id: linkedPlatforms.twitch_account.platform_id,
         token: linkedPlatforms.twitch_account.access_token,
       });
+
+      if (linkedPlatforms.twitch_account.validation_error) {
+        const message =
+          linkedPlatforms.twitch_account.validation_error === 'missing_scope'
+            ? $t(
+                'Streamlabs requires additional permissions from your Twitch account. Please log in with Twitch to continue.',
+              )
+            : $t('Your Twitch access token has expired. Please log in with Twitch to continue.');
+        this.reauthenticate(true, {
+          type: 'warning',
+          title: 'Twitch Error',
+          buttons: [$t('Refresh Login')],
+          message,
+        });
+      }
     } else if (this.state.auth.primaryPlatform !== 'twitch') {
       this.UNLINK_PLATFORM('twitch');
     }
