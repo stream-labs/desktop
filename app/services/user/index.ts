@@ -608,13 +608,15 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         token: linkedPlatforms.twitch_account.access_token,
       });
 
-      if (linkedPlatforms.twitch_account.validation_error) {
+      const validationError = linkedPlatforms.twitch_account.validation_error;
+      if (validationError) {
         const message =
-          linkedPlatforms.twitch_account.validation_error === 'missing_scope'
+          validationError === 'missing_scope'
             ? $t(
                 'Streamlabs requires additional permissions from your Twitch account. Please log in with Twitch to continue.',
               )
             : $t('Your Twitch access token has expired. Please log in with Twitch to continue.');
+        this.usageStatisticsService.recordAnalyticsEvent('TwitchCredentialsAlert', validationError);
         this.reauthenticate(true, {
           type: 'warning',
           title: 'Twitch Error',
