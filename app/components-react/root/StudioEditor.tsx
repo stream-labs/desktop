@@ -10,6 +10,7 @@ import { TDisplayType } from 'services/settings-v2';
 import AutoProgressBar from 'components-react/shared/AutoProgressBar';
 import { useSubscription } from 'components-react/hooks/useSubscription';
 import { message } from 'antd';
+import { useRealmObject } from 'components-react/hooks/realm';
 
 export default function StudioEditor() {
   const {
@@ -21,9 +22,9 @@ export default function StudioEditor() {
     DualOutputService,
     StreamingService,
   } = Services;
+  const performanceMode = useRealmObject(CustomizationService.state).performanceMode;
   const v = useVuex(() => ({
     hideStyleBlockers: WindowsService.state.main.hideStyleBlockers,
-    performanceMode: CustomizationService.state.performanceMode,
     cursor: EditorService.state.cursor,
     studioMode: TransitionsService.state.studioMode,
     dualOutputMode: DualOutputService.views.dualOutputMode,
@@ -33,7 +34,7 @@ export default function StudioEditor() {
     activeSceneId: ScenesService.views.activeSceneId,
     isLoading: DualOutputService.views.isLoading,
   }));
-  const displayEnabled = !v.hideStyleBlockers && !v.performanceMode && !v.isLoading;
+  const displayEnabled = !v.hideStyleBlockers && !performanceMode && !v.isLoading;
   const placeholderRef = useRef<HTMLDivElement>(null);
   const studioModeRef = useRef<HTMLDivElement>(null);
   const [studioModeStacked, setStudioModeStacked] = useState(false);
@@ -52,7 +53,7 @@ export default function StudioEditor() {
   useEffect(() => {
     let timeout: number;
 
-    if (displayEnabled || v.performanceMode) return;
+    if (displayEnabled || performanceMode) return;
 
     function checkVerticalOrientation() {
       if (placeholderRef.current) {
@@ -68,7 +69,7 @@ export default function StudioEditor() {
     return () => {
       if (timeout) clearTimeout(timeout);
     };
-  }, [displayEnabled, v.performanceMode]);
+  }, [displayEnabled, performanceMode]);
 
   // Track orientation for studio mode
   useEffect(() => {
@@ -278,7 +279,7 @@ export default function StudioEditor() {
       {v.isLoading && <DualOutputProgressBar sceneId={v.activeSceneId} />}
       {!displayEnabled && (
         <div className={styles.noPreview}>
-          {v.performanceMode && (
+          {performanceMode && (
             <div className={styles.message}>
               {$t('Preview is disabled in performance mode')}
               <div
@@ -289,7 +290,7 @@ export default function StudioEditor() {
               </div>
             </div>
           )}
-          {!v.performanceMode && (
+          {!performanceMode && (
             <div className={styles.placeholder} ref={placeholderRef}>
               {v.studioMode && (
                 <div

@@ -31,11 +31,13 @@ export default function AddDestinationButton(p: IAddDestinationButtonProps) {
           // open the stream settings or prime page
           if (UserService.views.isPrime) {
             SettingsService.actions.showSettings('Stream');
-          } else {
+          } else if (isDualOutputMode) {
             // record dual output analytics event
             UsageStatisticsService.recordAnalyticsEvent('DualOutput', {
               type: 'UpgradeToUltra',
             });
+            MagicLinkService.linkToPrime('slobs-multistream');
+          } else {
             MagicLinkService.linkToPrime('slobs-multistream');
           }
         },

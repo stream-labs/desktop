@@ -17,12 +17,13 @@ export default function Studio(p: { onTotalWidth: (width: Number) => void; class
     }
   }
 
-  const { elementsToRender, slottedElements } = useVuex(() => ({
+  const { elementsToRender, slottedElements, layout } = useVuex(() => ({
     elementsToRender: LayoutService.views.elementsToRender,
     slottedElements: LayoutService.views.currentTab.slottedElements,
+    layout: LayoutService.views.component,
   }));
 
-  const Layout = layouts[LayoutService.views.component];
+  const Layout = layouts[layout];
 
   const { children, childrenMins } = useMemo(() => {
     const children: Dictionary<ReactNode> = {};

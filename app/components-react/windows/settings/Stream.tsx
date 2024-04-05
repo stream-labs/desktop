@@ -38,7 +38,22 @@ function censorEmail(str: string) {
  * A Redux module for components in the StreamSetting window
  */
 class StreamSettingsModule {
-  constructor(private form: FormInstance) {}
+  constructor(private form: FormInstance) {
+    Services.UserService.refreshedLinkedAccounts.subscribe(
+      (res: { success: boolean; message: string }) => {
+        message.config({
+          duration: 6,
+          maxCount: 1,
+        });
+
+        if (res.success) {
+          message.success(res.message);
+        } else {
+          message.error(res.message);
+        }
+      },
+    );
+  }
 
   // DEFINE A STATE
   state = injectState({
@@ -83,9 +98,6 @@ class StreamSettingsModule {
   }
   private get customizationService() {
     return Services.CustomizationService;
-  }
-  private get dualOutputService() {
-    return Services.DualOutputService;
   }
 
   // DEFINE MUTATIONS
