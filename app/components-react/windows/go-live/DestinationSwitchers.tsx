@@ -190,11 +190,11 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
       // define slots for a platform switcher
       const { UserService } = Services;
       const service = getPlatformService(platform);
-      const platformAuthData = UserService.state.auth?.platforms[platform] ?? { username: '' };
-      assertIsDefined(platformAuthData);
+      const platformAuthData = UserService.state.auth?.platforms[platform];
+      const username = platformAuthData?.username ?? '';
       return {
         title: $t('Stream to %{platformName}', { platformName: service.displayName }),
-        description: platformAuthData.username,
+        description: username,
         Logo: () => (
           <PlatformLogo platform={platform} className={styles[`platform-logo-${platform}`]} />
         ),
