@@ -22,7 +22,10 @@ import GiftComment from './comment/GiftComment.vue';
 import NicoadComment from './comment/NicoadComment.vue';
 import SystemMessage from './comment/SystemMessage.vue';
 import { getDisplayName } from 'services/nicolive-program/ChatMessage/getDisplayName';
-import { NicoliveFailure, openErrorDialogFromFailure } from 'services/nicolive-program/NicoliveFailure';
+import {
+  NicoliveFailure,
+  openErrorDialogFromFailure,
+} from 'services/nicolive-program/NicoliveFailure';
 
 const componentMap: { [type in ChatComponentType]: Vue.Component } = {
   common: CommonComment,
@@ -92,13 +95,15 @@ export default class CommentViewer extends Vue {
       this.nicoliveCommentViewerService.pinComment(null);
       if (item) {
         this.$nextTick(() => {
-          this.nicoliveCommentViewerService.pinComment(item && {
-            ...item,
-            value: {
-              ...item.value,
-              name: item.value.name || item.rawName, // なふだon/offに追従できるようにnameを復元して保持する
+          this.nicoliveCommentViewerService.pinComment(
+            item && {
+              ...item,
+              value: {
+                ...item.value,
+                name: item.value.name || item.rawName, // なふだon/offに追従できるようにnameを復元して保持する
+              },
             },
-          });
+          );
         });
       }
     }
@@ -106,14 +111,18 @@ export default class CommentViewer extends Vue {
 
   get pinnedItem(): WrappedChat | null {
     const item = this.pinnedComment;
-    return item && {
-      ...item,
-      value: {
-        ...item.value,
-        content: `${getContentWithFilter(item)}  (${this.getFormattedLiveTime(item.value)})`,
-        name: this.nicoliveProgramStateService.state.nameplateEnabled ? item.value.name : undefined,
-      },
-    };
+    return (
+      item && {
+        ...item,
+        value: {
+          ...item.value,
+          content: `${getContentWithFilter(item)}  (${this.getFormattedLiveTime(item.value)})`,
+          name: this.nicoliveProgramStateService.state.nameplateEnabled
+            ? item.value.name
+            : undefined,
+        },
+      }
+    );
   }
 
   getDisplayName(item: WrappedChat): string {
@@ -192,9 +201,10 @@ export default class CommentViewer extends Vue {
       });
       menu.append({
         id: 'Ban comment content',
-        label: 'コメントをNGに追加',
+        label: 'コメントを配信からブロック',
         click: () => {
-          this.nicoliveCommentFilterService.addFilter({ type: 'word', body: item.value.content })
+          this.nicoliveCommentFilterService
+            .addFilter({ type: 'word', body: item.value.content })
             .catch(e => {
               if (e instanceof NicoliveFailure) {
                 openErrorDialogFromFailure(e);
@@ -204,9 +214,15 @@ export default class CommentViewer extends Vue {
       });
       menu.append({
         id: 'Ban comment owner',
-        label: 'ユーザーIDをNGに追加',
+        label: 'ユーザーを配信からブロック',
         click: () => {
-          this.nicoliveCommentFilterService.addFilter({ type: 'user', body: item.value.user_id, messageId: `${item.value.no}`, memo: item.value.content })
+          this.nicoliveCommentFilterService
+            .addFilter({
+              type: 'user',
+              body: item.value.user_id,
+              messageId: `${item.value.no}`,
+              memo: item.value.content,
+            })
             .catch(e => {
               if (e instanceof NicoliveFailure) {
                 openErrorDialogFromFailure(e);
@@ -229,7 +245,11 @@ export default class CommentViewer extends Vue {
   }
 
   showUserInfo(item: WrappedChatWithComponent) {
-    this.nicoliveCommentViewerService.showUserInfo(item.value.user_id, item.value.name, (item.value.premium & 1) !== 0);
+    this.nicoliveCommentViewerService.showUserInfo(
+      item.value.user_id,
+      item.value.name,
+      (item.value.premium & 1) !== 0,
+    );
   }
 
   private cleanup: () => void = undefined;
