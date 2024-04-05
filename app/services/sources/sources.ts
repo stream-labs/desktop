@@ -376,11 +376,14 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       const audioDevices = this.audioService
         .getVisibleSourcesForCurrentScene()
         .map(source => source.name);
-      const obsLog = ipcRenderer.sendSync('get-latest-obs-log');
+      const obsLog: { filename: string; data: string } = ipcRenderer.sendSync('get-latest-obs-log');
+      const re = /([^/']*\.dll)' not loaded/g;
+      const notLoadedDlls = [...obsLog.data.matchAll(re)].map(m => m[1]);
       const obsPluginFiles = ipcRenderer.sendSync('get-obs-plugin-files-list');
       console.info({
         audioDevices,
         obsLog: { filename: obsLog.filename, length: obsLog.data.length, obsPluginFiles },
+        notLoadedDlls,
       });
 
       Sentry.withScope(scope => {
@@ -388,7 +391,11 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
         scope.setTags({
           'nair-rtvc-source': 'not-available',
           audioDevices: audioDevices.length,
+          obsPluginFiles: obsPluginFiles.length,
         });
+        if (notLoadedDlls.length > 0) {
+          scope.setTag('obsPluginNotLoaded', notLoadedDlls.join(','));
+        }
 
         // attach obs log
         scope.addAttachment({
