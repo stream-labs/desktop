@@ -138,8 +138,7 @@ export class RtvcStateService extends PersistentStatefulService<IRtvcState> {
   // -- state params
 
   getState(): StateParam {
-    let r = this.state.value as StateParam;
-    if (!r) r = {} as StateParam;
+    const r = { ...this.state.value } as StateParam;
 
     if (!r.presets) r.presets = [];
     while (r.presets.length < PresetValues.length) r.presets.push({ pitchShift: 0 });
