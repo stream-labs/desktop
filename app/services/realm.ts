@@ -169,7 +169,7 @@ export class RealmObject {
 
           if (val instanceof Realm.Object) {
             const dataType = this.schema.properties[key];
-            const klass = RealmService.registeredClasses[dataType ?? dataType.type];
+            const klass = RealmService.registeredClasses[dataType.type ?? dataType];
 
             return klass.fromRealmModel(val);
           }
