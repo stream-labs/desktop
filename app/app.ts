@@ -122,6 +122,7 @@ if ((isProduction || process.env.NAIR_REPORT_TO_SENTRY) && !electron.remote.proc
             return null;
           }
         }
+        return event;
       },
     },
     sentryVueInit,
