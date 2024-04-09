@@ -169,8 +169,9 @@ export class RealmObject {
 
           if (val instanceof Realm.Object) {
             const dataType = this.schema.properties[key];
-            const klass = RealmService.registeredClasses[dataType.type ?? dataType];
-
+            // Realm type can be either a string or a nested object with a `type` property
+            const type = typeof dataType === 'string' ? dataType : dataType.type;
+            const klass = RealmService.registeredClasses[type];
             return klass.fromRealmModel(val);
           }
 
