@@ -28,22 +28,24 @@ import {
   isChatMessage,
   isThreadMessage,
 } from './MessageServerClient';
-import { KonomiTag } from './NicoliveClient';
 import { WrappedChat, WrappedChatWithComponent } from './WrappedChat';
 import { NicoliveCommentLocalFilterService } from './nicolive-comment-local-filter';
 import { NicoliveCommentSynthesizerService } from './nicolive-comment-synthesizer';
 import { NicoliveProgramStateService } from './state';
+import { NicoliveModeratorsService } from './nicolive-moderators';
 
 function makeEmulatedChat(
   content: string,
   date: number = Math.floor(Date.now() / 1000),
-): Pick<WrappedChat, 'type' | 'value'> {
+  isModerator = false,
+): Pick<WrappedChat, 'type' | 'value' | 'isModerator'> {
   return {
     type: 'n-air-emulated' as const,
     value: {
       content,
       date,
     },
+    isModerator,
   };
 }
 
@@ -89,6 +91,7 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
   @Inject() private nicoliveCommentSynthesizerService: NicoliveCommentSynthesizerService;
   @Inject() private customizationService: CustomizationService;
   @Inject() private windowsService: WindowsService;
+  @Inject() private nicoliveModeratorsService: NicoliveModeratorsService;
 
   static initialState: INicoliveCommentViewerState = {
     messages: [],
@@ -119,7 +122,7 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
   // なふだがoff なら名前を消す
   get filterNameplate(): (chat: WrappedChatWithComponent) => WrappedChatWithComponent {
     if (!this.nicoliveProgramStateService.state.nameplateEnabled) {
-      return (chat) => {
+      return chat => {
         return {
           ...chat,
           value: {
@@ -128,16 +131,14 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
           },
           rawName: chat.value.name, // ピン留めコメント用に元のnameを保持する
         };
-      }
+      };
     } else {
-      return (chat) => chat;
+      return chat => chat;
     }
   }
 
   get itemsLocalFiltered() {
-    return this.items
-      .filter(this.filterFn)
-      .map(this.filterNameplate);
+    return this.items.filter(this.filterFn).map(this.filterNameplate);
   }
   get recentPopoutsLocalFiltered() {
     return this.state.popoutMessages.filter(this.filterFn);
@@ -195,11 +196,13 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
   }
 
   private connect() {
+    // TODO get moderators into this.moderators
+
     this.lastSubscription = this.client
       .connect()
       .pipe(
         groupBy(msg => Object.keys(msg)[0]),
-        mergeMap((group$): Observable<Pick<WrappedChat, 'type' | 'value'>> => {
+        mergeMap((group$): Observable<Pick<WrappedChat, 'type' | 'value' | 'isModerator'>> => {
           switch (group$.key) {
             case 'chat':
               return group$.pipe(
@@ -207,6 +210,7 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
                 map(({ chat }) => ({
                   type: classify(chat),
                   value: chat,
+                  isModerator: this.nicoliveModeratorsService.isModerator(chat.user_id),
                 })),
               );
             case 'thread':
@@ -233,7 +237,7 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
             this.unsubscribe();
           }
         }),
-        map(({ type, value }, seqId) => ({ type, value, seqId })),
+        map(({ type, value, isModerator }, seqId) => ({ type, value, isModerator, seqId })),
         bufferTime(1000),
         filter(arr => arr.length > 0),
       )
@@ -249,9 +253,8 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
       size: {
         width: 600,
         height: 600,
-      }
-    })
-
+      },
+    });
   }
 
   private queueToSpeech(values: WrappedChatWithComponent[]) {

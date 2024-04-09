@@ -8,6 +8,8 @@ import { WrappedChat, WrappedChatWithComponent } from 'services/nicolive-program
 import { KonomiTagsService } from 'services/nicolive-program/konomi-tags';
 import { NicoliveCommentViewerService } from 'services/nicolive-program/nicolive-comment-viewer';
 import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
+import { getDisplayName } from 'services/nicolive-program/ChatMessage/getDisplayName';
+import { NicoliveModeratorsService } from 'services/nicolive-program/nicolive-moderators';
 import { WindowsService } from 'services/windows';
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
@@ -16,7 +18,6 @@ import EmotionComment from '../nicolive-area/comment/EmotionComment.vue';
 import GiftComment from '../nicolive-area/comment/GiftComment.vue';
 import NicoadComment from '../nicolive-area/comment/NicoadComment.vue';
 import SystemMessage from '../nicolive-area/comment/SystemMessage.vue';
-import { getDisplayName } from 'services/nicolive-program/ChatMessage/getDisplayName';
 import electron from 'electron';
 
 const componentMap: { [type in ChatComponentType]: Vue.Component } = {
@@ -42,6 +43,7 @@ export default class UserInfo extends Vue {
   @Inject() private nicoliveProgramService: NicoliveProgramService;
   @Inject() private windowsService: WindowsService;
   @Inject() private konomiTagsService: KonomiTagsService;
+  @Inject() private nicoliveModeratorsService: NicoliveModeratorsService;
 
   private konomiTagsSubscription: Subscription;
   private myKonomiTags: KonomiTag[] = [];
@@ -116,6 +118,25 @@ export default class UserInfo extends Vue {
   get isPremium() {
     return this.windowsService.getChildWindowQueryParams().isPremium;
   }
+  get isModerator() {
+    return this.nicoliveModeratorsService.isModerator(this.userId);
+  }
+
+  async addModerator() {
+    return this.nicoliveModeratorsService.addModeratorWithConfirm({
+      userId: this.userId,
+      userName: this.userName,
+    });
+  }
+
+  async removeModerator() {
+    return this.nicoliveModeratorsService.removeModeratorWithConfirm({
+      userId: this.userId,
+      userName: this.userName,
+    });
+  }
+
+  // TODO メニューを作る
 
   isFollowing: boolean = false;
 

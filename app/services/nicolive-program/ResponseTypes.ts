@@ -38,28 +38,28 @@ export interface ProgramInfo {
     status: 'test' | 'onAir' | 'end';
     /** 番組の配信者に関係する情報 */
     socialGroup:
-    | {
-      providerType: 'community';
-      /** コミュニティ名 */
-      name: string;
-      /** コミュニティID */
-      id: string;
-      /** コミュレベル */
-      communityLevel: number;
-      /** サムネイルのURL */
-      thumbnailUrl: string;
-    }
-    | {
-      providerType: 'channel';
-      /** チャンネル名 */
-      name: string;
-      /** チャンネルID */
-      id: string;
-      /** 配信会社名 */
-      ownerName: string;
-      /** サムネイルのURL */
-      thumbnailUrl: string;
-    };
+      | {
+          providerType: 'community';
+          /** コミュニティ名 */
+          name: string;
+          /** コミュニティID */
+          id: string;
+          /** コミュレベル */
+          communityLevel: number;
+          /** サムネイルのURL */
+          thumbnailUrl: string;
+        }
+      | {
+          providerType: 'channel';
+          /** チャンネル名 */
+          name: string;
+          /** チャンネルID */
+          id: string;
+          /** 配信会社名 */
+          ownerName: string;
+          /** サムネイルのURL */
+          thumbnailUrl: string;
+        };
     /** コメントのルーム */
     rooms: {
       /** 部屋ID */
@@ -240,12 +240,11 @@ export type BroadcastStreamData = {
   name: string;
 };
 
-
 export interface UserFollow {
   meta: {
     status: number;
   };
-};
+}
 
 export interface UserFollowStatus {
   meta: {
@@ -254,4 +253,19 @@ export interface UserFollowStatus {
   data: {
     following: boolean;
   };
+}
+
+export type Moderator = {
+  userId: number;
+  nickname: string;
+  iconUrl: string;
+  isValid: boolean;
+  createdAt: string;
 };
+
+export interface Moderators {
+  meta: {
+    status: 200;
+  };
+  data: Moderator[];
+}

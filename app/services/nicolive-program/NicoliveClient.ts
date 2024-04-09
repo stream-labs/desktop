@@ -21,7 +21,9 @@ import {
   UserFollowStatus,
   UserFollow,
   AddFilterRecord,
-  AddFilterResult
+  AddFilterResult,
+  Moderator,
+  Moderators,
 } from './ResponseTypes';
 const { BrowserWindow } = remote;
 
@@ -63,7 +65,7 @@ export function isOk<T>(result: WrappedResult<T>): result is SucceededResult<T> 
   return result.ok === true;
 }
 
-export class NotLoggedInError { }
+export class NotLoggedInError {}
 
 type Quality = {
   bitrate: number;
@@ -89,13 +91,13 @@ export function parseMaxQuality(maxQuality: string, fallback: Quality): Quality 
 export type KonomiTag = {
   tag_id: {
     value: string;
-  }
+  };
   name: string;
   followers_count: number;
 };
 type KonomiTags = {
   konomi_tags: KonomiTag[];
-}
+};
 
 function isValidUserFollowResponse(response: any): response is UserFollow {
   if (typeof response !== 'object') return false;
@@ -436,10 +438,11 @@ export class NicoliveClient {
   /** ユーザーアイコンを取得 */
   static getUserIconURL(userId: string, hash: string): string {
     const dir = Math.floor(Number(userId) / 10000);
-    const url = `https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/${dir}/${userId}.jpg?${hash}`
+    const url = `https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/${dir}/${userId}.jpg?${hash}`;
     return url;
   }
-  static defaultUserIconURL = 'https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg';
+  static defaultUserIconURL =
+    'https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg';
 
   // 関心が別だが他の場所におく程の理由もないのでここにおく
   /** コミュニティ情報を取得 */
@@ -735,8 +738,8 @@ export class NicoliveClient {
   // 関心が別だが他の場所におく程の理由もないのでここにおく
   /**
    * ユーザーの好みタグを取得する
-   * @param userId 
-   * @returns 
+   * @param userId
+   * @returns
    */
   async fetchKonomiTags(userId: string): Promise<KonomiTag[]> {
     const res = await this.post(
@@ -746,11 +749,11 @@ export class NicoliveClient {
           'Content-Type': 'application/json',
           'x-service-id': 'n-air-app',
         },
-        body: JSON.stringify({ 'follower_id': { value: userId, type: 'USER' } }),
+        body: JSON.stringify({ follower_id: { value: userId, type: 'USER' } }),
       },
     );
     if (res.ok) {
-      const json = await res.json() as KonomiTags;
+      const json = (await res.json()) as KonomiTags;
       return json.konomi_tags;
     }
     throw new Error(`fetchKonomiTags failed: ${res.status} ${res.statusText}`);
@@ -766,15 +769,12 @@ export class NicoliveClient {
    * @returns フォロー中ならtrue
    */
   async fetchUserFollow(userId: string): Promise<boolean> {
-    const res = await this.get(
-      NicoliveClient.userFollowEndpoint(userId),
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'x-frontend-id': NicoliveClient.frontendID.toString(10),
-        },
+    const res = await this.get(NicoliveClient.userFollowEndpoint(userId), {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-frontend-id': NicoliveClient.frontendID.toString(10),
       },
-    );
+    });
     if (res.ok) {
       const json = await res.json();
       console.info('fetchUserFollow', json);
@@ -785,7 +785,6 @@ export class NicoliveClient {
     console.info('fetchUserFollow', userId, res); // DEBUG
     throw new Error(`fetchUserFollow failed: ${res.status} ${res.statusText}`);
   }
-
 
   private prepareUserFollowApi() {
     const session = remote.session;
@@ -803,16 +802,13 @@ export class NicoliveClient {
    */
   async followUser(userId: string): Promise<void> {
     this.prepareUserFollowApi();
-    const res = await this.post(
-      NicoliveClient.userFollowEndpoint(userId),
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'x-frontend-id': NicoliveClient.frontendID.toString(10),
-          'X-Request-With': 'N Air',
-        },
+    const res = await this.post(NicoliveClient.userFollowEndpoint(userId), {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-frontend-id': NicoliveClient.frontendID.toString(10),
+        'X-Request-With': 'N Air',
       },
-    );
+    });
     if (!res.ok) {
       console.info('followUser', userId, res, await res.json()); // DEBUG
       throw new Error(`followUser failed: ${res.status} ${res.statusText}`);
@@ -825,19 +821,63 @@ export class NicoliveClient {
    */
   async unFollowUser(userId: string): Promise<void> {
     this.prepareUserFollowApi();
-    const res = await this.delete(
-      NicoliveClient.userFollowEndpoint(userId),
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'x-frontend-id': NicoliveClient.frontendID.toString(10),
-          'X-Request-With': 'N Air',
-        },
+    const res = await this.delete(NicoliveClient.userFollowEndpoint(userId), {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-frontend-id': NicoliveClient.frontendID.toString(10),
+        'X-Request-With': 'N Air',
       },
-    );
+    });
     if (!res.ok) {
       console.info('unFollowUser', userId, res, await res.json());
       throw new Error(`unFollowUser failed: ${res.status} ${res.statusText}`);
     }
+  }
+
+  async fetchModerators(): Promise<Moderator[]> {
+    console.info('API call: fetchModerators'); // DEBUG
+
+    const res = await this.get(
+      `${NicoliveClient.live2BaseURL}/unama/api/v2/broadcasters/moderators`,
+    );
+    if (res.ok) {
+      const json = (await res.json()) as Moderators;
+      return json.data;
+    }
+    throw new Error(`fetchModerators failed: ${res.status} ${res.statusText}`);
+  }
+
+  /**
+   * 配信者の設定のモデレーターを追加する
+   * @param userId
+   * @returns
+   */
+  async addModerator(userId: string): Promise<void> {
+    console.info('API call: addModerator', userId); // DEBUG
+
+    const res = await this.post(
+      `${NicoliveClient.live2BaseURL}/unama/api/v2/broadcasters/moderators`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId }),
+      },
+    );
+    if (res.ok) {
+      return;
+    }
+    throw new Error(`addModerator failed: ${res.status} ${res.statusText}`);
+  }
+  async removeModerator(userId: string): Promise<void> {
+    console.info('API call: removeModerator', userId); // DEBUG
+
+    const res = await this.delete(
+      `${NicoliveClient.live2BaseURL}/unama/api/v2/broadcasters/moderators?userId=${userId}`,
+    );
+    if (res.ok) {
+      return;
+    }
+    throw new Error(`removeModerator failed: ${res.status} ${res.statusText}`);
   }
 }

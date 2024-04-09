@@ -26,6 +26,7 @@ import {
   NicoliveFailure,
   openErrorDialogFromFailure,
 } from 'services/nicolive-program/NicoliveFailure';
+import { NicoliveModeratorsService } from 'services/nicolive-program/nicolive-moderators';
 
 const componentMap: { [type in ChatComponentType]: Vue.Component } = {
   common: CommonComment,
@@ -63,6 +64,8 @@ export default class CommentViewer extends Vue {
   @Inject() private customizationService: CustomizationService;
 
   @Inject() private settingsService: ISettingsServiceApi;
+
+  @Inject() private nicoliveModeratorsService: NicoliveModeratorsService;
 
   @Prop({ default: false }) showPlaceholder: boolean;
 
@@ -230,6 +233,31 @@ export default class CommentViewer extends Vue {
             });
         },
       });
+      if (item.value.name /* なふだ有効ユーザー */) {
+        if (!item.isModerator) {
+          menu.append({
+            id: 'Add to moderator',
+            label: 'モデレーターに追加',
+            click: () => {
+              this.nicoliveModeratorsService.addModeratorWithConfirm({
+                userId: item.value.user_id,
+                userName: item.value.name,
+              });
+            },
+          });
+        } else {
+          menu.append({
+            id: 'Remove from moderator',
+            label: 'モデレーターから削除',
+            click: () => {
+              this.nicoliveModeratorsService.removeModeratorWithConfirm({
+                userId: item.value.user_id,
+                userName: item.value.name,
+              });
+            },
+          });
+        }
+      }
     }
 
     // コンテキストメニューが出るとホバー判定が消えるので、外観を維持するために注目している要素を保持しておく

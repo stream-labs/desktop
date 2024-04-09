@@ -21,6 +21,7 @@
             @error.once="userIconURL = defaultUserIconURL"
           />
           <div class="comment-name">{{ computedName }}</div>
+          <div class="comment-moderator" v-if="chat.isModerator">[モ]</div>
         </div>
         <div class="comment-body">{{ computedContent }}</div>
       </div>
@@ -106,6 +107,11 @@
   .comment-name-box:hover & {
     color: var(--color-text-active);
   }
+}
+
+.comment-moderator { // TODO
+  font-size: @font-size2;
+  color: var(--color-text-light);
 }
 
 .comment-body {

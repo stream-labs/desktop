@@ -26,6 +26,7 @@ import CroppingOverlay from 'components/windows/CroppingOverlay.vue';
 import NicoliveProgramSelector from 'components/windows/NicoliveProgramSelector.vue';
 import Informations from 'components/windows/Informations.vue';
 import AutoCompactConfirmDialog from 'components/windows/AutoCompactConfirmDialog.vue';
+import ModeratorConfirmDialog from 'components/windows/ModeratorConfirmDialog.vue';
 import { mutation, StatefulService } from 'services/core/stateful-service';
 import electron from 'electron';
 import Vue from 'vue';
@@ -68,6 +69,7 @@ export function getComponents() {
     AutoCompactConfirmDialog,
     UserInfo,
     BrowserSourceInteraction,
+    ModeratorConfirmDialog,
   };
 }
 

@@ -17,6 +17,7 @@
         <div class="user-detail-body">
           <a class="user-page-link" @click="openUserPage" :title="userName">
             <div class="user-name">{{ userName }}</div>
+            <div class="user-moderator" v-if="isModerator">[モ]</div>
           </a>
           <div class="user-account">
             <p class="user-id">ID: {{ userId }}</p>
@@ -107,6 +108,12 @@
   .user-detail:hover & {
     color: var(--color-text-active);
   }
+}
+
+.user-moderator { // TODO
+  margin-left: 8px;
+  font-size: @font-size2;
+  color: var(--color-text-active);
 }
 
 .user-account {

@@ -160,4 +160,6 @@ export default class CommentFilter extends Vue {
   set isBannerOpened(value: boolean) {
     this.nicoliveCommentFilterService.ngPanelInfoCoachingClosed = !value;
   }
+
+  // TODO add 絞り込みフィルター(すべて/放送者モデレーター)
 }
