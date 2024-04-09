@@ -113,20 +113,36 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
     const locale = i18nService.state.locale.toLowerCase();
     view.webContents.on('dom-ready', () => {
       view.webContents.executeJavaScript(`
-        const langCode = $.cookie('langCode');
+        const getCookie = (name) => {
+          let value = "; " + document.cookie;
+          let parts = value.split("; " + name + "=");
+          if (parts.length === 2) return parts.pop().split(";").shift();
+        };
+
+        const setCookie = (name, value, days) => {
+          let expires = "";
+          if (days) {
+            let date = new Date();
+            date.setTime(date.getTime() + (days*24*60*60*1000));
+            expires = "; expires=" + date.toUTCString();
+          }
+          document.cookie = name + "=" + (value || "") + expires + "; path=/";
+        };
+
+        const langCode = getCookie('langCode');
 
         if (!(new RegExp('${locale}', 'i').test(langCode))) {
           // Detect the proper format and set the cookie to Desktop's locale
           const isUpper = x => x.toUpperCase() === x;
           const splitLocale = l => l.split('-');
 
-          const [lang, code] = splitLocale(langCode)
+          const [lang, code] = splitLocale(langCode || '');
           const usesUpperCode = code && isUpper(code[0]);
           const [newLang, newCode] = splitLocale('${locale}');
 
           const localeToSet = [newLang, (usesUpperCode ? newCode.toUpperCase() : newCode)].join('-');
 
-          $.cookie('langCode', localeToSet);
+          setCookie('langCode', localeToSet, 365); // set or update the cookie for 1 year
           window.location.reload();
         }
       `);
