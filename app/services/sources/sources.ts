@@ -380,13 +380,13 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       const re = /([^/']*\.dll)' not loaded/g;
       const notLoadedDlls = [...obsLog.data.matchAll(re)].map(m => m[1]);
       const obsPluginFiles = ipcRenderer.sendSync('get-obs-plugin-files-list');
+      const rtvcRelatedLines = [...obsLog.data.matchAll(/.*nair-rtvc-source.*/g)].map(m => m[0]);
       console.info({
         audioDevices,
         obsLog: { filename: obsLog.filename, length: obsLog.data.length, obsPluginFiles },
         notLoadedDlls,
+        rtvcRelatedLines,
       });
-      const rtvcRelatedLines = [...obsLog.data.matchAll(/.*nair-rtvc-source.*/g)].map(m => m[0]);
-      console.log('ObsLog.rtvcRelatedLines', rtvcRelatedLines);
 
       Sentry.withScope(scope => {
         scope.setLevel('error');
@@ -410,6 +410,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
         scope.setExtra('audioSource', audioDevices);
         // list of OBS plugin files
         scope.setExtra('obsPluginFiles', obsPluginFiles);
+        // list of RTVC plugin related lines
+        scope.setExtra('rtvcRelatedLines', rtvcRelatedLines);
 
         scope.setFingerprint(['nair-rtvc-source']);
         Sentry.captureMessage('nair-rtvc-source is not available');
