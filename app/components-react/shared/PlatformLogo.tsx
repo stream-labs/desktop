@@ -1,7 +1,7 @@
 import React, { HTMLAttributes } from 'react';
 import { TPlatform } from '../../services/platforms';
 import cx from 'classnames';
-import css from './PlatformLogo.m.less';
+import css from './PlatformLogo.module.less';
 import { Services } from 'components-react/service-provider';
 import { useRealmObject } from 'components-react/hooks/realm';
 

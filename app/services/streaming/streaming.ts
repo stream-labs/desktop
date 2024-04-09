@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { mutation, StatefulService } from 'services/core/stateful-service';
-import { EOutputCode, Global, NodeObs } from '../../../obs-api';
+import { EOutputCode, Global, NodeObs } from 'obs-studio-node';
 import { Inject } from 'services/core/injector';
 import moment from 'moment';
 import padStart from 'lodash/padStart';
@@ -36,15 +36,15 @@ import Utils from 'services/utils';
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
 import { createStreamError, IStreamError, StreamError, TStreamErrorType } from './stream-error';
-import { authorizedHeaders } from 'util/requests';
+import { authorizedHeaders } from '../../util/requests';
 import { HostsService } from '../hosts';
-import { assertIsDefined, getDefined } from 'util/properties-type-guards';
+import { assertIsDefined, getDefined } from '../../util/properties-type-guards';
 import { StreamInfoView } from './streaming-view';
 import { GrowService } from 'services/grow/grow';
 import * as remote from '@electron/remote';
 import { RecordingModeService } from 'services/recording-mode';
 import { MarkersService } from 'services/markers';
-import { byOS, OS } from 'util/operating-systems';
+import { byOS, OS } from '../../util/operating-systems';
 import { DualOutputService } from 'services/dual-output';
 
 enum EOBSOutputType {

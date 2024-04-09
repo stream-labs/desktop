@@ -5,7 +5,7 @@ import https from 'https';
 import electron from 'electron';
 import { AppService } from 'services/app';
 import { Inject } from 'services/core/injector';
-import { jfetch } from 'util/requests';
+import { jfetch } from '../util/requests';
 
 export interface IFamilyWithStyle {
   family: IFontFamily;

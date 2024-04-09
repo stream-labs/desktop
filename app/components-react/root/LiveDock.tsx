@@ -11,7 +11,7 @@ import { TPlatform, getPlatformService } from 'services/platforms';
 import { $t } from 'services/i18n';
 import { Services } from '../service-provider';
 import Chat from './Chat';
-import styles from './LiveDock.m.less';
+import styles from './LiveDock.module.less';
 import Tooltip from 'components-react/shared/Tooltip';
 import PlatformAppPageView from 'components-react/shared/PlatformAppPageView';
 import { useVuex } from 'components-react/hooks';

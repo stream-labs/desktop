@@ -7,7 +7,7 @@ import { FileManagerService } from 'services/file-manager';
 import { Inject } from 'services/core/injector';
 import { AppService } from 'services/app';
 import omit from 'lodash/omit';
-import { OS } from 'util/operating-systems';
+import { OS } from '../../util/operating-systems';
 
 interface ISceneCollectionsManifest {
   activeId: string | null;

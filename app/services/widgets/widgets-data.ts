@@ -1,5 +1,5 @@
 import { IWidgetTester, IWidget } from './widgets-api';
-import { AnchorPoint } from 'util/ScalableRectangle';
+import { AnchorPoint } from '../../util/ScalableRectangle';
 import { $t } from 'services/i18n';
 
 export interface IWidgetDisplayData {

@@ -10,7 +10,7 @@ import NumberInput from 'components/shared/inputs/NumberInput.vue';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm';
 
 import { $t } from 'services/i18n';
-import styles from './MedaShare.m.less';
+import styles from './MedaShare.module.less';
 import Scrollable from 'components/shared/Scrollable';
 
 @Component({})

@@ -5,7 +5,7 @@ import { I18nService } from 'services/i18n';
 import Datepicker from 'vuejs-datepicker';
 import * as locales from 'vuejs-datepicker/dist/locale';
 import { Inject } from 'services/core';
-import styles from './DateInput.m.less';
+import styles from './DateInput.module.less';
 
 @Component({ components: { Datepicker } })
 export default class DateInput extends BaseInput<number, IDateMetadata> {

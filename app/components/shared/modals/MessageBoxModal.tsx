@@ -1,6 +1,6 @@
 import { Component } from 'vue-property-decorator';
 import TsxComponent from 'components/tsx-component';
-import styles from './MessageBoxModal.m.less';
+import styles from './MessageBoxModal.module.less';
 import { WindowsService } from 'services/windows';
 
 /**

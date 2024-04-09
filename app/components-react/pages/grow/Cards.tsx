@@ -3,7 +3,7 @@ import React from 'react';
 import cx from 'classnames';
 import { Progress, Button } from 'antd';
 import PlatformLogo from '../../shared/PlatformLogo';
-import styles from './Grow.m.less';
+import styles from './Grow.module.less';
 import { Services } from '../../service-provider';
 import { ICommunityReach, IGoal, IUniversityProgress } from '../../../services/grow/grow';
 import { $t } from '../../../services/i18n';

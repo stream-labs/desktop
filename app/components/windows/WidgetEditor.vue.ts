@@ -16,13 +16,13 @@ import CustomFieldsEditor from 'components/widgets/CustomFieldsEditor.vue';
 import CodeEditor from 'components/widgets/CodeEditor.vue';
 import { WindowsService } from 'services/windows';
 import { IAlertBoxVariation } from 'services/widgets/settings/alert-box/alert-box-api';
-import { ERenderingMode } from '../../../obs-api';
+import { ERenderingMode } from 'obs-studio-node';
 import TsxComponent, { createProps } from 'components/tsx-component';
 import Scrollable from 'components/shared/Scrollable';
 import { CustomizationService } from '../../services/customization';
 import { SourcesService } from '../../services/sources';
 import { EAvailableFeatures, IncrementalRolloutService } from '../../services/incremental-rollout';
-import { onUnload } from 'util/unload';
+import { onUnload } from '../../util/unload';
 
 class WidgetEditorProps {
   isAlertBox?: boolean = false;

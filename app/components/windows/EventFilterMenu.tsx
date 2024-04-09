@@ -7,7 +7,7 @@ import { $t } from 'services/i18n';
 import { WindowsService } from 'services/windows';
 import { RecentEventsService } from 'services/recent-events';
 import { BoolInput, NumberInput } from 'components/shared/inputs/inputs';
-import styles from './EventFilterMenu.m.less';
+import styles from './EventFilterMenu.module.less';
 
 @Component({})
 export default class EventFilterMenu extends TsxComponent<{}> {

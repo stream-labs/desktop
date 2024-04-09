@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { OS } from 'util/operating-systems';
+import { OS } from '../../util/operating-systems';
 
 export interface ISceneCollectionsServiceApi {
   /**

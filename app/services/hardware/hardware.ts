@@ -1,7 +1,6 @@
 import { mutation, StatefulService } from '../core/stateful-service';
-import * as obs from '../../../obs-api';
+import * as obs from 'obs-studio-node';
 import uuid from 'uuid/v4';
-import { byOS, OS } from 'util/operating-systems';
 import { Inject } from 'services/core';
 import { UsageStatisticsService } from 'services/usage-statistics';
 

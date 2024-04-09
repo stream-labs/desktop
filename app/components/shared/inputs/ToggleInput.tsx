@@ -1,5 +1,5 @@
 import cx from 'classnames';
-import styles from './ToggleInput.m.less';
+import styles from './ToggleInput.module.less';
 import { Component } from 'vue-property-decorator';
 import BoolInput from './BoolInput';
 

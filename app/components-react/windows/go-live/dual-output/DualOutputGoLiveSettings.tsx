@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './DualOutputGoLive.m.less';
+import styles from './DualOutputGoLive.module.less';
 import Scrollable from 'components-react/shared/Scrollable';
 import { Services } from 'components-react/service-provider';
 import { useGoLiveSettings } from '../useGoLiveSettings';

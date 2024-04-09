@@ -4,7 +4,7 @@ import shuffle from 'lodash/shuffle';
 import { Button, Modal } from 'antd';
 import Form, { useForm } from '../../shared/inputs/Form';
 import { $t } from '../../../services/i18n';
-import styles from './Grow.m.less';
+import styles from './Grow.module.less';
 import { useVuex } from '../../hooks';
 import { Services } from '../../service-provider';
 import {

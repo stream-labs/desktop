@@ -5,8 +5,8 @@ import { Service } from 'services';
 import { ENotificationType } from 'services/notifications';
 import { $t } from 'services/i18n';
 import BrowserView from 'components-react/shared/BrowserView';
-import { GuestApiHandler } from 'util/guest-api-handler';
-import { IDownloadProgress } from 'util/requests';
+import { GuestApiHandler } from '../../util/guest-api-handler';
+import { IDownloadProgress } from '../../util/requests';
 import { Services } from 'components-react/service-provider';
 
 export default function AlertboxLibrary(p: { params: { id?: string } }) {

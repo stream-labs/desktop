@@ -8,7 +8,7 @@ import { WidgetDisplayData, WidgetType } from 'services/widgets';
 import { TSourceType } from 'services/sources';
 import { getPlatformService } from 'services/platforms';
 import { $i } from 'services/utils';
-import { byOS, getOS, OS } from 'util/operating-systems';
+import { byOS, getOS, OS } from '../../../util/operating-systems';
 import { $t, I18nService } from 'services/i18n';
 import SourceTag from './SourceTag';
 import { useSourceShowcaseSettings } from './useSourceShowcase';

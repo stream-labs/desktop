@@ -8,7 +8,7 @@ import {
   IObsInput,
   TObsValue,
 } from 'components/obs/inputs/ObsInput';
-import * as obs from '../../../obs-api';
+import obs from 'obs-studio-node';
 import { SourcesService } from 'services/sources';
 import { Inject } from '../core/injector';
 import { AudioService, E_AUDIO_CHANNELS } from 'services/audio';
@@ -21,7 +21,7 @@ import { VideoEncodingOptimizationService } from 'services/video-encoding-optimi
 import { PlatformAppsService } from 'services/platform-apps';
 import { EDeviceType, HardwareService } from 'services/hardware';
 import { StreamingService } from 'services/streaming';
-import { byOS, getOS, OS } from 'util/operating-systems';
+import { byOS, getOS, OS } from '../../util/operating-systems';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { Subject } from 'rxjs';

@@ -1,5 +1,5 @@
 import { mutation, StatefulService, ViewHandler } from 'services/core/stateful-service';
-import * as obs from '../../obs-api';
+import * as obs from 'obs-studio-node';
 import { Inject } from 'services/core/injector';
 import { TObsValue, TObsFormData } from 'components/obs/inputs/ObsInput';
 import { IListOption } from 'components/shared/inputs';
@@ -12,7 +12,7 @@ import { $t } from 'services/i18n';
 import { DefaultManager } from 'services/sources/properties-managers/default-manager';
 import { Subject } from 'rxjs';
 import { isUrl } from '../util/requests';
-import { getOS, OS } from 'util/operating-systems';
+import { getOS, OS } from '../util/operating-systems';
 import { UsageStatisticsService } from './usage-statistics';
 import { SourcesService } from 'services/sources';
 import { VideoSettingsService } from './settings-v2';

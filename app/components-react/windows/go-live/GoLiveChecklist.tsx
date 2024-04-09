@@ -1,5 +1,5 @@
 import { useGoLiveSettings } from './useGoLiveSettings';
-import css from './GoLiveChecklist.m.less';
+import css from './GoLiveChecklist.module.less';
 import React, { HTMLAttributes, useEffect } from 'react';
 import { Services } from '../../service-provider';
 import { $t } from '../../../services/i18n';

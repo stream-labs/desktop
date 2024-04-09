@@ -10,7 +10,7 @@ import * as remote from '@electron/remote';
 import crypto from 'crypto';
 import { Inject } from 'services/core';
 import { HostsService } from 'app-services';
-import { jfetch } from 'util/requests';
+import { jfetch } from '../../util/requests';
 
 interface IPkceAuthResponse {
   data: {

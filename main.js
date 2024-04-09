@@ -206,12 +206,12 @@ console.log('=================================');
 
 app.on('ready', () => {
   console.log('in dev mode');
-  const reactDevToolsPath = path.join(__dirname, 'vendor', 'react-devtools');
-  console.log(reactDevToolsPath);
-  session.defaultSession
-    .loadExtension(reactDevToolsPath, { allowFileAccess: true })
-    .then(() => console.log('Installed React DevTools'))
-    .catch(err => console.log('Error installing React DevTools', err));
+  // const reactDevToolsPath = path.join(__dirname, 'vendor', 'react-devtools');
+  // console.log(reactDevToolsPath);
+  // session.defaultSession
+  //   .loadExtension(reactDevToolsPath, { allowFileAccess: true })
+  //   .then(() => console.log('Installed React DevTools'))
+  //   .catch(err => console.log('Error installing React DevTools', err));
 
   // Detect when running from an unwritable location like a DMG image (will break updater)
   if (process.platform === 'darwin') {
@@ -278,7 +278,9 @@ async function startApp() {
     overlay = require('game_overlay');
   }
 
-  await bundleUpdater(__dirname);
+  // await bundleUpdater(__dirname);
+
+  console.log('wtf');
 
   crashHandler.startCrashHandler(
     app.getAppPath(),

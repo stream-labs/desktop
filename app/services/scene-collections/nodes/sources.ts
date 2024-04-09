@@ -11,10 +11,10 @@ import {
 } from 'services/sources';
 import { AudioService } from 'services/audio';
 import { Inject } from '../../core/injector';
-import * as obs from '../../../../obs-api';
+import * as obs from 'obs-studio-node';
 import { ScenesService } from 'services/scenes';
 import defaultTo from 'lodash/defaultTo';
-import { byOS, OS } from 'util/operating-systems';
+import { byOS, OS } from '../../../util/operating-systems';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import {
   EFilterDisplayType,

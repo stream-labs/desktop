@@ -3,7 +3,7 @@ import { Inject } from 'services/core/injector';
 import { WindowsService } from 'services/windows';
 import { $t } from './i18n';
 import { SourcesService } from './sources';
-import { ERenderingMode } from '../../obs-api';
+import { ERenderingMode } from 'obs-studio-node';
 
 export class ProjectorService extends Service {
   @Inject() windowsService: WindowsService;

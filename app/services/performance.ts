@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Subject } from 'rxjs';
 import electron from 'electron';
-import * as obs from '../../obs-api';
+import * as obs from 'obs-studio-node';
 import { Service, Inject } from 'services';
 import { throttle } from 'lodash-decorators';
 import {

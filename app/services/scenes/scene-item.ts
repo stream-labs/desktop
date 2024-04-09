@@ -8,9 +8,9 @@ import {
   CenteringAxis,
   AnchorPositions,
   AnchorPoint,
-} from 'util/ScalableRectangle';
+} from '../../util/ScalableRectangle';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
-import * as obs from '../../../obs-api';
+import obs from 'obs-studio-node';
 
 import {
   IPartialSettings,
@@ -36,7 +36,7 @@ import { EditorService } from 'services/editor';
  * how it fits in to the given scene
  */
 
-export { EScaleType, EBlendingMode, EBlendingMethod } from '../../../obs-api';
+export { EScaleType, EBlendingMode, EBlendingMethod } from 'obs-studio-node';
 
 @ServiceHelper('ScenesService')
 export class SceneItem extends SceneItemNode {

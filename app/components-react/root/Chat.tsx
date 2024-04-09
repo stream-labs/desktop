@@ -1,9 +1,9 @@
 import * as remote from '@electron/remote';
 import React, { useEffect, useRef } from 'react';
 import { Services } from '../service-provider';
-import styles from './Chat.m.less';
+import styles from './Chat.module.less';
 import { OS, getOS } from '../../util/operating-systems';
-import { onUnload } from 'util/unload';
+import { onUnload } from '../../util/unload';
 import { Button } from 'antd';
 import { $t } from 'services/i18n';
 

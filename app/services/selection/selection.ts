@@ -16,8 +16,8 @@ import {
   EBlendingMethod,
 } from 'services/scenes';
 import { EDeinterlaceFieldOrder, EDeinterlaceMode, Source } from 'services/sources';
-import { Rect } from 'util/rect';
-import { AnchorPoint, AnchorPositions, CenteringAxis } from 'util/ScalableRectangle';
+import { Rect } from '../../util/rect';
+import { AnchorPoint, AnchorPositions, CenteringAxis } from '../../util/ScalableRectangle';
 import { ISelectionState, TNodesList } from './index';
 import { DualOutputService } from 'services/dual-output';
 import { TDisplayType } from 'services/settings-v2';

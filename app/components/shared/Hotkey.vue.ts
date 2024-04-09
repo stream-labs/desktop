@@ -1,7 +1,7 @@
 import { Component } from 'vue-property-decorator';
 import { IHotkey, IBinding } from 'services/hotkeys';
 import TsxComponent, { createProps } from 'components/tsx-component';
-import { byOS, OS } from 'util/operating-systems';
+import { byOS, OS } from '../../util/operating-systems';
 import TextInput from './inputs/TextInput';
 import { Inject } from 'services';
 import { MarkersService } from 'app-services';

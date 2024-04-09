@@ -7,7 +7,7 @@ import { PlatformAppsService } from 'services/platform-apps';
 import { PlatformAppStoreService } from 'services/platform-app-store';
 import { UserService } from 'services/user';
 import { SettingsService } from './settings';
-import { byOS, OS } from 'util/operating-systems';
+import { byOS, OS } from '../util/operating-systems';
 import { GuestCamService } from './guest-cam';
 import { SideNavService, ESideNavKey, ProtocolLinkKeyMap } from './side-nav';
 import { Subject } from 'rxjs';

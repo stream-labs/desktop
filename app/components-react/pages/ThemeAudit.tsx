@@ -2,7 +2,7 @@ import { Services } from 'components-react/service-provider';
 import React, { useEffect, useState } from 'react';
 import execa from 'execa';
 import { FFPROBE_EXE } from 'services/highlighter/constants';
-import { pmap } from 'util/pmap';
+import { pmap } from '../../util/pmap';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import Scrollable from 'components-react/shared/Scrollable';
 import styles from './ThemeAudit.m.less';

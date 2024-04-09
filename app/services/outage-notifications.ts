@@ -5,7 +5,7 @@ import { JsonrpcService, IJsonRpcRequest } from 'services/api/jsonrpc';
 import { UserService } from 'services/user';
 import { TPlatform } from 'services/platforms';
 import { InitAfter } from './core';
-import { jfetch } from 'util/requests';
+import { jfetch } from '../util/requests';
 import * as remote from '@electron/remote';
 
 interface IOutageNotification {

@@ -3,7 +3,7 @@ import cx from 'classnames';
 import { SliderInput } from 'components-react/shared/inputs';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
-import { EditMenu } from 'util/menus/EditMenu';
+import { EditMenu } from '../../../../util/menus/EditMenu';
 import MixerVolmeter from './CanvasVolmeter';
 import styles from './MixerItem.m.less';
 

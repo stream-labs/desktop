@@ -1,6 +1,6 @@
 import path from 'path';
 import Utils from 'services/utils';
-import { getOS, OS } from 'util/operating-systems';
+import { getOS, OS } from '../../util/operating-systems';
 import * as remote from '@electron/remote';
 
 export const FFMPEG_DIR = Utils.isDevMode()

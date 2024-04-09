@@ -1,7 +1,7 @@
 import { Service } from './core/service';
 import fs from 'fs';
 import path from 'path';
-import * as obs from '../../obs-api';
+import * as obs from 'obs-studio-node';
 import * as remote from '@electron/remote';
 
 // WARNING: This service is initialized extremely early

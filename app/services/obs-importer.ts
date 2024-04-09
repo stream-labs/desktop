@@ -11,7 +11,7 @@ import { TransitionsService, ETransitionType } from 'services/transitions';
 import { AudioService } from 'services/audio';
 import { Inject } from 'services/core/injector';
 import { SceneCollectionsService } from 'services/scene-collections';
-import * as obs from '../../obs-api';
+import * as obs from 'obs-studio-node';
 import { SettingsService } from 'services/settings';
 import { AppService } from 'services/app';
 import { RunInLoadingMode } from 'services/app/app-decorators';

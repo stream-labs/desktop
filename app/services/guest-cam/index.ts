@@ -1,5 +1,5 @@
-import { authorizedHeaders, jfetch } from 'util/requests';
-import { importSocketIOClient } from 'util/slow-imports';
+import { authorizedHeaders, jfetch } from '../../util/requests';
+import { importSocketIOClient } from '../../util/slow-imports';
 import { InitAfter, Inject, mutation, StatefulService, Service, ViewHandler } from 'services/core';
 import { UserService } from 'services/user';
 import uuid from 'uuid/v4';
@@ -10,8 +10,8 @@ import { Subject } from 'rxjs';
 import { HardwareService } from 'services/hardware';
 import { Producer } from './producer';
 import { Consumer } from './consumer';
-import { byOS, OS } from 'util/operating-systems';
-import { Mutex } from 'util/mutex';
+import { byOS, OS } from '../../util/operating-systems';
+import { Mutex } from '../../util/mutex';
 import Utils from 'services/utils';
 import { AudioService, E_AUDIO_CHANNELS } from 'services/audio';
 import {
@@ -31,7 +31,6 @@ import { EStreamingState } from 'services/streaming';
 import Vue from 'vue';
 import { EDismissable } from 'services/dismissables';
 import { EAvailableFeatures } from 'services/incremental-rollout';
-import { assertIsDefined } from 'util/properties-type-guards';
 
 /**
  * This is in actuality a big data blob at runtime, the shape

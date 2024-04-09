@@ -6,7 +6,7 @@ import { Button } from 'antd';
 import { ButtonGroup } from 'components-react/shared/ButtonGroup';
 import UltraIcon from './UltraIcon';
 import ButtonHighlighted from './ButtonHighlighted';
-import styles from './AddDestinationButton.m.less';
+import styles from './AddDestinationButton.module.less';
 import cx from 'classnames';
 interface IAddDestinationButtonProps {
   type?: 'default' | 'ultra';

@@ -14,7 +14,7 @@ import {
 import { YoutubeService } from 'services/platforms/youtube';
 import os from 'os';
 import { CLIP_DIR, SCRUB_SPRITE_DIRECTORY, SUPPORTED_FILE_TYPES, TEST_MODE } from './constants';
-import { pmap } from 'util/pmap';
+import { pmap } from '../../util/pmap';
 import { Clip } from './clip';
 import { AudioCrossfader } from './audio-crossfader';
 import { FrameWriter } from './frame-writer';

@@ -1,5 +1,5 @@
 import { mutation, StatefulService } from './core/stateful-service';
-import * as obs from '../../obs-api';
+import * as obs from 'obs-studio-node';
 import {
   getPropertiesFormData,
   IObsListOption,

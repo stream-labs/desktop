@@ -6,7 +6,7 @@ import { alertAsync, confirmAsync } from '../../modals';
 import { $t } from '../../../services/i18n';
 import { ObsSettingsSection } from './ObsSettings';
 import { CheckboxInput, TextInput } from '../../shared/inputs';
-import { getOS, OS } from 'util/operating-systems';
+import { getOS, OS } from '../../../util/operating-systems';
 import { Button } from 'antd';
 import cx from 'classnames';
 import { CheckCircleOutlined, ExclamationCircleOutlined } from '@ant-design/icons';

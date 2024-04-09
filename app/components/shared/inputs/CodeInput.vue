@@ -7,9 +7,9 @@
 <script lang="ts" src="./CodeInput.vue.ts"></script>
 
 <style lang="less">
-  @import '~codemirror/theme/xq-light.css';
-  @import '~codemirror/theme/material.css';
-  @import '~codemirror/lib/codemirror.css';
+  @import 'codemirror/theme/xq-light.css';
+  @import 'codemirror/theme/material.css';
+  @import 'codemirror/lib/codemirror.css';
 
   .CodeMirror {
     font-size: 10pt;

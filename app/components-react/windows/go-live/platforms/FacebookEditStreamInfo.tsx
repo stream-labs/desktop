@@ -1,4 +1,4 @@
-import css from './FacebookEditStreamInfo.m.less';
+import css from './FacebookEditStreamInfo.module.less';
 import { CommonPlatformFields } from '../CommonPlatformFields';
 import React from 'react';
 import { inject, injectFormBinding, injectState, useModule } from 'slap';

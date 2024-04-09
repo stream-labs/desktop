@@ -4,7 +4,7 @@ import InputWrapper from './InputWrapper';
 import { Services } from '../../service-provider';
 import { LinkOutlined, CloseOutlined, CloudDownloadOutlined } from '@ant-design/icons';
 import { Button, Col, Row, Tooltip } from 'antd';
-import css from './mediaUrlInput.m.less';
+import css from './mediaUrlInput.module.less';
 import { $t } from '../../../services/i18n';
 import { promptAsync } from '../../modals';
 import cx from 'classnames';

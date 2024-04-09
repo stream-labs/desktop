@@ -2,7 +2,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import cx from 'classnames';
 import { BaseInput } from 'components/shared/inputs/BaseInput';
 import { IListMetadata, IListOption } from 'components/shared/inputs';
-import styles from './TagsInput.m.less';
+import styles from './TagsInput.module.less';
 import { modifiers as m } from 'vue-tsx-support';
 import { Multiselect } from 'vue-multiselect';
 import { $t } from 'services/i18n';

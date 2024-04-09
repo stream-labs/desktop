@@ -1,6 +1,6 @@
 import { Component } from 'vue-property-decorator';
 import TsxComponent from 'components/tsx-component';
-import styles from './Modal.m.less';
+import styles from './Modal.module.less';
 
 /**
  * Shows content above black fade in the middle of the window

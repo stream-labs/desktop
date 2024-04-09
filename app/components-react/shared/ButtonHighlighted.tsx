@@ -1,7 +1,7 @@
 import React, { CSSProperties, SVGProps } from 'react';
 import { Button, ButtonProps } from 'antd';
 import cx from 'classnames';
-import styles from './ButtonHighlighted.m.less';
+import styles from './ButtonHighlighted.module.less';
 
 interface IButtonHighlighted extends ButtonProps {
   icon?: SVGProps<SVGElement> | HTMLDivElement;

@@ -1,7 +1,7 @@
 import { Component, Watch } from 'vue-property-decorator';
 import TsxComponent, { createProps } from 'components/tsx-component';
 import { ProgressBar } from 'streamlabs-beaker';
-import styles from './SmoothProgressBar.m.less';
+import styles from './SmoothProgressBar.module.less';
 
 class SmoothProgressBarProps {
   value: number = 0;

@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { IBinding, IHotkey } from 'services/hotkeys';
 import { TextInput } from 'components-react/shared/inputs';
-import { byOS, OS } from 'util/operating-systems';
+import { byOS, OS } from '../../util/operating-systems';
 import Form from './inputs/Form';
 import { Input } from 'antd';
 import { Services } from 'components-react/service-provider';

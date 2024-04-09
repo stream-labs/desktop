@@ -21,7 +21,7 @@ import { FileManagerService } from 'services/file-manager';
 import { PatchNotesService } from 'services/patch-notes';
 import { ProtocolLinksService } from 'services/protocol-links';
 import { WindowsService } from 'services/windows';
-import * as obs from '../../../obs-api';
+import * as obs from 'obs-studio-node';
 import { OutageNotificationsService } from 'services/outage-notifications';
 import { CrashReporterService } from 'services/crash-reporter';
 import { PlatformAppsService } from 'services/platform-apps';
@@ -41,7 +41,7 @@ import { KeyListenerService } from 'services/key-listener';
 import { MetricsService } from '../metrics';
 import { SettingsService } from '../settings';
 import { DualOutputService } from 'services/dual-output';
-import { OS, getOS } from 'util/operating-systems';
+import { OS, getOS } from '../../util/operating-systems';
 import * as remote from '@electron/remote';
 import { RealmService } from 'services/realm';
 

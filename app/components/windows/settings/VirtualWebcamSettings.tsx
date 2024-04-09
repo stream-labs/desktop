@@ -2,11 +2,11 @@ import { Component } from 'vue-property-decorator';
 import Vue from 'vue';
 import { Inject } from 'services';
 import { VirtualWebcamService, EVirtualWebcamPluginInstallStatus } from 'services/virtual-webcam';
-import styles from './VirtualWebcamSettings.m.less';
+import styles from './VirtualWebcamSettings.module.less';
 import cx from 'classnames';
 import { $t } from 'services/i18n';
 import Translate from 'components/shared/translate';
-import { getOS, OS } from 'util/operating-systems';
+import { getOS, OS } from '../../../util/operating-systems';
 
 @Component({})
 export default class AppearanceSettings extends Vue {

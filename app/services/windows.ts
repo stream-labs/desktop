@@ -72,7 +72,7 @@ import Poll from 'components/widgets/Poll';
 import ChatHighlight from 'components/widgets/ChatHighlight';
 import SuperchatGoal from 'components/widgets/goal/SuperchatGoal';
 
-import { byOS, OS } from 'util/operating-systems';
+import { byOS, OS } from '../util/operating-systems';
 import { UsageStatisticsService } from './usage-statistics';
 import { Inject } from 'services/core';
 import MessageBoxModal from 'components/shared/modals/MessageBoxModal';

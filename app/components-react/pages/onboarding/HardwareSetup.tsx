@@ -4,7 +4,7 @@ import commonStyles from './Common.m.less';
 import styles from './HardwareSetup.m.less';
 import { Services } from 'components-react/service-provider';
 import Display from 'components-react/shared/Display';
-import { ERenderingMode } from '../../../../obs-api';
+import { ERenderingMode } from 'obs-studio-node';
 import Form from 'components-react/shared/inputs/Form';
 import { ListInput } from 'components-react/shared/inputs';
 import { useVuex } from 'components-react/hooks';

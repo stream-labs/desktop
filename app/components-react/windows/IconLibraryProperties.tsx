@@ -7,7 +7,7 @@ import React, { useEffect, useState } from 'react';
 import { Services } from '../service-provider';
 import { FileInput } from '../shared/inputs';
 import Scrollable from '../shared/Scrollable';
-import styles from './IconLibraryProperties.m.less';
+import styles from './IconLibraryProperties.module.less';
 import { useChildWindowParams } from 'components-react/hooks';
 
 export default () => {

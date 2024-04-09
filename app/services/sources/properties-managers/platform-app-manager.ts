@@ -1,7 +1,7 @@
 import { Subscription } from 'rxjs';
 import { PropertiesManager } from './properties-manager';
 import { Inject } from 'services/core/injector';
-import * as obs from '../../../../obs-api';
+import obs from 'obs-studio-node';
 import { PlatformAppsService } from 'services/platform-apps';
 import { TransitionsService } from 'services/transitions';
 

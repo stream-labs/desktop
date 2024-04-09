@@ -4,7 +4,7 @@ import cx from 'classnames';
 import { useVuex } from '../hooks';
 import { Services } from '../service-provider';
 import cloneDeep from 'lodash/cloneDeep';
-import styles from './PerformanceMetrics.m.less';
+import styles from './PerformanceMetrics.module.less';
 import { $t } from '../../services/i18n';
 import { useRealmObject } from 'components-react/hooks/realm';
 

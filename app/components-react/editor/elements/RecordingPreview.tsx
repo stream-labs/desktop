@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import Display from 'components-react/shared/Display';
 import Util from 'services/utils';
-import { ERenderingMode } from '../../../../obs-api';
+import { ERenderingMode } from 'obs-studio-node';
 import styles from './BaseElement.m.less';
 import { $t } from 'services/i18n';
 import { Services } from 'components-react/service-provider';

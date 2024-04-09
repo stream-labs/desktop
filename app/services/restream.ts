@@ -5,7 +5,7 @@ import { getPlatformService, TPlatform } from 'services/platforms';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { UserService } from 'services/user';
 import { CustomizationService, ICustomizationServiceState } from 'services/customization';
-import { authorizedHeaders, jfetch } from 'util/requests';
+import { authorizedHeaders, jfetch } from '../util/requests';
 import { IncrementalRolloutService } from './incremental-rollout';
 import electron from 'electron';
 import { StreamingService } from './streaming';

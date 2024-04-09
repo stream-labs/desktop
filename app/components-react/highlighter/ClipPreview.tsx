@@ -4,7 +4,7 @@ import React, { useMemo, useState } from 'react';
 import path from 'path';
 import { Services } from 'components-react/service-provider';
 import { BoolButtonInput } from 'components-react/shared/inputs/BoolButtonInput';
-import styles from '../pages/Highlighter.m.less';
+import styles from '../pages/Highlighter.module.less';
 import cx from 'classnames';
 import { Tooltip } from 'antd';
 import { $t } from 'services/i18n';

@@ -4,7 +4,7 @@ import fs from 'fs';
 import { Inject } from 'services/core/injector';
 import { HostsService } from 'services/hosts';
 import { UserService } from 'services/user';
-import { getChecksum, isUrl, downloadFile, jfetch } from 'util/requests';
+import { getChecksum, isUrl, downloadFile, jfetch } from '../util/requests';
 import { AppService } from 'services/app';
 
 const uuid = window['require']('uuid/v4');

@@ -4,7 +4,7 @@ import { Observable, Subject, Subscription } from 'rxjs';
 import { mutation, StatefulService, ServiceHelper, InitAfter, Inject } from 'services';
 import { SourcesService, ISource, Source } from 'services/sources';
 import { ScenesService } from 'services/scenes';
-import * as obs from '../../../obs-api';
+import * as obs from 'obs-studio-node';
 import Utils from 'services/utils';
 import { WindowsService } from 'services/windows';
 import { IAudioSource, IAudioSourceApi, IAudioSourcesState, IFader, IVolmeter } from './audio-api';

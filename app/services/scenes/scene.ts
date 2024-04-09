@@ -15,14 +15,14 @@ import {
   EBlendingMethod,
 } from './index';
 import Utils from 'services/utils';
-import * as obs from '../../../obs-api';
+import obs from 'obs-studio-node';
 import { SelectionService, Selection, TNodesList } from 'services/selection';
 import uniqBy from 'lodash/uniqBy';
 import { TSceneNodeInfo } from 'services/scene-collections/nodes/scene-items';
 import * as fs from 'fs';
 import * as path from 'path';
 import uuid from 'uuid/v4';
-import { assertIsDefined } from 'util/properties-type-guards';
+import { assertIsDefined } from '../../util/properties-type-guards';
 import { VideoSettingsService, TDisplayType } from 'services/settings-v2';
 import { DualOutputService } from 'services/dual-output';
 import { SceneCollectionsService } from 'services/scene-collections';

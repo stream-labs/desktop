@@ -10,7 +10,7 @@ import {
 import { authorizedHeaders, jfetch } from '../../util/requests';
 import { throwStreamError } from '../streaming/stream-error';
 import { platformAuthorizedRequest } from './utils';
-import { getOS } from 'util/operating-systems';
+import { getOS } from '../../util/operating-systems';
 import { IGoLiveSettings } from '../streaming';
 import { TOutputOrientation } from 'services/restream';
 import { IVideo } from 'obs-studio-node';
@@ -25,7 +25,7 @@ import {
   TTikTokLiveScopeTypes,
 } from './tiktok/api';
 import { I18nService } from 'services/i18n';
-import { getDefined } from 'util/properties-type-guards';
+import { getDefined } from '../../util/properties-type-guards';
 import * as remote from '@electron/remote';
 import { WindowsService } from 'services/windows';
 import Utils from 'services/utils';

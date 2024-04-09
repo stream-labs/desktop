@@ -15,7 +15,7 @@ import { UsageStatisticsService } from 'services/usage-statistics';
 import fs from 'fs-extra';
 import path from 'path';
 import { AppService } from './app';
-import * as obs from '../../obs-api';
+import * as obs from 'obs-studio-node';
 import { RealmObject } from './realm';
 
 // Maps to --background

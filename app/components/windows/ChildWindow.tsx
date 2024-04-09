@@ -6,7 +6,7 @@ import { getComponents, IModalOptions, IWindowOptions, WindowsService } from 'se
 import { CustomizationService } from 'services/customization';
 import { TitleBar } from 'components/shared/ReactComponentList';
 import { AppService } from 'services/app';
-import styles from './ChildWindow.m.less';
+import styles from './ChildWindow.module.less';
 import ModalWrapper from '../shared/modals/ModalWrapper';
 import antdThemes from 'styles/antd/index';
 

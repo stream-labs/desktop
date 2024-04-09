@@ -1,4 +1,4 @@
-import { getDefined } from 'util/properties-type-guards';
+import { getDefined } from '../../util/properties-type-guards';
 import {
   IGame,
   IPlatformCapabilityResolutionPreset,

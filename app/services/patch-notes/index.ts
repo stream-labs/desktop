@@ -6,7 +6,6 @@ import { NavigationService } from 'services/navigation';
 import { $t } from 'services/i18n';
 import { NotificationsService, ENotificationType } from 'services/notifications';
 import { JsonrpcService } from 'services/api/jsonrpc/jsonrpc';
-import { getOS, OS } from 'util/operating-systems';
 import { WindowsService } from 'services/windows';
 
 interface IPatchNotesState {

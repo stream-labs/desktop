@@ -3,12 +3,12 @@ import { Component, Prop } from 'vue-property-decorator';
 import { Sketch } from 'vue-color';
 import { BaseInput } from './BaseInput';
 import { IColorMetadata } from './index';
-import styles from './ColorInput.m.less';
+import styles from './ColorInput.module.less';
 import { $t } from 'services/i18n';
 import { Inject } from 'services';
 import { UsageStatisticsService } from 'services/usage-statistics';
-import { loadColorPicker } from 'util/slow-imports';
-import { OS, getOS } from 'util/operating-systems';
+import { loadColorPicker } from '../../../util/slow-imports';
+import { OS, getOS } from '../../../util/operating-systems';
 
 @Component({})
 export default class ColorInput extends BaseInput<string, IColorMetadata> {

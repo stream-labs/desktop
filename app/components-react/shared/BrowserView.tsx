@@ -8,7 +8,7 @@ import Spinner from 'components-react/shared/Spinner';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
 import electron from 'electron';
-import { onUnload } from 'util/unload';
+import { onUnload } from '../../util/unload';
 
 interface BrowserViewProps {
   src: string;

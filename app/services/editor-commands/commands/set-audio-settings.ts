@@ -1,5 +1,5 @@
 import { CombinableCommand } from './combinable-command';
-import obs from '../../../../obs-api';
+import obs from 'obs-studio-node';
 import { Inject } from 'services/core';
 import { AudioService } from 'services/audio';
 import { $t } from 'services/i18n';

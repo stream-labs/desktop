@@ -3,7 +3,7 @@ import { SceneItem } from 'services/scenes';
 import { FontLibraryService } from 'services/font-library';
 import { Inject } from 'services/core/injector';
 import path from 'path';
-import { byOS, OS } from 'util/operating-systems';
+import { byOS, OS } from '../../../../util/operating-systems';
 import Utils from 'services/utils';
 
 interface ISchema {

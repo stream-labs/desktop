@@ -5,7 +5,7 @@ import { Inject } from '../core/injector';
 import { FileManagerService } from 'services/file-manager';
 import { IObsListInput, TObsFormData } from 'components/obs/inputs/ObsInput';
 import { I18nServiceApi } from './i18n-api';
-import * as obs from '../../../obs-api';
+import * as obs from 'obs-studio-node';
 import * as fs from 'fs';
 import path from 'path';
 import Utils from '../utils';

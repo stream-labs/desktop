@@ -5,7 +5,7 @@ import { CustomizationService } from 'services/customization';
 import { Inject } from 'services/core/injector';
 import { AppService } from 'services/app';
 import TsxComponent from 'components/tsx-component';
-import { OS, getOS } from 'util/operating-systems';
+import { OS, getOS } from '../util/operating-systems';
 import Scrollable from 'components/shared/Scrollable';
 
 @Component({ components: { Scrollable } })

@@ -7,7 +7,7 @@ import { assertIsDefined } from '../../../util/properties-type-guards';
 import { getPlatformService, TPlatform } from '../../../services/platforms';
 import { $t } from '../../../services/i18n';
 import Translate from '../../shared/Translate';
-import css from './GoLiveError.m.less';
+import css from './GoLiveError.module.less';
 import * as remote from '@electron/remote';
 
 /**

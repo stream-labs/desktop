@@ -17,7 +17,7 @@ import { SceneCollectionsService } from 'services/scene-collections';
 // eslint-disable-next-line no-undef
 import WritableStream = NodeJS.WritableStream;
 import { $t } from 'services/i18n';
-import { OS, getOS } from 'util/operating-systems';
+import { OS, getOS } from '../../../util/operating-systems';
 
 const net = require('net');
 

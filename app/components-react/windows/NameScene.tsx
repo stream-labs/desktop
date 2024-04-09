@@ -6,7 +6,7 @@ import { ModalLayout } from 'components-react/shared/ModalLayout';
 import React, { useMemo, useState } from 'react';
 import { ISceneCreateOptions } from 'services/editor-commands/commands/create-scene';
 import { $t } from 'services/i18n';
-import { assertIsDefined } from 'util/properties-type-guards';
+import { assertIsDefined } from '../../util/properties-type-guards';
 
 export default function NameScene() {
   const { WindowsService, ScenesService, SourcesService, EditorCommandsService } = Services;

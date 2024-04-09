@@ -3,12 +3,12 @@ import { IVolmeter } from 'services/audio';
 import { Subscription } from 'rxjs';
 import electron from 'electron';
 import difference from 'lodash/difference';
-import { compileShader, createProgram } from 'util/webgl/utils';
-import vShaderSrc from 'util/webgl/shaders/volmeter.vert';
-import fShaderSrc from 'util/webgl/shaders/volmeter.frag';
+import { compileShader, createProgram } from '../../../../util/webgl/utils';
+import vShaderSrc from '../../../../util/webgl/shaders/volmeter.vert?raw';
+import fShaderSrc from '../../../../util/webgl/shaders/volmeter.frag?raw';
 import { Services } from 'components-react/service-provider';
 import { injectWatch, useModule } from 'slap';
-import { assertIsDefined, getDefined } from 'util/properties-type-guards';
+import { assertIsDefined, getDefined } from '../../../../util/properties-type-guards';
 
 // Configuration
 const CHANNEL_HEIGHT = 3;

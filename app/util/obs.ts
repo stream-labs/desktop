@@ -1,4 +1,4 @@
-import * as obs from '../../obs-api';
+import obs from 'obs-studio-node';
 
 // Utilities for interacting with OBS
 

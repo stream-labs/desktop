@@ -28,7 +28,7 @@ import InputWrapper from '../shared/inputs/InputWrapper';
 import { $t, $translateIfExist, $translateIfExistWithCheck } from '../../services/i18n';
 import Utils from 'services/utils';
 
-import * as obs from '../../../obs-api';
+import * as obs from 'obs-studio-node';
 
 interface IExtraInputProps {
   debounce?: number;

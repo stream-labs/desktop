@@ -8,7 +8,7 @@ import { WindowsService } from '../windows';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { mutation } from 'services/core/stateful-service';
 import { $t } from 'services/i18n';
-import { getOS, OS } from 'util/operating-systems';
+import { getOS, OS } from '../../util/operating-systems';
 import { StreamingService } from '../streaming';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import * as remote from '@electron/remote';

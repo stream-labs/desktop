@@ -15,7 +15,7 @@ import { EDeviceType } from 'services/hardware';
 import { $t } from 'services/i18n';
 import { SourcesService, TSourceType } from 'services/sources';
 import { ScenesService } from 'services/scenes';
-import { byOS, OS } from 'util/operating-systems';
+import { byOS, OS } from '../../util/operating-systems';
 import { IGuest, GuestCamService } from 'services/guest-cam';
 import {
   AudioService,

@@ -5,7 +5,7 @@ import { AudioService, E_AUDIO_CHANNELS } from 'services/audio';
 import { SourcesService, ISourceAddOptions } from 'services/sources';
 import { mutation } from 'services/core';
 import { SceneCollectionsService } from 'services/scene-collections';
-import { byOS, OS } from 'util/operating-systems';
+import { byOS, OS } from '../../util/operating-systems';
 
 interface IDefaultHardwareServiceState {
   defaultVideoDevice: string;

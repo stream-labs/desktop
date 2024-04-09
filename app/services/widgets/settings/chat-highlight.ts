@@ -10,7 +10,7 @@ import {
 import { WIDGET_INITIAL_STATE } from './widget-settings';
 import { InheritMutations } from 'services/core/stateful-service';
 import { formMetadata, metadata } from 'components/shared/inputs';
-import { authorizedHeaders, jfetch } from 'util/requests';
+import { authorizedHeaders, jfetch } from '../../../util/requests';
 import { $t } from 'services/i18n';
 
 export interface IChatHighlightMessage {

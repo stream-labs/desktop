@@ -1,7 +1,7 @@
 import { Component } from 'vue-property-decorator';
 import TsxComponent from 'components/tsx-component';
 import { RecentEvents } from 'components/shared/ReactComponentList';
-import styles from './GameOverlayEventFeed.m.less';
+import styles from './GameOverlayEventFeed.module.less';
 
 @Component({})
 export default class GameOverlayEventFeed extends TsxComponent<{}> {

@@ -4,7 +4,7 @@ import { useVuex } from 'components-react/hooks';
 import { Services } from 'components-react/service-provider';
 import { TAppPage } from 'services/navigation';
 import { $t } from 'services/i18n';
-import styles from './Banner.m.less';
+import styles from './Banner.module.less';
 import { useRealmObject } from 'components-react/hooks/realm';
 
 export default function Banner() {

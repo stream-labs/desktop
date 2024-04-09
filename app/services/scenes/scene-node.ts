@@ -12,7 +12,7 @@ import {
   TSceneNode,
 } from './index';
 import { SelectionService } from 'services/selection';
-import { assertIsDefined } from 'util/properties-type-guards';
+import { assertIsDefined } from '../../util/properties-type-guards';
 import { IVideo } from 'obs-studio-node';
 import { TDisplayType } from 'services/settings-v2';
 

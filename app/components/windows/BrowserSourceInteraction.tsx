@@ -6,7 +6,7 @@ import { WindowsService } from 'services/windows';
 import { Inject } from 'services';
 import Utils from 'services/utils';
 import { SourcesService } from 'services/sources';
-import { byOS, OS } from 'util/operating-systems';
+import { byOS, OS } from '../../util/operating-systems';
 
 @Component({})
 export default class BrowserSourceInteraction extends TsxComponent<{}> {

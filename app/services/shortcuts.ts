@@ -3,7 +3,7 @@ import Utils from './utils';
 import { AppService } from './app';
 import { Inject } from './core/injector';
 import { InitAfter } from './core';
-import { OS, getOS } from 'util/operating-systems';
+import { OS, getOS } from '../util/operating-systems';
 import { NavigationService } from './navigation';
 
 type TShortcutHandler = () => void;

@@ -1,4 +1,4 @@
-import styles from './GoLive.m.less';
+import styles from './GoLive.module.less';
 import React, { HTMLAttributes } from 'react';
 import cx from 'classnames';
 import InputWrapper from '../../shared/inputs/InputWrapper';

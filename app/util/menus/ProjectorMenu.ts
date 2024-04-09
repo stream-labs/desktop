@@ -2,7 +2,7 @@ import { Menu } from './Menu';
 import { Inject } from '../../services/core/injector';
 import { $t } from 'services/i18n';
 import { ProjectorService } from 'services/projector';
-import { ERenderingMode } from '../../../obs-api';
+import { ERenderingMode } from 'obs-studio-node';
 import { StreamingService } from 'services/streaming';
 import { SelectionService } from 'services/selection';
 

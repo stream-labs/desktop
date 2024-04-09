@@ -7,7 +7,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Services } from '../service-provider';
 import { ENotificationType, INotification } from 'services/notifications';
 import { $t } from 'services/i18n';
-import styles from './NotificationsArea.m.less';
+import styles from './NotificationsArea.module.less';
 import { useVuex } from 'components-react/hooks';
 const notificationAudio = require('../../../media/sound/ding.wav');
 

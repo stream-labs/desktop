@@ -1,6 +1,6 @@
 import { InputComponent, TSlobsInputProps, useInput } from './inputs';
 import InputWrapper from './InputWrapper';
-import css from './mediaUrlInput.m.less';
+import css from './mediaUrlInput.module.less';
 import React from 'react';
 import { MediaInputButtons } from './MediaUrlInput';
 

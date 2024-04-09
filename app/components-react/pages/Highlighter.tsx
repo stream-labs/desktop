@@ -1,7 +1,7 @@
 import { useVuex } from 'components-react/hooks';
 import React, { useEffect, useState } from 'react';
 import { Services } from 'components-react/service-provider';
-import styles from './Highlighter.m.less';
+import styles from './Highlighter.module.less';
 import { IClip } from 'services/highlighter';
 import ClipPreview from 'components-react/highlighter/ClipPreview';
 import ClipTrimmer from 'components-react/highlighter/ClipTrimmer';

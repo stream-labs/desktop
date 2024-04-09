@@ -1,4 +1,4 @@
-import styles from './GoLiveError.m.less';
+import styles from './GoLiveError.module.less';
 import React, { useState, HTMLAttributes } from 'react';
 import { errorTypes, IStreamError } from '../../../services/streaming/stream-error';
 import { $t } from '../../../services/i18n';

@@ -1,11 +1,11 @@
 import { useVuex } from 'components-react/hooks';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import styles from './StudioEditor.m.less';
+import styles from './StudioEditor.module.less';
 import { Services } from 'components-react/service-provider';
 import cx from 'classnames';
 import Display from 'components-react/shared/Display';
 import { $t } from 'services/i18n';
-import { ERenderingMode } from '../../../obs-api';
+import { ERenderingMode } from 'obs-studio-node';
 import { TDisplayType } from 'services/settings-v2';
 import AutoProgressBar from 'components-react/shared/AutoProgressBar';
 import { useSubscription } from 'components-react/hooks/useSubscription';

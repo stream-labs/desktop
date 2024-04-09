@@ -4,7 +4,7 @@ import { ModalLayout } from 'components-react/shared/ModalLayout';
 import { Services } from 'components-react/service-provider';
 import InputWrapper from 'components-react/shared/inputs/InputWrapper';
 import { $t } from 'services/i18n';
-import { AnchorPositions, AnchorPoint } from 'util/ScalableRectangle';
+import { AnchorPositions, AnchorPoint } from '../../util/ScalableRectangle';
 import { useVuex } from 'components-react/hooks';
 import { NumberInput } from 'components-react/shared/inputs';
 import Form, { useForm } from 'components-react/shared/inputs/Form';

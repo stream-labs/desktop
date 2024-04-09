@@ -1,4 +1,4 @@
-import styles from './GoLive.m.less';
+import styles from './GoLive.module.less';
 import { WindowsService } from 'app-services';
 import { ModalLayout } from '../../shared/ModalLayout';
 import { Button } from 'antd';

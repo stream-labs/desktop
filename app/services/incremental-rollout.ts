@@ -1,5 +1,5 @@
 import { Inject } from 'services/core/injector';
-import { authorizedHeaders, jfetch } from 'util/requests';
+import { authorizedHeaders, jfetch } from '../util/requests';
 import { mutation, StatefulService, ViewHandler } from 'services/core/stateful-service';
 import { UserService } from 'services/user';
 import { HostsService } from './hosts';

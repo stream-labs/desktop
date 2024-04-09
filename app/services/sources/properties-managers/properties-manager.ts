@@ -1,5 +1,5 @@
 import * as input from 'components/obs/inputs/ObsInput';
-import * as obs from '../../../../obs-api';
+import obs from 'obs-studio-node';
 import compact from 'lodash/compact';
 import { Inject } from 'services/core';
 import { SourcesService } from 'services/sources';

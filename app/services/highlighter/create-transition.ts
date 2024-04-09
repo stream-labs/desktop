@@ -4,7 +4,7 @@
 // Modifications were also made to move off stack-gl/gl-shader.
 // It was also ported from flow to Typescript
 
-import { compileShader, createProgram } from 'util/webgl/utils';
+import { compileShader, createProgram } from '../../util/webgl/utils';
 
 interface TransitionObjectLike {
   glsl: string;

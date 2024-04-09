@@ -2,7 +2,7 @@ import { Service } from './core/service';
 import { Inject } from 'services/core/injector';
 import { UserService } from 'services/user';
 import { HostsService } from 'services/hosts';
-import { authorizedHeaders, jfetch } from 'util/requests';
+import { authorizedHeaders, jfetch } from '../util/requests';
 import { Subject } from 'rxjs';
 import { AppService } from 'services/app';
 import { IRecentEvent, ISafeModeServerSettings } from 'services/recent-events';

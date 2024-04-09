@@ -1,7 +1,7 @@
 import { Subject } from 'rxjs';
 import debounce from 'lodash/debounce';
 import { Service } from '../core/service';
-import * as obs from '../../../obs-api';
+import * as obs from 'obs-studio-node';
 import { Inject } from 'services';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { getPlatformService } from 'services/platforms';

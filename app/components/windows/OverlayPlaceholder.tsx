@@ -1,6 +1,6 @@
 import { Component, Prop } from 'vue-property-decorator';
 import TsxComponent from 'components/tsx-component';
-import styles from './OverlayPlaceholder.m.less';
+import styles from './OverlayPlaceholder.module.less';
 
 @Component({})
 export default class OverlayPlaceholder extends TsxComponent<{}> {

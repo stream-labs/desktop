@@ -5,7 +5,7 @@ import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
 import { TAppPage } from 'services/navigation';
 import { IAnnouncementsInfo } from 'services/announcements';
-import styles from './News.m.less';
+import styles from './News.module.less';
 import { useRealmObject } from 'components-react/hooks/realm';
 
 export default function News() {

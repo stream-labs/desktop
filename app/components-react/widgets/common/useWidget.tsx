@@ -9,7 +9,7 @@ import { $t } from '../../../services/i18n';
 import Utils from '../../../services/utils';
 import { TAlertType } from '../../../services/widgets/alerts-config';
 import { alertAsync } from '../../modals';
-import { onUnload } from 'util/unload';
+import { onUnload } from '../../../util/unload';
 import merge from 'lodash/merge';
 import { GetUseModuleResult, injectFormBinding, injectState, useModule } from 'slap';
 import { IWidgetConfig } from '../../../services/widgets/widgets-config';

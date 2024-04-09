@@ -1,4 +1,4 @@
-import * as obs from '../../obs-api';
+import obs from 'obs-studio-node';
 
 export function isNumberProperty(property: obs.IProperty): property is obs.INumberProperty {
   return property.type === obs.EPropertyType.Int || property.type === obs.EPropertyType.Float;

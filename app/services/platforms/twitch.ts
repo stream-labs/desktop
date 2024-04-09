@@ -8,7 +8,7 @@ import {
 } from '.';
 import { HostsService } from 'services/hosts';
 import { Inject } from 'services/core/injector';
-import { authorizedHeaders, jfetch } from 'util/requests';
+import { authorizedHeaders, jfetch } from '../../util/requests';
 import { UserService } from 'services/user';
 import { TTwitchOAuthScope, TwitchTagsService } from './twitch/index';
 import { platformAuthorizedRequest } from './utils';

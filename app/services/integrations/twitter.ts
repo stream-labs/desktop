@@ -1,7 +1,7 @@
 import URI from 'urijs';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { Inject } from 'services/core/injector';
-import { authorizedHeaders, jfetch } from 'util/requests';
+import { authorizedHeaders, jfetch } from '../../util/requests';
 import { mutation, ViewHandler } from 'services/core/stateful-service';
 import { HostsService } from 'services/hosts';
 import { UserService } from 'services/user';

@@ -1,7 +1,7 @@
 import { Service } from 'services';
 import { Inject } from 'services/core';
 import { UserService } from 'services/user';
-import { authorizedHeaders, jfetch } from 'util/requests';
+import { authorizedHeaders, jfetch } from '../util/requests';
 import { HostsService } from './hosts';
 import * as remote from '@electron/remote';
 import electron from 'electron';

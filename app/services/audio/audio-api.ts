@@ -1,4 +1,4 @@
-import * as obs from '../../../obs-api';
+import * as obs from 'obs-studio-node';
 import { Subscription, Observable } from 'rxjs';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import { ISource } from '../sources';

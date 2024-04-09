@@ -3,7 +3,7 @@ import uuid from 'uuid/v4';
 import { StatefulService, mutation, ViewHandler, Inject } from 'services/core';
 import { HostsService } from 'services/hosts';
 import { UserService } from 'services/user';
-import { jfetch, authorizedHeaders } from 'util/requests';
+import { jfetch, authorizedHeaders } from '../../util/requests';
 import { GOAL_OPTIONS, GROWTH_TIPS } from './grow-data';
 import { TwitchService } from 'services/platforms/twitch';
 import { YoutubeService } from 'services/platforms/youtube';

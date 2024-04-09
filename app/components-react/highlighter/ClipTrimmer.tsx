@@ -3,7 +3,7 @@ import { IClip } from 'services/highlighter';
 import { SCRUB_FRAMES, SCRUB_HEIGHT, SCRUB_WIDTH } from 'services/highlighter/constants';
 import { Services } from 'components-react/service-provider';
 import times from 'lodash/times';
-import styles from './ClipTrimmer.m.less';
+import styles from './ClipTrimmer.module.less';
 import cx from 'classnames';
 import { $t } from 'services/i18n';
 

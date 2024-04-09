@@ -1,5 +1,5 @@
 import React, { CSSProperties } from 'react';
-import styles from './InfoBadge.m.less';
+import styles from './InfoBadge.module.less';
 import { $t } from 'services/i18n';
 import cx from 'classnames';
 

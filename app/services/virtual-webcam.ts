@@ -1,10 +1,10 @@
 import { StatefulService, mutation } from 'services/core';
-import * as obs from '../../obs-api';
+import * as obs from 'obs-studio-node';
 import fs from 'fs';
 import util from 'util';
 import path from 'path';
-import { getChecksum } from 'util/requests';
-import { byOS, OS } from 'util/operating-systems';
+import { getChecksum } from '../util/requests';
+import { byOS, OS } from '../util/operating-systems';
 import { Inject } from 'services/core/injector';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import * as remote from '@electron/remote';

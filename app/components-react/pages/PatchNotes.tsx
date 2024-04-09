@@ -2,7 +2,7 @@ import { $t } from '../../services/i18n';
 import React from 'react';
 import { Services } from '../service-provider';
 import cx from 'classnames';
-import styles from './PatchNotes.m.less';
+import styles from './PatchNotes.module.less';
 
 export default function PatchNotes() {
   const { PatchNotesService, NavigationService } = Services;

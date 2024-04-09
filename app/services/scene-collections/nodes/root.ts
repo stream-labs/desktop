@@ -7,7 +7,7 @@ import { NodeMapNode } from './node-map';
 import { Inject } from 'services/core';
 import { VideoService } from 'services/video';
 import { StreamingService } from 'services/streaming';
-import { OS } from 'util/operating-systems';
+import { OS } from '../../../util/operating-systems';
 import { GuestCamNode } from './guest-cam';
 import { VideoSettingsService } from 'services/settings-v2/video';
 import { DualOutputService } from 'services/dual-output';

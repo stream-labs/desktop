@@ -2,7 +2,7 @@ import React, { useRef, MouseEvent } from 'react';
 import { getPlatformService, TPlatform } from '../../../services/platforms';
 import cx from 'classnames';
 import { $t } from '../../../services/i18n';
-import styles from './DestinationSwitchers.m.less';
+import styles from './DestinationSwitchers.module.less';
 import { ICustomStreamDestination } from '../../../services/settings/streaming';
 import { Services } from '../../service-provider';
 import { SwitchInput } from '../../shared/inputs';

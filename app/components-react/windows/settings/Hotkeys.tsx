@@ -7,7 +7,7 @@ import mapValues from 'lodash/mapValues';
 import Fuse from 'fuse.js';
 import type { Scene, Source } from 'app-services';
 import Tooltip from 'components-react/shared/Tooltip';
-import { getOS, OS } from 'util/operating-systems';
+import { getOS, OS } from '../../../util/operating-systems';
 import * as remote from '@electron/remote';
 
 interface IAugmentedHotkey extends IHotkey {

@@ -3,7 +3,7 @@ import React from 'react';
 import { InputComponent, TSlobsInputProps, useInput, ValuesOf } from './inputs';
 import InputWrapper from './InputWrapper';
 import { SwitchProps } from 'antd/lib/switch';
-import styles from './SwitchInput.m.less';
+import styles from './SwitchInput.module.less';
 import cx from 'classnames';
 
 // select which features from the antd lib we are going to use

@@ -1,5 +1,8 @@
 'use strict';
 
+export * from './obs-api.d.ts';
+
+const exports = {};
 exports.__esModule = true;
 const obs = window['require']('obs-studio-node');
 
@@ -22,3 +25,5 @@ for (const entry in obs) {
     );
   }
 }
+
+export default exports;

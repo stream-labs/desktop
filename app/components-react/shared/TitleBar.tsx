@@ -7,7 +7,7 @@ import { $t } from '../../services/i18n';
 import { ipcRenderer } from 'electron';
 import Utils from '../../services/utils';
 import KevinSvg from './KevinSvg';
-import styles from './TitleBar.m.less';
+import styles from './TitleBar.module.less';
 import * as remote from '@electron/remote';
 import Banner from 'components-react/root/Banner';
 import { useRealmObject } from 'components-react/hooks/realm';

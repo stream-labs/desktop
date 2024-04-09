@@ -1,7 +1,7 @@
 import { debounce } from 'lodash-decorators';
 import { Inject } from 'services/core/injector';
 import { mutation, StatefulService } from '../core/stateful-service';
-import { IVideoInfo, EScaleType, EFPSType, IVideo, VideoFactory, Video } from '../../../obs-api';
+import { IVideoInfo, EScaleType, EFPSType, IVideo, VideoFactory, Video } from 'obs-studio-node';
 import { DualOutputService } from 'services/dual-output';
 import { SettingsService } from 'services/settings';
 import { OutputSettingsService } from 'services/settings/output';

@@ -1,6 +1,6 @@
 import { Component, Prop } from 'vue-property-decorator';
 import cx from 'classnames';
-import styles from './ImageUploaderInput.m.less';
+import styles from './ImageUploaderInput.module.less';
 import { BaseInput } from './BaseInput';
 import { $t } from 'services/i18n';
 import { createProps } from 'components/tsx-component';

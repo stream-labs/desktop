@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { Service, Inject, ViewHandler } from 'services/core';
 import { UserService } from 'services/user';
-import { authorizedHeaders, jfetch } from 'util/requests';
+import { authorizedHeaders, jfetch } from '../../util/requests';
 import { $t } from 'services/i18n';
 
 interface IPrepareResponse {

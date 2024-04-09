@@ -11,7 +11,7 @@ import { $t } from 'services/i18n';
 import { formMetadata, IListOption } from 'components/shared/inputs';
 import { metadata } from 'components/widgets/inputs';
 import uuid from 'uuid/v4';
-import { authorizedHeaders, handleResponse } from 'util/requests';
+import { authorizedHeaders, handleResponse } from '../../../util/requests';
 
 export interface ISpinWheelSettings extends IWidgetSettings {
   resultColor: string;

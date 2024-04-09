@@ -1,6 +1,6 @@
 import { Component, Prop } from 'vue-property-decorator';
 import cx from 'classnames';
-import styles from './TextInput.m.less';
+import styles from './TextInput.module.less';
 import { BaseInput } from './BaseInput';
 import { ITextMetadata } from './index';
 import { $t } from 'services/i18n';

@@ -24,7 +24,7 @@ import { WindowsService } from 'services/windows';
 import { UserService } from 'services/user';
 import { TcpServerService } from 'services/api/tcp-server';
 import { OverlaysPersistenceService } from './overlays';
-import { IDownloadProgress } from 'util/requests';
+import { IDownloadProgress } from '../../util/requests';
 import {
   ISceneCollectionsManifestEntry,
   ISceneCollectionSchema,
@@ -37,7 +37,7 @@ import { TransitionsService } from 'services/transitions';
 import { $t } from '../i18n';
 import { StreamingService, EStreamingState } from 'services/streaming';
 import { DefaultHardwareService } from 'services/hardware';
-import { byOS, OS, getOS } from 'util/operating-systems';
+import { byOS, OS, getOS } from '../../util/operating-systems';
 import Utils from 'services/utils';
 import * as remote from '@electron/remote';
 import { GuestCamNode } from './nodes/guest-cam';

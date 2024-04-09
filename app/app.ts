@@ -27,7 +27,7 @@ import ChildWindow from 'components/windows/ChildWindow';
 import OneOffWindow from 'components/windows/OneOffWindow.vue';
 import { UserService, setSentryContext } from 'services/user';
 import { getResource } from 'services';
-import * as obs from '../obs-api';
+import obs from 'obs-studio-node';
 import path from 'path';
 import util from 'util';
 import uuid from 'uuid/v4';
@@ -37,7 +37,7 @@ import process from 'process';
 import { MetricsService } from 'services/metrics';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import * as remote from '@electron/remote';
-import { RealmService } from 'app-services';
+import { RealmService } from './app-services';
 
 const { ipcRenderer } = electron;
 const slobsVersion = Utils.env.SLOBS_VERSION;

@@ -7,7 +7,7 @@ import { PersistentStatefulService } from '../core/persistent-stateful-service';
 import { ILoadedApp, PlatformAppsService } from './index';
 import { TransitionsService } from '../transitions';
 import { Inject } from 'services/core/injector';
-import { downloadFile, getChecksum } from 'util/requests';
+import { downloadFile, getChecksum } from '../../util/requests';
 import { InitAfter } from 'services/core/service-initialization-observer';
 import { AppService } from 'services/app';
 import url from 'url';

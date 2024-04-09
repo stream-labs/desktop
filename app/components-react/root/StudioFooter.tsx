@@ -5,7 +5,7 @@ import { EStreamingState, EReplayBufferState, ERecordingState } from '../../serv
 import { Services } from '../service-provider';
 import { $t } from '../../services/i18n';
 import { useVuex } from '../hooks';
-import styles from './StudioFooter.m.less';
+import styles from './StudioFooter.module.less';
 import PerformanceMetrics from '../shared/PerformanceMetrics';
 import TestWidgets from './TestWidgets';
 import StartStreamingButton from './StartStreamingButton';

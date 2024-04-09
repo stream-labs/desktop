@@ -6,7 +6,7 @@ import {
 } from 'services/audio';
 import { SourcesService as InternalSourcesService } from 'services/sources';
 import { Fallback } from 'services/api/external-api';
-import * as obs from '../../../../../obs-api';
+import * as obs from 'obs-studio-node';
 
 /**
  * Fader variables.

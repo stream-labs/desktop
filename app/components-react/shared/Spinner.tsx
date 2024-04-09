@@ -1,6 +1,6 @@
 import React, { HTMLAttributes, useEffect, useRef, useState } from 'react';
 import Animation from 'rc-animate';
-import css from './Spinner.m.less';
+import css from './Spinner.module.less';
 import cx from 'classnames';
 
 const spinnerSvg =

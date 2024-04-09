@@ -6,7 +6,7 @@ import { Button, Form, Modal, message } from 'antd';
 import FormFactory, { TInputValue } from 'components-react/shared/inputs/FormFactory';
 import { CheckboxInput } from 'components-react/shared/inputs';
 import Tooltip from 'components-react/shared/Tooltip';
-import { EScaleType, EFPSType } from '../../../../obs-api';
+import { EScaleType, EFPSType } from 'obs-studio-node';
 import { $t } from 'services/i18n';
 import styles from './Common.m.less';
 import Tabs from 'components-react/shared/Tabs';

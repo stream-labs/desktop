@@ -1,7 +1,7 @@
 import { Service } from 'services/core/service';
 import { Inject } from 'services/core/injector';
 import { HostsService } from 'services/hosts';
-import { authorizedHeaders, jfetch } from 'util/requests';
+import { authorizedHeaders, jfetch } from '../../util/requests';
 import { UserService } from 'services/user';
 
 export interface IServerSceneCollectionCreation {

@@ -6,7 +6,7 @@ import Scrollable from 'components-react/shared/Scrollable';
 import GLVolmeters from './mixer/GLVolmeters';
 import MixerItem from './mixer/MixerItem';
 import { Services } from 'components-react/service-provider';
-import { Menu } from 'util/menus/Menu';
+import { Menu } from '../../../util/menus/Menu';
 import { $t } from 'services/i18n';
 
 const mins = { x: 150, y: 120 };

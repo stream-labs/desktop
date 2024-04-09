@@ -3,7 +3,7 @@ import omit from 'lodash/omit';
 import { Services } from '../../service-provider';
 import { TPropertiesManager, TSourceType } from 'services/sources';
 import { WidgetType } from 'services/widgets';
-import { byOS, OS } from 'util/operating-systems';
+import { byOS, OS } from '../../../util/operating-systems';
 import { IAppSource } from 'services/platform-apps';
 import { initStore, useController } from 'components-react/hooks/zustand';
 

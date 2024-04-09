@@ -21,7 +21,7 @@ import { IFilterData } from 'services/editor-commands/commands/paste-filters';
 import { NavigationService } from 'services/navigation';
 import { DualOutputService } from './dual-output';
 import { VideoSettingsService } from './settings-v2';
-import { byOS, OS } from 'util/operating-systems';
+import { byOS, OS } from '../util/operating-systems';
 const { clipboard } = electron;
 
 interface ISceneNodeInfo {

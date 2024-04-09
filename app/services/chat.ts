@@ -11,9 +11,9 @@ import { WidgetsService, WidgetType } from 'services/widgets';
 import { InitAfter } from './core';
 import Utils from './utils';
 import { StreamingService } from './streaming';
-import { GuestApiHandler } from 'util/guest-api-handler';
+import { GuestApiHandler } from '../util/guest-api-handler';
 import { ChatHighlightService, IChatHighlightMessage } from './widgets/settings/chat-highlight';
-import { assertIsDefined } from 'util/properties-type-guards';
+import { assertIsDefined } from '../util/properties-type-guards';
 import * as remote from '@electron/remote';
 import { SourcesService } from 'app-services';
 
@@ -336,7 +336,7 @@ export class ChatService extends Service {
           // this.chatView.webContents.openDevTools({ mode: 'detach' });
           setTimeout(() => {
             if (!this.chatView) return;
-            const chatHighlightScript = require('!!raw-loader!./widgets/settings/chat-highlight-script.js');
+            const chatHighlightScript = require('./widgets/settings/chat-highlight-script.js?raw');
             assertIsDefined(chatHighlightScript.default);
             this.chatView.webContents.executeJavaScript(chatHighlightScript.default, true);
           }, 10000);

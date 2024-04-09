@@ -4,7 +4,7 @@ import { SceneItem } from 'services/scenes';
 import { VideoService } from 'services/video';
 import { WindowsService } from 'services/windows';
 import { DualOutputService } from 'services/dual-output';
-import { ScalableRectangle } from 'util/ScalableRectangle';
+import { ScalableRectangle } from '../util/ScalableRectangle';
 import { SelectionService } from 'services/selection';
 import { EditorCommandsService } from 'services/editor-commands';
 import { IMouseEvent } from 'services/editor';

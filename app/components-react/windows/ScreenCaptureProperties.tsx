@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import electron from 'electron';
 import { Services } from 'components-react/service-provider';
-import styles from './ScreenCaptureProperties.m.less';
+import styles from './ScreenCaptureProperties.module.less';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
 import Display from 'components-react/shared/Display';
 import cx from 'classnames';

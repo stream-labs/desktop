@@ -1,5 +1,5 @@
 import { mutation, StatefulService, ViewHandler } from 'services/core/stateful-service';
-import { lazyModule } from 'util/lazy-module';
+import { lazyModule } from '../../util/lazy-module';
 import path from 'path';
 import fs from 'fs';
 import { Subject } from 'rxjs';
@@ -9,7 +9,7 @@ import { EApiPermissions } from './api/modules/module';
 import { VideoService } from 'services/video';
 import { DevServer } from './dev-server';
 import { HostsService } from 'services/hosts';
-import { authorizedHeaders, handleResponse, jfetch } from 'util/requests';
+import { authorizedHeaders, handleResponse, jfetch } from '../../util/requests';
 import { UserService } from 'services/user';
 import trim from 'lodash/trim';
 import without from 'lodash/without';

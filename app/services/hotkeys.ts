@@ -9,12 +9,12 @@ import { StatefulService, mutation, ServiceHelper } from 'services';
 import defer from 'lodash/defer';
 import mapValues from 'lodash/mapValues';
 import { $t } from 'services/i18n';
-import * as obs from '../../obs-api';
+import * as obs from 'obs-studio-node';
 import { GameOverlayService } from './game-overlay';
 import { CustomizationService } from './customization';
 import { RecentEventsService } from './recent-events';
 import { UsageStatisticsService } from './usage-statistics';
-import { getOS, OS } from 'util/operating-systems';
+import { getOS, OS } from '../util/operating-systems';
 import { TDisplayType } from './settings-v2';
 import { VirtualWebcamService } from 'app-services';
 

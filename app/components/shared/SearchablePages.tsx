@@ -1,6 +1,6 @@
 import { Component, Watch } from 'vue-property-decorator';
 import Mark from 'mark.js';
-import styles from './SearchablePages.m.less';
+import styles from './SearchablePages.module.less';
 import { Spinner } from 'streamlabs-beaker';
 import TsxComponent, { createProps } from 'components/tsx-component';
 

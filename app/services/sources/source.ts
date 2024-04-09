@@ -11,7 +11,7 @@ import { mutation, ServiceHelper, Inject, ExecuteInWorkerProcess } from 'service
 import { ScenesService } from 'services/scenes';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import Utils from 'services/utils';
-import * as obs from '../../../obs-api';
+import obs from 'obs-studio-node';
 import isEqual from 'lodash/isEqual';
 import omitBy from 'lodash/omitBy';
 import omit from 'lodash/omit';

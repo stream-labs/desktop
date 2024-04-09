@@ -2,7 +2,7 @@ import { Service, Inject } from 'services/core';
 import electron from 'electron';
 import { EditorCommandsService } from './editor-commands';
 import { ClipboardService } from './clipboard';
-import { OS } from 'util/operating-systems';
+import { OS } from '../util/operating-systems';
 import { SelectionService } from './selection';
 import { AppService } from './app';
 import { WindowsService } from './windows';

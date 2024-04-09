@@ -6,7 +6,7 @@ import { useVuex } from 'components-react/hooks';
 import { $t } from 'services/i18n';
 import Translate from 'components-react/shared/Translate';
 import UploadProgress from './UploadProgress';
-import styles from './ExportModal.m.less';
+import styles from './ExportModal.module.less';
 import VideoPreview from './VideoPreview';
 
 export default function StorageUpload(p: { onClose: () => void; platform: string }) {

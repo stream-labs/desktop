@@ -2,7 +2,7 @@ import { DefaultManager, IDefaultManagerSettings } from './default-manager';
 import { Inject } from 'services/core/injector';
 import { StreamlabelsService } from 'services/streamlabels';
 import { UserService } from 'services/user';
-import { byOS, OS } from 'util/operating-systems';
+import { byOS, OS } from '../../../util/operating-systems';
 import { Subscription } from 'rxjs';
 
 export interface IStreamlabelsManagerSettings extends IDefaultManagerSettings {

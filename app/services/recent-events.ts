@@ -1,7 +1,7 @@
 import { HostsService } from 'services/hosts';
 import { StatefulService, Inject, mutation, InitAfter, ViewHandler } from 'services/core';
 import { UserService, LoginLifecycle } from 'services/user';
-import { authorizedHeaders, handleResponse, jfetch } from 'util/requests';
+import { authorizedHeaders, handleResponse, jfetch } from '../util/requests';
 import { $t } from 'services/i18n';
 import { WindowsService } from 'services/windows';
 import {

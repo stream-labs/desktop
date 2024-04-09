@@ -5,7 +5,7 @@ import { $t } from 'services/i18n';
 import { Services } from 'components-react/service-provider';
 import MenuItem from 'components-react/shared/MenuItem';
 import { EAppPageSlot } from 'services/platform-apps';
-import { Menu } from 'util/menus/Menu';
+import { Menu } from '../../util/menus/Menu';
 import cx from 'classnames';
 interface IAppsNav {
   type?: 'enabled' | 'selected';

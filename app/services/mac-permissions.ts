@@ -1,5 +1,5 @@
 import { Service } from 'services/core';
-import * as obs from '../../obs-api';
+import * as obs from 'obs-studio-node';
 import { Subject } from 'rxjs';
 
 export interface IPermissionsStatus {

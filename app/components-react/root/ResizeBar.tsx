@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Resizable, ResizableProps } from 'react-resizable';
 import cx from 'classnames';
-import styles from './ResizeBar.m.less';
+import styles from './ResizeBar.module.less';
 import { Services } from 'components-react/service-provider';
 
 interface ResizeBarProps {

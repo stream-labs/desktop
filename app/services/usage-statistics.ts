@@ -5,7 +5,7 @@ import { UserService } from './user';
 import { HostsService } from './hosts';
 import fs from 'fs';
 import path from 'path';
-import { authorizedHeaders, handleResponse } from 'util/requests';
+import { authorizedHeaders, handleResponse } from '../util/requests';
 import throttle from 'lodash/throttle';
 import { Service } from './core/service';
 import Utils from './utils';

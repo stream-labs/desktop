@@ -2,7 +2,7 @@ import { useModule } from 'slap';
 import { Services } from 'components-react/service-provider';
 import React, { useEffect, useState } from 'react';
 import { $t } from 'services/i18n';
-import commonStyles from './Common.m.less';
+import commonStyles from './Common.module.less';
 import { OnboardingModule } from './Onboarding';
 
 export function MacPermissions() {
