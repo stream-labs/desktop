@@ -69,7 +69,6 @@ if (isProduction) {
       processType: 'renderer',
     },
   });
-
 }
 
 const SENTRY_SERVER_URL = getSentryCrashReportUrl(sentryParam);
@@ -110,10 +109,24 @@ window.addEventListener('unhandledrejection', e => {
 });
 
 if ((isProduction || process.env.NAIR_REPORT_TO_SENTRY) && !electron.remote.process.env.NAIR_IPC) {
-  Sentry.init({
-    sampleRate: /* isPreview ? */ 1.0 /* : 0.1 */,
-    Vue,
-  }, sentryVueInit);
+  Sentry.init(
+    {
+      sampleRate: /* isPreview ? */ 1.0 /* : 0.1 */,
+      Vue,
+      beforeSend(event) {
+        // 一度出始めると大量に送信しつづける IPC error のSentry送信を削減する(quota対策)
+        if (event.exception && event.exception.values) {
+          const value = event.exception.values[0].value;
+          if (value.match(/Failed to make IPC call/)) {
+            console.log(`skip send to Sentry(IPC): ${value}`, event);
+            return null;
+          }
+        }
+        return event;
+      },
+    },
+    sentryVueInit,
+  );
 
   const oldConsoleError = console.error;
 
@@ -175,7 +188,8 @@ export const apiInitErrorResultToMessage = (resultCode: obs.EVideoCodes) => {
 const showDialog = (message: string): void => {
   electron.remote.dialog.showErrorBox(
     locale === 'ja' ? '初期化エラー' : 'Initialization Error',
-    message);
+    message,
+  );
 };
 
 document.addEventListener('DOMContentLoaded', () => {
