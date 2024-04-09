@@ -1,8 +1,8 @@
 import React from 'react';
 import { Button, ButtonProps } from 'antd';
 import cx from 'classnames';
-import { EPlatform, TPlatform } from '../../services/platforms';
-import PlatformLogo from './PlatformLogo';
+import { TPlatform } from '../../services/platforms';
+import PlatformLogo, { sizeMap } from './PlatformLogo';
 import styles from './PlatformButton.m.less';
 
 interface PlatformButtonProps extends ButtonProps {
@@ -11,11 +11,13 @@ interface PlatformButtonProps extends ButtonProps {
   onClick: () => void;
   disabled?: boolean;
   loading?: boolean;
+  logoSize?: keyof typeof sizeMap | number;
 }
 
 interface PlatformIconButtonProps {
   platform?: TPlatform;
   logo?: string;
+  logoSize?: keyof typeof sizeMap | number | undefined;
   title: string;
   onClick: () => void;
   disabled?: boolean;
@@ -27,13 +29,14 @@ const loadingIcon = <i className="fas fa-spinner fa-spin" />;
 export const PlatformIconButton = ({
   platform,
   logo,
+  logoSize,
   title,
   onClick,
   disabled,
   loading,
 }: PlatformIconButtonProps) => {
   const icon = platform ? (
-    <PlatformLogo platform={platform} className={styles.platformIcon} />
+    <PlatformLogo platform={platform} size={logoSize} className={styles.platformIcon} />
   ) : (
     <img src={logo}></img>
   );
@@ -53,6 +56,7 @@ export default function PlatformButton({
   disabled = false,
   loading = false,
   platform,
+  logoSize,
   className,
   children,
   onClick,
@@ -61,7 +65,12 @@ export default function PlatformButton({
 
   const Loading = () => <i className="fas fa-spinner fa-spin" />;
   const Logo = () => (
-    <PlatformLogo platform={platform} className={styles.platformIcon} {...logoProps} />
+    <PlatformLogo
+      platform={platform}
+      size={logoSize}
+      className={styles.platformIcon}
+      {...logoProps}
+    />
   );
 
   return (

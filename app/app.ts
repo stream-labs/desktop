@@ -37,6 +37,7 @@ import process from 'process';
 import { MetricsService } from 'services/metrics';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import * as remote from '@electron/remote';
+import { RealmService } from 'app-services';
 
 const { ipcRenderer } = electron;
 const slobsVersion = Utils.env.SLOBS_VERSION;
@@ -254,6 +255,8 @@ const showDialog = (message: string): void => {
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
+  await RealmService.instance.connect();
+
   const store = createStore();
 
   // setup VueI18n plugin

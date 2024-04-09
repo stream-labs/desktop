@@ -59,6 +59,7 @@ interface IItemSchema {
 
   visible?: boolean;
   display?: TDisplayType;
+  locked: boolean;
 }
 
 export interface IFolderSchema {
@@ -122,6 +123,7 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
           settings: filter.settings,
         };
       }),
+      locked: sceneNode.locked,
     };
 
     if (sceneNode.getObsInput().audioMixers) {
@@ -338,6 +340,8 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
     }
 
     this.adjustTransform(sceneItem, obj);
+    this.setExtraSettings(sceneItem, obj);
+
     if (!existing) {
       await obj.content.load({
         sceneItem,
@@ -363,17 +367,41 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
   }
 
   adjustTransform(item: SceneItem, obj: IItemSchema) {
-    item.setTransform({
-      position: {
-        x: obj.x * this.videoService.baseWidth,
-        y: obj.y * this.videoService.baseHeight,
-      },
-      scale: {
-        x: obj.scaleX * this.videoService.baseWidth,
-        y: obj.scaleY * this.videoService.baseHeight,
-      },
-      crop: obj.crop,
-      rotation: obj.rotation,
+    // special handling for game capture to show same dimensions on the vertical display as the horizontal
+
+    if (item.type === 'game_capture') {
+      item.setTransform({
+        position: {
+          x: obj.x * this.videoService.baseWidth,
+          y: obj.y * this.videoService.baseHeight,
+        },
+        crop: obj.crop,
+        rotation: obj.rotation,
+      });
+    } else {
+      item.setTransform({
+        position: {
+          x: obj.x * this.videoService.baseWidth,
+          y: obj.y * this.videoService.baseHeight,
+        },
+        scale: {
+          x: obj.scaleX * this.videoService.baseWidth,
+          y: obj.scaleY * this.videoService.baseHeight,
+        },
+        crop: obj.crop,
+        rotation: obj.rotation,
+      });
+    }
+  }
+
+  /*
+   * TODO: this is probably better than doing it individually on every source type
+   * branch, but might impact performance.
+   */
+  setExtraSettings(item: SceneItem, obj: IItemSchema) {
+    item.setSettings({
+      visible: obj.visible ?? true,
+      locked: obj.locked ?? false,
     });
   }
 }

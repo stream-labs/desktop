@@ -6,13 +6,9 @@ import { Services } from 'components-react/service-provider';
 import { injectState, useModule, mutation } from 'slap';
 import { ExtraPlatformConnect } from './ExtraPlatformConnect';
 import { EPlatform, EPlatformCallResult, TPlatform, platformLabels } from 'services/platforms';
-import cx from 'classnames';
 import * as remote from '@electron/remote';
 import { OnboardingModule } from './Onboarding';
-import PlatformLogo from 'components-react/shared/PlatformLogo';
 import { EAuthProcessState } from 'services/user';
-import { ListInput } from 'components-react/shared/inputs';
-import Form from 'components-react/shared/inputs/Form';
 import Signup from './Signup';
 import { SkipContext } from './OnboardingContext';
 import PlatformButton, { PlatformIconButton } from 'components-react/shared/PlatformButton';
@@ -51,12 +47,7 @@ export function Connect() {
 
   ctx.onSkip = onSkip;
 
-  function onSelectExtraPlatform(val: TExtraPlatform | 'tiktok' | undefined) {
-    if (val === 'tiktok') {
-      authPlatform('tiktok', afterLogin);
-      return;
-    }
-
+  function onSelectExtraPlatform(val: TExtraPlatform | undefined) {
     UsageStatisticsService.recordAnalyticsEvent('PlatformLogin', val);
     setExtraPlatform(val);
   }
@@ -73,21 +64,15 @@ export function Connect() {
   // streamlabs and trovo are added separarely on markup below
   const platforms = RecordingModeService.views.isRecordingModeEnabled
     ? ['youtube']
-    : ['twitch', 'youtube', 'facebook', 'twitter'];
+    : ['twitch', 'youtube', 'facebook', 'twitter', 'tiktok'];
 
   const shouldAddTrovo = !RecordingModeService.views.isRecordingModeEnabled;
 
   const extraPlatforms: {
-    value: 'tiktok' | TExtraPlatform;
+    value: TExtraPlatform;
     label: string;
     image: string;
   }[] = [
-    {
-      value: 'tiktok',
-      label: 'TikTok',
-      image:
-        'data:image/png;base64,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',
-    },
     {
       value: 'dlive',
       label: 'Dlive',
@@ -109,7 +94,7 @@ export function Connect() {
           {title}
         </h1>
         {isSignup ? (
-          <Signup onSignupLinkClick={() => setIsSignup(false)} />
+          <Signup onSignupLinkClick={() => setIsSignup(false)} onSuccess={afterLogin} />
         ) : (
           <>
             {!isRelog && <p style={{ marginBottom: 20 }}>{$t('Log in with email/password')}</p>}
@@ -148,6 +133,7 @@ export function Connect() {
                     loading={loading}
                     onClick={() => authPlatform(platform, afterLogin)}
                     key={platform}
+                    logoSize={['twitter', 'tiktok'].includes(platform) ? 15 : undefined}
                   >
                     <Translate
                       message={$t('Log in with <span>%{platform}</span>', {
@@ -268,14 +254,19 @@ export class LoginModule {
     this.UsageStatisticsService.recordAnalyticsEvent('PlatformLogin', platform);
 
     if (platform === 'streamlabs') {
-      await this.UserService.startSLAuth();
-      onSuccess();
+      await this.UserService.startSLAuth()
+        .then((success: EPlatformCallResult) => {
+          if (success !== EPlatformCallResult.Success) return;
+          onSuccess();
+        })
+        .catch(e => console.error('Onboarding Authentication Error: ', e));
+
       return;
     }
 
     const result = await this.UserService.startAuth(
       platform,
-      ['youtube', 'twitch', 'twitter'].includes(platform) ? 'external' : 'internal',
+      ['youtube', 'twitch', 'twitter', 'tiktok'].includes(platform) ? 'external' : 'internal',
       merge,
     );
 

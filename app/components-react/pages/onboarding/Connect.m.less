@@ -1,4 +1,4 @@
-@import "../../../styles/index";
+@import '../../../styles/index';
 
 .page-container {
   height: 100%;
@@ -26,10 +26,13 @@
   }
 
   :global(.list-input),
-  :global(.section) { width: 400px; }
+  :global(.section) {
+    width: 400px;
+  }
 
   @media (max-height: 600px) {
-    & > h1, & > p {
+    & > h1,
+    & > p {
       display: none;
     }
   }
@@ -54,7 +57,6 @@
   align-items: center;
   justify-content: center;
 }
-
 
 .loginButton {
   height: 80px;
@@ -103,7 +105,6 @@
     bottom: 0;
     left: 0;
   }
-
 }
 
 :global(#oval-left) {
@@ -130,7 +131,8 @@
   }
 }
 
-.streamlabs-platform-container, .third-party-platforms-container {
+.streamlabs-platform-container,
+.third-party-platforms-container {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -166,7 +168,10 @@
   margin-top: 20px;
 
   a {
-    &, &:hover, &:focus, &:active {
+    &,
+    &:hover,
+    &:focus,
+    &:active {
       text-decoration: underline;
     }
   }

@@ -240,7 +240,6 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
       operatingSystem: os,
       deleted: false,
       needsRename: false,
-      sceneNodeMaps: {},
     });
   }
 
