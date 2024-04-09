@@ -20,6 +20,7 @@ import { getPlatformService } from 'services/platforms';
 import { IModalOptions } from 'services/windows';
 import styles from './Main.m.less';
 import { StatefulService } from 'services';
+import { useRealmObject } from 'components-react/hooks/realm';
 
 const MainCtx = React.createContext<MainController | null>(null);
 
@@ -57,10 +58,6 @@ class MainController {
     maxDockWidth: 290,
     minEditorWidth: 500,
   });
-
-  get dockWidth() {
-    return this.customizationService.state.livedockSize;
-  }
 
   get title() {
     return this.windowsService.state.main.title;
@@ -237,7 +234,6 @@ function Main() {
 
   const {
     theme,
-    dockWidth,
     showLoadingSpinner,
     errorAlert,
     hasLiveDock,
@@ -252,7 +248,6 @@ function Main() {
   } = useVuex(
     () => ({
       theme: ctrl.theme(bulkLoadFinished),
-      dockWidth: ctrl.dockWidth,
       showLoadingSpinner: ctrl.showLoadingSpinner,
       errorAlert: ctrl.errorAlert,
       renderDock: ctrl.renderDock,
@@ -267,6 +262,8 @@ function Main() {
     }),
     true,
   );
+
+  const dockWidth = useRealmObject(Services.CustomizationService.state).livedockSize;
 
   useEffect(() => {
     const unsubscribe = StatefulService.store.subscribe((_, state) => {
