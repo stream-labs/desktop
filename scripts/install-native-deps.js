@@ -74,7 +74,7 @@ async function rtvc() {
   // cwd is node_modules
   log_info('copy rtvc');
 
-  const url = 'https://github.com/n-air-app/rtvc_plugin/releases/download/1.0.4/nair-rtvc.tar.gz';
+  const url = 'https://github.com/n-air-app/rtvc_plugin/releases/download/1.0.5/nair-rtvc.tar.gz';
   const zip = './nair-rtvc.tar.gz';
   const dst = './obs-studio-node/obs-plugins/64bit/';
 
