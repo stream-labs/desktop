@@ -139,11 +139,11 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
       // define slots for a platform switcher
       const service = getPlatformService(platform);
       const platformAuthData = UserService.state.auth?.platforms[platform];
-      assertIsDefined(platformAuthData);
+      const username = platformAuthData?.username ?? '';
 
       return {
         title: service.displayName,
-        description: platformAuthData.username,
+        description: username,
         Logo: () => (
           <PlatformLogo
             platform={platform}
