@@ -216,6 +216,11 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
     <div
       ref={containerRef}
       className={cx(styles.platformSwitcher, { [styles.platformDisabled]: !p.enabled })}
+      onClick={() => {
+        if (p.promptConnectTikTok) {
+          showTikTokConnectModal();
+        }
+      }}
     >
       <div className={styles.switcherHeader}>
         <div className={styles.platformInfoWrapper}>
@@ -231,11 +236,12 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
         <div
           onClick={e => {
             if (p.promptConnectTikTok) {
-              e.stopPropagation();
               showTikTokConnectModal();
+              e.stopPropagation();
               return;
+            } else {
+              onClickHandler();
             }
-            onClickHandler();
           }}
         >
           <Switch />
