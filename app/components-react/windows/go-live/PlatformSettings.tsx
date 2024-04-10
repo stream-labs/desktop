@@ -29,11 +29,16 @@ export default function PlatformSettings() {
     updateCommonFields,
     descriptionIsRequired,
     isUpdateMode,
+    isTikTokConnected,
   } = useGoLiveSettings().extend(settings => ({
     get descriptionIsRequired() {
       const fbSettings = settings.state.platforms['facebook'];
       const descriptionIsRequired = fbSettings && fbSettings.enabled && !fbSettings.useCustomFields;
       return descriptionIsRequired;
+    },
+
+    get isTikTokConnected() {
+      return settings.state.isPlatformLinked('tiktok');
     },
   }));
 
@@ -92,7 +97,7 @@ export default function PlatformSettings() {
               {platform === 'youtube' && (
                 <YoutubeEditStreamInfo {...createPlatformBinding('youtube')} />
               )}
-              {platform === 'tiktok' && (
+              {platform === 'tiktok' && isTikTokConnected && (
                 <TikTokEditStreamInfo {...createPlatformBinding('tiktok')} />
               )}
               {platform === 'trovo' && <TrovoEditStreamInfo {...createPlatformBinding('trovo')} />}
