@@ -10,7 +10,7 @@ import * as remote from '@electron/remote';
 import { Services } from 'components-react/service-provider';
 
 export default function BrowseOverlays(p: {
-  params: { type?: 'overlay' | 'widget-themes' | 'site-themes'; id?: string };
+  params: { type?: 'overlay' | 'widget-themes' | 'site-themes'; id?: string; install?: boolean };
 }) {
   const {
     UserService,
@@ -29,13 +29,13 @@ export default function BrowseOverlays(p: {
 
   useEffect(() => {
     async function getOverlaysUrl() {
-      const url = await UserService.actions.return.overlaysUrl(p.params?.type, p.params?.id);
+      const url = await UserService.actions.return.overlaysUrl(p.params?.type, p.params?.id, p.params?.install);
       if (!url) return;
       setOverlaysUrl(url);
     }
 
     getOverlaysUrl();
-  }, [p.params?.type, p.params?.id]);
+  }, [p.params?.type, p.params?.id, p.params?.install]);
 
   function onBrowserViewReady(view: Electron.BrowserView) {
     new GuestApiHandler().exposeApi(view.webContents.id, {

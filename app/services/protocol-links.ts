@@ -86,10 +86,14 @@ export class ProtocolLinksService extends Service {
     if (!this.userService.isLoggedIn) return;
 
     const parts = info.path.match(/^\/(.+)\/(.+)$/);
+    const searchParams = new URLSearchParams(info.query);
+    // additional param to prompt the install confirm dialog on the overlay page
+    const install = searchParams?.get('install') === 'true';
     if (parts) {
       this.navigationService.navigate('BrowseOverlays', {
         type: parts[1],
         id: parts[2],
+        install,
       });
       const menuItem =
         ProtocolLinkKeyMap[parts[1]] ?? this.sideNavService.views.isOpen
