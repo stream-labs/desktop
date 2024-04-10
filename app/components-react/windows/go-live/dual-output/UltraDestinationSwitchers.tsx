@@ -228,7 +228,16 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
           </div>
         </div>
         {/* SWITCH */}
-        <div onClick={onClickHandler}>
+        <div
+          onClick={e => {
+            if (p.promptConnectTikTok) {
+              e.stopPropagation();
+              showTikTokConnectModal();
+              return;
+            }
+            onClickHandler();
+          }}
+        >
           <Switch />
         </div>
       </div>
