@@ -265,7 +265,7 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
    */
   get chatUrl(): string {
     if (!this.userView.isLoggedIn || !this.userView.auth) return '';
-    return getPlatformService(this.userView.auth.primaryPlatform).chatUrl;
+    return getPlatformService(this.userView.auth.primaryPlatform)?.chatUrl;
   }
 
   getTweetText(streamTitle: string) {

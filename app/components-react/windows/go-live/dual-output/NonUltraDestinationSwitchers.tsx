@@ -180,11 +180,11 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
         const platformAuthData = UserService.state.auth?.platforms[platform] ?? {
           username: '',
         };
-        assertIsDefined(platformAuthData);
+        const username = platformAuthData?.username ?? '';
 
         return {
           title: service.displayName,
-          description: platformAuthData.username,
+          description: username,
           Logo: () => (
             <PlatformLogo
               platform={platform}
