@@ -63,6 +63,7 @@ const base = {
     },
   },
   mac: {
+    identity: (process.env.APPLE_SLD_IDENTITY) ? process.env.APPLE_SLD_IDENTITY : 'Streamlabs LLC (UT675MBB9Q)',
     extraFiles: [
       'shared-resources/**/*',
       '!shared-resources/README',
@@ -82,6 +83,8 @@ const base = {
     entitlements: 'electron-builder/entitlements.plist',
     entitlementsInherit: 'electron-builder/entitlements.plist',
     extendInfo: {
+      NSAppleEventsUsageDescription: 'Allow Streamlabs Desktop to run Apple scripts.',
+      NSAppleScriptEnabled: 'YES',
       CFBundleURLTypes: [
         {
           CFBundleURLName: 'Streamlabs OBS Link',
@@ -112,6 +115,7 @@ const base = {
     sentryBackendClientURL: process.env.SLD_SENTRY_BACKEND_CLIENT_URL,
     sentryBackendClientPreviewURL: process.env.SLD_SENTRY_BACKEND_CLIENT_PREVIEW_URL,
   },
+  beforePack: './electron-builder/beforePack.js',
   afterPack: './electron-builder/afterPack.js',
   afterSign: './electron-builder/notarize.js',
 };

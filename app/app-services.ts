@@ -60,6 +60,7 @@ export { SideNavService } from 'services/side-nav';
 export { VideoSettingsService } from 'services/settings-v2/video';
 export { SettingsManagerService } from 'services/settings-manager';
 export { MarkersService } from 'services/markers';
+export { RealmService } from 'services/realm';
 
 // ONLINE SERVICES
 export { UserService } from './services/user';
@@ -194,6 +195,7 @@ import { SettingsManagerService } from 'services/settings-manager';
 import { DualOutputService } from 'services/dual-output';
 import { MarkersService } from 'services/markers';
 import { SharedStorageService } from 'services/integrations/shared-storage';
+import { RealmService } from 'services/realm';
 import { InstagramService } from 'services/platforms/instagram';
 
 export const AppServices = {
@@ -270,4 +272,5 @@ export const AppServices = {
   DualOutputService,
   MarkersService,
   SharedStorageService,
+  RealmService,
 };

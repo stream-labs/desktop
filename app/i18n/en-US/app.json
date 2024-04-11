@@ -10,5 +10,8 @@
   "Enable Live Streaming?": "Enable Live Streaming?",
   "Streamlabs is currently in recording mode, which hides live streaming features. Would you like to enable live streaming features? You can disable them again in General settings.": "Streamlabs is currently in recording mode, which hides live streaming features. Would you like to enable live streaming features? You can disable them again in General settings.",
   "Enable Streaming": "Enable Streaming",
-  "This account is already linked to another Streamlabs Account. Please use a different account.": "This account is already linked to another Streamlabs Account. Please use a different account."
+  "This account is already linked to another Streamlabs Account. Please use a different account.": "This account is already linked to another Streamlabs Account. Please use a different account.",
+  "Successfully unlinked account": "Successfully unlinked account",
+  "Successfully merged account": "Successfully merged account",
+  "Account merge error": "Account merge error"
 }

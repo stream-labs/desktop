@@ -162,6 +162,7 @@ class UserViews extends ViewHandler<IUserServiceState> {
   // Injecting HostsService since it's not stateful
   @Inject() hostsService: HostsService;
   @Inject() magicLinkService: MagicLinkService;
+  @Inject() customizationService: CustomizationService;
 
   get settingsServiceViews() {
     return this.getServiceViews(SettingsService);
@@ -169,10 +170,6 @@ class UserViews extends ViewHandler<IUserServiceState> {
 
   get streamSettingsServiceViews() {
     return this.getServiceViews(StreamSettingsService);
-  }
-
-  get customizationServiceViews() {
-    return this.getServiceViews(CustomizationService);
   }
 
   get isLoggedIn() {
@@ -255,7 +252,7 @@ class UserViews extends ViewHandler<IUserServiceState> {
   appStoreUrl(params?: { appId?: string | undefined; type?: string | undefined }) {
     const host = this.hostsService.platform;
     const token = this.auth.apiToken;
-    const nightMode = this.customizationServiceViews.isDarkTheme ? 'night' : 'day';
+    const nightMode = this.customizationService.isDarkTheme ? 'night' : 'day';
     let url = `https://${host}/slobs-store`;
 
     if (params?.appId) {
@@ -411,6 +408,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   private socketConnection: Subscription = null;
 
   /**
+   * Primarily used for frontend confirmations
+   */
+  refreshedLinkedAccounts = new Subject();
+
+  /**
    * Used by child and 1-off windows to update their sentry contexts
    */
   sentryContext = new Subject<ISentryContext>();
@@ -437,6 +439,25 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
             "You've merged a Streamlabs ID to your account, please log back in to ensure you have the right credentials.",
           ),
         });
+      }
+
+      if (['account_merged', 'account_unlinked'].includes(event.type)) {
+        await this.updateLinkedPlatforms();
+
+        const message =
+          event.type === 'account_merged'
+            ? $t('Successfully merged account')
+            : $t('Successfully unlinked account');
+
+        this.windowsService.setWindowOnTop();
+        this.settingsService.showSettings('Stream');
+        this.refreshedLinkedAccounts.next({ success: true, message });
+      }
+
+      if (event.type === 'account_merge_error') {
+        this.windowsService.setWindowOnTop();
+        this.settingsService.showSettings('Stream');
+        this.refreshedLinkedAccounts.next({ success: false, message: $t('Account merge error') });
       }
     });
   }
@@ -851,7 +872,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   async alertboxLibraryUrl(id?: string) {
-    const uiTheme = this.customizationService.views.isDarkTheme ? 'night' : 'day';
+    const uiTheme = this.customizationService.isDarkTheme ? 'night' : 'day';
     let url = `https://${this.hostsService.streamlabs}/alert-box-themes?mode=${uiTheme}&slobs`;
 
     if (id) url += `&id=${id}`;
@@ -860,7 +881,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   async overlaysUrl(type?: 'overlay' | 'widget-themes' | 'site-themes', id?: string) {
-    const uiTheme = this.customizationService.views.isDarkTheme ? 'night' : 'day';
+    const uiTheme = this.customizationService.isDarkTheme ? 'night' : 'day';
 
     let url = `https://${this.hostsService.streamlabs}/library`;
 

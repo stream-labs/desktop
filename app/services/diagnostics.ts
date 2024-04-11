@@ -22,6 +22,9 @@ import { Source, SourcesService } from './sources';
 import { VideoEncodingOptimizationService } from './video-encoding-optimizations';
 import { DualOutputService, RecordingModeService, TransitionsService } from 'app-services';
 import * as remote from '@electron/remote';
+import { AppService } from 'services/app';
+import fs from 'fs';
+import path from 'path';
 
 interface IStreamDiagnosticInfo {
   startTime: number;
@@ -141,7 +144,12 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
   @Inject() videoEncodingOptimizationService: VideoEncodingOptimizationService;
   @Inject() transitionsService: TransitionsService;
   @Inject() recordingModeService: RecordingModeService;
+  @Inject() appService: AppService;
   @Inject() dualOutputService: DualOutputService;
+
+  get cacheDir() {
+    return this.appService.appDataDirectory;
+  }
 
   static defaultState: IDiagnosticsServiceState = {
     streams: [],
@@ -233,6 +241,7 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
     const transitions = this.generateTransitionsSection();
     const streams = this.generateStreamsSection();
     const network = this.generateNetworkSection();
+    const crashes = this.generateCrashesSection();
 
     // Problems section needs to be generated last, because it relies on the
     // problems array that all other sections add to.
@@ -245,6 +254,7 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
       system,
       config,
       streams,
+      crashes,
       video,
       output,
       network,
@@ -511,6 +521,97 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
       'New Networking Code': settings.Advanced.NewSocketLoopEnable,
       'Low Latency Mode': settings.Advanced.LowLatencyEnable,
     });
+  }
+
+  private generateCrashesSection() {
+    // Here we read and parse 'crash-handler' file and parse it to extract information about crashes
+    // As the files' size in total is < 2 MB, it is not resource-intensive operation.
+    // Furthermore, the code is optimized to parse last N entries only.
+    const MAX_CRASHES_COUNT = 5;
+
+    const parseDate = (rawDate: string, rawTime: string): Date => {
+      const year = +rawDate.substring(0, 4);
+      const month = +rawDate.substring(4, 6) - 1; // -1 is used to convert it into month index
+      const day = +rawDate.substring(6, 8);
+
+      const hour = +rawTime.substring(0, 2);
+      const minute = +rawTime.substring(2, 4);
+
+      return new Date(year, month, day, hour, minute);
+    };
+
+    const sectionItems: Array<{ Time: string; Module?: string; Path?: string }> = [];
+
+    const parseCrashLog = (fileName: string): void => {
+      const fullPath = path.join(this.cacheDir, fileName);
+      if (!fs.existsSync(fullPath)) {
+        return;
+      }
+
+      const fileContents = fs.readFileSync(fullPath, 'utf8');
+
+      const crashEntries: Array<any> = [];
+      const lines = fileContents.split('\n');
+
+      // Going backwards to fetch the latest entries first
+      for (let i = lines.length - 1; i >= 0; --i) {
+        const line = lines[i];
+
+        // There can be crashes with and without crash info, so using 2 distinct matches to process them
+        if (line.match(/crashed_module_info/)) {
+          const [, infoBlock] = line.split(': ');
+
+          let [, module] = infoBlock.split(' ');
+          module = module.trim();
+          const pathStartIndex = infoBlock.indexOf('(');
+          const pathEndIndex = infoBlock.indexOf(')');
+          let path = null;
+          if (pathStartIndex !== -1 && pathEndIndex !== -1) {
+            // +1 is to skip the leading '(' symbol
+            path = infoBlock.substring(pathStartIndex + 1, pathEndIndex);
+          }
+
+          // As we are parsing backwards and this message comes after the 'process died', we can just update the last record
+          Object.assign(crashEntries[crashEntries.length - 1], { module, path });
+        } else if (line.match(/process died/)) {
+          const [, , date, time] = line.split(':');
+          crashEntries.push({ timestamp: parseDate(date, time) });
+        }
+
+        if (crashEntries.length >= MAX_CRASHES_COUNT) {
+          break;
+        }
+      }
+
+      for (const entry of crashEntries) {
+        const data = { Time: entry.timestamp.toString() };
+
+        if (entry.module) {
+          data['Module'] =
+            entry.module +
+            ' (' +
+            (entry.path && entry.path.length !== 0 ? entry.path : 'unknown path') +
+            ')';
+        } else {
+          data['Module'] = '(no data)';
+        }
+
+        sectionItems.push(data);
+
+        if (sectionItems.length >= MAX_CRASHES_COUNT) {
+          break;
+        }
+      }
+    };
+
+    // There is a log rotation feature for crash-handler logs, so it no entries were found in the current log,
+    // we are trying the old one, because it might just be recently rotated.
+    parseCrashLog('crash-handler.log');
+    if (sectionItems.length < MAX_CRASHES_COUNT) {
+      parseCrashLog('crash-handler.log.old');
+    }
+
+    return new Section('Crashes', sectionItems);
   }
 
   private generateAudioSection() {

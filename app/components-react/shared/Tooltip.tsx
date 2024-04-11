@@ -27,6 +27,7 @@ interface ITooltipTipProps {
   placement?: TTipPosition;
   content?: HTMLElement | boolean;
   disabled?: boolean;
+  autoAdjustOverflow?: boolean;
 }
 
 export default function Tooltip(props: PropsWithChildren<ITooltipTipProps>) {
@@ -40,6 +41,7 @@ export default function Tooltip(props: PropsWithChildren<ITooltipTipProps>) {
     placement = 'bottom',
     content,
     disabled = false,
+    autoAdjustOverflow = true,
   } = props;
 
   return (
@@ -62,6 +64,7 @@ export default function Tooltip(props: PropsWithChildren<ITooltipTipProps>) {
           getPopupContainer={triggerNode => triggerNode}
           mouseLeaveDelay={0.1}
           trigger={['hover', 'focus', 'click']}
+          autoAdjustOverflow={autoAdjustOverflow}
         >
           {content}
           {{ ...props }.children}

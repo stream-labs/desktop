@@ -37,7 +37,7 @@ import { IconLibraryManager } from './properties-managers/icon-library-manager';
 import { assertIsDefined } from 'util/properties-type-guards';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { SourceFiltersService } from 'services/source-filters';
-import { VideoService } from 'services/video';
+import { VideoSettingsService } from 'services/settings-v2';
 import { CustomizationService } from '../customization';
 import { EAvailableFeatures, IncrementalRolloutService } from '../incremental-rollout';
 import { EMonitoringType, EDeinterlaceMode, EDeinterlaceFieldOrder } from '../../../obs-api';
@@ -49,6 +49,7 @@ const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
 const AsyncFlag = obs.ESourceOutputFlags.Async;
 const DoNotDuplicateFlag = obs.ESourceOutputFlags.DoNotDuplicate;
+const ForceUiRefresh = obs.ESourceOutputFlags.ForceUiRefresh;
 
 export const PROPERTIES_MANAGER_TYPES = {
   default: DefaultManager,
@@ -188,7 +189,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
   @Inject() private defaultHardwareService: DefaultHardwareService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject() private sourceFiltersService: SourceFiltersService;
-  @Inject() private videoService: VideoService;
+  @Inject() private videoSettingsService: VideoSettingsService;
   @Inject() private customizationService: CustomizationService;
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
   @Inject() private guestCamService: GuestCamService;
@@ -248,6 +249,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       video: false,
       async: false,
       doNotDuplicate: false,
+      forceUiRefresh: false,
 
       configurable: addOptions.configurable,
 
@@ -340,12 +342,19 @@ export class SourcesService extends StatefulService<ISourcesState> {
     const id = obsInput.name;
     const type: TSourceType = obsInput.id as TSourceType;
     const managerType = options.propertiesManager || 'default';
+    const width = options?.display
+      ? this.videoSettingsService.baseResolutions[options?.display].baseWidth
+      : obsInput.width;
+    const height = options?.display
+      ? this.videoSettingsService.baseResolutions[options?.display].baseHeight
+      : obsInput.height;
+
     this.ADD_SOURCE({
       id,
       name,
       type,
-      width: obsInput.width,
-      height: obsInput.height,
+      width,
+      height,
       configurable: obsInput.configurable,
       channel: options.channel,
       isTemporary: options.isTemporary,
@@ -356,7 +365,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
     const source = this.views.getSource(id)!;
     const muted = obsInput.muted;
     this.UPDATE_SOURCE({ id, muted });
-    this.updateSourceFlags(source.state, obsInput.outputFlags, true);
+    this.updateSourceFlags(source, obsInput.outputFlags, true);
 
     if (type === 'ndi_source') {
       this.usageStatisticsService.recordFeatureUsage('NDI');
@@ -616,16 +625,28 @@ export class SourcesService extends StatefulService<ISourcesState> {
     });
   }
 
-  private updateSourceFlags(source: ISource, flags: number, doNotEmit?: boolean) {
+  private updateSourceFlags(source: Source, flags: number, doNotEmit?: boolean) {
     const audio = !!(AudioFlag & flags);
     const video = !!(VideoFlag & flags);
     const async = !!(AsyncFlag & flags);
     const doNotDuplicate = !!(DoNotDuplicateFlag & flags);
+    const forceUiRefresh = !!(ForceUiRefresh & flags);
 
-    if (source.audio !== audio || source.video !== video) {
-      this.UPDATE_SOURCE({ audio, video, async, doNotDuplicate, id: source.sourceId });
+    if (
+      source.audio !== audio ||
+      source.video !== video ||
+      source.forceUiRefresh !== forceUiRefresh
+    ) {
+      this.UPDATE_SOURCE({
+        audio,
+        video,
+        async,
+        doNotDuplicate,
+        forceUiRefresh,
+        id: source.sourceId,
+      });
 
-      if (!doNotEmit) this.sourceUpdated.next(source);
+      if (!doNotEmit) this.sourceUpdated.next(source.getModel());
     }
   }
 

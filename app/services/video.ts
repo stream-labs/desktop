@@ -176,7 +176,8 @@ export class Display {
       }
     };
 
-    this.trackingFun();
+    // Allow a browser paint before trying to set initional position
+    window.setTimeout(() => this.trackingFun(), 0);
     this.trackingInterval = window.setInterval(this.trackingFun, DISPLAY_ELEMENT_POLLING_INTERVAL);
   }
 

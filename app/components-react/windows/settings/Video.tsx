@@ -57,6 +57,7 @@ class VideoSettingsModule {
   service = Services.VideoSettingsService;
   userService = Services.UserService;
   dualOutputService = Services.DualOutputService;
+  streamingService = Services.StreamingService;
 
   get display(): TDisplayType {
     return this.state.display;
@@ -64,6 +65,10 @@ class VideoSettingsModule {
 
   get isLoggedIn(): boolean {
     return this.userService.isLoggedIn;
+  }
+
+  get cantEditFields(): boolean {
+    return this.streamingService.views.isStreaming || this.streamingService.views.isRecording;
   }
 
   get values(): Dictionary<TInputValue> {
@@ -108,6 +113,7 @@ class VideoSettingsModule {
         label: $t('Base (Canvas) Resolution'),
         options: this.baseResOptions,
         onChange: (val: string) => this.selectResolution('baseRes', val),
+        disabled: this.cantEditFields,
         children: {
           customBaseRes: {
             type: 'text',
@@ -115,6 +121,7 @@ class VideoSettingsModule {
             rules: [this.resolutionValidator],
             onChange: (val: string) => this.setResolution('baseRes', val),
             displayed: this.state.customBaseRes,
+            disabled: this.cantEditFields,
           },
         },
       },
@@ -123,6 +130,7 @@ class VideoSettingsModule {
         label: $t('Output (Scaled) Resolution'),
         options: this.outputResOptions,
         onChange: (val: string) => this.selectResolution('outputRes', val),
+        disabled: this.cantEditFields,
         children: {
           customOutputRes: {
             type: 'text',
@@ -130,6 +138,7 @@ class VideoSettingsModule {
             rules: [this.resolutionValidator],
             onChange: (val: string) => this.setResolution('outputRes', val),
             displayed: this.state.customOutputRes,
+            disabled: this.cantEditFields,
           },
         },
       },
@@ -145,6 +154,7 @@ class VideoSettingsModule {
           { label: $t('Bicubic (Sharpened scaling, 16 samples)'), value: EScaleType.Bicubic },
           { label: $t('Lanczos (Sharpened scaling, 32 samples)'), value: EScaleType.Lanczos },
         ],
+        disabled: this.cantEditFields,
       },
       fpsType: {
         type: 'list',
@@ -155,6 +165,7 @@ class VideoSettingsModule {
           { label: $t('Integer FPS Values'), value: EFPSType.Integer },
           { label: $t('Fractional FPS Values'), value: EFPSType.Fractional },
         ],
+        disabled: this.cantEditFields,
 
         children: {
           fpsCom: {
@@ -163,6 +174,7 @@ class VideoSettingsModule {
             options: FPS_OPTIONS,
             onChange: (val: string) => this.setCommonFPS(val),
             displayed: this.values.fpsType === EFPSType.Common,
+            disabled: this.cantEditFields,
           },
           fpsInt: {
             type: 'number',
@@ -170,6 +182,7 @@ class VideoSettingsModule {
             onChange: (val: string) => this.setIntegerFPS(val),
             rules: [{ max: 1000, min: 1, message: $t('FPS Value must be between 1 and 1000') }],
             displayed: this.values.fpsType === EFPSType.Integer,
+            disabled: this.cantEditFields,
           },
           fpsNum: {
             type: 'number',
@@ -185,6 +198,7 @@ class VideoSettingsModule {
               },
             ],
             displayed: this.values.fpsType === EFPSType.Fractional,
+            disabled: this.cantEditFields,
           },
           fpsDen: {
             type: 'number',
@@ -200,6 +214,7 @@ class VideoSettingsModule {
               },
             ],
             displayed: this.values.fpsType === EFPSType.Fractional,
+            disabled: this.cantEditFields,
           },
         },
       },
@@ -467,6 +482,7 @@ export function VideoSettings() {
     showDualOutputSettings,
     showModal,
     isLoggedIn,
+    cantEditFields,
     onChange,
     setDisplay,
     setShowDualOutput,
@@ -488,6 +504,7 @@ export function VideoSettings() {
             value={showDualOutputSettings}
             onChange={(val: boolean) => (isLoggedIn ? setShowDualOutput() : handleShowModal(val))}
             className={styles.doCheckbox}
+            disabled={cantEditFields}
           />
           {$t('Enable Dual Output')}
           <Tooltip

@@ -15,6 +15,7 @@ import styles from './LiveDock.m.less';
 import Tooltip from 'components-react/shared/Tooltip';
 import PlatformAppPageView from 'components-react/shared/PlatformAppPageView';
 import { useVuex } from 'components-react/hooks';
+import { useRealmObject } from 'components-react/hooks/realm';
 
 const LiveDockCtx = React.createContext<LiveDockController | null>(null);
 
@@ -49,10 +50,6 @@ class LiveDockController {
     return this.streamingService.isStreaming;
   }
 
-  get collapsed() {
-    return this.customizationService.state.livedockCollapsed;
-  }
-
   get pageSlot() {
     return EAppPageSlot.Chat;
   }
@@ -84,10 +81,6 @@ class LiveDockController {
 
   get hideViewerCount() {
     return this.customizationService.state.hideViewerCount;
-  }
-
-  get liveDockSize() {
-    return this.customizationService.state.livedockSize;
   }
 
   get viewerCount() {
@@ -264,14 +257,15 @@ function LiveDock(p: { onLeft: boolean }) {
   const [visibleChat, setVisibleChat] = useState('default');
   const [elapsedStreamTime, setElapsedStreamTime] = useState('');
 
+  const liveDockSize = useRealmObject(Services.CustomizationService.state).livedockSize;
+  const collapsed = useRealmObject(Services.CustomizationService.state).livedockCollapsed;
+
   const {
-    collapsed,
     isPlatform,
     isStreaming,
     isRestreaming,
     hasChatTabs,
     chatTabs,
-    liveDockSize,
     applicationLoading,
     hideStyleBlockers,
     hideViewerCount,
@@ -283,13 +277,11 @@ function LiveDock(p: { onLeft: boolean }) {
     streamingStatus,
   } = useVuex(() =>
     pick(ctrl, [
-      'collapsed',
       'isPlatform',
       'isStreaming',
       'isRestreaming',
       'hasChatTabs',
       'chatTabs',
-      'liveDockSize',
       'applicationLoading',
       'hideStyleBlockers',
       'hideViewerCount',
@@ -303,7 +295,7 @@ function LiveDock(p: { onLeft: boolean }) {
   );
 
   useEffect(() => {
-    if (streamingStatus === EStreamingState.Starting && ctrl.collapsed) {
+    if (streamingStatus === EStreamingState.Starting && collapsed) {
       ctrl.setCollapsed(false);
     }
 
@@ -382,17 +374,29 @@ function LiveDock(p: { onLeft: boolean }) {
             <div className={styles.liveDockInfo}>
               <div className={styles.liveDockPlatformTools}>
                 {ctrl.canEditChannelInfo && (
-                  <Tooltip title={$t('Edit your stream title and description')} placement="right">
+                  <Tooltip
+                    title={$t('Edit your stream title and description')}
+                    placement="right"
+                    autoAdjustOverflow={false}
+                  >
                     <i onClick={() => ctrl.showEditStreamInfo()} className="icon-edit" />
                   </Tooltip>
                 )}
                 {isPlatform(['youtube', 'facebook', 'trovo', 'tiktok']) && isStreaming && (
-                  <Tooltip title={$t('View your live stream in a web browser')} placement="right">
+                  <Tooltip
+                    title={$t('View your live stream in a web browser')}
+                    placement="right"
+                    autoAdjustOverflow={false}
+                  >
                     <i onClick={() => ctrl.openPlatformStream()} className="icon-studio" />
                   </Tooltip>
                 )}
                 {isPlatform(['youtube', 'facebook', 'tiktok']) && isStreaming && (
-                  <Tooltip title={$t('Go to Live Dashboard')} placement="right">
+                  <Tooltip
+                    title={$t('Go to Live Dashboard')}
+                    placement="right"
+                    autoAdjustOverflow={false}
+                  >
                     <i onClick={() => ctrl.openPlatformDash()} className="icon-settings" />
                   </Tooltip>
                 )}

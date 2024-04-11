@@ -24,7 +24,7 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
     switchPlatforms,
     switchCustomDestination,
     isPrimaryPlatform,
-    isPrime,
+    isPlatformLinked,
   } = useGoLiveSettings();
   // use these references to apply debounce
   // for error handling and switch animation
@@ -35,9 +35,9 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
 
   // special handling for TikTok for non-ultra users
   // to disable/enable platforms and open ultra link
-  const handleTikTok = !isPrime && linkedPlatforms.includes('tiktok');
+  const promptConnectTikTok = !isPlatformLinked('tiktok');
   const disableSwitchers =
-    handleTikTok && (enabledPlatforms.length > 1 || enabledDestinations.length > 0);
+    promptConnectTikTok && (enabledPlatforms.length > 1 || enabledDestinations.length > 0);
 
   const emitSwitch = useDebounce(500, (ind?: number, enabled?: boolean) => {
     if (ind !== undefined && enabled !== undefined) {
@@ -51,6 +51,10 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
     if (typeof target === 'number') {
       return enabledDestRef.current.includes(target);
     } else {
+      if (target === 'tiktok' && promptConnectTikTok) {
+        return false;
+      }
+
       return enabledPlatformsRef.current.includes(target);
     }
   }
@@ -78,7 +82,7 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
           enabled={isEnabled(platform)}
           onChange={enabled => togglePlatform(platform, enabled)}
           isPrimary={isPrimaryPlatform(platform)}
-          handleTikTok={handleTikTok}
+          promptConnectTikTok={platform === 'tiktok' && promptConnectTikTok}
           disabled={disableSwitchers && !isEnabled(platform)}
         />
       ))}
@@ -100,7 +104,7 @@ interface IDestinationSwitcherProps {
   enabled: boolean;
   onChange: (enabled: boolean) => unknown;
   isPrimary?: boolean;
-  handleTikTok?: boolean;
+  promptConnectTikTok?: boolean;
   disabled?: boolean;
 }
 
@@ -114,7 +118,7 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
   const switchInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const platform = typeof p.destination === 'string' ? (p.destination as TPlatform) : null;
-  const { RestreamService, MagicLinkService } = Services;
+  const { RestreamService, MagicLinkService, NavigationService, WindowsService } = Services;
 
   function onClickHandler(ev: MouseEvent) {
     if (p.isPrimary) {
@@ -126,17 +130,28 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
       return;
     }
 
-    if (p.disabled) {
-      alertAsync($t('Subscribe to Ultra to add more destinations.'));
-      MagicLinkService.actions.linkToPrime('slobs-multistream');
+    if (p.promptConnectTikTok) {
+      alertAsync({
+        type: 'confirm',
+        title: $t('Connect TikTok Account'),
+        closable: true,
+        content: (
+          <span>
+            {$t(
+              'Connect your TikTok account to stream to TikTok and one additional platform for free.',
+            )}
+          </span>
+        ),
+        okText: $t('Connect'),
+        onOk: () => {
+          Services.NavigationService.actions.navigate('PlatformMerge', { platform: 'tiktok' });
+          Services.WindowsService.actions.closeChildWindow();
+        },
+      });
       return;
     }
 
-    if (
-      RestreamService.views.canEnableRestream ||
-      platform === 'tiktok' ||
-      ((p.handleTikTok || !platform) && !p.disabled)
-    ) {
+    if (RestreamService.views.canEnableRestream || !p.promptConnectTikTok) {
       const enable = !p.enabled;
       p.onChange(enable);
       // always proxy the click to the SwitchInput
@@ -176,10 +191,10 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
       const { UserService } = Services;
       const service = getPlatformService(platform);
       const platformAuthData = UserService.state.auth?.platforms[platform];
-      assertIsDefined(platformAuthData);
+      const username = platformAuthData?.username ?? '';
       return {
         title: $t('Stream to %{platformName}', { platformName: service.displayName }),
-        description: platformAuthData.username,
+        description: username,
         Logo: () => (
           <PlatformLogo platform={platform} className={styles[`platform-logo-${platform}`]} />
         ),
@@ -216,7 +231,9 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
   return (
     <div
       ref={containerRef}
-      className={cx(styles.platformSwitcher, { [styles.platformDisabled]: !p.enabled })}
+      className={cx(styles.platformSwitcher, {
+        [styles.platformDisabled]: !p.enabled || p.promptConnectTikTok,
+      })}
       onClick={onClickHandler}
     >
       <div className={cx(styles.colInput)}>

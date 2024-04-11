@@ -6,13 +6,16 @@ import { useVuex } from 'components-react/hooks';
 import { EditMenu } from 'util/menus/EditMenu';
 import MixerVolmeter from './CanvasVolmeter';
 import styles from './MixerItem.m.less';
+import { useRealmObject } from 'components-react/hooks/realm';
 
 export default function MixerItem(p: { audioSourceId: string; volmetersEnabled?: boolean }) {
   const volmetersEnabled = p.volmetersEnabled ?? true;
 
   const { CustomizationService, EditorCommandsService, SourcesService, AudioService } = Services;
 
-  const { performanceMode, sourceName, muted, deflection, db } = useVuex(() => ({
+  const performanceMode = useRealmObject(CustomizationService.state).performanceMode;
+
+  const { sourceName, muted, deflection, db } = useVuex(() => ({
     performanceMode: CustomizationService.state.performanceMode,
     sourceName: SourcesService.state.sources[p.audioSourceId].name,
     muted: AudioService.views.getSource(p.audioSourceId).muted,
@@ -58,7 +61,7 @@ export default function MixerItem(p: { audioSourceId: string; volmetersEnabled?:
             min={0}
             max={1}
             step={0.01}
-            debounce={500}
+            throttle={100}
             nowrap
           />
         </div>

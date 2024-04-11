@@ -13,6 +13,7 @@ import { $t, I18nService } from 'services/i18n';
 import SourceTag from './SourceTag';
 import { useSourceShowcaseSettings } from './useSourceShowcase';
 import { EAvailableFeatures } from 'services/incremental-rollout';
+import { useRealmObject } from 'components-react/hooks/realm';
 
 export default function SourceGrid(p: { activeTab: string }) {
   const {
@@ -24,13 +25,15 @@ export default function SourceGrid(p: { activeTab: string }) {
     IncrementalRolloutService,
   } = Services;
 
-  const { demoMode, designerMode, isLoggedIn, linkedPlatforms, primaryPlatform } = useVuex(() => ({
-    demoMode: CustomizationService.views.isDarkTheme ? 'night' : 'day',
-    designerMode: CustomizationService.views.designerMode,
+  const { isLoggedIn, linkedPlatforms, primaryPlatform } = useVuex(() => ({
     isLoggedIn: UserService.views.isLoggedIn,
     linkedPlatforms: UserService.views.linkedPlatforms,
     primaryPlatform: UserService.views.platform?.type,
   }));
+
+  const customization = useRealmObject(CustomizationService.state);
+  const demoMode = customization.isDarkTheme ? 'night' : 'day';
+  const designerMode = customization.designerMode;
 
   /**
    * English and languages with logographic writing systems

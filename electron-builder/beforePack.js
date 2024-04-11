@@ -32,44 +32,25 @@ function signBinaries(identity, directory) {
       if (fs.lstatSync(absolutePath).isSymbolicLink()) continue;
 
       // Sign dynamic libraries
-      if (ext === '.so' || ext === '.dylib') {
+      if (ext === '.node') {
         signAndCheck(identity, absolutePath);
         continue;
       }
-
-      // This will allow us to detect and sign executable files that
-      // aren't marked by a specific extension.
-      try {
-        fs.accessSync(absolutePath, fs.constants.X_OK);
-      } catch {
-        continue;
-      }
-
-      signAndCheck(identity, absolutePath);
     }
   }
 }
 
 exports.default = async function(context) {
   if (process.platform !== 'darwin') return;
-
-  console.log('Updating dependency paths');
-  cp.execSync(
-    `install_name_tool -change ./node_modules/node-libuiohook/libuiohook.1.dylib @executable_path/../Resources/app.asar.unpacked/node_modules/node-libuiohook/libuiohook.1.dylib \"${context.appOutDir}/${context.packager.appInfo.productName}.app/Contents/Resources/app.asar.unpacked/node_modules/node-libuiohook/node_libuiohook.node\"`,
-  );
-
-  cp.execSync(
-    `cp -R ./node_modules/obs-studio-node/Frameworks \"${context.appOutDir}/${context.packager.appInfo.productName}.app/Contents/\"`,
-  );
-
-  cp.execSync(
-    `cp -R ./node_modules/obs-studio-node/Frameworks \"${context.appOutDir}/${context.packager.appInfo.productName}.app/Contents/Resources/app.asar.unpacked/node_modules/\"`,
-  );
-
   if (process.env.SLOBS_NO_SIGN) return;
 
+  console.log(JSON.stringify(context.packager.config));
+
+  // Some *.node dynamic libraries do not go to the unpacked folder,
+  // so we sign all *.node in the node_modules to be sure we can avoid
+  // the com.apple.security.cs.disable-library-validation entitlement.
   signBinaries(
     context.packager.config.mac.identity,
-    `${context.appOutDir}/${context.packager.appInfo.productName}.app/Contents/Resources/app.asar.unpacked`,
+    `${context.packager.projectDir}/node_modules`,
   );
 };
