@@ -100,11 +100,7 @@ export default class SourceProperties extends Vue {
   }
 
   closeWindow() {
-    if (this.sourceId.startsWith("window_capture")) {
-      this.sourcesService.closeSourcePropertiesWindow();
-    } else {
-      this.windowsService.closeChildWindow();
-    }
+    this.windowsService.closeChildWindow();
   }
 
   done() {

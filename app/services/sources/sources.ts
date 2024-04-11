@@ -56,8 +56,6 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     temporarySources: {}, // don't save temporarySources in the config file
   } as ISourcesState;
 
-  private static readonly sourcePropertiesWindowId = 'sourcePropertiesWindow';
-
   sourceAdded = new Subject<ISource>();
   sourceUpdated = new Subject<ISource>();
   sourceRemoved = new Subject<ISource>();
@@ -555,7 +553,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       return;
     }
 
-    const baseConfig = {
+    const config = {
       componentName: 'SourceProperties',
       title: $t('sources.propertyWindowTitle', { sourceName: source.name }),
       queryParams: { sourceId },
@@ -565,35 +563,9 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       },
     };
 
-    if (source.type === 'nair-rtvc-source') baseConfig.componentName = 'RtvcSourceProperties';
+    if (source.type === 'nair-rtvc-source') config.componentName = 'RtvcSourceProperties';
 
-    // HACK: childWindow で表示してしまうとウィンドウキャプチャでクラッシュするので OneOffWindow で代替している
-    // StreamLabs 1.3.0 まで追従したらこのワークアラウンドはなくせる
-    this.windowsService.closeChildWindow();
-    (this.windowsService.getWindow(SourcesService.sourcePropertiesWindowId)
-      ? this.closeSourcePropertiesWindow()
-      : Promise.resolve()
-    ).then(() => {
-      if (!sourceId.startsWith('window_capture')) {
-        this.windowsService.showWindow(baseConfig);
-        return;
-      }
-      this.windowsService.createOneOffWindow(
-        {
-          ...baseConfig,
-          limitMinimumSize: true, // 小さくできなくする
-          // alwaysOnTop を利用した場合、メインウィンドウの背面に隠れることは防げるが、
-          // N Air 以外のウィンドウよりも前面に出てしまう
-          alwaysOnTop: true,
-        },
-        SourcesService.sourcePropertiesWindowId,
-      );
-    });
-  }
-
-  async closeSourcePropertiesWindow() {
-    this.windowsService.closeChildWindow();
-    await this.windowsService.closeOneOffWindow(SourcesService.sourcePropertiesWindowId);
+    this.windowsService.showWindow(config);
   }
 
   showShowcase() {

@@ -31,9 +31,8 @@ async function focusWindow(t: any, regex: RegExp) {
   for (const handle of handles.value) {
     await t.context.app.client.window(handle);
     const url = await t.context.app.client.getUrl();
-    if (url.match(regex)) return true;
+    if (url.match(regex)) return;
   }
-  return false;
 }
 
 // Focuses the main window
@@ -44,12 +43,6 @@ export async function focusMain(t: any) {
 // Focuses the child window
 export async function focusChild(t: any) {
   await focusWindow(t, /windowId=child/);
-}
-
-export async function focusSourcePropertiesWindow(t: any) {
-  while (!(await focusWindow(t, /windowId=sourcePropertiesWindow/))) {
-    await sleep(500);
-  }
 }
 
 export async function waitForLoader(t: any) {
