@@ -175,12 +175,6 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
     ipcRenderer.send('window-showChildWindow', options);
     this.updateChildWindowOptions(options);
-
-    // HACK: ソースプロパティウィンドウを oneOffWindow で開いている場合は閉じる
-    // (childウィンドウで開く場合を模倣するため)
-    if (this.windows['sourcePropertiesWindow']) {
-      this.closeOneOffWindow('sourcePropertiesWindow');
-    }
   }
 
   closeChildWindow() {

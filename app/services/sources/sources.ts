@@ -580,7 +580,13 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       }
       this.windowsService.createOneOffWindow(
         {
-          ...baseConfig,
+          componentName: 'SourceProperties',
+          title: $t('sources.propertyWindowTitle', { sourceName: source.name }),
+          queryParams: { sourceId },
+          size: {
+            width: 600,
+            height: 600,
+          },
           limitMinimumSize: true, // 小さくできなくする
           // alwaysOnTop を利用した場合、メインウィンドウの背面に隠れることは防げるが、
           // N Air 以外のウィンドウよりも前面に出てしまう
@@ -592,7 +598,6 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   }
 
   async closeSourcePropertiesWindow() {
-    this.windowsService.closeChildWindow();
     await this.windowsService.closeOneOffWindow(SourcesService.sourcePropertiesWindowId);
   }
 
