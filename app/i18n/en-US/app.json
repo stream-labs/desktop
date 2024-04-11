@@ -13,5 +13,6 @@
   "This account is already linked to another Streamlabs Account. Please use a different account.": "This account is already linked to another Streamlabs Account. Please use a different account.",
   "Successfully unlinked account": "Successfully unlinked account",
   "Successfully merged account": "Successfully merged account",
-  "Account merge error": "Account merge error"
+  "Account merge error": "Account merge error",
+  "Loading scene...": "Loading scene..."
 }
