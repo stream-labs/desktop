@@ -340,7 +340,6 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
 
   @mutation()
   private SET_STATE(nextState: Partial<INicoliveCommentViewerState>) {
-    console.info('SET_STATE', nextState); // DEBUG
     this.state = { ...this.state, ...nextState };
   }
 }

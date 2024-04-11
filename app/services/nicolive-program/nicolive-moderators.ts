@@ -1,3 +1,4 @@
+import { Subject } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import { Inject } from 'services/core/injector';
 import { StatefulService, mutation } from 'services/core/stateful-service';
@@ -22,6 +23,9 @@ export class NicoliveModeratorsService extends StatefulService<INicoliveModerato
     roomURL: '',
   };
 
+  private stateChangeSubject = new Subject<typeof this.state>();
+  stateChange = this.stateChangeSubject.asObservable();
+
   init() {
     super.init();
 
@@ -38,7 +42,7 @@ export class NicoliveModeratorsService extends StatefulService<INicoliveModerato
       .subscribe(state => {
         if (state.roomURL !== this.state.roomURL) {
           if (state.roomURL) {
-            this.SET_STATE({ roomURL: state.roomURL });
+            this.setState({ roomURL: state.roomURL });
             this.clearModeratorsCache();
             this.fetchModerators();
           } else {
@@ -60,12 +64,12 @@ export class NicoliveModeratorsService extends StatefulService<INicoliveModerato
 
   clearModeratorsCache() {
     console.info('clearModeratorsCache'); // DEBUG
-    this.SET_STATE({ moderatorsCache: [] });
+    this.setState({ moderatorsCache: [] });
   }
 
   setModeratorsCache(userIds: string[]) {
     console.info('setModeratorsCache', userIds); // DEBUG
-    this.SET_STATE({ moderatorsCache: userIds });
+    this.setState({ moderatorsCache: userIds });
   }
 
   async addModerator(userId: string) {
@@ -151,8 +155,14 @@ export class NicoliveModeratorsService extends StatefulService<INicoliveModerato
     }
   }
 
+  private setState(partial: Partial<INicoliveModeratorsService>) {
+    const nextState = { ...this.state, ...partial };
+    this.SET_STATE(nextState);
+    this.stateChangeSubject.next(nextState);
+  }
+
   @mutation()
-  private SET_STATE(nextState: Partial<INicoliveModeratorsService>) {
-    this.state = { ...this.state, ...nextState };
+  private SET_STATE(nextState: INicoliveModeratorsService) {
+    this.state = nextState;
   }
 }

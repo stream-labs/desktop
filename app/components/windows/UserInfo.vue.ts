@@ -19,6 +19,12 @@ import GiftComment from '../nicolive-area/comment/GiftComment.vue';
 import NicoadComment from '../nicolive-area/comment/NicoadComment.vue';
 import SystemMessage from '../nicolive-area/comment/SystemMessage.vue';
 import electron from 'electron';
+import { NicoliveCommentFilterService } from 'app-services';
+import {
+  NicoliveFailure,
+  openErrorDialogFromFailure,
+} from 'services/nicolive-program/NicoliveFailure';
+import Popper from 'vue-popperjs';
 
 const componentMap: { [type in ChatComponentType]: Vue.Component } = {
   common: CommonComment,
@@ -36,6 +42,7 @@ const componentMap: { [type in ChatComponentType]: Vue.Component } = {
     GiftComment,
     EmotionComment,
     SystemMessage,
+    Popper,
   },
 })
 export default class UserInfo extends Vue {
@@ -44,13 +51,22 @@ export default class UserInfo extends Vue {
   @Inject() private windowsService: WindowsService;
   @Inject() private konomiTagsService: KonomiTagsService;
   @Inject() private nicoliveModeratorsService: NicoliveModeratorsService;
+  @Inject() private nicoliveCommentFilterService: NicoliveCommentFilterService;
 
   private konomiTagsSubscription: Subscription;
   private myKonomiTags: KonomiTag[] = [];
   private rawKonomiTags: KonomiTag[] = [];
 
+  private moderatorSubscription: Subscription;
+  private isBlockedSubscription: Subscription;
+
   private cleanup: () => void = undefined;
   isLatestVisible = true;
+  showPopupMenu = false;
+
+  isBlockedUser = false;
+  isFollowing = false;
+  isModerator = false;
 
   mounted() {
     this.myKonomiTags = [];
@@ -84,8 +100,27 @@ export default class UserInfo extends Vue {
       this.rawKonomiTags = tags;
       this.updateKonomiTags();
     });
+
     this.nicoliveProgramService.client.fetchUserFollow(this.userId).then(following => {
       this.isFollowing = following;
+    });
+
+    this.isModerator = this.nicoliveModeratorsService.isModerator(this.userId);
+    this.moderatorSubscription = this.nicoliveModeratorsService.stateChange.subscribe({
+      next: state => {
+        const isModerator = state.moderatorsCache.includes(this.userId);
+        this.isModerator = isModerator;
+      },
+    });
+
+    const isBlocked = (filters: { type: string; body: string }[]) =>
+      filters.some(filter => filter.type === 'user' && filter.body === this.userId);
+
+    this.isBlockedUser = isBlocked(this.nicoliveCommentFilterService.state.filters);
+    this.isBlockedSubscription = this.nicoliveCommentFilterService.stateChange.subscribe({
+      next: state => {
+        this.isBlockedUser = isBlocked(state.filters);
+      },
     });
   }
 
@@ -97,6 +132,8 @@ export default class UserInfo extends Vue {
 
   beforeDestroy() {
     this.konomiTagsSubscription.unsubscribe();
+    this.moderatorSubscription.unsubscribe();
+    this.isBlockedSubscription.unsubscribe();
 
     if (this.cleanup) {
       this.cleanup();
@@ -118,8 +155,37 @@ export default class UserInfo extends Vue {
   get isPremium() {
     return this.windowsService.getChildWindowQueryParams().isPremium;
   }
-  get isModerator() {
-    return this.nicoliveModeratorsService.isModerator(this.userId);
+
+  followUser(): void {
+    this.nicoliveProgramService.client.followUser(this.userId).then(() => {
+      this.isFollowing = true;
+    });
+  }
+
+  unFollowUser(): void {
+    this.nicoliveProgramService.client.unFollowUser(this.userId).then(() => {
+      this.isFollowing = false;
+    });
+  }
+
+  async blockUser() {
+    await this.nicoliveCommentFilterService
+      .addFilter({
+        type: 'user',
+        body: this.userId,
+      })
+      .catch(e => {
+        if (e instanceof NicoliveFailure) {
+          openErrorDialogFromFailure(e);
+        }
+      });
+  }
+  async unBlockUser() {
+    await this.nicoliveCommentFilterService.deleteFilters([this.userId]).catch(e => {
+      if (e instanceof NicoliveFailure) {
+        openErrorDialogFromFailure(e);
+      }
+    });
   }
 
   async addModerator() {
@@ -135,10 +201,6 @@ export default class UserInfo extends Vue {
       userName: this.userName,
     });
   }
-
-  // TODO メニューを作る
-
-  isFollowing: boolean = false;
 
   konomiTags: { name: string; common: boolean }[] = [];
 
@@ -191,19 +253,10 @@ export default class UserInfo extends Vue {
     };
   }
 
-  followUser(): void {
-    this.nicoliveProgramService.client.followUser(this.userId).then(() => {
-      this.isFollowing = true;
-    });
-  }
-
-  unFollowUser(): void {
-    this.nicoliveProgramService.client.unFollowUser(this.userId).then(() => {
-      this.isFollowing = false;
-    });
-  }
-
   openUserPage() {
     electron.remote.shell.openExternal(`https://www.nicovideo.jp/user/${this.userId}`);
+  }
+  copyUserId() {
+    electron.remote.clipboard.writeText(this.userId);
   }
 }

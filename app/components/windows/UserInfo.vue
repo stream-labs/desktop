@@ -34,6 +34,43 @@
             <i class="icon-follow"></i>フォロー
           </button>
         </div>
+
+        <popper
+          trigger="click"
+          :options="{ placement: 'bottom-end' }"
+          @show="showPopupMenu = true"
+          @hide="showPopupMenu = false"
+        >
+          <div class="popper">
+            <ul class="popup-menu-list">
+              <li class="popup-menu-item">
+                <a @click="copyUserId" class="link">ユーザーIDをコピー</a>
+              </li>
+            </ul>
+            <ul class="popup-menu-list">
+              <li class="popup-menu-item">
+                <a @click="blockUser" class="link" v-if="!isBlockedUser">ユーザーを配信からブロック</a>
+                <a @click="unBlockUser" class="link" v-if="isBlockedUser">ユーザーブロック解除</a>
+              </li>
+            </ul>
+            <ul class="popup-menu-list">
+              <li class="popup-menu-item">
+                <a @click="addModerator" class="link" v-if="!isModerator">モデレーターに追加</a>
+                <a @click="removeModerator" class="link" v-if="isModerator">モデレーターから削除</a>
+              </li>
+            </ul>
+            <ul class="popup-menu-list">
+              <li class="popup-menu-item">
+                <a @click="unFollowUser" class="link" v-if="isFollowing">フォローを解除する</a>
+                <a @click="followUser" class="link" v-if="!isFollowing">フォローする</a>
+              </li>
+            </ul>
+          </div>
+          <div class="indicator" :class="{ 'is-show': showPopupMenu }" slot="reference">
+            <i class="icon-drop-down-arrow"></i>
+          </div>
+        </popper>
+
       </div>
       <div class="tag-list">
         <div class="tag-list-header">好きなものリスト ({{ konomiTags.length }})</div>
@@ -300,4 +337,44 @@
     font-size: @font-size1;
   }
 }
+
+.popper {
+  .popper-styling();
+
+  width: 260px;
+}
+
+.indicator {
+  .transition;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-left: 16px;
+  cursor: pointer;
+  border-radius: 50%;
+
+  i {
+    font-size: @font-size1;
+  }
+
+  &:hover {
+    background-color: var(--color-bg-active);
+
+    i {
+      color: var(--color-text-light);
+    }
+  }
+
+  &.is-show {
+    background-color: var(--color-bg-active);
+
+    i {
+      color: var(--color-text-active);
+    }
+  }
+}
+
 </style>
