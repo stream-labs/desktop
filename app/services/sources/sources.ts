@@ -553,7 +553,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       return;
     }
 
-    const baseConfig = {
+    const config = {
       componentName: 'SourceProperties',
       title: $t('sources.propertyWindowTitle', { sourceName: source.name }),
       queryParams: { sourceId },
@@ -563,17 +563,9 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       },
     };
 
-    if (source.type === 'nair-rtvc-source') baseConfig.componentName = 'RtvcSourceProperties';
+    if (source.type === 'nair-rtvc-source') config.componentName = 'RtvcSourceProperties';
 
-    this.windowsService.showWindow({
-      componentName: 'SourceProperties',
-      title: $t('sources.propertyWindowTitle', { sourceName: source.name }),
-      queryParams: { sourceId },
-      size: {
-        width: 600,
-        height: 600,
-      },
-    });
+    this.windowsService.showWindow(config);
   }
 
   showShowcase() {
