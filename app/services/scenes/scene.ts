@@ -139,8 +139,8 @@ export class Scene {
     return this.state.nodes.map(item => item.id);
   }
 
-  getNodeMap(): Dictionary<string> {
-    return this.state.nodeMap;
+  getNodeMap(): Dictionary<string> | undefined {
+    return this.state?.nodeMap;
   }
 
   /**
@@ -234,9 +234,6 @@ export class Scene {
     if (source.forceHidden) obsSceneItem.visible = false;
 
     const display = options?.display ?? 'horizontal';
-    // assign context to scene item
-    const context =
-      this.videoSettingsService.contexts[display] ?? this.videoSettingsService.contexts.horizontal;
 
     this.ADD_SOURCE_TO_SCENE(
       sceneItemId,
@@ -247,7 +244,10 @@ export class Scene {
     );
     const sceneItem = this.getItem(sceneItemId)!;
 
-    sceneItem.setSettings({ ...sceneItem.getSettings(), display, output: context });
+    // assign context to scene item
+    const context =
+      this.videoSettingsService.contexts[display] ?? this.videoSettingsService.contexts.horizontal;
+    sceneItem.setSettings({ ...sceneItem.getSettings(), output: context, display });
 
     // Default is to select
     if (options.select == null) options.select = true;
@@ -311,12 +311,7 @@ export class Scene {
     }
     if (this.dualOutputService.views.hasNodeMap()) {
       Promise.resolve(
-        this.dualOutputService.actions.return.createOrAssignOutputNode(
-          item,
-          'vertical',
-          false,
-          this.id,
-        ),
+        this.dualOutputService.actions.return.createDualOutputVerticalSource(item, this.id),
       ).then(node => {
         if (folderId) {
           const verticalFolderId = this.dualOutputService.views.getVerticalNodeId(folderId);

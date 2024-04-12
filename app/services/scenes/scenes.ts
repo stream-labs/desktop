@@ -263,7 +263,7 @@ class ScenesViews extends ViewHandler<IScenesState> {
     return false;
   }
 
-  getNodeMap(): Dictionary<string> {
+  getNodeMap(): Dictionary<string> | undefined {
     return this.state?.nodeMap;
   }
 }
@@ -348,7 +348,7 @@ export class ScenesService extends StatefulService<IScenesState> {
            * also create scene items for the vertical display
            */
           if (this.dualOutputService.views.dualOutputMode) {
-            this.dualOutputService.actions.createOrAssignOutputNode(newItem, 'vertical', false, id);
+            this.dualOutputService.actions.createDualOutputVerticalSource(newItem, id);
           }
         });
     }
