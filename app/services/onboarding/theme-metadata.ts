@@ -26,7 +26,7 @@ export const THEME_METADATA = {
     1445: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/fdb4d16/fdb4d16.overlay',
     // Talon (paid version), free: 1207
     1289: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/c5f35e1/c5f35e1.overlay',
-    // Halloween Nights (free)
-    2682: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/1fbce2a/1fbce2a.overlay',
+    // Cyber Nights
+    3872: 'https://cdn.streamlabs.com/marketplace/overlays/60327649/249fcfe/249fcfe.overlay',
   },
 };
