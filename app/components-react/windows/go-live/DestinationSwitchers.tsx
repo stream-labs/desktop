@@ -120,6 +120,26 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
   const platform = typeof p.destination === 'string' ? (p.destination as TPlatform) : null;
   const { RestreamService, MagicLinkService, NavigationService, WindowsService } = Services;
 
+  function showTikTokConnectModal() {
+    alertAsync({
+      type: 'confirm',
+      title: $t('Connect TikTok Account'),
+      closable: true,
+      content: (
+        <span>
+          {$t(
+            'Connect your TikTok account to stream to TikTok and one additional platform for free.',
+          )}
+        </span>
+      ),
+      okText: $t('Connect'),
+      onOk: () => {
+        Services.NavigationService.actions.navigate('PlatformMerge', { platform: 'tiktok' });
+        Services.WindowsService.actions.closeChildWindow();
+      },
+    });
+  }
+
   function onClickHandler(ev: MouseEvent) {
     if (p.isPrimary) {
       alertAsync(
@@ -131,24 +151,7 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
     }
 
     if (p.promptConnectTikTok) {
-      alertAsync({
-        type: 'confirm',
-        title: $t('Connect TikTok Account'),
-        closable: true,
-        content: (
-          <span>
-            {$t(
-              'Connect your TikTok account to stream to TikTok and one additional platform for free.',
-            )}
-          </span>
-        ),
-        okText: $t('Connect'),
-        onOk: () => {
-          Services.NavigationService.actions.navigate('PlatformMerge', { platform: 'tiktok' });
-          Services.WindowsService.actions.closeChildWindow();
-        },
-      });
-      return;
+      showTikTokConnectModal();
     }
 
     if (RestreamService.views.canEnableRestream || !p.promptConnectTikTok) {
@@ -220,7 +223,7 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
             inputRef={switchInputRef}
             value={destination.enabled}
             name={`destination_${destination.name}`}
-            disabled={p.disabled}
+            disabled={p.disabled || p.promptConnectTikTok}
             uncontrolled
           />
         ),
@@ -236,7 +239,15 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
       })}
       onClick={onClickHandler}
     >
-      <div className={cx(styles.colInput)}>
+      <div
+        className={cx(styles.colInput)}
+        onClick={e => {
+          if (p.promptConnectTikTok) {
+            showTikTokConnectModal();
+            e.stopPropagation();
+          }
+        }}
+      >
         <Switch />
       </div>
 
