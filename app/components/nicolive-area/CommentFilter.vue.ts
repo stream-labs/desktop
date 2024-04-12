@@ -5,6 +5,7 @@ import { NicoliveCommentFilterService } from 'services/nicolive-program/nicolive
 import { FilterType, FilterRecord } from 'services/nicolive-program/ResponseTypes';
 import { UserService } from 'services/user';
 import Banner from '../shared/banner.vue';
+import Popper from 'vue-popperjs';
 import {
   NicoliveFailure,
   openErrorDialogFromFailure,
@@ -23,9 +24,12 @@ function getBody(item: FilterRecord): string {
   }
 }
 
+type FilterByUser = 'all' | 'broadcaster' | 'moderator';
+
 @Component({
   components: {
     Banner,
+    Popper,
   },
 })
 export default class CommentFilter extends Vue {
@@ -34,6 +38,9 @@ export default class CommentFilter extends Vue {
 
   @Inject()
   private userService: UserService;
+
+  // @ts-expect-error: ts2729: use before initialization
+  userId: string = this.userService.platform.id;
 
   async reloadFilters() {
     try {
@@ -70,7 +77,13 @@ export default class CommentFilter extends Vue {
     this.newFilterValue = '';
   }
 
+  currentFilterBy: FilterByUser = 'all';
+
   newFilterValue: string = '';
+
+  get isEmptyBecauseOfFilterBy(): boolean {
+    return this.currentTypeFilters.length === 0 && this.currentFilterBy !== 'all';
+  }
 
   FILTER_VALUE = {
     word: 'コメント',
@@ -137,8 +150,16 @@ export default class CommentFilter extends Vue {
   }
 
   get currentTypeFilters() {
+    const isBroadcaster = (x: FilterRecord) => !x.userId || x.userId.toString() === this.userId;
+    const filtersBy: (x: FilterRecord) => boolean = {
+      all: () => true,
+      broadcaster: isBroadcaster,
+      moderator: (x: FilterRecord) => !isBroadcaster(x),
+    }[this.currentFilterBy];
+
     return this.filters
       .filter(x => x.type === this.currentType)
+      .filter(x => filtersBy(x))
       .map(item => {
         return {
           id: item.id,

@@ -7,6 +7,26 @@
     </div>
     <div class="content">
       <div class="content-header">
+        <popper rigger="click" :options="{placement: 'bottom'}">
+          <div class="popper">
+            <ul class="popup-menu-list">
+              <li class="item" :class="{ active: currentFilterBy === 'all' }" @click="currentFilterBy = 'all'" >
+                すべて
+              </li>
+              <li class="item" :class="{ active: currentFilterBy === 'broadcaster' }" @click="currentFilterBy = 'broadcaster'">
+                放送者が登録
+              </li>
+              <li class="item" :class="{ active: currentFilterBy === 'moderator' }" @click="currentFilterBy = 'moderator'">
+                モデレーターが登録
+                </li>
+            </ul>
+          </div>
+
+        <div class="indicator" slot="reference">
+          <i class="icon-details-setting"></i>
+        </div>
+        </popper>
+        
         <button
           type="button"
           @click="currentType = 'word'"
@@ -51,7 +71,7 @@
         </button>
         <div class="form-tip floating-wrapper" v-if="invalid">数字以外の文字列は登録できません</div>
       </form>
-      <div class="list">
+      <div class="list" v-if="!isEmptyBecauseOfFilterBy">
         <div class="item row" v-for="item of currentTypeFilters" :key="item.id">
           <div class="item-box">
             <div class="item-body" :title="item.body">{{ item.body }}</div>
@@ -67,6 +87,14 @@
             @click="deleteFilter(item)"
           ></button>
         </div>
+      </div>
+      <div v-else>
+        <button
+          type="button"
+          class="button button--secondary"
+          @click="currentFilterBy = 'all'">
+          絞り込みを解除
+        </button>
       </div>
       <banner
         class="banner"
@@ -237,5 +265,34 @@
   bottom: 16px;
   left: 16px;
   .shadow;
+}
+
+.indicator {
+  .transition;
+}
+
+.popper {
+  .popper-styling;
+
+  .popup-menu-list {
+    & > .item {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 64px;
+      padding: 0 16px;
+      text-align: left;
+      cursor: pointer;
+
+      &.active {
+        .bg-hover();
+      }
+
+      &:not(.active):hover {
+        .bg-hover();
+      }
+    }
+  }
 }
 </style>
