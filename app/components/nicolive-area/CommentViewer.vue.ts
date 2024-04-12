@@ -190,18 +190,11 @@ export default class CommentViewer extends Vue {
         clipboard.writeText(item.value.user_id);
       },
     });
-
     if (item.type === 'normal') {
-      menu.append({
-        id: 'Pin the comment',
-        label: 'コメントをピン留め',
-        click: () => {
-          this.pin(item);
-        },
-      });
       menu.append({
         type: 'separator',
       });
+
       menu.append({
         id: 'Ban comment content',
         label: 'コメントを配信からブロック',
@@ -233,8 +226,11 @@ export default class CommentViewer extends Vue {
             });
         },
       });
+      menu.append({
+        type: 'separator',
+      });
       if (item.value.name /* なふだ有効ユーザー */) {
-        if (!item.isModerator) {
+        if (!this.nicoliveModeratorsService.isModerator(item.value.user_id)) {
           menu.append({
             id: 'Add to moderator',
             label: 'モデレーターに追加',
@@ -257,7 +253,17 @@ export default class CommentViewer extends Vue {
             },
           });
         }
+        menu.append({
+          type: 'separator',
+        });
       }
+      menu.append({
+        id: 'Pin the comment',
+        label: 'コメントをピン留め',
+        click: () => {
+          this.pin(item);
+        },
+      });
     }
 
     // コンテキストメニューが出るとホバー判定が消えるので、外観を維持するために注目している要素を保持しておく
