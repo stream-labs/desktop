@@ -72,7 +72,9 @@ export function ThemeSelector() {
 
   return (
     <div style={{ width: '100%' }}>
-      <h1 className={commonStyles.titleContainer}>{$t('Add an Overlay')}</h1>
+      <h1 className={commonStyles.titleContainer} style={{ marginTop: '20px' }}>
+        {$t('Add an Overlay')}
+      </h1>
 
       {isPrime && (
         <div style={{ display: 'flex', justifyContent: 'center' }}>
