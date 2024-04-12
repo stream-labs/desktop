@@ -51,6 +51,10 @@ class LiveDockController {
     return this.streamingService.isStreaming;
   }
 
+  get currentViewers() {
+    return this.streamingService.views.viewerCount.toString();
+  }
+
   get pageSlot() {
     return EAppPageSlot.Chat;
   }
@@ -78,17 +82,6 @@ class LiveDockController {
   get offlineImageSrc() {
     const mode = this.customizationService.isDarkTheme ? 'night' : 'day';
     return $i(`images/sleeping-kevin-${mode}.png`);
-  }
-
-  get hideViewerCount() {
-    return this.customizationService.state.hideViewerCount;
-  }
-
-  get viewerCount() {
-    if (this.hideViewerCount) {
-      return $t('Viewers Hidden');
-    }
-    return this.streamingService.views.viewerCount.toString();
   }
 
   get hideStyleBlockers() {
@@ -258,9 +251,6 @@ function LiveDock(p: { onLeft: boolean }) {
   const [visibleChat, setVisibleChat] = useState('default');
   const [elapsedStreamTime, setElapsedStreamTime] = useState('');
 
-  const liveDockSize = useRealmObject(Services.CustomizationService.state).livedockSize;
-  const collapsed = useRealmObject(Services.CustomizationService.state).livedockCollapsed;
-
   const {
     isPlatform,
     isStreaming,
@@ -269,8 +259,7 @@ function LiveDock(p: { onLeft: boolean }) {
     chatTabs,
     applicationLoading,
     hideStyleBlockers,
-    hideViewerCount,
-    viewerCount,
+    currentViewers,
     pageSlot,
     canAnimate,
     liveText,
@@ -285,15 +274,20 @@ function LiveDock(p: { onLeft: boolean }) {
       'chatTabs',
       'applicationLoading',
       'hideStyleBlockers',
-      'hideViewerCount',
-      'viewerCount',
       'pageSlot',
       'canAnimate',
+      'currentViewers',
       'liveText',
       'isPopOutAllowed',
       'streamingStatus',
     ]),
   );
+
+  const liveDockSize = useRealmObject(Services.CustomizationService.state).livedockSize;
+  const collapsed = useRealmObject(Services.CustomizationService.state).livedockCollapsed;
+  const hideViewerCount = useRealmObject(Services.CustomizationService.state).hideViewerCount;
+
+  const viewerCount = hideViewerCount ? $t('Viewers Hidden') : currentViewers;
 
   useEffect(() => {
     if (streamingStatus === EStreamingState.Starting && collapsed) {
