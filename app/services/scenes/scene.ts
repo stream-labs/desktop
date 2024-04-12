@@ -311,7 +311,12 @@ export class Scene {
     }
     if (this.dualOutputService.views.hasNodeMap()) {
       Promise.resolve(
-        this.dualOutputService.actions.return.createDualOutputVerticalSource(item, this.id),
+        this.dualOutputService.actions.return.createOrAssignOutputNode(
+          item,
+          'vertical',
+          false,
+          this.id,
+        ),
       ).then(node => {
         if (folderId) {
           const verticalFolderId = this.dualOutputService.views.getVerticalNodeId(folderId);

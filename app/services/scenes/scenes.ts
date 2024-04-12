@@ -348,7 +348,7 @@ export class ScenesService extends StatefulService<IScenesState> {
            * also create scene items for the vertical display
            */
           if (this.dualOutputService.views.dualOutputMode) {
-            this.dualOutputService.actions.createDualOutputVerticalSource(newItem, id);
+            this.dualOutputService.actions.createOrAssignOutputNode(newItem, 'vertical', false, id);
           }
         });
     }

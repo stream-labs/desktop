@@ -24,6 +24,7 @@ import { StreamingService } from 'services/streaming';
 import { SettingsService } from 'services/settings';
 import { RunInLoadingMode } from 'services/app/app-decorators';
 import compact from 'lodash/compact';
+import invert from 'lodash/invert';
 
 interface IDisplayVideoSettings {
   horizontal: IVideoInfo;
@@ -418,19 +419,25 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    * @remark The horizontal node id is always the key in the scene node map.
    * The node map entry is so that the horizontal and vertical nodes can refer to each other.
    */
-  createVerticalNode(horizontalNode: TSceneNode): TSceneNode {
+  createVerticalNode(horizontalNode: TSceneNode, verticalNodeId?: string): TSceneNode {
     const scene = horizontalNode.getScene();
 
     if (horizontalNode.isFolder()) {
       // add folder and create node map entry
-      const folder = scene.createFolder(horizontalNode.name, { display: 'vertical' });
+      const folder = scene.createFolder(horizontalNode.name, {
+        id: verticalNodeId,
+        display: 'vertical',
+      });
       this.sceneCollectionsService.createNodeMapEntry(scene.id, horizontalNode.id, folder.id);
 
       this.sceneNodeHandled.next();
       return folder;
     } else {
       // add item
-      const item = scene.addSource(horizontalNode.sourceId, { display: 'vertical' });
+      const item = scene.addSource(horizontalNode.sourceId, {
+        id: verticalNodeId,
+        display: 'vertical',
+      });
 
       // position all of the nodes in the upper left corner of the vertical display
       // so that all of the sources are visible
@@ -456,12 +463,19 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    * @remark The horizontal node id is always the key in the scene node map.
    * The node map entry is so that the horizontal and vertical nodes can refer to each other.
    */
-  createHorizontalNode(verticalNode: TSceneNode): TSceneNode {
+  createHorizontalNode(
+    verticalNode: TSceneNode,
+    repair: boolean = false,
+    horizontalNodeId?: string,
+  ): TSceneNode {
     const scene = verticalNode.getScene();
 
     if (verticalNode.isFolder()) {
       // add folder and create node map entry
-      const folder = scene.createFolder(verticalNode.name, { display: 'horizontal' });
+      const folder = scene.createFolder(verticalNode.name, {
+        id: horizontalNodeId,
+        display: 'horizontal',
+      });
       folder.placeBefore(verticalNode.id);
 
       this.sceneCollectionsService.createNodeMapEntry(scene.id, folder.id, verticalNode.id);
@@ -471,13 +485,21 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     } else {
       // add item
       const item = scene.addSource(verticalNode.sourceId, {
+        id: horizontalNodeId,
         display: 'horizontal',
       });
 
       item.placeBefore(verticalNode.id);
 
-      // match values
-      item.setVisibility(verticalNode.visible);
+      // position all of the nodes in the upper left corner of the vertical display
+      // so that all of the sources are visible
+      item.setTransform({ position: { x: 0, y: 0 } });
+
+      // hide all horizontal scene items created via repair by default
+      const visibility = repair ? false : verticalNode.visible;
+      item.setVisibility(visibility);
+
+      // match locked
       item.setLocked(verticalNode.locked);
 
       this.sceneCollectionsService.createNodeMapEntry(scene.id, item.id, verticalNode.id);
@@ -538,9 +560,12 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       this.videoSettingsService.establishVideoContext('vertical');
     }
 
+    const scene = this.scenesService.views.getScene(sceneId);
     const nodes = this.scenesService.views.getSceneNodesBySceneId(sceneId);
     if (!nodes) return;
 
+    // node map with vertical node ids as keys and horizontal node ids as values
+    const invertedNodeMap = invert(nodeMap);
     // the keys in the nodemap are the ids for the horizontal nodes
     const keys = Object.keys(nodeMap);
     const horizontalNodeIds = new Set(keys);
@@ -559,7 +584,14 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
         // confirm horizontal node has a partner vertical node
         if (verticalNodeId) {
-          nodeIdsMap[sceneNode.id] = verticalNodeId;
+          const verticalNode = scene.getNode(verticalNodeId);
+          if (!verticalNode) {
+            const verticalNode = this.createVerticalNode(sceneNode, verticalNodeId);
+            nodeIdsMap[verticalNode.id] = sceneNode.id;
+            repairedNodes.push(verticalNode);
+          } else {
+            nodeIdsMap[sceneNode.id] = verticalNodeId;
+          }
         } else {
           // create vertical node and node map entry
           const verticalNode = this.createVerticalNode(sceneNode);
@@ -577,11 +609,21 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         // confirm horizontal node
         if (!verticalNodeIds.has(sceneNode.id)) {
           // create horizontal node and node map entry
-          const horizontalNode = this.createHorizontalNode(sceneNode);
+          const horizontalNode = this.createHorizontalNode(sceneNode, true);
           if (horizontalNode) {
             nodeOrder.push(horizontalNode.id);
             nodeIdsMap[horizontalNode.id] = sceneNode.id;
             repairedNodes.push(horizontalNode);
+          }
+        } else {
+          const horizontalNodeId = invertedNodeMap[sceneNode.id];
+          const horizontalNode = scene.getNode(horizontalNodeId);
+          if (!horizontalNode) {
+            const horizontalNode = this.createHorizontalNode(sceneNode, true, horizontalNodeId);
+            nodeIdsMap[horizontalNode.id] = sceneNode.id;
+            repairedNodes.push(horizontalNode);
+          } else {
+            nodeIdsMap[sceneNode.id] = horizontalNodeId;
           }
         }
 
@@ -604,8 +646,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     horizontalNodeIds.forEach((horizontalId: string) => {
       this.sceneCollectionsService.removeNodeMapEntry(horizontalId, sceneId);
     });
-
-    const scene = this.scenesService.views.getScene(sceneId);
 
     // recreate parent/child relationships
     const selection = new Selection(sceneId, repairedNodes);
