@@ -48,7 +48,6 @@ export default function DisplaySelector(p: IDisplaySelectorProps) {
 
   return (
     <RadioInput
-      data-test="display-input"
       className={p?.className}
       style={p?.style}
       label={label}

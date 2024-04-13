@@ -1,5 +1,6 @@
 import {
   SceneItem as InternalSceneItem,
+  ScenesService as InternalScenesService,
   ISceneItem as IInternalSceneItemModel,
   ISceneItem,
   EScaleType,
@@ -10,7 +11,7 @@ import { InjectFromExternalApi, Fallback } from 'services/api/external-api';
 import { Source, SourcesService } from 'services/api/external-api/sources';
 import { getExternalNodeModel, ISceneNodeModel, SceneNode } from './scene-node';
 import Utils from '../../../utils';
-import { ServiceHelper } from '../../../core';
+import { Inject, ServiceHelper } from '../../../core';
 import { IVideo } from 'obs-studio-node';
 import { TDisplayType } from 'services/settings-v2';
 
@@ -173,8 +174,6 @@ export class SceneItem extends SceneNode implements ISceneItemActions, ISceneIte
   blendingMode: EBlendingMode;
   blendingMethod: EBlendingMethod;
   resourceId: string;
-  display?: TDisplayType;
-  output?: IVideo;
 
   constructor(public sceneId: string, public nodeId: string, sourceId: string) {
     super(sceneId, nodeId);
