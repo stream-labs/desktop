@@ -52,8 +52,6 @@ interface ISceneItem extends INode {
   scaleFiler: EScaleType;
   blendingMode: EBlendingMode;
   blendingMethod: EBlendingMethod;
-  display?: TDisplayType;
-  output?: IVideo;
 }
 
 interface ISceneItemFolder extends INode {

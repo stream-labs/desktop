@@ -7,17 +7,10 @@ import { requestUtilsServer, USER_POOL_TOKEN } from './runner-utils';
 import { getApiClient } from '../api-client';
 import { UserService } from '../../../app/services/user';
 import { closeWindow, focusChild, focusMain, focusWindow } from '../modules/core';
-import {
-  isDummyUserPlatform,
-  getDummyUser,
-  IDummyTestUser,
-  TTestDummyUserPlatforms,
-} from '../../data/dummy-accounts';
-import { TTikTokLiveScopeTypes } from 'services/platforms/tiktok/api';
 
 let user: ITestUser; // keep user's name if SLOBS is logged-in
 
-export interface ITestUser {
+interface ITestUser {
   email: string;
   workerId: string; // null if user is not active right now
   updated: string; // time of the last request for this user
@@ -70,11 +63,6 @@ export interface ITestUserFeatures {
    * User pool does not return accounts with this flag unless you explicitly set this flag to true in the request
    */
   notStreamable?: boolean;
-
-  /**
-   * TikTok approval status for showing UI variations
-   */
-  tiktokLiveScope?: TTikTokLiveScopeTypes;
 }
 
 export async function logOut(t: TExecutionContext, skipUI = false) {
@@ -108,7 +96,7 @@ export async function logIn(
   features?: ITestUserFeatures, // if not set, pick a random user's account from user-pool
   waitForUI = true,
   isOnboardingTest = false,
-): Promise<ITestUser | IDummyTestUser> {
+): Promise<ITestUser> {
   if (user) throw new Error('User already logged in');
 
   if (USER_POOL_TOKEN) {
@@ -121,38 +109,9 @@ export async function logIn(
   return user;
 }
 
-/**
- * Add a dummy account for a platform without a test account
- * @remark We can only add dummy accounts as linked platforms
- * because they cannot authenticate.
- * @param platform - platform with dummy account
- * @param features - any optional features
- */
-export async function addDummyAccount(
-  platform: TTestDummyUserPlatforms,
-  features?: ITestUserFeatures,
-): Promise<IDummyTestUser> {
-  const user = getDummyUser(platform, features?.tiktokLiveScope);
-
-  const userInfo = {
-    type: user.type,
-    username: user.username,
-    id: user.id,
-    token: user.token,
-  };
-
-  // for now, tiktok live scope is the only feature to add to a dummy account
-  const api = await getApiClient();
-  await api
-    .getResource<UserService>('UserService')
-    .addDummyAccount(userInfo, features?.tiktokLiveScope);
-
-  return user;
-}
-
 export async function loginWithAuthInfo(
   t: TExecutionContext,
-  userInfo: ITestUser | IDummyTestUser,
+  userInfo: ITestUser,
   waitForUI = true,
   isOnboardingTest = false,
 ) {

@@ -135,13 +135,6 @@ export class TikTokService
     const context = display ?? ttSettings?.display;
 
     if (this.getHasScope('approved')) {
-      // skip generate stream keys for tests
-      if (Utils.isTestMode()) {
-        await this.putChannelInfo(ttSettings);
-        this.setPlatformContext('tiktok');
-        return;
-      }
-
       // update server url and stream key if handling streaming via API
       // streaming with server url and stream key is default
       let streamInfo = {} as ITikTokStartStreamResponse;
@@ -422,12 +415,6 @@ export class TikTokService
    * prepopulate channel info and save it to the store
    */
   async prepopulateInfo(): Promise<void> {
-    // skip validation call when running tests
-    if (Utils.isTestMode()) {
-      this.SET_PREPOPULATED(true);
-      return;
-    }
-
     // fetch user live access status
     const status = await this.validatePlatform();
     this.usageStatisticsService.recordAnalyticsEvent('TikTokLiveAccess', {
@@ -530,9 +517,6 @@ export class TikTokService
   }
 
   async handleOpenLiveManager(): Promise<void> {
-    // no need to open window for tests
-    if (Utils.isTestMode()) return;
-
     // keep main window on top to prevent flicker when opening url
     const win = Utils.getMainWindow();
     win.setAlwaysOnTop(true);
@@ -547,10 +531,6 @@ export class TikTokService
       win.setAlwaysOnTop(false);
       return Promise.resolve();
     }, 1000);
-  }
-
-  setLiveScope(scope: TTikTokLiveScopeTypes) {
-    this.SET_LIVE_SCOPE(scope);
   }
 
   @mutation()
