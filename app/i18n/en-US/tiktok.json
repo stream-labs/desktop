@@ -15,7 +15,5 @@
   "<unlink>Unlink here</unlink>": "<unlink>Unlink here</unlink>",
   "Close Streamlabs Desktop and reload": "Close Streamlabs Desktop and reload",
   "Go to Settings - Stream and reconnect TikTok": "Go to Settings - Stream and reconnect TikTok",
-  "Connect TikTok Account": "Connect TikTok Account",
-  "Approvals are solely at TikTok's discretion.": "Approvals are solely at TikTok's discretion.",
-  "Failed to generate TikTok stream credentials. Confirm Live Access with TikTok.": "Failed to generate TikTok stream credentials. Confirm Live Access with TikTok."
+  "Connect TikTok Account": "Connect TikTok Account"
 }

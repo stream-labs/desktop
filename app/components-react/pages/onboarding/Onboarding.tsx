@@ -147,10 +147,6 @@ function TopBarLogo({ component }: { component: string }) {
 
 function TopBar() {
   const component = useModule(OnboardingModule).currentStep.component;
-  // We decided to skip the top bar for Theme Selection as the cards are big and make Footer overlap
-  if (component === 'ThemeSelector') {
-    return <></>;
-  }
 
   return (
     <div

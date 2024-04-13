@@ -214,7 +214,7 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
       }
     })();
     return (
-      <div data-test="non-ultra-switcher" className={styles.platformSwitcher}>
+      <div className={styles.platformSwitcher}>
         <div
           ref={containerRef}
           className={cx(styles.switcherHeader, {
