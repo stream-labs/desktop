@@ -214,6 +214,7 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
 
   return (
     <div
+      data-test="ultra-switcher"
       ref={containerRef}
       className={cx(styles.platformSwitcher, { [styles.platformDisabled]: !p.enabled })}
       onClick={() => {
