@@ -86,6 +86,18 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
           disabled={disableSwitchers && !isEnabled(platform)}
         />
       ))}
+
+      {!linkedPlatforms.includes('tiktok') && (
+        <DestinationSwitcher
+          destination={'tiktok'}
+          enabled={isEnabled('tiktok')}
+          onChange={enabled => togglePlatform('tiktok', enabled)}
+          isPrimary={isPrimaryPlatform('tiktok')}
+          promptConnectTikTok={promptConnectTikTok}
+          disabled={disableSwitchers && !isEnabled('tiktok')}
+        />
+      )}
+
       {customDestinations?.map((dest, ind) => (
         <DestinationSwitcher
           key={ind}
