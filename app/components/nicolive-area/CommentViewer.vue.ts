@@ -1,4 +1,4 @@
-import { clipboard } from 'electron';
+import { clipboard, remote } from 'electron';
 import { Inject } from 'services/core/injector';
 import { CustomizationService } from 'services/customization';
 import { ChatMessage } from 'services/nicolive-program/ChatMessage';
@@ -326,5 +326,9 @@ export default class CommentViewer extends Vue {
 
   openCommentSettings() {
     this.settingsService.showSettings('Comment');
+  }
+
+  openModeratorSettings() {
+    remote.shell.openExternal('https://www.upload.nicovideo.jp/niconico-garage/live/moderators');
   }
 }
