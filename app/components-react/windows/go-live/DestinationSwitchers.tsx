@@ -195,6 +195,7 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
 
       // Preserving old TikTok functionality, so they can't enable the toggle if TikTok is not
       // connected.
+      // TODO: this kind of logic should belong on caller, but ideally we would refactor all this
       const tiktokDisabled =
         platform === 'tiktok' && !StreamingService.views.isPlatformLinked('tiktok');
 
