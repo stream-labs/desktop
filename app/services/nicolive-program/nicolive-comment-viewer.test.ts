@@ -19,8 +19,7 @@ const setup = createSetupFunction({
 });
 
 jest.mock('services/nicolive-program/nicolive-program', () => ({
-  NicoliveProgramService: {
-  },
+  NicoliveProgramService: {},
 }));
 jest.mock('services/nicolive-program/nicolive-comment-filter', () => ({
   NicoliveCommentFilterService: {},
@@ -53,7 +52,7 @@ test('接続先情報が来たら接続する', () => {
       connect() {
         return clientSubject;
       }
-      requestLatestMessages() { }
+      requestLatestMessages() {}
     },
   }));
   setup({ injectee: { NicoliveProgramService: { stateChange } } });
@@ -75,7 +74,7 @@ test('接続先情報が欠けていたら接続しない', () => {
       connect() {
         return clientSubject;
       }
-      requestLatestMessages() { }
+      requestLatestMessages() {}
     },
   }));
   setup({ injectee: { NicoliveProgramService: { stateChange } } });
@@ -99,7 +98,7 @@ test('/disconnectが流れてきたらunsubscribeする', () => {
         connect() {
           return clientSubject;
         }
-        requestLatestMessages() { }
+        requestLatestMessages() {}
       },
     };
   });
@@ -134,7 +133,7 @@ function connectionSetup() {
       connect() {
         return clientSubject;
       }
-      requestLatestMessages() { }
+      requestLatestMessages() {}
     },
   }));
   setup({
@@ -144,9 +143,9 @@ function connectionSetup() {
         stateService: {
           state: {},
         },
-        checkNameplateHint: () => { },
-      }
-    }
+        checkNameplateHint: () => {},
+      },
+    },
   });
 
   const { NicoliveCommentViewerService } = require('./nicolive-comment-viewer');
@@ -184,6 +183,7 @@ test('chatメッセージはstateに保持する', () => {
     Array [
       Object {
         "component": "common",
+        "isModerator": false,
         "seqId": 0,
         "type": "normal",
         "value": Object {
@@ -192,6 +192,7 @@ test('chatメッセージはstateに保持する', () => {
       },
       Object {
         "component": "common",
+        "isModerator": false,
         "seqId": 1,
         "type": "normal",
         "value": Object {
@@ -258,6 +259,7 @@ test('接続エラー時にメッセージを表示する', () => {
                           Array [
                             Object {
                               "component": "system",
+                              "isModerator": false,
                               "seqId": 0,
                               "type": "n-air-emulated",
                               "value": Object {
@@ -267,6 +269,7 @@ test('接続エラー時にメッセージを表示する', () => {
                             },
                             Object {
                               "component": "system",
+                              "isModerator": false,
                               "seqId": 1,
                               "type": "n-air-emulated",
                               "value": Object {
@@ -295,6 +298,7 @@ test('スレッドの参加失敗時にメッセージを表示する', () => {
         Array [
           Object {
             "component": "system",
+            "isModerator": false,
             "seqId": 0,
             "type": "n-air-emulated",
             "value": Object {
@@ -304,6 +308,7 @@ test('スレッドの参加失敗時にメッセージを表示する', () => {
           },
           Object {
             "component": "system",
+            "isModerator": false,
             "seqId": 1,
             "type": "n-air-emulated",
             "value": Object {
@@ -330,6 +335,7 @@ test('スレッドからの追い出し発生時にメッセージを表示す�
         Array [
           Object {
             "component": "system",
+            "isModerator": false,
             "seqId": 0,
             "type": "n-air-emulated",
             "value": Object {
@@ -339,6 +345,7 @@ test('スレッドからの追い出し発生時にメッセージを表示す�
           },
           Object {
             "component": "system",
+            "isModerator": false,
             "seqId": 1,
             "type": "n-air-emulated",
             "value": Object {
