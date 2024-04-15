@@ -51,8 +51,6 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
   }
 
   function updateCommonField(fieldName: TCustomFieldName, value: string) {
-    console.log(value);
-    console.log(value.length)
     updatePlatform({ [fieldName]: value });
   }
 
