@@ -834,8 +834,12 @@ export class NicoliveClient {
     }
   }
 
+  // for DEBUG
+  skipModeratorAPICall = true;
+
   async fetchModerators(): Promise<Moderator[]> {
     console.info('API call: fetchModerators'); // DEBUG
+    if (this.skipModeratorAPICall) return [];
 
     const res = await this.get(
       `${NicoliveClient.live2BaseURL}/unama/api/v2/broadcasters/moderators`,
@@ -854,6 +858,7 @@ export class NicoliveClient {
    */
   async addModerator(userId: string): Promise<void> {
     console.info('API call: addModerator', userId); // DEBUG
+    if (this.skipModeratorAPICall) return;
 
     const res = await this.post(
       `${NicoliveClient.live2BaseURL}/unama/api/v2/broadcasters/moderators`,
@@ -871,6 +876,9 @@ export class NicoliveClient {
   }
   async removeModerator(userId: string): Promise<void> {
     console.info('API call: removeModerator', userId); // DEBUG
+    if (this.skipModeratorAPICall) {
+      return;
+    }
 
     const res = await this.delete(
       `${NicoliveClient.live2BaseURL}/unama/api/v2/broadcasters/moderators?userId=${userId}`,
