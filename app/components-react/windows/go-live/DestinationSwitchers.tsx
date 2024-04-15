@@ -192,6 +192,10 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
       const service = getPlatformService(platform);
       const platformAuthData = UserService.state.auth?.platforms[platform];
       const username = platformAuthData?.username ?? '';
+
+      // Preserving old TikTok functionality, so they can't enable the toggle if TikTok is not
+      // connected.
+      const tiktokDisabled = platform === 'tiktok' && p.disabled;
       return {
         title: $t('Stream to %{platformName}', { platformName: service.displayName }),
         description: username,
@@ -203,7 +207,7 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
             inputRef={switchInputRef}
             value={p.enabled}
             name={platform}
-            disabled={p.isPrimary}
+            disabled={p.isPrimary || tiktokDisabled}
             uncontrolled
           />
         ),
