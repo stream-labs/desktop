@@ -203,7 +203,7 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
             inputRef={switchInputRef}
             value={p.enabled}
             name={platform}
-            disabled={p.isPrimary || p.disabled}
+            disabled={p.isPrimary}
             uncontrolled
           />
         ),
