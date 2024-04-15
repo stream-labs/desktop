@@ -15,13 +15,15 @@ export type SourcePropKey =
   | 'pitch_snap'
   | 'primary_voice'
   | 'secondary_voice'
-  | 'amount';
+  | 'amount'
+  | 'pitch_shift_song'; // 仮想key pitch_shift_mode=1(song) の時こちらの値をpitch_shiftに入れます
 
 export const PresetValues = [
   {
     index: 'preset/0',
     name: '琴詠ニア',
     pitchShift: 0,
+    pitchShiftSong: 0,
     primaryVoice: 100,
     secondaryVoice: -1,
     amount: 0,
@@ -32,6 +34,7 @@ export const PresetValues = [
     index: 'preset/1',
     name: 'ずんだもん',
     pitchShift: 0,
+    pitchShiftSong: 0,
     primaryVoice: 101,
     secondaryVoice: -1,
     amount: 0,
@@ -42,6 +45,7 @@ export const PresetValues = [
     index: 'preset/2',
     name: '春日部つむぎ',
     pitchShift: 0,
+    pitchShiftSong: 0,
     primaryVoice: 102,
     secondaryVoice: -1,
     amount: 0,
@@ -54,6 +58,7 @@ export const PresetValues = [
 interface ManualParam {
   name: string;
   pitchShift: number;
+  pitchShiftSong: number;
   amount: number;
   primaryVoice: number;
   secondaryVoice: number;
@@ -61,6 +66,7 @@ interface ManualParam {
 
 interface PresetParam {
   pitchShift: number;
+  pitchShiftSong: number;
 }
 
 export interface StateParam {
@@ -68,6 +74,7 @@ export interface StateParam {
   manuals: ManualParam[];
   presets: PresetParam[];
   scenes: { [id: string]: string };
+  tab: number;
 }
 
 export interface CommonParam {
@@ -76,6 +83,7 @@ export interface CommonParam {
   description: string;
 
   pitchShift: number;
+  pitchShiftSong: number;
   amount: number;
   primaryVoice: number;
   secondaryVoice: number;
@@ -94,6 +102,7 @@ interface RtvcActiveLog {
       | {
           name: string;
           pitchShift: number;
+          pitchShiftSong: number;
           amount: number;
           primaryVoice: number;
           secondaryVoice: number;
@@ -102,6 +111,8 @@ interface RtvcActiveLog {
 }
 
 export class RtvcStateService extends PersistentStatefulService<IRtvcState> {
+  isSongMode = false;
+
   setState(v: StateParam) {
     this.SET_STATE(v);
   }
@@ -117,11 +128,21 @@ export class RtvcStateService extends PersistentStatefulService<IRtvcState> {
     const props = source.getPropertiesFormData();
 
     for (const v of values) {
-      if (v.key === 'latency') this.eventLog.latency = v.value as number;
-      const prop = props.find(a => a.name === v.key);
+      let k = v.key;
+      if (k === 'pitch_shift' && this.isSongMode) continue;
+      if (k === 'pitch_shift_song') {
+        if (!this.isSongMode) continue;
+        k = 'pitch_shift'; // 本来のkeyに変更
+      }
+      if (k === 'latency') this.eventLog.latency = v.value as number;
+      const prop = props.find(a => a.name === k);
+      // for value check console.log(`rtvc set ${k} ${prop?.value} to ${v.value}`);
       if (!prop || prop.value === v.value) continue; // no need change
       prop.value = v.value;
     }
+
+    const pitchShiftModeProp = props.find(a => a.name === 'pitch_shift_mode');
+    this.isSongMode = pitchShiftModeProp && pitchShiftModeProp.value === 1;
 
     source.setPropertiesFormData(props);
   }
@@ -129,10 +150,12 @@ export class RtvcStateService extends PersistentStatefulService<IRtvcState> {
   setSourcePropertiesByCommonParam(source: ISourceApi, p: CommonParam) {
     this.setSourceProperties(source, [
       { key: 'pitch_shift', value: p.pitchShift },
+      { key: 'pitch_shift_song', value: p.pitchShiftSong },
       { key: 'amount', value: p.amount },
       { key: 'primary_voice', value: p.primaryVoice },
       { key: 'secondary_voice', value: p.secondaryVoice },
     ]);
+    this.modifyEventLog();
   }
 
   // -- state params
@@ -141,15 +164,33 @@ export class RtvcStateService extends PersistentStatefulService<IRtvcState> {
     const r = { ...this.state.value } as StateParam;
 
     if (!r.presets) r.presets = [];
-    while (r.presets.length < PresetValues.length) r.presets.push({ pitchShift: 0 });
+    while (r.presets.length < PresetValues.length)
+      r.presets.push({ pitchShift: 0, pitchShiftSong: 0 });
 
-    // default values
+    // defaults
     if (!r.manuals)
       r.manuals = [
-        { name: 'オリジナル1', pitchShift: 0, amount: 0, primaryVoice: 0, secondaryVoice: -1 },
-        { name: 'オリジナル2', pitchShift: 0, amount: 0, primaryVoice: 0, secondaryVoice: -1 },
-        { name: 'オリジナル3', pitchShift: 0, amount: 0, primaryVoice: 0, secondaryVoice: -1 },
-      ];
+        { name: 'オリジナル1' },
+        { name: 'オリジナル2' },
+        { name: 'オリジナル3' },
+      ] as any;
+
+    const numFix = (v: any, def: number) => (typeof v === 'number' || !isNaN(v) ? v : def);
+
+    // set and repair by default values
+    r.presets.forEach(a => {
+      a.pitchShift = numFix(a.pitchShift, 0);
+      a.pitchShiftSong = numFix(a.pitchShiftSong, 0);
+    });
+
+    r.manuals.forEach(a => {
+      if (!a.name) a.name = 'none';
+      a.pitchShift = numFix(a.pitchShift, 0);
+      a.pitchShiftSong = numFix(a.pitchShiftSong, 0);
+      a.amount = numFix(a.amount, 0);
+      a.primaryVoice = numFix(a.primaryVoice, 0);
+      a.secondaryVoice = numFix(a.secondaryVoice, -1);
+    });
 
     if (!r.scenes) r.scenes = {};
     if (!r.currentIndex || typeof r.currentIndex !== 'string') r.currentIndex = 'preset/0';
@@ -181,6 +222,7 @@ export class RtvcStateService extends PersistentStatefulService<IRtvcState> {
         label: '',
         description: '',
         pitchShift: v.pitchShift,
+        pitchShiftSong: v.pitchShiftSong,
         amount: v.amount,
         primaryVoice: v.primaryVoice,
         secondaryVoice: v.secondaryVoice,
@@ -195,6 +237,7 @@ export class RtvcStateService extends PersistentStatefulService<IRtvcState> {
       label: v.label,
       description: v.description,
       pitchShift: m.pitchShift,
+      pitchShiftSong: m.pitchShiftSong,
       amount: v.amount,
       primaryVoice: v.primaryVoice,
       secondaryVoice: v.secondaryVoice,
@@ -213,7 +256,6 @@ export class RtvcStateService extends PersistentStatefulService<IRtvcState> {
     const idx = state.scenes[sceneId];
     if (state.currentIndex === idx) return; // no change
     const p = this.stateToCommonParam(state, idx);
-
     this.setSourcePropertiesByCommonParam(source, p);
     state.currentIndex = idx;
     this.setState(state);
@@ -243,16 +285,24 @@ export class RtvcStateService extends PersistentStatefulService<IRtvcState> {
     const { isManual, idx } = this.indexToNum(state, index);
     if (isManual) {
       const p = state.manuals[idx];
-      this.eventLog.param[`manual${idx}`] = {
-        name: p.name,
-        pitch_shift: p.pitchShift,
-        amount: p.amount,
-        primary_voice: p.primaryVoice,
-        secondary_voice: p.secondaryVoice,
-      };
+      const key = `manual${idx}`;
+      if (!this.eventLog.param[key]) this.eventLog.param[key] = {};
+
+      const s = this.eventLog.param[key];
+      s.name = p.name;
+      if (!this.isSongMode) s.pitch_shift = p.pitchShift;
+      if (this.isSongMode) s.pitch_shift_song = p.pitchShiftSong;
+      s.amount = p.amount;
+      s.primary_voice = p.primaryVoice;
+      s.secondary_voice = p.secondaryVoice;
     } else {
       const p = state.presets[idx];
-      this.eventLog.param[`preset${idx}`] = { pitch_shift: p.pitchShift };
+      const key = `preset${idx}`;
+      if (!this.eventLog.param[key]) this.eventLog.param[key] = {};
+
+      const s = this.eventLog.param[key];
+      if (!this.isSongMode) s.pitch_shift = p.pitchShift;
+      if (this.isSongMode) s.pitch_shift_song = p.pitchShiftSong;
     }
   }
 
