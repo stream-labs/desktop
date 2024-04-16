@@ -16,6 +16,7 @@ import Tooltip from 'components-react/shared/Tooltip';
 import PlatformAppPageView from 'components-react/shared/PlatformAppPageView';
 import { useVuex } from 'components-react/hooks';
 import { useRealmObject } from 'components-react/hooks/realm';
+import { $i } from 'services/utils';
 
 const LiveDockCtx = React.createContext<LiveDockController | null>(null);
 
@@ -80,7 +81,7 @@ class LiveDockController {
 
   get offlineImageSrc() {
     const mode = this.customizationService.isDarkTheme ? 'night' : 'day';
-    return require(`../../../media/images/sleeping-kevin-${mode}.png`);
+    return $i(`images/sleeping-kevin-${mode}.png`);
   }
 
   get hideStyleBlockers() {
@@ -447,7 +448,7 @@ function LiveDock(p: { onLeft: boolean }) {
                 </div>
               )}
             {(!ctrl.platform ||
-              (isPlatform(['youtube', 'facebook', 'twitter']) && !isStreaming)) && (
+              (isPlatform(['youtube', 'facebook', 'twitter', 'tiktok']) && !isStreaming)) && (
               <div className={cx('flex flex--center flex--column', styles.liveDockChatOffline)}>
                 <img className={styles.liveDockChatImgOffline} src={ctrl.offlineImageSrc} />
                 {!hideStyleBlockers && <span>{$t('Your chat is currently offline')}</span>}
