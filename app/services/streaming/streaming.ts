@@ -175,9 +175,6 @@ export class StreamingService
    */
   async prepopulateInfo() {
     const platforms = this.views.enabledPlatforms;
-    if (!platforms.includes('tiktok')) {
-      platforms.push('tiktok');
-    }
 
     this.UPDATE_STREAM_INFO({ lifecycle: 'prepopulate', error: null });
 
@@ -392,15 +389,15 @@ export class StreamingService
       const allPlatforms = this.views.enabledPlatforms;
       const allDestinations = this.views.customDestinations
         .filter(dest => dest.enabled)
-        .map(dest => dest.name);
+        .map(dest => dest.url);
 
       // record dual output analytics event
       this.usageStatisticsService.recordAnalyticsEvent('DualOutput', {
         type: 'StreamingDualOutput',
-        platforms: allPlatforms,
-        destinations: allDestinations,
-        horizontal: horizontalStream,
-        vertical: verticalStream,
+        platforms: JSON.stringify(allPlatforms),
+        destinations: JSON.stringify(allDestinations),
+        horizontal: JSON.stringify(horizontalStream),
+        vertical: JSON.stringify(verticalStream),
       });
 
       // if needed, set up multistreaming for dual output
