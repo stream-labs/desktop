@@ -229,7 +229,7 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     return destinations.reduce(
       (displayDestinations: TDisplayDestinations, destination: ICustomStreamDestination) => {
         if (destination.enabled) {
-          displayDestinations[destination.display ?? 'horizontal'].push(destination.name);
+          displayDestinations[destination.display ?? 'horizontal'].push(destination.url);
         }
         return displayDestinations;
       },
