@@ -15,16 +15,21 @@ import { platformAuthorizedRequest } from './utils';
 import { CustomizationService } from 'services/customization';
 import { IGoLiveSettings } from 'services/streaming';
 import { InheritMutations, mutation } from 'services/core';
-import { throwStreamError, TStreamErrorType } from 'services/streaming/stream-error';
+import { StreamError, throwStreamError, TStreamErrorType } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
 import Utils from '../utils';
 import { IVideo } from 'obs-studio-node';
 import { TDisplayType } from 'services/settings-v2';
 import { TOutputOrientation } from 'services/restream';
+<<<<<<< HEAD
 import {
   ITwitchContentClassificationLabelsRootResponse,
   TwitchContentClassificationService,
 } from './twitch/content-classification';
+=======
+import { ENotificationType, NotificationsService } from '../notifications';
+import { $t } from '../i18n';
+>>>>>>> 7f3809259 (fix(twitch): invalid tags prevent channel update, retry)
 
 export interface ITwitchStartStreamOptions {
   title: string;
@@ -77,7 +82,11 @@ export class TwitchService
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
   @Inject() twitchTagsService: TwitchTagsService;
+<<<<<<< HEAD
   @Inject() twitchContentClassificationService: TwitchContentClassificationService;
+=======
+  @Inject() notificationsService: NotificationsService;
+>>>>>>> 7f3809259 (fix(twitch): invalid tags prevent channel update, retry)
 
   static initialState: ITwitchServiceState = {
     ...BasePlatformService.initialState,
@@ -353,19 +362,59 @@ export class TwitchService
       is_enabled: contentClassificationLabels.includes(option.value),
     }));
 
-    await Promise.all([
+    const updateInfo = async (tags: ITwitchStartStreamOptions['tags']) =>
       this.requestTwitch({
         url: `${this.apiBase}/helix/channels?broadcaster_id=${this.twitchId}`,
         method: 'PATCH',
         body: JSON.stringify({
-          game_id: gameId,
+          tags,
           title,
-          tags: scopedTags,
+          game_id: gameId,
           is_branded_content: isBrandedContent,
           content_classification_labels: labels,
         }),
-      }),
-    ]);
+      });
+
+    // TODO: I would like to extract fn on all this, but the early return makes it tricky, will revisit eventually
+    try {
+      await updateInfo(scopedTags);
+    } catch (e: unknown) {
+      // Full error message from Twitch:
+      // "400 Bad Request One or more tags were not applied because they failed a moderation check: [noob, Twitch]"
+      if (e instanceof StreamError && e.details?.includes('One or more tags were not applied')) {
+        // Remove offending tags by finding the **not-valid JSON** array of tags returned from the response
+        const offendingTagsStr = e.details.match(/moderation check: \[(.+)]$/)?.[1];
+
+        // If they ever change their response format let it blow as before, we can't handle without code updates
+        if (!offendingTagsStr) {
+          throw e;
+        }
+
+        const offendingTags = offendingTagsStr.split(', ').map(str => str.toLowerCase());
+        const newTags = tags.filter(tag => !offendingTags.includes(tag.toLowerCase()));
+
+        // If we fail the second time we're throwing our hands up and let it blow up as before
+        await updateInfo(newTags);
+
+        // Remove the offending tags from their list, they can't use them anyways
+        this.twitchTagsService.actions.setTags(newTags);
+        this.SET_STREAM_SETTINGS({ title, game, tags: newTags });
+
+        // Notify the user of the tags that were removed
+        // TODO: I don't personally like calling Notification code from here
+        this.notificationsService.push({
+          message: $t(
+            'While updating your Twitch channel info, some tags were removed due to moderation rules: %{tags}',
+            { tags: offendingTags.join(', ') },
+          ),
+          playSound: false,
+          type: ENotificationType.WARNING,
+        });
+
+        return;
+      }
+    }
+
     this.SET_STREAM_SETTINGS({ title, game, tags });
   }
 
