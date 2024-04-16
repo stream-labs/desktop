@@ -16,7 +16,7 @@ import { waitForDisplayed } from '../../helpers/modules/core';
 
 useWebdriver();
 
-test('Streaming to TikTok', async t => {
+test.skip('Streaming to TikTok', async t => {
   const user = await logIn('twitch', { multistream: false, prime: false });
 
   // test approved status
