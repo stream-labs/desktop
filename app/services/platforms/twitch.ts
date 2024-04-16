@@ -413,6 +413,8 @@ export class TwitchService
 
         return;
       }
+
+      throw e;
     }
 
     this.SET_STREAM_SETTINGS({ title, game, tags });
