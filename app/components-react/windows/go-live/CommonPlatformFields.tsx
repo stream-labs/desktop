@@ -100,7 +100,7 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
               onChange={val => updateCommonField('title', val)}
               label={$t('Title')}
               required={true}
-              max={p.platform === 'twitch' ? 140 : 120}
+              max={p.platform === 'twitch' ? 140 : p.platform === 'tiktok' ? 32 : 120}
             />
 
             {/*DESCRIPTION*/}
