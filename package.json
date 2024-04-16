@@ -231,7 +231,7 @@
     "webpack-cli": "^4.10.0",
     "webpack-dev-server": "^4.15.1",
     "webpack-manifest-plugin": "^4.1.1",
-    "webpack-merge": "^5.9.0"
+    "webpack-merge": "^5.10.0"
   },
   "husky": {
     "hooks": {
