@@ -122,12 +122,10 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
       (!this.restreamView.canEnableRestream || !this.protectedModeEnabled) &&
       !this.isDualOutputMode
     ) {
-      return this.userView.auth!.primaryPlatform === 'tiktok'
-        ? [this.userView.auth!.primaryPlatform]
-        : [this.userView.auth!.primaryPlatform, 'tiktok'];
+      return [this.userView.auth!.primaryPlatform];
     }
 
-    return this.allPlatforms.filter(p => this.isPlatformLinked(p) || p === 'tiktok');
+    return this.allPlatforms.filter(p => this.isPlatformLinked(p));
   }
 
   get protectedModeEnabled() {
