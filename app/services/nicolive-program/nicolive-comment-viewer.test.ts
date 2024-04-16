@@ -1,5 +1,6 @@
 import { createSetupFunction } from 'util/test-setup';
 import { Subject } from 'rxjs';
+
 type NicoliveCommentViewerService =
   import('./nicolive-comment-viewer').NicoliveCommentViewerService;
 
@@ -15,6 +16,10 @@ const setup = createSetupFunction({
       stateChange: new Subject(),
       available: false,
     },
+    NicoliveModeratorsService: {
+      stateChange: new Subject(),
+      isModerator: () => false,
+    },
   },
 });
 
@@ -29,6 +34,9 @@ jest.mock('services/nicolive-program/nicolive-comment-local-filter', () => ({
 }));
 jest.mock('services/nicolive-program/nicolive-comment-synthesizer', () => ({
   NicoliveCommentSynthesizerService: {},
+}));
+jest.mock('services/nicolive-program/nicolive-moderators', () => ({
+  NicoliveModeratorsService: {},
 }));
 jest.mock('services/windows', () => ({
   WindowsService: {},
@@ -201,6 +209,7 @@ test('chatメッセージはstateに保持する', () => {
       },
       Object {
         "component": "system",
+        "isModerator": false,
         "seqId": 2,
         "type": "n-air-emulated",
         "value": Object {
