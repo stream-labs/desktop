@@ -1,6 +1,6 @@
 import React, { CSSProperties } from 'react';
 import { Menu, MenuItemProps, SubMenuProps } from 'antd';
-import styles from './SubMenu.m.less';
+import styles from './SubMenu.module.less';
 import cx from 'classnames';
 
 interface ISubMenuProps extends SubMenuProps, MenuItemProps {

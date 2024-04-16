@@ -4,7 +4,7 @@ import cx from 'classnames';
 import moment from 'moment';
 import { $t } from 'services/i18n';
 import { IRecentEvent } from 'services/recent-events';
-import styles from './RecentEvents.m.less';
+import styles from './RecentEvents.module.less';
 import Scrollable from 'components-react/shared/Scrollable';
 import PlatformLogo from 'components-react/shared/PlatformLogo';
 import { Services } from 'components-react/service-provider';

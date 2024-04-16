@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './SideNav.m.less';
+import styles from './SideNav.module.less';
 import { useVuex } from 'components-react/hooks';
 import { $t } from 'services/i18n';
 import { Services } from 'components-react/service-provider';

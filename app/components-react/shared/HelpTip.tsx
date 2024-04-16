@@ -3,7 +3,7 @@ import cx from 'classnames';
 import { EDismissable } from 'services/dismissables';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
-import styles from './HelpTip.m.less';
+import styles from './HelpTip.module.less';
 
 interface IHelpTipProps {
   title: string;

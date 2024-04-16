@@ -12,7 +12,7 @@ import {
   SourceShowcaseControllerCtx,
   useSourceShowcaseSettings,
 } from './useSourceShowcase';
-import styles from './SourceShowcase.m.less';
+import styles from './SourceShowcase.module.less';
 import SourceGrid from './SourceGrid';
 import Scrollable from 'components-react/shared/Scrollable';
 import pick from 'lodash/pick';

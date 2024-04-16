@@ -11,7 +11,7 @@ import { $t } from 'services/i18n';
 import { $i } from 'services/utils';
 import { ISceneCollectionsManifestEntry } from 'services/scene-collections';
 import { getOS, OS } from '../../util/operating-systems';
-import styles from './ManageSceneCollections.m.less';
+import styles from './ManageSceneCollections.module.less';
 import { TextInput } from 'components-react/shared/inputs';
 import { useVuex } from 'components-react/hooks';
 import Translate from 'components-react/shared/Translate';

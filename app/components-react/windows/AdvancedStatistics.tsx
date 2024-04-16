@@ -3,7 +3,7 @@ import cx from 'classnames';
 import { Services } from '../service-provider';
 import { useRenderInterval, useVuex } from '../hooks';
 import { $t } from '../../services/i18n';
-import styles from './AdvancedStatistics.m.less';
+import styles from './AdvancedStatistics.module.less';
 import { ModalLayout } from '../shared/ModalLayout';
 import PerformanceMetrics from '../shared/PerformanceMetrics';
 import { EStreamingState } from 'services/streaming';

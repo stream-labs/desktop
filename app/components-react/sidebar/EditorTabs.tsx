@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Services } from 'components-react/service-provider';
-import styles from './SideNav.m.less';
+import styles from './SideNav.module.less';
 import MenuItem from 'components-react/shared/MenuItem';
 import { useVuex } from 'components-react/hooks';
 import cx from 'classnames';

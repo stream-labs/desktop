@@ -16,7 +16,7 @@ import { AudioSource } from 'services/audio';
 import { Source } from 'services/sources';
 import { $t } from 'services/i18n';
 import Utils from 'services/utils';
-import styles from './AdvancedAudio.m.less';
+import styles from './AdvancedAudio.module.less';
 
 const { Panel } = Collapse;
 

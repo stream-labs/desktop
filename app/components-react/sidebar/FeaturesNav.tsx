@@ -14,7 +14,7 @@ import { TAppPage } from 'services/navigation';
 import { useVuex } from 'components-react/hooks';
 import { Services } from 'components-react/service-provider';
 import { Menu, message } from 'antd';
-import styles from './SideNav.m.less';
+import styles from './SideNav.module.less';
 import SubMenu from 'components-react/shared/SubMenu';
 import MenuItem from 'components-react/shared/MenuItem';
 import AppsNav from './AppsNav';

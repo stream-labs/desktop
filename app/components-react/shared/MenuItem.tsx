@@ -1,6 +1,6 @@
 import React, { CSSProperties } from 'react';
 import { Menu, MenuItemProps } from 'antd';
-import styles from './MenuItem.m.less';
+import styles from './MenuItem.module.less';
 import cx from 'classnames';
 
 interface IMenuProps extends MenuItemProps {

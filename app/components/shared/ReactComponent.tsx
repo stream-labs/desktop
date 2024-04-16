@@ -5,6 +5,10 @@ const reactBuild = require('components-react');
 const ReactDOM = require('react-dom');
 const React = require('react');
 
+// import * as reactBuild from 'components-react';
+// import ReactDOM from 'react-dom';
+// import react from 'react';
+
 import { Component, Prop, Watch } from 'vue-property-decorator';
 
 class WrapperProps<TComponentProps> {

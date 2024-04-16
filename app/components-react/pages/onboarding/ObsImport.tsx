@@ -7,8 +7,8 @@ import Form from 'components-react/shared/inputs/Form';
 import KevinSvg from 'components-react/shared/KevinSvg';
 import React from 'react';
 import { $t } from 'services/i18n';
-import commonStyles from './Common.m.less';
-import styles from './ObsImport.m.less';
+import commonStyles from './Common.module.less';
+import styles from './ObsImport.module.less';
 import { OnboardingModule } from './Onboarding';
 
 export function ObsImport() {

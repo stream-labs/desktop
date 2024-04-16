@@ -2,7 +2,7 @@ import React from 'react';
 import cx from 'classnames';
 import useLayout, { LayoutProps } from './hooks';
 import ResizeBar from 'components-react/root/ResizeBar';
-import styles from './Layouts.m.less';
+import styles from './Layouts.module.less';
 
 export function Default(p: React.PropsWithChildren<LayoutProps>) {
   const { mins, bars, resizes, calculateMax, setBar, componentRef } = useLayout(

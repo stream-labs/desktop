@@ -1,12 +1,11 @@
 import { useModule } from 'slap';
 import React from 'react';
 import { $t } from 'services/i18n';
-import commonStyles from './Common.m.less';
 import { OnboardingModule } from './Onboarding';
 import { Services } from 'components-react/service-provider';
 import { useWatchVuex } from 'components-react/hooks';
 import { UltraComparison } from 'components-react/shared/UltraComparison';
-import styles from './Prime.m.less';
+import styles from './Prime.module.less';
 
 export function Prime() {
   const { UserService, RecordingModeService } = Services;

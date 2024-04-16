@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useContext, createContext } from 'react';
 import { Button, Progress } from 'antd';
-import styles from './Onboarding.m.less';
-import commonStyles from './Common.m.less';
+import styles from './Onboarding.module.less';
+import commonStyles from './Common.module.less';
 import { Services } from 'components-react/service-provider';
 import { injectState, useModule, mutation } from 'slap';
 import cx from 'classnames';

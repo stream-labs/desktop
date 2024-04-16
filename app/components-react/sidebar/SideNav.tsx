@@ -7,7 +7,7 @@ import { $t } from 'services/i18n';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
 import NavTools from './NavTools';
-import styles from './SideNav.m.less';
+import styles from './SideNav.module.less';
 import { Layout, Button } from 'antd';
 import Scrollable from 'components-react/shared/Scrollable';
 import HelpTip from 'components-react/shared/HelpTip';

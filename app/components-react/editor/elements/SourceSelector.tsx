@@ -16,7 +16,7 @@ import { StreamingService } from 'services/streaming';
 import { EDismissable } from 'services/dismissables';
 import { assertIsDefined, getDefined } from '../../../util/properties-type-guards';
 import useBaseElement from './hooks';
-import styles from './SceneSelector.m.less';
+import styles from './SceneSelector.module.less';
 import Scrollable from 'components-react/shared/Scrollable';
 import HelpTip from 'components-react/shared/HelpTip';
 import Translate from 'components-react/shared/Translate';

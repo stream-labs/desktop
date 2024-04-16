@@ -6,7 +6,7 @@ import { $t } from 'services/i18n';
 import throttle from 'lodash/throttle';
 import { Services } from '../service-provider';
 import { useVuex } from '../hooks';
-import styles from './NavTools.m.less';
+import styles from './NavTools.module.less';
 import * as remote from '@electron/remote';
 import { Badge, Button, Form, Menu, Modal } from 'antd';
 import { EMenuItemKey, ENavName, IMenuItem, IParentMenuItem, menuTitles } from 'services/side-nav';

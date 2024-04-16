@@ -4,8 +4,8 @@ import KevinSvg from 'components-react/shared/KevinSvg';
 import React from 'react';
 import { $t } from 'services/i18n';
 import { $i } from 'services/utils';
-import styles from './FreshOrImport.m.less';
-import commonStyles from './Common.m.less';
+import styles from './FreshOrImport.module.less';
+import commonStyles from './Common.module.less';
 import ObsSvg from './ObsSvg';
 import { OnboardingModule } from './Onboarding';
 

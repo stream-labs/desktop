@@ -1,6 +1,6 @@
 import React, { MouseEvent, useEffect, useMemo } from 'react';
 import moment, { Moment } from 'moment';
-import css from './StreamScheduler.m.less';
+import css from './StreamScheduler.module.less';
 import cx from 'classnames';
 import { Button, Calendar, Modal, Row, Col, Spin } from 'antd';
 import { YoutubeEditStreamInfo } from '../../windows/go-live/platforms/YoutubeEditStreamInfo';

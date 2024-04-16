@@ -4,7 +4,7 @@ import AutoProgressBar from 'components-react/shared/AutoProgressBar';
 import React, { useState } from 'react';
 import { IConfigProgress } from 'services/auto-config';
 import { $t } from 'services/i18n';
-import commonStyles from './Common.m.less';
+import commonStyles from './Common.module.less';
 import { OnboardingModule } from './Onboarding';
 
 interface IConfigStepPresentation {

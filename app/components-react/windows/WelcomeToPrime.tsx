@@ -3,7 +3,7 @@ import cx from 'classnames';
 import { $t } from 'services/i18n';
 import { TAppPage } from 'services/navigation';
 import { SwitchInput } from 'components-react/shared/inputs';
-import styles from './WelcomeToPrime.m.less';
+import styles from './WelcomeToPrime.module.less';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
 import { useRealmObject } from 'components-react/hooks/realm';

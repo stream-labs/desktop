@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import cx from 'classnames';
-import styles from './LayoutEditor.m.less';
+import styles from './LayoutEditor.module.less';
 import { ELayoutElement, LayoutSlot } from 'services/layout';
 import { $t } from 'services/i18n';
 import { Services } from 'components-react/service-provider';

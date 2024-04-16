@@ -14,7 +14,7 @@ import { useTree, IOnDropInfo } from 'components-react/hooks/useTree';
 import { $t } from 'services/i18n';
 import { EDismissable } from 'services/dismissables';
 import { ERenderingMode } from 'obs-studio-node';
-import styles from './SceneSelector.m.less';
+import styles from './SceneSelector.module.less';
 import useBaseElement from './hooks';
 import { IScene } from 'services/scenes';
 import { ISceneCollectionsManifestEntry } from 'services/scene-collections';

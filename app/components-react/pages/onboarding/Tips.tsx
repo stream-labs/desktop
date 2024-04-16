@@ -6,8 +6,8 @@ import { useModule } from 'slap';
 import { StreamerKnowledgeMode } from 'services/onboarding';
 import { $t } from 'services/i18n';
 import Translate from 'components-react/shared/Translate';
-import commonStyles from './Common.m.less';
-import styles from './Tips.m.less';
+import commonStyles from './Common.module.less';
+import styles from './Tips.module.less';
 
 const openExternalLink: React.MouseEventHandler<HTMLAnchorElement> = evt => {
   evt.preventDefault();

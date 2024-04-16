@@ -12,7 +12,7 @@ import { Services } from 'components-react/service-provider';
 import { useSubscription } from 'components-react/hooks/useSubscription';
 import { useChildWindowParams, useVuex } from 'components-react/hooks';
 import { confirmAsync } from 'components-react/modals';
-import styles from './MediaGallery.m.less';
+import styles from './MediaGallery.module.less';
 
 const getTypeMap = () => ({
   title: {

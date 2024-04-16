@@ -6,7 +6,7 @@ import { ObsSettingsSection } from './ObsSettings';
 import Translate from 'components-react/shared/Translate';
 import UltraIcon from 'components-react/shared/UltraIcon';
 import ButtonHighlighted from 'components-react/shared/ButtonHighlighted';
-import styles from './Multistreaming.m.less';
+import styles from './Multistreaming.module.less';
 
 export function MultistreamingSettings() {
   const { UserService, MagicLinkService, DualOutputService, StreamingService } = Services;

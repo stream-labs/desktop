@@ -2,7 +2,7 @@ import React from 'react';
 import { $t } from 'services/i18n';
 import Translate from 'components-react/shared/Translate';
 import PlatformButton from 'components-react/shared/PlatformButton';
-import styles from './Signup.m.less';
+import styles from './Signup.module.less';
 import { Services } from 'components-react/service-provider';
 import { EPlatformCallResult } from 'services/platforms';
 

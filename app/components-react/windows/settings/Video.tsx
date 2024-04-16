@@ -8,7 +8,7 @@ import { CheckboxInput } from 'components-react/shared/inputs';
 import Tooltip from 'components-react/shared/Tooltip';
 import { EScaleType, EFPSType } from 'obs-studio-node';
 import { $t } from 'services/i18n';
-import styles from './Common.m.less';
+import styles from './Common.module.less';
 import Tabs from 'components-react/shared/Tabs';
 import { invalidFps, TDisplayType } from 'services/settings-v2/video';
 

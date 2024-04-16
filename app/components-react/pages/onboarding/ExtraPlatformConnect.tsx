@@ -3,7 +3,7 @@ import PlatformLogo from 'components-react/shared/PlatformLogo';
 import React, { useState } from 'react';
 import { $t } from 'services/i18n';
 import { LoginModule } from './Connect';
-import styles from './Connect.m.less';
+import styles from './Connect.module.less';
 import * as remote from '@electron/remote';
 import { TextInput } from 'components-react/shared/inputs/TextInput';
 import { OnboardingModule } from './Onboarding';

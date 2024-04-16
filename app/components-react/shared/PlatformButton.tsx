@@ -3,7 +3,7 @@ import { Button, ButtonProps } from 'antd';
 import cx from 'classnames';
 import { TPlatform } from '../../services/platforms';
 import PlatformLogo, { sizeMap } from './PlatformLogo';
-import styles from './PlatformButton.m.less';
+import styles from './PlatformButton.module.less';
 
 interface PlatformButtonProps extends ButtonProps {
   className?: string;

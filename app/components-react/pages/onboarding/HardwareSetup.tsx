@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { $t } from 'services/i18n';
-import commonStyles from './Common.m.less';
-import styles from './HardwareSetup.m.less';
+import commonStyles from './Common.module.less';
+import styles from './HardwareSetup.module.less';
 import { Services } from 'components-react/service-provider';
 import Display from 'components-react/shared/Display';
 import { ERenderingMode } from 'obs-studio-node';

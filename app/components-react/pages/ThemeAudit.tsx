@@ -5,7 +5,7 @@ import { FFPROBE_EXE } from 'services/highlighter/constants';
 import { pmap } from '../../util/pmap';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import Scrollable from 'components-react/shared/Scrollable';
-import styles from './ThemeAudit.m.less';
+import styles from './ThemeAudit.module.less';
 import groupBy from 'lodash/groupBy';
 import { Tabs, Modal } from 'antd';
 import Display from 'components-react/shared/Display';

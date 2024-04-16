@@ -9,7 +9,7 @@ import { ModalLayout } from 'components-react/shared/ModalLayout';
 import Display from 'components-react/shared/Display';
 import { Services } from 'components-react/service-provider';
 import { useChildWindowParams, useVuex } from 'components-react/hooks';
-import styles from './AddSource.m.less';
+import styles from './AddSource.module.less';
 import { TextInput, SwitchInput } from 'components-react/shared/inputs';
 import Form, { useForm } from 'components-react/shared/inputs/Form';
 import Scrollable from 'components-react/shared/Scrollable';

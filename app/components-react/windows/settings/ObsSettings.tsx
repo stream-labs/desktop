@@ -3,7 +3,7 @@ import * as pageComponents from './pages';
 import { useObsSettings } from './useObsSettings';
 import { ObsFormGroup } from '../../obs/ObsForm';
 import Form from '../../shared/inputs/Form';
-import css from './ObsSettings.m.less';
+import css from './ObsSettings.module.less';
 
 /**
  * Renders a settings page

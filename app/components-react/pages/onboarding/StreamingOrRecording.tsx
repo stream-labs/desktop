@@ -2,7 +2,7 @@ import { Button, Divider } from 'antd';
 import React, { useState } from 'react';
 import { $t } from 'services/i18n';
 import { $i } from 'services/utils';
-import styles from './StreamingOrRecording.m.less';
+import styles from './StreamingOrRecording.module.less';
 import { OnboardingModule } from './Onboarding';
 import cx from 'classnames';
 import { confirmAsync } from 'components-react/modals';

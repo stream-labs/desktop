@@ -6,7 +6,7 @@ import { useVuex } from 'components-react/hooks';
 import { ListInput } from 'components-react/shared/inputs';
 import { ELayoutElement } from 'services/layout';
 import { $t } from 'services/i18n';
-import styles from './LayoutEditor.m.less';
+import styles from './LayoutEditor.module.less';
 import { useLayoutEditor } from './hooks';
 import Form from '../../shared/inputs/Form';
 

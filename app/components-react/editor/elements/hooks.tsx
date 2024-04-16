@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { $t } from 'services/i18n';
-import styles from './BaseElement.m.less';
+import styles from './BaseElement.module.less';
 import Scrollable from 'components-react/shared/Scrollable';
 import { useModule, injectState, mutation } from 'slap';
 

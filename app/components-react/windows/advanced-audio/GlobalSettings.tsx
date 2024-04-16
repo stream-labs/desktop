@@ -6,7 +6,7 @@ import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
 import { $t } from 'services/i18n';
 import Utils from 'services/utils';
-import styles from './AdvancedAudio.m.less';
+import styles from './AdvancedAudio.module.less';
 import { ObsSettings, ObsSettingsSection } from '../../windows/settings/ObsSettings';
 
 const trackOptions = [

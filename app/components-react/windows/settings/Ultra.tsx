@@ -2,7 +2,7 @@ import React from 'react';
 import * as remote from '@electron/remote';
 import cx from 'classnames';
 import { UltraComparison } from 'components-react/shared/UltraComparison';
-import styles from './Ultra.m.less';
+import styles from './Ultra.module.less';
 import { $t } from 'services/i18n';
 import { $i } from 'services/utils';
 import { Services } from 'components-react/service-provider';

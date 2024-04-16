@@ -9,7 +9,7 @@ import * as remote from '@electron/remote';
 import { injectFormBinding, useModule } from 'slap';
 import { ENavName, EMenuItemKey, IAppMenuItem, menuTitles } from 'services/side-nav';
 import { useVuex } from 'components-react/hooks';
-import styles from './Appearance.m.less';
+import styles from './Appearance.module.less';
 import cx from 'classnames';
 import { EAppPageSlot } from 'services/platform-apps';
 import Scrollable from 'components-react/shared/Scrollable';

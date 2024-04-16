@@ -5,7 +5,7 @@ import Utils from 'services/utils';
 import { useVuex } from 'components-react/hooks';
 import { Services } from 'components-react/service-provider';
 import { $t } from 'services/i18n';
-import styles from './PlatformAppPageView.m.less';
+import styles from './PlatformAppPageView.module.less';
 
 export default function PlatformAppPageView(p: {
   appId: string;

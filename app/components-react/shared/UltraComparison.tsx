@@ -1,6 +1,6 @@
 import React from 'react';
 import { $t } from 'services/i18n';
-import styles from './UltraComparison.m.less';
+import styles from './UltraComparison.module.less';
 import cx from 'classnames';
 import { Services } from 'components-react/service-provider';
 import UltraIcon from 'components-react/shared/UltraIcon';

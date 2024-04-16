@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './LayoutEditor.m.less';
+import styles from './LayoutEditor.module.less';
 import { ELayoutElement, ELayout } from 'services/layout';
 import { $t } from 'services/i18n';
 import Scrollable from 'components-react/shared/Scrollable';

@@ -2,7 +2,7 @@ import { Button, Col, Collapse, Layout, Row, Spin } from 'antd';
 import React, { ReactNode } from 'react';
 import { useWidget } from './useWidget';
 import Display from '../../shared/Display';
-import css from './WidgetLayout.m.less';
+import css from './WidgetLayout.module.less';
 import Form, { useForm } from '../../shared/inputs/Form';
 import { ObsForm } from '../../obs/ObsForm';
 import { $t } from '../../../services/i18n';

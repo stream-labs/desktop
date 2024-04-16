@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import * as cp from 'child_process';
 import * as path from 'path';
 import vuePlugin from '@vitejs/plugin-vue2';
-import commonjs from 'vite-plugin-commonjs';
+import { viteCommonjs } from '@originjs/vite-plugin-commonjs'
 
 const commit = cp.execSync('git rev-parse --short HEAD').toString().replace('\n', '');
 const OUTPUT_DIR = path.join(__dirname, 'bundles');
@@ -10,7 +10,7 @@ const OUTPUT_DIR = path.join(__dirname, 'bundles');
 const plugins = [];
 
 plugins.push(vuePlugin());
-plugins.push(commonjs());
+// plugins.push(viteCommonjs());
 
 // function nodeNativePlugin() {
 //   return {
@@ -146,12 +146,19 @@ export default defineConfig({
   build: {
     manifest: true,
     minify: false, // TODO: Remove
-    rollupOptions: {
-      input: {
+    lib: {
+      entry: {
         renderer: './app/app.ts',
-        // updater: './updater/mac/ui.js',
-        // 'guest-api': './guest-api',
+        react: './app/components-react/index.ts',
       },
+    },
+    rollupOptions: {
+      // input: {
+      //   renderer: './app/app.ts',
+      //   react: `./app/components-react/index.ts`,
+      //   // updater: './updater/mac/ui.js',
+      //   // 'guest-api': './guest-api',
+      // },
       external: id => {
         // console.log('EXTERNAL?', id);
         return externals.includes(id);
@@ -164,7 +171,7 @@ export default defineConfig({
             return `require("${id}")`;
           }
         },
-      }
+      },
     },
     outDir: OUTPUT_DIR,
   },

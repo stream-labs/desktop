@@ -1,6 +1,6 @@
 import React, { CSSProperties, PropsWithChildren, HTMLAttributes } from 'react';
 import { Tooltip as AntdTooltip } from 'antd';
-import styles from './Tooltip.m.less';
+import styles from './Tooltip.module.less';
 import cx from 'classnames';
 
 type TTipPosition =

@@ -3,7 +3,7 @@ import * as remote from '@electron/remote';
 import { Tooltip } from 'antd';
 import { $t } from 'services/i18n';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
-import styles from './RecordingHistory.m.less';
+import styles from './RecordingHistory.module.less';
 import AutoProgressBar from 'components-react/shared/AutoProgressBar';
 import { GetSLID } from 'components-react/highlighter/StorageUpload';
 import { ENotificationType } from 'services/notifications';

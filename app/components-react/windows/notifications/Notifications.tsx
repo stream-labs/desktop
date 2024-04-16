@@ -6,7 +6,7 @@ import { Services } from 'components-react/service-provider';
 import Scrollable from 'components-react/shared/Scrollable';
 import { INotification } from 'services/notifications';
 import { $t } from 'services/i18n';
-import styles from './Notifications.m.less';
+import styles from './Notifications.module.less';
 
 export default function Notifications() {
   const { NotificationsService } = Services;

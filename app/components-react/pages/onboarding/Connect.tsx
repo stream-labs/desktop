@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
-import styles from './Connect.m.less';
-import commonStyles from './Common.m.less';
+import styles from './Connect.module.less';
+import commonStyles from './Common.module.less';
 import { $t } from 'services/i18n';
 import { Services } from 'components-react/service-provider';
 import { injectState, useModule, mutation } from 'slap';

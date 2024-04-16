@@ -7,7 +7,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import namingHelpers from '../../../util/NamingHelpers';
 import { Services } from '../../service-provider';
 import { ObsGenericSettingsForm } from './ObsSettings';
-import css from './Stream.m.less';
+import css from './Stream.module.less';
 import cx from 'classnames';
 import { Button, message, Tooltip } from 'antd';
 import PlatformLogo from '../../shared/PlatformLogo';

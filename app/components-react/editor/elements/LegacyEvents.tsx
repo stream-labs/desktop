@@ -5,7 +5,7 @@ import { $t } from 'services/i18n';
 import useBaseElement from './hooks';
 import { Services } from 'components-react/service-provider';
 import BrowserView from 'components-react/shared/BrowserView';
-import styles from './RecentEvents.m.less';
+import styles from './RecentEvents.module.less';
 
 const mins = { x: 360, y: 150 };
 

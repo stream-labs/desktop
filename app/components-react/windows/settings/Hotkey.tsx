@@ -1,7 +1,7 @@
 import React, { useState, useEffect, KeyboardEvent, MouseEvent, UIEvent } from 'react';
 import { IHotkey, IBinding } from 'services/hotkeys';
 import cx from 'classnames';
-import styles from './Hotkey.m.less';
+import styles from './Hotkey.module.less';
 import HotkeyBinding from 'components-react/shared/HotkeyBinding';
 
 /**

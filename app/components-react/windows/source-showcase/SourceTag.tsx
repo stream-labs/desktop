@@ -4,7 +4,7 @@ import cx from 'classnames';
 import { WidgetDisplayData, WidgetType } from 'services/widgets';
 import { SourceDisplayData } from 'services/sources';
 import { useSourceShowcaseSettings } from './useSourceShowcase';
-import styles from './SourceShowcase.m.less';
+import styles from './SourceShowcase.module.less';
 import { useVuex } from 'components-react/hooks';
 import { Services } from '../../service-provider';
 

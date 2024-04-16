@@ -19,7 +19,7 @@ import { message } from 'antd';
 import { $t } from '../../../services/i18n';
 import { IStreamError } from '../../../services/streaming/stream-error';
 import { IGoLiveSettings } from '../../../services/streaming';
-import styles from './StreamScheduler.m.less';
+import styles from './StreamScheduler.module.less';
 import React from 'react';
 import { initStore, useController } from '../../hooks/zustand';
 

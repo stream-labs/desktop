@@ -8,7 +8,7 @@ import Scrollable from 'components-react/shared/Scrollable';
 import { Services } from 'components-react/service-provider';
 import { useOneOffWindowParams, useVuex } from 'components-react/hooks';
 import { useSubscription } from 'components-react/hooks/useSubscription';
-import styles from './Projector.m.less';
+import styles from './Projector.module.less';
 
 export default function Projector() {
   const { WindowsService, SourcesService } = Services;
