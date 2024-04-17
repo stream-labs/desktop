@@ -108,6 +108,7 @@ export interface ISourceAddOptions<TPropertiesManagerSettings = Dictionary<any>>
   deinterlaceMode?: EDeinterlaceMode;
   deinterlaceFieldOrder?: EDeinterlaceFieldOrder;
   display?: TDisplayType;
+  dimensions?: IVec2; // Used for dual output to set dimensions of a vertical scene source
 }
 
 export type TSourceType =

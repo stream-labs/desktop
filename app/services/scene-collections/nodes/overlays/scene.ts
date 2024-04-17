@@ -7,6 +7,7 @@ interface ISceneNodeSchema {
   sceneId: string;
   width: number; // Exported base resolution width
   height: number; // Exported base resolution height
+  dualOutputSceneSourceId?: string;
 }
 
 interface IContext {

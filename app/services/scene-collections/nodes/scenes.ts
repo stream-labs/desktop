@@ -12,6 +12,7 @@ export interface ISceneSchema {
   active: boolean;
   hotkeys?: HotkeysNode;
   filters?: SceneFiltersNode;
+  dualOutputSceneSourceId?: string;
 }
 
 export class ScenesNode extends ArrayNode<ISceneSchema, {}, Scene> {
@@ -46,6 +47,7 @@ export class ScenesNode extends ArrayNode<ISceneSchema, {}, Scene> {
             id: scene.id,
             name: scene.name,
             active: this.scenesService.views.activeSceneId === scene.id,
+            dualOutputSceneSourceId: scene?.dualOutputSceneSourceId,
           });
         });
     });

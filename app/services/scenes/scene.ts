@@ -39,6 +39,7 @@ export class Scene {
   name: string;
   nodes: (ISceneItem | ISceneItemFolder)[];
   nodeMap?: Dictionary<string>;
+  dualOutputSceneSourceId?: string;
   resourceId: string;
 
   private _resourceId: string;
@@ -113,6 +114,10 @@ export class Scene {
     return this.state.nodes
       .filter(node => node.sceneNodeType === 'item')
       .map(item => this.getItem(item.id)!);
+  }
+
+  getItemsIds(): string[] {
+    return this.state.nodes.filter(node => node.sceneNodeType === 'item').map(item => item.id);
   }
 
   getFolders(): SceneItemFolder[] {

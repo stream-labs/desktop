@@ -5,6 +5,7 @@ import { DualOutputService } from 'services/dual-output';
 import { Inject } from 'services/core/injector';
 import { $t } from 'services/i18n';
 import { SceneCollectionsService } from 'services/scene-collections';
+import { EditorService } from 'services/editor';
 
 /**
  * Creates an item from an existing source
@@ -23,6 +24,7 @@ export class CreateExistingItemCommand extends Command {
   @Inject() private scenesService: ScenesService;
   @Inject() private dualOutputService: DualOutputService;
   @Inject() private sceneCollectionsService: SceneCollectionsService;
+  @Inject() private editorService: EditorService;
 
   private sceneItemId: string;
 
@@ -45,25 +47,50 @@ export class CreateExistingItemCommand extends Command {
     // check the existence of all scene node maps because the scene may not have a
     // node map created for it
     if (this.dualOutputService.views.hasSceneNodeMaps) {
-      if (this.dualOutputVerticalNodeId) {
-        Promise.resolve(
-          this.dualOutputService.actions.return.createOrAssignOutputNode(
-            item,
-            'vertical',
-            false,
-            this.sceneId,
-            this.dualOutputVerticalNodeId,
-          ),
+      if (item.type === 'scene') {
+        const verticalScene = this.scenesService.createDualOutputSceneSource(item.sourceId);
+
+        const verticalSceneItem = this.scenesService.views
+          .getScene(this.sceneId)
+          .addSource(verticalScene.id, {
+            id: this.dualOutputVerticalNodeId,
+            display: 'vertical',
+          });
+
+        const cropHeight =
+          this.editorService.baseResolutions.vertical.baseHeight - verticalSceneItem.height;
+        verticalSceneItem.setTransform({
+          crop: { bottom: cropHeight },
+        });
+
+        this.sceneCollectionsService.createNodeMapEntry(
+          this.sceneId,
+          item.id,
+          verticalSceneItem.id,
         );
+
+        this.dualOutputVerticalNodeId = verticalSceneItem.id;
       } else {
-        Promise.resolve(
-          this.dualOutputService.actions.return.createOrAssignOutputNode(
-            item,
-            'vertical',
-            false,
-            this.sceneId,
-          ),
-        ).then(node => (this.dualOutputVerticalNodeId = node.id));
+        if (this.dualOutputVerticalNodeId) {
+          Promise.resolve(
+            this.dualOutputService.actions.return.createOrAssignOutputNode(
+              item,
+              'vertical',
+              false,
+              this.sceneId,
+              this.dualOutputVerticalNodeId,
+            ),
+          );
+        } else {
+          Promise.resolve(
+            this.dualOutputService.actions.return.createOrAssignOutputNode(
+              item,
+              'vertical',
+              false,
+              this.sceneId,
+            ),
+          ).then(node => (this.dualOutputVerticalNodeId = node.id));
+        }
       }
     }
 
@@ -74,7 +101,15 @@ export class CreateExistingItemCommand extends Command {
     this.scenesService.views.getScene(this.sceneId).removeItem(this.sceneItemId);
 
     if (this.dualOutputVerticalNodeId) {
+      const dualOutputSceneItem = this.scenesService.views
+        .getScene(this.sceneId)
+        .getItem(this.dualOutputVerticalNodeId);
+
       this.scenesService.views.getScene(this.sceneId).removeItem(this.dualOutputVerticalNodeId);
+
+      if (dualOutputSceneItem.type === 'scene') {
+        this.scenesService.removeScene(dualOutputSceneItem.sourceId);
+      }
       this.sceneCollectionsService.removeNodeMapEntry(this.sceneId, this.sceneItemId);
     }
   }

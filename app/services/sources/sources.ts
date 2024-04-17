@@ -342,12 +342,15 @@ export class SourcesService extends StatefulService<ISourcesState> {
     const id = obsInput.name;
     const type: TSourceType = obsInput.id as TSourceType;
     const managerType = options.propertiesManager || 'default';
-    const width = options?.display
-      ? this.videoSettingsService.baseResolutions[options?.display].baseWidth
-      : obsInput.width;
-    const height = options?.display
-      ? this.videoSettingsService.baseResolutions[options?.display].baseHeight
-      : obsInput.height;
+    const width =
+      this.videoSettingsService.baseResolutions[options?.display]?.baseWidth ??
+      options?.dimensions?.x ??
+      obsInput.width;
+
+    const height =
+      this.videoSettingsService.baseResolutions[options?.display]?.baseHeight ??
+      options?.dimensions?.y ??
+      obsInput.height;
 
     this.ADD_SOURCE({
       id,

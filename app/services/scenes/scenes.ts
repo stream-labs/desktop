@@ -14,6 +14,10 @@ import uuid from 'uuid/v4';
 import { DualOutputService } from 'services/dual-output';
 import { TDisplayType } from 'services/settings-v2/video';
 import { ViewHandler } from 'services/core';
+import { EditorService } from 'services/editor';
+import { SceneCollectionsService } from 'services/scene-collections';
+import { ScalableRectangle } from 'util/ScalableRectangle';
+import { v2 } from 'util/vec2';
 
 export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
 
@@ -22,6 +26,7 @@ export interface IScene {
   name: string;
   nodes: (ISceneItem | ISceneItemFolder)[];
   nodeMap?: Dictionary<string>;
+  dualOutputSceneSourceId?: string;
 }
 
 export interface ISceneNodeAddOptions {
@@ -270,6 +275,8 @@ class ScenesViews extends ViewHandler<IScenesState> {
 
 export class ScenesService extends StatefulService<IScenesState> {
   @Inject() private dualOutputService: DualOutputService;
+  @Inject() private editorService: EditorService;
+  @Inject() private sceneCollectionsService: SceneCollectionsService;
 
   static initialState: IScenesState = {
     activeSceneId: '',
@@ -293,11 +300,12 @@ export class ScenesService extends StatefulService<IScenesState> {
   @Inject() private transitionsService: TransitionsService;
 
   @mutation()
-  private ADD_SCENE(id: string, name: string) {
+  private ADD_SCENE(id: string, name: string, dualOutputSceneSourceId?: string) {
     Vue.set<IScene>(this.state.scenes, id, {
       id,
       name,
       nodes: [],
+      dualOutputSceneSourceId,
     });
     this.state.displayOrder.push(id);
   }
@@ -355,6 +363,98 @@ export class ScenesService extends StatefulService<IScenesState> {
 
     this.sceneAdded.next(this.state.scenes[id]);
     if (options.makeActive) this.makeSceneActive(id);
+
+    return this.views.getScene(id);
+  }
+
+  /**
+   * Create a scene to use as a source in the vertical display in dual output mode
+   * to render scene sources in the vertical display.
+   * @remark In order to render a scene source in dual output mode, we need to create
+   * a new scene that is a copy of the horizontal scene source in the horizontal display
+   * and a scaled copy of the horizontal scene source in the vertical display
+   * @param sceneId - id of the horizontal scene to copy
+   * @returns id of vertical scene created for the dual output vertical scene source
+   */
+  createDualOutputSceneSource(sceneId: string) {
+    // Get an id to identify the scene on the frontend
+    const id = `vertical_${sceneId}`;
+    this.ADD_SCENE(id, id, sceneId);
+    const obsScene = SceneFactory.create(id);
+
+    // calculate scale
+    const verticalBaseWidth = this.editorService.baseResolutions.vertical.baseWidth;
+    const horizontalBaseWidth = this.editorService.baseResolutions.horizontal.baseWidth;
+    const scale =
+      Math.min(verticalBaseWidth, horizontalBaseWidth) /
+      Math.max(verticalBaseWidth, horizontalBaseWidth);
+    const scaleDelta = {
+      x: 1 * scale,
+      y: 1 * scale,
+    };
+    const scaledHeight = Math.ceil(
+      this.editorService.baseResolutions.horizontal.baseHeight * scale,
+    );
+
+    // keep horizontal base resolution to maintain the same dimensions for scene sources in the vertical display
+    this.sourcesService.addSource(obsScene.source, id, {
+      sourceId: id,
+      dimensions: { x: verticalBaseWidth, y: scaledHeight },
+    });
+
+    const dualOutputSceneSource = this.views.getScene(id)!;
+    const oldScene = this.views.getScene(sceneId);
+    if (!oldScene) return;
+
+    oldScene
+      .getItems()
+      .slice()
+      .reverse()
+      .forEach(item => {
+        // only copy horizontal nodes
+        if (item?.display === 'vertical') return;
+
+        const rect = new ScalableRectangle(item.rectangle);
+        let currentScale = v2();
+        let currentPosition = v2();
+        rect.normalized(() => {
+          currentScale = v2(rect.scaleX, rect.scaleY);
+          currentPosition = v2(rect.x, rect.y);
+        });
+
+        const newScale = v2(scaleDelta).multiply(currentScale);
+        const newPosition = v2(scaleDelta).multiply(currentPosition);
+
+        rect.normalized(() => {
+          rect.withOrigin({ x: 0, y: 0 }, () => {
+            rect.x = newPosition.x;
+            rect.y = newPosition.y;
+            rect.scaleX = newScale.x;
+            rect.scaleY = newScale.y;
+          });
+        });
+
+        const transform = {
+          ...item.transform,
+          position: {
+            x: rect.x,
+            y: rect.y,
+          },
+          scale: {
+            x: newScale.x,
+            y: newScale.y,
+          },
+        };
+
+        const verticalItem = dualOutputSceneSource.addSource(item.sourceId, {
+          display: 'vertical',
+          initialTransform: transform,
+        });
+
+        // add node map entry for vertical scene source using the horizontal scene source item as the key
+        // because any transforms to the horizontal scene source will need to be applied to the vertical scene source
+        this.sceneCollectionsService.createNodeMapEntry(id, item.id, verticalItem.id);
+      });
 
     return this.views.getScene(id);
   }
