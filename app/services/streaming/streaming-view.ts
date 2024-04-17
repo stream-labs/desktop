@@ -22,6 +22,7 @@ import difference from 'lodash/difference';
 import { Services } from '../../components-react/service-provider';
 import { getDefined } from '../../util/properties-type-guards';
 import { TDisplayType } from 'services/settings-v2';
+import compact from 'lodash/compact';
 
 /**
  * The stream info view is responsible for keeping
@@ -122,7 +123,10 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
       (!this.restreamView.canEnableRestream || !this.protectedModeEnabled) &&
       !this.isDualOutputMode
     ) {
-      return [this.userView.auth!.primaryPlatform];
+      return compact([
+        this.userView.auth!.primaryPlatform,
+        this.isPlatformLinked('tiktok') && 'tiktok',
+      ]);
     }
 
     return this.allPlatforms.filter(p => this.isPlatformLinked(p));
