@@ -75,9 +75,9 @@ test('Dual Output Selective Recording is Horizontal Only', async (t: TExecutionC
  * Dual Output Go Live
  */
 
-test('Dual Output Go Live Non-Ultra', async t => {
+test('Dual Output Go Live Non-Ultra', async (t: TExecutionContext) => {
   // non-ultra user
-  const user = await logIn('twitch');
+  const user = await logIn('twitch', { prime: false });
   await toggleDualOutputMode();
   await prepareToGoLive();
   await clickGoLive();
