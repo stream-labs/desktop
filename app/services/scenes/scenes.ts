@@ -20,12 +20,14 @@ import { ScalableRectangle } from 'util/ScalableRectangle';
 import { v2 } from 'util/vec2';
 
 export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
+export type TSceneType = 'scene' | 'source';
 
 export interface IScene {
   id: string;
   name: string;
   nodes: (ISceneItem | ISceneItemFolder)[];
   nodeMap?: Dictionary<string>;
+  sceneType?: TSceneType;
   dualOutputSceneSourceId?: string;
 }
 
@@ -69,6 +71,8 @@ export interface ISceneCreateOptions {
   duplicateSourcesFromScene?: string;
   sceneId?: string; // A new ID will be generated if one is not provided
   makeActive?: boolean;
+  sceneType?: TSceneType;
+  dualOutputSceneSourceId?: string;
 }
 
 export interface ITransform {
@@ -183,10 +187,18 @@ class ScenesViews extends ViewHandler<IScenesState> {
     return new Scene(sceneModel.id);
   }
 
-  sceneSourcesForScene(sceneId: string): SceneItem[] {
+  singleOutputSceneSources(sceneId: string): SceneItem[] {
     const scene = this.getScene(sceneId);
     if (!scene) return [];
-    return scene.getItems().filter(sceneItem => sceneItem.type === 'scene');
+    return scene.getItems().filter(sceneItem => {
+      // filter out any scene sources that already have vertical scene sources created for them
+      if (sceneItem.type === 'scene') {
+        const sceneSource = this.getScene(sceneItem.sourceId);
+        if (sceneSource?.sceneType === 'scene' && !sceneSource?.dualOutputSceneSourceId) {
+          return sceneItem;
+        }
+      }
+    });
   }
 
   get activeSceneId() {
@@ -300,11 +312,17 @@ export class ScenesService extends StatefulService<IScenesState> {
   @Inject() private transitionsService: TransitionsService;
 
   @mutation()
-  private ADD_SCENE(id: string, name: string, dualOutputSceneSourceId?: string) {
+  private ADD_SCENE(
+    id: string,
+    name: string,
+    sceneType: TSceneType = 'scene',
+    dualOutputSceneSourceId?: string,
+  ) {
     Vue.set<IScene>(this.state.scenes, id, {
       id,
       name,
       nodes: [],
+      sceneType,
       dualOutputSceneSourceId,
     });
     this.state.displayOrder.push(id);
@@ -333,7 +351,7 @@ export class ScenesService extends StatefulService<IScenesState> {
   createScene(name: string, options: ISceneCreateOptions = {}) {
     // Get an id to identify the scene on the frontend
     const id = options.sceneId || `scene_${uuid()}`;
-    this.ADD_SCENE(id, name);
+    this.ADD_SCENE(id, name, options?.sceneType, options?.dualOutputSceneSourceId);
     const obsScene = SceneFactory.create(id);
     this.sourcesService.addSource(obsScene.source, name, { sourceId: id, display: 'horizontal' });
 
@@ -378,9 +396,11 @@ export class ScenesService extends StatefulService<IScenesState> {
    */
   createDualOutputSceneSource(sceneId: string) {
     // Get an id to identify the scene on the frontend
-    const id = `vertical_${sceneId}`;
-    this.ADD_SCENE(id, id, sceneId);
-    const obsScene = SceneFactory.create(id);
+    const verticalSceneId = `vertical_${sceneId}`;
+    this.ADD_SCENE(verticalSceneId, verticalSceneId, 'source', sceneId);
+    const obsScene = SceneFactory.create(verticalSceneId);
+    const horizontalScene = this.views.getScene(sceneId);
+    horizontalScene.setDualOutputSceneSourceId(verticalSceneId);
 
     // calculate scale
     const verticalBaseWidth = this.editorService.baseResolutions.vertical.baseWidth;
@@ -397,12 +417,12 @@ export class ScenesService extends StatefulService<IScenesState> {
     );
 
     // keep horizontal base resolution to maintain the same dimensions for scene sources in the vertical display
-    this.sourcesService.addSource(obsScene.source, id, {
-      sourceId: id,
+    this.sourcesService.addSource(obsScene.source, verticalSceneId, {
+      sourceId: verticalSceneId,
       dimensions: { x: verticalBaseWidth, y: scaledHeight },
     });
 
-    const dualOutputSceneSource = this.views.getScene(id)!;
+    const dualOutputSceneSource = this.views.getScene(verticalSceneId)!;
     const oldScene = this.views.getScene(sceneId);
     if (!oldScene) return;
 
@@ -453,10 +473,38 @@ export class ScenesService extends StatefulService<IScenesState> {
 
         // add node map entry for vertical scene source using the horizontal scene source item as the key
         // because any transforms to the horizontal scene source will need to be applied to the vertical scene source
-        this.sceneCollectionsService.createNodeMapEntry(id, item.id, verticalItem.id);
+        this.sceneCollectionsService.createNodeMapEntry(verticalSceneId, item.id, verticalItem.id);
       });
 
-    return this.views.getScene(id);
+    return this.views.getScene(verticalSceneId);
+  }
+
+  createDualOutputSceneSourceSceneItem(
+    sceneId: string,
+    horizontalSceneSourceId: string,
+    horizontalSceneItemId: string,
+    verticalSceneSourceId?: string,
+  ): SceneItem {
+    const verticalScene = this.createDualOutputSceneSource(horizontalSceneSourceId);
+
+    const verticalSceneItem = this.views.getScene(sceneId).addSource(verticalScene.id, {
+      id: verticalSceneSourceId,
+      display: 'vertical',
+    });
+
+    const cropHeight =
+      this.editorService.baseResolutions.vertical.baseHeight - verticalSceneItem.height;
+    verticalSceneItem.setTransform({
+      crop: { bottom: cropHeight },
+    });
+
+    this.sceneCollectionsService.createNodeMapEntry(
+      sceneId,
+      horizontalSceneItemId,
+      verticalSceneItem.id,
+    );
+
+    return verticalSceneItem;
   }
 
   canRemoveScene() {

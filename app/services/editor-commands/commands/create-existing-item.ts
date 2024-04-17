@@ -5,7 +5,6 @@ import { DualOutputService } from 'services/dual-output';
 import { Inject } from 'services/core/injector';
 import { $t } from 'services/i18n';
 import { SceneCollectionsService } from 'services/scene-collections';
-import { EditorService } from 'services/editor';
 
 /**
  * Creates an item from an existing source
@@ -24,7 +23,6 @@ export class CreateExistingItemCommand extends Command {
   @Inject() private scenesService: ScenesService;
   @Inject() private dualOutputService: DualOutputService;
   @Inject() private sceneCollectionsService: SceneCollectionsService;
-  @Inject() private editorService: EditorService;
 
   private sceneItemId: string;
 
@@ -48,28 +46,12 @@ export class CreateExistingItemCommand extends Command {
     // node map created for it
     if (this.dualOutputService.views.hasSceneNodeMaps) {
       if (item.type === 'scene') {
-        const verticalScene = this.scenesService.createDualOutputSceneSource(item.sourceId);
-
-        const verticalSceneItem = this.scenesService.views
-          .getScene(this.sceneId)
-          .addSource(verticalScene.id, {
-            id: this.dualOutputVerticalNodeId,
-            display: 'vertical',
-          });
-
-        const cropHeight =
-          this.editorService.baseResolutions.vertical.baseHeight - verticalSceneItem.height;
-        verticalSceneItem.setTransform({
-          crop: { bottom: cropHeight },
-        });
-
-        this.sceneCollectionsService.createNodeMapEntry(
+        this.dualOutputVerticalNodeId = this.scenesService.createDualOutputSceneSourceSceneItem(
           this.sceneId,
+          item.sourceId,
           item.id,
-          verticalSceneItem.id,
-        );
-
-        this.dualOutputVerticalNodeId = verticalSceneItem.id;
+          this.dualOutputVerticalNodeId,
+        ).id;
       } else {
         if (this.dualOutputVerticalNodeId) {
           Promise.resolve(

@@ -1,5 +1,5 @@
 import { ArrayNode } from '../array-node';
-import { ScenesService, Scene } from '../../../scenes';
+import { ScenesService, Scene, TSceneType } from '../../../scenes';
 import { IFolderSchema, SlotsNode, TSlotSchema } from './slots';
 import uuid from 'uuid';
 
@@ -7,6 +7,8 @@ interface ISchema {
   name: string;
   sceneId: string;
   slots: SlotsNode;
+  sceneType?: TSceneType;
+  dualOutputSceneSourceId?: string;
 }
 
 interface IContext {
@@ -15,7 +17,7 @@ interface IContext {
 }
 
 export class ScenesNode extends ArrayNode<ISchema, IContext, Scene> {
-  schemaVersion = 2;
+  schemaVersion = 3;
 
   scenesService: ScenesService = ScenesService.instance;
 
@@ -35,12 +37,16 @@ export class ScenesNode extends ArrayNode<ISchema, IContext, Scene> {
       slots,
       name: scene.name,
       sceneId: scene.id,
+      sceneType: scene?.sceneType,
+      dualOutputSceneSourceId: scene?.dualOutputSceneSourceId,
     };
   }
 
   async loadItem(obj: ISchema, context: IContext): Promise<() => Promise<void>> {
     const scene = this.scenesService.createScene(obj.name, {
       sceneId: obj.sceneId,
+      sceneType: obj?.sceneType ?? 'scene',
+      dualOutputSceneSourceId: obj?.dualOutputSceneSourceId,
     });
 
     // Load items into the scene after all scenes have been created

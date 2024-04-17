@@ -1,6 +1,6 @@
 import { ArrayNode } from './array-node';
 import { SceneItemsNode } from './scene-items';
-import { ScenesService, Scene } from '../../scenes';
+import { ScenesService, Scene, TSceneType } from '../../scenes';
 import { SourcesService } from '../../sources';
 import { HotkeysNode } from './hotkeys';
 import { SceneFiltersNode } from './scene-filters';
@@ -12,6 +12,7 @@ export interface ISceneSchema {
   active: boolean;
   hotkeys?: HotkeysNode;
   filters?: SceneFiltersNode;
+  sceneType?: TSceneType;
   dualOutputSceneSourceId?: string;
 }
 
@@ -47,6 +48,7 @@ export class ScenesNode extends ArrayNode<ISceneSchema, {}, Scene> {
             id: scene.id,
             name: scene.name,
             active: this.scenesService.views.activeSceneId === scene.id,
+            sceneType: scene?.sceneType,
             dualOutputSceneSourceId: scene?.dualOutputSceneSourceId,
           });
         });
@@ -70,7 +72,11 @@ export class ScenesNode extends ArrayNode<ISceneSchema, {}, Scene> {
 
   loadItem(obj: ISceneSchema): Promise<() => Promise<void>> {
     return new Promise(resolve => {
-      const scene = this.scenesService.createScene(obj.name, { sceneId: obj.id });
+      const scene = this.scenesService.createScene(obj.name, {
+        sceneId: obj.id,
+        sceneType: obj?.sceneType ?? 'scene',
+        dualOutputSceneSourceId: obj?.dualOutputSceneSourceId,
+      });
 
       if (obj.filters) obj.filters.load({ sceneId: scene.id });
 

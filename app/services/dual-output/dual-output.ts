@@ -308,27 +308,35 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     this.scenesService.sceneSwitched.subscribe(scene => {
       // do nothing if scene has a node map because this means it has already been validated
       if (scene?.nodeMap) {
-        this.setIsLoading(false);
+        // update the vertical scene sources created to render a scene source
+        // in the vertical display in dual output mode
+        console.log('update scene switched');
+        // this.createDualOutputSceneSources(scene.id);
+        if (this.state.isLoading) this.setIsLoading(false);
         return;
       }
 
       // do nothing for single output collections loaded in single output mode
       if (!this.views.activeCollection?.sceneNodeMaps && !this.views.dualOutputMode) {
-        this.setIsLoading(false);
+        console.log('single output');
+        if (this.state.isLoading) this.setIsLoading(false);
         return;
       }
 
+      // TODO: comment out
       // convert single output collection loaded in dual output mode
       if (!this.views.activeCollection?.sceneNodeMaps && this.views.dualOutputMode) {
         this.convertSingleOutputToDualOutputCollection();
-        this.setIsLoading(false);
+        console.log('convert single output loaded');
+        if (this.state.isLoading) this.setIsLoading(false);
         return;
       }
 
       // confirm dual output collections after loaded (dual output scenes will have node map after loaded)
       if (this.views.activeCollection?.sceneNodeMaps && !scene?.nodeMap) {
+        console.log('confirming dual output collection');
         this.confirmOrCreateDualOutputCollection();
-        this.setIsLoading(false);
+        if (this.state.isLoading) this.setIsLoading(false);
         return;
       }
 
@@ -396,6 +404,9 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     this.SET_IS_LOADING(true);
     // confirm dual output scene collection
     this.scenesService.views.scenes.forEach(scene => {
+      console.log('validate dual output scene');
+      // this.createDualOutputSceneSources(scene.id);
+
       if (this.views.sceneNodeMaps[scene.id]) {
         this.confirmSceneNodeMap(scene.id, this.views.sceneNodeMaps[scene.id]);
       } else {
@@ -408,9 +419,157 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   convertSingleOutputToDualOutputCollection() {
     // if in dual output mode, convert the single output collection to dual output
     this.scenesService.views.scenes.forEach(scene => {
+      console.log('convert single output scene');
       this.createVerticalNodes(scene.id);
     });
   }
+
+  createDualOutputSceneSources(sceneId: string) {
+    const sceneSources = this.scenesService.views.singleOutputSceneSources(sceneId);
+    if (!sceneSources.length) return;
+
+    sceneSources.forEach(sceneSourceSceneItem => {
+      this.scenesService.createDualOutputSceneSourceSceneItem(
+        sceneId,
+        sceneSourceSceneItem.sourceId,
+        sceneSourceSceneItem.id,
+      );
+    });
+  }
+
+  /**
+   * STRATEGY TO UPDATE ON SCENE SWITCH
+   * Create scene sources to render in dual output mode
+   */
+  // createDualOutputSceneSources(sceneId: string) {
+  //   const sceneSources = this.scenesService.views.sceneSourcesForScene(sceneId);
+  //   if (!sceneSources.length) return;
+
+  //   sceneSources.forEach(sceneSourceSceneItem => {
+  //     const originalSceneSource = this.scenesService.views.getScene(sceneSourceSceneItem.sourceId);
+
+  //     // this is a vertical scene source
+  //     // the `dualOutputSceneSourceId` is the id of the horizontal scene source
+  //     // that is this vertical scene source's partner
+  //     if (originalSceneSource && originalSceneSource?.dualOutputSceneSourceId) {
+  //       const horizontalSceneSource = this.scenesService.views.getScene(
+  //         originalSceneSource?.dualOutputSceneSourceId,
+  //       );
+
+  //       if (horizontalSceneSource) {
+  //         console.log('updating ', originalSceneSource.id);
+  //         const verticalSceneSourceSceneItemIds = originalSceneSource.getItemsIds();
+  //         const verticalItemIds = new Set(verticalSceneSourceSceneItemIds);
+
+  //         const verticalBaseWidth = this.videoSettingsService.baseResolutions.vertical.baseWidth;
+  //         const horizontalBaseWidth = this.videoSettingsService.baseResolutions.horizontal
+  //           .baseWidth;
+
+  //         const scale =
+  //           Math.min(verticalBaseWidth, horizontalBaseWidth) /
+  //           Math.max(verticalBaseWidth, horizontalBaseWidth);
+
+  //         const scaleDelta = {
+  //           x: 1 * scale,
+  //           y: 1 * scale,
+  //         };
+
+  //         console.log('scaleDelta', JSON.stringify(scaleDelta, null, 2));
+
+  //         const horizontalSceneSourceSceneItems = horizontalSceneSource.getItems();
+  //         //
+  //         let originalSceneSourceNodeMap = this.views.sceneNodeMaps[horizontalSceneSource.id]!;
+
+  //         // to prevent errors, if, for whatever reason the scene is missing an entry in the node map,
+  //         // repair the scene node map here by creating the node map
+  //         if (!originalSceneSourceNodeMap) {
+  //           // horizontalSceneSourceSceneItems
+  //           originalSceneSourceNodeMap = this.confirmSceneNodeMap(horizontalSceneSource.id, {});
+  //         }
+
+  //         horizontalSceneSourceSceneItems.forEach(item => {
+  //           const verticalSceneItemId = originalSceneSourceNodeMap[item.id];
+  //           let verticalSceneItem = this.scenesService.views.getSceneItem(verticalSceneItemId);
+
+  //           // create any missing vertical sources
+  //           if (!verticalSceneItem) {
+  //             verticalSceneItem = this.createVerticalNode(item, verticalSceneItemId) as SceneItem;
+  //           }
+
+  //           // transform item to match horizontal scene item
+  //           verticalSceneItem.setTransform(item.transform);
+  //           verticalSceneItem.scale(scaleDelta, { x: 0.5, y: 0.5 });
+
+  //           verticalItemIds.delete(verticalSceneItem.id);
+  //         });
+
+  //         // any remaining vertical item ids are partner nodes of scene items
+  //         // deleted in the horizontal source scene, so remove them here
+  //         verticalItemIds.forEach(verticalItemId => {
+  //           const horizontalNodeId = this.views.getHorizontalNodeId(verticalItemId);
+  //           if (horizontalNodeId) {
+  //             this.sceneCollectionsService.removeNodeMapEntry(horizontalNodeId, verticalItemId);
+  //           }
+
+  //           this.scenesService.views.getSceneItem(verticalItemId)?.remove();
+  //         });
+  //       } else {
+  //         // if the horizontal scene source does not exist, the scene has been deleted so delete this partner vertical scene source
+  //         originalSceneSource.remove();
+  //         this.sceneCollectionsService.removeNodeMapEntry(
+  //           sceneId,
+  //           originalSceneSource?.dualOutputSceneSourceId,
+  //         );
+  //       }
+  //     } else {
+  //       // this is a horizontal scene source without a partner vertical scene source
+  //       // so copy the horizontal scene to a new scene with all of the horizontal scene items
+  //       // assigned to the vertical display
+  //       console.log(
+  //         'creating partner for ',
+  //         originalSceneSource.id,
+  //         ' = ',
+  //         sceneSourceSceneItem.sourceId,
+  //       );
+
+  //       // create scene source to render in the vertical display
+  //       // only create vertical scene items because the horizontal scene source is the horizontal scene
+  //       const createdVerticalSceneSource = this.scenesService.createDualOutputSceneSource(
+  //         originalSceneSource.id,
+  //       );
+
+  //       const verticalSourceSceneItem = this.scenesService.views
+  //         .getScene(sceneId)
+  //         .addSource(createdVerticalSceneSource.id, {
+  //           // id: createdVerticalSceneSource.id,
+  //           display: 'vertical',
+  //         });
+
+  //       console.log('sceneSourceSceneItem.id', sceneSourceSceneItem.id);
+  //       console.log('originalSceneSource.id', originalSceneSource.id);
+  //       console.log('createdVerticalSceneSource.id', createdVerticalSceneSource.id);
+  //       console.log('verticalSourceSceneItem.id', verticalSourceSceneItem.id);
+  //       // create node map entry for the scene source
+  //       this.sceneCollectionsService.createNodeMapEntry(
+  //         sceneId,
+  //         sceneSourceSceneItem.id,
+  //         verticalSourceSceneItem.id,
+  //       );
+
+  //       console.log(
+  //         'this.views.sceneNodeMaps[createdVerticalSceneSource.id]',
+  //         JSON.stringify(this.views.sceneNodeMaps[createdVerticalSceneSource.id], null, 2),
+  //       );
+
+  //       console.log(
+  //         'SCENE SOURCE sceneId ',
+  //         sceneId,
+  //         ' entry',
+  //         JSON.stringify(this.views.sceneNodeMaps[sceneId][sceneSourceSceneItem.id], null, 2),
+  //       );
+  //     }
+  //   });
+  // }
 
   /**
    * Create a vertical node to partner with the vertical node
@@ -523,7 +682,16 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     const nodeIdsMap: Dictionary<string> = {};
 
     selection.getNodes().forEach(node => {
-      const verticalNode = this.createVerticalNode(node);
+      let verticalNode = {} as TSceneNode;
+      if (node.isItem() && node.type === 'scene') {
+        verticalNode = this.scenesService.createDualOutputSceneSourceSceneItem(
+          sceneId,
+          node.sourceId,
+          node.id,
+        );
+      } else {
+        verticalNode = this.createVerticalNode(node);
+      }
       nodeIdsMap[node.id] = verticalNode.id;
       verticalNodes.push(verticalNode);
     });
@@ -552,9 +720,9 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    * Confirm scene node map is correct for dual output
    * @param sceneId - scene to confirm
    * @param nodeMap - node map to confirm
-   * @returns
+   * @returns - the validated node map
    */
-  confirmSceneNodeMap(sceneId: string, nodeMap: Dictionary<string>) {
+  confirmSceneNodeMap(sceneId: string, nodeMap: Dictionary<string>): Dictionary<string> {
     // establish vertical context if it doesn't exist
     if (!this.videoSettingsService.contexts.vertical) {
       this.videoSettingsService.establishVideoContext('vertical');
@@ -666,6 +834,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
     // load node map into scene to show map was confirmed
     scene.setNodeMap(this.views?.sceneNodeMaps[sceneId]);
+
+    return this.views?.sceneNodeMaps[sceneId];
   }
 
   /**
