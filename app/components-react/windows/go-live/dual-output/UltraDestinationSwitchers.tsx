@@ -216,7 +216,6 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
     <div
       data-test="ultra-switcher"
       ref={containerRef}
-      data-test="ultra-switcher"
       className={cx(styles.platformSwitcher, { [styles.platformDisabled]: !p.enabled })}
       onClick={() => {
         if (p.promptConnectTikTok) {
