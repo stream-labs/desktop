@@ -431,7 +431,7 @@ function LiveDock(p: { onLeft: boolean }) {
                   )}
                   {!applicationLoading && !collapsed && (
                     <Chat
-                      restream={visibleChat === 'restream'}
+                      restream={isRestreaming && visibleChat === 'restream'}
                       key={visibleChat}
                       visibleChat={visibleChat}
                       setChat={setChat}
