@@ -39,6 +39,7 @@ import { JsonrpcService } from 'services/api/jsonrpc';
 import * as remote from '@electron/remote';
 import { TikTokService } from 'services/platforms/tiktok';
 import { TTikTokLiveScopeTypes } from 'services/platforms/tiktok/api';
+import { UsageStatisticsService } from 'app-services';
 
 export enum EAuthProcessState {
   Idle = 'idle',
@@ -282,6 +283,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private appService: AppService;
   @Inject() private notificationsService: NotificationsService;
   @Inject() private jsonrpcService: JsonrpcService;
+  @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject('TikTokService') tiktokService: TikTokService;
 
   @mutation()
