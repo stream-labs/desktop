@@ -3,13 +3,13 @@ import Form from '../../../shared/inputs/Form';
 import { $t } from '../../../../services/i18n';
 import { Services } from '../../../service-provider';
 import { Button, Tooltip } from 'antd';
-// import Tooltip from 'components-react/shared/Tooltip';
 import InputWrapper from '../../../shared/inputs/InputWrapper';
 import PlatformSettingsLayout, { IPlatformComponentParams } from './PlatformSettingsLayout';
 import * as remote from '@electron/remote';
 import { CommonPlatformFields } from '../CommonPlatformFields';
 import { ITikTokStartStreamOptions } from 'services/platforms/tiktok';
 import { TextInput, createBinding } from 'components-react/shared/inputs';
+import InfoBanner from 'components-react/shared/InfoBanner';
 
 export function TikTokEditStreamInfo(p: IPlatformComponentParams<'tiktok'>) {
   const ttSettings = p.value;
@@ -38,34 +38,6 @@ export function TikTokEditStreamInfo(p: IPlatformComponentParams<'tiktok'>) {
 
       {(!liveStreamingEnabled || legacy) && <TikTokEnterCredentialsFormInfo {...p} />}
     </Form>
-  );
-}
-
-function TikTokStreamApplicationInfo() {
-  return (
-    <InputWrapper
-      extra={
-        <a onClick={() => openInfoPage()}>
-          {$t('Go live to TikTok with a single click. Click here to learn more.')}
-        </a>
-      }
-    >
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <div style={{ marginBottom: '5px' }}>
-          {$t('You do not have permission to stream live to TikTok.')}
-        </div>
-        <Button
-          onClick={openApplicationInfoPage}
-          style={{
-            marginBottom: '10px',
-            background: 'var(--tiktok-btn)',
-            color: 'var(--black)',
-          }}
-        >
-          {$t('Apply for TikTok Live Permission')}
-        </Button>
-      </div>
-    </InputWrapper>
   );
 }
 
@@ -113,6 +85,11 @@ export function TikTokEnterCredentialsFormInfo(p: IPlatformComponentParams<'tikt
             <a onClick={() => openInfoPage()}>
               {$t('Go live to TikTok with a single click. Click here to learn more.')}
             </a>
+            <InfoBanner
+              message={$t("Approvals are solely at TikTok's discretion.")}
+              type="info"
+              style={{ marginTop: '5px' }}
+            />
           </div>
         }
       >
