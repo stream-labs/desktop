@@ -362,7 +362,7 @@ export class TwitchService
       is_enabled: contentClassificationLabels.includes(option.value),
     }));
 
-    const updateInfo = async (tags: ITwitchStartStreamOptions['tags']) =>
+    const updateTags = async (tags: ITwitchStartStreamOptions['tags'] | undefined) =>
       this.requestTwitch({
         url: `${this.apiBase}/helix/channels?broadcaster_id=${this.twitchId}`,
         method: 'PATCH',
