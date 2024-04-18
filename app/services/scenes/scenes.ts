@@ -397,6 +397,13 @@ export class ScenesService extends StatefulService<IScenesState> {
   createDualOutputSceneSource(sceneId: string) {
     // Get an id to identify the scene on the frontend
     const verticalSceneId = `vertical_${sceneId}`;
+
+    // if this horizontal scene source already has a partner vertical scene source,
+    // use the existing vertical scene source
+    if (this.views.getScene(verticalSceneId)) {
+      return this.views.getScene(verticalSceneId);
+    }
+
     this.ADD_SCENE(verticalSceneId, verticalSceneId, 'source', sceneId);
     const obsScene = SceneFactory.create(verticalSceneId);
     const horizontalScene = this.views.getScene(sceneId);
