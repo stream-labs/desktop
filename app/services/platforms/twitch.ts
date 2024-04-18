@@ -21,15 +21,12 @@ import Utils from '../utils';
 import { IVideo } from 'obs-studio-node';
 import { TDisplayType } from 'services/settings-v2';
 import { TOutputOrientation } from 'services/restream';
-<<<<<<< HEAD
 import {
   ITwitchContentClassificationLabelsRootResponse,
   TwitchContentClassificationService,
 } from './twitch/content-classification';
-=======
 import { ENotificationType, NotificationsService } from '../notifications';
 import { $t } from '../i18n';
->>>>>>> 7f3809259 (fix(twitch): invalid tags prevent channel update, retry)
 
 export interface ITwitchStartStreamOptions {
   title: string;
@@ -82,11 +79,8 @@ export class TwitchService
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
   @Inject() twitchTagsService: TwitchTagsService;
-<<<<<<< HEAD
   @Inject() twitchContentClassificationService: TwitchContentClassificationService;
-=======
   @Inject() notificationsService: NotificationsService;
->>>>>>> 7f3809259 (fix(twitch): invalid tags prevent channel update, retry)
 
   static initialState: ITwitchServiceState = {
     ...BasePlatformService.initialState,
@@ -362,7 +356,7 @@ export class TwitchService
       is_enabled: contentClassificationLabels.includes(option.value),
     }));
 
-    const updateTags = async (tags: ITwitchStartStreamOptions['tags'] | undefined) =>
+    const updateInfo = async (tags: ITwitchStartStreamOptions['tags'] | undefined) =>
       this.requestTwitch({
         url: `${this.apiBase}/helix/channels?broadcaster_id=${this.twitchId}`,
         method: 'PATCH',
