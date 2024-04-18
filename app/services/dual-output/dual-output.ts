@@ -746,6 +746,47 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     const nodeIdsMap: Dictionary<string> = {};
 
     nodes.forEach((sceneNode: TSceneNode) => {
+      if (sceneNode.isItem() && sceneNode.type === 'scene') {
+        nodeOrder.push(sceneNode.id);
+
+        if (sceneNode?.display === 'horizontal') {
+          const verticalNodeId = this.views.getVerticalNodeId(sceneNode.id);
+
+          if (verticalNodeId) {
+            const verticalNode = this.scenesService.views.getSceneItem(verticalNodeId);
+
+            if (verticalNode) {
+              verticalNode.remove();
+            }
+            const updatedVerticalNode = this.scenesService.createDualOutputSceneSourceSceneItem(
+              sceneId,
+              sceneNode.sourceId,
+              sceneNode.id,
+              verticalNodeId,
+            );
+
+            nodeOrder.push(updatedVerticalNode.id);
+            nodeIdsMap[updatedVerticalNode.id] = sceneNode.id;
+            repairedNodes.push(updatedVerticalNode);
+          } else {
+            const verticalNode = this.scenesService.createDualOutputSceneSourceSceneItem(
+              sceneId,
+              sceneNode.sourceId,
+              sceneNode.id,
+            );
+
+            nodeOrder.push(verticalNode.id);
+            nodeIdsMap[verticalNode.id] = sceneNode.id;
+            repairedNodes.push(verticalNode);
+          }
+          horizontalNodeIds.delete(sceneNode.id);
+        } else {
+          // remove all vertical scene-as-scene-items because they are updated
+          // when the horizontal scene-as-scene-item is encountered
+          verticalNodeIds.delete(sceneNode.id);
+        }
+      }
+
       if (sceneNode?.display === 'horizontal') {
         nodeOrder.push(sceneNode.id);
         const verticalNodeId = nodeMap[sceneNode.id];
@@ -754,9 +795,9 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         if (verticalNodeId) {
           const verticalNode = scene.getNode(verticalNodeId);
           if (!verticalNode) {
-            const verticalNode = this.createVerticalNode(sceneNode, verticalNodeId);
-            nodeIdsMap[verticalNode.id] = sceneNode.id;
-            repairedNodes.push(verticalNode);
+            const repairedVerticalNode = this.createVerticalNode(sceneNode, verticalNodeId);
+            nodeIdsMap[repairedVerticalNode.id] = sceneNode.id;
+            repairedNodes.push(repairedVerticalNode);
           } else {
             nodeIdsMap[sceneNode.id] = verticalNodeId;
           }
