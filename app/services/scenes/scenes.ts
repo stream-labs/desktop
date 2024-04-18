@@ -211,7 +211,9 @@ class ScenesViews extends ViewHandler<IScenesState> {
   }
 
   get scenes(): Scene[] {
-    return this.state.displayOrder.map(id => this.getScene(id)!);
+    return this.state.displayOrder
+      .filter(id => this.getScene(id)?.sceneType === 'scene')
+      .map(id => this.getScene(id)!);
   }
 
   getSceneItems(): SceneItem[] {

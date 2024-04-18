@@ -46,7 +46,14 @@ export default function AddSource() {
         widgetType,
       };
       const isSameType = source.isSameType(comparison);
-      return isSameType && source.sourceId !== ScenesService.views.activeSceneId;
+      const isDualOutputSceneSource =
+        source.type === 'scene' &&
+        ScenesService.views.getScene(source.sourceId)?.sceneType === 'source';
+      return (
+        isSameType &&
+        source.sourceId !== ScenesService.views.activeSceneId &&
+        !isDualOutputSceneSource
+      );
     }),
   }));
 
