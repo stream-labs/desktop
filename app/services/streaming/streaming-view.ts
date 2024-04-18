@@ -125,7 +125,9 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     ) {
       return compact([
         this.userView.auth!.primaryPlatform,
-        this.isPlatformLinked('tiktok') && 'tiktok',
+        this.userView.auth!.primaryPlatform !== 'tiktok' &&
+          this.isPlatformLinked('tiktok') &&
+          'tiktok',
       ]);
     }
 
