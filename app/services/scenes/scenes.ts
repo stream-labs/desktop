@@ -187,18 +187,17 @@ class ScenesViews extends ViewHandler<IScenesState> {
     return new Scene(sceneModel.id);
   }
 
-  singleOutputSceneSources(sceneId: string): SceneItem[] {
+  getDualOutputHorizontalSceneSourceItems(sceneId: string): SceneItem[] {
     const scene = this.getScene(sceneId);
     if (!scene) return [];
-    return scene.getItems().filter(sceneItem => {
-      // filter out any scene sources that already have vertical scene sources created for them
-      if (sceneItem.type === 'scene') {
-        const sceneSource = this.getScene(sceneItem.sourceId);
-        if (sceneSource?.sceneType === 'scene' && !sceneSource?.dualOutputSceneSourceId) {
-          return sceneItem;
-        }
-      }
-    });
+
+    // filter out any vertical scene-as-scene-items
+    return scene
+      .getItems()
+      .filter(
+        sceneItem =>
+          sceneItem.type === 'scene' && this.getScene(sceneItem.sourceId)?.sceneType !== 'source',
+      );
   }
 
   get activeSceneId() {
@@ -434,13 +433,10 @@ export class ScenesService extends StatefulService<IScenesState> {
     if (!oldScene) return;
 
     oldScene
-      .getItems()
+      .getItemsByDisplay('horizontal')
       .slice()
       .reverse()
       .forEach(item => {
-        // only copy horizontal nodes
-        if (item?.display === 'vertical') return;
-
         const rect = new ScalableRectangle(item.rectangle);
         let currentScale = v2();
         let currentPosition = v2();

@@ -118,6 +118,12 @@ export class Scene {
       .map(item => this.getItem(item.id)!);
   }
 
+  getItemsByDisplay(display: TDisplayType) {
+    return this.state.nodes
+      .filter(node => node.sceneNodeType === 'item' && node?.display === display)
+      .map(item => this.getItem(item.id)!);
+  }
+
   getItemsIds(): string[] {
     return this.state.nodes.filter(node => node.sceneNodeType === 'item').map(item => item.id);
   }
