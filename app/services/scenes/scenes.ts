@@ -18,6 +18,7 @@ import { EditorService } from 'services/editor';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { ScalableRectangle } from 'util/ScalableRectangle';
 import { v2 } from 'util/vec2';
+import { assertIsDefined } from 'util/properties-type-guards';
 
 export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
 export type TSceneType = 'scene' | 'source';
@@ -408,7 +409,10 @@ export class ScenesService extends StatefulService<IScenesState> {
     this.ADD_SCENE(verticalSceneId, verticalSceneId, 'source', sceneId);
     const obsScene = SceneFactory.create(verticalSceneId);
     const horizontalScene = this.views.getScene(sceneId);
-    horizontalScene.setDualOutputSceneSourceId(verticalSceneId);
+
+    if (horizontalScene) {
+      horizontalScene.setDualOutputSceneSourceId(verticalSceneId);
+    }
 
     // calculate scale
     const verticalBaseWidth = this.editorService.baseResolutions.vertical.baseWidth;
@@ -492,16 +496,21 @@ export class ScenesService extends StatefulService<IScenesState> {
     horizontalSceneSourceId: string,
     horizontalSceneItemId: string,
     verticalSceneItemId?: string,
-  ): SceneItem {
+  ): SceneItem | null {
     const verticalScene = this.createDualOutputSceneSource(horizontalSceneSourceId);
 
-    const verticalSceneItem = this.views.getScene(sceneId).addSource(verticalScene.id, {
+    // not ideal, but to prevent errors use the horizontal scene source as a fallback
+    const sceneSourceId = verticalScene?.id ?? horizontalSceneSourceId;
+
+    const verticalSceneItem = this.views.getScene(sceneId).addSource(sceneSourceId, {
       id: verticalSceneItemId,
       display: 'vertical',
     });
 
+    assertIsDefined(verticalSceneItem);
+
     const cropHeight =
-      this.editorService.baseResolutions.vertical.baseHeight - verticalSceneItem.height;
+      this.editorService.baseResolutions.vertical.baseHeight - verticalSceneItem?.height;
     verticalSceneItem.setTransform({
       crop: { bottom: cropHeight },
     });
