@@ -10,7 +10,7 @@ import * as remote from '@electron/remote';
 import { Services } from 'components-react/service-provider';
 
 export default function BrowseOverlays(p: {
-  params: { type?: 'overlay' | 'widget-themes' | 'site-themes'; id?: string; install?: boolean };
+  params: { type?: 'overlay' | 'widget-themes' | 'site-themes'; id?: string; install?: string };
 }) {
   const {
     UserService,
