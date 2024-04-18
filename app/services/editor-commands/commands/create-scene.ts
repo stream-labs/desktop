@@ -37,6 +37,7 @@ export class CreateSceneCommand extends Command {
   async execute() {
     const scene = this.scenesService.createScene(this.name, {
       sceneId: this.sceneId,
+      sceneType: 'scene',
     });
     this.sceneId = scene.id;
 
