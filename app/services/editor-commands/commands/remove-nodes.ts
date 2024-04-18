@@ -70,12 +70,8 @@ export class RemoveNodesCommand extends Command {
     });
 
     for (const item of this.selection.getItems()) {
-      const verticalNodeId = this.dualOutputService.views.getVerticalNodeId(
-        item.id,
-        this.selection.sceneId,
-      );
       if (item?.display === 'horizontal') {
-        const subCommand = new RemoveItemCommand(item.id, verticalNodeId);
+        const subCommand = new RemoveItemCommand(item.id);
         await subCommand.execute();
         this.removeItemSubCommands.push(subCommand);
       }

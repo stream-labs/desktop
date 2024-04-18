@@ -28,6 +28,9 @@ export class RemoveSceneCommand extends Command {
   private removeNodesSubcommand: RemoveNodesCommand;
   private removeItemSubcommands: RemoveItemCommand[];
 
+  // used when rolling back
+  private dualOutputSceneSourceId: string;
+
   constructor(private sceneId: string) {
     super();
     this.sceneName = this.scenesService.views.getScene(this.sceneId).name;
@@ -40,6 +43,19 @@ export class RemoveSceneCommand extends Command {
 
   async execute() {
     const scene = this.scenesService.views.getScene(this.sceneId);
+
+    // if this is a dual output collection, the scene may have a partner vertical scene
+    // for rendering a scene source in the vertical display, so also remove this vertical scene
+    if (scene?.dualOutputSceneSourceId) {
+      this.dualOutputSceneSourceId = scene.dualOutputSceneSourceId;
+
+      const verticalSceneSource = this.scenesService.views.getScene(this.dualOutputSceneSourceId);
+
+      if (verticalSceneSource) {
+        this.sceneCollectionsService.removeNodeMap(this.dualOutputSceneSourceId);
+        verticalSceneSource.remove();
+      }
+    }
 
     // Remove this scene from any other scenes
     this.removeItemSubcommands = [];
@@ -67,18 +83,26 @@ export class RemoveSceneCommand extends Command {
   }
 
   async rollback() {
-    this.scenesService.createScene(this.sceneName, { sceneId: this.sceneId });
+    this.scenesService.createScene(this.sceneName, {
+      sceneId: this.sceneId,
+      dualOutputSceneSourceId: this.dualOutputSceneSourceId,
+      sceneType: 'scene',
+    });
     this.scenesService.setSceneOrder(this.sceneOrder.slice());
 
-    // restore scene node map to collection
+    // restore dual output scene node map
     if (this.hasSceneNodeMap) {
       this.sceneCollectionsService.restoreNodeMap(this.sceneId);
     }
 
-    if (this.removeNodesSubcommand) await this.removeNodesSubcommand.rollback();
-
+    // restore scene items
     for (const command of this.removeItemSubcommands) {
       await command.rollback();
+    }
+
+    // if necessary, restore vertical-scene-source
+    if (this.dualOutputSceneSourceId) {
+      this.scenesService.createDualOutputSceneSource(this.sceneId);
     }
   }
 }

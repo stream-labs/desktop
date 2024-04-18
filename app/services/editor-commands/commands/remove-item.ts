@@ -40,14 +40,16 @@ export class RemoveItemCommand extends Command {
   private sourceReviver: SourceReviver;
 
   private reorderNodesSubcommand: ReorderNodesCommand;
-  private verticalReorderNodesSubcommand: ReorderNodesCommand;
 
   private settings: ISceneItemSettings;
-  private dualOutputVerticalNodeId: string;
 
-  constructor(private sceneItemId: string, private verticalNodeId?: string) {
+  // data for dual output
+  private dualOutputVerticalSceneItemId: string;
+  private dualOutputVerticalSceneSourceId: string;
+  private dualOutputVerticalReorderNodesSubcommand: ReorderNodesCommand;
+
+  constructor(private sceneItemId: string) {
     super();
-    this.dualOutputVerticalNodeId = verticalNodeId;
   }
 
   get description() {
@@ -74,24 +76,53 @@ export class RemoveItemCommand extends Command {
     );
     this.reorderNodesSubcommand.execute();
 
-    // also remove vertical node if it exists
-    if (this.dualOutputService.views.hasSceneNodeMaps || this.dualOutputVerticalNodeId) {
-      const verticalNodeId =
-        this.dualOutputVerticalNodeId ??
-        this.dualOutputService.views.getVerticalNodeId(this.sceneItemId);
+    // For dual output, handle removing the vertical-scene-source for the partner vertical scene-as-scene-item
+    if (this.dualOutputService.views.hasNodeMap(this.sceneId)) {
+      const dualOutputVerticalSceneItemId = this.dualOutputService.views.getVerticalNodeId(
+        this.sceneItemId,
+      );
 
-      this.sceneCollectionsService.removeNodeMapEntry(this.sceneId, item.id);
-
-      if (verticalNodeId && this.scenesService.views.getSceneItem(this.verticalNodeId)) {
-        const verticalItem = this.scenesService.views.getSceneItem(this.verticalNodeId);
-        this.verticalReorderNodesSubcommand = new ReorderNodesCommand(
-          scene.getSelection(this.verticalNodeId),
-          void 0,
-          EPlaceType.After,
+      if (dualOutputVerticalSceneItemId) {
+        console.log('this.dualOutputVerticalSceneItemId', this.dualOutputVerticalSceneItemId);
+        const dualOutputVerticalSceneItem = this.scenesService.views.getSceneItem(
+          dualOutputVerticalSceneItemId,
         );
-        this.verticalReorderNodesSubcommand.execute();
+        console.log(
+          'dualOutputVerticalSceneItem',
+          JSON.stringify(dualOutputVerticalSceneItem, null, 2),
+        );
 
-        verticalItem.remove();
+        if (dualOutputVerticalSceneItem) {
+          this.dualOutputVerticalReorderNodesSubcommand = new ReorderNodesCommand(
+            scene.getSelection(this.dualOutputVerticalSceneItemId),
+            void 0,
+            EPlaceType.After,
+          );
+          this.dualOutputVerticalReorderNodesSubcommand.execute();
+
+          dualOutputVerticalSceneItem.remove();
+
+          // if this scene item uses a scene as its source, we need to remove the partner vertical-scene-source created
+          // to render the horizontal scene-as-scene-item's source in the vertical display.
+          if (item?.type === 'scene') {
+            // get the scene that is the source for the horizontal scene-as-scene-item
+
+            this.dualOutputVerticalSceneSourceId = dualOutputVerticalSceneItem?.sourceId;
+
+            // remove the partner-vertical-scene-source
+            const verticalSceneSource = this.scenesService.views.getScene(
+              this.dualOutputVerticalSceneSourceId,
+            );
+
+            if (verticalSceneSource) {
+              verticalSceneSource.remove();
+              this.sceneCollectionsService.removeNodeMap(this.dualOutputVerticalSceneSourceId);
+            }
+          }
+        }
+
+        // remove entry regardless
+        this.sceneCollectionsService.removeNodeMapEntry(this.sceneId, this.sceneItemId);
       }
     }
 
@@ -122,21 +153,31 @@ export class RemoveItemCommand extends Command {
       display: this.settings?.display,
     });
 
-    if (this.dualOutputVerticalNodeId) {
-      Promise.resolve(
-        this.dualOutputService.actions.return.createOrAssignOutputNode(
-          horizontalItem,
-          'vertical',
-          false,
+    if (this.dualOutputVerticalSceneItemId) {
+      if (this.dualOutputVerticalSceneSourceId) {
+        this.scenesService.createDualOutputSceneSourceSceneItem(
           this.sceneId,
-          this.dualOutputVerticalNodeId,
-        ),
-      );
-      if (this.verticalReorderNodesSubcommand) {
-        this.verticalReorderNodesSubcommand.rollback();
-      }
-    }
+          this.sourceId,
+          this.sceneItemId,
+          this.dualOutputVerticalSceneItemId,
+        );
+      } else {
+        Promise.resolve(
+          this.dualOutputService.actions.return.createOrAssignOutputNode(
+            horizontalItem,
+            'vertical',
+            false,
+            this.sceneId,
+            this.dualOutputVerticalSceneItemId,
+          ),
+        );
 
-    this.reorderNodesSubcommand.rollback();
+        if (this.dualOutputVerticalReorderNodesSubcommand) {
+          this.dualOutputVerticalReorderNodesSubcommand.rollback();
+        }
+      }
+
+      this.reorderNodesSubcommand.rollback();
+    }
   }
 }

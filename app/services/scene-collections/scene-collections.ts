@@ -1111,6 +1111,8 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * @param sceneId - The scene id
    */
   removeNodeMap(sceneId: string) {
+    if (!this.sceneNodeMaps[sceneId]) return;
+
     this.stateService.removeNodeMap(sceneId);
   }
 

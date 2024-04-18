@@ -478,6 +478,9 @@ export class ScenesService extends StatefulService<IScenesState> {
           initialTransform: transform,
         });
 
+        // optimization: check visibility to reduce unnecessary calls to obs
+        if (!item.visible) verticalItem.setVisibility(item.visible);
+
         // add node map entry for vertical scene source using the horizontal scene source item as the key
         // because any transforms to the horizontal scene source will need to be applied to the vertical scene source
         this.sceneCollectionsService.createNodeMapEntry(verticalSceneId, item.id, verticalItem.id);
@@ -490,12 +493,12 @@ export class ScenesService extends StatefulService<IScenesState> {
     sceneId: string,
     horizontalSceneSourceId: string,
     horizontalSceneItemId: string,
-    verticalSceneSourceId?: string,
+    verticalSceneItemId?: string,
   ): SceneItem {
     const verticalScene = this.createDualOutputSceneSource(horizontalSceneSourceId);
 
     const verticalSceneItem = this.views.getScene(sceneId).addSource(verticalScene.id, {
-      id: verticalSceneSourceId,
+      id: verticalSceneItemId,
       display: 'vertical',
     });
 
