@@ -8,6 +8,7 @@ import {
   focusChild,
   focusMain,
   getNumElements,
+  isDisplayed,
   selectElements,
   waitForDisplayed,
 } from '../../helpers/modules/core';
@@ -31,6 +32,7 @@ test('Populates essential hotkeys for them to be bound', async t => {
   await focusChild();
 
   await (await app.client.$('li=Hotkeys')).click();
+  t.true(await isDisplayed('h2=Mic/Aux'));
   await (await app.client.$('h2=Mic/Aux')).click();
 
   for (const hotkey of [
@@ -49,7 +51,7 @@ test('Populates essential hotkeys for them to be bound', async t => {
   ]) {
     const hotkeyLabel = await app.client.$(`label=${hotkey}`);
 
-    await t.true(await hotkeyLabel.isExisting(), `Hotkey for ${hotkey} was not found`);
+    t.true(await hotkeyLabel.isExisting(), `Hotkey for ${hotkey} was not found`);
   }
 });
 
