@@ -10,6 +10,7 @@ import { CommonPlatformFields } from '../CommonPlatformFields';
 import { ITikTokStartStreamOptions } from 'services/platforms/tiktok';
 import { TextInput, createBinding } from 'components-react/shared/inputs';
 import InfoBanner from 'components-react/shared/InfoBanner';
+import GameSelector from '../GameSelector';
 
 export function TikTokEditStreamInfo(p: IPlatformComponentParams<'tiktok'>) {
   const ttSettings = p.value;
@@ -19,6 +20,8 @@ export function TikTokEditStreamInfo(p: IPlatformComponentParams<'tiktok'>) {
   function updateSettings(patch: Partial<ITikTokStartStreamOptions>) {
     p.onChange({ ...ttSettings, ...patch });
   }
+
+  const bind = createBinding(ttSettings, updatedSettings => updateSettings(updatedSettings));
 
   return (
     <Form name="tiktok-settings">
@@ -33,7 +36,7 @@ export function TikTokEditStreamInfo(p: IPlatformComponentParams<'tiktok'>) {
             onChange={updateSettings}
           />
         }
-        requiredFields={<div key={'empty-tiktok'} />}
+        requiredFields={<GameSelector key="required" platform={'tiktok'} {...bind.game} />}
       />
 
       {(!liveStreamingEnabled || legacy) && <TikTokEnterCredentialsFormInfo {...p} />}
@@ -60,7 +63,6 @@ export function TikTokEnterCredentialsFormInfo(p: IPlatformComponentParams<'tikt
       />
       <TextInput
         label={
-          // eslint-disable-next-line prettier/prettier
           <Tooltip title={$t('Generate with "Locate my Stream Key"')} placement="right">
             {$t('TikTok Stream Key')}
             <i className="icon-information" style={{ marginLeft: '5px' }} />

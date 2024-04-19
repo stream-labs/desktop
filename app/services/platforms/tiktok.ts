@@ -2,6 +2,7 @@ import { InheritMutations, Inject, mutation } from '../core';
 import { BasePlatformService } from './base-platform';
 import {
   EPlatformCallResult,
+  IGame,
   IPlatformRequest,
   IPlatformService,
   IPlatformState,
@@ -43,6 +44,8 @@ interface ITikTokStartStreamSettings {
   streamKey: string;
   title: string;
   liveScope: TTikTokLiveScopeTypes;
+  gameName: string; // TODO: confirm param name
+  game: string; // TODO: confirm param name
   display: TDisplayType;
   video?: IVideo;
   mode?: TOutputOrientation;
@@ -53,6 +56,8 @@ export interface ITikTokStartStreamOptions {
   serverUrl: string;
   streamKey: string;
   display: TDisplayType;
+  gameName: string;
+  game: string;
 }
 interface ITikTokRequestHeaders extends Dictionary<string> {
   Accept: string;
@@ -70,9 +75,11 @@ export class TikTokService
       title: '',
       display: 'vertical',
       liveScope: 'denied',
+      streamKey: '',
+      gameName: '',
+      game: '',
       mode: 'portrait',
       serverUrl: '',
-      streamKey: '',
     },
     broadcastId: '',
     username: '',
@@ -395,6 +402,21 @@ export class TikTokService
       .catch(() => {
         console.warn('Error fetching TikTok Live Access status.');
       });
+  }
+
+  /**
+   * Search for games
+   * TODO: UPDATE REQUEST
+   */
+  async searchGames(searchString: string): Promise<IGame[]> {
+    const host = this.hostsService.streamlabs;
+    const url = `https://${host}/api/v5/slobs/tiktok/games?id=${searchString}`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const request = new Request(url, { headers });
+    return jfetch<IGame[]>(request).catch(() => {
+      console.warn('Error fetching TikTok games.');
+      return [] as IGame[];
+    });
   }
 
   /**
