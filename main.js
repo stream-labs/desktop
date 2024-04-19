@@ -43,12 +43,6 @@ if (process.env.SLOBS_CACHE_DIR) {
   app.setPath('appData', process.env.SLOBS_CACHE_DIR);
 }
 
-// temp for overlay dev
-app.on('certificate-error', (event, webContents, url, error, certificate, callback) => {
-  event.preventDefault();
-  callback(true);
-});
-
 app.setPath('userData', path.join(app.getPath('appData'), 'slobs-client'));
 
 if (process.argv.includes('--clearCacheDir')) {

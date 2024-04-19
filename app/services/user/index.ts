@@ -862,9 +862,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   async overlaysUrl(type?: 'overlay' | 'widget-themes' | 'site-themes', id?: string, install?: string) {
     const uiTheme = this.customizationService.isDarkTheme ? 'night' : 'day';
 
-    // let url = `https://${this.hostsService.streamlabs}/library`;
-    // let url = 'http://overlays.streamlabs.site:5173';
-    let url = 'https://beta.streamlabs.com/library';
+    let url = `https://${this.hostsService.streamlabs}/library`;
+
     if (type && !id) {
       url += `/${type}`;
     }
