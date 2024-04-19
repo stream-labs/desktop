@@ -23,6 +23,10 @@ export default function GameSelector(p: TProps) {
     selectedGameName = Services.TrovoService.state.channelInfo.gameName;
   }
 
+  if (platform === 'tiktok') {
+    selectedGameName = Services.TikTokService.state.settings.gameName;
+  }
+
   const { isSearching, setIsSearching, games, setGames } = useModule(() => ({
     state: injectState({
       isSearching: false,
@@ -69,11 +73,13 @@ export default function GameSelector(p: TProps) {
 
   const isTwitch = platform === 'twitch';
   const isTrovo = platform === 'trovo';
+  const isTikTok = platform === 'tiktok';
 
   const label = {
     twitch: $t('Twitch Category'),
     facebook: $t('Facebook Game'),
     trovo: $t('Trovo Category'),
+    tiktok: $t('TikTok Game'),
   }[platform as string];
 
   return (
@@ -88,7 +94,7 @@ export default function GameSelector(p: TProps) {
       showSearch
       onSearch={onSearch}
       debounce={500}
-      required={isTwitch || isTrovo}
+      required={isTwitch || isTrovo || isTikTok}
       hasImage={isTwitch || isTrovo}
       onBeforeSearch={onBeforeSearchHandler}
       imageSize={platformService.gameImageSize}
