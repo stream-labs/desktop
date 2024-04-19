@@ -502,12 +502,13 @@ export class ScenesService extends StatefulService<IScenesState> {
     // not ideal, but to prevent errors use the horizontal scene source as a fallback
     const sceneSourceId = verticalScene?.id ?? horizontalSceneSourceId;
 
-    const verticalSceneItem = this.views.getScene(sceneId).addSource(sceneSourceId, {
+    const scene = this.views.getScene(sceneId);
+    if (!scene) return;
+
+    const verticalSceneItem = scene.addSource(sceneSourceId, {
       id: verticalSceneItemId,
       display: 'vertical',
     });
-
-    assertIsDefined(verticalSceneItem);
 
     const cropHeight =
       this.editorService.baseResolutions.vertical.baseHeight - verticalSceneItem?.height;
