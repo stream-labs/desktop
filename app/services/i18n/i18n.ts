@@ -140,7 +140,7 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
           const [newLang, newCode] = splitLocale('${locale}');
           const localeToSet = [newLang, (usesUpperCode ? newCode.toUpperCase() : newCode)].join('-');
 
-          setCookie('langCode', localeToSet, 365); // set or update the cookie for 1 year
+          setCookie('langCode', localeToSet);
           window.location.reload();
         }
       `);
