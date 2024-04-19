@@ -11,6 +11,7 @@ import { NicoliveProgramService } from 'services/nicolive-program/nicolive-progr
 import { getDisplayName } from 'services/nicolive-program/ChatMessage/getDisplayName';
 import { NicoliveModeratorsService } from 'services/nicolive-program/nicolive-moderators';
 import { WindowsService } from 'services/windows';
+import { HostsService } from 'services/hosts';
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import CommonComment from '../nicolive-area/comment/CommonComment.vue';
@@ -52,6 +53,7 @@ export default class UserInfo extends Vue {
   @Inject() private konomiTagsService: KonomiTagsService;
   @Inject() private nicoliveModeratorsService: NicoliveModeratorsService;
   @Inject() private nicoliveCommentFilterService: NicoliveCommentFilterService;
+  @Inject() private hostsService: HostsService;
 
   private konomiTagsSubscription: Subscription;
   private myKonomiTags: KonomiTag[] = [];
@@ -258,7 +260,7 @@ export default class UserInfo extends Vue {
   }
 
   openUserPage() {
-    electron.remote.shell.openExternal(`https://www.nicovideo.jp/user/${this.userId}`);
+    electron.remote.shell.openExternal(this.hostsService.getUserPageURL(this.userId));
   }
   copyUserId() {
     electron.remote.clipboard.writeText(this.userId);

@@ -95,15 +95,18 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     console.log('validateLogin: this.platform=' + JSON.stringify(this.platform));
     const service = getPlatformService(this.platform.type);
     if (service && service.isLoggedIn) {
-      return service.isLoggedIn().then(valid => {
-        if (!valid) {
-          this.LOGOUT();
-          this.userLogout.next();
-        }
-      }).catch((e) => {
-        // offline や Internal Server Error などのときなので記録するだけ
-        console.warn('validateLogin: error=' + JSON.stringify(e));
-      });
+      return service
+        .isLoggedIn()
+        .then(valid => {
+          if (!valid) {
+            this.LOGOUT();
+            this.userLogout.next();
+          }
+        })
+        .catch(e => {
+          // offline や Internal Server Error などのときなので記録するだけ
+          console.warn('validateLogin: error=' + JSON.stringify(e));
+        });
     }
 
     // ここに来るパターンは存在しないはず
@@ -164,8 +167,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   get platformUserPageURL() {
     if (this.isLoggedIn()) {
       const platform = getPlatformService(this.state.auth.platform.type);
-      if (platform.getUserPageURL !== undefined) {
-        return platform.getUserPageURL();
+      if (platform.getMyPageURL !== undefined) {
+        return platform.getMyPageURL();
       }
       return '';
     }
@@ -301,8 +304,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     this.startAuth({
       platform: this.platform.type,
-      onAuthFinish: () => { },
-      onAuthClose: () => { },
+      onAuthFinish: () => {},
+      onAuthClose: () => {},
     });
   }
 

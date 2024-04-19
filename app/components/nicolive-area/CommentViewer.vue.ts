@@ -27,6 +27,7 @@ import {
   openErrorDialogFromFailure,
 } from 'services/nicolive-program/NicoliveFailure';
 import { NicoliveModeratorsService } from 'services/nicolive-program/nicolive-moderators';
+import { HostsService } from 'services/hosts';
 
 const componentMap: { [type in ChatComponentType]: Vue.Component } = {
   common: CommonComment,
@@ -66,6 +67,7 @@ export default class CommentViewer extends Vue {
   @Inject() private settingsService: ISettingsServiceApi;
 
   @Inject() private nicoliveModeratorsService: NicoliveModeratorsService;
+  @Inject() private hostsService: HostsService;
 
   @Prop({ default: false }) showPlaceholder: boolean;
 
@@ -330,6 +332,6 @@ export default class CommentViewer extends Vue {
   }
 
   openModeratorSettings() {
-    remote.shell.openExternal('https://www.upload.nicovideo.jp/niconico-garage/live/moderators');
+    remote.shell.openExternal(this.hostsService.getModeratorSettingsURL());
   }
 }

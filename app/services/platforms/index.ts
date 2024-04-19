@@ -3,11 +3,13 @@ import { NiconicoService } from './niconico';
 export type IStreamingSetting = {
   url: string;
   key: string;
-  quality: {
-    bitrate: number;
-    height: number;
-    fps: number;
-  } | undefined;
+  quality:
+    | {
+        bitrate: number;
+        height: number;
+        fps: number;
+      }
+    | undefined;
 };
 
 // All platform services should implement
@@ -22,7 +24,7 @@ export interface IPlatformService {
   isLoggedIn?: () => Promise<boolean>;
   logout?: () => Promise<void>;
 
-  getUserPageURL?: () => string;
+  getMyPageURL?: () => string;
   isPremium?: (token: string) => Promise<boolean>;
 }
 

@@ -42,6 +42,8 @@ const userID = 2;
 
 const dummyURL = 'https://example.com';
 
+const nicoliveWeb = 'https://live.nicovideo.jp';
+
 const dummyBody = {
   meta: {
     status: 200,
@@ -328,7 +330,7 @@ describe('webviews', () => {
 
     // don't await
     const result = expect(client.createProgram()).resolves.toBe('CREATED');
-    mock.browserWindow.loadURL(`https://live.nicovideo.jp/watch/${programID}`);
+    mock.browserWindow.loadURL(`${nicoliveWeb}/watch/${programID}`);
     await result;
     expect(mock.browserWindow.removeMenu).toHaveBeenCalled();
   });
@@ -341,7 +343,7 @@ describe('webviews', () => {
 
     // don't await
     const result = expect(client.createProgram()).resolves.toBe('CREATED');
-    mock.browserWindow.loadURL(`https://live.nicovideo.jp/watch/${programID}`);
+    mock.browserWindow.loadURL(`${nicoliveWeb}/watch/${programID}`);
 
     await result;
     expect(mock.browserWindow.close).toHaveBeenCalled();
@@ -355,7 +357,7 @@ describe('webviews', () => {
 
     // don't await
     const result = expect(client.createProgram()).resolves.toBe('RESERVED');
-    mock.browserWindow.loadURL('https://live.nicovideo.jp/my');
+    mock.browserWindow.loadURL(`${nicoliveWeb}/my`);
 
     await result;
     expect(mock.browserWindow.close).toHaveBeenCalled();
@@ -398,7 +400,7 @@ describe('webviews', () => {
     const client = new NicoliveClient();
 
     const result = expect(client.editProgram(programID)).resolves.toBe('EDITED');
-    mock.browserWindow.loadURL(`https://live.nicovideo.jp/watch/${programID}`);
+    mock.browserWindow.loadURL(`${nicoliveWeb}/watch/${programID}`);
     await result;
     expect(mock.browserWindow.removeMenu).toHaveBeenCalled();
   });
@@ -411,7 +413,7 @@ describe('webviews', () => {
 
     // don't await
     const result = expect(client.editProgram(programID)).resolves.toBe('EDITED');
-    mock.browserWindow.loadURL(`https://live.nicovideo.jp/watch/${programID}`);
+    mock.browserWindow.loadURL(`${nicoliveWeb}/watch/${programID}`);
 
     await result;
     expect(mock.browserWindow.close).toHaveBeenCalled();
@@ -425,7 +427,7 @@ describe('webviews', () => {
 
     // don't await
     const result = expect(client.editProgram(programID)).resolves.toBe('EDITED');
-    mock.browserWindow.loadURL('https://live.nicovideo.jp/my');
+    mock.browserWindow.loadURL(`${nicoliveWeb}/my`);
 
     await result;
     expect(mock.browserWindow.close).toHaveBeenCalled();
