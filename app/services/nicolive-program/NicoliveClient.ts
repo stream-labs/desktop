@@ -243,9 +243,15 @@ export class NicoliveClient {
     });
     try {
       const resp = await fetch(url, requestInit);
-      return NicoliveClient.wrapResult<T>(resp);
+      return NicoliveClient.wrapResult<T>(resp).then(r => {
+        console.log(`requestAPI(${method} ${url}) result`, JSON.parse(JSON.stringify(r))); // DEBUG
+        return r;
+      });
     } catch (err) {
-      return NicoliveClient.wrapFetchError(err as Error);
+      return NicoliveClient.wrapFetchError(err as Error).then(r => {
+        console.error(`requestAPI(${method} ${url}) error`, JSON.parse(JSON.stringify(r))); // DEBUG
+        return r;
+      });
     }
   }
 

@@ -1,5 +1,9 @@
-import { createSetupFunction } from 'util/test-setup';
 import { Subject } from 'rxjs';
+import type { ObserveType } from 'util/jest_fn';
+import { createSetupFunction } from 'util/test-setup';
+import type { MessageResponse } from './MessageServerClient';
+import { FilterRecord } from './ResponseTypes';
+import { NicoliveModeratorsService } from './nicolive-moderators';
 
 type NicoliveCommentViewerService =
   import('./nicolive-comment-viewer').NicoliveCommentViewerService;
@@ -20,6 +24,15 @@ const setup = createSetupFunction({
       stateChange: new Subject(),
       refreshObserver: new Subject(),
       isModerator: () => false,
+      disconnectNdgr() {},
+    },
+    CustomizationService: {
+      state: {
+        compactModeNewComment: true,
+      },
+    },
+    NicoliveProgramService: {
+      hidePlaceholder() {},
     },
   },
 });
@@ -41,6 +54,9 @@ jest.mock('services/nicolive-program/nicolive-moderators', () => ({
 }));
 jest.mock('services/windows', () => ({
   WindowsService: {},
+}));
+jest.mock('services/customization', () => ({
+  CustomizationService: {},
 }));
 
 beforeEach(() => {
@@ -133,9 +149,13 @@ test('/disconnectが流れてきたらunsubscribeする', () => {
   expect(unsubscribe).toHaveBeenCalledTimes(2);
 });
 
+const MODERATOR_ID = '123';
+const NOT_MODERATOR_ID = '456';
+
 function connectionSetup() {
   const stateChange = new Subject();
-  const clientSubject = new Subject();
+  const clientSubject = new Subject<MessageResponse>();
+  const refreshObserver = new Subject<ObserveType<NicoliveModeratorsService['refreshObserver']>>();
   jest.doMock('./MessageServerClient', () => ({
     ...(jest.requireActual('./MessageServerClient') as {}),
     MessageServerClient: class MessageServerClient {
@@ -154,6 +174,17 @@ function connectionSetup() {
         },
         checkNameplateHint: () => {},
       },
+      NicoliveModeratorsService: {
+        refreshObserver,
+        isModerator: (userId: string) => {
+          return userId === '123';
+        },
+      },
+      NicoliveCommentFilterService: {
+        addFilterCache: () => {},
+        findFilterCache: () => ({ type: 'word', body: 'abc' } as FilterRecord),
+        deleteFiltersCache: () => {},
+      },
     },
   });
 
@@ -165,6 +196,7 @@ function connectionSetup() {
   return {
     instance,
     clientSubject,
+    refreshObserver,
   };
 }
 
@@ -365,4 +397,114 @@ test('スレッドからの追い出し発生時にメッセージを表示す�
           },
         ]
     `);
+});
+
+test('モデレーターによるSSNG追加・削除がきたらシステムメッセージが追加される', async () => {
+  const { clientSubject, instance, refreshObserver } = connectionSetup();
+
+  const tests: {
+    event: ObserveType<NicoliveModeratorsService['refreshObserver']>;
+    message: string;
+  }[] = [
+    {
+      event: {
+        event: 'addSSNG',
+        record: {
+          id: 1,
+          type: 'word',
+          body: 'abc',
+          userId: parseInt(MODERATOR_ID, 10),
+          userName: 'test',
+        },
+      },
+      message: 'test さんがコメントを配信からブロックしました',
+    },
+    {
+      event: {
+        event: 'removeSSNG',
+        record: {
+          ssngId: 1,
+          userId: parseInt(MODERATOR_ID, 10),
+          userName: 'test',
+        },
+      },
+      message: 'test さんがコメントのブロックを取り消しました',
+    },
+    {
+      event: {
+        event: 'addSSNG',
+        record: {
+          id: 1,
+          type: 'user',
+          body: '456',
+          userId: parseInt(MODERATOR_ID, 10),
+          userName: 'test',
+        },
+      },
+      message: 'test さんがユーザーを配信からブロックしました',
+    },
+    {
+      event: {
+        event: 'addSSNG',
+        record: {
+          id: 1,
+          type: 'command',
+          body: 'shita',
+          userId: parseInt(MODERATOR_ID, 10),
+          userName: 'test',
+        },
+      },
+      message: 'test さんがコマンドを配信からブロックしました',
+    },
+  ];
+
+  for (const test of tests) {
+    refreshObserver.next(test.event);
+  }
+
+  // bufferTime tweaks
+  clientSubject.complete();
+
+  expect(instance.state.messages.length).toEqual(tests.length + 1);
+  for (const [i, test] of tests.entries()) {
+    expect(instance.state.messages[i].value.content).toEqual(test.message);
+  }
+});
+
+test('refreshModeratorsがきたらコメントのモデレーター情報を更新する', async () => {
+  const { clientSubject, instance, refreshObserver } = connectionSetup();
+  instance.state.messages = [
+    {
+      component: 'common',
+      isModerator: false,
+      seqId: 0,
+      type: 'normal',
+      value: {
+        content: 'yay',
+        user_id: MODERATOR_ID,
+      },
+    },
+    {
+      component: 'common',
+      isModerator: true,
+      seqId: 1,
+      type: 'normal',
+      value: {
+        content: 'yay',
+        user_id: NOT_MODERATOR_ID,
+      },
+    },
+  ];
+  expect(instance.state.messages[0].isModerator).toBeFalsy();
+  expect(instance.state.messages[1].isModerator).toBeTruthy();
+
+  refreshObserver.next({
+    event: 'refreshModerators',
+  });
+
+  // bufferTime tweaks
+  clientSubject.complete();
+
+  expect(instance.state.messages[0].isModerator).toBeTruthy();
+  expect(instance.state.messages[1].isModerator).toBeFalsy();
 });

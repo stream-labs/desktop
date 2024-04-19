@@ -118,6 +118,23 @@ export class NicoliveCommentFilterService extends StatefulService<INicoliveComme
       throw NicoliveFailure.fromClientError('deleteFilters', result);
     }
 
+    this.deleteFiltersCache(ids);
+  }
+
+  findFilterCache(id: number): FilterRecord | undefined {
+    return this.state.filters.find(rec => rec.id === id);
+  }
+
+  addFilterCache(record: FilterRecord) {
+    if (!this.state.filters.some(rec => rec.id === record.id)) {
+      const filters = [...this.state.filters, record];
+      this.updateFilters(filters);
+    } else {
+      console.warn('addFilterCache: already exists', record);
+    }
+  }
+
+  deleteFiltersCache(ids: number[]) {
     const filters = this.state.filters.filter(rec => !ids.includes(rec.id));
     this.updateFilters(filters);
   }

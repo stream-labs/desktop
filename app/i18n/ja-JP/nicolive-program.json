@@ -238,15 +238,27 @@
       "addModerator": {
         "NOT_BROADCASTER": {
           "title": "NOT_BROADCASTER",
-          "message": "一度も配信したことのないユーザーは配信できない"
+          "message": "配信していないため、モデレーターを取得できませんでした"
         },
         "ALREADY_EXISTS": {
           "title": "ALREADY_EXISTS",
-          "message": "登録済みのユーザーを登録しようとした"
+          "message": "すでにモデレータ費として登録済みです"
         },
         "MAX": {
           "title": "MAX",
-          "message": "登録上限人数に達している"
+          "message": "登録上限が人数に達しているため、登録できませんでした"
+        }
+      },
+      "removeModerator": {
+        "NOT_BROADCASTER": {
+          "title": "NOT_BROADCASTER",
+          "message": "配信していないため、モデレーターを取得できませんでした"
+        }
+      },
+      "fetchModerators": {
+        "NOT_BROADCASTER": {
+          "title": "NOT_BROADCASTER",
+          "message": "配信していないため、モデレーターを取得できませんでした"
         }
       }
     },

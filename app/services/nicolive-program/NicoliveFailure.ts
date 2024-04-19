@@ -9,7 +9,8 @@ export class NicoliveFailure {
     public method: string,
     public reason: string,
     public additionalMessage: string = '',
-  ) { }
+    public errorCode: string = '',
+  ) {}
 
   static fromClientError(method: string, res: FailedResult) {
     if (res.value instanceof NotLoggedInError) {
@@ -22,7 +23,13 @@ export class NicoliveFailure {
     }
     const { errorCode, errorMessage } = res.value.meta;
     const additionalMessage = `${errorCode ?? ''}${errorMessage ? `: ${errorMessage}` : ''}`;
-    return new this('http_error', method, res.value.meta.status.toString(10), additionalMessage);
+    return new this(
+      'http_error',
+      method,
+      res.value.meta.status.toString(10),
+      additionalMessage,
+      errorCode,
+    );
   }
 
   static fromConditionalError(method: string, reason: string) {
@@ -78,21 +85,30 @@ export async function openErrorDialogFromFailure(failure: NicoliveFailure): Prom
     });
   }
 
-  /** 4xx, 5xxエラーに対する文言がなかったら400や500向けの文言を出す */
+  // errorCode, status code(4xx, 5xx) -> status code(400, 500) の順で探索するfallback chain を構築する
+  const fallbackChain = [
+    failure.errorCode ? failure.errorCode : undefined,
+    failure.reason,
+    fallbackToX00(failure.reason),
+  ];
+  const buildMessage = (
+    key: string,
+    params: { additionalMessage?: string } = {},
+    index: number = 0,
+  ): string | undefined => {
+    if (index >= fallbackChain.length) {
+      return undefined;
+    }
+    if (fallbackChain[index] === undefined) {
+      return buildMessage(key, params, index + 1);
+    }
+    return $t(`nicolive-program.errors.api.${failure.method}.${fallbackChain[index]}.${key}`, {
+      ...params,
+      fallback: buildMessage(key, params, index + 1),
+    });
+  };
   return openErrorDialog({
-    title: $t(`nicolive-program.errors.api.${failure.method}.${failure.reason}.title`, {
-      fallback: $t(
-        `nicolive-program.errors.api.${failure.method}.${fallbackToX00(failure.reason)}.title`,
-      ),
-    }),
-    message: $t(`nicolive-program.errors.api.${failure.method}.${failure.reason}.message`, {
-      additionalMessage: failure.additionalMessage,
-      fallback: $t(
-        `nicolive-program.errors.api.${failure.method}.${fallbackToX00(failure.reason)}.message`,
-        {
-          additionalMessage: failure.additionalMessage,
-        },
-      ),
-    }),
+    title: buildMessage('title'),
+    message: buildMessage('message', { additionalMessage: failure.additionalMessage }),
   });
 }

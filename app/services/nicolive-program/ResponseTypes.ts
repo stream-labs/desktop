@@ -103,6 +103,7 @@ export interface ProgramInfo {
       /** 配信の向き */
       orientation: 'Landscape' | 'Portrait';
     };
+    moderatorViewUri: string;
   };
 }
 
@@ -194,8 +195,8 @@ export type FilterRecord = {
   createdAt?: string; // NG登録日時: 例: "2023-02-20T00:00:00+09:00"
   memo?: string; // NG登録時のコメント本文
   isHashed?: boolean; // type: 'user' 時にユーザーIDが hash化されているかどうか
-  userId?: number;
-  userName?: string;
+  userId?: number; // 登録者ID
+  userName?: string; // 登録者名
 };
 
 export type FilterType = FilterRecord['type'];

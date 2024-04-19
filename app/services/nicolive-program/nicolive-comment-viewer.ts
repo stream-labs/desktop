@@ -1,14 +1,16 @@
-import { EMPTY, Observable, Subscription, interval, of, timer } from 'rxjs';
+import { EMPTY, Observable, Subject, Subscription, merge, of, timer } from 'rxjs';
 import {
   bufferTime,
   catchError,
   distinctUntilChanged,
   endWith,
   filter,
+  finalize,
   groupBy,
   map,
   mapTo,
   mergeMap,
+  takeUntil,
   tap,
 } from 'rxjs/operators';
 import { Inject } from 'services/core/injector';
@@ -33,6 +35,7 @@ import { NicoliveCommentLocalFilterService } from './nicolive-comment-local-filt
 import { NicoliveCommentSynthesizerService } from './nicolive-comment-synthesizer';
 import { NicoliveProgramStateService } from './state';
 import { NicoliveModeratorsService } from './nicolive-moderators';
+import { FilterRecord } from './ResponseTypes';
 
 function makeEmulatedChat(
   content: string,
@@ -79,6 +82,22 @@ interface INicoliveCommentViewerState {
   popoutMessages: WrappedChatWithComponent[];
   pinnedMessage: WrappedChatWithComponent | null;
   speakingSeqId: number | null;
+}
+
+function calcModeratorName(record: { userId?: number; userName?: string }) {
+  if (record.userName) {
+    return `${record.userName} さん`;
+  } else {
+    return 'モデレーター';
+  }
+}
+
+function calcSSNGTypeName(record: FilterRecord) {
+  return {
+    word: 'コメント',
+    user: 'ユーザー',
+    command: 'コマンド',
+  }[record.type];
 }
 
 export class NicoliveCommentViewerService extends StatefulService<INicoliveCommentViewerState> {
@@ -164,18 +183,54 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
       });
     });
 
-    // モデレーター情報が再取得されたら既存コメントのモデレーター情報も更新する
     this.nicoliveModeratorsService.refreshObserver.subscribe({
-      next: () => {
-        console.log('refresh moderators'); // DEBUG
-        this.SET_STATE({
-          messages: this.items.map(chat => ({
-            ...chat,
-            isModerator: this.nicoliveModeratorsService.isModerator(chat.value.user_id),
-          })),
-        });
+      next: event => {
+        switch (event.event) {
+          case 'refreshModerators':
+            // モデレーター情報が再取得されたら既存コメントのモデレーター情報も更新する
+            console.log('refresh moderators'); // DEBUG
+            this.SET_STATE({
+              messages: this.items.map(chat => ({
+                ...chat,
+                isModerator: this.nicoliveModeratorsService.isModerator(chat.value.user_id),
+              })),
+            });
+            break;
+
+          case 'addSSNG':
+            {
+              this.nicoliveCommentFilterService.addFilterCache(event.record);
+              const name = calcModeratorName(event.record);
+              const type = calcSSNGTypeName(event.record);
+              this.addSystemMessage(makeEmulatedChat(`${name}が${type}を配信からブロックしました`));
+            }
+            break;
+
+          case 'removeSSNG':
+            {
+              const { ssngId, userName, userId } = event.record;
+              const record = this.nicoliveCommentFilterService.findFilterCache(ssngId);
+
+              console.log('Removing SSNG:', ssngId, { ...record }); // DEBUG
+              if (record) {
+                this.nicoliveCommentFilterService.deleteFiltersCache([ssngId]);
+              } else {
+                console.warn('Removing SSNG failed:', ssngId); // DEBUG
+                break;
+              }
+              const name = calcModeratorName({ userId, userName });
+              const type = calcSSNGTypeName(record);
+              this.addSystemMessage(makeEmulatedChat(`${name}が${type}のブロックを取り消しました`));
+            }
+            break;
+        }
       },
     });
+  }
+
+  private systemMessages = new Subject<Pick<WrappedChat, 'type' | 'value' | 'isModerator'>>();
+  addSystemMessage(message: Pick<WrappedChat, 'type' | 'value' | 'isModerator'>) {
+    this.systemMessages.next(message);
   }
 
   lastSubscription: Subscription = null;
@@ -206,12 +261,14 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
 
   private unsubscribe() {
     this.lastSubscription?.unsubscribe();
+    this.nicoliveModeratorsService.disconnectNdgr();
   }
 
   private connect() {
-    this.lastSubscription = this.client
-      .connect()
-      .pipe(
+    const closer = new Subject();
+
+    this.lastSubscription = merge(
+      this.client.connect().pipe(
         groupBy(msg => Object.keys(msg)[0]),
         mergeMap((group$): Observable<Pick<WrappedChat, 'type' | 'value' | 'isModerator'>> => {
           switch (group$.key) {
@@ -241,6 +298,10 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
           return of(makeEmulatedChat(`エラーが発生しました: ${err.message}`));
         }),
         endWith(makeEmulatedChat('サーバーとの接続が終了しました')),
+        finalize(() => {
+          // コメント接続が終了したらモデレーター情報の監視も終了する
+          closer.next();
+        }),
         tap(v => {
           if (isOperatorCommand(v.value) && v.value.content === '/disconnect') {
             // completeが発生しないのでサーバーとの接続終了メッセージは出ない
@@ -248,6 +309,10 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
             this.unsubscribe();
           }
         }),
+      ),
+      this.systemMessages.pipe(takeUntil(closer)),
+    )
+      .pipe(
         map(({ type, value, isModerator }, seqId) => ({ type, value, isModerator, seqId })),
         bufferTime(1000),
         filter(arr => arr.length > 0),
