@@ -53,7 +53,7 @@ export class CreateExistingItemCommand extends Command {
           this.sourceId,
           this.sceneItemId,
           this.dualOutputVerticalSceneItemId,
-        ).id;
+        )?.id;
       } else {
         if (this.dualOutputVerticalSceneItemId) {
           Promise.resolve(

@@ -496,7 +496,7 @@ export class ScenesService extends StatefulService<IScenesState> {
     horizontalSceneSourceId: string,
     horizontalSceneItemId: string,
     verticalSceneItemId?: string,
-  ): SceneItem | null {
+  ): SceneItem | undefined {
     const verticalScene = this.createDualOutputSceneSource(horizontalSceneSourceId);
 
     // not ideal, but to prevent errors use the horizontal scene source as a fallback

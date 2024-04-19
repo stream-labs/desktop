@@ -466,6 +466,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         horizontalSceneSourceSceneItem.id,
       );
 
+      if (!verticalSceneSourceSceneItem) return;
+
       const selection = this.scenesService.views
         .getScene(verticalSceneSourceSceneItem.sourceId)
         .getSelection(verticalSceneSourceSceneItem.id);
