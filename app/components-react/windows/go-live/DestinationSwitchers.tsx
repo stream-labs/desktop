@@ -25,6 +25,7 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
     switchCustomDestination,
     isPrimaryPlatform,
     isPlatformLinked,
+    isRestreamEnabled,
   } = useGoLiveSettings();
   // use these references to apply debounce
   // for error handling and switch animation
@@ -60,8 +61,37 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
   }
 
   function togglePlatform(platform: TPlatform, enabled: boolean) {
-    enabledPlatformsRef.current = enabledPlatformsRef.current.filter(p => p !== platform);
-    if (enabled) enabledPlatformsRef.current.push(platform);
+    // On non multistream mode, switch the platform that was just selected while disabling all the others,
+    // allow TikTok to be added as an extra platform
+    if (!isRestreamEnabled) {
+      /*
+       * If TikTok is the platform being toggled:
+       * - Preserve the currently active platform so TikTok can be added to this list at the bottom of this function,
+       *   we will have 2 active platforms and a Primary Chat switcher.
+       * - Remove TikTok from the list without removing the other active platform if we're disabling TikTok itself.
+       */
+      if (platform === 'tiktok') {
+        enabledPlatformsRef.current = enabled
+          ? enabledPlatformsRef.current
+          : enabledPlatformsRef.current.filter(platform => platform !== 'tiktok');
+      } else {
+        /*
+         * Clearing this list ensures that when a new platform is selected, instead of enabling 2 platforms
+         * we switch to 1 enabled platforms that was just toggled.
+         * We will also preserve TikTok as an active platform if it was before.
+         */
+        enabledPlatformsRef.current = enabledPlatformsRef.current.includes('tiktok')
+          ? ['tiktok']
+          : [];
+      }
+    } else {
+      enabledPlatformsRef.current = enabledPlatformsRef.current.filter(p => p !== platform);
+    }
+
+    if (enabled) {
+      enabledPlatformsRef.current.push(platform);
+    }
+
     emitSwitch();
   }
 
