@@ -16,6 +16,7 @@ import { CustomizationService } from './customization';
 import { JsonrpcService } from 'services/api/jsonrpc/jsonrpc';
 import { WindowsService } from 'services/windows';
 import { RealmObject } from './realm';
+import { ObjectSchema } from 'realm';
 
 export interface IAnnouncementsInfo {
   id: number;
@@ -42,7 +43,7 @@ class AnnouncementInfo extends RealmObject {
   params?: { [key: string]: string };
   closeOnLink?: boolean;
 
-  static schema = {
+  static schema: ObjectSchema = {
     name: 'AnnouncementInfo',
     embedded: true,
     properties: {
@@ -66,10 +67,14 @@ class AnnouncementsServiceEphemeralState extends RealmObject {
   news: IAnnouncementsInfo[];
   banner: IAnnouncementsInfo;
 
-  static schema = {
+  static schema: ObjectSchema = {
     name: 'AnnouncementsServiceEphemeralState',
     properties: {
-      news: { type: 'AnnouncementInfo[]', default: [] as AnnouncementInfo[] },
+      news: {
+        type: 'list',
+        objectType: 'AnnouncementInfo',
+        default: [] as AnnouncementInfo[],
+      },
       banner: 'AnnouncementInfo',
     },
   };
@@ -80,7 +85,7 @@ AnnouncementsServiceEphemeralState.register();
 class AnnouncementsServicePersistedState extends RealmObject {
   lastReadId: number;
 
-  static schema = {
+  static schema: ObjectSchema = {
     name: 'AnnouncementsServicePersistedState',
     properties: {
       lastReadId: { type: 'int', default: 145 },

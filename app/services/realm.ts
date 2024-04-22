@@ -1,5 +1,5 @@
 import { Service } from 'services';
-import Realm from 'realm';
+import Realm, { PropertyTypeName } from 'realm';
 import path from 'path';
 import * as remote from '@electron/remote';
 import { ExecuteInCurrentWindow } from './core';
@@ -252,7 +252,7 @@ export class RealmObject {
     name: string,
     initObject: TInit,
   ): () => DynamicRealmObject<TInit> {
-    const propMap: { [key: string]: { type: string; default: any } } = {};
+    const propMap: { [key: string]: { type: PropertyTypeName; default: any } } = {};
 
     const klass = class extends RealmObject {};
 

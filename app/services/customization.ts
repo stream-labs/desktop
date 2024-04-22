@@ -1,13 +1,4 @@
 import { Subject } from 'rxjs';
-import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
-import { mutation, ViewHandler } from 'services/core/stateful-service';
-import {
-  IObsInput,
-  IObsListInput,
-  IObsNumberInputValue,
-  TObsFormData,
-} from 'components/obs/inputs/ObsInput';
-import Utils from 'services/utils';
 import { $t } from 'services/i18n';
 import { Inject, Service } from 'services/core';
 import { UserService } from 'services/user';
@@ -17,6 +8,7 @@ import path from 'path';
 import { AppService } from './app';
 import * as obs from '../../obs-api';
 import { RealmObject } from './realm';
+import { ObjectSchema } from 'realm';
 
 // Maps to --background
 const THEME_BACKGROUNDS = {
@@ -84,7 +76,7 @@ class PinnedStatistics extends RealmObject {
   droppedFrames: boolean;
   bandwidth: boolean;
 
-  static schema = {
+  static schema: ObjectSchema = {
     name: 'PinnedStatistics',
     embedded: true,
     properties: {
@@ -122,7 +114,7 @@ export class CustomizationState extends RealmObject {
   enableCrashDumps: boolean;
   enableAnnouncements: boolean;
 
-  static schema = {
+  static schema: ObjectSchema = {
     name: 'CustomizationState',
     properties: {
       theme: { type: 'string', default: 'night-theme' },
@@ -144,7 +136,7 @@ export class CustomizationState extends RealmObject {
       navigateToLiveOnStreamStart: { type: 'bool', default: true },
       legacyEvents: { type: 'bool', default: false },
       designerMode: { type: 'bool', default: false },
-      pinnedStatistics: { type: 'PinnedStatistics', default: {} },
+      pinnedStatistics: { type: 'object', objectType: 'PinnedStatistics', default: {} },
       enableCrashDumps: { type: 'bool', default: true },
       enableAnnouncements: { type: 'bool', default: true },
     },
