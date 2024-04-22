@@ -27,9 +27,8 @@ export default function DualOutputGoLiveSettings() {
     isLoading,
     isPrime,
     canUseOptimizedProfile,
-    isRestreamEnabled,
-    hasMultiplePlatforms,
-    enabledPlatforms,
+    shouldShowPrimaryChatSwitcher,
+    chatPlatforms,
     primaryChat,
     setPrimaryChat,
   } = useGoLiveSettings().extend(module => {
@@ -47,7 +46,6 @@ export default function DualOutputGoLiveSettings() {
     };
   });
 
-  const shouldShowPrimaryChatSwitcher = isRestreamEnabled && hasMultiplePlatforms;
   // TODO: make sure this doesn't jank the UI
   const leftPaneHeight = shouldShowPrimaryChatSwitcher ? '82%' : '100%';
 
@@ -62,7 +60,7 @@ export default function DualOutputGoLiveSettings() {
         {shouldShowPrimaryChatSwitcher && (
           <PrimaryChatSwitcher
             style={{ padding: '0 16px' }}
-            enabledPlatforms={enabledPlatforms}
+            chatPlatforms={chatPlatforms}
             primaryChat={primaryChat}
             onSetPrimaryChat={setPrimaryChat}
           />
