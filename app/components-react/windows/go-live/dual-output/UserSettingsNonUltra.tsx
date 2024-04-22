@@ -1,5 +1,4 @@
 import React from 'react';
-import { Services } from 'components-react/service-provider';
 import { useGoLiveSettings } from '../useGoLiveSettings';
 import AddDestinationButton from 'components-react/shared/AddDestinationButton';
 import { NonUltraDestinationSwitchers } from './NonUltraDestinationSwitchers';
@@ -23,7 +22,9 @@ export default function UserSettingsNonUltra() {
       {/*DESTINATION SWITCHERS*/}
       {!isLoading && <NonUltraDestinationSwitchers showSelector={canAddDestinations} />}
       {/*ADD DESTINATION BUTTON*/}
-      {!isLoading && !canAddDestinations && <AddDestinationButton />}
+      {!isLoading && !canAddDestinations && (
+        <AddDestinationButton data-test="add-dest-btn" style={{ margin: '0px 15px 15px 15px' }} />
+      )}
     </>
   );
 }

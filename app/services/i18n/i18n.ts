@@ -26,6 +26,11 @@ export function $t(...args: any[]): string {
   return vueI18nInstance.t.call(I18nService.vueI18nInstance, ...args);
 }
 
+function $te(...args: any[]): boolean {
+  const vueI18nInstance = I18nService.vueI18nInstance;
+  return vueI18nInstance.te.call(I18nService.vueI18nInstance, ...args);
+}
+
 /**
  * get localized string from dictionary if exists
  * returns a keypath if localized version of string doesn't exist
@@ -33,6 +38,17 @@ export function $t(...args: any[]): string {
 export function $translateIfExist(...args: any[]): string {
   // TODO: Investigate method to silently fail and not trigger console warnings ($te is unreliable)
   return $t(...args);
+}
+
+/*
+ * While above it says `$te` is unreliable, running into bugs when OBS settings are used as translation
+ * keys, where `silentTranslationWarn` is set to false in VueI18n, will cause the process to hang when
+ * running tests, and only when running tests, presumably while trying to log the failure to the console.
+ * Not sure which issues we ran into with `$te`, but hoping a small subset (OBS dropdown setting values,
+ * i.e `OBS_PROPERTY_LIST`) will be more reliable.
+ */
+export function $translateIfExistWithCheck(key: string, ...args: any[]) {
+  return $te(key) ? $t(key, ...args) : key;
 }
 
 /**

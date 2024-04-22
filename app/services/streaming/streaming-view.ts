@@ -22,6 +22,7 @@ import difference from 'lodash/difference';
 import { Services } from '../../components-react/service-provider';
 import { getDefined } from '../../util/properties-type-guards';
 import { TDisplayType } from 'services/settings-v2';
+import compact from 'lodash/compact';
 
 /**
  * The stream info view is responsible for keeping
@@ -113,6 +114,7 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
 
   /**
    * Returns a list of linked platforms available for restream
+   * @remark If TikTok is linked, users can always stream to it
    */
   get linkedPlatforms(): TPlatform[] {
     if (!this.userView.state.auth) return [];
@@ -121,7 +123,12 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
       (!this.restreamView.canEnableRestream || !this.protectedModeEnabled) &&
       !this.isDualOutputMode
     ) {
-      return [this.userView.auth!.primaryPlatform];
+      return compact([
+        this.userView.auth!.primaryPlatform,
+        this.userView.auth!.primaryPlatform !== 'tiktok' &&
+          this.isPlatformLinked('tiktok') &&
+          'tiktok',
+      ]);
     }
 
     return this.allPlatforms.filter(p => this.isPlatformLinked(p));
@@ -136,6 +143,17 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
    */
   get enabledPlatforms(): TPlatform[] {
     return this.getEnabledPlatforms(this.settings.platforms);
+  }
+
+  /**
+   * Returns the host from the rtmp url
+   */
+  get enabledCustomDestinationHosts() {
+    return (
+      this.settings.customDestinations
+        .filter(dest => dest.enabled)
+        .map(dest => dest.url.split[2]) || []
+    );
   }
 
   /**
@@ -217,7 +235,7 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     return destinations.reduce(
       (displayDestinations: TDisplayDestinations, destination: ICustomStreamDestination) => {
         if (destination.enabled) {
-          displayDestinations[destination.display ?? 'horizontal'].push(destination.name);
+          displayDestinations[destination.display ?? 'horizontal'].push(destination.url);
         }
         return displayDestinations;
       },
@@ -251,7 +269,7 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
    */
   get chatUrl(): string {
     if (!this.userView.isLoggedIn || !this.userView.auth) return '';
-    return getPlatformService(this.userView.auth.primaryPlatform).chatUrl;
+    return getPlatformService(this.userView.auth.primaryPlatform)?.chatUrl;
   }
 
   getTweetText(streamTitle: string) {

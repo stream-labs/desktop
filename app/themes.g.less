@@ -13,6 +13,7 @@
   --accent: @purple-light;
   --blue: @blue-light;
   --warning: @red-light;
+  --warning-semi: fade(@red-light, 8%);
   --warning-hover: lighten(@red-light, 4%);
   --warning-bg: fade(@red-light, 28%);
   --warning-button-bg: fade(@red-light, 36%);
@@ -82,11 +83,14 @@
   --youtube: @youtube;
   --youtube-transparent: fade(@youtube, 50%);
   --youtube-hover: lighten(@youtube, 4%);
-  --tiktok: @black;
-  --tiktok-inverse: @white;
+  --tiktok: @white;
+  --tiktok-inverse: @black;
   --tiktok-hover: lighten(@black, 4%);
+  --tiktok-btn: @cyan;
   --twitter: @twitter;
   --twitter-hover: lighten(@twitter, 4%);
+  --instagram: @instagram;
+  --instagram-hover: lighten(@instagram, 4%);
   --trovo: @trovo;
   --trovo-hover: lighten(@trovo, 4%);
 }
@@ -150,9 +154,11 @@
   --prime-button: @dark-2;
   --tooltip-hover: @dark-4;
 
-  --tiktok: @white;
-  --tiktok-inverse: @black;
+  // 3rd Party Colors
+  --tiktok: @black;
+  --tiktok-inverse: @white;
   --tiktok-hover: darken(@white, 4%);
+  --tiktok-btn: @cyan;
 }
 
 .prime-dark {
@@ -214,9 +220,11 @@
   --prime-button: @dark-2;
   --tooltip-hover: @primedark-4;
 
-  --tiktok: @white;
-  --tiktok-inverse: @black;
+  // 3rd Party Colors
+  --tiktok: @black;
+  --tiktok-inverse: @white;
   --tiktok-hover: darken(@white, 4%);
+  --tiktok-btn: @cyan;
 }
 
 .prime-light {
@@ -278,4 +286,8 @@
   --logged-in: @lavender-light;
   --prime-button: @dark-2;
   --tooltip-hover: @primelight-4;
+
+  // 3rd Party Colors
+  --tiktok-inverse: @black;
+  --tiktok-btn: @cyan;
 }

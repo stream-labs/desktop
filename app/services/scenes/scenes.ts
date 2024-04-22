@@ -322,7 +322,7 @@ export class ScenesService extends StatefulService<IScenesState> {
     const id = options.sceneId || `scene_${uuid()}`;
     this.ADD_SCENE(id, name);
     const obsScene = SceneFactory.create(id);
-    this.sourcesService.addSource(obsScene.source, name, { sourceId: id });
+    this.sourcesService.addSource(obsScene.source, name, { sourceId: id, display: 'horizontal' });
 
     if (options.duplicateSourcesFromScene) {
       const newScene = this.views.getScene(id)!;
@@ -414,6 +414,10 @@ export class ScenesService extends StatefulService<IScenesState> {
     if (!scene) return false;
 
     const activeScene = this.views.activeScene;
+
+    if (this.dualOutputService.views.dualOutputMode && id !== this.state.activeSceneId) {
+      this.dualOutputService.setIsLoading(true);
+    }
 
     this.MAKE_SCENE_ACTIVE(id);
 

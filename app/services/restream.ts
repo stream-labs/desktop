@@ -10,12 +10,13 @@ import { IncrementalRolloutService } from './incremental-rollout';
 import electron from 'electron';
 import { StreamingService } from './streaming';
 import { FacebookService } from './platforms/facebook';
-import { TiktokService } from './platforms/tiktok';
+import { TikTokService } from './platforms/tiktok';
 import { TrovoService } from './platforms/trovo';
 import * as remote from '@electron/remote';
 import { VideoSettingsService, TDisplayType } from './settings-v2/video';
 import { DualOutputService } from './dual-output';
 import { TwitterPlatformService } from './platforms/twitter';
+import { InstagramService } from './platforms/instagram';
 
 export type TOutputOrientation = 'landscape' | 'portrait';
 interface IRestreamTarget {
@@ -51,8 +52,9 @@ export class RestreamService extends StatefulService<IRestreamState> {
   @Inject() streamingService: StreamingService;
   @Inject() incrementalRolloutService: IncrementalRolloutService;
   @Inject() facebookService: FacebookService;
-  @Inject() tiktokService: TiktokService;
+  @Inject('TikTokService') tiktokService: TikTokService;
   @Inject() trovoService: TrovoService;
+  @Inject() instagramService: InstagramService;
   @Inject() videoSettingsService: VideoSettingsService;
   @Inject() dualOutputService: DualOutputService;
   @Inject('TwitterPlatformService') twitterService: TwitterPlatformService;
@@ -272,7 +274,9 @@ export class RestreamService extends StatefulService<IRestreamState> {
       const ttSettings = this.tiktokService.state.settings;
       tikTokTarget.platform = 'relay';
       tikTokTarget.streamKey = `${ttSettings.serverUrl}/${ttSettings.streamKey}`;
-      tikTokTarget.mode = this.dualOutputService.views.getPlatformMode('tiktok');
+      tikTokTarget.mode = isDualOutputMode
+        ? this.dualOutputService.views.getPlatformMode('tiktok')
+        : 'landscape';
     }
 
     // treat twitter as a custom destination
@@ -280,7 +284,19 @@ export class RestreamService extends StatefulService<IRestreamState> {
     if (twitterTarget) {
       twitterTarget.platform = 'relay';
       twitterTarget.streamKey = `${this.twitterService.state.ingest}/${this.twitterService.state.streamKey}`;
-      twitterTarget.mode = this.dualOutputService.views.getPlatformMode('twitter');
+      twitterTarget.mode = isDualOutputMode
+        ? this.dualOutputService.views.getPlatformMode('twitter')
+        : 'landscape';
+    }
+
+    // treat instagram as a custom destination
+    const instagramTarget = newTargets.find(t => t.platform === 'instagram');
+    if (instagramTarget) {
+      instagramTarget.platform = 'relay';
+      instagramTarget.streamKey = `${this.instagramService.state.settings.streamUrl}${this.instagramService.state.streamKey}`;
+      instagramTarget.mode = isDualOutputMode
+        ? this.dualOutputService.views.getPlatformMode('instagram')
+        : 'landscape';
     }
 
     await this.createTargets(newTargets);

@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
-import { handleResponse, authorizedHeaders, jfetch } from 'util/requests';
+import { authorizedHeaders, jfetch } from 'util/requests';
 import { mutation } from 'services/core/stateful-service';
 import { Service, Inject, ViewHandler } from 'services/core';
 import electron from 'electron';
@@ -33,11 +33,13 @@ import { MagicLinkService } from 'services/magic-link';
 import fs from 'fs';
 import path from 'path';
 import { AppService } from 'services/app';
-import { UsageStatisticsService } from 'services/usage-statistics';
 import { StreamingService } from 'services/streaming';
 import { NotificationsService, ENotificationType } from 'services/notifications';
 import { JsonrpcService } from 'services/api/jsonrpc';
 import * as remote from '@electron/remote';
+import { TikTokService } from 'services/platforms/tiktok';
+import { TTikTokLiveScopeTypes } from 'services/platforms/tiktok/api';
+import { UsageStatisticsService } from 'app-services';
 
 export enum EAuthProcessState {
   Idle = 'idle',
@@ -104,6 +106,7 @@ interface ILinkedPlatform {
   access_token: string;
   platform_id: string;
   platform_name: string;
+  validation_error?: 'invalid' | 'missing_scope' | null;
 }
 
 interface ILinkedPlatformsResponse {
@@ -162,6 +165,7 @@ class UserViews extends ViewHandler<IUserServiceState> {
   @Inject() hostsService: HostsService;
   @Inject() urlService: UrlService;
   @Inject() magicLinkService: MagicLinkService;
+  @Inject() customizationService: CustomizationService;
 
   get settingsServiceViews() {
     return this.getServiceViews(SettingsService);
@@ -169,10 +173,6 @@ class UserViews extends ViewHandler<IUserServiceState> {
 
   get streamSettingsServiceViews() {
     return this.getServiceViews(StreamSettingsService);
-  }
-
-  get customizationServiceViews() {
-    return this.getServiceViews(CustomizationService);
   }
 
   get isLoggedIn() {
@@ -256,7 +256,7 @@ class UserViews extends ViewHandler<IUserServiceState> {
     const host = this.hostsService.platform;
     const protocol = this.urlService.protocol;
     const token = this.auth.apiToken;
-    const nightMode = this.customizationServiceViews.isDarkTheme ? 'night' : 'day';
+    const nightMode = this.customizationService.isDarkTheme ? 'night' : 'day';
     let url = `${protocol}${host}/slobs-store`;
 
     if (params?.appId) {
@@ -284,9 +284,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private websocketService: WebsocketService;
   @Inject() private magicLinkService: MagicLinkService;
   @Inject() private appService: AppService;
-  @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject() private notificationsService: NotificationsService;
   @Inject() private jsonrpcService: JsonrpcService;
+  @Inject() private usageStatisticsService: UsageStatisticsService;
+  @Inject('TikTokService') tiktokService: TikTokService;
 
   @mutation()
   LOGIN(auth: IUserAuth) {
@@ -413,6 +414,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   private socketConnection: Subscription = null;
 
   /**
+   * Primarily used for frontend confirmations
+   */
+  refreshedLinkedAccounts = new Subject();
+
+  /**
    * Used by child and 1-off windows to update their sentry contexts
    */
   sentryContext = new Subject<ISentryContext>();
@@ -440,6 +446,25 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
           ),
         });
       }
+
+      if (['account_merged', 'account_unlinked'].includes(event.type)) {
+        await this.updateLinkedPlatforms();
+
+        const message =
+          event.type === 'account_merged'
+            ? $t('Successfully merged account')
+            : $t('Successfully unlinked account');
+
+        this.windowsService.setWindowOnTop();
+        this.settingsService.showSettings('Stream');
+        this.refreshedLinkedAccounts.next({ success: true, message });
+      }
+
+      if (event.type === 'account_merge_error') {
+        this.windowsService.setWindowOnTop();
+        this.settingsService.showSettings('Stream');
+        this.refreshedLinkedAccounts.next({ success: false, message: $t('Account merge error') });
+      }
     });
   }
 
@@ -457,6 +482,26 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.streamSettingsService.resetStreamSettings();
     await this.login(service, auth);
     if (!isOnboardingTest) this.onboardingService.finish();
+  }
+
+  /**
+   * This is also allows us to use dummy accounts for tests.
+   * @remark Use for tests where test accounts are not available.
+   */
+  async addDummyAccount(
+    dummyAcct: IPlatformAuth,
+    tiktokLiveScope: TTikTokLiveScopeTypes,
+  ): Promise<EPlatformCallResult> {
+    if (!Utils.isTestMode()) return;
+
+    this.UPDATE_PLATFORM(dummyAcct);
+
+    // for tiktok, also update live access status
+    if (tiktokLiveScope) {
+      this.tiktokService.setLiveScope(tiktokLiveScope);
+    }
+
+    return EPlatformCallResult.Success;
   }
 
   async autoLogin() {
@@ -589,6 +634,23 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         id: linkedPlatforms.twitch_account.platform_id,
         token: linkedPlatforms.twitch_account.access_token,
       });
+
+      const validationError = linkedPlatforms.twitch_account.validation_error;
+      if (validationError) {
+        const message =
+          validationError === 'missing_scope'
+            ? $t(
+                'Streamlabs requires additional permissions from your Twitch account. Please log in with Twitch to continue.',
+              )
+            : $t('Your Twitch access token has expired. Please log in with Twitch to continue.');
+        this.usageStatisticsService.recordAnalyticsEvent('TwitchCredentialsAlert', validationError);
+        this.reauthenticate(true, {
+          type: 'warning',
+          title: 'Twitch Error',
+          buttons: [$t('Refresh Login')],
+          message,
+        });
+      }
     } else if (this.state.auth.primaryPlatform !== 'twitch') {
       this.UNLINK_PLATFORM('twitch');
     }
@@ -837,7 +899,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   async alertboxLibraryUrl(id?: string) {
-    const uiTheme = this.customizationService.views.isDarkTheme ? 'night' : 'day';
+    const uiTheme = this.customizationService.isDarkTheme ? 'night' : 'day';
     let url = `${this.urlService.protocol}${this.hostsService.streamlabs}/alert-box-themes?mode=${uiTheme}&slobs`;
 
     if (id) url += `&id=${id}`;
@@ -846,7 +908,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   async overlaysUrl(type?: 'overlay' | 'widget-themes' | 'site-themes', id?: string) {
-    const uiTheme = this.customizationService.views.isDarkTheme ? 'night' : 'day';
+    const uiTheme = this.customizationService.isDarkTheme ? 'night' : 'day';
 
     let url = `${this.urlService.protocol}${this.hostsService.streamlabs}/library`;
 
@@ -1006,24 +1068,25 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    * platform linked, they will be prompted to merge a platform into their
    * account before they can be considered fully logged in.
    */
-  async startSLAuth() {
+  async startSLAuth({ signup = false } = {}) {
     const query = `_=${Date.now()}&skip_splash=true&external=electron&slid&force_verify&origin=slobs`;
-    const url = `${this.urlService.protocol}${this.hostsService.streamlabs}/slobs/login?${query}`;
-
+    const url = `${this.urlService.protocol}${this.hostsService.streamlabs}/slobs/${
+      signup ? 'signup' : 'login'
+    }?${query}`;
     this.SET_AUTH_STATE(EAuthProcessState.Loading);
-    const auth = await this.authModule.startExternalAuth(
-      url,
-      () => {
-        this.SET_AUTH_STATE(EAuthProcessState.Idle);
-      },
-      false,
-    );
+
+    const auth = await this.authModule.startPkceAuth(url, () => {
+      this.SET_AUTH_STATE(EAuthProcessState.Idle);
+    });
+
+    if (!auth) return EPlatformCallResult.Error;
 
     this.LOGOUT();
     this.LOGIN(auth);
 
     // Find out if the user has any additional platforms linked
     await this.updateLinkedPlatforms();
+    return EPlatformCallResult.Success;
   }
 
   /**
@@ -1074,13 +1137,17 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.SET_AUTH_STATE(EAuthProcessState.Loading);
     const onWindowShow = () => this.SET_AUTH_STATE(EAuthProcessState.Idle);
 
-    const auth = await this.authModule.startExternalAuth(authUrl, onWindowShow, true);
-
-    this.SET_AUTH_STATE(EAuthProcessState.Loading);
-    this.SET_IS_RELOG(false);
-    this.SET_SLID(auth.slid);
-    this.SET_AUTH_STATE(EAuthProcessState.Idle);
-    return EPlatformCallResult.Success;
+    try {
+      const auth = await this.authModule.startPkceAuth(authUrl, onWindowShow, () => {}, true);
+      this.SET_AUTH_STATE(EAuthProcessState.Loading);
+      this.SET_IS_RELOG(false);
+      this.SET_SLID(auth.slid);
+      this.SET_AUTH_STATE(EAuthProcessState.Idle);
+      return EPlatformCallResult.Success;
+    } catch (e: unknown) {
+      console.error('Merge Account Error: ', e);
+      return EPlatformCallResult.Error;
+    }
   }
 
   /**
@@ -1099,6 +1166,28 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       throw new Error('Account merging can only be performed while logged in');
     }
 
+    // HACK: faking instagram login
+    if (platform === 'instagram') {
+      const auth = {
+        widgetToken: '',
+        apiToken: '',
+        primaryPlatform: 'instagram' as TPlatform,
+        platforms: {
+          instagram: {
+            type: 'instagram' as TPlatform,
+            // HACK: faking instagram username
+            username: 'linked',
+            token: '',
+            id: 'instagram',
+          },
+        },
+        hasRelogged: true,
+      };
+
+      this.UPDATE_PLATFORM(auth.platforms[auth.primaryPlatform]);
+      return EPlatformCallResult.Success;
+    }
+
     this.SET_AUTH_STATE(EAuthProcessState.Loading);
     const onWindowShow = () =>
       this.SET_AUTH_STATE(
@@ -1106,18 +1195,14 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       );
     const onWindowClose = () => this.SET_AUTH_STATE(EAuthProcessState.Idle);
 
-    const auth =
-      mode === 'internal'
-        ? /* eslint-disable */
-          await this.authModule.startInternalAuth(
-            authUrl,
-            service.authWindowOptions,
-            onWindowShow,
-            onWindowClose,
-            merge,
-          )
-        : await this.authModule.startExternalAuth(authUrl, onWindowShow, merge);
-    /* eslint-enable */
+    const auth = await this.authModule.startPkceAuth(
+      authUrl,
+      onWindowShow,
+      onWindowClose,
+      merge,
+      mode === 'external',
+      service.authWindowOptions,
+    );
 
     this.SET_AUTH_STATE(EAuthProcessState.Loading);
     this.SET_IS_RELOG(false);
@@ -1130,8 +1215,12 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
       result = await this.login(service, auth);
     } else {
-      this.UPDATE_PLATFORM(auth.platforms[auth.primaryPlatform]);
-      result = EPlatformCallResult.Success;
+      if (auth) {
+        this.UPDATE_PLATFORM(auth.platforms[auth.primaryPlatform]);
+        result = EPlatformCallResult.Success;
+      } else {
+        result = EPlatformCallResult.Error;
+      }
     }
 
     this.SET_AUTH_STATE(EAuthProcessState.Idle);

@@ -1,5 +1,5 @@
 import electron, { ipcRenderer } from 'electron';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { Inject, InitAfter } from 'services/core';
 import { UserService } from 'services/user';
 import { CustomizationService } from 'services/customization';
@@ -45,6 +45,16 @@ const hideInteraction = `
   });
 `;
 
+export enum EGameOverlayState {
+  Disabled = 'disabled',
+  Enabled = 'enabled',
+}
+
+export enum EGameOverlayVisibility {
+  Hidden = 'hidden',
+  Visible = 'visible',
+}
+
 @InitAfter('UserService')
 export class GameOverlayService extends PersistentStatefulService<GameOverlayState> {
   @Inject() userService: UserService;
@@ -84,6 +94,9 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   // work around an electron bug: https://github.com/electron/electron/issues/20559
   // TODO: This module has types but we can't use them in their current state
   private overlay: any;
+
+  overlayStatusChanged = new Subject<EGameOverlayState>();
+  overlayVisibilityChanged = new Subject<EGameOverlayVisibility>();
 
   async init() {
     // Game overlay is windows only
@@ -259,11 +272,14 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
 
     // Force a refresh to trigger a paint event
     Object.values(this.windows).forEach(win => win.webContents.invalidate());
+
+    this.overlayVisibilityChanged.next(EGameOverlayVisibility.Visible);
   }
 
   hideOverlay() {
     this.overlay.hide();
     this.TOGGLE_OVERLAY(false);
+    this.overlayVisibilityChanged.next(EGameOverlayVisibility.Hidden);
   }
 
   toggleOverlay() {
@@ -294,6 +310,10 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
 
     this.SET_ENABLED(shouldEnable);
     if (shouldStop) await this.destroyOverlay();
+
+    this.overlayStatusChanged.next(
+      shouldEnable ? EGameOverlayState.Enabled : EGameOverlayState.Disabled,
+    );
   }
 
   async toggleWindowEnabled(window: string) {
@@ -344,6 +364,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
 
   async destroy() {
     await this.destroyOverlay();
+    this.overlayVisibilityChanged.next(EGameOverlayVisibility.Hidden);
   }
 
   async destroyOverlay() {

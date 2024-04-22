@@ -11,8 +11,9 @@ import { DualOutputService } from './dual-output';
 import { byOS, OS, getOS } from 'util/operating-systems';
 import * as remote from '@electron/remote';
 import { onUnload } from 'util/unload';
-import { ScenesService } from './api/external-api/resources';
 import { ISelectionState, SelectionService } from 'services/selection';
+import { SourcesService } from 'services/sources';
+import { ScenesService } from 'services/scenes';
 import { TDisplayType, VideoSettingsService } from './settings-v2';
 
 // TODO: There are no typings for nwr
@@ -175,7 +176,8 @@ export class Display {
       }
     };
 
-    this.trackingFun();
+    // Allow a browser paint before trying to set initional position
+    window.setTimeout(() => this.trackingFun(), 0);
     this.trackingInterval = window.setInterval(this.trackingFun, DISPLAY_ELEMENT_POLLING_INTERVAL);
   }
 
@@ -306,6 +308,9 @@ export class VideoService extends Service {
   @Inject() scenesService: ScenesService;
   @Inject() videoSettingsService: VideoSettingsService;
   @Inject() dualOutputService: DualOutputService;
+  @Inject() sourcesService: SourcesService;
+
+  displayNameToSceneSourceIdMap: Map<string, string> = new Map();
 
   init() {
     this.settingsService.loadSettingsIntoStore();
@@ -396,6 +401,12 @@ export class VideoService extends Service {
         false,
         context,
       );
+
+      const source = this.sourcesService.views.getSource(sourceId);
+      if (source && source.type === 'scene') {
+        this.displayNameToSceneSourceIdMap.set(name, sourceId);
+        obs.Global.addSceneToBackstage(source.getObsInput());
+      }
     } else {
       obs.NodeObs.OBS_content_createDisplay(
         electronWindow.getNativeWindowHandle(),
@@ -425,6 +436,14 @@ export class VideoService extends Service {
 
   destroyOBSDisplay(name: string) {
     obs.NodeObs.OBS_content_destroyDisplay(name);
+
+    const sourceId = this.displayNameToSceneSourceIdMap.get(name);
+    if (sourceId) {
+      const source = this.sourcesService.views.getSource(sourceId);
+      if (source && source.type === 'scene') {
+        obs.Global.removeSceneFromBackstage(source.getObsInput());
+      }
+    }
   }
 
   getOBSDisplayPreviewOffset(name: string): IVec2 {

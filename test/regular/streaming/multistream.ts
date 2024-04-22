@@ -5,6 +5,7 @@ import {
   submit,
   switchAdvancedMode,
   waitForSettingsWindowLoaded,
+  waitForStreamStart,
 } from '../../helpers/modules/streaming';
 import { fillForm, useForm } from '../../helpers/modules/forms';
 import { click, clickButton, isDisplayed, waitForDisplayed } from '../../helpers/modules/core';
@@ -134,13 +135,19 @@ test('Custom stream destinations', async t => {
   await prepareToGoLive();
   await clickGoLive();
   await waitForSettingsWindowLoaded();
-  await t.true(await isDisplayed('span=MyCustomDest'), 'Destination is available');
+  t.true(await isDisplayed('span=MyCustomDest'), 'Destination is available');
   await click('span=MyCustomDest'); // switch the destination on
 
   // try to stream
+  await fillForm({
+    title: 'Test stream',
+    twitchGame: 'Fortnite',
+  });
+  await waitForSettingsWindowLoaded();
   await submit();
   await waitForDisplayed('span=Configure the Multistream service');
   await waitForDisplayed("h1=You're live!", { timeout: 60000 });
+  await waitForStreamStart();
   await stopStream();
   await releaseUserInPool(user);
 

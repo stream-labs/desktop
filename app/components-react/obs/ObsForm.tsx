@@ -25,8 +25,10 @@ import {
 import cloneDeep from 'lodash/cloneDeep';
 import { Button } from 'antd';
 import InputWrapper from '../shared/inputs/InputWrapper';
-import { $t, $translateIfExist } from '../../services/i18n';
+import { $t, $translateIfExist, $translateIfExistWithCheck } from '../../services/i18n';
 import Utils from 'services/utils';
+
+import * as obs from '../../../obs-api';
 
 interface IExtraInputProps {
   debounce?: number;
@@ -117,7 +119,13 @@ function ObsInput(p: IObsInputProps) {
       if (textVal.multiline) {
         return <TextAreaInput {...inputProps} debounce={300} />;
       } else if (textVal.infoField) {
-        return <InputWrapper>{textVal.description}</InputWrapper>;
+        let style = { };
+        if (textVal.infoType == obs.ETextInfoType.Warning) {
+          Object.assign(style, { color: 'var(--info)' });
+        } else if (textVal.infoType == obs.ETextInfoType.Error) {
+          Object.assign(style, { color: 'var(--warning)' });
+        }
+        return <InputWrapper style={ style }>{textVal.description}</InputWrapper>;
       } else {
         return <TextInput {...inputProps} isPassword={inputProps.masked} />;
       }
@@ -128,9 +136,11 @@ function ObsInput(p: IObsInputProps) {
         if (opt.value === 0 && opt.description === '') {
           return { label: $t('Select Option'), value: 0 };
         }
+
         return {
           value: opt.value,
-          label: opt.description,
+          label: $translateIfExistWithCheck(opt.description),
+          originalLabel: opt.description,
         };
       });
       return <ListInput {...inputProps} options={options} allowClear={false} />;

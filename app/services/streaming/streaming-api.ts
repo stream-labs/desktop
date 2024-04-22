@@ -5,10 +5,11 @@ import { IYoutubeStartStreamOptions } from '../platforms/youtube';
 import { IFacebookStartStreamOptions } from '../platforms/facebook';
 import { IStreamError } from './stream-error';
 import { ICustomStreamDestination } from '../settings/streaming';
-import { ITiktokStartStreamOptions } from '../platforms/tiktok';
+import { ITikTokStartStreamOptions } from '../platforms/tiktok';
 import { ITrovoStartStreamOptions } from '../platforms/trovo';
 import { IVideo } from 'obs-studio-node';
 import { ITwitterStartStreamOptions } from 'services/platforms/twitter';
+import { IInstagramStartStreamOptions } from 'services/platforms/instagram';
 
 export enum EStreamingState {
   Offline = 'offline',
@@ -51,6 +52,7 @@ export interface IStreamInfo {
     tiktok: TGoLiveChecklistItemState;
     trovo: TGoLiveChecklistItemState;
     twitter: TGoLiveChecklistItemState;
+    instagram: TGoLiveChecklistItemState;
     setupMultistream: TGoLiveChecklistItemState;
     setupDualOutput: TGoLiveChecklistItemState;
     startVideoTransmission: TGoLiveChecklistItemState;
@@ -64,9 +66,10 @@ export interface IStreamSettings {
     twitch?: IPlatformFlags & ITwitchStartStreamOptions;
     youtube?: IPlatformFlags & IYoutubeStartStreamOptions;
     facebook?: IPlatformFlags & IFacebookStartStreamOptions;
-    tiktok?: IPlatformFlags & ITiktokStartStreamOptions;
+    tiktok?: IPlatformFlags & ITikTokStartStreamOptions;
     trovo?: IPlatformFlags & ITrovoStartStreamOptions;
     twitter?: IPlatformFlags & ITwitterStartStreamOptions;
+    instagram?: IPlatformFlags & IInstagramStartStreamOptions;
   };
   customDestinations: ICustomStreamDestination[];
   advancedMode: boolean;

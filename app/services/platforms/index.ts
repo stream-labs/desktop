@@ -1,7 +1,8 @@
 import { ITwitchStartStreamOptions, TwitchService } from './twitch';
 import { IYoutubeStartStreamOptions, YoutubeService } from './youtube';
 import { FacebookService, IFacebookStartStreamOptions } from './facebook';
-import { ITiktokStartStreamOptions, TiktokService } from './tiktok';
+import { ITikTokStartStreamOptions, TikTokService } from './tiktok';
+import { InstagramService, IInstagramStartStreamOptions } from './instagram';
 import { TwitterPlatformService } from './twitter';
 import { TTwitchOAuthScope } from './twitch/index';
 import { IGoLiveSettings } from 'services/streaming';
@@ -132,14 +133,25 @@ export enum EPlatformCallResult {
    * The user is missing an essential Twitch scope.
    */
   TwitchScopeMissing,
+
+  /**
+   * The user is not authorized for livestreaming by TikTok.
+   */
+  TikTokStreamScopeMissing,
+
+  /**
+   * The user needs to re-merge their to update Live Access status.
+   */
+  TikTokScopeOutdated,
 }
 
 export type TStartStreamOptions =
   | ITwitchStartStreamOptions
   | IYoutubeStartStreamOptions
   | Partial<IFacebookStartStreamOptions>
-  | Partial<ITiktokStartStreamOptions>
-  | Partial<ITrovoStartStreamOptions>;
+  | Partial<ITikTokStartStreamOptions>
+  | Partial<ITrovoStartStreamOptions>
+  | Partial<IInstagramStartStreamOptions>;
 
 // state applicable for all platforms
 export interface IPlatformState {
@@ -229,9 +241,17 @@ export enum EPlatform {
   TikTok = 'tiktok',
   Trovo = 'trovo',
   Twitter = 'twitter',
+  Instagram = 'instagram',
 }
 
-export type TPlatform = 'twitch' | 'youtube' | 'facebook' | 'tiktok' | 'trovo' | 'twitter';
+export type TPlatform =
+  | 'twitch'
+  | 'youtube'
+  | 'facebook'
+  | 'tiktok'
+  | 'trovo'
+  | 'twitter'
+  | 'instagram';
 
 export const platformList = [
   EPlatform.Facebook,
@@ -240,6 +260,7 @@ export const platformList = [
   EPlatform.Twitch,
   EPlatform.YouTube,
   EPlatform.Twitter,
+  EPlatform.Instagram,
 ];
 
 export const platformLabels = (platform: TPlatform | string) =>
@@ -249,7 +270,9 @@ export const platformLabels = (platform: TPlatform | string) =>
     [EPlatform.Facebook]: $t('Facebook'),
     [EPlatform.TikTok]: $t('TikTok'),
     [EPlatform.Trovo]: $t('Trovo'),
+    // TODO: translate
     [EPlatform.Twitter]: 'Twitter',
+    [EPlatform.Instagram]: $t('Instagram'),
   }[platform]);
 
 export function getPlatformService(platform: TPlatform): IPlatformService {
@@ -257,9 +280,10 @@ export function getPlatformService(platform: TPlatform): IPlatformService {
     twitch: TwitchService.instance,
     youtube: YoutubeService.instance,
     facebook: FacebookService.instance,
-    tiktok: TiktokService.instance,
+    tiktok: TikTokService.instance,
     trovo: TrovoService.instance,
     twitter: TwitterPlatformService.instance,
+    instagram: InstagramService.instance,
   }[platform];
 }
 

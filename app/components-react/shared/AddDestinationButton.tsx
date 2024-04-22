@@ -16,40 +16,46 @@ interface IAddDestinationButtonProps {
 }
 
 export default function AddDestinationButton(p: IAddDestinationButtonProps) {
-  const { addDestination, shouldShowPrimeLabel } = useGoLiveSettings().extend(module => {
-    const {
-      RestreamService,
-      SettingsService,
-      MagicLinkService,
-      UserService,
-      UsageStatisticsService,
-    } = Services;
+  const { addDestination, shouldShowPrimeLabel, isDualOutputMode } = useGoLiveSettings().extend(
+    module => {
+      const {
+        RestreamService,
+        SettingsService,
+        MagicLinkService,
+        UserService,
+        UsageStatisticsService,
+      } = Services;
 
-    return {
-      addDestination() {
-        // open the stream settings or prime page
-        if (UserService.views.isPrime) {
-          SettingsService.actions.showSettings('Stream');
-        } else {
-          // record dual output analytics event
-          UsageStatisticsService.recordAnalyticsEvent('DualOutput', {
-            type: 'UpgradeToUltra',
-          });
-          MagicLinkService.linkToPrime('slobs-multistream');
-        }
-      },
+      return {
+        addDestination() {
+          // open the stream settings or prime page
+          if (UserService.views.isPrime) {
+            SettingsService.actions.showSettings('Stream');
+          } else if (isDualOutputMode) {
+            // record dual output analytics event
+            UsageStatisticsService.recordAnalyticsEvent('DualOutput', {
+              type: 'UpgradeToUltra',
+            });
+            MagicLinkService.linkToPrime('slobs-multistream');
+          } else {
+            MagicLinkService.linkToPrime('slobs-multistream');
+          }
+        },
 
-      shouldShowPrimeLabel:
-        p.type === 'ultra' || (!RestreamService.state.grandfathered && !UserService.views.isPrime),
-    };
-  });
+        shouldShowPrimeLabel:
+          p.type === 'ultra' ||
+          (!RestreamService.state.grandfathered && !UserService.views.isPrime),
+      };
+    },
+  );
 
   return (
     <ButtonGroup
-      className={styles.addDestinationGroup}
+      className={cx(styles.addDestinationGroup, { [styles.dualOutput]: isDualOutputMode })}
       align="center"
       direction="vertical"
       size="middle"
+      style={p?.style}
     >
       {shouldShowPrimeLabel && (
         <ButtonHighlighted

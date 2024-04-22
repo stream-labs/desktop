@@ -266,7 +266,9 @@ export default class Settings extends Vue {
       remote.dialog
         .showMessageBox({
           title: $t('Confirm'),
-          message: $t('Are you sure you want to log out?'),
+          message: $t('Are you sure you want to log out %{username}?', {
+            username: this.userService.username,
+          }),
           buttons: [$t('Yes'), $t('No')],
         })
         .then(({ response }) => {

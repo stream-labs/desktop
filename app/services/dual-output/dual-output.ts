@@ -310,18 +310,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     this.confirmDestinationDisplays();
 
     /**
-     * The audio settings refresh each time the scene collection is switched.
-     * When a collection is loaded, confirm all sources have been assigned a context.
-     */
-    this.settingsService.audioRefreshed.subscribe(() => {
-      this.convertSceneSources(this.scenesService.views.activeSceneId);
-
-      if (this.state.isLoading) {
-        this.setIsCollectionOrSceneLoading(false);
-      }
-    });
-
-    /**
      * Ensures that the scene nodes are assigned a context
      */
     this.scenesService.sceneSwitched.subscribe(scene => {
@@ -329,6 +317,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       if (scene?.nodes.length) {
         this.confirmOrCreateVerticalNodes(scene.id);
       }
+
+      this.setIsLoading(false);
     });
 
     /**
@@ -559,14 +549,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   }
 
   setIsLoading(status: boolean) {
-    this.SET_IS_LOADING(status);
-  }
-
-  /**
-   * Update loading state to show loading animation
-   */
-
-  setIsCollectionOrSceneLoading(status: boolean) {
     this.SET_IS_LOADING(status);
   }
 

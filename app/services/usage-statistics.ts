@@ -40,7 +40,11 @@ type TAnalyticsEvent =
   | 'MicrophoneUse'
   | 'GuestCam'
   | 'RecordingHistory'
-  | 'DualOutput';
+  | 'DualOutput'
+  | 'StreamToTikTokSettings'
+  | 'StreamCustomDestinations'
+  | 'TikTokLiveAccess'
+  | 'TwitchCredentialsAlert';
 
 interface IAnalyticsEvent {
   product: string;

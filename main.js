@@ -205,6 +205,14 @@ console.log(`Free: ${humanFileSize(os.freemem(), false)}`);
 console.log('=================================');
 
 app.on('ready', () => {
+  console.log('in dev mode');
+  const reactDevToolsPath = path.join(__dirname, 'vendor', 'react-devtools');
+  console.log(reactDevToolsPath);
+  session.defaultSession
+    .loadExtension(reactDevToolsPath, { allowFileAccess: true })
+    .then(() => console.log('Installed React DevTools'))
+    .catch(err => console.log('Error installing React DevTools', err));
+
   // Detect when running from an unwritable location like a DMG image (will break updater)
   if (process.platform === 'darwin') {
     try {
@@ -353,6 +361,11 @@ async function startApp() {
   // we will refactor this to not use electron IPC, which will make it much
   // more efficient.
   ipcMain.on('getWorkerWindowId', event => {
+    if (workerWindow.isDestroyed()) {
+      // prevent potential race-condition issues on app close
+      // https://github.com/stream-labs/desktop/pull/4239
+      return;
+    }
     event.returnValue = workerWindow.webContents.id;
   });
 

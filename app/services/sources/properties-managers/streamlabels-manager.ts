@@ -24,10 +24,11 @@ export class StreamlabelsManager extends DefaultManager {
     this.subscription = this.streamlabelsService.output.subscribe(output => {
       if (output[this.settings.statname] !== this.oldOutput) {
         this.oldOutput = output[this.settings.statname];
+
         this.obsSource.update({
           ...this.obsSource.settings,
+          text: this.normalizeText(output[this.settings.statname]),
           read_from_file: false,
-          text: output[this.settings.statname],
         });
       }
     });
@@ -66,10 +67,17 @@ export class StreamlabelsManager extends DefaultManager {
     }
   }
 
+  normalizeText(text: string | undefined) {
+    // When using `item_separator` for list items, it would appear that streamlabels will
+    // send output like `foo\\nbar` instead of `foo\nbar`, normalize here.
+    // We don't want to do it in settings since it would be sent to the backend
+    return text?.replace('\\n', '\n');
+  }
+
   applySettings(settings: Dictionary<any>) {
     if (settings.statname !== this.settings.statname) {
       this.obsSource.update({
-        text: this.streamlabelsService.output.getValue()[settings.statname],
+        text: this.normalizeText(this.streamlabelsService.output.getValue()[settings.statname]),
       });
     }
 

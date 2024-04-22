@@ -1,6 +1,9 @@
 import { Service } from 'services/core/service';
 import { Inject } from 'services/core/injector';
-import { SceneCollectionsServerApiService } from 'services/scene-collections/server-api';
+import {
+  IServerSceneCollection,
+  SceneCollectionsServerApiService,
+} from 'services/scene-collections/server-api';
 import { RootNode } from './nodes/root';
 import { SourcesNode, ISourceInfo } from './nodes/sources';
 import { ScenesNode, ISceneSchema } from './nodes/scenes';
@@ -40,6 +43,7 @@ import * as remote from '@electron/remote';
 import { GuestCamNode } from './nodes/guest-cam';
 import { DualOutputService } from 'services/dual-output';
 import { NodeMapNode } from './nodes/node-map';
+import { VideoSettingsService } from 'services/settings-v2';
 
 const uuid = window['require']('uuid/v4');
 
@@ -88,6 +92,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   @Inject() transitionsService: TransitionsService;
   @Inject() streamingService: StreamingService;
   @Inject() dualOutputService: DualOutputService;
+  @Inject() videoSettingsService: VideoSettingsService;
   @Inject() private defaultHardwareService: DefaultHardwareService;
 
   collectionAdded = new Subject<ISceneCollectionsManifestEntry>();
@@ -127,14 +132,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
         if (collection.modified > latestModified) {
           latestModified = collection.modified;
           latestId = collection.id;
-        }
-
-        /**
-         * before dual output, collections did not have the scene node map property
-         * so add it here on load
-         */
-        if (!collection.hasOwnProperty('sceneNodeMaps')) {
-          collection.sceneNodeMaps = {};
         }
       });
 
@@ -219,9 +216,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   async create(
     options: ISceneCollectionInternalCreateOptions = {},
   ): Promise<ISceneCollectionsManifestEntry> {
-    if (this.dualOutputService.views.dualOutputMode) {
-      this.dualOutputService.actions.setIsCollectionOrSceneLoading(true);
-    }
     await this.deloadCurrentApplicationState();
 
     const name = options.name || this.suggestName(DEFAULT_COLLECTION_NAME);
@@ -814,6 +808,9 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
     let failed = false;
 
+    const collectionsToInsert = [];
+    const collectionsToUpdate = [];
+
     for (const onServer of serverCollections) {
       const inManifest = this.stateService.state.collections.find(
         coll => coll.serverId === onServer.id,
@@ -849,60 +846,37 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
           if (!success) failed = true;
         } else if (new Date(inManifest.modified) < new Date(onServer.last_updated_at)) {
-          const success = await this.performSyncStep('Update from server', async () => {
-            const response = await this.serverApi.fetchSceneCollection(onServer.id);
-
-            if (response.scene_collection.data) {
-              this.stateService.writeDataToCollectionFile(
-                inManifest.id,
-                response.scene_collection.data,
-              );
-            } else {
-              console.error(`Server returned empty data for collection ${inManifest.id}`);
-            }
-
-            this.stateService.RENAME_COLLECTION(
-              inManifest.id,
-              onServer.name,
-              onServer.last_updated_at,
-            );
-          });
-
-          if (!success) failed = true;
+          collectionsToUpdate.push(onServer.id);
         } else {
           console.log('Up to date file: ', inManifest.id);
         }
       } else {
-        const success = await this.performSyncStep('Insert from server', async () => {
-          const id: string = uuid();
-          const response = await this.serverApi.fetchSceneCollection(onServer.id);
-
-          let operatingSystem = getOS();
-
-          // Empty data means that the collection was created from the Streamlabs
-          // dashboard and does not currently have any scenes assoicated with it.
-          // The first time we try to load this collection, we will initialize it
-          // with some scenes.
-
-          if (response.scene_collection.data != null) {
-            this.stateService.writeDataToCollectionFile(id, response.scene_collection.data);
-
-            // Attempt to pull the OS out of the data, assuming Windows if it is not marked
-            operatingSystem =
-              JSON.parse(response.scene_collection.data).operatingSystem || OS.Windows;
-          }
-
-          this.stateService.ADD_COLLECTION(
-            id,
-            onServer.name,
-            onServer.last_updated_at,
-            operatingSystem,
-          );
-          this.stateService.SET_SERVER_ID(id, onServer.id);
-        });
-
-        if (!success) failed = true;
+        collectionsToInsert.push(onServer.id);
       }
+    }
+
+    if (collectionsToUpdate.length > 0) {
+      const serverCollectionsToUpdate = await this.serverApi.fetchSceneCollectionsById(
+        collectionsToUpdate,
+      );
+
+      const success = await this.performSyncStep('Update from Server', async () => {
+        this.updateCollectionsFromServer(serverCollectionsToUpdate.scene_collections);
+      });
+
+      if (!success) failed = true;
+    }
+
+    if (collectionsToInsert.length > 0) {
+      const serverCollectionsToInsert = await this.serverApi.fetchSceneCollectionsById(
+        collectionsToInsert,
+      );
+
+      const success = await this.performSyncStep('Insert from Server', async () => {
+        this.insertCollectionsFromServer(serverCollectionsToInsert.scene_collections);
+      });
+
+      if (!success) failed = true;
     }
 
     for (const inManifest of this.stateService.state.collections) {
@@ -952,6 +926,54 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     if (failed) throw new Error('Sync failed!');
   }
 
+  updateCollectionsFromServer(collections: IServerSceneCollection[]) {
+    collections.forEach(collection => {
+      const inManifest = this.stateService.state.collections.find(
+        coll => coll.serverId === collection.id,
+      );
+      if (!inManifest) return console.error('Scene Collection not found');
+      if (collection.data) {
+        this.stateService.writeDataToCollectionFile(inManifest.id, collection.data);
+      } else {
+        console.error(`Server returned empty data for collection ${inManifest.id}`);
+      }
+
+      this.stateService.RENAME_COLLECTION(
+        inManifest.id,
+        collection.name,
+        collection.last_updated_at,
+      );
+    });
+  }
+
+  insertCollectionsFromServer(collections: IServerSceneCollection[]) {
+    collections.forEach(collection => {
+      const id: string = uuid();
+
+      let operatingSystem = getOS();
+
+      // Empty data means that the collection was created from the Streamlabs
+      // dashboard and does not currently have any scenes assoicated with it.
+      // The first time we try to load this collection, we will initialize it
+      // with some scenes.
+
+      if (collection.data != null) {
+        this.stateService.writeDataToCollectionFile(id, collection.data);
+
+        // Attempt to pull the OS out of the data, assuming Windows if it is not marked
+        operatingSystem = JSON.parse(collection.data).operatingSystem || OS.Windows;
+      }
+
+      this.stateService.ADD_COLLECTION(
+        id,
+        collection.name,
+        collection.last_updated_at,
+        operatingSystem,
+      );
+      this.stateService.SET_SERVER_ID(id, collection.id);
+    });
+  }
+
   /**
    * Performs a sync step, catches any errors, and returns
    * true/false depending on whether the step succeeded
@@ -992,6 +1014,10 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    */
 
   initNodeMaps(sceneNodeMap?: { [sceneId: string]: Dictionary<string> }) {
+    if (!this.videoSettingsService.contexts.vertical) {
+      this.videoSettingsService.establishVideoContext('vertical');
+    }
+
     if (!this.activeCollection) return;
 
     this.stateService.initNodeMaps(sceneNodeMap);

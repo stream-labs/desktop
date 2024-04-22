@@ -195,6 +195,7 @@ export default function SideNav() {
         showModal={showModal}
         handleAuth={handleAuth}
         handleShowModal={handleShowModal}
+        username={UserService.username}
       />
     </>
   );
@@ -255,6 +256,7 @@ function LogoutModal(p: {
   showModal: boolean;
   handleAuth: () => void;
   handleShowModal: (status: boolean) => void;
+  username?: string;
 }) {
   return (
     <Modal
@@ -266,7 +268,9 @@ function LogoutModal(p: {
     >
       <Form className={styles.confirmLogout}>
         <h2>{$t('Confirm')}</h2>
-        {$t('Are you sure you want to log out?')}
+        {$t('Are you sure you want to log out %{username}?', {
+          username: p.username,
+        })}
         <div className={styles.buttons}>
           <Button onClick={() => p.handleAuth()}>{$t('Yes')}</Button>
           <Button onClick={() => p.handleShowModal(false)}>{$t('No')}</Button>
@@ -312,7 +316,6 @@ function LoginMenuItem(p: {
                   styles.platformLogo,
                   styles[`platform-logo-${platform?.type ?? 'default'}`],
                 )}
-                size={platform.type === 'twitter' ? 20 : undefined}
               />
             )}
             <span className={styles.username}>{platform?.username || $t('Log Out')}</span>

@@ -174,6 +174,15 @@ export class LegacyEvents extends ReactComponent {}
 
 @Component({
   props: {
+    name: { default: 'LiveDock' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+    componentProps: { default: () => ({ onLeft: false }) },
+  },
+})
+export class LiveDock extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'ManageSceneCollections' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
   },
@@ -425,6 +434,9 @@ export class StartStreamingButton extends ReactComponent {}
 
 @Component({ props: { name: { default: 'StreamScheduler' } } })
 export class StreamScheduler extends ReactComponent {}
+
+@Component({ props: { name: { default: 'Studio' } } })
+export class Studio extends ReactComponent {}
 
 @Component({ props: { name: { default: 'StudioEditor' } } })
 export class StudioEditor extends ReactComponent {}

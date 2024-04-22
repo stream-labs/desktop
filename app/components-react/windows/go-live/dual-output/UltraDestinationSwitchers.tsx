@@ -9,7 +9,6 @@ import { SwitchInput } from 'components-react/shared/inputs';
 import PlatformLogo from 'components-react/shared/PlatformLogo';
 import InfoBadge from 'components-react/shared/InfoBadge';
 import DisplaySelector from 'components-react/shared/DisplaySelector';
-import { assertIsDefined } from 'util/properties-type-guards';
 import { useGoLiveSettings } from '../useGoLiveSettings';
 import { alertAsync } from 'components-react/modals';
 import Translate from 'components-react/shared/Translate';
@@ -27,18 +26,25 @@ export function UltraDestinationSwitchers(p: IUltraDestinationSwitchers) {
     enabledPlatforms,
     linkedPlatforms,
     customDestinations,
+    isDualOutputMode,
     isPrimaryPlatform,
+    isPlatformLinked,
     switchPlatforms,
     switchCustomDestination,
   } = useGoLiveSettings();
   const enabledPlatformsRef = useRef(enabledPlatforms);
   enabledPlatformsRef.current = enabledPlatforms;
+  const promptConnectTikTok = !isPlatformLinked('tiktok');
 
   const emitSwitch = useDebounce(500, () => {
     switchPlatforms(enabledPlatformsRef.current);
   });
-  const isEnabled = useCallback((platform: TPlatform) => {
-    return enabledPlatformsRef.current.includes(platform);
+  const isEnabled = useCallback((target: TPlatform) => {
+    if (target === 'tiktok' && promptConnectTikTok) {
+      return false;
+    }
+
+    return enabledPlatformsRef.current.includes(target);
   }, []);
 
   const togglePlatform = useCallback((platform: TPlatform, enabled: boolean) => {
@@ -56,14 +62,16 @@ export function UltraDestinationSwitchers(p: IUltraDestinationSwitchers) {
 
   return (
     <div className={styles.switchWrapper}>
-      <InfoBadge
-        content={
-          <Translate message="<dualoutput>Dual Output</dualoutput> is enabled - you must stream to one horizontal and one vertical platform.">
-            <u slot="dualoutput" />
-          </Translate>
-        }
-        hasMargin={true}
-      />
+      {isDualOutputMode && (
+        <InfoBadge
+          content={
+            <Translate message="<dualoutput>Dual Output</dualoutput> is enabled - you must stream to one horizontal and one vertical platform.">
+              <u slot="dualoutput" />
+            </Translate>
+          }
+          style={{ marginBottom: '15px' }}
+        />
+      )}
       {linkedPlatforms.map((platform: TPlatform, index: number) => (
         <DestinationSwitcher
           key={platform}
@@ -71,6 +79,7 @@ export function UltraDestinationSwitchers(p: IUltraDestinationSwitchers) {
           enabled={isEnabled(platform)}
           onChange={enabled => togglePlatform(platform, enabled)}
           isPrimary={isPrimaryPlatform(platform)}
+          promptConnectTikTok={platform === 'tiktok' && promptConnectTikTok}
           index={index}
         />
       ))}
@@ -92,6 +101,7 @@ interface IDestinationSwitcherProps {
   enabled: boolean;
   onChange: (enabled: boolean) => unknown;
   isPrimary?: boolean;
+  promptConnectTikTok?: boolean;
   index: number;
 }
 
@@ -102,9 +112,30 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
   const switchInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const platform = typeof p.destination === 'string' ? (p.destination as TPlatform) : null;
+  const enable = !p.enabled ?? (p.promptConnectTikTok && p.promptConnectTikTok === true);
   const { RestreamService, MagicLinkService } = Services;
 
-  function onClickHandler(ev: MouseEvent) {
+  function showTikTokConnectModal() {
+    alertAsync({
+      type: 'confirm',
+      title: $t('Connect TikTok Account'),
+      closable: true,
+      content: (
+        <span>
+          {$t(
+            'Connect your TikTok account to stream to TikTok and one additional platform for free.',
+          )}
+        </span>
+      ),
+      okText: $t('Connect'),
+      onOk: () => {
+        Services.NavigationService.actions.navigate('PlatformMerge', { platform: 'tiktok' });
+        Services.WindowsService.actions.closeChildWindow();
+      },
+    });
+  }
+
+  function onClickHandler() {
     if (p.isPrimary) {
       alertAsync(
         $t(
@@ -113,8 +144,8 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
       );
       return;
     }
-    if (RestreamService.views.canEnableRestream) {
-      const enable = !p.enabled;
+
+    if (RestreamService.views.canEnableRestream && !p.promptConnectTikTok) {
       p.onChange(enable);
       // always proxy the click to the SwitchInput
       // so it can play a transition animation
@@ -136,11 +167,11 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
       // define slots for a platform switcher
       const service = getPlatformService(platform);
       const platformAuthData = UserService.state.auth?.platforms[platform];
-      assertIsDefined(platformAuthData);
+      const username = platformAuthData?.username ?? '';
 
       return {
         title: service.displayName,
-        description: platformAuthData.username,
+        description: username,
         Logo: () => (
           <PlatformLogo
             platform={platform}
@@ -153,7 +184,7 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
             inputRef={switchInputRef}
             value={p.enabled}
             name={platform}
-            disabled={p?.isPrimary}
+            disabled={p?.isPrimary || (p.promptConnectTikTok && platform === 'tiktok')}
             uncontrolled
             className={styles.platformSwitch}
             checkedChildren={<i className="icon-check-mark" />}
@@ -184,7 +215,13 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
   return (
     <div
       ref={containerRef}
+      data-test="ultra-switcher"
       className={cx(styles.platformSwitcher, { [styles.platformDisabled]: !p.enabled })}
+      onClick={() => {
+        if (p.promptConnectTikTok) {
+          showTikTokConnectModal();
+        }
+      }}
     >
       <div className={styles.switcherHeader}>
         <div className={styles.platformInfoWrapper}>
@@ -197,7 +234,17 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
           </div>
         </div>
         {/* SWITCH */}
-        <div onClick={onClickHandler}>
+        <div
+          onClick={e => {
+            if (p.promptConnectTikTok) {
+              showTikTokConnectModal();
+              e.stopPropagation();
+              return;
+            } else {
+              onClickHandler();
+            }
+          }}
+        >
           <Switch />
         </div>
       </div>

@@ -6,7 +6,7 @@ import {
   InputComponent,
   ListInput,
 } from '../../../shared/inputs';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Services } from '../../../service-provider';
 import { $t } from '../../../../services/i18n';
 import BroadcastInput from './BroadcastInput';
@@ -226,7 +226,7 @@ export const YoutubeEditStreamInfo = InputComponent((p: IPlatformComponentParams
       <PlatformSettingsLayout
         layoutMode={p.layoutMode}
         commonFields={renderCommonFields()}
-        requiredFields={<div key={'empty'} />}
+        requiredFields={<div key={'empty-youtube'} />}
         optionalFields={renderOptionalFields()}
         essentialOptionalFields={renderBroadcastInput()}
       />

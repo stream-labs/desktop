@@ -1,17 +1,8 @@
 import React, { useEffect, useMemo } from 'react';
-import cx from 'classnames';
 import * as remote from '@electron/remote';
-import { Tooltip, Menu, Button, message, Dropdown } from 'antd';
+import { Tooltip } from 'antd';
 import { $t } from 'services/i18n';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
-import {
-  RecordingModeService,
-  UserService,
-  SharedStorageService,
-  OnboardingService,
-  WindowsService,
-  NotificationsService,
-} from 'app-services';
 import styles from './RecordingHistory.m.less';
 import AutoProgressBar from 'components-react/shared/AutoProgressBar';
 import { GetSLID } from 'components-react/highlighter/StorageUpload';
@@ -20,6 +11,7 @@ import Scrollable from 'components-react/shared/Scrollable';
 import { Services } from '../service-provider';
 import { initStore, useController } from '../hooks/zustand';
 import { useVuex } from '../hooks';
+import Translate from 'components-react/shared/Translate';
 
 const RecordingHistoryCtx = React.createContext<RecordingHistoryController | null>(null);
 
@@ -56,7 +48,7 @@ class RecordingHistoryController {
         icon: 'icon-editor-7',
       },
       {
-        label: $t('Transcribe'),
+        label: $t('Subtitle'),
         value: 'typestudio',
         icon: 'icon-mic',
       },
@@ -159,6 +151,10 @@ export function RecordingHistory() {
     }
   }, [uploadInfo.error]);
 
+  function openMarkersSettings() {
+    Services.SettingsService.actions.showSettings('Hotkeys');
+  }
+
   function UploadActions(p: { filename: string }) {
     return (
       <span className={styles.actionGroup}>
@@ -181,10 +177,14 @@ export function RecordingHistory() {
   return (
     <div className={styles.container}>
       <h1>{$t('Recordings')}</h1>
-      <div style={{ marginBottom: 24 }}>
+      <div style={{ marginBottom: 24, display: 'flex', flexDirection: 'column' }}>
         {$t(
           'Record your screen with Streamlabs Desktop. Once recording is complete, it will be displayed here. Access your files or edit further with Streamlabs tools.',
         )}
+        <Translate message="<color>Pro tip:</color> set Markers in Hotkeys settings to timestamp your recordings. <link>Set up here</link>">
+          <span slot="color" className={styles.tipHighlight} />
+          <a slot="link" onClick={openMarkersSettings} className={styles.tipLink} />
+        </Translate>
       </div>
       <div className={styles.recordingsContainer} id="recordingHistory">
         <Scrollable style={{ height: '100%' }}>
