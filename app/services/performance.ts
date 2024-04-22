@@ -142,6 +142,7 @@ export class PerformanceService extends Service {
   statisticsUpdated = new Subject<IPerformanceState>();
 
   private setStats(stats: Partial<IPerformanceState>) {
+    console.log('firing');
     this.state.db.write(() => {
       Object.keys(stats).forEach(stat => {
         this.state[stat] = stats[stat];
