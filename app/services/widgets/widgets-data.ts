@@ -553,7 +553,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     icon: 'fas fa-calendar',
   },
   [WidgetType.CharityGoal]: {
-    name: $t('Streamlabs Charity Goal'),
+    name: $t('Streamlabs Charity Donation Goal'),
     description: $t('Set a goal for your viewers to help you reach.'),
     demoVideo: false,
     demoFilename: 'source-charity-goal.gif',
