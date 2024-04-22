@@ -90,6 +90,18 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
           disabled={disableSwitchers && !isEnabled(platform)}
         />
       ))}
+
+      {!linkedPlatforms.includes('tiktok') && (
+        <DestinationSwitcher
+          destination={'tiktok'}
+          enabled={isEnabled('tiktok')}
+          onChange={enabled => togglePlatform('tiktok', enabled)}
+          isPrimary={isPrimaryPlatform('tiktok')}
+          promptConnectTikTok={promptConnectTikTok}
+          disabled={disableSwitchers && !isEnabled('tiktok')}
+        />
+      )}
+
       {customDestinations?.map((dest, ind) => (
         <DestinationSwitcher
           key={ind}
@@ -122,9 +134,15 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
   const switchInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const platform = typeof p.destination === 'string' ? (p.destination as TPlatform) : null;
-  const { RestreamService, MagicLinkService, NavigationService, WindowsService } = Services;
+  const { RestreamService, MagicLinkService, StreamingService } = Services;
   const canEnableRestream = RestreamService.views.canEnableRestream;
   const cannotDisableDestination = p.isPrimary && !canEnableRestream;
+
+  // Preserving old TikTok functionality, so they can't enable the toggle if TikTok is not
+  // connected.
+  // TODO: this kind of logic should belong on caller, but ideally we would refactor all this
+  const tiktokDisabled =
+    platform === 'tiktok' && !StreamingService.views.isPlatformLinked('tiktok');
 
   function onClickHandler(ev: MouseEvent) {
     // If re-stream isn't enabled, don't allow disabling the primary platform
@@ -195,10 +213,11 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
   const { title, description, Switch, Logo } = (() => {
     if (platform) {
       // define slots for a platform switcher
-      const { UserService } = Services;
+      const { UserService, StreamingService } = Services;
       const service = getPlatformService(platform);
       const platformAuthData = UserService.state.auth?.platforms[platform];
       const username = platformAuthData?.username ?? '';
+
       return {
         title: $t('Stream to %{platformName}', { platformName: service.displayName }),
         description: username,
@@ -210,7 +229,7 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
             inputRef={switchInputRef}
             value={p.enabled}
             name={platform}
-            disabled={cannotDisableDestination}
+            disabled={cannotDisableDestination || tiktokDisabled}
             uncontrolled
           />
         ),

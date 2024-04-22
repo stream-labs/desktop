@@ -43,7 +43,8 @@ type TAnalyticsEvent =
   | 'DualOutput'
   | 'StreamToTikTokSettings'
   | 'StreamCustomDestinations'
-  | 'TikTokLiveAccess';
+  | 'TikTokLiveAccess'
+  | 'TwitchCredentialsAlert';
 
 interface IAnalyticsEvent {
   product: string;

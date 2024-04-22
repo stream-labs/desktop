@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
-import { handleResponse, authorizedHeaders, jfetch } from 'util/requests';
+import { authorizedHeaders, jfetch } from 'util/requests';
 import { mutation } from 'services/core/stateful-service';
 import { Service, Inject, ViewHandler } from 'services/core';
 import electron from 'electron';
@@ -33,11 +33,13 @@ import { MagicLinkService } from 'services/magic-link';
 import fs from 'fs';
 import path from 'path';
 import { AppService } from 'services/app';
-import { UsageStatisticsService } from 'services/usage-statistics';
 import { StreamingService } from 'services/streaming';
 import { NotificationsService, ENotificationType } from 'services/notifications';
 import { JsonrpcService } from 'services/api/jsonrpc';
 import * as remote from '@electron/remote';
+import { TikTokService } from 'services/platforms/tiktok';
+import { TTikTokLiveScopeTypes } from 'services/platforms/tiktok/api';
+import { UsageStatisticsService } from 'app-services';
 
 export enum EAuthProcessState {
   Idle = 'idle',
@@ -104,6 +106,7 @@ interface ILinkedPlatform {
   access_token: string;
   platform_id: string;
   platform_name: string;
+  validation_error?: 'invalid' | 'missing_scope' | null;
 }
 
 interface ILinkedPlatformsResponse {
@@ -283,9 +286,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private websocketService: WebsocketService;
   @Inject() private magicLinkService: MagicLinkService;
   @Inject() private appService: AppService;
-  @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject() private notificationsService: NotificationsService;
   @Inject() private jsonrpcService: JsonrpcService;
+  @Inject() private usageStatisticsService: UsageStatisticsService;
+  @Inject('TikTokService') tiktokService: TikTokService;
 
   setPrimaryPlatform(platform: TPlatform) {
     this.SET_PRIMARY_PLATFORM(platform);
@@ -486,6 +490,26 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     if (!isOnboardingTest) this.onboardingService.finish();
   }
 
+  /**
+   * This is also allows us to use dummy accounts for tests.
+   * @remark Use for tests where test accounts are not available.
+   */
+  async addDummyAccount(
+    dummyAcct: IPlatformAuth,
+    tiktokLiveScope: TTikTokLiveScopeTypes,
+  ): Promise<EPlatformCallResult> {
+    if (!Utils.isTestMode()) return;
+
+    this.UPDATE_PLATFORM(dummyAcct);
+
+    // for tiktok, also update live access status
+    if (tiktokLiveScope) {
+      this.tiktokService.setLiveScope(tiktokLiveScope);
+    }
+
+    return EPlatformCallResult.Success;
+  }
+
   async autoLogin() {
     if (!this.state.auth) return;
 
@@ -615,6 +639,23 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         id: linkedPlatforms.twitch_account.platform_id,
         token: linkedPlatforms.twitch_account.access_token,
       });
+
+      const validationError = linkedPlatforms.twitch_account.validation_error;
+      if (validationError) {
+        const message =
+          validationError === 'missing_scope'
+            ? $t(
+                'Streamlabs requires additional permissions from your Twitch account. Please log in with Twitch to continue.',
+              )
+            : $t('Your Twitch access token has expired. Please log in with Twitch to continue.');
+        this.usageStatisticsService.recordAnalyticsEvent('TwitchCredentialsAlert', validationError);
+        this.reauthenticate(true, {
+          type: 'warning',
+          title: 'Twitch Error',
+          buttons: [$t('Refresh Login')],
+          message,
+        });
+      }
     } else if (this.state.auth.primaryPlatform !== 'twitch') {
       this.UNLINK_PLATFORM('twitch');
     }
