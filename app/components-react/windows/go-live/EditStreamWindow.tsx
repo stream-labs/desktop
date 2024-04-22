@@ -29,8 +29,9 @@ export default function EditStreamWindow() {
     prepopulate,
     isLoading,
     form,
-    shouldShowPrimaryChatSwitcher,
-    chatPlatforms,
+    enabledPlatforms,
+    hasMultiplePlatforms,
+    isRestreamEnabled,
     primaryChat,
     setPrimaryChat,
   } = useGoLiveSettingsRoot({ isUpdateMode: true });
@@ -88,6 +89,8 @@ export default function EditStreamWindow() {
     );
   }
 
+  const shouldShowPrimaryChatSwitcher = isRestreamEnabled && hasMultiplePlatforms;
+
   return (
     <ModalLayout footer={renderFooter()}>
       <Form
@@ -106,7 +109,7 @@ export default function EditStreamWindow() {
               {shouldShowPrimaryChatSwitcher && (
                 <PrimaryChatSwitcher
                   layout="horizontal"
-                  chatPlatforms={chatPlatforms}
+                  enabledPlatforms={enabledPlatforms}
                   primaryChat={primaryChat}
                   onSetPrimaryChat={setPrimaryChat}
                 />

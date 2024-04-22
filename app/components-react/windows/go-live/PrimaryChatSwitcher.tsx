@@ -7,8 +7,7 @@ import PlatformLogo from 'components-react/shared/PlatformLogo';
 import { $t } from 'services/i18n';
 
 interface IPrimaryChatSwitcherProps {
-  /** A filtered list of enabled platforms where all support chat **/
-  chatPlatforms: TPlatform[];
+  enabledPlatforms: TPlatform[];
   primaryChat: TPlatform;
   onSetPrimaryChat: (platform: TPlatform) => void;
   style?: React.CSSProperties;
@@ -16,7 +15,7 @@ interface IPrimaryChatSwitcherProps {
 }
 
 export default function PrimaryChatSwitcher({
-  chatPlatforms,
+  enabledPlatforms,
   primaryChat,
   onSetPrimaryChat,
   style = {},
@@ -24,14 +23,14 @@ export default function PrimaryChatSwitcher({
 }: IPrimaryChatSwitcherProps) {
   const primaryChatOptions = useMemo(
     () =>
-      chatPlatforms.map(platform => {
+      enabledPlatforms.map(platform => {
         const service = getPlatformService(platform);
         return {
           label: service.displayName,
           value: platform,
         };
       }),
-    [chatPlatforms],
+    [enabledPlatforms],
   );
 
   return (

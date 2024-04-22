@@ -354,17 +354,6 @@ export class GoLiveSettingsModule {
   get isRestreamEnabled() {
     return Services.RestreamService.views.canEnableRestream;
   }
-
-  get chatPlatforms() {
-    return this.state.enabledPlatforms.filter(platform => {
-      const service = getPlatformService(platform);
-      return service.hasCapability('chat');
-    });
-  }
-  get shouldShowPrimaryChatSwitcher() {
-    // TODO: adjust for the tiktok scenarios if needed
-    return this.isRestreamEnabled && this.chatPlatforms.length > 1;
-  }
 }
 
 export function useGoLiveSettings() {

@@ -36,8 +36,9 @@ export default function GoLiveSettings() {
     showSelector,
     showTweet,
     addDestination,
-    shouldShowPrimaryChatSwitcher,
-    chatPlatforms,
+    hasDestinations,
+    hasMultiplePlatforms,
+    enabledPlatforms,
     primaryChat,
     setPrimaryChat,
   } = useGoLiveSettings().extend(module => {
@@ -74,6 +75,7 @@ export default function GoLiveSettings() {
   const shouldShowSettings = !error && !isLoading;
   const shouldShowLeftCol = protectedModeEnabled;
   const shouldShowAddDestButton = canAddDestinations && isPrime;
+  const shouldShowPrimaryChatSwitcher = hasMultiplePlatforms;
 
   return (
     <Row gutter={16} style={{ height: 'calc(100% + 24px)' }}>
@@ -95,7 +97,7 @@ export default function GoLiveSettings() {
           </Scrollable>
           {shouldShowPrimaryChatSwitcher && (
             <PrimaryChatSwitcher
-              chatPlatforms={chatPlatforms}
+              enabledPlatforms={enabledPlatforms}
               onSetPrimaryChat={setPrimaryChat}
               primaryChat={primaryChat}
             />
