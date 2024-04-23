@@ -305,6 +305,7 @@ export class SceneItem extends SceneItemNode {
 
     this.UPDATE({
       visible,
+      display,
       sceneItemId: this.sceneItemId,
       transform: {
         position,
@@ -318,7 +319,6 @@ export class SceneItem extends SceneItemNode {
       scaleFilter: customSceneItem.scaleFilter,
       blendingMode: customSceneItem.blendingMode,
       blendingMethod: customSceneItem.blendingMethod,
-      display,
       output: context,
       position: customSceneItem.position,
     });

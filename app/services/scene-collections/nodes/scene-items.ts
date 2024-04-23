@@ -141,10 +141,8 @@ export class SceneItemsNode extends Node<ISchema, {}> {
     this.sanitizeIds();
 
     this.data.items.forEach(item => {
-      if (!item?.display) {
-        // single output scene's items are assigned to the horizontal display by default
-        item.display = item?.display ?? 'horizontal';
-      }
+      // single output scene's items are assigned to the horizontal display by default
+      item.display = item?.display ?? 'horizontal';
 
       if (item.sceneNodeType === 'item') {
         if (item.streamVisible == null) item.streamVisible = true;

@@ -480,7 +480,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
       this.sceneCollectionsService.createNodeMapEntry(scene.id, folder.id, verticalNode.id);
 
-      folder.placeBefore(verticalNode.id);
       return folder;
     } else {
       // add item

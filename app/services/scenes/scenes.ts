@@ -264,7 +264,7 @@ class ScenesViews extends ViewHandler<IScenesState> {
   }
 
   getNodeMap(): Dictionary<string> | undefined {
-    return this.state?.nodeMap;
+    return this.state.nodeMap;
   }
 }
 
