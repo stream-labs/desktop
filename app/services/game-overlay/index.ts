@@ -410,7 +410,6 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       this.overlay.setTransparency(overlayId, this.state.opacity * 2.55);
       this.overlay.setVisibility(overlayId, this.state.windowProperties[key].enabled);
 
-      win.webContents.openDevTools();
       win.webContents.executeJavaScript(hideInteraction);
       win.webContents.executeJavaScript(
         enableBTTVEmotesScript(this.customizationService.isDarkTheme),
