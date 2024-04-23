@@ -35,7 +35,7 @@ const hideInteraction = `
   /* Platform Chats */
   elements.push(document.querySelector('.chat-input'));
   elements.push(document.querySelector('.webComposerBlock__3lT5b'));
-  
+
   /* Recent Events */
   elements.push(document.querySelector('.recent-events__header'));
   elements.push(document.querySelector('.recent-events__tabs'));
