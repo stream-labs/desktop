@@ -43,6 +43,13 @@ const hideInteraction = `
   elements.forEach((el) => {
     if (el) { el.style.cssText = 'display: none !important'; }
   });
+  
+  // Trovo Chat
+  // Fix chat container that's cut off on Game Overlay's 300px wide window
+  const trovoChatContainer = document.querySelector('#__layout .popout-container .chat-wrap');
+  if (trovoChatContainer) {
+    container.style.minWidth = '300px';
+  }
 `;
 
 export enum EGameOverlayState {
