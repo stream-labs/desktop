@@ -55,7 +55,7 @@ const hideInteraction = `
      * 
      * 1. Fix chat wrapper width.
      * 2. Hide chat input panel.
-     * 3. Hide Gift Rank header.
+     * 3. Hide all headers, including Gift Rank.
      */
     const el = document.createElement('style');
     document.head.appendChild(el);
