@@ -43,7 +43,7 @@
     ]
   },
   "include": ["./app/**/*"],
-  "exclude": ["./app/components-react/**/*", "./node_modules/@realm/fetch/dist/types/types.d.ts"],
+  "exclude": ["./app/components-react/**/*", "**/node_modules/@realm/fetch/dist/types/types.d.ts"],
   "typedocOptions": {
     "entryPoints": ["src/index.ts"],
     "out": "docs"
