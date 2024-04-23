@@ -48,7 +48,7 @@ const hideInteraction = `
   // Fix chat container that's cut off on Game Overlay's 300px wide window
   const trovoChatContainer = document.querySelector('#__layout .popout-container .chat-wrap');
   if (trovoChatContainer) {
-    container.style.minWidth = '300px';
+    trovoChatContainer.style.minWidth = '300px';
   }
 `;
 
@@ -410,6 +410,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       this.overlay.setTransparency(overlayId, this.state.opacity * 2.55);
       this.overlay.setVisibility(overlayId, this.state.windowProperties[key].enabled);
 
+      win.webContents.openDevTools();
       win.webContents.executeJavaScript(hideInteraction);
       win.webContents.executeJavaScript(
         enableBTTVEmotesScript(this.customizationService.isDarkTheme),
