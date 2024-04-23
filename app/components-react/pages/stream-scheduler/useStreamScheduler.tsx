@@ -447,6 +447,7 @@ export class StreamSchedulerController {
 
   updatePlatform<T extends TPlatform>(platform: T, patch: ISchedulerPlatformSettings[T]) {
     this.store.setState(s => {
+      //@ts-ignore typescript upgrade
       Object.assign(s.platformSettings[platform], patch);
     });
   }
