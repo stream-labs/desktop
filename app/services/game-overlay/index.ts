@@ -36,8 +36,7 @@ const hideInteraction = `
   // TODO: remove .chat-input if it was only for Twitch, as it wasn't working and fixed below
   elements.push(document.querySelector('.chat-input'));
   elements.push(document.querySelector('.webComposerBlock__3lT5b'));
-
-  /* Recent Events */
+  
   elements.forEach((el) => {
     if (el) { el.style.cssText = 'display: none !important'; }
   });
