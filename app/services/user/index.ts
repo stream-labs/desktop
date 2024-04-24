@@ -900,7 +900,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     return await this.magicLinkService.actions.return.getMagicSessionUrl(url);
   }
 
-  async overlaysUrl(type?: 'overlay' | 'widget-themes' | 'site-themes', id?: string) {
+  async overlaysUrl(
+    type?: 'overlay' | 'widget-themes' | 'site-themes',
+    id?: string,
+    install?: string,
+  ) {
     const uiTheme = this.customizationService.isDarkTheme ? 'night' : 'day';
 
     let url = `https://${this.hostsService.streamlabs}/library`;
@@ -913,6 +917,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     if (type && id) {
       url += `#/?type=${type}&id=${id}`;
+    }
+
+    if (install) {
+      url += `&install=${install}`;
     }
 
     return await this.magicLinkService.actions.return.getMagicSessionUrl(url);
