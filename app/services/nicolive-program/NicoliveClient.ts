@@ -242,6 +242,16 @@ export class NicoliveClient {
     }
   }
 
+  static jsonBody<T>(body: T, extraHeaders: HeadersInit = {}): RequestInit {
+    return {
+      headers: {
+        'Content-Type': 'application/json',
+        ...extraHeaders,
+      },
+      body: JSON.stringify(body),
+    };
+  }
+
   /** ユーザごとの番組スケジュールを取得 */
   async fetchProgramSchedules(): Promise<WrappedResult<ProgramSchedules['data']>> {
     return this.requestAPI<ProgramSchedules['data']>(
@@ -263,10 +273,7 @@ export class NicoliveClient {
     return this.requestAPI<Segment['data']>(
       'PUT',
       `${NicoliveClient.live2BaseURL}/watch/${programID}/segment`,
-      {
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ state: 'on_air' }),
-      },
+      NicoliveClient.jsonBody({ state: 'on_air' }),
     );
   }
 
@@ -275,10 +282,7 @@ export class NicoliveClient {
     return this.requestAPI<Segment['data']>(
       'PUT',
       `${NicoliveClient.live2BaseURL}/watch/${programID}/segment`,
-      {
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ state: 'end' }),
-      },
+      NicoliveClient.jsonBody({ state: 'end' }),
     );
   }
 
@@ -290,10 +294,7 @@ export class NicoliveClient {
     return this.requestAPI<Extension['data']>(
       'POST',
       `${NicoliveClient.live2BaseURL}/watch/${programID}/extension`,
-      {
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ minutes }),
-      },
+      NicoliveClient.jsonBody({ minutes }),
     );
   }
 
@@ -305,10 +306,7 @@ export class NicoliveClient {
     return this.requestAPI<void>(
       'PUT',
       `${NicoliveClient.live2BaseURL}/watch/${programID}/operator_comment`,
-      {
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, isPermanent }),
-      },
+      NicoliveClient.jsonBody({ text, isPermanent }),
     );
   }
 
@@ -349,12 +347,7 @@ export class NicoliveClient {
     return this.requestAPI<AddFilterResult['data']>(
       'POST',
       `${NicoliveClient.live2BaseURL}/unama/tool/v2/programs/${programID}/ssng/create`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(records[0]),
-      },
+      NicoliveClient.jsonBody(records[0]),
     );
   }
 
@@ -362,12 +355,7 @@ export class NicoliveClient {
     return this.requestAPI<void>(
       'DELETE',
       `${NicoliveClient.live2BaseURL}/unama/tool/v2/programs/${programID}/ssng`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ id: ids }),
-      },
+      NicoliveClient.jsonBody({ id: ids }),
     );
   }
 
@@ -671,13 +659,13 @@ export class NicoliveClient {
   async fetchKonomiTags(userId: string): Promise<KonomiTag[]> {
     const res = await fetch(
       `${NicoliveClient.live2ApiBaseURL}/api/v1/konomiTags/GetFollowing`,
-      NicoliveClient.createRequest('POST', {
-        headers: {
-          'Content-Type': 'application/json',
-          'x-service-id': 'n-air-app',
-        },
-        body: JSON.stringify({ follower_id: { value: userId, type: 'USER' } }),
-      }),
+      NicoliveClient.createRequest(
+        'POST',
+        NicoliveClient.jsonBody(
+          { follower_id: { value: userId, type: 'USER' } },
+          { 'x-service-id': 'n-air-app' },
+        ),
+      ),
     );
     if (res.ok) {
       const json = (await res.json()) as KonomiTags;
