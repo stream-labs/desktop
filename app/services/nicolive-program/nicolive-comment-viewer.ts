@@ -248,11 +248,11 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
   showUserInfo(userId: string, userName: string, isPremium: boolean) {
     this.windowsService.showWindow({
       componentName: 'UserInfo',
-      title: `${userName} さんのユーザー情報`,
+      title: 'ユーザー情報',
       queryParams: { userId, userName, isPremium },
       size: {
-        width: 600,
-        height: 600,
+        width: 360,
+        height: 440,
       },
     });
   }
