@@ -157,7 +157,7 @@ export const menuTitles = (item: EMenuItemKey | ESubMenuItemKey | string) => {
     [ESubMenuItemKey.DashboardHome]: $t('Dashboard Home'),
     [ESubMenuItemKey.Cloudbot]: $t('Cloudbot'),
     [ESubMenuItemKey.AlertBoxSettings]: $t('Alert Box Settings'),
-    [ESubMenuItemKey.Widgets]: $t('Widgets'),
+    [ESubMenuItemKey.Widgets]: $t('Alerts and Widgets'),
     [ESubMenuItemKey.TipSettings]: $t('Tip Settings'),
     [ESubMenuItemKey.Multistream]: $t('Multistream'),
   }[item];
