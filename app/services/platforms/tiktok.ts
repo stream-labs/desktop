@@ -24,6 +24,7 @@ import {
   ITikTokLiveScopeResponse,
   ITikTokStartStreamResponse,
   TTikTokLiveScopeTypes,
+  ITikTokGamesData,
 } from './tiktok/api';
 import { I18nService } from 'services/i18n';
 import { getDefined } from 'util/properties-type-guards';
@@ -44,8 +45,8 @@ interface ITikTokStartStreamSettings {
   streamKey: string;
   title: string;
   liveScope: TTikTokLiveScopeTypes;
-  gameName: string; // TODO: confirm param name
-  game: string; // TODO: confirm param name
+  gameName: string;
+  game: string;
   display: TDisplayType;
   video?: IVideo;
   mode?: TOutputOrientation;
@@ -308,6 +309,7 @@ export class TikTokService
     const body = new FormData();
     body.append('title', opts.title);
     body.append('device_platform', getOS());
+    body.append('category', opts.game);
     const request = new Request(url, { headers, method: 'POST', body });
 
     return jfetch<ITikTokStartStreamResponse>(request);
@@ -406,17 +408,24 @@ export class TikTokService
 
   /**
    * Search for games
-   * TODO: UPDATE REQUEST
+   * @remark While this is the same endpoint for if a user can go live,
+   * the category parameter will only show category results, and will not
+   * show live approval status.
    */
   async searchGames(searchString: string): Promise<IGame[]> {
     const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/tiktok/games?id=${searchString}`;
+    const url = `https://${host}/api/v5/slobs/tiktok/info?category=${searchString}`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
-    return jfetch<IGame[]>(request).catch(() => {
-      console.warn('Error fetching TikTok games.');
-      return [] as IGame[];
-    });
+
+    return jfetch<ITikTokGamesData[]>(request)
+      .then(res => {
+        return res.map(g => ({ id: g.game_mask_id, name: g.full_name }));
+      })
+      .catch(() => {
+        console.warn('Error fetching TikTok games.');
+        return [];
+      });
   }
 
   /**
