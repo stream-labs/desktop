@@ -63,19 +63,18 @@ export function PrimaryPlatformSelect() {
 
   // There's probably a better way to do this
   useEffect(() => {
-    // If user has exactly one streaming platform linked, we can proceed straight
-    // to a logged in state.
-    // If the user has Ultra, auto-select the first platform as well, even if they
-    // have multiple platforms linked, as they'd now be able to disable/enable it
+    /*
+     * Per new requirements, we automatically select a platform for the user since they
+     * are now able to switch them off from the Go Live window. This makes this component
+     * obsolete except for the case where the user has no linked accounts at all.
+     */
     // TODO: we're still doing render side-effects here, which is not ideal
-    if (
-      UserService.views.linkedPlatforms.length === 1 ||
-      (isPrime && UserService.views.linkedPlatforms.length)
-    ) {
+    if (UserService.views.linkedPlatforms.length) {
       selectPrimary(UserService.views.linkedPlatforms[0]);
       return;
     }
 
+    // TODO: This is probably dead code now
     if (linkedPlatforms.length) {
       setSelectedPlatform(linkedPlatforms[0]);
     }
