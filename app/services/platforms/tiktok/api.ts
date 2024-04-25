@@ -26,14 +26,6 @@ export enum ETikTokLiveScopeReason {
 
 export type TTikTokLiveScopeTypes = 'approved' | 'not-approved' | 'legacy' | 'denied';
 
-export interface ITikTokUserInfoResponse {
-  data: {
-    user: {
-      username: string;
-    };
-  };
-}
-
 export interface ITikTokLiveScopeResponse {
   can_be_live: boolean;
   reason: ETikTokLiveScopeReason;
@@ -53,6 +45,11 @@ export interface ITikTokUserData {
   follower_count?: number;
   following_count?: number;
   profile_deep_link?: string;
+}
+
+export interface ITikTokGamesData {
+  full_name: string;
+  game_mask_id: string;
 }
 
 export interface ITikTokError {

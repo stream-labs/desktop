@@ -24,6 +24,7 @@ import {
   ITikTokLiveScopeResponse,
   ITikTokStartStreamResponse,
   TTikTokLiveScopeTypes,
+  ITikTokGamesData,
 } from './tiktok/api';
 import { I18nService } from 'services/i18n';
 import { getDefined } from 'util/properties-type-guards';
@@ -43,8 +44,8 @@ interface ITikTokStartStreamSettings {
   streamKey: string;
   title: string;
   liveScope: TTikTokLiveScopeTypes;
-  gameName: string; // TODO: confirm param name
-  game: string; // TODO: confirm param name
+  gameName: string;
+  game: string;
   display: TDisplayType;
   video?: IVideo;
   mode?: TOutputOrientation;
@@ -183,47 +184,6 @@ export class TikTokService
 
     await this.putChannelInfo(ttSettings);
     this.setPlatformContext('tiktok');
-
-    // TODO: comment in after legacy flow handled
-    // if (!this.liveStreamingEnabled) {
-    //   throwStreamError('TIKTOK_STREAM_SCOPE_MISSING');
-    // }
-
-    // if (!this.getHasScope('legacy')) {
-    //   // update server url and stream key if handling streaming via API
-    //   // streaming with server url and stream key is default
-    //   let streamInfo = {} as ITikTokStartStreamResponse;
-
-    //   try {
-    //     streamInfo = await this.startStream(ttSettings);
-    //     if (!streamInfo?.id) {
-    //       throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED');
-    //     }
-    //   } catch (error: unknown) {
-    //     this.SET_LIVE_SCOPE('denied');
-    //     await this.handleOpenLiveManager();
-    //     throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED', error as any);
-    //   }
-
-    //   ttSettings.serverUrl = streamInfo.rtmp;
-    //   ttSettings.streamKey = streamInfo.key;
-
-    //   this.SET_BROADCAST_ID(streamInfo.id);
-    // }
-
-    // if (!this.streamingService.views.isMultiplatformMode) {
-    //   this.streamSettingsService.setSettings(
-    //     {
-    //       streamType: 'rtmp_custom',
-    //       key: ttSettings.streamKey,
-    //       server: ttSettings.serverUrl,
-    //     },
-    //     context,
-    //   );
-    // }
-
-    // await this.putChannelInfo(ttSettings);
-    // this.setPlatformContext('tiktok');
   }
 
   async afterGoLive(): Promise<void> {
@@ -349,6 +309,7 @@ export class TikTokService
     const body = new FormData();
     body.append('title', opts.title);
     body.append('device_platform', getOS());
+    body.append('category', opts.game);
     const request = new Request(url, { headers, method: 'POST', body });
 
     return jfetch<ITikTokStartStreamResponse>(request);
@@ -420,24 +381,31 @@ export class TikTokService
     const url = `https://${host}/api/v5/slobs/tiktok/info`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
-    return jfetch<ITikTokError>(request).catch(() => {
+    return jfetch<ITikTokLiveScopeResponse | ITikTokError>(request).catch(() => {
       console.warn('Error fetching TikTok Live Access status.');
     });
   }
 
   /**
    * Search for games
-   * TODO: UPDATE REQUEST
+   * @remark While this is the same endpoint for if a user can go live,
+   * the category parameter will only show category results, and will not
+   * show live approval status.
    */
   async searchGames(searchString: string): Promise<IGame[]> {
     const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/tiktok/games?id=${searchString}`;
+    const url = `https://${host}/api/v5/slobs/tiktok/info?category=${searchString}`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
-    return jfetch<IGame[]>(request).catch(() => {
-      console.warn('Error fetching TikTok games.');
-      return [] as IGame[];
-    });
+
+    return jfetch<ITikTokGamesData[]>(request)
+      .then(res => {
+        return res.map(g => ({ id: g.game_mask_id, name: g.full_name }));
+      })
+      .catch(() => {
+        console.warn('Error fetching TikTok games.');
+        return [];
+      });
   }
 
   /**
