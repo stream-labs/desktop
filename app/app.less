@@ -10,7 +10,7 @@ body {
   font-family: @font-family;
   font-size: @font-size4;
   font-weight: @font-weight-normal;
-  line-height: 1.6;
+  line-height: @font-line-height-normal;
   color: var(--color-text);
 }
 
@@ -120,6 +120,26 @@ h4 {
   letter-spacing: 0.7px;
 }
 
+.text-link {
+  display: flex;
+  align-items: center;
+  line-height: @font-line-height-tight;
+  color: var(--color-text-active);
+  text-decoration: none;
+
+  > i {
+    margin: 0 4px 0 0;
+  }
+
+  &:not(:disabled):hover {
+    color: var(--color-text-active);
+
+    span {
+      text-decoration: underline;
+    }
+  }
+}
+
 .label--icon {
   margin-right: 4px;
 }
@@ -202,7 +222,7 @@ h4 {
     &:active {
       color: @white;
       background: transparent;
-      border-bottom: 1px solid rgb(255 255 255 / 14%);
+      border-bottom: 1px solid rgb(255, 255, 255, 14%);
     }
   }
 
@@ -375,7 +395,7 @@ th {
 }
 
 .v--modal-overlay {
-  background: rgb(0 0 0 / 30%);
+  background: rgb(0, 0, 0, 30%);
 }
 
 .v--modal {
