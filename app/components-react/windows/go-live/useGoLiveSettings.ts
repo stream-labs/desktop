@@ -251,12 +251,7 @@ export class GoLiveSettingsModule {
     const primaryPlatform = Services.UserService.views.platform!;
     // this is migration-like code for users with old primary platform deselected (i.e me)
     if (!this.state.enabledPlatforms.includes(primaryPlatform.type)) {
-      // return the first enabled platform that supports chat
-      // FIXME: what if there are no enabled platforms that support chat?
-      const chatPlatform = this.state.enabledPlatforms.find(platform => {
-        return getPlatformService(platform).hasCapability('chat');
-      });
-      return chatPlatform!;
+      return this.state.enabledPlatforms[0];
     }
 
     return Services.UserService.views.platform!.type;
