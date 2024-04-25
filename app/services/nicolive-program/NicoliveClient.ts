@@ -688,7 +688,6 @@ export class NicoliveClient {
       NicoliveClient.userFollowEndpoint(userId),
       NicoliveClient.createRequest('GET', {
         headers: {
-          'Content-Type': 'application/json',
           'x-frontend-id': NicoliveClient.frontendID.toString(10),
         },
       }),
@@ -724,7 +723,6 @@ export class NicoliveClient {
       NicoliveClient.userFollowEndpoint(userId),
       NicoliveClient.createRequest('POST', {
         headers: {
-          'Content-Type': 'application/json',
           'x-frontend-id': NicoliveClient.frontendID.toString(10),
           'X-Request-With': 'N Air',
         },
@@ -746,7 +744,6 @@ export class NicoliveClient {
       NicoliveClient.userFollowEndpoint(userId),
       NicoliveClient.createRequest('DELETE', {
         headers: {
-          'Content-Type': 'application/json',
           'x-frontend-id': NicoliveClient.frontendID.toString(10),
           'X-Request-With': 'N Air',
         },
