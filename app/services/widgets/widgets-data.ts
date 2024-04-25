@@ -491,7 +491,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     demoVideo: false,
     demoFilename: 'source-alertbox.png',
     supportList: [$t('Donations'), $t('Subscriptions'), $t('Follows'), $t('Bits'), $t('Hosts')],
-    icon: 'fas fa-bell',
+    icon: 'icon-alert-box',
     shortDesc: $t('Dynamic, live alerts'),
   },
   [WidgetType.DonationGoal]: {
@@ -553,7 +553,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     icon: 'fas fa-calendar',
   },
   [WidgetType.CharityGoal]: {
-    name: $t('Streamlabs Charity Goal'),
+    name: $t('Streamlabs Charity Donation Goal'),
     description: $t('Set a goal for your viewers to help you reach.'),
     demoVideo: false,
     demoFilename: 'source-charity-goal.gif',
