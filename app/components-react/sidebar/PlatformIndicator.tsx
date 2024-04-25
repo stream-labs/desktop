@@ -55,7 +55,6 @@ const SinglePlatformIndicator = ({ platform }: Pick<IPlatformIndicatorProps, 'pl
             styles.platformLogo,
             styles[`platform-logo-${platform?.type ?? 'default'}`],
           )}
-          size={platform.type === 'twitter' ? 20 : undefined}
         />
       )}
       <span className={styles.username}>{platform?.username || $t('Log Out')}</span>
@@ -88,7 +87,6 @@ const MultiPlatformIndicator = ({
             key={platform}
             platform={platform}
             className={cx(styles.platformLogo, styles[`platform-logo-${platform}`])}
-            size={platform === 'twitter' ? 20 : undefined}
           />
         ))}
         {hasCustomDestinations && <i className="fa fa-globe" />}
