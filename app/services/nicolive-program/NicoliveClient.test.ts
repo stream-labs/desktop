@@ -1,7 +1,6 @@
 import * as fetchMock from 'fetch-mock';
-import { WrappedResult } from './NicoliveClient';
+import { NicoliveClient, parseMaxQuality, WrappedResult } from './NicoliveClient';
 import { Communities, Community } from './ResponseTypes';
-const { NicoliveClient, parseMaxQuality } = require('./NicoliveClient');
 
 jest.mock('services/i18n', () => ({
   $t: (x: any) => x,
@@ -28,8 +27,7 @@ describe('parseMaxQuality', () => {
       height,
       fps,
     });
-  }
-  );
+  });
 });
 
 test('constructor', () => {
@@ -160,7 +158,8 @@ const suites: Suite[] = [
 
 suites.forEach((suite: Suite) => {
   test(`dataを取り出して返す - ${suite.name}`, async () => {
-    const client = new NicoliveClient();
+    // niconicoSession を与えないと、実行時の main process の cookieから取ろうとして失敗するので差し替える
+    const client = new NicoliveClient({ niconicoSession: 'dummy' });
 
     fetchMock[suite.method.toLowerCase()](suite.base + suite.path, dummyBody);
     const result = await client[suite.name](...(suite.args || []));
@@ -251,7 +250,7 @@ function setupMock() {
     loadURL(url: string) {
       this.url = url;
       for (const cb of this.webContentsCallbacks) {
-        cb({ preventDefault() { } }, url);
+        cb({ preventDefault() {} }, url);
       }
     }
     close = jest.fn().mockImplementation(() => {
@@ -284,7 +283,7 @@ function setupMock() {
       },
     },
     ipcRenderer: {
-      send() { },
+      send() {},
     },
   }));
 

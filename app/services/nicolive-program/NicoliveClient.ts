@@ -127,6 +127,12 @@ export class NicoliveClient {
   static userFollowBaseURL = 'https://user-follow-api.nicovideo.jp';
   private static frontendID = 134;
 
+  /**
+   *
+   * @param options niconicoSession: ニコニコのセッションIDを外挿する場合に与える
+   */
+  constructor(private options: { niconicoSession?: string } = {}) {}
+
   static isProgramPage(url: string): boolean {
     return /^https?:\/\/live2?\.nicovideo\.jp\/watch\/lv\d+/.test(url);
   }
@@ -199,6 +205,10 @@ export class NicoliveClient {
    * rendererのdocument.cookieからはローカル扱いになって読めないので、mainプロセスで取る
    */
   private async fetchSession(): Promise<string> {
+    if (this.options.niconicoSession) {
+      return this.options.niconicoSession;
+    }
+
     const { session } = remote.getCurrentWebContents();
     return new Promise((resolve, reject) => {
       session.cookies.get(
@@ -212,138 +222,102 @@ export class NicoliveClient {
     });
   }
 
-  private get(url: string | URL, options: RequestInit = {}): Promise<Response> {
-    return fetch(url.toString(), NicoliveClient.createRequest('GET', options));
+  private async requestAPI<T>(
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+    url: string,
+    options: RequestInit = {},
+  ): Promise<WrappedResult<T>> {
+    const headers: HeadersInit = {};
+    // renderer process だと cookieが取れないので、main process で取ってきて付ける
+    if (process.type === 'renderer') {
+      headers['X-Niconico-Session'] = await this.fetchSession();
+    }
+    const requestInit = NicoliveClient.createRequest(method, {
+      ...options,
+      headers: { ...headers, ...options.headers },
+    });
+    try {
+      const resp = await fetch(url, requestInit);
+      return NicoliveClient.wrapResult<T>(resp);
+    } catch (err) {
+      return NicoliveClient.wrapFetchError(err as Error);
+    }
   }
 
-  private post(url: string | URL, options: RequestInit = {}): Promise<Response> {
-    return fetch(url.toString(), NicoliveClient.createRequest('POST', options));
-  }
-
-  private put(url: string | URL, options: RequestInit = {}): Promise<Response> {
-    return fetch(url.toString(), NicoliveClient.createRequest('PUT', options));
-  }
-
-  private delete(url: string | URL, options: RequestInit = {}): Promise<Response> {
-    return fetch(url.toString(), NicoliveClient.createRequest('DELETE', options));
+  static jsonBody<T>(body: T, extraHeaders: HeadersInit = {}): RequestInit {
+    return {
+      headers: {
+        'Content-Type': 'application/json',
+        ...extraHeaders,
+      },
+      body: JSON.stringify(body),
+    };
   }
 
   /** ユーザごとの番組スケジュールを取得 */
-  async fetchProgramSchedules(
-    headers?: HeaderSeed,
-  ): Promise<WrappedResult<ProgramSchedules['data']>> {
-    try {
-      const res = await this.get(`${NicoliveClient.live2BaseURL}/unama/tool/v1/program_schedules`, {
-        headers,
-      });
-      return NicoliveClient.wrapResult<ProgramSchedules['data']>(res);
-    } catch (err) {
-      return NicoliveClient.wrapFetchError(err as Error);
-    }
+  async fetchProgramSchedules(): Promise<WrappedResult<ProgramSchedules['data']>> {
+    return this.requestAPI<ProgramSchedules['data']>(
+      'GET',
+      `${NicoliveClient.live2BaseURL}/unama/tool/v1/program_schedules`,
+    );
   }
 
   /** 番組情報を取得 */
-  async fetchProgram(
-    programID: string,
-    headers?: HeaderSeed,
-  ): Promise<WrappedResult<ProgramInfo['data']>> {
-    try {
-      const res = await this.get(`${NicoliveClient.live2BaseURL}/watch/${programID}/programinfo`, {
-        headers,
-      });
-      return NicoliveClient.wrapResult<ProgramInfo['data']>(res);
-    } catch (err) {
-      return NicoliveClient.wrapFetchError(err as Error);
-    }
+  async fetchProgram(programID: string): Promise<WrappedResult<ProgramInfo['data']>> {
+    return this.requestAPI<ProgramInfo['data']>(
+      'GET',
+      `${NicoliveClient.live2BaseURL}/watch/${programID}/programinfo`,
+    );
   }
 
   /** 番組を開始 */
-  async startProgram(
-    programID: string,
-    headers?: HeaderSeed,
-  ): Promise<WrappedResult<Segment['data']>> {
-    try {
-      const res = await this.put(`${NicoliveClient.live2BaseURL}/watch/${programID}/segment`, {
-        headers: { ...headers, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ state: 'on_air' }),
-      });
-
-      return NicoliveClient.wrapResult<Segment['data']>(res);
-    } catch (err) {
-      return NicoliveClient.wrapFetchError(err as Error);
-    }
+  async startProgram(programID: string): Promise<WrappedResult<Segment['data']>> {
+    return this.requestAPI<Segment['data']>(
+      'PUT',
+      `${NicoliveClient.live2BaseURL}/watch/${programID}/segment`,
+      NicoliveClient.jsonBody({ state: 'on_air' }),
+    );
   }
 
   /** 番組を終了 */
-  async endProgram(
-    programID: string,
-    headers?: HeaderSeed,
-  ): Promise<WrappedResult<Segment['data']>> {
-    try {
-      const res = await this.put(`${NicoliveClient.live2BaseURL}/watch/${programID}/segment`, {
-        headers: { ...headers, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ state: 'end' }),
-      });
-
-      return NicoliveClient.wrapResult<Segment['data']>(res);
-    } catch (err) {
-      return NicoliveClient.wrapFetchError(err as Error);
-    }
+  async endProgram(programID: string): Promise<WrappedResult<Segment['data']>> {
+    return this.requestAPI<Segment['data']>(
+      'PUT',
+      `${NicoliveClient.live2BaseURL}/watch/${programID}/segment`,
+      NicoliveClient.jsonBody({ state: 'end' }),
+    );
   }
 
   /** 番組を延長 */
   async extendProgram(
     programID: string,
     minutes: number = 30,
-    headers?: HeaderSeed,
   ): Promise<WrappedResult<Extension['data']>> {
-    try {
-      const res = await this.post(`${NicoliveClient.live2BaseURL}/watch/${programID}/extension`, {
-        headers: { ...headers, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ minutes }),
-      });
-
-      return NicoliveClient.wrapResult<Extension['data']>(res);
-    } catch (err) {
-      return NicoliveClient.wrapFetchError(err as Error);
-    }
+    return this.requestAPI<Extension['data']>(
+      'POST',
+      `${NicoliveClient.live2BaseURL}/watch/${programID}/extension`,
+      NicoliveClient.jsonBody({ minutes }),
+    );
   }
 
   /** 運営コメントを送信 */
   async sendOperatorComment(
     programID: string,
     { text, isPermanent }: { text: string; isPermanent?: boolean },
-    headers?: HeaderSeed,
   ): Promise<WrappedResult<void>> {
-    try {
-      const res = await this.put(
-        `${NicoliveClient.live2BaseURL}/watch/${programID}/operator_comment`,
-        {
-          headers: { ...headers, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text, isPermanent }),
-        },
-      );
-
-      return NicoliveClient.wrapResult<void>(res);
-    } catch (err) {
-      return NicoliveClient.wrapFetchError(err as Error);
-    }
+    return this.requestAPI<void>(
+      'PUT',
+      `${NicoliveClient.live2BaseURL}/watch/${programID}/operator_comment`,
+      NicoliveClient.jsonBody({ text, isPermanent }),
+    );
   }
 
   /** 統計情報（視聴者とコメント数）を取得 */
-  async fetchStatistics(
-    programID: string,
-    headers?: HeaderSeed,
-  ): Promise<WrappedResult<Statistics['data']>> {
-    try {
-      const res = await this.get(`${NicoliveClient.live2BaseURL}/watch/${programID}/statistics`, {
-        headers,
-      });
-
-      return NicoliveClient.wrapResult<Statistics['data']>(res);
-    } catch (err) {
-      return NicoliveClient.wrapFetchError(err as Error);
-    }
+  async fetchStatistics(programID: string): Promise<WrappedResult<Statistics['data']>> {
+    return this.requestAPI<Statistics['data']>(
+      'GET',
+      `${NicoliveClient.live2BaseURL}/watch/${programID}/statistics`,
+    );
   }
 
   // 関心が別だが他の場所におく程の理由もないのでここにおく
@@ -351,87 +325,40 @@ export class NicoliveClient {
    * ニコニ広告ptとギフトptを取得
    * 放送開始前は404になる
    **/
-  async fetchNicoadStatistics(
-    programID: string,
-    headers?: HeaderSeed,
-  ): Promise<WrappedResult<NicoadStatistics['data']>> {
-    try {
-      const res = await this.get(
-        `${NicoliveClient.nicoadBaseURL}/v1/live/statusarea/${programID}`,
-        { headers },
-      );
-
-      return NicoliveClient.wrapResult<NicoadStatistics['data']>(res);
-    } catch (err) {
-      return NicoliveClient.wrapFetchError(err as Error);
-    }
+  async fetchNicoadStatistics(programID: string): Promise<WrappedResult<NicoadStatistics['data']>> {
+    return this.requestAPI<NicoadStatistics['data']>(
+      'GET',
+      `${NicoliveClient.nicoadBaseURL}/v1/live/statusarea/${programID}`,
+    );
   }
 
   async fetchFilters(programID: string): Promise<WrappedResult<Filters['data']>> {
-    const session = await this.fetchSession();
-    const requestInit = NicoliveClient.createRequest('GET', {
-      headers: {
-        'X-Niconico-Session': session,
-        'Content-Type': 'application/json',
-      },
-    });
-    try {
-      const resp = await fetch(
-        `${NicoliveClient.live2BaseURL}/unama/tool/v2/programs/${programID}/ssng`,
-        requestInit,
-      );
-      return NicoliveClient.wrapResult<Filters['data']>(resp);
-    } catch (err) {
-      return NicoliveClient.wrapFetchError(err as Error);
-    }
+    return this.requestAPI<Filters['data']>(
+      'GET',
+      `${NicoliveClient.live2BaseURL}/unama/tool/v2/programs/${programID}/ssng`,
+    );
   }
 
   async addFilters(
     programID: string,
     records: AddFilterRecord[],
   ): Promise<WrappedResult<AddFilterResult['data']>> {
-    const session = await this.fetchSession();
     if (records.length !== 1) {
       throw new Error('addFilters: records.length must be 1');
     }
-    const requestInit = NicoliveClient.createRequest('POST', {
-      body: JSON.stringify(records[0]),
-      headers: {
-        'X-Niconico-Session': session,
-        'Content-Type': 'application/json',
-      },
-    });
-    try {
-      const resp = await fetch(
-        `${NicoliveClient.live2BaseURL}/unama/tool/v2/programs/${programID}/ssng/create`,
-        requestInit,
-      );
-      return NicoliveClient.wrapResult<AddFilterResult['data']>(resp);
-    } catch (err) {
-      return NicoliveClient.wrapFetchError(err as Error);
-    }
+    return this.requestAPI<AddFilterResult['data']>(
+      'POST',
+      `${NicoliveClient.live2BaseURL}/unama/tool/v2/programs/${programID}/ssng/create`,
+      NicoliveClient.jsonBody(records[0]),
+    );
   }
 
   async deleteFilters(programID: string, ids: FilterRecord['id'][]): Promise<WrappedResult<void>> {
-    const session = await this.fetchSession();
-    const requestInit = NicoliveClient.createRequest('DELETE', {
-      body: JSON.stringify({
-        id: ids,
-      }),
-      headers: {
-        'X-Niconico-Session': session,
-        'Content-Type': 'application/json',
-      },
-    });
-    try {
-      const resp = await fetch(
-        `${NicoliveClient.live2BaseURL}/unama/tool/v2/programs/${programID}/ssng`,
-        requestInit,
-      );
-      return NicoliveClient.wrapResult<void>(resp);
-    } catch (err) {
-      return NicoliveClient.wrapFetchError(err as Error);
-    }
+    return this.requestAPI<void>(
+      'DELETE',
+      `${NicoliveClient.live2BaseURL}/unama/tool/v2/programs/${programID}/ssng`,
+      NicoliveClient.jsonBody({ id: ids }),
+    );
   }
 
   // 関心が別だが他の場所におく程の理由もないのでここにおく
@@ -461,12 +388,15 @@ export class NicoliveClient {
 
     let res = null;
     try {
-      res = await this.get(url, {
-        headers: {
-          ...headers,
-          'X-Frontend-Id': NicoliveClient.frontendID.toString(10),
-        },
-      });
+      res = await fetch(
+        url,
+        NicoliveClient.createRequest('GET', {
+          headers: {
+            ...headers,
+            'X-Frontend-Id': NicoliveClient.frontendID.toString(10),
+          },
+        }),
+      );
     } catch (err) {
       return NicoliveClient.wrapFetchError(err as Error);
     }
@@ -541,33 +471,20 @@ export class NicoliveClient {
   async fetchOnairChannelProgram(
     channelId: string,
   ): Promise<WrappedResult<OnairChannelProgramData>> {
-    const url = `${NicoliveClient.live2BaseURL}/unama/tool/v2/onairs/channels/${channelId}`;
-    const headers = new Headers();
-    try {
-      const userSession = await this.fetchSession();
-      headers.append('X-niconico-session', userSession);
-      const request = new Request(url, { headers });
-      const response = await fetch(request);
-      return NicoliveClient.wrapResult<OnairChannelProgramData>(response);
-    } catch (error) {
-      return NicoliveClient.wrapFetchError(error as Error);
-    }
+    return this.requestAPI<OnairChannelProgramData>(
+      'GET',
+      `${NicoliveClient.live2BaseURL}/unama/tool/v2/onairs/channels/${channelId}`,
+    );
   }
 
   /**
    * 放送可能なチャンネル一覧を取得する
    */
   async fetchOnairChannels(): Promise<WrappedResult<OnairChannelData[]>> {
-    const url = `${NicoliveClient.live2BaseURL}/unama/tool/v2/onairs/channels`;
-    const headers = new Headers();
-    try {
-      const userSession = await this.fetchSession();
-      headers.append('X-niconico-session', userSession);
-      const response = await fetch(new Request(url, { headers }));
-      return NicoliveClient.wrapResult<OnairChannelData[]>(response);
-    } catch (error) {
-      return NicoliveClient.wrapFetchError(error as Error);
-    }
+    return this.requestAPI<OnairChannelData[]>(
+      'GET',
+      `${NicoliveClient.live2BaseURL}/unama/tool/v2/onairs/channels`,
+    );
   }
 
   /**
@@ -742,15 +659,15 @@ export class NicoliveClient {
    * @returns
    */
   async fetchKonomiTags(userId: string): Promise<KonomiTag[]> {
-    const res = await this.post(
+    const res = await fetch(
       `${NicoliveClient.live2ApiBaseURL}/api/v1/konomiTags/GetFollowing`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'x-service-id': 'n-air-app',
-        },
-        body: JSON.stringify({ follower_id: { value: userId, type: 'USER' } }),
-      },
+      NicoliveClient.createRequest(
+        'POST',
+        NicoliveClient.jsonBody(
+          { follower_id: { value: userId, type: 'USER' } },
+          { 'x-service-id': 'n-air-app' },
+        ),
+      ),
     );
     if (res.ok) {
       const json = (await res.json()) as KonomiTags;
@@ -769,12 +686,14 @@ export class NicoliveClient {
    * @returns フォロー中ならtrue
    */
   async fetchUserFollow(userId: string): Promise<boolean> {
-    const res = await this.get(NicoliveClient.userFollowEndpoint(userId), {
-      headers: {
-        'Content-Type': 'application/json',
-        'x-frontend-id': NicoliveClient.frontendID.toString(10),
-      },
-    });
+    const res = await fetch(
+      NicoliveClient.userFollowEndpoint(userId),
+      NicoliveClient.createRequest('GET', {
+        headers: {
+          'x-frontend-id': NicoliveClient.frontendID.toString(10),
+        },
+      }),
+    );
     if (res.ok) {
       const json = await res.json();
       console.info('fetchUserFollow', json);
@@ -802,13 +721,15 @@ export class NicoliveClient {
    */
   async followUser(userId: string): Promise<void> {
     this.prepareUserFollowApi();
-    const res = await this.post(NicoliveClient.userFollowEndpoint(userId), {
-      headers: {
-        'Content-Type': 'application/json',
-        'x-frontend-id': NicoliveClient.frontendID.toString(10),
-        'X-Request-With': 'N Air',
-      },
-    });
+    const res = await fetch(
+      NicoliveClient.userFollowEndpoint(userId),
+      NicoliveClient.createRequest('POST', {
+        headers: {
+          'x-frontend-id': NicoliveClient.frontendID.toString(10),
+          'X-Request-With': 'N Air',
+        },
+      }),
+    );
     if (!res.ok) {
       console.info('followUser', userId, res, await res.json()); // DEBUG
       throw new Error(`followUser failed: ${res.status} ${res.statusText}`);
@@ -821,13 +742,15 @@ export class NicoliveClient {
    */
   async unFollowUser(userId: string): Promise<void> {
     this.prepareUserFollowApi();
-    const res = await this.delete(NicoliveClient.userFollowEndpoint(userId), {
-      headers: {
-        'Content-Type': 'application/json',
-        'x-frontend-id': NicoliveClient.frontendID.toString(10),
-        'X-Request-With': 'N Air',
-      },
-    });
+    const res = await fetch(
+      NicoliveClient.userFollowEndpoint(userId),
+      NicoliveClient.createRequest('DELETE', {
+        headers: {
+          'x-frontend-id': NicoliveClient.frontendID.toString(10),
+          'X-Request-With': 'N Air',
+        },
+      }),
+    );
     if (!res.ok) {
       console.info('unFollowUser', userId, res, await res.json());
       throw new Error(`unFollowUser failed: ${res.status} ${res.statusText}`);
@@ -841,8 +764,9 @@ export class NicoliveClient {
     console.info('API call: fetchModerators'); // DEBUG
     if (this.skipModeratorAPICall) return [];
 
-    const res = await this.get(
+    const res = await fetch(
       `${NicoliveClient.live2BaseURL}/unama/api/v2/broadcasters/moderators`,
+      NicoliveClient.createRequest('GET', {}),
     );
     if (res.ok) {
       const json = (await res.json()) as Moderators;
@@ -860,14 +784,9 @@ export class NicoliveClient {
     console.info('API call: addModerator', userId); // DEBUG
     if (this.skipModeratorAPICall) return;
 
-    const res = await this.post(
+    const res = await fetch(
       `${NicoliveClient.live2BaseURL}/unama/api/v2/broadcasters/moderators`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userId }),
-      },
+      NicoliveClient.createRequest('POST', NicoliveClient.jsonBody({ userId })),
     );
     if (res.ok) {
       return;
@@ -880,8 +799,9 @@ export class NicoliveClient {
       return;
     }
 
-    const res = await this.delete(
+    const res = await fetch(
       `${NicoliveClient.live2BaseURL}/unama/api/v2/broadcasters/moderators?userId=${userId}`,
+      NicoliveClient.createRequest('DELETE', {}),
     );
     if (res.ok) {
       return;
