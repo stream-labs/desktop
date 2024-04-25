@@ -288,11 +288,6 @@ function FeaturesNavItem(p: {
     });
   }
 
-  // HACK: remove alertbox-library, even after removing elsewhere this seems to be loaded (perhaps from cache)
-  if (menuItem.key === 'alertbox-library') {
-    return null;
-  }
-
   return (
     <MenuItem
       className={cx(
