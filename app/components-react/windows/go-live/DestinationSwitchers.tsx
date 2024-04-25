@@ -92,6 +92,11 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
       enabledPlatformsRef.current.push(platform);
     }
 
+    // Do not allow disabling the last platform
+    if (!enabledPlatformsRef.current.length) {
+      enabledPlatformsRef.current.push(platform);
+    }
+
     emitSwitch();
   }
 
@@ -117,7 +122,6 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
           onChange={enabled => togglePlatform(platform, enabled)}
           promptConnectTikTok={platform === 'tiktok' && promptConnectTikTok}
           isPrimary={isPrimaryPlatform(platform)}
-          disabled={disableSwitchers && !isEnabled(platform)}
         />
       ))}
 
@@ -128,7 +132,6 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
           onChange={enabled => togglePlatform('tiktok', enabled)}
           isPrimary={isPrimaryPlatform('tiktok')}
           promptConnectTikTok={promptConnectTikTok}
-          disabled={disableSwitchers && !isEnabled('tiktok')}
         />
       )}
 
@@ -176,15 +179,6 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
 
   function onClickHandler(ev: MouseEvent) {
     // If re-stream isn't enabled, don't allow disabling the primary platform
-    if (cannotDisableDestination) {
-      alertAsync(
-        $t(
-          'You cannot disable the platform you used to sign in to Streamlabs Desktop. Please sign in with a different platform to disable streaming to this destination.',
-        ),
-      );
-      return;
-    }
-
     if (p.promptConnectTikTok) {
       alertAsync({
         type: 'confirm',
@@ -206,20 +200,16 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
       return;
     }
 
-    if (canEnableRestream || !p.promptConnectTikTok) {
-      const enable = !p.enabled;
-      p.onChange(enable);
-      // always proxy the click to the SwitchInput
-      // so it can play a transition animation
-      switchInputRef.current?.click();
-      // switch the container class without re-rendering to not stop the animation
-      if (enable) {
-        containerRef.current?.classList.remove(styles.platformDisabled);
-      } else {
-        containerRef.current?.classList.add(styles.platformDisabled);
-      }
+    const enable = !p.enabled;
+    p.onChange(enable);
+    // always proxy the click to the SwitchInput
+    // so it can play a transition animation
+    switchInputRef.current?.click();
+    // switch the container class without re-rendering to not stop the animation
+    if (enable) {
+      containerRef.current?.classList.remove(styles.platformDisabled);
     } else {
-      MagicLinkService.actions.linkToPrime('slobs-multistream');
+      containerRef.current?.classList.add(styles.platformDisabled);
     }
   }
 
@@ -259,7 +249,7 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
             inputRef={switchInputRef}
             value={p.enabled}
             name={platform}
-            disabled={cannotDisableDestination || tiktokDisabled}
+            disabled={tiktokDisabled}
             uncontrolled
           />
         ),
