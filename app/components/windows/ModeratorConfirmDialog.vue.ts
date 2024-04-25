@@ -5,6 +5,7 @@ import { WindowsService } from 'services/windows';
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import ModalLayout from '../ModalLayout.vue';
+import { remote } from 'electron';
 
 @Component({
   components: {
@@ -45,5 +46,13 @@ export default class ModeratorConfirmDialog extends Vue {
   cancel() {
     this.isClosing = true;
     this.nicoliveModeratorsService.closeConfirmWindow(false);
+  }
+
+  openInDefaultBrowser(event: MouseEvent): void {
+    const href = (event.currentTarget as HTMLAnchorElement).href;
+    const url = new URL(href);
+    if (/^https?/.test(url.protocol)) {
+      remote.shell.openExternal(url.toString());
+    }
   }
 }
