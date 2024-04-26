@@ -77,8 +77,9 @@ export default class CommentViewer extends Vue {
   commentReloadTooltip = 'コメント再取得';
   commentSynthesizerOnTooltip = 'コメント読み上げ：クリックしてOFFにする';
   commentSynthesizerOffTooltip = 'コメント読み上げ：クリックしてONにする';
-  filterTooltip = 'NG設定';
+  filterTooltip = '配信用ブロック設定';
   settingsTooltip = 'コメント設定';
+  moderatorTooltip = 'モデレーター管理';
 
   isFilterOpened = false;
 

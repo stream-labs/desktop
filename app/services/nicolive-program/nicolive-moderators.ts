@@ -129,9 +129,9 @@ export class NicoliveModeratorsService extends StatefulService<INicoliveModerato
       // TODO modalにする?
       const confirmWindowId = this.windowsService.createOneOffWindow({
         componentName: 'ModeratorConfirmDialog',
-        title: '?', // TODO
+        isFullScreen: true, // hide Titlebar
         queryParams: { userName, userId, operation },
-        size: { width: 400, height: 224 },
+        size: { width: 480, height: 240 },
       });
       this.resolveConfirmPromise = (result: boolean) => {
         resolve({ confirmWindowId, result });

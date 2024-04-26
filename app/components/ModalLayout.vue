@@ -89,7 +89,6 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: flex-end;
-  height: 56px;
   text-align: right;
   background-color: var(--color-bg-primary);
 
@@ -99,11 +98,11 @@
   }
 
   &:not(:empty) {
-    padding: 8px 16px;
+    padding: 16px;
   }
 
   .button {
-    .margin-left();
+    margin-left: 12px;
   }
 }
 

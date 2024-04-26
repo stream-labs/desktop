@@ -76,7 +76,7 @@
             <div class="text">
               <p class="name">{{ name }}</p>
               <p class="description">{{ description }}</p>
-              <button class="button button--secondary" @click="playSample(label)"><i class="icon-speaker"></i>{{
+              <button class="button button--round button--primary" @click="playSample(label)"><i class="icon-speaker"></i>{{
         $t('source-props.nair-rtvc-source.preset.play_sample') }}</button>
             </div>
           </div>
@@ -219,7 +219,6 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  height: 56px;
   text-align: right;
   background-color: var(--color-bg-primary);
 
@@ -229,11 +228,11 @@
   }
 
   &:not(:empty) {
-    padding: 8px 16px;
+    padding: 16px;
   }
 
   .button {
-    .margin-left();
+  margin-left: 12px;
   }
 }
 
@@ -289,7 +288,7 @@
 
 .character-header {
   position: relative;
-  height: 304px;
+  height: 295px;
   overflow: hidden;
   border-radius: 4px 4px 0 0;
 
@@ -395,7 +394,7 @@
     }
 
     .button {
-      margin-top: 16px;
+      margin-top: 12px;
     }
   }
 }

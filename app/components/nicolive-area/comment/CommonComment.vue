@@ -3,14 +3,12 @@
     <div
       class="comment-wrapper"
       :speaking="speaking"
-      :title="computedTitle"
       @dblclick="$emit('pinned')"
     >
       <div class="comment-number">{{ chat.value.no }}</div>
       <div class="comment-box">
         <div
           class="comment-name-box"
-          :title="computedName"
           v-if="computedName"
           @click.stop="$emit('commentUser')"
         >
@@ -18,12 +16,17 @@
             class="comment-icon"
             :src="userIconURL"
             :alt="computedName"
+            :title="computedName"
             @error.once="userIconURL = defaultUserIconURL"
           />
           <div class="comment-name">{{ computedName }}</div>
-          <div class="comment-moderator" v-if="chat.isModerator">[モ]</div>
+          <i
+            class="icon-moderator"
+            v-tooltip.bottom="moderatorTooltip"
+            v-if="chat.isModerator"
+          ></i>
         </div>
-        <div class="comment-body">{{ computedContent }}</div>
+        <div class="comment-body" :title="computedTitle">{{ computedContent }}</div>
       </div>
       <div class="comment-misc" @click.stop="$emit('commentMenu')">
         <i class="icon-btn icon-ellipsis-vertical"></i>
@@ -38,8 +41,8 @@
         <a
           @click.prevent="openInDefaultBrowser($event)"
           href="https://qa.nicovideo.jp/faq/show/21148?site_domain=default"
-          class="link"
-          >なふだ機能とは?</a
+          class="text-link"
+          ><i class="icon-question"></i><span>なふだ機能とは？</span></a
         >
       </div>
     </div>
@@ -109,9 +112,10 @@
   }
 }
 
-.comment-moderator { // TODO
-  font-size: @font-size2;
-  color: var(--color-text-light);
+.icon-moderator {
+    margin-left: 4px;
+    font-size: @font-size5;
+    color: var(--color-primary);
 }
 
 .comment-body {
@@ -165,12 +169,8 @@
 }
 
 .nameplate-hint-anchor {
-  margin-top: 4px;
+  margin-top: 8px;
   font-size: @font-size2;
-
-  a {
-    color: var(--color-text-active);
-  }
 }
 
 .nameplate-hint div {

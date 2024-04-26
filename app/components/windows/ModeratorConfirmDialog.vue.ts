@@ -5,6 +5,7 @@ import { WindowsService } from 'services/windows';
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import ModalLayout from '../ModalLayout.vue';
+import { remote } from 'electron';
 
 @Component({
   components: {
@@ -45,5 +46,9 @@ export default class ModeratorConfirmDialog extends Vue {
   cancel() {
     this.isClosing = true;
     this.nicoliveModeratorsService.closeConfirmWindow(false);
+  }
+
+  openModeratorHelpPage() {
+    remote.shell.openExternal('https://qa.nicovideo.jp/faq/show/22379?site_domain=default');
   }
 }

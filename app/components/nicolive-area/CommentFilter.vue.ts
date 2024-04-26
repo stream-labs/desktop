@@ -42,6 +42,11 @@ export default class CommentFilter extends Vue {
   // @ts-expect-error: ts2729: use before initialization
   userId: string = this.userService.platform.id;
 
+  showPopupMenu: boolean = false;
+
+  // TODO: 後で言語ファイルに移動する
+  adjusterTooltip = '登録者で絞り込み';
+
   async reloadFilters() {
     try {
       return this.nicoliveCommentFilterService.fetchFilters();
@@ -83,6 +88,21 @@ export default class CommentFilter extends Vue {
 
   get isEmptyBecauseOfFilterBy(): boolean {
     return this.currentTypeFilters.length === 0 && this.currentFilterBy !== 'all';
+  }
+
+  get numberOfEntries() {
+    return this.currentTypeFilters.length;
+  }
+
+  get currentFilterName() {
+    switch (this.currentFilterBy) {
+      case 'broadcaster':
+        return '放送者による';
+      case 'moderator':
+        return 'モデレーターによる';
+      default:
+        return '';
+    }
   }
 
   FILTER_VALUE = {

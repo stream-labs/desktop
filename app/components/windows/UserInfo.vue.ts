@@ -68,6 +68,10 @@ export default class UserInfo extends Vue {
   isFollowing = false;
   isModerator = false;
 
+  // TODO: 後で言語ファイルに移動する
+  moderatorTooltip = 'モデレーター';
+  otherMenuTooltip = 'その他メニュー';
+
   mounted() {
     this.myKonomiTags = [];
     this.rawKonomiTags = [];
@@ -258,5 +262,11 @@ export default class UserInfo extends Vue {
   }
   copyUserId() {
     electron.remote.clipboard.writeText(this.userId);
+  }
+
+  currentTab = 'konomi';
+
+  changeTab(tab: string) {
+    this.currentTab = tab;
   }
 }
