@@ -271,3 +271,10 @@ export interface Moderators {
   };
   data: Moderator[];
 }
+
+export interface AddModerator {
+  meta: {
+    status: 200;
+  };
+  data: Moderator;
+}

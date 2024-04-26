@@ -22,8 +22,8 @@ import {
   UserFollow,
   AddFilterRecord,
   AddFilterResult,
-  Moderator,
   Moderators,
+  AddModerator,
 } from './ResponseTypes';
 const { BrowserWindow } = remote;
 
@@ -131,7 +131,12 @@ export class NicoliveClient {
    *
    * @param options niconicoSession: ニコニコのセッションIDを外挿する場合に与える
    */
-  constructor(private options: { niconicoSession?: string } = {}) {}
+  constructor(
+    private options: {
+      niconicoSession?: string;
+      enableModeratorAPICall?: boolean; // for DEBUG
+    } = {},
+  ) {}
 
   static isProgramPage(url: string): boolean {
     return /^https?:\/\/live2?\.nicovideo\.jp\/watch\/lv\d+/.test(url);
@@ -757,22 +762,15 @@ export class NicoliveClient {
     }
   }
 
-  // for DEBUG
-  skipModeratorAPICall = true;
+  async fetchModerators(): Promise<WrappedResult<Moderators>> {
+    // DEBUG
+    if (!this.options.enableModeratorAPICall)
+      return { ok: true, value: { meta: { status: 200 }, data: [] } };
 
-  async fetchModerators(): Promise<Moderator[]> {
-    console.info('API call: fetchModerators'); // DEBUG
-    if (this.skipModeratorAPICall) return [];
-
-    const res = await fetch(
+    return this.requestAPI<Moderators>(
+      'GET',
       `${NicoliveClient.live2BaseURL}/unama/api/v2/broadcasters/moderators`,
-      NicoliveClient.createRequest('GET', {}),
     );
-    if (res.ok) {
-      const json = (await res.json()) as Moderators;
-      return json.data;
-    }
-    throw new Error(`fetchModerators failed: ${res.status} ${res.statusText}`);
   }
 
   /**
@@ -780,32 +778,40 @@ export class NicoliveClient {
    * @param userId
    * @returns
    */
-  async addModerator(userId: string): Promise<void> {
-    console.info('API call: addModerator', userId); // DEBUG
-    if (this.skipModeratorAPICall) return;
+  async addModerator(userId: string): Promise<WrappedResult<AddModerator>> {
+    // DEBUG
+    if (!this.options.enableModeratorAPICall) {
+      return {
+        ok: true,
+        value: {
+          meta: { status: 200 },
+          data: {
+            userId: parseInt(userId, 10),
+            nickname: 'dummy',
+            iconUrl: '',
+            isValid: true,
+            createdAt: '1970-01-01T09:00:00+09:00',
+          },
+        },
+      };
+    }
 
-    const res = await fetch(
+    return this.requestAPI<AddModerator>(
+      'POST',
       `${NicoliveClient.live2BaseURL}/unama/api/v2/broadcasters/moderators`,
-      NicoliveClient.createRequest('POST', NicoliveClient.jsonBody({ userId })),
+      NicoliveClient.jsonBody({ userId }),
     );
-    if (res.ok) {
-      return;
-    }
-    throw new Error(`addModerator failed: ${res.status} ${res.statusText}`);
   }
-  async removeModerator(userId: string): Promise<void> {
-    console.info('API call: removeModerator', userId); // DEBUG
-    if (this.skipModeratorAPICall) {
-      return;
+
+  async removeModerator(userId: string): Promise<WrappedResult<void>> {
+    // DEBUG
+    if (!this.options.enableModeratorAPICall) {
+      return { ok: true, value: undefined };
     }
 
-    const res = await fetch(
+    return this.requestAPI<void>(
+      'DELETE',
       `${NicoliveClient.live2BaseURL}/unama/api/v2/broadcasters/moderators?userId=${userId}`,
-      NicoliveClient.createRequest('DELETE', {}),
     );
-    if (res.ok) {
-      return;
-    }
-    throw new Error(`removeModerator failed: ${res.status} ${res.statusText}`);
   }
 }

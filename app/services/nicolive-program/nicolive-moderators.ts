@@ -3,8 +3,9 @@ import { distinctUntilChanged, map } from 'rxjs/operators';
 import { Inject } from 'services/core/injector';
 import { StatefulService, mutation } from 'services/core/stateful-service';
 import { WindowsService } from 'services/windows';
-import { NicoliveClient } from './NicoliveClient';
+import { NicoliveClient, isOk } from './NicoliveClient';
 import { NicoliveProgramService } from './nicolive-program';
+import { NicoliveFailure, openErrorDialogFromFailure } from './NicoliveFailure';
 
 interface INicoliveModeratorsService {
   // moderator の userId 集合
@@ -54,8 +55,11 @@ export class NicoliveModeratorsService extends StatefulService<INicoliveModerato
   }
 
   private async fetchModerators() {
-    const moderators = await this.client.fetchModerators();
-    this.setModeratorsCache(moderators.map(moderator => moderator.userId).map(String));
+    const result = await this.client.fetchModerators();
+    if (!isOk(result)) {
+      throw NicoliveFailure.fromClientError('fetchModerators', result);
+    }
+    this.setModeratorsCache(result.value.data.map(moderator => moderator.userId).map(String));
   }
 
   isModerator(userId: string): boolean {
@@ -72,18 +76,31 @@ export class NicoliveModeratorsService extends StatefulService<INicoliveModerato
     this.setState({ moderatorsCache: userIds });
   }
 
-  async addModerator(userId: string) {
+  private async addModeratorCache(userId: string) {
     if (this.isModerator(userId)) return;
-    await this.client.addModerator(userId);
     this.setModeratorsCache([...this.state.moderatorsCache, userId]);
   }
 
-  async removeModerator(userId: string) {
+  async addModerator(userId: string) {
+    if (this.isModerator(userId)) return;
+    const result = await this.client.addModerator(userId);
+    if (!isOk(result)) {
+      throw NicoliveFailure.fromClientError('addModerator', result);
+    }
+    this.addModeratorCache(userId);
+  }
+
+  async removeModeratorCache(userId: string) {
     if (this.isModerator(userId)) {
-      await this.client.removeModerator(userId);
       const moderators = new Set(this.state.moderatorsCache);
       moderators.delete(userId);
       this.setModeratorsCache([...moderators]);
+    }
+  }
+  async removeModerator(userId: string) {
+    if (this.isModerator(userId)) {
+      await this.client.removeModerator(userId);
+      this.removeModeratorCache(userId);
     }
   }
 
@@ -138,8 +155,13 @@ export class NicoliveModeratorsService extends StatefulService<INicoliveModerato
       operation: 'add',
     });
     if (ok) {
-      await this.addModerator(userId);
-      // TODO error handling
+      try {
+        await this.addModerator(userId);
+      } catch (caught) {
+        if (caught instanceof NicoliveFailure) {
+          openErrorDialogFromFailure(caught);
+        }
+      }
     }
   }
   async removeModeratorWithConfirm({ userId, userName }: { userId: string; userName: string }) {
@@ -150,8 +172,13 @@ export class NicoliveModeratorsService extends StatefulService<INicoliveModerato
       operation: 'remove',
     });
     if (ok) {
-      await this.removeModerator(userId);
-      // TODO error handling
+      try {
+        await this.removeModerator(userId);
+      } catch (caught) {
+        if (caught instanceof NicoliveFailure) {
+          openErrorDialogFromFailure(caught);
+        }
+      }
     }
   }
 

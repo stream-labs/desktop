@@ -38,6 +38,7 @@ test('constructor', () => {
 // 実際には叩かないのでなんでもよい
 const programID = 'lv1';
 const communityID = 'co1';
+const userID = 2;
 
 const dummyURL = 'https://example.com';
 
@@ -154,12 +155,36 @@ const suites: Suite[] = [
     path: `/v1/live/statusarea/${programID}`,
     args: [programID],
   },
+  {
+    name: 'fetchModerators',
+    method: 'get',
+    base: NicoliveClient.live2BaseURL,
+    path: `/unama/api/v2/broadcasters/moderators`,
+    args: [],
+  },
+  {
+    name: 'addModerator',
+    method: 'post',
+    base: NicoliveClient.live2BaseURL,
+    path: `/unama/api/v2/broadcasters/moderators`,
+    args: [userID],
+  },
+  {
+    name: 'removeModerator',
+    method: 'delete',
+    base: NicoliveClient.live2BaseURL,
+    path: `/unama/api/v2/broadcasters/moderators?userId=${userID}`,
+    args: [userID],
+  },
 ];
 
 suites.forEach((suite: Suite) => {
   test(`dataを取り出して返す - ${suite.name}`, async () => {
     // niconicoSession を与えないと、実行時の main process の cookieから取ろうとして失敗するので差し替える
-    const client = new NicoliveClient({ niconicoSession: 'dummy' });
+    const client = new NicoliveClient({
+      niconicoSession: 'dummy',
+      enableModeratorAPICall: true, // DEBUG
+    });
 
     fetchMock[suite.method.toLowerCase()](suite.base + suite.path, dummyBody);
     const result = await client[suite.name](...(suite.args || []));

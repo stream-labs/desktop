@@ -234,6 +234,20 @@
           "title": "サーバーでエラーが発生しました",
           "message": "サーバーでエラーが発生したため、番組情報を取得できませんでした。\n一時的な不具合の場合がありますので、少し時間をおいてから再度お試し下さい。合わせて［お知らせ］ボタンより、障害情報に関するニコニコインフォをご確認ください。"
         }
+      },
+      "addModerator": {
+        "NOT_BROADCASTER": {
+          "title": "NOT_BROADCASTER",
+          "message": "一度も配信したことのないユーザーは配信できない"
+        },
+        "ALREADY_EXISTS": {
+          "title": "ALREADY_EXISTS",
+          "message": "登録済みのユーザーを登録しようとした"
+        },
+        "MAX": {
+          "title": "MAX",
+          "message": "登録上限人数に達している"
+        }
       }
     },
     "logic": {

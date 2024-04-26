@@ -234,6 +234,20 @@
           "title": "An error occurred on the server",
           "message": "The program information could not be fetched because an error occurred on the server.\nhere may be temporary problems, so try again later. Check the trouble information from the \"Notification\" button, as well."
         }
+      },
+      "addModerator": {
+        "NOT_BROADCASTER": {
+          "title": "NOT_BROADCASTER",
+          "message": "一度も配信したことのないユーザーは配信できない(TODO 翻訳)"
+        },
+        "ALREADY_EXISTS": {
+          "title": "ALREADY_EXISTS",
+          "message": "登録済みのユーザーを登録しようとした(TODO 翻訳)"
+        },
+        "MAX": {
+          "title": "MAX",
+          "message": "登録上限人数に達している(TODO 翻訳)"
+        }
       }
     },
     "logic": {
