@@ -18,6 +18,7 @@ const setup = createSetupFunction({
     },
     NicoliveModeratorsService: {
       stateChange: new Subject(),
+      refreshObserver: new Subject(),
       isModerator: () => false,
     },
   },

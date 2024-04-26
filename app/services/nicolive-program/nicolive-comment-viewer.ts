@@ -163,6 +163,19 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
         messages: this.items.map(chat => this.nicoliveCommentFilterService.applyFilter(chat)),
       });
     });
+
+    // モデレーター情報が再取得されたら既存コメントのモデレーター情報も更新する
+    this.nicoliveModeratorsService.refreshObserver.subscribe({
+      next: () => {
+        console.log('refresh moderators'); // DEBUG
+        this.SET_STATE({
+          messages: this.items.map(chat => ({
+            ...chat,
+            isModerator: this.nicoliveModeratorsService.isModerator(chat.value.user_id),
+          })),
+        });
+      },
+    });
   }
 
   lastSubscription: Subscription = null;
@@ -196,8 +209,6 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
   }
 
   private connect() {
-    // TODO get moderators into this.moderators
-
     this.lastSubscription = this.client
       .connect()
       .pipe(
