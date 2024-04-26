@@ -26,6 +26,8 @@ export class NicoliveModeratorsService extends StatefulService<INicoliveModerato
 
   private stateChangeSubject = new Subject<typeof this.state>();
   stateChange = this.stateChangeSubject.asObservable();
+  private refreshSubject = new Subject<void>();
+  refreshObserver = this.refreshSubject.asObservable();
 
   init() {
     super.init();
@@ -42,13 +44,11 @@ export class NicoliveModeratorsService extends StatefulService<INicoliveModerato
       )
       .subscribe(state => {
         if (state.roomURL !== this.state.roomURL) {
+          this.setState({ roomURL: state.roomURL, moderatorsCache: [] });
           if (state.roomURL) {
-            this.setState({ roomURL: state.roomURL });
-            this.clearModeratorsCache();
             this.fetchModerators();
           } else {
-            // 切断時に消す場合
-            this.clearModeratorsCache();
+            this.patchState({ roomURL: '' });
           }
         }
       });
@@ -60,27 +60,22 @@ export class NicoliveModeratorsService extends StatefulService<INicoliveModerato
       throw NicoliveFailure.fromClientError('fetchModerators', result);
     }
     this.setModeratorsCache(result.value.data.map(moderator => moderator.userId).map(String));
+    this.refreshSubject.next();
   }
 
   isModerator(userId: string): boolean {
     return new Set(this.state.moderatorsCache).has(userId);
   }
 
-  clearModeratorsCache() {
-    console.info('clearModeratorsCache'); // DEBUG
-    this.setState({ moderatorsCache: [] });
-  }
-
-  setModeratorsCache(userIds: string[]) {
+  private setModeratorsCache(userIds: string[]) {
     console.info('setModeratorsCache', userIds); // DEBUG
-    this.setState({ moderatorsCache: userIds });
+    this.patchState({ moderatorsCache: userIds });
   }
 
   private async addModeratorCache(userId: string) {
     if (this.isModerator(userId)) return;
     this.setModeratorsCache([...this.state.moderatorsCache, userId]);
   }
-
   async addModerator(userId: string) {
     if (this.isModerator(userId)) return;
     const result = await this.client.addModerator(userId);
@@ -182,10 +177,13 @@ export class NicoliveModeratorsService extends StatefulService<INicoliveModerato
     }
   }
 
-  private setState(partial: Partial<INicoliveModeratorsService>) {
-    const nextState = { ...this.state, ...partial };
-    this.SET_STATE(nextState);
-    this.stateChangeSubject.next(nextState);
+  private setState(state: INicoliveModeratorsService) {
+    this.SET_STATE(state);
+    this.stateChangeSubject.next(state);
+  }
+
+  private patchState(partial: Partial<INicoliveModeratorsService>) {
+    this.setState({ ...this.state, ...partial });
   }
 
   @mutation()
