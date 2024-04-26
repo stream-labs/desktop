@@ -132,6 +132,17 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
       this.UPDATE_MENU_ITEMS(ENavName.TopNav, menuItems);
     }
 
+    // Remove alertbox-library, it seems to persist even after removing it from all other places
+    const menuItems = [...this.state[ENavName.TopNav].menuItems];
+    const themes = menuItems.find(menuItems => menuItems.key === EMenuItemKey.Themes)!;
+    if (
+      'subMenuItems' in themes &&
+      themes.subMenuItems.find(item => item.key === 'alertbox-library')
+    ) {
+      themes.subMenuItems = themes.subMenuItems.filter(item => item.key !== 'alertbox-library');
+      this.UPDATE_MENU_ITEMS(ENavName.TopNav, menuItems);
+    }
+
     this.state.currentMenuItem =
       this.layoutService.state.currentTab !== 'default'
         ? this.layoutService.state.currentTab
