@@ -48,11 +48,7 @@ export default class ModeratorConfirmDialog extends Vue {
     this.nicoliveModeratorsService.closeConfirmWindow(false);
   }
 
-  openInDefaultBrowser(event: MouseEvent): void {
-    const href = (event.currentTarget as HTMLAnchorElement).href;
-    const url = new URL(href);
-    if (/^https?/.test(url.protocol)) {
-      remote.shell.openExternal(url.toString());
-    }
+  openModeratorHelpPage() {
+    remote.shell.openExternal('https://qa.nicovideo.jp/faq/show/22379?site_domain=default');
   }
 }

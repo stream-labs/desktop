@@ -4,8 +4,7 @@
       <div v-if="operation === 'add'">
         <p class="confirm-title">{{ `${userName}さんをモデレーターに追加しますか?` }}</p>
         <p class="confirm-description">追加すると視聴中または視聴を開始した追加対象のユーザーに通知されます</p>
-        <a @click.prevent="openInDefaultBrowser($event)"
-        href="https://qa.nicovideo.jp/?site_domain=default"
+        <a @click="openModeratorHelpPage"
         class="text-link">
           <i class="icon-question"></i>
           <span>モデレーターとは</span>
