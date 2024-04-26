@@ -59,7 +59,7 @@ export class NicoliveModeratorsService extends StatefulService<INicoliveModerato
     if (!isOk(result)) {
       throw NicoliveFailure.fromClientError('fetchModerators', result);
     }
-    this.setModeratorsCache(result.value.data.map(moderator => moderator.userId).map(String));
+    this.setModeratorsCache(result.value.map(moderator => moderator.userId).map(String));
     this.refreshSubject.next();
   }
 

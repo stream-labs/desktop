@@ -22,8 +22,8 @@ import {
   UserFollow,
   AddFilterRecord,
   AddFilterResult,
-  Moderators,
   AddModerator,
+  Moderator,
 } from './ResponseTypes';
 const { BrowserWindow } = remote;
 
@@ -762,12 +762,11 @@ export class NicoliveClient {
     }
   }
 
-  async fetchModerators(): Promise<WrappedResult<Moderators>> {
+  async fetchModerators(): Promise<WrappedResult<Moderator[]>> {
     // DEBUG
-    if (!this.options.enableModeratorAPICall)
-      return { ok: true, value: { meta: { status: 200 }, data: [] } };
+    if (!this.options.enableModeratorAPICall) return { ok: true, value: [] };
 
-    return this.requestAPI<Moderators>(
+    return this.requestAPI<Moderator[]>(
       'GET',
       `${NicoliveClient.live2BaseURL}/unama/api/v2/broadcasters/moderators`,
     );

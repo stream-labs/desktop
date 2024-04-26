@@ -265,13 +265,6 @@ export type Moderator = {
   createdAt: string;
 };
 
-export interface Moderators {
-  meta: {
-    status: 200;
-  };
-  data: Moderator[];
-}
-
 export interface AddModerator {
   meta: {
     status: 200;
