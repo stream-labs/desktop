@@ -66,7 +66,7 @@ interface IStreamSettingsState {
    */
   warnNoVideoSources: boolean;
 
-  goLiveSettings?: ISavedGoLiveSettings;
+  goLiveSettings?: ISavedGoLiveSettings | null;
 }
 
 /**
