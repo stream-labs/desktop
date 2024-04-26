@@ -798,7 +798,7 @@ export class NicoliveClient {
     return this.requestAPI<AddModerator>(
       'POST',
       `${NicoliveClient.live2BaseURL}/unama/api/v2/broadcasters/moderators`,
-      NicoliveClient.jsonBody({ userId }),
+      NicoliveClient.jsonBody({ userId: parseInt(userId, 10) }),
     );
   }
 
