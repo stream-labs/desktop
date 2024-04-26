@@ -20,11 +20,20 @@ import { AudioService } from './audio';
 import { getOS, OS } from 'util/operating-systems';
 import { Source, SourcesService } from './sources';
 import { VideoEncodingOptimizationService } from './video-encoding-optimizations';
-import { DualOutputService, RecordingModeService, TransitionsService } from 'app-services';
+import {
+  DualOutputService,
+  RecordingModeService,
+  StreamSettingsService,
+  TransitionsService,
+  VideoSettingsService,
+} from 'app-services';
 import * as remote from '@electron/remote';
 import { AppService } from 'services/app';
 import fs from 'fs';
 import path from 'path';
+import { TPlatform } from './platforms';
+import { TDisplayType } from './settings-v2';
+import { EScaleType, EFPSType } from '../../obs-api';
 
 interface IStreamDiagnosticInfo {
   startTime: number;
@@ -35,6 +44,9 @@ interface IStreamDiagnosticInfo {
   avgFps?: number;
   avgCpu?: number;
   error?: string;
+  platforms?: string;
+  destinations?: string;
+  type?: string;
 }
 
 interface IDiagnosticsServiceState {
@@ -146,6 +158,8 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
   @Inject() recordingModeService: RecordingModeService;
   @Inject() appService: AppService;
   @Inject() dualOutputService: DualOutputService;
+  @Inject() streamSettingsService: StreamSettingsService;
+  @Inject() videoSettingsService: VideoSettingsService;
 
   get cacheDir() {
     return this.appService.appDataDirectory;
@@ -176,7 +190,14 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
 
         this.streaming = true;
 
-        this.ADD_STREAM({ startTime: Date.now() });
+        const { platforms, destinations, type } = this.formatStreamInfo();
+
+        this.ADD_STREAM({
+          startTime: Date.now(),
+          platforms,
+          destinations,
+          type,
+        });
 
         this.accumulators.skipped = new Accumulator();
         this.accumulators.lagged = new Accumulator();
@@ -204,7 +225,8 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
     });
 
     this.streamingService.streamErrorCreated.subscribe((error: string) => {
-      this.UPDATE_STREAM({ error });
+      const { platforms, destinations, type } = this.formatStreamInfo();
+      this.UPDATE_STREAM({ error, platforms, destinations, type });
     });
 
     setInterval(() => {
@@ -242,6 +264,7 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
     const streams = this.generateStreamsSection();
     const network = this.generateNetworkSection();
     const crashes = this.generateCrashesSection();
+    const dualOutput = this.generateDualOutputSection();
 
     // Problems section needs to be generated last, because it relies on the
     // problems array that all other sections add to.
@@ -260,6 +283,7 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
       network,
       audio,
       devices,
+      dualOutput,
       scenes,
       transitions,
     ];
@@ -282,6 +306,42 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
 
   private logProblem(problem: string) {
     this.problems.push(problem);
+  }
+
+  private formatTargets(arr: TPlatform[] | string[], platforms?: boolean) {
+    if (!arr.length) return 'None';
+    return JSON.stringify(arr).slice(1, -1);
+  }
+
+  private formatStreamInfo() {
+    const targets = this.dualOutputService.views.getEnabledTargets();
+
+    const platformList = targets.platforms.horizontal.concat(targets.platforms.vertical);
+    const destinationList = targets.destinations.horizontal.concat(targets.destinations.vertical);
+    const platforms = this.formatTargets(platformList, true);
+    const destinations = this.formatTargets(destinationList);
+
+    const info = {
+      platforms,
+      destinations,
+      type: 'Single Output',
+    };
+
+    if (this.dualOutputService.views.dualOutputMode) {
+      return {
+        ...info,
+        type: 'Dual Output',
+      };
+    }
+
+    if (platformList.length + destinationList.length > 1) {
+      return {
+        ...info,
+        type: 'Multistream',
+      };
+    }
+
+    return info;
   }
 
   private async generateTopSection() {
@@ -325,89 +385,80 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
   }
 
   private generateVideoSection() {
-    const settings = this.settingsService.views.values;
-    const dualOutputSettings = {
-      hasToggledDualOutput: this.dualOutputService.views.hasSceneNodeMaps,
-      dualOutputSceneCollection: this.dualOutputService.views.hasNodeMap(),
-      dualOutputMode: this.dualOutputService.views.dualOutputMode,
-    };
+    const isDualOutputMode = this.dualOutputService.views.dualOutputMode;
+    const displays: TDisplayType[] = isDualOutputMode ? ['horizontal'] : ['horizontal', 'vertical'];
 
-    const fpsObj = { Type: settings.Video.FPSType };
+    let settings = {} as { horizontal: {}; vertical: {} };
 
-    if (fpsObj.Type === 'Common FPS Values') {
-      fpsObj['Value'] = settings.Video.FPSCommon;
-    } else if (fpsObj.Type === 'Integer FPS Value') {
-      fpsObj['Value'] = settings.Video.FPSInt;
-    } else if (fpsObj.Type === 'Fractional FPS Value') {
-      fpsObj['Numerator'] = settings.Video.FPSNum;
-      fpsObj['Denominator'] = settings.Video.FPSDen;
-    }
+    // get settings for all active displays
+    displays.forEach((display: TDisplayType) => {
+      const setting = this.videoSettingsService.formatVideoSettings(display, true);
+      const maxHeight = display === 'horizontal' ? 1080 : 1280;
+      const minHeight = 720;
 
-    const baseRes = this.parseRes(settings.Video.Base);
-    const baseAspect = baseRes.x / baseRes.y;
+      if (!setting) return;
 
-    if (baseAspect < 16 / 9.1 || baseAspect > 16 / 8.9) {
-      this.logProblem(`Base resolution is not 16:9 aspect ratio: ${baseRes.x}x${baseRes.y}`);
-    }
+      const outputRes = this.videoSettingsService.outputResolutions[display];
+      const outputAspect = outputRes.outputWidth / outputRes.outputHeight;
 
-    // Need to pull output res from output settings service, in case
-    // rescale output option is being used on stream encoder
-    const outputRes = this.parseRes(
-      this.outputSettingsService.getSettings().streaming.outputResolution,
-    );
-    const outputAspect = outputRes.x / outputRes.y;
-
-    if (outputAspect < 16 / 9.1 || outputAspect > 16 / 8.9) {
-      this.logProblem(`Output resolution is not 16:9 aspect ratio: ${outputRes.x}x${outputRes.y}`);
-    }
-
-    if (baseAspect !== outputAspect) {
-      this.logProblem('Base resolution and Output resolution have different aspect ratio');
-    }
-
-    if (outputRes.y > baseRes.y) {
-      this.logProblem('Output resolution is higher than Base resolution (upscaling)');
-    }
-
-    if (outputRes.y < 720) {
-      this.logProblem(`Low Output resolution: ${outputRes.x}x${outputRes.y}`);
-    }
-
-    if (outputRes.y > 1080) {
-      this.logProblem(`High Output resolution: ${outputRes.x}x${outputRes.y}`);
-    }
-
-    if (baseRes.y < 720) {
-      this.logProblem(`Low Base resolution: ${baseRes.x}x${baseRes.y}`);
-    }
-
-    if (baseRes.y < 720) {
-      this.logProblem(`Low Base resolution: ${baseRes.x}x${baseRes.y}`);
-    }
-
-    if (dualOutputSettings.hasToggledDualOutput) {
-      this.logProblem('User has enabled Dual Output at some point.');
-
-      if (dualOutputSettings.dualOutputSceneCollection) {
-        this.logProblem('A Dual Output scene collection is the active scene collection.');
+      if (outputAspect < 16 / 9.1 || outputAspect > 16 / 8.9) {
+        this.logProblem(`Output resolution is not 16:9 aspect ratio: ${setting.outputRes}`);
       }
 
-      if (dualOutputSettings.dualOutputMode) {
-        this.logProblem('Dual Output currently enabled.');
+      const fpsObj = { Type: setting.fpsType.toString() };
+
+      if (fpsObj.Type === 'Common FPS Values') {
+        fpsObj['Value'] = setting.fpsCom;
+      } else if (fpsObj.Type === 'Integer FPS Value') {
+        fpsObj['Value'] = setting.fpsInt;
+      } else if (fpsObj.Type === 'Fractional FPS Value') {
+        fpsObj['Numerator'] = setting.fpsNum;
+        fpsObj['Denominator'] = setting.fpsDen;
       }
-    }
+
+      const baseRes = this.videoSettingsService.baseResolutions[display];
+      const baseAspect = baseRes.baseWidth / baseRes.baseHeight;
+
+      if (baseAspect < 16 / 9.1 || baseAspect > 16 / 8.9) {
+        this.logProblem(`Base resolution is not 16:9 aspect ratio: ${setting.baseRes}`);
+      }
+
+      if (baseAspect !== outputAspect) {
+        this.logProblem('Base resolution and Output resolution have different aspect ratio');
+      }
+
+      if (outputRes.outputHeight > baseRes.baseHeight) {
+        this.logProblem('Output resolution is higher than Base resolution (upscaling)');
+      }
+
+      if (outputRes.outputHeight < minHeight) {
+        this.logProblem(`Low Output resolution: ${setting.outputRes}`);
+      }
+
+      if (outputRes.outputHeight > maxHeight) {
+        this.logProblem(`High Output resolution: ${setting.outputRes}`);
+      }
+
+      if (baseRes.baseHeight < minHeight) {
+        this.logProblem(`Low Base resolution: ${setting.baseRes}`);
+      }
+
+      settings = {
+        ...settings,
+        [display]: {
+          'Base Resolution': setting.baseRes,
+          'Output Resolution': setting.outputRes,
+          'Downscale Filter': setting.scaleType,
+          'Frame Rate': fpsObj,
+        },
+      };
+    });
 
     return new Section('Video', {
-      'Base Resolution': settings.Video.Base,
-      'Output Resolution': settings.Video.Output,
-      'Downscale Filter': settings.Video.ScaleType,
-      'Frame Rate': fpsObj,
+      'Single Output': settings.horizontal,
+      'Dual Output Horizontal': settings.horizontal,
+      'Dual Output Vertical': settings.vertical ?? 'None',
     });
-  }
-
-  private parseRes(resString: string): IVec2 {
-    const parts = resString.split('x');
-    return { x: parseInt(parts[0], 10), y: parseInt(parts[1], 10) };
   }
 
   private generateOutputSection() {
@@ -833,9 +884,46 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
           'Average CPU': `${s.avgCpu?.toFixed(2)}%`,
           'Average FPS': s.avgFps?.toFixed(2),
           'Stream Error': s?.error ?? 'None',
+          Platforms: s?.platforms,
+          Destinations: s?.destinations,
+          'Stream Type': s?.type,
         };
       }),
     );
+  }
+
+  private generateDualOutputSection() {
+    const { platforms, destinations } = this.dualOutputService.views.getEnabledTargets('name');
+    const restreamHorizontal =
+      platforms.horizontal.length + destinations.horizontal.length > 1 ? 'Yes' : 'No';
+    const restreamVertical =
+      platforms.vertical.length + destinations.vertical.length > 1 ? 'Yes' : 'No';
+
+    const numHorizontal = this.dualOutputService.views.horizontalNodeIds.length;
+    const numVertical = this.dualOutputService.views.horizontalNodeIds.length;
+
+    if (numHorizontal !== numVertical) {
+      this.logProblem(
+        'Active collection has a different number of horizontal and vertical sources.',
+      );
+    }
+
+    return new Section('Dual Output', {
+      'Dual Output Active': this.dualOutputService.views.dualOutputMode,
+      'Dual Output Scene Collection Active': this.dualOutputService.views.hasNodeMap(),
+      Sources: {
+        'Number Horizontal Sources': numHorizontal,
+        'Number Vertical Sources': numVertical,
+      },
+      Targets: {
+        'Horizontal Platforms': this.formatTargets(platforms.horizontal, true),
+        'Vertical Platforms': this.formatTargets(platforms.vertical, true),
+        'Horizontal Custom Destinations': this.formatTargets(destinations.horizontal),
+        'Vertical Custom Destinations': this.formatTargets(destinations.vertical),
+      },
+      'Horizontal Uses Multistream': restreamHorizontal,
+      'Vertical Uses Multistream': restreamVertical,
+    });
   }
 
   private generateProblemsSection() {
