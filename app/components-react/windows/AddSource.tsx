@@ -156,6 +156,7 @@ export default function AddSource() {
           display: 'horizontal',
         },
       );
+      //@ts-ignore typescript upgrade
       source = item?.source;
     }
     if (!source?.video && source?.hasProps()) {
