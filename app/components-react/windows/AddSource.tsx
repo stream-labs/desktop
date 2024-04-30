@@ -211,7 +211,6 @@ export default function AddSource() {
                   mode="vertical"
                   selectedKeys={[selectedSourceId]}
                   onClick={({ key }: { key: string }) => {
-                    console.log('firing', key);
                     setSelectedSourceId(key);
                   }}
                   className={styles.menu}
