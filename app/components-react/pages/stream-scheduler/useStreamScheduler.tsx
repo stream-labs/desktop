@@ -165,6 +165,7 @@ export class StreamSchedulerController {
     // load fb and yt events simultaneously
     // @ts-ignore typescript upgrade
     const [fbEvents, ytEvents] = await Promise.all([this.fetchFbEvents(), this.fetchYTBEvents()]);
+    // @ts-ignore typescript upgrade
     this.setEvents([...fbEvents, ...ytEvents]);
   }
 
