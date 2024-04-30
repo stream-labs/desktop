@@ -315,7 +315,7 @@ test('Scene item has correct context', async t => {
 
   // dual output
   videoSettingsService.establishVideoContext('vertical');
-  dualOutputService.createSceneNodes(scene.id);
+  dualOutputService.createVerticalNodes(scene.id);
   const verticalContext = videoSettingsService.contexts.vertical;
   scene.getItems().forEach(sceneItem => {
     const context = sceneItem?.display === 'vertical' ? verticalContext : horizontalContext;

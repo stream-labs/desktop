@@ -35,7 +35,7 @@ export function TwitterEditStreamInfo(p: IPlatformComponentParams<'twitter'>) {
         requiredFields={
           <ListInput
             {...bind.chatType}
-            label={$t('Chat Type')}
+            label={$t('X (Twitter) Chat Type')}
             options={[
               {
                 value: ETwitterChatType.Off,

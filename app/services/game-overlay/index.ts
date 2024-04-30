@@ -35,7 +35,7 @@ const hideInteraction = `
   /* Platform Chats */
   elements.push(document.querySelector('.chat-input'));
   elements.push(document.querySelector('.webComposerBlock__3lT5b'));
-
+  
   /* Recent Events */
   elements.push(document.querySelector('.recent-events__header'));
   elements.push(document.querySelector('.recent-events__tabs'));
@@ -43,6 +43,28 @@ const hideInteraction = `
   elements.forEach((el) => {
     if (el) { el.style.cssText = 'display: none !important'; }
   });
+  
+  // Trovo Chat
+  // Fix chat container that's cut off on Game Overlay's 300px wide window
+  const trovoChatContainer = document.querySelector('#__layout .popout-container .chat-wrap');
+  if (trovoChatContainer) {
+    /* 
+     * The input box is rendered way after this code runs, insert a CSS rule to hide it instead of 
+     * manipulating style directly since we will never find the element here. 
+     * Since we're using CSSStyleSheet we add the rest of the rules here. 
+     * 
+     * 1. Fix chat wrapper width.
+     * 2. Hide chat input panel.
+     * 3. Hide all headers, including Gift Rank.
+     */
+    const el = document.createElement('style');
+    document.head.appendChild(el);
+    const sheet = el.sheet;
+    sheet.insertRule('#__layout .popout-container .chat-wrap { min-width: 300px }', sheet.cssRules.length);
+    sheet.insertRule('#__layout .popout-container .chat-wrap .chat-header { display: none }', sheet.cssRules.length);
+    sheet.insertRule('#__layout .popout-container .input-panels-container { display: none }', sheet.cssRules.length);
+    sheet.insertRule('#__layout .popout-container .gift-rank-header { display: none }', sheet.cssRules.length);
+  }
 `;
 
 export enum EGameOverlayState {
