@@ -33,7 +33,6 @@ import fs from 'fs';
 import path from 'path';
 import { TPlatform } from './platforms';
 import { TDisplayType } from './settings-v2';
-import { EScaleType, EFPSType } from '../../obs-api';
 
 interface IStreamDiagnosticInfo {
   startTime: number;
@@ -313,6 +312,125 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
     return JSON.stringify(arr).slice(1, -1);
   }
 
+  private formatSimpleOutputInfo() {
+    const settings = this.outputSettingsService.getSettings();
+    const values = this.settingsService.views.values.Output;
+
+    return {
+      Mode: settings.mode,
+      Streaming: {
+        'Video Bitrate': settings.streaming.bitrate,
+        Encoder:
+          settings.streaming.encoder === EEncoderFamily.jim_nvenc
+            ? 'NVENC (New)'
+            : settings.streaming.encoder,
+        'Audio Bitrate': values.ABitrate,
+        'Enable Advanced Encoder Settings': values.UseAdvanced,
+        'Advanced Encoder Settings': {
+          'Enforce Streaming Service Bitrate Limits': values.EnforceBitrate,
+          'Encoder Preset': settings.streaming.preset,
+          'Custom Encoder Settings': values.x264Settings,
+        },
+      },
+      Recording: {
+        'Recording Path': values.RecFilePath,
+        'Generate File Name without Space': values.FileNameWithoutSpace,
+        'Recording Quality': values.RecQuality,
+        'Recording Format': values.RecFormat,
+        'Audio Encoder': values.RecAEncoder,
+        'Custom Muxer Settings': values.MuxerCustom,
+      },
+      ReplayBuffer: {
+        'Enable Replay Buffer': values.RecRB,
+        'Maximum Replay Time (Seconds)': values.RecRBTime,
+      },
+    };
+  }
+
+  private formatAdvancedOutputInfo() {
+    const settings = this.outputSettingsService.getSettings();
+    const values = this.settingsService.views.values.Output;
+
+    return {
+      Mode: settings.mode,
+      Streaming: {
+        'Audio Track': this.settingsService.views.streamTrack + 1,
+        Encoder:
+          settings.streaming.encoder === EEncoderFamily.jim_nvenc
+            ? 'NVENC (New)'
+            : settings.streaming.encoder,
+        'Enforce Streaming Service Encoder Settings': values.ApplyServiceSettings,
+        'Rescale Output': settings.streaming.rescaleOutput,
+        'Rate Control': settings.streaming.rateControl,
+        Bitrate: settings.streaming.bitrate,
+        'Use Custom Buffer Size': values.use_bufsize,
+        'Buffer Size': values.buffer_size,
+        'Keyframe Interval': values.keyint_sec,
+        'CPU Usage Preset': values.preset,
+        Profile: values.profile,
+        Tune: values.tune,
+        'x264 Options': values.x264opts,
+        Other: {
+          'Use Custom Resolution': settings.streaming.hasCustomResolution,
+          'Output Resolution': settings.streaming.outputResolution,
+          'Encoder Preset': settings.streaming.preset,
+          'Encoder Options': settings.streaming.encoderOptions,
+          'VOD Track': this.settingsService.views.vodTrack + 1,
+          'VOD Track Enabled': !!this.settingsService.views.vodTrackEnabled,
+        },
+      },
+      Recording: {
+        Type: values.RecType,
+        'Recording Path': values.RecFilePath,
+        'Generate File Name without Space': values.FileNameWithoutSpace,
+        'Recording Format': values.RecFormat,
+        'Audio Track': values.RecTracks,
+        'Video Encoder': values.RecEncoder,
+        'Audio Encoder': values.RecAEncoder,
+        'Rescale Output': values.RecRescale,
+        'Custom Muxer Settings': values.MuxerCustom,
+        'Automatic File Splitting': values.RecSplitFile,
+        'File Splitting Settings': {
+          'Split By': values.RecSplitFileType,
+          'Split Time in Minutes': values.RecSplitFileTime,
+          'Reset Timestamps at the Beginning of Each Split File':
+            values.RecSplitFileResetTimestamps,
+        },
+        Other: {
+          'Using Stream Encoder': settings.recording.isSameAsStream,
+          Encoder:
+            settings.recording.encoder === EEncoderFamily.jim_nvenc
+              ? 'NVENC (New)'
+              : settings.recording.encoder,
+          'Rate Control': settings.recording.rateControl,
+          Bitrate: settings.recording.bitrate,
+          'Output Resolution': settings.recording.outputResolution,
+          'Audio Tracks': this.settingsService.views.recordingTracks.map(t => t + 1).join(', '),
+        },
+      },
+      Audio: {
+        'Track 1 - Audio Bitrate': values.Track1Bitrate,
+        'Track 1 - Audio Name': values.Track1Name,
+        'Track 2 - Audio Bitrate': values.Track2Bitrate,
+        'Track 2 - Audio Name': values.Track2Name,
+        'Track 3 - Audio Bitrate': values.Track3Bitrate,
+        'Track 3 - Audio Name': values.Track3Name,
+        'Track 4 - Audio Bitrate': values.Track4Bitrate,
+        'Track 4 - Audio Name': values.Track4Name,
+        'Track 5 - Audio Bitrate': values.Track5Bitrate,
+        'Track 5 - Audio Name': values.Track5Name,
+        'Track 6 - Audio Bitrate': values.Track6Bitrate,
+        'Track 6 - Audio Name': values.Track6Name,
+      },
+      ReplayBuffer: {
+        'Enable Replay Buffer': values.RecRB,
+        'Maximum Replay Time (Seconds)': values.RecRBTime,
+      },
+      'Use Optimizaed Encoder Settings': this.videoEncodingOptimizationService.state
+        .useOptimizedProfile,
+    };
+  }
+
   private formatStreamInfo() {
     const targets = this.dualOutputService.views.getEnabledTargets();
 
@@ -472,39 +590,10 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
       this.logProblem(`Low recording bitrate: ${settings.recording.bitrate}`);
     }
 
-    return new Section('Output', {
-      Mode: settings.mode,
-      Streaming: {
-        Encoder:
-          settings.streaming.encoder === EEncoderFamily.jim_nvenc
-            ? 'NVENC (New)'
-            : settings.streaming.encoder,
-        'Rate Control': settings.streaming.rateControl,
-        Bitrate: settings.streaming.bitrate,
-        'Use Custom Resolution': settings.streaming.hasCustomResolution,
-        'Output Resolution': settings.streaming.outputResolution,
-        'Encoder Preset': settings.streaming.preset,
-        'Encoder Options': settings.streaming.encoderOptions,
-        'Rescale Output': settings.streaming.rescaleOutput,
-        'Audio Track': this.settingsService.views.streamTrack + 1,
-        'VOD Track': this.settingsService.views.vodTrack + 1,
-        'VOD Track Enabled': !!this.settingsService.views.vodTrackEnabled,
-        'Keyframe Interval': this.settingsService.views.values.Output.keyint_sec,
-      },
-      Recording: {
-        'Using Stream Encoder': settings.recording.isSameAsStream,
-        Encoder:
-          settings.recording.encoder === EEncoderFamily.jim_nvenc
-            ? 'NVENC (New)'
-            : settings.recording.encoder,
-        'Rate Control': settings.recording.rateControl,
-        Bitrate: settings.recording.bitrate,
-        'Output Resolution': settings.recording.outputResolution,
-        'Audio Tracks': this.settingsService.views.recordingTracks.map(t => t + 1).join(', '),
-      },
-      'Use Optimizaed Encoder Settings': this.videoEncodingOptimizationService.state
-        .useOptimizedProfile,
-    });
+    const outputInfo =
+      settings.mode === 'Simple' ? this.formatSimpleOutputInfo() : this.formatAdvancedOutputInfo();
+
+    return new Section('Output', outputInfo);
   }
 
   private generateSystemSection() {
