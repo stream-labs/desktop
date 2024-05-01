@@ -376,7 +376,6 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
 
   @mutation()
   private SET_LOCAL_STORAGE_SETTINGS(settings: Partial<IStreamSettingsState>) {
-    console.log(settings);
     Object.keys(settings).forEach(prop => {
       Vue.set(this.state, prop, settings[prop]);
     });
