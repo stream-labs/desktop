@@ -17,7 +17,6 @@ import { ERenderingMode } from '../../../../obs-api';
 import styles from './SceneSelector.m.less';
 import useBaseElement from './hooks';
 import { IScene } from 'services/scenes';
-import { ISceneCollectionsManifestEntry } from 'services/scene-collections';
 
 function SceneSelector() {
   const {
