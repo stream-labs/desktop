@@ -66,7 +66,7 @@ interface IStreamSettingsState {
    */
   warnNoVideoSources: boolean;
 
-  goLiveSettings?: ISavedGoLiveSettings;
+  goLiveSettings?: ISavedGoLiveSettings | null;
 }
 
 /**
@@ -297,7 +297,29 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
       protectedModeMigrationRequired: false,
       key: '',
       streamType: 'rtmp_common',
-      goLiveSettings: undefined,
+      /*
+       * If we pass `undefined` to `goLiveSettings`, for some reason the worker process gets
+       * the update correctly, but the main process receives a sequence of updates like this:
+       *
+       * ```
+       * {protectedModeEnabled: true}
+       * {protectedModeMigrationRequired: false}
+       * {}
+       * ```
+       *
+       * When set to `null` we can see the following output instead:
+       *
+       * ```
+       * {protectedModeEnabled: true}
+       * {protectedModeMigrationRequired: false}
+       * {goLiveSettings: null}
+       * ```
+       *
+       * I've only suspicions about why this happens, but as a result of failing to update on main,
+       * a user logging out of one account and logging back in to a different account (or the same account)
+       * will have the Go Live settings from the old account until the app restarts.
+       */
+      goLiveSettings: null,
     });
   }
 
