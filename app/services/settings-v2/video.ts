@@ -81,6 +81,30 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   }
 
   /**
+   * The below provides a default base resolution
+   * @remark replaces the legacy base resolution in the video service
+   */
+  get baseResolution() {
+    return this.baseResolutions.horizontal;
+  }
+
+  /**
+   * The below provides a default base width
+   * @remark replaces the legacy base width in the video service
+   */
+  get baseWidth() {
+    return this.baseResolutions.horizontal.baseWidth;
+  }
+
+  /**
+   * The below provides a default base width
+   * @remark replaces the legacy base width in the video service
+   */
+  get baseHeight() {
+    return this.baseResolutions.horizontal.baseHeight;
+  }
+
+  /**
    * The below conditionals are to prevent undefined errors on app startup
    */
   get baseResolutions() {
@@ -336,6 +360,8 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   setVideoSetting(key: string, value: unknown, display: TDisplayType = 'horizontal') {
     this.SET_VIDEO_SETTING(key, value, display);
     this.updateObsSettings(display);
+
+    // console.log('this.baseResolutions', JSON.stringify(this.baseResolutions, null, 2));
 
     // also update the persisted settings
     this.dualOutputService.setVideoSetting({ [key]: value }, display);
