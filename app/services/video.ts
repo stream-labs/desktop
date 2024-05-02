@@ -338,21 +338,6 @@ export class VideoService extends Service {
     };
   }
 
-  get baseWidth() {
-    return this.videoSettingsService.baseResolutions.horizontal.baseWidth;
-  }
-
-  get baseHeight() {
-    return this.videoSettingsService.baseResolutions.horizontal.baseHeight;
-  }
-
-  get baseResolution() {
-    return {
-      baseWidth: this.baseWidth,
-      baseHeight: this.baseHeight,
-    };
-  }
-
   setBaseResolution(resolutions: {
     horizontal: {
       baseWidth: number;

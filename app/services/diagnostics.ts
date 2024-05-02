@@ -20,11 +20,19 @@ import { AudioService } from './audio';
 import { getOS, OS } from 'util/operating-systems';
 import { Source, SourcesService } from './sources';
 import { VideoEncodingOptimizationService } from './video-encoding-optimizations';
-import { DualOutputService, RecordingModeService, TransitionsService } from 'app-services';
+import {
+  DualOutputService,
+  RecordingModeService,
+  StreamSettingsService,
+  TransitionsService,
+  VideoSettingsService,
+} from 'app-services';
 import * as remote from '@electron/remote';
 import { AppService } from 'services/app';
 import fs from 'fs';
 import path from 'path';
+import { TPlatform } from './platforms';
+import { TDisplayType } from './settings-v2';
 
 interface IStreamDiagnosticInfo {
   startTime: number;
@@ -35,6 +43,9 @@ interface IStreamDiagnosticInfo {
   avgFps?: number;
   avgCpu?: number;
   error?: string;
+  platforms?: string;
+  destinations?: string;
+  type?: string;
 }
 
 interface IDiagnosticsServiceState {
@@ -146,6 +157,8 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
   @Inject() recordingModeService: RecordingModeService;
   @Inject() appService: AppService;
   @Inject() dualOutputService: DualOutputService;
+  @Inject() streamSettingsService: StreamSettingsService;
+  @Inject() videoSettingsService: VideoSettingsService;
 
   get cacheDir() {
     return this.appService.appDataDirectory;
@@ -176,7 +189,14 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
 
         this.streaming = true;
 
-        this.ADD_STREAM({ startTime: Date.now() });
+        const { platforms, destinations, type } = this.formatStreamInfo();
+
+        this.ADD_STREAM({
+          startTime: Date.now(),
+          platforms,
+          destinations,
+          type,
+        });
 
         this.accumulators.skipped = new Accumulator();
         this.accumulators.lagged = new Accumulator();
@@ -204,7 +224,8 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
     });
 
     this.streamingService.streamErrorCreated.subscribe((error: string) => {
-      this.UPDATE_STREAM({ error });
+      const { platforms, destinations, type } = this.formatStreamInfo();
+      this.UPDATE_STREAM({ error, platforms, destinations, type });
     });
 
     setInterval(() => {
@@ -242,6 +263,7 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
     const streams = this.generateStreamsSection();
     const network = this.generateNetworkSection();
     const crashes = this.generateCrashesSection();
+    const dualOutput = this.generateDualOutputSection();
 
     // Problems section needs to be generated last, because it relies on the
     // problems array that all other sections add to.
@@ -260,6 +282,7 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
       network,
       audio,
       devices,
+      dualOutput,
       scenes,
       transitions,
     ];
@@ -282,6 +305,161 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
 
   private logProblem(problem: string) {
     this.problems.push(problem);
+  }
+
+  private formatTargets(arr: TPlatform[] | string[], platforms?: boolean) {
+    if (!arr.length) return 'None';
+    return JSON.stringify(arr).slice(1, -1);
+  }
+
+  private formatSimpleOutputInfo() {
+    const settings = this.outputSettingsService.getSettings();
+    const values = this.settingsService.views.values.Output;
+
+    return {
+      Mode: settings.mode,
+      Streaming: {
+        'Video Bitrate': settings.streaming.bitrate,
+        Encoder:
+          settings.streaming.encoder === EEncoderFamily.jim_nvenc
+            ? 'NVENC (New)'
+            : settings.streaming.encoder,
+        'Audio Bitrate': values.ABitrate,
+        'Enable Advanced Encoder Settings': values.UseAdvanced,
+        'Advanced Encoder Settings': {
+          'Enforce Streaming Service Bitrate Limits': values.EnforceBitrate,
+          'Encoder Preset': settings.streaming.preset,
+          'Custom Encoder Settings': values.x264Settings,
+        },
+      },
+      Recording: {
+        'Recording Path': values.RecFilePath,
+        'Generate File Name without Space': values.FileNameWithoutSpace,
+        'Recording Quality': values.RecQuality,
+        'Recording Format': values.RecFormat,
+        'Audio Encoder': values.RecAEncoder,
+        'Custom Muxer Settings': values.MuxerCustom,
+      },
+      ReplayBuffer: {
+        'Enable Replay Buffer': values.RecRB,
+        'Maximum Replay Time (Seconds)': values.RecRBTime,
+      },
+    };
+  }
+
+  private formatAdvancedOutputInfo() {
+    const settings = this.outputSettingsService.getSettings();
+    const values = this.settingsService.views.values.Output;
+
+    return {
+      Mode: settings.mode,
+      Streaming: {
+        'Audio Track': this.settingsService.views.streamTrack + 1,
+        Encoder:
+          settings.streaming.encoder === EEncoderFamily.jim_nvenc
+            ? 'NVENC (New)'
+            : settings.streaming.encoder,
+        'Enforce Streaming Service Encoder Settings': values.ApplyServiceSettings,
+        'Rescale Output': settings.streaming.rescaleOutput,
+        'Rate Control': settings.streaming.rateControl,
+        Bitrate: settings.streaming.bitrate,
+        'Use Custom Buffer Size': values.use_bufsize,
+        'Buffer Size': values.buffer_size,
+        'Keyframe Interval': values.keyint_sec,
+        'CPU Usage Preset': values.preset,
+        Profile: values.profile,
+        Tune: values.tune,
+        'x264 Options': values.x264opts,
+        Other: {
+          'Use Custom Resolution': settings.streaming.hasCustomResolution,
+          'Output Resolution': settings.streaming.outputResolution,
+          'Encoder Preset': settings.streaming.preset,
+          'Encoder Options': settings.streaming.encoderOptions,
+          'VOD Track': this.settingsService.views.vodTrack + 1,
+          'VOD Track Enabled': !!this.settingsService.views.vodTrackEnabled,
+        },
+      },
+      Recording: {
+        Type: values.RecType,
+        'Recording Path': values.RecFilePath,
+        'Generate File Name without Space': values.FileNameWithoutSpace,
+        'Recording Format': values.RecFormat,
+        'Audio Track': values.RecTracks,
+        'Video Encoder': values.RecEncoder,
+        'Audio Encoder': values.RecAEncoder,
+        'Rescale Output': values.RecRescale,
+        'Custom Muxer Settings': values.MuxerCustom,
+        'Automatic File Splitting': values.RecSplitFile,
+        'File Splitting Settings': {
+          'Split By': values.RecSplitFileType,
+          'Split Time in Minutes': values.RecSplitFileTime,
+          'Reset Timestamps at the Beginning of Each Split File':
+            values.RecSplitFileResetTimestamps,
+        },
+        Other: {
+          'Using Stream Encoder': settings.recording.isSameAsStream,
+          Encoder:
+            settings.recording.encoder === EEncoderFamily.jim_nvenc
+              ? 'NVENC (New)'
+              : settings.recording.encoder,
+          'Rate Control': settings.recording.rateControl,
+          Bitrate: settings.recording.bitrate,
+          'Output Resolution': settings.recording.outputResolution,
+          'Audio Tracks': this.settingsService.views.recordingTracks.map(t => t + 1).join(', '),
+        },
+      },
+      Audio: {
+        'Track 1 - Audio Bitrate': values.Track1Bitrate,
+        'Track 1 - Audio Name': values.Track1Name,
+        'Track 2 - Audio Bitrate': values.Track2Bitrate,
+        'Track 2 - Audio Name': values.Track2Name,
+        'Track 3 - Audio Bitrate': values.Track3Bitrate,
+        'Track 3 - Audio Name': values.Track3Name,
+        'Track 4 - Audio Bitrate': values.Track4Bitrate,
+        'Track 4 - Audio Name': values.Track4Name,
+        'Track 5 - Audio Bitrate': values.Track5Bitrate,
+        'Track 5 - Audio Name': values.Track5Name,
+        'Track 6 - Audio Bitrate': values.Track6Bitrate,
+        'Track 6 - Audio Name': values.Track6Name,
+      },
+      ReplayBuffer: {
+        'Enable Replay Buffer': values.RecRB,
+        'Maximum Replay Time (Seconds)': values.RecRBTime,
+      },
+      'Use Optimizaed Encoder Settings': this.videoEncodingOptimizationService.state
+        .useOptimizedProfile,
+    };
+  }
+
+  private formatStreamInfo() {
+    const targets = this.dualOutputService.views.getEnabledTargets();
+
+    const platformList = targets.platforms.horizontal.concat(targets.platforms.vertical);
+    const destinationList = targets.destinations.horizontal.concat(targets.destinations.vertical);
+    const platforms = this.formatTargets(platformList, true);
+    const destinations = this.formatTargets(destinationList);
+
+    const info = {
+      platforms,
+      destinations,
+      type: 'Single Output',
+    };
+
+    if (this.dualOutputService.views.dualOutputMode) {
+      return {
+        ...info,
+        type: 'Dual Output',
+      };
+    }
+
+    if (platformList.length + destinationList.length > 1) {
+      return {
+        ...info,
+        type: 'Multistream',
+      };
+    }
+
+    return info;
   }
 
   private async generateTopSection() {
@@ -325,89 +503,80 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
   }
 
   private generateVideoSection() {
-    const settings = this.settingsService.views.values;
-    const dualOutputSettings = {
-      hasToggledDualOutput: this.dualOutputService.views.hasSceneNodeMaps,
-      dualOutputSceneCollection: this.dualOutputService.views.hasNodeMap(),
-      dualOutputMode: this.dualOutputService.views.dualOutputMode,
-    };
+    const isDualOutputMode = this.dualOutputService.views.dualOutputMode;
+    const displays: TDisplayType[] = isDualOutputMode ? ['horizontal'] : ['horizontal', 'vertical'];
 
-    const fpsObj = { Type: settings.Video.FPSType };
+    let settings = {} as { horizontal: {}; vertical: {} };
 
-    if (fpsObj.Type === 'Common FPS Values') {
-      fpsObj['Value'] = settings.Video.FPSCommon;
-    } else if (fpsObj.Type === 'Integer FPS Value') {
-      fpsObj['Value'] = settings.Video.FPSInt;
-    } else if (fpsObj.Type === 'Fractional FPS Value') {
-      fpsObj['Numerator'] = settings.Video.FPSNum;
-      fpsObj['Denominator'] = settings.Video.FPSDen;
-    }
+    // get settings for all active displays
+    displays.forEach((display: TDisplayType) => {
+      const setting = this.videoSettingsService.formatVideoSettings(display, true);
+      const maxHeight = display === 'horizontal' ? 1080 : 1280;
+      const minHeight = 720;
 
-    const baseRes = this.parseRes(settings.Video.Base);
-    const baseAspect = baseRes.x / baseRes.y;
+      if (!setting) return;
 
-    if (baseAspect < 16 / 9.1 || baseAspect > 16 / 8.9) {
-      this.logProblem(`Base resolution is not 16:9 aspect ratio: ${baseRes.x}x${baseRes.y}`);
-    }
+      const outputRes = this.videoSettingsService.outputResolutions[display];
+      const outputAspect = outputRes.outputWidth / outputRes.outputHeight;
 
-    // Need to pull output res from output settings service, in case
-    // rescale output option is being used on stream encoder
-    const outputRes = this.parseRes(
-      this.outputSettingsService.getSettings().streaming.outputResolution,
-    );
-    const outputAspect = outputRes.x / outputRes.y;
-
-    if (outputAspect < 16 / 9.1 || outputAspect > 16 / 8.9) {
-      this.logProblem(`Output resolution is not 16:9 aspect ratio: ${outputRes.x}x${outputRes.y}`);
-    }
-
-    if (baseAspect !== outputAspect) {
-      this.logProblem('Base resolution and Output resolution have different aspect ratio');
-    }
-
-    if (outputRes.y > baseRes.y) {
-      this.logProblem('Output resolution is higher than Base resolution (upscaling)');
-    }
-
-    if (outputRes.y < 720) {
-      this.logProblem(`Low Output resolution: ${outputRes.x}x${outputRes.y}`);
-    }
-
-    if (outputRes.y > 1080) {
-      this.logProblem(`High Output resolution: ${outputRes.x}x${outputRes.y}`);
-    }
-
-    if (baseRes.y < 720) {
-      this.logProblem(`Low Base resolution: ${baseRes.x}x${baseRes.y}`);
-    }
-
-    if (baseRes.y < 720) {
-      this.logProblem(`Low Base resolution: ${baseRes.x}x${baseRes.y}`);
-    }
-
-    if (dualOutputSettings.hasToggledDualOutput) {
-      this.logProblem('User has enabled Dual Output at some point.');
-
-      if (dualOutputSettings.dualOutputSceneCollection) {
-        this.logProblem('A Dual Output scene collection is the active scene collection.');
+      if (outputAspect < 16 / 9.1 || outputAspect > 16 / 8.9) {
+        this.logProblem(`Output resolution is not 16:9 aspect ratio: ${setting.outputRes}`);
       }
 
-      if (dualOutputSettings.dualOutputMode) {
-        this.logProblem('Dual Output currently enabled.');
+      const fpsObj = { Type: setting.fpsType.toString() };
+
+      if (fpsObj.Type === 'Common FPS Values') {
+        fpsObj['Value'] = setting.fpsCom;
+      } else if (fpsObj.Type === 'Integer FPS Value') {
+        fpsObj['Value'] = setting.fpsInt;
+      } else if (fpsObj.Type === 'Fractional FPS Value') {
+        fpsObj['Numerator'] = setting.fpsNum;
+        fpsObj['Denominator'] = setting.fpsDen;
       }
-    }
+
+      const baseRes = this.videoSettingsService.baseResolutions[display];
+      const baseAspect = baseRes.baseWidth / baseRes.baseHeight;
+
+      if (baseAspect < 16 / 9.1 || baseAspect > 16 / 8.9) {
+        this.logProblem(`Base resolution is not 16:9 aspect ratio: ${setting.baseRes}`);
+      }
+
+      if (baseAspect !== outputAspect) {
+        this.logProblem('Base resolution and Output resolution have different aspect ratio');
+      }
+
+      if (outputRes.outputHeight > baseRes.baseHeight) {
+        this.logProblem('Output resolution is higher than Base resolution (upscaling)');
+      }
+
+      if (outputRes.outputHeight < minHeight) {
+        this.logProblem(`Low Output resolution: ${setting.outputRes}`);
+      }
+
+      if (outputRes.outputHeight > maxHeight) {
+        this.logProblem(`High Output resolution: ${setting.outputRes}`);
+      }
+
+      if (baseRes.baseHeight < minHeight) {
+        this.logProblem(`Low Base resolution: ${setting.baseRes}`);
+      }
+
+      settings = {
+        ...settings,
+        [display]: {
+          'Base Resolution': setting.baseRes,
+          'Output Resolution': setting.outputRes,
+          'Downscale Filter': setting.scaleType,
+          'Frame Rate': fpsObj,
+        },
+      };
+    });
 
     return new Section('Video', {
-      'Base Resolution': settings.Video.Base,
-      'Output Resolution': settings.Video.Output,
-      'Downscale Filter': settings.Video.ScaleType,
-      'Frame Rate': fpsObj,
+      'Single Output': settings.horizontal,
+      'Dual Output Horizontal': settings.horizontal,
+      'Dual Output Vertical': settings.vertical ?? 'None',
     });
-  }
-
-  private parseRes(resString: string): IVec2 {
-    const parts = resString.split('x');
-    return { x: parseInt(parts[0], 10), y: parseInt(parts[1], 10) };
   }
 
   private generateOutputSection() {
@@ -421,39 +590,10 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
       this.logProblem(`Low recording bitrate: ${settings.recording.bitrate}`);
     }
 
-    return new Section('Output', {
-      Mode: settings.mode,
-      Streaming: {
-        Encoder:
-          settings.streaming.encoder === EEncoderFamily.jim_nvenc
-            ? 'NVENC (New)'
-            : settings.streaming.encoder,
-        'Rate Control': settings.streaming.rateControl,
-        Bitrate: settings.streaming.bitrate,
-        'Use Custom Resolution': settings.streaming.hasCustomResolution,
-        'Output Resolution': settings.streaming.outputResolution,
-        'Encoder Preset': settings.streaming.preset,
-        'Encoder Options': settings.streaming.encoderOptions,
-        'Rescale Output': settings.streaming.rescaleOutput,
-        'Audio Track': this.settingsService.views.streamTrack + 1,
-        'VOD Track': this.settingsService.views.vodTrack + 1,
-        'VOD Track Enabled': !!this.settingsService.views.vodTrackEnabled,
-        'Keyframe Interval': this.settingsService.views.values.Output.keyint_sec,
-      },
-      Recording: {
-        'Using Stream Encoder': settings.recording.isSameAsStream,
-        Encoder:
-          settings.recording.encoder === EEncoderFamily.jim_nvenc
-            ? 'NVENC (New)'
-            : settings.recording.encoder,
-        'Rate Control': settings.recording.rateControl,
-        Bitrate: settings.recording.bitrate,
-        'Output Resolution': settings.recording.outputResolution,
-        'Audio Tracks': this.settingsService.views.recordingTracks.map(t => t + 1).join(', '),
-      },
-      'Use Optimizaed Encoder Settings': this.videoEncodingOptimizationService.state
-        .useOptimizedProfile,
-    });
+    const outputInfo =
+      settings.mode === 'Simple' ? this.formatSimpleOutputInfo() : this.formatAdvancedOutputInfo();
+
+    return new Section('Output', outputInfo);
   }
 
   private generateSystemSection() {
@@ -833,9 +973,46 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
           'Average CPU': `${s.avgCpu?.toFixed(2)}%`,
           'Average FPS': s.avgFps?.toFixed(2),
           'Stream Error': s?.error ?? 'None',
+          Platforms: s?.platforms,
+          Destinations: s?.destinations,
+          'Stream Type': s?.type,
         };
       }),
     );
+  }
+
+  private generateDualOutputSection() {
+    const { platforms, destinations } = this.dualOutputService.views.getEnabledTargets('name');
+    const restreamHorizontal =
+      platforms.horizontal.length + destinations.horizontal.length > 1 ? 'Yes' : 'No';
+    const restreamVertical =
+      platforms.vertical.length + destinations.vertical.length > 1 ? 'Yes' : 'No';
+
+    const numHorizontal = this.dualOutputService.views.horizontalNodeIds.length;
+    const numVertical = this.dualOutputService.views.horizontalNodeIds.length;
+
+    if (numHorizontal !== numVertical) {
+      this.logProblem(
+        'Active collection has a different number of horizontal and vertical sources.',
+      );
+    }
+
+    return new Section('Dual Output', {
+      'Dual Output Active': this.dualOutputService.views.dualOutputMode,
+      'Dual Output Scene Collection Active': this.dualOutputService.views.hasNodeMap(),
+      Sources: {
+        'Number Horizontal Sources': numHorizontal,
+        'Number Vertical Sources': numVertical,
+      },
+      Targets: {
+        'Horizontal Platforms': this.formatTargets(platforms.horizontal, true),
+        'Vertical Platforms': this.formatTargets(platforms.vertical, true),
+        'Horizontal Custom Destinations': this.formatTargets(destinations.horizontal),
+        'Vertical Custom Destinations': this.formatTargets(destinations.vertical),
+      },
+      'Horizontal Uses Multistream': restreamHorizontal,
+      'Vertical Uses Multistream': restreamVertical,
+    });
   }
 
   private generateProblemsSection() {
