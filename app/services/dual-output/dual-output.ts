@@ -3,6 +3,9 @@ import {
   TDualOutputPlatformSettings,
   DualOutputPlatformSettings,
   IDualOutputDestinationSetting,
+  TDisplayPlatforms,
+  IDualOutputPlatformSetting,
+  TDisplayDestinations,
 } from './dual-output-data';
 import { verticalDisplayData } from '../settings-v2/default-settings-data';
 import { ScenesService, SceneItem, TSceneNode } from 'services/scenes';
@@ -100,6 +103,37 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
 
   get destinationSettings() {
     return this.state.destinationSettings;
+  }
+
+  getEnabledTargets(destinationId: 'name' | 'url' = 'url') {
+    const platforms = Object.entries(this.platformSettings).reduce(
+      (displayPlatforms: TDisplayPlatforms, [key, val]: [string, IDualOutputPlatformSetting]) => {
+        if (val && this.streamingService.views.enabledPlatforms.includes(val.platform)) {
+          displayPlatforms[val.display].push(val.platform);
+        }
+        return displayPlatforms;
+      },
+      { horizontal: [], vertical: [] },
+    );
+
+    /**
+     * Returns the enabled destinations according to their assigned display
+     */
+    const destinations = this.streamingService.views.customDestinations.reduce(
+      (displayDestinations: TDisplayDestinations, destination: ICustomStreamDestination) => {
+        if (destination.enabled) {
+          const id = destinationId === 'name' ? destination.name : destination.url;
+          displayDestinations[destination.display ?? 'horizontal'].push(id);
+        }
+        return displayDestinations;
+      },
+      { horizontal: [], vertical: [] },
+    );
+
+    return {
+      platforms,
+      destinations,
+    };
   }
 
   get horizontalNodeIds(): string[] {
