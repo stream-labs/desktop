@@ -84,30 +84,21 @@ export class ProtocolLinksService extends Service {
   @protocolHandler('library')
   private navigateLibrary(info: IProtocolLinkInfo) {
     if (!this.userService.isLoggedIn) return;
-
     const parts = info.path.match(/^\/(.+)\/(.+)$/);
+    const searchParams = new URLSearchParams(info.query);
+    // additional param to prompt the install confirm dialog on the overlay page
+    const install = searchParams?.get('install');
     if (parts) {
       this.navigationService.navigate('BrowseOverlays', {
         type: parts[1],
         id: parts[2],
+        install,
       });
       const menuItem =
         ProtocolLinkKeyMap[parts[1]] ?? this.sideNavService.views.isOpen
           ? ESideNavKey.Scene
           : ESideNavKey.Themes;
       this.sideNavService.setCurrentMenuItem(menuItem);
-    }
-  }
-
-  @protocolHandler('alertbox-library')
-  private navigateAlertboxLibrary(info: IProtocolLinkInfo) {
-    if (!this.userService.isLoggedIn) return;
-
-    const match = info.path.match(/^\/?([0-9]+)?\/?$/);
-
-    if (match) {
-      this.navigationService.navigate('AlertboxLibrary', { id: match[1] });
-      this.sideNavService.setCurrentMenuItem(ESideNavKey.AlertBoxLibrary);
     }
   }
 

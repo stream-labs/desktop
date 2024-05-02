@@ -36,7 +36,6 @@ export enum EMenuItemKey {
  */
 export enum ESubMenuItemKey {
   Scene = 'browse-overlays',
-  AlertBoxLibrary = 'alertbox-library',
   Widget = 'browse-overlays-widgets',
   Sites = 'browse-overlays-sites',
   AppsStoreHome = 'platform-app-store-home',
@@ -149,7 +148,6 @@ export const menuTitles = (item: EMenuItemKey | ESubMenuItemKey | string) => {
     [EMenuItemKey.Settings]: $t('Settings'),
     [EMenuItemKey.Login]: $t('Login'),
     [ESubMenuItemKey.Scene]: $t('Scene'),
-    [ESubMenuItemKey.AlertBoxLibrary]: $t('Alert Box Library'),
     [ESubMenuItemKey.Widget]: $t('Widget'),
     [ESubMenuItemKey.Sites]: $t('Creator Sites'),
     [ESubMenuItemKey.AppsStoreHome]: $t('Apps Store Home'),
@@ -157,7 +155,7 @@ export const menuTitles = (item: EMenuItemKey | ESubMenuItemKey | string) => {
     [ESubMenuItemKey.DashboardHome]: $t('Dashboard Home'),
     [ESubMenuItemKey.Cloudbot]: $t('Cloudbot'),
     [ESubMenuItemKey.AlertBoxSettings]: $t('Alert Box Settings'),
-    [ESubMenuItemKey.Widgets]: $t('Widgets'),
+    [ESubMenuItemKey.Widgets]: $t('Alerts and Widgets'),
     [ESubMenuItemKey.TipSettings]: $t('Tip Settings'),
     [ESubMenuItemKey.Multistream]: $t('Multistream'),
   }[item];
@@ -232,7 +230,6 @@ export const SideNavMenuItems = (): TMenuItems => ({
     icon: 'icon-themes',
     subMenuItems: [
       SideBarSubMenuItems()[ESubMenuItemKey.Scene],
-      SideBarSubMenuItems()[ESubMenuItemKey.AlertBoxLibrary],
       SideBarSubMenuItems()[ESubMenuItemKey.Widget],
       SideBarSubMenuItems()[ESubMenuItemKey.Sites],
     ],
@@ -334,12 +331,6 @@ export const SideBarSubMenuItems = (): TSubMenuItems => ({
     target: 'BrowseOverlays',
     type: 'overlays',
     trackingTarget: 'themes',
-    isExpanded: false,
-  },
-  [ESubMenuItemKey.AlertBoxLibrary]: {
-    key: ESubMenuItemKey.AlertBoxLibrary,
-    target: 'AlertboxLibrary',
-    trackingTarget: 'alertbox-library',
     isExpanded: false,
   },
   [ESubMenuItemKey.Widget]: {

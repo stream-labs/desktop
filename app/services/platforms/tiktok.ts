@@ -161,7 +161,6 @@ export class TikTokService
         }
       } catch (error: unknown) {
         this.SET_LIVE_SCOPE('denied');
-        await this.handleOpenLiveManager();
         throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED', error as any);
       }
 
@@ -188,8 +187,6 @@ export class TikTokService
 
   async afterGoLive(): Promise<void> {
     // open url if stream successfully started
-
-    // keep main window on top to prevent flicker when opening url
     await this.handleOpenLiveManager();
   }
 
@@ -470,14 +467,12 @@ export class TikTokService
     return '';
   }
 
-  // opens the live center for users with approved live access accounts
+  // url for the live monitor
   get dashboardUrl(): string {
-    return this.liveStreamingEnabled
-      ? `https://livecenter.tiktok.com/live_monitor?lang=${this.locale}`
-      : this.legacyDashboardUrl;
+    return `https://livecenter.tiktok.com/live_monitor?lang=${this.locale}`;
   }
 
-  // opens the producer for legacy users with approval for stream keys and server urls
+  // url for the producer for legacy users with approval for stream keys and server urls
   get legacyDashboardUrl(): string {
     return `https://livecenter.tiktok.com/producer?lang=${this.locale}`;
   }
@@ -522,6 +517,8 @@ export class TikTokService
   async handleOpenLiveManager(): Promise<void> {
     // no need to open window for tests
     if (Utils.isTestMode()) return;
+
+    if (!this.liveStreamingEnabled) return;
 
     // keep main window on top to prevent flicker when opening url
     const win = Utils.getMainWindow();
