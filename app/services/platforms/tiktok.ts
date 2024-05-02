@@ -113,8 +113,41 @@ export class TikTokService
   }
 
   get liveStreamingEnabled(): boolean {
-    const scope = this.state.settings?.liveScope ?? 'denied';
+    const scope = this.state.settings?.liveScope ?? 'not-approved';
     return ['approved', 'legacy'].includes(scope);
+  }
+
+  /**
+   * Indicates if a user has live access approval
+   * @remark A user who previously had legacy approval that is then approved for live access
+   * will now show approval for live access regardless of their legacy approval remaining active.
+   */
+  get approved(): boolean {
+    return this.state.settings?.liveScope === 'approved';
+  }
+
+  /**
+   * Indicates if a user has approval to generate a stream key and server url
+   */
+  get legacy(): boolean {
+    return this.state.settings?.liveScope === 'legacy';
+  }
+
+  /**
+   * Indicates whether a user needs to remerge their account to access a feature
+   * @remark Whenever TikTok adds a new endpoint, their API requires granting access to a new scope.
+   * In order to prevent excessive disruptions for users with live access, some features have
+   * conditional logic to activate after the account has been remerged on core.
+   */
+  get denied(): boolean {
+    return this.state.settings?.liveScope === 'denied';
+  }
+
+  /**
+   * Indicates that a user has either not applied for live access approval or does not have live access approval
+   */
+  get notApproved(): boolean {
+    return this.state.settings?.liveScope === 'not-approved';
   }
 
   /**
@@ -160,7 +193,7 @@ export class TikTokService
           throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED');
         }
       } catch (error: unknown) {
-        this.SET_LIVE_SCOPE('denied');
+        this.SET_LIVE_SCOPE('not-approved');
         throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED', error as any);
       }
 
@@ -281,7 +314,7 @@ export class TikTokService
         : 'Connection failed';
 
       if (notApproved) {
-        this.SET_LIVE_SCOPE('denied');
+        this.SET_LIVE_SCOPE('not-approved');
       } else if (hasStream) {
         // show error stream exists
         throwStreamError('TIKTOK_STREAM_ACTIVE', e as any, details);
@@ -340,11 +373,16 @@ export class TikTokService
 
         // Note on the 'denied' response: A user who needs to reauthenticate with TikTok
         // due a change in the scope for our api, needs to be told to unlink and remerge their account.
+        // TODO: confirm the expected response. We expect that a ETikTokLiveScopeReason.DENIED (-1) response
+        // is only returned when a user needs to remerge. This may need to be combined with checking for can_be_live.
+        // For example, `if (can_be_live === true && reason === -1)` this may indicate a user has remerged to use live access,
+        // so needs to remerge to use the new feature. But `if (can_be_live === false && reason === -1)` then it may indicate
+        // that a user has been approved for live access but the user has not remerged their account to be able to use live access.
         if (scope === 'denied') {
           return EPlatformCallResult.TikTokScopeOutdated;
         }
       } else {
-        this.SET_LIVE_SCOPE('denied');
+        this.SET_LIVE_SCOPE('not-approved');
       }
 
       // clear any leftover server url or stream key
@@ -361,7 +399,7 @@ export class TikTokService
         : EPlatformCallResult.TikTokStreamScopeMissing;
     } catch (e: unknown) {
       console.warn(this.getErrorMessage(e));
-      this.SET_LIVE_SCOPE('denied');
+      this.SET_LIVE_SCOPE('not-approved');
       return EPlatformCallResult.TikTokStreamScopeMissing;
     }
   }
@@ -509,8 +547,11 @@ export class TikTokService
       case ETikTokLiveScopeReason.APPROVED_OBS: {
         return 'legacy';
       }
-      default:
+      case ETikTokLiveScopeReason.DENIED: {
         return 'denied';
+      }
+      default:
+        return 'not-approved';
     }
   }
 
