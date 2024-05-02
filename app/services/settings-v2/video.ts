@@ -157,7 +157,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
       this.dualOutputService.views.videoSettings.vertical;
 
     const scaleType = typeStrings ? scaleTypeNames[settings?.scaleType] : settings?.scaleType;
-    const fpsType = typeStrings ? fpsTypeNames[settings?.fpsType] : settings?.scaleType;
+    const fpsType = typeStrings ? fpsTypeNames[settings?.fpsType] : settings?.fpsType;
 
     return {
       baseRes: `${settings?.baseWidth}x${settings?.baseHeight}`,
