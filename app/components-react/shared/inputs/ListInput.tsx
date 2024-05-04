@@ -31,8 +31,6 @@ export interface ICustomListProps<TValue> {
   onBeforeSearch?: (searchStr: string) => unknown;
   options?: IListOption<TValue>[];
   description?: string;
-  // TODO: comment in or remove
-  // label?: string | ReactNode | JSX.Element | undefined;
 }
 
 // define a type for the component's props

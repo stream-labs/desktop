@@ -36,8 +36,7 @@ export function TikTokEditStreamInfo(p: IPlatformComponentParams<'tiktok'>) {
             onChange={updateSettings}
           />
         }
-        requiredFields={<div key="empty-tiktok" />}
-        optionalFields={<TikTokGameSelector key="optional-tiktok" {...p} />}
+        requiredFields={<GameSelector key="required" platform={'tiktok'} {...bind.game} />}
       />
 
       {(!liveStreamingEnabled || legacy) && <TikTokEnterCredentialsFormInfo {...p} />}
@@ -104,51 +103,6 @@ export function TikTokEnterCredentialsFormInfo(p: IPlatformComponentParams<'tikt
   );
 }
 
-function TikTokGameSelector(p: IPlatformComponentParams<'tiktok'>) {
-  // const approved = Services.TikTokService.approved;
-  // const denied = Services.TikTokService.denied;
-
-  const approved = true;
-  const denied = true;
-
-  const bind = createBinding(p.value, updatedSettings =>
-    p.onChange({ ...p.value, ...updatedSettings }),
-  );
-
-  // TODO: confirm the conditional logic to show this tooltip
-  // In order to use the games list, the users must remerge their accounts
-  // The tooltip should only show for users who are approved for live access but have not yet remerged.
-
-  // Do not show game selector for legacy users because they do not have access to the API
-  return (
-    <div key="optional-tiktok-wrapper">
-      {approved && (
-        <GameSelector key="optional-tiktok-approved" platform={'tiktok'} {...bind.game} />
-      )}
-
-      {denied && (
-        <GameSelector
-          key="optional-tiktok-denied"
-          platform={'tiktok'}
-          {...bind.game}
-          label={
-            <Tooltip title={$t('Remerge TikTok account to access game list.')} placement="right">
-              {/* TODO: the title prop above only accepts strings. We need to convert the below into a string in advance.
-                 <Translate message="Remerge TikTok account to access game list. <link>Click here to remerge.</link>">
-                    <a slot="link" onClick={openMergePage} />
-                  </Translate> */}
-              {$t('TikTok Game')}
-              <i className="icon-information" style={{ marginLeft: '5px' }} />
-            </Tooltip>
-          }
-        />
-      )}
-
-      {!approved && !denied && <div key="optional-tiktok-empty" />}
-    </div>
-  );
-}
-
 function openInfoPage() {
   remote.shell.openExternal(Services.TikTokService.infoUrl);
 }
@@ -159,8 +113,4 @@ function openApplicationInfoPage() {
 
 function openProducer() {
   remote.shell.openExternal(Services.TikTokService.legacyDashboardUrl);
-}
-
-function openMergePage() {
-  remote.shell.openExternal(Services.TikTokService.mergeUrl);
 }

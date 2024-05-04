@@ -1,5 +1,5 @@
 import { Form } from 'antd';
-import React, { ReactNode, useContext } from 'react';
+import React, { useContext } from 'react';
 import { FormItemProps } from 'antd/lib/form/FormItem';
 import omit from 'lodash/omit';
 import { FormContext } from './Form';
@@ -11,8 +11,6 @@ type TInputWrapperProps = FormItemProps & {
   inputRef?: unknown;
   layout?: TInputLayout;
   name?: string;
-  // TODO: comment in or remove
-  // label?: string | ReactNode | JSX.Element | undefined;
 };
 
 /**

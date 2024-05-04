@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import {
   getPlatformService,
   IGame,
@@ -11,10 +11,7 @@ import { IListOption } from '../../shared/inputs/ListInput';
 import { Services } from '../../service-provider';
 import { injectState, useModule } from 'slap';
 
-type TProps = TSlobsInputProps<
-  { platform: TPlatform; label?: string | ReactNode | JSX.Element | undefined },
-  string
->;
+type TProps = TSlobsInputProps<{ platform: TPlatform }, string>;
 
 export default function GameSelector(p: TProps) {
   const { platform } = p;
@@ -53,9 +50,9 @@ export default function GameSelector(p: TProps) {
     if (!selectedGameName) return;
     const game = await platformService.fetchGame(selectedGameName);
     if (!game || game.name !== selectedGameName) return;
-    setGames(
-      games.map(opt => (opt.value === selectedGameId ? { ...opt, image: game.image } : opt)),
-    );
+    setGames(games.map(opt =>
+      opt.value === selectedGameId ? { ...opt, image: game.image } : opt,
+    ));
   }
 
   async function onSearch(searchString: string) {
@@ -76,15 +73,14 @@ export default function GameSelector(p: TProps) {
 
   const isTwitch = platform === 'twitch';
   const isTrovo = platform === 'trovo';
+  const isTikTok = platform === 'tiktok';
 
-  const label =
-    p?.label ??
-    {
-      twitch: $t('Twitch Category'),
-      facebook: $t('Facebook Game'),
-      trovo: $t('Trovo Category'),
-      tiktok: $t('TikTok Game'),
-    }[platform as string];
+  const label = {
+    twitch: $t('Twitch Category'),
+    facebook: $t('Facebook Game'),
+    trovo: $t('Trovo Category'),
+    tiktok: $t('TikTok Game'),
+  }[platform as string];
 
   return (
     <ListInput
@@ -98,7 +94,7 @@ export default function GameSelector(p: TProps) {
       showSearch
       onSearch={onSearch}
       debounce={500}
-      required={isTwitch || isTrovo}
+      required={isTwitch || isTrovo || isTikTok}
       hasImage={isTwitch || isTrovo}
       onBeforeSearch={onBeforeSearchHandler}
       imageSize={platformService.gameImageSize}
