@@ -178,7 +178,6 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
     platform === 'tiktok' && !StreamingService.views.isPlatformLinked('tiktok');
 
   function onClickHandler(ev: MouseEvent) {
-    // If re-stream isn't enabled, don't allow disabling the primary platform
     if (p.promptConnectTikTok) {
       alertAsync({
         type: 'confirm',
@@ -205,12 +204,20 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
     // always proxy the click to the SwitchInput
     // so it can play a transition animation
     switchInputRef.current?.click();
+
+    /*
+     * TODO:
+     *   this causes inconsistent state when disabling primary platform
+     *   after is being re-enabled. Not sure which animation is referring to.
+     */
     // switch the container class without re-rendering to not stop the animation
+    /*
     if (enable) {
       containerRef.current?.classList.remove(styles.platformDisabled);
     } else {
       containerRef.current?.classList.add(styles.platformDisabled);
     }
+    */
   }
 
   function addClass() {
