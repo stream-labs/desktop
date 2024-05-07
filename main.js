@@ -205,13 +205,14 @@ console.log(`Free: ${humanFileSize(os.freemem(), false)}`);
 console.log('=================================');
 
 app.on('ready', () => {
-  console.log('in dev mode');
-  const reactDevToolsPath = path.join(__dirname, 'vendor', 'react-devtools');
-  console.log(reactDevToolsPath);
-  session.defaultSession
-    .loadExtension(reactDevToolsPath, { allowFileAccess: true })
-    .then(() => console.log('Installed React DevTools'))
-    .catch(err => console.log('Error installing React DevTools', err));
+  if (process.env.NODE_ENV === 'development') {
+    console.log('in dev mode');
+    const reactDevToolsPath = path.join(__dirname, 'vendor', 'react-devtools');
+    session.defaultSession
+      .loadExtension(reactDevToolsPath, { allowFileAccess: true })
+      .then(() => console.log('Installed React DevTools'))
+      .catch(err => console.log('Error installing React DevTools', err));
+  }
 
   // Detect when running from an unwritable location like a DMG image (will break updater)
   if (process.platform === 'darwin') {
