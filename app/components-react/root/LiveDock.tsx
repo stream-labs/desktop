@@ -324,7 +324,8 @@ function LiveDock(p: { onLeft: boolean }) {
     });
   }
 
-  const showTiktokInfo = isPlatform('tiktok');
+  const showTiktokInfo =
+    visibleChat === 'tiktok' || Services.UserService.state.auth!.primaryPlatform === 'tiktok';
 
   return (
     <div
