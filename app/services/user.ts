@@ -17,21 +17,6 @@ import * as Sentry from '@sentry/vue';
 import { AppService } from 'services/app';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { Subject, Observable, merge } from 'rxjs';
-import { WindowsService } from 'services/windows';
-import {
-  cpu as systemInfoCpu,
-  graphics as systemInfoGraphics,
-  osInfo as systemInfoOsInfo,
-  uuid as systemInfoUuid,
-} from 'systeminformation';
-import {
-  totalmem as nodeTotalMem,
-  freemem as nodeFreeMem,
-  cpus as nodeCpus,
-  release as nodeOsRelease,
-} from 'os';
-import { memoryUsage as nodeMemUsage } from 'process';
-import { $t } from 'services/i18n';
 import uuid from 'uuid/v4';
 import { OnboardingService } from './onboarding';
 import { UuidService } from './uuid';
@@ -95,15 +80,18 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     console.log('validateLogin: this.platform=' + JSON.stringify(this.platform));
     const service = getPlatformService(this.platform.type);
     if (service && service.isLoggedIn) {
-      return service.isLoggedIn().then(valid => {
-        if (!valid) {
-          this.LOGOUT();
-          this.userLogout.next();
-        }
-      }).catch((e) => {
-        // offline や Internal Server Error などのときなので記録するだけ
-        console.warn('validateLogin: error=' + JSON.stringify(e));
-      });
+      return service
+        .isLoggedIn()
+        .then(valid => {
+          if (!valid) {
+            this.LOGOUT();
+            this.userLogout.next();
+          }
+        })
+        .catch(e => {
+          // offline や Internal Server Error などのときなので記録するだけ
+          console.warn('validateLogin: error=' + JSON.stringify(e));
+        });
     }
 
     // ここに来るパターンは存在しないはず
@@ -301,8 +289,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     this.startAuth({
       platform: this.platform.type,
-      onAuthFinish: () => { },
-      onAuthClose: () => { },
+      onAuthFinish: () => {},
+      onAuthClose: () => {},
     });
   }
 
