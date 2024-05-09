@@ -16,6 +16,12 @@ class ValidatedFormProps {
    * 'input' event is triggering every time when nested field or nested form is changed
    */
   onInput?: () => unknown;
+
+  /**
+   * 'blur' event is triggering every time when nested field or nested form lost focus
+   */
+  onBlur?: (event: FocusEvent) => unknown;
+
   /**
    * A custom validation function that will be called after regular validation
    * Should return `true` for successful validation
@@ -101,6 +107,10 @@ export default class ValidatedForm extends TsxComponent<ValidatedFormProps> {
 
   emitInput(data: any, event: Event) {
     this.$emit('input', data, event);
+  }
+
+  async emitBlur(event: Event) {
+    this.$emit('blur', event);
   }
 
   handleSubmit(event: Event) {
