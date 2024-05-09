@@ -236,7 +236,7 @@ export class GoLiveSettingsModule {
     }
     /*
      * This should only trigger on free user mode: when toggling another platform
-     * when TikTok is enabled, set primary chat to that platform instead of Tiktok
+     * when TikTok is enabled, set primary chat to that platform instead of TikTok
      */
     if (
       this.state.enabledPlatforms.length === 2 &&
@@ -244,6 +244,7 @@ export class GoLiveSettingsModule {
     ) {
       const otherPlatform = this.state.enabledPlatforms.find(platform => platform !== 'tiktok');
 
+      // This is always true, but to make TS happy and code explicit, we null check here
       if (otherPlatform) {
         this.setPrimaryChat(otherPlatform);
       }
