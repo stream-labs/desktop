@@ -52,6 +52,10 @@ export default class NumberInput extends BaseInput<number | string, INumberMetad
     this.emitInput(value);
   }
 
+  handleBlur(event: Event) {
+    super.emitBlur(event);
+  }
+
   handleInput(value: string) {
     this.displayValue = value;
     if (value === '-' || value === '') return;
