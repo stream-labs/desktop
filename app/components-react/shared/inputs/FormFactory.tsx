@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { Button } from 'antd';
 import { FormProps } from 'antd/lib/form';
 import debounce from 'lodash/debounce';
 import cloneDeep from 'lodash/cloneDeep';
@@ -6,6 +7,8 @@ import * as inputs from './inputList';
 import { TInputType, TSlobsInputProps } from './inputs';
 import Form, { useForm } from './Form';
 import { TInputMetadata } from './metadata';
+import { ButtonGroup } from 'components-react/shared/ButtonGroup';
+import { $t } from 'services/i18n';
 
 export type TInputValue = string | number | boolean | IRGBColor;
 
@@ -34,10 +37,19 @@ export default function FormFactory(p: {
   values: Dictionary<TInputValue>;
   formOptions?: FormProps;
   name?: string;
+  onSubmit?: () => void;
+  onCancel?: (e: React.MouseEvent) => void;
 }) {
   const form = useForm();
 
   useMemo(() => form.setFieldsValue(cloneDeep(p.values)), []);
+
+  function submit() {
+    form.validateFields();
+    if (p.onSubmit) {
+      p.onSubmit();
+    }
+  }
 
   return (
     <Form
@@ -55,6 +67,14 @@ export default function FormFactory(p: {
           onChange={p.onChange}
         />
       ))}
+      {p.onSubmit && (
+        <ButtonGroup>
+          {p.onCancel && <Button onClick={p.onCancel}>{$t('Cancel')}</Button>}
+          <Button type="primary" onClick={submit}>
+            {$t('Save')}
+          </Button>
+        </ButtonGroup>
+      )}
     </Form>
   );
 }
