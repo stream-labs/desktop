@@ -44,11 +44,14 @@ export default function FormFactory(p: {
 
   useMemo(() => form.setFieldsValue(cloneDeep(p.values)), []);
 
-  function submit() {
-    form.validateFields();
-    if (p.onSubmit) {
-      p.onSubmit();
+  async function submit() {
+    try {
+      await form.validateFields();
+    } catch (e: unknown) {
+      return;
     }
+
+    if (p.onSubmit) p.onSubmit();
   }
 
   return (
