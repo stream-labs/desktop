@@ -234,6 +234,21 @@ export class GoLiveSettingsModule {
     if (this.state.enabledPlatforms.length === 1) {
       this.setPrimaryChat(this.state.enabledPlatforms[0]);
     }
+    /*
+     * This should only trigger on free user mode: when toggling another platform
+     * when TikTok is enabled, set primary chat to that platform instead of Tiktok
+     */
+    if (
+      this.state.enabledPlatforms.length === 2 &&
+      this.state.enabledPlatforms.includes('tiktok')
+    ) {
+      const otherPlatform = this.state.enabledPlatforms.find(platform => platform !== 'tiktok');
+
+      if (otherPlatform) {
+        this.setPrimaryChat(otherPlatform);
+      }
+    }
+
     this.save(this.state.settings);
     this.prepopulate();
   }
