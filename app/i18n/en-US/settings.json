@@ -258,5 +258,6 @@
   "Above High": "Above High",
   "Normal": "Normal",
   "Below Normal": "Below Normal",
-  "Idle": "Idle"
+  "Idle": "Idle",
+  "Please connect platforms directly from Streamlabs Desktop instead of adding Streamlabs Multistream as a custom destination": "Please connect platforms directly from Streamlabs Desktop instead of adding Streamlabs Multistream as a custom destination"
 }
