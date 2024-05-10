@@ -114,6 +114,7 @@ export const macSources: TSourceType[] = [
   'display_capture',
   'audio_line',
   'ndi_source',
+  'screen_capture',
   'vlc_source',
   'window_capture',
   'syphon-input',
