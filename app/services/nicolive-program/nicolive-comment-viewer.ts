@@ -2,6 +2,7 @@ import { EMPTY, Observable, Subject, Subscription, merge, of, timer } from 'rxjs
 import {
   bufferTime,
   catchError,
+  debounceTime,
   distinctUntilChanged,
   endWith,
   filter,
@@ -67,7 +68,13 @@ class DummyMessageServerClient implements IMessageServerClient {
       })),
     );
   }
+  close(): void {
+    // do nothing
+  }
   requestLatestMessages(): void {
+    // do nothing
+  }
+  ping(): void {
     // do nothing
   }
 }
@@ -99,6 +106,8 @@ function calcSSNGTypeName(record: FilterRecord) {
     command: 'コマンド',
   }[record.type];
 }
+
+const PING_DEBOUNCE_TIME = 180000; // 無通信切断される環境で切断を避けるためのping送信間隔
 
 export class NicoliveCommentViewerService extends StatefulService<INicoliveCommentViewerState> {
   private client: IMessageServerClient | null = null;
@@ -266,9 +275,21 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
 
   private connect() {
     const closer = new Subject();
+    const clientSubject = this.client.connect();
+
+    const pingSubject = new Subject();
+    merge(pingSubject, clientSubject)
+      .pipe(debounceTime(PING_DEBOUNCE_TIME), takeUntil(closer))
+      .subscribe({
+        next: () => {
+          this.client.ping();
+          pingSubject.next();
+        },
+        error: () => {}, // こちらはエラー処理はしなくてよい(下でやる)
+      });
 
     this.lastSubscription = merge(
-      this.client.connect().pipe(
+      clientSubject.pipe(
         groupBy(msg => Object.keys(msg)[0]),
         mergeMap((group$): Observable<Pick<WrappedChat, 'type' | 'value' | 'isModerator'>> => {
           switch (group$.key) {
@@ -290,10 +311,14 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
             case 'leave_thread':
               return group$.pipe(mapTo(makeEmulatedChat('コメントの取得に失敗しました')));
             default:
-              EMPTY;
+              return EMPTY;
           }
         }),
         catchError(err => {
+          if (err instanceof CloseEvent) {
+            this.client.close();
+            return EMPTY;
+          }
           console.error(err);
           return of(makeEmulatedChat(`エラーが発生しました: ${err.message}`));
         }),

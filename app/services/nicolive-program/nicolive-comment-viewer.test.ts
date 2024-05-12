@@ -88,7 +88,7 @@ test('接続先情報が来たら接続する', () => {
   expect(clientSubject.observers).toHaveLength(0);
   expect(stateChange.observers).toHaveLength(1);
   stateChange.next({ roomURL: 'https://example.com', roomThreadID: '175622' });
-  expect(clientSubject.observers).toHaveLength(1);
+  expect(clientSubject.observers).toHaveLength(2);
 });
 
 test('接続先情報が欠けていたら接続しない', () => {
@@ -138,7 +138,7 @@ test('/disconnectが流れてきたらunsubscribeする', () => {
   expect(clientSubject.observers).toHaveLength(0);
   expect(unsubscribe).toHaveBeenCalledTimes(0);
   stateChange.next({ roomURL: 'https://example.com', roomThreadID: '175622' });
-  expect(clientSubject.observers).toHaveLength(1);
+  expect(clientSubject.observers).toHaveLength(2);
   expect(unsubscribe).toHaveBeenCalledTimes(1);
 
   // 通常コメントではunsubscribeしない
