@@ -131,7 +131,7 @@ export class NicoliveModeratorsService extends StatefulService<INicoliveModerato
         componentName: 'ModeratorConfirmDialog',
         isFullScreen: true, // hide Titlebar
         queryParams: { userName, userId, operation },
-        size: { width: 480, height: 240 },
+        size: { width: 480, height: 220 },
       });
       this.resolveConfirmPromise = (result: boolean) => {
         resolve({ confirmWindowId, result });
