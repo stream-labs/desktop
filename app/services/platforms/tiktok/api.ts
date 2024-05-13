@@ -35,10 +35,24 @@ export interface ITikTokUserInfoResponse {
 }
 
 export interface ITikTokLiveScopeResponse {
-  can_be_live: boolean;
-  reason: ETikTokLiveScopeReason;
   platform: TPlatform | string;
-  user: ITikTokUserData;
+  reason: ETikTokLiveScopeReason;
+  can_be_live?: boolean;
+  user?: ITikTokUserData;
+  info?: any[] | null[] | undefined[] | ITikTokGame[] | ITikTokGamesData | any;
+}
+
+export interface ITikTokGamesData {
+  platform: TPlatform | string;
+  info: {
+    categories: ITikTokGame[];
+  };
+  reason: ETikTokLiveScopeReason;
+}
+
+interface ITikTokGame {
+  full_name: string;
+  game_mask_id: string;
 }
 
 export interface ITikTokUserData {

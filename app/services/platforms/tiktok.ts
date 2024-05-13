@@ -324,7 +324,7 @@ export class TikTokService
       const response = await this.fetchLiveAccessStatus();
       const status = response as ITikTokLiveScopeResponse;
 
-      if (status?.reason) {
+      if (status?.user) {
         const scope = this.convertScope(status.reason);
         this.SET_USERNAME(status.user.username);
         this.SET_LIVE_SCOPE(scope);
@@ -334,8 +334,15 @@ export class TikTokService
         if (scope === 'denied') {
           return EPlatformCallResult.TikTokScopeOutdated;
         }
-      } else {
+      } else if (
+        status?.info &&
+        (!status?.reason || status?.reason !== ETikTokLiveScopeReason.DENIED)
+      ) {
         this.SET_LIVE_SCOPE('denied');
+        return EPlatformCallResult.TikTokScopeOutdated;
+      } else {
+        this.SET_LIVE_SCOPE('not-approved');
+        return EPlatformCallResult.TikTokStreamScopeMissing;
       }
 
       // clear any leftover server url or stream key
@@ -352,7 +359,7 @@ export class TikTokService
         : EPlatformCallResult.TikTokStreamScopeMissing;
     } catch (e: unknown) {
       console.warn(this.getErrorMessage(e));
-      this.SET_LIVE_SCOPE('denied');
+      this.SET_LIVE_SCOPE('not-approved');
       return EPlatformCallResult.TikTokStreamScopeMissing;
     }
   }
@@ -369,9 +376,22 @@ export class TikTokService
     const url = `https://${host}/api/v5/slobs/tiktok/info`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
-    return jfetch<ITikTokError>(request).catch(() => {
-      console.warn('Error fetching TikTok Live Access status.');
-    });
+    return jfetch<ITikTokLiveScopeResponse | ITikTokError>(request)
+      .then(async res => {
+        // prevent error from unresolved promises in array
+        const scopeData = res as ITikTokLiveScopeResponse;
+        if (scopeData?.info) {
+          const info = await Promise.all(scopeData?.info.map((category: any) => category));
+          return {
+            ...scopeData,
+            info,
+          };
+        }
+        return res;
+      })
+      .catch(() => {
+        console.warn('Error fetching TikTok Live Access status.');
+      });
   }
 
   /**
@@ -477,6 +497,9 @@ export class TikTokService
       }
       case ETikTokLiveScopeReason.APPROVED_OBS: {
         return 'legacy';
+      }
+      case ETikTokLiveScopeReason.DENIED: {
+        return 'denied';
       }
       default:
         return 'denied';

@@ -11,7 +11,7 @@ interface IMessageLayoutProps {
    * overrides the error message if provided
    */
   message?: string;
-  type?: 'error' | 'success';
+  type?: 'error' | 'success' | 'info' | 'warning';
   hasButton?: boolean;
 }
 
