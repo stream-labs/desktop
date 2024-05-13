@@ -114,7 +114,7 @@ export const macSources: TSourceType[] = [
   'display_capture',
   'audio_line',
   'ndi_source',
-  'screen_capture',
+  'mac_screen_capture',
   'vlc_source',
   'window_capture',
   'syphon-input',
@@ -372,7 +372,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       this.usageStatisticsService.recordFeatureUsage('NDI');
     } else if (type === 'openvr_capture') {
       this.usageStatisticsService.recordFeatureUsage('OpenVR');
-    } else if (type === 'screen_capture') {
+    } else if (type === 'screen_capture' || type === 'mac_screen_capture') {
       this.usageStatisticsService.recordFeatureUsage('SimpleCapture');
     } else if (type === 'vlc_source') {
       this.usageStatisticsService.recordFeatureUsage('VLC');
@@ -584,6 +584,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       { description: 'NDI Source', value: 'ndi_source' },
       { description: 'OpenVR Capture', value: 'openvr_capture' },
       { description: 'Screen Capture', value: 'screen_capture' },
+      { description: 'macOS Screen Capture', value: 'mac_screen_capture' },
       { description: 'LIV Client Capture', value: 'liv_capture' },
       { description: 'OvrStream', value: 'ovrstream_dc_source' },
       { description: 'VLC Source', value: 'vlc_source' },
