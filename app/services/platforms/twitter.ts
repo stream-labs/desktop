@@ -75,6 +75,11 @@ export class TwitterPlatformService
   }
 
   async beforeGoLive(goLiveSettings: IGoLiveSettings, context?: TDisplayType) {
+    if (Utils.isTestMode()) {
+      this.SET_BROADCAST_ID('twitterBroadcast1');
+      this.setPlatformContext('twitter');
+      return;
+    }
     const streamInfo = await this.startStream(
       goLiveSettings.platforms.twitter ?? this.state.settings,
     );

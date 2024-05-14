@@ -303,9 +303,11 @@ export class SceneItem extends SceneItemNode {
     }
     const context = this.videoSettingsService.contexts[display];
 
+    const obsSceneItem = this.getObsSceneItem();
+    obsSceneItem.video = context as obs.IVideo;
+
     this.UPDATE({
       visible,
-      display,
       sceneItemId: this.sceneItemId,
       transform: {
         position,
@@ -319,8 +321,9 @@ export class SceneItem extends SceneItemNode {
       scaleFilter: customSceneItem.scaleFilter,
       blendingMode: customSceneItem.blendingMode,
       blendingMethod: customSceneItem.blendingMethod,
+      display,
       output: context,
-      position: customSceneItem.position,
+      position: obsSceneItem.position,
     });
   }
 

@@ -18,7 +18,7 @@ useWebdriver();
 
 test('Multistream default mode', async t => {
   // login to via Twitch because it doesn't have strict rate limits
-  const user = await logIn('twitch', { multistream: true });
+  await logIn('twitch', { multistream: true });
   await prepareToGoLive();
   await clickGoLive();
   await waitForSettingsWindowLoaded();
@@ -42,13 +42,12 @@ test('Multistream default mode', async t => {
   await waitForDisplayed('span=Configure the Multistream service');
   await waitForDisplayed("h1=You're live!", { timeout: 60000 });
   await stopStream();
-  await releaseUserInPool(user);
   await t.pass();
 });
 
 test('Multistream advanced mode', async t => {
   // login to via Twitch because it doesn't have strict rate limits
-  const user = await logIn('twitch', { multistream: true });
+  await logIn('twitch', { multistream: true });
   await prepareToGoLive();
   await clickGoLive();
   await waitForSettingsWindowLoaded();
@@ -90,12 +89,11 @@ test('Multistream advanced mode', async t => {
   await waitForDisplayed('span=Configure the Multistream service');
   await waitForDisplayed("h1=You're live!", { timeout: 60000 });
   await stopStream();
-  await releaseUserInPool(user);
   await t.pass();
 });
 
 test('Custom stream destinations', async t => {
-  const loggedInUser = await logIn('twitch', { prime: true });
+  await logIn('twitch', { prime: true });
 
   // fetch a new stream key
   const user = await reserveUserFromPool(t, 'twitch');
@@ -151,7 +149,6 @@ test('Custom stream destinations', async t => {
   await waitForDisplayed("h1=You're live!", { timeout: 60000 });
   await waitForStreamStart();
   await stopStream();
-  await releaseUserInPool(loggedInUser);
   await releaseUserInPool(user);
 
   // delete existing destinations
