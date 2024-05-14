@@ -435,7 +435,7 @@ function LiveDock(p: { onLeft: boolean }) {
                   )}
                   {!applicationLoading &&
                     !collapsed &&
-                    (showTiktokInfo ? (
+                    (showTiktokInfo && !isRestreaming ? (
                       <TikTokChatInfo />
                     ) : (
                       <Chat
