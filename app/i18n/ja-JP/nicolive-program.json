@@ -252,7 +252,7 @@
       "removeModerator": {
         "NOT_BROADCASTER": {
           "title": "NOT_BROADCASTER",
-          "message": "配信していないため、モデレーターを取得できませんでした"
+          "message": "配信していないため、モデレーターを削除できませんでした"
         }
       },
       "fetchModerators": {
