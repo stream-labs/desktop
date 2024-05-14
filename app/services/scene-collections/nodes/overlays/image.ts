@@ -42,8 +42,8 @@ export class ImageNode extends Node<ISchema, IContext> {
       try {
         const destination = path.join(context.assetsPath, newFileName);
         fs.writeFileSync(destination, fs.readFileSync(filePath));
-      } catch (error) {
-        console.error('Error saving image node: ', error);
+      } catch (e: unknown) {
+        console.error('Error saving image node: ', e);
       }
     }
 
