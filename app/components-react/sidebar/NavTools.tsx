@@ -78,6 +78,12 @@ export default function SideNav() {
 
   const throttledOpenDashboard = throttle(openDashboard, 2000, { trailing: false });
 
+  // Instagram doesn't provide a username, since we're not really linked, pass undefined for a generic logout msg w/o it
+  const username =
+    isLoggedIn && UserService.views.auth!.primaryPlatform !== 'instagram'
+      ? UserService.username
+      : undefined;
+
   function openHelp() {
     UsageStatisticsService.actions.recordClick('SideNav2', 'help');
     remote.shell.openExternal(
@@ -196,7 +202,7 @@ export default function SideNav() {
         showModal={showModal}
         handleAuth={handleAuth}
         handleShowModal={handleShowModal}
-        username={UserService.username}
+        username={username}
       />
     </>
   );
@@ -259,6 +265,11 @@ function LogoutModal(p: {
   handleShowModal: (status: boolean) => void;
   username?: string;
 }) {
+  const { username } = p;
+  const confirmMsg = username
+    ? $t('Are you sure you want to log out %{username}?', { username })
+    : $t('Are you sure you want to log out?');
+
   return (
     <Modal
       footer={null}
@@ -269,9 +280,7 @@ function LogoutModal(p: {
     >
       <Form className={styles.confirmLogout}>
         <h2>{$t('Confirm')}</h2>
-        {$t('Are you sure you want to log out %{username}?', {
-          username: p.username,
-        })}
+        {confirmMsg}
         <div className={styles.buttons}>
           <Button onClick={() => p.handleAuth()}>{$t('Yes')}</Button>
           <Button onClick={() => p.handleShowModal(false)}>{$t('No')}</Button>
