@@ -30,7 +30,7 @@ import { NVoiceCharacterTypes } from 'services/nvoice-character';
 import { InitAfter } from 'services/core';
 import { RtvcStateService } from '../../services/rtvcStateService';
 import * as Sentry from '@sentry/vue';
-import { ipcRenderer } from 'electron';
+import { IPCWrapper } from 'services/ipc-wrapper';
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
@@ -374,16 +374,43 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       const audioDevices = this.audioService
         .getVisibleSourcesForCurrentScene()
         .map(source => source.name);
-      const obsLog: { filename: string; data: string } = ipcRenderer.sendSync('get-latest-obs-log');
+      const obsLog: { filename: string; data: string } = IPCWrapper.getLatestObsLog();
       const re = /([^/']*\.dll)' not loaded/g;
       const notLoadedDlls = [...obsLog.data.matchAll(re)].map(m => m[1]);
-      const obsPluginFiles = ipcRenderer.sendSync('get-obs-plugin-files-list');
+      const obsPluginFiles = IPCWrapper.getObsPluginFilesList();
       const rtvcRelatedLines = [...obsLog.data.matchAll(/.*nair-rtvc-source.*/g)].map(m => m[0]);
+      const cpuModel = IPCWrapper.getCpuModel();
+
+      /* DLL自体がロードできなかったとき:
+[
+[][36936][Info] LoadLibrary failed for 'C:/Program Files/N Air/resources/app.asar.unpacked/node_modules/obs-studio-node/obs-plugins/64bit/nair-rtvc-source.dll': A dynamic link library (DLL) initialization routine failed.,
+[][36936][Warning] Module 'C:/Program Files/N Air/resources/app.asar.unpacked/node_modules/obs-studio-node/obs-plugins/64bit/nair-rtvc-source.dll' not loaded
+]
+      */
+      /* DLLはロードできたが、rtvc.vvfxがロードできなかったとき:
+[
+[][1748][Info] [nair-rtvc-source] load rtvc at C:\Program Files\Common Files\VVFX\rtvc.vvfx,
+[][1748][Info] [nair-rtvc-source] load rtvc at C:\Program Files\N Air\resources\app.asar.unpacked\node_modules\obs-studio-node\obs-plugins\64bit\VVFX\rtvc.vvfx,
+[][1748][Error] [nair-rtvc-source] failed to load rtvc.vvfx,
+[][1748][Info] LoadLibrary failed for 'C:/Program Files/N Air/resources/app.asar.unpacked/node_modules/obs-studio-node/obs-plugins/64bit/nair-rtvc-source.dll': A dynamic link library (DLL) initialization routine failed.,
+[][1748][Warning] Module 'C:/Program Files/N Air/resources/app.asar.unpacked/node_modules/obs-studio-node/obs-plugins/64bit/nair-rtvc-source.dll' not loaded
+]
+     */
+      const failedToLoadVVFX = rtvcRelatedLines.some(line =>
+        line.includes('failed to load rtvc.vvfx'),
+      );
+      const rtvcModuleNotLoaded = rtvcRelatedLines.some(line =>
+        line.includes("nair-rtvc-source.dll' not loaded"),
+      );
+
       console.info({
         audioDevices,
         obsLog: { filename: obsLog.filename, length: obsLog.data.length, obsPluginFiles },
         notLoadedDlls,
         rtvcRelatedLines,
+        failedToLoadVVFX,
+        rtvcModuleNotLoaded,
+        cpuModel,
       });
 
       Sentry.withScope(scope => {
@@ -391,7 +418,10 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
         scope.setTags({
           'nair-rtvc-source': 'not-available',
           audioDevices: audioDevices.length,
-          obsPluginFiles: obsPluginFiles.length,
+          obsPluginFiles: obsPluginFiles.files.length,
+          failedToLoadVVFX,
+          rtvcModuleNotLoaded,
+          cpu: cpuModel,
         });
         if (notLoadedDlls.length > 0) {
           scope.setTag('obsPluginNotLoaded', notLoadedDlls.join(','));

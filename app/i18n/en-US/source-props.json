@@ -415,7 +415,7 @@
     "description": "Converts your own voice. You can blend 100 different voices to become your own original voice, or become the voice of \"Kotoyomi Near\", \"Zundamon\", or \"Kasukabe Tsumugi\".",
     "nav": {
       "voice_setting": "Voice",
-      "mic_setting": "Input",
+      "mic_setting": "Common(Mic,Song...etc)",
       "preset_voice": "Presets",
       "original_voice": "Originals",
       "remove_voice": "Remove",
@@ -471,6 +471,10 @@
       "12": "12",
       "13": "13: Conversion time is long",
       "description": "The smaller this value, the faster the conversion time, but the output may become unstable."
+    },
+    "song": {
+      "name": "Enable song mode",
+      "description": "Enable if you want to song"
     }
   },
   "vlc_source": {

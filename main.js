@@ -252,6 +252,10 @@ function initialize(crashHandler) {
   const os = require('os');
   const cpus = os.cpus();
 
+  ipcMain.on('get-cpu-model', e => {
+    e.returnValue = cpus[0].model;
+  });
+
   // Source: https://stackoverflow.com/questions/10420352/converting-file-size-in-bytes-to-human-readable-string/10420404
   // eslint-disable-next-line no-inner-declarations
   function humanFileSize(bytes, si) {

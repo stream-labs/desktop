@@ -17,21 +17,6 @@ import * as Sentry from '@sentry/vue';
 import { AppService } from 'services/app';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { Subject, Observable, merge } from 'rxjs';
-import { WindowsService } from 'services/windows';
-import {
-  cpu as systemInfoCpu,
-  graphics as systemInfoGraphics,
-  osInfo as systemInfoOsInfo,
-  uuid as systemInfoUuid,
-} from 'systeminformation';
-import {
-  totalmem as nodeTotalMem,
-  freemem as nodeFreeMem,
-  cpus as nodeCpus,
-  release as nodeOsRelease,
-} from 'os';
-import { memoryUsage as nodeMemUsage } from 'process';
-import { $t } from 'services/i18n';
 import uuid from 'uuid/v4';
 import { OnboardingService } from './onboarding';
 import { UuidService } from './uuid';
