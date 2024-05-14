@@ -29,8 +29,6 @@ export function DualOutputSourceSelector(p: IDualOutputSourceSelector) {
 
   const showHorizontalToggle = horizontalActive;
 
-  console.log(p.nodeId, v.verticalNodeId);
-
   const showVerticalToggle = v.verticalNodeId && verticalActive;
 
   const horizontalToggleMessage = useMemo(() => {
