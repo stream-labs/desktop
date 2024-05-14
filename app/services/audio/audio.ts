@@ -85,8 +85,6 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
   }
 
   protected init() {
-    // this.initVolmeterRelay();
-
     this.sourcesService.sourceAdded.subscribe(sourceModel => {
       const source = this.sourcesService.views.getSource(sourceModel.sourceId);
       if (!source.audio) return;
