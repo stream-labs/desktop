@@ -18,7 +18,16 @@ export class ImageNode extends Node<ISchema, IContext> {
   schemaVersion = 1;
 
   async save(context: IContext) {
-    const filePath = (context.sceneItem.getObsInput().settings as any).file;
+    const filePath = (context.sceneItem.getObsInput().settings as any)?.file;
+
+    if (!filePath) {
+      console.log('no filepath');
+      this.data = {
+        filename: '',
+      };
+      return;
+    }
+
     const newFileName = `${uniqueId()}${path.parse(filePath).ext}`;
 
     // Do not duplicate file if it has already been copied
@@ -29,8 +38,14 @@ export class ImageNode extends Node<ISchema, IContext> {
     context.savedAssets[filePath] = newFileName;
 
     // Copy the image file
-    const destination = path.join(context.assetsPath, newFileName);
-    fs.writeFileSync(destination, fs.readFileSync(filePath));
+    if (filePath) {
+      try {
+        const destination = path.join(context.assetsPath, newFileName);
+        fs.writeFileSync(destination, fs.readFileSync(filePath));
+      } catch (error) {
+        console.error('Error saving image node: ', error);
+      }
+    }
 
     this.data = {
       filename: newFileName,
