@@ -112,7 +112,9 @@ class FacebookEditStreamInfoModule {
   }
 
   get shouldShowGame() {
-    return !this.isUpdateMode && !this.props.isScheduleMode;
+    // this is currently broken in the fb api
+    return false;
+    // return !this.isUpdateMode && !this.props.isScheduleMode;
   }
 
   get shouldShowPrivacy() {
