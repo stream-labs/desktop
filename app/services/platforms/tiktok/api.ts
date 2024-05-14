@@ -35,12 +35,8 @@ export interface ITikTokLiveScopeResponse {
   info?: any[] | null[] | undefined[] | ITikTokGame[] | ITikTokGamesData | any;
 }
 
-export interface ITikTokGamesData {
-  platform: TPlatform | string;
-  info: {
-    categories: ITikTokGame[];
-  };
-  reason: ETikTokLiveScopeReason;
+export interface ITikTokGamesData extends ITikTokLiveScopeResponse {
+  categories: ITikTokGame[];
 }
 
 interface ITikTokGame {
@@ -60,11 +56,6 @@ export interface ITikTokUserData {
   follower_count?: number;
   following_count?: number;
   profile_deep_link?: string;
-}
-
-export interface ITikTokGamesData {
-  full_name: string;
-  game_mask_id: string;
 }
 
 export interface ITikTokError {

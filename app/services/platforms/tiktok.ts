@@ -418,12 +418,12 @@ export class TikTokService
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
 
-    return jfetch<ITikTokGamesData[]>(request)
-      .then(res => {
-        return res.map(g => ({ id: g.game_mask_id, name: g.full_name }));
+    return jfetch<ITikTokGamesData>(request)
+      .then(async res => {
+        return res.categories.map(g => ({ id: g.game_mask_id, name: g.full_name }));
       })
-      .catch(() => {
-        console.warn('Error fetching TikTok games.');
+      .catch(e => {
+        console.error('Error fetching TikTok games: ', e);
         return [];
       });
   }
