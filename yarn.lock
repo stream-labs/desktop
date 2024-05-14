@@ -1872,12 +1872,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@electron/remote@npm:2.0.8":
-  version: 2.0.8
-  resolution: "@electron/remote@npm:2.0.8"
+"@electron/remote@npm:2.1.2":
+  version: 2.1.2
+  resolution: "@electron/remote@npm:2.1.2"
   peerDependencies:
     electron: ">= 13.0.0"
-  checksum: d0ef11b3f09d789baf4330c2c021cfc1a997fc5ffdb56e8810ed7fe2fd76cda1a168c0589d2a10284a907fd3829bae14002a58b35c4881473cdd0049f07fbd63
+  checksum: 24d49aa494b12f1f791b322850f4e29ac69ec57b318d01f1b9e216807886ba1c3dcf9dc1508a18b8daf3ea3c58f8131e1dcf863ba246cfe3554c8ec872a50d10
   languageName: node
   linkType: hard
 
@@ -2787,10 +2787,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^18.11.18":
-  version: 18.16.18
-  resolution: "@types/node@npm:18.16.18"
-  checksum: d32d8a0a04cd3f5ecb361bcb42f3a07623881ac90d680e06bf626defb3c663a94860d11690babe607cfe67265eceeb8a59ba5fe40c0e49f5a1b01e0088640469
+"@types/node@npm:^20.9.0":
+  version: 20.12.8
+  resolution: "@types/node@npm:20.12.8"
+  dependencies:
+    undici-types: ~5.26.4
+  checksum: 84d4876d95792a9567d2cc5a2c48db7028c397820e842cd65e2f848c23dd4b868b7131bda8eb66a1729d4944289070153d6180048de5bd155b35de421283c433
   languageName: node
   linkType: hard
 
@@ -6467,16 +6469,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron@npm:25.9.3":
-  version: 25.9.3
-  resolution: "electron@npm:25.9.3"
+"electron@npm:29.3.1":
+  version: 29.3.1
+  resolution: "electron@npm:29.3.1"
   dependencies:
     "@electron/get": ^2.0.0
-    "@types/node": ^18.11.18
+    "@types/node": ^20.9.0
     extract-zip: ^2.0.1
   bin:
     electron: cli.js
-  checksum: 855aff79ff14843ea8a853f534a7f442b02891b29037f0c21b52180ee36e827515dc0dd3e1e472e1041c2f2b4b23ebd319e7dd42a7c57955741071572003f11d
+  checksum: 49d54a56ffd7f4c60a2fba8f84a57041a70442dc6d774b750a52ca08943509b099b90861139d4c281926038cdbb4fb1fe8d9a56a57ad93eaeb90c66017062d0f
   languageName: node
   linkType: hard
 
@@ -13280,7 +13282,7 @@ __metadata:
     "@babel/plugin-proposal-decorators": 7.17.2
     "@babel/preset-env": 7.22.10
     "@electron/notarize": ^2.3.0
-    "@electron/remote": 2.0.8
+    "@electron/remote": 2.1.2
     "@octokit/app": 14.0.0
     "@octokit/request": 8.1.1
     "@octokit/rest": 20.0.1
@@ -13332,7 +13334,7 @@ __metadata:
     css-element-queries: 1.2.3
     css-loader: 2.1.1
     dotenv: 8.2.0
-    electron: 25.9.3
+    electron: 29.3.1
     electron-builder: 22.14.5
     electron-chromedriver: 25.1.1
     electron-devtools-installer: 3.1.1
