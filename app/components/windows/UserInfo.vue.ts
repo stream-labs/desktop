@@ -10,6 +10,7 @@ import { NicoliveCommentViewerService } from 'services/nicolive-program/nicolive
 import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
 import { getDisplayName } from 'services/nicolive-program/ChatMessage/getDisplayName';
 import { NicoliveModeratorsService } from 'services/nicolive-program/nicolive-moderators';
+import { NicoliveCommentFilterService } from 'services/nicolive-program/nicolive-comment-filter';
 import { WindowsService } from 'services/windows';
 import { HostsService } from 'services/hosts';
 import Vue from 'vue';
@@ -20,7 +21,6 @@ import GiftComment from '../nicolive-area/comment/GiftComment.vue';
 import NicoadComment from '../nicolive-area/comment/NicoadComment.vue';
 import SystemMessage from '../nicolive-area/comment/SystemMessage.vue';
 import electron from 'electron';
-import { NicoliveCommentFilterService } from 'app-services';
 import {
   NicoliveFailure,
   openErrorDialogFromFailure,
