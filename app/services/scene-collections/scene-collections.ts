@@ -400,6 +400,13 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     try {
       await this.overlaysPersistenceService.loadOverlay(filePath);
       this.setupDefaultAudio();
+
+      // Whenever an overlay is installed, confirm if it is a Dual Output collection.
+      // Single output collections installed in dual output mode should be converted to
+      // Dual Output collections.
+      if (this.activeCollection?.sceneNodeMaps || this.dualOutputService.views.dualOutputMode) {
+        this.dualOutputService.confirmOrCreateDualOutputCollection();
+      }
     } catch (e: unknown) {
       // We tried really really hard :(
       console.error('Overlay installation failed', e);

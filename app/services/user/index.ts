@@ -454,6 +454,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       }
 
       if (['account_merged', 'account_unlinked'].includes(event.type)) {
+        if (!this.isLoggedIn) return;
+
         await this.updateLinkedPlatforms();
 
         const message =

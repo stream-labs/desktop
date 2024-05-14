@@ -38,6 +38,7 @@ export class Scene {
   id: string;
   name: string;
   nodes: (ISceneItem | ISceneItemFolder)[];
+  nodeMap?: Dictionary<string>;
   resourceId: string;
 
   private _resourceId: string;
@@ -138,6 +139,10 @@ export class Scene {
     return this.state.nodes.map(item => item.id);
   }
 
+  getNodeMap(): Dictionary<string> | undefined {
+    return this.state?.nodeMap;
+  }
+
   /**
    * After a scene has been opened in dual output mode, the vertical nodes
    * must be filtered. Any scene with dual output nodes will use horizontal nodes
@@ -229,9 +234,6 @@ export class Scene {
     if (source.forceHidden) obsSceneItem.visible = false;
 
     const display = options?.display ?? 'horizontal';
-    // assign context to scene item
-    const context =
-      this.videoSettingsService.contexts[display] ?? this.videoSettingsService.contexts.horizontal;
 
     this.ADD_SOURCE_TO_SCENE(
       sceneItemId,
@@ -242,7 +244,10 @@ export class Scene {
     );
     const sceneItem = this.getItem(sceneItemId)!;
 
-    sceneItem.setSettings({ ...sceneItem.getSettings(), display, output: context });
+    // assign context to scene item
+    const context =
+      this.videoSettingsService.contexts[display] ?? this.videoSettingsService.contexts.horizontal;
+    sceneItem.setSettings({ ...sceneItem.getSettings(), output: context, display });
 
     // Default is to select
     if (options.select == null) options.select = true;
@@ -434,6 +439,10 @@ export class Scene {
     this.reconcileNodeOrderWithObs();
   }
 
+  setNodeMap(nodeMap: Dictionary<string>) {
+    this.SET_NODE_MAP(nodeMap);
+  }
+
   /**
    * Makes sure all scene items are in the correct order in OBS.
    */
@@ -500,7 +509,12 @@ export class Scene {
     let itemIndex = 0;
     nodes.forEach(nodeModel => {
       const display = nodeModel?.display ?? 'horizontal';
+      if (display === 'vertical' && !this.videoSettingsService.contexts.vertical) {
+        this.videoSettingsService.establishVideoContext('vertical');
+      }
+
       const obsSceneItem = obsSceneItems[itemIndex];
+
       if (nodeModel.sceneNodeType === 'folder') {
         this.createFolder(nodeModel.name, { id: nodeModel.id, display });
       } else {
@@ -511,6 +525,12 @@ export class Scene {
           display,
           obsSceneItem.position,
         );
+
+        const context = this.videoSettingsService.contexts[display];
+        obsSceneItem.video = context as obs.IVideo;
+
+        nodeModel.position = obsSceneItem.position;
+
         const item = this.getItem(nodeModel.id)!;
         item.loadItemAttributes(nodeModel);
         itemIndex++;
@@ -697,5 +717,10 @@ export class Scene {
     const childNodeState = this.state.nodes.find(node => node.id === childNodeId);
     assertIsDefined(childNodeState);
     childNodeState.parentId = parentFolderId;
+  }
+
+  @mutation()
+  private SET_NODE_MAP(nodeMap: Dictionary<string>) {
+    this.state.nodeMap = nodeMap;
   }
 }

@@ -310,8 +310,6 @@ export class VideoService extends Service {
   @Inject() dualOutputService: DualOutputService;
   @Inject() sourcesService: SourcesService;
 
-  displayNameToSceneSourceIdMap: Map<string, string> = new Map();
-
   init() {
     this.settingsService.loadSettingsIntoStore();
   }
@@ -337,21 +335,6 @@ export class VideoService extends Service {
         baseWidth: baseResolutions.vertical.baseWidth,
         baseHeight: baseResolutions.vertical.baseHeight,
       },
-    };
-  }
-
-  get baseWidth() {
-    return this.videoSettingsService.baseResolutions.horizontal.baseWidth;
-  }
-
-  get baseHeight() {
-    return this.videoSettingsService.baseResolutions.horizontal.baseHeight;
-  }
-
-  get baseResolution() {
-    return {
-      baseWidth: this.baseWidth,
-      baseHeight: this.baseHeight,
     };
   }
 
@@ -401,12 +384,6 @@ export class VideoService extends Service {
         false,
         context,
       );
-
-      const source = this.sourcesService.views.getSource(sourceId);
-      if (source && source.type === 'scene') {
-        this.displayNameToSceneSourceIdMap.set(name, sourceId);
-        obs.Global.addSceneToBackstage(source.getObsInput());
-      }
     } else {
       obs.NodeObs.OBS_content_createDisplay(
         electronWindow.getNativeWindowHandle(),
@@ -436,14 +413,6 @@ export class VideoService extends Service {
 
   destroyOBSDisplay(name: string) {
     obs.NodeObs.OBS_content_destroyDisplay(name);
-
-    const sourceId = this.displayNameToSceneSourceIdMap.get(name);
-    if (sourceId) {
-      const source = this.sourcesService.views.getSource(sourceId);
-      if (source && source.type === 'scene') {
-        obs.Global.removeSceneFromBackstage(source.getObsInput());
-      }
-    }
   }
 
   getOBSDisplayPreviewOffset(name: string): IVec2 {

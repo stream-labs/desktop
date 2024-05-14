@@ -24,6 +24,7 @@ export abstract class BaseInput<
   abstract readonly title: string;
   abstract readonly metadata: TMetadataType;
   onInput: Function = null;
+  onBlur: Function = null;
 
   /**
    * true if the component listens and re-emits child-inputs events
@@ -72,6 +73,14 @@ export abstract class BaseInput<
       (this.parentInput && !this.parentInput.delegateChildrenEvents);
 
     if (needToSendEventToForm) this.form.emitInput(eventData, event);
+  }
+
+  emitBlur(event?: any) {
+    this.$emit('blur', event);
+
+    if (this.onBlur) this.onBlur();
+
+    this.form.emitBlur(event);
   }
 
   getValidations() {
