@@ -86,7 +86,7 @@
   },
   "dependencies": {
     "@n-air-app/n-voice-package": "^1.0.2",
-    "@n-air-app/nicolive-comment-protobuf": "^0.0.2",
+    "@n-air-app/nicolive-comment-protobuf": "^0.0.3",
     "@sentry/electron": "4.23.0",
     "@sentry/vue": "7.110.0",
     "archiver": "^5.3.1",
