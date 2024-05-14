@@ -53,6 +53,7 @@ import { MarkersService } from 'services/markers';
 import { byOS, OS } from 'util/operating-systems';
 import { DualOutputService } from 'services/dual-output';
 import { capitalize } from 'lodash';
+import { tiktokErrorMessages } from 'services/platforms/tiktok/api';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -205,7 +206,6 @@ export class StreamingService
         try {
           await service.prepopulateInfo();
         } catch (e: unknown) {
-          console.log('e ', e);
           // cast all PLATFORM_REQUEST_FAILED errors to PREPOPULATE_FAILED
           if (e instanceof StreamError) {
             e.type =
@@ -545,6 +545,28 @@ export class StreamingService
       await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform, context));
     } catch (e: unknown) {
       this.handleSetupPlatformError(e, platform);
+
+      if (platform === 'tiktok') {
+        const error = e as StreamError;
+        const message = tiktokErrorMessages(error.type);
+        this.outputErrorOpen = true;
+
+        remote.dialog
+          .showMessageBox(Utils.getMainWindow(), {
+            title: $t('TikTok Stream Error'),
+            type: 'error',
+            message,
+            buttons: [$t('OK')],
+          })
+          .then(() => {
+            this.outputErrorOpen = false;
+          })
+          .catch(() => {
+            this.outputErrorOpen = false;
+          });
+
+        this.windowsService.actions.closeChildWindow();
+      }
     }
   }
 

@@ -35,6 +35,7 @@ interface ITikTokServiceState extends IPlatformState {
   settings: ITikTokStartStreamSettings;
   broadcastId: string;
   username: string;
+  error?: string | null;
 }
 
 interface ITikTokStartStreamSettings {
@@ -149,10 +150,12 @@ export class TikTokService
       try {
         streamInfo = await this.startStream(ttSettings);
         if (!streamInfo?.id) {
+          await this.handleOpenLiveManager();
           throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED');
         }
       } catch (error: unknown) {
         this.SET_LIVE_SCOPE('denied');
+        await this.handleOpenLiveManager();
         throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED', error as any);
       }
 
