@@ -35,7 +35,13 @@ import { RestreamService, TOutputOrientation } from 'services/restream';
 import Utils from 'services/utils';
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
-import { createStreamError, IStreamError, StreamError, TStreamErrorType } from './stream-error';
+import {
+  createStreamError,
+  errorTypes,
+  IStreamError,
+  StreamError,
+  TStreamErrorType,
+} from './stream-error';
 import { authorizedHeaders } from 'util/requests';
 import { HostsService } from '../hosts';
 import { assertIsDefined, getDefined } from 'util/properties-type-guards';
@@ -542,7 +548,8 @@ export class StreamingService
 
       if (platform === 'tiktok') {
         const error = e as StreamError;
-        const message = tiktokErrorMessages(error.type);
+        const message =
+          tiktokErrorMessages(error.type) ?? errorTypes['PLATFORM_REQUEST_FAILED']?.message ?? '';
         this.outputErrorOpen = true;
 
         remote.dialog
