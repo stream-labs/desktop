@@ -54,6 +54,7 @@ import { byOS, OS } from 'util/operating-systems';
 import { DualOutputService } from 'services/dual-output';
 import { capitalize } from 'lodash';
 import { tiktokErrorMessages } from 'services/platforms/tiktok/api';
+import { TikTokService } from 'services/platforms/tiktok';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -98,6 +99,7 @@ export class StreamingService
   @Inject() private videoSettingsService: VideoSettingsService;
   @Inject() private markersService: MarkersService;
   @Inject() private dualOutputService: DualOutputService;
+  @Inject() private tikTokService: TikTokService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
@@ -556,9 +558,12 @@ export class StreamingService
             title: $t('TikTok Stream Error'),
             type: 'error',
             message,
-            buttons: [$t('OK')],
+            buttons: [$t('Open TikTok Live Center'), $t('Close')],
           })
-          .then(() => {
+          .then(({ response }) => {
+            if (response === 0) {
+              this.tikTokService.handleOpenLiveManager();
+            }
             this.outputErrorOpen = false;
           })
           .catch(() => {
