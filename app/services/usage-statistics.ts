@@ -22,13 +22,15 @@ export type RtvcEventLog = {
   param?:
     | {
         [name in 'preset0' | 'preset1' | 'preset2']: {
-          pitch_shift: number;
+          pitch_shift?: number;
+          pitch_shift_song?: number;
         };
       }
     | {
         [name in 'manual0' | 'manual1' | 'manual2' | 'manual3' | 'manual4']: {
           name: string;
-          pitch_shift: number;
+          pitch_shift?: number;
+          pitch_shift_song?: number;
           amount: number;
           primary_voice: number;
           secondary_voice: number;

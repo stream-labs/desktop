@@ -10,7 +10,7 @@
     <div v-if="tab == 0" class="content">
       <div class="nav-menu">
         <div class="nav-menu-heading">{{
-        $t('source-props.nair-rtvc-source.nav.preset_voice') }}</div>
+          $t('source-props.nair-rtvc-source.nav.preset_voice') }}</div>
         <ul class="nav-menu-child">
           <li v-for="v in presetList" :key="v.value" class="nav-item" :class="{ active: v.value === currentIndex }">
             <div class="nav-item-content" @click="onSelect(v.value)">
@@ -24,7 +24,7 @@
         </ul>
 
         <div class="nav-menu-heading">{{
-        $t('source-props.nair-rtvc-source.nav.original_voice') }} ({{ manualList.length
+          $t('source-props.nair-rtvc-source.nav.original_voice') }} ({{ manualList.length
           }}/{{ manualMax }})
           <button v-if="canAdd" @click="onAdd()" class="indicator"
             v-tooltip.bottom="$t('source-props.nair-rtvc-source.nav.original_voice_add')">
@@ -77,14 +77,15 @@
               <p class="name">{{ name }}</p>
               <p class="description">{{ description }}</p>
               <button class="button button--secondary" @click="playSample(label)"><i class="icon-speaker"></i>{{
-        $t('source-props.nair-rtvc-source.preset.play_sample') }}</button>
+                $t('source-props.nair-rtvc-source.preset.play_sample') }}</button>
             </div>
           </div>
           <div class="section">
             <div class="section-heading-wrapper">
               <div class="section-heading">{{ $t('source-props.nair-rtvc-source.container.voice_setting') }}</div>
             </div>
-            <div class="input-container">
+
+            <div v-if="!isSongMode" class="input-container">
               <div class="input-label">
                 <label>{{ $t('source-props.nair-rtvc-source.pitch_shift.name') }}
                   <i class="icon-help icon-tooltip"
@@ -93,9 +94,23 @@
                 <label> {{ pitchShift.toFixed(0) + ' cent' }} </label>
               </div>
               <div class="input-wrapper">
-                <VueSlider class="slider" v-model="pitchShift" :min="-1200" :max="1200" :interval="1" tooltip="none" />
+                <VueSlider class="slider" v-model="pitchShift" :min=-1200 :max=1200 :interval=1 tooltip="none" />
               </div>
             </div>
+
+            <div v-if="isSongMode" class="input-container">
+              <div class="input-label">
+                <label>{{ $t('source-props.nair-rtvc-source.pitch_shift.name') }}
+                  <i class="icon-help icon-tooltip"
+                    v-tooltip.bottom="$t('source-props.nair-rtvc-source.preset.description')"></i>
+                </label>
+                <label> {{ labelForPitchSong(pitchShiftSong) }} </label>
+              </div>
+              <div class="input-wrapper">
+                <VueSlider class="slider" v-model="pitchShiftSong" :min=-1200 :max=1200 :interval=1200 tooltip="none" />
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -116,20 +131,29 @@
               <div class="section-heading">{{ $t('source-props.nair-rtvc-source.container.voice_setting') }}</div>
               <div class="button-wrapper">
                 <button class="button--text" @click="onRandom">{{
-        $t('source-props.nair-rtvc-source.container.make_random.name') }} </button>
+                  $t('source-props.nair-rtvc-source.container.make_random.name') }} </button>
                 <i class="icon-help icon-tooltip"
                   v-tooltip.bottom="$t('source-props.nair-rtvc-source.container.make_random.description')"></i>
               </div>
             </div>
 
             <div class="input-container">
-              <div class="input-wrapper">
+              <div v-if="!isSongMode" class="input-wrapper">
                 <div class="input-label">
                   <label>{{ $t('source-props.nair-rtvc-source.pitch_shift.name') }}</label>
                   <label> {{ pitchShift.toFixed(0) + ' cent' }} </label>
                 </div>
-                <VueSlider class="slider" v-model="pitchShift" :min="-1200" :max="1200" :interval="1" tooltip="none" />
+                <VueSlider class="slider" v-model="pitchShift" :min=-1200 :max=1200 :interval=1 tooltip="none" />
               </div>
+
+              <div v-if="isSongMode" class="input-wrapper">
+                <div class="input-label">
+                  <label>{{ $t('source-props.nair-rtvc-source.pitch_shift.name') }}</label>
+                  <label> {{ labelForPitchSong(pitchShiftSong) }} </label>
+                </div>
+                <VueSlider class="slider" v-model="pitchShiftSong" :min=-1200 :max=1200 :interval=1200 tooltip="none" />
+              </div>
+
               <div class="input-wrapper">
                 <div class="input-label"><label>{{ $t('source-props.nair-rtvc-source.primary_voice.name') }}</label>
                 </div>
@@ -162,14 +186,16 @@
     <div v-if="tab == 1" class="content">
       <div class="content-container">
         <div class="section">
-          <div class="input-container">
 
+          <div class="input-container">
             <div class="input-label"><label>{{ $t('source-props.nair-rtvc-source.device.name') }}</label></div>
             <div class="input-wrapper">
               <multiselect v-model="deviceModel" :options="deviceList" label="description" trackBy="value"
                 :allow-empty="false" :placeholder="$t('settings.listPlaceholder')" />
             </div>
+          </div>
 
+          <div class="input-container">
             <div class="input-label">
               <label>{{ $t('source-props.nair-rtvc-source.latency.name') }}
                 <i class="icon-help icon-tooltip wide"
@@ -179,9 +205,25 @@
               <multiselect v-model="latencyModel" :options="latencyList" label="description" trackBy="value"
                 :allow-empty="false" :placeholder="$t('settings.listPlaceholder')" />
             </div>
-
           </div>
+
+          <div class="input-container">
+            <div class="input-wrapper">
+              <div class="row">
+                <div class="name">{{ $t('source-props.nair-rtvc-source.song.name') }}
+                  <i class="icon-help icon-tooltip wide"
+                    v-tooltip.top="$t('source-props.nair-rtvc-source.song.description')"></i>
+                </div>
+                <div class="value">
+                  <input v-model="isSongMode" type="checkbox" class="toggle-button" />
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
+
+
       </div>
     </div>
 
@@ -623,6 +665,7 @@
   border-bottom: 1px solid var(--color-border-light);
 
   button {
+    flex-basis: 0;
     flex-grow: 1;
     height: 100%;
   }
@@ -643,5 +686,24 @@
 
 .toggle-wrapper {
   margin-right: auto;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+}
+
+.name {
+  flex-grow: 1;
+  font-size: @font-size4;
+  color: var(--color-text);
+}
+
+.value {
+  display: flex;
+  align-items: center;
+  color: var(--color-text);
 }
 </style>
