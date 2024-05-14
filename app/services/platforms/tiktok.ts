@@ -509,11 +509,10 @@ export class TikTokService
     }
   }
 
-  async handleOpenLiveManager(): Promise<void> {
+  async handleOpenLiveManager(): Promise<void | boolean> {
     // no need to open window for tests
-    if (Utils.isTestMode()) return;
-
-    if (!this.liveStreamingEnabled) return;
+    // but confirm the function has run
+    if (Utils.isTestMode()) return true;
 
     // keep main window on top to prevent flicker when opening url
     const win = Utils.getMainWindow();
