@@ -220,8 +220,5 @@
   "Error generating TikTok stream credentials": "Error generating TikTok stream credentials",
   "You are already live on a another device": "You are already live on a another device",
   "Connect your TikTok account to stream to TikTok and one additional platform for free.": "Connect your TikTok account to stream to TikTok and one additional platform for free.",
-  "While updating your Twitch channel info, some tags were removed due to moderation rules: %{tags}": "While updating your Twitch channel info, some tags were removed due to moderation rules: %{tags}",
-  "Content Classification": "Content Classification",
-  "Stream features branded content": "Stream features branded content",
   "Primary Chat": "Primary Chat"
 }
