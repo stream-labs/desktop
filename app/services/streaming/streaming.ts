@@ -554,7 +554,7 @@ export class StreamingService
           })
           .then(({ response }) => {
             if (response === 0) {
-              this.tikTokService.handleOpenLiveManager();
+              this.tikTokService.handleOpenLiveManager(true);
             }
             this.outputErrorOpen = false;
           })

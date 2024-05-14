@@ -509,10 +509,15 @@ export class TikTokService
     }
   }
 
-  async handleOpenLiveManager(): Promise<void | boolean> {
+  async handleOpenLiveManager(visible?: true): Promise<void | boolean> {
     // no need to open window for tests
     // but confirm the function has run
     if (Utils.isTestMode()) return true;
+
+    if (visible) {
+      await remote.shell.openExternal(this.dashboardUrl);
+      return;
+    }
 
     // keep main window on top to prevent flicker when opening url
     const win = Utils.getMainWindow();
