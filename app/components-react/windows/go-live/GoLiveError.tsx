@@ -199,7 +199,6 @@ export default function GoLiveError() {
   function renderTikTokOAuthExpiredError(error: IStreamError) {
     // If error authenticating with TikTok, prompt re-login
     assertIsDefined(error.platform);
-    const platformName = getPlatformService(error.platform).displayName;
 
     return (
       <MessageLayout error={error} hasButton={true}>
