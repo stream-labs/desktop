@@ -324,8 +324,29 @@ function LiveDock(p: { onLeft: boolean }) {
     });
   }
 
-  const showTiktokInfo =
-    visibleChat === 'tiktok' || Services.UserService.state.auth!.primaryPlatform === 'tiktok';
+  const chat = useMemo(() => {
+    const primaryChat = Services.UserService.state.auth!.primaryPlatform;
+    const showTiktokInfo = visibleChat === 'tiktok' || primaryChat === 'tiktok';
+
+    if (showTiktokInfo && !isRestreaming) {
+      return <TikTokChatInfo />;
+    }
+
+    const showInstagramInfo = primaryChat === 'instagram';
+    if (showInstagramInfo) {
+      // FIXME: empty tab
+      return <></>;
+    }
+
+    return (
+      <Chat
+        restream={isRestreaming && visibleChat === 'restream'}
+        key={visibleChat}
+        visibleChat={visibleChat}
+        setChat={setChat}
+      />
+    );
+  }, [Services.UserService.state.auth!.primaryPlatform, visibleChat]);
 
   return (
     <div
@@ -433,18 +454,7 @@ function LiveDock(p: { onLeft: boolean }) {
                       )}
                     </div>
                   )}
-                  {!applicationLoading &&
-                    !collapsed &&
-                    (showTiktokInfo && !isRestreaming ? (
-                      <TikTokChatInfo />
-                    ) : (
-                      <Chat
-                        restream={isRestreaming && visibleChat === 'restream'}
-                        key={visibleChat}
-                        visibleChat={visibleChat}
-                        setChat={setChat}
-                      />
-                    ))}
+                  {!applicationLoading && !collapsed && chat}
                   {!['default', 'restream'].includes(visibleChat) && (
                     <PlatformAppPageView
                       className={styles.liveDockPlatformAppWebview}
