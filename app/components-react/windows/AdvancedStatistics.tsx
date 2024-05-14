@@ -21,15 +21,14 @@ export default function AdvancedStatistics() {
     MediaBackupService,
   } = Services;
 
-  const { notifications, streamingStatus, syncStatus } = useVuex(() => ({
+  const { notifications, streamingStatus, syncStatus, streamQuality } = useVuex(() => ({
     notifications: NotificationsService.views
       .getAll()
       .filter(notification => notification.subType !== ENotificationSubType.DEFAULT),
+    streamQuality: PerformanceService.views.streamQuality,
     streamingStatus: StreamingService.views.streamingStatus,
     syncStatus: MediaBackupService.views.globalSyncStatus,
   }));
-
-  const stats = useRealmObject(PerformanceService.state);
 
   // Forces a refresh on notification labels every minute
   useRenderInterval(() => {}, 60 * 1000);
@@ -53,10 +52,7 @@ export default function AdvancedStatistics() {
       };
     }
 
-    if (
-      streamingStatus === EStreamingState.Reconnecting ||
-      stats.streamQuality === EStreamQuality.POOR
-    ) {
+    if (streamingStatus === EStreamingState.Reconnecting || streamQuality === EStreamQuality.POOR) {
       return {
         type: 'error',
         description: $t('Your stream is experiencing issues'),
@@ -64,7 +60,7 @@ export default function AdvancedStatistics() {
       };
     }
 
-    if (stats.streamQuality === EStreamQuality.FAIR) {
+    if (streamQuality === EStreamQuality.FAIR) {
       return {
         type: 'warning',
         description: $t('Your stream is experiencing minor issues'),
