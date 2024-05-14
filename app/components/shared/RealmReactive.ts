@@ -11,14 +11,16 @@ import Vue from 'vue';
 export function realmReactive<T extends typeof RealmObject>(klass: T) {
   const obj = new klass(klass.schema);
 
-  let listener: (vue: Vue) => void;
+  let listener: () => void;
 
   return {
     mounted() {
+      // @ts-ignore: typings incorrect
+      const vue: Vue = this;
       if (!listener) {
-        listener = function (vue: Vue) {
+        listener = function () {
           vue.$forceUpdate();
-        }.bind({}, this);
+        };
       }
 
       obj.realmModel.addListener(listener);

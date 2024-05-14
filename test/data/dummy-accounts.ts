@@ -97,16 +97,18 @@ export const instagramUser1: ITestUser = {
  * Twitter
  */
 
-export const twitterUser1: ITestUser = {
-  email: 'twitterUser4@email.com',
-  workerId: 'twitterWorkerId4',
-  updated: 'twitterUpdatedId4',
-  username: 'twitterUser4',
+export const twitterUser1: IDummyTestUser = {
+  email: 'twitterUser1@email.com',
+  workerId: 'twitterWorkerId1',
+  updated: 'twitterUpdatedId1',
+  username: 'twitterUser1',
   type: 'twitter',
-  id: 'twitterId4',
-  token: 'twitterToken4',
-  apiToken: 'twitterApiToken4',
-  widgetToken: 'twitterWidgetToken4',
+  id: 'twitterId1',
+  token: 'twitterToken1',
+  apiToken: 'twitterApiToken1',
+  serverUrl: 'twitterServerUrl1',
+  streamKey: 'twitterStreamKey1',
+  widgetToken: 'twitterWidgetToken1',
 };
 
 /**

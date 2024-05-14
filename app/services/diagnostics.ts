@@ -988,8 +988,8 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
     const restreamVertical =
       platforms.vertical.length + destinations.vertical.length > 1 ? 'Yes' : 'No';
 
-    const numHorizontal = this.dualOutputService.views.horizontalNodeIds.length;
-    const numVertical = this.dualOutputService.views.horizontalNodeIds.length;
+    const numHorizontal = this.dualOutputService.views.horizontalNodeIds?.length;
+    const numVertical = this.dualOutputService.views.verticalNodeIds?.length;
 
     if (numHorizontal !== numVertical) {
       this.logProblem(
