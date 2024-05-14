@@ -13,7 +13,7 @@ import namingHelpers from 'util/NamingHelpers';
 import uuid from 'uuid/v4';
 import { DualOutputService } from 'services/dual-output';
 import { TDisplayType } from 'services/settings-v2/video';
-import { ViewHandler } from 'services/core';
+import { InitAfter, ViewHandler } from 'services/core';
 
 export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
 
@@ -21,7 +21,6 @@ export interface IScene {
   id: string;
   name: string;
   nodes: (ISceneItem | ISceneItemFolder)[];
-  nodeMap?: Dictionary<string>;
 }
 
 export interface ISceneNodeAddOptions {
@@ -57,7 +56,6 @@ export interface IScenesState {
   activeSceneId: string;
   displayOrder: string[];
   scenes: Dictionary<IScene>;
-  nodeMap?: Dictionary<string>;
 }
 
 export interface ISceneCreateOptions {
@@ -212,10 +210,10 @@ class ScenesViews extends ViewHandler<IScenesState> {
     return null;
   }
 
-  getSceneNodesBySceneId(sceneId: string): TSceneNode[] | undefined {
+  getSceneItemsBySceneId(sceneId: string): SceneItem[] | undefined {
     const scene: Scene | null = this.getScene(sceneId);
     if (!scene) return;
-    return scene.getNodes();
+    return scene.getItems();
   }
 
   /**
@@ -262,12 +260,9 @@ class ScenesViews extends ViewHandler<IScenesState> {
 
     return false;
   }
-
-  getNodeMap(): Dictionary<string> | undefined {
-    return this.state.nodeMap;
-  }
 }
 
+@InitAfter('DualOutputService')
 export class ScenesService extends StatefulService<IScenesState> {
   @Inject() private dualOutputService: DualOutputService;
 
