@@ -242,11 +242,11 @@
         },
         "ALREADY_EXISTS": {
           "title": "ALREADY_EXISTS",
-          "message": "すでにモデレータ費として登録済みです(TODO 翻訳)"
+          "message": "すでにモデレーターとして登録済みです(TODO 翻訳)"
         },
         "MAX": {
           "title": "MAX",
-          "message": "登録上限が人数に達しているため、登録できませんでした(TODO 翻訳)"
+          "message": "登録上限が人数に達しているため、モデレーターに登録できませんでした(TODO 翻訳)"
         }
       },
       "removeModerator": {
