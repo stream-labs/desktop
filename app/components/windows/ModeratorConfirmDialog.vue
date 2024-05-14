@@ -2,7 +2,7 @@
   <modal-layout :show-controls="false" :customControls="true">
     <div class="content" slot="content">
       <div v-if="operation === 'add'">
-        <p class="confirm-title">{{ `${userName}さんをモデレーターに追加しますか?` }}</p>
+        <p class="confirm-title"><span class="text-ellipsis">{{userName}}</span><span class="text-suffix">さんをモデレーターに追加しますか？</span></p>
         <p class="confirm-description">追加すると視聴中または視聴を開始した追加対象のユーザーに通知されます</p>
         <a @click="openModeratorHelpPage"
         class="text-link">
@@ -11,7 +11,7 @@
         </a>
       </div>
       <div v-else-if="operation === 'remove'">
-        <p class="confirm-title">{{ `${userName}さんをモデレーターから削除しますか?` }}</p>
+        <p class="confirm-title"><span class="text-ellipsis">{{userName}}</span><span class="text-suffix">さんをモデレーターから削除しますか？</span></p>
         <p class="confirm-description">削除されたことは削除対象のユーザーに通知されません</p>
       </div>
     </div>
@@ -36,6 +36,7 @@
 }
 
 .confirm-title {
+  display: flex;
   margin-bottom: 16px;
   font-size: @font-size5;
   line-height: @font-line-height-normal;
@@ -53,10 +54,10 @@
   display: flex;
   align-items: center;
   margin: 0;
+}
 
-  // TODO
-
-
+.text-suffix {
+  flex-shrink: 0;
 }
 
 </style>
