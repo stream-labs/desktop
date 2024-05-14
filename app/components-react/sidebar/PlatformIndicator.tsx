@@ -46,6 +46,8 @@ export default function PlatformIndicator({ platform }: IPlatformIndicatorProps)
 }
 
 const SinglePlatformIndicator = ({ platform }: Pick<IPlatformIndicatorProps, 'platform'>) => {
+  const username = platform?.type === 'instagram' ? undefined : platform?.username;
+
   return (
     <>
       {platform && (
@@ -57,7 +59,7 @@ const SinglePlatformIndicator = ({ platform }: Pick<IPlatformIndicatorProps, 'pl
           )}
         />
       )}
-      <span className={styles.username}>{platform?.username || $t('Log Out')}</span>
+      <span className={styles.username}>{username || $t('Log Out')}</span>
       <i className={cx('icon-logout', styles.loginArrow)} />
     </>
   );
