@@ -50,15 +50,15 @@ export default function GameSelector(p: TProps) {
     if (!selectedGameName) return;
     const game = await platformService.fetchGame(selectedGameName);
     if (!game || game.name !== selectedGameName) return;
-    setGames(games.map(opt =>
-      opt.value === selectedGameId ? { ...opt, image: game.image } : opt,
-    ));
+    setGames(
+      games.map(opt => (opt.value === selectedGameId ? { ...opt, image: game.image } : opt)),
+    );
   }
 
   async function onSearch(searchString: string) {
     if (searchString.length < 2) return;
     const games = (await fetchGames(searchString)).map(g => ({
-      value: platform === 'trovo' ? g.id : g.name,
+      value: ['trovo', 'tiktok'].includes(platform) ? g.id : g.name,
       label: g.name,
       image: g.image,
     }));

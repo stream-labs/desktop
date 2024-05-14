@@ -309,7 +309,7 @@ export class TikTokService
     const body = new FormData();
     body.append('title', opts.title);
     body.append('device_platform', getOS());
-    body.append('category', opts.game);
+    body.append('game_mask_id', opts.game);
     const request = new Request(url, { headers, method: 'POST', body });
 
     return jfetch<ITikTokStartStreamResponse>(request);
@@ -420,7 +420,9 @@ export class TikTokService
 
     return jfetch<ITikTokGamesData>(request)
       .then(async res => {
-        return res.categories.map(g => ({ id: g.game_mask_id, name: g.full_name }));
+        return await Promise.all(
+          res.categories.map(g => ({ id: g.game_mask_id, name: g.full_name })),
+        );
       })
       .catch(e => {
         console.error('Error fetching TikTok games: ', e);
