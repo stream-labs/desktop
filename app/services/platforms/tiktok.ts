@@ -309,7 +309,8 @@ export class TikTokService
     const body = new FormData();
     body.append('title', opts.title);
     body.append('device_platform', getOS());
-    body.append('game_mask_id', opts.game);
+    body.append('category', opts.game);
+
     const request = new Request(url, { headers, method: 'POST', body });
 
     return jfetch<ITikTokStartStreamResponse>(request);
