@@ -84,6 +84,7 @@
             <div class="item-comment" v-if="item.comment_body" :title="item.comment_body">
               {{ item.comment_body }}
             </div>
+            <div class="item-date" :title="item.register_by" :v-if="item.register_by">{{ item.register_by }}</div>
             <div class="item-date" :title="item.register_date">{{ item.register_date }}</div>
           </div>
           <button

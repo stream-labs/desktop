@@ -187,7 +187,7 @@ export default class CommentFilter extends Vue {
           body: getBody(item),
           register_date: `登録日時: ${new Date(item.createdAt).toLocaleString()}`,
           comment_body: item.memo && `コメント: ${item.memo}`,
-          ...(isBroadcaster(item) ? {} : { user_id: item.userId, user_name: item.userName }),
+          ...(isBroadcaster(item) ? {} : { register_by: `登録者名: ${item.userName}` }),
         };
       });
   }
