@@ -187,7 +187,15 @@ export default class UserInfo extends Vue {
       });
   }
   async unBlockUser() {
-    await this.nicoliveCommentFilterService.deleteFilters([this.userId]).catch(e => {
+    const filterRecord = this.nicoliveCommentFilterService.state.filters.find(
+      filter => filter.type === 'user' && filter.body === this.userId,
+    );
+    if (!filterRecord) {
+      console.warn('unBlockUser: block user filter not found', this.userId);
+      return;
+    }
+
+    await this.nicoliveCommentFilterService.deleteFilters([filterRecord.id]).catch(e => {
       if (e instanceof NicoliveFailure) {
         openErrorDialogFromFailure(e);
       }
