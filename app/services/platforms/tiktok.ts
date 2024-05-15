@@ -190,7 +190,9 @@ export class TikTokService
 
   async afterGoLive(): Promise<void> {
     // open url if stream successfully started
-    await this.handleOpenLiveManager();
+    if (this.scope !== 'legacy') {
+      await this.handleOpenLiveManager();
+    }
   }
 
   async afterStopStream(): Promise<void> {
@@ -333,7 +335,8 @@ export class TikTokService
    * Confirm user is approved to stream to TikTok
    */
   async validatePlatform(): Promise<EPlatformCallResult> {
-    if (!this.userService.views.auth?.platforms['tiktok']) return;
+    if (!this.userService.views.auth?.platforms['tiktok'])
+      return EPlatformCallResult.TikTokStreamScopeMissing;
 
     try {
       const response = await this.fetchLiveAccessStatus();
