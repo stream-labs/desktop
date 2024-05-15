@@ -111,16 +111,6 @@
         </div>
       </div>
       <div class="status-bar">{{currentFilterName}}{{ FILTER_VALUE[currentType] }}登録数：{{ numberOfEntries }}</div>
-      <banner
-        class="banner"
-        title="匿名ユーザーによるNG登録についても、無期限に登録されるようになりました"
-        body=""
-        anchorLabel="詳細はこちら"
-        anchorLink="https://blog.nicovideo.jp/niconews/205517.html"
-        @close="isBannerOpened = false"
-        v-if="isBannerOpened"
-      >
-      </banner>
     </div>
   </div>
 </template>

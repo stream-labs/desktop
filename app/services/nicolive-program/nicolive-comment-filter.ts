@@ -148,11 +148,4 @@ export class NicoliveCommentFilterService extends StatefulService<INicoliveComme
   private UPDATE_FILTERS(filters: FilterRecord[]) {
     this.state = { filters };
   }
-
-  get ngPanelInfoCoachingClosed() {
-    return this.stateService.state.ngPanelInfoCoachingClosed;
-  }
-  set ngPanelInfoCoachingClosed(value: boolean) {
-    this.stateService.updateNgPanelInfoCoachingClosed(value);
-  }
 }

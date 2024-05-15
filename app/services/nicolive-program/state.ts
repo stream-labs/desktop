@@ -4,9 +4,9 @@ import { Subject, BehaviorSubject, Observable } from 'rxjs';
 import { $t } from 'services/i18n';
 
 export const SynthesizerIds = ['webSpeech', 'nVoice'] as const;
-export type SynthesizerId = typeof SynthesizerIds[number];
+export type SynthesizerId = (typeof SynthesizerIds)[number];
 export const SynthesizerSelectors = [...SynthesizerIds, 'ignore'] as const;
-export type SynthesizerSelector = typeof SynthesizerSelectors[number];
+export type SynthesizerSelector = (typeof SynthesizerSelectors)[number];
 
 type SpeechSynthesizerSettingsState = {
   enabled: boolean;
@@ -24,7 +24,7 @@ type SpeechSynthesizerSettingsState = {
 type NameplateHintState = {
   programID: string;
   commentNo: number;
-}
+};
 
 interface IState {
   autoExtensionEnabled: boolean;
@@ -32,7 +32,6 @@ interface IState {
   speechSynthesizerSettings?: SpeechSynthesizerSettingsState;
   nameplateHint?: NameplateHintState;
   nameplateEnabled: boolean;
-  ngPanelInfoCoachingClosed?: boolean;
 }
 
 /**
@@ -43,7 +42,6 @@ export class NicoliveProgramStateService extends PersistentStatefulService<IStat
     autoExtensionEnabled: false,
     panelOpened: true,
     nameplateEnabled: true,
-    ngPanelInfoCoachingClosed: false,
   };
 
   private subject: Subject<IState> = new BehaviorSubject<IState>(this.state);
@@ -67,10 +65,6 @@ export class NicoliveProgramStateService extends PersistentStatefulService<IStat
 
   updateNameplateEnabled(newState?: boolean): void {
     this.setState({ nameplateEnabled: newState });
-  }
-
-  updateNgPanelInfoCoachingClosed(newState?: boolean): void {
-    this.setState({ ngPanelInfoCoachingClosed: newState });
   }
 
   private setState(nextState: Partial<IState>): void {

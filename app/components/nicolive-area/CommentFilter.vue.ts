@@ -195,11 +195,4 @@ export default class CommentFilter extends Vue {
   mounted() {
     this.reloadFilters();
   }
-
-  get isBannerOpened(): boolean {
-    return !this.nicoliveCommentFilterService.ngPanelInfoCoachingClosed;
-  }
-  set isBannerOpened(value: boolean) {
-    this.nicoliveCommentFilterService.ngPanelInfoCoachingClosed = !value;
-  }
 }
