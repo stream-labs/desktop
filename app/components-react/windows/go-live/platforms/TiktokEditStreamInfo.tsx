@@ -14,8 +14,7 @@ import GameSelector from '../GameSelector';
 
 export function TikTokEditStreamInfo(p: IPlatformComponentParams<'tiktok'>) {
   const ttSettings = p.value;
-  const liveStreamingEnabled = Services.TikTokService.liveStreamingEnabled;
-  const legacy = Services.TikTokService.scope === 'legacy';
+  const approved = Services.TikTokService.scope === 'approved';
 
   function updateSettings(patch: Partial<ITikTokStartStreamOptions>) {
     p.onChange({ ...ttSettings, ...patch });
@@ -36,10 +35,16 @@ export function TikTokEditStreamInfo(p: IPlatformComponentParams<'tiktok'>) {
             onChange={updateSettings}
           />
         }
-        requiredFields={<GameSelector key="required" platform={'tiktok'} {...bind.game} />}
+        requiredFields={
+          approved ? (
+            <GameSelector key="required" platform={'tiktok'} {...bind.game} />
+          ) : (
+            <div key="empty-tiktok" />
+          )
+        }
       />
 
-      {(!liveStreamingEnabled || legacy) && <TikTokEnterCredentialsFormInfo {...p} />}
+      {!approved && <TikTokEnterCredentialsFormInfo {...p} />}
     </Form>
   );
 }

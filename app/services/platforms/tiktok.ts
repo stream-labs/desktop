@@ -333,6 +333,8 @@ export class TikTokService
    * Confirm user is approved to stream to TikTok
    */
   async validatePlatform(): Promise<EPlatformCallResult> {
+    if (!this.userService.views.auth?.platforms['tiktok']) return;
+
     try {
       const response = await this.fetchLiveAccessStatus();
       const status = response as ITikTokLiveScopeResponse;
