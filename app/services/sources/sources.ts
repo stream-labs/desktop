@@ -372,7 +372,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       this.usageStatisticsService.recordFeatureUsage('NDI');
     } else if (type === 'openvr_capture') {
       this.usageStatisticsService.recordFeatureUsage('OpenVR');
-    } else if (type === 'screen_capture' || type === 'mac_screen_capture') {
+    } else if (type === 'screen_capture') {
       this.usageStatisticsService.recordFeatureUsage('SimpleCapture');
     } else if (type === 'vlc_source') {
       this.usageStatisticsService.recordFeatureUsage('VLC');
