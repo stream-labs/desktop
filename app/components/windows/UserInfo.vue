@@ -269,7 +269,6 @@
 
 .tag-list-body {
   display: flex;
-  flex-grow: 1;
   flex-wrap: wrap;
   padding: 16px 8px 8px 16px;
   overflow: auto;

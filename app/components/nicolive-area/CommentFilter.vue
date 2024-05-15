@@ -81,11 +81,11 @@
         <div class="item row" v-for="item of currentTypeFilters" :key="item.id">
           <div class="item-box">
             <div class="item-body" :title="item.body">{{ item.body }}</div>
-            <div class="item-comment" v-if="item.comment_body" :title="item.comment_body">
+            <div class="item-content" v-if="item.comment_body" :title="item.comment_body">
               {{ item.comment_body }}
             </div>
-            <div class="item-date" :title="item.register_by" :v-if="item.register_by">{{ item.register_by }}</div>
-            <div class="item-date" :title="item.register_date">{{ item.register_date }}</div>
+            <div class="item-content" :title="item.register_by" :v-if="item.register_by">{{ item.register_by }}</div>
+            <div class="item-content" :title="item.register_date">{{ item.register_date }}</div>
           </div>
           <button
             type="button"
@@ -258,26 +258,28 @@
 }
 
 .item-box {
-  .text-ellipsis;
-
   display: flex;
   flex-direction: column;
   flex-grow: 1;
 }
 
 .item-body {
+  font-size: @font-size4;
+  line-height: @font-line-height-normal;
   color: var(--color-text);
+  word-break: break-all;
 }
 
-.item-comment {
-  font-size: @font-size2;
-  color: var(--color-text-dark);
-}
-
-.item-date {
+.item-content {
   flex-shrink: 0;
+  margin-top: 4px;
   font-size: @font-size2;
+  line-height: @font-line-height-normal;
   color: var(--color-text-dark);
+
+  &:empty {
+    display: none;
+  }
 }
 
 .item-misc {
