@@ -38,6 +38,8 @@ interface ITikTokServiceState extends IPlatformState {
   broadcastId: string;
   username: string;
   error?: string | null;
+  gameName: string;
+  channelInfo: { gameId: string; gameName: string };
 }
 
 interface ITikTokStartStreamSettings {
@@ -82,8 +84,10 @@ export class TikTokService
       mode: 'portrait',
       serverUrl: '',
     },
+    channelInfo: { gameId: '', gameName: '' },
     broadcastId: '',
     username: '',
+    gameName: '',
   };
 
   @Inject() windowsService: WindowsService;
@@ -143,6 +147,9 @@ export class TikTokService
     const ttSettings = getDefined(goLiveSettings.platforms.tiktok);
     const context = display ?? ttSettings?.display;
 
+    console.log('goLiveSettings', goLiveSettings.platforms.tiktok);
+    console.log('ttSettings.gameName', ttSettings);
+
     if (this.getHasScope('approved')) {
       // skip generate stream keys for tests
       if (Utils.isTestMode()) {
@@ -192,6 +199,10 @@ export class TikTokService
     // open url if stream successfully started
     if (this.scope !== 'legacy') {
       await this.handleOpenLiveManager();
+    }
+
+    if (this.state.settings.game !== '') {
+      this.CLEAR_GAME();
     }
   }
 
@@ -458,6 +469,13 @@ export class TikTokService
       throwStreamError('TIKTOK_SCOPE_OUTDATED');
     }
 
+    if (this.state.channelInfo.gameName) {
+      // this.SET_CHANNEL_INFO({
+      //   gameId: channelInfo.category_id,
+      //   gameName: channelInfo.category_name,
+      // });
+    }
+
     this.SET_PREPOPULATED(true);
   }
 
@@ -575,6 +593,10 @@ export class TikTokService
     this.SET_LIVE_SCOPE(scope);
   }
 
+  setGameName(gameName: string) {
+    this.SET_GAME_NAME(gameName);
+  }
+
   @mutation()
   SET_LIVE_SCOPE(scope: TTikTokLiveScopeTypes) {
     this.state.settings.liveScope = scope;
@@ -588,5 +610,20 @@ export class TikTokService
   @mutation()
   protected SET_USERNAME(username: string) {
     this.state.username = username;
+  }
+
+  @mutation()
+  protected CLEAR_GAME() {
+    this.state.settings.game = '';
+  }
+
+  @mutation()
+  protected SET_GAME_NAME(gameName: string) {
+    this.state.gameName = gameName;
+  }
+
+  @mutation()
+  private SET_CHANNEL_INFO(info: ITikTokServiceState['channelInfo']) {
+    this.state.channelInfo = info;
   }
 }

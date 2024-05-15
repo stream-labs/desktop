@@ -307,6 +307,7 @@ export class StreamingService
 
     // use default settings if no new settings provided
     const settings = newSettings || cloneDeep(this.views.savedSettings);
+    console.log('settings', JSON.stringify(settings, null, 2));
 
     /**
      * Set custom destination stream settings

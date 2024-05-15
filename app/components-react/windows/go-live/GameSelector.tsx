@@ -24,7 +24,7 @@ export default function GameSelector(p: TProps) {
   }
 
   if (platform === 'tiktok') {
-    selectedGameName = Services.TikTokService.state.settings.gameName;
+    selectedGameName = Services.TikTokService.state.gameName;
   }
 
   const { isSearching, setIsSearching, games, setGames } = useModule(() => ({
@@ -42,6 +42,10 @@ export default function GameSelector(p: TProps) {
 
   useEffect(() => {
     loadImageForSelectedGame();
+
+    if (platform === 'tiktok') {
+      setGames([]);
+    }
   }, []);
 
   async function loadImageForSelectedGame() {
@@ -56,7 +60,7 @@ export default function GameSelector(p: TProps) {
   }
 
   async function onSearch(searchString: string) {
-    if (searchString.length < 2) return;
+    if (searchString.length < 2 && platform !== 'tiktok') return;
     const games = (await fetchGames(searchString)).map(g => ({
       value: ['trovo', 'tiktok'].includes(platform) ? g.id : g.name,
       label: g.name,
@@ -69,6 +73,14 @@ export default function GameSelector(p: TProps) {
   function onBeforeSearchHandler(searchString: string) {
     if (searchString.length < 2) return;
     setIsSearching(true);
+  }
+
+  function onSelect(searchString: string) {
+    console.log('searchString', searchString);
+
+    if (platform === 'tiktok') {
+      Services.TikTokService.setGameName(searchString);
+    }
   }
 
   const isTwitch = platform === 'twitch';
@@ -93,6 +105,7 @@ export default function GameSelector(p: TProps) {
       options={games}
       showSearch
       onSearch={onSearch}
+      onSelect={onSelect}
       debounce={500}
       required={isTwitch || isTrovo || isTikTok}
       hasImage={isTwitch || isTrovo}
