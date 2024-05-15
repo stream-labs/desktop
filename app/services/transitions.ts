@@ -207,7 +207,10 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     this.SET_STUDIO_MODE(false);
     this.studioModeChanged.next(false);
 
-    obs.Global.removeSceneFromBackstage(this.studioModeTransition.getActiveSource());
+    const currentScene = this.scenesService.views.activeScene;
+    if (this.currentSceneId !== currentScene.id) {
+      obs.Global.removeSceneFromBackstage(this.studioModeTransition.getActiveSource());
+    }
 
     this.getCurrentTransition().set(this.scenesService.views.activeScene.getObsScene());
     this.releaseStudioModeObjects();

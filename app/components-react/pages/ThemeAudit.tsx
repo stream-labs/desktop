@@ -88,8 +88,9 @@ export default function ThemeAudit() {
   } = Services;
   const [mediaInfo, setMediaInfo] = useState<IMediaSourceInfo[] | null>(null);
   const [inspectedSource, setInspectedSource] = useState<string | null>(null);
-  const cpu = useRealmObject(PerformanceService.state).cpuPercent;
-
+  const v = useVuex(() => ({
+    cpu: PerformanceService.views.cpuPercent,
+  }));
   useEffect(() => {
     readMediaInfo().then(info => setMediaInfo(info));
   }, []);
@@ -229,7 +230,7 @@ export default function ThemeAudit() {
               <div style={{ height: 400 }}>
                 <Display sourceId={inspectedSource} />
               </div>
-              <div style={{ fontSize: 48 }}>CPU: {cpu}%</div>
+              <div style={{ fontSize: 48 }}>CPU: {v.cpu}%</div>
             </div>
           )}
         </Modal>

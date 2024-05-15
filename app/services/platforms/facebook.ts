@@ -303,7 +303,8 @@ export class FacebookService
     const { title, description, game, privacy, event_params } = options;
     const data: Dictionary<any> = { title, description };
 
-    if (game) data.game_specs = { name: game };
+    // game info is currently broken in fb api
+    // if (game) data.game_specs = { name: game };
 
     if (Object.keys(event_params).length) {
       data.event_params = event_params;
@@ -418,7 +419,8 @@ export class FacebookService
     const destinationId = this.views.getDestinationId(options);
     const token = this.views.getDestinationToken(options.destinationType, destinationId);
     const body: Dictionary<any> = { title, description };
-    if (game) body.game_specs = { name: game };
+    // game info is currently broken in fb api
+    // if (game) body.game_specs = { name: game };
     if (privacy?.value) body.privacy = privacy;
 
     return this.requestFacebook<IFacebookLiveVideo>(
@@ -499,7 +501,8 @@ export class FacebookService
         status: 'SCHEDULED_UNPUBLISHED',
       },
     };
-    if (game) data.game_specs = { name: game };
+    // game info is currently broken in fb api
+    // if (game) data.game_specs = { name: game };
     const body = JSON.stringify(data);
     return await this.requestFacebook({ url, body, method: 'POST' }, token);
   }
