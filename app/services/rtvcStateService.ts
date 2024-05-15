@@ -3,6 +3,7 @@ import { PersistentStatefulService } from './core/persistent-stateful-service';
 import { SourcesService, ISourceApi } from './sources';
 import { TObsValue } from 'components/obs/inputs/ObsInput';
 import { RtvcEventLog } from 'services/usage-statistics';
+import { isInitialized } from '@sentry/vue';
 
 // for source properties
 export type SourcePropKey =
@@ -136,13 +137,14 @@ export class RtvcStateService extends PersistentStatefulService<IRtvcState> {
       }
       if (k === 'latency') this.eventLog.latency = v.value as number;
       const prop = props.find(a => a.name === k);
-      // for value check console.log(`rtvc set ${k} ${prop?.value} to ${v.value}`);
+      // for value check
+      //console.log(`rtvc set ${k} ${prop?.value} to ${v.value}`);
       if (!prop || prop.value === v.value) continue; // no need change
       prop.value = v.value;
     }
 
     const pitchShiftModeProp = props.find(a => a.name === 'pitch_shift_mode');
-    this.isSongMode = pitchShiftModeProp && pitchShiftModeProp.value === 1;
+    this.isSongMode = pitchShiftModeProp && pitchShiftModeProp.value === 0;
 
     source.setPropertiesFormData(props);
   }
@@ -159,6 +161,10 @@ export class RtvcStateService extends PersistentStatefulService<IRtvcState> {
   }
 
   // -- state params
+
+  isEmptyState(): boolean {
+    return this.state.value === undefined;
+  }
 
   getState(): StateParam {
     const r = { ...this.state.value } as StateParam;
