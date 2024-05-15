@@ -11,7 +11,6 @@ import moment from 'moment';
 import { EStreamQuality } from 'services/performance';
 import { ENotificationSubType, INotification } from 'services/notifications';
 import Scrollable from '../shared/Scrollable';
-import { useRealmObject } from 'components-react/hooks/realm';
 
 export default function AdvancedStatistics() {
   const {
@@ -84,7 +83,7 @@ export default function AdvancedStatistics() {
   }
 
   function onNotificationClickHandler(id: number) {
-    NotificationsService.applyAction(id);
+    NotificationsService.actions.applyAction(id);
   }
 
   return (
