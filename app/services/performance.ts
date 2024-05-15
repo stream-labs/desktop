@@ -336,8 +336,9 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
       lifeTime: 2 * 60 * 1000,
       showTime: true,
       subType: ENotificationSubType.SKIPPED,
-      // tslint:disable-next-line:prefer-template
-      message: $t('Skipped frames detected:') + Math.round(factor * 100) + '% over last 2 minutes',
+      message: $t('Skipped frames detected: %{percentage}% over last 2 minutes', {
+        percentage: Math.round(factor * 100),
+      }),
       action: this.jsonrpcService.createRequest(
         Service.getResourceId(this.troubleshooterService),
         'showTroubleshooter',

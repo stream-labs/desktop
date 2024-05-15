@@ -2,7 +2,7 @@
   "You don't have any notifications": "You don't have any notifications",
   "Enable notifications": "Enable notifications",
   "Enable sound": "Enable sound",
-  "Skipped frames detected:": "Skipped frames detected:",
+  "Skipped frames detected: %{percentage}% over last 2 minutes": "Skipped frames detected: %{percentage}% over last 2 minutes",
   "Detect skipped frames": "Detect skipped frames",
   "Skipped frames threshold": "Skipped frames threshold",
   "Detect lagged frames": "Detect lagged frames",
