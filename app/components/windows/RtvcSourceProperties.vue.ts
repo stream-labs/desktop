@@ -13,6 +13,7 @@ import {
   PresetValues,
   StateParam,
   SourcePropKey,
+  PitchShiftModeValue,
 } from 'services/rtvcStateService';
 import electron from 'electron';
 import { $t } from 'services/i18n';
@@ -210,7 +211,10 @@ export default class RtvcSourceProperties extends SourceProperties {
 
   @Watch('isSongMode')
   onChangeSongMode() {
-    this.setSourcePropertyValue('pitch_shift_mode', this.isSongMode ? 1 : 0);
+    this.setSourcePropertyValue(
+      'pitch_shift_mode',
+      this.isSongMode ? PitchShiftModeValue.song : PitchShiftModeValue.talk,
+    );
     // 値入れ直し
     const p = this.rtvcStateService.stateToCommonParam(this.state, this.currentIndex);
     this.rtvcStateService.setSourcePropertiesByCommonParam(this.source, p);
@@ -296,16 +300,23 @@ export default class RtvcSourceProperties extends SourceProperties {
       this.isMonitor = m !== obs.EMonitoringType.None;
     }
 
+    // 初期値修正
+    if (this.rtvcStateService.isEmptyState()) {
+      this.setSourcePropertyValue('latency', 13);
+    }
+
+    this.state = this.rtvcStateService.getState();
+
     this.device = this.getSourcePropertyValue('device') as number;
     this.latency = this.getSourcePropertyValue('latency') as number;
 
-    this.state = this.rtvcStateService.getState();
     this.updateManualList();
 
     this.currentIndex = this.state.currentIndex;
     this.onChangeIndex();
 
-    this.isSongMode = (this.getSourcePropertyValue('pitch_shift_mode') as number) === 1;
+    this.isSongMode =
+      (this.getSourcePropertyValue('pitch_shift_mode') as number) === PitchShiftModeValue.song;
     this.tab = this.state.tab ?? 0;
   }
 
