@@ -13,6 +13,7 @@ import {
   PresetValues,
   StateParam,
   SourcePropKey,
+  PitchShiftModeValue,
 } from 'services/rtvcStateService';
 import electron from 'electron';
 import { $t } from 'services/i18n';
@@ -210,7 +211,10 @@ export default class RtvcSourceProperties extends SourceProperties {
 
   @Watch('isSongMode')
   onChangeSongMode() {
-    this.setSourcePropertyValue('pitch_shift_mode', this.isSongMode ? 0 : 1);
+    this.setSourcePropertyValue(
+      'pitch_shift_mode',
+      this.isSongMode ? PitchShiftModeValue.song : PitchShiftModeValue.talk,
+    );
     // 値入れ直し
     const p = this.rtvcStateService.stateToCommonParam(this.state, this.currentIndex);
     this.rtvcStateService.setSourcePropertiesByCommonParam(this.source, p);
@@ -311,7 +315,8 @@ export default class RtvcSourceProperties extends SourceProperties {
     this.currentIndex = this.state.currentIndex;
     this.onChangeIndex();
 
-    this.isSongMode = (this.getSourcePropertyValue('pitch_shift_mode') as number) === 0;
+    this.isSongMode =
+      (this.getSourcePropertyValue('pitch_shift_mode') as number) === PitchShiftModeValue.song;
     this.tab = this.state.tab ?? 0;
   }
 

@@ -3,7 +3,6 @@ import { PersistentStatefulService } from './core/persistent-stateful-service';
 import { SourcesService, ISourceApi } from './sources';
 import { TObsValue } from 'components/obs/inputs/ObsInput';
 import { RtvcEventLog } from 'services/usage-statistics';
-import { isInitialized } from '@sentry/vue';
 
 // for source properties
 export type SourcePropKey =
@@ -17,7 +16,12 @@ export type SourcePropKey =
   | 'primary_voice'
   | 'secondary_voice'
   | 'amount'
-  | 'pitch_shift_song'; // 仮想key pitch_shift_mode=1(song) の時こちらの値をpitch_shiftに入れます
+  | 'pitch_shift_song'; // 仮想key pitch_shift_modeがsongの時こちらの値をpitch_shiftに入れます
+
+export const enum PitchShiftModeValue {
+  song = 0,
+  talk = 1,
+}
 
 export const PresetValues = [
   {
@@ -138,13 +142,13 @@ export class RtvcStateService extends PersistentStatefulService<IRtvcState> {
       if (k === 'latency') this.eventLog.latency = v.value as number;
       const prop = props.find(a => a.name === k);
       // for value check
-      //console.log(`rtvc set ${k} ${prop?.value} to ${v.value}`);
+      console.log(`rtvc set ${k} ${prop?.value} to ${v.value}`);
       if (!prop || prop.value === v.value) continue; // no need change
       prop.value = v.value;
     }
 
     const pitchShiftModeProp = props.find(a => a.name === 'pitch_shift_mode');
-    this.isSongMode = pitchShiftModeProp && pitchShiftModeProp.value === 0;
+    this.isSongMode = pitchShiftModeProp && pitchShiftModeProp.value === PitchShiftModeValue.song;
 
     source.setPropertiesFormData(props);
   }
