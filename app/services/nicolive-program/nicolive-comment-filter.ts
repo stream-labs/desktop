@@ -108,12 +108,30 @@ export class NicoliveCommentFilterService extends StatefulService<INicoliveComme
     return this.fetchFilters();
   }
 
+  isBroadcastersFilter(record: Pick<FilterRecord, 'userId'>): boolean {
+    if (!record.userId) {
+      return true;
+    }
+    return record.userId.toString() === this.nicoliveProgramService.userService.platform.id;
+  }
+
   async deleteFilters(ids: number[]) {
     if (process.env.DEV_SERVER) {
       return;
     }
 
-    const result = await this.client.deleteFilters(this.programID, ids);
+    const [ownIds, moderatorIds] = ids.reduce(
+      ([own, moderator], id) => {
+        const record = this.findFilterCache(id);
+        if (this.isBroadcastersFilter(record)) {
+          return [[...own, id], moderator];
+        }
+        return [own, [...moderator, id]];
+      },
+      [[], []] as [number[], number[]],
+    );
+
+    const result = await this.client.deleteFilters(this.programID, ownIds, moderatorIds);
     if (!isOk(result)) {
       throw NicoliveFailure.fromClientError('deleteFilters', result);
     }

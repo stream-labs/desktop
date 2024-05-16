@@ -12,6 +12,7 @@ const setup = createSetupFunction({
   injectee: {
     NicoliveCommentFilterService: {
       stateChange: new Subject(),
+      isBroadcastersFilter: () => false,
     },
     NicoliveCommentLocalFilterService: {
       filterFn: () => true,

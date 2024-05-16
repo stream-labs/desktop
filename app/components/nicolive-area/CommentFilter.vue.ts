@@ -3,7 +3,6 @@ import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { NicoliveCommentFilterService } from 'services/nicolive-program/nicolive-comment-filter';
 import { FilterType, FilterRecord } from 'services/nicolive-program/ResponseTypes';
-import { UserService } from 'services/user';
 import Banner from '../shared/banner.vue';
 import Popper from 'vue-popperjs';
 import {
@@ -35,12 +34,6 @@ type FilterByUser = 'all' | 'broadcaster' | 'moderator';
 export default class CommentFilter extends Vue {
   @Inject()
   private nicoliveCommentFilterService: NicoliveCommentFilterService;
-
-  @Inject()
-  private userService: UserService;
-
-  // @ts-expect-error: ts2729: use before initialization
-  userId: string = this.userService.platform.id;
 
   showPopupMenu: boolean = false;
 
@@ -170,7 +163,8 @@ export default class CommentFilter extends Vue {
   }
 
   get currentTypeFilters() {
-    const isBroadcaster = (x: FilterRecord) => !x.userId || x.userId.toString() === this.userId;
+    const isBroadcaster = (x: FilterRecord) =>
+      this.nicoliveCommentFilterService.isBroadcastersFilter(x);
     const filtersBy: (x: FilterRecord) => boolean = {
       all: () => true,
       broadcaster: isBroadcaster,

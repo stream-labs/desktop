@@ -364,11 +364,15 @@ export class NicoliveClient {
     );
   }
 
-  async deleteFilters(programID: string, ids: FilterRecord['id'][]): Promise<WrappedResult<void>> {
+  async deleteFilters(
+    programID: string,
+    ids: FilterRecord['id'][],
+    idsByModerator: FilterRecord['id'][],
+  ): Promise<WrappedResult<void>> {
     return this.requestAPI<void>(
       'DELETE',
       `${NicoliveClient.live2BaseURL}/unama/tool/v2/programs/${programID}/ssng`,
-      NicoliveClient.jsonBody({ id: ids }),
+      NicoliveClient.jsonBody({ id: ids, idByModerator: idsByModerator }),
     );
   }
 

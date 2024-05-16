@@ -216,7 +216,8 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
             break;
 
           case 'removeSSNG':
-            {
+            // 放送者自身が削除したときはすでにキャッシュも更新されているし通知も不要
+            if (!this.nicoliveCommentFilterService.isBroadcastersFilter(event.record)) {
               const { ssngId, userName, userId } = event.record;
               const record = this.nicoliveCommentFilterService.findFilterCache(ssngId);
 
