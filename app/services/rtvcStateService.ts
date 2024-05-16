@@ -142,7 +142,7 @@ export class RtvcStateService extends PersistentStatefulService<IRtvcState> {
       if (k === 'latency') this.eventLog.latency = v.value as number;
       const prop = props.find(a => a.name === k);
       // for value check
-      console.log(`rtvc set ${k} ${prop?.value} to ${v.value}`);
+      //console.log(`rtvc set ${k} ${prop?.value} to ${v.value}`);
       if (!prop || prop.value === v.value) continue; // no need change
       prop.value = v.value;
     }
