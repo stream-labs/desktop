@@ -39,7 +39,6 @@ interface ITikTokServiceState extends IPlatformState {
   username: string;
   error?: string | null;
   gameName: string;
-  channelInfo: { gameId: string; gameName: string };
 }
 
 interface ITikTokStartStreamSettings {
@@ -47,7 +46,6 @@ interface ITikTokStartStreamSettings {
   streamKey: string;
   title: string;
   liveScope: TTikTokLiveScopeTypes;
-  gameName: string;
   game: string;
   display: TDisplayType;
   video?: IVideo;
@@ -59,7 +57,6 @@ export interface ITikTokStartStreamOptions {
   serverUrl: string;
   streamKey: string;
   display: TDisplayType;
-  gameName: string;
   game: string;
 }
 interface ITikTokRequestHeaders extends Dictionary<string> {
@@ -79,12 +76,10 @@ export class TikTokService
       display: 'vertical',
       liveScope: 'denied',
       streamKey: '',
-      gameName: '',
       game: '',
       mode: 'portrait',
       serverUrl: '',
     },
-    channelInfo: { gameId: '', gameName: '' },
     broadcastId: '',
     username: '',
     gameName: '',
@@ -147,9 +142,6 @@ export class TikTokService
     const ttSettings = getDefined(goLiveSettings.platforms.tiktok);
     const context = display ?? ttSettings?.display;
 
-    console.log('goLiveSettings', goLiveSettings.platforms.tiktok);
-    console.log('ttSettings.gameName', ttSettings);
-
     if (this.getHasScope('approved')) {
       // skip generate stream keys for tests
       if (Utils.isTestMode()) {
@@ -197,12 +189,8 @@ export class TikTokService
 
   async afterGoLive(): Promise<void> {
     // open url if stream successfully started
-    if (this.scope !== 'legacy') {
+    if (this.scope === 'approved') {
       await this.handleOpenLiveManager();
-    }
-
-    if (this.state.settings.game !== '') {
-      this.CLEAR_GAME();
     }
   }
 
@@ -346,8 +334,9 @@ export class TikTokService
    * Confirm user is approved to stream to TikTok
    */
   async validatePlatform(): Promise<EPlatformCallResult> {
-    if (!this.userService.views.auth?.platforms['tiktok'])
+    if (!this.userService.views.auth?.platforms['tiktok']) {
       return EPlatformCallResult.TikTokStreamScopeMissing;
+    }
 
     try {
       const response = await this.fetchLiveAccessStatus();
@@ -438,7 +427,7 @@ export class TikTokService
     return jfetch<ITikTokGamesData>(request)
       .then(async res => {
         return await Promise.all(
-          res.categories.map(g => ({ id: g.game_mask_id, name: g.full_name })),
+          res?.categories.map(g => ({ id: g.game_mask_id, name: g.full_name })),
         );
       })
       .catch(e => {
@@ -467,13 +456,6 @@ export class TikTokService
 
     if (status === EPlatformCallResult.TikTokScopeOutdated) {
       throwStreamError('TIKTOK_SCOPE_OUTDATED');
-    }
-
-    if (this.state.channelInfo.gameName) {
-      // this.SET_CHANNEL_INFO({
-      //   gameId: channelInfo.category_id,
-      //   gameName: channelInfo.category_name,
-      // });
     }
 
     this.SET_PREPOPULATED(true);
@@ -613,17 +595,7 @@ export class TikTokService
   }
 
   @mutation()
-  protected CLEAR_GAME() {
-    this.state.settings.game = '';
-  }
-
-  @mutation()
-  protected SET_GAME_NAME(gameName: string) {
+  protected SET_GAME_NAME(gameName: string = '') {
     this.state.gameName = gameName;
-  }
-
-  @mutation()
-  private SET_CHANNEL_INFO(info: ITikTokServiceState['channelInfo']) {
-    this.state.channelInfo = info;
   }
 }
