@@ -335,16 +335,15 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    * we can view more detailed information in sentry.
    */
   async setSentryContext() {
-    Sentry.configureScope(scope => {
-      if (this.isLoggedIn()) {
-        scope.setUser({ username: this.username, id: this.platformId });
-        scope.setExtra('platform', this.platform ? this.platform.type : 'not logged in');
-      } else {
-        scope.setUser({});
-        scope.setExtra('platform', null);
-      }
-      scope.setExtra('uuid', this.uuidService.uuid);
-    });
+    const scope = Sentry.getCurrentScope();
+    if (this.isLoggedIn()) {
+      scope.setUser({ username: this.username, id: this.platformId });
+      scope.setExtra('platform', this.platform ? this.platform.type : 'not logged in');
+    } else {
+      scope.setUser({});
+      scope.setExtra('platform', null);
+    }
+    scope.setExtra('uuid', this.uuidService.uuid);
   }
 
   async updateStreamSettings(programId: string): Promise<IStreamingSetting> {
