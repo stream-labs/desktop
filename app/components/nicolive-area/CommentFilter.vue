@@ -75,7 +75,7 @@
         >
           登録
         </button>
-        <div class="form-tip floating-wrapper" v-if="invalid">数字以外の文字列は登録できません</div>
+        <div class="form-tip floating-wrapper" v-if="invalid">不正なユーザーIDです。入力内容を確認してください。</div>
       </form>
       <div class="list">
         <div class="item row" v-for="item of currentTypeFilters" :key="item.id">
