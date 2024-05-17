@@ -158,6 +158,9 @@ export class NicoliveCommentFilterService extends StatefulService<INicoliveComme
   }
 
   private updateFilters(filters: FilterRecord[]) {
+    // 登録日時降順にする
+    filters.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
     this.UPDATE_FILTERS(filters);
     this.stateChangeSubject.next({ filters });
   }
