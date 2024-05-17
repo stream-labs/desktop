@@ -207,7 +207,7 @@
             </div>
           </div>
 
-          <!-- <div class="input-container">
+          <div class="input-container">
             <div class="input-wrapper">
               <div class="row">
                 <div class="name">{{ $t('source-props.nair-rtvc-source.song.name') }}
@@ -219,7 +219,7 @@
                 </div>
               </div>
             </div>
-          </div> -->
+          </div>
 
         </div>
 
