@@ -35,7 +35,7 @@ export default class CommentFilter extends Vue {
   @Inject()
   private nicoliveCommentFilterService: NicoliveCommentFilterService;
 
-  showPopupMenu: boolean = false;
+  showPopupMenu = false;
 
   // TODO: 後で言語ファイルに移動する
   adjusterTooltip = '登録者で絞り込み';

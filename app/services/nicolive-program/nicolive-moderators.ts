@@ -6,9 +6,9 @@ import { Inject } from 'services/core/injector';
 import { StatefulService, mutation } from 'services/core/stateful-service';
 import { WindowsService } from 'services/windows';
 import { NdgrClient, convertSSNGType, toISO8601, toNumber } from './NdgrClient';
-import { NicoliveClient, WrappedResult, isOk } from './NicoliveClient';
+import { NicoliveClient, isOk } from './NicoliveClient';
 import { NicoliveFailure, openErrorDialogFromFailure } from './NicoliveFailure';
-import { FilterRecord, Moderator } from './ResponseTypes';
+import { FilterRecord } from './ResponseTypes';
 import { NicoliveProgramService } from './nicolive-program';
 
 interface INicoliveModeratorsService {
@@ -98,104 +98,106 @@ export class NicoliveModeratorsService extends StatefulService<INicoliveModerato
     this.ndgrClient = new NdgrClient(ndgrURL, 'moderator');
     this.ndgrSubscription = this.ndgrClient.messages.subscribe({
       next: msg => {
-        if (msg.message) {
-          if (msg.message.moderatorUpdated) {
-            switch (msg.message.moderatorUpdated.operation) {
-              case dwango.nicolive.chat.data.atoms.ModeratorUpdated.ModeratorOperation.ADD:
-                {
-                  const userId = msg.message.moderatorUpdated.operator.userId;
-                  if (userId) {
-                    console.log('Adding moderator:', userId); // DEBUG
-                    this.addModeratorCache(userId.toString());
-                  }
-                }
-                break;
-              case dwango.nicolive.chat.data.atoms.ModeratorUpdated.ModeratorOperation.DELETE: {
+        if (!msg.message) {
+          return;
+        }
+
+        if (msg.message.moderatorUpdated) {
+          switch (msg.message.moderatorUpdated.operation) {
+            case dwango.nicolive.chat.data.atoms.ModeratorUpdated.ModeratorOperation.ADD:
+              {
                 const userId = msg.message.moderatorUpdated.operator.userId;
                 if (userId) {
-                  console.log('Removing moderator:', userId); // DEBUG
-                  this.removeModeratorCache(userId.toString());
+                  console.log('Adding moderator:', userId); // DEBUG
+                  this.addModeratorCache(userId.toString());
                 }
               }
+              break;
+            case dwango.nicolive.chat.data.atoms.ModeratorUpdated.ModeratorOperation.DELETE: {
+              const userId = msg.message.moderatorUpdated.operator.userId;
+              if (userId) {
+                console.log('Removing moderator:', userId); // DEBUG
+                this.removeModeratorCache(userId.toString());
+              }
             }
-          } else if (msg.message.ssngUpdated) {
-            const ssngUpdated = msg.message.ssngUpdated;
-            switch (ssngUpdated.operation) {
-              case dwango.nicolive.chat.data.atoms.SSNGUpdated.SSNGOperation.ADD:
-                {
-                  const { ssngId, type, source, updatedAt, operator } = ssngUpdated;
-                  if (ssngId) {
-                    let ssngType: FilterRecord['type'];
-                    try {
-                      ssngType = convertSSNGType(type);
-                    } catch (e) {
-                      // 未対応のタイプが増えたときに毎回送信すると送信数が無駄に増えるので、一回だけ送信する
-                      if (this.registerUnknownSSNGType(type)) {
-                        console.warn(`Unknown SSNG Type: ${type}`);
-                        Sentry.withScope(scope => {
-                          scope.setFingerprint([
-                            'NicoliveModeratorsService',
-                            'unknownSSNGType',
-                            type.toString(),
-                          ]);
-                          scope.setExtra('ssngUpdated', ssngUpdated);
-                          scope.setTag('unknownSSNGType', type);
-                          Sentry.captureException(e);
-                        });
-                      }
-                      return; // 不明タイプなので追加せず終わる
-                    }
-                    const record: FilterRecord = {
-                      id: toNumber(ssngId),
-                      type: ssngType,
-                      body: source,
-                      createdAt: toISO8601(updatedAt),
-                      ...(operator?.userId ? { userId: toNumber(operator.userId) } : {}),
-                      ...(operator?.nickname ? { userName: operator.nickname } : {}),
-                    };
-                    this.refreshSubject.next({ event: 'addSSNG', record });
-                  } else {
-                    console.warn('Adding SSNG failed:', ssngUpdated); // DEBUG
-                  }
-                }
-                break;
-
-              case dwango.nicolive.chat.data.atoms.SSNGUpdated.SSNGOperation.DELETE:
-                {
-                  const ssngId = toNumber(ssngUpdated.ssngId);
-                  const userName = ssngUpdated.operator?.nickname;
-                  const userId = ssngUpdated.operator?.userId
-                    ? toNumber(ssngUpdated.operator.userId)
-                    : undefined;
-                  if (ssngId) {
-                    this.refreshSubject.next({
-                      event: 'removeSSNG',
-                      record: { ssngId, userName, userId },
-                    });
-                  } else {
-                    console.warn('Removing SSNG failed:', ssngUpdated); // DEBUG
-                  }
-                }
-                break;
-
-              default:
-                if (this.registerUnknownSSNGOperation(ssngUpdated.operation)) {
-                  console.warn('Unknown SSNG operation:', ssngUpdated.operation, ssngUpdated); // DEBUG
-                  Sentry.withScope(scope => {
-                    scope.setFingerprint([
-                      'NicoliveModeratorsService',
-                      'unknownSSNGOperation',
-                      ssngUpdated.operation.toString(),
-                    ]);
-                    scope.setExtra('ssngUpdated', ssngUpdated);
-                    scope.setTag('unknownSSNGOperation', ssngUpdated.operation);
-                    Sentry.captureMessage('Unknown SSNG operation');
-                  });
-                }
-            }
-          } else {
-            // 未知のmessageは単に無視する
           }
+        } else if (msg.message.ssngUpdated) {
+          const ssngUpdated = msg.message.ssngUpdated;
+          switch (ssngUpdated.operation) {
+            case dwango.nicolive.chat.data.atoms.SSNGUpdated.SSNGOperation.ADD:
+              {
+                const { ssngId, type, source, updatedAt, operator } = ssngUpdated;
+                if (ssngId) {
+                  let ssngType: FilterRecord['type'];
+                  try {
+                    ssngType = convertSSNGType(type);
+                  } catch (e) {
+                    // 未対応のタイプが増えたときに毎回送信すると送信数が無駄に増えるので、一回だけ送信する
+                    if (this.registerUnknownSSNGType(type)) {
+                      console.warn(`Unknown SSNG Type: ${type}`);
+                      Sentry.withScope(scope => {
+                        scope.setFingerprint([
+                          'NicoliveModeratorsService',
+                          'unknownSSNGType',
+                          type.toString(),
+                        ]);
+                        scope.setExtra('ssngUpdated', ssngUpdated);
+                        scope.setTag('unknownSSNGType', type);
+                        Sentry.captureException(e);
+                      });
+                    }
+                    return; // 不明タイプなので追加せず終わる
+                  }
+                  const record: FilterRecord = {
+                    id: toNumber(ssngId),
+                    type: ssngType,
+                    body: source,
+                    createdAt: toISO8601(updatedAt),
+                    ...(operator?.userId ? { userId: toNumber(operator.userId) } : {}),
+                    ...(operator?.nickname ? { userName: operator.nickname } : {}),
+                  };
+                  this.refreshSubject.next({ event: 'addSSNG', record });
+                } else {
+                  console.warn('Adding SSNG failed:', ssngUpdated); // DEBUG
+                }
+              }
+              break;
+
+            case dwango.nicolive.chat.data.atoms.SSNGUpdated.SSNGOperation.DELETE:
+              {
+                const ssngId = toNumber(ssngUpdated.ssngId);
+                const userName = ssngUpdated.operator?.nickname;
+                const userId = ssngUpdated.operator?.userId
+                  ? toNumber(ssngUpdated.operator.userId)
+                  : undefined;
+                if (ssngId) {
+                  this.refreshSubject.next({
+                    event: 'removeSSNG',
+                    record: { ssngId, userName, userId },
+                  });
+                } else {
+                  console.warn('Removing SSNG failed:', ssngUpdated); // DEBUG
+                }
+              }
+              break;
+
+            default:
+              if (this.registerUnknownSSNGOperation(ssngUpdated.operation)) {
+                console.warn('Unknown SSNG operation:', ssngUpdated.operation, ssngUpdated); // DEBUG
+                Sentry.withScope(scope => {
+                  scope.setFingerprint([
+                    'NicoliveModeratorsService',
+                    'unknownSSNGOperation',
+                    ssngUpdated.operation.toString(),
+                  ]);
+                  scope.setExtra('ssngUpdated', ssngUpdated);
+                  scope.setTag('unknownSSNGOperation', ssngUpdated.operation);
+                  Sentry.captureMessage('Unknown SSNG operation');
+                });
+              }
+          }
+        } else {
+          // 未知のmessageは単に無視する
         }
       },
       error: err => {
@@ -326,6 +328,7 @@ export class NicoliveModeratorsService extends StatefulService<INicoliveModerato
       }
     }
   }
+
   async removeModeratorWithConfirm({ userId, userName }: { userId: string; userName: string }) {
     if (!this.isModerator(userId)) return;
     const ok = await this.confirmModerator({
