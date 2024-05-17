@@ -16,7 +16,7 @@ import { waitForDisplayed } from '../../helpers/modules/core';
 
 useWebdriver();
 
-test.skip('Streaming to TikTok', async t => {
+test('Streaming to TikTok', async t => {
   const user = await logIn('twitch', { multistream: false, prime: false });
 
   // test approved status
@@ -43,7 +43,9 @@ test.skip('Streaming to TikTok', async t => {
   await fillForm({
     title: 'Test stream',
     twitchGame: 'Fortnite',
+    tiktokGame: 'Fortnite',
   });
+  await waitForSettingsWindowLoaded();
   await submit();
   await waitForDisplayed('span=Update settings for TikTok');
   await waitForStreamStart();
@@ -52,6 +54,8 @@ test.skip('Streaming to TikTok', async t => {
   // test all other tiktok statuses
   await testLiveScope(t, 'not-approved');
   await testLiveScope(t, 'legacy');
+
+  // test users prompted to relogin
   await testLiveScope(t, 'denied');
 
   await releaseUserInPool(user);

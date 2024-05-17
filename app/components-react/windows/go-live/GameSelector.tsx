@@ -27,14 +27,28 @@ export default function GameSelector(p: TProps) {
     selectedGameName = Services.TikTokService.state.gameName;
   }
 
-  const { isSearching, setIsSearching, games, setGames } = useModule(() => ({
-    state: injectState({
-      isSearching: false,
-      games: selectedGameId
-        ? [{ label: selectedGameName, value: selectedGameId }]
-        : ([] as IListOption<string>[]),
-    }),
-  }));
+  const { isSearching, setIsSearching, games, setGames } = useModule(() => {
+    const defaultGames = selectedGameId
+      ? [{ label: selectedGameName, value: selectedGameId }]
+      : ([] as IListOption<string>[]);
+
+    // if (platform === 'tiktok' && defaultGames.length > 0) {
+    //   const defaultTikTokGame = {
+    //     label: Services.TikTokService.defaultGame.name,
+    //     value: Services.TikTokService.defaultGame.id,
+    //   };
+    //   defaultGames.push(defaultTikTokGame);
+    // }
+
+    return {
+      state: injectState({
+        isSearching: false,
+        games: selectedGameId
+          ? [{ label: selectedGameName, value: selectedGameId }]
+          : ([] as IListOption<string>[]),
+      }),
+    };
+  });
 
   function fetchGames(query: string): Promise<IGame[]> {
     return platformService.searchGames(query);
@@ -57,11 +71,15 @@ export default function GameSelector(p: TProps) {
 
   async function onSearch(searchString: string) {
     if (searchString.length < 2 && platform !== 'tiktok') return;
-    const games = (await fetchGames(searchString)).map(g => ({
-      value: ['trovo', 'tiktok'].includes(platform) ? g.id : g.name,
-      label: g.name,
-      image: g?.image,
-    }));
+    const games =
+      (await fetchGames(searchString))?.map(g => ({
+        value: ['trovo', 'tiktok'].includes(platform) ? g.id : g.name,
+        label: g.name,
+        image: g?.image,
+      })) ?? [];
+
+    console.log('games', JSON.stringify(games, null, 2));
+
     setGames(games);
     setIsSearching(false);
   }
@@ -102,6 +120,7 @@ export default function GameSelector(p: TProps) {
       onSelect={(val, opts) => {
         onSelect(opts.labelrender);
       }}
+      // filterOption={platform !== 'tiktok' && !selectedGameId}
       debounce={500}
       required={isTwitch || isTrovo || isTikTok}
       hasImage={isTwitch || isTrovo}

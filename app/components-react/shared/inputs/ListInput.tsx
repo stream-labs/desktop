@@ -7,6 +7,7 @@ import { useDebounce } from '../../hooks';
 import omit from 'lodash/omit';
 import { getDefined } from '../../../util/properties-type-guards';
 import { findDOMNode } from 'react-dom';
+import { OptionData, OptionGroupData } from 'rc-select/lib/interface';
 
 // select what features from the antd lib we are going to use
 const ANT_SELECT_FEATURES = [
@@ -20,6 +21,7 @@ const ANT_SELECT_FEATURES = [
   'allowClear',
   'defaultActiveFirstOption',
   'listHeight',
+  'filterOption',
 ] as const;
 
 // define custom props
@@ -84,6 +86,8 @@ export const ListInput = InputComponent(<T extends any>(p: TListInputProps<T>) =
   }
 
   const selectedOption = options?.find(opt => opt.value === p.value);
+
+  console.log('options', JSON.stringify(options, null, 2));
 
   return (
     <InputWrapper {...wrapperAttrs} extra={p?.description ?? selectedOption?.description}>

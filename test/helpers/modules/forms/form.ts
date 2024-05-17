@@ -63,6 +63,7 @@ export function useForm(name?: string) {
     const filledFields: string[] = [];
     await traverseForm(async (input, stopTraverse) => {
       const name = input.name;
+      console.log('name', name);
       if (!(name in formData)) return;
       const value = formData[name];
       try {
