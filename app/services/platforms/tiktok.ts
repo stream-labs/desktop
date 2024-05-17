@@ -117,6 +117,15 @@ export class TikTokService
     return ['approved', 'legacy'].includes(scope);
   }
 
+  // TODO: add logic to show rejected component
+  get rejected(): boolean {
+    return false;
+  }
+
+  get defaultGame(): IGame {
+    return { id: '', name: 'Other' };
+  }
+
   /**
    * Whether the user is approved to generate a server url & stream key outside of Live Access
    * @remark Before the implementation of TikTok's Live Access API, users approved for live streaming
@@ -426,11 +435,17 @@ export class TikTokService
 
     return jfetch<ITikTokGamesData>(request)
       .then(async res => {
-        return await Promise.all(
+        const games = await Promise.all(
           res?.categories.map(g => ({ id: g.game_mask_id, name: g.full_name })),
         );
+        games.push(this.defaultGame);
+        return games;
       })
       .catch(e => {
+        // return dummy game if running a test
+        if (Utils.isTestMode()) {
+          return [{ id: 'game1', name: 'test1' }, this.defaultGame];
+        }
         console.error('Error fetching TikTok games: ', e);
         return [];
       });
@@ -518,6 +533,18 @@ export class TikTokService
 
   get mergeUrl(): string {
     return 'https://streamlabs.com/dashboard#/settings/account-settings/platforms';
+  }
+
+  get guidelinesUrl(): string {
+    return 'https://www.tiktok.com/community-guidelines/en/community-principles';
+  }
+
+  get appealsUrl(): string {
+    return 'https://www.tiktok.com/community-guidelines/en/enforcement#3';
+  }
+
+  get confirmationUrl(): string {
+    return 'https://www.tiktok.com/falcon/live_g/live_access_pc_apply/result/index.html?id=GL6399433079641606942';
   }
 
   get locale(): string {
