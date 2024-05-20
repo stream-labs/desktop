@@ -225,7 +225,6 @@ test('chatメッセージはstateに保持する', () => {
     Array [
       Object {
         "component": "common",
-        "isModerator": false,
         "seqId": 0,
         "type": "normal",
         "value": Object {
@@ -234,7 +233,6 @@ test('chatメッセージはstateに保持する', () => {
       },
       Object {
         "component": "common",
-        "isModerator": false,
         "seqId": 1,
         "type": "normal",
         "value": Object {
@@ -243,7 +241,6 @@ test('chatメッセージはstateに保持する', () => {
       },
       Object {
         "component": "system",
-        "isModerator": false,
         "seqId": 2,
         "type": "n-air-emulated",
         "value": Object {
@@ -302,7 +299,6 @@ test('接続エラー時にメッセージを表示する', () => {
                           Array [
                             Object {
                               "component": "system",
-                              "isModerator": false,
                               "seqId": 0,
                               "type": "n-air-emulated",
                               "value": Object {
@@ -312,7 +308,6 @@ test('接続エラー時にメッセージを表示する', () => {
                             },
                             Object {
                               "component": "system",
-                              "isModerator": false,
                               "seqId": 1,
                               "type": "n-air-emulated",
                               "value": Object {
@@ -341,7 +336,6 @@ test('スレッドの参加失敗時にメッセージを表示する', () => {
         Array [
           Object {
             "component": "system",
-            "isModerator": false,
             "seqId": 0,
             "type": "n-air-emulated",
             "value": Object {
@@ -351,7 +345,6 @@ test('スレッドの参加失敗時にメッセージを表示する', () => {
           },
           Object {
             "component": "system",
-            "isModerator": false,
             "seqId": 1,
             "type": "n-air-emulated",
             "value": Object {
@@ -378,7 +371,6 @@ test('スレッドからの追い出し発生時にメッセージを表示す�
         Array [
           Object {
             "component": "system",
-            "isModerator": false,
             "seqId": 0,
             "type": "n-air-emulated",
             "value": Object {
@@ -388,7 +380,6 @@ test('スレッドからの追い出し発生時にメッセージを表示す�
           },
           Object {
             "component": "system",
-            "isModerator": false,
             "seqId": 1,
             "type": "n-air-emulated",
             "value": Object {

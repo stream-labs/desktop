@@ -292,7 +292,7 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
     this.lastSubscription = merge(
       clientSubject.pipe(
         groupBy(msg => Object.keys(msg)[0]),
-        mergeMap((group$): Observable<Pick<WrappedChat, 'type' | 'value' | 'isModerator'>> => {
+        mergeMap((group$): Observable<Pick<WrappedChat, 'type' | 'value'>> => {
           switch (group$.key) {
             case 'chat':
               return group$.pipe(
@@ -300,7 +300,6 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
                 map(({ chat }) => ({
                   type: classify(chat),
                   value: chat,
-                  isModerator: this.nicoliveModeratorsService.isModerator(chat.user_id),
                 })),
               );
             case 'thread':
@@ -339,9 +338,20 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
       this.systemMessages.pipe(takeUntil(closer)),
     )
       .pipe(
-        map(({ type, value, isModerator }, seqId) => ({ type, value, isModerator, seqId })),
+        map(({ type, value }, seqId) => ({ type, value, seqId })),
         bufferTime(1000),
         filter(arr => arr.length > 0),
+        map(arr =>
+          arr.map(m => {
+            if (m.type === 'normal' && m.value.user_id) {
+              return {
+                ...m,
+                isModerator: this.nicoliveModeratorsService.isModerator(m.value.user_id),
+              };
+            }
+            return m;
+          }),
+        ),
       )
       .subscribe(values => this.onMessage(values.map(c => AddComponent(c))));
     this.client.requestLatestMessages();
