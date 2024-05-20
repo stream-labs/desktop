@@ -125,6 +125,7 @@ export class NicoliveClient {
   static nicoadBaseURL = 'https://api.nicoad.nicovideo.jp';
   static communityBaseURL = 'https://com.nicovideo.jp';
   static userFollowBaseURL = 'https://user-follow-api.nicovideo.jp';
+  static userIconBaseURL = 'https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/';
   private static frontendID = 134;
 
   /**
@@ -380,11 +381,10 @@ export class NicoliveClient {
   /** ユーザーアイコンを取得 */
   static getUserIconURL(userId: string, hash: string): string {
     const dir = Math.floor(Number(userId) / 10000);
-    const url = `https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/${dir}/${userId}.jpg?${hash}`;
+    const url = `${NicoliveClient.userIconBaseURL}${dir}/${userId}.jpg?${hash}`;
     return url;
   }
-  static defaultUserIconURL =
-    'https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg';
+  static defaultUserIconURL = `${NicoliveClient.userIconBaseURL}defaults/blank.jpg`;
 
   // 関心が別だが他の場所におく程の理由もないのでここにおく
   /** コミュニティ情報を取得 */
