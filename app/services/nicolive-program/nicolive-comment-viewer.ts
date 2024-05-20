@@ -41,15 +41,13 @@ import { FilterRecord } from './ResponseTypes';
 function makeEmulatedChat(
   content: string,
   date: number = Math.floor(Date.now() / 1000),
-  isModerator = false,
-): Pick<WrappedChat, 'type' | 'value' | 'isModerator'> {
+): Pick<WrappedChat, 'type' | 'value'> {
   return {
     type: 'n-air-emulated' as const,
     value: {
       content,
       date,
     },
-    isModerator,
   };
 }
 
