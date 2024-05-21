@@ -1,4 +1,4 @@
-import { EMPTY, Observable, Subject, Subscription, merge, of, timer } from 'rxjs';
+import { EMPTY, Observable, Subject, Subscription, interval, merge, of } from 'rxjs';
 import {
   bufferTime,
   catchError,
@@ -54,15 +54,9 @@ function makeEmulatedChat(
 // yarn dev 用: ダミーでコメントを5秒ごとに出し続ける
 class DummyMessageServerClient implements IMessageServerClient {
   connect(): Observable<MessageResponse> {
-    return timer(0, 5000).pipe(
+    return interval(5000).pipe(
       map(res => ({
-        chat: {
-          ...makeEmulatedChat(`${res}`).value,
-          user_id: res & 1 ? '2' : '3',
-          premium: 1,
-          name: res & 1 ? '戀塚' : '悪い人',
-          no: res + 1,
-        },
+        chat: makeEmulatedChat(`${res}`).value,
       })),
     );
   }
@@ -394,7 +388,6 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
   }
 
   private onMessage(values: WrappedChatWithComponent[]) {
-    console.info('onMessage', values); // DEBUG
     const maxQueueToSpeak = 3; // 直近3件つづ読み上げ対象にする
     const recentSeconds = 60;
 

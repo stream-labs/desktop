@@ -70,25 +70,6 @@ export class NicoliveCommentFilterService extends StatefulService<INicoliveComme
   }
 
   async fetchFilters() {
-    if (process.env.DEV_SERVER) {
-      this.updateFilters(
-        [
-          {
-            type: 'word',
-            body: 'test',
-            createdAt: '2021-01-01T00:00:00+09:00',
-            userId: 2,
-            userName: '戀塚',
-          } as Pick<FilterRecord, 'type' | 'body' | 'createdAt' | 'userId' | 'userName'>,
-          {
-            type: 'user',
-            body: '3', // 悪い人
-            createdAt: '2021-01-01T00:00:00+09:00',
-            Memo: '悪い人',
-          } as Pick<FilterRecord, 'type' | 'body' | 'createdAt' | 'userId' | 'userName'>,
-        ].map((record, id) => ({ id, ...record })),
-      );
-    }
     const result = await this.client.fetchFilters(this.programID);
     if (!isOk(result)) {
       throw NicoliveFailure.fromClientError('fetchFilters', result);
@@ -98,9 +79,6 @@ export class NicoliveCommentFilterService extends StatefulService<INicoliveComme
   }
 
   async addFilter(record: AddFilterRecord) {
-    if (process.env.DEV_SERVER) {
-      return;
-    }
     const result = await this.client.addFilters(this.programID, [record]);
     if (!isOk(result)) {
       throw NicoliveFailure.fromClientError('addFilters', result);

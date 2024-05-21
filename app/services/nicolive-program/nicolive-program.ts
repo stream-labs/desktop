@@ -223,10 +223,6 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   }
 
   async createProgram(): Promise<CreateResult> {
-    if (process.env.DEV_SERVER) {
-      await this.fetchProgram();
-      return CreateResult.CREATED;
-    }
     const result = await this.client.createProgram();
     if (result === 'CREATED') {
       await this.fetchProgram();
@@ -236,25 +232,6 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
 
   async fetchProgram(): Promise<void> {
     this.setState({ isFetching: true });
-    if (process.env.DEV_SERVER) {
-      const now = Math.floor(Date.now() / 1000);
-      this.setState({
-        programID: 'lvDEBUG',
-        status: 'onAir',
-        title: 'DEBUG番組',
-        description: 'N Airデザイン作業用番組',
-        startTime: now,
-        vposBaseTime: now,
-        endTime: now + 60 * 60,
-        isMemberOnly: true,
-        communityID: 'coDEBUG',
-        communityName: 'DEBUGコミュニティ',
-        communitySymbol: '',
-        roomURL: 'URL',
-        roomThreadID: 'thread',
-      });
-      return;
-    }
     try {
       const schedulesResponse = await this.client.fetchProgramSchedules();
       if (!isOk(schedulesResponse)) {
@@ -325,10 +302,6 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   }
 
   async refreshProgram(): Promise<void> {
-    if (process.env.DEV_SERVER) {
-      await this.fetchProgram();
-      return;
-    }
     const programResponse = await this.client.fetchProgram(this.state.programID);
     if (!isOk(programResponse)) {
       throw NicoliveFailure.fromClientError('fetchProgram', programResponse);
@@ -350,9 +323,6 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   }
 
   async editProgram(): Promise<EditResult> {
-    if (process.env.DEV_SERVER) {
-      return;
-    }
     const result = await this.client.editProgram(this.state.programID);
     if (result === 'EDITED') {
       await this.refreshProgram();
@@ -377,10 +347,6 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   }
 
   async endProgram(): Promise<void> {
-    if (process.env.DEV_SERVER) {
-      this.setState({ status: 'end' });
-      return;
-    }
     this.setState({ isEnding: true });
     try {
       const result = await this.client.endProgram(this.state.programID);
@@ -448,10 +414,6 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   }
 
   updateStatistics(programID: string): Promise<any> {
-    if (process.env.DEV_SERVER) {
-      return Promise.resolve();
-    }
-
     const stats = this.client
       .fetchStatistics(programID)
       .then(res => {
@@ -480,10 +442,6 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   }
 
   async sendOperatorComment(text: string, isPermanent: boolean): Promise<void> {
-    if (process.env.DEV_SERVER) {
-      // TODO
-      return;
-    }
     const result = await this.client.sendOperatorComment(this.state.programID, {
       text,
       isPermanent,
