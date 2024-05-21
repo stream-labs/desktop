@@ -236,9 +236,21 @@
         }
       },
       "addModerator": {
+        "network_error": {
+          "title": "ネットワークエラーが発生しました",
+          "message": "ネットワークエラーが発生したため、モデレーターを登録できませんでした。\nネットワーク接続が正常かどうかをご確認ください。"
+        },
+        "400": {
+          "title": "モデレーターを登録できませんでした",
+          "message": "登録に失敗しました。\n%{additionalMessage}"
+        },
+        "500": {
+          "title": "モデレーターを登録できませんでした",
+          "message": "登録に失敗しました。\n%{additionalMessage}"
+        },
         "NOT_BROADCASTER": {
           "title": "NOT_BROADCASTER",
-          "message": "配信していないため、モデレーターを取得できませんでした"
+          "message": "配信していないため、モデレーターを登録できませんでした"
         },
         "ALREADY_EXISTS": {
           "title": "ALREADY_EXISTS",
@@ -250,15 +262,39 @@
         }
       },
       "removeModerator": {
+        "network_error": {
+          "title": "ネットワークエラーが発生しました",
+          "message": "ネットワークエラーが発生したため、モデレーターを削除できませんでした。\nネットワーク接続が正常かどうかをご確認ください。"
+        },
+        "400": {
+          "title": "モデレーターを削除できませんでした",
+          "message": "削除登録に失敗しました。\n%{additionalMessage}"
+        },
+        "500": {
+          "title": "モデレーターを削除できませんでした",
+          "message": "削除登録に失敗しました。\n%{additionalMessage}"
+        },
         "NOT_BROADCASTER": {
           "title": "NOT_BROADCASTER",
           "message": "配信していないため、モデレーターを削除できませんでした"
         }
       },
       "fetchModerators": {
+        "network_error": {
+          "title": "ネットワークエラーが発生しました",
+          "message": "ネットワークエラーが発生したため、モデレーター情報を取得できませんでした。\nネットワーク接続が正常かどうかをご確認ください。"
+        },
+        "400": {
+          "title": "モデレーター情報を取得できませんでした",
+          "message": "取得に失敗しました。\n%{additionalMessage}"
+        },
+        "500": {
+          "title": "モデレーター情報を取得できませんでした",
+          "message": "取得に失敗しました。\n%{additionalMessage}"
+        },
         "NOT_BROADCASTER": {
           "title": "NOT_BROADCASTER",
-          "message": "配信していないため、モデレーターを取得できませんでした"
+          "message": "配信していないため、モデレーター情報を取得できませんでした"
         }
       }
     },
