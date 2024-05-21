@@ -37,7 +37,6 @@ export default class CommentFilter extends Vue {
 
   showPopupMenu = false;
 
-  // TODO: 後で言語ファイルに移動する
   adjusterTooltip = '登録者で絞り込み';
 
   async reloadFilters() {
