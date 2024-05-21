@@ -189,7 +189,6 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
         switch (event.event) {
           case 'refreshModerators':
             // モデレーター情報が再取得されたら既存コメントのモデレーター情報も更新する
-            console.log('refresh moderators'); // DEBUG
             this.SET_STATE({
               messages: this.items.map(chat => ({
                 ...chat,
@@ -213,16 +212,14 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
               const { ssngId, userName, userId } = event.record;
               const record = this.nicoliveCommentFilterService.findFilterCache(ssngId);
 
-              console.log('Removing SSNG:', ssngId, { ...record }); // DEBUG
               if (record) {
                 this.nicoliveCommentFilterService.deleteFiltersCache([ssngId]);
-              } else {
-                console.warn('Removing SSNG failed:', ssngId); // DEBUG
-                break;
+                const name = calcModeratorName({ userId, userName });
+                const type = calcSSNGTypeName(record);
+                this.addSystemMessage(
+                  makeEmulatedChat(`${name}が${type}のブロックを取り消しました`),
+                );
               }
-              const name = calcModeratorName({ userId, userName });
-              const type = calcSSNGTypeName(record);
-              this.addSystemMessage(makeEmulatedChat(`${name}が${type}のブロックを取り消しました`));
             }
             break;
         }

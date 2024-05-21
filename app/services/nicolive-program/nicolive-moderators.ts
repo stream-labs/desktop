@@ -24,7 +24,7 @@ export class NicoliveModeratorsService extends StatefulService<INicoliveModerato
   private ndgrClient: NdgrClient;
   private ndgrSubscription: Subscription;
 
-  private client = new NicoliveClient({ });
+  private client = new NicoliveClient({});
 
   static initialState: INicoliveModeratorsService = {
     moderatorsCache: [],
@@ -64,7 +64,7 @@ export class NicoliveModeratorsService extends StatefulService<INicoliveModerato
                 if (url) {
                   this.connectModeratorStream(url);
                 } else {
-                  console.warn('NDGR URL not found'); // DEBUG TODO
+                  console.warn('NDGR URL not found');
                 }
               })
               .catch(caught => {
@@ -93,8 +93,6 @@ export class NicoliveModeratorsService extends StatefulService<INicoliveModerato
   }
 
   async connectModeratorStream(ndgrURL: string) {
-    console.log('Connecting to NDGR:', ndgrURL); // DEBUG
-
     this.ndgrClient = new NdgrClient(ndgrURL, 'moderator');
     this.ndgrSubscription = this.ndgrClient.messages.subscribe({
       next: msg => {
@@ -108,7 +106,6 @@ export class NicoliveModeratorsService extends StatefulService<INicoliveModerato
               {
                 const userId = msg.message.moderatorUpdated.operator.userId;
                 if (userId) {
-                  console.log('Adding moderator:', userId); // DEBUG
                   this.addModeratorCache(userId.toString());
                 }
               }
@@ -116,7 +113,6 @@ export class NicoliveModeratorsService extends StatefulService<INicoliveModerato
             case dwango.nicolive.chat.data.atoms.ModeratorUpdated.ModeratorOperation.DELETE: {
               const userId = msg.message.moderatorUpdated.operator.userId;
               if (userId) {
-                console.log('Removing moderator:', userId); // DEBUG
                 this.removeModeratorCache(userId.toString());
               }
             }
@@ -157,8 +153,6 @@ export class NicoliveModeratorsService extends StatefulService<INicoliveModerato
                     ...(operator?.nickname ? { userName: operator.nickname } : {}),
                   };
                   this.refreshSubject.next({ event: 'addSSNG', record });
-                } else {
-                  console.warn('Adding SSNG failed:', ssngUpdated); // DEBUG
                 }
               }
               break;
@@ -175,15 +169,13 @@ export class NicoliveModeratorsService extends StatefulService<INicoliveModerato
                     event: 'removeSSNG',
                     record: { ssngId, userName, userId },
                   });
-                } else {
-                  console.warn('Removing SSNG failed:', ssngUpdated); // DEBUG
                 }
               }
               break;
 
             default:
               if (this.registerUnknownSSNGOperation(ssngUpdated.operation)) {
-                console.warn('Unknown SSNG operation:', ssngUpdated.operation, ssngUpdated); // DEBUG
+                console.warn('Unknown SSNG operation:', ssngUpdated.operation, ssngUpdated);
                 Sentry.withScope(scope => {
                   scope.setFingerprint([
                     'NicoliveModeratorsService',
@@ -209,14 +201,13 @@ export class NicoliveModeratorsService extends StatefulService<INicoliveModerato
           scope.captureException(error);
         });
       },
-      complete: () => console.log('Message stream completed'), // DEBUG
+      complete: () => console.log('Message stream completed'),
     });
     await this.ndgrClient.connect();
   }
 
   disconnectNdgr() {
     if (this.ndgrClient) {
-      console.log('Unsubscribing from NDGR'); // DEBUG
       this.ndgrClient.dispose();
       this.ndgrClient = null;
       this.ndgrSubscription.unsubscribe();
@@ -237,7 +228,6 @@ export class NicoliveModeratorsService extends StatefulService<INicoliveModerato
   }
 
   private setModeratorsCache(userIds: string[]) {
-    console.info('setModeratorsCache', userIds); // DEBUG
     this.patchState({ moderatorsCache: userIds });
   }
 
@@ -274,8 +264,6 @@ export class NicoliveModeratorsService extends StatefulService<INicoliveModerato
   private resolveConfirmPromise: (result: boolean) => void | undefined = undefined;
 
   closeConfirmWindow(result: boolean) {
-    console.info('closeConfirmWindow', result); // DEBUG
-
     if (!this.resolveConfirmPromise) return;
 
     const resolve = this.resolveConfirmPromise;

@@ -53,7 +53,6 @@ export class NdgrClient {
       for await (const entry of this.retrieve(fetchUri, reader =>
         dwango.nicolive.chat.service.edge.ChunkedEntry.decodeDelimited(reader),
       )) {
-        // console.log(`[${this.label}] ChunkedEntry`, entry); // DEBUG
         if (entry.segment != null) {
           await this.retrieveMessages(entry.segment.uri);
         } else if (entry.next != null) {
@@ -67,7 +66,6 @@ export class NdgrClient {
     for await (const msg of this.retrieve(uri, reader =>
       dwango.nicolive.chat.service.edge.ChunkedMessage.decodeDelimited(reader),
     )) {
-      // console.log(`[${this.label}] ChunkedMessage`, msg); // DEBUG
       if (this.isDisposed) return;
       this.messages.next(msg);
       if (msg.state != null) {

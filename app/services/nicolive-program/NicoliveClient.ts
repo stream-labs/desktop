@@ -243,15 +243,9 @@ export class NicoliveClient {
     });
     try {
       const resp = await fetch(url, requestInit);
-      return NicoliveClient.wrapResult<T>(resp).then(r => {
-        console.log(`requestAPI(${method} ${url}) result`, JSON.parse(JSON.stringify(r))); // DEBUG
-        return r;
-      });
+      return NicoliveClient.wrapResult<T>(resp);
     } catch (err) {
-      return NicoliveClient.wrapFetchError(err as Error).then(r => {
-        console.error(`requestAPI(${method} ${url}) error`, JSON.parse(JSON.stringify(r))); // DEBUG
-        return r;
-      });
+      return NicoliveClient.wrapFetchError(err as Error);
     }
   }
 
@@ -715,7 +709,6 @@ export class NicoliveClient {
         return json.data.following;
       }
     }
-    console.info('fetchUserFollow', userId, res); // DEBUG
     throw new Error(`fetchUserFollow failed: ${res.status} ${res.statusText}`);
   }
 
@@ -745,7 +738,6 @@ export class NicoliveClient {
       }),
     );
     if (!res.ok) {
-      console.info('followUser', userId, res, await res.json()); // DEBUG
       throw new Error(`followUser failed: ${res.status} ${res.statusText}`);
     }
   }
