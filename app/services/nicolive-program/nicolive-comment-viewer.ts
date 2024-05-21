@@ -251,7 +251,8 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
   }
 
   refreshConnection() {
-    this.unsubscribe();
+    // コメントは切断するがモデレーター通信は維持する
+    this.lastSubscription?.unsubscribe();
     this.clearList();
     // 再接続ではピン止めは解除しない
 
