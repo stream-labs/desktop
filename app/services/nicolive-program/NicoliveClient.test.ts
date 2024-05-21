@@ -185,7 +185,6 @@ suites.forEach((suite: Suite) => {
     // niconicoSession を与えないと、実行時の main process の cookieから取ろうとして失敗するので差し替える
     const client = new NicoliveClient({
       niconicoSession: 'dummy',
-      enableModeratorAPICall: true, // DEBUG
     });
 
     fetchMock[suite.method.toLowerCase()](suite.base + suite.path, dummyBody);

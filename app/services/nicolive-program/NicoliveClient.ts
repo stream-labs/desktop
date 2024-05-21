@@ -135,7 +135,6 @@ export class NicoliveClient {
   constructor(
     private options: {
       niconicoSession?: string;
-      enableModeratorAPICall?: boolean; // for DEBUG
     } = {},
   ) {}
 
@@ -773,9 +772,6 @@ export class NicoliveClient {
   }
 
   async fetchModerators(): Promise<WrappedResult<Moderator[]>> {
-    // DEBUG
-    if (!this.options.enableModeratorAPICall) return { ok: true, value: [] };
-
     return this.requestAPI<Moderator[]>(
       'GET',
       `${NicoliveClient.live2BaseURL}/unama/api/v2/broadcasters/moderators`,
@@ -788,36 +784,13 @@ export class NicoliveClient {
    * @returns
    */
   async addModerator(userId: string): Promise<WrappedResult<AddModerator>> {
-    // DEBUG
-    if (!this.options.enableModeratorAPICall) {
-      return {
-        ok: true,
-        value: {
-          meta: { status: 200 },
-          data: {
-            userId: parseInt(userId, 10),
-            nickname: 'dummy',
-            iconUrl: '',
-            isValid: true,
-            createdAt: '1970-01-01T09:00:00+09:00',
-          },
-        },
-      };
-    }
-
     return this.requestAPI<AddModerator>(
       'POST',
       `${NicoliveClient.live2BaseURL}/unama/api/v2/broadcasters/moderators`,
       NicoliveClient.jsonBody({ userId: parseInt(userId, 10) }),
     );
   }
-
   async removeModerator(userId: string): Promise<WrappedResult<void>> {
-    // DEBUG
-    if (!this.options.enableModeratorAPICall) {
-      return { ok: true, value: undefined };
-    }
-
     return this.requestAPI<void>(
       'DELETE',
       `${NicoliveClient.live2BaseURL}/unama/api/v2/broadcasters/moderators?userId=${userId}`,

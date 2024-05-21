@@ -24,7 +24,7 @@ export class NicoliveModeratorsService extends StatefulService<INicoliveModerato
   private ndgrClient: NdgrClient;
   private ndgrSubscription: Subscription;
 
-  private client = new NicoliveClient({ enableModeratorAPICall: true });
+  private client = new NicoliveClient({ });
 
   static initialState: INicoliveModeratorsService = {
     moderatorsCache: [],
