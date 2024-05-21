@@ -123,7 +123,7 @@ export class TikTokService
   }
 
   get defaultGame(): IGame {
-    return { id: '', name: 'Other' };
+    return { id: 'tiktok-other', name: 'Other' };
   }
 
   /**
@@ -319,7 +319,10 @@ export class TikTokService
     const body = new FormData();
     body.append('title', opts.title);
     body.append('device_platform', getOS());
-    body.append('category', opts.game);
+
+    // pass an empty string for the 'Other' game option
+    const game = opts.game === this.defaultGame.id ? '' : opts.game;
+    body.append('category', game);
 
     const request = new Request(url, { headers, method: 'POST', body });
 

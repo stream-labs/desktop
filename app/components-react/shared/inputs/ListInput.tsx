@@ -87,8 +87,6 @@ export const ListInput = InputComponent(<T extends any>(p: TListInputProps<T>) =
 
   const selectedOption = options?.find(opt => opt.value === p.value);
 
-  console.log('options', JSON.stringify(options, null, 2));
-
   return (
     <InputWrapper {...wrapperAttrs} extra={p?.description ?? selectedOption?.description}>
       <Select

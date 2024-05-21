@@ -19,33 +19,33 @@ export default function GameSelector(p: TProps) {
   const selectedGameId = platformService.state.settings.game;
   let selectedGameName = selectedGameId;
 
-  if (platform === 'trovo') {
+  const isTwitch = platform === 'twitch';
+  const isTrovo = platform === 'trovo';
+  const isTikTok = platform === 'tiktok';
+
+  if (isTrovo) {
     selectedGameName = Services.TrovoService.state.channelInfo.gameName;
   }
 
-  if (platform === 'tiktok') {
+  if (isTikTok) {
     selectedGameName = Services.TikTokService.state.gameName;
   }
 
   const { isSearching, setIsSearching, games, setGames } = useModule(() => {
-    const defaultGames = selectedGameId
-      ? [{ label: selectedGameName, value: selectedGameId }]
-      : ([] as IListOption<string>[]);
-
-    // if (platform === 'tiktok' && defaultGames.length > 0) {
-    //   const defaultTikTokGame = {
-    //     label: Services.TikTokService.defaultGame.name,
-    //     value: Services.TikTokService.defaultGame.id,
-    //   };
-    //   defaultGames.push(defaultTikTokGame);
-    // }
+    const selectedGameOptions = isTikTok
+      ? [
+          { label: selectedGameName, value: selectedGameId },
+          {
+            label: Services.TikTokService.defaultGame.name,
+            value: Services.TikTokService.defaultGame.id,
+          },
+        ]
+      : [{ label: selectedGameName, value: selectedGameId }];
 
     return {
       state: injectState({
         isSearching: false,
-        games: selectedGameId
-          ? [{ label: selectedGameName, value: selectedGameId }]
-          : ([] as IListOption<string>[]),
+        games: selectedGameId ? selectedGameOptions : ([] as IListOption<string>[]),
       }),
     };
   });
@@ -78,8 +78,6 @@ export default function GameSelector(p: TProps) {
         image: g?.image,
       })) ?? [];
 
-    console.log('games', JSON.stringify(games, null, 2));
-
     setGames(games);
     setIsSearching(false);
   }
@@ -90,14 +88,16 @@ export default function GameSelector(p: TProps) {
   }
 
   function onSelect(searchString: string) {
-    if (platform === 'tiktok') {
+    const game = games.find(game => game.label === searchString);
+    console.log('game ', game);
+
+    if (isTikTok) {
       Services.TikTokService.actions.setGameName(searchString);
     }
-  }
 
-  const isTwitch = platform === 'twitch';
-  const isTrovo = platform === 'trovo';
-  const isTikTok = platform === 'tiktok';
+    if (!game) return;
+    setGames([game]);
+  }
 
   const label = {
     twitch: $t('Twitch Category'),
@@ -105,6 +105,17 @@ export default function GameSelector(p: TProps) {
     trovo: $t('Trovo Category'),
     tiktok: $t('TikTok Game'),
   }[platform as string];
+
+  const filterOption = (input: string, option?: { label: string; value: string }) => {
+    if (isTikTok) {
+      return (
+        option?.label === 'Other' ||
+        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+      );
+    }
+
+    return (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
+  };
 
   return (
     <ListInput
@@ -120,7 +131,7 @@ export default function GameSelector(p: TProps) {
       onSelect={(val, opts) => {
         onSelect(opts.labelrender);
       }}
-      // filterOption={platform !== 'tiktok' && !selectedGameId}
+      filterOption={filterOption}
       debounce={500}
       required={isTwitch || isTrovo || isTikTok}
       hasImage={isTwitch || isTrovo}
