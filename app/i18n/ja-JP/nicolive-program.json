@@ -258,7 +258,7 @@
         },
         "MAX": {
           "title": "MAX",
-          "message": "登録上限が人数に達しているため、モデレーターに登録できませんでした"
+          "message": "登録人数が上限がに達しているため、モデレーターに登録できませんでした"
         }
       },
       "removeModerator": {
@@ -268,11 +268,11 @@
         },
         "400": {
           "title": "モデレーターを削除できませんでした",
-          "message": "削除登録に失敗しました。\n%{additionalMessage}"
+          "message": "削除に失敗しました。\n%{additionalMessage}"
         },
         "500": {
           "title": "モデレーターを削除できませんでした",
-          "message": "削除登録に失敗しました。\n%{additionalMessage}"
+          "message": "削除に失敗しました。\n%{additionalMessage}"
         },
         "NOT_BROADCASTER": {
           "title": "NOT_BROADCASTER",
