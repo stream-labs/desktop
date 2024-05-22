@@ -5,5 +5,9 @@
   "Grant Permissions": "Udělit oprávnění",
   "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs potřebuje další oprávnění. Pokračujte udělením oprávnění v místním dialogovém okně.",
   "Microphone": "Mikrofon",
-  "Webcam": "Webová kamera"
+  "Webcam": "Webová kamera",
+  "You've merged a Streamlabs ID to your account, please log back in to ensure you have the right credentials.": "Sloučili jste Streamlabs ID se svým účtem. Znovu se přihlaste pro ujištění, že máte správné přihlašovací údaje.",
+  "Enable Live Streaming?": "Povolit živé streamování?",
+  "Streamlabs is currently in recording mode, which hides live streaming features. Would you like to enable live streaming features? You can disable them again in General settings.": "Streamlabs je momentálně v režimu nahrávání, který skryje funkce živého streamování. Chcete povolit funkce živého streamování? Můžete je znovu zakázat v Obecných nastaveních.",
+  "Enable Streaming": "Povolit streamování"
 }

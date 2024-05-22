@@ -18,8 +18,8 @@ export abstract class MediasoupEntity {
 
   constructor(public sourceId: string) {}
 
-  sendWebRTCRequest(data: unknown) {
-    return this.guestCamService.sendWebRTCRequest(data);
+  sendWebRTCRequest<T = unknown>(data: unknown): Promise<T> {
+    return this.guestCamService.sendWebRTCRequest(data) as Promise<T>;
   }
 
   getSource() {

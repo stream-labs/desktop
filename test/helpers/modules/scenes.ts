@@ -1,6 +1,6 @@
 // Scene helper functions
-import { contextMenuClick } from '../spectron/context-menu';
-import { dialogDismiss } from '../spectron/dialog';
+import { contextMenuClick } from '../webdriver/context-menu';
+import { dialogDismiss } from '../webdriver/dialog';
 import { click, clickButton, focusChild, focusMain, select, waitForLoader } from './core';
 import { sleep } from '../sleep';
 import { useForm } from './forms';

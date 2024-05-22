@@ -14,5 +14,10 @@
   "Manage List": "관리 목록",
   "Font Settings": "폰트 설정",
   "A hex color for the text of the": "다음에 대한 16진수 색상:",
-  "token": "토큰"
+  "token": "토큰",
+  "Each donation that shows in the donation ticker will be in this format. Available tokens:": "도네이션 표시기에 모든 도네이션이 이 형식으로 표시됩니다. 이용 가능 토큰:",
+  "The maximum amount of donations to show in the ticker. Must be a number greater than 0.": "표시기에 표시할 수 있는 최대 도네이션 금액. 0보다 큰 수를 입력해야 합니다.",
+  "How fast the ticker should scroll between 1 (fastest) and 10 (slowest). Set to 0 for no scrolling.": "1(가장 빠름)~10(가장 느림) 중 표시기의 스크롤 속도를 결정합니다. 0으로 설정하면 스크롤하지 않습니다.",
+  "The font size in pixels. Reasonable size typically ranges between 24px and 48px.": "폰트 사이즈는 픽셀 기준입니다. 일반적으로 적당한 크기의 범위는 24px ~ 48px 사이입니다.",
+  "How thick to make the font. The value should range between 300 (thinnest) and 900 (thickest)": "폰트의 두께입니다. 값은 300(가장 가늘음)~900(가장 두꺼움) 사이로만 설정할 수 있습니다."
 }

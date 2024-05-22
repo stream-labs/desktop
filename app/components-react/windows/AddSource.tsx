@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Menu } from 'antd';
 import * as remote from '@electron/remote';
 import cx from 'classnames';
@@ -153,8 +153,10 @@ export default function AddSource() {
             propertiesManagerSettings: sourceAddOptions.propertiesManagerSettings,
             guestCamStreamId: sourceAddOptions.guestCamStreamId,
           },
+          display: 'horizontal',
         },
       );
+      //@ts-ignore typescript upgrade
       source = item?.source;
     }
     if (!source?.video && source?.hasProps()) {
@@ -209,7 +211,6 @@ export default function AddSource() {
                   mode="vertical"
                   selectedKeys={[selectedSourceId]}
                   onClick={({ key }: { key: string }) => {
-                    console.log('firing', key);
                     setSelectedSourceId(key);
                   }}
                   className={styles.menu}

@@ -4,6 +4,7 @@ import { WidgetType } from 'services/widgets';
 import { Observable } from 'rxjs';
 import { IAudioSource } from 'services/audio';
 import { EDeinterlaceFieldOrder, EDeinterlaceMode } from 'obs-studio-node';
+import { TDisplayType } from 'services/settings-v2';
 
 export interface ISource {
   sourceId: string;
@@ -17,6 +18,7 @@ export interface ISource {
   height: number;
   doNotDuplicate: boolean;
   configurable: boolean;
+  forceUiRefresh: boolean;
   propertiesManagerType: TPropertiesManager;
   propertiesManagerSettings?: Dictionary<any>;
   channel?: number;
@@ -105,6 +107,7 @@ export interface ISourceAddOptions<TPropertiesManagerSettings = Dictionary<any>>
   guestCamStreamId?: string; // Automatically assign a guest to this source after creation
   deinterlaceMode?: EDeinterlaceMode;
   deinterlaceFieldOrder?: EDeinterlaceFieldOrder;
+  display?: TDisplayType;
 }
 
 export type TSourceType =
@@ -137,7 +140,8 @@ export type TSourceType =
   | 'syphon-input'
   | 'soundtrack_source'
   | 'mediasoupconnector'
-  | 'wasapi_process_output_capture';
+  | 'wasapi_process_output_capture'
+  | 'spout_capture';
 
 // Register new properties managers here
 export type TPropertiesManager =
@@ -166,4 +170,6 @@ export interface ISourceDisplayData {
   demoVideo?: boolean;
   icon: string;
   shortDesc?: string;
+  link?: string;
+  linkText?: string;
 }

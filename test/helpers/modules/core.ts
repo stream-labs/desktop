@@ -2,7 +2,7 @@
  * The core module provides methods for the most frequent actions
  */
 
-import { getContext } from '../spectron';
+import { getContext } from '../webdriver';
 import { getApiClient } from '../api-client';
 import { WindowsService } from '../../../app/services/windows';
 import { ClickOptions, WaitForOptions } from 'webdriverio';
@@ -23,6 +23,13 @@ export async function select(selectorOrEl: TSelectorOrEl): Promise<WebdriverIO.E
     return getClient().$(selectorOrEl);
   }
   return selectorOrEl;
+}
+
+/**
+ * A shortcut for client.$$()
+ */
+export async function selectElements(selector: string): Promise<WebdriverIO.Element[]> {
+  return getClient().$$(selector);
 }
 
 export function selectButton(buttonText: string) {
@@ -56,7 +63,20 @@ export async function clickTab(tabText: string) {
   await click(`div[role="tab"]=${tabText}`);
 }
 
+export async function clickCheckbox(dataName: string) {
+  const $checkbox = await select(`input[data-name="${dataName}"]`);
+  await $checkbox.click();
+}
+
 // OTHER SHORTCUTS
+
+export async function hoverElement(selector: string, duration?: number) {
+  const element = await select(`${selector}`);
+  await element.moveTo();
+  if (duration) {
+    await getClient().pause(duration);
+  }
+}
 
 export async function isDisplayed(selectorOrEl: TSelectorOrEl, waitForOptions?: WaitForOptions) {
   if (waitForOptions) {
@@ -84,6 +104,23 @@ export function waitForText(text: string) {
 
 export async function waitForEnabled(selectorOrEl: TSelectorOrEl, options?: WaitForOptions) {
   await (await select(selectorOrEl)).waitForEnabled(options);
+}
+
+/**
+ * Get number of elements displayed
+ * @remark This is needed because arrays of WebdriverIO.Element cannot use array methods and properties
+ */
+export async function getNumElements(selector: string): Promise<number> {
+  const elements = (await selectElements(selector)).values();
+  let numElements = 0;
+
+  if (elements) {
+    for await (const element of elements) {
+      numElements++;
+    }
+  }
+
+  return numElements;
 }
 
 // WINDOW FOCUS

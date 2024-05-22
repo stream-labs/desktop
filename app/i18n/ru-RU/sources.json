@@ -354,5 +354,8 @@
   "Set scale filter 'Bicubic'": "Фильтр масштаба «Бикубический»",
   "Set scale filter 'Bilinear'": "Фильтр масштаба «Билинейный»",
   "Set scale filter 'Lanczos'": "Фильтр масштаба «Ланцош»",
-  "Set scale filter 'Area'": "Фильтр масштаба «Область»"
+  "Set scale filter 'Area'": "Фильтр масштаба «Область»",
+  "You currently have the same source on both canvases selected. Please select the source in the canvas to edit it independently.": "В данный момент для обоих холстов выбран один и тот же источник. Выберите источник для холста, чтобы его можно было редактировать отдельно.",
+  "Selective Recording can only be used with horizontal sources.": "Выборочную запись можно использовать только с горизонтальными источниками.",
+  "Cannot move source outside canvas in Dual Output Mode.": "В режиме Dual Output невозможно сдвинуть источник вне холста."
 }

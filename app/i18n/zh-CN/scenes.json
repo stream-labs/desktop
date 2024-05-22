@@ -49,5 +49,12 @@
   "Choose a template from our theme library": "从我们的主题库中选择一个模板",
   "Enter a Scene Collection Name": "输入场景集名称",
   "Copy of %{collectionName}": "%{collectionName}副本",
-  "Your Scene Collections": "您的场景集："
+  "Your Scene Collections": "您的场景集：",
+  "Dual Output Mode": "Dual Output 模式",
+  "Horizontal Output": "水平输出",
+  "Vertical Output": "垂直输出",
+  "Arrange sources here for a vertical scene layout.": "在此处排列源，以实现垂直场景布局。",
+  "Arrange sources here for a horizontal scene layout.": "在此处排列源，以实现水平场景布局。",
+  "Toggle Dual Output Mode.": "切换 Dual Output 模式。",
+  "Cannot hide dual output toggles in dual output mode.": "无法在 Dual Output 模式下隐藏 Dual Output 切换。"
 }

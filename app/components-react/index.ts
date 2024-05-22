@@ -37,19 +37,11 @@ import { CustomCodeWindow } from './widgets/common/CustomCode';
 import SourceShowcase from './windows/source-showcase';
 import SourceFilters from './windows/SourceFilters';
 import RecentEvents from './editor/elements/RecentEvents';
-import MiniFeed from './editor/elements/Minifeed';
-import RecordingPreview from './editor/elements/RecordingPreview';
-import StreamPreview from './editor/elements/StreamPreview';
 import BrowserView from './shared/BrowserView';
-import LegacyEvents from './editor/elements/LegacyEvents';
-import Browser from './editor/elements/Browser';
-import DisplayElement from './editor/elements/Display';
 import MediaGallery from './windows/MediaGallery';
 import LayoutEditor from './pages/layout-editor/LayoutEditor';
 import Projector from './windows/Projector';
-import SceneSelector from './editor/elements/SceneSelector';
 import AddSource from './windows/AddSource';
-import SourceSelector from './editor/elements/SourceSelector';
 import SideNav from './sidebar/SideNav';
 import WelcomeToPrime from './windows/WelcomeToPrime';
 import Notifications from './windows/notifications/Notifications';
@@ -64,11 +56,13 @@ import PlatformAppPageView from './shared/PlatformAppPageView';
 import PlatformAppPopOut from './windows/PlatformAppPopOut';
 import RecentEventsWindow from './windows/RecentEvents';
 import NewBadge from './shared/NewBadge';
-import RecordingHistory from './windows/RecordingHistory';
+import RecordingHistory from './pages/RecordingHistory';
 import UltraIcon from './shared/UltraIcon';
 import EditTransform from './windows/EditTransform';
 import InstalledApps from './windows/settings/InstalledApps';
 import Hotkeys from './windows/settings/Hotkeys';
+import Studio from './pages/Studio';
+import LiveDock from './root/LiveDock';
 
 // list of React components to be used inside Vue components
 export const components = {
@@ -89,7 +83,7 @@ export const components = {
   Display,
   TitleBar,
   Chat,
-  Highlighter,
+  Highlighter: createRoot(Highlighter),
   Grow,
   Loader,
   PlatformLogo,
@@ -114,17 +108,9 @@ export const components = {
   SourceShowcase: createRoot(SourceShowcase),
   SourceFilters,
   RecentEvents,
-  MiniFeed: createRoot(MiniFeed),
-  LegacyEvents: createRoot(LegacyEvents),
-  Browser: createRoot(Browser),
-  RecordingPreview: createRoot(RecordingPreview),
-  StreamPreview: createRoot(StreamPreview),
-  DisplayElement: createRoot(DisplayElement),
   MediaGallery,
   LayoutEditor: createRoot(LayoutEditor),
-  SceneSelector: createRoot(SceneSelector),
   AddSource,
-  SourceSelector: createRoot(SourceSelector),
   RecordingHistory: createRoot(RecordingHistory),
   RecentEventsWindow,
   SideNav,
@@ -142,4 +128,6 @@ export const components = {
   InstalledApps,
   Blank,
   Hotkeys,
+  LiveDock: createRoot(LiveDock),
+  Studio: createRoot(Studio),
 };

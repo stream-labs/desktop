@@ -69,7 +69,7 @@
   "Sparks sent are exactly <amount>": "Sparks sendt er nøjagtigt <amount>",
   "Ember amount is at least <amount>": "Ember-beløb er mindst <amount>",
   "Ember amount is exactly <amopunt>": "Ember-beløb er nøjagtigt <amopunt>",
-  "Please note that when advanced media share is enabled, media will no longer play through your alert box widget. Media will only play through this media share widget.": "Bemærk, at når avanceret mediedeling er aktiveret, vil medier ikke længere afspille via din alarmboks-widget. Medier afspilles kun via denne mediedeling-widget.",
+  "Allow your viewers to donate to share media on your stream.": "Allow your viewers to donate to share media on your stream.",
   "Twitch Subscribers": "Twitch-abonnenter",
   "YouTube Members": "YouTube-medlemmer",
   "Media Share": "Mediedeling",
@@ -187,6 +187,6 @@
   "Something went wrong while applying settings": "Der opstod en fejl under anvendelsen af indstillingerne",
   "Superchat Goal": "Superchat-mål",
   "YouTube Superchats": "YouTube Superchats",
-  "Custom Widget": "Custom Widget",
-  "Use HTML, CSS, and JavaScript to create a widget with custom functionality": "Use HTML, CSS, and JavaScript to create a widget with custom functionality"
+  "Custom Widget": "Brugerdefineret widget",
+  "Use HTML, CSS, and JavaScript to create a widget with custom functionality": "Brug HTML, CSS og JavaScript til at oprette en widget med brugerdefinerede funktioner"
 }

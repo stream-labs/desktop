@@ -19,5 +19,13 @@
   "Streamlabs Desktop has updated! Click here to see what changed.": "Aplikace Streamlabs Desktop byla aktualizována! Kliknutím sem zobrazíte přehled změn.",
   "Notifications & News": "Oznámení a novinky",
   "News": "Novinky",
-  "Notifications": "Upozornění"
+  "Notifications": "Upozornění",
+  "A new Recording has been completed. Click for more info": "Byla dokončena nová Nahrávka. Klikněte pro bližší informace",
+  "Recording History": "Historie nahrávek",
+  "Show in folder": "Zobrazit ve složce",
+  "Recordings": "Nahrávky",
+  "Marker %{label} added at %{timestamp}": "Značka %{label} přidána %{timestamp}",
+  "File is too large to upload": "File is too large to upload",
+  "File type %{extension} is not supported": "File type %{extension} is not supported",
+  "Upload already in progress": "Upload already in progress"
 }

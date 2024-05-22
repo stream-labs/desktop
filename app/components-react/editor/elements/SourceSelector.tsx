@@ -1,18 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
+import pick from 'lodash/pick';
 import { Tooltip, Tree } from 'antd';
 import { DataNode } from 'rc-tree/lib/interface';
 import { TreeProps } from 'rc-tree/lib/Tree';
 import cx from 'classnames';
-import { inject, injectState, injectWatch, mutation, useModule } from 'slap';
-import { SourcesService } from 'services/sources';
-import { ScenesService, ISceneItem, TSceneNode, isItem } from 'services/scenes';
-import { SelectionService } from 'services/selection';
+import { TSceneNode, isItem } from 'services/scenes';
 import { EditMenu } from 'util/menus/EditMenu';
 import { $t } from 'services/i18n';
-import { EditorCommandsService } from 'services/editor-commands';
 import { EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
-import { AudioService } from 'services/audio';
-import { StreamingService } from 'services/streaming';
 import { EDismissable } from 'services/dismissables';
 import { assertIsDefined, getDefined } from 'util/properties-type-guards';
 import useBaseElement from './hooks';
@@ -20,8 +15,10 @@ import styles from './SceneSelector.m.less';
 import Scrollable from 'components-react/shared/Scrollable';
 import HelpTip from 'components-react/shared/HelpTip';
 import Translate from 'components-react/shared/Translate';
-import { WidgetsService } from '../../../app-services';
-import { GuestCamService } from 'app-services';
+import { DualOutputSourceSelector } from './DualOutputSourceSelector';
+import { Services } from 'components-react/service-provider';
+import { initStore, useController } from 'components-react/hooks/zustand';
+import { useVuex } from 'components-react/hooks';
 
 interface ISourceMetadata {
   id: string;
@@ -32,34 +29,41 @@ interface ISourceMetadata {
   isStreamVisible: boolean;
   isRecordingVisible: boolean;
   isGuestCamActive: boolean;
+  isDualOutputActive: boolean;
   isFolder: boolean;
   canShowActions: boolean;
   parentId?: string;
+  sceneId?: string;
+  toggleAll?: boolean;
 }
 
-class SourceSelectorModule {
-  private scenesService = inject(ScenesService);
-  private sourcesService = inject(SourcesService);
-  private widgetsService = inject(WidgetsService);
-  private selectionService = inject(SelectionService);
-  private editorCommandsService = inject(EditorCommandsService);
-  private streamingService = inject(StreamingService);
-  private audioService = inject(AudioService);
-  private guestCamService = inject(GuestCamService);
+export const SourceSelectorCtx = React.createContext<SourceSelectorController | null>(null);
 
-  sourcesTooltip = $t('The building blocks of your scene. Also contains widgets.');
-  addSourceTooltip = $t('Add a new Source to your Scene. Includes widgets.');
-  openSourcePropertiesTooltip = $t('Open the Source Properties.');
-  addGroupTooltip = $t('Add a Group so you can move multiple Sources at the same time.');
+class SourceSelectorController {
+  private scenesService = Services.ScenesService;
+  private sourcesService = Services.SourcesService;
+  private widgetsService = Services.WidgetsService;
+  private selectionService = Services.SelectionService;
+  private editorCommandsService = Services.EditorCommandsService;
+  private streamingService = Services.StreamingService;
+  private audioService = Services.AudioService;
+  private guestCamService = Services.GuestCamService;
+  private dualOutputService = Services.DualOutputService;
 
-  state = injectState({
+  store = initStore({
     expandedFoldersIds: [] as string[],
-    showTreeMask: true,
   });
 
   nodeRefs = {};
 
+  /**
+   * This property handles selection when expanding/collapsing folders
+   */
   callCameFromInsideTheHouse = false;
+  /**
+   * This property handles selection when clicking a dual output icon
+   */
+  callCameFromIcon = false;
 
   getTreeData(nodeData: ISourceMetadata[]) {
     // recursive function for transforming SceneNode[] to a Tree format of Antd.Tree
@@ -71,20 +75,24 @@ class SourceSelectorModule {
         if (sceneNode.isFolder) {
           children = getTreeNodes(nodeData.filter(n => n.parentId === sceneNode.id));
         }
+
         return {
           title: (
             <TreeNode
               title={sceneNode.title}
               id={sceneNode.id}
+              sceneId={sceneNode.sceneId}
               isVisible={sceneNode.isVisible}
               isLocked={sceneNode.isLocked}
               canShowActions={sceneNode.canShowActions}
-              toggleVisibility={() => this.toggleVisibility(sceneNode.id)}
+              toggleVisibility={() => this.toggleVisibility(sceneNode.id, sceneNode?.toggleAll)}
               toggleLock={() => this.toggleLock(sceneNode.id)}
               selectiveRecordingEnabled={this.selectiveRecordingEnabled}
               isStreamVisible={sceneNode.isStreamVisible}
               isRecordingVisible={sceneNode.isRecordingVisible}
               isGuestCamActive={sceneNode.isGuestCamActive}
+              isDualOutputActive={sceneNode.isDualOutputActive}
+              hasNodeMap={this.hasNodeMap}
               cycleSelectiveRecording={() => this.cycleSelectiveRecording(sceneNode.id)}
               ref={this.nodeRefs[sceneNode.id]}
               onDoubleClick={() => this.sourceProperties(sceneNode.id)}
@@ -104,9 +112,10 @@ class SourceSelectorModule {
   }
 
   get nodeData(): ISourceMetadata[] {
-    return this.scene.getNodes().map(node => {
-      const itemsForNode = this.getItemsForNode(node.id);
-      const isVisible = itemsForNode.some(i => i.visible);
+    return this.scene.getSourceSelectorNodes().map(node => {
+      const itemsForNode = this.scene.getItemsForNode(node.id);
+      const toggleAll = !!this.dualOutputService.views.sceneNodeMaps[this.scene.id];
+
       const isLocked = itemsForNode.every(i => i.locked);
       const isRecordingVisible = itemsForNode.every(i => i.recordingVisible);
       const isStreamVisible = itemsForNode.every(i => i.streamVisible);
@@ -116,8 +125,21 @@ class SourceSelectorModule {
           !!this.guestCamService.views.getGuestBySourceId(i.sourceId)
         );
       });
-
+      const isDualOutputActive = this.isDualOutputActive;
       const isFolder = !isItem(node);
+
+      let isVisible = itemsForNode.some(i => i.visible);
+
+      // In dual output mode, the icon-view/icon-hide toggle only updates when
+      // all scene items have the same visibility
+      if (toggleAll && this.isDualOutputActive) {
+        const dualOutputNodeId = this.dualOutputService.views.getDualOutputNodeId(node.id);
+        const itemsForDualOutputNode = this.scene.getItemsForNode(dualOutputNodeId);
+        isVisible =
+          itemsForNode.some(i => i.visible) || itemsForDualOutputNode.some(i => i.visible);
+      }
+
+      // create the object
       return {
         id: node.id,
         title: this.getNameForNode(node),
@@ -127,9 +149,12 @@ class SourceSelectorModule {
         isRecordingVisible,
         isStreamVisible,
         isGuestCamActive,
+        isDualOutputActive,
         parentId: node.parentId,
+        sceneId: node.sceneId,
         canShowActions: itemsForNode.length > 0,
         isFolder,
+        toggleAll,
       };
     });
   }
@@ -149,7 +174,7 @@ class SourceSelectorModule {
 
   determineIcon(isLeaf: boolean, sourceId: string) {
     if (!isLeaf) {
-      return this.state.expandedFoldersIds.includes(sourceId)
+      return this.store.expandedFoldersIds.includes(sourceId)
         ? 'fas fa-folder-open'
         : 'fa fa-folder';
     }
@@ -176,7 +201,7 @@ class SourceSelectorModule {
 
   addSource() {
     if (this.scenesService.views.activeScene) {
-      this.sourcesService.showShowcase();
+      this.sourcesService.actions.showShowcase();
     }
   }
 
@@ -189,7 +214,7 @@ class SourceSelectorModule {
         const parent = this.selectionService.views.globalSelection.getClosestParent();
         if (parent) parentId = parent.id;
       }
-      this.scenesService.showNameFolder({
+      this.scenesService.actions.showNameFolder({
         itemsToGroup,
         parentId,
         sceneId: this.scenesService.views.activeScene.id,
@@ -272,86 +297,276 @@ class SourceSelectorModule {
       destNode?.id,
       placement,
     );
-  }
 
-  makeActive(info: { node: DataNode; nativeEvent: MouseEvent }) {
-    this.callCameFromInsideTheHouse = true;
-    let ids: string[] = [info.node.key as string];
+    /**
+     * If this is a dual output scene, reorder the corresponding nodes
+     */
+    if (this.dualOutputService.views.hasSceneNodeMaps) {
+      const destNodeId = destNode?.id ?? (info.node.key as string);
+      const dualOutputNodes = targetNodes
+        .map(nodeId => {
+          const dualOutputNodeId = this.dualOutputService.views.getDualOutputNodeId(nodeId);
+          if (dualOutputNodeId) {
+            return dualOutputNodeId;
+          }
+        })
+        .filter(nodeId => typeof nodeId === 'string') as string[];
+      const dualOutputNodesToDrop = this.scene.getSelection(dualOutputNodes);
+      const dualOutputDestNodeId = this.dualOutputService.views.getDualOutputNodeId(destNodeId);
+      if (!dualOutputDestNodeId) return;
+      const dualOutputNode = this.scene.getNode(dualOutputDestNodeId);
 
-    if (info.nativeEvent.ctrlKey) {
-      ids = this.activeItemIds.concat(ids);
-    } else if (info.nativeEvent.shiftKey) {
-      // Logic for multi-select
-      const idx1 = this.nodeData.findIndex(
-        i => i.id === this.activeItemIds[this.activeItemIds.length - 1],
+      if (!dualOutputNodesToDrop || !dualOutputNode) return;
+      if (dualOutputNodes.some(nodeId => nodeId === dualOutputNode.id)) return;
+
+      await this.editorCommandsService.actions.return.executeCommand(
+        'ReorderNodesCommand',
+        dualOutputNodesToDrop,
+        dualOutputNode?.id,
+        placement,
       );
-      const idx2 = this.nodeData.findIndex(i => i.id === info.node.key);
-      const swapIdx = idx1 > idx2;
-      ids = this.nodeData
-        .map(i => i.id)
-        .slice(swapIdx ? idx2 : idx1, swapIdx ? idx1 + 1 : idx2 + 1);
     }
-
-    this.selectionService.views.globalSelection.select(ids);
   }
 
-  @mutation()
-  toggleFolder(nodeId: string) {
-    if (this.state.expandedFoldersIds.includes(nodeId)) {
-      this.state.expandedFoldersIds.splice(this.state.expandedFoldersIds.indexOf(nodeId), 1);
-    } else {
-      this.state.expandedFoldersIds.push(nodeId);
+  makeActive(info: { node: DataNode; nativeEvent: MouseEvent } | string) {
+    this.callCameFromInsideTheHouse = true;
+
+    /**
+     * For calls made from a dual output toggle,
+     * select only the source from the icon clicked
+     */
+    if (typeof info === 'string') {
+      this.callCameFromIcon = true;
+      this.selectionService.views.globalSelection.reset();
+      this.selectionService.views.globalSelection.select([info]);
+      return;
     }
+
+    /**
+     * Skip multiselect logic when call is made from toggle
+     */
+    if (!this.callCameFromIcon) {
+      let ids: string[] = [info.node.key as string];
+
+      if (info.nativeEvent.ctrlKey) {
+        ids = this.activeItemIds.concat(ids);
+      } else if (info.nativeEvent.shiftKey) {
+        // Logic for multi-select
+        const idx1 = this.nodeData.findIndex(
+          i => i.id === this.activeItemIds[this.activeItemIds.length - 1],
+        );
+        const idx2 = this.nodeData.findIndex(i => i.id === info.node.key);
+        const swapIdx = idx1 > idx2;
+        ids = this.nodeData
+          .map(i => i.id)
+          .slice(swapIdx ? idx2 : idx1, swapIdx ? idx1 + 1 : idx2 + 1);
+      }
+
+      /**
+       * In dual output mode with both displays active,
+       * clicking on the source selector selects both sources
+       */
+      if (
+        this.dualOutputService.views.hasNodeMap(this.scene.id) &&
+        this.dualOutputService.views.activeDisplays.horizontal &&
+        this.dualOutputService.views.activeDisplays.vertical
+      ) {
+        const updatedIds = new Set(ids);
+        ids.forEach(id => {
+          const dualOutputNodeId = this.dualOutputService.views.getDualOutputNodeId(id);
+          if (dualOutputNodeId && !updatedIds.has(dualOutputNodeId)) {
+            updatedIds.add(dualOutputNodeId);
+          }
+        });
+
+        ids = Array.from(updatedIds);
+      }
+      this.selectionService.views.globalSelection.select(ids);
+    }
+
+    this.callCameFromIcon = false;
+  }
+
+  toggleFolder(nodeId: string) {
+    this.store.setState(s => {
+      if (s.expandedFoldersIds.includes(nodeId)) {
+        s.expandedFoldersIds = s.expandedFoldersIds.filter(id => id !== nodeId);
+      } else {
+        s.expandedFoldersIds = [...s.expandedFoldersIds, nodeId];
+      }
+    });
   }
 
   get lastSelectedId() {
     return this.selectionService.state.lastSelectedId;
   }
 
-  watchSelected = injectWatch(() => this.lastSelectedId, this.expandSelectedFolders);
+  get isDualOutputActive() {
+    return this.dualOutputService.views.dualOutputMode;
+  }
+
+  /**
+   * Determines if the current scene has a node map entry in the scene collections node map.
+   * The existence of the scene node maps property in the scene collection's manifest indicates
+   * that the scene collection has been converted to a dual output scene. An entry in the
+   * scene node maps in the scene collection manifest indicates that the scene in the
+   * scene collection has been made active in dual output mode. To reduce bulk, scenes only
+   * create vertical nodes when the following are true:
+   *   1. The scene collection has been opened in dual output mode.
+   *   2. The scene has been opened at any point after the scene collection has been opened in
+   *      dual output mode.
+   * This is a finite distinction from the scene collection having any node maps for any scene.
+   */
+  get hasNodeMap() {
+    return !!this.dualOutputService.views.sceneNodeMaps[this.scene.id];
+  }
+  /**
+   * True if there are any node maps in the scene collections scene node map property
+   * in the scene collections manifest or if dual output mode is on.
+   */
+  get hasSceneNodeMaps() {
+    return this.dualOutputService.views.hasSceneNodeMaps;
+  }
+
+  get horizontalActive() {
+    return this.dualOutputService.views.activeDisplays.horizontal;
+  }
+
+  get verticalActive() {
+    return this.dualOutputService.views.activeDisplays.vertical;
+  }
 
   async expandSelectedFolders() {
+    if (!this.store) return;
     if (this.callCameFromInsideTheHouse) {
       this.callCameFromInsideTheHouse = false;
       return;
     }
     const node = this.scene.getNode(this.lastSelectedId);
     if (!node || this.selectionService.state.selectedIds.length > 1) return;
-    this.state.setExpandedFoldersIds(
-      this.state.expandedFoldersIds.concat(node.getPath().slice(0, -1)),
-    );
+    this.store.setState(s => {
+      s.expandedFoldersIds = s.expandedFoldersIds.concat(node.getPath().slice(0, -1));
+    });
 
-    this.nodeRefs[this.lastSelectedId].current.scrollIntoView({ behavior: 'smooth' });
+    this.nodeRefs[this.lastSelectedId]?.current?.scrollIntoView({ behavior: 'smooth' });
   }
 
+  /**
+   * Used for actions initiated from the source selector such as sorting and selecting
+   */
   get activeItemIds() {
+    /* Because the source selector only works with either the horizontal
+     * or vertical node ids at one time, filter them in a dual output scene.
+     */
+    if (this.dualOutputService.views.hasNodeMap()) {
+      const selectedIds = this.selectionService.state.selectedIds;
+      const nodeIds = this.dualOutputService.views.onlyVerticalDisplayActive
+        ? this.dualOutputService.views.verticalNodeIds
+        : this.dualOutputService.views.horizontalNodeIds;
+
+      if (!nodeIds) return selectedIds;
+
+      return selectedIds.filter(id => nodeIds.includes(id));
+    }
+
     return this.selectionService.state.selectedIds;
   }
 
+  /**
+   * Used to highlight selected items in the source selector
+   */
+  get selectionItemIds() {
+    /**
+     * When both displays are active, the source selector rows use the horizontal nodes to render.
+     * To highlight the source in the source selector when interacting with the source
+     * in the vertical display, convert the vertical node id to the horizontal node id.
+     */
+    if (
+      this.dualOutputService.views.activeDisplays.horizontal &&
+      this.dualOutputService.views.activeDisplays.vertical
+    ) {
+      const selectedIds = new Set(this.selectionService.state.selectedIds);
+
+      this.selectionService.state.selectedIds.map(id => {
+        const horizontalNodeId = this.dualOutputService.views.getHorizontalNodeId(id);
+        if (horizontalNodeId && !selectedIds.has(horizontalNodeId)) {
+          selectedIds.add(horizontalNodeId);
+        }
+      });
+
+      return Array.from(selectedIds);
+    }
+    // In all other cases, return all selected ids
+    return this.selectionService.state.selectedIds;
+  }
+
+  /**
+   * Used to get all items in the selection
+   */
   get activeItems() {
     return this.selectionService.views.globalSelection.getItems();
   }
 
-  toggleVisibility(sceneNodeId: string) {
+  /**
+   * Toggle the visibility of the scene item
+   * @remark If the intent is to toggle scene items in both displays but the partner
+   * node id for dual output cannot be found, this will just toggle the selected node
+   * @param sceneNodeId - string of the id of the node selected
+   * @param toggleAll - boolean for whether nodes in both displays should be toggled
+   */
+  toggleVisibility(sceneNodeId: string | undefined, toggleAll: boolean = false) {
+    if (!sceneNodeId) return;
+
+    if (toggleAll) {
+      const bothToggled = this.toggleBothVisibility(sceneNodeId);
+      if (bothToggled) return;
+    }
+
     const selection = this.scene.getSelection(sceneNodeId);
     const visible = !selection.isVisible();
     this.editorCommandsService.actions.executeCommand('HideItemsCommand', selection, !visible);
   }
 
-  // Required for performance. Using Selection is too slow (Service Helpers)
-  getItemsForNode(sceneNodeId: string): ISceneItem[] {
-    const node = getDefined(this.scene.state.nodes.find(n => n.id === sceneNodeId));
+  /**
+   * Primarily used to toggle both dual output scene items at the same time
+   * @remark A little counterintuitive, but to reduce executions of the hide items command,
+   * this function only executes the hide items command if both scene items currently have
+   * the same visibility. This instead of setting the dual output node to the same visibility
+   * as the selected node and then applying the desired visibility to both.
+   *
+   * Otherwise, proceed with toggling just the selected node because this will match
+   * the visibility between the two nodes.
+   *
+   * If the partner node id is not found, only the selected node is toggled.
 
-    if (node.sceneNodeType === 'item') {
-      return [node];
+   * @param sceneNodeId - string of the id of the node selected
+   * @returns boolean signifying whether or not the hide items command was executed
+   */
+  toggleBothVisibility(sceneNodeId: string): boolean {
+    const dualOutputNodeId = this.dualOutputService.views.getDualOutputNodeId(sceneNodeId);
+    if (!dualOutputNodeId) return false;
+
+    const selectedNodeSelection = this.scene.getSelection(sceneNodeId);
+    const dualOutputNodeSelection = this.scene.getSelection(dualOutputNodeId);
+
+    const selectedNodeVisibility = !selectedNodeSelection.isVisible();
+    const dualOutputNodeVisibility = !dualOutputNodeSelection.isVisible();
+
+    if (selectedNodeVisibility === dualOutputNodeVisibility) {
+      const selection = this.scene.getSelection([sceneNodeId, dualOutputNodeId]);
+
+      this.editorCommandsService.actions.executeCommand(
+        'HideItemsCommand',
+        selection,
+        !selectedNodeVisibility,
+      );
+
+      // nodes toggled
+      return true;
     }
 
-    const children = this.scene.state.nodes.filter(n => n.parentId === sceneNodeId);
-    let childrenItems: ISceneItem[] = [];
-
-    children.forEach(c => (childrenItems = childrenItems.concat(this.getItemsForNode(c.id))));
-
-    return childrenItems;
+    // nodes not toggled
+    return false;
   }
 
   get selectiveRecordingEnabled() {
@@ -375,10 +590,15 @@ class SourceSelectorModule {
     this.streamingService.actions.setSelectiveRecording(
       !this.streamingService.state.selectiveRecording,
     );
+    if (!this.selectiveRecordingEnabled && this.isDualOutputActive) {
+      this.dualOutputService.actions.toggleDisplay(false, 'vertical');
+      this.selectionService.views.globalSelection.filterDualOutputNodes();
+    }
   }
 
   cycleSelectiveRecording(sceneNodeId: string) {
     const selection = this.scene.getSelection(sceneNodeId);
+
     if (selection.isLocked()) return;
     if (selection.isStreamVisible() && selection.isRecordingVisible()) {
       selection.setRecordingVisible(false);
@@ -392,9 +612,24 @@ class SourceSelectorModule {
   }
 
   toggleLock(sceneNodeId: string) {
-    const selection = this.scene.getSelection(sceneNodeId);
+    const selection = this.createSelection(sceneNodeId);
+
     const locked = !selection.isLocked();
     selection.setSettings({ locked });
+  }
+
+  createSelection(sceneNodeId: string) {
+    if (this.dualOutputService.views.hasSceneNodeMaps) {
+      /**
+       * Toggling the lock applies to both horizontal and vertical scene items
+       */
+      const otherDisplayNodeId = this.dualOutputService.views.getDualOutputNodeId(sceneNodeId);
+      return this.scene.getSelection([sceneNodeId, otherDisplayNodeId] as string[]);
+    }
+    /**
+     * For vanilla scenes, there are no vertical scene items to handle
+     */
+    return this.scene.getSelection(sceneNodeId);
   }
 
   get scene() {
@@ -404,12 +639,12 @@ class SourceSelectorModule {
 }
 
 function SourceSelector() {
-  const { nodeData } = useModule(SourceSelectorModule);
+  const ctrl = useController(SourceSelectorCtx);
   return (
     <>
       <StudioControls />
       <ItemsTree />
-      {nodeData.some(node => node.isFolder) && (
+      {ctrl.nodeData.some(node => node.isFolder) && (
         <HelpTip
           title={$t('Folder Expansion')}
           dismissableKey={EDismissable.SourceSelectorFolders}
@@ -429,16 +664,14 @@ function SourceSelector() {
 }
 
 function StudioControls() {
-  const {
-    sourcesTooltip,
-    addGroupTooltip,
-    addSourceTooltip,
-    selectiveRecordingEnabled,
-    selectiveRecordingLocked,
-    addSource,
-    addFolder,
-    toggleSelectiveRecording,
-  } = useModule(SourceSelectorModule);
+  const ctrl = useController(SourceSelectorCtx);
+  const { selectiveRecordingEnabled, selectiveRecordingLocked } = useVuex(() =>
+    pick(ctrl, ['selectiveRecordingEnabled', 'selectiveRecordingLocked']),
+  );
+
+  const sourcesTooltip = $t('The building blocks of your scene. Also contains widgets.');
+  const addSourceTooltip = $t('Add a new Source to your Scene. Includes widgets.');
+  const addGroupTooltip = $t('Add a Group so you can move multiple Sources at the same time.');
 
   return (
     <div className={styles.topContainer} data-name="sourcesControls">
@@ -448,7 +681,10 @@ function StudioControls() {
         </Tooltip>
       </div>
       <Tooltip title={addSourceTooltip} placement="bottomLeft">
-        <i className="icon-add-circle icon-button icon-button--lg" onClick={addSource} />
+        <i
+          className="icon-add-circle icon-button icon-button--lg"
+          onClick={() => ctrl.addSource()}
+        />
       </Tooltip>
 
       <Tooltip title={$t('Toggle Selective Recording')} placement="bottomRight">
@@ -457,30 +693,27 @@ function StudioControls() {
             active: selectiveRecordingEnabled,
             disabled: selectiveRecordingLocked,
           })}
-          onClick={toggleSelectiveRecording}
+          onClick={() => ctrl.toggleSelectiveRecording()}
         />
       </Tooltip>
       <Tooltip title={addGroupTooltip} placement="bottomRight">
-        <i className="icon-add-folder icon-button icon-button--lg" onClick={addFolder} />
+        <i
+          className="icon-add-folder icon-button icon-button--lg"
+          onClick={() => ctrl.addFolder()}
+        />
       </Tooltip>
     </div>
   );
 }
 
 function ItemsTree() {
-  const {
-    nodeData,
-    getTreeData,
-    activeItemIds,
-    expandedFoldersIds,
-    selectiveRecordingEnabled,
-    showContextMenu,
-    makeActive,
-    toggleFolder,
-    handleSort,
-    showTreeMask,
-    setShowTreeMask,
-  } = useModule(SourceSelectorModule);
+  const ctrl = useController(SourceSelectorCtx);
+  const { nodeData, selectionItemIds, selectiveRecordingEnabled, lastSelectedId } = useVuex(() =>
+    pick(ctrl, ['nodeData', 'selectionItemIds', 'selectiveRecordingEnabled', 'lastSelectedId']),
+  );
+  const expandedFoldersIds = ctrl.store.useState(s => s.expandedFoldersIds);
+
+  const [showTreeMask, setShowTreeMask] = useState(true);
 
   // Force a rerender when the state of selective recording changes
   const [selectiveRecordingToggled, setSelectiveRecordingToggled] = useState(false);
@@ -488,7 +721,11 @@ function ItemsTree() {
     selectiveRecordingEnabled,
   ]);
 
-  const treeData = getTreeData(nodeData);
+  useEffect(() => {
+    ctrl.expandSelectedFolders();
+  }, [lastSelectedId]);
+
+  const treeData = ctrl.getTreeData(nodeData);
 
   return (
     <div
@@ -503,16 +740,16 @@ function ItemsTree() {
     >
       <Scrollable
         className={cx(styles.scenesContainer, styles.sourcesContainer)}
-        onContextMenu={(e: React.MouseEvent) => showContextMenu('', e)}
+        onContextMenu={(e: React.MouseEvent) => ctrl.showContextMenu('', e)}
       >
         {showTreeMask && <div className={styles.treeMask} data-name="treeMask" />}
         <Tree
-          selectedKeys={activeItemIds}
+          selectedKeys={selectionItemIds}
           expandedKeys={expandedFoldersIds}
-          onSelect={(selectedKeys, info) => makeActive(info)}
-          onExpand={(selectedKeys, info) => toggleFolder(info.node.key as string)}
-          onRightClick={info => showContextMenu(info.node.key as string, info.event)}
-          onDrop={handleSort}
+          onSelect={(selectedKeys, info) => ctrl.makeActive(info)}
+          onExpand={(selectedKeys, info) => ctrl.toggleFolder(info.node.key as string)}
+          onRightClick={info => ctrl.showContextMenu(info.node.key as string, info.event)}
+          onDrop={(info: Parameters<Required<TreeProps>['onDrop']>[0]) => ctrl.handleSort(info)}
           treeData={treeData}
           draggable
           multiple
@@ -529,13 +766,16 @@ const TreeNode = React.forwardRef(
     p: {
       title: string;
       id: string;
+      sceneId?: string;
       isLocked: boolean;
       isVisible: boolean;
       isStreamVisible: boolean;
       isRecordingVisible: boolean;
       selectiveRecordingEnabled: boolean;
       isGuestCamActive: boolean;
+      isDualOutputActive: boolean;
       canShowActions: boolean;
+      hasNodeMap: boolean;
       toggleVisibility: (ev: unknown) => unknown;
       toggleLock: (ev: unknown) => unknown;
       cycleSelectiveRecording: (ev: unknown) => void;
@@ -568,6 +808,9 @@ const TreeNode = React.forwardRef(
         {p.canShowActions && (
           <>
             {p.isGuestCamActive && <i className="fa fa-signal" />}
+            {p.isDualOutputActive && p.hasNodeMap && (
+              <DualOutputSourceSelector nodeId={p.id} sceneId={p?.sceneId} />
+            )}
             {p.selectiveRecordingEnabled && (
               <Tooltip title={selectiveRecordingMetadata().tooltip} placement="left">
                 <i
@@ -576,8 +819,30 @@ const TreeNode = React.forwardRef(
                 />
               </Tooltip>
             )}
-            <i onClick={p.toggleLock} className={p.isLocked ? 'icon-lock' : 'icon-unlock'} />
-            <i onClick={p.toggleVisibility} className={p.isVisible ? 'icon-view' : 'icon-hide'} />
+            <Tooltip
+              title={$t('Lock/Unlock Source')}
+              placement="left"
+              visible={['icon-lock', 'icon-unlock'].includes(hoveredIcon)}
+            >
+              <i
+                onClick={p.toggleLock}
+                className={p.isLocked ? 'icon-lock' : 'icon-unlock'}
+                onMouseEnter={() => setHoveredIcon(p.isLocked ? 'icon-lock' : 'icon-unlock')}
+                onMouseLeave={() => setHoveredIcon('')}
+              />
+            </Tooltip>
+            <Tooltip
+              title={$t('Hide/Unhide')}
+              placement="left"
+              visible={['icon-view', 'icon-hide'].includes(hoveredIcon)}
+            >
+              <i
+                onClick={p.toggleVisibility}
+                className={p.isVisible ? 'icon-view' : 'icon-hide'}
+                onMouseEnter={() => setHoveredIcon(p.isVisible ? 'icon-view' : 'icon-hide')}
+                onMouseLeave={() => setHoveredIcon('')}
+              />
+            </Tooltip>
           </>
         )}
         <Tooltip
@@ -609,13 +874,12 @@ const TreeNode = React.forwardRef(
   },
 );
 
-export default function SourceSelectorElement() {
+const mins = { x: 200, y: 120 };
+
+export function SourceSelectorElement() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { renderElement } = useBaseElement(
-    <SourceSelector />,
-    { x: 200, y: 120 },
-    containerRef.current,
-  );
+  const { renderElement } = useBaseElement(<SourceSelector />, mins, containerRef.current);
+  const controller = useMemo(() => new SourceSelectorController(), []);
 
   return (
     <div
@@ -623,7 +887,9 @@ export default function SourceSelectorElement() {
       data-name="SourceSelector"
       style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
     >
-      {renderElement()}
+      <SourceSelectorCtx.Provider value={controller}>{renderElement()}</SourceSelectorCtx.Provider>
     </div>
   );
 }
+
+SourceSelectorElement.mins = mins;

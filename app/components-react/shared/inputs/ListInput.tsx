@@ -30,6 +30,7 @@ export interface ICustomListProps<TValue> {
   labelRender?: (opt: IListOption<TValue>) => ReactNode;
   onBeforeSearch?: (searchStr: string) => unknown;
   options?: IListOption<TValue>[];
+  description?: string;
 }
 
 // define a type for the component's props
@@ -45,8 +46,10 @@ export type TListInputProps<TValue> = TSlobsInputProps<
  */
 export interface IListOption<TValue> {
   label: string;
+  /** The untranslated original label */
+  originalLabel?: string;
   value: TValue;
-  description?: string; // TODO
+  description?: string;
   image?: string | ReactNode;
 }
 
@@ -83,7 +86,7 @@ export const ListInput = InputComponent(<T extends any>(p: TListInputProps<T>) =
   const selectedOption = options?.find(opt => opt.value === p.value);
 
   return (
-    <InputWrapper {...wrapperAttrs} extra={selectedOption?.description}>
+    <InputWrapper {...wrapperAttrs} extra={p?.description ?? selectedOption?.description}>
       <Select
         ref={$inputRef}
         {...omit(inputAttrs, 'onChange')}
@@ -113,7 +116,7 @@ export function renderOption<T>(
 ) {
   const attrs = {
     'data-option-list': inputProps.name,
-    'data-option-label': opt.label,
+    'data-option-label': opt.originalLabel ?? opt.label,
     'data-option-value': opt.value,
     label: opt.label,
     value: (opt.value as unknown) as string,

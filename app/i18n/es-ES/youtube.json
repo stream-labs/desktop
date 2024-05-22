@@ -29,7 +29,7 @@
   "Does not support: Closed captions, 1440p, and 4k resolutions": "No admite: subtítulos cerrados, resoluciones 1440p y 4K",
   "Enable DVR": "Activar DVR",
   "Additional Settings": "Ajustes adicionales",
-  "Open Youtube Studio": "Abrir Youtube Studio",
+  "Open Youtube Studio": "Abrir YouTube Studio",
   "360° video": "Vídeo de 360°",
   "Enable Auto-start": "Activar inicio automático",
   "Enable Auto-stop": "Activar detención automática",
@@ -37,7 +37,7 @@
   "Enabling auto-start will automatically start the stream when you start sending data from your streaming software": "Activar el inicio automático iniciará automáticamente la transmisión cuando empiece a enviar datos desde su software de streaming",
   "Enabling auto-stop will automatically stop the stream when you stop sending data from your streaming software": "Activar la detención automática detendrá automáticamente la transmisión cuando deje de enviar datos desde su software de streaming",
   "DVR controls enable the viewer to control the video playback experience by pausing, rewinding, or fast forwarding content": "Los controles de DVR permiten que el espectador controle la experiencia de reproducción de vídeo pausando, rebobinando o avanzando rápidamente el contenido",
-  "Auto-start is disabled for your broadcast. You should manually publish your stream from Youtube Studio": "El inicio automático está desactivado para su transmisión. Debe publicar manualmente su transmisión desde Youtube Studio",
+  "Auto-start is disabled for your broadcast. You should manually publish your stream from Youtube Studio": "El inicio automático está desactivado para su transmisión. Debe publicar manualmente su transmisión desde YouTube Studio",
   "Made for kids": "Hecho para niños",
   "Features like personalized ads and live chat won't be available on live streams made for kids.": "Características como anuncios personalizados y chat en directo no estarán disponibles en transmisiones en tiempo real hechas para niños.",
   "Try our new thumbnail editor": "Probar nuestro nuevo editor de miniaturas"

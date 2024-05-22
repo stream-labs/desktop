@@ -49,5 +49,12 @@
   "Choose a template from our theme library": "Выбрать шаблон из нашей библиотеки тем",
   "Enter a Scene Collection Name": "Ввести название для коллекции сцен",
   "Copy of %{collectionName}": "Копия %{collectionName}",
-  "Your Scene Collections": "Ваши коллекции сцен"
+  "Your Scene Collections": "Ваши коллекции сцен",
+  "Dual Output Mode": "Режим Dual Output",
+  "Horizontal Output": "Горизонтальный вывод",
+  "Vertical Output": "Вертикальный вывод",
+  "Arrange sources here for a vertical scene layout.": "Расположите источники здесь для вертикального макета сцены.",
+  "Arrange sources here for a horizontal scene layout.": "Расположите источники здесь для горизонтального макета сцены.",
+  "Toggle Dual Output Mode.": "Переключите режим Dual Output.",
+  "Cannot hide dual output toggles in dual output mode.": "Нельзя скрыть переключатели Dual Output в режиме Dual Output."
 }

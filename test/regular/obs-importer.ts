@@ -1,4 +1,4 @@
-import { debugPause, skipCheckingErrorsInLog, test, useSpectron } from '../helpers/spectron';
+import { debugPause, skipCheckingErrorsInLog, test, useWebdriver } from '../helpers/webdriver';
 import { sceneExisting, switchCollection } from '../helpers/modules/scenes';
 import { sourceIsExisting } from '../helpers/modules/sources';
 import { getApiClient } from '../helpers/api-client';
@@ -8,17 +8,18 @@ import { FormMonkey } from '../helpers/form-monkey';
 import { ExecutionContext } from 'ava';
 import {
   click,
+  clickIfDisplayed,
   focusChild,
   focusMain,
   isDisplayed,
   waitForDisplayed,
 } from '../helpers/modules/core';
-import { logIn } from '../helpers/spectron/user';
+import { logIn } from '../helpers/webdriver/user';
 import { sleep } from '../helpers/sleep';
 
 const path = require('path');
 
-useSpectron({ skipOnboarding: false, beforeAppStartCb: installOBSCache });
+useWebdriver({ skipOnboarding: false, beforeAppStartCb: installOBSCache });
 
 async function installOBSCache(t: ExecutionContext) {
   // extract OBS config to the cache dir
@@ -47,19 +48,35 @@ test('OBS Importer', async t => {
 
   if (!(await isDisplayed('h2=Live Streaming'))) return;
   await click('h2=Live Streaming');
+  await click('h2=Advanced');
   await click('button=Continue');
+  await click('button=Skip');
 
+  /*
+  await click('a=Login');
+  await isDisplayed('button=Log in with Twitch');
+  await click('button=Skip');
+  */
+
+  /*
+   * TODO: "Advanced" flow doesn't have a login, but we couldn't get this to pass
+   * when trying to go through the Intermediate flow which does have login.
+   * After fixing everything step-related there, it was stuck on the loader after
+   * switching to the Widgets collection.
+   * Since going through Onboarding as Intermediate (or any other mode) is already
+   * covered by their own tests, we're faking login here while remaining on the
+   * Advanced flow. We need the login for widget assertions below to pass.
+   */
   await logIn(t, 'twitch', { prime: false }, false, true);
   await sleep(1000);
-  await (await t.context.app.client.$('span=Skip')).click();
 
   // import from OBS
   await click('div=Import from OBS Studio');
   await click('div=Start');
 
-  await waitForDisplayed('h1=Optimize');
-  await (await t.context.app.client.$('button=Skip')).click();
-  await (await t.context.app.client.$('div=Choose Starter')).click();
+  // skip Ultra
+  await waitForDisplayed('div=Choose Starter');
+  await click('button=Skip');
 
   await waitForDisplayed('[data-name=SceneSelector]');
 

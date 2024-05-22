@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "outDir": "../test-dist",
-    "target": "es5",
+    "target": "es6",
     "lib": [
       "dom",
       "es7",
@@ -38,12 +38,13 @@
       "tapable",
       "uuid",
       "vue-tsx-support",
-      "webdriverio/async",
+      "webdriverio/async"
     ]
   },
   "exclude": [
     "node_modules",
     "screentest/runner.js",
+    "screentest",
     "performance/performance-test-runner.js"
   ]
 }

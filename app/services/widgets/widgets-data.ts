@@ -11,6 +11,8 @@ export interface IWidgetDisplayData {
   supportList: string[];
   icon: string;
   shortDesc?: string;
+  link?: string;
+  linkText?: string;
 }
 // Do not alter the order of this enum, it is coupled to the user's local config
 export enum WidgetType {
@@ -73,7 +75,7 @@ export const WidgetTesters: IWidgetTester[] = [
   },
   {
     type: 'donations',
-    name: 'Donation',
+    name: 'Tip',
     url(host) {
       return `https://${host}/api/v5/slobs/test/streamlabs/donation`;
     },
@@ -170,7 +172,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
   },
 
   [WidgetType.DonationGoal]: {
-    name: 'Donation Goal',
+    name: 'Tip Goal',
     url(host, token) {
       return `https://${host}/widgets/donation-goal?token=${token}`;
     },
@@ -484,20 +486,20 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
 export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisplayData } => ({
   [WidgetType.AlertBox]: {
-    name: $t('Alertbox'),
+    name: $t('Alert Box'),
     description: $t('Thanks viewers with notification popups.'),
     demoVideo: false,
-    demoFilename: 'source-alertbox.gif',
+    demoFilename: 'source-alertbox.png',
     supportList: [$t('Donations'), $t('Subscriptions'), $t('Follows'), $t('Bits'), $t('Hosts')],
-    icon: 'fas fa-bell',
+    icon: 'icon-alert-box',
     shortDesc: $t('Dynamic, live alerts'),
   },
   [WidgetType.DonationGoal]: {
-    name: $t('Donation Goal'),
+    name: $t('Tip Goal'),
     description: $t('Set a goal for your viewers to help you reach.'),
-    demoVideo: true,
+    demoVideo: false,
     demoFilename: 'source-donation-goal.gif',
-    supportList: [$t('Donations')],
+    supportList: [$t('Tips')],
     icon: 'fas fa-calendar',
   },
   [WidgetType.FollowerGoal]: {
@@ -551,9 +553,9 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     icon: 'fas fa-calendar',
   },
   [WidgetType.CharityGoal]: {
-    name: $t('Streamlabs Charity Goal'),
+    name: $t('Streamlabs Charity Donation Goal'),
     description: $t('Set a goal for your viewers to help you reach.'),
-    demoVideo: true,
+    demoVideo: false,
     demoFilename: 'source-charity-goal.gif',
     supportList: [$t('Streamlabs Charity Donations')],
     icon: 'fas fa-calendar',
@@ -576,7 +578,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     icon: 'fas fa-ellipsis-h',
   },
   [WidgetType.ChatBox]: {
-    name: $t('Chatbox'),
+    name: $t('Chat Box'),
     description: $t("Include your channel's chat into your stream."),
     demoVideo: false,
     demoFilename: 'source-chatbox.png',
@@ -652,11 +654,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
   },
   [WidgetType.MediaShare]: {
     name: $t('Media Share'),
-    description: $t(
-      'Please note that when advanced media share is enabled,' +
-        ' media will no longer play through your alert box widget.' +
-        ' Media will only play through this media share widget.',
-    ),
+    description: $t('Allow your viewers to donate to share media on your stream.'),
     demoVideo: false,
     demoFilename: 'media.png',
     supportList: [],

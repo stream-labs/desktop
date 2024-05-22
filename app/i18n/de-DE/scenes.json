@@ -49,5 +49,12 @@
   "Choose a template from our theme library": "Vorlage aus unserer Themen-Bibliothek laden",
   "Enter a Scene Collection Name": "Name für Szenen-Sammlung eingeben",
   "Copy of %{collectionName}": "Kopie von %{collectionName}",
-  "Your Scene Collections": "Ihre Szenen-Sammlungen"
+  "Your Scene Collections": "Ihre Szenen-Sammlungen",
+  "Dual Output Mode": "Dual Output Modus",
+  "Horizontal Output": "Horizontale Ausgabe",
+  "Vertical Output": "Vertikale Ausgabe",
+  "Arrange sources here for a vertical scene layout.": "Quellen für vertikales Szenenlayout hier anordnen.",
+  "Arrange sources here for a horizontal scene layout.": "Quellen für horizontales Szenenlayout hier anordnen.",
+  "Toggle Dual Output Mode.": "Dual Output Modus ein/aus.",
+  "Cannot hide dual output toggles in dual output mode.": "Im Dual Output Modus können die Umschalter für Dual Output nicht ausgeblendet werden."
 }

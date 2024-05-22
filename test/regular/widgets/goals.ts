@@ -1,12 +1,12 @@
-import { test, useSpectron } from '../../helpers/spectron';
+import { test, useWebdriver } from '../../helpers/webdriver';
 import { addSource } from '../../helpers/modules/sources';
-import { logIn } from '../../helpers/spectron/user';
+import { logIn } from '../../helpers/webdriver/user';
 import { FormMonkey } from '../../helpers/form-monkey';
 import { waitForWidgetSettingsSync } from '../../helpers/widget-helpers';
 
-useSpectron();
+useWebdriver();
 
-testGoal('Donation Goal');
+testGoal('Tip Goal');
 testGoal('Follower Goal');
 testGoal('Bit Goal');
 

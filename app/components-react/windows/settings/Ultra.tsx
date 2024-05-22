@@ -42,28 +42,28 @@ export function Ultra() {
       link: 'https://streamlabs.com/console?refl=slobs-settings',
     },
     {
-      title: 'Melon App Pro',
+      title: 'Talk Studio Pro',
       description: $t('Stream and record with guests from your browser'),
-      image: 'melon.png',
-      link: 'https://melonapp.com/?refl=slobs-settings',
+      image: 'talk-studio.png',
+      link: 'https://streamlabs.com/talk-studio?refl=slobs-settings',
     },
     {
-      title: 'Oslo Editor Pro',
+      title: 'Video Editor Pro',
       description: $t('Professional video editing and collaboration tools'),
-      image: 'oslo.png',
-      link: 'http://oslo.io/?refl=slobs-settings',
+      image: 'video-editor.png',
+      link: 'http://streamlabs.com/video-editor?refl=slobs-settings',
     },
     {
-      title: 'Streamlabs Cross Clip Pro',
+      title: 'Cross Clip Pro',
       description: $t('Turn your VODs into must-see TikToks, Reels, and Shorts'),
       image: 'crossclip.png',
       link: 'https://crossclip.streamlabs.com/?refl=slobs-settings',
     },
     {
-      title: 'Willow Link Pro',
-      description: $t('Create a custom personal, all-in-one page to link in bio'),
-      image: 'willow.png',
-      link: 'https://streamlabs.com/willow?refl=slobs-settings',
+      title: 'Podcast Editor Pro',
+      description: $t('Text-based editing of VOD content'),
+      image: 'podcast-editor.png',
+      link: 'https://podcasteditor.streamlabs.com/?refl=slobs-settings',
     },
   ];
 
@@ -84,7 +84,11 @@ export function Ultra() {
           icon: 'icon-editor-7',
           tooltip: $t('Format Clips for TikTok, Shorts, etc'),
         },
-        { text: 'Oslo', icon: 'icon-streamlabs', tooltip: $t('Collaborative Video Editing') },
+        {
+          text: 'Video Editor',
+          icon: 'icon-streamlabs',
+          tooltip: $t('Collaborative Video Editing'),
+        },
         { text: $t('Merch Store'), icon: 'icon-upperwear' },
       ],
       tableData: {
@@ -158,7 +162,7 @@ function ProductCard(p: IProductInfo) {
     <div className={cx(styles.productCard, { [styles.hasLink]: !!p.link })} onClick={linkToProduct}>
       <img src={$i(`images/products/${p.image}`)} />
       <span className={styles.title}>{p.title}</span>
-      <span>{p.description}</span>
+      <span className={styles.description}>{p.description}</span>
       {!!p.link && <span className={styles.explore}>{$t('Explore')}</span>}
     </div>
   );

@@ -16,5 +16,15 @@
   "Font Size": "字体大小",
   "Muted Chatters": "静音聊天者",
   "Hide Commands": "隐藏指令",
-  "Background Color": "背景颜色"
+  "Background Color": "背景颜色",
+  "Show Platform Icons": "显示平台图标",
+  "Theme": "主题",
+  "Badges": "徽章",
+  "Extra Emotes": "额外表情",
+  "Chat Delay": "聊天延迟",
+  "Hide Delay": "隐藏延迟",
+  "Disable Message Animations": "禁用消息动画",
+  "Hide Characters": "隐藏文字",
+  "Hide Common Chat Bots": "隐藏通用聊天机器人",
+  "Hide commands starting with `!`": "隐藏以“!”开头的命令"
 }

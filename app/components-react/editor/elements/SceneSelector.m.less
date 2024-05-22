@@ -48,6 +48,8 @@
   display: flex;
   align-items: center;
   min-width: 0;
+  // Fixes long scene collection names still pushing width even with overflow: hidden and text-overflow: ellipsis
+  max-width:  30vw;
 
   &:hover {
     cursor: pointer;
@@ -60,7 +62,8 @@
   }
 }
 
-.active-scene, .source-title {
+.active-scene,
+.source-title {
   display: block;
   overflow: hidden;
   white-space: nowrap;
@@ -89,7 +92,8 @@
     width: 100%;
   }
 
-  :global(.ant-tree-treenode), :global(.ant-tree-node-content-wrapper) {
+  :global(.ant-tree-treenode),
+  :global(.ant-tree-node-content-wrapper) {
     width: 100%;
     transition: all 0s !important;
     border-radius: 0 !important;
@@ -171,7 +175,10 @@
     color: var(--teal);
   }
 
-  :global(.icon-lock), :global(.icon-hide), :global(.icon-broadcast), :global(.icon-studio) {
+  :global(.icon-lock),
+  :global(.icon-hide),
+  :global(.icon-broadcast),
+  :global(.icon-studio) {
     opacity: 0.7;
   }
 
@@ -207,7 +214,7 @@
   :global(.fa-folder) {
     &:hover {
       &::before {
-        content: "\f07c";
+        content: '\f07c';
       }
       color: var(--title);
     }
@@ -219,4 +226,19 @@
   height: 100%;
   z-index: 100;
   position: absolute;
+}
+
+.toggle-error {
+  padding: 0px !important;
+  text-align: unset !important;
+  :global(.ant-message-notice-content) {
+    padding: 4px 16px;
+  }
+}
+
+.display-toggle {
+  i {
+    line-height: unset;
+    margin-left: 10px !important;
+  }
 }

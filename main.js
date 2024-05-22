@@ -32,8 +32,8 @@ const {
   desktopCapturer,
 } = require('electron');
 const path = require('path');
-const rimraf = require('rimraf');
 const remote = require('@electron/remote/main');
+const fs = require('fs');
 
 // Game overlay is Windows only
 let overlay;
@@ -46,7 +46,16 @@ if (process.env.SLOBS_CACHE_DIR) {
 app.setPath('userData', path.join(app.getPath('appData'), 'slobs-client'));
 
 if (process.argv.includes('--clearCacheDir')) {
-  rimraf.sync(app.getPath('userData'));
+  try {
+    // This could block for a while, but should ensure that the crash handler
+    // is no longer able to interfere with cache removal.
+    fs.rmSync(app.getPath('userData'), {
+      force: true,
+      recursive: true,
+      maxRetries: 5,
+      retryDelay: 500,
+    });
+  } catch (e) {}
 }
 
 // This ensures that only one copy of our app can run at once.
@@ -57,7 +66,6 @@ if (!gotTheLock) {
   return;
 }
 
-const fs = require('fs');
 const bootstrap = require('./updater/build/bootstrap.js');
 const bundleUpdater = require('./updater/build/bundle-updater.js');
 const uuid = require('uuid/v4');
@@ -197,6 +205,14 @@ console.log(`Free: ${humanFileSize(os.freemem(), false)}`);
 console.log('=================================');
 
 app.on('ready', () => {
+  console.log('in dev mode');
+  const reactDevToolsPath = path.join(__dirname, 'vendor', 'react-devtools');
+  console.log(reactDevToolsPath);
+  session.defaultSession
+    .loadExtension(reactDevToolsPath, { allowFileAccess: true })
+    .then(() => console.log('Installed React DevTools'))
+    .catch(err => console.log('Error installing React DevTools', err));
+
   // Detect when running from an unwritable location like a DMG image (will break updater)
   if (process.platform === 'darwin') {
     try {
@@ -243,9 +259,9 @@ let appShutdownTimeout;
 global.indexUrl = `file://${__dirname}/index.html`;
 
 function openDevTools() {
-  childWindow.webContents.openDevTools({ mode: 'undocked' });
-  mainWindow.webContents.openDevTools({ mode: 'undocked' });
-  workerWindow.webContents.openDevTools({ mode: 'undocked' });
+  childWindow.webContents.openDevTools({ mode: 'detach' });
+  mainWindow.webContents.openDevTools({ mode: 'detach' });
+  workerWindow.webContents.openDevTools({ mode: 'detach' });
 }
 
 // TODO: Clean this up
@@ -317,6 +333,7 @@ async function startApp() {
         },
         globalExtra: {
           'sentry[release]': pjson.version,
+          'sentry[user][ip_address]': '{{auto}}',
         },
       });
     }
@@ -333,11 +350,22 @@ async function startApp() {
   workerWindow.loadURL(`${global.indexUrl}?windowId=worker`);
   // }, 10 * 1000);
 
+  if (process.env.SLOBS_PRODUCTION_DEBUG) {
+    workerWindow.webContents.once('dom-ready', () => {
+      workerWindow.webContents.openDevTools({ mode: 'detach' });
+    });
+  }
+
   // All renderers should use ipcRenderer.sendTo to send to communicate with
   // the worker.  This still gets proxied via the main process, but eventually
   // we will refactor this to not use electron IPC, which will make it much
   // more efficient.
   ipcMain.on('getWorkerWindowId', event => {
+    if (workerWindow.isDestroyed()) {
+      // prevent potential race-condition issues on app close
+      // https://github.com/stream-labs/desktop/pull/4239
+      return;
+    }
     event.returnValue = workerWindow.webContents.id;
   });
 
@@ -370,6 +398,12 @@ async function startApp() {
   // setTimeout(() => {
   mainWindow.loadURL(`${global.indexUrl}?windowId=main`);
   // }, 5 * 1000)
+
+  if (process.env.SLOBS_PRODUCTION_DEBUG) {
+    mainWindow.webContents.once('dom-ready', () => {
+      mainWindow.webContents.openDevTools({ mode: 'detach' });
+    });
+  }
 
   mainWindowState.manage(mainWindow);
 
@@ -445,6 +479,12 @@ async function startApp() {
 
   childWindow.loadURL(`${global.indexUrl}?windowId=child`);
 
+  if (process.env.SLOBS_PRODUCTION_DEBUG) {
+    childWindow.webContents.once('dom-ready', () => {
+      childWindow.webContents.openDevTools({ mode: 'detach' });
+    });
+  }
+
   // The child window is never closed, it just hides in the
   // background until it is needed.
   childWindow.on('close', e => {
@@ -455,8 +495,6 @@ async function startApp() {
       e.preventDefault();
     }
   });
-
-  if (process.env.SLOBS_PRODUCTION_DEBUG) openDevTools();
 
   // simple messaging system for services between windows
   // WARNING! renderer windows use synchronous requests and will be frozen
@@ -708,16 +746,6 @@ ipcMain.on('webContents-preventNavigation', (e, id) => {
   if (contents.isDestroyed()) return;
 
   contents.on('will-navigate', e => {
-    e.preventDefault();
-  });
-});
-
-ipcMain.on('webContents-preventPopup', (e, id) => {
-  const contents = webContents.fromId(id);
-
-  if (contents.isDestroyed()) return;
-
-  contents.on('new-window', e => {
     e.preventDefault();
   });
 });

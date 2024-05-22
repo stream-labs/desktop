@@ -13,7 +13,7 @@ import {
 import cloneDeep from 'lodash/cloneDeep';
 import pick from 'lodash/pick';
 import uuid from 'uuid/v4';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import mapValues from 'lodash/mapValues';
 import { WidgetsService, WidgetType } from './widgets';
 
@@ -145,6 +145,11 @@ export interface ISafeModeServerSettings {
   sub_only: boolean;
   enable_timer: boolean;
   time_in_minutes: number;
+}
+
+enum ESafeModeStatus {
+  Enabled = 'enabled',
+  Disabled = 'disabled',
 }
 
 const subscriptionMap = (subPlan: string) => {
@@ -401,6 +406,8 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   @Inject() private userService: UserService;
   @Inject() private windowsService: WindowsService;
   @Inject() private websocketService: WebsocketService;
+
+  safeModeStatusChanged = new Subject<ESafeModeStatus>();
 
   static initialState: IRecentEventsState = {
     recentEvents: [],
@@ -956,22 +963,27 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     });
   }
 
-  fetchSafeModeStatus() {
+  async fetchSafeModeStatus() {
     const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/safemode`;
     const headers = authorizedHeaders(this.userService.apiToken);
     return jfetch<{
       safe_mode_settings: { active: boolean; data: ISafeModeServerSettings; ends_at: number };
     }>(url, {
       headers,
-    }).then(data => {
-      this.updateSafeModeSettingsFromServer(data.safe_mode_settings.data);
+    })
+      .then(data => {
+        this.updateSafeModeSettingsFromServer(data.safe_mode_settings.data);
 
-      if (data.safe_mode_settings.active) {
-        this.onSafeModeEnabled(data.safe_mode_settings.ends_at);
-      } else {
+        if (data.safe_mode_settings.active) {
+          this.onSafeModeEnabled(data.safe_mode_settings.ends_at);
+        } else {
+          this.onSafeModeDisabled();
+        }
+      })
+      .catch(error => {
+        console.warn('Error fetching safe mode settings', error);
         this.onSafeModeDisabled();
-      }
-    });
+      });
   }
 
   updateSafeModeSettingsFromServer(data: ISafeModeServerSettings) {
@@ -1025,6 +1037,11 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     this.SET_SAFE_MODE_SETTINGS({ loading: true });
     const promise = jfetch(new Request(url, { headers, body, method: 'POST' }));
 
+    promise.then(resp => {
+      this.safeModeStatusChanged.next(ESafeModeStatus.Enabled);
+      return resp;
+    });
+
     promise.finally(() => this.SET_SAFE_MODE_SETTINGS({ loading: false }));
 
     return promise;
@@ -1038,6 +1055,10 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     this.SET_SAFE_MODE_SETTINGS({ loading: true });
     const promise = jfetch(new Request(url, { headers, method: 'DELETE' }));
 
+    promise.then(resp => {
+      this.safeModeStatusChanged.next(ESafeModeStatus.Disabled);
+    });
+
     promise.finally(() => this.SET_SAFE_MODE_SETTINGS({ loading: false }));
 
     return promise;
@@ -1049,10 +1070,13 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     if (this.state.safeMode.clearRecentEvents) {
       this.SET_RECENT_EVENTS([]);
     }
+
+    this.safeModeStatusChanged.next(ESafeModeStatus.Enabled);
   }
 
   onSafeModeDisabled() {
     this.SET_SAFE_MODE_SETTINGS({ enabled: false });
+    this.safeModeStatusChanged.next(ESafeModeStatus.Disabled);
   }
 
   @mutation()

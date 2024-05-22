@@ -16,5 +16,15 @@
   "Font Size": "Velikost písma",
   "Muted Chatters": "Ztlumený chatter",
   "Hide Commands": "Skrýt příkazy",
-  "Background Color": "Barva pozadí"
+  "Background Color": "Barva pozadí",
+  "Show Platform Icons": "Zobrazit ikony platformy",
+  "Theme": "Motiv",
+  "Badges": "Odznaky",
+  "Extra Emotes": "Další emotikony",
+  "Chat Delay": "Zpoždění chatu",
+  "Hide Delay": "Skrýt zpoždění",
+  "Disable Message Animations": "Zakázat animace zpráv",
+  "Hide Characters": "Skrýt znaky",
+  "Hide Common Chat Bots": "Skrýt běžné chatovací boty",
+  "Hide commands starting with `!`": "Skrýt příkazy začínající `!`"
 }

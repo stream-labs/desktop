@@ -7,7 +7,9 @@ import { Services } from 'components-react/service-provider';
 import BrowserView from 'components-react/shared/BrowserView';
 import styles from './RecentEvents.m.less';
 
-export default function LegacyEvents(p: { onPopout: () => void }) {
+const mins = { x: 360, y: 150 };
+
+export function LegacyEvents(p: { onPopout: () => void }) {
   const { UserService, RecentEventsService, MagicLinkService } = Services;
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -19,33 +21,35 @@ export default function LegacyEvents(p: { onPopout: () => void }) {
   }
 
   function handleBrowserViewReady(view: Electron.BrowserView) {
-    electron.ipcRenderer.send('webContents-preventPopup', view.webContents.id);
-
-    view.webContents.on('new-window', async (e, url) => {
-      const match = url.match(/dashboard\/([^\/^\?]*)/);
+    view.webContents.setWindowOpenHandler(details => {
+      const match = details.url.match(/dashboard\/([^\/^\?]*)/);
 
       if (match && match[1] === 'recent-events') {
         popoutRecentEvents();
       } else if (match) {
         // Prevent spamming our API
-        if (magicLinkDisabled.current) return;
+        if (magicLinkDisabled.current) return { action: 'deny' };
         magicLinkDisabled.current = true;
 
-        try {
-          const link = await MagicLinkService.actions.return.getDashboardMagicLink(match[1]);
-          remote.shell.openExternal(link);
-        } catch (e: unknown) {
-          console.error('Error generating dashboard magic link', e);
-        }
+        MagicLinkService.actions.return
+          .getDashboardMagicLink(match[1])
+          .then(link => {
+            remote.shell.openExternal(link);
+          })
+          .catch(e => {
+            console.error('Error generating dashboard magic link', e);
+          });
 
         magicLinkDisabled.current = false;
       } else {
-        remote.shell.openExternal(url);
+        remote.shell.openExternal(details.url);
       }
+
+      return { action: 'deny' };
     });
   }
 
-  const { renderElement } = useBaseElement(<Element />, { x: 360, y: 150 }, containerRef.current);
+  const { renderElement } = useBaseElement(<Element />, mins, containerRef.current);
 
   function Element() {
     if (!UserService.isLoggedIn) {
@@ -74,3 +78,5 @@ export default function LegacyEvents(p: { onPopout: () => void }) {
     </div>
   );
 }
+
+LegacyEvents.mins = mins;

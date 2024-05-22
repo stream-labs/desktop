@@ -5,16 +5,17 @@ import isEqual from 'lodash/isEqual';
 import cloneDeep from 'lodash/cloneDeep';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import { EditSourcePropertiesCommand } from './edit-source-properties';
+import { TDisplayType } from 'services/settings-v2';
 
 export abstract class ModifyTransformCommand extends CombinableCommand {
   startTransforms: Dictionary<ITransform> = {};
   endTransforms: Dictionary<ITransform>;
   private modifyTransformSubCommands: EditSourcePropertiesCommand[] = [];
 
-  constructor(protected selection: Selection) {
+  constructor(protected selection: Selection, protected display?: TDisplayType) {
     super();
     this.selection.freeze();
-    this.selection.getItems().forEach(item => {
+    this.selection.getItems(this.display).forEach(item => {
       this.startTransforms[item.id] = cloneDeep(item.state.transform);
     });
   }
@@ -32,20 +33,20 @@ export abstract class ModifyTransformCommand extends CombinableCommand {
     // We already have end transforms, so this is a redo operation.
     // We should simply skip straight to the end result.
     if (this.endTransforms) {
-      this.selection.getItems().forEach(item => {
+      this.selection.getItems(this.display).forEach(item => {
         item.setTransform(this.endTransforms[item.id]);
       });
     } else {
       this.modifyTransform();
       this.endTransforms = {};
-      this.selection.getItems().forEach(item => {
+      this.selection.getItems(this.display).forEach(item => {
         this.endTransforms[item.id] = cloneDeep(item.state.transform);
       });
     }
   }
 
   rollback() {
-    this.selection.getItems().forEach(item => {
+    this.selection.getItems(this.display).forEach(item => {
       item.setTransform(this.startTransforms[item.id]);
     });
     this.modifyTransformSubCommands.forEach(cmd => cmd.rollback());

@@ -43,6 +43,7 @@ export declare type TObsValue = number | string | boolean | IObsFont | TObsStrin
  */
 export interface IObsInput<TValueType> {
   value: TValueType;
+  currentValue?: TValueType;
   name: string;
   description: string;
   showDescription?: boolean;
@@ -81,6 +82,7 @@ export interface IObsSliderInputValue extends IObsNumberInputValue {
 export interface IObsTextInputValue extends IObsInput<string> {
   multiline: boolean;
   infoField: boolean;
+  infoType?: obs.ETextInfoType;
 }
 
 export interface IObsBitmaskInput extends IObsInput<number> {
@@ -399,6 +401,7 @@ export function getPropertiesFormData(obsSource: obs.ISource): TObsFormData {
       Object.assign(formItem as IObsTextInputValue, {
         multiline: obsProp.details.type === obs.ETextType.Multiline,
         infoField: obsProp.details.type === obs.ETextType.TextInfo,
+        infoType: obsProp.details.infoType,
       });
     }
 

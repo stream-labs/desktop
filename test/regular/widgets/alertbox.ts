@@ -1,4 +1,4 @@
-import { test, TExecutionContext, useSpectron } from '../../helpers/spectron';
+import { test, TExecutionContext, useWebdriver } from '../../helpers/webdriver';
 import { addSource, openSourceProperties } from '../../helpers/modules/sources';
 import { logIn } from '../../helpers/modules/user';
 import {
@@ -14,11 +14,11 @@ import { CustomizationService } from '../../../app/services/customization';
 import { assertFormContains, fillForm } from '../../helpers/modules/forms';
 import { sleep } from '../../helpers/sleep';
 
-useSpectron({pauseIfFailed: false });
+useWebdriver({ pauseIfFailed: false });
 
-test('AlertBox for Twitch', t => testAlertbox(t, 'twitch'));
-test('AlertBox for YouTube', t => testAlertbox(t, 'youtube'));
-test('AlertBox for Facebook', t => testAlertbox(t, 'facebook'));
+test('Alert Box for Twitch', t => testAlertbox(t, 'twitch'));
+test('Alert Box for YouTube', t => testAlertbox(t, 'youtube'));
+test('Alert Box for Facebook', t => testAlertbox(t, 'facebook'));
 
 const commonAlerts = ['Donation', 'Merch'];
 
@@ -40,7 +40,7 @@ async function testAlertbox(t: TExecutionContext, platform: TPlatform) {
 
   // create alertbox
   await enableNewAlertbox();
-  await addSource('Alertbox', 'Alertbox');
+  await addSource('Alert Box', 'Alert Box');
   await sleep(500);
   await openAlertboxSettings();
 
@@ -62,7 +62,7 @@ async function testDonationAlert() {
   // fill the form
   const formData1 = {
     message_template: 'Test {name} donated {amount}!',
-    sound_volume: 30,
+    sound_volume: 50,
   };
   await fillForm(formData1);
 
@@ -94,7 +94,7 @@ async function testDonationAlert() {
 
 async function openAlertboxSettings() {
   await focusMain();
-  await openSourceProperties('Alertbox');
+  await openSourceProperties('Alert Box');
   await focusChild();
   await waitForDisplayed('span=General Settings');
 }

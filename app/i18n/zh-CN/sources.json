@@ -354,5 +354,8 @@
   "Set scale filter 'Bicubic'": "设置缩放滤镜“Bicubic”",
   "Set scale filter 'Bilinear'": "设置缩放滤镜“Bilinear”",
   "Set scale filter 'Lanczos'": "设置缩放滤镜“Lanczos”",
-  "Set scale filter 'Area'": "设置缩放滤镜“区域”"
+  "Set scale filter 'Area'": "设置缩放滤镜“区域”",
+  "You currently have the same source on both canvases selected. Please select the source in the canvas to edit it independently.": "您目前在两个画布上选择了相同的源。请在画布中选择源以单独编辑。",
+  "Selective Recording can only be used with horizontal sources.": "选择性录制仅可用于水平源。",
+  "Cannot move source outside canvas in Dual Output Mode.": "在 Dual Output 模式下无法将源移动到画布外。"
 }

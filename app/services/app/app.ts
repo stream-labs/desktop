@@ -10,6 +10,7 @@ import { TransitionsService } from 'services/transitions';
 import { SourcesService } from 'services/sources';
 import { ScenesService } from 'services/scenes';
 import { VideoService } from 'services/video';
+import { VideoSettingsService } from 'services/settings-v2/video';
 import { track, UsageStatisticsService } from 'services/usage-statistics';
 import { IpcServerService } from 'services/api/ipc-server';
 import { TcpServerService } from 'services/api/tcp-server';
@@ -39,8 +40,10 @@ import { ApplicationMenuService } from 'services/application-menu';
 import { KeyListenerService } from 'services/key-listener';
 import { MetricsService } from '../metrics';
 import { SettingsService } from '../settings';
+import { DualOutputService } from 'services/dual-output';
 import { OS, getOS } from 'util/operating-systems';
 import * as remote from '@electron/remote';
+import { RealmService } from 'services/realm';
 
 interface IAppState {
   loading: boolean;
@@ -90,6 +93,9 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private metricsService: MetricsService;
   @Inject() private settingsService: SettingsService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
+  @Inject() private videoSettingsService: VideoSettingsService;
+  @Inject() private dualOutputService: DualOutputService;
+  @Inject() private realmService: RealmService;
 
   static initialState: IAppState = {
     loading: true,
@@ -114,6 +120,8 @@ export class AppService extends StatefulService<IAppState> {
         this.SET_ERROR_ALERT(true);
       });
     }
+
+    this.realmService.connect();
 
     // perform several concurrent http requests
     await Promise.all([
@@ -191,6 +199,7 @@ export class AppService extends StatefulService<IAppState> {
       await this.sceneCollectionsService.deinitialize();
       this.performanceService.stop();
       this.transitionsService.shutdown();
+      this.videoSettingsService.shutdown();
       await this.gameOverlayService.destroy();
       await this.fileManagerService.flushAll();
       obs.NodeObs.RemoveSourceCallback();

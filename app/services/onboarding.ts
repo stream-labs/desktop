@@ -1,3 +1,5 @@
+import * as remote from '@electron/remote';
+import { Subject } from 'rxjs';
 import { StatefulService, mutation } from 'services/core/stateful-service';
 import { NavigationService } from 'services/navigation';
 import { UserService } from 'services/user';
@@ -11,110 +13,152 @@ import { OutputSettingsService } from './settings';
 import { ObsImporterService } from './obs-importer';
 import Utils from './utils';
 import { RecordingModeService } from './recording-mode';
-import * as remote from '@electron/remote';
+import { THEME_METADATA, IThemeMetadata } from './onboarding/theme-metadata';
+export type { IThemeMetadata } from './onboarding/theme-metadata';
+import {
+  StreamerKnowledgeMode,
+  isBeginnerOrIntermediateOrUnselected,
+  isIntermediateOrAdvancedOrUnselected,
+} from './onboarding/knowledge-mode';
+export { StreamerKnowledgeMode } from './onboarding/knowledge-mode';
 
 enum EOnboardingSteps {
   MacPermissions = 'MacPermissions',
-  SteamingOrRecording = 'StreamingOrRecording',
+  StreamingOrRecording = 'StreamingOrRecording',
   Connect = 'Connect',
   PrimaryPlatformSelect = 'PrimaryPlatformSelect',
   FreshOrImport = 'FreshOrImport',
   ObsImport = 'ObsImport',
   HardwareSetup = 'HardwareSetup',
   ThemeSelector = 'ThemeSelector',
-  Optimize = 'Optimize',
+  // temporarily disable auto config until migrate to new api
+  // Optimize = 'Optimize',
   Prime = 'Prime',
+  Tips = 'Tips',
 }
+
+const isMac = () => process.platform === OS.Mac;
 
 export const ONBOARDING_STEPS = () => ({
   [EOnboardingSteps.MacPermissions]: {
-    component: 'MacPermissions',
-    disableControls: false,
-    hideSkip: true,
+    component: 'MacPermissions' as const,
     hideButton: true,
     isPreboarding: true,
+    cond: isMac,
+    isSkippable: true,
   },
-  [EOnboardingSteps.SteamingOrRecording]: {
-    component: 'StreamingOrRecording',
-    disableControls: true,
-    hideSkip: true,
+  [EOnboardingSteps.StreamingOrRecording]: {
+    component: 'StreamingOrRecording' as const,
     hideButton: true,
     isPreboarding: true,
+    isSkippable: false,
   },
   [EOnboardingSteps.Connect]: {
-    component: 'Connect',
-    disableControls: false,
-    hideSkip: true,
+    component: 'Connect' as const,
+    // Skippable for now, ideally will make non-skippable for beginners with a custom RTMP URL setup
+    isSkippable: true,
     hideButton: true,
     isPreboarding: true,
   },
   [EOnboardingSteps.PrimaryPlatformSelect]: {
-    component: 'PrimaryPlatformSelect',
-    disableControls: true,
-    hideSkip: true,
+    component: 'PrimaryPlatformSelect' as const,
     hideButton: true,
     isPreboarding: true,
+    cond: ({ isPartialSLAuth }: OnboardingStepContext) => isPartialSLAuth,
   },
   [EOnboardingSteps.FreshOrImport]: {
-    component: 'FreshOrImport',
-    disableControls: true,
-    hideSkip: true,
+    component: 'FreshOrImport' as const,
     hideButton: true,
     isPreboarding: true,
+    cond: ({ isObsInstalled, recordingModeEnabled }: OnboardingStepContext) =>
+      isObsInstalled && !recordingModeEnabled,
   },
   [EOnboardingSteps.ObsImport]: {
-    component: 'ObsImport',
-    disableControls: true,
-    hideSkip: false,
+    component: 'ObsImport' as const,
     hideButton: true,
     label: $t('Import'),
+    cond: ({ importedFromObs, isObsInstalled }: OnboardingStepContext) =>
+      importedFromObs && isObsInstalled,
   },
   [EOnboardingSteps.HardwareSetup]: {
-    component: 'HardwareSetup',
-    disableControls: false,
-    hideSkip: false,
-    hideButton: false,
+    component: 'HardwareSetup' as const,
     label: $t('Set Up Mic and Webcam'),
+    cond: ({ importedFromObs }: OnboardingStepContext) => !importedFromObs,
+    isSkippable: true,
   },
   [EOnboardingSteps.ThemeSelector]: {
-    component: 'ThemeSelector',
-    disableControls: false,
-    hideSkip: false,
+    component: 'ThemeSelector' as const,
     hideButton: true,
     label: $t('Add a Theme'),
+    cond: ({
+      isLoggedIn,
+      existingSceneCollections,
+      importedFromObs,
+      recordingModeEnabled,
+      platformSupportsThemes,
+    }: OnboardingStepContext) =>
+      !existingSceneCollections &&
+      !importedFromObs &&
+      !recordingModeEnabled &&
+      ((isLoggedIn && platformSupportsThemes) || !isLoggedIn),
+    isSkippable: true,
   },
-  [EOnboardingSteps.Optimize]: {
-    component: 'Optimize',
-    disableControls: false,
-    hideSkip: false,
-    hideButton: true,
-    label: $t('Optimize'),
-  },
+  // temporarily disable auto config until migrate to new api
+  // [EOnboardingSteps.Optimize]: {
+  //   component: 'Optimize' as const,
+  //   disableControls: false,
+  //   hideSkip: false,
+  //   hideButton: true,
+  //   label: $t('Optimize'),
+  //   cond: ({ isTwitchAuthed, isYoutubeAuthed, recordingModeEnabled }: OnboardingStepContext) => isTwitchAuthed || isYoutubeAuthed || recordingModeEnabled,
+  // },
   [EOnboardingSteps.Prime]: {
-    component: 'Prime',
-    disableControls: false,
-    hideSkip: false,
+    component: 'Prime' as const,
     hideButton: true,
     label: $t('Ultra'),
+    cond: ({ isUltra }: OnboardingStepContext) => !isUltra,
+    isSkippable: true,
+  },
+  [EOnboardingSteps.Tips]: {
+    component: 'Tips' as const,
+    hideButton: true,
+    cond: isBeginnerOrIntermediateOrUnselected,
+    isSkippable: false,
   },
 });
 
-const THEME_METADATA = {
-  2560: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/0a2acb8/0a2acb8.overlay',
-  2559: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/6dcbf5f/6dcbf5f.overlay',
-  2624: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/eeeb9e1/eeeb9e1.overlay',
-  2657: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/0697cee/0697cee.overlay',
-  2656: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/59acc9a/59acc9a.overlay',
-  2639: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/a1a4ab0/a1a4ab0.overlay',
-};
+export interface OnboardingStepContext {
+  streamerKnowledgeMode: StreamerKnowledgeMode | null;
+  isPartialSLAuth: boolean;
+  existingSceneCollections: boolean;
+  isObsInstalled: boolean;
+  recordingModeEnabled: boolean;
+  importedFromObs: boolean;
+  isLoggedIn: boolean;
+  isUltra: boolean;
+  platformSupportsThemes: boolean;
+}
 
 export interface IOnboardingStep {
-  component: string;
-  disableControls: boolean;
-  hideSkip: boolean;
-  hideButton: boolean;
+  // Adding these explicitly so we don't accidentally do a comparison in some other components
+  component:
+    | 'MacPermissions'
+    | 'StreamingOrRecording'
+    | 'Connect'
+    | 'PrimaryPlatformSelect'
+    | 'FreshOrImport'
+    | 'ObsImport'
+    | 'HardwareSetup'
+    | 'ThemeSelector'
+    | 'Optimize'
+    | 'Prime'
+    | 'Tips';
+  hideButton?: boolean;
   label?: string;
   isPreboarding?: boolean;
+  /** Predicate that returns whether this step should run, keeps steps declarative */
+  cond?: (ctx: OnboardingStepContext) => boolean;
+  isSkippable?: boolean | ((ctx: OnboardingStepContext) => boolean);
 }
 
 interface IOnboardingOptions {
@@ -129,14 +173,7 @@ interface IOnboardingServiceState {
   options: IOnboardingOptions;
   importedFromObs: boolean;
   existingSceneCollections: boolean;
-}
-
-export interface IThemeMetadata {
-  data: {
-    id: number;
-    name: string;
-    custom_images: Dictionary<string>;
-  };
+  streamerKnowledgeMode: StreamerKnowledgeMode | null;
 }
 
 class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
@@ -148,59 +185,123 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
 
       return ONBOARDING_STEPS()[EOnboardingSteps.Connect];
     }
-    if (this.state.options.isOptimize) return ONBOARDING_STEPS()[EOnboardingSteps.Optimize];
+    // temporarily disable auto config until migrate to new api
+    // if (this.state.options.isOptimize) return ONBOARDING_STEPS()[EOnboardingSteps.Optimize];
     if (this.state.options.isHardware) return ONBOARDING_STEPS()[EOnboardingSteps.HardwareSetup];
     if (this.state.options.isImport) return ONBOARDING_STEPS()[EOnboardingSteps.ObsImport];
   }
 
   get steps() {
-    const steps: IOnboardingStep[] = [];
     const userViews = this.getServiceViews(UserService);
     const isOBSinstalled = this.getServiceViews(ObsImporterService).isOBSinstalled();
     const recordingModeEnabled = this.getServiceViews(RecordingModeService).isRecordingModeEnabled;
 
-    if (process.platform === OS.Mac) {
-      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.MacPermissions]);
+    const streamerKnowledgeMode = this.streamerKnowledgeMode;
+
+    const { existingSceneCollections, importedFromObs } = this.state;
+    const { isLoggedIn, isPrime: isUltra } = userViews;
+
+    const ctx: OnboardingStepContext = {
+      streamerKnowledgeMode,
+      recordingModeEnabled,
+      existingSceneCollections,
+      importedFromObs,
+      isLoggedIn,
+      isUltra,
+      isObsInstalled: isOBSinstalled,
+      isPartialSLAuth: userViews.auth && userViews.isPartialSLAuth,
+      platformSupportsThemes:
+        isLoggedIn && getPlatformService(userViews.platform?.type)?.hasCapability('themes'),
+    };
+
+    return this.getStepsForMode(streamerKnowledgeMode)(ctx);
+  }
+
+  get totalSteps() {
+    return this.steps.length;
+  }
+
+  getStepsForMode(mode: StreamerKnowledgeMode) {
+    const { getSteps } = this;
+
+    switch (mode) {
+      case StreamerKnowledgeMode.BEGINNER:
+        return getSteps([
+          EOnboardingSteps.MacPermissions,
+          EOnboardingSteps.StreamingOrRecording,
+          EOnboardingSteps.Connect,
+          EOnboardingSteps.PrimaryPlatformSelect,
+          EOnboardingSteps.FreshOrImport,
+          EOnboardingSteps.ObsImport,
+          EOnboardingSteps.HardwareSetup,
+          EOnboardingSteps.ThemeSelector,
+          EOnboardingSteps.Prime,
+          EOnboardingSteps.Tips,
+        ]);
+      case StreamerKnowledgeMode.INTERMEDIATE:
+        /*
+         * Yes, these are the same as beginner, only inner screens are supposed to differ,
+         * but the one screen that was provided is currently disabled (Optimizer).
+         * Nevertheless, this sets the foundation for future changes.
+         */
+        return getSteps([
+          EOnboardingSteps.MacPermissions,
+          EOnboardingSteps.StreamingOrRecording,
+          EOnboardingSteps.Connect,
+          EOnboardingSteps.PrimaryPlatformSelect,
+          EOnboardingSteps.FreshOrImport,
+          EOnboardingSteps.ObsImport,
+          EOnboardingSteps.HardwareSetup,
+          EOnboardingSteps.ThemeSelector,
+          EOnboardingSteps.Prime,
+          EOnboardingSteps.Tips,
+        ]);
+      case StreamerKnowledgeMode.ADVANCED:
+        return getSteps([
+          EOnboardingSteps.MacPermissions,
+          EOnboardingSteps.StreamingOrRecording,
+          EOnboardingSteps.Connect,
+          EOnboardingSteps.PrimaryPlatformSelect,
+          EOnboardingSteps.FreshOrImport,
+          EOnboardingSteps.ObsImport,
+          EOnboardingSteps.HardwareSetup,
+          EOnboardingSteps.Prime,
+        ]);
+      default:
+        return getSteps([
+          EOnboardingSteps.MacPermissions,
+          EOnboardingSteps.StreamingOrRecording,
+          EOnboardingSteps.Connect,
+          EOnboardingSteps.PrimaryPlatformSelect,
+          EOnboardingSteps.FreshOrImport,
+          EOnboardingSteps.ObsImport,
+          EOnboardingSteps.HardwareSetup,
+          EOnboardingSteps.ThemeSelector,
+          EOnboardingSteps.Prime,
+        ]);
     }
+  }
 
-    steps.push(ONBOARDING_STEPS()[EOnboardingSteps.SteamingOrRecording]);
+  getSteps(stepNames: EOnboardingSteps[]) {
+    return (ctx: OnboardingStepContext): IOnboardingStep[] => {
+      const steps = stepNames.map(step => ONBOARDING_STEPS()[step]);
 
-    steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Connect]);
+      return steps.reduce((acc, step: IOnboardingStep) => {
+        if (!step.cond || (step.cond && step.cond(ctx))) {
+          // Lazy eval `isSkippable` in function form if the step's condition is met
+          const isSkippable =
+            typeof step.isSkippable === 'function' ? step.isSkippable(ctx) : step.isSkippable;
 
-    if (userViews.auth && userViews.isPartialSLAuth) {
-      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.PrimaryPlatformSelect]);
-    }
+          acc.push({ ...step, isSkippable });
+        }
 
-    if (isOBSinstalled && !recordingModeEnabled) {
-      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.FreshOrImport]);
-    }
+        return acc;
+      }, [] as IOnboardingStep[]);
+    };
+  }
 
-    if (this.state.importedFromObs && isOBSinstalled) {
-      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ObsImport]);
-    } else {
-      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.HardwareSetup]);
-    }
-
-    if (
-      !this.state.existingSceneCollections &&
-      !this.state.importedFromObs &&
-      !recordingModeEnabled &&
-      ((userViews.isLoggedIn &&
-        getPlatformService(userViews.platform.type).hasCapability('themes')) ||
-        !userViews.isLoggedIn)
-    ) {
-      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ThemeSelector]);
-    }
-
-    if (userViews.isTwitchAuthed || userViews.isYoutubeAuthed || recordingModeEnabled) {
-      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Optimize]);
-    }
-
-    if (!userViews.isPrime) {
-      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Prime]);
-    }
-
-    return steps;
+  get streamerKnowledgeMode() {
+    return this.state.streamerKnowledgeMode;
   }
 }
 
@@ -214,9 +315,12 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
     },
     importedFromObs: false,
     existingSceneCollections: false,
+    streamerKnowledgeMode: null,
   };
 
   localStorageKey = 'UserHasBeenOnboarded';
+
+  onboardingCompleted = new Subject();
 
   @Inject() navigationService: NavigationService;
   @Inject() userService: UserService;
@@ -238,17 +342,26 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
     this.state.existingSceneCollections = val;
   }
 
+  @mutation()
+  SET_STREAMER_KNOWLEDGE_MODE(val: StreamerKnowledgeMode) {
+    this.state.streamerKnowledgeMode = val;
+  }
+
   async fetchThemeData(id: string) {
     const url = `https://overlays.streamlabs.com/api/overlay/${id}`;
     return jfetch<IThemeMetadata>(url);
   }
 
   async fetchThemes() {
-    return await Promise.all(Object.keys(THEME_METADATA).map(id => this.fetchThemeData(id)));
+    return await Promise.all(Object.keys(this.themeMetadata).map(id => this.fetchThemeData(id)));
+  }
+
+  get themeMetadata() {
+    return this.userService.views.isPrime ? THEME_METADATA.PAID : THEME_METADATA.FREE;
   }
 
   themeUrl(id: number) {
-    return THEME_METADATA[id];
+    return this.themeMetadata[id];
   }
 
   get views() {
@@ -278,8 +391,10 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
     this.SET_EXISTING_COLLECTIONS(this.existingSceneCollections);
   }
 
-  // A login attempt is an abbreviated version of the onboarding process,
-  // and some steps should be skipped.
+  setStreamerKnowledgeMode(val: StreamerKnowledgeMode | null) {
+    this.SET_STREAMER_KNOWLEDGE_MODE(val);
+  }
+
   start(options: Partial<IOnboardingOptions> = {}) {
     const actualOptions: IOnboardingOptions = {
       isLogin: false,
@@ -311,6 +426,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
     }
 
     this.navigationService.navigate('Studio');
+    this.onboardingCompleted.next();
   }
 
   get isTwitchAuthed() {

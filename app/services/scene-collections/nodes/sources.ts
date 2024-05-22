@@ -285,7 +285,7 @@ export class SourcesNode extends Node<ISchema, {}> {
     const sources = obs.createSources(sourceCreateData);
     const promises: Promise<void>[] = [];
 
-    sources.forEach((source, index) => {
+    sources.forEach(async (source, index) => {
       const sourceInfo = supportedSources[index];
 
       this.sourcesService.addSource(source, supportedSources[index].name, {

@@ -17,10 +17,13 @@ import {
   PlatformAppStore,
   BrowseOverlays,
   PlatformAppMainPage,
+  RecordingHistory,
+  Studio,
+  LiveDock,
 } from 'components/shared/ReactComponentList';
 import { ScenesService } from 'services/scenes';
 import { PlatformAppsService } from 'services/platform-apps';
-import { EditorCommandsService } from '../../app-services';
+import { EditorCommandsService, PerformanceService } from '../../app-services';
 import VueResize from 'vue-resize';
 import { $t } from 'services/i18n';
 import fs from 'fs';
@@ -28,25 +31,16 @@ import * as remote from '@electron/remote';
 Vue.use(VueResize);
 
 // Pages
-import Studio from '../pages/Studio';
 import { Inject } from '../../services/core/injector';
-import { CustomizationService } from 'services/customization';
+import { CustomizationService, CustomizationState } from 'services/customization';
 import { NavigationService } from 'services/navigation';
 import { AppService } from 'services/app';
 import { UserService } from 'services/user';
 import { IModalOptions, WindowsService } from 'services/windows';
-import LiveDock from '../LiveDock.vue';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 import { getPlatformService } from 'services/platforms';
 import ModalWrapper from '../shared/modals/ModalWrapper';
 import antdThemes from 'styles/antd/index';
-
-const loadedTheme = () => {
-  const customizationState = localStorage.getItem('PersistentStatefulService-CustomizationService');
-  if (customizationState) {
-    return JSON.parse(customizationState)?.theme;
-  }
-};
 
 @Component({
   components: {
@@ -66,6 +60,7 @@ const loadedTheme = () => {
     LayoutEditor,
     AlertboxLibrary,
     ModalWrapper,
+    RecordingHistory,
     StreamScheduler,
     Highlighter,
     Grow,
@@ -81,6 +76,7 @@ export default class Main extends Vue {
   @Inject() scenesService: ScenesService;
   @Inject() platformAppsService: PlatformAppsService;
   @Inject() editorCommandsService: EditorCommandsService;
+  @Inject() performanceService: PerformanceService;
 
   private modalOptions: IModalOptions = {
     renderFn: null,
@@ -90,7 +86,16 @@ export default class Main extends Vue {
     window.addEventListener('resize', this.windowSizeHandler);
   }
 
+  unbind: () => void;
+
   mounted() {
+    this.unbind = this.customizationService.state.bindProps(this, {
+      theme: 'theme',
+      isDockCollapsed: 'livedockCollapsed',
+      leftDock: 'leftDock',
+      liveDockSize: 'livedockSize',
+    });
+
     antdThemes[this.theme].use();
     WindowsService.modalChanged.subscribe(modalOptions => {
       this.modalOptions = { ...this.modalOptions, ...modalOptions };
@@ -122,6 +127,7 @@ export default class Main extends Vue {
 
   destroyed() {
     window.removeEventListener('resize', this.windowSizeHandler);
+    this.unbind();
   }
 
   minEditorWidth = 500;
@@ -138,13 +144,7 @@ export default class Main extends Vue {
     return this.navigationService.state.params;
   }
 
-  get theme() {
-    if (this.$store.state.bulkLoadFinished) {
-      return this.customizationService.currentTheme;
-    }
-
-    return loadedTheme() || 'night-theme';
-  }
+  theme = 'night-theme';
 
   get applicationLoading() {
     return this.appService.state.loading;
@@ -170,17 +170,9 @@ export default class Main extends Vue {
     );
   }
 
-  get liveDockSize() {
-    return this.customizationService.state.livedockSize;
-  }
-
-  get isDockCollapsed() {
-    return this.customizationService.state.livedockCollapsed;
-  }
-
-  get leftDock() {
-    return this.customizationService.state.leftDock;
-  }
+  liveDockSize = 0;
+  isDockCollapsed = true;
+  leftDock = false;
 
   get isOnboarding() {
     return this.navigationService.state.currentPage === 'Onboarding';

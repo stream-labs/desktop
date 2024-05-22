@@ -8,13 +8,13 @@ import { ELayout, ELayoutElement, LayoutService } from './layout';
 import { ScenesService } from './scenes';
 import { EObsSimpleEncoder, SettingsService } from './settings';
 import { AnchorPoint, ScalableRectangle } from 'util/ScalableRectangle';
-import { VideoService } from './video';
+import { VideoSettingsService } from './settings-v2/video';
 import { ENotificationType, NotificationsService } from 'services/notifications';
 import { DefaultHardwareService } from './hardware';
 import { RunInLoadingMode } from './app/app-decorators';
 import { byOS, OS } from 'util/operating-systems';
 import { JsonrpcService } from './api/jsonrpc';
-import { WindowsService, UsageStatisticsService } from 'app-services';
+import { NavigationService, UsageStatisticsService, SharedStorageService } from 'app-services';
 import { getPlatformService } from 'services/platforms';
 import { IYoutubeUploadResponse } from 'services/platforms/youtube/uploader';
 import { YoutubeService } from 'services/platforms/youtube';
@@ -25,8 +25,10 @@ interface IRecordingEntry {
 }
 
 export interface IUploadInfo {
+  uploading: boolean;
   uploadedBytes?: number;
   totalBytes?: number;
+  error?: string;
 }
 
 interface IRecordingModeState {
@@ -56,21 +58,27 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
   @Inject() private scenesService: ScenesService;
   @Inject() private settingsService: SettingsService;
   @Inject() private sourcesService: SourcesService;
-  @Inject() private videoService: VideoService;
+  @Inject() private videoSettingsService: VideoSettingsService;
   @Inject() private defaultHardwareService: DefaultHardwareService;
   @Inject() private notificationsService: NotificationsService;
   @Inject() private jsonrpcService: JsonrpcService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
-  @Inject() private windowsService: WindowsService;
+  @Inject() private navigationService: NavigationService;
+  @Inject() private sharedStorageService: SharedStorageService;
 
   static defaultState: IRecordingModeState = {
     enabled: false,
     recordingHistory: {},
-    uploadInfo: {} as IUploadInfo,
+    uploadInfo: { uploading: false } as IUploadInfo,
   };
 
   static filter(state: IRecordingModeState) {
     return { ...state, uploadInfo: {} };
+  }
+
+  init() {
+    super.init();
+    this.pruneRecordingEntries();
   }
 
   cancelFunction = () => {};
@@ -147,7 +155,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
         const rect = new ScalableRectangle({ x: 0, y: 0, width: s.width, height: s.height });
 
         // Scale width to approximately 25% of canvas width
-        rect.scaleX = (this.videoService.baseWidth / rect.width) * 0.25;
+        rect.scaleX = (this.videoSettingsService.baseWidth / rect.width) * 0.25;
 
         // Scale height to match
         rect.scaleY = rect.scaleX;
@@ -155,7 +163,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
         // Move to just near bottom left corner
         rect.withAnchor(AnchorPoint.SouthWest, () => {
           rect.x = 20;
-          rect.y = this.videoService.baseHeight - 20;
+          rect.y = this.videoSettingsService.baseHeight - 20;
         });
 
         item.setTransform({
@@ -186,6 +194,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
   }
 
   pruneRecordingEntries() {
+    if (Object.keys(this.state.recordingHistory).length < 30) return;
     const oneMonthAgo = moment().subtract(30, 'days');
     const prunedEntries = {};
     Object.keys(this.state.recordingHistory).forEach(timestamp => {
@@ -197,15 +206,12 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
   }
 
   showRecordingHistory() {
-    this.windowsService.actions.showWindow({
-      componentName: 'RecordingHistory',
-      title: $t('Recording History'),
-      size: { width: 450, height: 600 },
-    });
+    this.navigationService.navigate('RecordingHistory');
   }
 
   async uploadToYoutube(filename: string) {
     const yt = getPlatformService('youtube') as YoutubeService;
+    this.SET_UPLOAD_INFO({ uploading: true });
 
     const { cancel, complete } = yt.uploader.uploadVideo(
       filename,
@@ -230,18 +236,77 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
       });
 
       this.usageStatisticsService.recordAnalyticsEvent('RecordingHistory', {
-        type: 'UploadError',
+        type: 'UploadYouTubeError',
       });
     }
 
     this.cancelFunction = () => {};
-    this.SET_UPLOAD_INFO({});
+    this.CLEAR_UPLOAD_INFO();
 
     if (result) {
       this.usageStatisticsService.recordAnalyticsEvent('RecordingHistory', {
-        type: 'UploadSuccess',
+        type: 'UploadYouTubeSuccess',
         privacy: 'private',
       });
+      return result.id;
+    }
+  }
+
+  async uploadToStorage(filename: string, platform: string) {
+    this.SET_UPLOAD_INFO({ uploading: true });
+    const { cancel, complete, size } = await this.sharedStorageService.actions.return.uploadFile(
+      filename,
+      progress => {
+        this.SET_UPLOAD_INFO({
+          uploadedBytes: progress.uploadedBytes,
+          totalBytes: progress.totalBytes,
+        });
+      },
+      (error: unknown) => {
+        this.SET_UPLOAD_INFO({ error: error.toString() });
+      },
+      platform,
+    );
+    this.usageStatisticsService.recordAnalyticsEvent('RecordingHistory', {
+      type: 'UploadStorageBegin',
+      fileSize: size,
+      platform,
+    });
+
+    this.cancelFunction = () => {
+      this.usageStatisticsService.recordAnalyticsEvent('RecordingHistory', {
+        type: 'UploadStorageCancel',
+        fileSize: size,
+        platform,
+      });
+      cancel();
+    };
+    let result;
+    try {
+      result = await complete;
+    } catch (e: unknown) {
+      Sentry.withScope(scope => {
+        scope.setTag('feature', 'recording-history');
+        console.error('Got error uploading Storage video', e);
+      });
+
+      this.usageStatisticsService.recordAnalyticsEvent('RecordingHistory', {
+        type: 'UploadStorageError',
+        fileSize: size,
+        platform,
+      });
+    }
+
+    this.cancelFunction = () => {};
+    this.CLEAR_UPLOAD_INFO();
+
+    if (result) {
+      this.usageStatisticsService.recordAnalyticsEvent('RecordingHistory', {
+        type: 'UploadStorageSuccess',
+        fileSize: size,
+        platform,
+      });
+      return result.id;
     }
   }
 
@@ -285,7 +350,12 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
   }
 
   @mutation()
-  private SET_UPLOAD_INFO(info: IUploadInfo) {
-    this.state.uploadInfo = info;
+  private SET_UPLOAD_INFO(info: Partial<IUploadInfo>) {
+    this.state.uploadInfo = { ...this.state.uploadInfo, ...info };
+  }
+
+  @mutation()
+  private CLEAR_UPLOAD_INFO() {
+    this.state.uploadInfo = { uploading: false };
   }
 }

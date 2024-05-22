@@ -3,7 +3,11 @@
   "This element is too small to be displayed": "Ten element jest zbyt mały, aby go wyświetlić",
   "This element requires Selective Recording to be enabled": "Ten element wymaga nagrywania selektywnego do włączenia",
   "Grant Permissions": "Udziel uprawnień",
-  "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs wymaga dodatkowych uprawnień. Udziel uprawnień w wyskakującym oknie dialogowym, aby kontynuować.",
+  "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs wymaga dodatkowych uprawnień. Nadaj uprawnienia w wyskakujących oknach dialogowych, aby kontynuować.",
   "Microphone": "Mikrofon",
-  "Webcam": "Kamera internetowa"
+  "Webcam": "Kamera internetowa",
+  "You've merged a Streamlabs ID to your account, please log back in to ensure you have the right credentials.": "Połączono Streamlabs ID ze swoim kontem, zaloguj się ponownie, aby upewnić się, że masz właściwe dane uwierzytelniające.",
+  "Enable Live Streaming?": "Włączyć strumieniową transmisję na żywo?",
+  "Streamlabs is currently in recording mode, which hides live streaming features. Would you like to enable live streaming features? You can disable them again in General settings.": "Streamlabs jest obecnie w trybie nagrywania, który ukrywa funkcje transmisji na żywo. Czy chcesz włączyć funkcje live streamingu? Możesz je ponownie wyłączyć w ustawieniach ogólnych.",
+  "Enable Streaming": "Włącz streaming"
 }

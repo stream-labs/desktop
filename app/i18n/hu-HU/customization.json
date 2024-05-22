@@ -10,8 +10,8 @@
   "Scene Selector": "Scene Selector",
   "Source Selector": "Source Selector",
   "Legacy Events": "Legacy Events",
-  "Stream Preview": "Stream Preview",
-  "Recording Preview": "Recording Preview",
+  "Stream Preview": "Stream előnézete",
+  "Recording Preview": "Felvétel előnézete",
   "Website": "Weboldal",
   "Save Changes": "Változtatások mentése",
   "Elements": "Elements",
@@ -23,5 +23,8 @@
   "Delete Current Tab": "Jelenlegi lap törlése",
   "Enter Target URL": "Enter Target URL",
   "Obsidian Prime": "Obsidian Prime",
-  "Alabaster Prime": "Alabaster Prime"
+  "Alabaster Prime": "Alabaster Prime",
+  "Custom Navigation Bar": "Custom Navigation Bar",
+  "Obsidian Ultra": "Obsidian Ultra",
+  "Alabaster Ultra": "Alabaster Ultra"
 }

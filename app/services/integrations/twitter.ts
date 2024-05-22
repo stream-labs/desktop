@@ -121,21 +121,6 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
     });
   }
 
-  async postTweet(tweet: string) {
-    const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/twitter/tweet`;
-    const headers = authorizedHeaders(this.userService.apiToken);
-    headers.append('Content-Type', 'application/json');
-    const request = new Request(url, {
-      headers,
-      method: 'POST',
-      body: JSON.stringify({ tweet }),
-    });
-    return jfetch(request).catch(e =>
-      throwStreamError('TWEET_FAILED', e, e.result?.error || $t('Could not connect to Twitter')),
-    );
-  }
-
   openLinkTwitterDialog() {
     if (this.authWindowOpen) return;
 
@@ -150,7 +135,6 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
       webPreferences: {
         partition,
         nodeIntegration: false,
-        nativeWindowOpen: true,
         sandbox: true,
       },
     });

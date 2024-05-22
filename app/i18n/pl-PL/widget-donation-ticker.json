@@ -14,5 +14,10 @@
   "Manage List": "Zarządzaj listą",
   "Font Settings": "Ustawienia czcionki",
   "A hex color for the text of the": "Kolor w formacie szesnastkowym dla tekstu",
-  "token": "tokenów"
+  "token": "tokenów",
+  "Each donation that shows in the donation ticker will be in this format. Available tokens:": "Każda dotacja, która pojawi się na stronie z informacjami o dotacjach, będzie miała taki format. Dostępne żetony:",
+  "The maximum amount of donations to show in the ticker. Must be a number greater than 0.": "Maksymalna ilość dotacji pokazywana w wyświetlaczu. Musi to być liczba większa niż 0.",
+  "How fast the ticker should scroll between 1 (fastest) and 10 (slowest). Set to 0 for no scrolling.": "Jak szybko powinien się przewijać wyświetlacz, pomiędzy 1 (najszybciej), a 10 (najwolniej). Ustaw to na 0, aby nie przewijać.",
+  "The font size in pixels. Reasonable size typically ranges between 24px and 48px.": "Rozmiar czcionki w pikselach. Rozsądny rozmiar zazwyczaj waha się między 24px a 48px.",
+  "How thick to make the font. The value should range between 300 (thinnest) and 900 (thickest)": "Jak gruba ma być czcionka. Ta wartość powinna wynosić od 300 (najcieńsza) do 900 (najgrubsza)"
 }

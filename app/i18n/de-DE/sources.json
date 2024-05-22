@@ -88,7 +88,7 @@
   "Alertbox": "Alertbox",
   "Essential": "Essentials",
   "Event List": "Ereignisliste",
-  "Tip Ticker": "Trinkgeld-Ticker",
+  "Tip Ticker": "Spenden-Ticker",
   "The source name is required": "Der Quellenname ist erforderlich",
   "Unable to add a source: the scene you are trying to add already contains your current scene": "Konnte Quelle nicht hinzufügen: Die Szene, die Sie hinzufügen möchten, enthält bereits die aktuelle Szene",
   "Add New Source": "Neue Quelle hinzufügen",
@@ -354,5 +354,8 @@
   "Set scale filter 'Bicubic'": "Skalierungsfilter „Bikubisch“ festlegen",
   "Set scale filter 'Bilinear'": "Skalierungsfilter „Bilinear“ festlegen",
   "Set scale filter 'Lanczos'": "Skalierungsfilter „Lanczos“ festlegen",
-  "Set scale filter 'Area'": "Skalierungsfilter „Bereich“ festlegen"
+  "Set scale filter 'Area'": "Skalierungsfilter „Bereich“ festlegen",
+  "You currently have the same source on both canvases selected. Please select the source in the canvas to edit it independently.": "Sie haben derzeit dieselbe Quelle für beide Arbeitsflächen ausgewählt. Bitte wählen Sie die Quelle in der Arbeitsfläche aus, um sie unabhängig zu bearbeiten.",
+  "Selective Recording can only be used with horizontal sources.": "Die selektive Aufzeichnung kann nur mit horizontalen Quellen verwendet werden.",
+  "Cannot move source outside canvas in Dual Output Mode.": "Die Quelle kann im Dual Output Modus nicht aus der Arbeitsfläche heraus verschoben werden."
 }

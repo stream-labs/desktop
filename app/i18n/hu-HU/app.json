@@ -1,9 +1,13 @@
 {
-  "You have been logged out": "You have been logged out",
+  "You have been logged out": "Ki lettél jelentkezve",
   "This element is too small to be displayed": "Ez az elem túl kicsi, hogy megjeleníthető legyen",
   "This element requires Selective Recording to be enabled": "This element requires Selective Recording to be enabled",
-  "Grant Permissions": "Grant Permissions",
-  "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.",
+  "Grant Permissions": "Engedélyek megadása",
+  "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "A Streamlabs-nak további engedélyekre van szüksége. A folytatáshoz add meg az engedélyeket a felugró külön ablakban.",
   "Microphone": "Mikrofon",
-  "Webcam": "Webkamera"
+  "Webcam": "Webkamera",
+  "You've merged a Streamlabs ID to your account, please log back in to ensure you have the right credentials.": "Egy Streamlabs ID-t társítottál a fiókodhoz, kérjük, jelentkezz be újra, hogy a megfelelő hitelesítő adatokkal rendelkezz.",
+  "Enable Live Streaming?": "Élő közvetítés engedélyezése?",
+  "Streamlabs is currently in recording mode, which hides live streaming features. Would you like to enable live streaming features? You can disable them again in General settings.": "A Streamlabs jelenleg felvételi módban van, ami elrejti az élő közvetítési funkciókat. Szeretnéd engedélyezni az élő közvetítési funkciókat? Az általános beállítások között újra kikapcsolhatod őket.",
+  "Enable Streaming": "Közvetítés engedélyezése"
 }

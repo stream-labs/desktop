@@ -1,4 +1,4 @@
-import { useSpectron, test, TExecutionContext } from '../helpers/spectron';
+import { useWebdriver, test, TExecutionContext } from '../helpers/webdriver';
 import { addSource, sourceIsExisting } from '../helpers/modules/sources';
 import { SceneBuilder } from '../helpers/scene-builder';
 import {
@@ -11,7 +11,7 @@ import {
 import { focusMain, getClient, useMainWindow } from '../helpers/modules/core';
 import { getApiClient } from '../helpers/api-client';
 
-useSpectron({
+useWebdriver({
   clearCollectionAfterEachTest: true,
   restartAppAfterEachTest: false,
 });

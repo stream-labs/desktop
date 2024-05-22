@@ -6,7 +6,7 @@
   "Enable Tweet Sharing": "Tweet megosztás engedélyezése",
   "Tweet when going live": "Tweetteljen, amikor indul a közvetítésed",
   "Unlink Twitter": "Twitter leválasztása",
-  "Tweet & Go Live": "Tweet & Go Live",
-  "Could not connect to Twitter": "Could not connect to Twitter",
-  "Use Streamlabs URL": "Use Streamlabs URL"
+  "Tweet & Go Live": "Tweetelés és élő közvetítés indítása",
+  "Could not connect to Twitter": "Nem sikerült csatlakozni a Twitterhez",
+  "Use Streamlabs URL": "Streamlabs URL használása"
 }

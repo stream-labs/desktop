@@ -33,5 +33,6 @@
   "FBPrivacyWarning": "Facebook hesabınız için sağlanan gizlilik düzeyi sınırlı olabilir. <link>Buradan</link> Streamlabs entegrasyonu için “Bu iş entegrasyonunu kullandığınızı kimler görebilir” bölümünü kontrol edin",
   "Only Me": "Yalnızca Ben",
   "Do not change privacy settings": "Gizlilik ayarlarını değiştirme",
-  "Install %{overlayName}": "Yükle %{overlayName}"
+  "Install %{overlayName}": "Yükle %{overlayName}",
+  "Please note that while you can schedule streams to Facebook, some will not appear on this calendar due to API limitations": "Facebook’ta yayın planlamaları yapsanız da bazı yayınların API kısıtlamaları nedeniyle bu takvimde yer almayacağını unutmayın"
 }

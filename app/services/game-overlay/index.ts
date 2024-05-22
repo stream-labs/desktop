@@ -1,5 +1,5 @@
 import electron, { ipcRenderer } from 'electron';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { Inject, InitAfter } from 'services/core';
 import { UserService } from 'services/user';
 import { CustomizationService } from 'services/customization';
@@ -33,17 +33,53 @@ const hideInteraction = `
   const elements = [];
 
   /* Platform Chats */
+  // TODO: remove .chat-input if it was only for Twitch, as it wasn't working and fixed below
   elements.push(document.querySelector('.chat-input'));
   elements.push(document.querySelector('.webComposerBlock__3lT5b'));
 
-  /* Recent Events */
-  elements.push(document.querySelector('.recent-events__header'));
-  elements.push(document.querySelector('.recent-events__tabs'));
-  elements.push(document.querySelector('.popout--recent-events'));
   elements.forEach((el) => {
     if (el) { el.style.cssText = 'display: none !important'; }
   });
+
+  const el = document.createElement('style');
+  document.head.appendChild(el);
+  const sheet = el.sheet;
+
+  /* Recent Events */
+  sheet.insertRule('.recent-events__header, .recent-events__tabs, .popout--recent-events { display: none !important; }');
+
+  /* Twitch Chat */
+  // Header
+  sheet.insertRule('.stream-chat .stream-chat-header { display: none !important; }', sheet.cssRules.length);
+  // Chat Input
+  sheet.insertRule('.stream-chat .chat-input { display: none !important; }', sheet.cssRules.length);
+
+  /* Trovo Chat */
+  // Fix chat container that's cut off on Game Overlay's 300px wide window
+  /* 
+   * The input box is rendered way after this code runs, insert a CSS rule to hide it instead of 
+   * manipulating style directly since we will never find the element here. 
+   * Since we're using CSSStyleSheet we add the rest of the rules here. 
+   * 
+   * 1. Fix chat wrapper width.
+   * 2. Hide chat input panel.
+   * 3. Hide all headers, including Gift Rank.
+   */
+  sheet.insertRule('#__layout .popout-container .chat-wrap { min-width: 300px }', sheet.cssRules.length);
+  sheet.insertRule('#__layout .popout-container .chat-wrap .chat-header { display: none }', sheet.cssRules.length);
+  sheet.insertRule('#__layout .popout-container .input-panels-container { display: none }', sheet.cssRules.length);
+  sheet.insertRule('#__layout .popout-container .gift-rank-header { display: none }', sheet.cssRules.length);
 `;
+
+export enum EGameOverlayState {
+  Disabled = 'disabled',
+  Enabled = 'enabled',
+}
+
+export enum EGameOverlayVisibility {
+  Hidden = 'hidden',
+  Visible = 'visible',
+}
 
 @InitAfter('UserService')
 export class GameOverlayService extends PersistentStatefulService<GameOverlayState> {
@@ -84,6 +120,9 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   // work around an electron bug: https://github.com/electron/electron/issues/20559
   // TODO: This module has types but we can't use them in their current state
   private overlay: any;
+
+  overlayStatusChanged = new Subject<EGameOverlayState>();
+  overlayVisibilityChanged = new Subject<EGameOverlayVisibility>();
 
   async init() {
     // Game overlay is windows only
@@ -259,11 +298,14 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
 
     // Force a refresh to trigger a paint event
     Object.values(this.windows).forEach(win => win.webContents.invalidate());
+
+    this.overlayVisibilityChanged.next(EGameOverlayVisibility.Visible);
   }
 
   hideOverlay() {
     this.overlay.hide();
     this.TOGGLE_OVERLAY(false);
+    this.overlayVisibilityChanged.next(EGameOverlayVisibility.Hidden);
   }
 
   toggleOverlay() {
@@ -294,6 +336,10 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
 
     this.SET_ENABLED(shouldEnable);
     if (shouldStop) await this.destroyOverlay();
+
+    this.overlayStatusChanged.next(
+      shouldEnable ? EGameOverlayState.Enabled : EGameOverlayState.Disabled,
+    );
   }
 
   async toggleWindowEnabled(window: string) {
@@ -344,6 +390,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
 
   async destroy() {
     await this.destroyOverlay();
+    this.overlayVisibilityChanged.next(EGameOverlayVisibility.Hidden);
   }
 
   async destroyOverlay() {

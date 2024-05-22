@@ -16,5 +16,15 @@
   "Font Size": "Typsnitt Storlek",
   "Muted Chatters": "Dämpa Chattare",
   "Hide Commands": "Hide Commands",
-  "Background Color": "Bakgrundsfärg"
+  "Background Color": "Bakgrundsfärg",
+  "Show Platform Icons": "Show Platform Icons",
+  "Theme": "Tema",
+  "Badges": "Emblem",
+  "Extra Emotes": "Extra Emotes",
+  "Chat Delay": "Chat Delay",
+  "Hide Delay": "Hide Delay",
+  "Disable Message Animations": "Disable Message Animations",
+  "Hide Characters": "Hide Characters",
+  "Hide Common Chat Bots": "Dölja Vanliga Chat Bots",
+  "Hide commands starting with `!`": "Dölj kommandon som börjar med '!'"
 }

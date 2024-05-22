@@ -1,9 +1,11 @@
 import { Service } from 'services/core/service';
 import { ISettingsSubCategory, SettingsService } from 'services/settings';
 import { VideoSettingsService } from 'services/settings-v2/video';
+import { HighlighterService } from 'services/highlighter';
 import { Inject } from 'services/core/injector';
 import { Dictionary } from 'vuex';
 import { AudioService } from 'app-services';
+import { parse } from 'path';
 
 /**
  * list of encoders for simple mode
@@ -182,6 +184,7 @@ export class OutputSettingsService extends Service {
   @Inject() private settingsService: SettingsService;
   @Inject() private audioService: AudioService;
   @Inject() private videoSettingsService: VideoSettingsService;
+  @Inject() private highlighterService: HighlighterService;
 
   /**
    * returns unified settings for the Streaming and Recording encoder

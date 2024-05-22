@@ -14,6 +14,8 @@ import cx from 'classnames';
 import { EAppPageSlot } from 'services/platform-apps';
 import Scrollable from 'components-react/shared/Scrollable';
 import UltraIcon from 'components-react/shared/UltraIcon';
+import { CustomizationState } from 'services/customization';
+import { useRealmObject } from 'components-react/hooks/realm';
 
 const { Option } = Select;
 
@@ -28,13 +30,16 @@ export function AppearanceSettings() {
     LayoutService,
   } = Services;
 
+  // Hooks up reactivity for Customization state
+  useRealmObject(CustomizationService.state);
+
   const { bind } = useModule(() => {
     function getSettings() {
-      return CustomizationService.state;
+      return CustomizationService.state.toObject() as CustomizationState;
     }
 
-    function setSettings(newSettings: typeof CustomizationService.state) {
-      CustomizationService.actions.setSettings(newSettings);
+    function setSettings(newSettings: CustomizationState) {
+      CustomizationService.actions.setSettings(newSettings as any);
     }
 
     return { bind: injectFormBinding(getSettings, setSettings) };
@@ -226,6 +231,13 @@ export function AppearanceSettings() {
               layout="horizontal"
               onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItemKey.Highlighter)}
               value={menuItemStatus[EMenuItemKey.Highlighter]}
+              disabled={!isLoggedIn || compactView}
+            />
+            <SwitchInput
+              label={menuTitles(EMenuItemKey.RecordingHistory)}
+              layout="horizontal"
+              onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItemKey.RecordingHistory)}
+              value={menuItemStatus[EMenuItemKey.RecordingHistory]}
               disabled={!isLoggedIn || compactView}
             />
           </Col>

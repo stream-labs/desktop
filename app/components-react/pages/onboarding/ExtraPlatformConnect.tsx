@@ -46,7 +46,9 @@ export function ExtraPlatformConnect() {
   }[selectedExtraPlatform];
 
   return (
-    <div>
+    <div
+      style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+    >
       <div className={styles.container} style={{ height: '50%' }}>
         <p>
           <PlatformLogo platform={selectedExtraPlatform} />

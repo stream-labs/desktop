@@ -20,7 +20,13 @@ export default class ChildWindow extends Vue {
   private refreshingTimeout: number;
   private modalOptions: IModalOptions = { renderFn: null };
 
+  unbind: () => void;
+
   mounted() {
+    this.unbind = this.customizationService.state.bindProps(this, {
+      theme: 'theme',
+    });
+
     antdThemes[this.theme].use();
     WindowsService.modalChanged.subscribe(modalOptions => {
       this.modalOptions = { ...this.modalOptions, ...modalOptions };
@@ -32,13 +38,15 @@ export default class ChildWindow extends Vue {
     });
   }
 
+  destroyed() {
+    this.unbind();
+  }
+
   get options() {
     return this.windowsService.state.child;
   }
 
-  get theme() {
-    return this.customizationService.currentTheme;
-  }
+  theme = 'night-theme';
 
   get currentComponent() {
     return this.components[this.components.length - 1];

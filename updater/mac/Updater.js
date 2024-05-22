@@ -14,10 +14,25 @@ class Updater {
   // orphan the main process in the background.
   constructor(startApp, channel) {
     this.startApp = startApp;
-    this.channel = channel;
+    if (process.arch === 'arm64') {
+      this.channel = 'arm64-' + channel;
+    } else {
+      this.channel = channel;
+    }
   }
 
   run() {
+    const osVersion = require('os').release();
+    if (osVersion && Number(osVersion.substring(0, 2)) < 19) {
+      dialog.showMessageBoxSync({
+        message:
+          'You are on a very old version of macOS. Please update macOS to continue using Streamlabs Desktop. Your current version is outdated and is no longer compatible with Streamlabs services.',
+        type: 'error',
+      });
+      app.exit();
+      return;
+    }
+
     this.updateState = {};
 
     this.bindListeners();

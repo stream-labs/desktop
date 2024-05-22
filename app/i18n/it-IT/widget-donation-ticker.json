@@ -14,5 +14,10 @@
   "Manage List": "Gestisci elenco",
   "Font Settings": "Impostazioni font",
   "A hex color for the text of the": "Un codice colore esadecimale per il testo del",
-  "token": "token"
+  "token": "token",
+  "Each donation that shows in the donation ticker will be in this format. Available tokens:": "Ogni donazione visualizzata nel ticker delle donazioni sarà in questo formato. Token disponibili:",
+  "The maximum amount of donations to show in the ticker. Must be a number greater than 0.": "Il numero massimo di donazioni che appaiono nel ticker. Deve essere maggiore di 0.",
+  "How fast the ticker should scroll between 1 (fastest) and 10 (slowest). Set to 0 for no scrolling.": "Velocità di scorrimento del ticker compresa tra 1 (più veloce) e 10 (più lenta). Impostala su 0 per impedire lo scorrimento.",
+  "The font size in pixels. Reasonable size typically ranges between 24px and 48px.": "Dimensione del font in pixel. Le dimensioni tipiche vanno da 24 a 48 px.",
+  "How thick to make the font. The value should range between 300 (thinnest) and 900 (thickest)": "Quanto spesso vuoi fare il font. Il valore di solito si aggira tra 300 (il più sottile) e 900 (il più spesso)"
 }

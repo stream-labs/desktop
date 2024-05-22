@@ -14,5 +14,10 @@
   "Manage List": "Listeyi Yönet",
   "Font Settings": "Yazı Tipi Ayarları",
   "A hex color for the text of the": "Belirteç metni için",
-  "token": "Hex rengi"
+  "token": "Hex rengi",
+  "Each donation that shows in the donation ticker will be in this format. Available tokens:": "Bağış bandında görünen her bir bağış bu formatta olacaktır. Kullanılabilir jetonlar:",
+  "The maximum amount of donations to show in the ticker. Must be a number greater than 0.": "Bant içinde gösterilecek maksimum bağış sayısı. 0’dan büyük bir sayı olmalıdır.",
+  "How fast the ticker should scroll between 1 (fastest) and 10 (slowest). Set to 0 for no scrolling.": "Bandın hangi hızda ilerlemesi: 1 (en hızlı) ve 10 (en yavaş). Kaydırmayı devre dışı bırakmak için 0 olarak ayarlayın.",
+  "The font size in pixels. Reasonable size typically ranges between 24px and 48px.": "Piksel cinsinden yazı tipi büyüklüğü. Makul boyut genellikle 24px ve 48px arasında değişir.",
+  "How thick to make the font. The value should range between 300 (thinnest) and 900 (thickest)": "Yazı tipinin kalınlığını düzenler. Değer, 300 (ince) ve 900 (kalın) arasında olmalıdır"
 }

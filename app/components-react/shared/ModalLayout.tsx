@@ -8,6 +8,7 @@ import css from './ModalLayout.m.less';
 import { Button } from 'antd';
 import { ModalProps } from 'antd/lib/modal';
 import Scrollable from './Scrollable';
+import { useRealmObject } from 'components-react/hooks/realm';
 
 // use props of Modal from the antd lib
 type TProps = {
@@ -16,6 +17,7 @@ type TProps = {
   hideFooter?: boolean;
   scrollable?: boolean;
   wrapperStyle?: React.CSSProperties;
+  className?: string;
 } & Pick<ModalProps, 'footer' | 'onOk' | 'okText' | 'bodyStyle' | 'confirmLoading' | 'onCancel'>;
 
 // calculate OS dependent styles
@@ -47,8 +49,7 @@ export function ModalLayout(p: TProps) {
   // inject services
   const { WindowsService, CustomizationService } = Services;
 
-  // define a vuex state
-  const v = useVuex(() => ({ currentTheme: CustomizationService.currentTheme }), false);
+  const currentTheme = useRealmObject(CustomizationService.state).theme;
 
   // define a close method for the modal
   function close() {
@@ -78,7 +79,7 @@ export function ModalLayout(p: TProps) {
 
   return (
     <div
-      className={cx('ant-modal-content', v.currentTheme)}
+      className={cx('ant-modal-content', currentTheme, p.className)}
       style={{ ...wrapperStyles, ...p.wrapperStyle }}
     >
       {p.fixedChild && <div style={fixedStyles}>{p.fixedChild}</div>}

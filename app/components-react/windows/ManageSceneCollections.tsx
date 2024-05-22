@@ -5,7 +5,7 @@ import moment from 'moment';
 import cx from 'classnames';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
 import { Services } from 'components-react/service-provider';
-import { confirmAsync, promptAsync } from 'components-react/modals';
+import { confirmAsync, promptAsync, alertAsync } from 'components-react/modals';
 import Scrollable from 'components-react/shared/Scrollable';
 import { $t } from 'services/i18n';
 import { $i } from 'services/utils';
@@ -126,9 +126,9 @@ export default function ManageSceneCollections() {
               <div>
                 <strong>{$t('Template')}</strong>
                 {isLoggedIn ? (
-                  <p>{$t('Choose a template from our theme library')}</p>
+                  <p>{$t('Choose a template from our overlay library')}</p>
                 ) : (
-                  <p>{$t('Log in to choose a template from our theme library')}</p>
+                  <p>{$t('Log in to choose a template from our overlay library')}</p>
                 )}
               </div>
               <img src={$i('images/prime-themes.png')} />
@@ -138,7 +138,7 @@ export default function ManageSceneCollections() {
                 <div className={styles.ultra}>
                   <strong>{$t('Ultra')}</strong>
                   <p>
-                    <Translate message="Upgrade your stream with premium themes with <ultra>Streamlabs Ultra</ultra>.">
+                    <Translate message="Upgrade your stream with premium overlays with <ultra>Streamlabs Ultra</ultra>.">
                       <u slot="ultra" />
                     </Translate>
                   </p>
@@ -150,10 +150,8 @@ export default function ManageSceneCollections() {
                       <UltraIcon
                         type="simple"
                         style={{
-                          fill: '#09161D',
-                          display: 'inline-block',
-                          height: '12px',
-                          width: '12px',
+                          color: 'var(--black)',
+                          fontSize: '12px',
                           marginRight: '5px',
                         }}
                       />
@@ -185,7 +183,7 @@ function CollectionNode(p: {
     if (p.collection.needsRename) rename();
   }
 
-  function makeActive() {
+  async function makeActive() {
     if (p.collection.operatingSystem !== getOS()) return;
     SceneCollectionsService.actions.load(p.collection.id);
   }

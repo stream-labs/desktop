@@ -14,8 +14,12 @@ import {
   TSceneNode,
   EBlendingMethod,
 } from 'services/scenes';
+import { TDisplayType } from 'services/settings-v2';
+import { IVideo } from 'obs-studio-node';
 import { Inject } from 'services/core/injector';
 import { Subject } from 'rxjs';
+import { DualOutputService } from 'services/dual-output';
+import { SceneCollectionsService } from 'services/scene-collections';
 
 enum ESceneNodeType {
   Folder = 'folder',
@@ -25,6 +29,9 @@ enum ESceneNodeType {
 interface INode {
   id: string;
   type: ESceneNodeType;
+  parentId?: string;
+  output?: IVideo;
+  display?: TDisplayType;
 }
 
 interface ITransform {
@@ -45,10 +52,13 @@ interface ISceneItem extends INode {
   scaleFiler: EScaleType;
   blendingMode: EBlendingMode;
   blendingMethod: EBlendingMethod;
+  display?: TDisplayType;
+  output?: IVideo;
 }
 
 interface ISceneItemFolder extends INode {
   type: ESceneNodeType.Folder;
+  sceneId?: string;
   name: string;
   childrenIds: string[];
 }
@@ -64,6 +74,8 @@ export class ScenesModule extends Module {
   permissions = [EApiPermissions.ScenesSources];
 
   @Inject() scenesService: ScenesService;
+  @Inject() dualOutputService: DualOutputService;
+  @Inject() sceneCollectionsService: SceneCollectionsService;
 
   constructor() {
     super();
@@ -142,7 +154,12 @@ export class ScenesModule extends Module {
     const scene = this.scenesService.views.getScene(sceneId);
     if (!scene) throw new Error(`Scene ${sceneId} does not exist!`);
 
-    const sceneItem = scene.addSource(sourceId);
+    const sceneItem = scene.addSource(sourceId, { display: 'horizontal' });
+
+    // if this is a dual output scene, also create the vertical scene item
+    if (this.dualOutputService.views.hasNodeMap(sceneId)) {
+      this.dualOutputService.createOrAssignOutputNode(sceneItem, 'vertical', false, sceneId);
+    }
     return this.serializeNode(sceneItem);
   }
 
@@ -154,6 +171,17 @@ export class ScenesModule extends Module {
     if (patch.locked != null) sceneItem.setLocked(patch.locked);
     if (patch.visible != null) sceneItem.setVisibility(patch.visible);
     if (patch.transform != null) sceneItem.setTransform(patch.transform);
+
+    // if this is a dual output scene, also update the vertical scene item
+    if (this.dualOutputService.views.hasNodeMap()) {
+      const verticalNodeId = this.dualOutputService.views.getVerticalNodeId(sceneItem.id);
+      if (!verticalNodeId) return;
+
+      const verticalSceneItem = this.scenesService.views.getSceneItem(verticalNodeId);
+      if (patch.locked != null) verticalSceneItem.setLocked(patch.locked);
+      if (patch.visible != null) verticalSceneItem.setVisibility(patch.visible);
+      if (patch.transform != null) verticalSceneItem.setTransform(patch.transform);
+    }
   }
 
   @apiMethod()
@@ -162,6 +190,13 @@ export class ScenesModule extends Module {
     if (!scene) throw new Error(`Scene ${sceneId} does not exist!`);
 
     scene.removeItem(sceneItemId);
+    if (this.dualOutputService.views.hasNodeMap(sceneId)) {
+      const verticalNodeId = this.dualOutputService.views.getVerticalNodeId(sceneItemId);
+      if (!verticalNodeId) return;
+
+      scene.removeItem(verticalNodeId);
+      this.sceneCollectionsService.removeNodeMapEntry(sceneItemId, sceneId);
+    }
   }
 
   private serializeScene(scene: Scene): IScene {
@@ -181,6 +216,7 @@ export class ScenesModule extends Module {
         type: ESceneNodeType.Folder,
         name: node.name,
         childrenIds: node.childrenIds,
+        display: node?.display,
       } as ISceneItemFolder;
     }
     if (node.isItem()) {
@@ -191,6 +227,7 @@ export class ScenesModule extends Module {
         visible: node.visible,
         locked: node.locked,
         transform: node.transform,
+        display: node?.display,
       } as ISceneItem;
     }
   }

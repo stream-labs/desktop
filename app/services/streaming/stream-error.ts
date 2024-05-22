@@ -1,9 +1,10 @@
-import { ServiceHelper } from 'services/core';
 import { getPlatformService, TPlatform } from '../platforms';
 import { $t } from 'services/i18n';
 import { Services } from '../../components-react/service-provider';
-import { platform } from 'os';
 
+// the `message` is shown to the user in the error notification
+// the `action` is included in the diag report for further specificity
+// about the error for debugging and support
 export const errorTypes = {
   PLATFORM_REQUEST_FAILED: {
     get message() {
@@ -40,6 +41,16 @@ export const errorTypes = {
       return $t('Failed to configure the Multistream server');
     },
   },
+  DUAL_OUTPUT_RESTREAM_DISABLED: {
+    get message() {
+      return $t('The Multistream server is temporarily unavailable for Dual Output');
+    },
+  },
+  DUAL_OUTPUT_SETUP_FAILED: {
+    get message() {
+      return $t('Failed to configure the Dual Output service');
+    },
+  },
   YOUTUBE_STREAMING_DISABLED: {
     get message() {
       return $t('Your YouTube account is not enabled for live streaming');
@@ -50,9 +61,44 @@ export const errorTypes = {
       return $t('Failed to upload the thumbnail');
     },
   },
-  TWEET_FAILED: {
+  TIKTOK_OAUTH_EXPIRED: {
     get message() {
-      return $t('Failed to post the Tweet');
+      return $t('Failed to authenticate with TikTok, re-login or re-merge TikTok account');
+    },
+    get action() {
+      return 're-login or re-merge TikTok account';
+    },
+  },
+  TIKTOK_SCOPE_OUTDATED: {
+    get message() {
+      return $t('Failed to update TikTok account');
+    },
+    get action() {
+      return 'unlink and re-merge TikTok account, then restart Desktop';
+    },
+  },
+  TIKTOK_STREAM_SCOPE_MISSING: {
+    get message() {
+      return $t('Your TikTok account is not enabled for live streaming');
+    },
+    get action() {
+      return 'confirm Live Access status with TikTok';
+    },
+  },
+  TIKTOK_STREAM_ACTIVE: {
+    get message() {
+      return $t('You are already live on a another device');
+    },
+    get action() {
+      return 'end stream on other device to start';
+    },
+  },
+  TIKTOK_GENERATE_CREDENTIALS_FAILED: {
+    get message() {
+      return $t('Error generating TikTok stream credentials');
+    },
+    get action() {
+      return 'confirm streaming approval status with TikTok';
     },
   },
   PRIME_REQUIRED: {
@@ -85,6 +131,7 @@ export interface IStreamError extends IRejectedRequest {
   platform?: TPlatform;
   type: TStreamErrorType;
   details?: string;
+  action?: string;
 }
 
 export class StreamError extends Error implements IRejectedRequest {

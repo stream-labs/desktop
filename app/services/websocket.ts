@@ -8,6 +8,7 @@ import { AppService } from 'services/app';
 import { IRecentEvent, ISafeModeServerSettings } from 'services/recent-events';
 import { importSocketIOClient } from '../util/slow-imports';
 import { SceneCollectionsService } from 'services/scene-collections';
+import { TPlatform } from './platforms';
 
 export type TSocketEvent =
   | IStreamlabelsSocketEvent
@@ -22,7 +23,10 @@ export type TSocketEvent =
   | IPrimeSubEvent
   | ISafeModeEnabledSocketEvent
   | ISafeModeDisabledSocketEvent
-  | ISLIDMerged;
+  | ISLIDMerged
+  | IUserAccountMerged
+  | IUserAccountUnlinked
+  | IUserAccountMergeError;
 
 interface IStreamlabelsSocketEvent {
   type: 'streamlabels';
@@ -121,6 +125,22 @@ interface ISLIDMerged {
   for: string;
 }
 
+interface IUserAccountMerged {
+  type: 'account_merged';
+  for: string;
+}
+interface IUserAccountUnlinked {
+  type: 'account_unlinked';
+  for: string;
+}
+interface IUserAccountMergeError {
+  type: 'account_merge_error';
+  for: string;
+  platform: TPlatform;
+  message: string;
+  code: number;
+}
+
 export class WebsocketService extends Service {
   @Inject() private userService: UserService;
   @Inject() private hostsService: HostsService;
@@ -130,6 +150,7 @@ export class WebsocketService extends Service {
   socket: SocketIOClient.Socket;
 
   socketEvent = new Subject<TSocketEvent>();
+  ultraSubscription = new Subject<boolean>();
   io: SocketIOClientStatic;
 
   init() {

@@ -17,14 +17,13 @@ import { MagicLinkService } from 'services/magic-link';
 import { UserService } from 'services/user';
 import { DismissablesService, EDismissable } from 'services/dismissables';
 import Scrollable from 'components/shared/Scrollable';
-import Hotkeys from './Hotkeys.vue';
 import {
   ObsSettings,
   PlatformLogo,
   NewBadge,
   UltraIcon,
   InstalledApps,
-  // Hotkeys,
+  Hotkeys,
 } from 'components/shared/ReactComponentList';
 import { $t } from 'services/i18n';
 import { debounce } from 'lodash-decorators';
@@ -181,7 +180,11 @@ export default class Settings extends Vue {
   }
 
   get categoryNames() {
-    return this.settingsService.getCategories();
+    // dual output mode returns additional categories for each context
+    // so hide these from the settings list
+    return this.settingsService
+      .getCategories()
+      .filter(category => !category.toLowerCase().startsWith('stream') || category === 'Stream');
   }
 
   save(settingsData: ISettingsSubCategory[]) {
@@ -263,7 +266,9 @@ export default class Settings extends Vue {
       remote.dialog
         .showMessageBox({
           title: $t('Confirm'),
-          message: $t('Are you sure you want to log out?'),
+          message: $t('Are you sure you want to log out %{username}?', {
+            username: this.userService.username,
+          }),
           buttons: [$t('Yes'), $t('No')],
         })
         .then(({ response }) => {

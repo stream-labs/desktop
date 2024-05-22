@@ -1,4 +1,4 @@
-import { PersistentStatefulService, mutation, InitAfter } from 'services/core/index';
+import { PersistentStatefulService, mutation, InitAfter, ViewHandler } from 'services/core/index';
 import { UserService } from './user';
 import { HostsService } from './hosts';
 import { Inject, Service } from 'services';
@@ -15,6 +15,8 @@ import {
 import { CustomizationService } from './customization';
 import { JsonrpcService } from 'services/api/jsonrpc/jsonrpc';
 import { WindowsService } from 'services/windows';
+import { RealmObject } from './realm';
+import { ObjectSchema } from 'realm';
 
 export interface IAnnouncementsInfo {
   id: number;
@@ -24,15 +26,89 @@ export interface IAnnouncementsInfo {
   thumbnail: string;
   link: string;
   linkTarget: 'external' | 'slobs';
+  type: 0 | 1;
   params?: { [key: string]: string };
   closeOnLink?: boolean;
 }
 
-@InitAfter('UserService')
-export class AnnouncementsService extends PersistentStatefulService<{
+class AnnouncementInfo extends RealmObject {
+  id: number;
+  header: string;
+  subHeader: string;
+  linkTitle: string;
+  thumbnail: string;
+  link: string;
+  linkTarget: 'external' | 'slobs';
+  type: 0 | 1;
+  params?: { [key: string]: string };
+  closeOnLink?: boolean;
+
+  static schema: ObjectSchema = {
+    name: 'AnnouncementInfo',
+    embedded: true,
+    properties: {
+      id: 'int',
+      header: 'string',
+      subHeader: 'string',
+      linkTitle: 'string',
+      thumbnail: 'string',
+      link: 'string',
+      linkTarget: 'string',
+      type: { type: 'int', default: 0 },
+      params: { type: 'dictionary', objectType: 'string' },
+      closeOnLink: { type: 'bool', default: false },
+    },
+  };
+}
+
+AnnouncementInfo.register();
+
+class AnnouncementsServiceEphemeralState extends RealmObject {
   news: IAnnouncementsInfo[];
+  banner: IAnnouncementsInfo;
+
+  static schema: ObjectSchema = {
+    name: 'AnnouncementsServiceEphemeralState',
+    properties: {
+      news: {
+        type: 'list',
+        objectType: 'AnnouncementInfo',
+        default: [] as AnnouncementInfo[],
+      },
+      banner: 'AnnouncementInfo',
+    },
+  };
+}
+
+AnnouncementsServiceEphemeralState.register();
+
+class AnnouncementsServicePersistedState extends RealmObject {
   lastReadId: number;
-}> {
+
+  static schema: ObjectSchema = {
+    name: 'AnnouncementsServicePersistedState',
+    properties: {
+      lastReadId: { type: 'int', default: 145 },
+    },
+  };
+
+  protected onCreated(): void {
+    const data = localStorage.getItem('PersistentStatefulService-AnnouncementsService');
+
+    if (data) {
+      const parsed = JSON.parse(data);
+
+      this.db.write(() => {
+        Object.assign(this, parsed);
+      });
+    }
+  }
+}
+
+AnnouncementsServicePersistedState.register({ persist: true });
+
+@InitAfter('UserService')
+export class AnnouncementsService extends Service {
   @Inject() private hostsService: HostsService;
   @Inject() private userService: UserService;
   @Inject() private appService: AppService;
@@ -42,32 +118,33 @@ export class AnnouncementsService extends PersistentStatefulService<{
   @Inject() private jsonrpcService: JsonrpcService;
   @Inject() private windowsService: WindowsService;
 
-  static defaultState: { news: IAnnouncementsInfo[]; lastReadId: number } = {
-    news: [],
-    lastReadId: 145,
-  };
-
-  static filter(state: { news: IAnnouncementsInfo[]; lastReadId: number }) {
-    return { ...state, news: [] as IAnnouncementsInfo[] };
-  }
+  state = AnnouncementsServicePersistedState.inject();
+  currentAnnouncements = AnnouncementsServiceEphemeralState.inject();
 
   init() {
     super.init();
-    this.userService.userLogin.subscribe(() => this.fetchLatestNews());
+    this.userService.userLogin.subscribe(() => {
+      this.fetchLatestNews();
+      this.getBanner();
+    });
   }
 
-  get bannersExist() {
-    return this.state.news.length > 0;
+  get newsExist() {
+    return this.currentAnnouncements.news.length > 0;
   }
 
   async getNews() {
-    if (this.bannersExist) return;
-    this.SET_BANNER(await this.fetchNews());
+    if (this.newsExist) return;
+    this.setNews(await this.fetchNews());
+  }
+
+  async getBanner() {
+    this.setBanner(await this.fetchBanner());
   }
 
   seenNews() {
-    if (!this.bannersExist) return;
-    this.SET_LATEST_READ(this.state.news[0].id);
+    if (!this.newsExist) return;
+    this.setLatestRead(this.currentAnnouncements.news[0].id);
   }
 
   private get installDateProxyFilePath() {
@@ -155,9 +232,48 @@ export class AnnouncementsService extends PersistentStatefulService<{
         }
       });
 
-      return newState[0].id ? newState : this.state.news;
+      return newState[0].id ? newState : this.currentAnnouncements.news;
     } catch (e: unknown) {
-      return this.state.news;
+      return this.currentAnnouncements.news;
+    }
+  }
+
+  private async fetchBanner() {
+    const recentlyInstalled = await this.recentlyInstalled();
+
+    if (recentlyInstalled || !this.customizationService.state.enableAnnouncements) {
+      return null;
+    }
+
+    const endpoint = `api/v5/slobs/announcement/get?clientId=${this.userService.getLocalUserId()}&locale=${
+      this.i18nService.state.locale
+    }`;
+    const req = this.formRequest(endpoint);
+
+    try {
+      const newState = await jfetch<IAnnouncementsInfo>(req);
+      return newState.id ? newState : null;
+    } catch (e: unknown) {
+      return null;
+    }
+  }
+
+  async closeBanner(clickType: 'action' | 'dismissal') {
+    const endpoint = 'api/v5/slobs/announcement/close';
+    const req = this.formRequest(endpoint, {
+      method: 'POST',
+      headers: new Headers({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({
+        clientId: this.userService.getLocalUserId(),
+        announcementId: this.currentAnnouncements.banner.id,
+        clickType,
+      }),
+    });
+
+    try {
+      await jfetch(req);
+    } finally {
+      this.setBanner(null);
     }
   }
 
@@ -179,18 +295,28 @@ export class AnnouncementsService extends PersistentStatefulService<{
     });
   }
 
-  @mutation()
-  SET_BANNER(banners: IAnnouncementsInfo[]) {
-    this.state.news = banners;
+  setNews(news: IAnnouncementsInfo[]) {
+    this.currentAnnouncements.db.write(() => {
+      this.currentAnnouncements.news = news;
+    });
   }
 
-  @mutation()
-  CLEAR_BANNER() {
-    this.state = AnnouncementsService.initialState;
+  clearNews() {
+    this.currentAnnouncements.db.write(() => {
+      this.currentAnnouncements.news = [];
+      this.currentAnnouncements.banner = null;
+    });
   }
 
-  @mutation()
-  SET_LATEST_READ(id: number) {
-    this.state.lastReadId = id;
+  setBanner(banner: IAnnouncementsInfo | null) {
+    this.currentAnnouncements.db.write(() => {
+      this.currentAnnouncements.banner = banner;
+    });
+  }
+
+  setLatestRead(id: number) {
+    this.state.db.write(() => {
+      this.state.lastReadId = id;
+    });
   }
 }

@@ -6,15 +6,23 @@ import {
   ERecordingState,
   EReplayBufferState,
 } from './streaming-api';
-import { StreamSettingsService } from '../settings/streaming';
+import { StreamSettingsService, ICustomStreamDestination } from '../settings/streaming';
 import { UserService } from '../user';
-import { RestreamService } from '../restream';
-import { getPlatformService, TPlatform, TPlatformCapability } from '../platforms';
+import { RestreamService, TOutputOrientation } from '../restream';
+import {
+  DualOutputService,
+  TDisplayPlatforms,
+  IDualOutputPlatformSetting,
+  TDisplayDestinations,
+} from '../dual-output';
+import { getPlatformService, TPlatform, TPlatformCapability, platformList } from '../platforms';
 import { TwitterService } from '../../app-services';
 import cloneDeep from 'lodash/cloneDeep';
 import difference from 'lodash/difference';
 import { Services } from '../../components-react/service-provider';
 import { getDefined } from '../../util/properties-type-guards';
+import { TDisplayType } from 'services/settings-v2';
+import compact from 'lodash/compact';
 
 /**
  * The stream info view is responsible for keeping
@@ -41,6 +49,10 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
 
   private get twitterView() {
     return this.getServiceViews(TwitterService);
+  }
+
+  private get dualOutputView() {
+    return this.getServiceViews(DualOutputService);
   }
 
   private get streamingState() {
@@ -97,18 +109,28 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
    * Returns a sorted list of all platforms (linked and unlinked)
    */
   get allPlatforms(): TPlatform[] {
-    const allPlatforms: TPlatform[] = ['twitch', 'facebook', 'youtube', 'tiktok', 'trovo'];
-    return this.getSortedPlatforms(allPlatforms);
+    return this.getSortedPlatforms(platformList);
   }
 
   /**
    * Returns a list of linked platforms available for restream
+   * @remark If TikTok is linked, users can always stream to it
    */
   get linkedPlatforms(): TPlatform[] {
     if (!this.userView.state.auth) return [];
-    if (!this.restreamView.canEnableRestream || !this.protectedModeEnabled) {
-      return [this.userView.auth!.primaryPlatform];
+
+    if (
+      (!this.restreamView.canEnableRestream || !this.protectedModeEnabled) &&
+      !this.isDualOutputMode
+    ) {
+      return compact([
+        this.userView.auth!.primaryPlatform,
+        this.userView.auth!.primaryPlatform !== 'tiktok' &&
+          this.isPlatformLinked('tiktok') &&
+          'tiktok',
+      ]);
     }
+
     return this.allPlatforms.filter(p => this.isPlatformLinked(p));
   }
 
@@ -121,6 +143,17 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
    */
   get enabledPlatforms(): TPlatform[] {
     return this.getEnabledPlatforms(this.settings.platforms);
+  }
+
+  /**
+   * Returns the host from the rtmp url
+   */
+  get enabledCustomDestinationHosts() {
+    return (
+      this.settings.customDestinations
+        .filter(dest => dest.enabled)
+        .map(dest => dest.url.split[2]) || []
+    );
   }
 
   /**
@@ -144,12 +177,77 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     ) as TPlatform[];
   }
 
+  /**
+   * Returns if the user can or should use the restream service
+   */
   get isMultiplatformMode(): boolean {
+    if (this.isDualOutputMode) return false;
     return (
       this.protectedModeEnabled &&
       (this.enabledPlatforms.length > 1 ||
         this.settings.customDestinations.filter(dest => dest.enabled).length > 0)
     );
+  }
+
+  /**
+   * Returns if dual output mode is on. Dual output mode is only available to logged in users
+   */
+  get isDualOutputMode(): boolean {
+    return this.dualOutputView.dualOutputMode && this.userView.isLoggedIn;
+  }
+
+  get shouldMultistreamDisplay(): { horizontal: boolean; vertical: boolean } {
+    const numHorizontal =
+      this.activeDisplayPlatforms.horizontal.length +
+      this.activeDisplayDestinations.horizontal.length;
+    const numVertical =
+      this.activeDisplayPlatforms.vertical.length + this.activeDisplayDestinations.vertical.length;
+
+    return {
+      horizontal: numHorizontal > 1,
+      vertical: numVertical > 1,
+    };
+  }
+
+  /**
+   * Returns the enabled platforms according to their assigned display
+   */
+  get activeDisplayPlatforms(): TDisplayPlatforms {
+    const enabledPlatforms = this.enabledPlatforms;
+
+    return Object.entries(this.dualOutputView.platformSettings).reduce(
+      (displayPlatforms: TDisplayPlatforms, [key, val]: [string, IDualOutputPlatformSetting]) => {
+        if (val && enabledPlatforms.includes(val.platform)) {
+          displayPlatforms[val.display].push(val.platform);
+        }
+        return displayPlatforms;
+      },
+      { horizontal: [], vertical: [] },
+    );
+  }
+
+  /**
+   * Returns the enabled destinations according to their assigned display
+   */
+  get activeDisplayDestinations(): TDisplayDestinations {
+    const destinations = this.customDestinations;
+
+    return destinations.reduce(
+      (displayDestinations: TDisplayDestinations, destination: ICustomStreamDestination) => {
+        if (destination.enabled) {
+          displayDestinations[destination.display ?? 'horizontal'].push(destination.url);
+        }
+        return displayDestinations;
+      },
+      { horizontal: [], vertical: [] },
+    );
+  }
+
+  /**
+   * Returns the display for a given platform
+   */
+  getPlatformDisplay(platform: TPlatform) {
+    return this.dualOutputView.getPlatformDisplay(platform);
   }
 
   get isMidStreamMode(): boolean {
@@ -171,7 +269,7 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
    */
   get chatUrl(): string {
     if (!this.userView.isLoggedIn || !this.userView.auth) return '';
-    return getPlatformService(this.userView.auth.primaryPlatform).chatUrl;
+    return getPlatformService(this.userView.auth.primaryPlatform)?.chatUrl;
   }
 
   getTweetText(streamTitle: string) {
@@ -202,7 +300,7 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
   }
 
   get isAdvancedMode(): boolean {
-    return this.isMultiplatformMode && this.settings.advancedMode;
+    return (this.isMultiplatformMode || this.isDualOutputMode) && this.settings.advancedMode;
   }
 
   /**
@@ -274,6 +372,13 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
       ...platforms.filter(p => !this.isPrimaryPlatform(p) && this.isPlatformLinked(p)),
       ...platforms.filter(p => !this.isPlatformLinked(p)),
     ];
+  }
+
+  /**
+   * Get the mode name based on the platform or destination display
+   */
+  getDisplayContextName(display: TDisplayType): TOutputOrientation {
+    return this.dualOutputView.getDisplayContextName(display);
   }
 
   /**

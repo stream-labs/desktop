@@ -5,7 +5,7 @@
   "Sounds": "Hangok",
   "Drag & Drop Upload": "Húz & Kidob Feltöltés",
   "Copy URL": "URL másolása",
-  "Browse the Gallery": "Browse the Gallery",
+  "Browse the Gallery": "Böngéssz a galériában",
   "Cancel": "Mégse",
   "OK": "OK",
   "Select": "Választ",
@@ -16,7 +16,7 @@
   "Upload An Image": "Tölts fel egy képet",
   "Upload A Sound": "Tölts fel egy hangot",
   "Are you sure you want to delete this file? This action is irreversable.": "Biztosan törli ezt a fájlt? Ez a művelet visszafordíthatatlan.",
-  "Stock Files": "Stock Files",
+  "Stock Files": "Alap fájlok",
   "My Uploads": "Feltöltéseim",
   "Not a supported file type": "Nem támogatott fájltípus",
   "Downloading...": "Letöltés...",
@@ -29,7 +29,7 @@
   "No Sound": "Nincs hang",
   "No Media": "Nincs média",
   "Change Link": "Link megváltoztatása",
-  "Pick From Gallery": "Pick From Gallery",
-  "Clear Link": "Clear Link",
+  "Pick From Gallery": "Válassz a galériából",
+  "Clear Link": "Link törlése",
   "Media URL": "Média URL"
 }

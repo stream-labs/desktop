@@ -5,15 +5,16 @@ import {
   submit,
   switchAdvancedMode,
   waitForSettingsWindowLoaded,
+  waitForStreamStart,
 } from '../../helpers/modules/streaming';
 import { fillForm, useForm } from '../../helpers/modules/forms';
 import { click, clickButton, isDisplayed, waitForDisplayed } from '../../helpers/modules/core';
 import { logIn } from '../../helpers/modules/user';
-import { releaseUserInPool, reserveUserFromPool } from '../../helpers/spectron/user';
+import { releaseUserInPool, reserveUserFromPool } from '../../helpers/webdriver/user';
 import { showSettingsWindow } from '../../helpers/modules/settings/settings';
-import { test, useSpectron } from '../../helpers/spectron';
+import { test, useWebdriver } from '../../helpers/webdriver';
 
-useSpectron();
+useWebdriver();
 
 test('Multistream default mode', async t => {
   // login to via Twitch because it doesn't have strict rate limits
@@ -134,13 +135,19 @@ test('Custom stream destinations', async t => {
   await prepareToGoLive();
   await clickGoLive();
   await waitForSettingsWindowLoaded();
-  await t.true(await isDisplayed('span=MyCustomDest'), 'Destination is available');
+  t.true(await isDisplayed('span=MyCustomDest'), 'Destination is available');
   await click('span=MyCustomDest'); // switch the destination on
 
   // try to stream
+  await fillForm({
+    title: 'Test stream',
+    twitchGame: 'Fortnite',
+  });
+  await waitForSettingsWindowLoaded();
   await submit();
   await waitForDisplayed('span=Configure the Multistream service');
   await waitForDisplayed("h1=You're live!", { timeout: 60000 });
+  await waitForStreamStart();
   await stopStream();
   await releaseUserInPool(user);
 

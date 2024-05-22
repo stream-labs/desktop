@@ -13,6 +13,7 @@ import NotificationsArea from './NotificationsArea';
 import { Tooltip } from 'antd';
 import { confirmAsync } from 'components-react/modals';
 import { useModule } from 'slap';
+import { useRealmObject } from 'components-react/hooks/realm';
 
 export default function StudioFooterComponent() {
   const {
@@ -21,13 +22,14 @@ export default function StudioFooterComponent() {
     UsageStatisticsService,
     NavigationService,
     RecordingModeService,
+    PerformanceService,
   } = Services;
 
   const {
     streamingStatus,
-    streamQuality,
     isLoggedIn,
     canSchedule,
+    streamQuality,
     replayBufferOffline,
     replayBufferStopping,
     replayBufferSaving,

@@ -7,40 +7,46 @@ import { TwitchEditStreamInfo } from './platforms/TwitchEditStreamInfo';
 import { Section } from './Section';
 import { YoutubeEditStreamInfo } from './platforms/YoutubeEditStreamInfo';
 import FacebookEditStreamInfo from './platforms/FacebookEditStreamInfo';
-import { TiktokEditStreamInfo } from './platforms/TiktokEditStreamInfo';
+import { TikTokEditStreamInfo } from './platforms/TikTokEditStreamInfo';
 import { IPlatformComponentParams, TLayoutMode } from './platforms/PlatformSettingsLayout';
 import { getDefined } from '../../../util/properties-type-guards';
 import { TrovoEditStreamInfo } from './platforms/TrovoEditStreamInfo';
+import { TwitterEditStreamInfo } from './platforms/TwitterEditStreamInfo';
+import { InstagramEditStreamInfo } from './platforms/InstagramEditStreamInfo';
 
 export default function PlatformSettings() {
   const {
     isMultiplatformMode,
+    isDualOutputMode,
+    settings,
     error,
     isAdvancedMode,
     enabledPlatforms,
     getPlatformDisplayName,
     isLoading,
     updatePlatform,
-    platforms,
     commonFields,
     updateCommonFields,
     descriptionIsRequired,
-    getPlatformSettings,
     isUpdateMode,
+    isTikTokConnected,
   } = useGoLiveSettings().extend(settings => ({
-
     get descriptionIsRequired() {
       const fbSettings = settings.state.platforms['facebook'];
       const descriptionIsRequired = fbSettings && fbSettings.enabled && !fbSettings.useCustomFields;
       return descriptionIsRequired;
-    }
+    },
 
+    get isTikTokConnected() {
+      return settings.state.isPlatformLinked('tiktok');
+    },
   }));
 
   const shouldShowSettings = !error && !isLoading;
+  const canShowAdvancedMode = isMultiplatformMode || isDualOutputMode;
 
   let layoutMode: TLayoutMode;
-  if (isMultiplatformMode) {
+  if (canShowAdvancedMode) {
     layoutMode = isAdvancedMode ? 'multiplatformAdvanced' : 'multiplatformSimple';
   } else {
     layoutMode = 'singlePlatform';
@@ -51,7 +57,7 @@ export default function PlatformSettings() {
       isUpdateMode,
       layoutMode,
       get value() {
-        return getDefined(getPlatformSettings(platform));
+        return getDefined(settings.platforms[platform]);
       },
       onChange(newSettings) {
         updatePlatform(platform, newSettings);
@@ -65,7 +71,7 @@ export default function PlatformSettings() {
       {shouldShowSettings && (
         <div style={{ width: '100%' }}>
           {/*COMMON FIELDS*/}
-          {isMultiplatformMode && (
+          {canShowAdvancedMode && (
             <Section isSimpleMode={!isAdvancedMode} title={$t('Common Stream Settings')}>
               <CommonPlatformFields
                 descriptionIsRequired={descriptionIsRequired}
@@ -91,10 +97,16 @@ export default function PlatformSettings() {
               {platform === 'youtube' && (
                 <YoutubeEditStreamInfo {...createPlatformBinding('youtube')} />
               )}
-              {platform === 'tiktok' && (
-                <TiktokEditStreamInfo {...createPlatformBinding('tiktok')} />
+              {platform === 'tiktok' && isTikTokConnected && (
+                <TikTokEditStreamInfo {...createPlatformBinding('tiktok')} />
               )}
               {platform === 'trovo' && <TrovoEditStreamInfo {...createPlatformBinding('trovo')} />}
+              {platform === 'twitter' && (
+                <TwitterEditStreamInfo {...createPlatformBinding('twitter')} />
+              )}
+              {platform === 'instagram' && (
+                <InstagramEditStreamInfo {...createPlatformBinding('instagram')} />
+              )}
             </Section>
           ))}
         </div>

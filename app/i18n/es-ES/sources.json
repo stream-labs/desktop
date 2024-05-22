@@ -354,5 +354,8 @@
   "Set scale filter 'Bicubic'": "Establecer filtro de escala 'Bicúbico'",
   "Set scale filter 'Bilinear'": "Establecer filtro de escala 'Bilineal'",
   "Set scale filter 'Lanczos'": "Establecer filtro de escala 'Lanczos'",
-  "Set scale filter 'Area'": "Establecer filtro de escala 'Área'"
+  "Set scale filter 'Area'": "Establecer filtro de escala 'Área'",
+  "You currently have the same source on both canvases selected. Please select the source in the canvas to edit it independently.": "Actualmente tiene seleccionada la misma fuente en ambos lienzos. Seleccione la fuente en el lienzo para editarla independientemente.",
+  "Selective Recording can only be used with horizontal sources.": "La grabación selectiva sólo se puede utilizar con fuentes horizontales.",
+  "Cannot move source outside canvas in Dual Output Mode.": "No se puede mover la fuente fuera del lienzo en modo Dual Output."
 }
