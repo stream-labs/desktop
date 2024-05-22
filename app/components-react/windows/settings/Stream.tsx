@@ -11,11 +11,8 @@ import css from './Stream.m.less';
 import cx from 'classnames';
 import { Button, message, Tooltip } from 'antd';
 import PlatformLogo from '../../shared/PlatformLogo';
-import Form, { useForm } from '../../shared/inputs/Form';
-import { TextInput } from '../../shared/inputs';
-import { ButtonGroup } from '../../shared/ButtonGroup';
 import { FormInstance } from 'antd/lib/form';
-import { injectFormBinding, injectState, mutation, useModule } from 'slap';
+import { injectState, mutation, useModule } from 'slap';
 import UltraIcon from 'components-react/shared/UltraIcon';
 import ButtonHighlighted from 'components-react/shared/ButtonHighlighted';
 import { useVuex } from 'components-react/hooks';
@@ -23,6 +20,8 @@ import Translate from 'components-react/shared/Translate';
 import * as remote from '@electron/remote';
 import { InstagramEditStreamInfo } from '../go-live/platforms/InstagramEditStreamInfo';
 import { IInstagramStartStreamOptions } from 'services/platforms/instagram';
+import { metadata } from 'components-react/shared/inputs/metadata';
+import FormFactory, { TInputValue } from 'components-react/shared/inputs/FormFactory';
 
 function censorWord(str: string) {
   if (str.length < 3) return str;
@@ -38,7 +37,7 @@ function censorEmail(str: string) {
  * A Redux module for components in the StreamSetting window
  */
 class StreamSettingsModule {
-  constructor(private form: FormInstance) {
+  constructor() {
     Services.UserService.refreshedLinkedAccounts.subscribe(
       (res: { success: boolean; message: string }) => {
         message.config({
@@ -70,11 +69,6 @@ class StreamSettingsModule {
       enabled: false,
     } as ICustomStreamDestination,
   });
-
-  bind = injectFormBinding(
-    () => this.state.customDestForm,
-    patch => this.updateCustomDestForm(patch),
-  );
 
   // INJECT SERVICES
 
@@ -153,6 +147,14 @@ class StreamSettingsModule {
 
   // DEFINE ACTIONS AND GETTERS
 
+  get formValues() {
+    return {
+      url: this.state.customDestForm.url,
+      streamKey: this.state.customDestForm.streamKey || '',
+      name: this.state.customDestForm.name,
+    };
+  }
+
   get platforms() {
     return this.streamingView.allPlatforms.filter(platform => {
       return true;
@@ -209,14 +211,6 @@ class StreamSettingsModule {
   }
 
   async saveCustomDest() {
-    // validate form
-    try {
-      await this.form.validateFields();
-    } catch (e: unknown) {
-      message.error($t('Invalid settings. Please check the form'));
-      return;
-    }
-
     if (!this.state.customDestForm.url.includes('?')) {
       // if the url contains parameters, don't add a trailing /
       this.fixUrl();
@@ -254,7 +248,6 @@ function useStreamSettings() {
  * A root component for StreamSettings
  */
 export function StreamSettings() {
-  const form = useForm();
   const {
     platforms,
     protectedModeEnabled,
@@ -262,7 +255,7 @@ export function StreamSettings() {
     disableProtectedMode,
     needToShowWarning,
     enableProtectedMode,
-  } = useModule(StreamSettingsModule, [form]);
+  } = useModule(StreamSettingsModule);
 
   return (
     <div>
@@ -601,19 +594,41 @@ function CustomDestination(p: { destination: ICustomStreamDestination; ind: numb
  * Renders an ADD/EDIT form for the custom destination
  */
 function CustomDestForm() {
-  const { saveCustomDest, stopEditing, bind } = useStreamSettings();
+  const { saveCustomDest, stopEditing, formValues, updateCustomDestForm } = useStreamSettings();
+
+  const urlValidator = {
+    message: $t(
+      'Please connect platforms directly from Streamlabs Desktop instead of adding Streamlabs Multistream as a custom destination',
+    ),
+    pattern: /^(?!.*streamlabs\.com).*/,
+  };
+
+  const meta = {
+    name: metadata.text({ label: $t('Name'), required: true }),
+    url: metadata.text({
+      label: 'URL',
+      rules: [urlValidator, { required: true }],
+    }),
+    streamKey: metadata.text({ label: $t('Stream Key'), isPassword: true }),
+  };
+
+  function editField(key: string) {
+    return (value: TInputValue) => {
+      console.log(key, value, /^(?!.*streamlabs\.com).*/.test(value as string));
+      updateCustomDestForm({ [key]: value });
+    };
+  }
 
   return (
-    <Form name="customDestForm">
-      <TextInput label={$t('Name')} required {...bind.name} />
-      <TextInput label={'URL'} required {...bind.url} />
-      <TextInput label={$t('Stream Key')} {...bind.streamKey} isPassword />
-      <ButtonGroup>
-        <Button onClick={stopEditing}>{$t('Cancel')}</Button>
-        <Button type="primary" onClick={saveCustomDest}>
-          {$t('Save')}
-        </Button>
-      </ButtonGroup>
-    </Form>
+    <>
+      <FormFactory
+        metadata={meta}
+        values={formValues}
+        name="customDestForm"
+        onChange={editField}
+        onSubmit={saveCustomDest}
+        onCancel={stopEditing}
+      />
+    </>
   );
 }

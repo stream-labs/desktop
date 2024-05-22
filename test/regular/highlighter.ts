@@ -2,7 +2,12 @@ import { test, useWebdriver } from '../helpers/webdriver';
 import { setTemporaryRecordingPath } from '../helpers/modules/settings/settings';
 import { click, clickButton, focusMain, select, waitForDisplayed } from '../helpers/modules/core';
 import { showPage } from '../helpers/modules/navigation';
-import { goLive, stopStream, waitForStreamStart } from '../helpers/modules/streaming';
+import {
+  prepareToGoLive,
+  stopStream,
+  tryToGoLive,
+  waitForStreamStart,
+} from '../helpers/modules/streaming';
 import { logIn } from '../helpers/modules/user';
 import { saveReplayBuffer } from '../helpers/modules/replay-buffer';
 import { fillForm } from '../helpers/modules/forms';
@@ -18,7 +23,11 @@ test('Highlighter save and export', async t => {
   await showPage('Highlighter');
   await clickButton('Configure');
 
-  await goLive();
+  await prepareToGoLive();
+  await tryToGoLive({
+    title: 'SLOBS Test Stream',
+    twitchGame: 'Fortnite',
+  });
   await waitForStreamStart();
   await saveReplayBuffer();
   await stopStream();
