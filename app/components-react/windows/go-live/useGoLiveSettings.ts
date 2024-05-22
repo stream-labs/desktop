@@ -223,6 +223,11 @@ export class GoLiveSettingsModule {
     this.prepopulate();
   }
 
+  switchCustomDestination(destInd: number, enabled: boolean) {
+    this.state.switchCustomDestination(destInd, enabled);
+    this.save(this.state.settings);
+  }
+
   get enabledDestinations() {
     return this.state.customDestinations.reduce(
       (enabled: number[], dest: ICustomStreamDestination, index: number) => {

@@ -67,6 +67,7 @@ export function ThemeSelector() {
 
   usePromise(
     () => OnboardingService.actions.return.fetchThemes(),
+    // @ts-ignore typescript upgrade
     p => p.then(themes => setThemesMetadata(themes)),
   );
 
