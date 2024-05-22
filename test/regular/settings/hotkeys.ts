@@ -26,14 +26,12 @@ useWebdriver();
 test('Populates essential hotkeys for them to be bound', async t => {
   const { app } = t.context;
 
-  await focusMain();
-  await (await app.client.$('.side-nav .icon-settings')).click();
+  await openHotkeySettings(t);
 
-  await focusChild();
-
-  await (await app.client.$('li=Hotkeys')).click();
   t.true(await isDisplayed('h2=Mic/Aux'));
-  await (await app.client.$('h2=Mic/Aux')).click();
+  const micAuxKey = await app.client.$('h2=Mic/Aux');
+  await micAuxKey.waitForExist();
+  await micAuxKey.click();
 
   for (const hotkey of [
     'Start Streaming',
