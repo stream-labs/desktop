@@ -1,14 +1,17 @@
-import { EMPTY, Observable, Subscription, interval, of } from 'rxjs';
+import { EMPTY, Observable, Subject, Subscription, interval, merge, of } from 'rxjs';
 import {
   bufferTime,
   catchError,
+  debounceTime,
   distinctUntilChanged,
   endWith,
   filter,
+  finalize,
   groupBy,
   map,
   mapTo,
   mergeMap,
+  takeUntil,
   tap,
 } from 'rxjs/operators';
 import { Inject } from 'services/core/injector';
@@ -28,11 +31,12 @@ import {
   isChatMessage,
   isThreadMessage,
 } from './MessageServerClient';
-import { KonomiTag } from './NicoliveClient';
 import { WrappedChat, WrappedChatWithComponent } from './WrappedChat';
 import { NicoliveCommentLocalFilterService } from './nicolive-comment-local-filter';
 import { NicoliveCommentSynthesizerService } from './nicolive-comment-synthesizer';
 import { NicoliveProgramStateService } from './state';
+import { NicoliveModeratorsService } from './nicolive-moderators';
+import { FilterRecord } from './ResponseTypes';
 
 function makeEmulatedChat(
   content: string,
@@ -56,7 +60,13 @@ class DummyMessageServerClient implements IMessageServerClient {
       })),
     );
   }
+  close(): void {
+    // do nothing
+  }
   requestLatestMessages(): void {
+    // do nothing
+  }
+  ping(): void {
     // do nothing
   }
 }
@@ -73,6 +83,24 @@ interface INicoliveCommentViewerState {
   speakingSeqId: number | null;
 }
 
+function calcModeratorName(record: { userId?: number; userName?: string }) {
+  if (record.userName) {
+    return `${record.userName} さん`;
+  } else {
+    return 'モデレーター';
+  }
+}
+
+function calcSSNGTypeName(record: FilterRecord) {
+  return {
+    word: 'コメント',
+    user: 'ユーザー',
+    command: 'コマンド',
+  }[record.type];
+}
+
+const PING_DEBOUNCE_TIME = 180000; // 無通信切断される環境で切断を避けるためのping送信間隔
+
 export class NicoliveCommentViewerService extends StatefulService<INicoliveCommentViewerState> {
   private client: IMessageServerClient | null = null;
 
@@ -83,6 +111,7 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
   @Inject() private nicoliveCommentSynthesizerService: NicoliveCommentSynthesizerService;
   @Inject() private customizationService: CustomizationService;
   @Inject() private windowsService: WindowsService;
+  @Inject() private nicoliveModeratorsService: NicoliveModeratorsService;
 
   static initialState: INicoliveCommentViewerState = {
     messages: [],
@@ -113,7 +142,7 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
   // なふだがoff なら名前を消す
   get filterNameplate(): (chat: WrappedChatWithComponent) => WrappedChatWithComponent {
     if (!this.nicoliveProgramStateService.state.nameplateEnabled) {
-      return (chat) => {
+      return chat => {
         return {
           ...chat,
           value: {
@@ -122,16 +151,14 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
           },
           rawName: chat.value.name, // ピン留めコメント用に元のnameを保持する
         };
-      }
+      };
     } else {
-      return (chat) => chat;
+      return chat => chat;
     }
   }
 
   get itemsLocalFiltered() {
-    return this.items
-      .filter(this.filterFn)
-      .map(this.filterNameplate);
+    return this.items.filter(this.filterFn).map(this.filterNameplate);
   }
   get recentPopoutsLocalFiltered() {
     return this.state.popoutMessages.filter(this.filterFn);
@@ -156,6 +183,53 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
         messages: this.items.map(chat => this.nicoliveCommentFilterService.applyFilter(chat)),
       });
     });
+
+    this.nicoliveModeratorsService.refreshObserver.subscribe({
+      next: event => {
+        switch (event.event) {
+          case 'refreshModerators':
+            // モデレーター情報が再取得されたら既存コメントのモデレーター情報も更新する
+            this.SET_STATE({
+              messages: this.items.map(chat => ({
+                ...chat,
+                isModerator: this.nicoliveModeratorsService.isModerator(chat.value.user_id),
+              })),
+            });
+            break;
+
+          case 'addSSNG':
+            {
+              this.nicoliveCommentFilterService.addFilterCache(event.record);
+              const name = calcModeratorName(event.record);
+              const type = calcSSNGTypeName(event.record);
+              this.addSystemMessage(makeEmulatedChat(`${name}が${type}を配信からブロックしました`));
+            }
+            break;
+
+          case 'removeSSNG':
+            // 放送者自身が削除したときはすでにキャッシュも更新されているし通知も不要
+            if (!this.nicoliveCommentFilterService.isBroadcastersFilter(event.record)) {
+              const { ssngId, userName, userId } = event.record;
+              const record = this.nicoliveCommentFilterService.findFilterCache(ssngId);
+
+              if (record) {
+                this.nicoliveCommentFilterService.deleteFiltersCache([ssngId]);
+                const name = calcModeratorName({ userId, userName });
+                const type = calcSSNGTypeName(record);
+                this.addSystemMessage(
+                  makeEmulatedChat(`${name}が${type}のブロックを取り消しました`),
+                );
+              }
+            }
+            break;
+        }
+      },
+    });
+  }
+
+  private systemMessages = new Subject<Pick<WrappedChat, 'type' | 'value' | 'isModerator'>>();
+  addSystemMessage(message: Pick<WrappedChat, 'type' | 'value' | 'isModerator'>) {
+    this.systemMessages.next(message);
   }
 
   lastSubscription: Subscription = null;
@@ -177,7 +251,8 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
   }
 
   refreshConnection() {
-    this.unsubscribe();
+    // コメントは切断するがモデレーター通信は維持する
+    this.lastSubscription?.unsubscribe();
     this.clearList();
     // 再接続ではピン止めは解除しない
 
@@ -186,12 +261,26 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
 
   private unsubscribe() {
     this.lastSubscription?.unsubscribe();
+    this.nicoliveModeratorsService.disconnectNdgr();
   }
 
   private connect() {
-    this.lastSubscription = this.client
-      .connect()
-      .pipe(
+    const closer = new Subject();
+    const clientSubject = this.client.connect();
+
+    const pingSubject = new Subject();
+    merge(pingSubject, clientSubject)
+      .pipe(debounceTime(PING_DEBOUNCE_TIME), takeUntil(closer))
+      .subscribe({
+        next: () => {
+          this.client.ping();
+          pingSubject.next();
+        },
+        error: () => {}, // こちらはエラー処理はしなくてよい(下でやる)
+      });
+
+    this.lastSubscription = merge(
+      clientSubject.pipe(
         groupBy(msg => Object.keys(msg)[0]),
         mergeMap((group$): Observable<Pick<WrappedChat, 'type' | 'value'>> => {
           switch (group$.key) {
@@ -212,14 +301,22 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
             case 'leave_thread':
               return group$.pipe(mapTo(makeEmulatedChat('コメントの取得に失敗しました')));
             default:
-              EMPTY;
+              return EMPTY;
           }
         }),
         catchError(err => {
+          if (err instanceof CloseEvent) {
+            this.client.close();
+            return EMPTY;
+          }
           console.error(err);
           return of(makeEmulatedChat(`エラーが発生しました: ${err.message}`));
         }),
         endWith(makeEmulatedChat('サーバーとの接続が終了しました')),
+        finalize(() => {
+          // コメント接続が終了したらモデレーター情報の監視も終了する
+          closer.next();
+        }),
         tap(v => {
           if (isOperatorCommand(v.value) && v.value.content === '/disconnect') {
             // completeが発生しないのでサーバーとの接続終了メッセージは出ない
@@ -227,9 +324,24 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
             this.unsubscribe();
           }
         }),
+      ),
+      this.systemMessages.pipe(takeUntil(closer)),
+    )
+      .pipe(
         map(({ type, value }, seqId) => ({ type, value, seqId })),
         bufferTime(1000),
         filter(arr => arr.length > 0),
+        map(arr =>
+          arr.map(m => {
+            if (m.type === 'normal' && m.value.user_id) {
+              return {
+                ...m,
+                isModerator: this.nicoliveModeratorsService.isModerator(m.value.user_id),
+              };
+            }
+            return m;
+          }),
+        ),
       )
       .subscribe(values => this.onMessage(values.map(c => AddComponent(c))));
     this.client.requestLatestMessages();
@@ -238,14 +350,13 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
   showUserInfo(userId: string, userName: string, isPremium: boolean) {
     this.windowsService.showWindow({
       componentName: 'UserInfo',
-      title: `${userName} さんのユーザー情報`,
+      title: 'ユーザー情報',
       queryParams: { userId, userName, isPremium },
       size: {
-        width: 600,
-        height: 600,
-      }
-    })
-
+        width: 360,
+        height: 440,
+      },
+    });
   }
 
   private queueToSpeech(values: WrappedChatWithComponent[]) {

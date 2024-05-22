@@ -22,6 +22,8 @@ import {
   UserFollow,
   AddFilterRecord,
   AddFilterResult,
+  AddModerator,
+  Moderator,
 } from './ResponseTypes';
 const { BrowserWindow } = remote;
 
@@ -123,13 +125,18 @@ export class NicoliveClient {
   static nicoadBaseURL = 'https://api.nicoad.nicovideo.jp';
   static communityBaseURL = 'https://com.nicovideo.jp';
   static userFollowBaseURL = 'https://user-follow-api.nicovideo.jp';
+  static userIconBaseURL = 'https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/';
   private static frontendID = 134;
 
   /**
    *
    * @param options niconicoSession: ニコニコのセッションIDを外挿する場合に与える
    */
-  constructor(private options: { niconicoSession?: string } = {}) {}
+  constructor(
+    private options: {
+      niconicoSession?: string;
+    } = {},
+  ) {}
 
   static isProgramPage(url: string): boolean {
     return /^https?:\/\/live2?\.nicovideo\.jp\/watch\/lv\d+/.test(url);
@@ -351,11 +358,15 @@ export class NicoliveClient {
     );
   }
 
-  async deleteFilters(programID: string, ids: FilterRecord['id'][]): Promise<WrappedResult<void>> {
+  async deleteFilters(
+    programID: string,
+    ids: FilterRecord['id'][],
+    idsByModerator: FilterRecord['id'][],
+  ): Promise<WrappedResult<void>> {
     return this.requestAPI<void>(
       'DELETE',
       `${NicoliveClient.live2BaseURL}/unama/tool/v2/programs/${programID}/ssng`,
-      NicoliveClient.jsonBody({ id: ids }),
+      NicoliveClient.jsonBody({ id: ids, idByModerator: idsByModerator }),
     );
   }
 
@@ -363,11 +374,10 @@ export class NicoliveClient {
   /** ユーザーアイコンを取得 */
   static getUserIconURL(userId: string, hash: string): string {
     const dir = Math.floor(Number(userId) / 10000);
-    const url = `https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/${dir}/${userId}.jpg?${hash}`;
+    const url = `${NicoliveClient.userIconBaseURL}${dir}/${userId}.jpg?${hash}`;
     return url;
   }
-  static defaultUserIconURL =
-    'https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg';
+  static defaultUserIconURL = `${NicoliveClient.userIconBaseURL}defaults/blank.jpg`;
 
   // 関心が別だが他の場所におく程の理由もないのでここにおく
   /** コミュニティ情報を取得 */
@@ -699,7 +709,6 @@ export class NicoliveClient {
         return json.data.following;
       }
     }
-    console.info('fetchUserFollow', userId, res); // DEBUG
     throw new Error(`fetchUserFollow failed: ${res.status} ${res.statusText}`);
   }
 
@@ -729,7 +738,6 @@ export class NicoliveClient {
       }),
     );
     if (!res.ok) {
-      console.info('followUser', userId, res, await res.json()); // DEBUG
       throw new Error(`followUser failed: ${res.status} ${res.statusText}`);
     }
   }
@@ -753,5 +761,31 @@ export class NicoliveClient {
       console.info('unFollowUser', userId, res, await res.json());
       throw new Error(`unFollowUser failed: ${res.status} ${res.statusText}`);
     }
+  }
+
+  async fetchModerators(): Promise<WrappedResult<Moderator[]>> {
+    return this.requestAPI<Moderator[]>(
+      'GET',
+      `${NicoliveClient.live2BaseURL}/unama/api/v2/broadcasters/moderators`,
+    );
+  }
+
+  /**
+   * 配信者の設定のモデレーターを追加する
+   * @param userId
+   * @returns
+   */
+  async addModerator(userId: string): Promise<WrappedResult<AddModerator>> {
+    return this.requestAPI<AddModerator>(
+      'POST',
+      `${NicoliveClient.live2BaseURL}/unama/api/v2/broadcasters/moderators`,
+      NicoliveClient.jsonBody({ userId: parseInt(userId, 10) }),
+    );
+  }
+  async removeModerator(userId: string): Promise<WrappedResult<void>> {
+    return this.requestAPI<void>(
+      'DELETE',
+      `${NicoliveClient.live2BaseURL}/unama/api/v2/broadcasters/moderators?userId=${userId}`,
+    );
   }
 }

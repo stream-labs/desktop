@@ -8,7 +8,11 @@ import { WrappedChat, WrappedChatWithComponent } from 'services/nicolive-program
 import { KonomiTagsService } from 'services/nicolive-program/konomi-tags';
 import { NicoliveCommentViewerService } from 'services/nicolive-program/nicolive-comment-viewer';
 import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
+import { getDisplayName } from 'services/nicolive-program/ChatMessage/getDisplayName';
+import { NicoliveModeratorsService } from 'services/nicolive-program/nicolive-moderators';
+import { NicoliveCommentFilterService } from 'services/nicolive-program/nicolive-comment-filter';
 import { WindowsService } from 'services/windows';
+import { HostsService } from 'services/hosts';
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import CommonComment from '../nicolive-area/comment/CommonComment.vue';
@@ -16,8 +20,12 @@ import EmotionComment from '../nicolive-area/comment/EmotionComment.vue';
 import GiftComment from '../nicolive-area/comment/GiftComment.vue';
 import NicoadComment from '../nicolive-area/comment/NicoadComment.vue';
 import SystemMessage from '../nicolive-area/comment/SystemMessage.vue';
-import { getDisplayName } from 'services/nicolive-program/ChatMessage/getDisplayName';
 import electron from 'electron';
+import {
+  NicoliveFailure,
+  openErrorDialogFromFailure,
+} from 'services/nicolive-program/NicoliveFailure';
+import Popper from 'vue-popperjs';
 
 const componentMap: { [type in ChatComponentType]: Vue.Component } = {
   common: CommonComment,
@@ -35,6 +43,7 @@ const componentMap: { [type in ChatComponentType]: Vue.Component } = {
     GiftComment,
     EmotionComment,
     SystemMessage,
+    Popper,
   },
 })
 export default class UserInfo extends Vue {
@@ -42,13 +51,27 @@ export default class UserInfo extends Vue {
   @Inject() private nicoliveProgramService: NicoliveProgramService;
   @Inject() private windowsService: WindowsService;
   @Inject() private konomiTagsService: KonomiTagsService;
+  @Inject() private nicoliveModeratorsService: NicoliveModeratorsService;
+  @Inject() private nicoliveCommentFilterService: NicoliveCommentFilterService;
+  @Inject() private hostsService: HostsService;
 
   private konomiTagsSubscription: Subscription;
   private myKonomiTags: KonomiTag[] = [];
   private rawKonomiTags: KonomiTag[] = [];
 
+  private moderatorSubscription: Subscription;
+  private isBlockedSubscription: Subscription;
+
   private cleanup: () => void = undefined;
   isLatestVisible = true;
+  showPopupMenu = false;
+
+  isBlockedUser = false;
+  isFollowing = false;
+  isModerator = false;
+
+  moderatorTooltip = 'モデレーター';
+  otherMenuTooltip = 'その他メニュー';
 
   mounted() {
     this.myKonomiTags = [];
@@ -82,8 +105,27 @@ export default class UserInfo extends Vue {
       this.rawKonomiTags = tags;
       this.updateKonomiTags();
     });
+
     this.nicoliveProgramService.client.fetchUserFollow(this.userId).then(following => {
       this.isFollowing = following;
+    });
+
+    this.isModerator = this.nicoliveModeratorsService.isModerator(this.userId);
+    this.moderatorSubscription = this.nicoliveModeratorsService.stateChange.subscribe({
+      next: state => {
+        const isModerator = state.moderatorsCache.includes(this.userId);
+        this.isModerator = isModerator;
+      },
+    });
+
+    const isBlocked = (filters: { type: string; body: string }[]) =>
+      filters.some(filter => filter.type === 'user' && filter.body === this.userId);
+
+    this.isBlockedUser = isBlocked(this.nicoliveCommentFilterService.state.filters);
+    this.isBlockedSubscription = this.nicoliveCommentFilterService.stateChange.subscribe({
+      next: state => {
+        this.isBlockedUser = isBlocked(state.filters);
+      },
     });
   }
 
@@ -95,6 +137,8 @@ export default class UserInfo extends Vue {
 
   beforeDestroy() {
     this.konomiTagsSubscription.unsubscribe();
+    this.moderatorSubscription.unsubscribe();
+    this.isBlockedSubscription.unsubscribe();
 
     if (this.cleanup) {
       this.cleanup();
@@ -117,7 +161,59 @@ export default class UserInfo extends Vue {
     return this.windowsService.getChildWindowQueryParams().isPremium;
   }
 
-  isFollowing: boolean = false;
+  followUser(): void {
+    this.nicoliveProgramService.client.followUser(this.userId).then(() => {
+      this.isFollowing = true;
+    });
+  }
+
+  unFollowUser(): void {
+    this.nicoliveProgramService.client.unFollowUser(this.userId).then(() => {
+      this.isFollowing = false;
+    });
+  }
+
+  async blockUser() {
+    await this.nicoliveCommentFilterService
+      .addFilter({
+        type: 'user',
+        body: this.userId,
+      })
+      .catch(e => {
+        if (e instanceof NicoliveFailure) {
+          openErrorDialogFromFailure(e);
+        }
+      });
+  }
+  async unBlockUser() {
+    const filterRecord = this.nicoliveCommentFilterService.state.filters.find(
+      filter => filter.type === 'user' && filter.body === this.userId,
+    );
+    if (!filterRecord) {
+      console.warn('unBlockUser: block user filter not found', this.userId);
+      return;
+    }
+
+    await this.nicoliveCommentFilterService.deleteFilters([filterRecord.id]).catch(e => {
+      if (e instanceof NicoliveFailure) {
+        openErrorDialogFromFailure(e);
+      }
+    });
+  }
+
+  async addModerator() {
+    return this.nicoliveModeratorsService.addModeratorWithConfirm({
+      userId: this.userId,
+      userName: this.userName,
+    });
+  }
+
+  async removeModerator() {
+    return this.nicoliveModeratorsService.removeModeratorWithConfirm({
+      userId: this.userId,
+      userName: this.userName,
+    });
+  }
 
   konomiTags: { name: string; common: boolean }[] = [];
 
@@ -170,19 +266,16 @@ export default class UserInfo extends Vue {
     };
   }
 
-  followUser(): void {
-    this.nicoliveProgramService.client.followUser(this.userId).then(() => {
-      this.isFollowing = true;
-    });
-  }
-
-  unFollowUser(): void {
-    this.nicoliveProgramService.client.unFollowUser(this.userId).then(() => {
-      this.isFollowing = false;
-    });
-  }
-
   openUserPage() {
-    electron.remote.shell.openExternal(`https://www.nicovideo.jp/user/${this.userId}`);
+    electron.remote.shell.openExternal(this.hostsService.getUserPageURL(this.userId));
+  }
+  copyUserId() {
+    electron.remote.clipboard.writeText(this.userId);
+  }
+
+  currentTab = 'konomi';
+
+  changeTab(tab: string) {
+    this.currentTab = tab;
   }
 }

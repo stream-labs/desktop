@@ -5,7 +5,6 @@ import { Inject } from 'services/core/injector';
 import { mutation } from 'services/core/stateful-service';
 import electron from 'electron';
 import { IncrementalRolloutService } from 'services/incremental-rollout';
-import { HostsService } from './hosts';
 import {
   getPlatformService,
   IPlatformAuth,
@@ -152,8 +151,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   get platformUserPageURL() {
     if (this.isLoggedIn()) {
       const platform = getPlatformService(this.state.auth.platform.type);
-      if (platform.getUserPageURL !== undefined) {
-        return platform.getUserPageURL();
+      if (platform.getMyPageURL !== undefined) {
+        return platform.getMyPageURL();
       }
       return '';
     }

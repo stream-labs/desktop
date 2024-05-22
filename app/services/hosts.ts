@@ -51,8 +51,18 @@ export class HostsService extends Service {
     }
   }
 
+  get nicoLiveWeb() {
+    return 'https://live.nicovideo.jp';
+  }
+
   getWatchPageURL(programID: string): string {
-    return `https://live.nicovideo.jp/watch/${programID}`;
+    return `${this.nicoLiveWeb}/watch/${programID}`;
+  }
+  getMyPageURL(): string {
+    return `${this.nicoLiveWeb}/my`;
+  }
+  getUserPageURL(userId: string): string {
+    return `https://www.nicovideo.jp/user/${userId}`;
   }
 
   getCommunityPageURL(communityID: string): string {
@@ -65,5 +75,9 @@ export class HostsService extends Service {
 
   getCreatorsProgramURL(programID: string): string {
     return `https://commons.nicovideo.jp/cpp/application/?site_id=nicolive&creation_id=${programID}`;
+  }
+
+  getModeratorSettingsURL(): string {
+    return 'https://www.upload.nicovideo.jp/niconico-garage/live/moderators';
   }
 }

@@ -86,17 +86,59 @@ export class NicoliveCommentFilterService extends StatefulService<INicoliveComme
     return this.fetchFilters();
   }
 
+  isBroadcastersFilter(record: Pick<FilterRecord, 'userId'>): boolean {
+    if (!record.userId) {
+      return true;
+    }
+    return record.userId.toString() === this.nicoliveProgramService.userService.platform.id;
+  }
+
   async deleteFilters(ids: number[]) {
-    const result = await this.client.deleteFilters(this.programID, ids);
+    if (process.env.DEV_SERVER) {
+      return;
+    }
+
+    const [ownIds, moderatorIds] = ids.reduce(
+      ([own, moderator], id) => {
+        const record = this.findFilterCache(id);
+        if (this.isBroadcastersFilter(record)) {
+          return [[...own, id], moderator];
+        }
+        return [own, [...moderator, id]];
+      },
+      [[], []] as [number[], number[]],
+    );
+
+    const result = await this.client.deleteFilters(this.programID, ownIds, moderatorIds);
     if (!isOk(result)) {
       throw NicoliveFailure.fromClientError('deleteFilters', result);
     }
 
+    this.deleteFiltersCache(ids);
+  }
+
+  findFilterCache(id: number): FilterRecord | undefined {
+    return this.state.filters.find(rec => rec.id === id);
+  }
+
+  addFilterCache(record: FilterRecord) {
+    if (!this.state.filters.some(rec => rec.id === record.id)) {
+      const filters = [...this.state.filters, record];
+      this.updateFilters(filters);
+    } else {
+      console.warn('addFilterCache: already exists', record);
+    }
+  }
+
+  deleteFiltersCache(ids: number[]) {
     const filters = this.state.filters.filter(rec => !ids.includes(rec.id));
     this.updateFilters(filters);
   }
 
   private updateFilters(filters: FilterRecord[]) {
+    // 登録日時降順にする
+    filters.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
     this.UPDATE_FILTERS(filters);
     this.stateChangeSubject.next({ filters });
   }
@@ -104,12 +146,5 @@ export class NicoliveCommentFilterService extends StatefulService<INicoliveComme
   @mutation()
   private UPDATE_FILTERS(filters: FilterRecord[]) {
     this.state = { filters };
-  }
-
-  get ngPanelInfoCoachingClosed() {
-    return this.stateService.state.ngPanelInfoCoachingClosed;
-  }
-  set ngPanelInfoCoachingClosed(value: boolean) {
-    this.stateService.updateNgPanelInfoCoachingClosed(value);
   }
 }

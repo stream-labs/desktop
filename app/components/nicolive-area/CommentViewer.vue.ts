@@ -1,4 +1,4 @@
-import { clipboard } from 'electron';
+import { clipboard, remote } from 'electron';
 import { Inject } from 'services/core/injector';
 import { CustomizationService } from 'services/customization';
 import { ChatMessage } from 'services/nicolive-program/ChatMessage';
@@ -26,6 +26,8 @@ import {
   NicoliveFailure,
   openErrorDialogFromFailure,
 } from 'services/nicolive-program/NicoliveFailure';
+import { NicoliveModeratorsService } from 'services/nicolive-program/nicolive-moderators';
+import { HostsService } from 'services/hosts';
 
 const componentMap: { [type in ChatComponentType]: Vue.Component } = {
   common: CommonComment,
@@ -64,6 +66,9 @@ export default class CommentViewer extends Vue {
 
   @Inject() private settingsService: ISettingsServiceApi;
 
+  @Inject() private nicoliveModeratorsService: NicoliveModeratorsService;
+  @Inject() private hostsService: HostsService;
+
   @Prop({ default: false }) showPlaceholder: boolean;
 
   get isCompactMode(): boolean {
@@ -74,8 +79,9 @@ export default class CommentViewer extends Vue {
   commentReloadTooltip = 'コメント再取得';
   commentSynthesizerOnTooltip = 'コメント読み上げ：クリックしてOFFにする';
   commentSynthesizerOffTooltip = 'コメント読み上げ：クリックしてONにする';
-  filterTooltip = 'NG設定';
+  filterTooltip = '配信用ブロック設定';
   settingsTooltip = 'コメント設定';
+  moderatorTooltip = 'モデレーター管理';
 
   isFilterOpened = false;
 
@@ -187,18 +193,11 @@ export default class CommentViewer extends Vue {
         clipboard.writeText(item.value.user_id);
       },
     });
-
     if (item.type === 'normal') {
-      menu.append({
-        id: 'Pin the comment',
-        label: 'コメントをピン留め',
-        click: () => {
-          this.pin(item);
-        },
-      });
       menu.append({
         type: 'separator',
       });
+
       menu.append({
         id: 'Ban comment content',
         label: 'コメントを配信からブロック',
@@ -228,6 +227,44 @@ export default class CommentViewer extends Vue {
                 openErrorDialogFromFailure(e);
               }
             });
+        },
+      });
+      menu.append({
+        type: 'separator',
+      });
+      if (item.value.name /* なふだ有効ユーザー */) {
+        if (!this.nicoliveModeratorsService.isModerator(item.value.user_id)) {
+          menu.append({
+            id: 'Add to moderator',
+            label: 'モデレーターに追加',
+            click: () => {
+              this.nicoliveModeratorsService.addModeratorWithConfirm({
+                userId: item.value.user_id,
+                userName: item.value.name,
+              });
+            },
+          });
+        } else {
+          menu.append({
+            id: 'Remove from moderator',
+            label: 'モデレーターから削除',
+            click: () => {
+              this.nicoliveModeratorsService.removeModeratorWithConfirm({
+                userId: item.value.user_id,
+                userName: item.value.name,
+              });
+            },
+          });
+        }
+        menu.append({
+          type: 'separator',
+        });
+      }
+      menu.append({
+        id: 'Pin the comment',
+        label: 'コメントをピン留め',
+        click: () => {
+          this.pin(item);
         },
       });
     }
@@ -292,5 +329,9 @@ export default class CommentViewer extends Vue {
 
   openCommentSettings() {
     this.settingsService.showSettings('Comment');
+  }
+
+  openModeratorSettings() {
+    remote.shell.openExternal(this.hostsService.getModeratorSettingsURL());
   }
 }

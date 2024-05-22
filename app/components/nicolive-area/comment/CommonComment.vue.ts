@@ -9,7 +9,12 @@ export default class CommonComment extends CommentBase {
   @Prop() speaking: boolean;
   @Prop() nameplateHint: boolean;
 
-  userIconURL: string = NicoliveClient.getUserIconURL(this.chat.value.user_id, `${this.chat.value.thread}`);
+  moderatorTooltip = 'モデレーター';
+
+  userIconURL: string = NicoliveClient.getUserIconURL(
+    this.chat.value.user_id,
+    `${this.chat.value.thread}`,
+  );
 
   defaultUserIconURL = NicoliveClient.defaultUserIconURL;
 

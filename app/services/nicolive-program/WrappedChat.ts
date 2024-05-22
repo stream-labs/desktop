@@ -9,6 +9,7 @@ export type WrappedChat = {
   /** NG追加したときに手元でフィルタをかけた結果 */
   filtered?: boolean;
   rawName?: string; // ピン留めコメント用にnameを保存
+  isModerator?: boolean;
 };
 
 export type WrappedChatWithComponent = WrappedChat & { component: ChatComponentType };

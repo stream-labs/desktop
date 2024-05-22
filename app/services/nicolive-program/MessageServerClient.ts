@@ -5,7 +5,8 @@ import { ChatMessage } from './ChatMessage';
 export type MessageResponse =
   | { chat: ChatMessage }
   | { leave_thread: LeaveThreadMessage }
-  | { thread: ThreadMessage };
+  | { thread: ThreadMessage }
+  | { ping: {} };
 export type Message = ChatMessage | LeaveThreadMessage | ThreadMessage;
 
 export function isChatMessage(msg: MessageResponse): msg is { chat: ChatMessage } {
@@ -43,7 +44,9 @@ export type MessageServerConfig = {
 
 export interface IMessageServerClient {
   connect(): Observable<MessageResponse>;
+  close(): void;
   requestLatestMessages(): void;
+  ping(): void;
 }
 
 export class MessageServerClient implements IMessageServerClient {
@@ -63,6 +66,9 @@ export class MessageServerClient implements IMessageServerClient {
     });
     return this.socket.asObservable();
   }
+  close() {
+    this.socket.complete();
+  }
 
   requestLatestMessages(thread: string = this.roomThreadID) {
     this.socket.next({
@@ -76,5 +82,8 @@ export class MessageServerClient implements IMessageServerClient {
         nicoru: 0,
       },
     } as any); // ここでしか送らないので型に含めない
+  }
+  ping() {
+    this.socket.next({ ping: {} });
   }
 }

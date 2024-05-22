@@ -126,7 +126,7 @@ export default class ProgramInfo extends Vue {
 
   private twitterShareContent(): { text: string; url: string } {
     const title = this.nicoliveProgramService.state.title;
-    const url = `https://live.nicovideo.jp/watch/${this.programID}?ref=sharetw`;
+    const url = `${this.hostsService.getWatchPageURL(this.programID)}?ref=sharetw`;
     const time = this.nicoliveProgramService.state.startTime;
     const formattedTime = moment.unix(time).format('YYYY/MM/DD HH:mm');
 
@@ -161,7 +161,7 @@ export default class ProgramInfo extends Vue {
   copyProgramURL() {
     if (this.isFetching) throw new Error('fetchProgram is running');
     clipboard.writeText(
-      `https://live.nicovideo.jp/watch/${this.nicoliveProgramService.state.programID}`,
+      this.hostsService.getWatchPageURL(this.nicoliveProgramService.state.programID),
     );
     this.hasProgramUrlCopied = true;
     window.clearTimeout(this.clearTimer);

@@ -38,8 +38,11 @@ test('constructor', () => {
 // 実際には叩かないのでなんでもよい
 const programID = 'lv1';
 const communityID = 'co1';
+const userID = 2;
 
 const dummyURL = 'https://example.com';
+
+const nicoliveWeb = 'https://live.nicovideo.jp';
 
 const dummyBody = {
   meta: {
@@ -154,12 +157,35 @@ const suites: Suite[] = [
     path: `/v1/live/statusarea/${programID}`,
     args: [programID],
   },
+  {
+    name: 'fetchModerators',
+    method: 'get',
+    base: NicoliveClient.live2BaseURL,
+    path: `/unama/api/v2/broadcasters/moderators`,
+    args: [],
+  },
+  {
+    name: 'addModerator',
+    method: 'post',
+    base: NicoliveClient.live2BaseURL,
+    path: `/unama/api/v2/broadcasters/moderators`,
+    args: [userID],
+  },
+  {
+    name: 'removeModerator',
+    method: 'delete',
+    base: NicoliveClient.live2BaseURL,
+    path: `/unama/api/v2/broadcasters/moderators?userId=${userID}`,
+    args: [userID],
+  },
 ];
 
 suites.forEach((suite: Suite) => {
   test(`dataを取り出して返す - ${suite.name}`, async () => {
     // niconicoSession を与えないと、実行時の main process の cookieから取ろうとして失敗するので差し替える
-    const client = new NicoliveClient({ niconicoSession: 'dummy' });
+    const client = new NicoliveClient({
+      niconicoSession: 'dummy',
+    });
 
     fetchMock[suite.method.toLowerCase()](suite.base + suite.path, dummyBody);
     const result = await client[suite.name](...(suite.args || []));
@@ -303,7 +329,7 @@ describe('webviews', () => {
 
     // don't await
     const result = expect(client.createProgram()).resolves.toBe('CREATED');
-    mock.browserWindow.loadURL(`https://live.nicovideo.jp/watch/${programID}`);
+    mock.browserWindow.loadURL(`${nicoliveWeb}/watch/${programID}`);
     await result;
     expect(mock.browserWindow.removeMenu).toHaveBeenCalled();
   });
@@ -316,7 +342,7 @@ describe('webviews', () => {
 
     // don't await
     const result = expect(client.createProgram()).resolves.toBe('CREATED');
-    mock.browserWindow.loadURL(`https://live.nicovideo.jp/watch/${programID}`);
+    mock.browserWindow.loadURL(`${nicoliveWeb}/watch/${programID}`);
 
     await result;
     expect(mock.browserWindow.close).toHaveBeenCalled();
@@ -330,7 +356,7 @@ describe('webviews', () => {
 
     // don't await
     const result = expect(client.createProgram()).resolves.toBe('RESERVED');
-    mock.browserWindow.loadURL('https://live.nicovideo.jp/my');
+    mock.browserWindow.loadURL(`${nicoliveWeb}/my`);
 
     await result;
     expect(mock.browserWindow.close).toHaveBeenCalled();
@@ -373,7 +399,7 @@ describe('webviews', () => {
     const client = new NicoliveClient();
 
     const result = expect(client.editProgram(programID)).resolves.toBe('EDITED');
-    mock.browserWindow.loadURL(`https://live.nicovideo.jp/watch/${programID}`);
+    mock.browserWindow.loadURL(`${nicoliveWeb}/watch/${programID}`);
     await result;
     expect(mock.browserWindow.removeMenu).toHaveBeenCalled();
   });
@@ -386,7 +412,7 @@ describe('webviews', () => {
 
     // don't await
     const result = expect(client.editProgram(programID)).resolves.toBe('EDITED');
-    mock.browserWindow.loadURL(`https://live.nicovideo.jp/watch/${programID}`);
+    mock.browserWindow.loadURL(`${nicoliveWeb}/watch/${programID}`);
 
     await result;
     expect(mock.browserWindow.close).toHaveBeenCalled();
@@ -400,7 +426,7 @@ describe('webviews', () => {
 
     // don't await
     const result = expect(client.editProgram(programID)).resolves.toBe('EDITED');
-    mock.browserWindow.loadURL('https://live.nicovideo.jp/my');
+    mock.browserWindow.loadURL(`${nicoliveWeb}/my`);
 
     await result;
     expect(mock.browserWindow.close).toHaveBeenCalled();

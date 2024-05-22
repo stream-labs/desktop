@@ -7,6 +7,11 @@
         @click="isFilterOpened = true"
       ></i>
       <i
+        class="icon-menu-moderator icon-btn"
+        v-tooltip.bottom="moderatorTooltip"
+        @click="openModeratorSettings"
+      ></i>
+      <i
         class="icon-settings icon-btn"
         v-tooltip.bottom="settingsTooltip"
         @click="openCommentSettings"
@@ -252,5 +257,9 @@
   font-size: @font-size2;
   color: var(--color-text);
   text-align: center;
+}
+
+.icon-menu-moderator {
+  font-size: @font-size5;
 }
 </style>

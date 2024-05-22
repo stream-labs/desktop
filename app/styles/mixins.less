@@ -311,7 +311,7 @@
 }
 
 .bg-active(@color: @black) {
-  background-color: rgb(@color 0.25);
+  background-color: rgba(@color, 0.25);
 }
 
 .text-ellipsis {
@@ -337,6 +337,8 @@
   .shadow;
 
   z-index: @z-index-popper;
+  min-width: 200px;
+  max-width: 300px;
   padding: 0;
   background-color: var(--color-popper-bg-light);
   border: 1px solid var(--color-border-light);
@@ -357,12 +359,13 @@
   }
 
   .popup-menu-head {
+    width: 100%;
     padding: 16px;
     font-size: @font-size4;
     font-weight: @font-weight-bold;
     color: var(--color-text-light);
     text-align: left;
-    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
 
   .popup-menu-item {
@@ -373,19 +376,28 @@
       line-height: 32px;
     }
 
+    > span {
+      display: block;
+      cursor: pointer;
+    }
+
     a,
     button {
-      &:not(:disabled):hover {
-        color: var(--color-text-light);
-        background-color: var(--color-bg-active);
-      }
-
       &.text--red {
         color: var(--color-red-light);
 
-        &:hover {
+        &:not(:disabled):hover {
           color: var(--color-red-light);
         }
+      }
+    }
+
+    a,
+    button,
+    > span {
+      &:not(:disabled):hover {
+        color: var(--color-text-light);
+        background-color: var(--color-bg-active);
       }
     }
 

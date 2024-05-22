@@ -2,22 +2,24 @@
   <modal-layout :showControls="false">
     <div class="user-info" slot="content">
       <div class="user-detail">
-        <div class="user-detail-left">
-          <a class="user-page-link" @click="openUserPage" :title="userName">
-            <img
-              :src="userIconURL"
-              width="32"
-              height="32"
-              class="user-icon"
-              :alt="userName"
-              @error.once="userIconURL = defaultUserIconURL"
-            />
-          </a>
-        </div>
+        <img
+          :src="userIconURL"
+          width="64"
+          height="64"
+          class="user-icon"
+          :alt="userName"
+          :title="userName"
+          @error.once="userIconURL = defaultUserIconURL"
+        />
         <div class="user-detail-body">
-          <a class="user-page-link" @click="openUserPage" :title="userName">
+          <div class="user-name-wrapper">
             <div class="user-name">{{ userName }}</div>
-          </a>
+            <i
+              class="icon-moderator"
+              v-tooltip.bottom="moderatorTooltip"
+              v-if="isModerator"
+            ></i>
+          </div>
           <div class="user-account">
             <p class="user-id">ID: {{ userId }}</p>
             <p class="user-type" :class="{ 'is-premium': isPremium }">
@@ -25,17 +27,66 @@
             </p>
           </div>
         </div>
-        <div class="user-detail-right">
-          <button class="button button--secondary" v-if="isFollowing" @click.stop="unFollowUser">
-            <i class="icon-check"></i>フォロー中
+        <div class="user-button-wrapper">
+          <button class="button button--round button--primary" @click="openUserPage">
+            ユーザーページを見る
           </button>
-          <button class="button button--primary" v-else @click.stop="followUser">
-            <i class="icon-follow"></i>フォロー
-          </button>
+          <popper
+            trigger="click"
+            :options="{ placement: 'bottom-end' }"
+            @show="showPopupMenu = true"
+            @hide="showPopupMenu = false"
+          >
+            <div class="popper">
+              <ul class="popup-menu-list">
+                <li class="popup-menu-item">
+                  <a @click="copyUserId" class="link">ユーザーIDをコピー</a>
+                </li>
+              </ul>
+              <ul class="popup-menu-list">
+                <li class="popup-menu-item">
+                  <a @click="blockUser" class="link" v-if="!isBlockedUser">配信からブロック</a>
+                  <a @click="unBlockUser" class="link" v-if="isBlockedUser">配信用ブロックから削除</a>
+                </li>
+              </ul>
+              <ul class="popup-menu-list">
+                <li class="popup-menu-item">
+                  <a @click="unFollowUser" class="link" v-if="isFollowing">フォローを解除</a>
+                  <a @click="followUser" class="link" v-if="!isFollowing">ユーザーをフォロー</a>
+                </li>
+              </ul>
+              <ul class="popup-menu-list">
+                <li class="popup-menu-item">
+                  <a @click="addModerator" class="link" v-if="!isModerator">モデレーターに追加</a>
+                  <a @click="removeModerator" class="link text--red" v-if="isModerator">モデレーターから削除</a>
+                </li>
+              </ul>
+            </div>
+            <div class="button--circle button--secondary" v-tooltip.bottom="otherMenuTooltip" :class="{ 'is-show': showPopupMenu }" slot="reference">
+              <i class="icon-ellipsis-horizontal"></i>
+            </div>
+          </popper>
         </div>
       </div>
-      <div class="tag-list">
-        <div class="tag-list-header">好きなものリスト ({{ konomiTags.length }})</div>
+      <div class="tab-list">
+        <button
+          type="button"
+          @click="changeTab('konomi')"
+          class="button--tab"
+          :class="{ active: currentTab === 'konomi' }"
+        >
+          好きなもの
+        </button>
+        <button
+          type="button"
+          @click="changeTab('comment')"
+          class="button--tab"
+          :class="{ active: currentTab === 'comment' }"
+        >
+          直近のコメント
+        </button>
+      </div>
+      <div class="tag-list" v-show="currentTab === 'konomi'">
         <div class="tag-list-body">
           <div
             v-for="tag in konomiTags"
@@ -46,8 +97,7 @@
           </div>
         </div>
       </div>
-      <div class="comment-list">
-        <div class="comment-list-header">直近のコメント一覧</div>
+      <div class="comment-list" v-show="currentTab === 'comment'">
         <div class="comment-list-body" ref="scroll">
           <div class="list">
             <component
@@ -82,46 +132,84 @@
 @import url('../../styles/index');
 
 .user-info {
+  position: relative;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  margin: -16px;
   overflow: hidden;
+  background-color: var(--color-bg-secondary);
+
+  &::before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    content: '';
+    background: url('../../../media/images/pattern.png') center repeat / auto 300%;
+  }
 }
 
-.user-page-link {
-  text-decoration: none;
+.user-detail {
+  z-index: @z-index-default-content;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+}
+
+.user-detail-body {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  margin-top: 4px;
+}
+
+.user-name-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .user-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 9999px;
+  width: 64px;
+  height: 64px;
+  border: 4px solid var(--color-bg-secondary);
+  border-radius: 9999px;;
 }
 
 .user-name {
-  font-size: @font-size5;
+  font-size: @font-size4;
   font-weight: @font-weight-bold;
+  line-height: @font-line-height-normal;
   color: var(--color-text-light);
+  text-align: center;
   .text-ellipsis;
+}
 
-  .user-detail:hover & {
-    color: var(--color-text-active);
-  }
+.icon-moderator {
+  margin-left: 4px;
+  font-size: @font-size5;
+  color: var(--color-primary);
 }
 
 .user-account {
   display: flex;
+  margin-top: 4px;
 }
 
 .user-id {
   margin: 0;
   font-size: @font-size2;
+  line-height: @font-line-height-tight;
   color: var(--color-text);
 }
 
 .user-type {
   margin: 0 0 0 8px;
   font-size: @font-size2;
+  line-height: @font-line-height-tight;
   color: var(--color-text);
 
   &.is-premium {
@@ -129,38 +217,42 @@
   }
 }
 
-.user-detail {
+.user-button-wrapper {
   display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 16px;
+
+  > .button {
+    flex-grow: 1;
+    max-width: 288px;
+    margin-right: 8px;
+  }
+}
+
+.popper {
+  .popper-styling();
+}
+
+.tab-list {
+  display: flex;
+  flex-shrink: 0;
   align-items: center;
-  padding: 0 8px 16px;
-}
+  height: 40px;
+  padding: 0 16px;
+  border-bottom: 1px solid @border;
 
-.user-detail-left {
-  flex-shrink: 0;
-}
-
-.user-detail-body {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  min-width: 0;
-  margin-left: 12px;
-}
-
-.user-detail-right {
-  flex-shrink: 0;
-  margin-left: 16px;
+  > button {
+    flex-grow: 1;
+    height: 100%;
+  }
 }
 
 .tag-list {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  min-height: 120px; // 3段目がちら見えする高さ
-  max-height: 176px; // 5段目がちら見えする高さ
-  margin-bottom: 16px;
   overflow: hidden;
-  background-color: var(--color-bg-secondary);
 }
 
 .tag-list-header {
@@ -177,13 +269,16 @@
 
 .tag-list-body {
   display: flex;
-  flex-grow: 1;
   flex-wrap: wrap;
-  min-height: 54px;
   padding: 16px 8px 8px 16px;
   overflow: auto;
 
   &:empty {
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+
     &::before {
       font-size: @font-size2;
       color: var(--color-text-dark);
@@ -193,6 +288,7 @@
 }
 
 .tagname {
+  height: 20px;
   padding: 0 8px;
   margin: 0 8px 8px 0;
   font-size: @font-size2;
@@ -237,7 +333,7 @@
 
 .list {
   flex-grow: 1;
-  padding-top: 8px;
+  padding: 8px 0;
   overflow-x: hidden;
   overflow-y: auto;
 
@@ -259,9 +355,8 @@
 .floating-wrapper {
   position: fixed;
   right: 0;
-  bottom: 16px;
+  bottom: 0;
   left: 0;
-  z-index: @z-index-default-content;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -293,4 +388,5 @@
     font-size: @font-size1;
   }
 }
+
 </style>

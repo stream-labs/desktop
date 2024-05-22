@@ -38,28 +38,28 @@ export interface ProgramInfo {
     status: 'test' | 'onAir' | 'end';
     /** 番組の配信者に関係する情報 */
     socialGroup:
-    | {
-      providerType: 'community';
-      /** コミュニティ名 */
-      name: string;
-      /** コミュニティID */
-      id: string;
-      /** コミュレベル */
-      communityLevel: number;
-      /** サムネイルのURL */
-      thumbnailUrl: string;
-    }
-    | {
-      providerType: 'channel';
-      /** チャンネル名 */
-      name: string;
-      /** チャンネルID */
-      id: string;
-      /** 配信会社名 */
-      ownerName: string;
-      /** サムネイルのURL */
-      thumbnailUrl: string;
-    };
+      | {
+          providerType: 'community';
+          /** コミュニティ名 */
+          name: string;
+          /** コミュニティID */
+          id: string;
+          /** コミュレベル */
+          communityLevel: number;
+          /** サムネイルのURL */
+          thumbnailUrl: string;
+        }
+      | {
+          providerType: 'channel';
+          /** チャンネル名 */
+          name: string;
+          /** チャンネルID */
+          id: string;
+          /** 配信会社名 */
+          ownerName: string;
+          /** サムネイルのURL */
+          thumbnailUrl: string;
+        };
     /** コメントのルーム */
     rooms: {
       /** 部屋ID */
@@ -103,6 +103,7 @@ export interface ProgramInfo {
       /** 配信の向き */
       orientation: 'Landscape' | 'Portrait';
     };
+    moderatorViewUri: string;
   };
 }
 
@@ -194,6 +195,8 @@ export type FilterRecord = {
   createdAt?: string; // NG登録日時: 例: "2023-02-20T00:00:00+09:00"
   memo?: string; // NG登録時のコメント本文
   isHashed?: boolean; // type: 'user' 時にユーザーIDが hash化されているかどうか
+  userId?: number; // 登録者ID
+  userName?: string; // 登録者名
 };
 
 export type FilterType = FilterRecord['type'];
@@ -240,12 +243,11 @@ export type BroadcastStreamData = {
   name: string;
 };
 
-
 export interface UserFollow {
   meta: {
     status: number;
   };
-};
+}
 
 export interface UserFollowStatus {
   meta: {
@@ -254,4 +256,19 @@ export interface UserFollowStatus {
   data: {
     following: boolean;
   };
+}
+
+export type Moderator = {
+  userId: number;
+  nickname: string;
+  iconUrl: string;
+  isValid: boolean;
+  createdAt: string;
 };
+
+export interface AddModerator {
+  meta: {
+    status: 200;
+  };
+  data: Moderator;
+}

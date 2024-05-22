@@ -69,6 +69,7 @@ test('fetchFilters/失敗', async () => {
   await expect(instance.fetchFilters()).rejects.toMatchInlineSnapshot(`
           NicoliveFailure {
             "additionalMessage": "ERROR_CODE: simple description",
+            "errorCode": "ERROR_CODE",
             "method": "fetchFilters",
             "reason": "400",
             "type": "http_error",
@@ -83,9 +84,7 @@ test('addFilters/通常成功', async () => {
   const { NicoliveCommentFilterService } = require('./nicolive-comment-filter');
   const instance = NicoliveCommentFilterService.instance as NicoliveCommentFilterService;
 
-  const addFilters = jest
-    .fn()
-    .mockResolvedValue({ ok: true, value: { id: 114514 } });
+  const addFilters = jest.fn().mockResolvedValue({ ok: true, value: { id: 114514 } });
   (instance as any).client.addFilters = addFilters;
   const fetchFilters = jest
     .fn()
@@ -138,6 +137,7 @@ test('addFilters/失敗', async () => {
   await expect(instance.addFilter({ type: 'word', body: '810' })).rejects.toMatchInlineSnapshot(`
                     NicoliveFailure {
                       "additionalMessage": "ERROR_CODE: simple description",
+                      "errorCode": "ERROR_CODE",
                       "method": "addFilters",
                       "reason": "400",
                       "type": "http_error",
@@ -189,6 +189,7 @@ test('deleteFilters/失敗', async () => {
   await expect(instance.deleteFilters([114514])).rejects.toMatchInlineSnapshot(`
                     NicoliveFailure {
                       "additionalMessage": "ERROR_CODE: simple description",
+                      "errorCode": "ERROR_CODE",
                       "method": "deleteFilters",
                       "reason": "400",
                       "type": "http_error",

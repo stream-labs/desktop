@@ -120,10 +120,9 @@ export class NiconicoService extends Service implements IPlatformService {
   get channelId() {
     return this.userService.channelId;
   }
-  getUserPageURL(): string {
-    return 'http://live.nicovideo.jp/my';
+  getMyPageURL(): string {
+    return this.hostsService.getMyPageURL();
   }
-
   getHeaders(authorized = false): Headers {
     const headers = new Headers();
     return headers;
@@ -211,11 +210,13 @@ export class NiconicoService extends Service implements IPlatformService {
   private static createStreamingSetting(
     url: string,
     key: string,
-    quality?: {
-      bitrate: number,
-      height: number,
-      fps: number
-    } | undefined,
+    quality?:
+      | {
+          bitrate: number;
+          height: number;
+          fps: number;
+        }
+      | undefined,
   ): IStreamingSetting {
     return { url, key, quality };
   }

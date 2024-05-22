@@ -31,6 +31,7 @@ type ProgramState = {
   adPoint: number;
   giftPoint: number;
   showPlaceholder: boolean;
+  moderatorViewUri?: string;
 };
 
 function getCommunityIconUrl(community: Community): string {
@@ -134,7 +135,9 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     const nextState = {
       ...this.state,
       ...partialState,
-      ...(partialState.status !== undefined && partialState.status !== 'test' ? { showPlaceholder: false } : {})
+      ...(partialState.status !== undefined && partialState.status !== 'test'
+        ? { showPlaceholder: false }
+        : {}),
     };
     this.refreshStatisticsPolling(this.state, nextState);
     this.refreshProgramStatusTimer(this.state, nextState);
@@ -175,7 +178,9 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   }
 
   static isProgramExtendable(state: INicoliveProgramState): boolean {
-    return state.status === 'onAir' && state.endTime - state.startTime < MAX_PROGRAM_DURATION_SECONDS;
+    return (
+      state.status === 'onAir' && state.endTime - state.startTime < MAX_PROGRAM_DURATION_SECONDS
+    );
   }
 
   static format(timeInSeconds: number): string {
@@ -286,6 +291,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
         communitySymbol: community ? getCommunityIconUrl(community) : '',
         roomURL: room ? room.webSocketUri : '',
         roomThreadID: room ? room.threadId : '',
+        ...(program.moderatorViewUri ? { moderatorViewUri: program.moderatorViewUri } : {}),
       });
       if (program.status === 'test') {
         this.showPlaceholder();
@@ -465,7 +471,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     /*: 予約番組で現在時刻が開始時刻より30分以上前なら、30分を切ったときに再取得するための補正項 */
     const readyTimeTermIfReserved =
       nextState.status === 'reserved' &&
-        nextState.startTime - Math.floor(Date.now() / 1000) > 30 * 60
+      nextState.startTime - Math.floor(Date.now() / 1000) > 30 * 60
         ? -30 * 60
         : 0;
     const nextTargetTime: number =

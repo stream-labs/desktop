@@ -3,8 +3,8 @@ import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { NicoliveCommentFilterService } from 'services/nicolive-program/nicolive-comment-filter';
 import { FilterType, FilterRecord } from 'services/nicolive-program/ResponseTypes';
-import { UserService } from 'services/user';
 import Banner from '../shared/banner.vue';
+import Popper from 'vue-popperjs';
 import {
   NicoliveFailure,
   openErrorDialogFromFailure,
@@ -23,17 +23,21 @@ function getBody(item: FilterRecord): string {
   }
 }
 
+type FilterByUser = 'all' | 'broadcaster' | 'moderator';
+
 @Component({
   components: {
     Banner,
+    Popper,
   },
 })
 export default class CommentFilter extends Vue {
   @Inject()
   private nicoliveCommentFilterService: NicoliveCommentFilterService;
 
-  @Inject()
-  private userService: UserService;
+  showPopupMenu = false;
+
+  adjusterTooltip = '登録者で絞り込み';
 
   async reloadFilters() {
     try {
@@ -70,7 +74,28 @@ export default class CommentFilter extends Vue {
     this.newFilterValue = '';
   }
 
+  currentFilterBy: FilterByUser = 'all';
+
   newFilterValue: string = '';
+
+  get isEmptyBecauseOfFilterBy(): boolean {
+    return this.currentTypeFilters.length === 0 && this.currentFilterBy !== 'all';
+  }
+
+  get numberOfEntries() {
+    return this.currentTypeFilters.length;
+  }
+
+  get currentFilterName() {
+    switch (this.currentFilterBy) {
+      case 'broadcaster':
+        return '放送者による';
+      case 'moderator':
+        return 'モデレーターによる';
+      default:
+        return '';
+    }
+  }
 
   FILTER_VALUE = {
     word: 'コメント',
@@ -137,8 +162,17 @@ export default class CommentFilter extends Vue {
   }
 
   get currentTypeFilters() {
+    const isBroadcaster = (x: FilterRecord) =>
+      this.nicoliveCommentFilterService.isBroadcastersFilter(x);
+    const filtersBy: (x: FilterRecord) => boolean = {
+      all: () => true,
+      broadcaster: isBroadcaster,
+      moderator: (x: FilterRecord) => !isBroadcaster(x),
+    }[this.currentFilterBy];
+
     return this.filters
       .filter(x => x.type === this.currentType)
+      .filter(x => filtersBy(x))
       .map(item => {
         return {
           id: item.id,
@@ -146,18 +180,12 @@ export default class CommentFilter extends Vue {
           body: getBody(item),
           register_date: `登録日時: ${new Date(item.createdAt).toLocaleString()}`,
           comment_body: item.memo && `コメント: ${item.memo}`,
+          ...(isBroadcaster(item) ? {} : { register_by: `登録者名: ${item.userName}` }),
         };
       });
   }
 
   mounted() {
     this.reloadFilters();
-  }
-
-  get isBannerOpened(): boolean {
-    return !this.nicoliveCommentFilterService.ngPanelInfoCoachingClosed;
-  }
-  set isBannerOpened(value: boolean) {
-    this.nicoliveCommentFilterService.ngPanelInfoCoachingClosed = !value;
   }
 }

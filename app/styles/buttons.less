@@ -100,6 +100,18 @@ button {
   }
 }
 
+.button--alert {
+  color: var(--color-button-label);
+  background-color: var(--color-button-alert);
+
+  &:hover,
+  &:focus,
+  &.active {
+    color: var(--color-button-label);
+    background-color: var(--color-button-alert-hover);
+  }
+}
+
 .button--disabled {
   cursor: default;
   background-color: @grey;
@@ -226,6 +238,12 @@ button {
   }
 }
 
+.button--round {
+  // twitchalerts.cssを打ち消し
+  font-weight: normal !important;
+  border-radius: 9999px !important;
+}
+
 .button--go-live,
 .button--start-program {
   color: var(--color-button-label);
@@ -260,16 +278,16 @@ button {
 
 .button--default {
   color: @white !important;
-  background: rgb(255 255 255 / 10%) !important;
+  background: rgba(255, 255, 255, 10%) !important;
   border-color: transparent !important;
 
   &:hover {
-    background: rgb(255 255 255 / 20%) !important;
+    background: rgba(255, 255, 255, 20%) !important;
   }
 
   &:disabled {
     &:hover {
-      background: rgb(255 255 255 / 10%) !important;
+      background: rgba(255, 255, 255, 10%) !important;
     }
   }
 }

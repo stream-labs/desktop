@@ -60,6 +60,7 @@ export { NicoliveCommentViewerService } from 'services/nicolive-program/nicolive
 export { NicoliveCommentFilterService } from 'services/nicolive-program/nicolive-comment-filter';
 export { NicoliveCommentLocalFilterService } from 'services/nicolive-program/nicolive-comment-local-filter';
 export { NicoliveCommentSynthesizerService } from 'services/nicolive-program/nicolive-comment-synthesizer';
+export { NicoliveModeratorsService } from 'services/nicolive-program/nicolive-moderators';
 export { NVoiceClientService } from 'services/nicolive-program/n-voice-client';
 export { KonomiTagsService } from 'services/nicolive-program/konomi-tags';
 export { CustomcastUsageService } from 'services/custom-cast-usage';

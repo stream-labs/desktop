@@ -234,6 +234,68 @@
           "title": "An error occurred on the server",
           "message": "The program information could not be fetched because an error occurred on the server.\nhere may be temporary problems, so try again later. Check the trouble information from the \"Notification\" button, as well."
         }
+      },
+      "addModerator": {
+        "network_error": {
+          "title": "A network error has occurred",
+          "message": "Unable to register moderator due to a network error.\nCheck the health of your Internet connection."
+        },
+        "400": {
+          "title": "Unable to register a moderator",
+          "message": "%{additionalMessage}"
+        },
+        "500": {
+          "title": "Unable to register a moderator",
+          "message": "%{additionalMessage}"
+        },
+        "NOT_BROADCASTER": {
+          "title": "NOT_BROADCASTER",
+          "message": "Unable to register a moderator because there are no previous streams."
+        },
+        "ALREADY_EXISTS": {
+          "title": "ALREADY_EXISTS",
+          "message": "Already registered as a moderator."
+        },
+        "MAX": {
+          "title": "MAX",
+          "message": "Unable to register a moderator because the registration limit has been reached."
+        }
+      },
+      "removeModerator": {
+        "network_error": {
+          "title": "A network error has occurred",
+          "message": "Unable to remove a moderator due to a network error.\nCheck the health of your Internet connection."
+        },
+        "400": {
+          "title": "Unable to remove a moderator",
+          "message": "%{additionalMessage}"
+        },
+        "500": {
+          "title": "Unable to remove a moderator",
+          "message": "%{additionalMessage}"
+        },
+        "NOT_BROADCASTER": {
+          "title": "NOT_BROADCASTER",
+          "message": "Unable to remove a moderator because there are no previous streams."
+        }
+      },
+      "fetchModerators": {
+        "network_error": {
+          "title": "A network error has occurred",
+          "message": "Unable to retrieve moderator information due to a network error.\nCheck the health of your Internet connection."
+        },
+        "400": {
+          "title": "Unable to retrieve moderator information",
+          "message": "%{additionalMessage}"
+        },
+        "500": {
+          "title": "Unable to retrieve moderator information",
+          "message": "%{additionalMessage}"
+        },
+        "NOT_BROADCASTER": {
+          "title": "NOT_BROADCASTER",
+          "message": "Unable to retrieve moderator information because there are no previous streams."
+        }
       }
     },
     "logic": {
