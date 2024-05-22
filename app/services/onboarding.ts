@@ -2,7 +2,6 @@ import { StatefulService, mutation } from './core/stateful-service';
 import { NavigationService } from './navigation';
 import { UserService } from './user';
 import { Inject } from './core/injector';
-import electron from 'electron';
 
 type TOnboardingStep = 'Connect' | 'ObsImport';
 
@@ -60,10 +59,12 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
 
   init() {
     // This is used for faking authentication in tests
+    /*
     electron.ipcRenderer.on('testing-fakeAuth', () => {
       this.COMPLETE_STEP('Connect');
       this.SET_CURRENT_STEP('ObsImport');
     });
+    */
   }
 
   @mutation()
