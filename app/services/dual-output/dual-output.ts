@@ -343,6 +343,9 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     // confirm custom destinations have a default display
     this.confirmDestinationDisplays();
 
+    // Disable global Rescale Output
+    this.disableGlobalRescaleIfNeeded();
+
     /**
      * Ensures that the scene nodes are assigned a context
      */
@@ -377,6 +380,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     this.SET_SHOW_DUAL_OUTPUT(status);
 
     if (this.state.dualOutputMode) {
+      this.disableGlobalRescaleIfNeeded();
       this.confirmOrCreateVerticalNodes(this.views.activeSceneId);
 
       /**
@@ -410,6 +414,27 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         this.confirmOrAssignSceneNodes(sceneId);
       } catch (error: unknown) {
         console.error('Error toggling Dual Output mode: ', error);
+      }
+    }
+  }
+  disableGlobalRescaleIfNeeded() {
+    // TODO: this could be improved, either by state tracking or making it compatible with dual output
+    // For now, disable global Rescale Output under Streaming if dual output is enabled
+    if (this.state.dualOutputMode) {
+      const output = this.settingsService.state.Output.formData;
+      const globalRescaleOutput = this.settingsService.findSettingValue(
+        output,
+        'Streaming',
+        'Rescale',
+      );
+      if (globalRescaleOutput) {
+        // `Output` not a typo, it is different from above
+        this.settingsService.setSettingValue('Output', 'Rescale', false);
+        // TODO: find a cleaner way to make dual output recalculate its settings for the vertical display
+        // since even after disabling "rescale output" its settings persists, and looks stretched.
+        // @ts-ignore: allow calling method for this specific scenario, marked private otherwise to prevent
+        // accidental use
+        this.videoSettingsService.resetVerticalContext();
       }
     }
   }

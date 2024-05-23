@@ -302,6 +302,16 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     return !!this.contexts[display];
   }
 
+  // Do not call this method unless there's a very good reason, this is a HACK to
+  // enable Dual Output service to recreate its vertical settings after a global
+  // Rescale Output was forced off.
+  private resetVerticalContext() {
+    this.contexts.vertical.destroy();
+    this.contexts.vertical = null;
+    this.DESTROY_VIDEO_CONTEXT('vertical');
+    this.establishVideoContext('vertical');
+  }
+
   createDefaultFps(display: TDisplayType = 'horizontal') {
     this.setVideoSetting('fpsNum', 30, display);
     this.setVideoSetting('fpsDen', 1, display);
