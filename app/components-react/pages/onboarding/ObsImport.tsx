@@ -10,14 +10,15 @@ import { $t } from 'services/i18n';
 import commonStyles from './Common.m.less';
 import styles from './ObsImport.m.less';
 import { OnboardingModule } from './Onboarding';
+import { ObsImporterService } from 'app-services';
 
 export function ObsImport() {
-  const { importing, percent } = useModule(ObsImportModule);
+  const { importing, percent, isObs } = useModule(ObsImportModule);
 
   return (
     <div style={{ width: '100%' }}>
       <h1 className={commonStyles.titleContainer}>
-        {$t('Importing Your Existing Settings From OBS')}
+        {$t(`Importing Your Existing Settings From ${isObs ? 'OBS' : 'Twitch Studio'}`)}
       </h1>
       {!importing && <PreImport />}
       {importing && (
@@ -29,7 +30,7 @@ export function ObsImport() {
         <KevinSvg />
         <div>
           {$t(
-            'While we import your settings and scenes from OBS Studio, check out these great features unique to Streamlabs',
+            'While we import your settings and scenes, check out these great features unique to Streamlabs',
           )}
         </div>
       </div>
@@ -72,7 +73,7 @@ function PreImport() {
               setProcessing(false);
               alertAsync(
                 $t(
-                  'Something went wrong while importing from OBS Studio. Please try again or skip to the next step.',
+                  'Something went wrong while importing. Please try again or skip to the next step.',
                 ),
               );
             });
@@ -134,23 +135,35 @@ class ObsImportModule {
   });
 
   init() {
-    // Intentionally synchronous
-    const profiles = this.ObsImporterService.getProfiles();
-    this.setProfiles(profiles);
-    this.setSelectedProfile(profiles[0] ?? null);
+    if (this.isObs) {
+      const service = this.importService as ObsImporterService;
+      // Intentionally synchronous
+      const profiles = service.getProfiles();
+      this.setProfiles(profiles);
+      this.setSelectedProfile(profiles[0] ?? null);
+    }
   }
 
-  get ObsImporterService() {
-    return Services.ObsImporterService;
+  get importService() {
+    if (this.isObs) {
+      return Services.ObsImporterService;
+    } else {
+      return Services.TwitchStudioImporterService;
+    }
+  }
+
+  get isObs() {
+    return Services.OnboardingService.state.importedFrom === 'obs';
   }
 
   startImport() {
     if (this.state.importing) return Promise.resolve();
-    if (!this.state.selectedProfile) return Promise.resolve();
+    if (this.isObs && !this.state.selectedProfile) return Promise.resolve();
 
     this.setImporting(true);
 
-    return this.ObsImporterService.load(this.state.selectedProfile)
+    return this.importService
+      .load(this.state.selectedProfile!)
       .then(r => {
         this.setImporting(false);
         return r;
