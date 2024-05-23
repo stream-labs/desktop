@@ -35,7 +35,13 @@ import { RestreamService, TOutputOrientation } from 'services/restream';
 import Utils from 'services/utils';
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
-import { createStreamError, IStreamError, StreamError, TStreamErrorType } from './stream-error';
+import {
+  createStreamError,
+  IStreamError,
+  StreamError,
+  TStreamErrorType,
+  errorTypes,
+} from './stream-error';
 import { authorizedHeaders } from 'util/requests';
 import { HostsService } from '../hosts';
 import { assertIsDefined, getDefined } from 'util/properties-type-guards';
@@ -46,6 +52,7 @@ import { RecordingModeService } from 'services/recording-mode';
 import { MarkersService } from 'services/markers';
 import { byOS, OS } from 'util/operating-systems';
 import { DualOutputService } from 'services/dual-output';
+import { capitalize } from 'lodash';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -98,6 +105,7 @@ export class StreamingService
   streamInfoChanged = new Subject<StreamInfoView<any>>();
   signalInfoChanged = new Subject<IOBSOutputSignalInfo>();
   streamErrorCreated = new Subject<string>();
+  unknownErrorCaught = new Subject<string>();
 
   // Dummy subscription for stream deck
   streamingStateChange = new Subject<void>();
@@ -1176,6 +1184,7 @@ export class StreamingService
 
   private outputErrorOpen = false;
 
+  // HERE
   private handleOBSOutputSignal(info: IOBSOutputSignalInfo) {
     console.debug('OBS Output signal: ', info);
 
@@ -1316,6 +1325,7 @@ export class StreamingService
       let extendedErrorText = '';
       let linkToDriverInfo = false;
       let showNativeErrorMessage = false;
+      let diagReportMessage = '';
 
       if (info.code === EOutputCode.BadPath) {
         errorText = $t(
@@ -1348,14 +1358,46 @@ export class StreamingService
       } else {
         // -4 is used for generic unknown messages in OBS. Both -4 and any other code
         // we don't recognize should fall into this branch and show a generic error.
-        errorText = $t(
-          'An error occurred with the output. Please check and switch encoders in your streaming and recording Output settings.',
-        );
-        if (info.error) {
+        if (info.error && typeof info.error === 'string') {
+          try {
+            const error = JSON.parse(info.error);
+            const platform = capitalize(error.platform);
+
+            errorText = platform
+              ? $t('Streaming to %{platform} is temporary unavailable', { platform })
+              : errorTypes['UNKNOWN_STREAMING_ERROR'].message;
+
+            diagReportMessage = `${capitalize(platform)} ${error?.code} Error: ${
+              error?.message ?? error?.details
+            }. ${errorTypes['UNKNOWN_STREAMING_ERROR_MESSAGE'].message}, ${
+              errorTypes['UNKNOWN_STREAMING_ERROR_MESSAGE'].action
+            }`;
+
+            showNativeErrorMessage = true;
+            extendedErrorText = errorText + '\n\n' + $t('Error Code:') + ' ' + info.code;
+          } catch (error: unknown) {
+            errorText = errorTypes['UNKNOWN_STREAMING_ERROR'].message;
+            diagReportMessage = `${errorText}, ${errorTypes['UNKNOWN_STREAMING_ERROR'].action}`;
+            console.error('Unknown Streaming Error:', error);
+          }
+        } else if (info.error) {
+          const error = (info.error as unknown) as { message?: string; details?: string };
+          errorText = errorTypes['UNKNOWN_STREAMING_ERROR'].message;
+          diagReportMessage = `System Error Message:  ${error.message ?? error}. ${errorText}, ${
+            errorTypes['UNKNOWN_STREAMING_ERROR'].action
+          }.`;
           showNativeErrorMessage = true;
           extendedErrorText = errorText + '\n\n' + $t('System error message:') + info.error + '"';
+        } else {
+          errorText = errorTypes['UNKNOWN_STREAMING_ERROR'].message;
+          diagReportMessage = `${errorText}, ${errorTypes['UNKNOWN_STREAMING_ERROR'].action}`;
+          showNativeErrorMessage = true;
+          extendedErrorText = $t(
+            'Streaming to platform is temporarily not available, confirm streaming approval and output settings.',
+          );
         }
       }
+
       const buttons = [$t('OK')];
 
       const title = {
@@ -1410,7 +1452,13 @@ export class StreamingService
         .catch(() => {
           this.outputErrorOpen = false;
         });
+
       this.windowsService.actions.closeChildWindow();
+
+      // pass unknown error to diag report
+      if (info.code === -4 && info.type === EOBSOutputType.Streaming) {
+        this.streamErrorCreated.next(diagReportMessage);
+      }
     }
   }
 
