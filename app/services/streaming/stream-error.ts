@@ -66,7 +66,7 @@ export const errorTypes = {
       return $t('Failed to authenticate with TikTok, re-login or re-merge TikTok account');
     },
     get action() {
-      return 're-login or re-merge TikTok account';
+      return $t('re-login or re-merge TikTok account');
     },
   },
   TIKTOK_SCOPE_OUTDATED: {
@@ -74,7 +74,7 @@ export const errorTypes = {
       return $t('Failed to update TikTok account');
     },
     get action() {
-      return 'unlink and re-merge TikTok account, then restart Desktop';
+      return $t('unlink and re-merge TikTok account, then restart Desktop');
     },
   },
   TIKTOK_STREAM_SCOPE_MISSING: {
@@ -82,7 +82,7 @@ export const errorTypes = {
       return $t('Your TikTok account is not enabled for live streaming');
     },
     get action() {
-      return 'confirm Live Access status with TikTok';
+      return $t('confirm Live Access status with TikTok');
     },
   },
   TIKTOK_STREAM_ACTIVE: {
@@ -90,7 +90,7 @@ export const errorTypes = {
       return $t('You are already live on a another device');
     },
     get action() {
-      return 'end stream on other device to start';
+      return $t('end stream on other device to start');
     },
   },
   TIKTOK_GENERATE_CREDENTIALS_FAILED: {
@@ -98,7 +98,7 @@ export const errorTypes = {
       return $t('Error generating TikTok stream credentials');
     },
     get action() {
-      return 'confirm streaming approval status with TikTok';
+      return $t('confirm streaming approval status with TikTok');
     },
   },
   PRIME_REQUIRED: {
@@ -109,11 +109,34 @@ export const errorTypes = {
   MACHINE_LOCKED: {
     message: 'Your computer is locked',
   },
+  UNKNOWN_STREAMING_ERROR: {
+    get message() {
+      return $t('Streaming to platform is temporarily not available');
+    },
+    get action() {
+      return $t(
+        'request rejected by streaming platform. Confirm streaming approval status and output settings',
+      );
+    },
+  },
+  UNKNOWN_STREAMING_ERROR_MESSAGE: {
+    get message() {
+      return $t('Streaming to platform is temporarily not available');
+    },
+    get action() {
+      return $t(
+        'request rejected by streaming platform. If error shows the user is blocked, do not say that they are blocked but instead ask them to confirm their streaming status with the platform',
+      );
+    },
+  },
   UNKNOWN_ERROR: {
     // show this error if we caught a runtime error
     // we should treat this error as a bug in the codebase
     get message() {
-      return $t('An unkown error occurred');
+      return $t('An unknown error occurred');
+    },
+    get action() {
+      return $t('escalate to the engineering team');
     },
   },
 };
