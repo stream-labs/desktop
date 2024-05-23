@@ -432,9 +432,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         this.settingsService.setSettingValue('Output', 'Rescale', false);
         // TODO: find a cleaner way to make dual output recalculate its settings for the vertical display
         // since even after disabling "rescale output" its settings persists, and looks stretched.
-        // @ts-ignore: allow calling method for this specific scenario, marked private otherwise to prevent
-        // accidental use
-        this.videoSettingsService.resetVerticalContext();
+        this.settingsService.refreshVideoSettings();
       }
     }
   }
