@@ -217,10 +217,14 @@ export class TwitchStudioImporterService extends Service {
       if (compositor.pluginId === 'compositor') {
         // Load each layer from the compositor
         for (const input of compositor.inputs) {
-          await this.importSource(
-            compositor.pluginSettings.layers[input],
-            config.graph.nodes.find(n => n.id === input),
-          );
+          try {
+            await this.importSource(
+              compositor.pluginSettings.layers[input],
+              config.graph.nodes.find(n => n.id === input),
+            );
+          } catch (e: unknown) {
+            console.error('Got error importing source!', input, e);
+          }
         }
       } else {
         console.error(
@@ -319,16 +323,15 @@ export class TwitchStudioImporterService extends Service {
 
       widthOverride = node.pluginSettings.outputSize.width;
       heightOverride = node.pluginSettings.outputSize.height;
-      noCrop = true;
     } else if (node.pluginId === 'colorInput') {
       item = this.scenesService.views.activeScene.createAndAddSource(layer.name, 'color_source');
 
       item.getObsInput().update({
         color: Utils.rgbaToInt(
-          node.pluginSettings.color.r * 255,
-          node.pluginSettings.color.g * 255,
-          node.pluginSettings.color.b * 255,
-          node.pluginSettings.color.a * 255,
+          (node.pluginSettings.color?.r ?? 0) * 255,
+          (node.pluginSettings.color?.g ?? 0) * 255,
+          (node.pluginSettings.color?.b ?? 0) * 255,
+          (node.pluginSettings.color?.a ?? 0) * 255,
         ),
         width: node.pluginSettings.outputSize.width,
         height: node.pluginSettings.outputSize.height,
@@ -336,13 +339,11 @@ export class TwitchStudioImporterService extends Service {
 
       widthOverride = node.pluginSettings.outputSize.width;
       heightOverride = node.pluginSettings.outputSize.height;
-      noCrop = true;
     } else if (node.pluginId === 'primaryScreenShare') {
       item = this.scenesService.views.activeScene.createAndAddSource(layer.name, 'screen_capture');
 
       widthOverride = this.videoService.baseResolutions.horizontal.baseWidth;
       heightOverride = this.videoService.baseResolutions.horizontal.baseHeight;
-      noCrop = true;
     } else {
       console.warn(`Twitch Studio Importer: Unknown plugin type ${layer.plugin.id}`);
     }
@@ -357,7 +358,7 @@ export class TwitchStudioImporterService extends Service {
         this.videoService.baseResolutions.horizontal.baseHeight;
 
       const sourceWidth = widthOverride ?? item.getSource().width;
-      const sourceHeight = widthOverride ?? item.getSource().height;
+      const sourceHeight = heightOverride ?? item.getSource().height;
 
       const scaleX = targetWidth / sourceWidth;
       const scaleY = targetHeight / sourceHeight;
