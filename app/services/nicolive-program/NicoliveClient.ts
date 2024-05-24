@@ -126,7 +126,10 @@ export class NicoliveClient {
   static communityBaseURL = 'https://com.nicovideo.jp';
   static userFollowBaseURL = 'https://user-follow-api.nicovideo.jp';
   static userIconBaseURL = 'https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/';
-  private static frontendID = 134;
+
+  private static FrontendIdHeader = {
+    'x-frontend-id': '134',
+  } as const;
 
   /**
    *
@@ -401,7 +404,7 @@ export class NicoliveClient {
         NicoliveClient.createRequest('GET', {
           headers: {
             ...headers,
-            'X-Frontend-Id': NicoliveClient.frontendID.toString(10),
+            ...NicoliveClient.FrontendIdHeader,
           },
         }),
       );
@@ -697,9 +700,7 @@ export class NicoliveClient {
     const res = await fetch(
       NicoliveClient.userFollowEndpoint(userId),
       NicoliveClient.createRequest('GET', {
-        headers: {
-          'x-frontend-id': NicoliveClient.frontendID.toString(10),
-        },
+        headers: NicoliveClient.FrontendIdHeader,
       }),
     );
     if (res.ok) {
@@ -732,7 +733,7 @@ export class NicoliveClient {
       NicoliveClient.userFollowEndpoint(userId),
       NicoliveClient.createRequest('POST', {
         headers: {
-          'x-frontend-id': NicoliveClient.frontendID.toString(10),
+          ...NicoliveClient.FrontendIdHeader,
           'X-Request-With': 'N Air',
         },
       }),
@@ -752,7 +753,7 @@ export class NicoliveClient {
       NicoliveClient.userFollowEndpoint(userId),
       NicoliveClient.createRequest('DELETE', {
         headers: {
-          'x-frontend-id': NicoliveClient.frontendID.toString(10),
+          ...NicoliveClient.FrontendIdHeader,
           'X-Request-With': 'N Air',
         },
       }),
@@ -779,13 +780,16 @@ export class NicoliveClient {
     return this.requestAPI<AddModerator>(
       'POST',
       `${NicoliveClient.live2BaseURL}/unama/api/v2/broadcasters/moderators`,
-      NicoliveClient.jsonBody({ userId: parseInt(userId, 10) }),
+      NicoliveClient.jsonBody({ userId: parseInt(userId, 10) }, NicoliveClient.FrontendIdHeader),
     );
   }
   async removeModerator(userId: string): Promise<WrappedResult<void>> {
     return this.requestAPI<void>(
       'DELETE',
       `${NicoliveClient.live2BaseURL}/unama/api/v2/broadcasters/moderators?userId=${userId}`,
+      {
+        headers: NicoliveClient.FrontendIdHeader,
+      },
     );
   }
 }
