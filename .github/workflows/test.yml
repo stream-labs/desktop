@@ -42,7 +42,35 @@ on:
       - .github/workflows/test.yml
 
 jobs:
-  test:
+  setup:
+    name: setup
+    runs-on: windows-2019
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: cache node modules
+        id: cache-node-modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('yarn.lock', 'scripts/install-native-deps.js', 'scripts/repositories.json') }}
+
+      - name: npm login
+        run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" >> $env:USERPROFILE\.npmrc
+
+      - name: Install dependencies
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
+        run: yarn install --frozen-lockfile --check-files
+
+  unit_test:
+    name: unit tests
+    needs: setup
     runs-on: windows-2019
 
     steps:
@@ -53,19 +81,45 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: yarn
 
-      - name: npm login
-        run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" >> $env:USERPROFILE\.npmrc
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile --check-files
-
-      - name: Compile
-        run: yarn compile:ci
+      - name: cache node modules
+        id: cache-node-modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('yarn.lock', 'scripts/install-native-deps.js', 'scripts/repositories.json') }}
 
       - name: Run unit tests
         run: yarn test:unit
 
+  e2e_test:
+    name: e2e tests
+    needs: setup
+    runs-on: windows-2019
+    strategy:
+      matrix:
+        directory:
+          - 'test-dist/test/e2e/*.js'
+          - 'test-dist/test/api/*.js'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: cache node modules
+        id: cache-node-modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('yarn.lock', 'scripts/install-native-deps.js', 'scripts/repositories.json') }}
+
+      - name: Compile
+        run: yarn compile:ci
+
       - name: Run e2e tests
-        run: yarn test
+        run: yarn test --fail-fast ${{ matrix.directory }}
