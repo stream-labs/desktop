@@ -96,6 +96,11 @@ jobs:
     name: e2e tests
     needs: setup
     runs-on: windows-2019
+    strategy:
+      matrix:
+        directory:
+          - 'test-dist/test/e2e/*.js'
+          - 'test-dist/test/api/*.js'
 
     steps:
       - name: Checkout code
@@ -117,4 +122,4 @@ jobs:
         run: yarn compile:ci
 
       - name: Run e2e tests
-        run: yarn test --fail-fast
+        run: yarn test --fail-fast ${{ matrix.directory }}
