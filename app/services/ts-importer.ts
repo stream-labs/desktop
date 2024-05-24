@@ -13,6 +13,7 @@ import { SceneItem } from 'services/scenes';
 import { VideoService } from './video';
 import Utils from './utils';
 import { WidgetType } from './widgets';
+import { VideoSettingsService } from './settings-v2';
 
 interface ITSConfig {
   graph: {
@@ -171,6 +172,7 @@ export class TwitchStudioImporterService extends Service {
   @Inject() sourcesService: SourcesService;
   @Inject() defaultHardwareService: DefaultHardwareService;
   @Inject() videoService: VideoService;
+  @Inject() videoSettingsService: VideoSettingsService;
 
   @RunInLoadingMode()
   async import() {
@@ -197,11 +199,8 @@ export class TwitchStudioImporterService extends Service {
   }
 
   setupVideo(config: ITSConfig) {
-    this.settingsService.setSettingValue(
-      'Video',
-      'Base',
-      `${config.graphics.canvasWidth}x${config.graphics.canvasHeight}`,
-    );
+    this.videoSettingsService.setVideoSetting('baseWidth', config.graphics.canvasWidth);
+    this.videoSettingsService.setVideoSetting('baseHeight', config.graphics.canvasHeight);
   }
 
   async importScenes(config: ITSConfig) {
