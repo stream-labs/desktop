@@ -282,16 +282,19 @@ export class TwitchStudioImporterService extends Service {
       item = this.scenesService.views.activeScene.createAndAddSource(layer.name, 'text_gdiplus');
 
       item.getObsInput().update({
-        font: { face: node.pluginSettings.font.family, size: node.pluginSettings.font.size },
+        font: {
+          face: node.pluginSettings.font?.family ?? 'Arial',
+          size: node.pluginSettings.font?.size ?? 40,
+        },
         text: node.pluginSettings.text,
         extents: true,
         extents_cx: node.pluginSettings.outputSize.width,
         extents_cy: node.pluginSettings.outputSize.height,
         color: Utils.rgbaToInt(
-          node.pluginSettings.color.r * 255,
-          node.pluginSettings.color.g * 255,
-          node.pluginSettings.color.b * 255,
-          node.pluginSettings.color.a * 255,
+          (node.pluginSettings.color?.r ?? 1) * 255,
+          (node.pluginSettings.color?.g ?? 1) * 255,
+          (node.pluginSettings.color?.b ?? 1) * 255,
+          (node.pluginSettings.color?.a ?? 1) * 255,
         ),
       });
 
@@ -328,10 +331,10 @@ export class TwitchStudioImporterService extends Service {
 
       item.getObsInput().update({
         color: Utils.rgbaToInt(
-          (node.pluginSettings.color?.r ?? 0) * 255,
-          (node.pluginSettings.color?.g ?? 0) * 255,
-          (node.pluginSettings.color?.b ?? 0) * 255,
-          (node.pluginSettings.color?.a ?? 0) * 255,
+          (node.pluginSettings.color?.r ?? 1) * 255,
+          (node.pluginSettings.color?.g ?? 1) * 255,
+          (node.pluginSettings.color?.b ?? 1) * 255,
+          (node.pluginSettings.color?.a ?? 1) * 255,
         ),
         width: node.pluginSettings.outputSize.width,
         height: node.pluginSettings.outputSize.height,
