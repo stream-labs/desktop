@@ -41,7 +41,9 @@ export function ObsImport() {
 
 function PreImport() {
   const { setProcessing, next } = useModule(OnboardingModule);
-  const { profiles, selectedProfile, setSelectedProfile, startImport } = useModule(ObsImportModule);
+  const { profiles, selectedProfile, setSelectedProfile, startImport, isObs } = useModule(
+    ObsImportModule,
+  );
 
   return (
     <div>
@@ -62,8 +64,24 @@ function PreImport() {
       <button
         className={commonStyles.optionCard}
         style={{ margin: 'auto', marginTop: 24 }}
-        onClick={() => {
+        onClick={async () => {
           setProcessing(true);
+
+          if (!isObs) {
+            await alertAsync({
+              title: $t('Twitch Studio Import'),
+              content: (
+                <p>
+                  {$t(
+                    'Importing from Twitch Studio is an experimental feature under active development. Some source types are unable to be imported, and not all settings will be carried over.',
+                  )}
+                </p>
+              ),
+              okText: $t('Start'),
+              okType: 'primary',
+            });
+          }
+
           startImport()
             .then(() => {
               setProcessing(false);
