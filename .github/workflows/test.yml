@@ -53,9 +53,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: yarn
 
-      - name: cache ndoe modules
+      - name: cache node modules
         id: cache-node-modules
         uses: actions/cache@v4
         with:
@@ -82,21 +81,15 @@ jobs:
         with:
           node-version: 20
 
-      - name: cache ndoe modules
+      - name: cache node modules
         id: cache-node-modules
         uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('yarn.lock', 'scripts/install-native-deps.js', 'scripts/repositories.json') }}
 
-      - name: Compile
-        run: yarn compile:ci
-
       - name: Run unit tests
         run: yarn test:unit
-
-      - name: Run e2e tests
-        run: yarn test
 
   e2e_test:
     name: e2e tests
@@ -112,12 +105,15 @@ jobs:
         with:
           node-version: 20
 
-      - name: cache ndoe modules
+      - name: cache node modules
         id: cache-node-modules
         uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('yarn.lock', 'scripts/install-native-deps.js', 'scripts/repositories.json') }}
+
+      - name: Compile
+        run: yarn compile:ci
 
       - name: Run e2e tests
         run: yarn test
