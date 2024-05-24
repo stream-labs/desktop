@@ -253,7 +253,11 @@ export class OnboardingModule {
   }
 
   setImportFromObs() {
-    this.OnboardingService.setObsImport(true);
+    this.OnboardingService.setImport('obs');
+  }
+
+  setImportFromTwitch() {
+    this.OnboardingService.setImport('twitch');
   }
 
   setStreamerKnowledgeMode(mode: StreamerKnowledgeMode | null) {
