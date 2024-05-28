@@ -14,9 +14,7 @@ export type TAlertType =
   | 'fbLike'
   | 'fbShare'
   | 'fbSupportGift'
-  | 'twHost'
   | 'merch'
-  | 'twRaid'
   | 'ytMembership'
   | 'ytSubscriber'
   | 'ytSuperchat';
