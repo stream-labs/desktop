@@ -392,7 +392,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
         this.dismissablesService.dismiss(EDismissable.CollabCamRollout);
       } else if (
         this.incrementalRolloutService.views.featureIsEnabled(
-          EAvailableFeatures.guestCaProduction,
+          EAvailableFeatures.guestCamProduction,
         ) &&
         this.dismissablesService.views.shouldShow(EDismissable.CollabCamRollout)
       ) {
