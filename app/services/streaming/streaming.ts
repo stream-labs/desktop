@@ -550,12 +550,13 @@ export class StreamingService
 
       if (platform === 'tiktok') {
         const error = e as StreamError;
-        const message = tiktokErrorMessages(error.type);
+        const title = $t('TikTok Stream Error');
+        const message = tiktokErrorMessages(error.type) ?? title;
         this.outputErrorOpen = true;
 
         remote.dialog
           .showMessageBox(Utils.getMainWindow(), {
-            title: $t('TikTok Stream Error'),
+            title,
             type: 'error',
             message,
             buttons: [$t('Open TikTok Live Center'), $t('Close')],
