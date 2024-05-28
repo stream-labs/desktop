@@ -182,7 +182,9 @@ export class TikTokService
 
   async afterGoLive(): Promise<void> {
     // open url if stream successfully started
-    await this.handleOpenLiveManager();
+    if (this.scope === 'approved') {
+      await this.handleOpenLiveManager();
+    }
   }
 
   async afterStopStream(): Promise<void> {
@@ -301,6 +303,7 @@ export class TikTokService
     const body = new FormData();
     body.append('title', opts.title);
     body.append('device_platform', getOS());
+
     const request = new Request(url, { headers, method: 'POST', body });
 
     return jfetch<ITikTokStartStreamResponse>(request);
@@ -323,6 +326,10 @@ export class TikTokService
    * Confirm user is approved to stream to TikTok
    */
   async validatePlatform(): Promise<EPlatformCallResult> {
+    if (!this.userService.views.auth?.platforms['tiktok']) {
+      return EPlatformCallResult.TikTokStreamScopeMissing;
+    }
+
     try {
       const response = await this.fetchLiveAccessStatus();
       const status = response as ITikTokLiveScopeResponse;
@@ -339,7 +346,7 @@ export class TikTokService
         }
       } else if (
         status?.info &&
-        (!status?.reason || status?.reason !== ETikTokLiveScopeReason.DENIED)
+        (!status?.reason || status?.reason === ETikTokLiveScopeReason.DENIED)
       ) {
         this.SET_LIVE_SCOPE('denied');
         return EPlatformCallResult.TikTokScopeOutdated;
@@ -362,8 +369,8 @@ export class TikTokService
         : EPlatformCallResult.TikTokStreamScopeMissing;
     } catch (e: unknown) {
       console.warn(this.getErrorMessage(e));
-      this.SET_LIVE_SCOPE('not-approved');
-      return EPlatformCallResult.TikTokStreamScopeMissing;
+      this.SET_LIVE_SCOPE('denied');
+      return EPlatformCallResult.TikTokScopeOutdated;
     }
   }
 
