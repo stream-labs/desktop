@@ -69,7 +69,7 @@ export class TikTokService
     settings: {
       title: '',
       display: 'vertical',
-      liveScope: 'denied',
+      liveScope: 'not-approved',
       mode: 'portrait',
       serverUrl: '',
       streamKey: '',
@@ -324,10 +324,32 @@ export class TikTokService
 
   /**
    * Confirm user is approved to stream to TikTok
+   *
+   */
+  /**
+   * Confirm user is approved to stream to TikTok
+   * @param testResponseValue - should only be used when running tests
+   * @returns fulfilled promise with platform call result
    */
   async validatePlatform(): Promise<EPlatformCallResult> {
     if (!this.userService.views.auth?.platforms['tiktok']) {
       return EPlatformCallResult.TikTokStreamScopeMissing;
+    }
+
+    // for test to show correct components for each scope
+    if (Utils.isTestMode()) {
+      switch (this.state.settings.liveScope) {
+        case 'approved':
+          return EPlatformCallResult.Success;
+        case 'legacy':
+          return EPlatformCallResult.Success;
+        case 'denied':
+          return EPlatformCallResult.TikTokScopeOutdated;
+        case 'not-approved':
+          return EPlatformCallResult.TikTokStreamScopeMissing;
+        default:
+          return EPlatformCallResult.TikTokStreamScopeMissing;
+      }
     }
 
     try {
@@ -408,17 +430,14 @@ export class TikTokService
    * prepopulate channel info and save it to the store
    */
   async prepopulateInfo(): Promise<void> {
-    // skip validation call when running tests
-    if (Utils.isTestMode()) {
-      this.SET_PREPOPULATED(true);
-      return;
-    }
-
     // fetch user live access status
     const status = await this.validatePlatform();
-    this.usageStatisticsService.recordAnalyticsEvent('TikTokLiveAccess', {
-      status: this.scope,
-    });
+
+    if (!Utils.isTestMode()) {
+      this.usageStatisticsService.recordAnalyticsEvent('TikTokLiveAccess', {
+        status: this.scope,
+      });
+    }
 
     console.debug('TikTok stream status: ', status);
 
