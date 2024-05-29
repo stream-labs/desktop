@@ -1,12 +1,12 @@
 import { RunInLoadingMode } from './app/app-decorators';
-import { Inject, Service, ViewHandler } from './core';
+import { Inject, StatefulService, ViewHandler } from './core';
 import { SceneCollectionsService } from './scene-collections';
 import * as remote from '@electron/remote';
 import path from 'path';
 import fs from 'fs';
 import { ScenesService } from './scenes';
 import { SettingsService } from './settings';
-import { Source, SourcesService, TSourceType } from './sources';
+import { Source, SourcesService } from './sources';
 import { IListProperty } from 'obs-studio-node';
 import { DefaultHardwareService } from './hardware';
 import { SceneItem } from 'services/scenes';
@@ -165,7 +165,7 @@ type TTSPlugin =
   | 'primaryScreenShare';
 type TTSLayerContent = 'windowsVideoCapture';
 
-export class TwitchStudioImporterService extends Service {
+export class TwitchStudioImporterService extends StatefulService<{}> {
   @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() scenesService: ScenesService;
   @Inject() settingsService: SettingsService;
@@ -174,18 +174,22 @@ export class TwitchStudioImporterService extends Service {
   @Inject() videoService: VideoService;
   @Inject() videoSettingsService: VideoSettingsService;
 
+  get views() {
+    return new TwitchStudioImporterViews(this.state);
+  }
+
   @RunInLoadingMode()
   async import() {
     await this.load();
   }
 
   async load() {
-    if (!this.isTwitchStudioIntalled()) {
+    if (!this.views.isTwitchStudioInstalled()) {
       console.error('Twitch Studio is not installed!');
       return;
     }
 
-    const config = JSON.parse(fs.readFileSync(this.layoutsFile).toString()) as ITSConfig;
+    const config = JSON.parse(fs.readFileSync(this.views.layoutsFile).toString()) as ITSConfig;
 
     await this.sceneCollectionsService.create({
       name: 'Twitch Studio Imported',
@@ -409,16 +413,18 @@ export class TwitchStudioImporterService extends Service {
       }, 5 * 1000);
     });
   }
+}
 
-  isTwitchStudioIntalled() {
-    return fs.existsSync(this.layoutsFile);
-  }
-
+class TwitchStudioImporterViews extends ViewHandler<{}> {
   get dataDir() {
     return path.join(remote.app.getPath('appData'), 'Twitch Studio');
   }
 
   get layoutsFile() {
     return path.join(this.dataDir, 'layouts.json');
+  }
+
+  isTwitchStudioInstalled() {
+    return fs.existsSync(this.dataDir);
   }
 }
