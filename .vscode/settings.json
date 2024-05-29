@@ -5,6 +5,7 @@
     "builtins",
     "camelcase",
     "cdup",
+    "CHROMEDRIVER",
     "codemirror",
     "CUSTOMCAST",
     "devtron",
