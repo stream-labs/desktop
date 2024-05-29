@@ -57,16 +57,6 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   @Inject() navigationService: NavigationService;
   @Inject() userService: UserService;
 
-  init() {
-    // This is used for faking authentication in tests
-    /*
-    electron.ipcRenderer.on('testing-fakeAuth', () => {
-      this.COMPLETE_STEP('Connect');
-      this.SET_CURRENT_STEP('ObsImport');
-    });
-    */
-  }
-
   @mutation()
   SET_CURRENT_STEP(step: TOnboardingStep) {
     this.state.currentStep = step;

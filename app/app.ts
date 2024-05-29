@@ -60,7 +60,6 @@ if (isProduction) {
     ? { organization: sentryOrg, project: '5372801', key: '819e76e51864453aafd28c6d0473881f' } // crash-reporter-unstable
     : { organization: sentryOrg, project: '1520076', key: 'd965eea4b2254c2b9f38d2346fb8a472' }; // crash-reporter
 
-  console.log('[RENDERER]crashReporter.start'); // DEBUG TODO
   electron.crashReporter.start({
     productName: 'n-air-app',
     companyName: 'n-air-app',
