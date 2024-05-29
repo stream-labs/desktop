@@ -18,7 +18,6 @@ export type { IThemeMetadata } from './onboarding/theme-metadata';
 import {
   StreamerKnowledgeMode,
   isBeginnerOrIntermediateOrUnselected,
-  isIntermediateOrAdvancedOrUnselected,
 } from './onboarding/knowledge-mode';
 import { TwitchStudioImporterService } from './ts-importer';
 export { StreamerKnowledgeMode } from './onboarding/knowledge-mode';
@@ -183,8 +182,6 @@ interface IOnboardingServiceState {
 }
 
 class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
-  @Inject() twitchStudioImporterService: TwitchStudioImporterService;
-
   get singletonStep(): IOnboardingStep {
     if (this.state.options.isLogin) {
       if (this.getServiceViews(UserService).isPartialSLAuth) {
@@ -202,7 +199,9 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
   get steps() {
     const userViews = this.getServiceViews(UserService);
     const isOBSinstalled = this.getServiceViews(ObsImporterService).isOBSinstalled();
-    const isTwitchStudioInstalled = this.twitchStudioImporterService.isTwitchStudioIntalled();
+    const isTwitchStudioInstalled = this.getServiceViews(
+      TwitchStudioImporterService,
+    ).isTwitchStudioInstalled();
     const recordingModeEnabled = this.getServiceViews(RecordingModeService).isRecordingModeEnabled;
 
     const streamerKnowledgeMode = this.streamerKnowledgeMode;
