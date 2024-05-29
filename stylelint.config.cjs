@@ -14,7 +14,7 @@ module.exports = {
     'font-family-no-missing-generic-family-keyword': [
       true,
       {
-        ignoreFontFamilies: 'n-air',
+        ignoreFontFamilies: ['n-air', 'Roboto'],
       },
     ],
     'function-no-unknown': [
@@ -22,6 +22,7 @@ module.exports = {
       { ignoreFunctions: ['lighten', 'darken', 'fade', 'fadein', 'fadeout'] },
     ],
     'color-function-notation': 'legacy',
+    'block-no-empty': null,
   },
   overrides: [
     {

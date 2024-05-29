@@ -1,17 +1,9 @@
 <template>
   <div class="root comment-root" :class="[chat.type, { pseudoHover: commentMenuOpened }]">
-    <div
-      class="comment-wrapper"
-      :speaking="speaking"
-      @dblclick="$emit('pinned')"
-    >
+    <div class="comment-wrapper" :speaking="speaking" @dblclick="$emit('pinned')">
       <div class="comment-number">{{ chat.value.no }}</div>
       <div class="comment-box">
-        <div
-          class="comment-name-box"
-          v-if="computedName"
-          @click.stop="$emit('commentUser')"
-        >
+        <div class="comment-name-box" v-if="computedName" @click.stop="$emit('commentUser')">
           <img
             class="comment-icon"
             :src="userIconURL"
@@ -20,11 +12,7 @@
             @error.once="userIconURL = defaultUserIconURL"
           />
           <div class="comment-name">{{ computedName }}</div>
-          <i
-            class="icon-moderator"
-            v-tooltip.bottom="moderatorTooltip"
-            v-if="chat.isModerator"
-          ></i>
+          <i class="icon-moderator" v-tooltip.bottom="moderatorTooltip" v-if="chat.isModerator"></i>
         </div>
         <div class="comment-body" :title="computedTitle">{{ computedContent }}</div>
       </div>
@@ -113,9 +101,9 @@
 }
 
 .icon-moderator {
-    margin-left: 4px;
-    font-size: @font-size5;
-    color: var(--color-primary);
+  margin-left: 4px;
+  font-size: @font-size5;
+  color: var(--color-primary);
 }
 
 .comment-body {

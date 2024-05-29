@@ -111,6 +111,11 @@ module.exports = {
     'import/no-named-default': OFF,
 
     'no-use-before-declare': OFF,
+    'no-irregular-whitespace': OFF,
+    'no-undef': OFF,
+    radix: OFF,
+    'vue/no-use-v-if-with-v-for': OFF,
+    'vue/require-v-for-key': OFF,
   },
   // https://teratail.com/questions/295406
   overrides: [
