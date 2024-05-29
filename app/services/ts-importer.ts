@@ -1,5 +1,5 @@
 import { RunInLoadingMode } from './app/app-decorators';
-import { Inject, StatefulService, ViewHandler } from './core';
+import { Inject, StatefulService, ViewHandler, mutation } from './core';
 import { SceneCollectionsService } from './scene-collections';
 import * as remote from '@electron/remote';
 import path from 'path';
@@ -165,7 +165,9 @@ type TTSPlugin =
   | 'primaryScreenShare';
 type TTSLayerContent = 'windowsVideoCapture';
 
-export class TwitchStudioImporterService extends StatefulService<{}> {
+export class TwitchStudioImporterService extends StatefulService<{
+  isTwitchStudioInstalled: boolean;
+}> {
   @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() scenesService: ScenesService;
   @Inject() settingsService: SettingsService;
@@ -174,8 +176,23 @@ export class TwitchStudioImporterService extends StatefulService<{}> {
   @Inject() videoService: VideoService;
   @Inject() videoSettingsService: VideoSettingsService;
 
+  static initialState: { isTwitchStudioInstalled: boolean } = {
+    isTwitchStudioInstalled: false,
+  };
+
   get views() {
     return new TwitchStudioImporterViews(this.state);
+  }
+
+  init() {
+    if (fs.existsSync(this.views.dataDir)) {
+      this.SET_IS_TWITCH_STUDIO_INSTALLED(true);
+    }
+  }
+
+  @mutation()
+  SET_IS_TWITCH_STUDIO_INSTALLED(val: boolean) {
+    this.state.isTwitchStudioInstalled = val;
   }
 
   @RunInLoadingMode()
@@ -415,7 +432,7 @@ export class TwitchStudioImporterService extends StatefulService<{}> {
   }
 }
 
-class TwitchStudioImporterViews extends ViewHandler<{}> {
+class TwitchStudioImporterViews extends ViewHandler<{ isTwitchStudioInstalled: boolean }> {
   get dataDir() {
     return path.join(remote.app.getPath('appData'), 'Twitch Studio');
   }
@@ -425,6 +442,6 @@ class TwitchStudioImporterViews extends ViewHandler<{}> {
   }
 
   isTwitchStudioInstalled() {
-    return fs.existsSync(this.dataDir);
+    return this.state.isTwitchStudioInstalled;
   }
 }
