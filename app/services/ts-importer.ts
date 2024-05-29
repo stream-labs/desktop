@@ -433,8 +433,11 @@ export class TwitchStudioImporterService extends StatefulService<{
 }
 
 class TwitchStudioImporterViews extends ViewHandler<{ isTwitchStudioInstalled: boolean }> {
+  // eslint-disable-next-line prettier/prettier
+  studio = 'Twitch\ Studio';
+
   get dataDir() {
-    return path.join(remote.app.getPath('appData'), 'Twitch Studio');
+    return path.join(remote.app.getPath('appData'), this.studio);
   }
 
   get layoutsFile() {
