@@ -11,7 +11,8 @@ import {
 } from '../helpers/modules/sources';
 import { test, useWebdriver } from '../helpers/webdriver/index';
 
-useWebdriver();
+// chromedriverのlogを有効にしないと、なぜかソース追加でフリーズしてしまう
+useWebdriver({ chromeDriverLogging: true });
 
 const sourceType = 'nair-rtvc-source';
 

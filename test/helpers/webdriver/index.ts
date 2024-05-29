@@ -27,7 +27,7 @@ class Application {
 
   constructor(public options: RemoteOptions) {}
 
-  async start(cacheDir: string) {
+  async start(cacheDir: string, chromedriverLogging = false) {
     if (this.process) return;
 
     const cdPath = require.resolve('electron-chromedriver/chromedriver');
@@ -35,6 +35,8 @@ class Application {
 
     if (CHROMEDRIVER_DEBUG) {
       chromedriverArgs.push('--verbose');
+      chromedriverArgs.push('--log-path=chromedriver.log');
+    } else if (chromedriverLogging) {
       chromedriverArgs.push('--log-path=chromedriver.log');
     }
 
@@ -115,6 +117,7 @@ interface ITestRunnerOptions {
   restartAppAfterEachTest?: boolean;
   appArgs?: string;
   implicitTimeout?: number;
+  chromeDriverLogging?: boolean;
 
   /**
    * Called after cache directory is created but before
@@ -201,7 +204,7 @@ export function useWebdriver(options: ITestRunnerOptions = {}) {
 
     if (options.beforeAppStartCb) await options.beforeAppStartCb(t);
 
-    await t.context.app.start(t.context.cacheDir);
+    await t.context.app.start(t.context.cacheDir, options.chromeDriverLogging);
 
     // Disable CSS transitions while running tests to allow for eager test clicks
     const disableTransitionsCode = `
