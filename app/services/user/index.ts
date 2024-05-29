@@ -473,6 +473,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         this.settingsService.showSettings('Stream');
         this.refreshedLinkedAccounts.next({ success: false, message: $t('Account merge error') });
       }
+
+      if (event.type === 'streamlabs_prime_subscribe') {
+        this.websocketService.ultraSubscription.next(true);
+      }
     });
   }
 

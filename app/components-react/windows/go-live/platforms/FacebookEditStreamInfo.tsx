@@ -41,7 +41,6 @@ class FacebookEditStreamInfoModule {
 
   fbState = this.fbService.state;
   canStreamToTimeline = this.fbState.grantedPermissions.includes('publish_video');
-  canStreamToGroup = this.fbState.grantedPermissions.includes('publish_to_groups');
   pages = this.fbState.facebookPages;
   groups = this.fbState.facebookGroups;
   isPrimary = this.streamingService.views.isPrimaryPlatform('facebook');
@@ -86,7 +85,7 @@ class FacebookEditStreamInfoModule {
 
   get shouldShowPermissionWarn() {
     return (
-      (!this.canStreamToTimeline || !this.canStreamToGroup) &&
+      !this.canStreamToTimeline &&
       this.dismissables.views.shouldShow(EDismissable.FacebookNeedPermissionsTip)
     );
   }
@@ -112,7 +111,9 @@ class FacebookEditStreamInfoModule {
   }
 
   get shouldShowGame() {
-    return !this.isUpdateMode && !this.props.isScheduleMode;
+    // this is currently broken in the fb api
+    return false;
+    // return !this.isUpdateMode && !this.props.isScheduleMode;
   }
 
   get shouldShowPrivacy() {
@@ -139,14 +140,8 @@ class FacebookEditStreamInfoModule {
         label: $t('Share to a Page You Manage'),
         image: 'https://slobs-cdn.streamlabs.com/media/fb-page.png',
       },
-      {
-        value: 'group' as TDestinationType,
-        label: $t('Share in a Group'),
-        image: 'https://slobs-cdn.streamlabs.com/media/fb-group.png',
-      },
     ].filter(opt => {
       if (opt.value === 'me' && !this.canStreamToTimeline) return false;
-      if (opt.value === 'group' && !this.canStreamToGroup) return false;
       return true;
     });
     return options;
