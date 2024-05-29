@@ -39,7 +39,7 @@
     "test": "node bin/i18n-early-check.js && tsc -p test && ava -v -s",
     "test:unit": "yarn test:unit:app && yarn test:unit:bin",
     "test:unit:app": "jest --silent --config ./jest.config.js",
-    "test:unit:bin": "jest --silent --config ./jest.bin-config.js",
+    "test:unit:bin": "yarn install --cwd bin && jest --silent --config ./jest.bin-config.js",
     "lint:js": "eslint --ext .js,.vue --ignore-path .gitignore .",
     "lint:style": "stylelint **/*.{vue,css,less} --ignore-path .gitignore .",
     "lint": "eslint \"{app,guest-api,obs-api,updater}/**/*.ts\" main.js&&yarn lint:js&&yarn lint:style",
