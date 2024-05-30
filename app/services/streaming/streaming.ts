@@ -53,6 +53,8 @@ import { MarkersService } from 'services/markers';
 import { byOS, OS } from 'util/operating-systems';
 import { DualOutputService } from 'services/dual-output';
 import { capitalize } from 'lodash';
+import { tiktokErrorMessages } from 'services/platforms/tiktok/api';
+import { TikTokService } from 'services/platforms/tiktok';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -97,6 +99,7 @@ export class StreamingService
   @Inject() private videoSettingsService: VideoSettingsService;
   @Inject() private markersService: MarkersService;
   @Inject() private dualOutputService: DualOutputService;
+  @Inject() private tikTokService: TikTokService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
@@ -205,7 +208,6 @@ export class StreamingService
         try {
           await service.prepopulateInfo();
         } catch (e: unknown) {
-          console.log('e ', e);
           // cast all PLATFORM_REQUEST_FAILED errors to PREPOPULATE_FAILED
           if (e instanceof StreamError) {
             e.type =
@@ -545,6 +547,32 @@ export class StreamingService
       await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform, context));
     } catch (e: unknown) {
       this.handleSetupPlatformError(e, platform);
+
+      if (platform === 'tiktok') {
+        const error = e as StreamError;
+        const title = $t('TikTok Stream Error');
+        const message = tiktokErrorMessages(error.type) ?? title;
+        this.outputErrorOpen = true;
+
+        remote.dialog
+          .showMessageBox(Utils.getMainWindow(), {
+            title,
+            type: 'error',
+            message,
+            buttons: [$t('Open TikTok Live Center'), $t('Close')],
+          })
+          .then(({ response }) => {
+            if (response === 0) {
+              this.tikTokService.handleOpenLiveManager(true);
+            }
+            this.outputErrorOpen = false;
+          })
+          .catch(() => {
+            this.outputErrorOpen = false;
+          });
+
+        this.windowsService.actions.closeChildWindow();
+      }
     }
   }
 
