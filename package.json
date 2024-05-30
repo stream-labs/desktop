@@ -35,14 +35,10 @@
     "release": "yarn install --cwd bin && node bin/release/mini-release.js",
     "patch-note": "yarn install --cwd bin && node bin/release/generatePatchNote.js",
     "webfont": "yarn install --cwd bin && node bin/generate-webfont.js",
-    "eslint": "eslint app/**/*.ts",
     "test": "node bin/i18n-early-check.js && tsc -p test && ava -v -s",
     "test:unit": "yarn test:unit:app && yarn test:unit:bin",
     "test:unit:app": "jest --silent --config ./jest.config.js",
     "test:unit:bin": "yarn install --cwd bin && jest --silent --config ./jest.bin-config.js",
-    "lint:js": "eslint --ext .js,.vue --ignore-path .gitignore .",
-    "lint:style": "stylelint **/*.{vue,css,less} --ignore-path .gitignore .",
-    "lint": "eslint \"{app,guest-api,obs-api,updater}/**/*.ts\" main.js&&yarn lint:js&&yarn lint:style",
     "clear": "shx rm -rf bundles/media",
     "typedoc": "typedoc --out docs/dist ./app/services --mode modules --theme ./docs/theme --readme ./docs/README.md --ignoreCompilerErrors --excludePrivate --excludeExternals --hideGenerator",
     "compile-tests": "tsc -p test",
@@ -50,7 +46,8 @@
     "version": "git add app/services/patch-notes/notes.ts",
     "postinstall": "node --no-warnings ./scripts/install-native-deps.js",
     "clear:cache": "npx shx rm -rf node_module/.cache dist bundles test-dist",
-    "prettier": "eslint --fix && prettier -w ./app/**/*.{ts,vue,tsx}"
+    "lint": "eslint app/**/*.{ts,js,vue} && stylelint app/**/*.{vue,css,less}",
+    "format": "prettier -w app/**/*.{ts,js,vue} && eslint --fix app/**/*.{ts,js,vue} && stylelint --fix app/**/*.{vue,css,less}"
   },
   "buildProductName": "N Air",
   "ava": {
@@ -69,11 +66,11 @@
   },
   "lint-staged": {
     "*.{ts,js,vue}": [
-      "eslint --fix",
+      "eslint",
       "git add"
     ],
     "*.{css,less,vue}": [
-      "stylelint --fix",
+      "stylelint",
       "git add"
     ],
     "app/i18n/*/*.json": [

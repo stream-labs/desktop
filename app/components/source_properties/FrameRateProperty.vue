@@ -67,7 +67,7 @@ const FrameRateProperty = Property.extend({
 
   methods: {
     setSimpleValue(event) {
-      const optionIndex = parseInt(event.target.value);
+      const optionIndex = parseInt(event.target.value, 10);
       const option = this.simpleOptions[optionIndex];
 
       SourcesService.instance.setProperty(this.property, {

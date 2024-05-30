@@ -113,7 +113,6 @@ module.exports = {
     'no-use-before-declare': OFF,
     'no-irregular-whitespace': OFF,
     'no-undef': OFF,
-    radix: OFF,
     'vue/no-use-v-if-with-v-for': OFF,
     'vue/require-v-for-key': OFF,
   },
