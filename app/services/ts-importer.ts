@@ -212,7 +212,7 @@ export class TwitchStudioImporterService extends StatefulService<{
       name: 'Twitch Studio Imported',
       setupFunction: async () => {
         this.setupVideo(config);
-        this.importScenes(config);
+        await this.importScenes(config);
 
         return this.scenesService.views.scenes.length !== 0;
       },
