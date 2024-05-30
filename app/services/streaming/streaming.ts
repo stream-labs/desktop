@@ -105,7 +105,6 @@ export class StreamingService
   streamInfoChanged = new Subject<StreamInfoView<any>>();
   signalInfoChanged = new Subject<IOBSOutputSignalInfo>();
   streamErrorCreated = new Subject<string>();
-  unknownErrorCaught = new Subject<string>();
 
   // Dummy subscription for stream deck
   streamingStateChange = new Subject<void>();
@@ -205,7 +204,6 @@ export class StreamingService
         try {
           await service.prepopulateInfo();
         } catch (e: unknown) {
-          console.log('e ', e);
           // cast all PLATFORM_REQUEST_FAILED errors to PREPOPULATE_FAILED
           if (e instanceof StreamError) {
             e.type =
@@ -549,7 +547,8 @@ export class StreamingService
   }
 
   handleSetupPlatformError(e: unknown, platform: TPlatform) {
-    console.error('Error running beforeGoLive for platform', e);
+    console.error(`Error running beforeGoLive for platform ${platform}\n`, e);
+
     // cast all PLATFORM_REQUEST_FAILED errors to SETTINGS_UPDATE_FAILED
     if (e instanceof StreamError) {
       e.type =
@@ -705,14 +704,28 @@ export class StreamingService
     if (typeof errorTypeOrError === 'object') {
       // an error object has been passed as a first arg
       if (platform) errorTypeOrError.platform = platform;
+
+      // only show user is blocked to support
+      if (!errorTypeOrError.message.split(' ').includes('blocked')) {
+        this.nativeErrorMessage = `${capitalize(errorTypeOrError.platform)} Error: ${
+          errorTypeOrError.message
+        }. ${errorTypeOrError.details}.`;
+      }
+
       this.SET_ERROR(errorTypeOrError);
     } else {
       // an error type has been passed as a first arg
       const errorType = errorTypeOrError as TStreamErrorType;
       const error = createStreamError(errorType);
       if (platform) error.platform = platform;
+      // only show user is blocked to support
+      if (!error.message.split(' ').includes('blocked')) {
+        this.nativeErrorMessage = `${capitalize(error.platform)} Error: ${error.message}.`;
+      }
+
       this.SET_ERROR(error);
     }
+
     const error = this.state.info.error;
     assertIsDefined(error);
     console.error(`Streaming Error: ${error.message}`, error);
@@ -720,9 +733,13 @@ export class StreamingService
     const target = platform ? this.views.getPlatformDisplayName(platform) : 'Custom destination';
 
     // add follow-up action to report if there is an action
-    const diagReportMessage = error?.action
+    let diagReportMessage = error?.action
       ? [`${target}: ${error.message}`, error?.action].join(', ')
       : `${target}: ${error.message}`;
+
+    diagReportMessage = error?.details
+      ? [diagReportMessage, error?.details].join('. ')
+      : diagReportMessage;
 
     this.streamErrorCreated.next(diagReportMessage);
   }
@@ -1183,8 +1200,8 @@ export class StreamingService
   }
 
   private outputErrorOpen = false;
+  private nativeErrorMessage = '';
 
-  // HERE
   private handleOBSOutputSignal(info: IOBSOutputSignalInfo) {
     console.debug('OBS Output signal: ', info);
 
@@ -1367,34 +1384,49 @@ export class StreamingService
               ? $t('Streaming to %{platform} is temporary unavailable', { platform })
               : errorTypes['UNKNOWN_STREAMING_ERROR'].message;
 
-            diagReportMessage = `${capitalize(platform)} ${error?.code} Error: ${
-              error?.message ?? error?.details
-            }. ${errorTypes['UNKNOWN_STREAMING_ERROR_MESSAGE'].message}, ${
-              errorTypes['UNKNOWN_STREAMING_ERROR_MESSAGE'].action
-            }`;
+            diagReportMessage =
+              this.nativeErrorMessage ??
+              `${capitalize(platform)} ${error?.code} Error: ${[
+                error?.message,
+                error?.details,
+              ].join('. ')} ${errorTypes['UNKNOWN_STREAMING_ERROR_MESSAGE'].message}, ${
+                errorTypes['UNKNOWN_STREAMING_ERROR_MESSAGE'].action
+              }`;
 
             showNativeErrorMessage = true;
             extendedErrorText = errorText + '\n\n' + $t('Error Code:') + ' ' + info.code;
           } catch (error: unknown) {
             errorText = errorTypes['UNKNOWN_STREAMING_ERROR'].message;
-            diagReportMessage = `${errorText}, ${errorTypes['UNKNOWN_STREAMING_ERROR'].action}`;
+            diagReportMessage =
+              this.nativeErrorMessage ??
+              `${errorText}, ${errorTypes['UNKNOWN_STREAMING_ERROR'].action}`;
             console.error('Unknown Streaming Error:', error);
           }
         } else if (info.error) {
           const error = (info.error as unknown) as { message?: string; details?: string };
           errorText = errorTypes['UNKNOWN_STREAMING_ERROR'].message;
-          diagReportMessage = `System Error Message:  ${error.message ?? error}. ${errorText}, ${
-            errorTypes['UNKNOWN_STREAMING_ERROR'].action
-          }.`;
+          diagReportMessage = [
+            this.nativeErrorMessage ??
+              `System Error Message:  ${error.message ?? error}. ${errorText}, ${
+                errorTypes['UNKNOWN_STREAMING_ERROR'].action
+              }.`,
+          ].join('. ');
           showNativeErrorMessage = true;
           extendedErrorText = errorText + '\n\n' + $t('System error message:') + info.error + '"';
         } else {
           errorText = errorTypes['UNKNOWN_STREAMING_ERROR'].message;
-          diagReportMessage = `${errorText}, ${errorTypes['UNKNOWN_STREAMING_ERROR'].action}`;
+          diagReportMessage =
+            this.nativeErrorMessage ??
+            `${errorText}, ${errorTypes['UNKNOWN_STREAMING_ERROR'].action}`;
           showNativeErrorMessage = true;
-          extendedErrorText = $t(
-            'Streaming to platform is temporarily not available, confirm streaming approval and output settings.',
-          );
+          extendedErrorText =
+            this.nativeErrorMessage ??
+            $t(
+              'Streaming to platform is temporarily not available, confirm streaming approval and output settings.',
+            );
+        }
+
+        if (errorText === extendedErrorText) {
         }
       }
 
@@ -1407,7 +1439,13 @@ export class StreamingService
       }[info.type];
 
       if (linkToDriverInfo) buttons.push($t('Learn More'));
-      if (showNativeErrorMessage) buttons.push($t('More'));
+      if (
+        showNativeErrorMessage &&
+        this.nativeErrorMessage !== extendedErrorText &&
+        errorText !== extendedErrorText
+      ) {
+        buttons.push($t('More'));
+      }
 
       this.outputErrorOpen = true;
       const errorType = 'error';
@@ -1416,7 +1454,7 @@ export class StreamingService
           buttons,
           title,
           type: errorType,
-          message: errorText,
+          message: this.nativeErrorMessage ?? errorText,
         })
         .then(({ response }) => {
           if (linkToDriverInfo && response === 1) {
@@ -1440,6 +1478,7 @@ export class StreamingService
                 })
                 .then(({ response }) => {
                   this.outputErrorOpen = false;
+                  this.nativeErrorMessage = null;
                 })
                 .catch(() => {
                   this.outputErrorOpen = false;
