@@ -46,8 +46,8 @@
     "version": "git add app/services/patch-notes/notes.ts",
     "postinstall": "node --no-warnings ./scripts/install-native-deps.js",
     "clear:cache": "npx shx rm -rf node_module/.cache dist bundles test-dist",
-    "lint": "eslint app/**/*.{ts,js,vue} && stylelint app/**/*.{vue,css,less}",
-    "format": "prettier -w app/**/*.{ts,js,vue} && eslint --fix app/**/*.{ts,js,vue} && stylelint --fix app/**/*.{vue,css,less}"
+    "lint": "eslint {app,test}/**/*.{ts,js,vue} && stylelint app/**/*.{vue,css,less}",
+    "format": "prettier -w {app,test}/**/*.{ts,js,vue} && eslint --fix {app,test}/**/*.{ts,js,vue} && stylelint --fix app/**/*.{vue,css,less}"
   },
   "buildProductName": "N Air",
   "ava": {
