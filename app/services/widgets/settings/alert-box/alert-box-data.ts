@@ -17,8 +17,6 @@ export const API_NAME_MAP = {
   tiltifydonation: 'tiltify',
   treat: 'treat',
   follow: 'follows',
-  host: 'hosts',
-  raid: 'raids',
   superheart: 'superhearts',
   fanfunding: 'fanfunding',
   subscriber: 'subscribers', // YouTube
@@ -49,8 +47,6 @@ export const alertNameMap = () => ({
   tiltify: $t('Tiltify Donations'),
   treat: $t('TreatStream'),
   follows: $t('Follows'),
-  hosts: $t('Hosts'),
-  raids: $t('Raids'),
   superhearts: $t('Super Hearts'),
   fanfunding: $t('Super Chat'),
   sponsors: $t('Members'),
@@ -111,12 +107,10 @@ export const conditions = () => ({
       title: $t('When a Prime Gaming sub is upgraded to a recurring <tier> sub'),
     },
   ],
-  hosts: [{ value: 'MIN_VIEWERS_ACQUIRED', title: $t('Viewers gained is at least <viewers>') }],
   bits: [
     { value: 'MIN_BITS_USED', title: $t('Bits used is at least <amount>') },
     { value: 'EXACT_BITS_USED', title: $t('Bits used is exactly <amount>') },
   ],
-  raids: [{ value: 'MIN_RAIDERS_ACQUIRED', title: $t('Raid party size is at least <raiders>') }],
   sponsors: [
     { value: 'MIN_MONTHS_SPONSORED', title: $t('Months as a member is at least <months>') },
   ],
@@ -262,8 +256,6 @@ const DEFAULT_ALERT_FORMATS = {
   tiltify: '{name} has just donated {amount} via Tiltify!',
   treat: '{name} bought you a {title} treat via Treatstream!',
   follows: '{name} is now following!',
-  hosts: '{name} just hosted for {count} viewers!',
-  raids: '{name} is raiding with a party of {count}!',
   superhearts: '{name} gifted {style} worth {amount} coins!',
   fanfunding: '{name} has just donated {amount} through Super Chat!',
   subscribers: '{name} just subscribed!', // YouTube
