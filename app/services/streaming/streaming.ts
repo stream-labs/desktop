@@ -1200,7 +1200,7 @@ export class StreamingService
   }
 
   private outputErrorOpen = false;
-  private nativeErrorMessage = '';
+  private nativeErrorMessage: string | null = null;
 
   private handleOBSOutputSignal(info: IOBSOutputSignalInfo) {
     console.debug('OBS Output signal: ', info);
