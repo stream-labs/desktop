@@ -183,7 +183,6 @@ const filterName = (key: string): string => {
     resub_tier_3: $t('Tier 3'),
     resub_prime: $t('Prime'),
     gifted_sub: $t('Gifted'),
-    host: $t('Hosts'),
     bits: $t('Bits'),
     raid: $t('Raids'),
     subscriber: $t('Subscribers'),
@@ -216,8 +215,6 @@ function getHashForRecentEvent(event: IRecentEvent) {
       return [event.type, event.name, event.message, parseInt(event.amount, 10)].join(':');
     case 'follow':
       return [event.type, event.name, event.message].join(':');
-    case 'host':
-      return [event.type, event.name, event.host_type].join(':');
     case 'justgivingdonation':
       return [event.type, event.name, event.message, parseInt(event.amount, 10)].join(':');
     case 'loyalty_store_redemption':
@@ -226,8 +223,6 @@ function getHashForRecentEvent(event: IRecentEvent) {
       return [event.type, event.name, parseInt(event.amount, 10), event.from].join(':');
     case 'prime_sub_gift':
       return [event.type, event.name, event.streamer, event.giftType].join(':');
-    case 'raid':
-      return [event.type, event.name, event.from].join(':');
     case 'redemption':
       return [event.type, event.name, event.message].join(':');
     case 'sticker':
@@ -264,8 +259,6 @@ const SUPPORTED_EVENTS = [
   'follow',
   'subscription',
   'bits',
-  'host',
-  'raid',
   'sticker',
   'effect',
   'like',
@@ -292,8 +285,6 @@ class RecentEventsViews extends ViewHandler<IRecentEventsState> {
       subscription: this.getSubString(event),
       // Twitch
       bits: $t('has used'),
-      host: $t('has hosted you with %{viewers} viewers', { viewers: event.viewers }),
-      raid: $t('has raided you with a party of %{viewers}', { viewers: event.raiders }),
       // Mixer
       sticker: $t('has used %{skill} for', { skill: event.skill }),
       effect: $t('has used %{skill} for', { skill: event.skill }),

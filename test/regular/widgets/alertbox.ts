@@ -23,7 +23,7 @@ test('Alert Box for Facebook', t => testAlertbox(t, 'facebook'));
 const commonAlerts = ['Donation', 'Merch'];
 
 const platformAlerts = {
-  twitch: [...commonAlerts, 'Follow', 'Cheer (Bits)', 'Host', 'Raid'],
+  twitch: [...commonAlerts, 'Follow', 'Cheer (Bits)'],
   youtube: [...commonAlerts, 'YouTube Subscribers', 'YouTube Membership', 'YouTube Super Chat'],
   facebook: [
     ...commonAlerts,
