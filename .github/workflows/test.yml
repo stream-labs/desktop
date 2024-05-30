@@ -11,7 +11,11 @@ on:
       - tsconfig.json
       - webpack.config.js
       - main.js
+      - test-main.js
       - app/**
+      - bin/package.json
+      - bin/yarn.lock
+      - bin/**/*.js
       - media/**
       - nvoice/**
       - obs-api/**
@@ -31,7 +35,11 @@ on:
       - tsconfig.json
       - webpack.config.js
       - main.js
+      - test-main.js
       - app/**
+      - bin/package.json
+      - bin/yarn.lock
+      - bin/**/*.js
       - media/**
       - nvoice/**
       - obs-api/**
