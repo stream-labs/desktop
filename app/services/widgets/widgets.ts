@@ -2,7 +2,8 @@ import { Inject } from 'services/core/injector';
 import { UserService } from '../user';
 import { ScenesService, SceneItem, Scene } from '../scenes';
 import { SourcesService } from '../sources';
-import { HostsService } from '../hosts';
+import { VideoService } from '../video';
+import { HostsService, UrlService } from '../hosts';
 import { ScalableRectangle } from 'util/ScalableRectangle';
 import namingHelpers from 'util/NamingHelpers';
 import fs from 'fs';
@@ -46,6 +47,7 @@ class WidgetsServiceViews extends ViewHandler<IWidgetSourcesState> {
 
   // hack since in the current iteration HostsService cannot have views be fetched
   @Inject() hostsService: HostsService;
+  @Inject() urlService: UrlService;
 
   get testers(): { name: string; url: string }[] {
     if (!this.userService.isLoggedIn) return;
@@ -54,7 +56,7 @@ class WidgetsServiceViews extends ViewHandler<IWidgetSourcesState> {
     }).map(tester => {
       return {
         name: tester.name,
-        url: tester.url(this.hostsService.streamlabs, this.userService.platform.type),
+        url: tester.url(this.urlService.protocol, this.hostsService.streamlabs, this.userService.platform.type),
       };
     });
   }
@@ -72,6 +74,8 @@ export class WidgetsService
   @Inject() scenesService: ScenesService;
   @Inject() sourcesService: SourcesService;
   @Inject() hostsService: HostsService;
+  @Inject() urlService: UrlService;
+  @Inject() videoService: VideoService;
   @Inject() editorCommandsService: EditorCommandsService;
   @Inject() dualOutputService: DualOutputService;
   @Inject() videoSettingsService: VideoSettingsService;
@@ -178,7 +182,7 @@ export class WidgetsService
 
   getWidgetUrl(type: WidgetType) {
     if (!this.userService.isLoggedIn || !WidgetDefinitions[type]) return;
-    return WidgetDefinitions[type].url(this.hostsService.streamlabs, this.userService.widgetToken);
+    return WidgetDefinitions[type].url(this.urlService.protocol, this.hostsService.streamlabs, this.userService.widgetToken);
   }
 
   getWidgetComponent(type: WidgetType): TWindowComponentName {
@@ -433,12 +437,12 @@ export class WidgetsService
   }
 
   get widgetsConfig() {
-    return getWidgetsConfig(this.hostsService.streamlabs, this.userService.widgetToken);
+    return getWidgetsConfig(this.urlService.protocol, this.hostsService.streamlabs, this.userService.widgetToken);
   }
 
   get alertsConfig() {
     const platforms = Object.keys(this.userService.views.platforms || []) as TPlatform[];
-    return getAlertsConfig(this.hostsService.streamlabs, platforms);
+    return getAlertsConfig(this.urlService.protocol, this.hostsService.streamlabs, platforms);
   }
 
   // make a request to widgets API

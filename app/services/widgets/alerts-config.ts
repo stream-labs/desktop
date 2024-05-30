@@ -33,6 +33,7 @@ export interface IAlertConfig {
 }
 
 export function getAlertsConfig(
+  protocol: string,
   host: string,
   platforms: TPlatform[] = [],
 ): Record<TAlertType, IAlertConfig> {
@@ -41,7 +42,7 @@ export function getAlertsConfig(
       type: 'donation',
       name: $t('Donation'),
       url() {
-        return `https://${host}/api/v5/slobs/test/streamlabs/donation`;
+        return `${protocol}${host}/api/v5/slobs/test/streamlabs/donation`;
       },
       tooltip: $t('Plays an alert when a viewer sends a tip/donation'),
     },
@@ -51,7 +52,7 @@ export function getAlertsConfig(
       name: $t('Follow'),
       apiKey: 'follow',
       url() {
-        return `https://${host}/api/v5/slobs/test/twitch_account/follow`;
+        return `${protocol}${host}/api/v5/slobs/test/twitch_account/follow`;
       },
       platforms: ['twitch'],
       tooltip: $t('Plays an alert for new Twitch followers'),
@@ -62,7 +63,7 @@ export function getAlertsConfig(
       apiKey: 'facebook_follow',
       name: $t('Facebook Follow'),
       url() {
-        return `https://${host}/api/v5/slobs/test/facebook_account/follow`;
+        return `${protocol}${host}/api/v5/slobs/test/facebook_account/follow`;
       },
       platforms: ['facebook'],
       tooltip: $t('Plays an alert for new Facebook followers'),
@@ -73,7 +74,7 @@ export function getAlertsConfig(
       name: $t('Trovo Follow'),
       apiKey: 'trovo_follow',
       url() {
-        return `https://${host}/api/v5/slobs/test/trovo_account/follow`;
+        return `${protocol}${host}/api/v5/slobs/test/trovo_account/follow`;
       },
       platforms: ['trovo'],
       tooltip: $t('Plays an alert for new Trovo followers'),
@@ -84,7 +85,7 @@ export function getAlertsConfig(
       apiKey: 'sub',
       name: $t('Subscription'),
       url() {
-        return `https://${host}/api/v5/slobs/test/twitch_account/subscription`;
+        return `${protocol}${host}/api/v5/slobs/test/twitch_account/subscription`;
       },
       platforms: ['twitch'],
       tooltip: $t('Plays an alert for new Twitch subscriptions'),
@@ -96,7 +97,7 @@ export function getAlertsConfig(
       apiKey: 'trovo_sub',
       name: $t('Trovo Subscription'),
       url() {
-        return `https://${host}/api/v5/slobs/test/trovo_account/subscription`;
+        return `${protocol}${host}/api/v5/slobs/test/trovo_account/subscription`;
       },
       platforms: ['trovo'],
       tooltip: $t('Plays an alert for new Trovo subscriptions'),
@@ -107,7 +108,7 @@ export function getAlertsConfig(
       apiKey: 'bits',
       name: $t('Cheer (Bits)'),
       url() {
-        return `https://${host}/api/v5/slobs/test/twitch_account/bits`;
+        return `${protocol}${host}/api/v5/slobs/test/twitch_account/bits`;
       },
       platforms: ['twitch'],
       tooltip: $t('Plays an alert when a viewer sends a Cheer'),
@@ -119,7 +120,7 @@ export function getAlertsConfig(
       type: 'twHost',
       apiKey: 'host',
       url() {
-        return `https://${host}/api/v5/slobs/test/twitch_account/host`;
+        return `${protocol}${host}/api/v5/slobs/test/twitch_account/host`;
       },
       platforms: ['twitch'],
       tooltip: $t('Plays an alert when another streamer hosts your channel'),
@@ -131,7 +132,7 @@ export function getAlertsConfig(
       type: 'twRaid',
       apiKey: 'raid',
       url() {
-        return `https://${host}/api/v5/slobs/test/twitch_account/raid`;
+        return `${protocol}${host}/api/v5/slobs/test/twitch_account/raid`;
       },
       platforms: ['twitch'],
       tooltip: $t('Plays an alert when another streamer raids your channel'),
@@ -143,7 +144,7 @@ export function getAlertsConfig(
       type: 'trRaid',
       apiKey: 'trovo_raid',
       url() {
-        return `https://${host}/api/v5/slobs/test/trovo_account/raid`;
+        return `${protocol}${host}/api/v5/slobs/test/trovo_account/raid`;
       },
       platforms: ['trovo'],
       tooltip: $t('Plays an alert when another streamer raids your channel'),
@@ -154,7 +155,7 @@ export function getAlertsConfig(
       type: 'ytMembership',
       apiKey: 'sponsor',
       url() {
-        return `https://${host}/api/v5/slobs/test/youtube_account/subscription`;
+        return `${protocol}${host}/api/v5/slobs/test/youtube_account/subscription`;
       },
       platforms: ['youtube'],
       tooltip: $t('Plays an alert for new YouTube Memberships'),
@@ -166,7 +167,7 @@ export function getAlertsConfig(
       type: 'ytSuperchat',
       apiKey: 'fanfunding',
       url() {
-        return `https://${host}/api/v5/slobs/test/youtube_account/superchat`;
+        return `${protocol}${host}/api/v5/slobs/test/youtube_account/superchat`;
       },
       platforms: ['youtube'],
       tooltip: $t('Plays an alert when a viewer sends a Super Chat'),
@@ -179,7 +180,7 @@ export function getAlertsConfig(
       type: 'fbSupport',
       apiKey: 'facebook_support',
       url() {
-        return `https://${host}/api/v5/slobs/test/facebook_account/support`;
+        return `${protocol}${host}/api/v5/slobs/test/facebook_account/support`;
       },
       platforms: ['facebook'],
       tooltip: $t('Plays an alert for new Facebook Supporters'),
@@ -191,7 +192,7 @@ export function getAlertsConfig(
       type: 'fbSupportGift',
       apiKey: 'facebook_support_gifter',
       url() {
-        return `https://${host}/api/v5/slobs/test/facebook_account/giftSupport`;
+        return `${protocol}${host}/api/v5/slobs/test/facebook_account/giftSupport`;
       },
     },
 
@@ -200,7 +201,7 @@ export function getAlertsConfig(
       apiKey: 'facebook_stars',
       type: 'fbStars',
       url() {
-        return `https://${host}/api/v5/slobs/test/facebook_account/stars`;
+        return `${protocol}${host}/api/v5/slobs/test/facebook_account/stars`;
       },
       platforms: ['facebook'],
       tooltip: $t('Plays an alert when a viewer sends Stars'),
@@ -212,7 +213,7 @@ export function getAlertsConfig(
       apiKey: 'facebook_like',
       type: 'fbLike',
       url() {
-        return `https://${host}/api/v5/slobs/test/facebook_account/like`;
+        return `${protocol}${host}/api/v5/slobs/test/facebook_account/like`;
       },
       platforms: ['facebook'],
       tooltip: $t('Plays an alert when a viewer likes your stream'),
@@ -223,7 +224,7 @@ export function getAlertsConfig(
       apiKey: 'facebook_share',
       type: 'fbShare',
       url() {
-        return `https://${host}/api/v5/slobs/test/facebook_account/share`;
+        return `${protocol}${host}/api/v5/slobs/test/facebook_account/share`;
       },
       platforms: ['facebook'],
       tooltip: $t('Plays an alert when a viewer shares your stream'),
@@ -233,10 +234,10 @@ export function getAlertsConfig(
       name: $t('Merch'),
       type: 'merch',
       url() {
-        return `https://${host}/api/v5/slobs/test/streamlabs/merch`;
+        return `${protocol}${host}/api/v5/slobs/test/streamlabs/merch`;
       },
       tooltip: $t('Plays an alert when a viewer buys your merch'),
-      tooltipLink: 'https://streamlabs.com/dashboard#/merchadmin',
+      tooltipLink: `${protocol}${host}/dashboard#/merchadmin`,
     },
 
     ytSubscriber: {
@@ -244,7 +245,7 @@ export function getAlertsConfig(
       type: 'ytSubscriber',
       apiKey: 'subscriber',
       url() {
-        return `https://${host}/api/v5/slobs/test/youtube_account/follow`;
+        return `${protocol}${host}/api/v5/slobs/test/youtube_account/follow`;
       },
       platforms: ['youtube'],
       tooltip: $t('Plays an alert when a viewer subscribes to your YouTube channel'),

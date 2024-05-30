@@ -92,8 +92,9 @@ export class TikTokService
 
   get authUrl() {
     const host = this.hostsService.streamlabs;
+    const protocol = this.urlService.protocol;
     const query = `_=${Date.now()}&skip_splash=true&external=electron&tiktok&force_verify&origin=slobs`;
-    return `https://${host}/slobs/login?${query}`;
+    return `${protocol}${host}/slobs/login?${query}`;
   }
 
   private get oauthToken() {

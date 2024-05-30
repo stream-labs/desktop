@@ -2,6 +2,7 @@ const { notarize } = require('@electron/notarize');
 const fs = require('fs');
 
 exports.default = async function notarizing(context) {
+  return;
   if (process.env.SLOBS_NO_NOTARIZE) return;
   if (process.platform !== 'darwin') return;
 

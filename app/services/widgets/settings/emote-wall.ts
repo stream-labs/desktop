@@ -31,7 +31,7 @@ export class EmoteWallService extends WidgetSettingsService<IEmoteWallData> {
   getApiSettings() {
     return {
       type: WidgetType.EmoteWall,
-      url: WidgetDefinitions[WidgetType.EmoteWall].url(this.getHost(), this.getWidgetToken()),
+      url: WidgetDefinitions[WidgetType.EmoteWall].url(this.getUrlProtocol(), this.getHost(), this.getWidgetToken()),
       previewUrl: `https://${this.getHost()}/widgets/emote-wall?token=${this.getWidgetToken()}&simulate=1`,
       dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/emote-wall`,
       settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/emote-wall`,

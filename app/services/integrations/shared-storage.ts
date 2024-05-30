@@ -1,4 +1,4 @@
-import { HostsService, MarkersService } from 'app-services';
+import { HostsService, UrlService, MarkersService } from 'app-services';
 import fs from 'fs';
 import path from 'path';
 import { Service, Inject, ViewHandler } from 'services/core';
@@ -49,6 +49,7 @@ class SharedStorageServiceViews extends ViewHandler<{}> {
 export class SharedStorageService extends Service {
   @Inject() userService: UserService;
   @Inject() hostsService: HostsService;
+  @Inject() urlService: UrlService;
   @Inject() markersService: MarkersService;
 
   id: string;
@@ -57,7 +58,7 @@ export class SharedStorageService extends Service {
   uploading = false;
 
   get host() {
-    return `https://${this.hostsService.streamlabs}/api/v5/slobs/streamlabs-storage`;
+    return `${this.urlService.protocol}${this.hostsService.streamlabs}/api/v5/slobs/streamlabs-storage`;
   }
 
   get views() {

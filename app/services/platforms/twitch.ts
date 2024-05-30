@@ -140,6 +140,7 @@ export class TwitchService
 
   get authUrl() {
     const host = this.hostsService.streamlabs;
+    const protocol = this.urlService.protocol;
     const scopes: TTwitchOAuthScope[] = [
       'channel_read',
       'channel_editor',
@@ -151,7 +152,7 @@ export class TwitchService
       `_=${Date.now()}&skip_splash=true&external=electron&twitch&force_verify&` +
       `scope=${scopes.join(',')}&origin=slobs`;
 
-    return `https://${host}/slobs/login?${query}`;
+    return `${protocol}${host}/slobs/login?${query}`;
   }
 
   // TODO: Refactor so this is reusable
@@ -233,7 +234,8 @@ export class TwitchService
 
   fetchNewToken(): Promise<void> {
     const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/twitch/refresh`;
+    const protocol = this.urlService.protocol;
+    const url = `${protocol}${host}/api/v5/slobs/twitch/refresh`;
     const headers = authorizedHeaders(this.userService.apiToken!);
     const request = new Request(url, { headers });
 

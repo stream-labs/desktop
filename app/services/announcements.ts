@@ -1,6 +1,6 @@
 import { PersistentStatefulService, mutation, InitAfter, ViewHandler } from 'services/core/index';
 import { UserService } from './user';
-import { HostsService } from './hosts';
+import { HostsService, UrlService } from './hosts';
 import { Inject, Service } from 'services';
 import { AppService } from 'services/app';
 import { authorizedHeaders, jfetch } from '../util/requests';
@@ -110,6 +110,7 @@ AnnouncementsServicePersistedState.register({ persist: true });
 @InitAfter('UserService')
 export class AnnouncementsService extends Service {
   @Inject() private hostsService: HostsService;
+  @Inject() private urlService: UrlService;
   @Inject() private userService: UserService;
   @Inject() private appService: AppService;
   @Inject() private i18nService: I18nService;
@@ -279,8 +280,9 @@ export class AnnouncementsService extends Service {
 
   private formRequest(endpoint: string, options: any = {}) {
     const host = this.hostsService.streamlabs;
+    const protocol = this.urlService.protocol
     const headers = authorizedHeaders(this.userService.apiToken, options.headers);
-    const url = `https://${host}/${endpoint}`;
+    const url = `${protocol}${host}/${endpoint}`;
     return new Request(url, { ...options, headers });
   }
 

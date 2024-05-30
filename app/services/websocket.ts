@@ -1,7 +1,7 @@
 import { Service } from './core/service';
 import { Inject } from 'services/core/injector';
 import { UserService } from 'services/user';
-import { HostsService } from 'services/hosts';
+import { HostsService, UrlService } from 'services/hosts';
 import { authorizedHeaders, jfetch } from 'util/requests';
 import { Subject } from 'rxjs';
 import { AppService } from 'services/app';
@@ -144,6 +144,7 @@ interface IUserAccountMergeError {
 export class WebsocketService extends Service {
   @Inject() private userService: UserService;
   @Inject() private hostsService: HostsService;
+  @Inject() private urlService: UrlService;
   @Inject() private appService: AppService;
   @Inject() private sceneCollectionsService: SceneCollectionsService;
 
@@ -174,7 +175,7 @@ export class WebsocketService extends Service {
       this.socket.disconnect();
     }
 
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/socket-token`;
+    const url = `${this.urlService.protocol}${this.hostsService.streamlabs}/api/v5/slobs/socket-token`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
 

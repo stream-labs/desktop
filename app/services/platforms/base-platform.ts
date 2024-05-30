@@ -9,7 +9,7 @@ import {
 } from './index';
 import { StreamingService } from 'services/streaming';
 import { UserService } from 'services/user';
-import { HostsService } from 'services/hosts';
+import { HostsService, UrlService } from 'services/hosts';
 import { DualOutputService } from 'services/dual-output';
 import { IFacebookStartStreamOptions } from './facebook';
 import { StreamSettingsService } from '../settings/streaming';
@@ -33,6 +33,7 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
   @Inject() protected streamingService: StreamingService;
   @Inject() protected userService: UserService;
   @Inject() protected hostsService: HostsService;
+  @Inject() protected urlService: UrlService;
   @Inject() protected streamSettingsService: StreamSettingsService;
   @Inject() protected dualOutputService: DualOutputService;
   @Inject() protected videoSettingsService: VideoSettingsService;
@@ -48,8 +49,9 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
 
   get mergeUrl() {
     const host = this.hostsService.streamlabs;
+    const protocol = this.urlService.protocol;
     const token = this.userService.apiToken;
-    return `https://${host}/slobs/merge/${token}/${this.platform}_account`;
+    return `${protocol}${host}/slobs/merge/${token}/${this.platform}_account`;
   }
 
   averageViewers: number;
@@ -84,7 +86,7 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
 
   unlink() {
     // unlink platform and reload auth state
-    // const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/unlink/${this.platform}_account`;
+    // const url = `${this.urlService.protocol}${this.hostsService.streamlabs}/api/v5/slobs/unlink/${this.platform}_account`;
     // const headers = authorizedHeaders(this.userService.apiToken!);
     // const request = new Request(url, { headers });
     // return fetch(request)
@@ -92,7 +94,7 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
     //   .then(_ => this.userService.updateLinkedPlatforms());
 
     remote.shell.openExternal(
-      `https://${this.hostsService.streamlabs}/dashboard#/settings/account-settings/platforms`,
+      `${this.urlService.protocol}${this.hostsService.streamlabs}/dashboard#/settings/account-settings`,
     );
   }
 

@@ -3,7 +3,7 @@ import { PersistentStatefulService } from 'services/core/persistent-stateful-ser
 import { Inject } from 'services/core/injector';
 import { authorizedHeaders, jfetch } from 'util/requests';
 import { mutation, ViewHandler } from 'services/core/stateful-service';
-import { HostsService } from 'services/hosts';
+import { HostsService, UrlService } from 'services/hosts';
 import { UserService } from 'services/user';
 import { $t, I18nService } from 'services/i18n';
 import uuid from 'uuid/v4';
@@ -29,6 +29,7 @@ interface ITwitterStatusResponse {
 
 export class TwitterService extends PersistentStatefulService<ITwitterServiceState> {
   @Inject() private hostsService: HostsService;
+  @Inject() private urlService: UrlService;
   @Inject() private userService: UserService;
   @Inject() i18nService: I18nService;
 
@@ -88,7 +89,7 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
     const token = this.userService.apiToken;
     const locale = this.i18nService.state.locale;
 
-    return `https://${this.hostsService.streamlabs}/slobs/twitter/link?oauth_token=${token}&l=${locale}`;
+    return `${this.urlService.protocol}${this.hostsService.streamlabs}/slobs/twitter/link?oauth_token=${token}&l=${locale}`;
   }
 
   async getTwitterStatus() {
@@ -99,7 +100,8 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
   async unlinkTwitter() {
     this.RESET_TWITTER_STATUS();
     const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/twitter/unlink`;
+    const protocol = this.urlService.protocol;
+    const url = `${protocol}${host}/api/v5/slobs/twitter/unlink`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
     return jfetch(request).catch(() => {
@@ -113,7 +115,8 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
 
   async fetchTwitterStatus() {
     const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/twitter/status`;
+    const protocol = this.urlService.protocol;
+    const url = `${protocol}${host}/api/v5/slobs/twitter/status`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
     return jfetch<ITwitterStatusResponse>(request).catch(() => {

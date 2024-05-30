@@ -114,6 +114,7 @@ const base = {
     sentryFrontendDSN: process.env.SLD_SENTRY_FRONTEND_DSN,
     sentryBackendClientURL: process.env.SLD_SENTRY_BACKEND_CLIENT_URL,
     sentryBackendClientPreviewURL: process.env.SLD_SENTRY_BACKEND_CLIENT_PREVIEW_URL,
+    SLOBS_USE_LOCAL_HOST: true,
   },
   beforePack: './electron-builder/beforePack.js',
   afterPack: './electron-builder/afterPack.js',

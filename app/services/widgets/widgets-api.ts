@@ -14,12 +14,12 @@ export interface ISerializableWidget {
   scaleY: number;
 }
 
-type TUrlGenerator = (host: string, token: string) => string;
+type TUrlGenerator = (protocol: string, host: string, token: string) => string;
 
 export interface IWidgetTester {
   type?: string; // TODO: make required
   name: string;
-  url: (host: string, platform: TPlatform) => string;
+  url: (protocol: string, host: string, platform: TPlatform) => string;
 
   // Which platforms this tester can be used on
   platforms: TPlatform[];

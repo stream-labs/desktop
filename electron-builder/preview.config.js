@@ -7,6 +7,6 @@ base.win.extraFiles.push({
   from: 'scripts/debug-launcher.bat',
   to: 'Streamlabs Desktop Preview Debug Mode.bat',
 });
-base.win.executableName = 'Streamlabs OBS Preview';
+base.win.executableName = 'Streamlabs OBS Preview Omar Version';
 
 module.exports = base;

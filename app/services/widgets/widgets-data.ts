@@ -16,6 +16,7 @@ export interface IWidgetDisplayData {
 }
 // Do not alter the order of this enum, it is coupled to the user's local config
 export enum WidgetType {
+  noType = -1,
   AlertBox = 0,
   DonationGoal = 1,
   FollowerGoal = 2,
@@ -47,109 +48,109 @@ export const WidgetTesters: IWidgetTester[] = [
   {
     type: 'follows',
     name: 'Follow',
-    url(host, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/follow`;
+    url(protocol, host, platform) {
+      return `${protocol}${host}/api/v5/slobs/test/${platform}_account/follow`;
     },
     platforms: ['twitch', 'facebook', 'trovo'],
   },
   {
     name: 'Subscriber',
-    url(host, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/follow`;
+    url(protocol, host, platform) {
+      return `${protocol}${host}/api/v5/slobs/test/${platform}_account/follow`;
     },
     platforms: ['youtube'],
   },
   {
     name: 'Subscription',
-    url(host, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/subscription`;
+    url(protocol, host, platform) {
+      return `${protocol}${host}/api/v5/slobs/test/${platform}_account/subscription`;
     },
     platforms: ['twitch', 'trovo'],
   },
   {
     name: 'Membership',
-    url(host, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/subscription`;
+    url(protocol, host, platform) {
+      return `${protocol}${host}/api/v5/slobs/test/${platform}_account/subscription`;
     },
     platforms: ['youtube'],
   },
   {
     type: 'donations',
-    name: 'Tip',
-    url(host) {
-      return `https://${host}/api/v5/slobs/test/streamlabs/donation`;
+    name: 'Donation',
+    url(protocol, host) {
+      return `${protocol}${host}/api/v5/slobs/test/streamlabs/donation`;
     },
     platforms: ['twitch', 'youtube', 'facebook', 'tiktok', 'trovo'],
   },
   {
     type: 'bits',
     name: 'Bits',
-    url(host, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/bits`;
+    url(protocol, host, platform) {
+      return `${protocol}${host}/api/v5/slobs/test/${platform}_account/bits`;
     },
     platforms: ['twitch'],
   },
   {
     name: 'Host',
     type: 'hosts',
-    url(host, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/host`;
+    url(protocol, host, platform) {
+      return `${protocol}${host}/api/v5/slobs/test/${platform}_account/host`;
     },
     platforms: ['twitch'],
   },
   {
     name: 'Super Chat',
-    url(host, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/superchat`;
+    url(protocol, host, platform) {
+      return `${protocol}${host}/api/v5/slobs/test/${platform}_account/superchat`;
     },
     platforms: ['youtube'],
   },
   {
     name: 'Share',
-    url(host, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/share`;
+    url(protocol, host, platform) {
+      return `${protocol}${host}/api/v5/slobs/test/${platform}_account/share`;
     },
     platforms: ['facebook'],
   },
   {
     name: 'Support',
-    url(host, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/support`;
+    url(protocol, host, platform) {
+      return `${protocol}${host}/api/v5/slobs/test/${platform}_account/support`;
     },
     platforms: ['facebook'],
   },
   {
     name: 'Stars',
-    url(host, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/stars`;
+    url(protocol, host, platform) {
+      return `${protocol}${host}/api/v5/slobs/test/${platform}_account/stars`;
     },
     platforms: ['facebook'],
   },
   {
     name: 'Like',
-    url(host, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/like`;
+    url(protocol, host, platform) {
+      return `${protocol}${host}/api/v5/slobs/test/${platform}_account/like`;
     },
     platforms: ['facebook'],
   },
   {
     name: 'Merch',
-    url(host, platform) {
-      return `https://${host}/api/v5/slobs/test/streamlabs/merch`;
+    url(protocol, host, platform) {
+      return `${protocol}${host}/api/v5/slobs/test/streamlabs/merch`;
     },
     platforms: ['youtube'],
   },
   {
     name: 'Cloudbot Redeem',
-    url(host, platform) {
-      return `https://${host}/api/v5/slobs/test/streamlabs/loyalty_store_redemption`;
+    url(protocol, host, platform) {
+      return `${protocol}${host}/api/v5/slobs/test/streamlabs/loyalty_store_redemption`;
     },
     platforms: ['youtube'],
   },
   {
     name: 'SL Ultra Gift',
-    url(host, platform) {
-      return `https://${host}/api/v5/slobs/test/streamlabs/prime_sub_gift`;
+    url(protocol, host, platform) {
+      return `${protocol}${host}/api/v5/slobs/test/streamlabs/prime_sub_gift`;
     },
     platforms: ['youtube'],
   },
@@ -158,8 +159,8 @@ export const WidgetTesters: IWidgetTester[] = [
 export const WidgetDefinitions: { [x: number]: IWidget } = {
   [WidgetType.AlertBox]: {
     name: 'Alert Box',
-    url(host, token) {
-      return `https://${host}/alert-box/v3/${token}`;
+    url(protocol, host, token) {
+      return `${protocol}${host}/alert-box/v3/${token}`;
     },
 
     width: 800,
@@ -172,9 +173,9 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
   },
 
   [WidgetType.DonationGoal]: {
-    name: 'Tip Goal',
-    url(host, token) {
-      return `https://${host}/widgets/donation-goal?token=${token}`;
+    name: 'Donation Goal',
+    url(protocol, host, token) {
+      return `${protocol}${host}/widgets/donation-goal?token=${token}`;
     },
 
     width: 600,
@@ -188,8 +189,8 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
   [WidgetType.FollowerGoal]: {
     name: 'Follower Goal',
-    url(host, token) {
-      return `https://${host}/widgets/follower-goal?token=${token}`;
+    url(protocol, host, token) {
+      return `${protocol}${host}/widgets/follower-goal?token=${token}`;
     },
 
     width: 600,
@@ -203,8 +204,8 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
   [WidgetType.SubscriberGoal]: {
     name: 'Subscriber Goal',
-    url(host, token) {
-      return `https://${host}/widgets/follower-goal?token=${token}`;
+    url(protocol, host, token) {
+      return `${protocol}${host}/widgets/follower-goal?token=${token}`;
     },
 
     width: 600,
@@ -218,8 +219,8 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
   [WidgetType.SubGoal]: {
     name: 'Sub Goal',
-    url(host, token) {
-      return `https://${host}/widgets/sub-goal?token=${token}`;
+    url(protocol, host, token) {
+      return `${protocol}${host}/widgets/sub-goal?token=${token}`;
     },
 
     width: 600,
@@ -233,8 +234,8 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
   [WidgetType.BitGoal]: {
     name: 'Bit Goal',
-    url(host, token) {
-      return `https://${host}/widgets/bit-goal?token=${token}`;
+    url(protocol, host, token) {
+      return `${protocol}${host}/widgets/bit-goal?token=${token}`;
     },
 
     width: 600,
@@ -248,8 +249,8 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
   [WidgetType.StarsGoal]: {
     name: 'Stars Goal',
-    url(host, token) {
-      return `https://${host}/widgets/stars-goal?token=${token}`;
+    url(protocol, host, token) {
+      return `${protocol}${host}/widgets/stars-goal?token=${token}`;
     },
 
     width: 600,
@@ -263,8 +264,8 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
   [WidgetType.SupporterGoal]: {
     name: 'Supporter Goal',
-    url(host, token) {
-      return `https://${host}/widgets/supporter-goal?token=${token}`;
+    url(protocol, host, token) {
+      return `${protocol}${host}/widgets/supporter-goal?token=${token}`;
     },
 
     width: 600,
@@ -278,8 +279,8 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
   [WidgetType.SuperchatGoal]: {
     name: 'Superchat Goal',
-    url(host, token) {
-      return `https://${host}/widgets/super-chat-goal?token=${token}`;
+    url(protocol, host, token) {
+      return `${protocol}${host}/widgets/super-chat-goal?token=${token}`;
     },
 
     width: 600,
@@ -293,8 +294,8 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
   [WidgetType.CharityGoal]: {
     name: 'Streamlabs Charity Goal',
-    url(host, token) {
-      return `https://${host}/widgets/streamlabs-charity-donation-goal?token=${token}`;
+    url(protocol, host, token) {
+      return `${protocol}${host}/widgets/streamlabs-charity-donation-goal?token=${token}`;
     },
 
     width: 600,
@@ -308,8 +309,8 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
   [WidgetType.DonationTicker]: {
     name: 'Donation Ticker',
-    url(host, token) {
-      return `https://${host}/widgets/donation-ticker?token=${token}`;
+    url(protocol, host, token) {
+      return `${protocol}${host}/widgets/donation-ticker?token=${token}`;
     },
 
     width: 600,
@@ -323,8 +324,8 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
   [WidgetType.ChatBox]: {
     name: 'Chat Box',
-    url(host, token) {
-      return `https://${host}/widgets/chat-box/v1/${token}`;
+    url(protocol, host, token) {
+      return `${protocol}${host}/widgets/chat-box/v1/${token}`;
     },
 
     width: 600,
@@ -338,8 +339,8 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
   [WidgetType.EventList]: {
     name: 'Event List',
-    url(host, token) {
-      return `https://${host}/widgets/event-list/v1/${token}`;
+    url(protocol, host, token) {
+      return `${protocol}${host}/widgets/event-list/v1/${token}`;
     },
 
     width: 600,
@@ -353,8 +354,8 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
   [WidgetType.TipJar]: {
     name: 'The Jar',
-    url(host, token) {
-      return `https://${host}/widgets/tip-jar/v1/${token}`;
+    url(protocol, host, token) {
+      return `${protocol}${host}/widgets/tip-jar/v1/${token}`;
     },
 
     width: 600,
@@ -368,8 +369,8 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
   [WidgetType.StreamBoss]: {
     name: 'Stream Boss',
-    url(host, token) {
-      return `https://${host}/widgets/streamboss?token=${token}`;
+    url(protocol, host, token) {
+      return `${protocol}${host}/widgets/streamboss?token=${token}`;
     },
 
     width: 600,
@@ -383,8 +384,8 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
   [WidgetType.Credits]: {
     name: 'Credits',
-    url(host, token) {
-      return `https://${host}/widgets/end-credits?token=${token}`;
+    url(protocol, host, token) {
+      return `${protocol}${host}/widgets/end-credits?token=${token}`;
     },
 
     width: 1280,
@@ -398,8 +399,8 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
   [WidgetType.SponsorBanner]: {
     name: 'Sponsor Banner',
-    url(host, token) {
-      return `https://${host}/widgets/sponsor-banner?token=${token}`;
+    url(protocol, host, token) {
+      return `${protocol}${host}/widgets/sponsor-banner?token=${token}`;
     },
 
     width: 600,
@@ -413,8 +414,8 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
   [WidgetType.SpinWheel]: {
     name: 'Spin Wheel',
-    url(host, token) {
-      return `https://${host}/widgets/wheel?token=${token}`;
+    url(protocol, host, token) {
+      return `${protocol}${host}/widgets/wheel?token=${token}`;
     },
 
     width: 600,
@@ -428,8 +429,8 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
   [WidgetType.MediaShare]: {
     name: 'Media Share',
-    url(host, token) {
-      return `https://${host}/widgets/media/v1/${token}`;
+    url(protocol, host, token) {
+      return `${protocol}${host}/widgets/media/v1/${token}`;
     },
 
     width: 800,
@@ -442,8 +443,8 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
   },
   [WidgetType.Poll]: {
     name: 'Poll',
-    url(host, token) {
-      return `https://${host}/widgets/poll/${token}`;
+    url(protocol, host, token) {
+      return `${protocol}${host}/widgets/poll/${token}`;
     },
 
     width: 800,
@@ -456,8 +457,8 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
   },
   [WidgetType.EmoteWall]: {
     name: 'Emote Wall',
-    url(host, token) {
-      return `https://${host}/widgets/emote-wall?token=${token}`;
+    url(protocol, host, token) {
+      return `${protocol}${host}/widgets/emote-wall?token=${token}`;
     },
 
     width: 1280,
@@ -470,8 +471,8 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
   },
   [WidgetType.ChatHighlight]: {
     name: 'Chat Highlight',
-    url(host, token) {
-      return `https://${host}/widgets/chat-highlight?token=${token}`;
+    url(protocol, host, token) {
+      return `${protocol}${host}/widgets/chat-highlight?token=${token}`;
     },
 
     width: 600,

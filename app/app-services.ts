@@ -170,7 +170,7 @@ import { NotificationsService } from './services/notifications';
 import { MediaBackupService } from './services/media-backup';
 import { HotkeysService } from './services/hotkeys';
 import { WidgetsService } from './services/widgets';
-import { HostsService } from './services/hosts';
+import { HostsService, UrlService } from './services/hosts';
 import { OnboardingService } from './services/onboarding';
 import { CacheUploaderService } from './services/cache-uploader';
 import { StreamlabelsService } from './services/streamlabels';
@@ -282,5 +282,6 @@ export const AppServices = {
   DualOutputService,
   MarkersService,
   SharedStorageService,
+  UrlService,
   RealmService,
 };

@@ -75,8 +75,9 @@ export class TrovoService
 
   get authUrl() {
     const host = this.hostsService.streamlabs;
+    const protocol = this.urlService.protocol;
     const query = `_=${Date.now()}&skip_splash=true&external=electron&trovo&force_verify&origin=slobs`;
-    return `https://${host}/slobs/login?${query}`;
+    return `${protocol}${host}/slobs/login?${query}`;
   }
 
   get username(): string {
@@ -105,7 +106,8 @@ export class TrovoService
 
   fetchNewToken(): Promise<void> {
     const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/trovo/refresh`;
+    const protocol = this.urlService.protocol;
+    const url = `${protocol}${host}/api/v5/slobs/trovo/refresh`;
     const headers = authorizedHeaders(this.userService.apiToken!);
     const request = new Request(url, { headers });
 
