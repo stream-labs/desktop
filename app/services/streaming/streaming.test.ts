@@ -1,4 +1,3 @@
-import * as electron from 'electron';
 import { EStreamingState, ERecordingState } from './streaming-api';
 
 import { createSetupFunction } from 'util/test-setup';
@@ -21,6 +20,16 @@ jest.mock('services/windows', () => ({}));
 jest.mock('services/usage-statistics', () => ({}));
 jest.mock('services/i18n', () => ({
   $t: (x: any) => x,
+}));
+jest.mock('@electron/remote', () => ({
+  BrowserWindow: jest.fn(),
+  getCurrentWindow: jest.fn(),
+  powerSaveBlocker: {
+    start: jest.fn(),
+  },
+  dialog: {
+    showMessageBox: jest.fn().mockImplementation(async () => ({ response: 0 })),
+  },
 }));
 jest.mock('services/customization', () => ({}));
 jest.mock('services/user', () => ({}));
