@@ -135,6 +135,8 @@ isUnskippable: ${this.updateState.isUnskippable}`);
       height: 369,
       webPreferences: {
         nodeIntegration: true,
+        enableRemoteModule: true,
+        contextIsolation: false,
       },
       useContentSize: true,
       title: `${process.env.NAIR_PRODUCT_NAME} - Ver: ${process.env.NAIR_VERSION}`,
@@ -143,6 +145,8 @@ isUnskippable: ${this.updateState.isUnskippable}`);
       resizable: false,
       show: false,
     });
+
+    require('@electron/remote/main').enable(browserWindow.webContents);
 
     browserWindow.setMenuBarVisibility(false);
 

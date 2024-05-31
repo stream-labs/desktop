@@ -1158,6 +1158,26 @@
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.7.tgz#1d572bfbbe14b7704e0ba0f39b74815b84870d70"
   integrity sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw==
 
+"@electron/get@^2.0.0":
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/@electron/get/-/get-2.0.3.tgz#fba552683d387aebd9f3fcadbcafc8e12ee4f960"
+  integrity sha512-Qkzpg2s9GnVV2I2BjRksUi43U5e6+zaQMcjoJy0C+C5oxaKl+fmckGDQFtRpZpZV0NQekuZZ+tGz7EA9TVnQtQ==
+  dependencies:
+    debug "^4.1.1"
+    env-paths "^2.2.0"
+    fs-extra "^8.1.0"
+    got "^11.8.5"
+    progress "^2.0.3"
+    semver "^6.2.0"
+    sumchecker "^3.0.1"
+  optionalDependencies:
+    global-agent "^3.0.0"
+
+"@electron/remote@2.0.8":
+  version "2.0.8"
+  resolved "https://registry.yarnpkg.com/@electron/remote/-/remote-2.0.8.tgz#85ff321f0490222993207106e2f720273bb1a5c3"
+  integrity sha512-P10v3+iFCIvEPeYzTWWGwwHmqWnjoh8RYnbtZAb3RlQefy4guagzIwcWtfftABIfm6JJTNQf4WPSKWZOpLmHXw==
+
 "@electron/universal@1.0.5":
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/@electron/universal/-/universal-1.0.5.tgz#b812340e4ef21da2b3ee77b2b4d35c9b86defe37"
@@ -2370,17 +2390,12 @@
   dependencies:
     undici-types "~5.26.4"
 
-"@types/node@^10.12.18":
-  version "10.17.60"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.17.60.tgz#35f3d6213daed95da7f0f73e75bcc6980e90597b"
-  integrity sha512-F0KIgDJfy2nA3zMLmWGKxcH2ZVEtCZXHHdOQs2gSaQ27+lNeEfGxzkIw90aXswATX7AZ33tahPbzy6KAfUreVw==
-
 "@types/node@^12.14.0":
   version "12.20.55"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-12.20.55.tgz#c329cbd434c42164f846b909bd6f85b5537f6240"
   integrity sha512-J8xLz7q2OFulZ2cyGTLE1TbbZcjpno7FaN6zdJNrgAdrJ+DZzh/uFR6YrTb4C+nXakvud8Q4+rbhoIWlYQbUFQ==
 
-"@types/node@^18.0.0":
+"@types/node@^18.0.0", "@types/node@^18.11.18":
   version "18.19.33"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-18.19.33.tgz#98cd286a1b8a5e11aa06623210240bcc28e95c48"
   integrity sha512-NR9+KrpSajr2qBVp/Yt5TU/rp+b5Mayi3+OlMlcg2cVCfRmcG5PWZ7S4+MG9PZ5gWBoc9Pd0BKSRViuBCRPu0A==
@@ -4115,6 +4130,11 @@ boolbase@^1.0.0, boolbase@~1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/boolbase/-/boolbase-1.0.0.tgz#68dff5fbe60c51eb37725ea9e3ed310dcc1e776e"
   integrity sha512-JZOSA7Mo9sNGB8+UjSgzdLtokWAky1zbztM3WRLCbZ70/3cTANmQmOdR7y2g+J0e2WXywy1yS468tY+IruqEww==
+
+boolean@^3.0.1:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/boolean/-/boolean-3.2.0.tgz#9e5294af4e98314494cbb17979fa54ca159f116b"
+  integrity sha512-d0II/GO9uf9lfUHH2BQsjxzRJZBdsjgsBiW4BvhWk/3qoKwQFjIDVN19PfX8F2D/r9PCMTtLWjYVCFrpeYUzsw==
 
 boxen@^5.0.0:
   version "5.1.2"
@@ -5859,7 +5879,7 @@ electron-devtools-installer@3.2.0:
     tslib "^2.1.0"
     unzip-crx-3 "^0.2.0"
 
-electron-download@^4.1.0, electron-download@^4.1.1:
+electron-download@^4.1.1:
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/electron-download/-/electron-download-4.1.1.tgz#02e69556705cc456e520f9e035556ed5a015ebe8"
   integrity sha512-FjEWG9Jb/ppK/2zToP+U5dds114fM1ZOJqMAR4aXXL5CvyPE9fiqBK/9YcwC9poIFQTEJk/EM/zyRwziziRZrg==
@@ -5935,14 +5955,14 @@ electron-window-state@5.0.3:
     jsonfile "^4.0.0"
     mkdirp "^0.5.1"
 
-electron@6.1.11:
-  version "6.1.11"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-6.1.11.tgz#a14a97b70f065bbb486992610a5e007fde1eeb0f"
-  integrity sha512-HCXp6GT0PIRjYWzRvA/M8XX76K511TRM63SmcPtmcOAjZ9sopVYC5abSojdcGHbcT6BUKBMXSsPxoyZ+SZUFEg==
+electron@25.9.3:
+  version "25.9.3"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-25.9.3.tgz#cdd53a30fb914adadcfbd34124237fb38b1c07d0"
+  integrity sha512-dacaHg/PuwVcFRgPDCM5j7UDzqGJWOsbBRdS5wPKLNS/ejPeccIjuNUT1cqcrpvCJKAFW8swHWg9kdizNSEDHQ==
   dependencies:
-    "@types/node" "^10.12.18"
-    electron-download "^4.1.0"
-    extract-zip "^1.0.3"
+    "@electron/get" "^2.0.0"
+    "@types/node" "^18.11.18"
+    extract-zip "^2.0.1"
 
 elegant-spinner@^1.0.1:
   version "1.0.1"
@@ -6065,6 +6085,11 @@ env-paths@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/env-paths/-/env-paths-1.0.0.tgz#4168133b42bb05c38a35b1ae4397c8298ab369e0"
   integrity sha512-+6r/UAzikJWJPcQZpBQS+bVmjAMz2BkDP/N4n2Uz1zz8lyw1IHWUeVdh/85gs0dp5A+z76LOQhCZkR6F88mlUw==
+
+env-paths@^2.2.0:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/env-paths/-/env-paths-2.2.1.tgz#420399d416ce1fbe9bc0a07c62fa68d67fd0f8f2"
+  integrity sha512-+h1lkLKhZMTYjog1VEpJNG7NZJWcuc2DDk/qsqSTRRCOXiLjeQ1d1/udrUGhqMxUgAlwKNZ0cf2uqan5GLuS2A==
 
 envinfo@^7.7.3:
   version "7.10.0"
@@ -6256,6 +6281,11 @@ es-to-primitive@^1.2.1:
     is-callable "^1.1.4"
     is-date-object "^1.0.1"
     is-symbol "^1.0.2"
+
+es6-error@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/es6-error/-/es6-error-4.1.1.tgz#9e3af407459deed47e9a91f9b885a84eb05c561d"
+  integrity sha512-Um/+FxMr9CISWh0bi5Zv0iOD+4cFh5qLeks1qhAopKVAJw3drgKbKySikp7wGhDL0HPeaja0P5ULZrxLkniUVg==
 
 escalade@^3.1.1:
   version "3.1.1"
@@ -6786,7 +6816,7 @@ extglob@^2.0.4:
     snapdragon "^0.8.1"
     to-regex "^3.0.1"
 
-extract-zip@2.0.1:
+extract-zip@2.0.1, extract-zip@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/extract-zip/-/extract-zip-2.0.1.tgz#663dca56fe46df890d5f131ef4a06d22bb8ba13a"
   integrity sha512-GDhU9ntwuKyGXdZBUgTIe+vXnWj0fppUEtMDL0+idd5Sta8TGpHssn/eusA9mrPr9qNDym6SxAYZjNvCn/9RBg==
@@ -6797,7 +6827,7 @@ extract-zip@2.0.1:
   optionalDependencies:
     "@types/yauzl" "^2.9.1"
 
-extract-zip@^1.0.3, extract-zip@^1.6.7:
+extract-zip@^1.6.7:
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/extract-zip/-/extract-zip-1.7.0.tgz#556cc3ae9df7f452c493a0cfb51cc30277940927"
   integrity sha512-xoh5G1W/PB0/27lXgMQyIhP5DSY/LhoCsOyZgb+6iMmRtCwVBo55uKaMoEYrDCKQhWvqEip5ZPKAc6eFNyf/MA==
@@ -7156,6 +7186,15 @@ fs-extra@^4.0.0, fs-extra@^4.0.1:
     jsonfile "^4.0.0"
     universalify "^0.1.0"
 
+fs-extra@^8.1.0:
+  version "8.1.0"
+  resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-8.1.0.tgz#49d43c45a88cd9677668cb7be1b46efdb8d2e1c0"
+  integrity sha512-yhlQgA6mnOJUKOsRUFsgJdQCvkKhcz8tlZG5HBQfReYZy46OwLcY+Zia0mtdHsOo9y/hP+CxMN0TU9QxoOtG4g==
+  dependencies:
+    graceful-fs "^4.2.0"
+    jsonfile "^4.0.0"
+    universalify "^0.1.0"
+
 fs-extra@^9.0.0, fs-extra@^9.0.1, fs-extra@^9.1.0:
   version "9.1.0"
   resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-9.1.0.tgz#5954460c764a8da2094ba3554bf839e6b9a7c86d"
@@ -7404,6 +7443,18 @@ glob@^8.0.3:
     minimatch "^5.0.1"
     once "^1.3.0"
 
+global-agent@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/global-agent/-/global-agent-3.0.0.tgz#ae7cd31bd3583b93c5a16437a1afe27cc33a1ab6"
+  integrity sha512-PT6XReJ+D07JvGoxQMkT6qji/jVNfX/h364XHZOWeRzy64sSFr+xJ5OX7LI3b4MPQzdL4H8Y8M0xzPpsVMwA8Q==
+  dependencies:
+    boolean "^3.0.1"
+    es6-error "^4.1.1"
+    matcher "^3.0.0"
+    roarr "^2.15.3"
+    semver "^7.3.2"
+    serialize-error "^7.0.1"
+
 global-dirs@^3.0.0:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/global-dirs/-/global-dirs-3.0.1.tgz#0c488971f066baceda21447aecb1a8b911d22485"
@@ -7445,6 +7496,14 @@ globals@^13.24.0:
   integrity sha512-AhO5QUcj8llrbG09iWhPU2B204J1xnPeL8kQmVorSsy+Sjj1sk8gIyh6cUocGmH4L0UuhAJy+hJMRA4mgA4mFQ==
   dependencies:
     type-fest "^0.20.2"
+
+globalthis@^1.0.1:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/globalthis/-/globalthis-1.0.4.tgz#7430ed3a975d97bfb59bcce41f5cabbafa651236"
+  integrity sha512-DpLKbNU4WylpxJykQujfCcwYWiV/Jhm50Goo0wrVILAv5jOr9d+H+UR3PhSCD2rCCEIg0uc+G+muBTwD54JhDQ==
+  dependencies:
+    define-properties "^1.2.1"
+    gopd "^1.0.1"
 
 globalthis@^1.0.3:
   version "1.0.3"
@@ -7488,7 +7547,7 @@ gopd@^1.0.1:
   dependencies:
     get-intrinsic "^1.1.3"
 
-got@^11.0.2, got@^11.8.1:
+got@^11.0.2, got@^11.8.1, got@^11.8.5:
   version "11.8.6"
   resolved "https://registry.yarnpkg.com/got/-/got-11.8.6.tgz#276e827ead8772eddbcfc97170590b841823233a"
   integrity sha512-6tfZ91bOr7bOXnK7PRDCGBLa1H4U080YHNaAQ2KsMGlLEzRbk44nsZF2E1IeRc3vtJHPVbKCYgdFbaGO2ljd8g==
@@ -11720,7 +11779,7 @@ progress-stream@^1.1.0:
     speedometer "~0.1.2"
     through2 "~0.2.3"
 
-progress@2.0.3, progress@^2.0.0, progress@~2.0.3:
+progress@2.0.3, progress@^2.0.0, progress@^2.0.3, progress@~2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/progress/-/progress-2.0.3.tgz#7e8cf8d8f5b8f239c1bc68beb4eb78567d572ef8"
   integrity sha512-7PiHtLll5LdnKIMw100I+8xJXR5gW2QwWYkT6iJva0bXitZKa/XMrSbdmg3r2Xnaidz9Qumd0VPaMrZlF9V9sA==
@@ -12359,6 +12418,18 @@ rimraf@~2.6.2:
   integrity sha512-mwqeW5XsA2qAejG46gYdENaxXjx9onRNCfn7L0duuP4hCuTIi/QO7PDK07KJfp1d+izWPrzEJDcSqBa0OZQriA==
   dependencies:
     glob "^7.1.3"
+
+roarr@^2.15.3:
+  version "2.15.4"
+  resolved "https://registry.yarnpkg.com/roarr/-/roarr-2.15.4.tgz#f5fe795b7b838ccfe35dc608e0282b9eba2e7afd"
+  integrity sha512-CHhPh+UNHD2GTXNYhPWLnU8ONHdI+5DI+4EYIAOaiD63rHeYlZvyh8P+in5999TTSFgUYuKUAjzRI4mdh/p+2A==
+  dependencies:
+    boolean "^3.0.1"
+    detect-node "^2.0.4"
+    globalthis "^1.0.1"
+    json-stringify-safe "^5.0.1"
+    semver-compare "^1.0.0"
+    sprintf-js "^1.1.2"
 
 rollup-plugin-typescript2@^0.34.1:
   version "0.34.1"
@@ -13103,6 +13174,11 @@ split2@^2.1.0:
   dependencies:
     through2 "^2.0.2"
 
+sprintf-js@^1.1.2:
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/sprintf-js/-/sprintf-js-1.1.3.tgz#4914b903a2f8b685d17fdf78a70e917e872e444a"
+  integrity sha512-Oo+0REFV59/rz3gfJNKQiBlwfHaSESl1pcGyABQsnnIfWOFt6JNj5gCog2U6MLZ//IGYD+nA8nI+mTShREReaA==
+
 sprintf-js@~1.0.2:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/sprintf-js/-/sprintf-js-1.0.3.tgz#04e6926f662895354f3dd015203633b857297e2c"
@@ -13476,6 +13552,13 @@ sumchecker@^2.0.2:
   integrity sha512-16O54scwFPgX60Of/+QJSufmklGqnHZyBK6uewBvtcp3VxT5RM65c/OnGCeEPnjBF8TJoO5Pf6gHAOXfxIjNpA==
   dependencies:
     debug "^2.2.0"
+
+sumchecker@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/sumchecker/-/sumchecker-3.0.1.tgz#6377e996795abb0b6d348e9b3e1dfb24345a8e42"
+  integrity sha512-MvjXzkz/BOfyVDkG0oFOtBxHX2u3gKbMHIF/dXblZsgD3BWOFLmHovIpZY7BykJdAjcqRCBi1WYBNdEC9yI7vg==
+  dependencies:
+    debug "^4.1.0"
 
 supertap@^2.0.0:
   version "2.0.0"

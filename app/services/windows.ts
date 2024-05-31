@@ -35,8 +35,9 @@ import { Subject } from 'rxjs';
 import ExecuteInCurrentWindow from '../util/execute-in-current-window';
 import BrowserSourceInteraction from 'components/windows/BrowserSourceInteraction';
 import UserInfo from 'components/windows/UserInfo.vue';
+import * as remote from '@electron/remote';
 
-const { ipcRenderer, remote } = electron;
+const { ipcRenderer } = electron;
 const BrowserWindow = remote.BrowserWindow;
 const uuid = window['require']('uuid/v4');
 
@@ -150,7 +151,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     const window = this.windows[windowId];
     if (window) {
       const bounds = window.getBounds();
-      const currentDisplay = electron.remote.screen.getDisplayMatching(bounds);
+      const currentDisplay = remote.screen.getDisplayMatching(bounds);
       if (!currentDisplay) {
         Sentry.withScope(scope => {
           scope.setExtra('windowId', windowId);
