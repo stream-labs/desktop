@@ -64,7 +64,7 @@ interface ISceneCollectionInternalCreateOptions extends ISceneCollectionCreateOp
   /** A function that can be used to set up some state.
    * This should really only be used by the OBS importer.
    */
-  setupFunction?: () => boolean;
+  setupFunction?: () => boolean | Promise<boolean>;
 
   auto?: boolean;
 }
@@ -225,7 +225,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     await this.setActiveCollection(id);
     if (options.needsRename) this.stateService.SET_NEEDS_RENAME(id);
 
-    if (options.setupFunction && options.setupFunction()) {
+    if (options.setupFunction && (await options.setupFunction())) {
       // Do nothing
     } else {
       this.setupEmptyCollection();

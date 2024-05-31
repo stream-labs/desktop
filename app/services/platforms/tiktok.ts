@@ -74,7 +74,7 @@ export class TikTokService
     settings: {
       title: '',
       display: 'vertical',
-      liveScope: 'denied',
+      liveScope: 'not-approved',
       streamKey: '',
       game: '',
       mode: 'portrait',
@@ -171,6 +171,7 @@ export class TikTokService
         }
       } catch (error: unknown) {
         this.SET_LIVE_SCOPE('denied');
+        await this.handleOpenLiveManager();
         await this.handleOpenLiveManager();
         throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED', error as any);
       }
@@ -344,10 +345,32 @@ export class TikTokService
 
   /**
    * Confirm user is approved to stream to TikTok
+   *
+   */
+  /**
+   * Confirm user is approved to stream to TikTok
+   * @param testResponseValue - should only be used when running tests
+   * @returns fulfilled promise with platform call result
    */
   async validatePlatform(): Promise<EPlatformCallResult> {
     if (!this.userService.views.auth?.platforms['tiktok']) {
       return EPlatformCallResult.TikTokStreamScopeMissing;
+    }
+
+    // for test to show correct components for each scope
+    if (Utils.isTestMode()) {
+      switch (this.state.settings.liveScope) {
+        case 'approved':
+          return EPlatformCallResult.Success;
+        case 'legacy':
+          return EPlatformCallResult.Success;
+        case 'denied':
+          return EPlatformCallResult.TikTokScopeOutdated;
+        case 'not-approved':
+          return EPlatformCallResult.TikTokStreamScopeMissing;
+        default:
+          return EPlatformCallResult.TikTokStreamScopeMissing;
+      }
     }
 
     try {
@@ -366,13 +389,9 @@ export class TikTokService
         }
       } else if (
         status?.info &&
-        (!status?.reason || status?.reason !== ETikTokLiveScopeReason.DENIED)
+        (!status?.reason || status?.reason === ETikTokLiveScopeReason.DENIED)
       ) {
         this.SET_LIVE_SCOPE('denied');
-        return EPlatformCallResult.TikTokScopeOutdated;
-      } else {
-        this.SET_LIVE_SCOPE('not-approved');
-        return EPlatformCallResult.TikTokStreamScopeMissing;
       }
 
       // clear any leftover server url or stream key
@@ -390,7 +409,7 @@ export class TikTokService
     } catch (e: unknown) {
       console.warn(this.getErrorMessage(e));
       this.SET_LIVE_SCOPE('denied');
-      return EPlatformCallResult.TikTokStreamScopeMissing;
+      return EPlatformCallResult.TikTokScopeOutdated;
     }
   }
 
@@ -462,17 +481,14 @@ export class TikTokService
    * prepopulate channel info and save it to the store
    */
   async prepopulateInfo(): Promise<void> {
-    // skip validation call when running tests
-    if (Utils.isTestMode()) {
-      this.SET_PREPOPULATED(true);
-      return;
-    }
-
     // fetch user live access status
     const status = await this.validatePlatform();
-    this.usageStatisticsService.recordAnalyticsEvent('TikTokLiveAccess', {
-      status: this.scope,
-    });
+
+    if (!Utils.isTestMode()) {
+      this.usageStatisticsService.recordAnalyticsEvent('TikTokLiveAccess', {
+        status: this.scope,
+      });
+    }
 
     console.debug('TikTok stream status: ', status);
 
@@ -573,6 +589,9 @@ export class TikTokService
       }
       case ETikTokLiveScopeReason.APPROVED_OBS: {
         return 'legacy';
+      }
+      case ETikTokLiveScopeReason.DENIED: {
+        return 'denied';
       }
       default:
         return 'denied';

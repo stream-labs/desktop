@@ -37,6 +37,11 @@ export interface ITikTokLiveScopeResponse {
 
 export interface ITikTokGamesData extends ITikTokLiveScopeResponse {
   categories: ITikTokGame[];
+  platform: TPlatform | string;
+  reason: ETikTokLiveScopeReason;
+  can_be_live?: boolean;
+  user?: ITikTokUserData;
+  info?: any[] | null[] | undefined[] | ITikTokGame[] | ITikTokGamesData | any;
 }
 
 interface ITikTokGame {

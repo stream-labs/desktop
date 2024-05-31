@@ -1,4 +1,9 @@
-import { TExecutionContext, test, useWebdriver } from '../../helpers/webdriver';
+import {
+  TExecutionContext,
+  skipCheckingErrorsInLog,
+  test,
+  useWebdriver,
+} from '../../helpers/webdriver';
 import { logIn } from '../../helpers/modules/user';
 import {
   clickGoLive,
@@ -12,7 +17,7 @@ import { addDummyAccount, releaseUserInPool } from '../../helpers/webdriver/user
 import { fillForm, readFields } from '../../helpers/modules/forms';
 import { IDummyTestUser } from '../../data/dummy-accounts';
 import { TTikTokLiveScopeTypes } from 'services/platforms/tiktok/api';
-import { waitForDisplayed } from '../../helpers/modules/core';
+import { isDisplayed, waitForDisplayed } from '../../helpers/modules/core';
 
 useWebdriver();
 
@@ -66,6 +71,14 @@ async function testLiveScope(t: TExecutionContext, scope: TTikTokLiveScopeTypes)
   const user: IDummyTestUser = await addDummyAccount('tiktok', { tiktokLiveScope: scope });
 
   await clickGoLive();
+
+  // denied scope should show prompt to remerge TikTok account
+  if (scope === 'denied') {
+    skipCheckingErrorsInLog();
+    t.true(await isDisplayed('div=Failed to update TikTok account', { timeout: 1000 }));
+    return;
+  }
+
   await waitForSettingsWindowLoaded();
 
   await fillForm({
