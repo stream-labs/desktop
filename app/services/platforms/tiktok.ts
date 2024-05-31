@@ -431,6 +431,10 @@ export class TikTokService
    * show live approval status.
    */
   async searchGames(searchString: string): Promise<IGame[]> {
+    if (searchString.toLowerCase() === 'other') {
+      return Promise.resolve([this.defaultGame]);
+    }
+
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/tiktok/info?category=${searchString}`;
     const headers = authorizedHeaders(this.userService.apiToken);
