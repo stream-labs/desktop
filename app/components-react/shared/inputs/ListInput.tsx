@@ -20,6 +20,7 @@ const ANT_SELECT_FEATURES = [
   'allowClear',
   'defaultActiveFirstOption',
   'listHeight',
+  'filterOption',
 ] as const;
 
 // define custom props
@@ -96,6 +97,7 @@ export const ListInput = InputComponent(<T extends any>(p: TListInputProps<T>) =
         optionLabelProp="labelrender"
         onSearch={p.showSearch ? onSearchHandler : undefined}
         onChange={val => p.onChange && p.onChange(val as T)}
+        onSelect={p.onSelect}
         defaultValue={p.defaultValue as string}
         getPopupContainer={getPopupContainer}
         data-value={inputAttrs.value}

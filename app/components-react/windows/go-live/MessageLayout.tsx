@@ -4,6 +4,9 @@ import { errorTypes, IStreamError } from '../../../services/streaming/stream-err
 import { $t } from '../../../services/i18n';
 import { Alert } from 'antd';
 import cx from 'classnames';
+import { EDismissable } from 'services/dismissables';
+import { Services } from '../../service-provider';
+import { useVuex } from 'components-react/hooks';
 
 interface IMessageLayoutProps {
   error?: IStreamError;
@@ -13,6 +16,9 @@ interface IMessageLayoutProps {
   message?: string;
   type?: 'error' | 'success' | 'info' | 'warning';
   hasButton?: boolean;
+  closable?: boolean;
+  onClose?: () => void;
+  dismissableKey?: EDismissable;
 }
 
 /**
@@ -20,6 +26,15 @@ interface IMessageLayoutProps {
  */
 export default function MessageLayout(p: IMessageLayoutProps & HTMLAttributes<unknown>) {
   const [isErrorDetailsShown, setDetailsShown] = useState(false);
+
+  const { shouldShow } = useVuex(() => ({
+    shouldShow: p?.dismissableKey
+      ? Services.DismissablesService.views.shouldShow(p?.dismissableKey)
+      : true,
+  }));
+
+  if (!shouldShow) return <></>;
+
   const error = p.error;
   const details = error?.details;
   const type = error ? 'error' : p.type;
@@ -29,7 +44,14 @@ export default function MessageLayout(p: IMessageLayoutProps & HTMLAttributes<un
   function render() {
     return (
       <div className={styles.container}>
-        <Alert type={type} message={message} showIcon description={renderDescription()} />
+        <Alert
+          type={type}
+          message={message}
+          showIcon
+          description={renderDescription()}
+          closable={p?.closable}
+          onClose={p?.onClose}
+        />
       </div>
     );
   }
