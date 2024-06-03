@@ -27,14 +27,6 @@ export enum ETikTokLiveScopeReason {
 
 export type TTikTokLiveScopeTypes = 'approved' | 'not-approved' | 'legacy' | 'denied';
 
-export interface ITikTokUserInfoResponse {
-  data: {
-    user: {
-      username: string;
-    };
-  };
-}
-
 export interface ITikTokLiveScopeResponse {
   platform: TPlatform | string;
   reason: ETikTokLiveScopeReason;
@@ -43,12 +35,13 @@ export interface ITikTokLiveScopeResponse {
   info?: any[] | null[] | undefined[] | ITikTokGame[] | ITikTokGamesData | any;
 }
 
-export interface ITikTokGamesData {
+export interface ITikTokGamesData extends ITikTokLiveScopeResponse {
+  categories: ITikTokGame[];
   platform: TPlatform | string;
-  info: {
-    categories: ITikTokGame[];
-  };
   reason: ETikTokLiveScopeReason;
+  can_be_live?: boolean;
+  user?: ITikTokUserData;
+  info?: any[] | null[] | undefined[] | ITikTokGame[] | ITikTokGamesData | any;
 }
 
 interface ITikTokGame {

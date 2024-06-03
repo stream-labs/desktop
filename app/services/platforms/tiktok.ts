@@ -2,6 +2,7 @@ import { InheritMutations, Inject, mutation } from '../core';
 import { BasePlatformService } from './base-platform';
 import {
   EPlatformCallResult,
+  IGame,
   IPlatformRequest,
   IPlatformService,
   IPlatformState,
@@ -23,6 +24,7 @@ import {
   ITikTokLiveScopeResponse,
   ITikTokStartStreamResponse,
   TTikTokLiveScopeTypes,
+  ITikTokGamesData,
 } from './tiktok/api';
 import { I18nService } from 'services/i18n';
 import { getDefined } from 'util/properties-type-guards';
@@ -36,6 +38,7 @@ interface ITikTokServiceState extends IPlatformState {
   broadcastId: string;
   username: string;
   error?: string | null;
+  gameName: string;
 }
 
 interface ITikTokStartStreamSettings {
@@ -43,6 +46,7 @@ interface ITikTokStartStreamSettings {
   streamKey: string;
   title: string;
   liveScope: TTikTokLiveScopeTypes;
+  game: string;
   display: TDisplayType;
   video?: IVideo;
   mode?: TOutputOrientation;
@@ -53,6 +57,7 @@ export interface ITikTokStartStreamOptions {
   serverUrl: string;
   streamKey: string;
   display: TDisplayType;
+  game: string;
 }
 interface ITikTokRequestHeaders extends Dictionary<string> {
   Accept: string;
@@ -73,9 +78,11 @@ export class TikTokService
       mode: 'portrait',
       serverUrl: '',
       streamKey: '',
+      game: '',
     },
     broadcastId: '',
     username: '',
+    gameName: '',
   };
 
   @Inject() windowsService: WindowsService;
@@ -108,6 +115,15 @@ export class TikTokService
   get liveStreamingEnabled(): boolean {
     const scope = this.state.settings?.liveScope ?? 'denied';
     return ['approved', 'legacy'].includes(scope);
+  }
+
+  // TODO: add logic to show rejected
+  get rejected(): boolean {
+    return false;
+  }
+
+  get defaultGame(): IGame {
+    return { id: 'tiktok-other', name: 'Other' };
   }
 
   /**
@@ -304,6 +320,10 @@ export class TikTokService
     body.append('title', opts.title);
     body.append('device_platform', getOS());
 
+    // pass an empty string for the 'Other' game option
+    const game = opts.game === this.defaultGame.id ? '' : opts.game;
+    body.append('category', game);
+
     const request = new Request(url, { headers, method: 'POST', body });
 
     return jfetch<ITikTokStartStreamResponse>(request);
@@ -427,6 +447,36 @@ export class TikTokService
   }
 
   /**
+   * Search for games
+   * @remark While this is the same endpoint for if a user can go live,
+   * the category parameter will only show category results, and will not
+   * show live approval status.
+   */
+  async searchGames(searchString: string): Promise<IGame[]> {
+    const host = this.hostsService.streamlabs;
+    const url = `https://${host}/api/v5/slobs/tiktok/info?category=${searchString}`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const request = new Request(url, { headers });
+
+    return jfetch<ITikTokGamesData>(request)
+      .then(async res => {
+        const games = await Promise.all(
+          res?.categories.map(g => ({ id: g.game_mask_id, name: g.full_name })),
+        );
+        games.push(this.defaultGame);
+        return games;
+      })
+      .catch(e => {
+        // return dummy game if running a test
+        if (Utils.isTestMode()) {
+          return [{ id: 'game1', name: 'test1' }, this.defaultGame];
+        }
+        console.error('Error fetching TikTok games: ', e);
+        return [];
+      });
+  }
+
+  /**
    * prepopulate channel info and save it to the store
    */
   async prepopulateInfo(): Promise<void> {
@@ -507,6 +557,18 @@ export class TikTokService
     return 'https://streamlabs.com/dashboard#/settings/account-settings/platforms';
   }
 
+  get guidelinesUrl(): string {
+    return 'https://www.tiktok.com/community-guidelines/en/community-principles';
+  }
+
+  get appealsUrl(): string {
+    return 'https://www.tiktok.com/community-guidelines/en/enforcement#3';
+  }
+
+  get confirmationUrl(): string {
+    return 'https://www.tiktok.com/falcon/live_g/live_access_pc_apply/result/index.html?id=GL6399433079641606942';
+  }
+
   get locale(): string {
     return I18nService.instance.state.locale;
   }
@@ -565,6 +627,10 @@ export class TikTokService
     this.SET_LIVE_SCOPE(scope);
   }
 
+  setGameName(gameName: string) {
+    this.SET_GAME_NAME(gameName);
+  }
+
   @mutation()
   SET_LIVE_SCOPE(scope: TTikTokLiveScopeTypes) {
     this.state.settings.liveScope = scope;
@@ -578,5 +644,10 @@ export class TikTokService
   @mutation()
   protected SET_USERNAME(username: string) {
     this.state.username = username;
+  }
+
+  @mutation()
+  protected SET_GAME_NAME(gameName: string = '') {
+    this.state.gameName = gameName;
   }
 }
