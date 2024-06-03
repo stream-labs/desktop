@@ -111,7 +111,7 @@ export const errorTypes = {
   },
   UNKNOWN_STREAMING_ERROR: {
     get message() {
-      return $t('Streaming to platform is temporarily not available');
+      return $t('Unknown error, please contact support');
     },
     get action() {
       return $t(
