@@ -227,6 +227,8 @@ function getHashForRecentEvent(event: IRecentEvent) {
       return [event.type, event.name, event.message].join(':');
     case 'sticker':
       return [event.name, event.type, event.currency].join(':');
+    case 'raid':
+      return [event.type, event.name, event.from].join(':');
     case 'subscription':
       return [event.type, event.name.toLowerCase(), event.message].join(':');
     case 'superchat':
@@ -262,6 +264,7 @@ const SUPPORTED_EVENTS = [
   'sticker',
   'effect',
   'like',
+  'raid',
   'stars',
   'support',
   'share',
@@ -285,6 +288,7 @@ class RecentEventsViews extends ViewHandler<IRecentEventsState> {
       subscription: this.getSubString(event),
       // Twitch
       bits: $t('has used'),
+      raid: $t('has raided you with a party of %{viewers}', { viewers: event.raiders }),
       // Mixer
       sticker: $t('has used %{skill} for', { skill: event.skill }),
       effect: $t('has used %{skill} for', { skill: event.skill }),

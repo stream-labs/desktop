@@ -485,7 +485,9 @@ function getVariationsMetadata() {
     },
     twFollow: {},
     fbFollow: {},
-    twHost: {},
+    twRaid: {
+      message_template: getMessageTemplateMetadata('twRaid'),
+    },
     twSubscription: {},
     twCheer: {
       message_template: getMessageTemplateMetadata('twCheer'),
@@ -560,6 +562,13 @@ function getMessageTemplateMetadata(alert?: TAlertType) {
       break;
     case 'merch':
       tooltipTokens = '{name}, {product}';
+      break;
+    case 'twRaid':
+      tooltipTokens =
+        ' {name} ' +
+        $t('The name of the streamer raiding you') +
+        ', {amount} ' +
+        $t('The number of viewers who joined the raid');
       break;
   }
 
