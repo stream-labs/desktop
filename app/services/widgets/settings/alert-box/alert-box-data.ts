@@ -19,6 +19,7 @@ export const API_NAME_MAP = {
   follow: 'follows',
   superheart: 'superhearts',
   fanfunding: 'fanfunding',
+  raid: 'raids',
   subscriber: 'subscribers', // YouTube
   sponsor: 'sponsors',
   facebook_support_gifter: 'giftSupport',
@@ -50,6 +51,7 @@ export const alertNameMap = () => ({
   superhearts: $t('Super Hearts'),
   fanfunding: $t('Super Chat'),
   sponsors: $t('Members'),
+  raids: $t('Raids'),
   subscribers: $t('Subscribers'), // YouTube
   stars: $t('Stars'),
   support: $t('Support'),
@@ -111,6 +113,7 @@ export const conditions = () => ({
     { value: 'MIN_BITS_USED', title: $t('Bits used is at least <amount>') },
     { value: 'EXACT_BITS_USED', title: $t('Bits used is exactly <amount>') },
   ],
+  raids: [{ value: 'MIN_RAIDERS_ACQUIRED', title: $t('Raid party size is at least <raiders>') }],
   sponsors: [
     { value: 'MIN_MONTHS_SPONSORED', title: $t('Months as a member is at least <months>') },
   ],
@@ -259,6 +262,7 @@ const DEFAULT_ALERT_FORMATS = {
   superhearts: '{name} gifted {style} worth {amount} coins!',
   fanfunding: '{name} has just donated {amount} through Super Chat!',
   subscribers: '{name} just subscribed!', // YouTube
+  raids: '{name} is raiding with a party of {count}!',
   sponsors: '{name} has sponsored you {months} months in a row!',
   support: '{name} has supported for {months} months!',
   likes: '{name} has liked!',

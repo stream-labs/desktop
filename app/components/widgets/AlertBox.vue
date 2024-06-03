@@ -318,7 +318,7 @@
       <v-form-group
         v-model="minTriggerAmount"
         :metadata="metadata.minTriggerAmount"
-        v-if="['donations', 'bits'].includes(selectedAlert)"
+        v-if="['donations', 'raids', 'bits'].includes(selectedAlert)"
       />
       <v-form-group
         v-model="minRecentEvents"

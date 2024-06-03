@@ -48,6 +48,7 @@ test('Streaming to TikTok', async t => {
   await fillForm({
     title: 'Test stream',
     twitchGame: 'Fortnite',
+    tiktokGame: 'test1',
   });
   await submit();
   await waitForDisplayed('span=Update settings for TikTok');
