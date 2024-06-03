@@ -232,7 +232,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       show: false,
       webPreferences: {
         nodeIntegration: false,
-        //nativeWindowOpen: true,
         sandbox: true,
       },
     });

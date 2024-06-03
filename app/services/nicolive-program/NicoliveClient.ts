@@ -531,7 +531,6 @@ export class NicoliveClient {
       webPreferences: {
         nodeIntegration: false,
         nodeIntegrationInWorker: false,
-        //nativeWindowOpen: true,
       },
     });
     win.removeMenu();
@@ -604,7 +603,6 @@ export class NicoliveClient {
       webPreferences: {
         nodeIntegration: false,
         nodeIntegrationInWorker: false,
-        //nativeWindowOpen: true,
       },
     });
     win.removeMenu();

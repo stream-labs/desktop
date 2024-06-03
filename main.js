@@ -468,7 +468,6 @@ function initialize(crashHandler) {
         nodeIntegration: true,
         webviewTag: true,
         contextIsolation: false,
-        worldSafeExecuteJavaScript: false,
       },
     });
 
@@ -541,7 +540,6 @@ function initialize(crashHandler) {
       webPreferences: {
         nodeIntegration: true,
         contextIsolation: false,
-        worldSafeExecuteJavaScript: false,
       },
     });
 
