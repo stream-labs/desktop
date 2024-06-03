@@ -205,10 +205,12 @@ export class SourcesNode extends Node<ISchema, {}> {
       if (supportedSources.includes(source.type)) {
         this.data.items.push(source);
       } else {
-        console.log("Removed the source with id: '%s', name: '%s', and type: '%s' from the scene because it is not suppported"
-          ,source.id
-          ,source.name
-          ,source.type);
+        console.log(
+          "Removed the source with id: '%s', name: '%s', and type: '%s' from the scene because it is not suppported",
+          source.id,
+          source.name,
+          source.type,
+        );
         removed = true;
       }
     });
