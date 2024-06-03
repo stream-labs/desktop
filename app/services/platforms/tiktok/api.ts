@@ -1,3 +1,4 @@
+import { $t } from 'services/i18n';
 import { TPlatform } from '..';
 
 export type TTikTokScope =
@@ -35,10 +36,24 @@ export interface ITikTokUserInfoResponse {
 }
 
 export interface ITikTokLiveScopeResponse {
-  can_be_live: boolean;
-  reason: ETikTokLiveScopeReason;
   platform: TPlatform | string;
-  user: ITikTokUserData;
+  reason: ETikTokLiveScopeReason;
+  can_be_live?: boolean;
+  user?: ITikTokUserData;
+  info?: any[] | null[] | undefined[] | ITikTokGame[] | ITikTokGamesData | any;
+}
+
+export interface ITikTokGamesData {
+  platform: TPlatform | string;
+  info: {
+    categories: ITikTokGame[];
+  };
+  reason: ETikTokLiveScopeReason;
+}
+
+interface ITikTokGame {
+  full_name: string;
+  game_mask_id: string;
 }
 
 export interface ITikTokUserData {
@@ -84,3 +99,17 @@ export interface ITikTokStartStreamResponse {
 export interface ITikTokEndStreamResponse {
   success: boolean;
 }
+
+export const tiktokErrorMessages = (error: string) => {
+  return {
+    TIKTOK_OAUTH_EXPIRED: $t('tiktokReAuthError'),
+    TIKTOK_GENERATE_CREDENTIALS_FAILED: $t(
+      'Failed to generate TikTok stream credentials. Confirm Live Access with TikTok.',
+    ),
+    TIKTOK_STREAM_SCOPE_MISSING: $t('Your TikTok account is not enabled for live streaming.'),
+    TIKTOK_SCOPE_OUTDATED: $t(
+      'Failed to update TikTok account. Please unlink and reconnect your TikTok account.',
+    ),
+    TIKTOK_STREAM_ACTIVE: $t('You are already live on a another device'),
+  }[error];
+};

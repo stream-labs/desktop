@@ -8,9 +8,12 @@ import styles from './FreshOrImport.m.less';
 import commonStyles from './Common.m.less';
 import ObsSvg from './ObsSvg';
 import { OnboardingModule } from './Onboarding';
+import PlatformLogo from 'components-react/shared/PlatformLogo';
+import { Services } from 'components-react/service-provider';
 
 export function FreshOrImport() {
-  const { setImportFromObs, next } = useModule(OnboardingModule);
+  const { setImportFromObs, next, setImportFromTwitch } = useModule(OnboardingModule);
+  const { TwitchStudioImporterService } = Services;
 
   const optionsMetadata = [
     {
@@ -22,6 +25,16 @@ export function FreshOrImport() {
       image: <ObsSvg />,
       onClick: () => {
         setImportFromObs();
+        next();
+      },
+    },
+    {
+      title: $t('Import from Twitch Studio'),
+      color: '--twitch',
+      description: $t('Import your scenes and sources from Twitch Studio.'),
+      image: <PlatformLogo platform="twitch" size={150} />,
+      onClick: async () => {
+        setImportFromTwitch();
         next();
       },
     },
@@ -43,7 +56,7 @@ export function FreshOrImport() {
         <img src={$i('images/onboarding/splash.png')} />
       </div>
       <div className={styles.contentContainer}>
-        <h1 className={styles.title}>{$t('1-Click Import from OBS')}</h1>
+        <h1 className={styles.title}>{$t('1-Click Import')}</h1>
         <div className={styles.optionContainer}>
           {optionsMetadata.map(data => (
             <Tooltip title={data.description} placement="bottom" key={data.title}>

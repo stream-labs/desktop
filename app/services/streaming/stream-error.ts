@@ -115,7 +115,7 @@ export const errorTypes = {
     },
     get action() {
       return $t(
-        'request rejected by streaming platform. Confirm streaming approval status and output settings',
+        'request rejected by streaming platform. Confirm go live settings, streaming approval status and output settings',
       );
     },
   },

@@ -35,6 +35,7 @@ interface ITikTokServiceState extends IPlatformState {
   settings: ITikTokStartStreamSettings;
   broadcastId: string;
   username: string;
+  error?: string | null;
 }
 
 interface ITikTokStartStreamSettings {
@@ -68,7 +69,7 @@ export class TikTokService
     settings: {
       title: '',
       display: 'vertical',
-      liveScope: 'denied',
+      liveScope: 'not-approved',
       mode: 'portrait',
       serverUrl: '',
       streamKey: '',
@@ -149,10 +150,12 @@ export class TikTokService
       try {
         streamInfo = await this.startStream(ttSettings);
         if (!streamInfo?.id) {
+          await this.handleOpenLiveManager();
           throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED');
         }
       } catch (error: unknown) {
         this.SET_LIVE_SCOPE('denied');
+        await this.handleOpenLiveManager();
         throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED', error as any);
       }
 
@@ -179,7 +182,9 @@ export class TikTokService
 
   async afterGoLive(): Promise<void> {
     // open url if stream successfully started
-    await this.handleOpenLiveManager();
+    if (this.scope === 'approved') {
+      await this.handleOpenLiveManager();
+    }
   }
 
   async afterStopStream(): Promise<void> {
@@ -298,6 +303,7 @@ export class TikTokService
     const body = new FormData();
     body.append('title', opts.title);
     body.append('device_platform', getOS());
+
     const request = new Request(url, { headers, method: 'POST', body });
 
     return jfetch<ITikTokStartStreamResponse>(request);
@@ -318,13 +324,39 @@ export class TikTokService
 
   /**
    * Confirm user is approved to stream to TikTok
+   *
+   */
+  /**
+   * Confirm user is approved to stream to TikTok
+   * @param testResponseValue - should only be used when running tests
+   * @returns fulfilled promise with platform call result
    */
   async validatePlatform(): Promise<EPlatformCallResult> {
+    if (!this.userService.views.auth?.platforms['tiktok']) {
+      return EPlatformCallResult.TikTokStreamScopeMissing;
+    }
+
+    // for test to show correct components for each scope
+    if (Utils.isTestMode()) {
+      switch (this.state.settings.liveScope) {
+        case 'approved':
+          return EPlatformCallResult.Success;
+        case 'legacy':
+          return EPlatformCallResult.Success;
+        case 'denied':
+          return EPlatformCallResult.TikTokScopeOutdated;
+        case 'not-approved':
+          return EPlatformCallResult.TikTokStreamScopeMissing;
+        default:
+          return EPlatformCallResult.TikTokStreamScopeMissing;
+      }
+    }
+
     try {
       const response = await this.fetchLiveAccessStatus();
       const status = response as ITikTokLiveScopeResponse;
 
-      if (status?.reason) {
+      if (status?.user) {
         const scope = this.convertScope(status.reason);
         this.SET_USERNAME(status.user.username);
         this.SET_LIVE_SCOPE(scope);
@@ -334,8 +366,15 @@ export class TikTokService
         if (scope === 'denied') {
           return EPlatformCallResult.TikTokScopeOutdated;
         }
-      } else {
+      } else if (
+        status?.info &&
+        (!status?.reason || status?.reason === ETikTokLiveScopeReason.DENIED)
+      ) {
         this.SET_LIVE_SCOPE('denied');
+        return EPlatformCallResult.TikTokScopeOutdated;
+      } else {
+        this.SET_LIVE_SCOPE('not-approved');
+        return EPlatformCallResult.TikTokStreamScopeMissing;
       }
 
       // clear any leftover server url or stream key
@@ -353,7 +392,7 @@ export class TikTokService
     } catch (e: unknown) {
       console.warn(this.getErrorMessage(e));
       this.SET_LIVE_SCOPE('denied');
-      return EPlatformCallResult.TikTokStreamScopeMissing;
+      return EPlatformCallResult.TikTokScopeOutdated;
     }
   }
 
@@ -369,26 +408,36 @@ export class TikTokService
     const url = `https://${host}/api/v5/slobs/tiktok/info`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
-    return jfetch<ITikTokError>(request).catch(() => {
-      console.warn('Error fetching TikTok Live Access status.');
-    });
+    return jfetch<ITikTokLiveScopeResponse | ITikTokError>(request)
+      .then(async res => {
+        // prevent error from unresolved promises in array
+        const scopeData = res as ITikTokLiveScopeResponse;
+        if (scopeData?.info) {
+          const info = await Promise.all(scopeData?.info.map((category: any) => category));
+          return {
+            ...scopeData,
+            info,
+          };
+        }
+        return res;
+      })
+      .catch(() => {
+        console.warn('Error fetching TikTok Live Access status.');
+      });
   }
 
   /**
    * prepopulate channel info and save it to the store
    */
   async prepopulateInfo(): Promise<void> {
-    // skip validation call when running tests
-    if (Utils.isTestMode()) {
-      this.SET_PREPOPULATED(true);
-      return;
-    }
-
     // fetch user live access status
     const status = await this.validatePlatform();
-    this.usageStatisticsService.recordAnalyticsEvent('TikTokLiveAccess', {
-      status: this.scope,
-    });
+
+    if (!Utils.isTestMode()) {
+      this.usageStatisticsService.recordAnalyticsEvent('TikTokLiveAccess', {
+        status: this.scope,
+      });
+    }
 
     console.debug('TikTok stream status: ', status);
 
@@ -478,16 +527,23 @@ export class TikTokService
       case ETikTokLiveScopeReason.APPROVED_OBS: {
         return 'legacy';
       }
+      case ETikTokLiveScopeReason.DENIED: {
+        return 'denied';
+      }
       default:
         return 'denied';
     }
   }
 
-  async handleOpenLiveManager(): Promise<void> {
+  async handleOpenLiveManager(visible?: true): Promise<void | boolean> {
     // no need to open window for tests
-    if (Utils.isTestMode()) return;
+    // but confirm the function has run
+    if (Utils.isTestMode()) return true;
 
-    if (!this.liveStreamingEnabled) return;
+    if (visible) {
+      await remote.shell.openExternal(this.dashboardUrl);
+      return;
+    }
 
     // keep main window on top to prevent flicker when opening url
     const win = Utils.getMainWindow();

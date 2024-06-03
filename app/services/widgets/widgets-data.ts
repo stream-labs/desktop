@@ -90,14 +90,6 @@ export const WidgetTesters: IWidgetTester[] = [
     platforms: ['twitch'],
   },
   {
-    name: 'Host',
-    type: 'hosts',
-    url(host, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/host`;
-    },
-    platforms: ['twitch'],
-  },
-  {
     name: 'Super Chat',
     url(host, platform) {
       return `https://${host}/api/v5/slobs/test/${platform}_account/superchat`;
@@ -490,7 +482,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     description: $t('Thanks viewers with notification popups.'),
     demoVideo: false,
     demoFilename: 'source-alertbox.png',
-    supportList: [$t('Donations'), $t('Subscriptions'), $t('Follows'), $t('Bits'), $t('Hosts')],
+    supportList: [$t('Donations'), $t('Subscriptions'), $t('Follows'), $t('Bits')],
     icon: 'icon-alert-box',
     shortDesc: $t('Dynamic, live alerts'),
   },
@@ -595,7 +587,6 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
       $t('Subscriptions'),
       $t('Follows'),
       $t('Bits'),
-      $t('Hosts'),
       $t('Redemptions'),
     ],
     icon: 'fas fa-th-list',
@@ -606,7 +597,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     description: $t('The jar that catches bits, tips, and more.'),
     demoVideo: false,
     demoFilename: 'source-jar.png',
-    supportList: [$t('Donations'), $t('Subscriptions'), $t('Follows'), $t('Bits'), $t('Hosts')],
+    supportList: [$t('Donations'), $t('Subscriptions'), $t('Follows'), $t('Bits')],
     icon: 'fas fa-beer',
   },
   [WidgetType.ViewerCount]: {
