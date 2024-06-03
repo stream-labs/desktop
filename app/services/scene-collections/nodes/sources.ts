@@ -199,7 +199,8 @@ export class SourcesNode extends Node<ISchema, {}> {
 	removeUnsupported(): boolean {
     const supportedSources = byOS({ [OS.Windows]: windowsSources, [OS.Mac]: macSources });
     const itemsCopy = this.data.items.slice();
-		let removed = false;
+    this.data.items = [];
+    let removed = false;
     itemsCopy.forEach(source => {
       if (supportedSources.includes(source.type)) {
         this.data.items.push(source);
