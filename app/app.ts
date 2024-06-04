@@ -26,7 +26,6 @@ import ChildWindow from 'components/windows/ChildWindow.vue';
 import OneOffWindow from 'components/windows/OneOffWindow.vue';
 import util from 'util';
 import * as obs from '../obs-api';
-import uuid from 'uuid/v4';
 import path from 'path';
 
 const crashHandler = window['require']('crash-handler');
@@ -35,7 +34,6 @@ const { ipcRenderer } = electron;
 
 import * as remote from '@electron/remote';
 
-const nAirVersion = remote.process.env.NAIR_VERSION;
 const isProduction = process.env.NODE_ENV === 'production';
 
 type SentryParams = {
@@ -61,16 +59,6 @@ if (isProduction) {
   sentryParam = Utils.isUnstable()
     ? { organization: sentryOrg, project: '5372801', key: '819e76e51864453aafd28c6d0473881f' } // crash-reporter-unstable
     : { organization: sentryOrg, project: '1520076', key: 'd965eea4b2254c2b9f38d2346fb8a472' }; // crash-reporter
-
-  electron.crashReporter.start({
-    productName: 'n-air-app',
-    companyName: 'n-air-app',
-    submitURL: getSentryCrashReportUrl(sentryParam),
-    extra: {
-      version: nAirVersion,
-      processType: 'renderer',
-    },
-  });
 }
 
 const SENTRY_SERVER_URL = getSentryCrashReportUrl(sentryParam);
