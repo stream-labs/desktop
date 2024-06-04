@@ -91,9 +91,7 @@ isUnskippable: ${this.updateState.isUnskippable}`);
     });
 
     autoUpdater.on('update-not-available', () => {
-      this.startApp();
-      this.finished = true;
-      this.browserWindow.close();
+      this.skipUpdateAndContinue();
     });
 
     autoUpdater.on('download-progress', progress => {
