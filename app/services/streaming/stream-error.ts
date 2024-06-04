@@ -111,11 +111,11 @@ export const errorTypes = {
   },
   UNKNOWN_STREAMING_ERROR: {
     get message() {
-      return $t('Streaming to platform is temporarily not available');
+      return $t('Unknown error, please contact support');
     },
     get action() {
       return $t(
-        'request rejected by streaming platform. Confirm streaming approval status and output settings',
+        'request rejected by streaming platform. Confirm go live settings, streaming approval status and output settings',
       );
     },
   },

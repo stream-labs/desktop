@@ -26,6 +26,7 @@ export default function ManageSceneCollections() {
     WindowsService,
     SceneCollectionsService,
     ObsImporterService,
+    TwitchStudioImporterService,
     MagicLinkService,
     NavigationService,
     UsageStatisticsService,
@@ -54,6 +55,10 @@ export default function ManageSceneCollections() {
 
   function importFromObs() {
     ObsImporterService.actions.import();
+  }
+
+  function importFromTwitch() {
+    TwitchStudioImporterService.actions.import();
   }
 
   function filteredCollections() {
@@ -108,15 +113,20 @@ export default function ManageSceneCollections() {
         <Content style={{ paddingLeft: '24px' }}>
           <div>{$t('Add New Scene Collection:')}</div>
           <div className={styles.buttonContainer}>
-            <button onClick={create} className={cx('button', styles.button)}>
+            <button onClick={create} className={cx('button', styles.button, styles.new)}>
               <i className="icon-stream-labels" />
               <strong>{$t('New')}</strong>
               <p>{$t('Start fresh and build from scratch')}</p>
             </button>
             <button onClick={importFromObs} className={cx('button', styles.button)}>
               <i className="icon-cloud-backup" />
-              <strong>{$t('Import')}</strong>
+              <strong>{$t('Import from OBS')}</strong>
               <p>{$t('Load existing scenes from OBS')}</p>
+            </button>
+            <button onClick={importFromTwitch} className={cx('button', styles.button)}>
+              <i className="icon-twitch" />
+              <strong>{$t('Import from Twitch')}</strong>
+              <p>{$t('Load existing scenes from Twitch Studio')}</p>
             </button>
             <button
               disabled={!isLoggedIn}
