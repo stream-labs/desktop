@@ -5,6 +5,7 @@ const { autoUpdater } = require('electron-updater');
 const { app, BrowserWindow, ipcMain } = require('electron');
 const semver = require('semver');
 const path = require('path');
+const electron = require('electron');
 
 class Updater {
   // startApp is a callback that will start the app.  Ideally this
@@ -36,9 +37,11 @@ class Updater {
   }
 
   async skipUpdateAndContinue() {
-    await this.startApp();
+    // Closing the only window would normally quit the app, so ensure it doesn't.
+    electron.app.once('will-quit', e => e.preventDefault());
     this.finished = true;
     this.browserWindow.close();
+    await this.startApp();
   }
 
   // PRIVATE
