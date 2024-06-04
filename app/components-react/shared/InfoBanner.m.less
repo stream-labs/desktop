@@ -10,6 +10,12 @@
   font-style: normal;
   border-radius: 3px;
   height: 30px;
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    cursor: pointer;
+  }
 
   &.info {
     color: var(--info);
@@ -25,10 +31,15 @@
     margin-right: 10px;
   }
 
+  i.close {
+    margin-right: 0px;
+  }
+
   .message {
     flex-grow: 1;
     overflow: visible;
     text-wrap: wrap;
     line-break: auto;
+    line-height: normal;
   }
 }

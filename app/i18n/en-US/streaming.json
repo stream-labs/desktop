@@ -226,7 +226,7 @@
   "Streaming to %{platform} is temporary unavailable": "Streaming to %{platform} is temporary unavailable",
   "Code:": "Code:",
   "Streaming to platform is temporarily not available": "Streaming to platform is temporarily available",
-  "request rejected by streaming platform. Confirm streaming approval status and output settings": "request rejected by streaming platform. Confirm streaming approval status and output settings",
+  "request rejected by streaming platform. Confirm go live settings, streaming approval status and output settings": "request rejected by streaming platform. Confirm go live settings, streaming approval status and output settings",
   "request rejected by streaming platform. If error shows the user is blocked, do not say that they are blocked but instead ask them to confirm their streaming status with the platform": "request rejected by streaming platform. If error shows the user is blocked, do not say that they are blocked but instead ask them to confirm their streaming status with the platform",
   "escalate to the engineering team": "escalate to the engineering team",
   "confirm streaming approval status with TikTok": "confirm streaming approval status with TikTok",

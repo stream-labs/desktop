@@ -8,15 +8,14 @@ export type TAlertType =
   | 'twSubscription'
   | 'twFollow'
   | 'twCheer'
+  | 'twRaid'
   | 'fbFollow'
   | 'fbSupport'
   | 'fbStars'
   | 'fbLike'
   | 'fbShare'
   | 'fbSupportGift'
-  | 'twHost'
   | 'merch'
-  | 'twRaid'
   | 'ytMembership'
   | 'ytSubscriber'
   | 'ytSuperchat';
@@ -112,18 +111,6 @@ export function getAlertsConfig(
       platforms: ['twitch'],
       tooltip: $t('Plays an alert when a viewer sends a Cheer'),
       tooltipLink: 'https://help.twitch.tv/s/article/guide-to-cheering-with-bits',
-    },
-
-    twHost: {
-      name: $t('Host'),
-      type: 'twHost',
-      apiKey: 'host',
-      url() {
-        return `https://${host}/api/v5/slobs/test/twitch_account/host`;
-      },
-      platforms: ['twitch'],
-      tooltip: $t('Plays an alert when another streamer hosts your channel'),
-      tooltipLink: 'https://help.twitch.tv/s/article/how-to-use-host-mode',
     },
 
     twRaid: {

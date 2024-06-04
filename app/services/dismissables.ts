@@ -15,6 +15,7 @@ export enum EDismissable {
   NewSideNav = 'new_side_nav',
   CustomMenuSettings = 'custom_menu_settings',
   LoginPrompt = 'login_prompt',
+  TikTokRejected = 'tiktok_rejected',
 }
 
 interface IDismissablesServiceState {

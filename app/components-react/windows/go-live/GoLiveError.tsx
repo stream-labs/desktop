@@ -199,7 +199,6 @@ export default function GoLiveError() {
   function renderTikTokOAuthExpiredError(error: IStreamError) {
     // If error authenticating with TikTok, prompt re-login
     assertIsDefined(error.platform);
-    const platformName = getPlatformService(error.platform).displayName;
 
     return (
       <MessageLayout error={error} hasButton={true}>
@@ -236,21 +235,13 @@ export default function GoLiveError() {
 
   function renderTikTokScopeOutdatedError(error: IStreamError) {
     return (
-      <MessageLayout error={error}>
+      <MessageLayout type="info" message={$t('Failed to update TikTok account')}>
         <p>
-          {$t(
-            'Failed to update TikTok account. Please unlink and reconnect your TikTok account by following these steps:',
-          )}
+          {$t('Failed to update TikTok account. Please unlink and reconnect your TikTok account.')}
         </p>
-        <ol>
-          <li>
-            <Translate message="<unlink>Unlink here</unlink>">
-              <a slot="unlink" onClick={() => remote.shell.openExternal(TikTokService.mergeUrl)} />
-            </Translate>
-          </li>
-          <li>{$t('Close Streamlabs Desktop and reload')}</li>
-          <li>{$t('Go to Settings - Stream and reconnect TikTok')}</li>
-        </ol>
+        <Translate message="<unlink>Unlink here</unlink>">
+          <a slot="unlink" onClick={() => remote.shell.openExternal(TikTokService.mergeUrl)} />
+        </Translate>
       </MessageLayout>
     );
   }

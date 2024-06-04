@@ -488,7 +488,6 @@ function getVariationsMetadata() {
     twRaid: {
       message_template: getMessageTemplateMetadata('twRaid'),
     },
-    twHost: {},
     twSubscription: {},
     twCheer: {
       message_template: getMessageTemplateMetadata('twCheer'),
@@ -561,15 +560,15 @@ function getMessageTemplateMetadata(alert?: TAlertType) {
         ', {amount} ' +
         $t('The amount that was donated');
       break;
+    case 'merch':
+      tooltipTokens = '{name}, {product}';
+      break;
     case 'twRaid':
       tooltipTokens =
         ' {name} ' +
         $t('The name of the streamer raiding you') +
         ', {amount} ' +
         $t('The number of viewers who joined the raid');
-      break;
-    case 'merch':
-      tooltipTokens = '{name}, {product}';
       break;
   }
 
