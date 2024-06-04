@@ -25,6 +25,7 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
     switchCustomDestination,
     isPrimaryPlatform,
     isPlatformLinked,
+    isRestreamEnabled,
   } = useGoLiveSettings();
   // use these references to apply debounce
   // for error handling and switch animation
@@ -60,8 +61,42 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
   }
 
   function togglePlatform(platform: TPlatform, enabled: boolean) {
-    enabledPlatformsRef.current = enabledPlatformsRef.current.filter(p => p !== platform);
-    if (enabled) enabledPlatformsRef.current.push(platform);
+    // On non multistream mode, switch the platform that was just selected while disabling all the others,
+    // allow TikTok to be added as an extra platform
+    if (!isRestreamEnabled) {
+      /*
+       * If TikTok is the platform being toggled:
+       * - Preserve the currently active platform so TikTok can be added to this list at the bottom of this function,
+       *   we will have 2 active platforms and a Primary Chat switcher.
+       * - Remove TikTok from the list without removing the other active platform if we're disabling TikTok itself.
+       */
+      if (platform === 'tiktok') {
+        enabledPlatformsRef.current = enabled
+          ? enabledPlatformsRef.current
+          : enabledPlatformsRef.current.filter(platform => platform !== 'tiktok');
+      } else {
+        /*
+         * Clearing this list ensures that when a new platform is selected, instead of enabling 2 platforms
+         * we switch to 1 enabled platforms that was just toggled.
+         * We will also preserve TikTok as an active platform if it was before.
+         */
+        enabledPlatformsRef.current = enabledPlatformsRef.current.includes('tiktok')
+          ? ['tiktok']
+          : [];
+      }
+    } else {
+      enabledPlatformsRef.current = enabledPlatformsRef.current.filter(p => p !== platform);
+    }
+
+    if (enabled) {
+      enabledPlatformsRef.current.push(platform);
+    }
+
+    // Do not allow disabling the last platform
+    if (!enabledPlatformsRef.current.length) {
+      enabledPlatformsRef.current.push(platform);
+    }
+
     emitSwitch();
   }
 
@@ -73,17 +108,20 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
     emitSwitch(ind, enabled);
   }
 
+  // TODO: find a cleaner way to do this
+  const isPrimary = (platform: TPlatform) =>
+    isPrimaryPlatform(platform) || linkedPlatforms.length === 1;
+
   return (
-    <div className={styles.switchWrapper}>
+    <div>
       {linkedPlatforms.map(platform => (
         <DestinationSwitcher
           key={platform}
           destination={platform}
           enabled={isEnabled(platform)}
           onChange={enabled => togglePlatform(platform, enabled)}
-          isPrimary={isPrimaryPlatform(platform)}
           promptConnectTikTok={platform === 'tiktok' && promptConnectTikTok}
-          disabled={disableSwitchers && !isEnabled(platform)}
+          isPrimary={isPrimaryPlatform(platform)}
         />
       ))}
 
@@ -94,7 +132,6 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
           onChange={enabled => togglePlatform('tiktok', enabled)}
           isPrimary={isPrimaryPlatform('tiktok')}
           promptConnectTikTok={promptConnectTikTok}
-          disabled={disableSwitchers && !isEnabled('tiktok')}
         />
       )}
 
@@ -102,8 +139,8 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
         <DestinationSwitcher
           key={ind}
           destination={dest}
-          enabled={isEnabled(ind)}
-          onChange={enabled => toggleDest(ind, enabled)}
+          enabled={customDestinations[ind].enabled}
+          onChange={enabled => switchCustomDestination(ind, enabled)}
           disabled={disableSwitchers && !isEnabled(ind)}
         />
       ))}
@@ -130,18 +167,17 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
   const switchInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const platform = typeof p.destination === 'string' ? (p.destination as TPlatform) : null;
-  const { RestreamService, MagicLinkService, NavigationService, WindowsService } = Services;
+  const { RestreamService, MagicLinkService, StreamingService } = Services;
+  const canEnableRestream = RestreamService.views.canEnableRestream;
+  const cannotDisableDestination = p.isPrimary && !canEnableRestream;
+
+  // Preserving old TikTok functionality, so they can't enable the toggle if TikTok is not
+  // connected.
+  // TODO: this kind of logic should belong on caller, but ideally we would refactor all this
+  const tiktokDisabled =
+    platform === 'tiktok' && !StreamingService.views.isPlatformLinked('tiktok');
 
   function onClickHandler(ev: MouseEvent) {
-    if (p.isPrimary) {
-      alertAsync(
-        $t(
-          'You cannot disable the platform you used to sign in to Streamlabs Desktop. Please sign in with a different platform to disable streaming to this destination.',
-        ),
-      );
-      return;
-    }
-
     if (p.promptConnectTikTok) {
       alertAsync({
         type: 'confirm',
@@ -163,21 +199,25 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
       return;
     }
 
-    if (RestreamService.views.canEnableRestream || !p.promptConnectTikTok) {
-      const enable = !p.enabled;
-      p.onChange(enable);
-      // always proxy the click to the SwitchInput
-      // so it can play a transition animation
-      switchInputRef.current?.click();
-      // switch the container class without re-rendering to not stop the animation
-      if (enable) {
-        containerRef.current?.classList.remove(styles.platformDisabled);
-      } else {
-        containerRef.current?.classList.add(styles.platformDisabled);
-      }
+    const enable = !p.enabled;
+    p.onChange(enable);
+    // always proxy the click to the SwitchInput
+    // so it can play a transition animation
+    switchInputRef.current?.click();
+
+    /*
+     * TODO:
+     *   this causes inconsistent state when disabling primary platform
+     *   after is being re-enabled. Not sure which animation is referring to.
+     */
+    // switch the container class without re-rendering to not stop the animation
+    /*
+    if (enable) {
+      containerRef.current?.classList.remove(styles.platformDisabled);
     } else {
-      MagicLinkService.actions.linkToPrime('slobs-multistream');
+      containerRef.current?.classList.add(styles.platformDisabled);
     }
+    */
   }
 
   function addClass() {
@@ -205,12 +245,6 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
       const platformAuthData = UserService.state.auth?.platforms[platform];
       const username = platformAuthData?.username ?? '';
 
-      // Preserving old TikTok functionality, so they can't enable the toggle if TikTok is not
-      // connected.
-      // TODO: this kind of logic should belong on caller, but ideally we would refactor all this
-      const tiktokDisabled =
-        platform === 'tiktok' && !StreamingService.views.isPlatformLinked('tiktok');
-
       return {
         title: $t('Stream to %{platformName}', { platformName: service.displayName }),
         description: username,
@@ -222,7 +256,7 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
             inputRef={switchInputRef}
             value={p.enabled}
             name={platform}
-            disabled={p.isPrimary || tiktokDisabled}
+            disabled={tiktokDisabled}
             uncontrolled
           />
         ),
