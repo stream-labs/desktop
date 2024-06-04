@@ -55,7 +55,6 @@ export default function DualOutputPlatformSelector(p: IPlatformSelectorProps) {
               platform={platform as TPlatform}
               className={styles.selectorIcon}
               fontIcon={['tiktok', 'trovo'].includes(platform) ? platform : undefined}
-              nocolor
             />
             {platformLabels(platform)}
           </>
