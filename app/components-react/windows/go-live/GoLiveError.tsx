@@ -56,6 +56,8 @@ export default function GoLiveError() {
         return renderTikTokCredentialsFailedError(error);
       case 'TIKTOK_SCOPE_OUTDATED':
         return renderTikTokScopeOutdatedError(error);
+      case 'FACEBOOK_STREAMING_DISABLED':
+        return renderFacebookNotEligibleForStreamingError();
       case 'MACHINE_LOCKED':
         return renderMachineLockedError(error);
       default:
@@ -250,6 +252,26 @@ export default function GoLiveError() {
     return (
       <MessageLayout error={error}>
         {$t('You could try locking and unlocking your computer to fix this error.')}
+      </MessageLayout>
+    );
+  }
+
+  function renderFacebookNotEligibleForStreamingError() {
+    return (
+      <MessageLayout>
+        {$t(
+          "You're not eligible to Go Live, your profile needs to be at least 60 days old, or your page needs to have at least 100 followers",
+        )}
+        <Translate message="Learn more at <link></link>">
+          <a
+            slot="link"
+            onClick={() =>
+              remote.shell.openExternal(
+                'https://www.facebook.com/business/help/167417030499767?id=1123223941353904',
+              )
+            }
+          />
+        </Translate>
       </MessageLayout>
     );
   }

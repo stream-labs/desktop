@@ -385,9 +385,16 @@ export class FacebookService
         ? await platformRequest<T>('facebook', reqInfo, token)
         : await platformAuthorizedRequest<T>('facebook', reqInfo);
     } catch (e: unknown) {
-      const details = (e as any).result?.error
-        ? `${(e as any).result.error.type} ${(e as any).result.error.message}`
-        : 'Connection failed';
+      const ACCOUNT_NOT_OLD_ENOUGH = 1363120;
+      const NOT_ENOUGH_FOLLOWERS_FOR_PAGE = 1363144;
+      const notEligibleErrorCodes = [ACCOUNT_NOT_OLD_ENOUGH, NOT_ENOUGH_FOLLOWERS_FOR_PAGE];
+      const error = (e as any).result?.error;
+
+      if (error && notEligibleErrorCodes.includes(error.error_subcode)) {
+        throwStreamError('FACEBOOK_STREAMING_DISABLED', e);
+      }
+
+      const details = error ? `${error.type} ${error.message}` : 'Connection failed';
       throwStreamError('PLATFORM_REQUEST_FAILED', e as any, details);
     }
   }
