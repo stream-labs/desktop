@@ -33,7 +33,7 @@ export default function GoLiveError() {
 
     switch (type) {
       case 'PREPOPULATE_FAILED':
-        return renderPrepopulateError(error);
+        return handlePlatformRequestError(error);
       case 'PRIME_REQUIRED':
         return renderPrimeRequiredError();
       case 'TWITCH_MISSED_OAUTH_SCOPE':
@@ -70,6 +70,23 @@ export default function GoLiveError() {
     WindowsService.actions.closeChildWindow();
   }
 
+  function handlePlatformRequestError(error: IStreamError, message?: string) {
+    // show remerge/relogin component for certain Twitch and Trovo errors
+    if (
+      ['twitch', 'trovo', 'tiktok'].includes(error.platform as string) &&
+      error?.status &&
+      [401, 500].includes(error?.status)
+    ) {
+      const shouldRelogin =
+        error.platform === ('twitch' as TPlatform) &&
+        UserService.state.auth?.primaryPlatform === 'twitch';
+
+      return renderRemergeError(error, shouldRelogin, message);
+    }
+
+    return renderPrepopulateError(error, message);
+  }
+
   function renderPrepopulateError(error: IStreamError, message?: string) {
     assertIsDefined(error.platform);
     const platformName = getPlatformService(error.platform).displayName;
@@ -103,28 +120,35 @@ export default function GoLiveError() {
     );
   }
 
-  function renderTwitchMissedScopeError(error: IStreamError) {
-    // If primary platform, then ask to re-login
-    if (UserService.state.auth?.primaryPlatform === 'twitch') {
-      return renderPrepopulateError(error);
-    }
-
-    // If not primary platform than ask to connect platform again from SLOBS
+  function renderRemergeError(error: IStreamError, relogin: boolean = false, message?: string) {
     assertIsDefined(error.platform);
-    const platformName = getPlatformService(error.platform).displayName;
+    const mergeUrl = getPlatformService(error.platform).mergeUrl;
+    const platform = getPlatformService(error.platform).displayName;
+
+    const description =
+      message ?? relogin
+        ? $t('Failed to update %{platform} account. Please relogin to your %{platform} account.', {
+            platform,
+          })
+        : $t(
+            'Failed to update %{platform} account. Please unlink and reconnect your %{platform} account.',
+            { platform },
+          );
+
     return (
-      <MessageLayout
-        message={$t('Failed to fetch settings from %{platformName}', { platformName })}
-      >
-        <Translate message={$t('twitchMissedScopeError')}>
-          <button
-            slot="connectButton"
-            className="button button--twitch"
-            onClick={() => navigatePlatformMerge('twitch')}
-          />
+      <MessageLayout type="info" message={$t('Failed to update %{platform} account', { platform })}>
+        <p>{description}</p>
+        <Translate message="<unlink>Unlink here</unlink>">
+          <a slot="unlink" onClick={() => remote.shell.openExternal(mergeUrl)} />
         </Translate>
       </MessageLayout>
     );
+  }
+
+  function renderTwitchMissedScopeError(error: IStreamError) {
+    // If primary platform, then ask to re-login
+    const isPrimary = UserService.state.auth?.primaryPlatform === 'twitch';
+    return renderRemergeError(error, isPrimary);
   }
 
   function renderSettingsUpdateError(error: IStreamError) {
@@ -236,16 +260,7 @@ export default function GoLiveError() {
   }
 
   function renderTikTokScopeOutdatedError(error: IStreamError) {
-    return (
-      <MessageLayout type="info" message={$t('Failed to update TikTok account')}>
-        <p>
-          {$t('Failed to update TikTok account. Please unlink and reconnect your TikTok account.')}
-        </p>
-        <Translate message="<unlink>Unlink here</unlink>">
-          <a slot="unlink" onClick={() => remote.shell.openExternal(TikTokService.mergeUrl)} />
-        </Translate>
-      </MessageLayout>
-    );
+    return renderRemergeError(error);
   }
 
   function renderMachineLockedError(error: IStreamError) {
