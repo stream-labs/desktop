@@ -850,6 +850,10 @@ function initialize(crashHandler) {
     }
   });
 
+  ipcMain.on('mwOp', (e, key, a, b) => {
+    e.returnValue = mainWindow[key](a, b);
+  });
+
   ipcMain.handle('recollectUserSessionCookie', async () => {
     await recollectUserSessionCookie();
   });
