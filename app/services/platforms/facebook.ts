@@ -15,6 +15,10 @@ import { WindowsService } from '../windows';
 import { assertIsDefined, getDefined } from '../../util/properties-type-guards';
 import { TDisplayType } from 'services/settings-v2';
 import { TOutputOrientation } from 'services/restream';
+import { ENotificationType, NotificationsService } from '../notifications';
+import { $t } from '../i18n';
+import { Service } from '../core';
+import { JsonrpcService } from '../api/jsonrpc';
 
 interface IFacebookPage {
   access_token: string;
@@ -145,6 +149,8 @@ export class FacebookService
   implements IPlatformService {
   @Inject() protected hostsService: HostsService;
   @Inject() private windowsService: WindowsService;
+  @Inject() private notificationsService: NotificationsService;
+  @Inject() private jsonrpcService: JsonrpcService;
 
   readonly platform = 'facebook';
   readonly displayName = 'Facebook';
@@ -165,6 +171,13 @@ export class FacebookService
   authWindowOptions: Electron.BrowserWindowConstructorOptions = { width: 800, height: 800 };
 
   static initialState = initialState;
+
+  // TODO: not sure if JSONRPC we're doing with this allows static method, so keeping it as instance for now
+  openStreamIneligibleHelp() {
+    const FACEBOOK_STREAM_INELIGIBLE_HELP =
+      'https://www.facebook.com/business/help/216491699144904';
+    return remote.shell.openExternal(FACEBOOK_STREAM_INELIGIBLE_HELP);
+  }
 
   get views() {
     return new FacebookView(this.state);
@@ -385,9 +398,25 @@ export class FacebookService
         ? await platformRequest<T>('facebook', reqInfo, token)
         : await platformAuthorizedRequest<T>('facebook', reqInfo);
     } catch (e: unknown) {
-      const details = (e as any).result?.error
-        ? `${(e as any).result.error.type} ${(e as any).result.error.message}`
-        : 'Connection failed';
+      const ACCOUNT_NOT_OLD_ENOUGH = 1363120;
+      const NOT_ENOUGH_FOLLOWERS_FOR_PAGE = 1363144;
+      const notEligibleErrorCodes = [ACCOUNT_NOT_OLD_ENOUGH, NOT_ENOUGH_FOLLOWERS_FOR_PAGE];
+      const error = (e as any).result?.error;
+
+      if (error && notEligibleErrorCodes.includes(error.error_subcode)) {
+        // TODO: probably not a good idea to be pushing notifications from service code, again
+        this.notificationsService.push({
+          type: ENotificationType.WARNING,
+          message: $t('Your account is not eligible to stream on Facebook. Click to learn more'),
+          action: this.jsonrpcService.createRequest(
+            Service.getResourceId(this),
+            'openStreamIneligibleHelp',
+          ),
+        });
+        throwStreamError('FACEBOOK_STREAMING_DISABLED', e);
+      }
+
+      const details = error ? `${error.type} ${error.message}` : 'Connection failed';
       throwStreamError('PLATFORM_REQUEST_FAILED', e as any, details);
     }
   }
