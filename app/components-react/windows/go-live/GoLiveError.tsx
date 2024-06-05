@@ -144,6 +144,9 @@ export default function GoLiveError() {
             onClick={() => {
               if (error.platform === 'tiktok') {
                 remote.shell.openExternal(mergeUrl);
+              } else if (UserService.state.auth?.primaryPlatform === error.platform) {
+                WindowsService.actions.closeChildWindow();
+                UserService.actions.showLogin();
               } else {
                 navigatePlatformMerge(error.platform!);
               }
