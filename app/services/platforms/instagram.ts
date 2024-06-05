@@ -108,7 +108,7 @@ export class InstagramService
   }
 
   get liveDockEnabled(): boolean {
-    return false;
+    return this.streamingService.views.isMultiplatformMode;
   }
 
   // Reset stream key since Instagram decided they change for each stream

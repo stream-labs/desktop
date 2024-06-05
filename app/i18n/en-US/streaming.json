@@ -238,5 +238,6 @@
   "Failed to update %{platform} account. Please relogin to your %{platform} account.": "Failed to update %{platform} account. Please relogin to your %{platform} account.",
   "Failed to update %{platform} account. Please unlink and reconnect your %{platform} account.": "Failed to update %{platform} account. Please unlink and reconnect your %{platform} account.",
   "Failed to update %{platform} account": "Failed to update %{platform} account",
-  "<unlink>Unlink here</unlink>": "<unlink>Unlink here</unlink>"
+  "<unlink>Unlink here</unlink>": "<unlink>Unlink here</unlink>",
+  "Primary Chat": "Primary Chat"
 }

@@ -205,8 +205,8 @@ console.log(`Free: ${humanFileSize(os.freemem(), false)}`);
 console.log('=================================');
 
 app.on('ready', () => {
+  /* Load React DevTools in dev mode */
   if (process.env.NODE_ENV === 'development') {
-    console.log('in dev mode');
     const reactDevToolsPath = path.join(__dirname, 'vendor', 'react-devtools');
     session.defaultSession
       .loadExtension(reactDevToolsPath, { allowFileAccess: true })
