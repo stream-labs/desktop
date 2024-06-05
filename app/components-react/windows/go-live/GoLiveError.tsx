@@ -139,7 +139,16 @@ export default function GoLiveError() {
       <MessageLayout type="info" message={$t('Failed to update %{platform} account', { platform })}>
         <p>{description}</p>
         <Translate message="<unlink>Unlink here</unlink>">
-          <a slot="unlink" onClick={() => remote.shell.openExternal(mergeUrl)} />
+          <a
+            slot="unlink"
+            onClick={() => {
+              if (error.platform === 'tiktok') {
+                remote.shell.openExternal(mergeUrl);
+              } else {
+                navigatePlatformMerge(error.platform!);
+              }
+            }}
+          />
         </Translate>
       </MessageLayout>
     );
