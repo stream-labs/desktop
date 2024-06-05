@@ -18,6 +18,12 @@ export default function TitleBar(props: { windowId: string; className?: string }
   const isMaximizable = remote.getCurrentWindow().isMaximizable() !== false;
   const isMac = byOS({ [OS.Windows]: false, [OS.Mac]: true });
   const theme = useRealmObject(CustomizationService.state).theme;
+  const { title } = useVuex(
+    () => ({
+      title: WindowsService.state[props.windowId]?.title,
+    }),
+    false,
+  );
 
   const isDev = useMemo(() => Utils.isDevMode(), []);
 
@@ -67,7 +73,7 @@ export default function TitleBar(props: { windowId: string; className?: string }
         )}
         {primeTheme && !isMac && <KevinSvg className={styles.titlebarIcon} />}
         <div className={styles.titlebarTitle} onDoubleClick={maximize}>
-          {v.title}
+          {title}
         </div>
         {!isMac && (
           <div className={styles.titlebarActions}>
