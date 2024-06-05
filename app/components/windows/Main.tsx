@@ -23,29 +23,33 @@ export default class MainWindow extends TsxComponent {
     return this.$store.state.bulkLoadFinished && this.$store.state.i18nReady;
   }
 
-  get theme() {
-    if (this.$store.state.bulkLoadFinished) {
-      return this.customizationService.currentTheme;
-    }
+  theme = 'night-theme';
 
-    return loadedTheme() || 'night-theme';
-  }
+  unbind: () => void;
 
   mounted() {
+    this.unbind = this.customizationService.state.bindProps(this, {
+      theme: 'theme',
+    });
+  
     antdThemes[this.theme].use();
+  }
+
+  destroyed() {
+    this.unbind();
   }
 
   render() {
     return (
       <div style={{ height: '100%' }} className={this.theme}>
-        {this.uiReady && <Main />}
+        {/* {this.uiReady && <Main />}
         <transition name="loader">
-          {!this.uiReady && (
-            <div className={cx(styles.mainLoading, { [styles.initialLoading]: !this.uiReady })}>
+          {!this.uiReady && ( */}
+            <div className={cx(styles.mainLoading, this.theme, { [styles.initialLoading]: !this.uiReady })}>
               <Loader />
             </div>
-          )}
-        </transition>
+          {/* )}
+        </transition> */}
       </div>
     );
   }
