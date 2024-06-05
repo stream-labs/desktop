@@ -413,7 +413,7 @@ export class FacebookService
             'openStreamIneligibleHelp',
           ),
         });
-        throwStreamError('FACEBOOK_STREAMING_DISABLED', e);
+        throwStreamError('FACEBOOK_STREAMING_DISABLED', e as any);
       }
 
       const details = error ? `${error.type} ${error.message}` : 'Connection failed';
