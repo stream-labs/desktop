@@ -16,9 +16,10 @@ import { useVuex, useWatchVuex } from 'components-react/hooks';
 
 export function PrimaryPlatformSelect() {
   const { UserService, OnboardingService } = Services;
-  const { linkedPlatforms, isLogin } = useVuex(() => ({
+  const { linkedPlatforms, isLogin, isPrime } = useVuex(() => ({
     linkedPlatforms: UserService.views.linkedPlatforms,
     isLogin: OnboardingService.state.options.isLogin,
+    isPrime: UserService.state.isPrime,
   }));
   const { loading, authInProgress, authPlatform, finishSLAuth } = useModule(LoginModule);
   const platforms = ['twitch', 'youtube', 'facebook', 'twitter', 'tiktok', 'trovo'];
@@ -62,17 +63,22 @@ export function PrimaryPlatformSelect() {
 
   // There's probably a better way to do this
   useEffect(() => {
-    // If user has exactly one streaming platform linked, we can proceed straight
-    // to a logged in state.
-    if (UserService.views.linkedPlatforms.length === 1) {
+    /*
+     * Per new requirements, we automatically select a platform for the user since they
+     * are now able to switch them off from the Go Live window. This makes this component
+     * obsolete except for the case where the user has no linked accounts at all.
+     */
+    // TODO: we're still doing render side-effects here, which is not ideal
+    if (UserService.views.linkedPlatforms.length) {
       selectPrimary(UserService.views.linkedPlatforms[0]);
       return;
     }
 
+    // TODO: This is probably dead code now
     if (linkedPlatforms.length) {
       setSelectedPlatform(linkedPlatforms[0]);
     }
-  }, [linkedPlatforms.length]);
+  }, [linkedPlatforms.length, isPrime]);
 
   // You may be confused why this component doesn't ever call `next()` to
   // continue to the next step.  The index-based step system makes this more

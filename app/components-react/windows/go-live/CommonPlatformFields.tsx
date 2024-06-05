@@ -63,7 +63,6 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
       : p.platform === 'facebook';
 
   const user = Services.UserService.views;
-  const platform = user.auth?.platform?.type;
 
   const hasDescription = p.platform
     ? view.supports('description', [p.platform as TPlatform])
@@ -75,6 +74,17 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
   const title = hasDescription
     ? $t('Use different title and description')
     : $t('Use different title');
+
+  // determine max character length for title by enabled platform limitation
+  let maxCharacters = 120;
+  const enabledPlatforms = view.enabledPlatforms;
+  if (enabledPlatforms.includes('tiktok')) {
+    maxCharacters = 32;
+  } else if (enabledPlatforms.includes('youtube')) {
+    maxCharacters = 100;
+  } else if (enabledPlatforms.includes('twitch')) {
+    maxCharacters = 140;
+  }
 
   return (
     <div>
@@ -100,7 +110,7 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
               onChange={val => updateCommonField('title', val)}
               label={$t('Title')}
               required={true}
-              max={p.platform === 'twitch' ? 140 : 120}
+              max={maxCharacters}
             />
 
             {/*DESCRIPTION*/}

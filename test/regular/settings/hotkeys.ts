@@ -8,6 +8,7 @@ import {
   focusChild,
   focusMain,
   getNumElements,
+  isDisplayed,
   selectElements,
   waitForDisplayed,
 } from '../../helpers/modules/core';
@@ -25,13 +26,12 @@ useWebdriver();
 test('Populates essential hotkeys for them to be bound', async t => {
   const { app } = t.context;
 
-  await focusMain();
-  await (await app.client.$('.side-nav .icon-settings')).click();
+  await openHotkeySettings(t);
 
-  await focusChild();
-
-  await (await app.client.$('li=Hotkeys')).click();
-  await (await app.client.$('h2=Mic/Aux')).click();
+  t.true(await isDisplayed('h2=Mic/Aux'));
+  const micAuxKey = await app.client.$('h2=Mic/Aux');
+  await micAuxKey.waitForExist();
+  await micAuxKey.click();
 
   for (const hotkey of [
     'Start Streaming',
@@ -49,7 +49,7 @@ test('Populates essential hotkeys for them to be bound', async t => {
   ]) {
     const hotkeyLabel = await app.client.$(`label=${hotkey}`);
 
-    await t.true(await hotkeyLabel.isExisting(), `Hotkey for ${hotkey} was not found`);
+    t.true(await hotkeyLabel.isExisting(), `Hotkey for ${hotkey} was not found`);
   }
 });
 

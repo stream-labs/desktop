@@ -67,12 +67,15 @@ export function ThemeSelector() {
 
   usePromise(
     () => OnboardingService.actions.return.fetchThemes(),
+    // @ts-ignore typescript upgrade
     p => p.then(themes => setThemesMetadata(themes)),
   );
 
   return (
     <div style={{ width: '100%' }}>
-      <h1 className={commonStyles.titleContainer}>{$t('Add an Overlay')}</h1>
+      <h1 className={commonStyles.titleContainer} style={{ marginTop: '20px' }}>
+        {$t('Add an Overlay')}
+      </h1>
 
       {isPrime && (
         <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -132,7 +135,7 @@ export function ThemeSelector() {
         ) : (
           <div style={{ margin: 'auto', marginTop: 24, width: '80%' }}>
             <AutoProgressBar percent={progress} timeTarget={60 * 1000} />
-            <p>{$t('Installing theme...')}</p>
+            <p>{$t('Installing overlay...')}</p>
           </div>
         )}
       </div>

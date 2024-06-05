@@ -15,9 +15,19 @@ export default function PerformanceMetrics(props: {
   className?: string;
 }) {
   const { CustomizationService, PerformanceService } = Services;
+
   const pinnedStats = useRealmObject(CustomizationService.state.pinnedStatistics);
 
-  const stats = useRealmObject(PerformanceService.state);
+  const v = useVuex(
+    () => ({
+      cpuPercent: PerformanceService.views.cpuPercent,
+      frameRate: PerformanceService.views.frameRate,
+      droppedFrames: PerformanceService.views.droppedFrames,
+      percentDropped: PerformanceService.views.percentDropped,
+      bandwidth: PerformanceService.views.bandwidth,
+    }),
+    false,
+  );
 
   function showAttribute(attribute: string) {
     return props.mode === 'full' || pinnedStats[attribute];
@@ -38,14 +48,14 @@ export default function PerformanceMetrics(props: {
   }
 
   const metadata = {
-    cpu: { value: `${stats.cpuPercent}%`, label: $t('CPU'), icon: 'icon-cpu' },
-    fps: { value: stats.frameRateFixed, label: 'FPS', icon: 'icon-fps' },
+    cpu: { value: `${v.cpuPercent}%`, label: $t('CPU'), icon: 'icon-cpu' },
+    fps: { value: v.frameRate, label: 'FPS', icon: 'icon-fps' },
     droppedFrames: {
-      value: `${stats.droppedFrames} (${stats.percentDropped}%)`,
+      value: `${v.droppedFrames} (${v.percentDropped}%)`,
       label: $t('Dropped Frames'),
       icon: 'icon-dropped-frames',
     },
-    bandwidth: { value: stats.bandwidth, label: 'kb/s', icon: 'icon-bitrate' },
+    bandwidth: { value: v.bandwidth, label: 'kb/s', icon: 'icon-bitrate' },
   };
 
   const shownCells = ['cpu', 'fps', 'droppedFrames', 'bandwidth'].filter((val: string) =>

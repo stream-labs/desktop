@@ -64,7 +64,7 @@ interface ISceneCollectionInternalCreateOptions extends ISceneCollectionCreateOp
   /** A function that can be used to set up some state.
    * This should really only be used by the OBS importer.
    */
-  setupFunction?: () => boolean;
+  setupFunction?: () => boolean | Promise<boolean>;
 
   auto?: boolean;
 }
@@ -225,7 +225,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     await this.setActiveCollection(id);
     if (options.needsRename) this.stateService.SET_NEEDS_RENAME(id);
 
-    if (options.setupFunction && options.setupFunction()) {
+    if (options.setupFunction && (await options.setupFunction())) {
       // Do nothing
     } else {
       this.setupEmptyCollection();
@@ -569,16 +569,17 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   private async loadDataIntoApplicationState(data: string) {
     const root: RootNode = parse(data, NODE_TYPES);
 
-    // TODO: This is an edge case now that scene collections are segmented by OS
-    // Ideally we don't ever hit this.
-    if (!root.data.sources.isAllSupported()) {
-      const backupName = `${this.activeCollection?.name} - Backup`;
-
-      await this.duplicate(backupName);
+    // Since scene collections are already segmented by OS,
+    // the source code below which restored collections was
+    // triggered by incorrect reasons and its result confused users.
+    // Instead of that, now we will just remove unsuppported sources here.
+    if (root.data.sources.removeUnsupported()) {
+      // The underlying function already wrote all details to the log.
+      // Users will see a very basic information.
       await remote.dialog.showMessageBox(Utils.getMainWindow(), {
         title: 'Unsupported Sources',
         type: 'warning',
-        message: `The scene collection you are loading has sources that are not supported by your current operating system. These sources will be removed before loading the scene collection. A backup of this collection with the original sources preserved has been created with the name: ${backupName}`,
+        message: 'One or more scene items were removed because they are not supported',
       });
     }
 

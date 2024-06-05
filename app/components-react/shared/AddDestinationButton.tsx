@@ -24,6 +24,7 @@ export default function AddDestinationButton(p: IAddDestinationButtonProps) {
         MagicLinkService,
         UserService,
         UsageStatisticsService,
+        WebsocketService,
       } = Services;
 
       return {
@@ -33,8 +34,11 @@ export default function AddDestinationButton(p: IAddDestinationButtonProps) {
             SettingsService.actions.showSettings('Stream');
           } else if (isDualOutputMode) {
             // record dual output analytics event
-            UsageStatisticsService.recordAnalyticsEvent('DualOutput', {
-              type: 'UpgradeToUltra',
+            const ultraSubscription = WebsocketService.ultraSubscription.subscribe(() => {
+              UsageStatisticsService.recordAnalyticsEvent('DualOutput', {
+                type: 'UpgradeToUltra',
+              });
+              ultraSubscription.unsubscribe();
             });
             MagicLinkService.linkToPrime('slobs-multistream');
           } else {

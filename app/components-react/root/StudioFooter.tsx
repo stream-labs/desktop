@@ -29,14 +29,13 @@ export default function StudioFooterComponent() {
     streamingStatus,
     isLoggedIn,
     canSchedule,
+    streamQuality,
     replayBufferOffline,
     replayBufferStopping,
     replayBufferSaving,
     recordingModeEnabled,
     replayBufferEnabled,
   } = useModule(FooterModule);
-
-  const streamQuality = useRealmObject(PerformanceService.state).streamQuality;
 
   function performanceIconClassName() {
     if (!streamingStatus || streamingStatus === EStreamingState.Offline) {
@@ -252,6 +251,10 @@ class FooterModule {
 
   get streamingStatus() {
     return Services.StreamingService.views.streamingStatus;
+  }
+
+  get streamQuality() {
+    return Services.PerformanceService.views.streamQuality;
   }
 
   get isLoggedIn() {

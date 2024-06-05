@@ -55,7 +55,6 @@ export default function DualOutputPlatformSelector(p: IPlatformSelectorProps) {
               platform={platform as TPlatform}
               className={styles.selectorIcon}
               fontIcon={['tiktok', 'trovo'].includes(platform) ? platform : undefined}
-              nocolor
             />
             {platformLabels(platform)}
           </>
@@ -92,6 +91,7 @@ export default function DualOutputPlatformSelector(p: IPlatformSelectorProps) {
 
   return (
     <Select
+      data-test="do-platform-selector"
       defaultValue={defaultLabel[0]}
       className={cx(styles.platformsSelector, { [styles.dualOutputSelector]: isDualOutputMode })}
       onChange={(option: { value: string; label: React.ReactNode }) => {

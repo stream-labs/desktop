@@ -1,5 +1,5 @@
 import { Service } from 'services';
-import Realm from 'realm';
+import Realm, { PropertyTypeName } from 'realm';
 import path from 'path';
 import * as remote from '@electron/remote';
 import { ExecuteInCurrentWindow } from './core';
@@ -168,8 +168,12 @@ export class RealmObject {
           const val = this.realmModel[key] as unknown;
 
           if (val instanceof Realm.Object) {
-            const klass = RealmService.registeredClasses[this.schema.properties[key].type];
-
+            const dataType = this.schema.properties[key];
+            // Realm type can be either a string or a nested object with a `type` property or an `objectType`
+            // property in the case of referential schemas
+            let type = typeof dataType === 'string' ? dataType : dataType.type;
+            if (dataType.objectType) type = dataType.objectType;
+            const klass = RealmService.registeredClasses[type];
             return klass.fromRealmModel(val);
           }
 
@@ -250,7 +254,7 @@ export class RealmObject {
     name: string,
     initObject: TInit,
   ): () => DynamicRealmObject<TInit> {
-    const propMap: { [key: string]: { type: string; default: any } } = {};
+    const propMap: { [key: string]: { type: PropertyTypeName; default: any } } = {};
 
     const klass = class extends RealmObject {};
 

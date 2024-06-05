@@ -1,7 +1,17 @@
 import { debounce } from 'lodash-decorators';
 import { Inject } from 'services/core/injector';
 import { mutation, StatefulService } from '../core/stateful-service';
-import { IVideoInfo, EScaleType, EFPSType, IVideo, VideoFactory, Video } from '../../../obs-api';
+import {
+  IVideoInfo,
+  EScaleType,
+  EFPSType,
+  IVideo,
+  VideoFactory,
+  Video,
+  EVideoFormat,
+  EColorSpace,
+  ERangeType,
+} from '../../../obs-api';
 import { DualOutputService } from 'services/dual-output';
 import { SettingsService } from 'services/settings';
 import { OutputSettingsService } from 'services/settings/output';
@@ -20,6 +30,14 @@ export interface IVideoSetting {
   horizontal: IVideoInfo;
   vertical: IVideoInfo;
 }
+
+export type IVideoInfoValue =
+  | number
+  | EVideoFormat
+  | EColorSpace
+  | ERangeType
+  | EScaleType
+  | EFPSType;
 
 export interface IVideoSettingFormatted {
   baseRes: string;
@@ -42,6 +60,21 @@ export enum ESettingsVideoProperties {
   'fpsDen' = 'FPSDen',
   'fpsInt' = 'FPSInt',
 }
+
+const scaleTypeNames = {
+  0: 'Disable',
+  1: 'Point',
+  2: 'Bicubic',
+  3: 'Bilinear',
+  4: 'Lanczos',
+  5: 'Area',
+};
+
+const fpsTypeNames = {
+  0: 'Common',
+  1: 'Integer',
+  2: 'Fractional',
+};
 export function invalidFps(num: number, den: number) {
   return num / den > 1000 || num / den < 1;
 }
@@ -81,6 +114,30 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   }
 
   /**
+   * The below provides a default base resolution
+   * @remark replaces the legacy base resolution in the video service
+   */
+  get baseResolution() {
+    return this.baseResolutions.horizontal;
+  }
+
+  /**
+   * The below provides a default base width
+   * @remark replaces the legacy base width in the video service
+   */
+  get baseWidth() {
+    return this.baseResolutions.horizontal.baseWidth;
+  }
+
+  /**
+   * The below provides a default base width
+   * @remark replaces the legacy base width in the video service
+   */
+  get baseHeight() {
+    return this.baseResolutions.horizontal.baseHeight;
+  }
+
+  /**
    * The below conditionals are to prevent undefined errors on app startup
    */
   get baseResolutions() {
@@ -115,24 +172,40 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     };
   }
 
+  get outputResolutions() {
+    return {
+      horizontal: {
+        outputWidth: this.contexts.horizontal?.video.outputWidth,
+        outputHeight: this.contexts.horizontal?.video.outputHeight,
+      },
+      vertical: {
+        outputWidth: this.contexts.vertical?.video.outputWidth,
+        outputHeight: this.contexts.vertical?.video.outputHeight,
+      },
+    };
+  }
+
   /**
    * Format video settings for the video settings form
    *
    * @param display - Optional, the display for the settings
    * @returns Settings formatted for the video settings form
    */
-  formatVideoSettings(display: TDisplayType = 'horizontal') {
+  formatVideoSettings(display: TDisplayType = 'horizontal', typeStrings?: boolean) {
     // use vertical display setting as a failsafe to prevent null errors
     const settings =
       this.contexts[display]?.video ??
       this.dualOutputService.views.videoSettings[display] ??
       this.dualOutputService.views.videoSettings.vertical;
 
+    const scaleType = typeStrings ? scaleTypeNames[settings?.scaleType] : settings?.scaleType;
+    const fpsType = typeStrings ? fpsTypeNames[settings?.fpsType] : settings?.fpsType;
+
     return {
       baseRes: `${settings?.baseWidth}x${settings?.baseHeight}`,
       outputRes: `${settings?.outputWidth}x${settings?.outputHeight}`,
-      scaleType: settings?.scaleType,
-      fpsType: settings?.fpsType,
+      scaleType,
+      fpsType,
       fpsCom: `${settings?.fpsNum}-${settings?.fpsDen}`,
       fpsNum: settings?.fpsNum,
       fpsDen: settings?.fpsDen,
@@ -333,9 +406,22 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     this.dualOutputService.updateVideoSettings(newVideoSettings, display);
   }
 
-  setVideoSetting(key: string, value: unknown, display: TDisplayType = 'horizontal') {
+  /**
+   * Set Video Settings
+   * @remark V2 api. This ealso updates the video settings in the V1 api.
+   * @param key - name of the video setting, must be key of obs video info
+   * @param value - value of the video setting, must be valid value of obs video info
+   * @param display - (optional) name of context (aka display) to apply setting to. Default is horizontal.
+   */
+  setVideoSetting(
+    key: keyof IVideoInfo,
+    value: IVideoInfoValue,
+    display: TDisplayType = 'horizontal',
+  ) {
     this.SET_VIDEO_SETTING(key, value, display);
     this.updateObsSettings(display);
+
+    // console.log('this.baseResolutions', JSON.stringify(this.baseResolutions, null, 2));
 
     // also update the persisted settings
     this.dualOutputService.setVideoSetting({ [key]: value }, display);
@@ -358,14 +444,15 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     const fpsSettings = ['scaleType', 'fpsType', 'fpsCom', 'fpsNum', 'fpsDen', 'fpsInt'];
 
     // update persisted local settings if the vertical context does not exist
-    const verticalVideoSetting = this.contexts.vertical
+    const verticalVideoSetting: IVideoInfo = this.contexts.vertical
       ? this.contexts.vertical.video
       : this.dualOutputService.views.videoSettings.vertical;
 
     let updated = false;
 
-    fpsSettings.forEach((setting: string) => {
-      const hasSameVideoSetting = this.contexts.horizontal.video[setting] === verticalVideoSetting;
+    fpsSettings.forEach((setting: keyof IVideoInfo) => {
+      const hasSameVideoSetting =
+        this.contexts.horizontal.video[setting as string] === verticalVideoSetting;
       let shouldUpdate = hasSameVideoSetting;
       // if the vertical context has been established, also compare legacy settings
       if (this.contexts.vertical) {
@@ -423,7 +510,11 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   }
 
   @mutation()
-  private SET_VIDEO_SETTING(key: string, value: unknown, display: TDisplayType = 'horizontal') {
+  private SET_VIDEO_SETTING(
+    key: keyof IVideoInfo,
+    value: IVideoInfoValue,
+    display: TDisplayType = 'horizontal',
+  ) {
     this.state[display] = {
       ...this.state[display],
       [key]: value,

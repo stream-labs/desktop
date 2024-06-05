@@ -147,6 +147,10 @@ function TopBarLogo({ component }: { component: string }) {
 
 function TopBar() {
   const component = useModule(OnboardingModule).currentStep.component;
+  // We decided to skip the top bar for Theme Selection as the cards are big and make Footer overlap
+  if (component === 'ThemeSelector') {
+    return <></>;
+  }
 
   return (
     <div
@@ -249,7 +253,11 @@ export class OnboardingModule {
   }
 
   setImportFromObs() {
-    this.OnboardingService.setObsImport(true);
+    this.OnboardingService.setImport('obs');
+  }
+
+  setImportFromTwitch() {
+    this.OnboardingService.setImport('twitch');
   }
 
   setStreamerKnowledgeMode(mode: StreamerKnowledgeMode | null) {

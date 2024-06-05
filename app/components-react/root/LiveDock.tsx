@@ -7,7 +7,7 @@ import pick from 'lodash/pick';
 import { initStore, useController } from 'components-react/hooks/zustand';
 import { EStreamingState } from 'services/streaming';
 import { EAppPageSlot, ILoadedApp } from 'services/platform-apps';
-import { TPlatform, getPlatformService } from 'services/platforms';
+import { getPlatformService, TPlatform } from 'services/platforms';
 import { $t } from 'services/i18n';
 import { Services } from '../service-provider';
 import Chat from './Chat';
@@ -17,6 +17,8 @@ import PlatformAppPageView from 'components-react/shared/PlatformAppPageView';
 import ResizeBar from 'components-react/root/ResizeBar';
 import { useVuex } from 'components-react/hooks';
 import { useRealmObject } from 'components-react/hooks/realm';
+import { $i } from 'services/utils';
+import { TikTokChatInfo } from './TiktokChatInfo';
 
 const LiveDockCtx = React.createContext<LiveDockController | null>(null);
 
@@ -51,6 +53,10 @@ class LiveDockController {
     return this.streamingService.isStreaming;
   }
 
+  get currentViewers() {
+    return this.streamingService.views.viewerCount.toString();
+  }
+
   get pageSlot() {
     return EAppPageSlot.Chat;
   }
@@ -77,18 +83,7 @@ class LiveDockController {
 
   get offlineImageSrc() {
     const mode = this.customizationService.isDarkTheme ? 'night' : 'day';
-    return require(`../../../media/images/sleeping-kevin-${mode}.png`);
-  }
-
-  get hideViewerCount() {
-    return this.customizationService.state.hideViewerCount;
-  }
-
-  get viewerCount() {
-    if (this.hideViewerCount) {
-      return $t('Viewers Hidden');
-    }
-    return this.streamingService.views.viewerCount.toString();
+    return $i(`images/sleeping-kevin-${mode}.png`);
   }
 
   get hideStyleBlockers() {
@@ -265,9 +260,6 @@ function LiveDock(p: ILiveDockProps) {
   const [visibleChat, setVisibleChat] = useState('default');
   const [elapsedStreamTime, setElapsedStreamTime] = useState('');
 
-  const liveDockSize = useRealmObject(Services.CustomizationService.state).livedockSize;
-  const collapsed = useRealmObject(Services.CustomizationService.state).livedockCollapsed;
-
   const {
     isPlatform,
     isStreaming,
@@ -276,8 +268,7 @@ function LiveDock(p: ILiveDockProps) {
     chatTabs,
     applicationLoading,
     hideStyleBlockers,
-    hideViewerCount,
-    viewerCount,
+    currentViewers,
     pageSlot,
     canAnimate,
     liveText,
@@ -292,15 +283,19 @@ function LiveDock(p: ILiveDockProps) {
       'chatTabs',
       'applicationLoading',
       'hideStyleBlockers',
-      'hideViewerCount',
-      'viewerCount',
       'pageSlot',
       'canAnimate',
+      'currentViewers',
       'liveText',
       'isPopOutAllowed',
       'streamingStatus',
     ]),
   );
+
+  const liveDockSize = useRealmObject(Services.CustomizationService.state).livedockSize;
+  const collapsed = useRealmObject(Services.CustomizationService.state).livedockCollapsed;
+  const hideViewerCount = useRealmObject(Services.CustomizationService.state).hideViewerCount;
+  const viewerCount = hideViewerCount ? $t('Viewers Hidden') : currentViewers;
 
   const onResize = useCallback((offset: number) => {
     p.setLiveDockWidth(liveDockSize + offset);
@@ -339,6 +334,30 @@ function LiveDock(p: ILiveDockProps) {
       }
     });
   }
+
+  const chat = useMemo(() => {
+    const primaryChat = Services.UserService.state.auth!.primaryPlatform;
+    const showTiktokInfo = visibleChat === 'tiktok' || primaryChat === 'tiktok';
+
+    if (showTiktokInfo && !isRestreaming) {
+      return <TikTokChatInfo />;
+    }
+
+    const showInstagramInfo = primaryChat === 'instagram';
+    if (showInstagramInfo) {
+      // FIXME: empty tab
+      return <></>;
+    }
+
+    return (
+      <Chat
+        restream={isRestreaming && visibleChat === 'restream'}
+        key={visibleChat}
+        visibleChat={visibleChat}
+        setChat={setChat}
+      />
+    );
+  }, [Services.UserService.state.auth!.primaryPlatform, visibleChat]);
 
   return (
     <div
@@ -475,57 +494,50 @@ function LiveDock(p: ILiveDockProps) {
                   <a onClick={() => ctrl.refreshChat()}>{$t('Refresh Chat')}</a>
                 )}
               </div>
-              {!hideStyleBlockers &&
-                (isPlatform(['twitch', 'trovo']) ||
-                  (isStreaming && isPlatform(['youtube', 'facebook', 'twitter']))) && (
-                  <div className={styles.liveDockChat}>
-                    {hasChatTabs && (
-                      <div className="flex">
-                        <Menu
-                          defaultSelectedKeys={[visibleChat]}
-                          onClick={ev => setChat(ev.key)}
-                          mode="horizontal"
-                        >
-                          {chatTabs.map(tab => (
-                            <Menu.Item key={tab.value}>{tab.name}</Menu.Item>
-                          ))}
-                        </Menu>
-                        {isPopOutAllowed && (
-                          <Tooltip title={$t('Pop out to new window')} placement="left">
-                            <i
-                              className={cx(styles.liveDockChatAppsPopout, 'icon-pop-out-1')}
-                              onClick={() => ctrl.popOut()}
-                            />
-                          </Tooltip>
-                        )}
-                      </div>
-                    )}
-                    {!applicationLoading && !collapsed && (
-                      <Chat
-                        restream={visibleChat === 'restream'}
-                        visibleChat={visibleChat}
-                        key={visibleChat}
-                        setChat={setChat}
-                      />
-                    )}
-                    {!['default', 'restream'].includes(visibleChat) && (
-                      <PlatformAppPageView
-                        className={styles.liveDockPlatformAppWebview}
-                        appId={visibleChat}
-                        pageSlot={pageSlot}
-                        key={visibleChat}
-                      />
-                    )}
-                  </div>
-                )}
-              {(!ctrl.platform ||
-                (isPlatform(['youtube', 'facebook', 'twitter']) && !isStreaming)) && (
-                <div className={cx('flex flex--center flex--column', styles.liveDockChatOffline)}>
-                  <img className={styles.liveDockChatImgOffline} src={ctrl.offlineImageSrc} />
-                  {!hideStyleBlockers && <span>{$t('Your chat is currently offline')}</span>}
+            </div>
+            {!hideStyleBlockers &&
+              (isPlatform(['twitch', 'trovo']) ||
+                (isStreaming && isPlatform(['youtube', 'facebook', 'twitter', 'tiktok']))) && (
+                <div className={styles.liveDockChat}>
+                  {hasChatTabs && (
+                    <div className="flex">
+                      <Menu
+                        defaultSelectedKeys={[visibleChat]}
+                        onClick={ev => setChat(ev.key)}
+                        mode="horizontal"
+                      >
+                        {chatTabs.map(tab => (
+                          <Menu.Item key={tab.value}>{tab.name}</Menu.Item>
+                        ))}
+                      </Menu>
+                      {isPopOutAllowed && (
+                        <Tooltip title={$t('Pop out to new window')} placement="left">
+                          <i
+                            className={cx(styles.liveDockChatAppsPopout, 'icon-pop-out-1')}
+                            onClick={() => ctrl.popOut()}
+                          />
+                        </Tooltip>
+                      )}
+                    </div>
+                  )}
+                  {!applicationLoading && !collapsed && chat}
+                  {!['default', 'restream'].includes(visibleChat) && (
+                    <PlatformAppPageView
+                      className={styles.liveDockPlatformAppWebview}
+                      appId={visibleChat}
+                      pageSlot={pageSlot}
+                      key={visibleChat}
+                    />
+                  )}
                 </div>
               )}
-            </div>
+            {(!ctrl.platform ||
+              (isPlatform(['youtube', 'facebook', 'twitter', 'tiktok']) && !isStreaming)) && (
+              <div className={cx('flex flex--center flex--column', styles.liveDockChatOffline)}>
+                <img className={styles.liveDockChatImgOffline} src={ctrl.offlineImageSrc} />
+                {!hideStyleBlockers && <span>{$t('Your chat is currently offline')}</span>}
+              </div>
+            )}
           </ResizeBar>
         )}
       </Animation>

@@ -10,6 +10,7 @@ export { ExternalApiLimitsService } from 'services/api/external-api-limits';
 export { SourcesService, Source } from 'services/sources';
 export { Scene, SceneItem, SceneItemFolder, ScenesService } from 'services/scenes';
 export { ObsImporterService } from 'services/obs-importer';
+export { TwitchStudioImporterService } from 'services/ts-importer';
 export { ClipboardService } from 'services/clipboard';
 export { AudioService, AudioSource } from 'services/audio';
 export { HostsService, UrlService } from 'services/hosts';
@@ -66,7 +67,10 @@ export { RealmService } from 'services/realm';
 export { UserService } from './services/user';
 export { YoutubeService } from 'services/platforms/youtube';
 export { TwitchService } from 'services/platforms/twitch';
-export { TwitchTagsService } from 'services/platforms/twitch/index';
+export {
+  TwitchTagsService,
+  TwitchContentClassificationService,
+} from 'services/platforms/twitch/index';
 export { FacebookService } from 'services/platforms/facebook';
 export { TikTokService } from 'services/platforms/tiktok';
 export { TrovoService } from 'services/platforms/trovo';
@@ -142,7 +146,10 @@ import { SettingsService } from './services/settings';
 import { UserService } from './services/user';
 import { TwitchService } from './services/platforms/twitch';
 import { TwitterPlatformService } from './services/platforms/twitter';
-import { TwitchTagsService } from './services/platforms/twitch/index';
+import {
+  TwitchTagsService,
+  TwitchContentClassificationService,
+} from './services/platforms/twitch/index';
 import { TrovoService } from './services/platforms/trovo';
 import { YoutubeService } from './services/platforms/youtube';
 import { FacebookService } from './services/platforms/facebook';
@@ -197,6 +204,7 @@ import { MarkersService } from 'services/markers';
 import { SharedStorageService } from 'services/integrations/shared-storage';
 import { RealmService } from 'services/realm';
 import { InstagramService } from 'services/platforms/instagram';
+import { TwitchStudioImporterService } from 'services/ts-importer';
 
 export const AppServices = {
   AppService,
@@ -227,6 +235,7 @@ export const AppServices = {
   TwitchService,
   TwitterPlatformService,
   TwitchTagsService,
+  TwitchContentClassificationService,
   TrovoService,
   InstagramService,
   DismissablesService,
@@ -255,6 +264,7 @@ export const AppServices = {
   LayoutService,
   ProjectorService,
   ObsImporterService,
+  TwitchStudioImporterService,
   DefaultHardwareService,
   AutoConfigService,
   MacPermissionsService,

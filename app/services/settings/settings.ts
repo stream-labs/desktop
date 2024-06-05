@@ -64,10 +64,43 @@ export interface ISettingsValues {
     RecTracks?: number;
     RecEncoder?: string;
     RecQuality?: string;
+    RecType?: string;
+    RecRescale?: string;
+    RecSplitFile?: string;
+    RecSplitFileType?: string;
+    RecSplitFileTime?: string;
+    RecSplitFileResetTimestamps?: string;
     TrackIndex?: string;
     VodTrackEnabled?: boolean;
     VodTrackIndex?: string;
+    ApplyServiceSettings?: boolean;
+    ABitrate?: number;
+    FileNameWithoutSpace?: boolean;
+    RecAEncoder?: string;
+    MuxerCustom?: string;
+    UseAdvanced?: boolean;
+    EnforceBitrate?: boolean;
+    Track1Bitrate?: string;
+    Track1Name?: string;
+    Track2Bitrate?: string;
+    Track2Name?: string;
+    Track3Bitrate?: string;
+    Track3Name?: string;
+    Track4Bitrate?: string;
+    Track4Name?: string;
+    Track5Bitrate?: string;
+    Track5Name?: string;
+    Track6Bitrate?: string;
+    Track6Name?: string;
     keyint_sec?: number;
+    bitrate?: number;
+    use_bufsize?: boolean;
+    buffer_size?: number;
+    preset?: string;
+    profile?: string;
+    tune?: string;
+    x264opts?: string;
+    x264Settings?: string;
   };
   Video: {
     // default video context
@@ -425,6 +458,10 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
     return settingsFormData;
   }
 
+  /**
+   * Set an individual setting value
+   * @remark When setting video settings, use the v2 video settings service.
+   */
   setSettingValue(category: string, name: string, value: TObsValue) {
     const newSettings = this.patchSetting(this.fetchSettingsFromObs(category).formData, name, {
       value,
@@ -496,6 +533,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
   }
   /**
    * Set settings in obs.
+   * @remark When setting video settings, use the v2 video settings service.
    * @remark The forceApplyCategory parameter is currently only used for refreshing
    * video settings before starting recording. This is because the video settings is using the v2 api
    * and the output settings are currently using the v1 api. This will no longer be needed when

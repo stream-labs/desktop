@@ -22,6 +22,7 @@ import difference from 'lodash/difference';
 import { Services } from '../../components-react/service-provider';
 import { getDefined } from '../../util/properties-type-guards';
 import { TDisplayType } from 'services/settings-v2';
+import compact from 'lodash/compact';
 
 /**
  * The stream info view is responsible for keeping
@@ -112,22 +113,12 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
   }
 
   /**
-   * Returns a list of linked platforms available for restream
-   * @remark If TikTok is linked, users can always stream to it
+   * Returns a list of linked platforms available
    */
   get linkedPlatforms(): TPlatform[] {
     if (!this.userView.state.auth) return [];
 
-    if (
-      (!this.restreamView.canEnableRestream || !this.protectedModeEnabled) &&
-      !this.isDualOutputMode
-    ) {
-      return this.userView.auth!.primaryPlatform === 'tiktok'
-        ? [this.userView.auth!.primaryPlatform]
-        : [this.userView.auth!.primaryPlatform, 'tiktok'];
-    }
-
-    return this.allPlatforms.filter(p => this.isPlatformLinked(p) || p === 'tiktok');
+    return this.allPlatforms.filter(p => this.isPlatformLinked(p));
   }
 
   get protectedModeEnabled() {
@@ -231,7 +222,7 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     return destinations.reduce(
       (displayDestinations: TDisplayDestinations, destination: ICustomStreamDestination) => {
         if (destination.enabled) {
-          displayDestinations[destination.display ?? 'horizontal'].push(destination.name);
+          displayDestinations[destination.display ?? 'horizontal'].push(destination.url);
         }
         return displayDestinations;
       },
@@ -262,10 +253,22 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
 
   /**
    * Chat url of a primary platform
+   * If the primary platform is not enabled, and we're on single stream mode,
+   * returns the URL of the first enabled platform
    */
   get chatUrl(): string {
     if (!this.userView.isLoggedIn || !this.userView.auth) return '';
-    return getPlatformService(this.userView.auth.primaryPlatform).chatUrl;
+
+    const enabledPlatforms = this.enabledPlatforms;
+    const platform = this.enabledPlatforms.includes(this.userView.auth.primaryPlatform)
+      ? this.userView.auth.primaryPlatform
+      : enabledPlatforms[0];
+
+    if (platform) {
+      return getPlatformService(platform).chatUrl;
+    }
+
+    return '';
   }
 
   getTweetText(streamTitle: string) {
@@ -286,6 +289,20 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     const platforms = this.applyCommonFields(destinations);
 
     const savedGoLiveSettings = this.streamSettingsView.state.goLiveSettings;
+
+    /*
+     * TODO: this should be done as a migration, if needed, but having it
+     * here seems to ensure we always have a primary platform, no app restart needed.
+     * we would ideally run this only if restream can be enabled, but multistream tests fail if we get that specific
+     */
+    const areNoPlatformsEnabled = () => Object.values(platforms!).every(p => !p.enabled);
+
+    if (areNoPlatformsEnabled()) {
+      const primaryPlatform = this.userView.auth?.primaryPlatform;
+      if (primaryPlatform && platforms[primaryPlatform]) {
+        platforms[primaryPlatform]!.enabled = true;
+      }
+    }
 
     return {
       platforms,
@@ -357,15 +374,15 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
 
   /**
    * Sort the platform list
-   * - the primary platform is always first
    * - linked platforms are always on the top of the list
    * - the rest has an alphabetic sort
+   *
+   * We no longer put primary platform on top since we're allowing it to be switched
    */
   getSortedPlatforms(platforms: TPlatform[]): TPlatform[] {
     platforms = platforms.sort();
     return [
-      ...platforms.filter(p => this.isPrimaryPlatform(p)),
-      ...platforms.filter(p => !this.isPrimaryPlatform(p) && this.isPlatformLinked(p)),
+      ...platforms.filter(p => this.isPlatformLinked(p)),
       ...platforms.filter(p => !this.isPlatformLinked(p)),
     ];
   }
@@ -441,6 +458,10 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     return this.settings.platforms[platform];
   }
 
+  setPrimaryPlatform(platform: TPlatform) {
+    this.userView.setPrimaryPlatform(platform);
+  }
+
   /**
    * Returns Go-Live settings for a given platform
    */
@@ -464,8 +485,8 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
 
     return {
       ...settings,
+      enabled,
       useCustomFields,
-      enabled: enabled || this.isPrimaryPlatform(platform),
     };
   }
 
@@ -491,5 +512,10 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
 
   get isIdle(): boolean {
     return !this.isStreaming && !this.isRecording;
+  }
+
+  // TODO: consolidate between this and GoLiveSettings
+  get hasDestinations() {
+    return this.enabledPlatforms.length > 0 || this.customDestinations.length > 0;
   }
 }

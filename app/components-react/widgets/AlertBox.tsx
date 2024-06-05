@@ -163,7 +163,7 @@ function AlertsList() {
                 playAlert(alertEvent.type);
               }}
               type={'text'}
-              style={{ position: 'absolute', right: '16px' }}
+              style={{ position: 'absolute', right: '16px', top: '8px' }}
               icon={<CaretRightOutlined style={{ fontSize: '36px', color: 'white' }} />}
             />
           </Tooltip>
