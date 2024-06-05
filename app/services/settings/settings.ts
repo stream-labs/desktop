@@ -458,6 +458,10 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
     return settingsFormData;
   }
 
+  /**
+   * Set an individual setting value
+   * @remark When setting video settings, use the v2 video settings service.
+   */
   setSettingValue(category: string, name: string, value: TObsValue) {
     const newSettings = this.patchSetting(this.fetchSettingsFromObs(category).formData, name, {
       value,
@@ -529,6 +533,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
   }
   /**
    * Set settings in obs.
+   * @remark When setting video settings, use the v2 video settings service.
    * @remark The forceApplyCategory parameter is currently only used for refreshing
    * video settings before starting recording. This is because the video settings is using the v2 api
    * and the output settings are currently using the v1 api. This will no longer be needed when
