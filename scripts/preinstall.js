@@ -63,7 +63,8 @@ async function runScript() {
 
     if (modified) {
       fs.writeFileSync(packageJsonFilename, JSON.stringify(packageJson, null, 2));
-      log_info('package.json has been updated');
+      log_info('package.json has been updated. please re-run yarn install!');
+      process.exit(1);
     }
   } catch (error) {
     log_error(
