@@ -1,8 +1,8 @@
 const sh = require('shelljs');
 const colors = require('colors/safe');
-const fs = require('fs');
-const path = require('path');
-const stream = require('stream');
+const fs = require('node:fs');
+const path = require('node:path');
+const stream = require('node:stream');
 
 const node_modules = path.join(process.cwd(), 'node_modules');
 

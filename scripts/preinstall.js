@@ -1,6 +1,5 @@
-const sh = require('shelljs');
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 
 function log_info(msg) {
   console.log(`INFO ${msg}`);
@@ -52,7 +51,7 @@ async function runScript() {
       if (!packageJson['dependencies'][name]) {
         // error
         log_error(`${name} not found in dependencies!`);
-        sh.exit(1);
+        process.exit(1);
       }
       if (packageJson['dependencies'][name] === url) {
         continue;
@@ -71,12 +70,12 @@ async function runScript() {
       'An error occurred preventing the script from installing successfully all required native dependencies.',
     );
     log_error(error);
-    sh.exit(1);
+    process.exit(1);
   }
 }
 
 runScript()
   .then(() => {
-    sh.exit(0);
+    process.exit(0);
   })
   .catch(e => console.log(e));
