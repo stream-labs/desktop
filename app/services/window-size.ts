@@ -35,18 +35,19 @@ type BackupSizeInfo = {
   maximized: boolean;
 };
 
+const MWOpKey = 'mainwindow-operation';
 class MainWindowOperation {
-  getPosition = (): number[] => ipcRenderer.sendSync('mwOp', 'getPosition');
-  setPosition = (a: number, b: number) => ipcRenderer.sendSync('mwOp', 'setPosition', a, b);
-  getSize = (): number[] => ipcRenderer.sendSync('mwOp', 'getSize');
-  setSize = (a: number, b: number) => ipcRenderer.sendSync('mwOp', 'setSize', a, b);
-  getMinimumSize = (): number[] => ipcRenderer.sendSync('mwOp', 'getMinimumSize');
-  setMinimumSize = (a: number, b: number) => ipcRenderer.sendSync('mwOp', 'setMinimumSize', a, b);
-  setMaximumSize = (a: number, b: number) => ipcRenderer.sendSync('mwOp', 'setMaximumSize', a, b);
-  isMaximized = (): boolean => ipcRenderer.sendSync('mwOp', 'isMaximized');
-  maximize = () => ipcRenderer.sendSync('mwOp', 'maximize');
-  unmaximize = () => ipcRenderer.sendSync('mwOp', 'unmaximize');
-  setMaximizable = (a: boolean) => ipcRenderer.sendSync('mwOp', 'setMaximizable', a);
+  getPosition = (): number[] => ipcRenderer.sendSync(MWOpKey, 'getPosition');
+  setPosition = (a: number, b: number) => ipcRenderer.sendSync(MWOpKey, 'setPosition', a, b);
+  getSize = (): number[] => ipcRenderer.sendSync(MWOpKey, 'getSize');
+  setSize = (a: number, b: number) => ipcRenderer.sendSync(MWOpKey, 'setSize', a, b);
+  getMinimumSize = (): number[] => ipcRenderer.sendSync(MWOpKey, 'getMinimumSize');
+  setMinimumSize = (a: number, b: number) => ipcRenderer.sendSync(MWOpKey, 'setMinimumSize', a, b);
+  setMaximumSize = (a: number, b: number) => ipcRenderer.sendSync(MWOpKey, 'setMaximumSize', a, b);
+  isMaximized = (): boolean => ipcRenderer.sendSync(MWOpKey, 'isMaximized');
+  maximize = () => ipcRenderer.sendSync(MWOpKey, 'maximize');
+  unmaximize = () => ipcRenderer.sendSync(MWOpKey, 'unmaximize');
+  setMaximizable = (a: boolean) => ipcRenderer.sendSync(MWOpKey, 'setMaximizable', a);
 }
 
 export class WindowSizeService extends StatefulService<IWindowSizeState> {
@@ -139,7 +140,7 @@ export class WindowSizeService extends StatefulService<IWindowSizeState> {
     const nextPanelState = WindowSizeService.getPanelState(nextState);
     if (nextPanelState !== null && prevPanelState !== nextPanelState) {
       const newSize = WindowSizeService.updateWindowSize(
-        new MainWindowOperation(), //this.windowsService.getWindow('main'),
+        new MainWindowOperation(),
         prevPanelState,
         nextPanelState,
         {
@@ -250,7 +251,7 @@ export class WindowSizeService extends StatefulService<IWindowSizeState> {
     }
 
     win.setMinimumSize(nextMinWidth, minHeight);
-    win.setMaximumSize(nextMaxWidth, 16384);
+    win.setMaximumSize(nextMaxWidth, 16384); // 0では作用しなくなったので変更
     if (nextWidth !== width || nextHeight !== height) {
       win.setSize(nextWidth, nextHeight);
     }

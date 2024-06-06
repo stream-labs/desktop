@@ -244,8 +244,10 @@ export class WindowsService extends StatefulService<IWindowsState> {
       transparent: options.transparent,
       resizable: options.resizable,
       alwaysOnTop: options.alwaysOnTop,
-      webPreferences: { nodeIntegration: true, webviewTag: true },
+      webPreferences: { nodeIntegration: true, webviewTag: true, contextIsolation: false },
     }));
+
+    electron.ipcRenderer.sendSync('webContents-enableRemote', newWindow.webContents.id);
 
     newWindow.setMenu(null);
     newWindow.on('closed', () => {

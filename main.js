@@ -850,7 +850,14 @@ function initialize(crashHandler) {
     }
   });
 
-  ipcMain.on('mwOp', (e, key, a, b) => {
+  ipcMain.on('webContents-enableRemote', (e, id) => {
+    const contents = webContents.fromId(id);
+    if (contents.isDestroyed()) return;
+    remote.enable(contents);
+    e.returnValue = null;
+  });
+
+  ipcMain.on('mainwindow-operation', (e, key, a, b) => {
     e.returnValue = mainWindow[key](a, b);
   });
 
