@@ -1,5 +1,5 @@
 <template>
-  <popper trigger="click" :options="{ placement: placement || 'bottom-end' }">
+  <popper trigger="click" :options="{ placement: placement || 'bottom-start' }">
     <div class="popper dropdown-menu">
       <slot></slot>
     </div>
@@ -20,6 +20,7 @@
 .popper.dropdown-menu {
   .popper-styling;
 
+  max-width: 100%;
   max-height: 152px;
   overflow-y: auto;
 }
