@@ -80,8 +80,8 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
   const enabledPlatforms = view.enabledPlatforms;
   if (enabledPlatforms.includes('tiktok')) {
     maxCharacters = 32;
-    // } else if (enabledPlatforms.includes('youtube')) {
-    //   maxCharacters = 100;
+  } else if (enabledPlatforms.includes('youtube')) {
+    maxCharacters = 100;
   } else if (enabledPlatforms.includes('twitch')) {
     maxCharacters = 140;
   }
