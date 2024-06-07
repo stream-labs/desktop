@@ -15,7 +15,7 @@ import { waitForDisplayed } from '../../helpers/modules/core';
 useWebdriver();
 
 test('Streaming to Instagram', async t => {
-  const user = await logIn('twitch', { multistream: true });
+  const user = await logIn('twitch', { prime: true, multistream: false });
 
   // test approved status
   const dummy = await addDummyAccount('instagram');
