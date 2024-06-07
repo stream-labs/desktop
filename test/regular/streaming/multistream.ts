@@ -18,7 +18,7 @@ useWebdriver();
 
 test('Multistream default mode', async t => {
   // login to via Twitch because it doesn't have strict rate limits
-  await logIn('twitch', { multistream: true });
+  const user = await logIn('twitch', { multistream: true });
   await prepareToGoLive();
   await clickGoLive();
   await waitForSettingsWindowLoaded();
@@ -36,18 +36,20 @@ test('Multistream default mode', async t => {
     title: 'Test stream',
     description: 'Test stream description',
     twitchGame: 'Fortnite',
+    trovoGame: 'Doom',
   });
 
   await submit();
   await waitForDisplayed('span=Configure the Multistream service');
   await waitForDisplayed("h1=You're live!", { timeout: 60000 });
   await stopStream();
+  await releaseUserInPool(user);
   await t.pass();
 });
 
 test('Multistream advanced mode', async t => {
   // login to via Twitch because it doesn't have strict rate limits
-  await logIn('twitch', { multistream: true });
+  const user = await logIn('twitch', { multistream: true });
   await prepareToGoLive();
   await clickGoLive();
   await waitForSettingsWindowLoaded();
@@ -89,11 +91,12 @@ test('Multistream advanced mode', async t => {
   await waitForDisplayed('span=Configure the Multistream service');
   await waitForDisplayed("h1=You're live!", { timeout: 60000 });
   await stopStream();
+  await releaseUserInPool(user);
   await t.pass();
 });
 
 test('Custom stream destinations', async t => {
-  await logIn('twitch', { prime: true });
+  const loggedInUser = await logIn('twitch', { prime: true });
 
   // fetch a new stream key
   const user = await reserveUserFromPool(t, 'twitch');
@@ -155,5 +158,6 @@ test('Custom stream destinations', async t => {
   await showSettingsWindow('Stream');
   await click('i.fa-trash');
   await click('i.fa-trash');
+  await releaseUserInPool(loggedInUser);
   t.false(await isDisplayed('i.fa-trash'), 'Destinations should be removed');
 });
