@@ -379,8 +379,8 @@ export class StreamingService
           await this.restreamService.beforeGoLive();
         });
       } catch (e: unknown) {
-        console.error('Failed to setup restream', e);
-        this.setError('RESTREAM_SETUP_FAILED');
+        console.error('Failed to setup restream', e as any);
+        this.setError('RESTREAM_SETUP_FAILED', e as any);
         return;
       }
     }
