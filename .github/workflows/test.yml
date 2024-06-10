@@ -161,7 +161,8 @@ jobs:
     strategy:
       matrix:
         directory:
-          - 'test-dist/test/e2e/*.js'
+          - 'test-dist/test/e2e/[^s]*.js'
+          - 'test-dist/test/e2e/s*.js'
           - 'test-dist/test/api/*.js'
 
     steps:
