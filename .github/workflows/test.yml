@@ -161,8 +161,9 @@ jobs:
     strategy:
       matrix:
         directory:
-          - 'test-dist/test/e2e/*.js'
-          - 'test-dist/test/api/*.js'
+          - 'e2e/[^s]*.js'
+          - 'e2e/s*.js'
+          - 'api/*.js'
 
     steps:
       - name: Checkout code
@@ -184,4 +185,4 @@ jobs:
         run: yarn compile:ci
 
       - name: Run e2e tests
-        run: yarn test --fail-fast ${{ matrix.directory }}
+        run: yarn test --fail-fast test-dist/test/${{ matrix.directory }}
