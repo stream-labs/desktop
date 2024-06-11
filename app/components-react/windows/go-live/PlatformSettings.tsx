@@ -65,6 +65,8 @@ export default function PlatformSettings() {
     };
   }
 
+  console.log('enabledPlatforms', JSON.stringify(enabledPlatforms, null, 2));
+
   return (
     // minHeight is required for the loading spinner
     <div style={{ minHeight: '150px' }}>
