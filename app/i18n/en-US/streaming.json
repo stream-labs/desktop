@@ -239,5 +239,6 @@
   "Failed to update %{platform} account. Please unlink and reconnect your %{platform} account.": "Failed to update %{platform} account. Please unlink and reconnect your %{platform} account.",
   "Failed to update %{platform} account": "Failed to update %{platform} account",
   "<unlink>Unlink here</unlink>": "<unlink>Unlink here</unlink>",
-  "Primary Chat": "Primary Chat"
+  "Primary Chat": "Primary Chat",
+  "Go to Settings -> Output -> Recording -> Recording Path if you need to change this location.":  "Go to Settings -> Output -> Recording -> Recording Path if you need to change this location."
 }
