@@ -14,7 +14,13 @@ import {
   waitForStreamStart,
 } from '../../helpers/modules/streaming';
 import { addDummyAccount, releaseUserInPool } from '../../helpers/webdriver/user';
-import { fillForm, readFields } from '../../helpers/modules/forms';
+import {
+  assertFormContains,
+  fillForm,
+  readFields,
+  setInputValue,
+  useForm,
+} from '../../helpers/modules/forms';
 import { IDummyTestUser } from '../../data/dummy-accounts';
 import { TTikTokLiveScopeTypes } from 'services/platforms/tiktok/api';
 import { isDisplayed, waitForDisplayed } from '../../helpers/modules/core';
@@ -22,20 +28,9 @@ import { isDisplayed, waitForDisplayed } from '../../helpers/modules/core';
 useWebdriver();
 
 test('Streaming to TikTok', async t => {
-  const user = await logIn('twitch', { multistream: false, prime: false });
+  // also tests approved status
+  const user = await logInTikTok(false);
 
-  // test approved status
-  await addDummyAccount('tiktok', { tiktokLiveScope: 'approved' });
-
-  await prepareToGoLive();
-  await clickGoLive();
-  await waitForSettingsWindowLoaded();
-
-  // enable tiktok
-  await fillForm({
-    tiktok: true,
-  });
-  await waitForSettingsWindowLoaded();
   const fields = await readFields();
 
   // tiktok always shows regardless of ultra status
@@ -63,6 +58,73 @@ test('Streaming to TikTok', async t => {
   await releaseUserInPool(user);
   t.pass();
 });
+
+test('TikTok game tags', async t => {
+  // using dummy data creates an error when requesting game tags
+  skipCheckingErrorsInLog();
+
+  const user = await logInTikTok(true);
+  await fillForm({
+    title: 'Test stream',
+    twitchGame: 'Fortnite',
+  });
+
+  // game tag is required
+  await submit();
+  await waitForDisplayed('div=The field is required');
+
+  // form shows game tag and default options
+  await setInputValue('div=TikTok Game', 'te');
+  const settingsForm = useForm('tiktok-settings');
+  await settingsForm.assertInputOptions('tiktokGame', null, ['test1', 'Other']);
+
+  // goes live with game tag
+  await settingsForm.fillForm({ tiktokGame: 'test1' });
+  await submit();
+  await waitForStreamStart();
+  await stopStream();
+
+  // persists game name
+  await clickGoLive();
+  await waitForSettingsWindowLoaded();
+  assertFormContains({ tiktokGame: 'test1' });
+
+  // goes live with default option
+  await settingsForm.fillForm({ tiktokGame: 'Other' });
+  await submit();
+  await waitForStreamStart();
+  await stopStream();
+
+  // default option only shows once in options
+  await clickGoLive();
+  await waitForSettingsWindowLoaded();
+
+  assertFormContains({ tiktokGame: 'Other' });
+  await settingsForm.assertInputOptions('tiktokGame', 'Other', ['Other']);
+
+  await releaseUserInPool(user);
+
+  t.pass();
+});
+
+async function logInTikTok(isPrime: boolean) {
+  const user = await logIn('twitch', { multistream: false, prime: isPrime });
+
+  // login approved status
+  await addDummyAccount('tiktok', { tiktokLiveScope: 'approved' });
+
+  await prepareToGoLive();
+  await clickGoLive();
+  await waitForSettingsWindowLoaded();
+
+  // enable tiktok
+  await fillForm({
+    tiktok: true,
+  });
+  await waitForSettingsWindowLoaded();
+
+  return user;
+}
 
 async function testLiveScope(t: TExecutionContext, scope: TTikTokLiveScopeTypes) {
   const user: IDummyTestUser = await addDummyAccount('tiktok', { tiktokLiveScope: scope });

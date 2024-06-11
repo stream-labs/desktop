@@ -16,6 +16,13 @@ import { test, useWebdriver } from '../../helpers/webdriver';
 
 useWebdriver();
 
+async function enableAllPlatforms() {
+  for (const platform of ['twitch', 'youtube', 'trovo']) {
+    await fillForm({ [platform]: true });
+    await waitForSettingsWindowLoaded();
+  }
+}
+
 test('Multistream default mode', async t => {
   // login to via Twitch because it doesn't have strict rate limits
   const user = await logIn('twitch', { multistream: true });
@@ -23,13 +30,9 @@ test('Multistream default mode', async t => {
   await clickGoLive();
   await waitForSettingsWindowLoaded();
 
-  // enable all platforms
-  await fillForm({
-    twitch: true,
-    youtube: true,
-    trovo: true,
-  });
-  await waitForSettingsWindowLoaded();
+  // TODO: this is to rule-out a race condition in platform switching, might not be needed and
+  // can possibly revert back to fillForm with all platforms.
+  await enableAllPlatforms();
 
   // add settings
   await fillForm({
@@ -54,12 +57,7 @@ test('Multistream advanced mode', async t => {
   await clickGoLive();
   await waitForSettingsWindowLoaded();
 
-  // enable all platforms
-  await fillForm({
-    twitch: true,
-    youtube: true,
-    trovo: true,
-  });
+  await enableAllPlatforms();
 
   await switchAdvancedMode();
   await waitForSettingsWindowLoaded();
