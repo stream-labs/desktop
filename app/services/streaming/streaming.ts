@@ -40,7 +40,8 @@ import {
   IStreamError,
   StreamError,
   TStreamErrorType,
-  errorTypes,
+  formatUnknownErrorMessage,
+  formatStreamErrorMessage,
 } from './stream-error';
 import { authorizedHeaders } from 'util/requests';
 import { HostsService } from '../hosts';
@@ -52,7 +53,6 @@ import { RecordingModeService } from 'services/recording-mode';
 import { MarkersService } from 'services/markers';
 import { byOS, OS } from 'util/operating-systems';
 import { DualOutputService } from 'services/dual-output';
-import { capitalize } from 'lodash';
 import { tiktokErrorMessages } from 'services/platforms/tiktok/api';
 import { TikTokService } from 'services/platforms/tiktok';
 
@@ -74,7 +74,7 @@ enum EOBSOutputSignal {
   WriteError = 'writing_error',
 }
 
-interface IOBSOutputSignalInfo {
+export interface IOBSOutputSignalInfo {
   type: EOBSOutputType;
   signal: EOBSOutputSignal;
   code: EOutputCode;
@@ -730,16 +730,18 @@ export class StreamingService
    * Set the error state for the GoLive window
    */
   private setError(errorTypeOrError?: TStreamErrorType | StreamError, platform?: TPlatform) {
+    const target = platform
+      ? this.views.getPlatformDisplayName(platform)
+      : $t('Custom Destination');
+
     if (typeof errorTypeOrError === 'object') {
       // an error object has been passed as a first arg
       if (platform) errorTypeOrError.platform = platform;
 
-      // only show user is blocked to support
-      if (!errorTypeOrError.message.split(' ').includes('blocked')) {
-        this.nativeErrorMessage = `${capitalize(errorTypeOrError.platform)} Error: ${
-          errorTypeOrError.message
-        }. ${errorTypeOrError.details}.`;
-      }
+      // handle error message for user and diag report
+      const messages = formatStreamErrorMessage(errorTypeOrError, target);
+      this.streamErrorUserMessage = messages.user;
+      this.streamErrorReportMessage = messages.report;
 
       this.SET_ERROR(errorTypeOrError);
     } else {
@@ -747,10 +749,10 @@ export class StreamingService
       const errorType = errorTypeOrError as TStreamErrorType;
       const error = createStreamError(errorType);
       if (platform) error.platform = platform;
-      // only show user is blocked to support
-      if (!error.message.split(' ').includes('blocked')) {
-        this.nativeErrorMessage = `${capitalize(error.platform)} Error: ${error.message}.`;
-      }
+      // handle error message for user and diag report
+      const messages = formatStreamErrorMessage(errorType, target);
+      this.streamErrorUserMessage = messages.user;
+      this.streamErrorReportMessage = messages.report;
 
       this.SET_ERROR(error);
     }
@@ -759,18 +761,10 @@ export class StreamingService
     assertIsDefined(error);
     console.error(`Streaming Error: ${error.message}`, error);
 
-    const target = platform ? this.views.getPlatformDisplayName(platform) : 'Custom destination';
-
     // add follow-up action to report if there is an action
-    let diagReportMessage = error?.action
-      ? [`${target}: ${error.message}`, error?.action].join(', ')
-      : `${target}: ${error.message}`;
+    console.error(`Streaming Error: ${error.message}.`, error);
 
-    diagReportMessage = error?.details
-      ? [diagReportMessage, error?.details].join('. ')
-      : diagReportMessage;
-
-    this.streamErrorCreated.next(diagReportMessage);
+    this.streamErrorCreated.next(this.streamErrorReportMessage);
   }
 
   resetInfo() {
@@ -1229,7 +1223,8 @@ export class StreamingService
   }
 
   private outputErrorOpen = false;
-  private nativeErrorMessage: string | null = null;
+  private streamErrorUserMessage = '';
+  private streamErrorReportMessage = '';
 
   private handleOBSOutputSignal(info: IOBSOutputSignalInfo) {
     console.debug('OBS Output signal: ', info);
@@ -1367,96 +1362,57 @@ export class StreamingService
         return;
       }
 
-      let errorText = '';
-      let extendedErrorText = '';
+      let errorText = this.streamErrorUserMessage;
+      let details = '';
       let linkToDriverInfo = false;
       let showNativeErrorMessage = false;
-      let diagReportMessage = '';
+      let diagReportMessage = this.streamErrorReportMessage;
 
       if (info.code === EOutputCode.BadPath) {
-        errorText = $t(
+        this.streamErrorUserMessage = $t(
           'Invalid Path or Connection URL.  Please check your settings to confirm that they are valid.',
         );
       } else if (info.code === EOutputCode.ConnectFailed) {
-        errorText = $t(
+        this.streamErrorUserMessage = $t(
           'Failed to connect to the streaming server.  Please check your internet connection.',
         );
       } else if (info.code === EOutputCode.Disconnected) {
-        errorText = $t(
+        this.streamErrorUserMessage = $t(
           'Disconnected from the streaming server.  Please check your internet connection.',
         );
       } else if (info.code === EOutputCode.InvalidStream) {
-        errorText = $t(
+        this.streamErrorUserMessage = $t(
           'Could not access the specified channel or stream key. Please log out and back in to refresh your credentials. If the problem persists, there may be a problem connecting to the server.',
         );
       } else if (info.code === EOutputCode.NoSpace) {
-        errorText = $t('There is not sufficient disk space to continue recording.');
+        this.streamErrorUserMessage = $t(
+          'There is not sufficient disk space to continue recording.',
+        );
       } else if (info.code === EOutputCode.Unsupported) {
-        errorText =
+        this.streamErrorUserMessage =
           $t(
             'The output format is either unsupported or does not support more than one audio track.  ',
           ) + $t('Please check your settings and try again.');
       } else if (info.code === EOutputCode.OutdatedDriver) {
         linkToDriverInfo = true;
-        errorText = $t(
+        this.streamErrorUserMessage = $t(
           'An error occurred with the output. This is usually caused by out of date video drivers. Please ensure your Nvidia or AMD drivers are up to date and try again.',
         );
       } else {
         // -4 is used for generic unknown messages in OBS. Both -4 and any other code
         // we don't recognize should fall into this branch and show a generic error.
-        if (info.error && typeof info.error === 'string') {
-          try {
-            const error = JSON.parse(info.error);
-            const platform = capitalize(error.platform);
 
-            errorText = platform
-              ? $t('Streaming to %{platform} is temporary unavailable', { platform })
-              : errorTypes['UNKNOWN_STREAMING_ERROR'].message;
+        const messages = formatUnknownErrorMessage(
+          info,
+          this.streamErrorUserMessage,
+          this.streamErrorReportMessage,
+        );
 
-            diagReportMessage =
-              this.nativeErrorMessage ??
-              `${capitalize(platform)} ${error?.code} Error: ${[
-                error?.message,
-                error?.details,
-              ].join('. ')} ${errorTypes['UNKNOWN_STREAMING_ERROR_MESSAGE'].message}, ${
-                errorTypes['UNKNOWN_STREAMING_ERROR_MESSAGE'].action
-              }`;
+        errorText = messages.user;
+        diagReportMessage = messages.report;
+        if (messages.details) details = messages.details;
 
-            showNativeErrorMessage = true;
-            extendedErrorText = errorText + '\n\n' + $t('Error Code:') + ' ' + info.code;
-          } catch (error: unknown) {
-            errorText = errorTypes['UNKNOWN_STREAMING_ERROR'].message;
-            diagReportMessage =
-              this.nativeErrorMessage ??
-              `${errorText}, ${errorTypes['UNKNOWN_STREAMING_ERROR'].action}`;
-            console.error('Unknown Streaming Error:', error);
-          }
-        } else if (info.error) {
-          const error = (info.error as unknown) as { message?: string; details?: string };
-          errorText = errorTypes['UNKNOWN_STREAMING_ERROR'].message;
-          diagReportMessage = [
-            this.nativeErrorMessage ??
-              `System Error Message:  ${error.message ?? error}. ${errorText}, ${
-                errorTypes['UNKNOWN_STREAMING_ERROR'].action
-              }.`,
-          ].join('. ');
-          showNativeErrorMessage = true;
-          extendedErrorText = errorText + '\n\n' + $t('System error message:') + info.error + '"';
-        } else {
-          errorText = errorTypes['UNKNOWN_STREAMING_ERROR'].message;
-          diagReportMessage =
-            this.nativeErrorMessage ??
-            `${errorText}, ${errorTypes['UNKNOWN_STREAMING_ERROR'].action}`;
-          showNativeErrorMessage = true;
-          extendedErrorText =
-            this.nativeErrorMessage ??
-            $t(
-              'Streaming to platform is temporarily not available, confirm streaming approval and output settings.',
-            );
-        }
-
-        if (errorText === extendedErrorText) {
-        }
+        showNativeErrorMessage = details !== '';
       }
 
       const buttons = [$t('OK')];
@@ -1468,11 +1424,7 @@ export class StreamingService
       }[info.type];
 
       if (linkToDriverInfo) buttons.push($t('Learn More'));
-      if (
-        showNativeErrorMessage &&
-        this.nativeErrorMessage !== extendedErrorText &&
-        errorText !== extendedErrorText
-      ) {
+      if (showNativeErrorMessage) {
         buttons.push($t('More'));
       }
 
@@ -1483,7 +1435,7 @@ export class StreamingService
           buttons,
           title,
           type: errorType,
-          message: this.nativeErrorMessage ?? errorText,
+          message: errorText,
         })
         .then(({ response }) => {
           if (linkToDriverInfo && response === 1) {
@@ -1503,11 +1455,12 @@ export class StreamingService
                   buttons,
                   title,
                   type: errorType,
-                  message: extendedErrorText,
+                  message: details,
                 })
                 .then(({ response }) => {
                   this.outputErrorOpen = false;
-                  this.nativeErrorMessage = null;
+                  this.streamErrorUserMessage = '';
+                  this.streamErrorReportMessage = '';
                 })
                 .catch(() => {
                   this.outputErrorOpen = false;
