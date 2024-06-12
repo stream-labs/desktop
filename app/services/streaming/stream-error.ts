@@ -411,7 +411,7 @@ export function formatUnknownErrorMessage(
     messages.report = typedMessages.report;
   }
 
-  const details = messages.details.length ? messages.details.join('. ') : null;
+  const details = messages.details.length ? messages.details.join('. ') : undefined;
   return {
     user: messages.user.join('. '),
     report: messages.user.join('. '),
