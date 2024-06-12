@@ -1137,6 +1137,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const service = getPlatformService(primaryPlatform);
 
     this.SET_AUTH_STATE(EAuthProcessState.Loading);
+    this.streamSettingsService.resetStreamSettings();
     const result = await this.login(service);
     this.SET_AUTH_STATE(EAuthProcessState.Idle);
 

@@ -379,8 +379,8 @@ export class StreamingService
           await this.restreamService.beforeGoLive();
         });
       } catch (e: unknown) {
-        console.error('Failed to setup restream', e);
-        this.setError('RESTREAM_SETUP_FAILED');
+        console.error('Failed to setup restream', e as any);
+        this.setError('RESTREAM_SETUP_FAILED', e as any);
         return;
       }
     }
@@ -1406,24 +1406,46 @@ export class StreamingService
         // we don't recognize should fall into this branch and show a generic error.
         if (info.error && typeof info.error === 'string') {
           try {
-            const error = JSON.parse(info.error);
-            const platform = capitalize(error.platform);
+            // Try to parse error as JSON as original, however if it's just a string (such as in the case of invalid recording path)
+            // use that message instead
+            let error;
+            let platform;
+            try {
+              error = JSON.parse(info.error);
+              platform = capitalize(error.platform);
+            } catch {
+              error = { message: info.error, code: info.code };
+            }
 
-            errorText = platform
-              ? $t('Streaming to %{platform} is temporary unavailable', { platform })
-              : errorTypes['UNKNOWN_STREAMING_ERROR'].message;
-
-            diagReportMessage =
-              this.nativeErrorMessage ??
-              `${capitalize(platform)} ${error?.code} Error: ${[
-                error?.message,
-                error?.details,
-              ].join('. ')} ${errorTypes['UNKNOWN_STREAMING_ERROR_MESSAGE'].message}, ${
-                errorTypes['UNKNOWN_STREAMING_ERROR_MESSAGE'].action
-              }`;
+            // Cover invalid recording path here
+            // TODO: could possibly move to its own branch
+            // TODO: will this message be the same across locales?
+            if (
+              /Unable to write to (.+). Make sure you're using a recording path which your user account is allowed to write to/.test(
+                error.message,
+              )
+            ) {
+              errorText = `${error.message}\n\n${$t(
+                'Go to Settings -> Output -> Recording -> Recording Path if you need to change this location.',
+              )}`;
+              diagReportMessage = `${error.code} Error: ${error.message}`;
+            } else {
+              errorText = platform
+                ? $t('Streaming to %{platform} is temporary unavailable', { platform })
+                : errorTypes['UNKNOWN_STREAMING_ERROR'].message;
+              diagReportMessage =
+                this.nativeErrorMessage ??
+                `${capitalize(platform)} ${error?.code} Error: ${[
+                  error?.message,
+                  error?.details,
+                ].join('. ')} ${errorTypes['UNKNOWN_STREAMING_ERROR_MESSAGE'].message}, ${
+                  errorTypes['UNKNOWN_STREAMING_ERROR_MESSAGE'].action
+                }`;
+            }
 
             showNativeErrorMessage = true;
             extendedErrorText = errorText + '\n\n' + $t('Error Code:') + ' ' + info.code;
+            // TODO: this should be dead code now
           } catch (error: unknown) {
             errorText = errorTypes['UNKNOWN_STREAMING_ERROR'].message;
             diagReportMessage =

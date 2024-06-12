@@ -16,48 +16,48 @@ import { test, useWebdriver } from '../../helpers/webdriver';
 
 useWebdriver();
 
+async function enableAllPlatforms() {
+  for (const platform of ['twitch', 'youtube', 'trovo']) {
+    await fillForm({ [platform]: true });
+    await waitForSettingsWindowLoaded();
+  }
+}
+
 test('Multistream default mode', async t => {
   // login to via Twitch because it doesn't have strict rate limits
-  await logIn('twitch', { multistream: true });
+  const user = await logIn('twitch', { multistream: true });
   await prepareToGoLive();
   await clickGoLive();
   await waitForSettingsWindowLoaded();
 
-  // enable all platforms
-  await fillForm({
-    twitch: true,
-    youtube: true,
-    trovo: true,
-  });
-  await waitForSettingsWindowLoaded();
+  // TODO: this is to rule-out a race condition in platform switching, might not be needed and
+  // can possibly revert back to fillForm with all platforms.
+  await enableAllPlatforms();
 
   // add settings
   await fillForm({
     title: 'Test stream',
     description: 'Test stream description',
     twitchGame: 'Fortnite',
+    trovoGame: 'Doom',
   });
 
   await submit();
   await waitForDisplayed('span=Configure the Multistream service');
   await waitForDisplayed("h1=You're live!", { timeout: 60000 });
   await stopStream();
+  await releaseUserInPool(user);
   await t.pass();
 });
 
 test('Multistream advanced mode', async t => {
   // login to via Twitch because it doesn't have strict rate limits
-  await logIn('twitch', { multistream: true });
+  const user = await logIn('twitch', { multistream: true });
   await prepareToGoLive();
   await clickGoLive();
   await waitForSettingsWindowLoaded();
 
-  // enable all platforms
-  await fillForm({
-    twitch: true,
-    youtube: true,
-    trovo: true,
-  });
+  await enableAllPlatforms();
 
   await switchAdvancedMode();
   await waitForSettingsWindowLoaded();
@@ -89,11 +89,12 @@ test('Multistream advanced mode', async t => {
   await waitForDisplayed('span=Configure the Multistream service');
   await waitForDisplayed("h1=You're live!", { timeout: 60000 });
   await stopStream();
+  await releaseUserInPool(user);
   await t.pass();
 });
 
 test('Custom stream destinations', async t => {
-  await logIn('twitch', { prime: true });
+  const loggedInUser = await logIn('twitch', { prime: true });
 
   // fetch a new stream key
   const user = await reserveUserFromPool(t, 'twitch');
@@ -155,5 +156,6 @@ test('Custom stream destinations', async t => {
   await showSettingsWindow('Stream');
   await click('i.fa-trash');
   await click('i.fa-trash');
+  await releaseUserInPool(loggedInUser);
   t.false(await isDisplayed('i.fa-trash'), 'Destinations should be removed');
 });
