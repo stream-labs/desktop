@@ -106,7 +106,12 @@ function ModalFooter() {
 
       {/* GO LIVE BUTTON */}
       {shouldShowConfirm && (
-        <Button type="primary" onClick={goLive} disabled={isLoading || !!error}>
+        <Button
+          data-testid="confirmGoLiveBtn"
+          type="primary"
+          onClick={goLive}
+          disabled={isLoading || !!error}
+        >
           {$t('Confirm & Go Live')}
         </Button>
       )}

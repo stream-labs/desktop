@@ -13,6 +13,9 @@ import InfoBanner from 'components-react/shared/InfoBanner';
 import GameSelector from '../GameSelector';
 import { EDismissable } from 'services/dismissables';
 
+/**
+ * @remark The filename for this component is intentionally not consistent with capitalization to preserve the commit history
+ */
 export function TikTokEditStreamInfo(p: IPlatformComponentParams<'tiktok'>) {
   const ttSettings = p.value;
   const approved = Services.TikTokService.scope === 'approved';
