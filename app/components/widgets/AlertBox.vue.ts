@@ -14,11 +14,10 @@ import { alertNameMap } from '../../services/widgets/settings/alert-box/alert-bo
 const triggerAmountMap = {
   bits: 'bits_alert_min_amount',
   donations: 'donation_alert_min_amount',
-  hosts: 'host_viewer_minimum',
   raids: 'raid_raider_minimum',
 };
 
-const HAS_ALERT_SETTINGS = ['donations', 'bits', 'hosts', 'raids', 'effects', 'stickers'];
+const HAS_ALERT_SETTINGS = ['donations', 'bits', 'effects', 'raids', 'stickers'];
 const HAS_DONOR_MESSAGE = [
   'donations',
   'bits',

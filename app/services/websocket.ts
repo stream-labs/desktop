@@ -150,6 +150,7 @@ export class WebsocketService extends Service {
   socket: SocketIOClient.Socket;
 
   socketEvent = new Subject<TSocketEvent>();
+  ultraSubscription = new Subject<boolean>();
   io: SocketIOClientStatic;
 
   init() {

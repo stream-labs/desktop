@@ -22,15 +22,6 @@ export default function Chat(props: {
 
   let leaveFullScreenTrigger: Function;
 
-  const showTikTokInfo =
-    props.visibleChat === 'tiktok' ||
-    (props.visibleChat === 'default' &&
-      Services.UserService.state.auth?.primaryPlatform === 'tiktok');
-
-  const setTikTokChat =
-    Services.UserService.state.auth?.primaryPlatform === 'tiktok' &&
-    props.visibleChat === 'restream';
-
   // Setup resize/fullscreen listeners
   useEffect(() => {
     resizeInterval = window.setInterval(() => {
@@ -66,9 +57,6 @@ export default function Chat(props: {
     const cancelUnload = onUnload(() => service.actions.unmountChat(remote.getCurrentWindow().id));
 
     return () => {
-      if (setTikTokChat) {
-        props.setChat('tiktok');
-      }
       service.actions.unmountChat(remote.getCurrentWindow().id);
       cancelUnload();
     };
@@ -111,21 +99,5 @@ export default function Chat(props: {
     );
   }
 
-  return showTikTokInfo ? <TikTokChatInfo /> : <div className={styles.chat} ref={chatEl} />;
-}
-
-function TikTokChatInfo() {
-  function openPlatformDash() {
-    remote.shell.openExternal(Services.TikTokService.dashboardUrl);
-  }
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', marginTop: '30px' }}>
-      <div style={{ marginBottom: '5px' }}>
-        {$t('Access chat for TikTok in the TikTok Live Center.')}
-      </div>
-      <Button style={{ width: '200px', marginBottom: '10px' }} onClick={() => openPlatformDash()}>
-        {$t('Open TikTok Live Center')}
-      </Button>
-    </div>
-  );
+  return <div className={styles.chat} ref={chatEl} />;
 }

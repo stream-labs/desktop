@@ -33,38 +33,42 @@ const hideInteraction = `
   const elements = [];
 
   /* Platform Chats */
+  // TODO: remove .chat-input if it was only for Twitch, as it wasn't working and fixed below
   elements.push(document.querySelector('.chat-input'));
   elements.push(document.querySelector('.webComposerBlock__3lT5b'));
-  
-  /* Recent Events */
-  elements.push(document.querySelector('.recent-events__header'));
-  elements.push(document.querySelector('.recent-events__tabs'));
-  elements.push(document.querySelector('.popout--recent-events'));
+
   elements.forEach((el) => {
     if (el) { el.style.cssText = 'display: none !important'; }
   });
-  
-  // Trovo Chat
+
+  const el = document.createElement('style');
+  document.head.appendChild(el);
+  const sheet = el.sheet;
+
+  /* Recent Events */
+  sheet.insertRule('.recent-events__header, .recent-events__tabs, .popout--recent-events { display: none !important; }');
+
+  /* Twitch Chat */
+  // Header
+  sheet.insertRule('.stream-chat .stream-chat-header { display: none !important; }', sheet.cssRules.length);
+  // Chat Input
+  sheet.insertRule('.stream-chat .chat-input { display: none !important; }', sheet.cssRules.length);
+
+  /* Trovo Chat */
   // Fix chat container that's cut off on Game Overlay's 300px wide window
-  const trovoChatContainer = document.querySelector('#__layout .popout-container .chat-wrap');
-  if (trovoChatContainer) {
-    /* 
-     * The input box is rendered way after this code runs, insert a CSS rule to hide it instead of 
-     * manipulating style directly since we will never find the element here. 
-     * Since we're using CSSStyleSheet we add the rest of the rules here. 
-     * 
-     * 1. Fix chat wrapper width.
-     * 2. Hide chat input panel.
-     * 3. Hide all headers, including Gift Rank.
-     */
-    const el = document.createElement('style');
-    document.head.appendChild(el);
-    const sheet = el.sheet;
-    sheet.insertRule('#__layout .popout-container .chat-wrap { min-width: 300px }', sheet.cssRules.length);
-    sheet.insertRule('#__layout .popout-container .chat-wrap .chat-header { display: none }', sheet.cssRules.length);
-    sheet.insertRule('#__layout .popout-container .input-panels-container { display: none }', sheet.cssRules.length);
-    sheet.insertRule('#__layout .popout-container .gift-rank-header { display: none }', sheet.cssRules.length);
-  }
+  /* 
+   * The input box is rendered way after this code runs, insert a CSS rule to hide it instead of 
+   * manipulating style directly since we will never find the element here. 
+   * Since we're using CSSStyleSheet we add the rest of the rules here. 
+   * 
+   * 1. Fix chat wrapper width.
+   * 2. Hide chat input panel.
+   * 3. Hide all headers, including Gift Rank.
+   */
+  sheet.insertRule('#__layout .popout-container .chat-wrap { min-width: 300px }', sheet.cssRules.length);
+  sheet.insertRule('#__layout .popout-container .chat-wrap .chat-header { display: none }', sheet.cssRules.length);
+  sheet.insertRule('#__layout .popout-container .input-panels-container { display: none }', sheet.cssRules.length);
+  sheet.insertRule('#__layout .popout-container .gift-rank-header { display: none }', sheet.cssRules.length);
 `;
 
 export enum EGameOverlayState {

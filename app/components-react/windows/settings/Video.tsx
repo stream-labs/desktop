@@ -6,11 +6,11 @@ import { Button, Form, Modal, message } from 'antd';
 import FormFactory, { TInputValue } from 'components-react/shared/inputs/FormFactory';
 import { CheckboxInput } from 'components-react/shared/inputs';
 import Tooltip from 'components-react/shared/Tooltip';
-import { EScaleType, EFPSType } from '../../../../obs-api';
+import { EScaleType, EFPSType, IVideoInfo } from '../../../../obs-api';
 import { $t } from 'services/i18n';
 import styles from './Common.m.less';
 import Tabs from 'components-react/shared/Tabs';
-import { invalidFps, TDisplayType } from 'services/settings-v2/video';
+import { invalidFps, IVideoInfoValue, TDisplayType } from 'services/settings-v2/video';
 
 const CANVAS_RES_OPTIONS = [
   { label: '1920x1080', value: '1920x1080' },
@@ -404,8 +404,9 @@ class VideoSettingsModule {
     }
   }
 
-  onChange(key: string) {
-    return (val: unknown) => this.service.actions.setVideoSetting(key, val, this.state.display);
+  onChange(key: keyof IVideoInfo) {
+    return (val: IVideoInfoValue) =>
+      this.service.actions.setVideoSetting(key, val, this.state.display);
   }
 
   setDisplay(display: TDisplayType) {

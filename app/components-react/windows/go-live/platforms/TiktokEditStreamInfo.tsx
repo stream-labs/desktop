@@ -10,15 +10,22 @@ import { CommonPlatformFields } from '../CommonPlatformFields';
 import { ITikTokStartStreamOptions } from 'services/platforms/tiktok';
 import { TextInput, createBinding } from 'components-react/shared/inputs';
 import InfoBanner from 'components-react/shared/InfoBanner';
+import GameSelector from '../GameSelector';
+import { EDismissable } from 'services/dismissables';
 
+/**
+ * @remark The filename for this component is intentionally not consistent with capitalization to preserve the commit history
+ */
 export function TikTokEditStreamInfo(p: IPlatformComponentParams<'tiktok'>) {
   const ttSettings = p.value;
-  const liveStreamingEnabled = Services.TikTokService.liveStreamingEnabled;
-  const legacy = Services.TikTokService.scope === 'legacy';
+  const approved = Services.TikTokService.scope === 'approved';
+  const rejected = Services.TikTokService.rejected;
 
   function updateSettings(patch: Partial<ITikTokStartStreamOptions>) {
     p.onChange({ ...ttSettings, ...patch });
   }
+
+  const bind = createBinding(ttSettings, updatedSettings => updateSettings(updatedSettings));
 
   return (
     <Form name="tiktok-settings">
@@ -33,10 +40,17 @@ export function TikTokEditStreamInfo(p: IPlatformComponentParams<'tiktok'>) {
             onChange={updateSettings}
           />
         }
-        requiredFields={<div key={'empty-tiktok'} />}
+        requiredFields={
+          approved ? (
+            <GameSelector key="required" platform={'tiktok'} {...bind.game} />
+          ) : (
+            <div key="empty-tiktok" />
+          )
+        }
       />
 
-      {(!liveStreamingEnabled || legacy) && <TikTokEnterCredentialsFormInfo {...p} />}
+      {!approved && <TikTokEnterCredentialsFormInfo {...p} />}
+      {rejected && <TikTokNotApprovedWarning {...p} />}
     </Form>
   );
 }
@@ -60,7 +74,6 @@ export function TikTokEnterCredentialsFormInfo(p: IPlatformComponentParams<'tikt
       />
       <TextInput
         label={
-          // eslint-disable-next-line prettier/prettier
           <Tooltip title={$t('Generate with "Locate my Stream Key"')} placement="right">
             {$t('TikTok Stream Key')}
             <i className="icon-information" style={{ marginLeft: '5px' }} />
@@ -101,6 +114,64 @@ export function TikTokEnterCredentialsFormInfo(p: IPlatformComponentParams<'tikt
   );
 }
 
+export function TikTokNotApprovedWarning(p: IPlatformComponentParams<'tiktok'>) {
+  const bind = createBinding(p.value, updatedSettings =>
+    p.onChange({ ...p.value, ...updatedSettings }),
+  );
+
+  return (
+    <>
+      <TextInput
+        label={
+          <Tooltip title={$t('Generate with "Locate my Stream Key"')} placement="right">
+            {$t('TikTok Server URL')}
+            <i className="icon-information" style={{ marginLeft: '5px' }} />
+          </Tooltip>
+        }
+        required
+        {...bind.serverUrl}
+      />
+      <TextInput
+        label={
+          <Tooltip title={$t('Generate with "Locate my Stream Key"')} placement="right">
+            {$t('TikTok Stream Key')}
+            <i className="icon-information" style={{ marginLeft: '5px' }} />
+          </Tooltip>
+        }
+        required
+        {...bind.streamKey}
+      />
+      <InputWrapper
+        extra={
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <InfoBanner
+              message={$t('TikTok Live Access not granted. Click here to learn more.')}
+              type="info"
+              style={{ marginTop: '5px' }}
+              onClick={() => {
+                openConfirmation();
+                Services.DismissablesService.actions.dismiss(EDismissable.TikTokRejected);
+              }}
+              dismissableKey={EDismissable.TikTokRejected}
+            />
+          </div>
+        }
+      >
+        <Button
+          onClick={openApplicationInfoPage}
+          style={{
+            marginBottom: '10px',
+            background: 'var(--tiktok-btn)',
+            color: 'var(--black)',
+          }}
+        >
+          {$t('Reapply for TikTok Live Permission')}
+        </Button>
+      </InputWrapper>
+    </>
+  );
+}
+
 function openInfoPage() {
   remote.shell.openExternal(Services.TikTokService.infoUrl);
 }
@@ -111,4 +182,8 @@ function openApplicationInfoPage() {
 
 function openProducer() {
   remote.shell.openExternal(Services.TikTokService.legacyDashboardUrl);
+}
+
+function openConfirmation() {
+  remote.shell.openExternal(Services.TikTokService.confirmationUrl);
 }

@@ -3,6 +3,9 @@ import {
   TDualOutputPlatformSettings,
   DualOutputPlatformSettings,
   IDualOutputDestinationSetting,
+  TDisplayPlatforms,
+  IDualOutputPlatformSetting,
+  TDisplayDestinations,
 } from './dual-output-data';
 import { verticalDisplayData } from '../settings-v2/default-settings-data';
 import { ScenesService, SceneItem, TSceneNode } from 'services/scenes';
@@ -100,6 +103,37 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
 
   get destinationSettings() {
     return this.state.destinationSettings;
+  }
+
+  getEnabledTargets(destinationId: 'name' | 'url' = 'url') {
+    const platforms = Object.entries(this.platformSettings).reduce(
+      (displayPlatforms: TDisplayPlatforms, [key, val]: [string, IDualOutputPlatformSetting]) => {
+        if (val && this.streamingService.views.enabledPlatforms.includes(val.platform)) {
+          displayPlatforms[val.display].push(val.platform);
+        }
+        return displayPlatforms;
+      },
+      { horizontal: [], vertical: [] },
+    );
+
+    /**
+     * Returns the enabled destinations according to their assigned display
+     */
+    const destinations = this.streamingService.views.customDestinations.reduce(
+      (displayDestinations: TDisplayDestinations, destination: ICustomStreamDestination) => {
+        if (destination.enabled) {
+          const id = destinationId === 'name' ? destination.name : destination.url;
+          displayDestinations[destination.display ?? 'horizontal'].push(id);
+        }
+        return displayDestinations;
+      },
+      { horizontal: [], vertical: [] },
+    );
+
+    return {
+      platforms,
+      destinations,
+    };
   }
 
   get horizontalNodeIds(): string[] {
@@ -309,6 +343,9 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     // confirm custom destinations have a default display
     this.confirmDestinationDisplays();
 
+    // Disable global Rescale Output
+    this.disableGlobalRescaleIfNeeded();
+
     /**
      * Ensures that the scene nodes are assigned a context
      */
@@ -343,6 +380,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     this.SET_SHOW_DUAL_OUTPUT(status);
 
     if (this.state.dualOutputMode) {
+      this.disableGlobalRescaleIfNeeded();
       this.confirmOrCreateVerticalNodes(this.views.activeSceneId);
 
       /**
@@ -376,6 +414,25 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         this.confirmOrAssignSceneNodes(sceneId);
       } catch (error: unknown) {
         console.error('Error toggling Dual Output mode: ', error);
+      }
+    }
+  }
+  disableGlobalRescaleIfNeeded() {
+    // TODO: this could be improved, either by state tracking or making it compatible with dual output
+    // For now, disable global Rescale Output under Streaming if dual output is enabled
+    if (this.state.dualOutputMode) {
+      const output = this.settingsService.state.Output.formData;
+      const globalRescaleOutput = this.settingsService.findSettingValue(
+        output,
+        'Streaming',
+        'Rescale',
+      );
+      if (globalRescaleOutput) {
+        // `Output` not a typo, it is different from above
+        this.settingsService.setSettingValue('Output', 'Rescale', false);
+        // TODO: find a cleaner way to make dual output recalculate its settings for the vertical display
+        // since even after disabling "rescale output" its settings persists, and looks stretched.
+        this.settingsService.refreshVideoSettings();
       }
     }
   }

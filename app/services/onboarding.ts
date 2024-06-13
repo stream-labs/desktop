@@ -18,8 +18,8 @@ export type { IThemeMetadata } from './onboarding/theme-metadata';
 import {
   StreamerKnowledgeMode,
   isBeginnerOrIntermediateOrUnselected,
-  isIntermediateOrAdvancedOrUnselected,
 } from './onboarding/knowledge-mode';
+import { TwitchStudioImporterService } from './ts-importer';
 export { StreamerKnowledgeMode } from './onboarding/knowledge-mode';
 
 enum EOnboardingSteps {
@@ -70,20 +70,24 @@ export const ONBOARDING_STEPS = () => ({
     component: 'FreshOrImport' as const,
     hideButton: true,
     isPreboarding: true,
-    cond: ({ isObsInstalled, recordingModeEnabled }: OnboardingStepContext) =>
-      isObsInstalled && !recordingModeEnabled,
+    cond: ({
+      isObsInstalled,
+      isTwitchStudioInstalled,
+      recordingModeEnabled,
+    }: OnboardingStepContext) =>
+      (isObsInstalled || isTwitchStudioInstalled) && !recordingModeEnabled,
   },
   [EOnboardingSteps.ObsImport]: {
     component: 'ObsImport' as const,
     hideButton: true,
     label: $t('Import'),
-    cond: ({ importedFromObs, isObsInstalled }: OnboardingStepContext) =>
-      importedFromObs && isObsInstalled,
+    cond: ({ importedFrom, isObsInstalled, isTwitchStudioInstalled }: OnboardingStepContext) =>
+      importedFrom && (isObsInstalled || isTwitchStudioInstalled),
   },
   [EOnboardingSteps.HardwareSetup]: {
     component: 'HardwareSetup' as const,
     label: $t('Set Up Mic and Webcam'),
-    cond: ({ importedFromObs }: OnboardingStepContext) => !importedFromObs,
+    cond: ({ importedFrom }: OnboardingStepContext) => !importedFrom,
     isSkippable: true,
   },
   [EOnboardingSteps.ThemeSelector]: {
@@ -93,12 +97,12 @@ export const ONBOARDING_STEPS = () => ({
     cond: ({
       isLoggedIn,
       existingSceneCollections,
-      importedFromObs,
+      importedFrom,
       recordingModeEnabled,
       platformSupportsThemes,
     }: OnboardingStepContext) =>
       !existingSceneCollections &&
-      !importedFromObs &&
+      !importedFrom &&
       !recordingModeEnabled &&
       ((isLoggedIn && platformSupportsThemes) || !isLoggedIn),
     isSkippable: true,
@@ -132,8 +136,9 @@ export interface OnboardingStepContext {
   isPartialSLAuth: boolean;
   existingSceneCollections: boolean;
   isObsInstalled: boolean;
+  isTwitchStudioInstalled: boolean;
   recordingModeEnabled: boolean;
-  importedFromObs: boolean;
+  importedFrom: 'obs' | 'twitch';
   isLoggedIn: boolean;
   isUltra: boolean;
   platformSupportsThemes: boolean;
@@ -171,7 +176,7 @@ interface IOnboardingOptions {
 
 interface IOnboardingServiceState {
   options: IOnboardingOptions;
-  importedFromObs: boolean;
+  importedFrom: 'obs' | 'twitch';
   existingSceneCollections: boolean;
   streamerKnowledgeMode: StreamerKnowledgeMode | null;
 }
@@ -194,18 +199,22 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
   get steps() {
     const userViews = this.getServiceViews(UserService);
     const isOBSinstalled = this.getServiceViews(ObsImporterService).isOBSinstalled();
+    const isTwitchStudioInstalled = this.getServiceViews(
+      TwitchStudioImporterService,
+    ).isTwitchStudioInstalled();
     const recordingModeEnabled = this.getServiceViews(RecordingModeService).isRecordingModeEnabled;
 
     const streamerKnowledgeMode = this.streamerKnowledgeMode;
 
-    const { existingSceneCollections, importedFromObs } = this.state;
+    const { existingSceneCollections, importedFrom } = this.state;
     const { isLoggedIn, isPrime: isUltra } = userViews;
 
     const ctx: OnboardingStepContext = {
       streamerKnowledgeMode,
       recordingModeEnabled,
       existingSceneCollections,
-      importedFromObs,
+      importedFrom,
+      isTwitchStudioInstalled,
       isLoggedIn,
       isUltra,
       isObsInstalled: isOBSinstalled,
@@ -313,7 +322,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
       isHardware: false,
       isImport: false,
     },
-    importedFromObs: false,
+    importedFrom: null,
     existingSceneCollections: false,
     streamerKnowledgeMode: null,
   };
@@ -333,8 +342,8 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   }
 
   @mutation()
-  SET_OBS_IMPORTED(val: boolean) {
-    this.state.importedFromObs = val;
+  SET_OBS_IMPORTED(val: 'obs' | 'twitch') {
+    this.state.importedFrom = val;
   }
 
   @mutation()
@@ -383,7 +392,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
     this.setExistingCollections();
   }
 
-  setObsImport(val: boolean) {
+  setImport(val: 'obs' | 'twitch') {
     this.SET_OBS_IMPORTED(val);
   }
 

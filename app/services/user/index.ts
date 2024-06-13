@@ -165,6 +165,7 @@ class UserViews extends ViewHandler<IUserServiceState> {
   @Inject() hostsService: HostsService;
   @Inject() magicLinkService: MagicLinkService;
   @Inject() customizationService: CustomizationService;
+  @Inject() userService: UserService;
 
   get settingsServiceViews() {
     return this.getServiceViews(SettingsService);
@@ -266,6 +267,10 @@ class UserViews extends ViewHandler<IUserServiceState> {
 
     return `${url}?token=${token}&mode=${nightMode}`;
   }
+
+  setPrimaryPlatform(platform: TPlatform) {
+    this.userService.setPrimaryPlatform(platform);
+  }
 }
 
 export class UserService extends PersistentStatefulService<IUserServiceState> {
@@ -285,6 +290,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private jsonrpcService: JsonrpcService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject('TikTokService') tiktokService: TikTokService;
+
+  setPrimaryPlatform(platform: TPlatform) {
+    this.SET_PRIMARY_PLATFORM(platform);
+  }
 
   @mutation()
   LOGIN(auth: IUserAuth) {
@@ -445,6 +454,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       }
 
       if (['account_merged', 'account_unlinked'].includes(event.type)) {
+        if (!this.isLoggedIn) return;
+
         await this.updateLinkedPlatforms();
 
         const message =
@@ -461,6 +472,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         this.windowsService.setWindowOnTop();
         this.settingsService.showSettings('Stream');
         this.refreshedLinkedAccounts.next({ success: false, message: $t('Account merge error') });
+      }
+
+      if (event.type === 'streamlabs_prime_subscribe') {
+        this.websocketService.ultraSubscription.next(true);
       }
     });
   }
@@ -1084,6 +1099,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.LOGOUT();
     this.LOGIN(auth);
 
+    // We need to fetch prime status to skip onboarding step for
+    // picking a primary platform if the user has Ultra, as we'll
+    // auto-select the first one in that case.
+    await this.setPrimeStatus();
+
     // Find out if the user has any additional platforms linked
     await this.updateLinkedPlatforms();
     return EPlatformCallResult.Success;
@@ -1117,6 +1137,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const service = getPlatformService(primaryPlatform);
 
     this.SET_AUTH_STATE(EAuthProcessState.Loading);
+    this.streamSettingsService.resetStreamSettings();
     const result = await this.login(service);
     this.SET_AUTH_STATE(EAuthProcessState.Idle);
 

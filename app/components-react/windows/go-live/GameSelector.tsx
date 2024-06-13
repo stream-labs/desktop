@@ -19,18 +19,37 @@ export default function GameSelector(p: TProps) {
   const selectedGameId = platformService.state.settings.game;
   let selectedGameName = selectedGameId;
 
-  if (platform === 'trovo') {
+  const isTwitch = platform === 'twitch';
+  const isTrovo = platform === 'trovo';
+  const isTikTok = platform === 'tiktok';
+
+  if (isTrovo) {
     selectedGameName = Services.TrovoService.state.channelInfo.gameName;
   }
 
-  const { isSearching, setIsSearching, games, setGames } = useModule(() => ({
-    state: injectState({
-      isSearching: false,
-      games: selectedGameId
-        ? [{ label: selectedGameName, value: selectedGameId }]
-        : ([] as IListOption<string>[]),
-    }),
-  }));
+  if (isTikTok) {
+    selectedGameName = Services.TikTokService.state.gameName;
+  }
+
+  const { isSearching, setIsSearching, games, setGames } = useModule(() => {
+    const selectedGameOptions =
+      isTikTok && selectedGameId.toLowerCase() !== Services.TikTokService.defaultGame.id
+        ? [
+            { label: selectedGameName, value: selectedGameId },
+            {
+              label: Services.TikTokService.defaultGame.name,
+              value: Services.TikTokService.defaultGame.id,
+            },
+          ]
+        : [{ label: selectedGameName, value: selectedGameId }];
+
+    return {
+      state: injectState({
+        isSearching: false,
+        games: selectedGameId ? selectedGameOptions : ([] as IListOption<string>[]),
+      }),
+    };
+  });
 
   function fetchGames(query: string): Promise<IGame[]> {
     return platformService.searchGames(query);
@@ -46,18 +65,20 @@ export default function GameSelector(p: TProps) {
     if (!selectedGameName) return;
     const game = await platformService.fetchGame(selectedGameName);
     if (!game || game.name !== selectedGameName) return;
-    setGames(games.map(opt =>
-      opt.value === selectedGameId ? { ...opt, image: game.image } : opt,
-    ));
+    setGames(
+      games.map(opt => (opt.value === selectedGameId ? { ...opt, image: game.image } : opt)),
+    );
   }
 
   async function onSearch(searchString: string) {
-    if (searchString.length < 2) return;
-    const games = (await fetchGames(searchString)).map(g => ({
-      value: platform === 'trovo' ? g.id : g.name,
-      label: g.name,
-      image: g.image,
-    }));
+    if (searchString.length < 2 && platform !== 'tiktok') return;
+    const games =
+      (await fetchGames(searchString))?.map(g => ({
+        value: ['trovo', 'tiktok'].includes(platform) ? g.id : g.name,
+        label: g.name,
+        image: g?.image,
+      })) ?? [];
+
     setGames(games);
     setIsSearching(false);
   }
@@ -67,14 +88,34 @@ export default function GameSelector(p: TProps) {
     setIsSearching(true);
   }
 
-  const isTwitch = platform === 'twitch';
-  const isTrovo = platform === 'trovo';
+  function onSelect(searchString: string) {
+    const game = games.find(game => game.label === searchString);
+
+    if (isTikTok) {
+      Services.TikTokService.actions.setGameName(searchString);
+    }
+
+    if (!game) return;
+    setGames([game]);
+  }
 
   const label = {
     twitch: $t('Twitch Category'),
     facebook: $t('Facebook Game'),
     trovo: $t('Trovo Category'),
+    tiktok: $t('TikTok Game'),
   }[platform as string];
+
+  const filterOption = (input: string, option?: { label: string; value: string }) => {
+    if (isTikTok) {
+      return (
+        option?.label === 'Other' ||
+        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+      );
+    }
+
+    return (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
+  };
 
   return (
     <ListInput
@@ -87,8 +128,12 @@ export default function GameSelector(p: TProps) {
       options={games}
       showSearch
       onSearch={onSearch}
+      onSelect={(val, opts) => {
+        onSelect(opts.labelrender);
+      }}
+      filterOption={filterOption}
       debounce={500}
-      required={isTwitch || isTrovo}
+      required={isTwitch || isTrovo || isTikTok}
       hasImage={isTwitch || isTrovo}
       onBeforeSearch={onBeforeSearchHandler}
       imageSize={platformService.gameImageSize}

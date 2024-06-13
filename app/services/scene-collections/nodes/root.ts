@@ -153,7 +153,7 @@ export class RootNode extends Node<ISchema, {}> {
 
     // Added baseResolution in version 3
     if (version < 3) {
-      this.data.baseResolution = this.videoService.baseResolution;
+      this.data.baseResolution = this.videoSettingsService.baseResolution;
     }
     // Added multiple displays with individual base resolutions in version 4
     if (version < 4) {

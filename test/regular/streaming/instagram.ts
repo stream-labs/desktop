@@ -9,13 +9,13 @@ import {
   stopStream,
 } from '../../helpers/modules/streaming';
 import { addDummyAccount, releaseUserInPool } from '../../helpers/webdriver/user';
-import { fillForm, readFields } from '../../helpers/modules/forms';
+import { fillForm } from '../../helpers/modules/forms';
 import { waitForDisplayed } from '../../helpers/modules/core';
 
 useWebdriver();
 
 test('Streaming to Instagram', async t => {
-  const user = await logIn('twitch', { multistream: true });
+  const user = await logIn('twitch', { prime: true, multistream: false });
 
   // test approved status
   const dummy = await addDummyAccount('instagram');
@@ -31,7 +31,7 @@ test('Streaming to Instagram', async t => {
   await fillForm({
     title: 'Test stream',
     twitchGame: 'Fortnite',
-    streamUrl: dummy.serverUrl,
+    streamUrl: dummy.streamUrl,
     streamKey: dummy.streamKey,
   });
   await submit();

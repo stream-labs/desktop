@@ -9,6 +9,8 @@ export type TTestDummyUserPlatforms = DummyUserPlatforms[number];
 
 export interface IDummyTestUser extends ITestUser {
   serverUrl?: string;
+  ingest?: string;
+  streamUrl?: string;
   streamKey?: string;
   tikTokLiveScope?: TTikTokLiveScopeTypes;
 }
@@ -27,7 +29,7 @@ export const tikTokUserApproved: IDummyTestUser = {
   token: 'ttToken1',
   apiToken: 'ttApiToken1',
   widgetToken: 'ttWidgetToken1',
-  serverUrl: 'ttServerUrl1',
+  serverUrl: 'rtmps://ttStreamUrl1:443/rtmp/',
   streamKey: 'ttStreamKey1',
   tikTokLiveScope: 'approved',
 };
@@ -42,7 +44,7 @@ export const tikTokUserNotApproved: IDummyTestUser = {
   token: 'ttToken2',
   apiToken: 'ttApiToken2',
   widgetToken: 'ttWidgetToken2',
-  serverUrl: 'ttServerUrl2',
+  serverUrl: 'rtmps://ttStreamUrl2:443/rtmp/',
   streamKey: 'ttStreamKey2',
   tikTokLiveScope: 'not-approved',
 };
@@ -57,7 +59,7 @@ export const tikTokUserLegacy: IDummyTestUser = {
   token: 'ttToken3',
   apiToken: 'ttApiToken3',
   widgetToken: 'ttWidgetToken3',
-  serverUrl: 'ttServerUrl3',
+  serverUrl: 'rtmps://ttStreamUrl3:443/rtmp/',
   streamKey: 'ttStreamKey3',
   tikTokLiveScope: 'legacy',
 };
@@ -72,7 +74,7 @@ export const tikTokUserDenied: IDummyTestUser = {
   token: 'ttToken4',
   apiToken: 'ttApiToken4',
   widgetToken: 'ttWidgetToken4',
-  serverUrl: 'ttServerUrl4',
+  serverUrl: 'rtmps://ttStreamUrl4:443/rtmp/',
   streamKey: 'ttStreamKey4',
   tikTokLiveScope: 'denied',
 };
@@ -81,7 +83,7 @@ export const tikTokUserDenied: IDummyTestUser = {
  * Instagram
  */
 
-export const instagramUser1: ITestUser = {
+export const instagramUser1: IDummyTestUser = {
   email: 'instagramUser4@email.com',
   workerId: 'instagramWorkerId4',
   updated: 'instagramUpdatedId4',
@@ -90,6 +92,8 @@ export const instagramUser1: ITestUser = {
   id: 'instagramId4',
   token: 'instagramToken4',
   apiToken: 'instagramApiToken4',
+  streamUrl: 'rtmps://instagramStreamUrl:443/rtmp/',
+  streamKey: 'instagramStreamKey4',
   widgetToken: 'instagramWidgetToken4',
 };
 
@@ -97,16 +101,18 @@ export const instagramUser1: ITestUser = {
  * Twitter
  */
 
-export const twitterUser1: ITestUser = {
-  email: 'twitterUser4@email.com',
-  workerId: 'twitterWorkerId4',
-  updated: 'twitterUpdatedId4',
-  username: 'twitterUser4',
+export const twitterUser1: IDummyTestUser = {
+  email: 'twitterUser1@email.com',
+  workerId: 'twitterWorkerId1',
+  updated: 'twitterUpdatedId1',
+  username: 'twitterUser1',
   type: 'twitter',
-  id: 'twitterId4',
-  token: 'twitterToken4',
-  apiToken: 'twitterApiToken4',
-  widgetToken: 'twitterWidgetToken4',
+  id: 'twitterId1',
+  token: 'twitterToken1',
+  apiToken: 'twitterApiToken1',
+  ingest: 'rtmps://twitterIngestUrl:443/rtmp/',
+  streamKey: 'twitterStreamKey1',
+  widgetToken: 'twitterWidgetToken1',
 };
 
 /**
