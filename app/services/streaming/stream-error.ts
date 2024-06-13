@@ -64,7 +64,7 @@ export const errorTypes = {
   FACEBOOK_STREAMING_DISABLED: {
     get message() {
       return $t(
-        "You're not eligible to Go Live, your profile needs to be at least 60 days old, or your page needs to have at least 100 followers",
+        "You're not eligible to Go Live, your profile needs to be at least 60 days old and your page needs to have at least 100 followers",
       );
     },
   },
