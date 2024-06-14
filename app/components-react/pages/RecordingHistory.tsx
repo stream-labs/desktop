@@ -19,8 +19,6 @@ class RecordingHistoryController {
   private RecordingModeService = Services.RecordingModeService;
   private UserService = Services.UserService;
   private SharedStorageService = Services.SharedStorageService;
-  private OnboardingService = Services.OnboardingService;
-  private WindowsService = Services.WindowsService;
   private NotificationsService = Services.NotificationsService;
   store = initStore({ showSLIDModal: false });
 
@@ -78,8 +76,7 @@ class RecordingHistoryController {
   }
 
   connectSLID() {
-    this.OnboardingService.actions.start({ isLogin: true });
-    this.WindowsService.actions.closeChildWindow();
+    this.UserService.actions.startSLMerge();
   }
 
   handleSelect(filename: string, platform: string) {

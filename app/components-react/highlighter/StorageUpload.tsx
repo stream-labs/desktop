@@ -10,7 +10,7 @@ import styles from './ExportModal.m.less';
 import VideoPreview from './VideoPreview';
 
 export default function StorageUpload(p: { onClose: () => void; platform: string }) {
-  const { UserService, HighlighterService, OnboardingService, SharedStorageService } = Services;
+  const { UserService, HighlighterService, SharedStorageService } = Services;
 
   const { uploadInfo, hasSLID } = useVuex(() => ({
     uploadInfo: HighlighterService.views.uploadInfo,
@@ -18,7 +18,7 @@ export default function StorageUpload(p: { onClose: () => void; platform: string
   }));
 
   function connectSLID() {
-    OnboardingService.actions.start({ isLogin: true });
+    UserService.actions.startSLMerge();
   }
 
   function uploadStorage() {
@@ -59,7 +59,9 @@ export default function StorageUpload(p: { onClose: () => void; platform: string
 
 export function GetSLID(p: { onClick: () => void }) {
   function signUp() {
-    remote.shell.openExternal('https://id.streamlabs.com/register');
+    remote.shell.openExternal(
+      'https://streamlabs.com/slobs/signup?skip_splash=true&external=electron&slid&force_verify&origin=slobs&port=51591',
+    );
   }
 
   return (
