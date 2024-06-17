@@ -8,6 +8,7 @@ import Translate from 'components-react/shared/Translate';
 import UploadProgress from './UploadProgress';
 import styles from './ExportModal.m.less';
 import VideoPreview from './VideoPreview';
+import { EPlatformCallResult } from 'services/platforms';
 
 export default function StorageUpload(p: { onClose: () => void; platform: string }) {
   const { UserService, HighlighterService, SharedStorageService } = Services;
@@ -58,10 +59,20 @@ export default function StorageUpload(p: { onClose: () => void; platform: string
 }
 
 export function GetSLID() {
-  const { UserService } = Services;
+  const { UserService, WindowsService } = Services;
 
-  function clickLink() {
-    UserService.actions.startSLMerge();
+  function clickLogin() {
+    clickLink(UserService.actions.return.startSLMerge);
+  }
+
+  function clickSignup() {
+    clickLink(UserService.actions.return.startSLAuth);
+  }
+
+  async function clickLink(cb: () => Promise<EPlatformCallResult>) {
+    const resp = await cb();
+    if (resp !== EPlatformCallResult.Success) return;
+    WindowsService.actions.setWindowOnTop();
   }
 
   return (
@@ -70,13 +81,13 @@ export function GetSLID() {
       <button
         className="button button--action"
         style={{ width: '300px', margin: '32px' }}
-        onClick={clickLink}
+        onClick={clickSignup}
       >
         {$t('Sign up for Streamlabs ID')}
       </button>
       <span className={styles.login}>
         <Translate message="Already have a Streamlabs ID? <link>Login</link>">
-          <a slot="link" onClick={clickLink} />
+          <a slot="link" onClick={clickLogin} />
         </Translate>
       </span>
     </div>
