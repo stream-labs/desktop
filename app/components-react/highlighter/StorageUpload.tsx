@@ -68,7 +68,6 @@ export function GetSLID(p: { onLogin?: () => void }) {
     if (resp !== EPlatformCallResult.Success) return;
     if (platform) UserService.actions.setPrimaryPlatform(platform);
     if (p.onLogin) p.onLogin();
-    WindowsService.actions.setWindowOnTop();
   }
 
   return (
