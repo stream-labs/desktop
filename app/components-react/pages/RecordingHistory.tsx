@@ -75,10 +75,6 @@ class RecordingHistoryController {
     });
   }
 
-  connectSLID() {
-    this.UserService.actions.startSLMerge();
-  }
-
   handleSelect(filename: string, platform: string) {
     if (this.uploadInfo.uploading) {
       this.postError($t('Upload already in progress'));
@@ -205,7 +201,7 @@ export function RecordingHistory() {
 }
 
 function SLIDModal() {
-  const { store, connectSLID } = useController(RecordingHistoryCtx);
+  const { store } = useController(RecordingHistoryCtx);
   const showSLIDModal = store.useState(s => s.showSLIDModal);
 
   if (!showSLIDModal) return <></>;
@@ -225,7 +221,7 @@ function SLIDModal() {
           width: '100%',
         }}
       >
-        <GetSLID onClick={connectSLID} />
+        <GetSLID />
       </ModalLayout>
     </div>
   );

@@ -40,7 +40,7 @@ export default function StorageUpload(p: { onClose: () => void; platform: string
     return () => HighlighterService.actions.dismissError();
   }, []);
 
-  if (!hasSLID) return <GetSLID onClick={connectSLID} />;
+  if (!hasSLID) return <GetSLID />;
   if (uploadInfo.uploading) return <UploadProgress />;
   return (
     <div className={styles.crossclipContainer}>
@@ -57,11 +57,11 @@ export default function StorageUpload(p: { onClose: () => void; platform: string
   );
 }
 
-export function GetSLID(p: { onClick: () => void }) {
-  function signUp() {
-    remote.shell.openExternal(
-      'https://streamlabs.com/slobs/signup?skip_splash=true&external=electron&slid&force_verify&origin=slobs&port=51591',
-    );
+export function GetSLID() {
+  const { UserService } = Services;
+
+  function clickLink() {
+    UserService.actions.startSLMerge();
   }
 
   return (
@@ -70,13 +70,13 @@ export function GetSLID(p: { onClick: () => void }) {
       <button
         className="button button--action"
         style={{ width: '300px', margin: '32px' }}
-        onClick={signUp}
+        onClick={clickLink}
       >
         {$t('Sign up for Streamlabs ID')}
       </button>
       <span className={styles.login}>
         <Translate message="Already have a Streamlabs ID? <link>Login</link>">
-          <a slot="link" onClick={p.onClick} />
+          <a slot="link" onClick={clickLink} />
         </Translate>
       </span>
     </div>
