@@ -127,10 +127,11 @@ export default function RecordingHistoryPage() {
 export function RecordingHistory() {
   const controller = useController(RecordingHistoryCtx);
   const { formattedTimestamp, showFile, handleSelect, postError } = controller;
-  const { uploadInfo, uploadOptions, recordings } = useVuex(() => ({
+  const { uploadInfo, uploadOptions, recordings, hasSLID } = useVuex(() => ({
     recordings: controller.recordings,
     uploadOptions: controller.uploadOptions,
     uploadInfo: controller.uploadInfo,
+    hasSLID: controller.hasSLID,
   }));
 
   useEffect(() => {
@@ -195,7 +196,7 @@ export function RecordingHistory() {
         </Scrollable>
       </div>
       <ExportModal />
-      <SLIDModal />
+      {!hasSLID && <SLIDModal />}
     </div>
   );
 }
