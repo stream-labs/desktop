@@ -1429,8 +1429,9 @@ export class StreamingService
                 'Go to Settings -> Output -> Recording -> Recording Path if you need to change this location.',
               )}`;
               diagReportMessage = `${error.code} Error: ${error.message}`;
-            } else if (info.type === 'recording') {
-              // Forward recording errors other than the above as is
+            } else if (!error.details) {
+              // Forward all errors without parsed `details` field (not sure where OBS sends JSON as info.error)
+              // TODO: this prefix might be misleading now
               errorText = `${$t(
                 'An error occurred with the output. Please check your streaming and recording settings.',
               )}\n\n${error.message}`;
