@@ -18,10 +18,6 @@ export default function StorageUpload(p: { onClose: () => void; platform: string
     hasSLID: !!UserService.views.auth?.slid?.id,
   }));
 
-  function connectSLID() {
-    UserService.actions.startSLMerge();
-  }
-
   function uploadStorage() {
     HighlighterService.actions.uploadStorage(p.platform);
   }
@@ -58,20 +54,18 @@ export default function StorageUpload(p: { onClose: () => void; platform: string
   );
 }
 
-export function GetSLID() {
+export function GetSLID(p: { onLogin?: () => void }) {
   const { UserService, WindowsService } = Services;
 
-  function clickLogin() {
-    clickLink(UserService.actions.return.startSLMerge);
-  }
-
-  function clickSignup() {
-    clickLink(UserService.actions.return.startSLAuth);
-  }
-
-  async function clickLink(cb: () => Promise<EPlatformCallResult>) {
-    const resp = await cb();
+  async function clickLink(merge?: boolean) {
+    let resp: EPlatformCallResult;
+    if (merge) {
+      resp = await UserService.actions.return.startSLMerge();
+    } else {
+      resp = await UserService.actions.return.startSLAuth({ signup: true });
+    }
     if (resp !== EPlatformCallResult.Success) return;
+    if (p.onLogin) p.onLogin();
     WindowsService.actions.setWindowOnTop();
   }
 
@@ -81,13 +75,13 @@ export function GetSLID() {
       <button
         className="button button--action"
         style={{ width: '300px', margin: '32px' }}
-        onClick={clickSignup}
+        onClick={() => clickLink(true)}
       >
         {$t('Sign up for Streamlabs ID')}
       </button>
       <span className={styles.login}>
         <Translate message="Already have a Streamlabs ID? <link>Login</link>">
-          <a slot="link" onClick={clickLogin} />
+          <a slot="link" onClick={() => clickLink()} />
         </Translate>
       </span>
     </div>

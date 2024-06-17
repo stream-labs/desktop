@@ -206,6 +206,10 @@ function SLIDModal() {
 
   if (!showSLIDModal) return <></>;
 
+  function loginSuccess() {
+    store.setState({ showSLIDModal: false });
+  }
+
   return (
     <div className={styles.modalBackdrop}>
       <ModalLayout
@@ -221,7 +225,7 @@ function SLIDModal() {
           width: '100%',
         }}
       >
-        <GetSLID />
+        <GetSLID onLogin={loginSuccess} />
       </ModalLayout>
     </div>
   );
