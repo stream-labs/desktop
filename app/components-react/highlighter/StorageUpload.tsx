@@ -60,7 +60,9 @@ export function GetSLID(p: { onLogin?: () => void }) {
   async function clickLink(merge?: boolean) {
     let resp: EPlatformCallResult;
     if (merge) {
+      const platform = UserService.views.platform?.type;
       resp = await UserService.actions.return.startSLMerge();
+      if (platform) UserService.actions.setPrimaryPlatform(platform);
     } else {
       resp = await UserService.actions.return.startSLAuth({ signup: true });
     }
