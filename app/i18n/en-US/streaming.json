@@ -240,5 +240,7 @@
   "Failed to update %{platform} account": "Failed to update %{platform} account",
   "<unlink>Unlink here</unlink>": "<unlink>Unlink here</unlink>",
   "Primary Chat": "Primary Chat",
-  "Go to Settings -> Output -> Recording -> Recording Path if you need to change this location.":  "Go to Settings -> Output -> Recording -> Recording Path if you need to change this location."
+  "Go to Settings -> Output -> Recording -> Recording Path if you need to change this location.":  "Go to Settings -> Output -> Recording -> Recording Path if you need to change this location.",
+  "An error occurred with the output. Please check your streaming and recording settings.": "An error occurred with the output. Please check your streaming and recording settings."
+
 }
