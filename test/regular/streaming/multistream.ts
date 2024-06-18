@@ -10,7 +10,7 @@ import {
 import { fillForm, useForm } from '../../helpers/modules/forms';
 import { click, clickButton, isDisplayed, waitForDisplayed } from '../../helpers/modules/core';
 import { logIn } from '../../helpers/modules/user';
-import { releaseUserInPool, reserveUserFromPool, withPoolUser } from '../../helpers/webdriver/user';
+import { releaseUserInPool, reserveUserFromPool, withUser } from '../../helpers/webdriver/user';
 import { showSettingsWindow } from '../../helpers/modules/settings/settings';
 import { test, useWebdriver } from '../../helpers/webdriver';
 
@@ -23,77 +23,68 @@ async function enableAllPlatforms() {
   }
 }
 
-test('Multistream default mode', async t => {
-  // login to via Twitch because it doesn't have strict rate limits
-  const user = await logIn('twitch', { multistream: true });
+test('Multistream default mode', withUser('twitch', { multistream: true }), async t => {
+  await prepareToGoLive();
+  await clickGoLive();
+  await waitForSettingsWindowLoaded();
 
-  await withPoolUser(user, async () => {
-    await prepareToGoLive();
-    await clickGoLive();
-    await waitForSettingsWindowLoaded();
+  // TODO: this is to rule-out a race condition in platform switching, might not be needed and
+  // can possibly revert back to fillForm with all platforms.
+  await enableAllPlatforms();
 
-    // TODO: this is to rule-out a race condition in platform switching, might not be needed and
-    // can possibly revert back to fillForm with all platforms.
-    await enableAllPlatforms();
-
-    // add settings
-    await fillForm({
-      title: 'Test stream',
-      description: 'Test stream description',
-      twitchGame: 'Fortnite',
-      trovoGame: 'Doom',
-    });
-
-    await submit();
-    await waitForDisplayed('span=Configure the Multistream service');
-    await waitForDisplayed("h1=You're live!", { timeout: 60000 });
-    await stopStream();
-    t.pass();
+  // add settings
+  await fillForm({
+    title: 'Test stream',
+    description: 'Test stream description',
+    twitchGame: 'Fortnite',
+    trovoGame: 'Doom',
   });
+
+  await submit();
+  await waitForDisplayed('span=Configure the Multistream service');
+  await waitForDisplayed("h1=You're live!", { timeout: 60000 });
+  await stopStream();
+  t.pass();
 });
 
-test('Multistream advanced mode', async t => {
-  // login to via Twitch because it doesn't have strict rate limits
-  const user = await logIn('twitch', { multistream: true });
-  await withPoolUser(user, async () => {
-    await prepareToGoLive();
-    await clickGoLive();
-    await waitForSettingsWindowLoaded();
+test('Multistream advanced mode', withUser('twitch', { multistream: true }), async t => {
+  await prepareToGoLive();
+  await clickGoLive();
+  await waitForSettingsWindowLoaded();
 
-    await enableAllPlatforms();
+  await enableAllPlatforms();
 
-    await switchAdvancedMode();
-    await waitForSettingsWindowLoaded();
+  await switchAdvancedMode();
+  await waitForSettingsWindowLoaded();
 
-    const twitchForm = useForm('twitch-settings');
-    await twitchForm.fillForm({
-      customEnabled: true,
-      title: 'twitch title',
-      twitchGame: 'Fortnite',
-      // TODO: Re-enable after reauthing userpool
-      // twitchTags: ['100%'],
-    });
-
-    const youtubeForm = useForm('youtube-settings');
-    await youtubeForm.fillForm({
-      customEnabled: true,
-      title: 'youtube title',
-      description: 'youtube description',
-    });
-
-    const trovoForm = useForm('trovo-settings');
-    await trovoForm.fillForm({
-      customEnabled: true,
-      trovoGame: 'Doom',
-      title: 'trovo title',
-    });
-
-    await submit();
-    await waitForDisplayed('span=Configure the Multistream service');
-    await waitForDisplayed("h1=You're live!", { timeout: 60000 });
-    await stopStream();
-    t.pass();
+  const twitchForm = useForm('twitch-settings');
+  await twitchForm.fillForm({
+    customEnabled: true,
+    title: 'twitch title',
+    twitchGame: 'Fortnite',
+    // TODO: Re-enable after reauthing userpool
+    // twitchTags: ['100%'],
   });
+
+  const youtubeForm = useForm('youtube-settings');
+  await youtubeForm.fillForm({
+    customEnabled: true,
+    title: 'youtube title',
+    description: 'youtube description',
+  });
+
+  const trovoForm = useForm('trovo-settings');
+  await trovoForm.fillForm({
+    customEnabled: true,
+    trovoGame: 'Doom',
+    title: 'trovo title',
+  });
+
+  await submit();
+  await waitForDisplayed('span=Configure the Multistream service');
+  await waitForDisplayed("h1=You're live!", { timeout: 60000 });
+  await stopStream();
+  t.pass();
 });
 
 test('Custom stream destinations', async t => {

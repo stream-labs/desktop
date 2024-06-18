@@ -4,7 +4,6 @@ import {
   TExecutionContext,
   useWebdriver,
 } from '../../helpers/webdriver';
-import { logIn } from '../../helpers/modules/user';
 import {
   clickGoLive,
   prepareToGoLive,
@@ -13,7 +12,7 @@ import {
   waitForSettingsWindowLoaded,
   waitForStreamStart,
 } from '../../helpers/modules/streaming';
-import { addDummyAccount, withPoolUser } from '../../helpers/webdriver/user';
+import { addDummyAccount, withUser } from '../../helpers/webdriver/user';
 import { fillForm, readFields } from '../../helpers/modules/forms';
 import { IDummyTestUser } from '../../data/dummy-accounts';
 import { TTikTokLiveScopeTypes } from 'services/platforms/tiktok/api';
@@ -21,46 +20,44 @@ import { isDisplayed, waitForDisplayed } from '../../helpers/modules/core';
 
 useWebdriver();
 
-test('Streaming to TikTok', async t => {
-  await withPoolUser(await logIn('twitch', { multistream: false, prime: false }), async () => {
-    // test approved status
-    await addDummyAccount('tiktok', { tiktokLiveScope: 'approved' });
+test('Streaming to TikTok', withUser('twitch', { multistream: false, prime: false }), async t => {
+  // test approved status
+  await addDummyAccount('tiktok', { tiktokLiveScope: 'approved' });
 
-    await prepareToGoLive();
-    await clickGoLive();
-    await waitForSettingsWindowLoaded();
+  await prepareToGoLive();
+  await clickGoLive();
+  await waitForSettingsWindowLoaded();
 
-    // enable tiktok
-    await fillForm({
-      tiktok: true,
-    });
-    await waitForSettingsWindowLoaded();
-    const fields = await readFields();
-
-    // tiktok always shows regardless of ultra status
-    t.true(fields.hasOwnProperty('tiktok'));
-
-    // accounts approved for live access do not show the server url and stream key fields
-    t.false(fields.hasOwnProperty('serverUrl'));
-    t.false(fields.hasOwnProperty('streamKey'));
-
-    await fillForm({
-      title: 'Test stream',
-      twitchGame: 'Fortnite',
-      tiktokGame: 'test1',
-    });
-    await submit();
-    await waitForDisplayed('span=Update settings for TikTok');
-    await waitForStreamStart();
-    await stopStream();
-
-    // test all other tiktok statuses
-    await testLiveScope(t, 'not-approved');
-    await testLiveScope(t, 'legacy');
-    await testLiveScope(t, 'denied');
-
-    t.pass();
+  // enable tiktok
+  await fillForm({
+    tiktok: true,
   });
+  await waitForSettingsWindowLoaded();
+  const fields = await readFields();
+
+  // tiktok always shows regardless of ultra status
+  t.true(fields.hasOwnProperty('tiktok'));
+
+  // accounts approved for live access do not show the server url and stream key fields
+  t.false(fields.hasOwnProperty('serverUrl'));
+  t.false(fields.hasOwnProperty('streamKey'));
+
+  await fillForm({
+    title: 'Test stream',
+    twitchGame: 'Fortnite',
+    tiktokGame: 'test1',
+  });
+  await submit();
+  await waitForDisplayed('span=Update settings for TikTok');
+  await waitForStreamStart();
+  await stopStream();
+
+  // test all other tiktok statuses
+  await testLiveScope(t, 'not-approved');
+  await testLiveScope(t, 'legacy');
+  await testLiveScope(t, 'denied');
+
+  t.pass();
 });
 
 async function testLiveScope(t: TExecutionContext, scope: TTikTokLiveScopeTypes) {

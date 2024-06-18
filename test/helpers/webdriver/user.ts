@@ -1,4 +1,4 @@
-import { TExecutionContext } from './index';
+import { ITestContext, TExecutionContext } from './index';
 import { TPlatform } from '../../../app/services/platforms';
 import { sleep } from '../sleep';
 import { dialogDismiss } from './dialog';
@@ -207,6 +207,37 @@ export async function withPoolUser(user: ITestUser, fn: () => Promise<void>) {
     await releaseUserInPool(user);
   }
 }
+
+/**
+ * AVA style decorator that logs in a user with the specified platform and features, then releases the user from the
+ * pool regardless of assertion outcomes.
+ * @see {withPoolUser}
+ *
+ * If we need `waitForUI` or `isOnboardingTest` support we can add it here, for now, we're just refactoring `releaseUserInPool` usages.
+ *
+ * Tests can access the logged-in user as an extra argument if needed.
+ *
+ * Example:
+ *
+ * test('Some platform test', withUser('twitch', { multistream: true }), async (t, user) => {
+ *   // ...
+ * }
+ */
+export const withUser = (platform?: TPlatform, features?: ITestUserFeatures) => async (
+  t: ExecutionContext<ITestContext>,
+  implementation: (
+    t: ExecutionContext<ITestContext>,
+    user: ITestUser | IDummyTestUser,
+  ) => Promise<void>,
+) => {
+  const user = await logIn(t, platform, features);
+
+  try {
+    await implementation(t, user);
+  } finally {
+    await releaseUserInPool(user);
+  }
+};
 
 /**
  * Fetch credentials from slobs-users-pool service, and reserve these credentials
