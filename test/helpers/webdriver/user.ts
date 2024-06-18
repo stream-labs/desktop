@@ -199,6 +199,15 @@ export async function releaseUserInPool(user: ITestUser) {
   await requestUserPool(`release/${user.type}/${user.email}`);
 }
 
+/** Execute the argument function within the context of this user, releasing the user from the pool after finishing or failing **/
+export async function withPoolUser(user: ITestUser, fn: () => Promise<void>) {
+  try {
+    await fn();
+  } finally {
+    await releaseUserInPool(user);
+  }
+}
+
 /**
  * Fetch credentials from slobs-users-pool service, and reserve these credentials
  */

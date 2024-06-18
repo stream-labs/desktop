@@ -10,7 +10,7 @@ import {
 import { fillForm, useForm } from '../../helpers/modules/forms';
 import { click, clickButton, isDisplayed, waitForDisplayed } from '../../helpers/modules/core';
 import { logIn } from '../../helpers/modules/user';
-import { releaseUserInPool, reserveUserFromPool } from '../../helpers/webdriver/user';
+import { releaseUserInPool, reserveUserFromPool, withPoolUser } from '../../helpers/webdriver/user';
 import { showSettingsWindow } from '../../helpers/modules/settings/settings';
 import { test, useWebdriver } from '../../helpers/webdriver';
 
@@ -26,71 +26,74 @@ async function enableAllPlatforms() {
 test('Multistream default mode', async t => {
   // login to via Twitch because it doesn't have strict rate limits
   const user = await logIn('twitch', { multistream: true });
-  await prepareToGoLive();
-  await clickGoLive();
-  await waitForSettingsWindowLoaded();
 
-  // TODO: this is to rule-out a race condition in platform switching, might not be needed and
-  // can possibly revert back to fillForm with all platforms.
-  await enableAllPlatforms();
+  await withPoolUser(user, async () => {
+    await prepareToGoLive();
+    await clickGoLive();
+    await waitForSettingsWindowLoaded();
 
-  // add settings
-  await fillForm({
-    title: 'Test stream',
-    description: 'Test stream description',
-    twitchGame: 'Fortnite',
-    trovoGame: 'Doom',
+    // TODO: this is to rule-out a race condition in platform switching, might not be needed and
+    // can possibly revert back to fillForm with all platforms.
+    await enableAllPlatforms();
+
+    // add settings
+    await fillForm({
+      title: 'Test stream',
+      description: 'Test stream description',
+      twitchGame: 'Fortnite',
+      trovoGame: 'Doom',
+    });
+
+    await submit();
+    await waitForDisplayed('span=Configure the Multistream service');
+    await waitForDisplayed("h1=You're live!", { timeout: 60000 });
+    await stopStream();
+    t.pass();
   });
-
-  await submit();
-  await waitForDisplayed('span=Configure the Multistream service');
-  await waitForDisplayed("h1=You're live!", { timeout: 60000 });
-  await stopStream();
-  await releaseUserInPool(user);
-  await t.pass();
 });
 
 test('Multistream advanced mode', async t => {
   // login to via Twitch because it doesn't have strict rate limits
   const user = await logIn('twitch', { multistream: true });
-  await prepareToGoLive();
-  await clickGoLive();
-  await waitForSettingsWindowLoaded();
+  await withPoolUser(user, async () => {
+    await prepareToGoLive();
+    await clickGoLive();
+    await waitForSettingsWindowLoaded();
 
-  await enableAllPlatforms();
+    await enableAllPlatforms();
 
-  await switchAdvancedMode();
-  await waitForSettingsWindowLoaded();
+    await switchAdvancedMode();
+    await waitForSettingsWindowLoaded();
 
-  const twitchForm = useForm('twitch-settings');
-  await twitchForm.fillForm({
-    customEnabled: true,
-    title: 'twitch title',
-    twitchGame: 'Fortnite',
-    // TODO: Re-enable after reauthing userpool
-    // twitchTags: ['100%'],
+    const twitchForm = useForm('twitch-settings');
+    await twitchForm.fillForm({
+      customEnabled: true,
+      title: 'twitch title',
+      twitchGame: 'Fortnite',
+      // TODO: Re-enable after reauthing userpool
+      // twitchTags: ['100%'],
+    });
+
+    const youtubeForm = useForm('youtube-settings');
+    await youtubeForm.fillForm({
+      customEnabled: true,
+      title: 'youtube title',
+      description: 'youtube description',
+    });
+
+    const trovoForm = useForm('trovo-settings');
+    await trovoForm.fillForm({
+      customEnabled: true,
+      trovoGame: 'Doom',
+      title: 'trovo title',
+    });
+
+    await submit();
+    await waitForDisplayed('span=Configure the Multistream service');
+    await waitForDisplayed("h1=You're live!", { timeout: 60000 });
+    await stopStream();
+    t.pass();
   });
-
-  const youtubeForm = useForm('youtube-settings');
-  await youtubeForm.fillForm({
-    customEnabled: true,
-    title: 'youtube title',
-    description: 'youtube description',
-  });
-
-  const trovoForm = useForm('trovo-settings');
-  await trovoForm.fillForm({
-    customEnabled: true,
-    trovoGame: 'Doom',
-    title: 'trovo title',
-  });
-
-  await submit();
-  await waitForDisplayed('span=Configure the Multistream service');
-  await waitForDisplayed("h1=You're live!", { timeout: 60000 });
-  await stopStream();
-  await releaseUserInPool(user);
-  await t.pass();
 });
 
 test('Custom stream destinations', async t => {
@@ -99,63 +102,66 @@ test('Custom stream destinations', async t => {
   // fetch a new stream key
   const user = await reserveUserFromPool(t, 'twitch');
 
-  // add new destination
-  await showSettingsWindow('Stream');
-  await click('span=Add Destination');
+  try {
+    // add new destination
+    await showSettingsWindow('Stream');
+    await click('span=Add Destination');
 
-  const { fillForm } = useForm();
-  await fillForm({
-    name: 'MyCustomDest',
-    url: 'rtmp://live.twitch.tv/app/',
-    streamKey: user.streamKey,
-  });
-  await clickButton('Save');
-  t.true(await isDisplayed('span=MyCustomDest'), 'New destination should be created');
+    const { fillForm } = useForm();
+    await fillForm({
+      name: 'MyCustomDest',
+      url: 'rtmp://live.twitch.tv/app/',
+      streamKey: user.streamKey,
+    });
+    await clickButton('Save');
+    t.true(await isDisplayed('span=MyCustomDest'), 'New destination should be created');
 
-  // update destinations
-  await click('i.fa-pen');
-  await fillForm({
-    name: 'MyCustomDestUpdated',
-  });
-  await clickButton('Save');
+    // update destinations
+    await click('i.fa-pen');
+    await fillForm({
+      name: 'MyCustomDestUpdated',
+    });
+    await clickButton('Save');
 
-  t.true(await isDisplayed('span=MyCustomDestUpdated'), 'Destination should be updated');
+    t.true(await isDisplayed('span=MyCustomDestUpdated'), 'Destination should be updated');
 
-  // add one more destination
-  await click('span=Add Destination');
-  await fillForm({
-    name: 'MyCustomDest',
-    url: 'rtmp://live.twitch.tv/app/',
-    streamKey: user.streamKey,
-  });
-  await clickButton('Save');
+    // add one more destination
+    await click('span=Add Destination');
+    await fillForm({
+      name: 'MyCustomDest',
+      url: 'rtmp://live.twitch.tv/app/',
+      streamKey: user.streamKey,
+    });
+    await clickButton('Save');
 
-  await t.false(await isDisplayed('span=Add Destination'), 'Do not allow more than 2 custom dest');
+    t.false(await isDisplayed('span=Add Destination'), 'Do not allow more than 2 custom dest');
 
-  // open the GoLiveWindow and check destinations
-  await prepareToGoLive();
-  await clickGoLive();
-  await waitForSettingsWindowLoaded();
-  t.true(await isDisplayed('span=MyCustomDest'), 'Destination is available');
-  await click('span=MyCustomDest'); // switch the destination on
+    // open the GoLiveWindow and check destinations
+    await prepareToGoLive();
+    await clickGoLive();
+    await waitForSettingsWindowLoaded();
+    t.true(await isDisplayed('span=MyCustomDest'), 'Destination is available');
+    await click('span=MyCustomDest'); // switch the destination on
 
-  // try to stream
-  await fillForm({
-    title: 'Test stream',
-    twitchGame: 'Fortnite',
-  });
-  await waitForSettingsWindowLoaded();
-  await submit();
-  await waitForDisplayed('span=Configure the Multistream service');
-  await waitForDisplayed("h1=You're live!", { timeout: 60000 });
-  await waitForStreamStart();
-  await stopStream();
-  await releaseUserInPool(user);
+    // try to stream
+    await fillForm({
+      title: 'Test stream',
+      twitchGame: 'Fortnite',
+    });
+    await waitForSettingsWindowLoaded();
+    await submit();
+    await waitForDisplayed('span=Configure the Multistream service');
+    await waitForDisplayed("h1=You're live!", { timeout: 60000 });
+    await waitForStreamStart();
+    await stopStream();
 
-  // delete existing destinations
-  await showSettingsWindow('Stream');
-  await click('i.fa-trash');
-  await click('i.fa-trash');
-  await releaseUserInPool(loggedInUser);
-  t.false(await isDisplayed('i.fa-trash'), 'Destinations should be removed');
+    // delete existing destinations
+    await showSettingsWindow('Stream');
+    await click('i.fa-trash');
+    await click('i.fa-trash');
+    t.false(await isDisplayed('i.fa-trash'), 'Destinations should be removed');
+  } finally {
+    await releaseUserInPool(user);
+    await releaseUserInPool(loggedInUser);
+  }
 });
