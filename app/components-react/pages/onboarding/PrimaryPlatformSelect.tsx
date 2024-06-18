@@ -21,7 +21,8 @@ export function PrimaryPlatformSelect() {
     isLogin: OnboardingService.state.options.isLogin,
     isPrime: UserService.state.isPrime,
   }));
-  const { loading, authInProgress, authPlatform, finishSLAuth } = useModule(LoginModule);
+  // Load state from this module to ensure it exists in subsequent renders of Connect.tsx
+  const { loading, authInProgress, authPlatform, finishSLAuth, state } = useModule(LoginModule);
   const platforms = ['twitch', 'youtube', 'facebook', 'twitter', 'tiktok', 'trovo'];
   const platformOptions = [
     {
