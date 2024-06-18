@@ -226,6 +226,10 @@ export class LoginModule {
     selectedExtraPlatform: undefined as TExtraPlatform | undefined,
   });
 
+  get selectedExtraPlatform() {
+    return this.state?.selectedExtraPlatform;
+  }
+
   get UserService() {
     return Services.UserService;
   }
