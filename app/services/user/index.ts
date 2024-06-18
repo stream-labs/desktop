@@ -463,14 +463,12 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
             ? $t('Successfully merged account')
             : $t('Successfully unlinked account');
 
-        this.windowsService.setWindowOnTop();
-        this.settingsService.showSettings('Stream');
+        this.windowsService.actions.setWindowOnTop();
         this.refreshedLinkedAccounts.next({ success: true, message });
       }
 
       if (event.type === 'account_merge_error') {
-        this.windowsService.setWindowOnTop();
-        this.settingsService.showSettings('Stream');
+        this.windowsService.actions.setWindowOnTop();
         this.refreshedLinkedAccounts.next({ success: false, message: $t('Account merge error') });
       }
 
