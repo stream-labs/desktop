@@ -78,9 +78,7 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
   // determine max character length for title by enabled platform limitation
   let maxCharacters = 120;
   const enabledPlatforms = view.enabledPlatforms;
-  if (enabledPlatforms.includes('tiktok')) {
-    maxCharacters = 32;
-  } else if (enabledPlatforms.includes('youtube')) {
+  if (enabledPlatforms.includes('youtube')) {
     maxCharacters = 100;
   } else if (enabledPlatforms.includes('twitch')) {
     maxCharacters = 140;
@@ -111,6 +109,10 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
               label={$t('Title')}
               required={true}
               max={maxCharacters}
+              tooltip={
+                enabledPlatforms.includes('tiktok') &&
+                $t('Only 32 characters of your title will display on TikTok')
+              }
             />
 
             {/*DESCRIPTION*/}
