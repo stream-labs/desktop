@@ -13,7 +13,7 @@ import { waitForDisplayed } from '../../helpers/modules/core';
 
 useWebdriver();
 
-test('Streaming to Instagram', withUser('twitch', { prime: true, multistream: true }), async t => {
+test('Streaming to Instagram', withUser('twitch', { prime: true, multistream: false }), async t => {
   // test approved status
   const dummy = await addDummyAccount('instagram');
 
