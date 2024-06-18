@@ -11,7 +11,6 @@ import css from './Stream.m.less';
 import cx from 'classnames';
 import { Button, message, Tooltip } from 'antd';
 import PlatformLogo from '../../shared/PlatformLogo';
-import { FormInstance } from 'antd/lib/form';
 import { injectState, mutation, useModule } from 'slap';
 import UltraIcon from 'components-react/shared/UltraIcon';
 import ButtonHighlighted from 'components-react/shared/ButtonHighlighted';
@@ -334,7 +333,7 @@ export function StreamSettings() {
 StreamSettings.page = 'Stream';
 
 function SLIDBlock() {
-  const { UserService } = Services;
+  const { UserService, SettingsService } = Services;
   const { hasSLID, username } = useVuex(() => ({
     hasSLID: UserService.views.hasSLID,
     username: UserService.views.auth?.slid?.username,
@@ -346,6 +345,12 @@ function SLIDBlock() {
 
   function openTwoFactorLink() {
     remote.shell.openExternal('https://id.streamlabs.com/security/tfa?companyId=streamlabs');
+  }
+
+  async function mergeSLID() {
+    const resp = await UserService.actions.return.startSLMerge();
+    if (resp !== EPlatformCallResult.Success) return;
+    SettingsService.actions.showSettings('Stream');
   }
 
   return (
@@ -365,7 +370,7 @@ function SLIDBlock() {
           )}
         </div>
         {!hasSLID && (
-          <Button type="primary" onClick={() => UserService.actions.startSLMerge()}>
+          <Button type="primary" onClick={mergeSLID}>
             {$t('Setup')}
           </Button>
         )}

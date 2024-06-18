@@ -19,8 +19,6 @@ class RecordingHistoryController {
   private RecordingModeService = Services.RecordingModeService;
   private UserService = Services.UserService;
   private SharedStorageService = Services.SharedStorageService;
-  private OnboardingService = Services.OnboardingService;
-  private WindowsService = Services.WindowsService;
   private NotificationsService = Services.NotificationsService;
   store = initStore({ showSLIDModal: false });
 
@@ -77,11 +75,6 @@ class RecordingHistoryController {
     });
   }
 
-  connectSLID() {
-    this.OnboardingService.actions.start({ isLogin: true });
-    this.WindowsService.actions.closeChildWindow();
-  }
-
   handleSelect(filename: string, platform: string) {
     if (this.uploadInfo.uploading) {
       this.postError($t('Upload already in progress'));
@@ -134,10 +127,11 @@ export default function RecordingHistoryPage() {
 export function RecordingHistory() {
   const controller = useController(RecordingHistoryCtx);
   const { formattedTimestamp, showFile, handleSelect, postError } = controller;
-  const { uploadInfo, uploadOptions, recordings } = useVuex(() => ({
+  const { uploadInfo, uploadOptions, recordings, hasSLID } = useVuex(() => ({
     recordings: controller.recordings,
     uploadOptions: controller.uploadOptions,
     uploadInfo: controller.uploadInfo,
+    hasSLID: controller.hasSLID,
   }));
 
   useEffect(() => {
@@ -202,16 +196,20 @@ export function RecordingHistory() {
         </Scrollable>
       </div>
       <ExportModal />
-      <SLIDModal />
+      {!hasSLID && <SLIDModal />}
     </div>
   );
 }
 
 function SLIDModal() {
-  const { store, connectSLID } = useController(RecordingHistoryCtx);
+  const { store } = useController(RecordingHistoryCtx);
   const showSLIDModal = store.useState(s => s.showSLIDModal);
 
   if (!showSLIDModal) return <></>;
+
+  function loginSuccess() {
+    store.setState({ showSLIDModal: false });
+  }
 
   return (
     <div className={styles.modalBackdrop}>
@@ -228,7 +226,7 @@ function SLIDModal() {
           width: '100%',
         }}
       >
-        <GetSLID onClick={connectSLID} />
+        <GetSLID onLogin={loginSuccess} />
       </ModalLayout>
     </div>
   );
