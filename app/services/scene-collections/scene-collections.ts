@@ -150,6 +150,10 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   @RunInLoadingMode()
   async setupNewUser() {
     await this.initialize();
+    await this.installOverlay(
+      'https://cdn.streamlabs.com/marketplace/overlays/7684923/6dcbf5f/6dcbf5f.overlay',
+      'TWITCHCON',
+    );
   }
 
   /**
