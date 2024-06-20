@@ -140,6 +140,19 @@ export class SceneCollectionsService extends Service implements ISceneCollection
       await this.create({ auto: true });
     }
     this.collectionInitialized.next();
+
+    this.userService.userLogout.subscribe(() => {
+      this.wipeCollections();
+    });
+  }
+
+  @RunInLoadingMode()
+  async wipeCollections() {
+    Promise.all(
+      this.collections.map(async collection => {
+        await this.delete(collection.id);
+      }),
+    );
   }
 
   /**
