@@ -55,18 +55,26 @@ export default function StorageUpload(p: { onClose: () => void; platform: string
 }
 
 export function GetSLID(p: { onLogin?: () => void }) {
-  const { UserService, WindowsService } = Services;
+  const { UserService, OnboardingService } = Services;
 
-  async function clickLink(merge?: boolean) {
+  async function clickLink(signup?: boolean) {
     let resp: EPlatformCallResult;
     const platform = UserService.views.platform?.type;
-    if (merge) {
-      resp = await UserService.actions.return.startSLMerge();
+    if (signup) {
+      resp = await UserService.actions.return.startSLAuth({ signup: true, merge: !!platform });
     } else {
-      resp = await UserService.actions.return.startSLAuth({ signup: true });
+      if (UserService.views.isLoggedIn) {
+        resp = await UserService.actions.return.startSLMerge();
+      } else {
+        resp = await UserService.actions.return.startSLAuth();
+      }
     }
     if (resp !== EPlatformCallResult.Success) return;
-    if (platform) UserService.actions.setPrimaryPlatform(platform);
+    if (platform) {
+      UserService.actions.setPrimaryPlatform(platform);
+    } else {
+      OnboardingService.actions.start({ isLogin: true });
+    }
     if (p.onLogin) p.onLogin();
   }
 

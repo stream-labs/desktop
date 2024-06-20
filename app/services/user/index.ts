@@ -1080,8 +1080,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    * platform linked, they will be prompted to merge a platform into their
    * account before they can be considered fully logged in.
    */
-  async startSLAuth({ signup = false } = {}) {
-    const query = `_=${Date.now()}&skip_splash=true&external=electron&slid&force_verify&origin=slobs`;
+  async startSLAuth({ signup = false, merge = false } = {}) {
+    const query = `_=${Date.now()}&skip_splash=true&external=electron&slid&force_verify&origin=slobs${
+      merge ? '&intent=merge' : ''
+    }`;
     const url = `https://${this.hostsService.streamlabs}/slobs/${
       signup ? 'signup' : 'login'
     }?${query}`;
