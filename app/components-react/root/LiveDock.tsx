@@ -328,7 +328,7 @@ function LiveDock(p: { onLeft: boolean }) {
     const primaryChat = Services.UserService.state.auth!.primaryPlatform;
     const showTiktokInfo = visibleChat === 'tiktok' || primaryChat === 'tiktok';
 
-    if (showTiktokInfo && !isRestreaming) {
+    if (showTiktokInfo) {
       return <TikTokChatInfo />;
     }
 
