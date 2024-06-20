@@ -61,7 +61,7 @@ export function GetSLID(p: { onLogin?: () => void }) {
     let resp: EPlatformCallResult;
     const platform = UserService.views.platform?.type;
     if (signup) {
-      resp = await UserService.actions.return.startSLAuth({ signup: true });
+      resp = await UserService.actions.return.startSLAuth({ signup: true, merge: !!platform });
     } else {
       if (UserService.views.isLoggedIn) {
         resp = await UserService.actions.return.startSLMerge();
