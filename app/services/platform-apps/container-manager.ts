@@ -330,6 +330,8 @@ export class PlatformContainerManager {
             'www.youtube.com',
             'cdn.segment.com',
             'static.twitchcdn.net',
+            'www.google.com',
+            'www.gstatic.com',
           ];
 
           const parsed = url.parse(details.url);
