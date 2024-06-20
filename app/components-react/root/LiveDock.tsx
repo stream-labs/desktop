@@ -326,7 +326,8 @@ function LiveDock(p: { onLeft: boolean }) {
 
   const chat = useMemo(() => {
     const primaryChat = Services.UserService.state.auth!.primaryPlatform;
-    const showTiktokInfo = visibleChat === 'tiktok' || primaryChat === 'tiktok';
+    const showTiktokInfo =
+      visibleChat === 'tiktok' || (visibleChat === 'default' && primaryChat === 'tiktok');
 
     if (showTiktokInfo) {
       return <TikTokChatInfo />;
