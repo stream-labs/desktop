@@ -82,13 +82,13 @@ export function GetSLID(p: { onLogin?: () => void }) {
       <button
         className="button button--action"
         style={{ width: '300px', margin: '32px' }}
-        onClick={() => clickLink()}
+        onClick={() => clickLink(true)}
       >
         {$t('Sign up for Streamlabs ID')}
       </button>
       <span className={styles.login}>
         <Translate message="Already have a Streamlabs ID? <link>Login</link>">
-          <a slot="link" onClick={() => clickLink(true)} />
+          <a slot="link" onClick={() => clickLink()} />
         </Translate>
       </span>
     </div>
