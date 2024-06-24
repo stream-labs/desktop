@@ -59,7 +59,7 @@
         <ul class="popup-menu-list">
           <li class="popup-menu-item">
             <a @click.prevent="openInDefaultBrowser($event)" :href="twitterShareURL" class="link"
-              ><i class="icon-twitter"></i>ツイートする</a
+              ><i class="icon-x"></i>ポストする</a
             >
           </li>
           <li class="popup-menu-item">
