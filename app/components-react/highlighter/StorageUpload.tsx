@@ -60,15 +60,13 @@ export function GetSLID(p: { onLogin?: () => void }) {
   async function clickLink(signup?: boolean) {
     let resp: EPlatformCallResult;
     const platform = UserService.views.platform?.type;
-    if (signup) {
-      resp = await UserService.actions.return.startSLAuth({ signup: true, merge: !!platform });
+
+    if (UserService.views.isLoggedIn) {
+      resp = await UserService.actions.return.startSLMerge();
     } else {
-      if (UserService.views.isLoggedIn) {
-        resp = await UserService.actions.return.startSLMerge();
-      } else {
-        resp = await UserService.actions.return.startSLAuth();
-      }
+      resp = await UserService.actions.return.startSLAuth({ signup });
     }
+
     if (resp !== EPlatformCallResult.Success) return;
     if (platform) {
       UserService.actions.setPrimaryPlatform(platform);
@@ -84,13 +82,13 @@ export function GetSLID(p: { onLogin?: () => void }) {
       <button
         className="button button--action"
         style={{ width: '300px', margin: '32px' }}
-        onClick={() => clickLink()}
+        onClick={() => clickLink(true)}
       >
         {$t('Sign up for Streamlabs ID')}
       </button>
       <span className={styles.login}>
         <Translate message="Already have a Streamlabs ID? <link>Login</link>">
-          <a slot="link" onClick={() => clickLink(true)} />
+          <a slot="link" onClick={() => clickLink()} />
         </Translate>
       </span>
     </div>
