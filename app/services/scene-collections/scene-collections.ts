@@ -835,22 +835,20 @@ export class SceneCollectionsService extends Service implements ISceneCollection
       );
 
       if (inManifest) {
-        if (inManifest.deleted) {
-          const success = await this.performSyncStep('Delete on server', async () => {
-            if (inManifest.serverId) {
-              await this.serverApi.deleteSceneCollection(inManifest.serverId);
-            }
-            this.stateService.HARD_DELETE_COLLECTION(inManifest.id);
-          });
-
-          if (!success) failed = true;
-        } else if (new Date(inManifest.modified) > new Date(onServer.last_updated_at)) {
+        // if (inManifest.deleted) {
+        //   const success = await this.performSyncStep('Delete on server', async () => {
+        //     if (inManifest.serverId) {
+        //       await this.serverApi.deleteSceneCollection(inManifest.serverId);
+        //     }
+        //     this.stateService.HARD_DELETE_COLLECTION(inManifest.id);
+        //   });
+        //   if (!success) failed = true;
+        // } else
+        if (new Date(inManifest.modified) > new Date(onServer.last_updated_at)) {
           const success = await this.performSyncStep('Update on server', async () => {
             const exists = await this.stateService.collectionFileExists(inManifest.id);
-
             if (exists) {
               const data = this.stateService.readCollectionFile(inManifest.id);
-
               if (data && inManifest.serverId) {
                 await this.serverApi.updateSceneCollection({
                   data,
@@ -861,7 +859,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
               }
             }
           });
-
           if (!success) failed = true;
         } else if (new Date(inManifest.modified) < new Date(onServer.last_updated_at)) {
           collectionsToUpdate.push(onServer.id);
