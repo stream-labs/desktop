@@ -315,6 +315,7 @@ class VideoSettingsModule {
       // when setting vertical dimensions
       if (display === 'horizontal') {
         const otherPrefix = key === 'baseRes' ? 'output' : 'base';
+        const customRes = this.state.customBaseRes || this.state.customOutputRes;
         const verticalValues = VERTICAL_CANVAS_OPTIONS.map(option => option.value);
         const horizontalValues = CANVAS_RES_OPTIONS.concat(OUTPUT_RES_OPTIONS).map(
           option => option.value,
@@ -323,11 +324,13 @@ class VideoSettingsModule {
         const outputRes = this.values.outputRes.toString();
 
         const shouldSyncVertical =
+          !customRes &&
           verticalValues.includes(value) &&
           !verticalValues.includes(baseRes) &&
           !verticalValues.includes(outputRes);
 
         const shouldSyncHorizontal =
+          !customRes &&
           !verticalValues.includes(value) &&
           !horizontalValues.includes(baseRes) &&
           !horizontalValues.includes(outputRes);
