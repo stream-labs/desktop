@@ -226,9 +226,9 @@ class VideoSettingsModule {
       return VERTICAL_CANVAS_OPTIONS;
     }
 
-    return CANVAS_RES_OPTIONS.concat(this.monitorResolutions).concat([
-      { label: $t('Custom'), value: 'custom' },
-    ]);
+    return CANVAS_RES_OPTIONS.concat(this.monitorResolutions)
+      .concat(VERTICAL_CANVAS_OPTIONS)
+      .concat([{ label: $t('Custom'), value: 'custom' }]);
   }
 
   get outputResOptions() {
@@ -240,9 +240,12 @@ class VideoSettingsModule {
     if (!OUTPUT_RES_OPTIONS.find(opt => opt.value === baseRes)) {
       return [{ label: baseRes, value: baseRes }]
         .concat(OUTPUT_RES_OPTIONS)
+        .concat(VERTICAL_OUTPUT_RES_OPTIONS)
         .concat([{ label: $t('Custom'), value: 'custom' }]);
     }
-    return OUTPUT_RES_OPTIONS.concat([{ label: $t('Custom'), value: 'custom' }]);
+    return OUTPUT_RES_OPTIONS.concat(VERTICAL_OUTPUT_RES_OPTIONS).concat([
+      { label: $t('Custom'), value: 'custom' },
+    ]);
   }
 
   get monitorResolutions() {
@@ -307,6 +310,33 @@ class VideoSettingsModule {
       const prefix = key === 'baseRes' ? 'base' : 'output';
       this.service.actions.setVideoSetting(`${prefix}Width`, Number(width), display);
       this.service.actions.setVideoSetting(`${prefix}Height`, Number(height), display);
+
+      // set base or output resolutions to vertical dimensions for horizontal display
+      // when setting vertical dimensions
+      if (display === 'horizontal') {
+        const otherPrefix = key === 'baseRes' ? 'output' : 'base';
+        const verticalValues = VERTICAL_CANVAS_OPTIONS.map(option => option.value);
+        const horizontalValues = CANVAS_RES_OPTIONS.concat(OUTPUT_RES_OPTIONS).map(
+          option => option.value,
+        );
+        const baseRes = this.values.baseRes.toString();
+        const outputRes = this.values.outputRes.toString();
+
+        const shouldSyncVertical =
+          verticalValues.includes(value) &&
+          !verticalValues.includes(baseRes) &&
+          !verticalValues.includes(outputRes);
+
+        const shouldSyncHorizontal =
+          !verticalValues.includes(value) &&
+          !horizontalValues.includes(baseRes) &&
+          !horizontalValues.includes(outputRes);
+
+        if (shouldSyncVertical || shouldSyncHorizontal) {
+          this.service.actions.setVideoSetting(`${otherPrefix}Width`, Number(width), display);
+          this.service.actions.setVideoSetting(`${otherPrefix}Height`, Number(height), display);
+        }
+      }
     }
   }
 
