@@ -21,6 +21,7 @@ export default function StudioEditor() {
     ScenesService,
     DualOutputService,
     StreamingService,
+    VideoSettingsService,
   } = Services;
   const performanceMode = useRealmObject(CustomizationService.state).performanceMode;
   const v = useVuex(() => ({
@@ -33,8 +34,10 @@ export default function StudioEditor() {
       DualOutputService.views.showVerticalDisplay && !StreamingService.state.selectiveRecording,
     activeSceneId: ScenesService.views.activeSceneId,
     isLoading: DualOutputService.views.isLoading,
+    hasDefaultContext: VideoSettingsService.contexts.horizontal,
   }));
-  const displayEnabled = !v.hideStyleBlockers && !performanceMode && !v.isLoading;
+  const displayEnabled =
+    v.hasDefaultContext && !v.hideStyleBlockers && !performanceMode && !v.isLoading;
   const placeholderRef = useRef<HTMLDivElement>(null);
   const studioModeRef = useRef<HTMLDivElement>(null);
   const [studioModeStacked, setStudioModeStacked] = useState(false);

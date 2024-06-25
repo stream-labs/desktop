@@ -236,7 +236,7 @@ class VideoSettingsModule {
       return VERTICAL_OUTPUT_RES_OPTIONS;
     }
 
-    const baseRes = `${this.service.state.horizontal.baseWidth}x${this.service.state.horizontal.baseHeight}`;
+    const baseRes = `${this.service.baseWidth}x${this.service.baseHeight}`;
     if (!OUTPUT_RES_OPTIONS.find(opt => opt.value === baseRes)) {
       return [{ label: baseRes, value: baseRes }]
         .concat(OUTPUT_RES_OPTIONS)
@@ -475,6 +475,14 @@ class VideoSettingsModule {
     });
   }
 }
+
+// @Component({ components: { BoolInput }, mixins: [realmReactive(CustomizationState)] })
+// refer to OverlaySettings.tsx
+
+// function getSettings() {
+//   return CustomizationService.state.toObject() as CustomizationState;
+// }
+// refer to Appearance.tsx
 
 export function VideoSettings() {
   const {
