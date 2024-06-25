@@ -8,7 +8,7 @@
       "es2017"
     ],
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "node16",
     "isolatedModules": false,
     "experimentalDecorators": true,
     "noImplicitAny": true,
