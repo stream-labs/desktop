@@ -28,7 +28,7 @@ export async function select(selectorOrEl: TSelectorOrEl): Promise<WebdriverIO.E
 /**
  * A shortcut for client.$$()
  */
-export async function selectElements(selector: string): Promise<WebdriverIO.Element[]> {
+export async function selectElements(selector: string): Promise<WebdriverIO.ElementArray> {
   return getClient().$$(selector);
 }
 
