@@ -1,5 +1,4 @@
 import { test, useWebdriver } from '../../helpers/webdriver';
-import { logIn } from '../../helpers/modules/user';
 import {
   clickGoLive,
   prepareToGoLive,
@@ -8,14 +7,13 @@ import {
   waitForSettingsWindowLoaded,
   waitForStreamStart,
 } from '../../helpers/modules/streaming';
-import { addDummyAccount, releaseUserInPool } from '../../helpers/webdriver/user';
+import { addDummyAccount, withUser } from '../../helpers/webdriver/user';
 import { fillForm } from '../../helpers/modules/forms';
 import { waitForDisplayed } from '../../helpers/modules/core';
 
 useWebdriver();
 
-test('Streaming to X', async t => {
-  const user = await logIn('twitch', { multistream: true });
+test('Streaming to X', withUser('twitch', { multistream: true }), async t => {
   await addDummyAccount('twitter');
 
   await prepareToGoLive();
@@ -34,7 +32,5 @@ test('Streaming to X', async t => {
   await waitForDisplayed('span=Update settings for X (Twitter)');
   await waitForStreamStart();
   await stopStream();
-
-  await releaseUserInPool(user);
   t.pass();
 });
