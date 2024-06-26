@@ -1,10 +1,9 @@
 import {
-  TExecutionContext,
   skipCheckingErrorsInLog,
   test,
+  TExecutionContext,
   useWebdriver,
 } from '../../helpers/webdriver';
-import { logIn } from '../../helpers/modules/user';
 import {
   clickGoLive,
   prepareToGoLive,
@@ -13,7 +12,7 @@ import {
   waitForSettingsWindowLoaded,
   waitForStreamStart,
 } from '../../helpers/modules/streaming';
-import { addDummyAccount, releaseUserInPool } from '../../helpers/webdriver/user';
+import { addDummyAccount, withUser } from '../../helpers/webdriver/user';
 import { fillForm, readFields } from '../../helpers/modules/forms';
 import { IDummyTestUser } from '../../data/dummy-accounts';
 import { TTikTokLiveScopeTypes } from 'services/platforms/tiktok/api';
@@ -21,9 +20,7 @@ import { isDisplayed, waitForDisplayed } from '../../helpers/modules/core';
 
 useWebdriver();
 
-test('Streaming to TikTok', async t => {
-  const user = await logIn('twitch', { multistream: false, prime: false });
-
+test('Streaming to TikTok', withUser('twitch', { multistream: false, prime: false }), async t => {
   // test approved status
   await addDummyAccount('tiktok', { tiktokLiveScope: 'approved' });
 
@@ -60,7 +57,6 @@ test('Streaming to TikTok', async t => {
   await testLiveScope(t, 'legacy');
   await testLiveScope(t, 'denied');
 
-  await releaseUserInPool(user);
   t.pass();
 });
 
