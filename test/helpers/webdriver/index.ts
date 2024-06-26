@@ -273,7 +273,7 @@ export function useWebdriver(options: ITestRunnerOptions = {}) {
     await focusMain();
 
     // await t.context.app.webContents.executeJavaScript(disableTransitionsCode);
-    app.client.execute(disableTransitionsCode);
+    await app.client.execute(disableTransitionsCode);
     await focusMain();
 
     // Wait up to N seconds before giving up looking for an element.
@@ -296,7 +296,7 @@ export function useWebdriver(options: ITestRunnerOptions = {}) {
     await focusChild();
 
     // await t.context.app.webContents.executeJavaScript(disableTransitionsCode);
-    app.client.execute(disableTransitionsCode);
+    await app.client.execute(disableTransitionsCode);
     await focusMain();
     appIsRunning = true;
 
@@ -332,7 +332,7 @@ export function useWebdriver(options: ITestRunnerOptions = {}) {
    */
   async function checkErrorsInLogFile(t: TExecutionContext) {
     await sleep(1000); // electron-log needs some time to write down logs
-    const logs: string = await readLogs();
+    const logs: string = readLogs();
     lastLogs = logs;
     let ignoringErrors = false;
     const errors = logs
@@ -428,7 +428,7 @@ export function useWebdriver(options: ITestRunnerOptions = {}) {
         }
       }
     } catch (e: unknown) {
-      fail('Test finalization failed');
+      fail('Test finalization failed ' + (e as Error)?.message);
       console.error(e);
     }
 
@@ -451,7 +451,7 @@ export function useWebdriver(options: ITestRunnerOptions = {}) {
   test.after.always(async t => {
     if (appIsRunning) await stopAppFn(t);
     if (!testPassed) saveFailedTestsToFile([testName]);
-    await saveTestStatsToFile(testStats);
+    saveTestStatsToFile(testStats);
   });
 
   /**

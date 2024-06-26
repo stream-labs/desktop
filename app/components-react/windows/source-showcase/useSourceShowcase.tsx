@@ -87,7 +87,7 @@ export class SourceShowcaseController {
     const managerType = options.propertiesManager || 'default';
     const propertiesManagerSettings: Dictionary<any> = { ...omit(options, 'propertiesManager') };
 
-    this.sourcesService.showAddSource(sourceType, {
+    this.sourcesService.actions.showAddSource(sourceType, {
       propertiesManagerSettings,
       propertiesManager: managerType,
     });
