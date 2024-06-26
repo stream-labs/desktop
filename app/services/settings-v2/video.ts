@@ -151,7 +151,7 @@ class VideoContextSetting extends RealmObject {
     name: 'VideoContextSetting',
     embedded: true,
     properties: {
-      video: { type: 'object', objectType: 'VideoInfo' },
+      video: { type: 'object', objectType: 'VideoInfo', default: {} },
       isActive: { type: 'bool', default: true },
     },
   };
@@ -169,10 +169,12 @@ class VideoSettingsState extends RealmObject {
       horizontal: {
         type: 'object',
         objectType: 'VideoContextSetting',
+        default: {},
       },
       vertical: {
         type: 'object',
         objectType: 'VideoContextSetting',
+        default: {},
       },
     },
   };
@@ -213,6 +215,8 @@ class VideoSettingsState extends RealmObject {
       //     });
       //   }
     }
+
+    // @@@ NOTE: we probably can't do this because the context hasn't been created yet
 
     // // 2. OSN Legacy Settings - Horizontal Only
     // // Ideally, the first time the user opens the app after the settings have migrated to being stored
@@ -275,11 +279,9 @@ export class VideoSettingsService extends Service {
   init() {
     console.log('init state', JSON.stringify(this.state.realmModel, null, 2));
     console.log('init contexts', JSON.stringify(this.contexts, null, 2));
-    if (!this.contexts.horizontal) {
-      this.establishVideoContext();
-    }
+    this.establishVideoContext();
 
-    if (this.state.vertical?.isActive && !this.contexts.vertical) {
+    if (this.state?.vertical?.isActive && !this.contexts.vertical) {
       this.establishVideoContext('vertical');
     }
 
@@ -332,14 +334,25 @@ export class VideoSettingsService extends Service {
     const defaultWidth = 1920;
     const defaultHeight = 1080;
 
+    // return {
+    //   horizontal: {
+    //     baseWidth: defaultWidth,
+    //     baseHeight: defaultHeight,
+    //   },
+    //   vertical: {
+    //     baseWidth: defaultWidth,
+    //     baseHeight: defaultHeight,
+    //   },
+    // };
+
     const horizontalSettings =
       this.contexts.horizontal?.video ??
       this.contexts.horizontal?.legacySettings ??
-      this.state.horizontal?.video;
+      this.state?.horizontal?.video;
     const verticalSettings =
       this.contexts.vertical?.video ??
       this.contexts.vertical?.legacySettings ??
-      this.state.vertical?.video;
+      this.state?.vertical?.video;
 
     return {
       horizontal: {
@@ -374,7 +387,7 @@ export class VideoSettingsService extends Service {
    */
 
   formatVideoValues(display: TDisplayType = 'horizontal', typeStrings?: boolean) {
-    const settings = this.contexts[display]?.video ?? this.state.realmModel[display].video;
+    const settings = this.contexts[display]?.video ?? this.state[display].video;
 
     const scaleType = typeStrings ? scaleTypeNames[settings?.scaleType] : settings?.scaleType;
     const fpsType = typeStrings ? fpsTypeNames[settings?.fpsType] : settings?.fpsType;
@@ -402,13 +415,9 @@ export class VideoSettingsService extends Service {
    */
   establishVideoContext(display: TDisplayType = 'horizontal') {
     if (this.contexts[display]) return;
-    const context = VideoFactory.create();
-
-    this.contexts[display] = context;
+    this.contexts[display] = VideoFactory.create();
     this.migrateSettings(display);
-    console.log('established ', display);
-
-    console.log('context ', this.contexts[display]);
+    console.log(`this.contexts[${display}] `, JSON.stringify(this.contexts[display], null, 2));
   }
 
   /**
