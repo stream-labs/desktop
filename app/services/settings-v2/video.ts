@@ -89,11 +89,11 @@ class VideoInfo extends RealmObject implements IVideoInfo {
   baseHeight: number;
   outputWidth: number;
   outputHeight: number;
-  outputFormat: EVideoFormat;
-  colorspace: EColorSpace;
-  range: ERangeType;
-  scaleType: EScaleType;
-  fpsType: EFPSType;
+  outputFormat: number;
+  colorspace: number;
+  range: number;
+  scaleType: number;
+  fpsType: number;
 
   static schema: ObjectSchema = {
     name: 'VideoInfo',
@@ -105,11 +105,11 @@ class VideoInfo extends RealmObject implements IVideoInfo {
       baseHeight: { type: 'int', default: 1280 },
       outputWidth: { type: 'int', default: 1920 },
       outputHeight: { type: 'int', default: 1280 },
-      outputFormat: { type: 'string', default: EVideoFormat.I420 },
-      colorspace: { type: 'string', default: EColorSpace.CS709 },
-      range: { type: 'string', default: ERangeType.Full },
-      scaleType: { type: 'string', default: EScaleType.Bilinear },
-      fpsType: { type: 'string', default: EFPSType.Integer },
+      outputFormat: { type: 'int', default: EVideoFormat.I420 as number },
+      colorspace: { type: 'int', default: EColorSpace.CS709 as number },
+      range: { type: 'int', default: ERangeType.Full as number },
+      scaleType: { type: 'int', default: EScaleType.Bilinear as number },
+      fpsType: { type: 'int', default: EFPSType.Integer as number },
     },
   };
 }
