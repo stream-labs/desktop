@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Empty, Row, Col, PageHeader, Button } from 'antd';
 import Scrollable from 'components-react/shared/Scrollable';
 import { Services } from 'components-react/service-provider';
@@ -16,6 +16,8 @@ import { EAvailableFeatures } from 'services/incremental-rollout';
 import { useRealmObject } from 'components-react/hooks/realm';
 
 export default function SourceGrid(p: { activeTab: string }) {
+  const [sourceTypes, setSourceTypes] = useState<IObsListOption<TSourceType>[]>([]);
+
   const {
     SourcesService,
     UserService,
@@ -71,13 +73,19 @@ export default function SourceGrid(p: { activeTab: string }) {
     [],
   );
 
+  useEffect(() => {
+    if (!sourceTypes.length) {
+      SourcesService.actions.return.getAvailableSourcesTypesList().then(setSourceTypes);
+    }
+  }, []);
+
   const availableSources = useMemo(() => {
     const guestCamAvailable =
       (IncrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.guestCamBeta) ||
         IncrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.guestCaProduction)) &&
       UserService.views.isLoggedIn;
 
-    return SourcesService.getAvailableSourcesTypesList().filter(type => {
+    return sourceTypes.filter(type => {
       // Freetype on windows is hidden
       if (type.value === 'text_ft2_source' && byOS({ [OS.Windows]: true, [OS.Mac]: false })) {
         return;
@@ -89,7 +97,7 @@ export default function SourceGrid(p: { activeTab: string }) {
 
       return !(type.value === 'scene' && ScenesService.views.scenes.length <= 1);
     });
-  }, []);
+  }, [sourceTypes]);
 
   const essentialSources = useMemo(() => {
     const essentialDefaults = availableSources.filter(source =>
