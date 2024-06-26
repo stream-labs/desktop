@@ -43,7 +43,9 @@ export default function StudioEditor() {
 
   const [studioModeTransitionName, setStudioModeTransitionName] = useState<string>();
   useEffect(() => {
-    TransitionsService.actions.return.getStudioTransitionName().then(setStudioModeTransitionName);
+    if (!studioModeTransitionName) {
+      TransitionsService.actions.return.getStudioTransitionName().then(setStudioModeTransitionName);
+    }
   }, [v.studioMode]);
 
   const sourceId = useMemo(() => {
