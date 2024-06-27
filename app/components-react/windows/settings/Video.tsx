@@ -308,8 +308,11 @@ class VideoSettingsModule {
     if (this.resolutionValidator.pattern.test(value)) {
       const [width, height] = value.split('x');
       const prefix = key === 'baseRes' ? 'base' : 'output';
-      this.service.actions.setVideoSetting(`${prefix}Width`, Number(width), display);
-      this.service.actions.setVideoSetting(`${prefix}Height`, Number(height), display);
+
+      const settings = {
+        [`${prefix}Width`]: Number(width),
+        [`${prefix}Height`]: Number(height),
+      };
 
       // set base or output resolutions to vertical dimensions for horizontal display
       // when setting vertical dimensions
@@ -336,10 +339,11 @@ class VideoSettingsModule {
           !horizontalValues.includes(outputRes);
 
         if (shouldSyncVertical || shouldSyncHorizontal) {
-          this.service.actions.setVideoSetting(`${otherPrefix}Width`, Number(width), display);
-          this.service.actions.setVideoSetting(`${otherPrefix}Height`, Number(height), display);
+          settings[`${otherPrefix}Width`] = Number(width);
+          settings[`${otherPrefix}Height`] = Number(height);
         }
       }
+      this.service.actions.setSettings(settings, display);
     }
   }
 
