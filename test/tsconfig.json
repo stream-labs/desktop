@@ -40,7 +40,6 @@
       "tapable",
       "uuid",
       "vue-tsx-support",
-      "@wdio/globals/types"
     ]
   },
   "exclude": [
