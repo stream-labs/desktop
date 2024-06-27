@@ -33,7 +33,7 @@
     "clear": "rimraf bundles/media",
     "typedoc": "typedoc --out docs/dist --entryPoints ./app/services/api/external-api/resources.ts --readme ./docs/README.md --name 'Streamlabs Desktop API' --excludePrivate --excludeProtected --excludeExternals --hideGenerator && cat docs/typedoc-monkeypatch.js >> docs/dist/assets/main.js",
     "ci:compile": "yarn clear && yarn compile:updater && yarn webpack-cli --config ./webpack.dev.config.js",
-    "ci:tests": "node ./test/helpers/runner.js",
+    "ci:tests": "tsc -p test && ava -v test-dist/test/dummy.js",
     "ci:screentests": "node test/screentest/runner.js",
     "ci:performance": "node test/performance/performance-test-runner.js",
     "commit": "commit",
