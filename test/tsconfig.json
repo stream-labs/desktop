@@ -37,6 +37,7 @@
       "tapable",
       "uuid",
       "vue-tsx-support",
+      "webdriverio/async"
     ]
   },
   "exclude": [
