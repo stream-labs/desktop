@@ -1,10 +1,10 @@
 /// <reference path="../../../app/index.d.ts" />
 /// <reference path="../../../app/jsx.d.ts" />
 import avaTest, { afterEach, ExecutionContext } from 'ava';
-import { getApiClient } from '../api-client';
-import { DismissablesService } from 'services/dismissables';
-import { getUser, logOut } from './user';
-import { sleep } from '../sleep';
+import { getApiClient } from '../api-client.ts';
+import { DismissablesService } from 'services/dismissables.ts';
+import { getUser, logOut } from './user.ts';
+import { sleep } from '../sleep.ts';
 import { remote, RemoteOptions } from 'webdriverio';
 import * as ChildProcess from 'child_process';
 import fetch from 'node-fetch';
@@ -17,10 +17,10 @@ import {
   saveTestStatsToFile,
   testFn,
   waitForElectronInstancesExist,
-} from './runner-utils';
-import { skipOnboarding } from '../modules/onboarding';
-import { closeWindow, focusChild, focusMain, getClient, waitForLoader } from '../modules/core';
-import { clearCollections } from '../modules/api/scenes';
+} from './runner-utils.ts';
+import { skipOnboarding } from '../modules/onboarding.ts';
+import { closeWindow, focusChild, focusMain, getClient, waitForLoader } from '../modules/core.mts';
+import { clearCollections } from '../modules/api/scenes.ts';
 export const test = testFn; // the overridden "test" function
 
 const path = require('path');

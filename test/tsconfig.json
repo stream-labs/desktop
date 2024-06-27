@@ -19,6 +19,7 @@
     "suppressImplicitAnyIndexErrors": true,
     "strictNullChecks": false,
     "emitDecoratorMetadata": true,
+    "allowImportingTsExtensions": true,
     "baseUrl": "../app",
     "jsx": "preserve",
     "types": [

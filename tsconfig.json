@@ -39,7 +39,8 @@
       "socket.io-client",
       "tapable",
       "uuid",
-      "vue-tsx-support"
+      "vue-tsx-support",
+      "@wdio/globals/types"
     ]
   },
   "include": ["./app/**/*"],
