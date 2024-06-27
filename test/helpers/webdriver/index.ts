@@ -4,7 +4,7 @@ import avaTest, { afterEach, ExecutionContext } from 'ava';
 import { getApiClient } from '../api-client';
 import { DismissablesService } from 'services/dismissables';
 import { getUser, logOut } from './user';
-import { sleep } from '../sleep.ts';
+import { sleep } from '../sleep';
 import { remote, RemoteOptions } from 'webdriverio';
 import * as ChildProcess from 'child_process';
 import fetch from 'node-fetch';
