@@ -2,9 +2,9 @@
  * The core module provides methods for the most frequent actions
  */
 
-import { getContext } from '../webdriver/index.mts';
-import { getApiClient } from '../api-client.ts';
-import { WindowsService } from '../../../app/services/windows.ts';
+import { getContext } from '../webdriver/index';
+import { getApiClient } from '../api-client';
+import { WindowsService } from '../../../app/services/windows';
 import type { ClickOptions, WaitForOptions } from 'webdriverio';
 
 export type TSelectorOrEl = string | WebdriverIO.Element;
