@@ -1,9 +1,9 @@
-import { useWebdriver, test } from '../../helpers/webdriver';
+import { useWebdriver, test } from '../../helpers/webdriver/index.mjs';
 import { disableGifAnimations, makeScreenshots, useScreentest } from '../screenshoter';
-import { logIn } from '../../helpers/webdriver/user';
+import { logIn } from '../../helpers/webdriver/user.mjs';
 import { spawnSync } from 'child_process';
 import { sleep } from '../../helpers/sleep';
-import { focusMain } from '../../helpers/modules/core';
+import { focusMain } from '../../helpers/modules/core.mjs';
 const path = require('path');
 const _7z = require('7zip')['7z'];
 

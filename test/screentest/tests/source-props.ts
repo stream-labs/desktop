@@ -1,11 +1,11 @@
-import { useWebdriver, test, afterAppStart } from '../../helpers/webdriver';
+import { useWebdriver, test, afterAppStart } from '../../helpers/webdriver/index.mjs';
 import { getApiClient } from '../../helpers/api-client';
 import { ISourcesServiceApi, TSourceType } from '../../../app/services/sources/sources-api';
 import { useScreentest } from '../screenshoter';
 import { sleep } from '../../helpers/sleep';
 import { ScenesService } from '../../../app/services/api/external-api/scenes';
 import { CustomizationService } from '../../../app/services/customization';
-import { focusChild } from '../../helpers/modules/core';
+import { focusChild } from '../../helpers/modules/core.mjs';
 
 let showSourceProps: (name: string) => void;
 

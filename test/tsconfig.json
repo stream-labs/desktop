@@ -7,7 +7,8 @@
       "es7",
       "es2017"
     ],
-    "module": "commonjs",
+    "module": "node16",
+    "moduleResolution": "node16",
     "sourceMap": true,
     "allowJs": true,
     "noImplicitAny": true,
@@ -38,7 +39,7 @@
       "tapable",
       "uuid",
       "vue-tsx-support",
-      "webdriverio/async"
+      "webdriverio"
     ]
   },
   "exclude": [

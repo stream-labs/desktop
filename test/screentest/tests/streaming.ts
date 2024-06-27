@@ -1,14 +1,14 @@
-import { skipCheckingErrorsInLog, test, useWebdriver } from '../../helpers/webdriver';
-import { logIn } from '../../helpers/webdriver/user';
-import { fillForm, selectTitle } from '../../helpers/form-monkey';
+import { skipCheckingErrorsInLog, test, useWebdriver } from '../../helpers/webdriver/index.mjs';
+import { logIn } from '../../helpers/webdriver/user.mjs';
+import { fillForm, selectTitle } from '../../helpers/form-monkey.mjs';
 import { makeScreenshots, useScreentest } from '../screenshoter';
 import { TPlatform } from '../../../app/services/platforms';
-import { fetchMock, installFetchMock, resetFetchMock } from '../../helpers/webdriver/network';
+import { fetchMock, installFetchMock, resetFetchMock } from '../../helpers/webdriver/network.mjs';
 import { getApiClient } from '../../helpers/api-client';
 import { ScenesService } from 'services/api/external-api/scenes';
 import { sleep } from '../../helpers/sleep';
-import { prepareToGoLive } from '../../helpers/modules/streaming';
-import { focusChild, focusMain } from '../../helpers/modules/core';
+import { prepareToGoLive } from '../../helpers/modules/streaming.mjs';
+import { focusChild, focusMain } from '../../helpers/modules/core.mjs';
 
 useWebdriver();
 useScreentest();

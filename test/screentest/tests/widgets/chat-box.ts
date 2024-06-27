@@ -1,7 +1,11 @@
-import { afterAppStart, test, useWebdriver } from '../../../helpers/webdriver';
-import { logIn } from '../../../helpers/webdriver/user';
-import { fillForm } from '../../../helpers/form-monkey';
-import { addWidget, EWidgetType, waitForWidgetSettingsSync } from '../../../helpers/widget-helpers';
+import { afterAppStart, test, useWebdriver } from '../../../helpers/webdriver/index.mjs';
+import { logIn } from '../../../helpers/webdriver/user.mjs';
+import { fillForm } from '../../../helpers/form-monkey.mjs';
+import {
+  addWidget,
+  EWidgetType,
+  waitForWidgetSettingsSync,
+} from '../../../helpers/widget-helpers.mjs';
 import { useScreentest } from '../../screenshoter';
 
 useWebdriver({ restartAppAfterEachTest: false });

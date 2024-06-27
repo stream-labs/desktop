@@ -1,9 +1,9 @@
-import { useWebdriver, test } from '../../helpers/webdriver';
+import { useWebdriver, test } from '../../helpers/webdriver/index.mjs';
 import { getApiClient } from '../../helpers/api-client';
 import { ISourcesServiceApi } from '../../../app/services/sources/sources-api';
 import { useScreentest } from '../screenshoter';
 import { ScenesService } from 'services/api/external-api/scenes';
-import { focusChild } from '../../helpers/modules/core';
+import { focusChild } from '../../helpers/modules/core.mjs';
 
 useWebdriver({ restartAppAfterEachTest: false });
 useScreentest();

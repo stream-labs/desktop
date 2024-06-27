@@ -269,7 +269,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     silentTranslationWarn: false,
     missing: (language: string, key: string) => {
       if (isProduction) return;
-      console.error(`Missing translation found for ${language} -- "${key}"`);
+      setTimeout(() => {
+        console.error(`Missing translation found for ${language} -- "${key}"`);
+      }, 0);
+      return null;
     },
   });
   I18nService.setVuei18nInstance(i18n);

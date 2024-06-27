@@ -1,4 +1,4 @@
-import { useWebdriver, test } from '../../helpers/webdriver';
+import { useWebdriver, test } from '../../helpers/webdriver/index.mjs';
 import { getApiClient } from '../../helpers/api-client';
 import { ISourcesServiceApi } from '../../../app/services/sources/sources-api';
 import { useScreentest } from '../screenshoter';

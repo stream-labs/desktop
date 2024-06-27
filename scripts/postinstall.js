@@ -4,7 +4,7 @@ const path = require('path');
 const rimraf = require('rimraf');
 
 // install native deps
-execSync('node ./scripts/install-native-deps.js', { stdio: [0, 1, 2] });
+execSync('node ./scripts/install-native-deps.mjs', { stdio: [0, 1, 2] });
 
 // the antd library doesn't work with webpack5
 // @see https://github.com/ant-design/ant-design/issues/26718#issuecomment-691846966

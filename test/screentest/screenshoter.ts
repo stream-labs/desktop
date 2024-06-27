@@ -3,11 +3,11 @@ import { CustomizationService } from '../../app/services/customization';
 import { getConfigsVariations, getConfig } from './utils';
 import test from 'ava';
 import { sleep } from '../helpers/sleep';
-import { afterAppStart, TExecutionContext } from '../helpers/webdriver';
+import { afterAppStart, TExecutionContext } from '../helpers/webdriver/index.mjs';
 import { PerformanceService } from '../../app/services/performance';
 import { IAudioServiceApi } from '../../app/services/audio';
 import { WindowsService } from '../../app/services/windows';
-import { focusChild, focusMain } from '../helpers/modules/core';
+import { focusChild, focusMain } from '../helpers/modules/core.mjs';
 
 const fs = require('fs');
 const CONFIG = getConfig();

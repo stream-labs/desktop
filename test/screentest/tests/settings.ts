@@ -1,10 +1,10 @@
-import { useWebdriver, test, TExecutionContext } from '../../helpers/webdriver';
+import { useWebdriver, test, TExecutionContext } from '../../helpers/webdriver/index.mjs';
 import { getApiClient } from '../../helpers/api-client';
 import { makeScreenshots, useScreentest } from '../screenshoter';
 import { SettingsService } from '../../../app/services/settings';
-import { logIn, logOut } from '../../helpers/webdriver/user';
+import { logIn, logOut } from '../../helpers/webdriver/user.mjs';
 import { sleep } from '../../helpers/sleep';
-import { closeWindow, focusChild } from '../../helpers/modules/core';
+import { closeWindow, focusChild } from '../../helpers/modules/core.mjs';
 
 useWebdriver({ restartAppAfterEachTest: false });
 useScreentest();

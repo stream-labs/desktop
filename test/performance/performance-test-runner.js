@@ -9,7 +9,7 @@ const args = process.argv.slice(2);
 const rimraf = require('rimraf');
 const Table = require('cli-table');
 const colors = require('colors');
-const fetch = require('node-fetch');
+const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 const { execSync } = require('child_process');
 
 const TESTS_SERVICE_URL = CI ? 'https://slobs-users-pool.herokuapp.com' : 'http://localhost:5000';
@@ -163,8 +163,7 @@ async function fetchLastResultsForBaseBranch() {
 
 function baseBranchHasCommit(commitSHA) {
   return (
-    execSync(`git branch --contains ${commitSHA}`)
-      .toString()
-      .indexOf(`* ${CONFIG.baseBranch}`) !== -1
+    execSync(`git branch --contains ${commitSHA}`).toString().indexOf(`* ${CONFIG.baseBranch}`) !==
+    -1
   );
 }

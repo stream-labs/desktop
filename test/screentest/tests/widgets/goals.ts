@@ -1,9 +1,13 @@
-import { TExecutionContext, test, useWebdriver } from '../../../helpers/webdriver/index';
-import { logIn, logOut } from '../../../helpers/webdriver/user';
+import { TExecutionContext, test, useWebdriver } from '../../../helpers/webdriver/index.mjs';
+import { logIn, logOut } from '../../../helpers/webdriver/user.mjs';
 import { makeScreenshots, useScreentest } from '../../screenshoter';
-import { FormMonkey } from '../../../helpers/form-monkey';
-import { addWidget, EWidgetType, waitForWidgetSettingsSync } from '../../../helpers/widget-helpers';
-import { closeWindow } from '../../../helpers/modules/core';
+import { FormMonkey } from '../../../helpers/form-monkey.mjs';
+import {
+  addWidget,
+  EWidgetType,
+  waitForWidgetSettingsSync,
+} from '../../../helpers/widget-helpers.mjs';
+import { closeWindow } from '../../../helpers/modules/core.mjs';
 
 useWebdriver({ restartAppAfterEachTest: false });
 useScreentest();

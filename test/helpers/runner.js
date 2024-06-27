@@ -9,7 +9,7 @@ const jobStartTime = Date.now();
 const { execSync } = require('child_process');
 const fs = require('fs');
 const rimraf = require('rimraf');
-const fetch = require('node-fetch');
+const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
 const failedTestsFile = 'test-dist/failed-tests.json';
 const testStatsFile = 'test-dist/test-stats.json';
