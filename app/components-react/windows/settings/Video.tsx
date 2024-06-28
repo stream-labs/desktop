@@ -1,6 +1,6 @@
 import * as remote from '@electron/remote';
-import React from 'react';
-import { useModule, injectState } from 'slap';
+import React, { useMemo, useRef } from 'react';
+import { useModule, injectState, injectFormBinding } from 'slap';
 import { Services } from '../../service-provider';
 import { Button, Form, Modal, message } from 'antd';
 import FormFactory, { TInputValue } from 'components-react/shared/inputs/FormFactory';
@@ -10,7 +10,15 @@ import { EScaleType, EFPSType, IVideoInfo } from '../../../../obs-api';
 import { $t } from 'services/i18n';
 import styles from './Common.m.less';
 import Tabs from 'components-react/shared/Tabs';
-import { invalidFps, IVideoInfoValue, TDisplayType } from 'services/settings-v2/video';
+import {
+  invalidFps,
+  IVideoInfoValue,
+  TDisplayType,
+  VideoSettingsState,
+} from 'services/settings-v2/video';
+import { useRealmObject } from 'components-react/hooks/realm';
+import { initStore, useController } from 'components-react/hooks/zustand';
+import useBaseElement from 'components-react/editor/elements/hooks';
 
 const CANVAS_RES_OPTIONS = [
   { label: '1920x1080', value: '1920x1080' },
@@ -53,14 +61,16 @@ const FPS_OPTIONS = [
   { label: '60', value: '60-1' },
 ];
 
-class VideoSettingsModule {
-  service = Services.VideoSettingsService;
-  userService = Services.UserService;
-  dualOutputService = Services.DualOutputService;
-  streamingService = Services.StreamingService;
+export const VideoSettingsCtx = React.createContext<VideoSettingsController | null>(null);
+
+class VideoSettingsController {
+  private service = Services.VideoSettingsService;
+  private userService = Services.UserService;
+  private dualOutputService = Services.DualOutputService;
+  private streamingService = Services.StreamingService;
 
   get display(): TDisplayType {
-    return this.state.display;
+    return this.store.display;
   }
 
   get isLoggedIn(): boolean {
@@ -71,28 +81,38 @@ class VideoSettingsModule {
     return this.streamingService.views.isStreaming || this.streamingService.views.isRecording;
   }
 
+  get showModal(): boolean {
+    return this.store.showModal;
+  }
+
+  get dualOutput(): boolean {
+    return this.store.dualOutput;
+  }
+
   get values(): Dictionary<TInputValue> {
-    const display = this.state.display;
+    console.log('this.store', JSON.stringify(this.store, null, 2));
+
+    const display = this.store.display;
     const vals = this.service.values[display];
-    const baseRes = display !== 'vertical' && this.state?.customBaseRes ? 'custom' : vals.baseRes;
+    const baseRes = display !== 'vertical' && this.store?.customBaseRes ? 'custom' : vals.baseRes;
     const outputRes =
-      display !== 'vertical' && this.state?.customOutputRes ? 'custom' : vals.outputRes;
+      display !== 'vertical' && this.store?.customOutputRes ? 'custom' : vals.outputRes;
     return {
       ...vals,
       baseRes,
       outputRes,
-      customBaseRes: this.state.customBaseResValue,
-      customOutputRes: this.state.customOutputResValue,
-      fpsNum: this.state.fpsNum,
-      fpsDen: this.state.fpsDen,
-      fpsInt: this.state.fpsInt,
+      customBaseRes: this.store.customBaseResValue,
+      customOutputRes: this.store.customOutputResValue,
+      fpsNum: this.store.fpsNum,
+      fpsDen: this.store.fpsDen,
+      fpsInt: this.store.fpsInt,
     };
   }
 
-  state = injectState({
+  store = initStore({
     display: 'horizontal' as TDisplayType,
     showModal: false,
-    showDualOutputSettings: this.dualOutputService.views.dualOutputMode,
+    dualOutput: this.dualOutputService.views.dualOutputMode,
     customBaseRes: !this.baseResOptions.find(
       opt => opt.value === this.service.values.horizontal.baseRes,
     ),
@@ -120,7 +140,7 @@ class VideoSettingsModule {
             label: $t('Custom Base Resolution'),
             rules: [this.resolutionValidator],
             onChange: (val: string) => this.setResolution('baseRes', val),
-            displayed: this.state.customBaseRes,
+            displayed: this.store.customBaseRes,
             disabled: this.cantEditFields,
           },
         },
@@ -137,7 +157,7 @@ class VideoSettingsModule {
             label: $t('Custom Output Resolution'),
             rules: [this.resolutionValidator],
             onChange: (val: string) => this.setResolution('outputRes', val),
-            displayed: this.state.customOutputRes,
+            displayed: this.store.customOutputRes,
             disabled: this.cantEditFields,
           },
         },
@@ -222,7 +242,7 @@ class VideoSettingsModule {
   }
 
   get baseResOptions() {
-    if (this.state?.display === 'vertical') {
+    if (this.store?.display === 'vertical') {
       return VERTICAL_CANVAS_OPTIONS;
     }
 
@@ -232,7 +252,7 @@ class VideoSettingsModule {
   }
 
   get outputResOptions() {
-    if (this.state?.display === 'vertical') {
+    if (this.store?.display === 'vertical') {
       return VERTICAL_OUTPUT_RES_OPTIONS;
     }
 
@@ -295,11 +315,15 @@ class VideoSettingsModule {
   }
 
   setResolution(key: string, value: string) {
-    const display = this.state.display;
+    const display = this.store.display;
     if (key === 'outputRes') {
-      this.state.setCustomOutputResValue(value);
+      this.store.setState(s => {
+        s.customOutputResValue = value;
+      });
     } else if (key === 'baseRes') {
-      this.state.setCustomBaseResValue(value);
+      this.store.setState(s => {
+        s.customBaseResValue = value;
+      });
     }
 
     if (this.resolutionValidator.pattern.test(value)) {
@@ -322,9 +346,13 @@ class VideoSettingsModule {
 
   setCustomResolution(key: string, value: boolean) {
     if (key === 'baseRes') {
-      this.state.setCustomBaseRes(value);
+      this.store.setState(s => {
+        s.customBaseRes = value;
+      });
     } else {
-      this.state.setCustomOutputRes(value);
+      this.store.setState(s => {
+        s.customOutputRes = value;
+      });
     }
   }
 
@@ -378,7 +406,10 @@ class VideoSettingsModule {
    * Otherwise, update the vertical display persisted settings.
    */
   setIntegerFPS(value: string) {
-    this.state.setFpsInt(Number(value));
+    this.store.setState(s => {
+      s.fpsInt = Number(value);
+    });
+
     if (Number(value) > 0 && Number(value) < 1001) {
       this.service.actions.setVideoSetting('fpsNum', Number(value), 'horizontal');
       this.service.actions.setVideoSetting('fpsDen', 1, 'horizontal');
@@ -394,11 +425,15 @@ class VideoSettingsModule {
    */
   setFPS(key: 'fpsNum' | 'fpsDen', value: string) {
     if (key === 'fpsNum') {
-      this.state.setFpsNum(Number(value));
+      this.store.setState(s => {
+        s.fpsNum = Number(value);
+      });
     } else {
-      this.state.setFpsDen(Number(value));
+      this.store.setState(s => {
+        s.fpsDen = Number(value);
+      });
     }
-    if (!invalidFps(this.state.fpsNum, this.state.fpsDen) && Number(value) > 0) {
+    if (!invalidFps(this.store.fpsNum, this.store.fpsDen) && Number(value) > 0) {
       this.service.actions.setVideoSetting(key, Number(value), 'horizontal');
       this.service.actions.syncFPSSettings();
     }
@@ -406,28 +441,39 @@ class VideoSettingsModule {
 
   onChange(key: keyof IVideoInfo) {
     return (val: IVideoInfoValue) =>
-      this.service.actions.setVideoSetting(key, val, this.state.display);
+      this.service.actions.setVideoSetting(key, val, this.store.display);
   }
 
   setDisplay(display: TDisplayType) {
-    this.state.setDisplay(display);
-
+    this.store.setState(s => {
+      s.display = display;
+    });
     const customBaseRes = !this.baseResOptions.find(
       opt => opt.value === this.service.values[display].baseRes,
     );
     const customOutputRes = !this.outputResOptions.find(
       opt => opt.value === this.service.values[display].outputRes,
     );
-    this.state.setCustomBaseRes(customBaseRes);
-    this.state.setCustomOutputRes(customOutputRes);
-    this.state.setCustomBaseResValue(this.service.values[display].baseRes);
-    this.state.setCustomOutputResValue(this.service.values[display].outputRes);
-    this.state.setFpsNum(this.service.values[display].fpsNum);
-    this.state.setFpsDen(this.service.values[display].fpsDen);
-    this.state.setFpsInt(this.service.values[display].fpsInt);
+    this.store.setState(s => {
+      s.customBaseRes = customBaseRes;
+      s.customOutputRes = customOutputRes;
+      s.customBaseResValue = this.service.values[display].baseRes;
+      s.customOutputResValue = this.service.values[display].outputRes;
+      s.fpsNum = this.service.values[display].fpsNum;
+      s.fpsDen = this.service.values[display].fpsDen;
+      s.fpsInt = this.service.values[display].fpsInt;
+    });
   }
 
-  setShowDualOutput() {
+  handleDualOutput(val: boolean) {
+    if (this.userService.isLoggedIn) {
+      this.toggleDualOutput();
+    } else {
+      this.handleShowModal(val);
+    }
+  }
+
+  toggleDualOutput() {
     if (Services.StreamingService.views.isMidStreamMode) {
       message.error({
         content: $t('Cannot toggle Dual Output while live.'),
@@ -439,7 +485,9 @@ class VideoSettingsModule {
     } else {
       // toggle dual output
       this.dualOutputService.actions.setdualOutputMode();
-      this.state.setShowDualOutputSettings(!this.state.showDualOutputSettings);
+      this.store.setState(s => {
+        s.dualOutput = !s.dualOutput;
+      });
       Services.UsageStatisticsService.recordFeatureUsage('DualOutput');
       Services.UsageStatisticsService.recordAnalyticsEvent('DualOutput', {
         type: 'ToggleOnDualOutput',
@@ -462,7 +510,9 @@ class VideoSettingsModule {
 
   handleShowModal(status: boolean) {
     Services.WindowsService.actions.updateStyleBlockers('child', status);
-    this.state.setShowModal(status);
+    this.store.setState(s => {
+      s.showModal = status;
+    });
   }
 
   handleAuth() {
@@ -485,22 +535,26 @@ class VideoSettingsModule {
 // refer to Appearance.tsx
 
 export function VideoSettings() {
-  const {
-    values,
-    metadata,
-    showDualOutputSettings,
-    showModal,
-    isLoggedIn,
-    cantEditFields,
-    onChange,
-    setDisplay,
-    setShowDualOutput,
-    handleShowModal,
-    handleAuth,
-  } = useModule(VideoSettingsModule);
+  const controller = useMemo(() => new VideoSettingsController(), []);
+  const ctrl = useController(VideoSettingsCtx);
+
+  // // Hooks up reactivity for Customization state
+  // useRealmObject(Services.VideoSettingsService.state);
+
+  // const { bind } = useModule(() => {
+  //   function getSettings() {
+  //     return Services.VideoSettingsService.state.toObject() as VideoSettingsState;
+  //   }
+
+  //   function setSettings(newSettings: Partial<IVideoInfo>) {
+  //     Services.VideoSettingsService.actions.updateVideoSettings(newSettings);
+  //   }
+
+  //   return { bind: injectFormBinding(getSettings, setSettings) };
+  // });
 
   return (
-    <>
+    <VideoSettingsCtx.Provider value={controller}>
       <div className={styles.videoSettingsHeader}>
         <h2>{$t('Video')}</h2>
         <div className={styles.doToggle}>
@@ -510,10 +564,10 @@ export function VideoSettings() {
             name="dual-output-checkbox"
             data-name="dual-output-checkbox"
             label="Dual Output Checkbox"
-            value={showDualOutputSettings}
-            onChange={(val: boolean) => (isLoggedIn ? setShowDualOutput() : handleShowModal(val))}
+            value={ctrl.dualOutput}
+            onChange={ctrl.handleDualOutput}
             className={styles.doCheckbox}
-            disabled={cantEditFields}
+            disabled={ctrl.cantEditFields}
           />
           {$t('Enable Dual Output')}
           <Tooltip
@@ -529,36 +583,30 @@ export function VideoSettings() {
         </div>
         {/* )} */}
       </div>
-      {showDualOutputSettings && <Tabs onChange={setDisplay} />}
+      {ctrl.dualOutput && <Tabs onChange={ctrl.setDisplay} />}
 
       <div className={styles.formSection}>
         <FormFactory
-          values={values}
-          metadata={metadata}
-          onChange={onChange}
+          values={ctrl.values}
+          metadata={ctrl.metadata}
+          onChange={ctrl.onChange}
           formOptions={{ layout: 'vertical' }}
           name="video-settings"
         />
       </div>
-      <LoginPromptModal
-        showModal={showModal}
-        handleAuth={handleAuth}
-        handleShowModal={handleShowModal}
-      />
-    </>
+      <LoginPromptModal />
+    </VideoSettingsCtx.Provider>
   );
 }
 
-function LoginPromptModal(p: {
-  showModal: boolean;
-  handleAuth: () => void;
-  handleShowModal: (status: boolean) => void;
-}) {
+function LoginPromptModal() {
+  const { showModal, handleAuth, handleShowModal } = useController(VideoSettingsCtx);
+
   return (
     <Modal
       footer={null}
-      visible={p.showModal}
-      onCancel={() => p.handleShowModal(false)}
+      visible={showModal}
+      onCancel={() => handleShowModal(false)}
       getContainer={false}
       className={styles.confirmLogout}
     >
@@ -566,12 +614,30 @@ function LoginPromptModal(p: {
         <h2>{$t('Login')}</h2>
         {$t('Please log in to enable dual output. Would you like to log in now?')}
         <div className={styles.buttons}>
-          <Button onClick={() => p.handleAuth()}>{$t('Yes')}</Button>
-          <Button onClick={() => p.handleShowModal(false)}>{$t('No')}</Button>
+          <Button onClick={() => handleAuth()}>{$t('Yes')}</Button>
+          <Button onClick={() => handleShowModal(false)}>{$t('No')}</Button>
         </div>
       </Form>
     </Modal>
   );
 }
 
-VideoSettings.page = 'Video';
+const mins = { x: 200, y: 120 };
+
+export function VideoSettingsPage() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { renderElement } = useBaseElement(<VideoSettings />, mins, containerRef.current);
+  const controller = useMemo(() => new VideoSettingsController(), []);
+
+  return (
+    <div
+      ref={containerRef}
+      data-name="SourceSelector"
+      style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+    >
+      <VideoSettingsCtx.Provider value={controller}>{renderElement()}</VideoSettingsCtx.Provider>
+    </div>
+  );
+}
+
+VideoSettingsPage.page = 'Video';

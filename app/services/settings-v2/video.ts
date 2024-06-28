@@ -15,7 +15,6 @@ import {
   ERangeType,
 } from '../../../obs-api';
 import { DualOutputService } from 'services/dual-output';
-import { SettingsService } from 'services/settings';
 import { OutputSettingsService } from 'services/settings/output';
 import { Subject } from 'rxjs';
 
@@ -82,6 +81,15 @@ export function invalidFps(num: number, den: number) {
   return num / den > 1000 || num / den < 1;
 }
 
+interface IVideoContextSetting {
+  video: IVideoInfo;
+  isActive: boolean;
+}
+export interface IVideoSettingsState {
+  horizontal: IVideoContextSetting;
+  vertical: IVideoContextSetting;
+}
+
 class VideoInfo extends RealmObject implements IVideoInfo {
   fpsNum: number;
   fpsDen: number;
@@ -105,44 +113,16 @@ class VideoInfo extends RealmObject implements IVideoInfo {
       baseHeight: { type: 'int', default: 1280 },
       outputWidth: { type: 'int', default: 1920 },
       outputHeight: { type: 'int', default: 1280 },
-      outputFormat: { type: 'int', default: EVideoFormat.I420 as number },
-      colorspace: { type: 'int', default: EColorSpace.CS709 as number },
-      range: { type: 'int', default: ERangeType.Full as number },
-      scaleType: { type: 'int', default: EScaleType.Bilinear as number },
-      fpsType: { type: 'int', default: EFPSType.Integer as number },
+      outputFormat: { type: 'int', default: EVideoFormat.I420 },
+      colorspace: { type: 'int', default: EColorSpace.CS709 },
+      range: { type: 'int', default: ERangeType.Full },
+      scaleType: { type: 'int', default: EScaleType.Bilinear },
+      fpsType: { type: 'int', default: EFPSType.Integer },
     },
   };
 }
 
 VideoInfo.register({ persist: true });
-
-// class VideoContext extends RealmObject {
-//   video: VideoInfo;
-//   legacySettings: VideoInfo;
-//   // destroy(): void;
-//   /**
-//    * Number of total skipped frames
-//    */
-//   readonly skippedFrames: number;
-
-//   /**
-//    * Number of total encoded frames
-//    */
-//   readonly encodedFrames: number;
-
-//   static schema: ObjectSchema = {
-//     name: 'VideoContext',
-//     embedded: true,
-//     properties: {
-//       video: { type: 'object', objectType: 'VideoInfo' },
-//       legacySettings: { type: 'object', objectType: 'VideoInfo' },
-//       skippedFrames: { type: 'int' },
-//       encodedFrames: { type: 'int' },
-//     },
-//   };
-// }
-// VideoContext.register({ persist: true });
-
 class VideoContextSetting extends RealmObject {
   video: VideoInfo;
   isActive: boolean;
@@ -159,7 +139,7 @@ class VideoContextSetting extends RealmObject {
 
 VideoContextSetting.register({ persist: true });
 
-class VideoSettingsState extends RealmObject {
+export class VideoSettingsState extends RealmObject {
   horizontal: VideoContextSetting;
   vertical: VideoContextSetting;
 
@@ -180,87 +160,133 @@ class VideoSettingsState extends RealmObject {
   };
 
   protected onCreated(): void {
-    //   console.log('Video', JSON.stringify(Video, null, 2));
-    //   console.log('this', JSON.stringify(this, null, 2));
+    console.log('Video', JSON.stringify(Video, null, 2));
+    console.log('this', JSON.stringify(this, null, 2));
 
-    // Migrating video settings is complicated because the method of storage has gone through many iterations.
-    // Attempt migration in reverse order of these changes. Default values have already been set to prevent errors.
+    const verticalResolutions = {
+      baseWidth: 720,
+      baseHeight: 1280,
+      outputWidth: 720,
+      outputHeight: 1280,
+    };
 
-    // // 1. Dual Output Service - Horizontal & Vertical
+    // load persisted horizontal settings from service
     const data = localStorage.getItem('PersistentStatefulService-DualOutputService');
 
     if (data) {
       const parsed = JSON.parse(data);
       console.log('parsed', JSON.stringify(parsed, null, 2));
 
-      //   // horizontal video settings will only exist if the app has been opened after dual output was released
-      //   if (parsed.videoSettings.horizontal) {
-      //     const settings = {
-      //       horizontal: this.formatVideoContextSettings(parsed.videoSettings.horizontal, true),
-      //       vertical: this.formatVideoContextSettings(parsed.videoSettings.horizontal),
-      //     };
+      // horizontal video settings will only exist if the app has been opened after dual output was released
+      if (parsed.videoSettings.horizontal) {
+        this.db.write(() => {
+          this.horizontal.video.deepPatch(parsed.videoSettings.horizontal);
 
-      //     this.db.write(() => {
-      //       this.horizontal.video.deepPatch(settings.horizontal.video);
-      //       this.horizontal.isActive = settings.horizontal.isActive;
-
-      //       const verticalSettings = {
-      //         ...settings.horizontal.video,
-      //       };
-      //       verticalSettings.baseWidth = 720;
-      //       verticalSettings.baseHeight = 720;
-
-      //       this.vertical.video.deepPatch(verticalSettings);
-      //       this.vertical.isActive = false;
-      //     });
-      //   }
+          this.vertical.video.deepPatch({
+            ...parsed.videoSettings.horizontal,
+            ...verticalResolutions,
+          });
+          this.vertical.isActive = false;
+        });
+      }
+    } else {
+      // always set vertical defaults
+      this.db.write(() => {
+        this.vertical.video.deepPatch(verticalResolutions);
+        this.vertical.isActive = false;
+      });
     }
-
-    // @@@ NOTE: we probably can't do this because the context hasn't been created yet
-
-    // // 2. OSN Legacy Settings - Horizontal Only
-    // // Ideally, the first time the user opens the app after the settings have migrated to being stored
-    // // on the front end, load the settings from the legacy settings. The legacy settings are
-    // // just values from basic.ini
-    // if (
-    //   Video.legacySettings &&
-    //   Video.legacySettings?.baseWidth !== 0 &&
-    //   Video.legacySettings?.baseHeight !== 0
-    // ) {
-    //   settings = {
-    //     horizontal: this.formatVideoContextSettings(Video.legacySettings, true),
-    //     vertical: this.formatVideoContextSettings(Video.legacySettings),
-    //   };
-    // }
-
-    // // 3. OSN Video Settings - Horizontal Display Settings Only
-    // // Because the legacy settings are just values from basic.ini, if the user is starting from
-    // // a clean cache, there will be no such file. In that case, load from the video property.
-    // if (Video.video) {
-    //   settings = {
-    //     horizontal: this.formatVideoContextSettings(Video.video, true),
-    //     vertical: this.formatVideoContextSettings(Video.video),
-    //   };
-    // }
-
-    // console.log('settings', JSON.stringify(settings, null, 2));
-    // // only overwrite default values if settings need to be migrated
   }
 
-  private formatVideoContextSettings(videoInfo: IVideoInfo, isActive: boolean = false) {
-    const settings = {} as VideoInfo;
-    Object.keys(videoInfo).forEach((key: keyof IVideoInfo) => {
-      settings[key as string] = videoInfo[key];
-    });
+  get values() {
+    return {
+      horizontal: this.formatVideoValues('horizontal'),
+      vertical: this.formatVideoValues('vertical'),
+    };
+  }
 
-    if (invalidFps(settings.fpsNum, settings.fpsDen)) {
-      settings.fpsNum = 30;
-      settings.fpsDen = 1;
+  /**
+   * The below provides a default base resolution
+   * @remark replaces the legacy base resolution in the video service
+   */
+  get baseResolution() {
+    return this.baseResolutions.horizontal;
+  }
+
+  /**
+   * The below provides a default base width
+   * @remark replaces the legacy base width in the video service
+   */
+  get baseWidth() {
+    return this.baseResolutions.horizontal.baseWidth;
+  }
+
+  /**
+   * The below provides a default base width
+   * @remark replaces the legacy base width in the video service
+   */
+  get baseHeight() {
+    return this.baseResolutions.horizontal.baseHeight;
+  }
+
+  /**
+   * The below conditionals are to prevent undefined errors on app startup
+   */
+  get baseResolutions() {
+    // to prevent any possible undefined errors on load in the event that the root node
+    // attempts to load before the first video context has finished establishing
+    // the below are fallback dimensions
+    if (!this.horizontal || !this.vertical) {
+      console.error('Error loading video settings state. Default base resolution used.');
+      return {
+        horizontal: {
+          baseWidth: 1920,
+          baseHeight: 1080,
+        },
+        vertical: {
+          baseWidth: 720,
+          baseHeight: 1080,
+        },
+      };
     }
 
+    const horizontalSettings = this.horizontal?.video;
+    const verticalSettings = this.vertical?.video;
+
     return {
-      video: settings,
-      isActive,
+      horizontal: {
+        baseWidth: horizontalSettings?.baseWidth,
+        baseHeight: horizontalSettings?.baseHeight,
+      },
+      vertical: {
+        baseWidth: verticalSettings?.baseWidth,
+        baseHeight: verticalSettings?.baseHeight,
+      },
+    };
+  }
+
+  /**
+   * Format video settings for the video settings form
+   *
+   * @param display - Optional, the display for the settings
+   * @returns Settings formatted for the video settings form
+   */
+
+  formatVideoValues(display: TDisplayType = 'horizontal', typeStrings?: boolean) {
+    const settings = this[display]?.video;
+
+    const scaleType = typeStrings ? scaleTypeNames[settings?.scaleType] : settings?.scaleType;
+    const fpsType = typeStrings ? fpsTypeNames[settings?.fpsType] : settings?.fpsType;
+
+    return {
+      baseRes: `${settings?.baseWidth}x${settings?.baseHeight}`,
+      outputRes: `${settings?.outputWidth}x${settings?.outputHeight}`,
+      scaleType,
+      fpsType,
+      fpsCom: `${settings?.fpsNum}-${settings?.fpsDen}`,
+      fpsNum: settings?.fpsNum,
+      fpsDen: settings?.fpsDen,
+      fpsInt: settings?.fpsNum,
     };
   }
 }
@@ -277,11 +303,9 @@ export class VideoSettingsService extends Service {
   settingsUpdated = new Subject();
 
   init() {
-    console.log('init state', JSON.stringify(this.state.realmModel, null, 2));
-    console.log('init contexts', JSON.stringify(this.contexts, null, 2));
     this.establishVideoContext();
 
-    if (this.state?.vertical?.isActive && !this.contexts.vertical) {
+    if (this.state.vertical?.isActive && !this.contexts.vertical) {
       this.establishVideoContext('vertical');
     }
 
@@ -331,37 +355,31 @@ export class VideoSettingsService extends Service {
     // to prevent any possible undefined errors on load in the event that the root node
     // attempts to load before the first video context has finished establishing
     // the below are fallback dimensions
-    const defaultWidth = 1920;
-    const defaultHeight = 1080;
+    if (!this.state) {
+      console.error('Error loading video settings state. Default base resolution used.');
+      return {
+        horizontal: {
+          baseWidth: 1920,
+          baseHeight: 1080,
+        },
+        vertical: {
+          baseWidth: 720,
+          baseHeight: 1080,
+        },
+      };
+    }
 
-    // return {
-    //   horizontal: {
-    //     baseWidth: defaultWidth,
-    //     baseHeight: defaultHeight,
-    //   },
-    //   vertical: {
-    //     baseWidth: defaultWidth,
-    //     baseHeight: defaultHeight,
-    //   },
-    // };
-
-    const horizontalSettings =
-      this.contexts.horizontal?.video ??
-      this.contexts.horizontal?.legacySettings ??
-      this.state?.horizontal?.video;
-    const verticalSettings =
-      this.contexts.vertical?.video ??
-      this.contexts.vertical?.legacySettings ??
-      this.state?.vertical?.video;
+    const horizontalSettings = this.state.horizontal?.video;
+    const verticalSettings = this.state.vertical?.video;
 
     return {
       horizontal: {
-        baseWidth: horizontalSettings?.baseWidth ?? defaultWidth,
-        baseHeight: horizontalSettings?.baseHeight ?? defaultHeight,
+        baseWidth: horizontalSettings?.baseWidth,
+        baseHeight: horizontalSettings?.baseHeight,
       },
       vertical: {
-        baseWidth: verticalSettings?.baseWidth ?? defaultWidth,
-        baseHeight: verticalSettings?.baseHeight ?? defaultHeight,
+        baseWidth: verticalSettings?.baseWidth,
+        baseHeight: verticalSettings?.baseHeight,
       },
     };
   }
@@ -369,12 +387,12 @@ export class VideoSettingsService extends Service {
   get outputResolutions() {
     return {
       horizontal: {
-        outputWidth: this.contexts.horizontal?.video.outputWidth,
-        outputHeight: this.contexts.horizontal?.video.outputHeight,
+        outputWidth: this.state.horizontal?.video.outputWidth,
+        outputHeight: this.state.horizontal?.video.outputHeight,
       },
       vertical: {
-        outputWidth: this.contexts.vertical?.video.outputWidth,
-        outputHeight: this.contexts.vertical?.video.outputHeight,
+        outputWidth: this.state.vertical?.video.outputWidth,
+        outputHeight: this.state.vertical?.video.outputHeight,
       },
     };
   }
@@ -426,16 +444,25 @@ export class VideoSettingsService extends Service {
    * @param display - Optional, the context's display name
    */
   migrateSettings(display: TDisplayType = 'horizontal') {
-    // if (!this.contexts[display] || !this.state[display]) return;
-    // const settings = this.state[display].video;
-    // this.contexts[display].video = settings;
+    if (!this.contexts[display] || !this.state[display]) return;
+
+    const settings = {} as IVideoInfo;
+    const videoInfo = this.state[display].video;
+    Object.keys(videoInfo).forEach((key: keyof IVideoInfo) => {
+      this.contexts[display].video[key as string] = videoInfo[key];
+    });
+
+    if (invalidFps(settings.fpsNum, settings.fpsDen)) {
+      settings.fpsNum = 30;
+      settings.fpsDen = 1;
+    }
+
+    this.contexts[display].legacySettings = this.contexts[display].video;
 
     // setting the below syncs the settings saved locally to obs default video context
     if (display === 'horizontal') {
-      Video.video = this.contexts.horizontal.video;
-      Video.legacySettings = this.contexts.horizontal.legacySettings;
-      // Video.video = settings;
-      // Video.legacySettings = settings;
+      Video.video = this.state.horizontal.video;
+      Video.legacySettings = this.state.horizontal.video;
     }
 
     this.settingsUpdated.next();
@@ -475,7 +502,7 @@ export class VideoSettingsService extends Service {
 
       if (diffStateSetting || diffContextSetting) {
         // set realm
-        this.setVideoSetting(key, newVideoSettings[key], display);
+        // this.setVideoSetting(key, newVideoSettings[key], display);
       }
     });
   }
@@ -496,7 +523,7 @@ export class VideoSettingsService extends Service {
       outputWidth: this.state.vertical.video.outputWidth,
       outputHeight: this.state.vertical.video.outputHeight,
     };
-    this.updateVideoSettings(updatedSettings, 'vertical');
+    // this.updateVideoSettings(updatedSettings, 'vertical');
 
     if (this.contexts?.vertical) {
       // update the Video settings property to the horizontal context dimensions
@@ -534,56 +561,29 @@ export class VideoSettingsService extends Service {
   // }
 
   /**
-   * Shut down the video settings service
-   *
-   * @remarks
-   * Each context must be destroyed when shutting down the app to prevent errors
+   * Update a multiple video settings
+   * @remark Use to reduce calls to obs, which contributes to app bloat
+   * @param patch - key/values for video info
+   * @param display - context to apply setting
    */
-  shutdown() {
-    console.log('this.contexts', JSON.stringify(this.contexts, null, 2));
-    Object.keys(this.contexts).forEach((display: TDisplayType) => {
-      if (this.contexts[display]) {
-        // save settings as legacy settings
-        this.contexts[display].legacySettings = this.state[display].video;
-
-        // destroy context
-        this.contexts[display].destroy();
-      }
-    });
-  }
-
   updateVideoSettings(patch: Partial<IVideoInfo>, display: TDisplayType = 'horizontal') {
-    const settings: IVideoInfo = this.contexts[display].video ?? this.state[display].video;
-    const video = { ...settings, ...patch };
-
-    this.setSettings({ [display]: video });
-
-    // this.SET_VIDEO_CONTEXT(display, newVideoSettings);
-    this.updateObsSettings(display);
-    // refresh v1 settings
-    this.settingsUpdated.next();
+    this.setSettings({ video: patch }, display);
   }
 
+  /**
+   * Update a single video setting
+   * @remark Primarily used for the video settings form
+   * @param key - property name of setting
+   * @param value - new value for setting
+   * @param display - context to apply setting
+   */
   setVideoSetting(
     key: keyof IVideoInfo,
     value: IVideoInfoValue,
     display: TDisplayType = 'horizontal',
   ) {
     const setting = { [key]: value };
-    this.setSettings({ [display]: { video: { setting } } });
-  }
-
-  setSettings(
-    settingsPatch: DeepPartial<VideoSettingsState>,
-    display: TDisplayType = 'horizontal',
-  ) {
-    this.state.db.write(() => {
-      this.state.deepPatch(settingsPatch);
-    });
-    this.updateObsSettings(display);
-
-    // refresh v1 settings
-    this.settingsUpdated.next();
+    this.setSettings({ video: setting }, display);
   }
 
   /**
@@ -594,7 +594,86 @@ export class VideoSettingsService extends Service {
    * @param isActive - boolean for if the context should be available for the user
    * @param display - display to update
    */
-  setIsActive(isActive: boolean, display: TDisplayType) {
-    this.setSettings({ [display]: isActive });
+  setIsActive(isActive: boolean, display: TDisplayType = 'horizontal') {
+    this.setSettings({ isActive }, display);
+  }
+
+  setSettings(settingsPatch: DeepPartial<VideoContextSetting>, display: TDisplayType) {
+    this.state.db.write(() => {
+      this.state[display].deepPatch(settingsPatch);
+    });
+
+    // update video contexts
+    this.updateObsSettings(display);
+
+    // refresh v1 settings
+    this.settingsUpdated.next();
+  }
+
+  /**
+   * Shut down the video settings service
+   *
+   * @remarks
+   * Each context must be destroyed when shutting down the app to prevent errors
+   */
+  shutdown() {
+    Object.keys(this.contexts).forEach((display: TDisplayType) => {
+      if (this.contexts[display]) {
+        // save settings as legacy settings
+        this.contexts[display].legacySettings = this.state[display].video;
+
+        // destroy context
+        this.contexts[display].destroy();
+      }
+    });
   }
 }
+
+//VV
+
+// @@@ NOTE: we probably can't do this because the context hasn't been created yet
+
+// // 2. OSN Legacy Settings - Horizontal Only
+// // Ideally, the first time the user opens the app after the settings have migrated to being stored
+// // on the front end, load the settings from the legacy settings. The legacy settings are
+// // just values from basic.ini
+// if (
+//   Video.legacySettings &&
+//   Video.legacySettings?.baseWidth !== 0 &&
+//   Video.legacySettings?.baseHeight !== 0
+// ) {
+//   settings = {
+//     horizontal: this.formatVideoContextSettings(Video.legacySettings, true),
+//     vertical: this.formatVideoContextSettings(Video.legacySettings),
+//   };
+// }
+
+// // 3. OSN Video Settings - Horizontal Display Settings Only
+// // Because the legacy settings are just values from basic.ini, if the user is starting from
+// // a clean cache, there will be no such file. In that case, load from the video property.
+// if (Video.video) {
+//   settings = {
+//     horizontal: this.formatVideoContextSettings(Video.video, true),
+//     vertical: this.formatVideoContextSettings(Video.video),
+//   };
+// }
+
+// console.log('settings', JSON.stringify(settings, null, 2));
+// // only overwrite default values if settings need to be migrated
+
+// private formatVideoContextSettings(videoInfo: IVideoInfo, isActive: boolean = false) {
+//   const settings = {} as VideoInfo;
+//   Object.keys(videoInfo).forEach((key: keyof IVideoInfo) => {
+//     settings[key as string] = videoInfo[key];
+//   });
+
+//   if (invalidFps(settings.fpsNum, settings.fpsDen)) {
+//     settings.fpsNum = 30;
+//     settings.fpsDen = 1;
+//   }
+
+//   return {
+//     video: settings,
+//     isActive,
+//   };
+// }
