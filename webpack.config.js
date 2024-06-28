@@ -1,27 +1,23 @@
 const { VueLoaderPlugin } = require('vue-loader');
-const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
+const { sentryWebpackPlugin } = require('@sentry/webpack-plugin');
 
-const path = require('path');
+const path = require('node:path');
+
+const package = require('./package.json');
 
 const plugins = [];
-
-/*
 plugins.push(
-  new WebpackManifestPlugin({
-    basePath: 'bundles/',
-    filter: file =>
-      ['renderer.js', 'vendors~renderer.js', 'renderer.js.map', 'vendors~renderer.js.map'].includes(
-        file.name,
-      ),
+  sentryWebpackPlugin({
+    org: 'n-air-app2',
+    project: package.name === 'n-air-app' ? 'n-air-app' : 'n-air-app-unstable',
+    authToken: process.env.SENTRY_AUTH_TOKEN,
+    release: {
+      version: JSON.stringify(package.version),
+    },
   }),
 );
-*/
-
-// plugins.push(new CleanWebpackPlugin());
-
 plugins.push(new VueLoaderPlugin());
 plugins.push(new ESLintPlugin({ extensions: ['js', 'ts'] }));
 
