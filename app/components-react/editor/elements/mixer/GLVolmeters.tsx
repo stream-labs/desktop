@@ -180,6 +180,7 @@ class GLVolmetersModule {
 
       this.audioService.subscribeVolmeter(sourceId).then(id => {
         ipcRenderer.once(`port-${id}`, e => {
+          if (!this.subscriptions[sourceId]) return;
           this.subscriptions[sourceId].channelId = id;
           e.ports[0].onmessage = listener;
         });
