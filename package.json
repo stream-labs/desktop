@@ -66,7 +66,7 @@
     "serial": true
   },
   "dependencies": {
-    "@electron/remote": "2.0.8",
+    "@electron/remote": "2.1.2",
     "abort-controller": "^3.0.0",
     "archiver": "2.1.1",
     "aws-sdk": "^2.814.0",
@@ -150,7 +150,7 @@
     "css-element-queries": "1.2.3",
     "css-loader": "2.1.1",
     "dotenv": "8.2.0",
-    "electron": "25.9.3",
+    "electron": "28.3.3",
     "electron-builder": "22.14.5",
     "electron-chromedriver": "25.1.1",
     "electron-devtools-installer": "3.1.1",

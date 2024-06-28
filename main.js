@@ -30,6 +30,7 @@ const {
   dialog,
   webContents,
   desktopCapturer,
+  MessageChannelMain,
 } = require('electron');
 const path = require('path');
 const remote = require('@electron/remote/main');
@@ -357,7 +358,7 @@ async function startApp() {
     });
   }
 
-  // All renderers should use ipcRenderer.sendTo to send to communicate with
+  // All renderers should use ipcRenderer.send to send to communicate with
   // the worker.  This still gets proxied via the main process, but eventually
   // we will refactor this to not use electron IPC, which will make it much
   // more efficient.
@@ -838,3 +839,20 @@ function measure(msg, time) {
 }
 
 ipcMain.handle('DESKTOP_CAPTURER_GET_SOURCES', (event, opts) => desktopCapturer.getSources(opts));
+
+// Message channel handling
+const channels = {};
+
+ipcMain.handle('create-message-channel', () => {
+  const id = uuid();
+  channels[id] = new MessageChannelMain();
+  return id;
+});
+
+ipcMain.on('request-message-channel-in', (e, id) => {
+  e.senderFrame.postMessage(`port-${id}`, null, [channels[id].port1]);
+});
+
+ipcMain.on('request-message-channel-out', (e, id) => {
+  e.senderFrame.postMessage(`port-${id}`, null, [channels[id].port2]);
+});

@@ -11,7 +11,6 @@ import { IAudioSource, IAudioSourceApi, IAudioSourcesState, IFader, IVolmeter } 
 import { EDeviceType, HardwareService, IDevice } from 'services/hardware';
 import { $t } from 'services/i18n';
 import { ipcRenderer } from 'electron';
-import without from 'lodash/without';
 import { ViewHandler } from 'services/core';
 
 export enum E_AUDIO_CHANNELS {
@@ -29,6 +28,11 @@ interface IAudioSourceData {
   stream?: Observable<IVolmeter>;
   timeoutId?: number;
   isControlledViaObs?: boolean;
+}
+
+interface IVolmeterMessageChannel {
+  id: string;
+  port: MessagePort;
 }
 
 class AudioViews extends ViewHandler<IAudioSourcesState> {
@@ -80,8 +84,6 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
   }
 
   protected init() {
-    this.initVolmeterRelay();
-
     this.sourcesService.sourceAdded.subscribe(sourceModel => {
       const source = this.sourcesService.views.getSource(sourceModel.sourceId);
       if (!source.audio) return;
@@ -125,20 +127,36 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
   volmeterSubscriptions: Dictionary<number[]> = {};
 
   /**
-   * Special IPC channel for volmeter updates
+   * Maps source ids to arrays of message channels
    */
-  initVolmeterRelay() {
-    ipcRenderer.on('volmeterSubscribe', (e, sourceId: string) => {
-      this.volmeterSubscriptions[sourceId] = this.volmeterSubscriptions[sourceId] || [];
-      this.volmeterSubscriptions[sourceId].push(e.senderId);
+  volmeterMessageChannels: Dictionary<IVolmeterMessageChannel[]> = {};
+
+  async subscribeVolmeter(sourceId: string) {
+    const channels = this.volmeterMessageChannels[sourceId] ?? [];
+    const channelId: string = await ipcRenderer.invoke('create-message-channel');
+
+    ipcRenderer.once(`port-${channelId}`, e => {
+      channels.push({
+        id: channelId,
+        port: e.ports[0],
+      });
     });
 
-    ipcRenderer.on('volmeterUnsubscribe', (e, sourceId: string) => {
-      this.volmeterSubscriptions[sourceId] = without(
-        this.volmeterSubscriptions[sourceId],
-        e.senderId,
-      );
-    });
+    ipcRenderer.send('request-message-channel-in', channelId);
+
+    this.volmeterMessageChannels[sourceId] = channels;
+
+    return channelId;
+  }
+
+  unsubscribeVolemeter(sourceId: string, channelId: string) {
+    const channel = this.volmeterMessageChannels[sourceId].find(c => (c.id = channelId));
+
+    this.volmeterMessageChannels[sourceId] = this.volmeterMessageChannels[sourceId].filter(
+      c => c.id !== channelId,
+    );
+
+    channel.port.close();
   }
 
   unhideAllSourcesForCurrentScene() {
@@ -297,11 +315,9 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
   }
 
   private sendVolmeterData(sourceId: string, data: IVolmeter) {
-    const subscribers = this.volmeterSubscriptions[sourceId] || [];
-
-    subscribers.forEach(id => {
-      ipcRenderer.sendTo(id, `volmeter-${sourceId}`, data);
-    });
+    if (this.volmeterMessageChannels[sourceId]) {
+      this.volmeterMessageChannels[sourceId].forEach(c => c.port.postMessage(data));
+    }
   }
 
   private removeAudioSource(sourceId: string) {
