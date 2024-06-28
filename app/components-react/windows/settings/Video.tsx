@@ -124,6 +124,7 @@ class VideoSettingsController {
     fpsNum: this.service.values.horizontal.fpsNum,
     fpsDen: this.service.values.horizontal.fpsDen,
     fpsInt: this.service.values.horizontal.fpsNum,
+    set: (setting: unknown) => {},
   });
 
   get metadata() {
@@ -346,13 +347,15 @@ class VideoSettingsController {
 
   setCustomResolution(key: string, value: boolean) {
     if (key === 'baseRes') {
-      this.store.setState(s => {
-        s.customBaseRes = value;
-      });
+      this.store.set({ customBaseRes: value });
+      // this.store.setState(s => {
+      //   s.customBaseRes = value;
+      // });
     } else {
-      this.store.setState(s => {
-        s.customOutputRes = value;
-      });
+      this.store.set({ customOutputRes: value });
+      // this.store.setState(s => {
+      //   s.customOutputRes = value;
+      // });
     }
   }
 

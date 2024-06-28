@@ -2,13 +2,19 @@ import { StoreApi, useStore } from 'zustand';
 import { createStore } from 'zustand/vanilla';
 import { immer } from 'zustand/middleware/immer';
 import React, { Context, useContext, useMemo } from 'react';
+import { capitalize } from 'lodash';
 
 /**
  * Initializes a Zustand store with the provided initial state, utilizing immer middleware.
  *
  */
 export function initStore<TState extends any>(initialStateDraft: TState) {
-  const initialState: TState = { ...(initialStateDraft as any) };
+  const initialState: TState = {
+    ...(initialStateDraft as any),
+    set: ([key, value]: [string, any]) => {
+      initialStateDraft[key] = value;
+    },
+  };
   const store = createStore<TState, [['zustand/immer', never]]>(immer(set => initialState));
 
   // Define shortcut getters for each property in initialState
@@ -28,6 +34,13 @@ export function initStore<TState extends any>(initialStateDraft: TState) {
 
   // ensure we have correct types
   return store as typeof store & { useState: typeof useState } & Readonly<typeof initialStateDraft>;
+}
+
+export function initStoreWithSetters<TState extends any>(initialStateDraft: TState) {
+  const stateDraft = {};
+  for (const key in stateDraft) {
+    const setterName = `set${capitalize(key)}`;
+  }
 }
 
 /**

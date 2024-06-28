@@ -198,13 +198,6 @@ export class VideoSettingsState extends RealmObject {
     }
   }
 
-  get videoInfo() {
-    return {
-      horizontal: this.formatVideoInfo('horizontal'),
-      vertical: this.formatVideoInfo('vertical'),
-    };
-  }
-
   get values() {
     return {
       horizontal: this.formatVideoValues('horizontal'),
@@ -295,15 +288,6 @@ export class VideoSettingsState extends RealmObject {
       fpsDen: settings?.fpsDen,
       fpsInt: settings?.fpsNum,
     };
-  }
-
-  formatVideoInfo(display: TDisplayType): IVideoInfo {
-    const settings = {} as IVideoInfo;
-    const videoInfo = this[display].video;
-    Object.keys(videoInfo).forEach((key: keyof IVideoInfo) => {
-      settings[key as string] = videoInfo[key];
-    });
-    return settings;
   }
 }
 
@@ -457,7 +441,7 @@ export class VideoSettingsService extends Service {
     console.log('creating');
     this.contexts[display] = VideoFactory.create();
     console.log(
-      'this.contexts[display].video',
+      '--> CREATED this.contexts[display].video',
       JSON.stringify(this.contexts[display].video, null, 2),
     );
     this.migrateSettings(display);
@@ -536,15 +520,20 @@ export class VideoSettingsService extends Service {
     // }
 
     const settings = {} as IVideoInfo;
-    const videoInfo = this.state.videoInfo[display];
+    const videoInfo = this.state[display].video.realmModel;
 
     Object.keys(videoInfo).forEach((key: keyof IVideoInfo) => {
-      console.log('key', key);
-      console.log('videoInfo[key]', JSON.stringify(videoInfo[key], null, 2));
+      console.log('foreach key', key);
+      console.log('foreach videoInfo[key]', JSON.stringify(videoInfo[key], null, 2));
+
       settings[key as string] = videoInfo[key];
-      console.log('settings[key as string]', JSON.stringify(settings[key as string], null, 2));
+
+      console.log(
+        'foreach settings[key as string]',
+        JSON.stringify(settings[key as string], null, 2),
+      );
     });
-    console.log('migrated settings', JSON.stringify(settings, null, 2));
+    console.log('foreach done settings', JSON.stringify(settings, null, 2));
 
     if (invalidFps(settings.fpsNum, settings.fpsDen)) {
       settings.fpsNum = 30;
@@ -565,8 +554,8 @@ export class VideoSettingsService extends Service {
   updateObsSettings(display: TDisplayType = 'horizontal') {
     if (!this.contexts[display]) return;
 
-    this.contexts[display].video = this.state.videoInfo[display];
-    this.contexts[display].legacySettings = this.state.videoInfo[display];
+    this.contexts[display].video = this.state[display].video;
+    this.contexts[display].legacySettings = this.state[display].video;
   }
 
   /**
@@ -697,7 +686,7 @@ export class VideoSettingsService extends Service {
     });
 
     // update video contexts
-    this.updateObsSettings(display);
+    // this.updateObsSettings(display);
 
     // refresh v1 settings
     this.settingsUpdated.next();
