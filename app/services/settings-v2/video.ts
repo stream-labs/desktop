@@ -198,6 +198,13 @@ export class VideoSettingsState extends RealmObject {
     }
   }
 
+  get videoInfo() {
+    return {
+      horizontal: this.formatVideoInfo('horizontal'),
+      vertical: this.formatVideoInfo('vertical'),
+    };
+  }
+
   get values() {
     return {
       horizontal: this.formatVideoValues('horizontal'),
@@ -288,6 +295,15 @@ export class VideoSettingsState extends RealmObject {
       fpsDen: settings?.fpsDen,
       fpsInt: settings?.fpsNum,
     };
+  }
+
+  formatVideoInfo(display: TDisplayType): IVideoInfo {
+    const settings = {} as IVideoInfo;
+    const videoInfo = this[display].video;
+    Object.keys(videoInfo).forEach((key: keyof IVideoInfo) => {
+      settings[key as string] = videoInfo[key];
+    });
+    return settings;
   }
 }
 
@@ -432,10 +448,78 @@ export class VideoSettingsService extends Service {
    * @param display - Optional, the context's display name
    */
   establishVideoContext(display: TDisplayType = 'horizontal') {
+    // if (this.contexts[display]) return;
+    // this.contexts[display] = VideoFactory.create();
+    // this.migrateSettings(display);
+    // console.log(`this.contexts[${display}] `, JSON.stringify(this.contexts[display], null, 2));
+
     if (this.contexts[display]) return;
+    console.log('creating');
     this.contexts[display] = VideoFactory.create();
+    console.log(
+      'this.contexts[display].video',
+      JSON.stringify(this.contexts[display].video, null, 2),
+    );
     this.migrateSettings(display);
-    console.log(`this.contexts[${display}] `, JSON.stringify(this.contexts[display], null, 2));
+
+    // ensure vertical context as the same fps settings as the horizontal context
+    if (display === 'vertical') {
+      this.syncFPSSettings();
+    }
+
+    // setting the below syncs the settings saved locally to obs default video context
+
+    Video.video = this.contexts.horizontal.video;
+    Video.legacySettings = this.contexts.horizontal.video;
+
+    return !!this.contexts[display];
+  }
+
+  /**
+   * Load legacy video settings from cache.
+   *
+   * @remarks
+   * Ideally, the first time the user opens the app after the settings
+    * have migrated to being stored on the front end, load the settings from
+    * the legacy settings. Because the legacy settings are just values from basic.ini
+    * if the user is starting from a clean cache, there will be no such file.
+    * In that case, load from the video property.
+
+    * Additionally, because this service is loaded lazily, calling this function elsewhere
+    * before the service has been initiated will call the function twice.
+    * To prevent errors, just return if both properties are null because
+    * the function will be called again as a part of establishing the context.
+   * @param display - Optional, the context's display name
+   */
+
+  loadLegacySettings(display: TDisplayType = 'horizontal') {
+    const legacySettings = this.contexts[display]?.legacySettings;
+    const videoSettings = this.contexts[display]?.video;
+
+    if (!legacySettings && !videoSettings) return;
+
+    if (legacySettings?.baseHeight === 0 || legacySettings?.baseWidth === 0) {
+      // return if null for the same reason as above
+      if (!videoSettings) return;
+
+      Object.keys(videoSettings).forEach((key: keyof IVideoInfo) => {
+        this.setVideoSetting(key, videoSettings[key], display);
+        this.dualOutputService.setVideoSetting({ [key]: videoSettings[key] }, display);
+      });
+    } else {
+      // return if null for the same reason as above
+      if (!legacySettings) return;
+      Object.keys(legacySettings).forEach((key: keyof IVideoInfo) => {
+        this.setVideoSetting(key, legacySettings[key], display);
+        this.dualOutputService.setVideoSetting({ [key]: legacySettings[key] }, display);
+      });
+      this.contexts[display].video = this.contexts[display].legacySettings;
+    }
+
+    if (invalidFps(this.contexts[display].video.fpsNum, this.contexts[display].video.fpsDen)) {
+      this.setVideoSetting('fpsNum', 30, display);
+      this.setVideoSetting('fpsDen', 1, display);
+    }
   }
 
   /**
@@ -445,26 +529,35 @@ export class VideoSettingsService extends Service {
    */
   migrateSettings(display: TDisplayType = 'horizontal') {
     if (!this.contexts[display] || !this.state[display]) return;
+    console.log('migrating');
+
+    // if (display === 'horizontal') {
+    //   this.loadLegacySettings(display)
+    // }
 
     const settings = {} as IVideoInfo;
-    const videoInfo = this.state[display].video;
+    const videoInfo = this.state.videoInfo[display];
+
     Object.keys(videoInfo).forEach((key: keyof IVideoInfo) => {
-      this.contexts[display].video[key as string] = videoInfo[key];
+      console.log('key', key);
+      console.log('videoInfo[key]', JSON.stringify(videoInfo[key], null, 2));
+      settings[key as string] = videoInfo[key];
+      console.log('settings[key as string]', JSON.stringify(settings[key as string], null, 2));
     });
+    console.log('migrated settings', JSON.stringify(settings, null, 2));
 
     if (invalidFps(settings.fpsNum, settings.fpsDen)) {
       settings.fpsNum = 30;
       settings.fpsDen = 1;
     }
 
+    this.contexts[display].video = settings;
+    console.log('context video settings', JSON.stringify(this.contexts[display].video, null, 2));
     this.contexts[display].legacySettings = this.contexts[display].video;
-
-    // setting the below syncs the settings saved locally to obs default video context
-    if (display === 'horizontal') {
-      Video.video = this.state.horizontal.video;
-      Video.legacySettings = this.state.horizontal.video;
-    }
-
+    console.log(
+      'context legacy settings',
+      JSON.stringify(this.contexts[display].legacySettings, null, 2),
+    );
     this.settingsUpdated.next();
   }
 
@@ -472,8 +565,8 @@ export class VideoSettingsService extends Service {
   updateObsSettings(display: TDisplayType = 'horizontal') {
     if (!this.contexts[display]) return;
 
-    this.contexts[display].video = this.state[display].video;
-    this.contexts[display].legacySettings = this.state[display].video;
+    this.contexts[display].video = this.state.videoInfo[display];
+    this.contexts[display].legacySettings = this.state.videoInfo[display];
   }
 
   /**
@@ -489,7 +582,8 @@ export class VideoSettingsService extends Service {
   syncFPSSettings(display: TDisplayType = 'horizontal') {
     const fpsSettings: (keyof IVideoInfo)[] = ['scaleType', 'fpsType', 'fpsNum', 'fpsDen'];
     const syncToDisplay = display === 'vertical' ? 'horizontal' : 'vertical';
-    const newVideoSettings = this.contexts[syncToDisplay].video ?? this.state[syncToDisplay].video;
+    const newVideoSettings =
+      this.contexts[syncToDisplay].video ?? this.state[syncToDisplay].video.realmModel;
     const oldVideoSettings = this.state[display].video;
     const oldVideoSettingsContext = this.contexts[display];
 
@@ -501,8 +595,7 @@ export class VideoSettingsService extends Service {
           newVideoSettings[key] !== oldVideoSettingsContext.legacySettings[key]);
 
       if (diffStateSetting || diffContextSetting) {
-        // set realm
-        // this.setVideoSetting(key, newVideoSettings[key], display);
+        this.setVideoSetting(key, newVideoSettings[key], display);
       }
     });
   }
