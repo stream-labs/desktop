@@ -193,12 +193,14 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     if (!this.studioModeTransition) this.createStudioModeTransition();
     this.currentSceneId = this.scenesService.views.activeScene.id;
     const currentScene = this.scenesService.views.activeScene.getObsScene();
-    this.sceneDuplicate = currentScene.duplicate(uuid(), obs.ESceneDupType.Copy);
+    this.sceneDuplicate = currentScene.duplicate('scene_copy_' + uuid(), obs.ESceneDupType.Copy);
 
-    // Immediately switch to the duplicated scene
+    // Immediately switch to the duplicated scene (Right window, Live)
     this.getCurrentTransition().set(this.sceneDuplicate);
 
+    // Left window, Edit. Note: order of these 2 calls is important
     this.studioModeTransition.set(currentScene);
+    obs.Global.addSceneToBackstage(this.studioModeTransition);
   }
 
   disableStudioMode() {
@@ -208,11 +210,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     this.studioModeChanged.next(false);
 
     const currentScene = this.scenesService.views.activeScene;
-    if (this.currentSceneId !== currentScene.id) {
-      obs.Global.removeSceneFromBackstage(this.studioModeTransition.getActiveSource());
-    }
-
-    this.getCurrentTransition().set(this.scenesService.views.activeScene.getObsScene());
+    this.getCurrentTransition().set(currentScene.getObsScene());
     this.releaseStudioModeObjects();
   }
 
@@ -227,12 +225,12 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
 
     const currentScene = this.scenesService.views.activeScene;
 
-    if (this.currentSceneId !== currentScene.id) {
-      obs.Global.removeSceneFromBackstage(currentScene.getSource().getObsInput());
-    }
+    obs.Global.removeSceneFromBackstage(currentScene.getSource().getObsInput());
 
     const oldDuplicate = this.sceneDuplicate;
-    this.sceneDuplicate = currentScene.getObsScene().duplicate(uuid(), obs.ESceneDupType.Copy);
+    this.sceneDuplicate = currentScene
+      .getObsScene()
+      .duplicate('scene_copy_' + uuid(), obs.ESceneDupType.Copy);
 
     // TODO: Make this a dropdown box
     const transition = this.getDefaultTransition();
@@ -271,6 +269,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
 
   releaseStudioModeObjects() {
     if (this.studioModeTransition) {
+      obs.Global.removeSceneFromBackstage(this.studioModeTransition);
       this.studioModeTransition.release();
       this.studioModeTransition = null;
     }
@@ -294,8 +293,11 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
       }
 
       const scene = this.scenesService.views.getScene(sceneBId);
+      if (this.currentSceneId !== sceneBId) {
+        obs.Global.addSceneToBackstage(scene.getSource().getObsInput());
+      }
+
       this.studioModeTransition.set(scene.getObsScene());
-      obs.Global.addSceneToBackstage(scene.getSource().getObsInput());
 
       return;
     }
