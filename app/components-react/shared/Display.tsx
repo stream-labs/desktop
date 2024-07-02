@@ -38,17 +38,17 @@ export default function Display(props: DisplayProps) {
   }, false);
 
   const paddingColor = useRealmObject(CustomizationService.state).displayBackground;
+  const baseResolution = useRealmObject(VideoSettingsService.state).baseResolutions[p.type];
 
   const obsDisplay = useRef<OBSDisplay | null>(null);
   const displayEl = useRef<HTMLDivElement>(null);
 
   useEffect(updateDisplay, [p.sourceId, paddingColor]);
-  useEffect(refreshOutputRegion, [v.baseResolution]);
+  useEffect(refreshOutputRegion, [baseResolution]);
 
   function refreshOutputRegion() {
     if (!obsDisplay.current) return;
-    const [width, height] = v.baseResolution.split('x');
-    obsDisplay.current.resize(Number(width), Number(height));
+    obsDisplay.current.resize(Number(baseResolution.baseWidth), Number(baseResolution.baseHeight));
   }
 
   function onClickHandler(event: React.MouseEvent) {

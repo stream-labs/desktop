@@ -9,12 +9,7 @@ import { capitalize } from 'lodash';
  *
  */
 export function initStore<TState extends any>(initialStateDraft: TState) {
-  const initialState: TState = {
-    ...(initialStateDraft as any),
-    set: ([key, value]: [string, any]) => {
-      initialStateDraft[key] = value;
-    },
-  };
+  const initialState: TState = { ...(initialStateDraft as any) };
   const store = createStore<TState, [['zustand/immer', never]]>(immer(set => initialState));
 
   // Define shortcut getters for each property in initialState
@@ -32,15 +27,16 @@ export function initStore<TState extends any>(initialStateDraft: TState) {
   const useState = createBoundedUseStore(store);
   (store as any).useState = useState;
 
-  // ensure we have correct types
-  return store as typeof store & { useState: typeof useState } & Readonly<typeof initialStateDraft>;
-}
+  const update = (key: keyof TState, value: any) =>
+    store.setState(s => {
+      s[key as string] = value;
+    });
+  (store as any).update = update;
 
-export function initStoreWithSetters<TState extends any>(initialStateDraft: TState) {
-  const stateDraft = {};
-  for (const key in stateDraft) {
-    const setterName = `set${capitalize(key)}`;
-  }
+  // ensure we have correct types
+  return store as typeof store & { useState: typeof useState } & {
+    update: typeof update;
+  } & Readonly<typeof initialStateDraft>;
 }
 
 /**

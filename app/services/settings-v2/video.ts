@@ -160,9 +160,6 @@ export class VideoSettingsState extends RealmObject {
   };
 
   protected onCreated(): void {
-    console.log('Video', JSON.stringify(Video, null, 2));
-    console.log('this', JSON.stringify(this, null, 2));
-
     const verticalResolutions = {
       baseWidth: 720,
       baseHeight: 1280,
@@ -192,7 +189,7 @@ export class VideoSettingsState extends RealmObject {
     } else {
       // always set vertical defaults
       this.db.write(() => {
-        this.vertical.video.deepPatch(verticalResolutions);
+        this.vertical.video.deepPatch({ ...verticalResolutions });
         this.vertical.isActive = false;
       });
     }
@@ -230,7 +227,8 @@ export class VideoSettingsState extends RealmObject {
   }
 
   /**
-   * The below conditionals are to prevent undefined errors on app startup
+   * Get base resolutions for the displays
+   * @remark Default values exist to prevent undefined errors on app startup
    */
   get baseResolutions() {
     // to prevent any possible undefined errors on load in the event that the root node
@@ -292,7 +290,6 @@ export class VideoSettingsState extends RealmObject {
 }
 
 VideoSettingsState.register({ persist: true });
-
 export class VideoSettingsService extends Service {
   @Inject() dualOutputService: DualOutputService;
   @Inject() outputSettingsService: OutputSettingsService;
@@ -397,6 +394,13 @@ export class VideoSettingsService extends Service {
     };
   }
 
+  get videoInfo() {
+    return {
+      horizontal: this.formatVideoInfo('horizontal'),
+      vertical: this.formatVideoInfo('vertical'),
+    };
+  }
+
   /**
    * Format video settings for the video settings form
    *
@@ -405,8 +409,7 @@ export class VideoSettingsService extends Service {
    */
 
   formatVideoValues(display: TDisplayType = 'horizontal', typeStrings?: boolean) {
-    const settings = this.contexts[display]?.video ?? this.state[display].video;
-
+    const settings = this.videoInfo[display];
     const scaleType = typeStrings ? scaleTypeNames[settings?.scaleType] : settings?.scaleType;
     const fpsType = typeStrings ? fpsTypeNames[settings?.fpsType] : settings?.fpsType;
 
@@ -420,6 +423,18 @@ export class VideoSettingsService extends Service {
       fpsDen: settings?.fpsDen,
       fpsInt: settings?.fpsNum,
     };
+  }
+
+  formatVideoInfo(display: TDisplayType): IVideoInfo {
+    const settings = {} as IVideoInfo;
+    const videoInfo = this.state[display].video.realmModel;
+    Object.keys(videoInfo)
+      .filter(key => key !== '_id')
+      .forEach((key: keyof IVideoInfo) => {
+        settings[key as string] = videoInfo[key];
+      });
+
+    return settings;
   }
 
   /**
@@ -438,12 +453,7 @@ export class VideoSettingsService extends Service {
     // console.log(`this.contexts[${display}] `, JSON.stringify(this.contexts[display], null, 2));
 
     if (this.contexts[display]) return;
-    console.log('creating');
     this.contexts[display] = VideoFactory.create();
-    console.log(
-      '--> CREATED this.contexts[display].video',
-      JSON.stringify(this.contexts[display].video, null, 2),
-    );
     this.migrateSettings(display);
 
     // ensure vertical context as the same fps settings as the horizontal context
@@ -451,10 +461,24 @@ export class VideoSettingsService extends Service {
       this.syncFPSSettings();
     }
 
+    const settings = { ...this.contexts.horizontal.video };
     // setting the below syncs the settings saved locally to obs default video context
+    Video.video = settings;
+    Video.legacySettings = settings;
 
-    Video.video = this.contexts.horizontal.video;
-    Video.legacySettings = this.contexts.horizontal.video;
+    console.log('display', JSON.stringify(display, null, 2));
+    console.log(
+      'this.contexts[display].video',
+      JSON.stringify(this.contexts[display].video, null, 2),
+    );
+    console.log(
+      'this.contexts.horizontal.video',
+      JSON.stringify(this.contexts.horizontal.video, null, 2),
+    );
+    console.log('Video.video', JSON.stringify(Video.video, null, 2));
+    console.log('Video.legacySettings', JSON.stringify(Video.legacySettings, null, 2));
+
+    this.settingsUpdated.next();
 
     return !!this.contexts[display];
   }
@@ -513,49 +537,34 @@ export class VideoSettingsService extends Service {
    */
   migrateSettings(display: TDisplayType = 'horizontal') {
     if (!this.contexts[display] || !this.state[display]) return;
-    console.log('migrating');
 
-    // if (display === 'horizontal') {
-    //   this.loadLegacySettings(display)
-    // }
-
-    const settings = {} as IVideoInfo;
-    const videoInfo = this.state[display].video.realmModel;
-
-    Object.keys(videoInfo).forEach((key: keyof IVideoInfo) => {
-      console.log('foreach key', key);
-      console.log('foreach videoInfo[key]', JSON.stringify(videoInfo[key], null, 2));
-
-      settings[key as string] = videoInfo[key];
-
-      console.log(
-        'foreach settings[key as string]',
-        JSON.stringify(settings[key as string], null, 2),
-      );
-    });
-    console.log('foreach done settings', JSON.stringify(settings, null, 2));
-
-    if (invalidFps(settings.fpsNum, settings.fpsDen)) {
-      settings.fpsNum = 30;
-      settings.fpsDen = 1;
+    if (display === 'horizontal') {
+      this.loadLegacySettings(display);
     }
 
-    this.contexts[display].video = settings;
-    console.log('context video settings', JSON.stringify(this.contexts[display].video, null, 2));
-    this.contexts[display].legacySettings = this.contexts[display].video;
-    console.log(
-      'context legacy settings',
-      JSON.stringify(this.contexts[display].legacySettings, null, 2),
-    );
-    this.settingsUpdated.next();
+    const videoInfo = this.videoInfo[display];
+
+    if (invalidFps(videoInfo.fpsNum, videoInfo.fpsDen)) {
+      videoInfo.fpsNum = 30;
+      videoInfo.fpsDen = 1;
+      this.state.db.write(() => {
+        this.state[display].video.fpsNum = 30;
+        this.state[display].video.fpsDen = 1;
+      });
+    }
+
+    Object.keys(videoInfo).forEach((key: keyof IVideoInfo) => {
+      this.contexts[display].video[key as string] = videoInfo[key];
+      this.contexts[display].legacySettings[key as string] = videoInfo[key];
+    });
   }
 
   @debounce(200)
   updateObsSettings(display: TDisplayType = 'horizontal') {
     if (!this.contexts[display]) return;
 
-    this.contexts[display].video = this.state[display].video;
-    this.contexts[display].legacySettings = this.state[display].video;
+    this.contexts[display].video = this.videoInfo[display];
+    this.contexts[display].legacySettings = this.videoInfo[display];
   }
 
   /**
@@ -571,9 +580,8 @@ export class VideoSettingsService extends Service {
   syncFPSSettings(display: TDisplayType = 'horizontal') {
     const fpsSettings: (keyof IVideoInfo)[] = ['scaleType', 'fpsType', 'fpsNum', 'fpsDen'];
     const syncToDisplay = display === 'vertical' ? 'horizontal' : 'vertical';
-    const newVideoSettings =
-      this.contexts[syncToDisplay].video ?? this.state[syncToDisplay].video.realmModel;
-    const oldVideoSettings = this.state[display].video;
+    const newVideoSettings = this.videoInfo[syncToDisplay];
+    const oldVideoSettings = this.videoInfo[display];
     const oldVideoSettingsContext = this.contexts[display];
 
     fpsSettings.forEach((key: keyof IVideoInfo) => {
@@ -686,7 +694,7 @@ export class VideoSettingsService extends Service {
     });
 
     // update video contexts
-    // this.updateObsSettings(display);
+    this.updateObsSettings(display);
 
     // refresh v1 settings
     this.settingsUpdated.next();
@@ -702,7 +710,7 @@ export class VideoSettingsService extends Service {
     Object.keys(this.contexts).forEach((display: TDisplayType) => {
       if (this.contexts[display]) {
         // save settings as legacy settings
-        this.contexts[display].legacySettings = this.state[display].video;
+        this.contexts[display].legacySettings = this.videoInfo[display];
 
         // destroy context
         this.contexts[display].destroy();

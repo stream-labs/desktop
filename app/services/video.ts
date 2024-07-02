@@ -41,7 +41,6 @@ export class Display {
   @Inject() videoService: VideoService;
   @Inject() windowsService: WindowsService;
   @Inject() selectionService: SelectionService;
-  @Inject() videoSettingsService: VideoSettingsService;
 
   outputRegionCallbacks: Function[];
   outputRegion: IRectangle;
@@ -91,44 +90,21 @@ export class Display {
 
     this.type = options.type ?? 'horizontal';
 
-    const establishedContext = this.videoSettingsService.establishedContext.subscribe(
-      (display: TDisplayType) => {
-        if (display === 'horizontal') {
-        }
-
-        this.videoService.actions.createOBSDisplay(
-          this.electronWindowId,
-          name,
-          this.renderingMode,
-          this.type,
-          this.sourceId,
-        );
-
-        this.displayDestroyed = false;
-
-        // grid lines are enabled by default
-        // switch them off multiple items are selected
-        if (this.selectionService.views.globalSelection.getSize() > 1) {
-          this.switchGridlines(false);
-        }
-
-        if (options.paddingColor) {
-          this.videoService.actions.setOBSDisplayPaddingColor(
-            name,
-            options.paddingColor.r,
-            options.paddingColor.g,
-            options.paddingColor.b,
-          );
-        } else {
-          this.videoService.actions.setOBSDisplayPaddingColor(name, 11, 22, 28);
-        }
-
-        if (options.paddingSize != null) {
-          this.videoService.actions.setOBSDisplayPaddingSize(name, options.paddingSize);
-        }
-        establishedContext.unsubscribe();
-      },
+    this.videoService.actions.createOBSDisplay(
+      this.electronWindowId,
+      name,
+      this.renderingMode,
+      this.type,
+      this.sourceId,
     );
+
+    this.displayDestroyed = false;
+
+    // grid lines are enabled by default
+    // switch them off multiple items are selected
+    if (this.selectionService.views.globalSelection.getSize() > 1) {
+      this.switchGridlines(false);
+    }
 
     // also sync girdlines when selection changes
     this.selectionSubscription = this.selectionService.updated.subscribe(
@@ -136,6 +112,21 @@ export class Display {
         this.switchGridlines(state.selectedIds.length <= 1);
       },
     );
+
+    if (options.paddingColor) {
+      this.videoService.actions.setOBSDisplayPaddingColor(
+        name,
+        options.paddingColor.r,
+        options.paddingColor.g,
+        options.paddingColor.b,
+      );
+    } else {
+      this.videoService.actions.setOBSDisplayPaddingColor(name, 11, 22, 28);
+    }
+
+    if (options.paddingSize != null) {
+      this.videoService.actions.setOBSDisplayPaddingSize(name, options.paddingSize);
+    }
 
     this.outputRegionCallbacks = [];
 
@@ -384,9 +375,6 @@ export class VideoService extends Service {
     // which display they belong to
     const context =
       this.videoSettingsService.contexts[type] ?? this.videoSettingsService.contexts.horizontal;
-
-    if (!context) return;
-    console.log('context', JSON.stringify(context, null, 2));
 
     if (sourceId) {
       obs.NodeObs.OBS_content_createSourcePreviewDisplay(

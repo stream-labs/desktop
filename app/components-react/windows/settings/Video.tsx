@@ -90,8 +90,6 @@ class VideoSettingsController {
   }
 
   get values(): Dictionary<TInputValue> {
-    console.log('this.store', JSON.stringify(this.store, null, 2));
-
     const display = this.store.display;
     const vals = this.service.values[display];
     const baseRes = display !== 'vertical' && this.store?.customBaseRes ? 'custom' : vals.baseRes;
@@ -124,7 +122,6 @@ class VideoSettingsController {
     fpsNum: this.service.values.horizontal.fpsNum,
     fpsDen: this.service.values.horizontal.fpsDen,
     fpsInt: this.service.values.horizontal.fpsNum,
-    set: (setting: unknown) => {},
   });
 
   get metadata() {
@@ -318,13 +315,9 @@ class VideoSettingsController {
   setResolution(key: string, value: string) {
     const display = this.store.display;
     if (key === 'outputRes') {
-      this.store.setState(s => {
-        s.customOutputResValue = value;
-      });
+      this.store.update('customOutputResValue', value);
     } else if (key === 'baseRes') {
-      this.store.setState(s => {
-        s.customBaseResValue = value;
-      });
+      this.store.update('customBaseResValue', value);
     }
 
     if (this.resolutionValidator.pattern.test(value)) {
@@ -347,15 +340,9 @@ class VideoSettingsController {
 
   setCustomResolution(key: string, value: boolean) {
     if (key === 'baseRes') {
-      this.store.set({ customBaseRes: value });
-      // this.store.setState(s => {
-      //   s.customBaseRes = value;
-      // });
+      this.store.update('customBaseRes', value);
     } else {
-      this.store.set({ customOutputRes: value });
-      // this.store.setState(s => {
-      //   s.customOutputRes = value;
-      // });
+      this.store.update('customOutputRes', value);
     }
   }
 
@@ -409,9 +396,7 @@ class VideoSettingsController {
    * Otherwise, update the vertical display persisted settings.
    */
   setIntegerFPS(value: string) {
-    this.store.setState(s => {
-      s.fpsInt = Number(value);
-    });
+    this.store.update('fpsInt', Number(value));
 
     if (Number(value) > 0 && Number(value) < 1001) {
       this.service.actions.setVideoSetting('fpsNum', Number(value), 'horizontal');
@@ -428,13 +413,9 @@ class VideoSettingsController {
    */
   setFPS(key: 'fpsNum' | 'fpsDen', value: string) {
     if (key === 'fpsNum') {
-      this.store.setState(s => {
-        s.fpsNum = Number(value);
-      });
+      this.store.update('fpsNum', Number(value));
     } else {
-      this.store.setState(s => {
-        s.fpsDen = Number(value);
-      });
+      this.store.update('fpsDen', Number(value));
     }
     if (!invalidFps(this.store.fpsNum, this.store.fpsDen) && Number(value) > 0) {
       this.service.actions.setVideoSetting(key, Number(value), 'horizontal');
@@ -448,9 +429,7 @@ class VideoSettingsController {
   }
 
   setDisplay(display: TDisplayType) {
-    this.store.setState(s => {
-      s.display = display;
-    });
+    this.store.update('display', display);
     const customBaseRes = !this.baseResOptions.find(
       opt => opt.value === this.service.values[display].baseRes,
     );
@@ -487,9 +466,11 @@ class VideoSettingsController {
       });
     } else {
       // toggle dual output
+      console.log('toggle dual output');
       this.dualOutputService.actions.setdualOutputMode();
+      this.store.update('dualOutput', !this.store.dualOutput);
       this.store.setState(s => {
-        s.dualOutput = !s.dualOutput;
+        s.dualOutput = !this.store.dualOutput;
       });
       Services.UsageStatisticsService.recordFeatureUsage('DualOutput');
       Services.UsageStatisticsService.recordAnalyticsEvent('DualOutput', {
@@ -513,9 +494,7 @@ class VideoSettingsController {
 
   handleShowModal(status: boolean) {
     Services.WindowsService.actions.updateStyleBlockers('child', status);
-    this.store.setState(s => {
-      s.showModal = status;
-    });
+    this.store.update('showModal', status);
   }
 
   handleAuth() {
@@ -528,14 +507,6 @@ class VideoSettingsController {
     });
   }
 }
-
-// @Component({ components: { BoolInput }, mixins: [realmReactive(CustomizationState)] })
-// refer to OverlaySettings.tsx
-
-// function getSettings() {
-//   return CustomizationService.state.toObject() as CustomizationState;
-// }
-// refer to Appearance.tsx
 
 export function VideoSettings() {
   const controller = useMemo(() => new VideoSettingsController(), []);
