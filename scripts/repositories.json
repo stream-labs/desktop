@@ -6,8 +6,7 @@
       "archive": "osn-[VERSION]-release-[OS][ARCH].tar.gz",
       "version": "0.24.38",
       "mac_version": "0.23.107m6",
-      "win64": true,
-      "osx": true
+      "win64": true
     },
     {
       "name": "node-libuiohook",
