@@ -14,6 +14,7 @@ import Spinner from '../../shared/Spinner';
 import GoLiveError from './GoLiveError';
 import TwitterInput from './Twitter';
 import AddDestinationButton from 'components-react/shared/AddDestinationButton';
+import PrimaryChatSwitcher from './PrimaryChatSwitcher';
 
 const PlusIcon = PlusOutlined as Function;
 
@@ -35,6 +36,11 @@ export default function GoLiveSettings() {
     showSelector,
     showTweet,
     addDestination,
+    hasDestinations,
+    hasMultiplePlatforms,
+    enabledPlatforms,
+    primaryChat,
+    setPrimaryChat,
   } = useGoLiveSettings().extend(module => {
     const { UserService, VideoEncodingOptimizationService, SettingsService } = Services;
 
@@ -69,13 +75,14 @@ export default function GoLiveSettings() {
   const shouldShowSettings = !error && !isLoading;
   const shouldShowLeftCol = protectedModeEnabled;
   const shouldShowAddDestButton = canAddDestinations && isPrime;
+  const shouldShowPrimaryChatSwitcher = hasMultiplePlatforms;
 
   return (
     <Row gutter={16} style={{ height: 'calc(100% + 24px)' }}>
       {/*LEFT COLUMN*/}
       {shouldShowLeftCol && (
-        <Col span={8} className={styles.leftColumn}>
-          <Scrollable style={{ height: '100%', margin: '15px' }}>
+        <Col span={8}>
+          <Scrollable style={{ height: '81%' }} snapToWindowEdge>
             {/*DESTINATION SWITCHERS*/}
             <DestinationSwitchers showSelector={showSelector} />
             {/*ADD DESTINATION BUTTON*/}
@@ -88,6 +95,13 @@ export default function GoLiveSettings() {
               <AddDestinationButton />
             )}
           </Scrollable>
+          {shouldShowPrimaryChatSwitcher && (
+            <PrimaryChatSwitcher
+              enabledPlatforms={enabledPlatforms}
+              onSetPrimaryChat={setPrimaryChat}
+              primaryChat={primaryChat}
+            />
+          )}
         </Col>
       )}
 

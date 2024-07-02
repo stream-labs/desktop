@@ -194,12 +194,27 @@ export class SourcesNode extends Node<ISchema, {}> {
   }
 
   /**
-   * Returns true if this scene collection only contains sources
-   * supported by the current operating system.
+   * Remove unsupported sources.
    */
-  isAllSupported() {
+  removeUnsupported(): boolean {
     const supportedSources = byOS({ [OS.Windows]: windowsSources, [OS.Mac]: macSources });
-    return this.data.items.every(source => supportedSources.includes(source.type));
+    const itemsCopy = this.data.items.slice();
+    this.data.items = [];
+    let removed = false;
+    itemsCopy.forEach(source => {
+      if (supportedSources.includes(source.type)) {
+        this.data.items.push(source);
+      } else {
+        console.log(
+          "Removed the source with id: '%s', name: '%s', and type: '%s' from the scene because it is not suppported",
+          source.id,
+          source.name,
+          source.type,
+        );
+        removed = true;
+      }
+    });
+    return removed;
   }
 
   load(context: {}): Promise<void> {

@@ -165,6 +165,7 @@ class UserViews extends ViewHandler<IUserServiceState> {
   @Inject() hostsService: HostsService;
   @Inject() magicLinkService: MagicLinkService;
   @Inject() customizationService: CustomizationService;
+  @Inject() userService: UserService;
 
   get settingsServiceViews() {
     return this.getServiceViews(SettingsService);
@@ -266,6 +267,10 @@ class UserViews extends ViewHandler<IUserServiceState> {
 
     return `${url}?token=${token}&mode=${nightMode}`;
   }
+
+  setPrimaryPlatform(platform: TPlatform) {
+    this.userService.setPrimaryPlatform(platform);
+  }
 }
 
 export class UserService extends PersistentStatefulService<IUserServiceState> {
@@ -285,6 +290,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private jsonrpcService: JsonrpcService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject('TikTokService') tiktokService: TikTokService;
+
+  setPrimaryPlatform(platform: TPlatform) {
+    this.SET_PRIMARY_PLATFORM(platform);
+  }
 
   @mutation()
   LOGIN(auth: IUserAuth) {
@@ -454,14 +463,12 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
             ? $t('Successfully merged account')
             : $t('Successfully unlinked account');
 
-        this.windowsService.setWindowOnTop();
-        this.settingsService.showSettings('Stream');
+        this.windowsService.actions.setWindowOnTop();
         this.refreshedLinkedAccounts.next({ success: true, message });
       }
 
       if (event.type === 'account_merge_error') {
-        this.windowsService.setWindowOnTop();
-        this.settingsService.showSettings('Stream');
+        this.windowsService.actions.setWindowOnTop();
         this.refreshedLinkedAccounts.next({ success: false, message: $t('Account merge error') });
       }
 
@@ -1073,8 +1080,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    * platform linked, they will be prompted to merge a platform into their
    * account before they can be considered fully logged in.
    */
-  async startSLAuth({ signup = false } = {}) {
-    const query = `_=${Date.now()}&skip_splash=true&external=electron&slid&force_verify&origin=slobs`;
+  async startSLAuth({ signup = false, merge = false } = {}) {
+    const query = `_=${Date.now()}&skip_splash=true&external=electron&slid&force_verify&origin=slobs${
+      merge ? '&intent=merge' : ''
+    }`;
     const url = `https://${this.hostsService.streamlabs}/slobs/${
       signup ? 'signup' : 'login'
     }?${query}`;
@@ -1089,6 +1098,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     this.LOGOUT();
     this.LOGIN(auth);
+
+    // We need to fetch prime status to skip onboarding step for
+    // picking a primary platform if the user has Ultra, as we'll
+    // auto-select the first one in that case.
+    await this.setPrimeStatus();
 
     // Find out if the user has any additional platforms linked
     await this.updateLinkedPlatforms();
@@ -1123,6 +1137,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const service = getPlatformService(primaryPlatform);
 
     this.SET_AUTH_STATE(EAuthProcessState.Loading);
+    this.streamSettingsService.resetStreamSettings();
     const result = await this.login(service);
     this.SET_AUTH_STATE(EAuthProcessState.Idle);
 

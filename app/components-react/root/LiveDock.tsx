@@ -7,7 +7,7 @@ import pick from 'lodash/pick';
 import { initStore, useController } from 'components-react/hooks/zustand';
 import { EStreamingState } from 'services/streaming';
 import { EAppPageSlot, ILoadedApp } from 'services/platform-apps';
-import { TPlatform, getPlatformService } from 'services/platforms';
+import { getPlatformService, TPlatform } from 'services/platforms';
 import { $t } from 'services/i18n';
 import { Services } from '../service-provider';
 import Chat from './Chat';
@@ -17,6 +17,7 @@ import PlatformAppPageView from 'components-react/shared/PlatformAppPageView';
 import { useVuex } from 'components-react/hooks';
 import { useRealmObject } from 'components-react/hooks/realm';
 import { $i } from 'services/utils';
+import { TikTokChatInfo } from './TiktokChatInfo';
 
 const LiveDockCtx = React.createContext<LiveDockController | null>(null);
 
@@ -323,6 +324,31 @@ function LiveDock(p: { onLeft: boolean }) {
     });
   }
 
+  const chat = useMemo(() => {
+    const primaryChat = Services.UserService.state.auth!.primaryPlatform;
+    const showTiktokInfo =
+      visibleChat === 'tiktok' || (visibleChat === 'default' && primaryChat === 'tiktok');
+
+    if (showTiktokInfo) {
+      return <TikTokChatInfo />;
+    }
+
+    const showInstagramInfo = primaryChat === 'instagram';
+    if (showInstagramInfo) {
+      // FIXME: empty tab
+      return <></>;
+    }
+
+    return (
+      <Chat
+        restream={isRestreaming && visibleChat === 'restream'}
+        key={visibleChat}
+        visibleChat={visibleChat}
+        setChat={setChat}
+      />
+    );
+  }, [Services.UserService.state.auth!.primaryPlatform, visibleChat]);
+
   return (
     <div
       className={cx(styles.liveDock, {
@@ -429,14 +455,7 @@ function LiveDock(p: { onLeft: boolean }) {
                       )}
                     </div>
                   )}
-                  {!applicationLoading && !collapsed && (
-                    <Chat
-                      restream={isRestreaming && visibleChat === 'restream'}
-                      key={visibleChat}
-                      visibleChat={visibleChat}
-                      setChat={setChat}
-                    />
-                  )}
+                  {!applicationLoading && !collapsed && chat}
                   {!['default', 'restream'].includes(visibleChat) && (
                     <PlatformAppPageView
                       className={styles.liveDockPlatformAppWebview}

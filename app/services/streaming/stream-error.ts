@@ -61,6 +61,13 @@ export const errorTypes = {
       return $t('Failed to upload the thumbnail');
     },
   },
+  FACEBOOK_STREAMING_DISABLED: {
+    get message() {
+      return $t(
+        "You're not eligible to Go Live, your profile needs to be at least 60 days old and your page needs to have at least 100 followers",
+      );
+    },
+  },
   TIKTOK_OAUTH_EXPIRED: {
     get message() {
       return $t('Failed to authenticate with TikTok, re-login or re-merge TikTok account');
