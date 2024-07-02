@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import * as remote from '@electron/remote';
+import cx from 'classnames';
 import { Tooltip } from 'antd';
 import { $t } from 'services/i18n';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
@@ -115,16 +116,16 @@ class RecordingHistoryController {
   }
 }
 
-export default function RecordingHistoryPage() {
+export default function RecordingHistoryPage(p: { className?: string }) {
   const controller = useMemo(() => new RecordingHistoryController(), []);
   return (
     <RecordingHistoryCtx.Provider value={controller}>
-      <RecordingHistory />
+      <RecordingHistory className={p.className} />
     </RecordingHistoryCtx.Provider>
   );
 }
 
-export function RecordingHistory() {
+export function RecordingHistory(p: { className?: string }) {
   const controller = useController(RecordingHistoryCtx);
   const { formattedTimestamp, showFile, handleSelect, postError } = controller;
   const { uploadInfo, uploadOptions, recordings, hasSLID } = useVuex(() => ({
@@ -169,7 +170,7 @@ export function RecordingHistory() {
   }
 
   return (
-    <div className={styles.container}>
+    <div className={cx(styles.container, p.className)}>
       <h1>{$t('Recordings')}</h1>
       <div style={{ marginBottom: 24, display: 'flex', flexDirection: 'column' }}>
         {$t(

@@ -275,7 +275,8 @@ export const platformLabels = (platform: TPlatform | string) =>
     [EPlatform.Instagram]: $t('Instagram'),
   }[platform]);
 
-export function getPlatformService(platform: TPlatform): IPlatformService {
+export function getPlatformService(platform?: TPlatform): IPlatformService {
+  if (!platform) return;
   return {
     twitch: TwitchService.instance,
     youtube: YoutubeService.instance,

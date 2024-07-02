@@ -10,7 +10,6 @@ import { Subject } from 'rxjs';
 import { throttle } from 'lodash-decorators';
 import * as remote from '@electron/remote';
 
-import Main from 'components/windows/Main.vue';
 import Settings from 'components/windows/settings/Settings.vue';
 import FFZSettings from 'components/windows/FFZSettings.vue';
 import SceneTransitions from 'components/windows/SceneTransitions.vue';
@@ -40,9 +39,9 @@ import {
   NotificationsAndNews,
   PlatformAppPopOut,
   RecentEventsWindow,
-  RecordingHistory,
   EditTransform,
   Blank,
+  Main,
 } from 'components/shared/ReactComponentList';
 
 import SourcePropertiesDeprecated from 'components/windows/SourceProperties.vue';
@@ -142,7 +141,6 @@ export function getComponents() {
     WidgetWindow,
     CustomCodeWindow,
     SourceShowcase,
-    RecordingHistory,
   };
 }
 

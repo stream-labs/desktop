@@ -1,11 +1,12 @@
 import React, { ReactNode, useMemo } from 'react';
+import cx from 'classnames';
 import { ELayoutElement, IVec2Array } from 'services/layout';
 import * as elements from 'components-react/editor/elements';
 import * as layouts from 'components-react/editor/layouts';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
 
-export default function Studio(p: { onTotalWidth: (width: Number) => void }) {
+export default function Studio(p: { onTotalWidth: (width: Number) => void; className?: string }) {
   const { LayoutService } = Services;
 
   function totalWidthHandler(slots: IVec2Array, isColumns: boolean) {
@@ -41,7 +42,7 @@ export default function Studio(p: { onTotalWidth: (width: Number) => void }) {
 
   return (
     <Layout
-      class="editor-page"
+      className={cx('editor-page', p.className)}
       childrenMins={childrenMins}
       onTotalWidth={(slots: IVec2Array, isColumns: boolean) => totalWidthHandler(slots, isColumns)}
     >
