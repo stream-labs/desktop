@@ -141,33 +141,18 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
    * The below conditionals are to prevent undefined errors on app startup
    */
   get baseResolutions() {
-    const videoSettings = this.dualOutputService.views.videoSettings;
-    const [widthStr, heightStr] = this.settingsService.views.values.Video.Base.split('x');
-
     // to prevent any possible undefined errors on load in the event that the root node
     // attempts to load before the first video context has finished establishing
     // the below are fallback dimensions
-    const defaultWidth = widthStr ? parseInt(widthStr, 10) : 1920;
-    const defaultHeight = heightStr ? parseInt(heightStr, 10) : 1080;
-
-    const horizontalWidth = videoSettings?.horizontal
-      ? videoSettings.horizontal?.baseWidth
-      : defaultWidth;
-    const horizontalHeight = videoSettings.horizontal
-      ? videoSettings.horizontal?.baseHeight
-      : defaultHeight;
-
-    const verticalWidth = videoSettings.vertical.baseWidth ?? defaultWidth;
-    const verticalHeight = videoSettings.vertical.baseHeight ?? defaultHeight;
 
     return {
       horizontal: {
-        baseWidth: horizontalWidth ?? this.contexts.horizontal?.video.baseWidth,
-        baseHeight: horizontalHeight ?? this.contexts.horizontal?.video.baseHeight,
+        baseWidth: this.state.horizontal?.baseWidth ?? 1920,
+        baseHeight: this.state.horizontal?.baseHeight ?? 1080,
       },
       vertical: {
-        baseWidth: verticalWidth ?? this.contexts.vertical?.video.baseWidth,
-        baseHeight: verticalHeight ?? this.contexts.vertical?.video.baseHeight,
+        baseWidth: this.state.vertical?.baseWidth ?? 720,
+        baseHeight: this.state.vertical?.baseHeight ?? 1280,
       },
     };
   }
@@ -175,12 +160,12 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   get outputResolutions() {
     return {
       horizontal: {
-        outputWidth: this.contexts.horizontal?.video.outputWidth,
-        outputHeight: this.contexts.horizontal?.video.outputHeight,
+        outputWidth: this.state.horizontal?.outputWidth,
+        outputHeight: this.state.horizontal?.outputHeight,
       },
       vertical: {
-        outputWidth: this.contexts.vertical?.video.outputWidth,
-        outputHeight: this.contexts.vertical?.video.outputHeight,
+        outputWidth: this.state.vertical?.outputWidth,
+        outputHeight: this.state.vertical?.outputHeight,
       },
     };
   }
@@ -194,7 +179,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   formatVideoSettings(display: TDisplayType = 'horizontal', typeStrings?: boolean) {
     // use vertical display setting as a failsafe to prevent null errors
     const settings =
-      this.contexts[display]?.video ??
+      this.state[display] ??
       this.dualOutputService.views.videoSettings[display] ??
       this.dualOutputService.views.videoSettings.vertical;
 
@@ -397,7 +382,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   }
 
   updateVideoSettings(patch: Partial<IVideoInfo>, display: TDisplayType = 'horizontal') {
-    const newVideoSettings = { ...this.contexts[display].video, ...patch };
+    const newVideoSettings = { ...this.state[display], ...patch };
 
     this.SET_VIDEO_CONTEXT(display, newVideoSettings);
     this.updateObsSettings(display);
@@ -421,10 +406,20 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     this.SET_VIDEO_SETTING(key, value, display);
     this.updateObsSettings(display);
 
-    // console.log('this.baseResolutions', JSON.stringify(this.baseResolutions, null, 2));
-
     // also update the persisted settings
     this.dualOutputService.setVideoSetting({ [key]: value }, display);
+
+    // refresh v1 settings
+    this.settingsService.refreshVideoSettings();
+  }
+
+  setSettings(settings: Partial<IVideoInfo>, display: TDisplayType = 'horizontal') {
+    this.SET_SETTINGS(settings, display);
+
+    this.updateObsSettings(display);
+
+    // also update the persisted settings
+    this.dualOutputService.setVideoSetting(settings, display);
 
     // refresh v1 settings
     this.settingsService.refreshVideoSettings();
@@ -445,7 +440,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
 
     // update persisted local settings if the vertical context does not exist
     const verticalVideoSetting: IVideoInfo = this.contexts.vertical
-      ? this.contexts.vertical.video
+      ? this.state.vertical
       : this.dualOutputService.views.videoSettings.vertical;
 
     let updated = false;
@@ -518,6 +513,14 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     this.state[display] = {
       ...this.state[display],
       [key]: value,
+    };
+  }
+
+  @mutation()
+  private SET_SETTINGS(settings: Partial<IVideoInfo>, display: TDisplayType = 'horizontal') {
+    this.state[display] = {
+      ...this.state[display],
+      ...settings,
     };
   }
 

@@ -84,10 +84,11 @@ class FacebookEditStreamInfoModule {
   }
 
   get shouldShowPermissionWarn() {
-    return (
-      !this.canStreamToTimeline &&
-      this.dismissables.views.shouldShow(EDismissable.FacebookNeedPermissionsTip)
-    );
+    /*
+     * With new Facebook requirements (60 day old account, 100 followers) and error handling
+     * while going live, we're removing the notification resulting from this boolean as it's confusing users.
+     */
+    return false;
   }
 
   get shouldShowDestinationType() {
