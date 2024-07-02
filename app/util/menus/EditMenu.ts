@@ -71,7 +71,7 @@ export class EditMenu extends Menu {
     this.appendEditMenuItems();
   }
 
-  private appendEditMenuItems() {
+  private async appendEditMenuItems() {
     if (this.scene) {
       this.append({
         label: $t('Paste (Reference)'),
@@ -356,7 +356,9 @@ export class EditMenu extends Menu {
         },
       });
 
-      const filtersCount = this.sourceFiltersService.getFilters(this.source.sourceId).length;
+      const filtersCount = (
+        await this.sourceFiltersService.actions.return.getFilters(this.source.sourceId)
+      ).length;
 
       this.append({
         label: $t('Filters') + (filtersCount > 0 ? ` (${filtersCount})` : ''),

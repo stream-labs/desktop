@@ -40,9 +40,13 @@ export default function StudioEditor() {
   const [studioModeStacked, setStudioModeStacked] = useState(false);
   const [verticalPlaceholder, setVerticalPlaceholder] = useState(false);
   const [messageActive, setMessageActive] = useState(false);
-  const studioModeTransitionName = useMemo(() => TransitionsService.getStudioTransitionName(), [
-    v.studioMode,
-  ]);
+
+  const [studioModeTransitionName, setStudioModeTransitionName] = useState<string>();
+  useEffect(() => {
+    if (!studioModeTransitionName) {
+      TransitionsService.actions.return.getStudioTransitionName().then(setStudioModeTransitionName);
+    }
+  }, [v.studioMode]);
 
   const sourceId = useMemo(() => {
     const dualOutputMode = v.showHorizontalDisplay && v.showVerticalDisplay;

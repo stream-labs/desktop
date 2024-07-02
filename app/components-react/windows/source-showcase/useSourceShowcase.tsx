@@ -6,6 +6,7 @@ import { WidgetType } from 'services/widgets';
 import { byOS, OS } from 'util/operating-systems';
 import { IAppSource } from 'services/platform-apps';
 import { initStore, useController } from 'components-react/hooks/zustand';
+import { IObsListOption } from '../../../components/obs/inputs/ObsInput';
 
 interface ISelectSourceOptions {
   propertiesManager?: TPropertiesManager;
@@ -26,7 +27,14 @@ export class SourceShowcaseController {
       : 'ffmpeg_source') as TInspectableSource,
     inspectedAppId: '',
     inspectedAppSourceId: '',
+    availableSourceTypes: [] as TSourceType[],
   });
+
+  init() {
+    this.sourcesService.actions.return.getAvailableSourcesTypes().then(sourceTypes => {
+      this.store.setState({ availableSourceTypes: sourceTypes });
+    });
+  }
 
   private get sourcesService() {
     return Services.SourcesService;
@@ -70,9 +78,7 @@ export class SourceShowcaseController {
       this.selectSource('image_source', { propertiesManager: 'iconLibrary' });
     } else if (inspectedSource === 'app_source') {
       this.selectAppSource(this.store.inspectedAppId, this.store.inspectedAppSourceId);
-    } else if (
-      this.sourcesService.getAvailableSourcesTypes().includes(inspectedSource as TSourceType)
-    ) {
+    } else if (this.store.availableSourceTypes.includes(inspectedSource as TSourceType)) {
       this.selectSource(inspectedSource as TSourceType);
     }
   }
@@ -81,7 +87,7 @@ export class SourceShowcaseController {
     const managerType = options.propertiesManager || 'default';
     const propertiesManagerSettings: Dictionary<any> = { ...omit(options, 'propertiesManager') };
 
-    this.sourcesService.showAddSource(sourceType, {
+    this.sourcesService.actions.showAddSource(sourceType, {
       propertiesManagerSettings,
       propertiesManager: managerType,
     });
