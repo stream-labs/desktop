@@ -226,9 +226,9 @@ class VideoSettingsModule {
       return VERTICAL_CANVAS_OPTIONS;
     }
 
-    return CANVAS_RES_OPTIONS.concat(this.monitorResolutions).concat([
-      { label: $t('Custom'), value: 'custom' },
-    ]);
+    return CANVAS_RES_OPTIONS.concat(this.monitorResolutions)
+      .concat(VERTICAL_CANVAS_OPTIONS)
+      .concat([{ label: $t('Custom'), value: 'custom' }]);
   }
 
   get outputResOptions() {
@@ -240,9 +240,12 @@ class VideoSettingsModule {
     if (!OUTPUT_RES_OPTIONS.find(opt => opt.value === baseRes)) {
       return [{ label: baseRes, value: baseRes }]
         .concat(OUTPUT_RES_OPTIONS)
+        .concat(VERTICAL_OUTPUT_RES_OPTIONS)
         .concat([{ label: $t('Custom'), value: 'custom' }]);
     }
-    return OUTPUT_RES_OPTIONS.concat([{ label: $t('Custom'), value: 'custom' }]);
+    return OUTPUT_RES_OPTIONS.concat(VERTICAL_OUTPUT_RES_OPTIONS).concat([
+      { label: $t('Custom'), value: 'custom' },
+    ]);
   }
 
   get monitorResolutions() {
@@ -305,8 +308,42 @@ class VideoSettingsModule {
     if (this.resolutionValidator.pattern.test(value)) {
       const [width, height] = value.split('x');
       const prefix = key === 'baseRes' ? 'base' : 'output';
-      this.service.actions.setVideoSetting(`${prefix}Width`, Number(width), display);
-      this.service.actions.setVideoSetting(`${prefix}Height`, Number(height), display);
+
+      const settings = {
+        [`${prefix}Width`]: Number(width),
+        [`${prefix}Height`]: Number(height),
+      };
+
+      // set base or output resolutions to vertical dimensions for horizontal display
+      // when setting vertical dimensions
+      if (display === 'horizontal') {
+        const otherPrefix = key === 'baseRes' ? 'output' : 'base';
+        const customRes = this.state.customBaseRes || this.state.customOutputRes;
+        const verticalValues = VERTICAL_CANVAS_OPTIONS.map(option => option.value);
+        const horizontalValues = CANVAS_RES_OPTIONS.concat(OUTPUT_RES_OPTIONS).map(
+          option => option.value,
+        );
+        const baseRes = this.values.baseRes.toString();
+        const outputRes = this.values.outputRes.toString();
+
+        const shouldSyncVertical =
+          !customRes &&
+          verticalValues.includes(value) &&
+          !verticalValues.includes(baseRes) &&
+          !verticalValues.includes(outputRes);
+
+        const shouldSyncHorizontal =
+          !customRes &&
+          !verticalValues.includes(value) &&
+          !horizontalValues.includes(baseRes) &&
+          !horizontalValues.includes(outputRes);
+
+        if (shouldSyncVertical || shouldSyncHorizontal) {
+          settings[`${otherPrefix}Width`] = Number(width);
+          settings[`${otherPrefix}Height`] = Number(height);
+        }
+      }
+      this.service.actions.setSettings(settings, display);
     }
   }
 
