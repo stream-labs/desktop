@@ -520,7 +520,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     if (!this.state.auth.hasRelogged) {
       await remote.session.defaultSession.clearCache();
       await remote.session.defaultSession.clearStorageData({
-        storages: ['appcache, cookies', 'cachestorage', 'filesystem'],
+        storages: ['cookies', 'cachestorage', 'filesystem'],
       });
       this.streamSettingsService.resetStreamSettings();
       this.LOGOUT();
