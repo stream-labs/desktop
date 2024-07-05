@@ -200,7 +200,10 @@ class GLVolmetersModule {
 
   private unsubscribeVolmeter(sourceId: string) {
     if (this.subscriptions[sourceId].channelId) {
-      this.audioService.unsubscribeVolemeter(sourceId, this.subscriptions[sourceId].channelId!);
+      this.audioService.actions.unsubscribeVolmeter(
+        sourceId,
+        this.subscriptions[sourceId].channelId!,
+      );
     }
 
     delete this.subscriptions[sourceId];
