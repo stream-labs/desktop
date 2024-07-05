@@ -239,8 +239,5 @@
   "engines": {
     "npm": "please-use-yarn"
   },
-  "//": {
-    "version": "0.11.2"
-  },
   "buildProductName": "N Air"
 }
