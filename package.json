@@ -84,6 +84,7 @@
     "@n-air-app/nicolive-comment-protobuf": "^0.0.3",
     "@sentry/electron": "4.24.0",
     "@sentry/vue": "7.112.0",
+    "@sentry/webpack-plugin": "^2.20.1",
     "archiver": "^5.3.1",
     "autoprefixer": "^10.4.14",
     "aws-sdk": "^2.344.0",
