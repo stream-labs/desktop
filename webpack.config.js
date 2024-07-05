@@ -66,7 +66,7 @@ module.exports = function (env, argv) {
     }, // if problem, clean node_modules/.cache
   };
 
-  return config = [{
+  return [{
     ...common,
     output: {
       path: `${__dirname}/bundles`,
