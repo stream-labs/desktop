@@ -178,7 +178,6 @@ document.addEventListener('DOMContentLoaded', () => {
       // await this.obsUserPluginsService.initialize();
 
       // Initialize OBS API
-      console.log('MINIDUMP_URL', SENTRY_MINIDUMP_URL); // DEBUG
       const apiResult = obs.NodeObs.OBS_API_initAPI(
         'en-US',
         appService.appDataDirectory,
