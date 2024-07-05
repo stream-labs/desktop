@@ -1,6 +1,5 @@
 import * as remote from '@electron/remote';
 import React, { useMemo, useRef } from 'react';
-import { useModule, injectState, injectFormBinding } from 'slap';
 import { Services } from '../../service-provider';
 import { Button, Form, Modal, message } from 'antd';
 import FormFactory, { TInputValue } from 'components-react/shared/inputs/FormFactory';
@@ -10,13 +9,7 @@ import { EScaleType, EFPSType, IVideoInfo } from '../../../../obs-api';
 import { $t } from 'services/i18n';
 import styles from './Common.m.less';
 import Tabs from 'components-react/shared/Tabs';
-import {
-  invalidFps,
-  IVideoInfoValue,
-  TDisplayType,
-  VideoSettingsState,
-} from 'services/settings-v2/video';
-import { useRealmObject } from 'components-react/hooks/realm';
+import { invalidFps, IVideoInfoValue, TDisplayType } from 'services/settings-v2/video';
 import { initStore, useController } from 'components-react/hooks/zustand';
 import useBaseElement from 'components-react/editor/elements/hooks';
 
@@ -315,9 +308,15 @@ class VideoSettingsController {
   setResolution(key: string, value: string) {
     const display = this.store.display;
     if (key === 'outputRes') {
-      this.store.update('customOutputResValue', value);
+      // this.store.update('customOutputResValue', value);
+      this.store.setState(s => {
+        s.customOutputResValue = value;
+      });
     } else if (key === 'baseRes') {
-      this.store.update('customBaseResValue', value);
+      // this.store.update('customBaseResValue', value);
+      this.store.setState(s => {
+        s.customBaseResValue = value;
+      });
     }
 
     if (this.resolutionValidator.pattern.test(value)) {
@@ -340,9 +339,15 @@ class VideoSettingsController {
 
   setCustomResolution(key: string, value: boolean) {
     if (key === 'baseRes') {
-      this.store.update('customBaseRes', value);
+      // this.store.update('customBaseRes', value);
+      this.store.setState(s => {
+        s.customBaseRes = value;
+      });
     } else {
-      this.store.update('customOutputRes', value);
+      // this.store.update('customOutputRes', value);
+      this.store.setState(s => {
+        s.customOutputRes = value;
+      });
     }
   }
 
@@ -355,12 +360,7 @@ class VideoSettingsController {
 
   setScaleType(value: EScaleType) {
     this.service.actions.setVideoSetting('scaleType', value, 'horizontal');
-
-    if (this.service.contexts.vertical) {
-      this.service.actions.setVideoSetting('scaleType', value, 'vertical');
-    } else {
-      this.dualOutputService.actions.setVideoSetting({ scaleType: value }, 'vertical');
-    }
+    this.service.actions.setVideoSetting('scaleType', value, 'vertical');
   }
 
   /**
@@ -374,6 +374,10 @@ class VideoSettingsController {
     this.service.actions.setVideoSetting('fpsNum', 30, 'horizontal');
     this.service.actions.setVideoSetting('fpsDen', 1, 'horizontal');
     this.service.actions.syncFPSSettings();
+    this.store.setState(s => {
+      s.fpsNum = 30;
+      s.fpsDen = 1;
+    });
   }
 
   /**
@@ -388,6 +392,10 @@ class VideoSettingsController {
     this.service.actions.setVideoSetting('fpsNum', Number(fpsNum), 'horizontal');
     this.service.actions.setVideoSetting('fpsDen', Number(fpsDen), 'horizontal');
     this.service.actions.syncFPSSettings();
+    this.store.setState(s => {
+      s.fpsNum = Number(fpsNum);
+      s.fpsDen = Number(fpsDen);
+    });
   }
   /**
    * Sets Integer FPS
@@ -396,12 +404,19 @@ class VideoSettingsController {
    * Otherwise, update the vertical display persisted settings.
    */
   setIntegerFPS(value: string) {
-    this.store.update('fpsInt', Number(value));
+    // this.store.update('fpsInt', Number(value));
+    this.store.setState(s => {
+      s.fpsInt = Number(value);
+    });
 
     if (Number(value) > 0 && Number(value) < 1001) {
       this.service.actions.setVideoSetting('fpsNum', Number(value), 'horizontal');
       this.service.actions.setVideoSetting('fpsDen', 1, 'horizontal');
       this.service.actions.syncFPSSettings();
+      this.store.setState(s => {
+        s.fpsNum = Number(value);
+        s.fpsDen = 1;
+      });
     }
   }
 
@@ -413,9 +428,15 @@ class VideoSettingsController {
    */
   setFPS(key: 'fpsNum' | 'fpsDen', value: string) {
     if (key === 'fpsNum') {
-      this.store.update('fpsNum', Number(value));
+      // this.store.update('fpsNum', Number(value));
+      this.store.setState(s => {
+        s.fpsNum = Number(value);
+      });
     } else {
-      this.store.update('fpsDen', Number(value));
+      // this.store.update('fpsDen', Number(value));
+      this.store.setState(s => {
+        s.fpsDen = Number(value);
+      });
     }
     if (!invalidFps(this.store.fpsNum, this.store.fpsDen) && Number(value) > 0) {
       this.service.actions.setVideoSetting(key, Number(value), 'horizontal');
@@ -429,7 +450,10 @@ class VideoSettingsController {
   }
 
   setDisplay(display: TDisplayType) {
-    this.store.update('display', display);
+    // this.store.update('display', display);
+    this.store.setState(s => {
+      s.display = display;
+    });
     const customBaseRes = !this.baseResOptions.find(
       opt => opt.value === this.service.values[display].baseRes,
     );
@@ -468,9 +492,9 @@ class VideoSettingsController {
       // toggle dual output
       console.log('toggle dual output');
       this.dualOutputService.actions.setdualOutputMode();
-      this.store.update('dualOutput', !this.store.dualOutput);
+      // this.store.update('dualOutput', !this.store.dualOutput);
       this.store.setState(s => {
-        s.dualOutput = !this.store.dualOutput;
+        s.dualOutput = !s.dualOutput;
       });
       Services.UsageStatisticsService.recordFeatureUsage('DualOutput');
       Services.UsageStatisticsService.recordAnalyticsEvent('DualOutput', {
@@ -493,8 +517,12 @@ class VideoSettingsController {
   }
 
   handleShowModal(status: boolean) {
-    Services.WindowsService.actions.updateStyleBlockers('child', status);
-    this.store.update('showModal', status);
+    console.log('modal status', status);
+    Services.WindowsService.actions.updateStyleBlockers('child', true);
+    // this.store.update('showModal', status);
+    this.store.setState(s => {
+      s.showModal = status;
+    });
   }
 
   handleAuth() {
@@ -509,26 +537,10 @@ class VideoSettingsController {
 }
 
 export function VideoSettings() {
-  const controller = useMemo(() => new VideoSettingsController(), []);
   const ctrl = useController(VideoSettingsCtx);
 
-  // // Hooks up reactivity for Customization state
-  // useRealmObject(Services.VideoSettingsService.state);
-
-  // const { bind } = useModule(() => {
-  //   function getSettings() {
-  //     return Services.VideoSettingsService.state.toObject() as VideoSettingsState;
-  //   }
-
-  //   function setSettings(newSettings: Partial<IVideoInfo>) {
-  //     Services.VideoSettingsService.actions.updateVideoSettings(newSettings);
-  //   }
-
-  //   return { bind: injectFormBinding(getSettings, setSettings) };
-  // });
-
   return (
-    <VideoSettingsCtx.Provider value={controller}>
+    <>
       <div className={styles.videoSettingsHeader}>
         <h2>{$t('Video')}</h2>
         <div className={styles.doToggle}>
@@ -555,7 +567,6 @@ export function VideoSettings() {
             <i className="icon-information" />
           </Tooltip>
         </div>
-        {/* )} */}
       </div>
       {ctrl.dualOutput && <Tabs onChange={ctrl.setDisplay} />}
 
@@ -568,19 +579,35 @@ export function VideoSettings() {
           name="video-settings"
         />
       </div>
-      <LoginPromptModal />
-    </VideoSettingsCtx.Provider>
+      <Modal
+        footer={null}
+        visible={ctrl.showModal}
+        onCancel={() => ctrl.handleShowModal(false)}
+        getContainer={false}
+        className={styles.confirmLogout}
+      >
+        <Form id="login-modal" className={styles.confirmLogout}>
+          <h2>{$t('Login')}</h2>
+          {$t('Please log in to enable dual output. Would you like to log in now?')}
+          <div className={styles.buttons}>
+            <Button onClick={() => ctrl.handleAuth()}>{$t('Yes')}</Button>
+            <Button onClick={() => ctrl.handleShowModal(false)}>{$t('No')}</Button>
+          </div>
+        </Form>
+      </Modal>
+    </>
   );
 }
 
 function LoginPromptModal() {
-  const { showModal, handleAuth, handleShowModal } = useController(VideoSettingsCtx);
+  // const { showModal, handleAuth, handleShowModal } = useController(VideoSettingsCtx);
+  const ctrl = useController(VideoSettingsCtx);
 
   return (
     <Modal
       footer={null}
-      visible={showModal}
-      onCancel={() => handleShowModal(false)}
+      visible={ctrl.showModal}
+      onCancel={() => ctrl.handleShowModal(false)}
       getContainer={false}
       className={styles.confirmLogout}
     >
@@ -588,8 +615,8 @@ function LoginPromptModal() {
         <h2>{$t('Login')}</h2>
         {$t('Please log in to enable dual output. Would you like to log in now?')}
         <div className={styles.buttons}>
-          <Button onClick={() => handleAuth()}>{$t('Yes')}</Button>
-          <Button onClick={() => handleShowModal(false)}>{$t('No')}</Button>
+          <Button onClick={() => ctrl.handleAuth()}>{$t('Yes')}</Button>
+          <Button onClick={() => ctrl.handleShowModal(false)}>{$t('No')}</Button>
         </div>
       </Form>
     </Modal>

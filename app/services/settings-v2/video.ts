@@ -181,13 +181,13 @@ export class VideoSettingsState extends RealmObject {
       if (parsed.videoSettings.horizontal) {
         this.db.write(() => {
           this.horizontal.video.deepPatch(parsed.videoSettings.horizontal);
-          this.horizontal.isActive = parsed.videoSettings.activeDisplays.horizontal;
+          this.horizontal.isActive = parsed.videoSettings?.activeDisplays?.horizontal ?? true;
 
           this.vertical.video.deepPatch({
             ...parsed.videoSettings.horizontal,
             ...verticalResolutions,
           });
-          this.vertical.isActive = parsed.videoSettings.activeDisplays.vertical;
+          this.vertical.isActive = parsed.videoSettings?.activeDisplays?.vertical ?? false;
         });
       }
     } else {

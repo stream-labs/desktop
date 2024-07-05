@@ -27,16 +27,16 @@ export function initStore<TState extends any>(initialStateDraft: TState) {
   const useState = createBoundedUseStore(store);
   (store as any).useState = useState;
 
-  const update = (key: keyof TState, value: any) =>
-    store.setState(s => {
-      s[key as string] = value;
-    });
-  (store as any).update = update;
+  return store as typeof store & { useState: typeof useState } & Readonly<typeof initialStateDraft>;
+
+  // const update = (key: keyof TState, value: any) =>
+  //   store.setState(s => {
+  //     s[key as string] = value;
+  //   });
+  // (store as any).update = update;
 
   // ensure we have correct types
-  return store as typeof store & { useState: typeof useState } & {
-    update: typeof update;
-  } & Readonly<typeof initialStateDraft>;
+  // return store as typeof store & { useState: typeof useState } & {update: typeof update} & Readonly<typeof initialStateDraft>;
 }
 
 /**
