@@ -324,7 +324,7 @@ export class StreamingService
         }
 
         const display = destination.display;
-        destination.video = this.videoSettingsService.contexts[display];
+        destination.video = this.videoSettingsService.getContext(display);
         destination.mode = this.views.getDisplayContextName(display);
       });
     }
@@ -416,7 +416,7 @@ export class StreamingService
 
       for (const display in shouldMultistreamDisplay) {
         // set up restream service to multistream display
-        if (shouldMultistreamDisplay[display]) {
+        if (shouldMultistreamDisplay[display as keyof typeof shouldMultistreamDisplay]) {
           // set up restream service to multistream display
           // check the restream service is available
           let ready = false;
@@ -448,7 +448,9 @@ export class StreamingService
             this.setError('DUAL_OUTPUT_SETUP_FAILED');
             return;
           }
-        } else if (destinationDisplays[display].length > 0) {
+        } else if (
+          destinationDisplays[display as keyof typeof shouldMultistreamDisplay].length > 0
+        ) {
           // if a custom destination is enabled for single streaming
           // move the relevant OBS context to custom ingest mode
 
@@ -892,8 +894,8 @@ export class StreamingService
     if (this.views.isDualOutputMode) {
       // start dual output
 
-      const horizontalContext = this.videoSettingsService.contexts.horizontal;
-      const verticalContext = this.videoSettingsService.contexts.vertical;
+      const horizontalContext = this.videoSettingsService.getContext('horizontal');
+      const verticalContext = this.videoSettingsService.getContext('vertical');
 
       NodeObs.OBS_service_setVideoInfo(horizontalContext, 'horizontal');
       NodeObs.OBS_service_setVideoInfo(verticalContext, 'vertical');
@@ -917,7 +919,7 @@ export class StreamingService
       await new Promise(resolve => setTimeout(resolve, 1000));
     } else {
       // start single output
-      const horizontalContext = this.videoSettingsService.contexts.horizontal;
+      const horizontalContext = this.videoSettingsService.getContext('horizontal');
       NodeObs.OBS_service_setVideoInfo(horizontalContext, 'horizontal');
 
       NodeObs.OBS_service_startStreaming();

@@ -97,7 +97,7 @@ export class RootNode extends Node<ISchema, {}> {
    * This if/else prevents an error by guaranteeing a video context exists.
    */
   async load(): Promise<void> {
-    if (!this.videoSettingsService.contexts.horizontal) {
+    if (!this.videoSettingsService.getContext('horizontal')) {
       const establishedContext = this.videoSettingsService.establishedContext.subscribe(
         async () => {
           this.videoService.setBaseResolution(this.data.baseResolutions);

@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from 'react';
-import { useVuex } from '../hooks';
 import { Services } from '../service-provider';
 import { Display as OBSDisplay } from '../../services/video';
 import { TDisplayType } from 'services/settings-v2/video';
@@ -29,14 +28,6 @@ export default function Display(props: DisplayProps) {
     ...props,
   };
 
-  const v = useVuex(() => {
-    const videoSettings = VideoSettingsService.baseResolutions[p.type];
-
-    return {
-      baseResolution: `${videoSettings?.baseWidth}x${videoSettings?.baseHeight}`,
-    };
-  }, false);
-
   const paddingColor = useRealmObject(CustomizationService.state).displayBackground;
   const baseResolution = useRealmObject(VideoSettingsService.state).baseResolutions[p.type];
 
@@ -48,7 +39,7 @@ export default function Display(props: DisplayProps) {
 
   function refreshOutputRegion() {
     if (!obsDisplay.current) return;
-    obsDisplay.current.resize(Number(baseResolution.baseWidth), Number(baseResolution.baseHeight));
+    obsDisplay.current.resize(baseResolution.baseWidth, baseResolution.baseHeight);
   }
 
   function onClickHandler(event: React.MouseEvent) {

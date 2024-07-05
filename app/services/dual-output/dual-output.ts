@@ -450,18 +450,14 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    */
   confirmOrAssignSceneNodes(sceneId: string) {
     this.SET_IS_LOADING(true);
-    const sceneItems = this.scenesService.views.getSceneItemsBySceneId(sceneId);
+    const sceneItems = this.scenesService.views.getSceneNodesBySceneId(sceneId);
     if (!sceneItems) return;
 
     const verticalNodeIds = new Set(this.views.getVerticalNodeIds(sceneId));
 
     // establish vertical context if it doesn't exist
-    if (
-      this.views.getVerticalNodeIds(sceneId)?.length > 0 &&
-      !this.videoSettingsService.contexts.vertical
-    ) {
-      this.videoSettingsService.establishVideoContext('vertical');
-    }
+    const hasVerticalNodes = this.views.getVerticalNodeIds(sceneId)?.length > 0;
+    this.videoSettingsService.validateContext('vertical', hasVerticalNodes);
 
     sceneItems.forEach((sceneItem: SceneItem, index: number) => {
       // Item already has a context assigned
@@ -477,9 +473,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   createSceneNodes(sceneId: string) {
     this.SET_IS_LOADING(true);
     // establish vertical context if it doesn't exist
-    if (this.state.dualOutputMode && !this.videoSettingsService.contexts.vertical) {
-      this.videoSettingsService.establishVideoContext('vertical');
-    }
+    this.videoSettingsService.validateContext('vertical', this.state.dualOutputMode);
 
     const nodes = this.scenesService.views.getScene(sceneId).getNodes();
 
@@ -539,7 +533,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
   assignNodeContext(node: TSceneNode, display: TDisplayType) {
     if (node.isItem()) {
-      const context = this.videoSettingsService.contexts[display];
+      const context = this.videoSettingsService.getContext(display);
       if (!context) return null;
       node.setSettings({ output: context, display });
     } else {

@@ -210,10 +210,10 @@ class ScenesViews extends ViewHandler<IScenesState> {
     return null;
   }
 
-  getSceneItemsBySceneId(sceneId: string): SceneItem[] | undefined {
+  getSceneNodesBySceneId(sceneId: string): TSceneNode[] | undefined {
     const scene: Scene | null = this.getScene(sceneId);
     if (!scene) return;
-    return scene.getItems();
+    return scene.getNodes();
   }
 
   /**
@@ -262,7 +262,6 @@ class ScenesViews extends ViewHandler<IScenesState> {
   }
 }
 
-@InitAfter('DualOutputService')
 export class ScenesService extends StatefulService<IScenesState> {
   @Inject() private dualOutputService: DualOutputService;
 

@@ -297,17 +297,9 @@ export class SceneItem extends SceneItemNode {
     const crop = customSceneItem.crop;
     const display = customSceneItem?.display ?? this?.display ?? 'horizontal';
 
-    // guarantee vertical context exists to prevent null errors
-    if (display === 'vertical' && !this.videoSettingsService.contexts.vertical) {
-      this.videoSettingsService.establishVideoContext('vertical');
-    }
-    const context = this.videoSettingsService.contexts[display];
-
-    const obsSceneItem = this.getObsSceneItem();
-    obsSceneItem.video = context as obs.IVideo;
-
     this.UPDATE({
       visible,
+      display,
       sceneItemId: this.sceneItemId,
       transform: {
         position,
@@ -321,9 +313,8 @@ export class SceneItem extends SceneItemNode {
       scaleFilter: customSceneItem.scaleFilter,
       blendingMode: customSceneItem.blendingMode,
       blendingMethod: customSceneItem.blendingMethod,
-      display,
-      output: context,
-      position: obsSceneItem.position,
+      output: this.videoSettingsService.getContext(display),
+      position: customSceneItem.position,
     });
   }
 

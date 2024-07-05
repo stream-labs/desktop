@@ -229,9 +229,6 @@ export class Scene {
     if (source.forceHidden) obsSceneItem.visible = false;
 
     const display = options?.display ?? 'horizontal';
-    // assign context to scene item
-    const context =
-      this.videoSettingsService.contexts[display] ?? this.videoSettingsService.contexts.horizontal;
 
     this.ADD_SOURCE_TO_SCENE(
       sceneItemId,
@@ -242,7 +239,9 @@ export class Scene {
     );
     const sceneItem = this.getItem(sceneItemId)!;
 
-    sceneItem.setSettings({ ...sceneItem.getSettings(), display, output: context });
+    // assign context to scene item
+    const context = this.videoSettingsService.getContext(display);
+    sceneItem.setSettings({ ...sceneItem.getSettings(), output: context, display });
 
     // Default is to select
     if (options.select == null) options.select = true;
@@ -500,7 +499,9 @@ export class Scene {
     let itemIndex = 0;
     nodes.forEach(nodeModel => {
       const display = nodeModel?.display ?? 'horizontal';
+      this.videoSettingsService.validateContext(display);
       const obsSceneItem = obsSceneItems[itemIndex];
+
       if (nodeModel.sceneNodeType === 'folder') {
         this.createFolder(nodeModel.name, { id: nodeModel.id, display });
       } else {
@@ -511,6 +512,9 @@ export class Scene {
           display,
           obsSceneItem.position,
         );
+
+        obsSceneItem.video = this.videoSettingsService.getContext(display);
+        nodeModel.position = obsSceneItem.position;
         const item = this.getItem(nodeModel.id)!;
         item.loadItemAttributes(nodeModel);
         itemIndex++;

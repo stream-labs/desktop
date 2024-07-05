@@ -1,6 +1,5 @@
 import { Service } from './core/service';
-import { StatefulService, InitAfter, mutation } from 'services/core';
-import { ISettingsSubCategory, SettingsService } from './settings';
+import { SettingsService } from './settings';
 import * as obs from '../../obs-api';
 import { Inject } from './core/injector';
 import Utils from './utils';
@@ -301,8 +300,7 @@ export class Display {
     this.videoService.actions.setOBSDisplayDrawGuideLines(this.name, enabled);
   }
 }
-@InitAfter('UserService')
-@InitAfter('VideoSettingsService')
+
 export class VideoService extends Service {
   @Inject() settingsService: SettingsService;
   @Inject() scenesService: ScenesService;
@@ -373,8 +371,7 @@ export class VideoService extends Service {
 
     // the display must have a context, otherwise the sources will not identify
     // which display they belong to
-    const context =
-      this.videoSettingsService.contexts[type] ?? this.videoSettingsService.contexts.horizontal;
+    const context = this.videoSettingsService.getContext(type);
 
     if (sourceId) {
       obs.NodeObs.OBS_content_createSourcePreviewDisplay(
