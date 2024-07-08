@@ -248,5 +248,6 @@
   "Unknown error with no further details, please contact support": "Unknown error with no further details, please contact support",
   "You are currently logged out. Please log in or confirm your server url and stream key": "You are currently logged out. Please log in or confirm your server url and stream key",
   "user probably has an invalid server url or stream key": "user probably has an invalid server url or stream key",
-  "Your computer is locked": "Your computer is locked"
+  "Your computer is locked": "Your computer is locked",
+  "Please try again. If the issue persists, you can stream in single output mode instead.": "Please try again. If the issue persists, you can stream in single output mode instead."
 }

@@ -275,8 +275,6 @@ export function formatStreamErrorMessage(
     user: [] as string[],
     report: [] as string[],
   };
-  const heading = target ? `${target} Error` : $t('Streaming Error');
-
   if (typeof errorTypeOrError === 'object') {
     // if an error object has been passed as a first arg
     let message = errorTypeOrError?.message;
@@ -308,11 +306,9 @@ export function formatStreamErrorMessage(
     messages.report = typedMessages.report;
   }
 
-  const userMessage = messages.user.join('. ');
-  const reportMessage = messages.report.join('. ');
   return {
-    user: [heading, userMessage].join(': '),
-    report: [heading, reportMessage].join(': '),
+    user: messages.user.join('. '),
+    report: messages.report.join('. '),
   };
 }
 
@@ -323,7 +319,7 @@ function createDefaultUnknownMessage(
 ) {
   const errorType = errorTypeOrError ?? 'UNKNOWN_STREAMING_ERROR';
   const error = errorTypes[errorType];
-  const message = target ? `${capitalize(target)} Error: ${error.message}` : error.message;
+  const message = target ? `Unknown ${capitalize(target)} Error: ${error.message}` : error.message;
 
   // user only sees the message
   messages.user.push(message);
@@ -336,7 +332,7 @@ function createDefaultUnknownMessage(
 }
 
 /**
- * Format error messagess for unknown streaming errors
+ * Format error messages for unknown streaming errors
  * @param info - IOBSOutputSignalInfo
  */
 export function formatUnknownErrorMessage(
