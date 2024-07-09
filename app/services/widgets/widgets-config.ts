@@ -31,6 +31,7 @@ export interface IWidgetConfig {
   url: string;
   dataFetchUrl: string;
   settingsSaveUrl: string;
+  staticWidgetConfigUrl?: string;
   previewUrl: string;
   settingsUpdateEvent: string;
   testers?: TAlertType[];
@@ -65,8 +66,9 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
 
       url: `https://${host}/alert-box/v3/${token}`,
       previewUrl: `https://${host}/alert-box/v3/${token}`,
-      dataFetchUrl: `https://${host}/api/v5/slobs/widget/alertbox?include_linked_integrations_only=true&primary_only=false`,
-      settingsSaveUrl: `https://${host}/api/v5/slobs/widget/alertbox`,
+      dataFetchUrl: `https://${host}/api/v5/widgets/desktop/alert-box?include_linked_integrations_only=true&primary_only=false`,
+      settingsSaveUrl: `https://${host}/api/v5/widgets/desktop/alert-box`,
+      staticWidgetConfigUrl: `https://${host}/api/v5/widgets/static/config/alert_box`,
       settingsUpdateEvent: 'filteredAlertBoxSettingsUpdate',
       customCodeAllowed: true,
       customFieldsAllowed: false,

@@ -121,7 +121,6 @@ export { TipJarService } from 'services/widgets/settings/tip-jar';
 export { SponsorBannerService } from 'services/widgets/settings/sponsor-banner';
 export { SubGoalService } from 'services/widgets/settings/sub-goal';
 export { MediaShareService } from 'services/widgets/settings/media-share';
-export { AlertBoxService } from 'services/widgets/settings/alert-box';
 export { SpinWheelService } from 'services/widgets/settings/spin-wheel';
 export { PollService } from 'services/widgets/settings/poll';
 export { EmoteWallService } from 'services/widgets/settings/emote-wall';

@@ -66,7 +66,6 @@ import EventList from 'components/widgets/EventList.vue';
 import TipJar from 'components/widgets/TipJar.vue';
 import SponsorBanner from 'components/widgets/SponsorBanner.vue';
 import MediaShare from 'components/widgets/MediaShare';
-import AlertBox from 'components/widgets/AlertBox.vue';
 import SpinWheel from 'components/widgets/SpinWheel.vue';
 import Poll from 'components/widgets/Poll';
 import ChatHighlight from 'components/widgets/ChatHighlight';
@@ -128,7 +127,6 @@ export function getComponents() {
     StreamBoss,
     SubGoal,
     MediaShare,
-    AlertBox,
     SpinWheel,
     Poll,
     ChatHighlight,

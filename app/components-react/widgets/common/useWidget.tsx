@@ -37,6 +37,7 @@ export interface IWidgetState {
   data: {
     settings: any;
   };
+  config?: any;
 }
 
 /**
@@ -63,7 +64,10 @@ export const DEFAULT_WIDGET_STATE: IWidgetCommonState = {
 /**
  * A base Redux module for all widget components
  */
-export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
+export class WidgetModule<
+  TWidgetState extends IWidgetState = IWidgetState,
+  IStaticConfig = object
+> {
   constructor(public params: WidgetParams) {}
 
   // init default state
@@ -99,12 +103,24 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
 
     this.cancelUnload = onUnload(() => this.widget.destroyPreviewSource());
 
-    // load settings from the server to the store
     this.state.type = widget.type;
+
+    // fetch static widget config (animation options, etc), TODO: cache
+    if (this.config.staticWidgetConfigUrl) {
+      const staticConfig = await this.fetchStaticConfig();
+      this.setStaticConfig(staticConfig);
+    }
+
+    // load settings from the server to the store
     const data = await this.fetchData();
     this.setData(data);
     this.setPrevSettings(data);
+
     this.state.setIsLoading(false);
+  }
+
+  get staticConfig(): IStaticConfig {
+    return this.state.widgetData.config;
   }
 
   destroy() {
@@ -246,6 +262,22 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
     return this.patchAfterFetch(rawData);
   }
 
+  // TODO: I don't like nulls
+  protected async fetchStaticConfig<T = IStaticConfig>(): Promise<T | undefined> {
+    if (this.config.staticWidgetConfigUrl) {
+      return await this.actions.return
+        .request({
+          url: this.config.staticWidgetConfigUrl,
+          method: 'GET',
+        })
+        .then(res => res.data);
+    }
+  }
+
+  protected get request() {
+    return this.actions.return.request;
+  }
+
   /**
    * Save setting on the server
    */
@@ -310,6 +342,13 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
   protected setData(data: TWidgetState['data']) {
     this.state.mutate(state => {
       state.widgetData.data = data;
+    });
+  }
+
+  // FIXME: types
+  protected setStaticConfig(config: any) {
+    this.state.mutate(state => {
+      state.widgetData.config = config;
     });
   }
 

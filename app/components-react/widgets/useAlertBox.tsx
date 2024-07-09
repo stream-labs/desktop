@@ -1,13 +1,6 @@
-import {
-  createAlertsMap,
-  ICustomCode,
-  IWidgetState,
-  useWidget,
-  WidgetModule,
-} from './common/useWidget';
+import { createAlertsMap, ICustomCode, IWidgetState, useWidget, WidgetModule } from './common/useWidget';
 import values from 'lodash/values';
 import cloneDeep from 'lodash/cloneDeep';
-import intersection from 'lodash/intersection';
 import { IAlertConfig, TAlertType } from '../../services/widgets/alerts-config';
 import { createBinding } from '../shared/inputs';
 import { Services } from '../service-provider';
@@ -18,15 +11,19 @@ import { TPlatform } from '../../services/platforms';
 import * as remote from '@electron/remote';
 import { IListOption } from '../shared/inputs/ListInput';
 import { injectFormBinding, mutation } from 'slap';
+import {
+  IAlertBoxApiResponse,
+  IAlertBoxApiSettings, IAlertType,
+  IAlertTypesResponse,
+  TServerPlatform,
+} from '../../services/widgets/settings/alert-box/alert-box-api';
+import * as assert from 'node:assert';
 
 interface IAlertBoxState extends IWidgetState {
   data: {
     settings: {
-      alert_delay: 0;
-      interrupt_mode: boolean;
-      interrupt_mode_delay: number;
-      moderation_delay: number;
-      bit_variations: any;
+      global: IAlertBoxApiSettings['global'],
+      platforms: IAlertBoxApiSettings['platforms'];
     };
     variations: TVariationsState;
     animationOptions: {
@@ -38,10 +35,22 @@ interface IAlertBoxState extends IWidgetState {
   availableAlerts: TAlertType[];
 }
 
+type AlertBoxAnimationGroup = { group: string, list: { value: string, key: string }[] };
+type AlertBoxAnimations = AlertBoxAnimationGroup[];
+
+interface IAlertBoxStaticConfig {
+  animations: {
+    show_animations: AlertBoxAnimations;
+    hide_animations: AlertBoxAnimations;
+    text_animations: AlertBoxAnimationGroup;
+  }
+  alertTypes: IAlertTypesResponse['data'];
+}
+
 /**
  * A Redux module for AlertBox components
  */
-export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
+export class AlertBoxModule extends WidgetModule<IAlertBoxState, IAlertBoxStaticConfig> {
   /**
    * config for all events supported by users' platforms
    */
@@ -145,48 +154,95 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
     SourcesService.actions.showSourceProperties(this.state.sourceId);
   }
 
+  // TODO: cache
+  // eslint-disable-next-line prettier/prettier
+  protected override async fetchStaticConfig<T = IAlertBoxStaticConfig>(): Promise<T> {
+    // TODO: do we need actions.return, if so it needs to be `protected`
+    const host = Services.HostsService.streamlabs;
+
+    return Promise.all(
+      [
+        super.request({
+          url: this.config.staticWidgetConfigUrl!,
+          method: 'GET',
+        })
+          .then(res => res.data),
+        super.request({
+          url: `https://${host}/api/v5/widgets/static/alert-types`,
+          method: 'GET',
+        })
+          .then(res => res.data),
+      ],
+    )
+      .then(([config, alertTypes]: [/* TODO */object, IAlertTypesResponse]) => {
+        return {
+          ...config,
+          alertTypes,
+        } as T;
+      });
+  }
   /**
    * Patch and sanitize the AlertBox settings after fetching data from the server
    */
-  protected override patchAfterFetch(data: any): any {
-    const settings = data.settings;
+  // eslint-disable-next-line prettier/prettier
+  protected override patchAfterFetch({ data }: IAlertBoxApiResponse): any {
+    // TODO
+    const settings: any = { ...data.settings };
 
     // sanitize general settings
-    Object.keys(settings).forEach(key => {
-      settings[key] = this.sanitizeValue(settings[key], key, this.generalMetadata[key]);
-    });
+    Object.keys(settings.global.general)
+      .forEach(key => {
+        settings.global.general[key] = this.sanitizeValue(settings[key], key, this.generalMetadata[key]);
+      });
 
+    // FIXME: move this out
     // create animations
-    data.animationOptions = {};
+    const staticConfig = this.staticConfig;
+    settings.animationOptions = {};
 
-    // create show-animation options
-    data.animationOptions.show = [] as IListOption<string>[];
-    Object.keys(data.show_animations).forEach(groupName => {
-      Object.keys(data.show_animations[groupName]).forEach(value => {
-        data.animationOptions.show.push({ value, label: data.show_animations[groupName][value] });
-      });
-    });
 
-    // create hide-animation options
-    data.animationOptions.hide = [] as IListOption<string>[];
-    Object.keys(data.hide_animations).forEach(groupName => {
-      Object.keys(data.hide_animations[groupName]).forEach(value => {
-        data.animationOptions.hide.push({ value, label: data.hide_animations[groupName][value] });
-      });
-    });
+    const flattenAnimations = (animations: AlertBoxAnimations): IListOption<string>[] => {
+      return animations.flatMap(({ list }) =>
+        list.map(({ key, value }) => ({ label: value, value: key })));
+    };
+
+    // create show and hide animation options
+    settings.animationOptions.show = flattenAnimations(staticConfig.animations.show_animations);
+    settings.animationOptions.hide = flattenAnimations(staticConfig.animations.hide_animations);
 
     // create text-animation options
-    data.animationOptions.text = [] as IListOption<string>[];
-    Object.keys(data.text_animations).forEach(value => {
-      data.animationOptions.text.push({ value, label: data.text_animations[value] });
-    });
+    // API is returning a single object for text animations, we wrap to use same interface
+    settings.animationOptions.text = flattenAnimations([staticConfig.animations.text_animations]);
 
-    return data;
+    return settings;
   }
 
   override setData(data: IAlertBoxState['data']) {
     // save widget data instate and calculate additional state variables
     super.setData(data);
+
+    /* define available alerts */
+    const userPlatforms = Object.keys(Services.UserService.views.platforms!) as TPlatform[];
+
+    // FIXME: what about integrations? original code here specifically did not take those into account
+
+    // TODO: this is complicated, unless we want to use a library, we need multiple level traversal of sorts, and filtering
+    // alertTypes = { streamlabs: { foo: "bar" }, twitch_account: { bar: "baz } }
+    const alertSources = Object.keys(this.staticConfig.alertTypes).filter(alertSource => {
+      // Always add streamlabs (donation, merch, loyalty_store_redemption)
+      return alertSource === 'streamlabs' || userPlatforms.includes(fromServerPlatform(alertSource as TServerPlatform));
+    });
+
+    const availableAlerts = alertSources.flatMap(platformOrIntegration => {
+      // { foo: "bar"}
+      return Object.values(this.staticConfig.alertTypes[platformOrIntegration]).map((alertConfig: IAlertType) => alertConfig.type);
+    });
+
+    assert(availableAlerts.includes('donation'));
+    // FIXME: available alerts does not match anymore
+    this.setAvailableAlerts(availableAlerts as any);
+
+    debugger;
     const allAlerts = values(this.eventsConfig) as IAlertConfig[];
 
     // group alertbox settings by alert types and store them in `state.data.variations`
@@ -214,19 +270,6 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
         this.setVariationSettings(alertEvent.type, 'default', variationSettings as any);
       });
     });
-
-
-    // define available alerts
-    const userPlatforms = Object.keys(Services.UserService.views.platforms!) as TPlatform[];
-    const availableAlerts = allAlerts
-      .filter(alertConfig => {
-        if (alertConfig.platforms && !intersection(alertConfig.platforms, userPlatforms).length) {
-          return false;
-        }
-        return !!this.widgetData.variations[alertConfig.type];
-      })
-      .map(alertConfig => alertConfig.type);
-    this.setAvailableAlerts(availableAlerts);
   }
 
   /**
@@ -311,6 +354,8 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
       settingsPatch[`${apiKey}_${key}`] = variationPatch[key];
     });
 
+    /* FIXME */
+    /*
     // set the same message template for all Cheer variations
     if (type === 'twCheer') {
       const newBitsVariations = this.widgetData.settings.bit_variations.map((variation: any) => {
@@ -320,6 +365,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
       });
       settingsPatch.bit_variations = newBitsVariations;
     }
+     */
 
     // save flatten setting in store and save them on the server
     this.updateSettings({ ...this.widgetData.settings, ...settingsPatch });
@@ -634,3 +680,17 @@ type PickValue<T> = T extends { value?: infer TValue } ? TValue : never;
 type PickValues<T> = {
   [fieldName in keyof T]: PickValue<T[fieldName]>;
 };
+
+/*
+ * Centralize usage of these conversions between server platform e.g `twitch_account` to desktop
+ *  platform e.g `twitch`.
+ * TODO: more usages are needed
+ */
+
+export function fromServerPlatform(platform: TServerPlatform): TPlatform {
+  return platform.replace('_account', '') as TPlatform;
+}
+
+export function toServerPlatform(platform: TPlatform): TServerPlatform {
+  return `${platform}_account` as TServerPlatform;
+}
