@@ -22,10 +22,12 @@ import {
   SceneCollectionsService,
 } from 'services/scene-collections';
 import { UserService } from 'services/user';
-import { SelectionService } from 'services/selection';
+import { SelectionService, Selection } from 'services/selection';
 import { StreamingService } from 'services/streaming';
 import { SettingsService } from 'services/settings';
 import { RunInLoadingMode } from 'services/app/app-decorators';
+import compact from 'lodash/compact';
+import invert from 'lodash/invert';
 
 interface IDisplayVideoSettings {
   defaultDisplay: TDisplayType;
@@ -348,14 +350,23 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
     /**
      * Ensures that the scene nodes are assigned a context
+     * @remark Optimize by only confirming when the collection is switched
      */
-    this.scenesService.sceneSwitched.subscribe(scene => {
-      // if the scene is not empty, handle vertical nodes
-      if (scene?.nodes.length) {
-        this.confirmOrCreateVerticalNodes(scene.id);
+    this.sceneCollectionsService.collectionSwitched.subscribe(collection => {
+      if (this.state.dualOutputMode || (this.state.isLoading && collection.sceneNodeMaps)) {
+        this.confirmOrCreateDualOutputCollection();
       }
-
       this.setIsLoading(false);
+    });
+
+    /**
+     * Set loading state after a scene is switched
+     * @remark This is necessary to turn off the loading state set when making the scene active
+     */
+    this.scenesService.sceneSwitched.subscribe(() => {
+      if (this.state.isLoading) {
+        this.setIsLoading(false);
+      }
     });
 
     /**
@@ -381,7 +392,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
     if (this.state.dualOutputMode) {
       this.disableGlobalRescaleIfNeeded();
-      this.confirmOrCreateVerticalNodes(this.views.activeSceneId);
+      this.confirmOrCreateDualOutputCollection();
 
       /**
        * Selective recording only works with horizontal sources, so don't show the
@@ -401,22 +412,22 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    * Create or confirm nodes for vertical output when toggling vertical display
    * @param sceneId - Id of the scene to map
    */
-  confirmOrCreateVerticalNodes(sceneId: string) {
-    this.convertSceneSources(sceneId);
-    if (!this.views.hasNodeMap(sceneId) && this.state.dualOutputMode) {
+  confirmOrCreateDualOutputCollection() {
+    if (!this.views.hasSceneNodeMaps && this.state.dualOutputMode) {
       try {
-        this.createSceneNodes(sceneId);
+        this.convertSingleOutputToDualOutputCollection();
       } catch (error: unknown) {
         console.error('Error toggling Dual Output mode: ', error);
       }
     } else {
       try {
-        this.confirmOrAssignSceneNodes(sceneId);
+        this.validateDualOutputCollection();
       } catch (error: unknown) {
         console.error('Error toggling Dual Output mode: ', error);
       }
     }
   }
+
   disableGlobalRescaleIfNeeded() {
     // TODO: this could be improved, either by state tracking or making it compatible with dual output
     // For now, disable global Rescale Output under Streaming if dual output is enabled
@@ -437,60 +448,365 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     }
   }
 
-  convertSceneSources(sceneId: string) {
-    const sceneSources = this.scenesService.views.sceneSourcesForScene(sceneId);
-    if (sceneSources.length > 0) {
-      sceneSources.forEach(scene => this.confirmOrCreateVerticalNodes(scene.sourceId));
+  convertSingleOutputToDualOutputCollection() {
+    // establish vertical context if it doesn't exist
+    if (this.state.dualOutputMode && !this.videoSettingsService.contexts.vertical) {
+      this.videoSettingsService.establishVideoContext('vertical');
     }
+
+    // convert all scenes in the single output collection to dual output
+    this.scenesService.views.scenes.forEach(scene => {
+      this.createPartnerNodes(scene.id);
+    });
+  }
+
+  createPartnerNodes(sceneId: string) {
+    this.SET_IS_LOADING(true);
+
+    // the reordering of the nodes below is replicated from the copy nodes command
+    const scene = this.scenesService.views.getScene(sceneId);
+    const selection = new Selection(scene.id, scene.getNodes());
+    const verticalNodes = [] as TSceneNode[];
+
+    const initialNodeOrder = scene.getNodesIds();
+    const nodeIdsMap: Dictionary<string> = {};
+
+    selection.getNodes().forEach(node => {
+      const verticalNode = this.createPartnerNode(node);
+      nodeIdsMap[node.id] = verticalNode.id;
+      verticalNodes.push(verticalNode);
+    });
+
+    // recreate parent/child relationships
+    selection.getNodes().forEach(node => {
+      const mappedNode = scene.getNode(nodeIdsMap[node.id]);
+      const mappedParent = nodeIdsMap[node.parentId]
+        ? scene.getNode(nodeIdsMap[node.parentId])
+        : null;
+
+      if (mappedParent) {
+        mappedNode.setParent(mappedParent.id);
+      }
+
+      this.sceneNodeHandled.next();
+    });
+
+    const order = compact(scene.getNodesIds().map(origNodeId => nodeIdsMap[origNodeId]));
+    scene.setNodesOrder(order.concat(initialNodeOrder));
+
+    this.SET_IS_LOADING(false);
+  }
+
+  /**
+   * Create a partner node to show the source in the opposite display
+   * @remark The horizontal node id is always the key in the scene node map.
+   * @remark The node map entry is so that the horizontal and vertical nodes can refer to each other.
+   * @param node - Node to copy to create a partner node to show the source in the opposite display
+   * @param repair - Whether the node is being created in order to repair a dual output scene collection. Primarily used for setting visibility
+   * @param partnerNodeId - Optional id for the partner node. For a horizontal node, it will be the vertical node id, and vice versa
+   * @param sourceId - Optional source id for the horizontal node. Primarily used for repairing a vertical node that has a different source than the horizontal node. Both nodes should have the same source.
+   *
+   */
+  createPartnerNode(
+    node: TSceneNode,
+    repair: boolean = false,
+    partnerNodeId?: string,
+    sourceId?: string,
+  ): TSceneNode {
+    const scene = node.getScene();
+    const display = node.display === 'vertical' ? 'horizontal' : 'vertical';
+
+    if (node.isFolder()) {
+      // add folder and create node map entry
+      const folder = scene.createFolder(node.name, {
+        id: partnerNodeId,
+        display,
+      });
+
+      this.sceneCollectionsService.createNodeMapEntry(scene.id, folder.id, node.id);
+
+      // ensure correct ordering when creating a horizontal partner node for a vertical node
+      if (display === 'horizontal') {
+        this.sceneCollectionsService.createNodeMapEntry(scene.id, folder.id, node.id);
+        folder.placeBefore(node.id);
+      } else {
+        this.sceneCollectionsService.createNodeMapEntry(scene.id, node.id, folder.id);
+      }
+
+      return folder;
+    } else {
+      // add item
+      const item = scene.addSource(sourceId ?? node.sourceId, {
+        id: partnerNodeId,
+        display,
+      });
+
+      // ensure correct ordering when creating a horizontal partner node for a vertical node
+      if (display === 'horizontal') {
+        this.sceneCollectionsService.createNodeMapEntry(scene.id, item.id, node.id);
+        item.placeBefore(node.id);
+      } else {
+        this.sceneCollectionsService.createNodeMapEntry(scene.id, node.id, item.id);
+      }
+
+      // position all of the nodes in the upper left corner of the vertical display
+      // so that all of the sources are visible
+      item.setTransform({ position: { x: 0, y: 0 } });
+
+      // setting visibility is a little complex because of the different reasons for creating the partner node
+      if (repair) {
+        // by default, hide all horizontal scene items created to repair a dual output scene collection
+        const visibility = repair ? false : node.visible;
+        item.setVisibility(visibility);
+      } else {
+        // by default, show all vertical scene items
+        const visibility = node.display === 'vertical' ? true : node.visible;
+        item.setVisibility(visibility);
+      }
+
+      // match locked
+      item.setLocked(node.locked);
+
+      console.log('created node.sourceId', JSON.stringify(node.sourceId, null, 2));
+      console.log('created item.sourceId', JSON.stringify(item.sourceId, null, 2));
+
+      this.sceneCollectionsService.createNodeMapEntry(scene.id, item.id, node.id);
+      return item;
+    }
+  }
+
+  // createVerticalNode(
+  //   horizontalNode: TSceneNode,
+  //   repair: boolean = false,
+  //   verticalNodeId?: string,
+  //   sourceId?: string,
+  // ): TSceneNode {
+  //   const scene = horizontalNode.getScene();
+
+  //   if (horizontalNode.isFolder()) {
+  //     // add folder and create node map entry
+  //     const folder = scene.createFolder(horizontalNode.name, {
+  //       id: verticalNodeId,
+  //       display: 'vertical',
+  //     });
+  //     this.sceneCollectionsService.createNodeMapEntry(scene.id, horizontalNode.id, folder.id);
+
+  //     this.sceneNodeHandled.next();
+  //     return folder;
+  //   } else {
+  //     // add item
+  //     const item = scene.addSource(sourceId ?? horizontalNode.sourceId, {
+  //       id: verticalNodeId,
+  //       display: 'vertical',
+  //     });
+
+  //     // position all of the nodes in the upper left corner of the vertical display
+  //     // so that all of the sources are visible
+  //     item.setTransform({ position: { x: 0, y: 0 } });
+
+  //     // show all vertical scene items by default
+  //     item.setVisibility(true);
+
+  //     // match locked
+  //     item.setLocked(horizontalNode.locked);
+
+  //     this.sceneCollectionsService.createNodeMapEntry(scene.id, horizontalNode.id, item.id);
+
+  //     this.sceneNodeHandled.next();
+  //     return item;
+  //   }
+  // }
+
+  // /**
+  //  * Create a horizontal node to partner with the vertical node
+  //  * @param verticalNode - Node to copy to the horizontal display
+  //  *
+  //  * @remark The horizontal node id is always the key in the scene node map.
+  //  * The node map entry is so that the horizontal and vertical nodes can refer to each other.
+  //  */
+  // createHorizontalNode(
+  //   verticalNode: TSceneNode,
+  //   repair: boolean = false,
+  //   horizontalNodeId?: string,
+  // ): TSceneNode {
+  //   const scene = verticalNode.getScene();
+
+  //   if (verticalNode.isFolder()) {
+  //     // add folder and create node map entry
+  //     const folder = scene.createFolder(verticalNode.name, {
+  //       id: horizontalNodeId,
+  //       display: 'horizontal',
+  //     });
+  //     folder.placeBefore(verticalNode.id);
+
+  //     this.sceneCollectionsService.createNodeMapEntry(scene.id, folder.id, verticalNode.id);
+
+  //     return folder;
+  //   } else {
+  //     // add item
+  //     const item = scene.addSource(verticalNode.sourceId, {
+  //       id: horizontalNodeId,
+  //       display: 'horizontal',
+  //     });
+
+  //     item.placeBefore(verticalNode.id);
+
+  //     // position all of the nodes in the upper left corner of the vertical display
+  //     // so that all of the sources are visible
+  //     item.setTransform({ position: { x: 0, y: 0 } });
+
+  //     // hide all horizontal scene items created via repair by default
+  //     const visibility = repair ? false : verticalNode.visible;
+  //     item.setVisibility(visibility);
+
+  //     // match locked
+  //     item.setLocked(verticalNode.locked);
+
+  //     this.sceneCollectionsService.createNodeMapEntry(scene.id, item.id, verticalNode.id);
+  //     return item;
+  //   }
+  // }
+
+  /**
+   * Confirm scene node maps and scene nodes for dual output
+   * @remark In order for nodes to reference each other, they must have an entry in the scene node map.
+   * The scene node map is a dictionary where the key is the horizontal node id and the value is the
+   * vertical node id. The scene node map is used to reference the vertical node from the horizontal node
+   * and vice versa.
+   * @remark Partner nodes are the node in the horizontal display and node in the vertical display that render
+   * the same source in their respective displays. In order for the source to show in both displays, each node
+   * must have a partner node.
+   * @remark There is no circumstance where a vertical node should exist without a horizontal node.
+   */
+  validateDualOutputCollection() {
+    // establish vertical context if it doesn't exist
+    if (!this.videoSettingsService.contexts.vertical) {
+      this.videoSettingsService.establishVideoContext('vertical');
+    }
+
+    // if in dual output mode, convert the single output collection to dual output
+    this.scenesService.views.scenes.forEach(scene => {
+      if (this.views.hasNodeMap(scene.id)) {
+        this.validateSceneNodes(scene.id);
+      } else {
+        this.createPartnerNodes(scene.id);
+      }
+    });
   }
 
   /**
    * Assign or confirm node contexts to a dual output scene
    * @param sceneId - Id of the scene to map
    */
-  confirmOrAssignSceneNodes(sceneId: string) {
+  validateSceneNodes(sceneId: string) {
     this.SET_IS_LOADING(true);
-    const sceneItems = this.scenesService.views.getSceneItemsBySceneId(sceneId);
-    if (!sceneItems) return;
+    const sceneNodes = this.scenesService.views.getSceneNodesBySceneId(sceneId);
+    if (!sceneNodes) return;
+    const corruptedNodes: SceneItem[] = [];
 
-    const verticalNodeIds = new Set(this.views.getVerticalNodeIds(sceneId));
+    sceneNodes.forEach((node: TSceneNode, index: number) => {
+      // confirm partner node exists
+      const partnerNode = this.validatePartnerNode(node, sceneId, sceneNodes);
+      // confirm source and output for scene items
+      if (node.isItem()) {
+        const corruptedNode: SceneItem = this.validateSource(
+          node as SceneItem,
+          partnerNode as SceneItem,
+        );
+        if (corruptedNode) {
+          corruptedNodes.push(corruptedNode);
+        }
+        this.validateOutput(node as SceneItem, sceneId);
+      }
 
-    // establish vertical context if it doesn't exist
-    if (
-      this.views.getVerticalNodeIds(sceneId)?.length > 0 &&
-      !this.videoSettingsService.contexts.vertical
-    ) {
-      this.videoSettingsService.establishVideoContext('vertical');
-    }
-
-    sceneItems.forEach((sceneItem: SceneItem, index: number) => {
-      // Item already has a context assigned
-      if (sceneItem?.output) return;
-
-      const display = verticalNodeIds?.has(sceneItem.id) ? 'vertical' : 'horizontal';
-      this.assignNodeContext(sceneItem, sceneItem?.display ?? display);
       this.sceneNodeHandled.next(index);
+    });
+
+    corruptedNodes.forEach(node => {
+      node.remove();
     });
     this.SET_IS_LOADING(false);
   }
 
-  createSceneNodes(sceneId: string) {
-    this.SET_IS_LOADING(true);
-    // establish vertical context if it doesn't exist
-    if (this.state.dualOutputMode && !this.videoSettingsService.contexts.vertical) {
-      this.videoSettingsService.establishVideoContext('vertical');
+  /**
+   * Confirm the partner node exists for the node
+   * @remark The partner node is the node in the opposite display that renders the same source in that display
+   * @param node - The node to confirm the partner node for
+   * @param sceneId - The id of the scene for both nodes
+   * @param sceneNodes - An array of all nodes in the scene, both items and folders
+   * @returns - The created partner node or the existing partner node
+   */
+  validatePartnerNode(node: TSceneNode, sceneId: string, sceneNodes: TSceneNode[]): TSceneNode {
+    const sceneNodeMap = this.views.sceneNodeMaps[sceneId];
+    const invertedSceneNodeMap = invert(this.views.sceneNodeMaps[sceneId]);
+    const repair = node?.display === 'vertical';
+
+    const partnerNodeId =
+      node?.display === 'vertical' ? invertedSceneNodeMap[node.id] : sceneNodeMap[node.id];
+
+    return partnerNodeId
+      ? sceneNodes.find(node => node.id === partnerNodeId)
+      : this.createPartnerNode(node, repair, partnerNodeId);
+  }
+
+  /**
+   * Confirm the source of the node matches the source of the partner node
+   * @remark Primarily used for validating a scene collection on load. If they don't match, recreate the vertical node with the correct source.
+   * @param node
+   * @param partnerNode
+   */
+  validateSource(node: SceneItem, partnerNode: SceneItem): SceneItem {
+    if (node.sourceId === partnerNode.sourceId) return;
+
+    console.log('validating node.sourceId', JSON.stringify(node.sourceId, null, 2));
+    console.log('validating partnerNode.sourceId', JSON.stringify(partnerNode.sourceId, null, 2));
+
+    const horizontalNode = node.display === 'horizontal' ? node : partnerNode;
+    const verticalNode = node.display === 'vertical' ? node : partnerNode;
+    const matchVisibility = node.display === 'horizontal';
+
+    try {
+      console.log('REMOVING verticalNode.id', JSON.stringify(verticalNode.id, null, 2));
+      const settings = Object.assign(verticalNode.getSettings());
+      verticalNode.remove();
+      console.log('REMOVED verticalNode.id', JSON.stringify(verticalNode.id, null, 2));
+
+      const newPartner = this.createPartnerNode(
+        horizontalNode,
+        matchVisibility,
+        verticalNode.id,
+        horizontalNode.sourceId,
+      );
+      (newPartner as SceneItem).setSettings(settings);
+    } catch (error: unknown) {
+      console.error('Error recreating vertical node: ', error);
+
+      // if the vertical node does not exist due to the dual output scene being corrupt,
+      // just create a new one
+      this.createPartnerNode(
+        horizontalNode,
+        matchVisibility,
+        verticalNode.id,
+        horizontalNode.sourceId,
+      );
     }
 
-    const nodes = this.scenesService.views.getScene(sceneId).getNodes();
+    return verticalNode;
+  }
 
-    this.editorCommandsService.executeCommand(
-      'CopyNodesCommand',
-      this.scenesService.views.getScene(sceneId).getSelection(nodes),
-      sceneId,
-      false,
-      'vertical',
-    );
-    this.SET_IS_LOADING(false);
+  /**
+   * Confirm the node has an output assigned
+   * @remark All nodes need to have an output assigned in order to be rendered in the displays
+   * @param node - The node to confirm the output for
+   * @param sceneId - The id of the scene for the node
+   */
+  validateOutput(node: SceneItem, sceneId: string) {
+    if (node?.output) return;
+
+    // assign an output to the node if it doesn't exist
+    const verticalNodeIds = new Set(this.views.getVerticalNodeIds(sceneId));
+    const display = verticalNodeIds.has(node.id) ? 'vertical' : 'horizontal';
+    this.assignNodeContext(node, node?.display ?? display);
   }
 
   /**
@@ -510,9 +826,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     sceneId?: string,
     verticalNodeId?: string,
   ) {
-    if (sceneItem.type === 'scene') {
-      this.confirmOrCreateVerticalNodes(sceneItem.sourceId);
-    }
     if (isHorizontalDisplay) {
       // if it's the first display, just assign the scene item's output to a context
       this.assignNodeContext(sceneItem, display);

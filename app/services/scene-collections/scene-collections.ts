@@ -524,6 +524,9 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   private async readCollectionDataAndLoadIntoApplicationState(id: string): Promise<void> {
     const exists = await this.stateService.collectionFileExists(id);
 
+    // necessary for validating a dual output scene collection
+    this.dualOutputService.setIsLoading(true);
+
     if (exists) {
       let data: string;
 
