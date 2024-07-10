@@ -14,7 +14,7 @@ import {
 } from '../../helpers/modules/streaming';
 import { addDummyAccount, withUser } from '../../helpers/webdriver/user';
 import { fillForm, readFields } from '../../helpers/modules/forms';
-import { IDummyTestUser } from '../../data/dummy-accounts';
+import { IDummyTestUser, tikTokUsers } from '../../data/dummy-accounts';
 import { TTikTokLiveScopeTypes } from 'services/platforms/tiktok/api';
 import { isDisplayed, waitForDisplayed } from '../../helpers/modules/core';
 
@@ -22,7 +22,8 @@ useWebdriver();
 
 test('Streaming to TikTok', withUser('twitch', { multistream: false, prime: false }), async t => {
   // test approved status
-  await addDummyAccount('tiktok', { tiktokLiveScope: 'approved' });
+  const { tikTokLiveScope, serverUrl, streamKey } = tikTokUsers.approved;
+  await addDummyAccount('tiktok', { tikTokLiveScope, serverUrl, streamKey });
 
   await prepareToGoLive();
   await clickGoLive();
@@ -30,6 +31,7 @@ test('Streaming to TikTok', withUser('twitch', { multistream: false, prime: fals
 
   // enable tiktok
   await fillForm({
+    twitch: true,
     tiktok: true,
   });
   await waitForSettingsWindowLoaded();
@@ -61,7 +63,12 @@ test('Streaming to TikTok', withUser('twitch', { multistream: false, prime: fals
 });
 
 async function testLiveScope(t: TExecutionContext, scope: TTikTokLiveScopeTypes) {
-  const user: IDummyTestUser = await addDummyAccount('tiktok', { tiktokLiveScope: scope });
+  const { serverUrl, streamKey } = tikTokUsers[scope];
+  const user: IDummyTestUser = await addDummyAccount('tiktok', {
+    tikTokLiveScope: scope,
+    serverUrl,
+    streamKey,
+  });
 
   await clickGoLive();
 
