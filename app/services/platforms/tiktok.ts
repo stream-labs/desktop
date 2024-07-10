@@ -23,7 +23,7 @@ import {
   ITikTokError,
   ITikTokLiveScopeResponse,
   ITikTokStartStreamResponse,
-  TTikTokLiveScopeTypes,
+  TikTokLiveScopeTypes,
   ITikTokGamesData,
 } from './tiktok/api';
 import { I18nService } from 'services/i18n';
@@ -45,7 +45,7 @@ interface ITikTokStartStreamSettings {
   serverUrl: string;
   streamKey: string;
   title: string;
-  liveScope: TTikTokLiveScopeTypes;
+  liveScope: TikTokLiveScopeTypes;
   game: string;
   display: TDisplayType;
   video?: IVideo;
@@ -131,11 +131,11 @@ export class TikTokService
    * @remark Before the implementation of TikTok's Live Access API, users approved for live streaming
    * generated server urls and stream keys that they added in the Go Live window. Until
    */
-  getHasScope(type: TTikTokLiveScopeTypes): boolean {
+  getHasScope(type: TikTokLiveScopeTypes): boolean {
     return this.state.settings?.liveScope === type;
   }
 
-  get scope(): TTikTokLiveScopeTypes {
+  get scope(): TikTokLiveScopeTypes {
     return this.state.settings?.liveScope;
   }
 
@@ -197,6 +197,8 @@ export class TikTokService
   }
 
   async afterGoLive(): Promise<void> {
+    super.afterGoLive();
+
     // open url if stream successfully started
     if (this.scope === 'approved') {
       await this.handleOpenLiveManager();
@@ -483,11 +485,9 @@ export class TikTokService
     // fetch user live access status
     const status = await this.validatePlatform();
 
-    if (!Utils.isTestMode()) {
-      this.usageStatisticsService.recordAnalyticsEvent('TikTokLiveAccess', {
-        status: this.scope,
-      });
-    }
+    this.usageStatisticsService.recordAnalyticsEvent('TikTokLiveAccess', {
+      status: this.scope,
+    });
 
     console.debug('TikTok stream status: ', status);
 
@@ -623,7 +623,7 @@ export class TikTokService
     }, 1000);
   }
 
-  setLiveScope(scope: TTikTokLiveScopeTypes) {
+  setLiveScope(scope: TikTokLiveScopeTypes) {
     this.SET_LIVE_SCOPE(scope);
   }
 
@@ -632,7 +632,7 @@ export class TikTokService
   }
 
   @mutation()
-  SET_LIVE_SCOPE(scope: TTikTokLiveScopeTypes) {
+  SET_LIVE_SCOPE(scope: TikTokLiveScopeTypes) {
     this.state.settings.liveScope = scope;
   }
 

@@ -38,7 +38,7 @@ import { NotificationsService, ENotificationType } from 'services/notifications'
 import { JsonrpcService } from 'services/api/jsonrpc';
 import * as remote from '@electron/remote';
 import { TikTokService } from 'services/platforms/tiktok';
-import { TTikTokLiveScopeTypes } from 'services/platforms/tiktok/api';
+import { TikTokLiveScopeTypes } from 'services/platforms/tiktok/api';
 import { UsageStatisticsService } from 'app-services';
 
 export enum EAuthProcessState {
@@ -500,15 +500,26 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    */
   async addDummyAccount(
     dummyAcct: IPlatformAuth,
-    tiktokLiveScope: TTikTokLiveScopeTypes,
+    settings?: { tikTokLiveScope?: TikTokLiveScopeTypes; serverUrl?: string; streamKey?: string },
   ): Promise<EPlatformCallResult> {
     if (!Utils.isTestMode()) return;
 
     this.UPDATE_PLATFORM(dummyAcct);
 
-    // for tiktok, also update live access status
-    if (tiktokLiveScope) {
-      this.tiktokService.setLiveScope(tiktokLiveScope);
+    // for tiktok, update live access status
+    if (settings?.tikTokLiveScope) {
+      this.tiktokService.setLiveScope(settings?.tikTokLiveScope);
+    }
+
+    // for platforms that require serverUrl and streamKey
+    if (settings?.serverUrl && settings?.streamKey) {
+      const service = getPlatformService(dummyAcct.type);
+
+      service.putChannelInfo({
+        ...service.state.settings,
+        serverUrl: settings.serverUrl,
+        streamKey: settings.streamKey,
+      });
     }
 
     return EPlatformCallResult.Success;

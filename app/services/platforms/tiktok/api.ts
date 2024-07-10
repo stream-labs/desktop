@@ -25,7 +25,7 @@ export enum ETikTokLiveScopeReason {
   APPROVED_OBS = 2,
 }
 
-export type TTikTokLiveScopeTypes = 'approved' | 'not-approved' | 'legacy' | 'denied';
+export type TikTokLiveScopeTypes = 'approved' | 'not-approved' | 'legacy' | 'denied';
 
 export interface ITikTokLiveScopeResponse {
   platform: TPlatform | string;
