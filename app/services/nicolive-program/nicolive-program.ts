@@ -41,7 +41,7 @@ function getCommunityIconUrl(community: Community): string {
     return urls.size_64x64;
   }
   // 目的のサイズが存在しなかった場合、フォールバックとして存在する一つを返す
-  return urls[Object.keys(urls)[0]] || '';
+  return (urls as Dictionary<string>)[Object.keys(urls)[0]] || '';
 }
 
 interface INicoliveProgramState extends ProgramState {

@@ -27,6 +27,7 @@ import OneOffWindow from 'components/windows/OneOffWindow.vue';
 import util from 'util';
 import * as obs from '../obs-api';
 import path from 'path';
+import { isFakeMode } from 'util/fakeMode';
 
 const crashHandler = window['require']('crash-handler');
 
@@ -105,6 +106,10 @@ if ((isProduction || process.env.NAIR_REPORT_TO_SENTRY) && !remote.process.env.N
       Sentry.captureMessage(msg, 'error');
     });
   };
+}
+
+if (isFakeMode()) {
+  console.log('Fake mode is enabled');
 }
 
 require('./app.less');
