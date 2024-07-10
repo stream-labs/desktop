@@ -7,12 +7,7 @@ import { requestUtilsServer, USER_POOL_TOKEN } from './runner-utils';
 import { getApiClient } from '../api-client';
 import { UserService } from '../../../app/services/user';
 import { closeWindow, focusChild, focusMain, focusWindow } from '../modules/core';
-import {
-  isDummyUserPlatform,
-  getDummyUser,
-  IDummyTestUser,
-  TTestDummyUserPlatforms,
-} from '../../data/dummy-accounts';
+import { getDummyUser, IDummyTestUser, TTestDummyUserPlatforms } from '../../data/dummy-accounts';
 import { TTikTokLiveScopeTypes } from 'services/platforms/tiktok/api';
 
 let user: ITestUser; // keep user's name if SLOBS is logged-in
@@ -74,7 +69,17 @@ export interface ITestUserFeatures {
   /**
    * TikTok approval status for showing UI variations
    */
-  tiktokLiveScope?: TTikTokLiveScopeTypes;
+  tikTokLiveScope?: TTikTokLiveScopeTypes;
+
+  /**
+   * Server URL for mocking streaming from platforms that use RTMP
+   */
+  serverUrl?: string;
+
+  /**
+   * Server URL for mocking streaming from platforms that use RTMP
+   */
+  streamKey?: string;
 }
 
 export async function logOut(t: TExecutionContext, skipUI = false) {
@@ -132,7 +137,7 @@ export async function addDummyAccount(
   platform: TTestDummyUserPlatforms,
   features?: ITestUserFeatures,
 ): Promise<IDummyTestUser> {
-  const user = getDummyUser(platform, features?.tiktokLiveScope);
+  const user = getDummyUser(platform, features?.tikTokLiveScope);
 
   const userInfo = {
     type: user.type,
@@ -141,11 +146,15 @@ export async function addDummyAccount(
     token: user.token,
   };
 
+  const settings = {
+    tikTokLiveScope: features?.tikTokLiveScope,
+    serverUrl: user.serverUrl,
+    streamKey: user.streamKey,
+  };
+
   // for now, tiktok live scope is the only feature to add to a dummy account
   const api = await getApiClient();
-  await api
-    .getResource<UserService>('UserService')
-    .addDummyAccount(userInfo, features?.tiktokLiveScope);
+  await api.getResource<UserService>('UserService').addDummyAccount(userInfo, settings);
 
   return user;
 }
