@@ -12,6 +12,6 @@ export const FakeUserAuth: IPlatformAuth = {
     username: 'fake',
     token: 'fake',
     id: '2',
-    userIcon: '',
+    userIcon: 'https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg',
   },
 };

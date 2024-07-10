@@ -9,6 +9,8 @@ import Popper from 'vue-popperjs';
 import * as moment from 'moment';
 import { HostsService } from 'services/hosts';
 import * as remote from '@electron/remote';
+import { UserService } from 'services/user';
+import { FakeUserAuth, isFakeMode } from 'util/fakeMode';
 
 @Component({
   components: {
@@ -20,9 +22,7 @@ export default class ProgramInfo extends Vue {
   nicoliveProgramService: NicoliveProgramService;
   @Inject() streamingService: StreamingService;
   @Inject() hostsService: HostsService;
-
-  // TODO: 後でまとめる
-  programIsMemberOnlyTooltip = 'コミュニティ限定放送';
+  @Inject() userService: UserService;
 
   private subscription: Subscription = null;
 
@@ -61,20 +61,18 @@ export default class ProgramInfo extends Vue {
     return this.nicoliveProgramService.state.title;
   }
 
-  get programIsMemberOnly(): boolean {
-    return this.nicoliveProgramService.state.isMemberOnly;
+  get userName(): string {
+    if (isFakeMode) {
+      return FakeUserAuth.platform.username;
+    }
+    return this.userService.username;
   }
 
-  get communityID(): string {
-    return this.nicoliveProgramService.state.communityID;
-  }
-
-  get communityName(): string {
-    return this.nicoliveProgramService.state.communityName;
-  }
-
-  get communitySymbol(): string {
-    return this.nicoliveProgramService.state.communitySymbol;
+  get userIcon(): string {
+    if (isFakeMode) {
+      return FakeUserAuth.platform.userIcon;
+    }
+    return this.userService.userIcon;
   }
 
   get autoExtensionEnabled() {
@@ -94,10 +92,6 @@ export default class ProgramInfo extends Vue {
 
   get watchPageURL(): string {
     return this.hostsService.getWatchPageURL(this.programID);
-  }
-
-  get communityPageURL(): string {
-    return this.hostsService.getCommunityPageURL(this.communityID);
   }
 
   async editProgram() {
