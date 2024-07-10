@@ -10,7 +10,6 @@ import * as moment from 'moment';
 import { HostsService } from 'services/hosts';
 import * as remote from '@electron/remote';
 import { UserService } from 'services/user';
-import { FakeUserAuth, isFakeMode } from 'util/fakeMode';
 
 @Component({
   components: {
@@ -62,16 +61,10 @@ export default class ProgramInfo extends Vue {
   }
 
   get userName(): string {
-    if (isFakeMode) {
-      return FakeUserAuth.platform.username;
-    }
     return this.userService.username;
   }
 
   get userIcon(): string {
-    if (isFakeMode) {
-      return FakeUserAuth.platform.userIcon;
-    }
     return this.userService.userIcon;
   }
 
