@@ -23,7 +23,7 @@ import {
   ITikTokError,
   ITikTokLiveScopeResponse,
   ITikTokStartStreamResponse,
-  TikTokLiveScopeTypes,
+  TTikTokLiveScopeTypes,
   ITikTokGamesData,
 } from './tiktok/api';
 import { I18nService } from 'services/i18n';
@@ -45,7 +45,7 @@ interface ITikTokStartStreamSettings {
   serverUrl: string;
   streamKey: string;
   title: string;
-  liveScope: TikTokLiveScopeTypes;
+  liveScope: TTikTokLiveScopeTypes;
   game: string;
   display: TDisplayType;
   video?: IVideo;
@@ -131,7 +131,7 @@ export class TikTokService
    * @remark Before the implementation of TikTok's Live Access API, users approved for live streaming
    * generated server urls and stream keys that they added in the Go Live window. Until
    */
-  getHasScope(type: TikTokLiveScopeTypes): boolean {
+  getHasScope(type: TTikTokLiveScopeTypes): boolean {
     return this.state.settings?.liveScope === type;
   }
 
@@ -623,7 +623,7 @@ export class TikTokService
     }, 1000);
   }
 
-  setLiveScope(scope: TikTokLiveScopeTypes) {
+  setLiveScope(scope: TTikTokLiveScopeTypes) {
     this.SET_LIVE_SCOPE(scope);
   }
 
@@ -632,7 +632,7 @@ export class TikTokService
   }
 
   @mutation()
-  SET_LIVE_SCOPE(scope: TikTokLiveScopeTypes) {
+  SET_LIVE_SCOPE(scope: TTikTokLiveScopeTypes) {
     this.state.settings.liveScope = scope;
   }
 

@@ -500,7 +500,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    */
   async addDummyAccount(
     dummyAcct: IPlatformAuth,
-    settings?: { tikTokLiveScope?: TikTokLiveScopeTypes; serverUrl?: string; streamKey?: string },
+    settings?: { tikTokLiveScope?: TTikTokLiveScopeTypes; serverUrl?: string; streamKey?: string },
   ): Promise<EPlatformCallResult> {
     if (!Utils.isTestMode()) return;
 
