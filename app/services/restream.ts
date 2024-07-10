@@ -17,8 +17,6 @@ import { VideoSettingsService, TDisplayType } from './settings-v2/video';
 import { DualOutputService } from './dual-output';
 import { TwitterPlatformService } from './platforms/twitter';
 import { InstagramService } from './platforms/instagram';
-import Utils from './utils';
-import { difference } from 'lodash';
 
 export type TOutputOrientation = 'landscape' | 'portrait';
 interface IRestreamTarget {
@@ -270,20 +268,6 @@ export class RestreamService extends StatefulService<IRestreamState> {
         ),
     ];
 
-    if (Utils.isTestMode()) {
-      // don't actually attempt to go live with dummy accounts, but confirm data exists
-      const dummyRelayTargets = newTargets
-        .filter(t => ['tiktok', 'twitter', 'instagram'].includes(t.platform))
-        .map(t => t);
-
-      const hasCredentials = this.testRelayPlatformTargets(dummyRelayTargets);
-
-      if (hasCredentials) {
-        await this.createTargets(difference(newTargets, dummyRelayTargets));
-      }
-      return;
-    }
-
     // treat tiktok as a custom destination
     const tikTokTarget = newTargets.find(t => t.platform === 'tiktok');
     if (tikTokTarget) {
@@ -390,50 +374,6 @@ export class RestreamService extends StatefulService<IRestreamState> {
     const request = new Request(url, { headers, body, method: 'PUT' });
 
     return fetch(request).then(res => res.json());
-  }
-
-  /**
-   * Used for testing platforms that are restreamed as relay targets
-   * @param relayTargets - targets to test for credentials
-   * @returns boolean for if targets all have credentials
-   */
-  private testRelayPlatformTargets(
-    relayTargets: {
-      platform: TPlatform | 'relay';
-      streamKey: string;
-      mode?: TOutputOrientation;
-    }[],
-  ) {
-    if (!Utils.isTestMode()) return;
-    return relayTargets.reduce((hasCredentials: boolean, target) => {
-      if (
-        target.platform === 'tiktok' &&
-        [
-          this.tiktokService.state.settings.serverUrl,
-          this.tiktokService.state.settings.streamKey,
-        ].includes('')
-      ) {
-        hasCredentials = false;
-      }
-
-      if (
-        target.platform === 'twitter' &&
-        [this.twitterService.state.ingest, this.twitterService.state.streamKey].includes('')
-      ) {
-        hasCredentials = false;
-      }
-
-      if (
-        target.platform === 'instagram' &&
-        [
-          this.instagramService.state.settings.streamUrl,
-          this.instagramService.state.settings.streamKey,
-        ].includes('')
-      ) {
-        hasCredentials = false;
-      }
-      return hasCredentials;
-    }, true);
   }
 
   /* Chat Handling
