@@ -500,15 +500,26 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    */
   async addDummyAccount(
     dummyAcct: IPlatformAuth,
-    tiktokLiveScope: TTikTokLiveScopeTypes,
+    settings?: { tikTokLiveScope?: TTikTokLiveScopeTypes; serverUrl?: string; streamKey?: string },
   ): Promise<EPlatformCallResult> {
     if (!Utils.isTestMode()) return;
 
     this.UPDATE_PLATFORM(dummyAcct);
 
-    // for tiktok, also update live access status
-    if (tiktokLiveScope) {
-      this.tiktokService.setLiveScope(tiktokLiveScope);
+    // for tiktok, update live access status
+    if (settings?.tikTokLiveScope) {
+      this.tiktokService.setLiveScope(settings?.tikTokLiveScope);
+    }
+
+    // for platforms that require serverUrl and streamKey
+    if (settings?.serverUrl && settings?.streamKey) {
+      const service = getPlatformService(dummyAcct.type);
+
+      service.putChannelInfo({
+        ...service.state.settings,
+        serverUrl: settings.serverUrl,
+        streamKey: settings.streamKey,
+      });
     }
 
     return EPlatformCallResult.Success;
