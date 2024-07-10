@@ -12,7 +12,7 @@ export interface IDummyTestUser extends ITestUser {
   ingest?: string;
   streamUrl?: string;
   streamKey?: string;
-  tikTokLiveScope?: TikTokLiveScopeTypes;
+  tikTokLiveScope?: TTikTokLiveScopeTypes;
 }
 
 /*
@@ -140,7 +140,7 @@ export function isDummyUserPlatform(platform: TPlatform): platform is TTestDummy
  */
 export function getDummyUser(
   platform: TTestDummyUserPlatforms,
-  tikTokLiveScope?: TikTokLiveScopeTypes,
+  tikTokLiveScope?: TTikTokLiveScopeTypes,
 ): IDummyTestUser | undefined {
   if (platform === 'instagram') return instagramUser1;
 

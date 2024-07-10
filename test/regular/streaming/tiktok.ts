@@ -62,7 +62,7 @@ test('Streaming to TikTok', withUser('twitch', { multistream: false, prime: fals
   t.pass();
 });
 
-async function testLiveScope(t: TExecutionContext, scope: TikTokLiveScopeTypes) {
+async function testLiveScope(t: TExecutionContext, scope: TTikTokLiveScopeTypes) {
   const { serverUrl, streamKey } = tikTokUsers[scope];
   const user: IDummyTestUser = await addDummyAccount('tiktok', {
     tikTokLiveScope: scope,

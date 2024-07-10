@@ -69,7 +69,7 @@ export interface ITestUserFeatures {
   /**
    * TikTok approval status for showing UI variations
    */
-  tikTokLiveScope?: TikTokLiveScopeTypes;
+  tikTokLiveScope?: TTikTokLiveScopeTypes;
 
   /**
    * Server URL for mocking streaming from platforms that use RTMP
