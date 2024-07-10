@@ -135,7 +135,7 @@ export class TikTokService
     return this.state.settings?.liveScope === type;
   }
 
-  get scope(): TikTokLiveScopeTypes {
+  get scope(): TTikTokLiveScopeTypes {
     return this.state.settings?.liveScope;
   }
 

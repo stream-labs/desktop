@@ -8,7 +8,7 @@ import { getApiClient } from '../api-client';
 import { UserService } from '../../../app/services/user';
 import { closeWindow, focusChild, focusMain, focusWindow } from '../modules/core';
 import { getDummyUser, IDummyTestUser, TTestDummyUserPlatforms } from '../../data/dummy-accounts';
-import { TikTokLiveScopeTypes } from 'services/platforms/tiktok/api';
+import { TTikTokLiveScopeTypes } from 'services/platforms/tiktok/api';
 
 let user: ITestUser; // keep user's name if SLOBS is logged-in
 

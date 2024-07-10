@@ -15,7 +15,7 @@ import {
 import { addDummyAccount, withUser } from '../../helpers/webdriver/user';
 import { fillForm, readFields } from '../../helpers/modules/forms';
 import { IDummyTestUser, tikTokUsers } from '../../data/dummy-accounts';
-import { TikTokLiveScopeTypes } from 'services/platforms/tiktok/api';
+import { TTikTokLiveScopeTypes } from 'services/platforms/tiktok/api';
 import { isDisplayed, waitForDisplayed } from '../../helpers/modules/core';
 
 useWebdriver();

@@ -38,7 +38,7 @@ import { NotificationsService, ENotificationType } from 'services/notifications'
 import { JsonrpcService } from 'services/api/jsonrpc';
 import * as remote from '@electron/remote';
 import { TikTokService } from 'services/platforms/tiktok';
-import { TikTokLiveScopeTypes } from 'services/platforms/tiktok/api';
+import { TTikTokLiveScopeTypes } from 'services/platforms/tiktok/api';
 import { UsageStatisticsService } from 'app-services';
 
 export enum EAuthProcessState {

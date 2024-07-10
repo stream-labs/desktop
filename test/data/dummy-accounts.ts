@@ -1,4 +1,4 @@
-import { TikTokLiveScopeTypes } from 'services/platforms/tiktok/api';
+import { TTikTokLiveScopeTypes } from 'services/platforms/tiktok/api';
 import { ITestUser } from '../helpers/webdriver/user';
 import { TPlatform } from 'services/platforms';
 
