@@ -387,7 +387,7 @@ function DualOutputProgressBar(p: { sceneId: string }) {
   const [current, setCurrent] = useState(0);
 
   const v = useVuex(() => ({
-    total: ScenesService.views.getSceneItemsBySceneId(p.sceneId)?.length ?? 1,
+    total: ScenesService.views.getSceneNodesBySceneId(p.sceneId)?.length ?? 1,
   }));
 
   useSubscription(DualOutputService.sceneNodeHandled, index => setCurrent(index));
