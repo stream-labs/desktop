@@ -197,6 +197,8 @@ export class TikTokService
   }
 
   async afterGoLive(): Promise<void> {
+    super.afterGoLive();
+
     // open url if stream successfully started
     if (this.scope === 'approved') {
       await this.handleOpenLiveManager();
@@ -483,11 +485,9 @@ export class TikTokService
     // fetch user live access status
     const status = await this.validatePlatform();
 
-    if (!Utils.isTestMode()) {
-      this.usageStatisticsService.recordAnalyticsEvent('TikTokLiveAccess', {
-        status: this.scope,
-      });
-    }
+    this.usageStatisticsService.recordAnalyticsEvent('TikTokLiveAccess', {
+      status: this.scope,
+    });
 
     console.debug('TikTok stream status: ', status);
 
