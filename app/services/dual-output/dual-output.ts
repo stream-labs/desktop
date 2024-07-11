@@ -523,8 +523,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         display,
       });
 
-      this.sceneCollectionsService.createNodeMapEntry(scene.id, folder.id, node.id);
-
       // ensure correct ordering when creating a horizontal partner node for a vertical node
       if (display === 'horizontal') {
         this.sceneCollectionsService.createNodeMapEntry(scene.id, folder.id, node.id);
@@ -539,6 +537,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       const item = scene.addSource(sourceId ?? node.sourceId, {
         id: partnerNodeId,
         display,
+        sourceAddOptions: { sourceId: node.sourceId },
       });
 
       // ensure correct ordering when creating a horizontal partner node for a vertical node
@@ -570,7 +569,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       console.log('created node.sourceId', JSON.stringify(node.sourceId, null, 2));
       console.log('created item.sourceId', JSON.stringify(item.sourceId, null, 2));
 
-      this.sceneCollectionsService.createNodeMapEntry(scene.id, item.id, node.id);
       return item;
     }
   }
@@ -702,29 +700,67 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     this.SET_IS_LOADING(true);
     const sceneNodes = this.scenesService.views.getSceneNodesBySceneId(sceneId);
     if (!sceneNodes) return;
-    const corruptedNodes: SceneItem[] = [];
+    const corruptedNodes = [] as SceneItem[];
+    const corruptedNodeIds = new Set<string>();
+
+    // optimize by modifying in place
+    // for (let i = 0; i < sceneNodes.length; i++) {
+    //   const node = sceneNodes[i];
+
+    //   // remove any undefined in the array
+    //   if (!node || !node.id) {
+    //     sceneNodes.splice(i, 1);
+    //     i--;
+    //     return;
+    //   }
+
+    //   const nodeMap =
+    //     node?.display === 'vertical'
+    //       ? invert(this.views.sceneNodeMaps[sceneId])
+    //       : this.views.sceneNodeMaps[sceneId];
+    //   const partnerNode = this.validatePartnerNode(node, nodeMap, sceneNodes);
+
+    //   // confirm source and output for scene items
+    //   if (node.isItem() && partnerNode.isItem()) {
+    //     console.log('items');
+    //     this.validateOutput(node, sceneId);
+    //     const repairedPartnerNode: SceneItem = this.validateSource(node, partnerNode);
+    //     // if (corruptedNode) {
+    //     //   corruptedNodes.push(corruptedNode);
+    //     // }
+    //     // skip handling the partner nodes since they have already been confirmed
+    //     const partnerNodeIndex = sceneNodes.findIndex(
+    //       sceneNode => sceneNode && sceneNode.id === partnerNode.id,
+    //     );
+    //     sceneNodes.splice(partnerNodeIndex, 1, repairedPartnerNode);
+    //   }
+    // }
 
     sceneNodes.forEach((node: TSceneNode, index: number) => {
+      // don't handle corrupted nodes
+      if (corruptedNodeIds.has(node.id)) return;
+
       // confirm partner node exists
-      const partnerNode = this.validatePartnerNode(node, sceneId, sceneNodes);
+      const nodeMap =
+        node?.display === 'vertical'
+          ? invert(this.views.sceneNodeMaps[sceneId])
+          : this.views.sceneNodeMaps[sceneId];
+      const partnerNode = this.validatePartnerNode(node, nodeMap, sceneNodes);
+
       // confirm source and output for scene items
-      if (node.isItem()) {
-        const corruptedNode: SceneItem = this.validateSource(
-          node as SceneItem,
-          partnerNode as SceneItem,
-        );
+      if (node.isItem() && partnerNode.isItem()) {
+        this.validateOutput(node, sceneId);
+        const corruptedNode: SceneItem = this.validateSource(node, partnerNode);
         if (corruptedNode) {
           corruptedNodes.push(corruptedNode);
+          corruptedNodeIds.add(corruptedNode.id);
         }
-        this.validateOutput(node as SceneItem, sceneId);
       }
-
-      this.sceneNodeHandled.next(index);
     });
 
-    corruptedNodes.forEach(node => {
-      node.remove();
-    });
+    // corruptedNodes.forEach(node => {
+    //   node.remove();
+    // });
     this.SET_IS_LOADING(false);
   }
 
@@ -736,17 +772,25 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    * @param sceneNodes - An array of all nodes in the scene, both items and folders
    * @returns - The created partner node or the existing partner node
    */
-  validatePartnerNode(node: TSceneNode, sceneId: string, sceneNodes: TSceneNode[]): TSceneNode {
-    const sceneNodeMap = this.views.sceneNodeMaps[sceneId];
-    const invertedSceneNodeMap = invert(this.views.sceneNodeMaps[sceneId]);
-    const repair = node?.display === 'vertical';
+  validatePartnerNode(
+    node: TSceneNode,
+    nodeMap: Dictionary<string>,
+    sceneNodes: TSceneNode[],
+  ): TSceneNode {
+    const partnerNodeId = nodeMap[node.id];
 
-    const partnerNodeId =
-      node?.display === 'vertical' ? invertedSceneNodeMap[node.id] : sceneNodeMap[node.id];
+    if (!partnerNodeId) {
+      return this.createPartnerNode(node);
+    }
 
-    return partnerNodeId
-      ? sceneNodes.find(node => node.id === partnerNodeId)
-      : this.createPartnerNode(node, repair, partnerNodeId);
+    // corrupted scenes may be missing nodes
+    const partnerNode = sceneNodes.find(node => node && node.id === partnerNodeId);
+
+    if (!partnerNode) {
+      return this.createPartnerNode(node, node?.display === 'horizontal', partnerNodeId);
+    }
+
+    return partnerNode;
   }
 
   /**
@@ -756,42 +800,57 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    * @param partnerNode
    */
   validateSource(node: SceneItem, partnerNode: SceneItem): SceneItem {
+    if (node.sourceId.split('_')[0] === 'game') {
+      console.log('game node.sourceId', JSON.stringify(node.sourceId, null, 2));
+      console.log('game partnerNode.sourceId', JSON.stringify(partnerNode.sourceId, null, 2));
+    }
     if (node.sourceId === partnerNode.sourceId) return;
 
-    console.log('validating node.sourceId', JSON.stringify(node.sourceId, null, 2));
-    console.log('validating partnerNode.sourceId', JSON.stringify(partnerNode.sourceId, null, 2));
+    console.log('fixing node.sourceId', JSON.stringify(node.sourceId, null, 2));
+    console.log('fixing partnerNode.sourceId', JSON.stringify(partnerNode.sourceId, null, 2));
 
     const horizontalNode = node.display === 'horizontal' ? node : partnerNode;
     const verticalNode = node.display === 'vertical' ? node : partnerNode;
     const matchVisibility = node.display === 'horizontal';
 
-    try {
-      console.log('REMOVING verticalNode.id', JSON.stringify(verticalNode.id, null, 2));
-      const settings = Object.assign(verticalNode.getSettings());
-      verticalNode.remove();
-      console.log('REMOVED verticalNode.id', JSON.stringify(verticalNode.id, null, 2));
+    const settings = Object.assign(verticalNode.getSettings());
+    const verticalNodeId = verticalNode.id;
+    this.sceneCollectionsService.removeNodeMapEntry(horizontalNode.id, horizontalNode.sceneId);
+    verticalNode.remove();
+    const newPartner = this.createPartnerNode(
+      horizontalNode,
+      matchVisibility,
+      verticalNodeId,
+      horizontalNode.sourceId,
+    ) as SceneItem;
+    newPartner.setTransform(settings.transform);
+    return partnerNode;
 
-      const newPartner = this.createPartnerNode(
-        horizontalNode,
-        matchVisibility,
-        verticalNode.id,
-        horizontalNode.sourceId,
-      );
-      (newPartner as SceneItem).setSettings(settings);
-    } catch (error: unknown) {
-      console.error('Error recreating vertical node: ', error);
+    // try {
+    //   console.log('REMOVING verticalNode.id', JSON.stringify(verticalNode.id, null, 2));
+    //   const settings = Object.assign(verticalNode.getSettings());
+    //   new Promise(resolve => resolve(verticalNode.remove()));
+    //   console.log('REMOVED verticalNode.id', JSON.stringify(verticalNode.id, null, 2));
 
-      // if the vertical node does not exist due to the dual output scene being corrupt,
-      // just create a new one
-      this.createPartnerNode(
-        horizontalNode,
-        matchVisibility,
-        verticalNode.id,
-        horizontalNode.sourceId,
-      );
-    }
+    //   const newPartner = this.createPartnerNode(
+    //     horizontalNode,
+    //     matchVisibility,
+    //     verticalNode.id,
+    //     horizontalNode.sourceId,
+    //   );
+    //   (newPartner as SceneItem).setTransform(settings.transform);
+    // } catch (error: unknown) {
+    //   console.error('Error recreating vertical node: ', error);
 
-    return verticalNode;
+    //   // if the vertical node does not exist due to the dual output scene being corrupt,
+    //   // just create a new one
+    //   this.createPartnerNode(
+    //     horizontalNode,
+    //     matchVisibility,
+    //     verticalNode.id,
+    //     horizontalNode.sourceId,
+    //   );
+    // }
   }
 
   /**
@@ -868,7 +927,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    * Settings for platforms to displays
    */
 
-  updatePlatformSetting(platform: string, display: TDisplayType) {
+  updatePlatformSetting(platform: TPlatform, display: TDisplayType) {
     this.UPDATE_PLATFORM_SETTING(platform, display);
   }
 
@@ -923,7 +982,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   }
 
   @mutation()
-  private UPDATE_PLATFORM_SETTING(platform: TPlatform | string, display: TDisplayType) {
+  private UPDATE_PLATFORM_SETTING(platform: TPlatform, display: TDisplayType) {
     this.state.platformSettings = {
       ...this.state.platformSettings,
       [platform]: { ...this.state.platformSettings[platform], display },
