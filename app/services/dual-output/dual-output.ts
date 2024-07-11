@@ -566,104 +566,9 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       // match locked
       item.setLocked(node.locked);
 
-      console.log('created node.sourceId', JSON.stringify(node.sourceId, null, 2));
-      console.log('created item.sourceId', JSON.stringify(item.sourceId, null, 2));
-
       return item;
     }
   }
-
-  // createVerticalNode(
-  //   horizontalNode: TSceneNode,
-  //   repair: boolean = false,
-  //   verticalNodeId?: string,
-  //   sourceId?: string,
-  // ): TSceneNode {
-  //   const scene = horizontalNode.getScene();
-
-  //   if (horizontalNode.isFolder()) {
-  //     // add folder and create node map entry
-  //     const folder = scene.createFolder(horizontalNode.name, {
-  //       id: verticalNodeId,
-  //       display: 'vertical',
-  //     });
-  //     this.sceneCollectionsService.createNodeMapEntry(scene.id, horizontalNode.id, folder.id);
-
-  //     this.sceneNodeHandled.next();
-  //     return folder;
-  //   } else {
-  //     // add item
-  //     const item = scene.addSource(sourceId ?? horizontalNode.sourceId, {
-  //       id: verticalNodeId,
-  //       display: 'vertical',
-  //     });
-
-  //     // position all of the nodes in the upper left corner of the vertical display
-  //     // so that all of the sources are visible
-  //     item.setTransform({ position: { x: 0, y: 0 } });
-
-  //     // show all vertical scene items by default
-  //     item.setVisibility(true);
-
-  //     // match locked
-  //     item.setLocked(horizontalNode.locked);
-
-  //     this.sceneCollectionsService.createNodeMapEntry(scene.id, horizontalNode.id, item.id);
-
-  //     this.sceneNodeHandled.next();
-  //     return item;
-  //   }
-  // }
-
-  // /**
-  //  * Create a horizontal node to partner with the vertical node
-  //  * @param verticalNode - Node to copy to the horizontal display
-  //  *
-  //  * @remark The horizontal node id is always the key in the scene node map.
-  //  * The node map entry is so that the horizontal and vertical nodes can refer to each other.
-  //  */
-  // createHorizontalNode(
-  //   verticalNode: TSceneNode,
-  //   repair: boolean = false,
-  //   horizontalNodeId?: string,
-  // ): TSceneNode {
-  //   const scene = verticalNode.getScene();
-
-  //   if (verticalNode.isFolder()) {
-  //     // add folder and create node map entry
-  //     const folder = scene.createFolder(verticalNode.name, {
-  //       id: horizontalNodeId,
-  //       display: 'horizontal',
-  //     });
-  //     folder.placeBefore(verticalNode.id);
-
-  //     this.sceneCollectionsService.createNodeMapEntry(scene.id, folder.id, verticalNode.id);
-
-  //     return folder;
-  //   } else {
-  //     // add item
-  //     const item = scene.addSource(verticalNode.sourceId, {
-  //       id: horizontalNodeId,
-  //       display: 'horizontal',
-  //     });
-
-  //     item.placeBefore(verticalNode.id);
-
-  //     // position all of the nodes in the upper left corner of the vertical display
-  //     // so that all of the sources are visible
-  //     item.setTransform({ position: { x: 0, y: 0 } });
-
-  //     // hide all horizontal scene items created via repair by default
-  //     const visibility = repair ? false : verticalNode.visible;
-  //     item.setVisibility(visibility);
-
-  //     // match locked
-  //     item.setLocked(verticalNode.locked);
-
-  //     this.sceneCollectionsService.createNodeMapEntry(scene.id, item.id, verticalNode.id);
-  //     return item;
-  //   }
-  // }
 
   /**
    * Confirm scene node maps and scene nodes for dual output
@@ -700,41 +605,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     this.SET_IS_LOADING(true);
     const sceneNodes = this.scenesService.views.getSceneNodesBySceneId(sceneId);
     if (!sceneNodes) return;
-    const corruptedNodes = [] as SceneItem[];
     const corruptedNodeIds = new Set<string>();
-
-    // optimize by modifying in place
-    // for (let i = 0; i < sceneNodes.length; i++) {
-    //   const node = sceneNodes[i];
-
-    //   // remove any undefined in the array
-    //   if (!node || !node.id) {
-    //     sceneNodes.splice(i, 1);
-    //     i--;
-    //     return;
-    //   }
-
-    //   const nodeMap =
-    //     node?.display === 'vertical'
-    //       ? invert(this.views.sceneNodeMaps[sceneId])
-    //       : this.views.sceneNodeMaps[sceneId];
-    //   const partnerNode = this.validatePartnerNode(node, nodeMap, sceneNodes);
-
-    //   // confirm source and output for scene items
-    //   if (node.isItem() && partnerNode.isItem()) {
-    //     console.log('items');
-    //     this.validateOutput(node, sceneId);
-    //     const repairedPartnerNode: SceneItem = this.validateSource(node, partnerNode);
-    //     // if (corruptedNode) {
-    //     //   corruptedNodes.push(corruptedNode);
-    //     // }
-    //     // skip handling the partner nodes since they have already been confirmed
-    //     const partnerNodeIndex = sceneNodes.findIndex(
-    //       sceneNode => sceneNode && sceneNode.id === partnerNode.id,
-    //     );
-    //     sceneNodes.splice(partnerNodeIndex, 1, repairedPartnerNode);
-    //   }
-    // }
 
     sceneNodes.forEach((node: TSceneNode, index: number) => {
       // don't handle corrupted nodes
@@ -752,15 +623,11 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         this.validateOutput(node, sceneId);
         const corruptedNode: SceneItem = this.validateSource(node, partnerNode);
         if (corruptedNode) {
-          corruptedNodes.push(corruptedNode);
           corruptedNodeIds.add(corruptedNode.id);
         }
       }
     });
 
-    // corruptedNodes.forEach(node => {
-    //   node.remove();
-    // });
     this.SET_IS_LOADING(false);
   }
 
@@ -800,14 +667,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    * @param partnerNode
    */
   validateSource(node: SceneItem, partnerNode: SceneItem): SceneItem {
-    if (node.sourceId.split('_')[0] === 'game') {
-      console.log('game node.sourceId', JSON.stringify(node.sourceId, null, 2));
-      console.log('game partnerNode.sourceId', JSON.stringify(partnerNode.sourceId, null, 2));
-    }
     if (node.sourceId === partnerNode.sourceId) return;
-
-    console.log('fixing node.sourceId', JSON.stringify(node.sourceId, null, 2));
-    console.log('fixing partnerNode.sourceId', JSON.stringify(partnerNode.sourceId, null, 2));
 
     const horizontalNode = node.display === 'horizontal' ? node : partnerNode;
     const verticalNode = node.display === 'vertical' ? node : partnerNode;
@@ -825,32 +685,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     ) as SceneItem;
     newPartner.setTransform(settings.transform);
     return partnerNode;
-
-    // try {
-    //   console.log('REMOVING verticalNode.id', JSON.stringify(verticalNode.id, null, 2));
-    //   const settings = Object.assign(verticalNode.getSettings());
-    //   new Promise(resolve => resolve(verticalNode.remove()));
-    //   console.log('REMOVED verticalNode.id', JSON.stringify(verticalNode.id, null, 2));
-
-    //   const newPartner = this.createPartnerNode(
-    //     horizontalNode,
-    //     matchVisibility,
-    //     verticalNode.id,
-    //     horizontalNode.sourceId,
-    //   );
-    //   (newPartner as SceneItem).setTransform(settings.transform);
-    // } catch (error: unknown) {
-    //   console.error('Error recreating vertical node: ', error);
-
-    //   // if the vertical node does not exist due to the dual output scene being corrupt,
-    //   // just create a new one
-    //   this.createPartnerNode(
-    //     horizontalNode,
-    //     matchVisibility,
-    //     verticalNode.id,
-    //     horizontalNode.sourceId,
-    //   );
-    // }
   }
 
   /**
