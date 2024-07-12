@@ -28,9 +28,9 @@ import { SettingsService } from 'services/settings';
 import { RunInLoadingMode } from 'services/app/app-decorators';
 import compact from 'lodash/compact';
 import invert from 'lodash/invert';
+import forEachRight from 'lodash/forEachRight';
 
 interface IDisplayVideoSettings {
-  defaultDisplay: TDisplayType;
   horizontal: IVideoInfo;
   vertical: IVideoInfo;
   activeDisplays: {
@@ -39,7 +39,6 @@ interface IDisplayVideoSettings {
   };
 }
 interface IDualOutputServiceState {
-  displays: TDisplayType[];
   platformSettings: TDualOutputPlatformSettings;
   destinationSettings: Dictionary<IDualOutputDestinationSetting>;
   dualOutputMode: boolean;
@@ -150,20 +149,12 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return Object.values(this.activeSceneNodeMap);
   }
 
-  get displays() {
-    return this.state.displays;
-  }
-
   get videoSettings() {
     return this.state.videoSettings;
   }
 
   get activeDisplays() {
     return this.state.videoSettings.activeDisplays;
-  }
-
-  get defaultDisplay() {
-    return this.state.videoSettings.defaultDisplay;
   }
 
   get showHorizontalDisplay() {
@@ -317,12 +308,10 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   @Inject() private settingsService: SettingsService;
 
   static defaultState: IDualOutputServiceState = {
-    displays: ['horizontal', 'vertical'],
     platformSettings: DualOutputPlatformSettings,
     destinationSettings: {},
     dualOutputMode: false,
     videoSettings: {
-      defaultDisplay: 'horizontal',
       horizontal: null,
       vertical: verticalDisplayData, // get settings for horizontal display from obs directly
       activeDisplays: {
@@ -529,6 +518,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         folder.placeBefore(node.id);
       } else {
         this.sceneCollectionsService.createNodeMapEntry(scene.id, node.id, folder.id);
+        folder.placeAfter(node.id);
       }
 
       return folder;
@@ -537,7 +527,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       const item = scene.addSource(sourceId ?? node.sourceId, {
         id: partnerNodeId,
         display,
-        sourceAddOptions: { sourceId: node.sourceId },
+        sourceAddOptions: { sourceId },
       });
 
       // ensure correct ordering when creating a horizontal partner node for a vertical node
@@ -546,6 +536,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         item.placeBefore(node.id);
       } else {
         this.sceneCollectionsService.createNodeMapEntry(scene.id, node.id, item.id);
+        item.placeAfter(node.id);
       }
 
       // position all of the nodes in the upper left corner of the vertical display
@@ -559,7 +550,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         item.setVisibility(visibility);
       } else {
         // by default, show all vertical scene items
-        const visibility = node.display === 'vertical' ? true : node.visible;
+        const visibility = item.display === 'vertical' ? true : node.visible;
         item.setVisibility(visibility);
       }
 
@@ -607,7 +598,10 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     if (!sceneNodes) return;
     const corruptedNodeIds = new Set<string>();
 
-    sceneNodes.forEach((node: TSceneNode, index: number) => {
+    // Iterate over the scene nodes in reverse order to automatically handle correctly ordering
+    // any nodes created as a part of the validation process. This optimizes validation by skipping
+    // an extra loop over the nodes to reorder them.
+    forEachRight(sceneNodes, (node: TSceneNode, index: number) => {
       // don't handle corrupted nodes
       if (corruptedNodeIds.has(node.id)) return;
 
@@ -626,6 +620,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
           corruptedNodeIds.add(corruptedNode.id);
         }
       }
+
+      this.sceneNodeHandled.next(index);
     });
 
     this.SET_IS_LOADING(false);
@@ -647,7 +643,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     const partnerNodeId = nodeMap[node.id];
 
     if (!partnerNodeId) {
-      return this.createPartnerNode(node);
+      return this.createPartnerNode(node, node?.display === 'horizontal');
     }
 
     // corrupted scenes may be missing nodes
@@ -672,18 +668,22 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     const horizontalNode = node.display === 'horizontal' ? node : partnerNode;
     const verticalNode = node.display === 'vertical' ? node : partnerNode;
     const matchVisibility = node.display === 'horizontal';
-
     const settings = Object.assign(verticalNode.getSettings());
     const verticalNodeId = verticalNode.id;
+
+    // remove old node
     this.sceneCollectionsService.removeNodeMapEntry(horizontalNode.id, horizontalNode.sceneId);
     verticalNode.remove();
+
+    // create new node
     const newPartner = this.createPartnerNode(
       horizontalNode,
       matchVisibility,
       verticalNodeId,
       horizontalNode.sourceId,
     ) as SceneItem;
-    newPartner.setTransform(settings.transform);
+    newPartner.setSettings(settings);
+
     return partnerNode;
   }
 
