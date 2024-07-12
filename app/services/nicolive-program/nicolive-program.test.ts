@@ -1,13 +1,21 @@
 import { createSetupFunction } from 'util/test-setup';
 import { WrappedResult } from './NicoliveClient';
-import { Community } from './ResponseTypes';
+import { Community, ProgramInfo } from './ResponseTypes';
 import { MAX_PROGRAM_DURATION_SECONDS } from './nicolive-constants';
 
 type NicoliveProgramService = import('./nicolive-program').NicoliveProgramService;
 
-const rooms = [{ id: 0, name: 'arena', webSocketUri: 'https://example.com/lv1', threadId: 'hoge' }];
+const rooms: ProgramInfo['data']['rooms'] = [{ viewUri: 'https://example.com/lv1' }];
 
-const schedules = {
+const schedules: Dictionary<{
+  nicoliveProgramId: string;
+  socialGroupId: string;
+  status: ProgramInfo['data']['status'];
+  vposBaseAt: number;
+  onAirBeginAt: number;
+  onAirEndAt: number;
+  rooms: ProgramInfo['data']['rooms'];
+}> = {
   ch: {
     nicoliveProgramId: 'lv1',
     socialGroupId: 'ch1',
@@ -64,7 +72,7 @@ const schedules = {
   },
 };
 
-const programs = {
+const programs: Dictionary<Partial<ProgramInfo['data']>> = {
   test: {
     status: schedules.test.status,
     title: '番組タイトル',
@@ -283,11 +291,10 @@ test('fetchProgram:testのときはshowPlaceholderをtrueにする', async () =>
           "endTime": 150,
           "isMemberOnly": true,
           "programID": "lv1",
-          "roomThreadID": "hoge",
-          "roomURL": "https://example.com/lv1",
           "startTime": 100,
           "status": "test",
           "title": "番組タイトル",
+          "viewUri": "https://example.com/lv1",
           "vposBaseTime": 50,
         },
       ],
@@ -342,11 +349,10 @@ test('fetchProgram:成功', async () => {
           "endTime": 150,
           "isMemberOnly": true,
           "programID": "lv1",
-          "roomThreadID": "hoge",
-          "roomURL": "https://example.com/lv1",
           "startTime": 100,
           "status": "onAir",
           "title": "番組タイトル",
+          "viewUri": "https://example.com/lv1",
           "vposBaseTime": 50,
         },
       ],
@@ -431,11 +437,10 @@ test('fetchProgramでコミュ情報がエラーでも番組があったら先�
           "endTime": 150,
           "isMemberOnly": true,
           "programID": "lv1",
-          "roomThreadID": "hoge",
-          "roomURL": "https://example.com/lv1",
           "startTime": 100,
           "status": "onAir",
           "title": "番組タイトル",
+          "viewUri": "https://example.com/lv1",
           "vposBaseTime": 50,
         },
       ],
@@ -467,11 +472,10 @@ test('refreshProgram:成功', async () => {
         "description": "番組詳細情報",
         "endTime": 150,
         "isMemberOnly": true,
-        "roomThreadID": "hoge",
-        "roomURL": "https://example.com/lv1",
         "startTime": 100,
         "status": "onAir",
         "title": "番組タイトル",
+        "viewUri": "https://example.com/lv1",
       },
     ]
   `);

@@ -62,16 +62,8 @@ export interface ProgramInfo {
         };
     /** コメントのルーム */
     rooms: {
-      /** 部屋ID */
-      id: number;
-      /** 部屋名 */
-      name: string;
-      /** コメントサーバーの接続先(WebSocket) */
-      webSocketUri: string;
-      /** コメントサーバーの接続先(XmlSocket) */
-      xmlSocketUri: string;
-      /** スレッドID */
-      threadId: string;
+      /** コメントサーバーの接続先(Ndgr) View URL */
+      viewUri: string;
     }[];
     /** 番組タイトル */
     title: string;

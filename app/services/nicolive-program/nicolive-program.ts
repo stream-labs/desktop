@@ -25,8 +25,7 @@ type ProgramState = {
   communityID: string;
   communityName: string;
   communitySymbol: string;
-  roomURL: string;
-  roomThreadID: string;
+  viewUri: string; // Ndgr View URL
   viewers: number;
   comments: number;
   adPoint: number;
@@ -88,8 +87,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     communityID: '',
     communityName: '',
     communitySymbol: '',
-    roomURL: '',
-    roomThreadID: '',
+    viewUri: '',
     viewers: 0,
     comments: 0,
     adPoint: 0,
@@ -251,8 +249,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
         communityID: 'coDEBUG',
         communityName: 'DEBUGコミュニティ',
         communitySymbol: '',
-        roomURL: 'URL',
-        roomThreadID: 'thread',
+        viewUri: 'viewUri',
       });
       return;
     }
@@ -298,8 +295,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
       const community = isOk(communityResponse) && communityResponse.value;
       const program = programResponse.value;
 
-      // アリーナのみ取得する
-      const room = program.rooms.find(r => r.id === 0);
+      const room = program.rooms.length > 0 ? program.rooms[0] : undefined;
 
       this.setState({
         programID: nicoliveProgramId,
@@ -313,8 +309,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
         communityID: socialGroupId,
         communityName: community ? community.name : '(コミュニティの取得に失敗しました)',
         communitySymbol: community ? getCommunityIconUrl(community) : '',
-        roomURL: room ? room.webSocketUri : '',
-        roomThreadID: room ? room.threadId : '',
+        viewUri: room ? room.viewUri : '',
         ...(program.moderatorViewUri ? { moderatorViewUri: program.moderatorViewUri } : {}),
       });
       if (program.status === 'test') {
@@ -336,7 +331,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     }
 
     const program = programResponse.value;
-    const room = program.rooms.find(r => r.id === 0);
+    const room = program.rooms.length > 0 ? program.rooms[0] : undefined;
 
     this.setState({
       status: program.status,
@@ -345,8 +340,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
       startTime: program.beginAt,
       endTime: program.endAt,
       isMemberOnly: program.isMemberOnly,
-      roomURL: room ? room.webSocketUri : '',
-      roomThreadID: room ? room.threadId : '',
+      viewUri: room ? room.viewUri : '',
     });
   }
 
