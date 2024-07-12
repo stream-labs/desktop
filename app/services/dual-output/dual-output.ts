@@ -342,7 +342,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
      * @remark Optimize by only confirming when the collection is switched
      */
     this.sceneCollectionsService.collectionSwitched.subscribe(collection => {
-      if (this.state.dualOutputMode || (this.state.isLoading && collection.sceneNodeMaps)) {
+      if (this.state.dualOutputMode || this.views.hasSceneNodeMaps) {
         this.confirmOrCreateDualOutputCollection();
       }
       this.setIsLoading(false);
@@ -383,8 +383,9 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       this.disableGlobalRescaleIfNeeded();
 
       // All dual output scene collections will have been validated when the collection was switched
-      // so there is no need to validate the scene nodes again
-      if (!this.views.hasSceneNodeMaps) {
+      // so there is no need to validate the scene nodes again. So just convert the single output collection
+      // to dual output if needed.
+      if (this.views.hasSceneNodeMaps) {
         this.convertSingleOutputToDualOutputCollection();
       }
 
@@ -400,6 +401,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     }
 
     this.settingsService.showSettings('Video');
+    this.SET_IS_LOADING(false);
   }
 
   /**
@@ -407,7 +409,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    * @param sceneId - Id of the scene to map
    */
   confirmOrCreateDualOutputCollection() {
-    if (!this.views.hasSceneNodeMaps && this.state.dualOutputMode) {
+    if (!this.views.hasSceneNodeMaps) {
       try {
         this.convertSingleOutputToDualOutputCollection();
       } catch (error: unknown) {
@@ -444,14 +446,18 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
   convertSingleOutputToDualOutputCollection() {
     // establish vertical context if it doesn't exist
-    if (this.state.dualOutputMode && !this.videoSettingsService.contexts.vertical) {
+    if (!this.videoSettingsService.contexts.vertical) {
       this.videoSettingsService.establishVideoContext('vertical');
     }
 
-    // convert all scenes in the single output collection to dual output
-    this.scenesService.views.scenes.forEach(scene => {
-      this.createPartnerNodes(scene.id);
-    });
+    try {
+      // convert all scenes in the single output collection to dual output
+      this.scenesService.views.scenes.forEach(scene => {
+        this.createPartnerNodes(scene.id);
+      });
+    } catch (error: unknown) {
+      console.error('Error toggling Dual Output mode: ', error);
+    }
   }
 
   createPartnerNodes(sceneId: string) {
@@ -532,7 +538,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       const item = scene.addSource(sourceId ?? node.sourceId, {
         id: partnerNodeId,
         display,
-        sourceAddOptions: { sourceId },
+        sourceAddOptions: { sourceId: node.sourceId },
       });
 
       // ensure correct ordering when creating a horizontal partner node for a vertical node

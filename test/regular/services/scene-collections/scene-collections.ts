@@ -7,6 +7,7 @@ import {
 } from '../../../helpers/webdriver';
 import { logIn } from '../../../helpers/webdriver/user';
 import { toggleDualOutputMode } from '../../../helpers/modules/dual-output';
+import { focusMain, isDisplayed } from '../../../helpers/modules/core';
 
 const fs = require('fs');
 const path = require('path');

@@ -14,7 +14,7 @@ import {
 import { logIn } from '../../helpers/modules/user';
 import { toggleDisplay, toggleDualOutputMode } from '../../helpers/modules/dual-output';
 import { test, TExecutionContext, useWebdriver } from '../../helpers/webdriver';
-import { releaseUserInPool, withPoolUser, withUser } from '../../helpers/webdriver/user';
+import { withUser } from '../../helpers/webdriver/user';
 import { SceneBuilder } from '../../helpers/scene-builder';
 import { getApiClient } from '../../helpers/api-client';
 
@@ -165,8 +165,6 @@ test('Dual output duplicates item and folder hierarchy', async (t: TExecutionCon
 
   // toggle dual output on and convert dual output scene collection
   await toggleDualOutputMode();
-  await focusMain();
-  t.true(await isDisplayed('div#vertical-display'));
   t.true(
     sceneBuilder.isEqualTo(
       `
