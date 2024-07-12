@@ -216,6 +216,12 @@ class ScenesViews extends ViewHandler<IScenesState> {
     return scene.getItems();
   }
 
+  getSceneNodesBySceneId(sceneId: string): TSceneNode[] | undefined {
+    const scene: Scene | null = this.getScene(sceneId);
+    if (!scene) return;
+    return scene.getNodes();
+  }
+
   /**
    * Returns an array of all scene items across all scenes
    * referencing the given source id.
