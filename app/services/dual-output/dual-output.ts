@@ -381,7 +381,12 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
     if (this.state.dualOutputMode) {
       this.disableGlobalRescaleIfNeeded();
-      this.confirmOrCreateDualOutputCollection();
+
+      // All dual output scene collections will have been validated when the collection was switched
+      // so there is no need to validate the scene nodes again
+      if (!this.views.hasSceneNodeMaps) {
+        this.convertSingleOutputToDualOutputCollection();
+      }
 
       /**
        * Selective recording only works with horizontal sources, so don't show the
