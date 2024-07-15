@@ -351,10 +351,15 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
      * @remark Optimize by only confirming when the collection is switched
      */
     this.sceneCollectionsService.collectionSwitched.subscribe(collection => {
-      if (this.state.dualOutputMode && !this.views.hasSceneNodeMaps) {
+      const hasNodeMap =
+        collection?.sceneNodeMaps && Object.entries(collection?.sceneNodeMaps).length > 0;
+
+      if (this.state.dualOutputMode && !hasNodeMap) {
         this.convertSingleOutputToDualOutputCollection();
-      } else if (collection?.sceneNodeMaps) {
+      } else if (hasNodeMap) {
         this.validateDualOutputCollection();
+      } else {
+        this.collectionHandled.next(null);
       }
     });
 
@@ -554,7 +559,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       // setting visibility is a little complex because of the different reasons for creating the partner node
       if (repair) {
         // by default, hide all horizontal scene items created to repair a dual output scene collection
-        const visibility = repair ? false : node.visible;
+        const visibility = item.display === 'horizontal' ? false : node.visible;
         item.setVisibility(visibility);
       } else {
         // by default, show all vertical scene items
@@ -683,7 +688,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     const horizontalNode = node.display === 'horizontal' ? node : partnerNode;
     const verticalNode = node.display === 'vertical' ? node : partnerNode;
     const matchVisibility = node.display === 'horizontal';
-    const settings = Object.assign(verticalNode.getSettings());
+    const { visible, display, output, ...settings } = Object.assign(verticalNode.getSettings());
     const verticalNodeId = verticalNode.id;
 
     // remove old node
@@ -698,6 +703,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       horizontalNode.sourceId,
     ) as SceneItem;
     newPartner.setSettings(settings);
+    newPartner.setVisibility(visible);
 
     return partnerNode;
   }
