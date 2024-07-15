@@ -98,9 +98,9 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return this.dualOutputMode || (!!nodeMaps && Object.entries(nodeMaps).length > 0);
   }
 
-  get isSingleOutputCollection(): boolean {
+  get isDualOutputCollection(): boolean {
     const nodeMaps = this.sceneCollectionsService?.sceneNodeMaps;
-    if (!nodeMaps) return true;
+    if (!nodeMaps) return false;
     return Object.entries(nodeMaps).length > 0;
   }
 
@@ -407,7 +407,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       // All dual output scene collections will have been validated when the collection was switched
       // so there is no need to validate the scene nodes again. So just convert the single output collection
       // to dual output if needed.
-      if (this.views.isSingleOutputCollection) {
+      if (!this.views.isDualOutputCollection) {
         this.convertSingleOutputToDualOutputCollection();
       }
 
@@ -688,7 +688,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     const horizontalNode = node.display === 'horizontal' ? node : partnerNode;
     const verticalNode = node.display === 'vertical' ? node : partnerNode;
     const matchVisibility = node.display === 'horizontal';
-    const { visible, display, output, ...settings } = Object.assign(verticalNode.getSettings());
+    const { visible, ...settings } = Object.assign(verticalNode.getSettings());
     const verticalNodeId = verticalNode.id;
 
     // remove old node
