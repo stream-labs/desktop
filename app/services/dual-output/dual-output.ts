@@ -95,7 +95,13 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
    */
   get hasSceneNodeMaps(): boolean {
     const nodeMaps = this.sceneCollectionsService?.sceneNodeMaps;
-    return this.dualOutputMode || (!!nodeMaps && Object.entries(nodeMaps).length > 0);
+    return this.dualOutputMode || (!!nodeMaps && Object.keys(nodeMaps).length > 0);
+  }
+
+  get isSingleOutputCollection(): boolean {
+    const nodeMaps = this.sceneCollectionsService?.sceneNodeMaps;
+    if (!nodeMaps) return true;
+    return Object.keys(nodeMaps).length > 0;
   }
 
   get platformSettings() {
@@ -342,7 +348,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
      * @remark Optimize by only confirming when the collection is switched
      */
     this.sceneCollectionsService.collectionSwitched.subscribe(collection => {
-      if (this.state.dualOutputMode || this.views.hasSceneNodeMaps) {
+      if (this.state.dualOutputMode || !this.views.isSingleOutputCollection) {
         this.confirmOrCreateDualOutputCollection();
       }
       this.setIsLoading(false);
@@ -385,7 +391,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       // All dual output scene collections will have been validated when the collection was switched
       // so there is no need to validate the scene nodes again. So just convert the single output collection
       // to dual output if needed.
-      if (this.views.hasSceneNodeMaps) {
+      if (this.views.isSingleOutputCollection) {
         this.convertSingleOutputToDualOutputCollection();
       }
 
@@ -406,21 +412,14 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
   /**
    * Create or confirm nodes for vertical output when toggling vertical display
+   * @remark Primarily used after switching collections to ensure that dual output loads correctly
    * @param sceneId - Id of the scene to map
    */
   confirmOrCreateDualOutputCollection() {
-    if (!this.views.hasSceneNodeMaps) {
-      try {
-        this.convertSingleOutputToDualOutputCollection();
-      } catch (error: unknown) {
-        console.error('Error toggling Dual Output mode: ', error);
-      }
+    if (this.views.isSingleOutputCollection) {
+      this.convertSingleOutputToDualOutputCollection();
     } else {
-      try {
-        this.validateDualOutputCollection();
-      } catch (error: unknown) {
-        console.error('Error toggling Dual Output mode: ', error);
-      }
+      this.validateDualOutputCollection();
     }
   }
 
@@ -456,7 +455,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         this.createPartnerNodes(scene.id);
       });
     } catch (error: unknown) {
-      console.error('Error toggling Dual Output mode: ', error);
+      console.error('Error converting to single output collection to dual output: ', error);
     }
   }
 
@@ -589,14 +588,18 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       this.videoSettingsService.establishVideoContext('vertical');
     }
 
-    // if in dual output mode, convert the single output collection to dual output
-    this.scenesService.views.scenes.forEach(scene => {
-      if (this.views.hasNodeMap(scene.id)) {
-        this.validateSceneNodes(scene.id);
-      } else {
-        this.createPartnerNodes(scene.id);
-      }
-    });
+    try {
+      this.scenesService.views.scenes.forEach(scene => {
+        if (this.views.hasNodeMap(scene.id)) {
+          this.validateSceneNodes(scene.id);
+        } else {
+          // if the scene is still a single output scene, convert it to dual output
+          this.createPartnerNodes(scene.id);
+        }
+      });
+    } catch (error: unknown) {
+      console.error('Error validating dual output collection: ', error);
+    }
   }
 
   /**

@@ -2,7 +2,7 @@ import { useWebdriver, test } from '../../helpers/webdriver';
 import { getApiClient } from '../../helpers/api-client';
 import { SceneBuilder } from '../../helpers/scene-builder';
 import { ScenesService } from '../../../app/services/api/external-api/scenes';
-import { VideoSettingsService } from 'app-services';
+import { VideoSettingsService, DualOutputService } from 'app-services';
 
 const path = require('path');
 
@@ -298,6 +298,7 @@ test('Scene item has correct context', async t => {
   const client = await getApiClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const videoSettingsService = client.getResource<VideoSettingsService>('VideoSettingsService');
+  const dualOutputService = client.getResource<DualOutputService>('DualOutputService');
   const scene = scenesService.createScene('Scene1');
   scene.createAndAddSource('Item1', 'color_source');
   scene.createAndAddSource('Item2', 'color_source');
@@ -311,7 +312,7 @@ test('Scene item has correct context', async t => {
   });
 
   // dual output
-  videoSettingsService.establishVideoContext('vertical');
+  dualOutputService.setdualOutputMode(true);
   const verticalContext = videoSettingsService.contexts.vertical;
   scene.getItems().forEach(sceneItem => {
     const context = sceneItem?.display === 'vertical' ? verticalContext : horizontalContext;
