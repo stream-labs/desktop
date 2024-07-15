@@ -95,13 +95,13 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
    */
   get hasSceneNodeMaps(): boolean {
     const nodeMaps = this.sceneCollectionsService?.sceneNodeMaps;
-    return this.dualOutputMode || (!!nodeMaps && Object.keys(nodeMaps).length > 0);
+    return this.dualOutputMode || (!!nodeMaps && Object.entries(nodeMaps).length > 0);
   }
 
   get isSingleOutputCollection(): boolean {
     const nodeMaps = this.sceneCollectionsService?.sceneNodeMaps;
     if (!nodeMaps) return true;
-    return Object.keys(nodeMaps).length !== 0;
+    return Object.entries(nodeMaps).length !== 0;
   }
 
   get platformSettings() {
@@ -348,14 +348,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
      * @remark Optimize by only confirming when the collection is switched
      */
     this.sceneCollectionsService.collectionActivated.subscribe(collection => {
-      console.log('this.state.dualOutputMode', JSON.stringify(this.state.dualOutputMode, null, 2));
-      console.log(
-        'this.views.isSingleOutputCollection',
-        JSON.stringify(this.views.isSingleOutputCollection, null, 2),
-      );
-      console.log('this.state.isLoading', JSON.stringify(this.state.isLoading, null, 2));
-      console.log('collection?.sceneNodeMaps', JSON.stringify(collection?.sceneNodeMaps, null, 2));
-
       if (this.state.dualOutputMode && this.views.isSingleOutputCollection) {
         this.convertSingleOutputToDualOutputCollection();
       } else if (!this.views.isSingleOutputCollection) {
