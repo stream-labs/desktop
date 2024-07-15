@@ -1,7 +1,6 @@
 import { restartApp, test, TExecutionContext, useWebdriver } from '../../helpers/webdriver';
 import {
   click,
-  clickButton,
   clickCheckbox,
   clickIfDisplayed,
   clickTab,
@@ -107,7 +106,7 @@ const openHotkeySettings = async (t: TExecutionContext) => {
 test('Shows and filters scene item hotkeys', async t => {
   await logIn();
 
-  // confirm vanilla scene collection scene item hotkeys
+  // confirm single output scene collection scene item hotkeys
 
   const client = await getApiClient();
   const sceneBuilder = new SceneBuilder(client);
@@ -132,6 +131,7 @@ test('Shows and filters scene item hotkeys', async t => {
 
   // confirm dual output scene collection scene item hotkeys
   await toggleDualOutputMode(false);
+  await focusChild();
   await click('.nav-item__content=Hotkeys');
   await clickIfDisplayed('div.ant-collapse-item');
   await waitForDisplayed('div.section-content--opened');
