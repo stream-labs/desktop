@@ -98,6 +98,12 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return this.dualOutputMode || (!!nodeMaps && Object.entries(nodeMaps).length > 0);
   }
 
+  get isSingleOutputCollection(): boolean {
+    const nodeMaps = this.sceneCollectionsService?.sceneNodeMaps;
+    if (!nodeMaps) return true;
+    return Object.entries(nodeMaps).length > 0;
+  }
+
   get platformSettings() {
     return this.state.platformSettings;
   }
@@ -323,6 +329,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   };
 
   sceneNodeHandled = new Subject<number>();
+  collectionHandled = new Subject<{ [sceneId: string]: Dictionary<string> } | null>();
 
   get views() {
     return new DualOutputViews(this.state);
@@ -349,7 +356,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       } else if (collection?.sceneNodeMaps) {
         this.validateDualOutputCollection();
       }
-      this.setIsLoading(false);
     });
 
     /**
@@ -360,6 +366,13 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       if (this.state.isLoading) {
         this.setIsLoading(false);
       }
+    });
+
+    /**
+     * Set loading state after a scene collection has been handled
+     */
+    this.collectionHandled.subscribe(() => {
+      this.setIsLoading(false);
     });
 
     /**
@@ -389,7 +402,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       // All dual output scene collections will have been validated when the collection was switched
       // so there is no need to validate the scene nodes again. So just convert the single output collection
       // to dual output if needed.
-      if (!this.views.hasSceneNodeMaps) {
+      if (this.views.isSingleOutputCollection) {
         this.convertSingleOutputToDualOutputCollection();
       }
 
@@ -442,8 +455,10 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       });
     } catch (error: unknown) {
       console.error('Error converting to single output collection to dual output: ', error);
+      this.collectionHandled.next(null);
     }
-    this.SET_IS_LOADING(false);
+
+    this.collectionHandled.next(this.sceneCollectionsService.sceneNodeMaps);
   }
 
   createPartnerNodes(sceneId: string) {
@@ -520,7 +535,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       const item = scene.addSource(sourceId ?? node.sourceId, {
         id: partnerNodeId,
         display,
-        sourceAddOptions: { sourceId: node.sourceId },
+        sourceAddOptions: { sourceId: sourceId ?? node.sourceId },
       });
 
       // ensure correct ordering when creating a horizontal partner node for a vertical node
@@ -583,8 +598,9 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       });
     } catch (error: unknown) {
       console.error('Error validating dual output collection: ', error);
+      this.collectionHandled.next(null);
     }
-    this.SET_IS_LOADING(false);
+    this.collectionHandled.next(this.sceneCollectionsService.sceneNodeMaps);
   }
 
   /**
