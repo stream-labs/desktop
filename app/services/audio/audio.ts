@@ -230,24 +230,28 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
     // Fader is ignored by this method.  Use setFader instead
     const newPatch = omit(patch, 'fader');
 
-    Object.keys(newPatch).forEach(name => {
-      const value = newPatch[name];
-      if (value === void 0) return;
+    Object.keys(newPatch).forEach(
+      (
+        name: keyof Omit<IAudioSource, 'fader' | 'sourceId' | 'mixerHidden' | 'isControlledViaObs'>,
+      ) => {
+        const value = newPatch[name];
+        if (value === void 0) return;
 
-      if (name === 'syncOffset') {
-        obsInput.syncOffset = AudioService.msToTimeSpec(value);
-      } else if (name === 'forceMono') {
-        if (this.views.getSource(sourceId).forceMono !== value) {
-          value
-            ? (obsInput.flags = obsInput.flags | obs.ESourceFlags.ForceMono)
-            : (obsInput.flags -= obs.ESourceFlags.ForceMono);
+        if (name === 'syncOffset') {
+          obsInput.syncOffset = AudioService.msToTimeSpec(value as number);
+        } else if (name === 'forceMono') {
+          if (this.views.getSource(sourceId).forceMono !== value) {
+            value
+              ? (obsInput.flags = obsInput.flags | obs.ESourceFlags.ForceMono)
+              : (obsInput.flags -= obs.ESourceFlags.ForceMono);
+          }
+        } else if (name === 'muted') {
+          this.sourcesService.setMuted(sourceId, value as boolean);
+        } else {
+          obsInput[name] = value as any;
         }
-      } else if (name === 'muted') {
-        this.sourcesService.setMuted(sourceId, value);
-      } else {
-        obsInput[name] = value;
-      }
-    });
+      },
+    );
 
     this.UPDATE_AUDIO_SOURCE(sourceId, newPatch);
     this.audioSourceUpdated.next(this.state.audioSources[sourceId]);
