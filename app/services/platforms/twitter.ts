@@ -1,21 +1,16 @@
-import { InheritMutations, mutation } from '../core';
+import { InheritMutations, Inject, mutation, Service } from '../core';
 import { BasePlatformService } from './base-platform';
-import {
-  IGame,
-  IPlatformRequest,
-  IPlatformService,
-  IPlatformState,
-  TPlatformCapability,
-} from './index';
+import { IPlatformRequest, IPlatformService, IPlatformState, TPlatformCapability } from './index';
 import { authorizedHeaders, jfetch } from '../../util/requests';
 import { throwStreamError } from '../streaming/stream-error';
 import { platformAuthorizedRequest } from './utils';
 import { IGoLiveSettings } from '../streaming';
-import { getDefined } from '../../util/properties-type-guards';
 import Utils from '../utils';
 import { TDisplayType } from 'services/settings-v2';
-import { TOutputOrientation } from 'services/restream';
-import { IVideo } from 'obs-studio-node';
+import { ENotificationType, NotificationsService } from '../notifications';
+import { JsonrpcService } from '../api/jsonrpc';
+import * as remote from '@electron/remote';
+import { $t } from 'services/i18n';
 
 interface ITwitterServiceState extends IPlatformState {
   settings: ITwitterStartStreamOptions;
@@ -59,6 +54,9 @@ export class TwitterPlatformService
   readonly displayName = 'X (Twitter)';
   readonly gameImageSize = { width: 30, height: 40 };
 
+  @Inject() private notificationsService: NotificationsService;
+  @Inject() private jsonrpcService: JsonrpcService;
+
   authWindowOptions: Electron.BrowserWindowConstructorOptions = {
     width: 600,
     height: 800,
@@ -80,26 +78,43 @@ export class TwitterPlatformService
       this.setPlatformContext('twitter');
       return;
     }
-    const streamInfo = await this.startStream(
-      goLiveSettings.platforms.twitter ?? this.state.settings,
-    );
 
-    this.SET_STREAM_KEY(streamInfo.key);
-    this.SET_BROADCAST_ID(streamInfo.id);
-    this.SET_INGEST(streamInfo.rtmp);
-
-    if (!this.streamingService.views.isMultiplatformMode) {
-      this.streamSettingsService.setSettings(
-        {
-          streamType: 'rtmp_custom',
-          key: streamInfo.key,
-          server: streamInfo.rtmp,
-        },
-        context,
+    try {
+      const streamInfo = await this.startStream(
+        goLiveSettings.platforms.twitter ?? this.state.settings,
       );
-    }
 
-    this.setPlatformContext('twitter');
+      this.SET_STREAM_KEY(streamInfo.key);
+      this.SET_BROADCAST_ID(streamInfo.id);
+      this.SET_INGEST(streamInfo.rtmp);
+
+      if (!this.streamingService.views.isMultiplatformMode) {
+        this.streamSettingsService.setSettings(
+          {
+            streamType: 'rtmp_custom',
+            key: streamInfo.key,
+            server: streamInfo.rtmp,
+          },
+          context,
+        );
+      }
+
+      this.setPlatformContext('twitter');
+    } catch (e: unknown) {
+      // We don't have error codes
+      if ((e as any)?.result?.message === 'You need X premium account to go live.') {
+        this.notificationsService.push({
+          type: ENotificationType.WARNING,
+          message: $t('You need X premium account to go live on X. Click to learn more'),
+          action: this.jsonrpcService.createRequest(
+            Service.getResourceId(this),
+            'openStreamIneligibleHelp',
+          ),
+        });
+        throwStreamError('X_PREMIUM_ACCOUNT_REQUIRED', e as any);
+      }
+      throw e;
+    }
   }
 
   async afterStopStream(): Promise<void> {
@@ -207,5 +222,10 @@ export class TwitterPlatformService
   @mutation()
   SET_INGEST(ingest: string) {
     this.state.ingest = ingest;
+  }
+
+  openStreamIneligibleHelp() {
+    const url = 'https://x.com/Live/status/1812291533162590577';
+    return remote.shell.openExternal(url);
   }
 }
