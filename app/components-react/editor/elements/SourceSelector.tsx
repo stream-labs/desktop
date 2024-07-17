@@ -598,9 +598,13 @@ class SourceSelectorController {
       !this.streamingService.state.selectiveRecording,
     );
     if (this.isDualOutputActive) {
+      // selective recording only works with the horizontal display
+      // so toggle the vertical display to hide it
       this.dualOutputService.actions.toggleDisplay(this.selectiveRecordingEnabled, 'vertical');
       this.selectionService.views.globalSelection.filterDualOutputNodes();
 
+      // if the vertical display is hidden because of selective recording
+      // show an alert to the user notifying them that the vertical display is disabled
       if (!this.selectiveRecordingEnabled) {
         remote.dialog.showMessageBox({
           title: 'Vertical Display Disabled',
@@ -661,9 +665,11 @@ class SourceSelectorController {
           className: styles.toggleError,
         });
       } else {
+        // showing the warning message is a subscription so that it shows over the video settings
+        // which is opened after dual output is toggled
         const dualOutputToggleHandled = this.dualOutputService.dualOutputToggleHandled.subscribe(
-          (enabled: boolean) => {
-            if (enabled && this.selectiveRecordingEnabled) {
+          (dualOutputEnabled: boolean) => {
+            if (dualOutputEnabled && this.selectiveRecordingEnabled) {
               // show warning message if selective recording is active
               remote.dialog.showMessageBox({
                 title: 'Vertical Display Disabled',
@@ -679,7 +685,7 @@ class SourceSelectorController {
         // only open video settings when toggling on dual output
         const skipShowVideoSettings = this.dualOutputService.views.dualOutputMode === true;
 
-        this.dualOutputService.actions.setdualOutputMode(
+        this.dualOutputService.actions.setDualOutputMode(
           !this.dualOutputService.views.dualOutputMode,
           skipShowVideoSettings,
         );
@@ -702,7 +708,7 @@ class SourceSelectorController {
   handleAuth() {
     this.userService.actions.showLogin();
     const onboardingCompleted = Services.OnboardingService.onboardingCompleted.subscribe(() => {
-      Services.DualOutputService.actions.setdualOutputMode();
+      Services.DualOutputService.actions.setDualOutputMode();
       Services.SettingsService.actions.showSettings('Video');
       onboardingCompleted.unsubscribe();
     });

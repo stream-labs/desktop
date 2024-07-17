@@ -64,6 +64,10 @@ test(
     await (await app.client.$('.icon-smart-record.active')).waitForExist();
 
     t.false(await isDisplayed('div#vertical-display'));
+
+    // Dismiss generated alert notifying the user that selective recording is horizontal only
+    app.client.acceptAlert();
+    t.pass();
   },
 );
 

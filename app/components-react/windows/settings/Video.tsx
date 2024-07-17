@@ -479,15 +479,18 @@ class VideoSettingsModule {
         content: $t('Cannot toggle Dual Output while in Studio Mode.'),
       });
     } else {
+      // showing the warning message is a subscription so that it shows over the video settings
+      // which is opened after dual output is toggled
       const dualOutputToggleHandled = this.dualOutputService.dualOutputToggleHandled.subscribe(
-        (enabled: boolean) => {
-          if (enabled && Services.StreamingService.state.selectiveRecording) {
+        (dualOutputEnabled: boolean) => {
+          if (dualOutputEnabled && Services.StreamingService.state.selectiveRecording) {
             // show warning message if selective recording is active
             remote.dialog.showMessageBox({
               title: 'Vertical Display Disabled',
               message: $t(
                 'Dual Output can’t be displayed - Selective Recording only works with horizontal sources and disables editing the vertical output scene. Please disable selective recording from Sources to set up Dual Output.',
               ),
+              buttons: [$t('OK')],
             });
           }
           dualOutputToggleHandled.unsubscribe();
@@ -495,7 +498,7 @@ class VideoSettingsModule {
       );
 
       // toggle dual output
-      this.dualOutputService.actions.setdualOutputMode(
+      this.dualOutputService.actions.setDualOutputMode(
         !this.dualOutputService.views.dualOutputMode,
       );
       this.state.setShowDualOutputSettings(!this.state.showDualOutputSettings);
@@ -516,7 +519,7 @@ class VideoSettingsModule {
     Services.WindowsService.actions.closeChildWindow();
     this.userService.actions.showLogin();
     const onboardingCompleted = Services.OnboardingService.onboardingCompleted.subscribe(() => {
-      Services.DualOutputService.actions.setdualOutputMode();
+      Services.DualOutputService.actions.setDualOutputMode();
       Services.SettingsService.actions.showSettings('Video');
       onboardingCompleted.unsubscribe();
     });

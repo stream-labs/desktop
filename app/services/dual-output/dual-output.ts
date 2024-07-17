@@ -387,7 +387,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
      */
     this.userService.userLogout.subscribe(() => {
       if (this.state.dualOutputMode) {
-        this.setdualOutputMode();
+        this.setDualOutputMode();
       }
     });
   }
@@ -397,7 +397,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    */
 
   @RunInLoadingMode()
-  setdualOutputMode(status: boolean = true, skipShowVideoSettings?: boolean) {
+  setDualOutputMode(status: boolean = true, skipShowVideoSettings?: boolean) {
     if (!this.userService.isLoggedIn) return;
 
     this.SET_SHOW_DUAL_OUTPUT(status);
