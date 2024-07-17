@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useMemo, Ref, RefObject } from 'react';
 import pick from 'lodash/pick';
-import { Tooltip, Tree } from 'antd';
+import { Button, Form, message, Tooltip, Tree } from 'antd';
 import { DataNode } from 'rc-tree/lib/interface';
 import { TreeProps } from 'rc-tree/lib/Tree';
 import cx from 'classnames';
@@ -19,6 +19,9 @@ import { DualOutputSourceSelector } from './DualOutputSourceSelector';
 import { Services } from 'components-react/service-provider';
 import { initStore, useController } from 'components-react/hooks/zustand';
 import { useVuex } from 'components-react/hooks';
+import * as remote from '@electron/remote';
+import { AuthModal } from 'components-react/shared/AuthModal';
+import SvgContainer from 'components-react/shared/SvgContainer';
 
 interface ISourceMetadata {
   id: string;
@@ -49,12 +52,14 @@ class SourceSelectorController {
   private audioService = Services.AudioService;
   private guestCamService = Services.GuestCamService;
   private dualOutputService = Services.DualOutputService;
+  private userService = Services.UserService;
 
   store = initStore({
     expandedFoldersIds: [] as string[],
+    showModal: false,
   });
 
-  nodeRefs = {};
+  nodeRefs: Dictionary<Ref<HTMLDivElement>> = {};
 
   /**
    * This property handles selection when expanding/collapsing folders
@@ -448,7 +453,9 @@ class SourceSelectorController {
       s.expandedFoldersIds = s.expandedFoldersIds.concat(node.getPath().slice(0, -1));
     });
 
-    this.nodeRefs[this.lastSelectedId]?.current?.scrollIntoView({ behavior: 'smooth' });
+    (this.nodeRefs[this.lastSelectedId] as RefObject<HTMLDivElement>)?.current?.scrollIntoView({
+      behavior: 'smooth',
+    });
   }
 
   /**
@@ -632,14 +639,92 @@ class SourceSelectorController {
     return this.scene.getSelection(sceneNodeId);
   }
 
+  toggleDualOutput() {
+    if (this.userService.isLoggedIn) {
+      if (Services.StreamingService.views.isMidStreamMode) {
+        message.error({
+          content: $t('Cannot toggle Dual Output while live.'),
+          className: styles.toggleError,
+        });
+      } else if (Services.TransitionsService.views.studioMode) {
+        message.error({
+          content: $t('Cannot toggle Dual Output while in Studio Mode.'),
+          className: styles.toggleError,
+        });
+      } else {
+        // open video settings dual output
+        this.dualOutputService.actions.setdualOutputMode(
+          !this.dualOutputService.views.dualOutputMode,
+        );
+        Services.UsageStatisticsService.recordFeatureUsage('DualOutput');
+        Services.UsageStatisticsService.recordAnalyticsEvent('DualOutput', {
+          type: 'ToggleOnDualOutput',
+          source: 'SourceSelector',
+        });
+
+        // show warning message if selective recording is active
+        if (
+          Services.StreamingService.state.selectiveRecording &&
+          !this.dualOutputService.views.dualOutputMode
+        ) {
+          remote.dialog.showMessageBox({
+            title: 'Vertical Display Disabled',
+            message: $t(
+              'Dual Output can’t be displayed - Selective Recording only works with horizontal sources and disables editing the vertical output scene. Please disable selective recording from Sources to set up Dual Output.',
+            ),
+          });
+        }
+      }
+    } else {
+      this.handleShowModal(true);
+    }
+  }
+
+  handleShowModal(status: boolean) {
+    Services.WindowsService.actions.updateStyleBlockers('main', status);
+    this.store.update('showModal', status);
+  }
+
+  handleAuth() {
+    this.userService.actions.showLogin();
+    const onboardingCompleted = Services.OnboardingService.onboardingCompleted.subscribe(() => {
+      Services.DualOutputService.actions.setdualOutputMode();
+      Services.SettingsService.actions.showSettings('Video');
+      onboardingCompleted.unsubscribe();
+    });
+  }
+
+  get dualOutputTitle() {
+    return !this.isDualOutputActive || !this.userService.isLoggedIn
+      ? $t('Enable Dual Output to stream to horizontal & vertical platforms simultaneously')
+      : $t('Open Dual Output Video Settings');
+  }
+
   get scene() {
     const scene = getDefined(this.scenesService.views.activeScene);
     return scene;
+  }
+
+  // TODO: update font icons to include this svg
+  get dualOutputIcon() {
+    return `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_26407_14549)">
+<path d="M1.55556 0C0.697569 0 0 0.697569 0 1.55556V8.55556C0 9.41354 0.697569 10.1111 1.55556 10.1111H5.5V8.55556H1.55556V1.55556H12.4444V3H14V1.55556C14 0.697569 13.3024 0 12.4444 0H1.55556Z" fill="#91979A"/>
+<path d="M3.88889 10.8889H5.5V12.4444H3.88889C3.45868 12.4444 3.11111 12.0969 3.11111 11.6667C3.11111 11.2365 3.45868 10.8889 3.88889 10.8889Z" fill="#91979A"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M8.15385 4.41669C7.51743 4.41669 7 4.92118 7 5.54169V12.2917C7 12.9122 7.51743 13.4167 8.15385 13.4167H12.1923C12.8287 13.4167 13.3462 12.9122 13.3462 12.2917V5.54169C13.3462 4.92118 12.8287 4.41669 12.1923 4.41669H8.15385ZM10.581 11.8939C10.6892 11.9994 10.75 12.1425 10.75 12.2917C10.75 12.4409 10.6892 12.5839 10.581 12.6894C10.4728 12.7949 10.3261 12.8542 10.1731 12.8542C10.0201 12.8542 9.87333 12.7949 9.76513 12.6894C9.65694 12.5839 9.59615 12.4409 9.59615 12.2917C9.59615 12.1425 9.65694 11.9994 9.76513 11.8939C9.87333 11.7885 10.0201 11.7292 10.1731 11.7292C10.3261 11.7292 10.4728 11.7885 10.581 11.8939ZM8.15385 5.54169H12.1923V11.1667H8.15385V5.54169Z" fill="#91979A"/>
+</g>
+<defs>
+<clipPath id="clip0_26407_14549">
+<rect width="14" height="14" fill="white"/>
+</clipPath>
+</defs>
+</svg>`;
   }
 }
 
 function SourceSelector() {
   const ctrl = useController(SourceSelectorCtx);
+  const showModal = ctrl.store.useState(s => s.showModal);
   return (
     <>
       <StudioControls />
@@ -659,6 +744,12 @@ function SourceSelector() {
           </Translate>
         </HelpTip>
       )}
+      <AuthModal
+        prompt={$t('Please log in to enable dual output. Would you like to log in now?')}
+        showModal={showModal}
+        handleShowModal={ctrl.handleShowModal}
+        handleAuth={ctrl.handleAuth}
+      />
     </>
   );
 }
@@ -685,6 +776,12 @@ function StudioControls() {
           className="icon-add-circle icon-button icon-button--lg"
           onClick={() => ctrl.addSource()}
         />
+      </Tooltip>
+
+      <Tooltip title={ctrl.dualOutputTitle} placement="bottomRight">
+        <div className="icon-button icon-button--lg" onClick={ctrl.toggleDualOutput}>
+          <SvgContainer src={ctrl.dualOutputIcon} />
+        </div>
       </Tooltip>
 
       <Tooltip title={$t('Toggle Selective Recording')} placement="bottomRight">
