@@ -330,6 +330,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
   sceneNodeHandled = new Subject<number>();
   collectionHandled = new Subject<{ [sceneId: string]: Dictionary<string> } | null>();
+  dualOutputToggleHandled = new Subject<boolean>();
 
   get views() {
     return new DualOutputViews(this.state);
@@ -396,7 +397,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    */
 
   @RunInLoadingMode()
-  setdualOutputMode(status?: boolean) {
+  setdualOutputMode(status: boolean = true, skipShowVideoSettings?: boolean) {
     if (!this.userService.isLoggedIn) return;
 
     this.SET_SHOW_DUAL_OUTPUT(status);
@@ -422,8 +423,12 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       this.selectionService.views.globalSelection.reset();
     }
 
-    this.settingsService.showSettings('Video');
+    if (!skipShowVideoSettings) {
+      this.settingsService.showSettings('Video');
+    }
+
     this.SET_IS_LOADING(false);
+    this.dualOutputToggleHandled.next(this.state.dualOutputMode);
   }
 
   disableGlobalRescaleIfNeeded() {

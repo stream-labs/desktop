@@ -478,7 +478,33 @@ class VideoSettingsModule {
       message.error({
         content: $t('Cannot toggle Dual Output while in Studio Mode.'),
       });
+    } else if (
+      Services.StreamingService.state.selectiveRecording &&
+      !this.dualOutputService.views.dualOutputMode
+    ) {
+      // show warning message if selective recording is active
+      remote.dialog.showMessageBox({
+        title: 'Vertical Display Disabled',
+        message: $t(
+          'Dual Output can’t be displayed - Selective Recording only works with horizontal sources and disables editing the vertical output scene. Please disable selective recording from Sources to set up Dual Output.',
+        ),
+      });
     } else {
+      const dualOutputToggleHandled = this.dualOutputService.dualOutputToggleHandled.subscribe(
+        (enabled: boolean) => {
+          if (enabled && Services.StreamingService.state.selectiveRecording) {
+            // show warning message if selective recording is active
+            remote.dialog.showMessageBox({
+              title: 'Vertical Display Disabled',
+              message: $t(
+                'Dual Output can’t be displayed - Selective Recording only works with horizontal sources and disables editing the vertical output scene. Please disable selective recording from Sources to set up Dual Output.',
+              ),
+            });
+          }
+          dualOutputToggleHandled.unsubscribe();
+        },
+      );
+
       // toggle dual output
       this.dualOutputService.actions.setdualOutputMode();
       this.state.setShowDualOutputSettings(!this.state.showDualOutputSettings);
@@ -487,19 +513,6 @@ class VideoSettingsModule {
         type: 'ToggleOnDualOutput',
         source: 'VideoSettings',
       });
-
-      // show warning message if selective recording is active
-      if (
-        Services.StreamingService.state.selectiveRecording &&
-        !this.dualOutputService.views.dualOutputMode
-      ) {
-        remote.dialog.showMessageBox({
-          title: 'Vertical Display Disabled',
-          message: $t(
-            'Dual Output can’t be displayed - Selective Recording only works with horizontal sources and disables editing the vertical output scene. Please disable selective recording from Sources to set up Dual Output.',
-          ),
-        });
-      }
     }
   }
 
