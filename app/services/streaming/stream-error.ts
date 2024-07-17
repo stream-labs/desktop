@@ -113,6 +113,11 @@ export const errorTypes = {
       return $t('confirm streaming approval status with TikTok');
     },
   },
+  X_PREMIUM_ACCOUNT_REQUIRED: {
+    get message() {
+      return $t('You need X premium account to go live on X.');
+    },
+  },
   PRIME_REQUIRED: {
     get message() {
       return $t('This feature is for Ultra members only');
