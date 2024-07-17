@@ -102,12 +102,7 @@ export class TwitterPlatformService
       this.setPlatformContext('twitter');
     } catch (e: unknown) {
       // We don't have error codes
-      if (
-        typeof e === 'object' &&
-        e['result'] &&
-        e['result'].error &&
-        e['result'].message === 'You need X premium account to go live.'
-      ) {
+      if ((e as any)?.result?.message === 'You need X premium account to go live.') {
         this.notificationsService.push({
           type: ENotificationType.WARNING,
           message: $t('You need X premium account to go live on X. Click to learn more'),
