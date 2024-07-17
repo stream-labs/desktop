@@ -663,7 +663,6 @@ class SourceSelectorController {
       } else {
         const dualOutputToggleHandled = this.dualOutputService.dualOutputToggleHandled.subscribe(
           (enabled: boolean) => {
-            console.log('enabled', enabled);
             if (enabled && this.selectiveRecordingEnabled) {
               // show warning message if selective recording is active
               remote.dialog.showMessageBox({
