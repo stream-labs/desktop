@@ -712,7 +712,7 @@ class SourceSelectorController {
   get dualOutputTitle() {
     return !this.isDualOutputActive || !this.userService.isLoggedIn
       ? $t('Enable Dual Output to stream to horizontal & vertical platforms simultaneously')
-      : $t('Open Dual Output Video Settings');
+      : $t('Disable Dual Output');
   }
 
   get scene() {
