@@ -294,6 +294,6 @@ export class Volmeter2d {
   }
 
   unsubscribeVolmeter() {
-    this.audioService.unsubscribeVolemeter(this.audioSource.sourceId, this.channelId);
+    this.audioService.actions.unsubscribeVolmeter(this.audioSource.sourceId, this.channelId);
   }
 }
