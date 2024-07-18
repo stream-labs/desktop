@@ -56,18 +56,16 @@ test(
   async (t: TExecutionContext) => {
     const { app } = t.context;
 
-    await toggleDualOutputMode();
-    await focusMain();
+    t.false(await isDisplayed('div#vertical-display'));
     await (await app.client.$('[data-name=sourcesControls] .icon-smart-record')).click();
 
     // Check that selective recording icon is active
     await (await app.client.$('.icon-smart-record.active')).waitForExist();
 
-    t.false(await isDisplayed('div#vertical-display'));
+    await toggleDualOutputMode();
 
-    // Dismiss generated alert notifying the user that selective recording is horizontal only
-    app.client.acceptAlert();
-    t.pass();
+    await focusMain();
+    t.false(await isDisplayed('div#vertical-display'));
   },
 );
 

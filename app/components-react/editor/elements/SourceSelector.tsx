@@ -21,7 +21,7 @@ import { initStore, useController } from 'components-react/hooks/zustand';
 import { useVuex } from 'components-react/hooks';
 import * as remote from '@electron/remote';
 import { AuthModal } from 'components-react/shared/AuthModal';
-import SvgContainer from 'components-react/shared/SvgContainer';
+import Utils from 'services/utils';
 
 interface ISourceMetadata {
   id: string;
@@ -665,23 +665,6 @@ class SourceSelectorController {
           className: styles.toggleError,
         });
       } else {
-        // showing the warning message is a subscription so that it shows over the video settings
-        // which is opened after dual output is toggled
-        const dualOutputToggleHandled = this.dualOutputService.dualOutputToggleHandled.subscribe(
-          (dualOutputEnabled: boolean) => {
-            if (dualOutputEnabled && this.selectiveRecordingEnabled) {
-              // show warning message if selective recording is active
-              remote.dialog.showMessageBox({
-                title: 'Vertical Display Disabled',
-                message: $t(
-                  'Dual Output can’t be displayed - Selective Recording only works with horizontal sources and disables editing the vertical output scene. Please disable selective recording from Sources to set up Dual Output.',
-                ),
-              });
-            }
-            dualOutputToggleHandled.unsubscribe();
-          },
-        );
-
         // only open video settings when toggling on dual output
         const skipShowVideoSettings = this.dualOutputService.views.dualOutputMode === true;
 
@@ -694,6 +677,19 @@ class SourceSelectorController {
           type: 'ToggleOnDualOutput',
           source: 'SourceSelector',
         });
+
+        if (!this.dualOutputService.views.dualOutputMode && this.selectiveRecordingEnabled) {
+          // show warning message if selective recording is active
+          remote.dialog
+            .showMessageBox(Utils.getChildWindow(), {
+              title: 'Vertical Display Disabled',
+              message: $t(
+                'Dual Output can’t be displayed - Selective Recording only works with horizontal sources and disables editing the vertical output scene. Please disable selective recording from Sources to set up Dual Output.',
+              ),
+              buttons: [$t('OK')],
+            })
+            .catch(() => {});
+        }
       }
     } else {
       this.handleShowModal(true);

@@ -12,6 +12,7 @@ import styles from './Common.m.less';
 import Tabs from 'components-react/shared/Tabs';
 import { invalidFps, IVideoInfoValue, TDisplayType } from 'services/settings-v2/video';
 import { AuthModal } from 'components-react/shared/AuthModal';
+import Utils from 'services/utils';
 
 const CANVAS_RES_OPTIONS = [
   { label: '1920x1080', value: '1920x1080' },
@@ -479,23 +480,21 @@ class VideoSettingsModule {
         content: $t('Cannot toggle Dual Output while in Studio Mode.'),
       });
     } else {
-      // showing the warning message is a subscription so that it shows over the video settings
-      // which is opened after dual output is toggled
-      const dualOutputToggleHandled = this.dualOutputService.dualOutputToggleHandled.subscribe(
-        (dualOutputEnabled: boolean) => {
-          if (dualOutputEnabled && Services.StreamingService.state.selectiveRecording) {
-            // show warning message if selective recording is active
-            remote.dialog.showMessageBox({
-              title: 'Vertical Display Disabled',
-              message: $t(
-                'Dual Output can’t be displayed - Selective Recording only works with horizontal sources and disables editing the vertical output scene. Please disable selective recording from Sources to set up Dual Output.',
-              ),
-              buttons: [$t('OK')],
-            });
-          }
-          dualOutputToggleHandled.unsubscribe();
-        },
-      );
+      // show warning message if selective recording is active
+      if (
+        !this.dualOutputService.views.dualOutputMode &&
+        Services.StreamingService.state.selectiveRecording
+      ) {
+        remote.dialog
+          .showMessageBox(Utils.getChildWindow(), {
+            title: 'Vertical Display Disabled',
+            message: $t(
+              'Dual Output can’t be displayed - Selective Recording only works with horizontal sources and disables editing the vertical output scene. Please disable selective recording from Sources to set up Dual Output.',
+            ),
+            buttons: [$t('OK')],
+          })
+          .catch(() => {});
+      }
 
       // toggle dual output
       this.dualOutputService.actions.setDualOutputMode(
