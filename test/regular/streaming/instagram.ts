@@ -24,6 +24,7 @@ test('Streaming to Instagram', withUser('twitch', { prime: true, multistream: fa
     instagram: true,
   });
   await waitForSettingsWindowLoaded();
+  await waitForDisplayed('div[data-name="instagram-settings"]');
 
   await fillForm({
     title: 'Test stream',

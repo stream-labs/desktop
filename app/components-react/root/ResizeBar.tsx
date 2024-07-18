@@ -3,6 +3,7 @@ import { Resizable, ResizableProps } from 'react-resizable';
 import cx from 'classnames';
 import styles from './ResizeBar.m.less';
 import { Services } from 'components-react/service-provider';
+import { useVuex } from 'components-react/hooks';
 
 interface ResizeBarProps {
   // the side of the external container to stick ResizeBar to
@@ -28,6 +29,10 @@ interface ResizableData {
  */
 export default function ResizeBar(p: React.PropsWithChildren<ResizeBarProps>) {
   const { WindowsService } = Services;
+
+  const v = useVuex(() => ({
+    hideStyleBlockers: WindowsService.state.main.hideStyleBlockers,
+  }));
 
   let resizableProps: ResizableProps;
 
@@ -80,7 +85,11 @@ export default function ResizeBar(p: React.PropsWithChildren<ResizeBarProps>) {
       transformScale={p.transformScale ?? 2}
       {...resizableProps}
       handle={
-        <div className={cx(styles.resizeBar, styles[p.position])}>
+        <div
+          className={cx(styles.resizeBar, styles[p.position], {
+            [styles['unset']]: v.hideStyleBlockers,
+          })}
+        >
           <div className={styles.resizeLine} />
         </div>
       }
