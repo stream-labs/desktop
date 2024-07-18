@@ -1,4 +1,4 @@
-@import "../../styles/index";
+@import '../../styles/index';
 
 .resize-bar {
   position: absolute;
@@ -42,6 +42,9 @@
   &.active {
     background-color: rgba(50, 50, 50, 0.5);
     cursor: default;
+  }
+  &.unset {
+    z-index: 1 !important;
   }
   &:hover {
     .resize-line {

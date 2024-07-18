@@ -2,7 +2,7 @@ import * as remote from '@electron/remote';
 import React from 'react';
 import { useModule, injectState } from 'slap';
 import { Services } from '../../service-provider';
-import { Button, Form, Modal, message } from 'antd';
+import { message } from 'antd';
 import FormFactory, { TInputValue } from 'components-react/shared/inputs/FormFactory';
 import { CheckboxInput } from 'components-react/shared/inputs';
 import Tooltip from 'components-react/shared/Tooltip';
@@ -11,6 +11,8 @@ import { $t } from 'services/i18n';
 import styles from './Common.m.less';
 import Tabs from 'components-react/shared/Tabs';
 import { invalidFps, IVideoInfoValue, TDisplayType } from 'services/settings-v2/video';
+import { AuthModal } from 'components-react/shared/AuthModal';
+import Utils from 'services/utils';
 
 const CANVAS_RES_OPTIONS = [
   { label: '1920x1080', value: '1920x1080' },
@@ -61,10 +63,6 @@ class VideoSettingsModule {
 
   get display(): TDisplayType {
     return this.state.display;
-  }
-
-  get isLoggedIn(): boolean {
-    return this.userService.isLoggedIn;
   }
 
   get cantEditFields(): boolean {
@@ -464,6 +462,14 @@ class VideoSettingsModule {
     this.state.setFpsInt(this.service.values[display].fpsInt);
   }
 
+  toggleDualOutput(value: boolean) {
+    if (this.userService.isLoggedIn) {
+      this.setShowDualOutput();
+    } else {
+      this.handleShowModal(value);
+    }
+  }
+
   setShowDualOutput() {
     if (Services.StreamingService.views.isMidStreamMode) {
       message.error({
@@ -474,26 +480,32 @@ class VideoSettingsModule {
         content: $t('Cannot toggle Dual Output while in Studio Mode.'),
       });
     } else {
+      // show warning message if selective recording is active
+      if (
+        !this.dualOutputService.views.dualOutputMode &&
+        Services.StreamingService.state.selectiveRecording
+      ) {
+        remote.dialog
+          .showMessageBox(Utils.getChildWindow(), {
+            title: 'Vertical Display Disabled',
+            message: $t(
+              'Dual Output can’t be displayed - Selective Recording only works with horizontal sources and disables editing the vertical output scene. Please disable selective recording from Sources to set up Dual Output.',
+            ),
+            buttons: [$t('OK')],
+          })
+          .catch(() => {});
+      }
+
       // toggle dual output
-      this.dualOutputService.actions.setdualOutputMode();
+      this.dualOutputService.actions.setDualOutputMode(
+        !this.dualOutputService.views.dualOutputMode,
+      );
       this.state.setShowDualOutputSettings(!this.state.showDualOutputSettings);
       Services.UsageStatisticsService.recordFeatureUsage('DualOutput');
       Services.UsageStatisticsService.recordAnalyticsEvent('DualOutput', {
         type: 'ToggleOnDualOutput',
+        source: 'VideoSettings',
       });
-
-      // show warning message if selective recording is active
-      if (
-        Services.StreamingService.state.selectiveRecording &&
-        !this.dualOutputService.views.dualOutputMode
-      ) {
-        remote.dialog.showMessageBox({
-          title: 'Vertical Display Disabled',
-          message: $t(
-            'Dual Output can’t be displayed - Selective Recording only works with horizontal sources and disables editing the vertical output scene. Please disable selective recording from Sources to set up Dual Output.',
-          ),
-        });
-      }
     }
   }
 
@@ -506,7 +518,7 @@ class VideoSettingsModule {
     Services.WindowsService.actions.closeChildWindow();
     this.userService.actions.showLogin();
     const onboardingCompleted = Services.OnboardingService.onboardingCompleted.subscribe(() => {
-      Services.DualOutputService.actions.setdualOutputMode();
+      Services.DualOutputService.actions.setDualOutputMode();
       Services.SettingsService.actions.showSettings('Video');
       onboardingCompleted.unsubscribe();
     });
@@ -519,13 +531,12 @@ export function VideoSettings() {
     metadata,
     showDualOutputSettings,
     showModal,
-    isLoggedIn,
     cantEditFields,
     onChange,
     setDisplay,
-    setShowDualOutput,
-    handleShowModal,
+    toggleDualOutput,
     handleAuth,
+    handleShowModal,
   } = useModule(VideoSettingsModule);
 
   return (
@@ -540,7 +551,7 @@ export function VideoSettings() {
             data-name="dual-output-checkbox"
             label="Dual Output Checkbox"
             value={showDualOutputSettings}
-            onChange={(val: boolean) => (isLoggedIn ? setShowDualOutput() : handleShowModal(val))}
+            onChange={toggleDualOutput}
             className={styles.doCheckbox}
             disabled={cantEditFields}
           />
@@ -569,37 +580,14 @@ export function VideoSettings() {
           name="video-settings"
         />
       </div>
-      <LoginPromptModal
+      <AuthModal
+        id="login-modal"
+        prompt={$t('Please log in to enable dual output. Would you like to log in now?')}
         showModal={showModal}
-        handleAuth={handleAuth}
         handleShowModal={handleShowModal}
+        handleAuth={handleAuth}
       />
     </>
-  );
-}
-
-function LoginPromptModal(p: {
-  showModal: boolean;
-  handleAuth: () => void;
-  handleShowModal: (status: boolean) => void;
-}) {
-  return (
-    <Modal
-      footer={null}
-      visible={p.showModal}
-      onCancel={() => p.handleShowModal(false)}
-      getContainer={false}
-      className={styles.confirmLogout}
-    >
-      <Form id="login-modal" className={styles.confirmLogout}>
-        <h2>{$t('Login')}</h2>
-        {$t('Please log in to enable dual output. Would you like to log in now?')}
-        <div className={styles.buttons}>
-          <Button onClick={() => p.handleAuth()}>{$t('Yes')}</Button>
-          <Button onClick={() => p.handleShowModal(false)}>{$t('No')}</Button>
-        </div>
-      </Form>
-    </Modal>
   );
 }
 

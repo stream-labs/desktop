@@ -35,6 +35,8 @@ test('Streaming to TikTok', withUser('twitch', { multistream: false, prime: fals
     tiktok: true,
   });
   await waitForSettingsWindowLoaded();
+  await waitForDisplayed('div[data-name="tiktok-settings"]');
+
   const fields = await readFields();
 
   // tiktok always shows regardless of ultra status
@@ -85,6 +87,7 @@ async function testLiveScope(t: TExecutionContext, scope: TTikTokLiveScopeTypes)
     tiktok: true,
   });
   await waitForSettingsWindowLoaded();
+  await waitForDisplayed('div[data-name="tiktok-settings"]');
 
   const settings = {
     title: 'Test stream',

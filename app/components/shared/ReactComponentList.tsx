@@ -506,6 +506,9 @@ export class UltraIcon extends ReactComponent<{
   className?: string;
 }> {}
 
+@Component({ props: { name: { default: 'AuthModal' } } })
+export class AuthModal extends ReactComponent {}
+
 @Component({
   props: {
     name: { default: 'Hotkeys' },
