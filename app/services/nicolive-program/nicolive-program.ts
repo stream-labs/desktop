@@ -34,6 +34,24 @@ type ProgramState = {
   moderatorViewUri?: string;
 };
 
+// DEBUG: とりあえず (Re:仮)のコメントを取得する
+function isNdgrViewInfo(data: unknown): data is { view: string } {
+  return typeof data === 'object' && data !== null && 'view' in data;
+}
+async function getReKariViewURL(programId = 'kl1'): Promise<string> {
+  const res = await fetch(`https://mpn.live.nicovideo.jp/m1/api/v1/chat/${programId}/view`);
+  if (!res.ok) {
+    throw new Error('Failed to fetch');
+  }
+  const data = await res.json();
+  if (isNdgrViewInfo(data)) {
+    console.log('view', data.view);
+    return data.view;
+  } else {
+    throw new Error('Invalid response');
+  }
+}
+
 function getCommunityIconUrl(community: Community): string {
   const urls = community.icon.url;
   if (urls.size_64x64) {
@@ -249,7 +267,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
         communityID: 'coDEBUG',
         communityName: 'DEBUGコミュニティ',
         communitySymbol: '',
-        viewUri: 'viewUri',
+        viewUri: await getReKariViewURL(), // DEBUG Re:仮のコメントを取得する
       });
       return;
     }

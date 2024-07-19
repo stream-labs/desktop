@@ -6,7 +6,7 @@ export function isFakeMode(): boolean {
 }
 
 export const FakeModeConfig = {
-  dummyComment: true,
+  dummyComment: false,
 };
 
 export const FakeUserAuth: IPlatformAuth = {
