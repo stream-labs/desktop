@@ -45,10 +45,12 @@ export default class MainWindow extends TsxComponent {
         {/* {this.uiReady && <Main />}
         <transition name="loader">
           {!this.uiReady && ( */}
-            <div className={cx(styles.mainLoading, this.theme, { [styles.initialLoading]: !this.uiReady })}>
-              <Loader />
-            </div>
-          {/* )}
+        <div
+          className={cx(styles.mainLoading, this.theme, { [styles.initialLoading]: !this.uiReady })}
+        >
+          <Loader componentProps={{ className: this.theme }} />
+        </div>
+        {/* )}
         </transition> */}
       </div>
     );
