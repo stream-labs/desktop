@@ -12,7 +12,6 @@ import { SliderInput, FileInput, SwitchInput } from 'components-react/shared/inp
 import { Modal, Button, Alert } from 'antd';
 import ExportModal from 'components-react/highlighter/ExportModal';
 import PreviewModal from 'components-react/highlighter/PreviewModal';
-import SettingsView from 'components-react/highlighter/SettingsView';
 import { SCRUB_HEIGHT, SCRUB_WIDTH, SUPPORTED_FILE_TYPES } from 'services/highlighter/constants';
 import path from 'path';
 import Scrollable from 'components-react/shared/Scrollable';
@@ -305,16 +304,6 @@ export default function Highlighter() {
     );
   }
 
-  if ((!v.clips.length && !v.dismissedTutorial && !v.error) || showTutorial) {
-    return (
-      <SettingsView
-        close={() => {
-          setShowTutorial(false);
-          HighlighterService.actions.dismissTutorial();
-        }}
-      />
-    );
-  }
   if (!v.loaded) return getLoadingView();
 
   return getClipsView();
