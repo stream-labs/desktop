@@ -31,7 +31,7 @@ export default class MainWindow extends TsxComponent {
     this.unbind = this.customizationService.state.bindProps(this, {
       theme: 'theme',
     });
-  
+
     antdThemes[this.theme].use();
   }
 
@@ -42,16 +42,18 @@ export default class MainWindow extends TsxComponent {
   render() {
     return (
       <div style={{ height: '100%' }} className={this.theme}>
-        {/* {this.uiReady && <Main />}
+        {this.uiReady && <Main />}
         <transition name="loader">
-          {!this.uiReady && ( */}
-        <div
-          className={cx(styles.mainLoading, this.theme, { [styles.initialLoading]: !this.uiReady })}
-        >
-          <Loader componentProps={{ className: this.theme }} />
-        </div>
-        {/* )}
-        </transition> */}
+          {!this.uiReady && (
+            <div
+              className={cx(styles.mainLoading, this.theme, {
+                [styles.initialLoading]: !this.uiReady,
+              })}
+            >
+              <Loader componentProps={{ className: this.theme }} />
+            </div>
+          )}
+        </transition>
       </div>
     );
   }
