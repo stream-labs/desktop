@@ -9,11 +9,11 @@ import { SUPPORTED_FILE_TYPES } from 'services/highlighter/constants';
 import { SliderInput } from 'components-react/shared/inputs';
 import Form from 'components-react/shared/inputs/Form';
 import Scrollable from 'components-react/shared/Scrollable';
-import styles from '../pages/Highlighter.m.less';
+import styles from './ClipsView.m.less';
 import { $t } from 'services/i18n';
 import Translate from 'components-react/shared/Translate';
 
-export default function BlankSlate(p: { close: () => void }) {
+export default function SettingsView(p: { close: () => void }) {
   const { HotkeysService, SettingsService, StreamingService } = Services;
   const [hotkey, setHotkey] = useState<IHotkey | null>(null);
   const hotkeyRef = useRef<IHotkey | null>(null);
