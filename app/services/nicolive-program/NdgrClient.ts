@@ -3,6 +3,7 @@ import Long from 'long';
 import { Reader } from 'protobufjs/minimal';
 import { Subject } from 'rxjs';
 import { FilterType } from './ResponseTypes';
+import { NdgrFetchError } from './NdgrFetchError';
 
 export function toNumber(num: Long | number): number {
   if (typeof num === 'number') {
@@ -43,12 +44,9 @@ export class NdgrClient {
   }
 
   public async connect(from_unix_time?: number): Promise<void> {
-    if (!from_unix_time) {
-      from_unix_time = Math.floor(Date.now() / 1000);
-    }
-    let next: number | Long = from_unix_time;
+    let next: number | Long | string = from_unix_time ?? 'now';
     while (next && !this.isDisposed) {
-      const fetchUri = this.uri + '?at=' + next;
+      const fetchUri = `${this.uri}?at=${next}`;
       next = null;
       for await (const entry of this.retrieve(fetchUri, reader =>
         dwango.nicolive.chat.service.edge.ChunkedEntry.decodeDelimited(reader),
@@ -80,7 +78,7 @@ export class NdgrClient {
   ): AsyncGenerator<T, void, undefined> {
     let unread = new Uint8Array();
     const response = await fetch(uri);
-    if (!response.ok) throw new Error(`Failed to fetch: ${response.statusText}`);
+    if (!response.ok) throw new NdgrFetchError(response.status, uri);
     const reader = response.body.getReader();
     while (true) {
       const { done, value } = await reader.read();

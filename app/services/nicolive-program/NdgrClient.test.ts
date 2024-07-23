@@ -68,7 +68,7 @@ describe('NdgrClient', () => {
   // Date.now() を固定する
   const now = Date.now();
   jest.spyOn(Date, 'now').mockReturnValue(now);
-  const ENTRY_URL_WITH_TIMESTAMP = `${ENTRY_URL}?at=${Math.floor(now / 1000)}`;
+  const ENTRY_URL_WITH_TIMESTAMP = `${ENTRY_URL}?at=now`;
 
   const fetchMock = jest_fn<typeof fetch>().mockImplementation(
     (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
@@ -122,11 +122,11 @@ describe('NdgrClient', () => {
     expect(fetchMock).toHaveBeenNthCalledWith(1, ENTRY_URL_WITH_TIMESTAMP);
     expect(fetchMock).toHaveBeenNthCalledWith(2, MESSAGES_URL);
 
-    expect(onReceived).toBeCalledTimes(2);
+    expect(onReceived).toHaveBeenCalledTimes(2);
     for (let i = 0; i < 2; i++) {
       expect(onReceived).toHaveBeenNthCalledWith(i + 1, { message: messages[i] });
     }
     target.dispose();
-    expect(onCompleted).toBeCalledTimes(1);
+    expect(onCompleted).toHaveBeenCalledTimes(1);
   });
 });
