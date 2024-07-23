@@ -13,7 +13,7 @@ import {
 } from 'services/platforms/youtube/uploader';
 import { YoutubeService } from 'services/platforms/youtube';
 import os from 'os';
-import { CLIP_DIR, SCRUB_SPRITE_DIRECTORY, SUPPORTED_FILE_TYPES, TEST_MODE } from './constants';
+import { CLIP_DIR, FFMPEG_EXE, SCRUB_SPRITE_DIRECTORY, SUPPORTED_FILE_TYPES, TEST_MODE } from './constants';
 import { pmap } from 'util/pmap';
 import { Clip } from './clip';
 import { AudioCrossfader } from './audio-crossfader';
@@ -31,6 +31,7 @@ import { ENotificationType, NotificationsService } from 'services/notifications'
 import { JsonrpcService } from 'services/api/jsonrpc';
 import { NavigationService } from 'services/navigation';
 import { SharedStorageService } from 'services/integrations/shared-storage';
+import execa from 'execa';
 
 export interface IClip {
   path: string;
@@ -41,7 +42,14 @@ export interface IClip {
   endTrim: number;
   duration?: number;
   deleted: boolean;
-  source: 'ReplayBuffer' | 'Manual';
+  source: 'ReplayBuffer' | 'Manual' | 'AiDetected'
+  // id: string;
+}
+
+export interface IHighlighterData {
+  type: string;
+  start: number;
+  end: number;
 }
 
 export enum EExportStep {
@@ -438,6 +446,8 @@ export class HighlighterService extends StatefulService<IHighligherState> {
   }
 
   init() {
+    console.log('Init highlighter service');
+
     try {
       // On some very very small number of systems, we won't be able to fetch
       // the videos path from the system.
@@ -721,11 +731,11 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     const exportOptions: IExportOptions = preview
       ? { width: 1280 / 4, height: 720 / 4, fps: 30, preset: 'ultrafast' }
       : {
-          width: this.views.exportInfo.resolution === 720 ? 1280 : 1920,
-          height: this.views.exportInfo.resolution === 720 ? 720 : 1080,
-          fps: this.views.exportInfo.fps,
-          preset: this.views.exportInfo.preset,
-        };
+        width: this.views.exportInfo.resolution === 720 ? 1280 : 1920,
+        height: this.views.exportInfo.resolution === 720 ? 720 : 1080,
+        fps: this.views.exportInfo.fps,
+        preset: this.views.exportInfo.preset,
+      };
 
     // Reset all clips
     await pmap(clips, c => c.reset(exportOptions), {
@@ -1076,4 +1086,109 @@ export class HighlighterService extends StatefulService<IHighligherState> {
   clearUpload() {
     this.CLEAR_UPLOAD();
   }
+
+
+
+
+
+  async flow() {
+    //// Highlighter flow
+    // 1. Toggle on ai highlighter
+    // 2. auto-record streams
+    // 3. after stream finished wait for the recording to be done
+    // 4. send recording to highlighterApi
+    // 5. cut data into highlightClips
+    console.log('🔄 getHighlighterData');
+
+
+    const highlighterData = [
+      {
+        start: 322,
+        end: 324,
+        type: 'elimination',
+      },
+      {
+        start: 425,
+        end: 427,
+        type: 'elimination',
+      },
+    ]
+
+    const videoUri = '/Users/marvinoffers/Movies/recording-test-djnardi.mp4';
+    console.log('✅ HighlighterData');
+
+    console.log('🔄 cutHighlightClips');
+    const paths = await this.cutHighlightClips(
+      videoUri, highlighterData);
+    console.log('✅ cutHighlightClips');
+
+    // 6. add highlight clips
+    console.log('🔄 addClips');
+    this.addClips(paths)
+    console.log('✅ addClips');
+  }
+
+
+  toggleAiHighlighterRecording() {
+    // Start aiHighlighterRecording
+
+
+  }
+
+  getHighlightClips() {
+    // call highlighter code
+
+
+  }
+
+
+  async cutHighlightClips(videoUri: string, highlighterData: IHighlighterData[]): Promise<string[]> {
+    const pathArray: string[] = []
+
+    for (const { start, end } of highlighterData) {
+      const outputUri = `${videoUri.slice(0, -4)}-${start}-${end}.mp4`;
+
+      try {
+        // console.log('📁 Check if file already exists');
+        await fs.access(outputUri);
+        // console.log(`Output file ${outputUri} already exists. Deleting it.`);
+        await fs.unlink(outputUri);
+      } catch (err) {
+
+        if (err.code !== 'ENOENT') {
+          console.error(`Error checking existence of ${outputUri}:`, err);
+        }
+      }
+
+      const args = [
+        '-i',
+        videoUri,
+        '-ss',
+        start.toString(),
+        '-to',
+        end.toString(),
+        '-c:v',
+        'libx264',
+        '-c:a',
+        'aac',
+        '-strict',
+        'experimental',
+        '-b:a',
+        '192k',
+        outputUri,
+      ];
+
+      try {
+        console.log(`run FFMPEG with args: ${args}`);
+        await execa(FFMPEG_EXE, args);
+        console.log(`Created segment: ${outputUri}`);
+        pathArray.push(outputUri)
+      } catch (error) {
+        console.error(`Error creating segment: ${outputUri}`, error);
+      }
+    }
+    return pathArray
+  }
+
+
 }

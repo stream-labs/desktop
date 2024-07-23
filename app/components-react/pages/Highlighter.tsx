@@ -2,7 +2,7 @@ import ClipsView from 'components-react/highlighter/ClipsView';
 import SettingsView from 'components-react/highlighter/SettingsView';
 import { useVuex } from 'components-react/hooks';
 import React, { useState } from 'react';
-import { IClip } from 'services/highlighter';
+import { IClip, IHighlighterData } from 'services/highlighter';
 import { Services } from 'components-react/service-provider';
 import { Button } from 'antd';
 
@@ -23,11 +23,12 @@ type IViewState = IClipsViewState | IStreamViewState | ISettingsViewState;
 export default function Highlighter() {
   const [viewState, setViewState] = useState<IViewState>({ view: 'settings' });
 
-  const { HighlighterService, HotkeysService, UsageStatisticsService } = Services;
+  const { HighlighterService, RecordingModeService } = Services;
   const v = useVuex(() => ({
     clips: HighlighterService.views.clips as IClip[],
     dismissedTutorial: HighlighterService.views.dismissedTutorial,
     error: HighlighterService.views.error,
+    recordings: RecordingModeService.views.sortedRecordings,
   }));
 
   // TODO: Below is currently always true. Add the handle correctly
@@ -35,7 +36,15 @@ export default function Highlighter() {
   //   setViewState({ view: 'settings' });
   // }
 
-  console.log(viewState.view);
+  // let streamMockdata: { id: string; videoUri: string }[] = [{ id: '123', videoUri: '234' }];
+  let streamMockdata: { id: string; videoUri: string; highlighterData: any }[] = v.recordings.map(
+    recording => ({
+      id: recording.timestamp,
+      videoUri: recording.filename,
+      highlighterData: { start: 2, end: 4, type: 'lol' },
+    }),
+  );
+
   switch (viewState.view) {
     case 'settings':
       // TODO: Add show tutorial
@@ -54,14 +63,37 @@ export default function Highlighter() {
 
       break;
 
-    case 'stream':
-      return <> {devHeaderBar()}streamView</>;
-      break;
+    // case 'stream':
+    //   return (
+    //     <>
+    //       {' '}
+    //       {devHeaderBar()}{' '}
+    //       <div>
+    //         {' '}
+    //         {streamMockdata.map(stream => (
+    //           <Button
+    //             key={stream.id}
+    //             onClick={() =>
+    //               setView({
+    //                 view: 'clips',
+    //                 id: '123',
+    //                 recordingPath: stream.videoUri,
+    //                 highlighterData: stream.highlighterData,
+    //               })
+    //             }
+    //           >
+    //             {stream.videoUri}
+    //           </Button>
+    //         ))}
+    //       </div>
+    //     </>
+    //   );
+    //   break;
     case 'clips':
       return (
         <>
           {devHeaderBar()}
-          <ClipsView />
+          <ClipsView id={viewState.id} />
         </>
       );
       break;
@@ -92,11 +124,22 @@ export default function Highlighter() {
         >
           clips
         </Button>
+
+        <Button
+          style={{ marginTop: '16px', marginRight: '8px' }}
+          onClick={() => trimHighlightData()}
+        >
+          create clips
+        </Button>
       </>
     );
   }
 
   function setView(view: IViewState) {
     setViewState(view);
+  }
+
+  async function trimHighlightData() {
+    HighlighterService.actions.flow();
   }
 }
