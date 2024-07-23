@@ -35,7 +35,7 @@ export interface ProgramInfo {
   };
   data: {
     /** 番組の状態 */
-    status: 'test' | 'onAir' | 'end';
+    status: 'test' | 'onAir' | 'end' | 'reserved';
     /** 番組の配信者に関係する情報 */
     socialGroup:
       | {
