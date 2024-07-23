@@ -486,7 +486,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     }
     const result = await this.client.sendOperatorComment(this.state.programID, {
       text,
-      isPermanent,
+      isPermCommand: isPermanent,
     });
     if (!isOk(result)) {
       throw NicoliveFailure.fromClientError('sendOperatorComment', result);
