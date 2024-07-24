@@ -667,11 +667,20 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   }
 
   async loadClips() {
-    await this.ensureScrubDirectory();
+    // TODO: Dont delete this directory, make sure that files get deleted
+    // await this.ensureScrubDirectory();
 
     // Ensure we have a Clip class for every clip in the store
     // Also make sure they are the correct format
-    this.views.clips.forEach(c => {
+
+    for (const c of this.views.clips) {
+
+      if (!this.fileExists(c.path)) {
+        this.REMOVE_CLIP(c.path);
+        //TODO: Make sure to also generate the scrub file
+        return
+      }
+
       if (!SUPPORTED_FILE_TYPES.map(e => `.${e}`).includes(path.parse(c.path).ext)) {
         this.REMOVE_CLIP(c.path);
         this.SET_ERROR(
@@ -682,7 +691,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       }
 
       this.clips[c.path] = this.clips[c.path] ?? new Clip(c.path);
-    });
+    }
 
     await pmap(
       this.views.clips.filter(c => !c.loaded),

@@ -16,6 +16,15 @@ export default function ClipPreview(props: {
 }) {
   const { HighlighterService } = Services;
   const [scrubFrame, setScrubFrame] = useState(0);
+
+  // TODO: placeholder image + make sure to regenerate sprite if sprite doesnt exist
+  let clipThumbnail = '';
+  if (props.clip.scrubSprite && HighlighterService.fileExists(props.clip.scrubSprite)) {
+    clipThumbnail = props.clip.scrubSprite;
+  } else {
+    clipThumbnail = '';
+  }
+
   const filename = useMemo(() => {
     return path.basename(props.clip.path);
   }, [props.clip.path]);
@@ -38,7 +47,7 @@ export default function ClipPreview(props: {
     <div style={{ height: `${SCRUB_HEIGHT}px`, position: 'relative' }}>
       {!props.clip.deleted && (
         <img
-          src={props.clip.scrubSprite?.replace('#', '%23')}
+          src={clipThumbnail}
           style={{
             width: `${SCRUB_WIDTH}px`,
             height: `${SCRUB_HEIGHT}px`,
