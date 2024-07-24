@@ -13,7 +13,12 @@ import {
 } from '../../helpers/modules/core';
 import { logIn } from '../../helpers/modules/user';
 import { toggleDisplay, toggleDualOutputMode } from '../../helpers/modules/dual-output';
-import { test, TExecutionContext, useWebdriver } from '../../helpers/webdriver';
+import {
+  skipCheckingErrorsInLog,
+  test,
+  TExecutionContext,
+  useWebdriver,
+} from '../../helpers/webdriver';
 import { withUser } from '../../helpers/webdriver/user';
 import { SceneBuilder } from '../../helpers/scene-builder';
 import { getApiClient } from '../../helpers/api-client';
@@ -64,8 +69,24 @@ test(
 
     await toggleDualOutputMode();
 
+    // dual output is active but the vertical display is not shown
     await focusMain();
+    await (await app.client.$('.icon-dual-output.active')).waitForExist();
     t.false(await isDisplayed('div#vertical-display'));
+
+    // toggling selective recording off should show the vertical display
+    await (await app.client.$('.icon-smart-record.active')).click();
+    t.true(await isDisplayed('div#vertical-display'));
+
+    // toggling selective recording back on should hide the vertical display
+    await (await app.client.$('.icon-smart-record')).click();
+    t.false(await isDisplayed('div#vertical-display'));
+
+    // toggling selective recording on while in dual output mode opens a message box warning
+    // notifying the user that the vertical canvas is no longer accessible
+    // skip checking the log for this error
+    skipCheckingErrorsInLog();
+    t.pass();
   },
 );
 
