@@ -56,14 +56,12 @@ export default function SideNav() {
   const updateStyleBlockersDebounced = useDebounce(1000, updateStyleBlockers);
 
   const resizeObserver = new ResizeObserver((entries: ResizeObserverEntry[]) => {
-    requestAnimationFrame(() => {
-      entries.forEach((entry: ResizeObserverEntry) => {
-        const width = Math.floor(entry?.contentRect?.width);
+    entries.forEach((entry: ResizeObserverEntry) => {
+      const width = Math.floor(entry?.contentRect?.width);
 
-        if (width === siderMinWidth || width === siderMaxWidth) {
-          updateStyleBlockersDebounced('main', false);
-        }
-      });
+      if (width === siderMinWidth || width === siderMaxWidth) {
+        updateStyleBlockersDebounced('main', false);
+      }
     });
   });
 
