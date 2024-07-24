@@ -300,6 +300,10 @@ class HighligherViews extends ViewHandler<IHighligherState> {
 
 @InitAfter('StreamingService')
 export class HighlighterService extends StatefulService<IHighligherState> {
+
+  createAiRecording: boolean = true
+  currentRecordingIsAiRecording: boolean = false
+
   static initialState: IHighligherState = {
     clips: {},
     clipOrder: [],
@@ -1091,7 +1095,8 @@ export class HighlighterService extends StatefulService<IHighligherState> {
 
 
 
-  async flow() {
+  async flow(filePath: string) {
+
     //// Highlighter flow
     // 1. Toggle on ai highlighter
     // 2. auto-record streams
@@ -1114,7 +1119,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       },
     ]
 
-    const videoUri = '/Users/marvinoffers/Movies/recording-test-djnardi.mp4';
+    const videoUri = '/Users/marvinoffers/Movies/recording-test-djnardi.mp4'; // replace with filepath
     console.log('✅ HighlighterData');
 
     console.log('🔄 cutHighlightClips');
@@ -1189,6 +1194,45 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     }
     return pathArray
   }
+
+
+
+  // async function test(path: string, highlighterData: IHighlighterData) {
+  //   const { HighlighterService } = Services;
+
+  //   const { stdout } = await execa(FFPROBE_EXE, [
+  //     '-v',
+  //     'error',
+  //     '-show_entries',
+  //     'format=duration',
+  //     '-of',
+  //     'default=noprint_wrappers=1:nokey=1',
+  //     path,
+  //   ]);
+  //   let duration = parseFloat(stdout);
+
+  //   console.log('ADD CLIP', path, duration);
+
+  //   HighlighterService.actions.ADD_CLIP({
+  //     path,
+  //     loaded: false,
+  //     enabled: true,
+  //     // Creates a 2 sec clip
+  //     startTrim: highlighterData.start - 1,
+  //     endTrim: duration - (highlighterData.end + 1),
+
+  //     deleted: false,
+  //     source: 'AiDetected',
+  //     // id: `${highlighterData.start.toString()}`,
+  //   });
+
+  //   console.log('🚀 ~ test ~ duration:', duration);
+  //   console.log('🚀 ~ test ~ highlighterData.start - 1:', highlighterData.start - 1);
+  //   console.log(
+  //     '🚀 ~ test ~ duration - (highlighterData.end - 1):',
+  //     duration - (highlighterData.end + 1),
+  //   );
+  // }
 
 
 }

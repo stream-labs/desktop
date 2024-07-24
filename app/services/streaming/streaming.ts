@@ -56,6 +56,7 @@ import { DualOutputService } from 'services/dual-output';
 import { capitalize } from 'lodash';
 import { tiktokErrorMessages } from 'services/platforms/tiktok/api';
 import { TikTokService } from 'services/platforms/tiktok';
+import { HighlighterService } from 'app-services';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -101,6 +102,7 @@ export class StreamingService
   @Inject() private markersService: MarkersService;
   @Inject() private dualOutputService: DualOutputService;
   @Inject() private tikTokService: TikTokService;
+  @Inject() private highlighterService: HighlighterService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
@@ -1110,6 +1112,7 @@ export class StreamingService
     this.toggleRecording();
   }
 
+  // Toggle recording
   toggleRecording() {
     if (this.state.recordingStatus === ERecordingState.Recording) {
       NodeObs.OBS_service_stopRecording();
@@ -1278,6 +1281,7 @@ export class StreamingService
 
   private handleOBSOutputSignal(info: IOBSOutputSignalInfo) {
     console.debug('OBS Output signal: ', info);
+    console.log('OBS Output signal: ', info);
 
     const shouldResolve =
       !this.views.isDualOutputMode || (this.views.isDualOutputMode && info.service === 'vertical');
@@ -1286,6 +1290,14 @@ export class StreamingService
 
     if (info.type === EOBSOutputType.Streaming) {
       if (info.signal === EOBSOutputSignal.Start && shouldResolve) {
+
+        if (this.highlighterService.createAiRecording) {
+          console.log('toggleRecording');
+          this.highlighterService.currentRecordingIsAiRecording = true
+          this.toggleRecording()
+        }
+
+
         this.SET_STREAMING_STATUS(EStreamingState.Live, time);
         this.resolveStartStreaming();
         this.streamingStatusChange.next(EStreamingState.Live);
@@ -1368,20 +1380,35 @@ export class StreamingService
       }
 
       if (info.signal === EOBSOutputSignal.Wrote) {
+        console.log('Record: EOBSOutputSignal.Wrote');
+
         const filename = NodeObs.OBS_service_getLastRecording();
         const parsedFilename = byOS({
           [OS.Mac]: filename,
           [OS.Windows]: filename.replace(/\//, '\\'),
         });
+
         this.recordingModeService.actions.addRecordingEntry(parsedFilename);
         this.markersService.actions.exportCsv(parsedFilename);
         this.recordingModeService.addRecordingEntry(parsedFilename);
+
+        console.log('parsedFilename', parsedFilename);
         // Wrote signals come after Offline, so we return early here
         // to not falsely set our state out of Offline
+
+        if (this.highlighterService.createAiRecording && this.highlighterService.currentRecordingIsAiRecording) {
+          console.log('ai-highlighter recording');
+          this.highlighterService.currentRecordingIsAiRecording = false
+          this.highlighterService.actions.flow(parsedFilename)
+        }
+
         return;
       }
 
       this.SET_RECORDING_STATUS(nextState, time);
+
+
+      // Sub to rec
       this.recordingStatusChange.next(nextState);
     } else if (info.type === EOBSOutputType.ReplayBuffer) {
       const nextState: EReplayBufferState = ({
