@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import { IClip, IHighlighterData } from 'services/highlighter';
 import { Services } from 'components-react/service-provider';
 import { Button } from 'antd';
+import moment from 'moment';
 
 interface IClipsViewState {
   view: 'clips';
@@ -131,8 +132,31 @@ export default function Highlighter() {
         >
           create clips
         </Button>
+
+        <Button
+          style={{ marginTop: '16px', marginRight: '8px' }}
+          onClick={() =>
+            HighlighterService.actions.SET_EXAMPLE_TITLE('JanniIstToll' + moment().format())
+          }
+        >
+          SetJanniIstToll
+        </Button>
+
+        <Button style={{ marginTop: '16px', marginRight: '8px' }} onClick={() => getTitle()}>
+          getText
+        </Button>
       </>
     );
+  }
+
+  function getTitle() {
+    const viewStateTitle = HighlighterService.views.state.exampleTitle;
+    console.log('🚀 ~ getTitle ~ viewStateTitle:', viewStateTitle);
+
+    const actionTitle = HighlighterService.actions.getExampleTitle();
+    console.log('actionTutle', actionTitle);
+    const title = HighlighterService.getExampleTitle();
+    console.log('title', title);
   }
 
   function setView(view: IViewState) {
@@ -140,6 +164,6 @@ export default function Highlighter() {
   }
 
   async function trimHighlightData() {
-    HighlighterService.actions.flow();
+    HighlighterService.actions.flow('das');
   }
 }

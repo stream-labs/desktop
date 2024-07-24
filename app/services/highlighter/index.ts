@@ -1,4 +1,4 @@
-import { mutation, StatefulService, ViewHandler, Inject, InitAfter, Service } from 'services/core';
+import { mutation, StatefulService, ViewHandler, Inject, InitAfter, Service, PersistentStatefulService } from 'services/core';
 import path from 'path';
 import Vue from 'vue';
 import fs from 'fs-extra';
@@ -113,6 +113,7 @@ interface IHighligherState {
   upload: IUploadInfo;
   dismissedTutorial: boolean;
   error: string;
+  exampleTitle: string;
 }
 
 // Capitalization is not consistent because it matches with the
@@ -299,12 +300,12 @@ class HighligherViews extends ViewHandler<IHighligherState> {
 }
 
 @InitAfter('StreamingService')
-export class HighlighterService extends StatefulService<IHighligherState> {
+export class HighlighterService extends PersistentStatefulService<IHighligherState> {
 
   createAiRecording: boolean = true
   currentRecordingIsAiRecording: boolean = false
 
-  static initialState: IHighligherState = {
+  static defaultState: IHighligherState = {
     clips: {},
     clipOrder: [],
     transition: {
@@ -340,6 +341,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     },
     dismissedTutorial: false,
     error: '',
+    exampleTitle: ''
   };
 
   @Inject() streamingService: StreamingService;
@@ -445,11 +447,24 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     this.state.error = error;
   }
 
+
+  @mutation()
+  SET_EXAMPLE_TITLE(exampleTitle: string) {
+    console.log('setExampleTitle', exampleTitle);
+    Vue.set(this.state, 'exampleTitle', exampleTitle);
+    // No need to call any explicit persistence method as it is handled by the watch method in init()
+  }
+
+  getExampleTitle(): string {
+    return this.state.exampleTitle;
+  }
+
   get views() {
     return new HighligherViews(this.state);
   }
 
   init() {
+    super.init();
     console.log('Init highlighter service');
 
     try {
