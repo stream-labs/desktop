@@ -213,8 +213,8 @@ class StreamSettingsModule {
       : 'internal';
 
     await Services.UserService.actions.return.startAuth(platform, mode, true).then(res => {
+      Services.WindowsService.actions.setWindowOnTop(true);
       if (res === EPlatformCallResult.Error) {
-        Services.WindowsService.actions.setWindowOnTop();
         alertAsync(
           $t(
             'This account is already linked to another Streamlabs Account. Please use a different account.',

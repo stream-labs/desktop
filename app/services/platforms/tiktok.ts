@@ -473,7 +473,7 @@ export class TikTokService
         if (Utils.isTestMode()) {
           return [{ id: 'game1', name: 'test1' }, this.defaultGame];
         }
-        console.error('Error fetching TikTok games: ', e);
+        console.error('Error fetching TikTok categories: ', e);
         return [];
       });
   }
