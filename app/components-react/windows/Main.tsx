@@ -343,7 +343,7 @@ function Main() {
 
   return (
     <div
-      className={cx(styles.main, theme)}
+      className={cx(styles.main, theme, 'react')}
       id="mainWrapper"
       ref={mainWindowEl}
       onDrop={(ev: React.DragEvent) => ctrl.onDropHandler(ev)}
@@ -356,7 +356,18 @@ function Main() {
           [styles.mainContentsOnboarding]: page === 'Onboarding',
         })}
       >
-        {page !== 'Onboarding' && !showLoadingSpinner && <SideNav />}
+        {page !== 'Onboarding' && !showLoadingSpinner && (
+          <div
+            style={{
+              minHeight: '100%',
+              height: '100%',
+              display: 'flex',
+              flexGrow: 1,
+            }}
+          >
+            <SideNav />
+          </div>
+        )}
         {renderDock && leftDock && (
           <LiveDock
             onLeft
@@ -371,13 +382,19 @@ function Main() {
           ref={mainMiddleEl}
         >
           {!showLoadingSpinner && (
-            <Component
-              className={styles.mainPageContainer}
-              params={ctrl.params}
-              onTotalWidth={(width: number) => ctrl.handleEditorWidth(width)}
-            />
+            <div className={styles.mainPageContainer} style={{ gridRow: '1 / span 1' }}>
+              <Component
+                className={''}
+                params={ctrl.params}
+                onTotalWidth={(width: number) => ctrl.handleEditorWidth(width)}
+              />
+            </div>
           )}
-          {!applicationLoading && page !== 'Onboarding' && <StudioFooter />}
+          {!applicationLoading && page !== 'Onboarding' && (
+            <div style={{ display: 'flex', minWidth: '0px', gridRow: '2 / span 1' }}>
+              <StudioFooter />
+            </div>
+          )}
         </div>
 
         {renderDock && !leftDock && (
