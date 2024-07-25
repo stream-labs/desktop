@@ -57,6 +57,13 @@ export enum EExportStep {
   FrameRender = 'frames',
 }
 
+interface HighlighterApiResponse {
+  start_time: number;
+  end_time: number;
+  type: string;
+  origin: string;
+}
+
 export type TFPS = 30 | 60;
 export type TResolution = 720 | 1080;
 export type TPreset = 'ultrafast' | 'fast' | 'slow';
@@ -1119,7 +1126,11 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
 
 
-  async flow(filePath: string) {
+  async flow(filePath: string, eventMetadata?: Dictionary<any>) {
+
+
+
+    console.log('eventMetadata', eventMetadata);
 
     //// Highlighter flow
     // 1. Toggle on ai highlighter
@@ -1143,12 +1154,21 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       },
     ]
 
-    const videoUri = '/Users/marvinoffers/Movies/recording-test-djnardi.mp4'; // replace with filepath
-    console.log('✅ HighlighterData');
+
+
+    const videoUri = '/Users/marvinoffers/Movies/djnardi-short.mp4'; // replace with filepath
+
+    console.log('🔄 HighlighterData');
+    const highlighterResponse = await this.getHighlightClips('/highlights', videoUri, undefined)
+    console.log('✅ HighlighterData', highlighterResponse);
+
+    console.log('🔄 formatHighlighterResponse');
+    const formattedHighlighterResponse = this.formatHighlighterResponse(highlighterResponse as unknown as any)
+    console.log('✅ formatHighlighterResponse', formattedHighlighterResponse);
 
     console.log('🔄 cutHighlightClips');
     const paths = await this.cutHighlightClips(
-      videoUri, highlighterData);
+      videoUri, formattedHighlighterResponse);
     console.log('✅ cutHighlightClips');
 
     // 6. add highlight clips
@@ -1158,16 +1178,63 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   }
 
 
-  toggleAiHighlighterRecording() {
-    // Start aiHighlighterRecording
+  async getHighlightClips(type: string, video_uri: string, trim: { start_time: number, start_end: number } | undefined) {
 
+    // Call highlighter code - replace with function
+    try {
+      const body = {
+        video_uri,
+        url,
+        trim
+      };
 
+      const controller = new AbortController();
+      const signal = controller.signal;
+      const timeout = 1000 * 60 * 30; // 30 minutes
+      console.time('requestDuration');
+      const fetchTimeout = setTimeout(() => {
+        controller.abort();
+      }, timeout);
+
+      const response = await fetch(`http://127.0.0.1:8000${type}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify(body),
+        signal: signal
+      });
+
+      clearTimeout(fetchTimeout);
+      console.timeEnd('requestDuration');
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data;
+
+    } catch (error) {
+      console.timeEnd('requestDuration');
+
+      if (error.name === 'AbortError') {
+        console.error('Fetch request timed out');
+      } else {
+        console.error('Fetch error:', error);
+      }
+
+      throw new Error("Error while fetching");
+    }
   }
 
-  getHighlightClips() {
-    // call highlighter code
 
 
+  formatHighlighterResponse(responseData: HighlighterApiResponse[]) {
+
+    //TODO: Currently the colde failes if start and endtime are equal. Needs to be fixed with the config
+    return responseData.map((curr) => { return { "start": curr.start_time - 2, "end": curr.end_time !== null ? curr.end_time + 2 : curr.start_time + 2, 'type': curr.type } })
   }
 
 

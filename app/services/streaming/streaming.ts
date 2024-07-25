@@ -117,8 +117,8 @@ export class StreamingService
 
   powerSaveId: number;
 
-  private resolveStartStreaming: Function = () => {};
-  private rejectStartStreaming: Function = () => {};
+  private resolveStartStreaming: Function = () => { };
+  private rejectStartStreaming: Function = () => { };
 
   static initialState: IStreamingServiceState = {
     streamingStatus: EStreamingState.Offline,
@@ -1279,6 +1279,8 @@ export class StreamingService
   private streamErrorUserMessage = '';
   private streamErrorReportMessage = '';
 
+  private eventMetadata: Dictionary<any> = {}
+
   private handleOBSOutputSignal(info: IOBSOutputSignalInfo) {
     console.debug('OBS Output signal: ', info);
     console.log('OBS Output signal: ', info);
@@ -1287,6 +1289,8 @@ export class StreamingService
       !this.views.isDualOutputMode || (this.views.isDualOutputMode && info.service === 'vertical');
 
     const time = new Date().toISOString();
+
+
 
     if (info.type === EOBSOutputType.Streaming) {
       if (info.signal === EOBSOutputSignal.Start && shouldResolve) {
@@ -1312,22 +1316,24 @@ export class StreamingService
           console.error('Error fetching stream encoder info: ', e);
         }
 
-        const eventMetadata: Dictionary<any> = {
+        this.eventMetadata = {
           ...streamEncoderInfo,
           game,
         };
+        console.log("🚀 ~ handleOBSOutputSignal ~ this.eventMetadata:", this.eventMetadata)
 
         if (this.videoEncodingOptimizationService.state.useOptimizedProfile) {
-          eventMetadata.useOptimizedProfile = true;
+          this.eventMetadata.useOptimizedProfile = true;
         }
 
         const streamSettings = this.streamSettingsService.settings;
+        console.log("🚀 ~ handleOBSOutputSignal ~ streamSettings:", streamSettings)
 
-        eventMetadata.streamType = streamSettings.streamType;
-        eventMetadata.platform = streamSettings.platform;
-        eventMetadata.server = streamSettings.server;
+        this.eventMetadata.streamType = streamSettings.streamType;
+        this.eventMetadata.platform = streamSettings.platform;
+        this.eventMetadata.server = streamSettings.server;
 
-        this.usageStatisticsService.recordEvent('stream_start', eventMetadata);
+        this.usageStatisticsService.recordEvent('stream_start', this.eventMetadata);
         this.usageStatisticsService.recordAnalyticsEvent('StreamingStatus', {
           code: info.code,
           status: EStreamingState.Live,
@@ -1346,6 +1352,17 @@ export class StreamingService
           code: info.code,
           status: EStreamingState.Offline,
         });
+
+
+        if (this.state.recordingStatus === 'recording') {
+          // is Recording: Do nothing, we will need the eventmetadata when the recording stops
+          console.log('Dont clean up metadata');
+
+        } else {
+          // Clean up eventMetadata
+          this.eventMetadata = {};
+        }
+
       } else if (info.signal === EOBSOutputSignal.Stopping) {
         this.sendStreamEndEvent();
         this.SET_STREAMING_STATUS(EStreamingState.Ending, time);
@@ -1399,8 +1416,11 @@ export class StreamingService
         if (this.highlighterService.createAiRecording && this.highlighterService.currentRecordingIsAiRecording) {
           console.log('ai-highlighter recording');
           this.highlighterService.currentRecordingIsAiRecording = false
-          this.highlighterService.actions.flow(parsedFilename)
+          this.highlighterService.actions.flow(parsedFilename, this.eventMetadata)
         }
+
+        // Clean up eventMetadata after recording stops. We are doing this here because we need the metadata when saving the recording
+        this.eventMetadata = {};
 
         return;
       }
