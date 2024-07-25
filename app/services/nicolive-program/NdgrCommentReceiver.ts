@@ -89,154 +89,200 @@ export function convertModifierToMail(modifier: dwango.nicolive.chat.data.Chat.I
   return commands.join(' ');
 }
 
+type CommonComponent = { date: number; date_usec: number };
+
+function convertChatToMessageResponse(
+  common: CommonComponent,
+  chat: dwango.nicolive.chat.data.IChat,
+): MessageResponse {
+  return {
+    chat: {
+      ...common,
+      ...(chat.content ? { content: chat.content } : {}),
+      ...(chat.no !== undefined ? { no: chat.no } : {}),
+      ...(chat.accountStatus === dwango.nicolive.chat.data.Chat.AccountStatus.Premium
+        ? { premium: 1 }
+        : {}),
+      ...(chat.hashedUserId ? { user_id: chat.hashedUserId } : {}),
+      ...(chat.vpos !== undefined ? { vpos: chat.vpos } : {}),
+      ...(chat.name ? { name: chat.name } : {}),
+      ...(chat.modifier ? { mail: convertModifierToMail(chat.modifier) } : {}),
+    },
+  };
+}
+
+function convertSimpleNotificationToMessageResponse(
+  common: CommonComponent,
+  notification: dwango.nicolive.chat.data.ISimpleNotification,
+): MessageResponse | undefined {
+  const key = Object.keys(notification)[0] as NotificationType;
+  if (!NotificationTypeTable.includes(key)) {
+    console.warn('Unknown simpleNotification type', notification);
+    return undefined;
+  }
+  return {
+    notification: {
+      ...common,
+      type: key,
+      message: notification[key],
+    },
+  };
+}
+
+function convertGiftToMessageResponse(
+  common: CommonComponent,
+  gift: dwango.nicolive.chat.data.IGift,
+): MessageResponse {
+  return {
+    gift: {
+      ...common,
+      ...(gift.itemId ? { itemId: gift.itemId } : {}),
+      ...(gift.advertiserUserId ? { advertiserUserId: toNumber(gift.advertiserUserId) } : {}),
+      ...(gift.advertiserName ? { advertiserName: gift.advertiserName } : {}),
+      ...(gift.point ? { point: toNumber(gift.point) } : {}),
+      ...(gift.message ? { message: gift.message } : {}),
+      ...(gift.itemName ? { itemName: gift.itemName } : {}),
+      ...(gift.contributionRank ? { contributionRank: gift.contributionRank } : {}),
+    },
+  };
+}
+
+function convertNicoadToMessageResponse(
+  common: CommonComponent,
+  nicoad: dwango.nicolive.chat.data.INicoad,
+): MessageResponse {
+  if (nicoad.v0) {
+    const v0 = nicoad.v0;
+    const latest = v0.latest;
+    const ranking = v0.ranking;
+    return {
+      nicoad: {
+        ...common,
+        v0: {
+          latest: {
+            ...(latest.advertiser ? { advertiser: latest.advertiser } : {}),
+            ...(latest.point ? { point: latest.point } : {}),
+            ...(latest.message ? { message: latest.message } : {}),
+          },
+          ranking: ranking.map(r => ({
+            ...(r.advertiser ? { advertiser: r.advertiser } : {}),
+            ...(r.rank ? { rank: r.rank } : {}),
+            ...(r.message ? { message: r.message } : {}),
+            ...(r.userRank ? { userRank: r.userRank } : {}),
+          })),
+          ...(v0.totalPoint ? { totalPoint: v0.totalPoint } : {}),
+        },
+      },
+    };
+  } else if (nicoad.v1) {
+    const v1 = nicoad.v1;
+    return {
+      nicoad: {
+        ...common,
+        v1: {
+          ...(v1.totalAdPoint ? { totalAdPoint: v1.totalAdPoint } : {}),
+          ...(v1.message ? { message: v1.message } : {}),
+        },
+      },
+    };
+  }
+}
+
+function convertGameUpdateToMessageResponse(
+  common: CommonComponent,
+  _gameUpdate: dwango.nicolive.chat.data.IGameUpdate,
+): MessageResponse {
+  return {
+    gameUpdate: {
+      ...common,
+      // empty
+    },
+  };
+}
+
+function convertMarqueeToMessageResponse(
+  common: CommonComponent,
+  marquee: dwango.nicolive.chat.data.IMarquee,
+): MessageResponse {
+  if (marquee.display) {
+    const display = marquee.display;
+    if (display.operatorComment) {
+      const operatorComment = display.operatorComment;
+      return {
+        operator: {
+          ...common,
+          content: operatorComment.content,
+          link: operatorComment.link,
+          mail: operatorComment.modifier
+            ? convertModifierToMail(operatorComment.modifier)
+            : undefined,
+          name: operatorComment.name,
+        },
+      };
+    }
+  }
+  return undefined;
+}
+
+function convertProgramStatusToMessageResponse(
+  common: CommonComponent,
+  programStatus: dwango.nicolive.chat.data.IProgramStatus,
+): MessageResponse | undefined {
+  switch (programStatus.state) {
+    case dwango.nicolive.chat.data.ProgramStatus.State.Ended:
+      // "/disconnect"
+      return {
+        state: {
+          ...common,
+          state: 'ended',
+        },
+      };
+  }
+  return undefined;
+}
+
+function convertSignalToMessageResponse(
+  signal: dwango.nicolive.chat.service.edge.ChunkedMessage.Signal,
+): MessageResponse {
+  switch (signal) {
+    case dwango.nicolive.chat.service.edge.ChunkedMessage.Signal.Flushed:
+      return {
+        signal: 'flushed',
+      };
+  }
+  return undefined;
+}
+
 export function convertChunkedResponseToMessageResponse(
   msg: dwango.nicolive.chat.service.edge.IChunkedMessage,
   now = Date.now(),
 ): MessageResponse | undefined {
-  const date = toNumber(msg.meta?.at?.seconds ?? Math.floor(now / 1000));
-  const date_usec = Math.floor(toNumber(msg.meta?.at?.nanos ?? (now % 1000) * 1000000) / 1000);
+  const common: CommonComponent = {
+    date: toNumber(msg.meta?.at?.seconds ?? Math.floor(now / 1000)),
+    date_usec: Math.floor(toNumber(msg.meta?.at?.nanos ?? (now % 1000) * 1000000) / 1000),
+  };
   if (msg.message) {
     if (msg.message.chat) {
-      const chat = msg.message.chat;
-
-      return {
-        chat: {
-          ...(chat.content ? { content: chat.content } : {}),
-          date,
-          date_usec,
-          ...(chat.no !== undefined ? { no: chat.no } : {}),
-          ...(chat.accountStatus === dwango.nicolive.chat.data.Chat.AccountStatus.Premium
-            ? { premium: 1 }
-            : {}),
-          ...(chat.hashedUserId ? { user_id: chat.hashedUserId } : {}),
-          ...(chat.vpos !== undefined ? { vpos: chat.vpos } : {}),
-          ...(chat.name ? { name: chat.name } : {}),
-          ...(chat.modifier ? { mail: convertModifierToMail(chat.modifier) } : {}),
-        },
-      };
+      return convertChatToMessageResponse(common, msg.message.chat);
     } else if (msg.message.simpleNotification) {
-      const n = msg.message.simpleNotification;
-      const key = Object.keys(n)[0] as NotificationType;
-      if (!NotificationTypeTable.includes(key)) {
-        console.warn('Unknown simpleNotification type', n);
-      } else {
-        return {
-          notification: {
-            date,
-            date_usec,
-            type: key,
-            message: n[key],
-          },
-        };
-      }
+      return convertSimpleNotificationToMessageResponse(common, msg.message.simpleNotification);
     } else if (msg.message.gift) {
-      const gift = msg.message.gift;
-      return {
-        gift: {
-          date,
-          date_usec,
-          ...(gift.itemId ? { itemId: gift.itemId } : {}),
-          ...(gift.advertiserUserId ? { advertiserUserId: toNumber(gift.advertiserUserId) } : {}),
-          ...(gift.advertiserName ? { advertiserName: gift.advertiserName } : {}),
-          ...(gift.point ? { point: toNumber(gift.point) } : {}),
-          ...(gift.message ? { message: gift.message } : {}),
-          ...(gift.itemName ? { itemName: gift.itemName } : {}),
-          ...(gift.contributionRank ? { contributionRank: gift.contributionRank } : {}),
-        },
-      };
+      return convertGiftToMessageResponse(common, msg.message.gift);
     } else if (msg.message.nicoad) {
-      const nicoad = msg.message.nicoad;
-      if (nicoad.v0) {
-        const v0 = nicoad.v0;
-        const latest = v0.latest;
-        const ranking = v0.ranking;
-        return {
-          nicoad: {
-            date,
-            date_usec,
-            v0: {
-              latest: {
-                ...(latest.advertiser ? { advertiser: latest.advertiser } : {}),
-                ...(latest.point ? { point: latest.point } : {}),
-                ...(latest.message ? { message: latest.message } : {}),
-              },
-              ranking: ranking.map(r => ({
-                ...(r.advertiser ? { advertiser: r.advertiser } : {}),
-                ...(r.rank ? { rank: r.rank } : {}),
-                ...(r.message ? { message: r.message } : {}),
-                ...(r.userRank ? { userRank: r.userRank } : {}),
-              })),
-              ...(v0.totalPoint ? { totalPoint: v0.totalPoint } : {}),
-            },
-          },
-        };
-      } else if (nicoad.v1) {
-        const v1 = nicoad.v1;
-        return {
-          nicoad: {
-            date,
-            date_usec,
-            v1: {
-              ...(v1.totalAdPoint ? { totalAdPoint: v1.totalAdPoint } : {}),
-              ...(v1.message ? { message: v1.message } : {}),
-            },
-          },
-        };
-      }
+      return convertNicoadToMessageResponse(common, msg.message.nicoad);
     } else if (msg.message.gameUpdate) {
-      const gameUpdate: dwango.nicolive.chat.data.IGameUpdate = msg.message.gameUpdate;
-      return {
-        gameUpdate: {
-          date,
-          date_usec,
-          // empty
-        },
-      };
+      return convertGameUpdateToMessageResponse(common, msg.message.gameUpdate);
     }
   } else if (msg.state) {
     console.info(msg.state);
     if (msg.state.marquee) {
       // 運コメ(放送者コメント)
-      const display = msg.state.marquee.display;
-      if (!display) {
-        // 運コメ消去
-      } else if (display.operatorComment) {
-        const operatorComment = display.operatorComment;
-        // display.duration は使わない
-        return {
-          operator: {
-            date,
-            date_usec,
-            content: operatorComment.content,
-            link: operatorComment.link,
-            mail: operatorComment.modifier
-              ? convertModifierToMail(operatorComment.modifier)
-              : undefined,
-            name: operatorComment.name,
-          },
-        };
-      }
-    }
-    if (msg.state.programStatus) {
-      if (msg.state.programStatus.state === dwango.nicolive.chat.data.ProgramStatus.State.Ended) {
-        // "/disconnect"
-        return {
-          state: {
-            date,
-            date_usec,
-            state: 'ended',
-          },
-        };
-      }
+      return convertMarqueeToMessageResponse(common, msg.state.marquee);
+    } else if (msg.state.programStatus) {
+      return convertProgramStatusToMessageResponse(common, msg.state.programStatus);
     }
   } else if (msg.signal !== undefined) {
-    if (msg.signal === dwango.nicolive.chat.service.edge.ChunkedMessage.Signal.Flushed) {
-      return {
-        signal: 'flushed',
-      };
-    } else {
-      // unknown signal
-    }
+    return convertSignalToMessageResponse(msg.signal);
   }
   return undefined;
 }
