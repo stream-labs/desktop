@@ -81,7 +81,7 @@
   "dependencies": {
     "@electron/remote": "2.0.8",
     "@n-air-app/n-voice-package": "^1.0.2",
-    "@n-air-app/nicolive-comment-protobuf": "^2024.725.91748",
+    "@n-air-app/nicolive-comment-protobuf": "2024.725.91748",
     "@sentry/electron": "4.24.0",
     "@sentry/vue": "7.112.0",
     "@sentry/webpack-plugin": "^2.20.1",
