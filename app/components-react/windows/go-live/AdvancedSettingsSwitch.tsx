@@ -18,18 +18,16 @@ export default function AdvancedSettingsSwitch() {
   const shouldShowAdvancedSwitch = ableToConfirm && (isMultiplatformMode || isDualOutputMode);
 
   return !shouldShowAdvancedSwitch ? null : (
-    <Form layout="horizontal">
-      <SwitchInput
-        label={$t('Additional Settings')}
-        name="advancedMode"
-        onChange={switchAdvancedMode}
-        value={isAdvancedMode}
-        debounce={200}
-        disabled={isLoading}
-        labelAlign="right"
-        wrapperCol={{ span: 1 }}
-        labelCol={{ flex: '95%' }}
-      />
-    </Form>
+    <SwitchInput
+      label={$t('Additional Settings')}
+      name="advancedMode"
+      onChange={switchAdvancedMode}
+      value={isAdvancedMode}
+      debounce={200}
+      disabled={isLoading}
+      labelAlign="right"
+      wrapperCol={{ span: 1 }}
+      labelCol={{ flex: '95%' }}
+    />
   );
 }
