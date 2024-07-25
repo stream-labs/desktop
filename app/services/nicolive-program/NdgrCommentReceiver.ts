@@ -8,6 +8,29 @@ function toHex2(n: number) {
   return n.toString(16).padStart(2, '0');
 }
 
+const namedColorTable: { [key in dwango.nicolive.chat.data.Chat.Modifier.ColorName]: string } = {
+  [dwango.nicolive.chat.data.Chat.Modifier.ColorName.white]: '', // whiteはエンコードされない
+  [dwango.nicolive.chat.data.Chat.Modifier.ColorName.red]: 'red',
+  [dwango.nicolive.chat.data.Chat.Modifier.ColorName.pink]: 'pink',
+  [dwango.nicolive.chat.data.Chat.Modifier.ColorName.orange]: 'orange',
+  [dwango.nicolive.chat.data.Chat.Modifier.ColorName.yellow]: 'yellow',
+  [dwango.nicolive.chat.data.Chat.Modifier.ColorName.green]: 'green',
+  [dwango.nicolive.chat.data.Chat.Modifier.ColorName.cyan]: 'cyan',
+  [dwango.nicolive.chat.data.Chat.Modifier.ColorName.blue]: 'blue',
+  [dwango.nicolive.chat.data.Chat.Modifier.ColorName.purple]: 'purple',
+  [dwango.nicolive.chat.data.Chat.Modifier.ColorName.black]: 'black',
+  [dwango.nicolive.chat.data.Chat.Modifier.ColorName.white2]: 'white2',
+  [dwango.nicolive.chat.data.Chat.Modifier.ColorName.red2]: 'red2',
+  [dwango.nicolive.chat.data.Chat.Modifier.ColorName.blue2]: 'blue2',
+  [dwango.nicolive.chat.data.Chat.Modifier.ColorName.green2]: 'green2',
+  [dwango.nicolive.chat.data.Chat.Modifier.ColorName.yellow2]: 'yellow2',
+  [dwango.nicolive.chat.data.Chat.Modifier.ColorName.purple2]: 'purple2',
+  [dwango.nicolive.chat.data.Chat.Modifier.ColorName.cyan2]: 'cyan2',
+  [dwango.nicolive.chat.data.Chat.Modifier.ColorName.orange2]: 'orange2',
+  [dwango.nicolive.chat.data.Chat.Modifier.ColorName.pink2]: 'pink2',
+  [dwango.nicolive.chat.data.Chat.Modifier.ColorName.black2]: 'black2',
+} as const;
+
 export function convertModifierToMail(modifier: dwango.nicolive.chat.data.Chat.IModifier): string {
   const commands: string[] = [];
   if (modifier.position) {
@@ -31,64 +54,9 @@ export function convertModifierToMail(modifier: dwango.nicolive.chat.data.Chat.I
     }
   }
   if (modifier.namedColor) {
-    switch (modifier.namedColor) {
-      case dwango.nicolive.chat.data.Chat.Modifier.ColorName.red:
-        commands.push('red');
-        break;
-      case dwango.nicolive.chat.data.Chat.Modifier.ColorName.pink:
-        commands.push('pink');
-        break;
-      case dwango.nicolive.chat.data.Chat.Modifier.ColorName.orange:
-        commands.push('orange');
-        break;
-      case dwango.nicolive.chat.data.Chat.Modifier.ColorName.yellow:
-        commands.push('yellow');
-        break;
-      case dwango.nicolive.chat.data.Chat.Modifier.ColorName.green:
-        commands.push('green');
-        break;
-      case dwango.nicolive.chat.data.Chat.Modifier.ColorName.cyan:
-        commands.push('cyan');
-        break;
-      case dwango.nicolive.chat.data.Chat.Modifier.ColorName.blue:
-        commands.push('blue');
-        break;
-      case dwango.nicolive.chat.data.Chat.Modifier.ColorName.purple:
-        commands.push('purple');
-        break;
-      case dwango.nicolive.chat.data.Chat.Modifier.ColorName.black:
-        commands.push('black');
-        break;
-      case dwango.nicolive.chat.data.Chat.Modifier.ColorName.white2:
-        commands.push('white2');
-        break;
-      case dwango.nicolive.chat.data.Chat.Modifier.ColorName.red2:
-        commands.push('red2');
-        break;
-      case dwango.nicolive.chat.data.Chat.Modifier.ColorName.blue2:
-        commands.push('blue2');
-        break;
-      case dwango.nicolive.chat.data.Chat.Modifier.ColorName.green2:
-        commands.push('green2');
-        break;
-      case dwango.nicolive.chat.data.Chat.Modifier.ColorName.yellow2:
-        commands.push('yellow2');
-        break;
-      case dwango.nicolive.chat.data.Chat.Modifier.ColorName.purple2:
-        commands.push('purple2');
-        break;
-      case dwango.nicolive.chat.data.Chat.Modifier.ColorName.cyan2:
-        commands.push('cyan2');
-        break;
-      case dwango.nicolive.chat.data.Chat.Modifier.ColorName.orange2:
-        commands.push('orange2');
-        break;
-      case dwango.nicolive.chat.data.Chat.Modifier.ColorName.pink2:
-        commands.push('pink2');
-        break;
-      case dwango.nicolive.chat.data.Chat.Modifier.ColorName.black2:
-        commands.push('black2');
-        break;
+    const color = namedColorTable[modifier.namedColor];
+    if (color) {
+      commands.push(color);
     }
   }
   if (modifier.fullColor) {
