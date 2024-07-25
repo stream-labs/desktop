@@ -29,6 +29,7 @@ export default function Highlighter() {
     clips: HighlighterService.views.clips as IClip[],
     dismissedTutorial: HighlighterService.views.dismissedTutorial,
     error: HighlighterService.views.error,
+    useAiHighlighter: HighlighterService.views.useAiHighlighter,
     recordings: RecordingModeService.views.sortedRecordings,
   }));
 
@@ -99,7 +100,7 @@ export default function Highlighter() {
       );
       break;
     default:
-      return <>DefaultView</>;
+      return <>DefaultView X{v.useAiHighlighter}X</>; // here it is undefined
       break;
   }
 
@@ -125,38 +126,20 @@ export default function Highlighter() {
         >
           clips
         </Button>
-
         <Button
           style={{ marginTop: '16px', marginRight: '8px' }}
           onClick={() => trimHighlightData()}
         >
           create clips
         </Button>
-
         <Button
           style={{ marginTop: '16px', marginRight: '8px' }}
-          onClick={() =>
-            HighlighterService.actions.SET_EXAMPLE_TITLE('JanniIstToll' + moment().format())
-          }
+          onClick={async () => HighlighterService.actions.toggleAiHighlighter()}
         >
-          SetJanniIstToll
-        </Button>
-
-        <Button style={{ marginTop: '16px', marginRight: '8px' }} onClick={() => getTitle()}>
-          getText
+          toggleState X{v.useAiHighlighter.toString()}X
         </Button>
       </>
     );
-  }
-
-  function getTitle() {
-    const viewStateTitle = HighlighterService.views.state.exampleTitle;
-    console.log('🚀 ~ getTitle ~ viewStateTitle:', viewStateTitle);
-
-    const actionTitle = HighlighterService.actions.getExampleTitle();
-    console.log('actionTutle', actionTitle);
-    const title = HighlighterService.getExampleTitle();
-    console.log('title', title);
   }
 
   function setView(view: IViewState) {

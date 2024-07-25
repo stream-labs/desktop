@@ -120,7 +120,7 @@ interface IHighligherState {
   upload: IUploadInfo;
   dismissedTutorial: boolean;
   error: string;
-  exampleTitle: string;
+  useAiHighlighter: boolean;
 }
 
 // Capitalization is not consistent because it matches with the
@@ -248,6 +248,13 @@ class HighligherViews extends ViewHandler<IHighligherState> {
   }
 
   /**
+     * Returns wether or not the AiHighlighter should be used
+     */
+  get useAiHighlighter() {
+    return this.state.useAiHighlighter
+  }
+
+  /**
    * Whether any clips need to be loaded
    */
   get loaded() {
@@ -309,8 +316,7 @@ class HighligherViews extends ViewHandler<IHighligherState> {
 @InitAfter('StreamingService')
 export class HighlighterService extends PersistentStatefulService<IHighligherState> {
 
-  createAiRecording: boolean = true
-  currentRecordingIsAiRecording: boolean = false
+  isHighlighterRecording: boolean = false
 
   static defaultState: IHighligherState = {
     clips: {},
@@ -348,7 +354,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     },
     dismissedTutorial: false,
     error: '',
-    exampleTitle: ''
+    useAiHighlighter: false
   };
 
   @Inject() streamingService: StreamingService;
@@ -456,14 +462,9 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
 
   @mutation()
-  SET_EXAMPLE_TITLE(exampleTitle: string) {
-    console.log('setExampleTitle', exampleTitle);
-    Vue.set(this.state, 'exampleTitle', exampleTitle);
-    // No need to call any explicit persistence method as it is handled by the watch method in init()
-  }
-
-  getExampleTitle(): string {
-    return this.state.exampleTitle;
+  SET_USE_AI_HIGHLIGHTER(useAiHighlighter: boolean) {
+    Vue.set(this.state, 'useAiHighlighter', useAiHighlighter);
+    this.state.useAiHighlighter = useAiHighlighter
   }
 
   get views() {
@@ -671,6 +672,15 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
   fileExists(file: string) {
     return fs.existsSync(file);
+  }
+
+
+  toggleAiHighlighter() {
+    if (this.state.useAiHighlighter) {
+      this.SET_USE_AI_HIGHLIGHTER(false);
+    } else {
+      this.SET_USE_AI_HIGHLIGHTER(true);
+    }
   }
 
   async loadClips() {

@@ -1294,14 +1294,6 @@ export class StreamingService
 
     if (info.type === EOBSOutputType.Streaming) {
       if (info.signal === EOBSOutputSignal.Start && shouldResolve) {
-
-        if (this.highlighterService.createAiRecording) {
-          console.log('toggleRecording');
-          this.highlighterService.currentRecordingIsAiRecording = true
-          this.toggleRecording()
-        }
-
-
         this.SET_STREAMING_STATUS(EStreamingState.Live, time);
         this.resolveStartStreaming();
         this.streamingStatusChange.next(EStreamingState.Live);
@@ -1340,6 +1332,12 @@ export class StreamingService
           service: streamSettings.service,
         });
         this.usageStatisticsService.recordFeatureUsage('Streaming');
+
+        if (this.highlighterService.views.state.useAiHighlighter) {
+          this.highlighterService.isHighlighterRecording = true
+          this.toggleRecording()
+        }
+
       } else if (info.signal === EOBSOutputSignal.Starting && shouldResolve) {
         this.SET_STREAMING_STATUS(EStreamingState.Starting, time);
         this.streamingStatusChange.next(EStreamingState.Starting);
@@ -1413,9 +1411,9 @@ export class StreamingService
         // Wrote signals come after Offline, so we return early here
         // to not falsely set our state out of Offline
 
-        if (this.highlighterService.createAiRecording && this.highlighterService.currentRecordingIsAiRecording) {
-          console.log('ai-highlighter recording');
-          this.highlighterService.currentRecordingIsAiRecording = false
+        const isHighlighterRecording = this.highlighterService.isHighlighterRecording
+        if (isHighlighterRecording) {
+          this.highlighterService.isHighlighterRecording = false
           this.highlighterService.actions.flow(parsedFilename, this.eventMetadata)
         }
 
