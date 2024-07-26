@@ -255,9 +255,9 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
         });
         throw NicoliveFailure.fromConditionalError('fetchProgram', 'no_suitable_program');
       }
-      const { nicoliveProgramId, socialGroupId } = programSchedule;
+      const { nicoliveProgramId } = programSchedule;
 
-      const [programResponse] = await Promise.all([this.client.fetchProgram(nicoliveProgramId)]);
+      const programResponse = await this.client.fetchProgram(nicoliveProgramId);
       if (!isOk(programResponse)) {
         throw NicoliveFailure.fromClientError('fetchProgram', programResponse);
       }
