@@ -9,7 +9,7 @@ import moment from 'moment';
 
 interface TClipsViewState {
   view: 'clips';
-  id: string;
+  id: string | undefined;
 }
 interface IStreamViewState {
   view: 'stream';
@@ -32,6 +32,10 @@ export default function Highlighter() {
     useAiHighlighter: HighlighterService.views.useAiHighlighter,
     recordings: RecordingModeService.views.sortedRecordings,
   }));
+
+  const streamsFromClipStreamInfo = v.clips
+    ? [...new Set(v.clips!.map(d => d.streamInfo?.id))]
+    : [];
 
   // TODO: Below is currently always true. Add the handle correctly
   // if (viewState.view !== 'settings' && !v.clips.length && !v.dismissedTutorial && !v.error || ) {
@@ -65,32 +69,30 @@ export default function Highlighter() {
 
       break;
 
-    // case 'stream':
-    //   return (
-    //     <>
-    //       {' '}
-    //       {devHeaderBar()}{' '}
-    //       <div>
-    //         {' '}
-    //         {streamMockdata.map(stream => (
-    //           <Button
-    //             key={stream.id}
-    //             onClick={() =>
-    //               setView({
-    //                 view: 'clips',
-    //                 id: '123',
-    //                 recordingPath: stream.videoUri,
-    //                 highlighterData: stream.highlighterData,
-    //               })
-    //             }
-    //           >
-    //             {stream.videoUri}
-    //           </Button>
-    //         ))}
-    //       </div>
-    //     </>
-    //   );
-    //   break;
+    case 'stream':
+      return (
+        <>
+          {' '}
+          {devHeaderBar()}{' '}
+          <div>
+            {' '}
+            {streamsFromClipStreamInfo.map(streamId => (
+              <Button
+                key={streamId}
+                onClick={() =>
+                  setView({
+                    view: 'clips',
+                    id: streamId,
+                  })
+                }
+              >
+                {streamId}
+              </Button>
+            ))}
+          </div>
+        </>
+      );
+      break;
     case 'clips':
       return (
         <>

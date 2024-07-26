@@ -24,11 +24,11 @@ import * as remote from '@electron/remote';
 
 type TModal = 'trim' | 'export' | 'preview' | 'remove';
 
-interface TClipsViewProps {
-  id: string;
+interface IClipsViewProps {
+  id: string | undefined;
 }
 
-export default function ClipsView(props: TClipsViewProps) {
+export default function ClipsView(props: IClipsViewProps) {
   const { HighlighterService, HotkeysService, UsageStatisticsService } = Services;
   const v = useVuex(() => ({
     clips: HighlighterService.views.clips as TClip[],

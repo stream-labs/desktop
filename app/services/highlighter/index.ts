@@ -1209,7 +1209,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       },
     ]
 
-    const videoUri = '/Users/marvinoffers/Movies/djnardi-short.mp4'; // replace with filepath
+    const videoUri = '/Users/marvinoffers/Movies/stream.mp4'; // replace with filepath
 
     console.log('🔄 HighlighterData');
     const highlighterResponse = await this.getHighlightClips('/highlights', videoUri, undefined)
