@@ -40,15 +40,9 @@ export function TikTokEditStreamInfo(p: IPlatformComponentParams<'tiktok'>) {
             onChange={updateSettings}
           />
         }
-        requiredFields={
-          approved ? (
-            <GameSelector key="required" platform={'tiktok'} {...bind.game} />
-          ) : (
-            <div key="empty-tiktok" />
-          )
-        }
+        requiredFields={<div key="empty-tiktok" />}
       />
-
+      {approved && <GameSelector key="optional" platform={'tiktok'} {...bind.game} />}
       {!approved && <TikTokEnterCredentialsFormInfo {...p} />}
       {rejected && <TikTokNotApprovedWarning {...p} />}
     </Form>

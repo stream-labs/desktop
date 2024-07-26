@@ -260,5 +260,6 @@
   "Below Normal": "Below Normal",
   "Idle": "Idle",
   "Please connect platforms directly from Streamlabs Desktop instead of adding Streamlabs Multistream as a custom destination": "Please connect platforms directly from Streamlabs Desktop instead of adding Streamlabs Multistream as a custom destination",
-  "Audio Encoder": "Audio Encoder"
+  "Audio Encoder": "Audio Encoder",
+  "Additional Settings": "Additional Settings"
 }
