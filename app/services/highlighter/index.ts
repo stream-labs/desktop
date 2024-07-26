@@ -32,6 +32,7 @@ import { JsonrpcService } from 'services/api/jsonrpc';
 import { NavigationService } from 'services/navigation';
 import { SharedStorageService } from 'services/integrations/shared-storage';
 import execa from 'execa';
+import moment from 'moment';
 
 
 //TODO: Better way to order them. 
@@ -71,6 +72,17 @@ export interface IHighlighterData {
   end: number;
 }
 
+
+// TODO: Need to clean up all of this
+export interface StreamInfoForAiHighlighter { id?: string, game?: string, title?: string }
+interface IHighlightedStream {
+  id: string
+  game: string
+  title: string
+  date: number
+  state: string
+}
+
 export enum EExportStep {
   AudioMix = 'audio',
   FrameRender = 'frames',
@@ -83,7 +95,7 @@ interface HighlighterApiResponse {
   origin: string;
 }
 
-export interface StreamInfoForAiHighlighter { id?: string, game?: string, title?: string }
+
 
 export type TFPS = 30 | 60;
 export type TResolution = 720 | 1080;
@@ -142,6 +154,7 @@ interface IHighligherState {
   dismissedTutorial: boolean;
   error: string;
   useAiHighlighter: boolean;
+  highlightedStreams: IHighlightedStream[];
 }
 
 // Capitalization is not consistent because it matches with the
@@ -276,6 +289,14 @@ class HighligherViews extends ViewHandler<IHighligherState> {
   }
 
   /**
+       * Returns wether or not the AiHighlighter should be used
+       */
+  get highlightedStreams() {
+    return this.state.highlightedStreams
+  }
+
+
+  /**
    * Whether any clips need to be loaded
    */
   get loaded() {
@@ -375,7 +396,8 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     },
     dismissedTutorial: false,
     error: '',
-    useAiHighlighter: false
+    useAiHighlighter: false,
+    highlightedStreams: []
   };
 
   @Inject() streamingService: StreamingService;
@@ -481,12 +503,30 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     this.state.error = error;
   }
 
-
   @mutation()
   SET_USE_AI_HIGHLIGHTER(useAiHighlighter: boolean) {
     Vue.set(this.state, 'useAiHighlighter', useAiHighlighter);
     this.state.useAiHighlighter = useAiHighlighter
   }
+
+
+  @mutation()
+  ADD_HIGHLIGHTED_STREAM(streamInfo: IHighlightedStream) {
+    // Vue.set(this.state, 'highlightedStreams', streamInfo);
+    this.state.highlightedStreams.push(streamInfo)
+  }
+
+  @mutation()
+  UPDATE_HIGHLIGHTED_STREAM(updatedStreamInfo: IHighlightedStream) {
+    let keepAsIs = this.state.highlightedStreams.filter(stream => stream.id !== updatedStreamInfo.id);
+    this.state.highlightedStreams = [...keepAsIs, updatedStreamInfo]
+  }
+
+  @mutation()
+  REMOVE_HIGHLIGHTED_STREAM(id: string) {
+    this.state.highlightedStreams = this.state.highlightedStreams.filter(stream => stream.id !== id);
+  }
+
 
   get views() {
     return new HighligherViews(this.state);
@@ -723,6 +763,17 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   }
 
 
+  addStream(streamInfo: IHighlightedStream) {
+    this.ADD_HIGHLIGHTED_STREAM(streamInfo);
+  }
+
+  updateStream(streamInfo: IHighlightedStream) {
+    this.UPDATE_HIGHLIGHTED_STREAM(streamInfo);
+  }
+
+  removeStream(id: string) {
+    this.REMOVE_HIGHLIGHTED_STREAM(id);
+  }
   toggleAiHighlighter() {
     if (this.state.useAiHighlighter) {
       this.SET_USE_AI_HIGHLIGHTER(false);
@@ -1223,7 +1274,11 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       },
     ]
 
-    const videoUri = '/Users/marvinoffers/Movies/stream.mp4'; // replace with filepath
+
+    let setStreamInfo: IHighlightedStream = { state: 'Searching for highlights...', date: moment().date(), id: streamInfo.id || 'noId', title: streamInfo.title || 'no title', game: streamInfo.game || 'no title', }
+    this.addStream(setStreamInfo)
+
+    const videoUri = '/Users/marvinoffers/Movies/djnardi-short.mp4'; // replace with filepath
 
     console.log('🔄 HighlighterData');
     const highlighterResponse = await this.getHighlightClips('/highlights', videoUri, undefined)
@@ -1234,11 +1289,16 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     console.log('✅ formatHighlighterResponse', formattedHighlighterResponse);
 
     console.log('🔄 cutHighlightClips');
+    setStreamInfo.state = 'Generating clips'
+    this.updateStream(setStreamInfo)
     const clipData = await this.cutHighlightClips(
       videoUri, formattedHighlighterResponse);
     console.log('✅ cutHighlightClips');
 
     // 6. add highlight clips
+    setStreamInfo.state = 'Done'
+    this.updateStream(setStreamInfo)
+
     console.log('🔄 addClips', clipData);
     this.addAiClips(clipData, streamInfo)
     console.log('✅ addClips');
@@ -1301,7 +1361,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   formatHighlighterResponse(responseData: HighlighterApiResponse[]) {
 
     //TODO: Currently the colde failes if start and endtime are equal. Needs to be fixed with the config
-    return responseData.map((curr) => { return { "start": curr.start_time - 2, "end": curr.end_time !== null ? curr.end_time + 2 : curr.start_time + 2, 'type': curr.type } })
+    return responseData.map((curr) => { return { "start": curr.start_time - 9, "end": curr.end_time !== null ? curr.end_time + 4 : curr.start_time + 4, 'type': curr.type } })
   }
 
 

@@ -32,6 +32,7 @@ export default function Highlighter() {
     error: HighlighterService.views.error,
     useAiHighlighter: HighlighterService.views.useAiHighlighter,
     recordings: RecordingModeService.views.sortedRecordings,
+    highlightedStreams: HighlighterService.views.highlightedStreams,
   }));
 
   const streamsFromClipStreamInfo = v.clips
@@ -85,6 +86,57 @@ export default function Highlighter() {
             {devHeaderBar()}{' '}
             <div className={styles.streamsWrapper}>
               {' '}
+              {v.highlightedStreams.map(highlightedStream => (
+                <div key={highlightedStream.id} className={styles.streamCard}>
+                  <div className={styles.thumbnailWrapper}>
+                    <img
+                      style={{ height: '100%' }}
+                      src={
+                        v.clips.find(clip => clip.streamInfo?.id === highlightedStream.id)
+                          ?.scrubSprite
+                      }
+                      alt=""
+                    />
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '8px',
+                      padding: '20px',
+                      paddingTop: '0px',
+                    }}
+                  >
+                    <div style={{}}>
+                      {highlightedStream.title} - {highlightedStream.state}
+                    </div>
+
+                    <div
+                      style={{
+                        display: 'flex',
+
+                        gap: '4px',
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      <Button
+                        disabled={highlightedStream.state !== 'done'}
+                        onClick={() =>
+                          setView({
+                            view: 'clips',
+                            id: highlightedStream.id,
+                          })
+                        }
+                      >
+                        Edit
+                      </Button>
+                      <Button disabled={highlightedStream.state !== 'done'} type="primary">
+                        Export
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
               {streamsFromClipStreamInfo.map(streamId => (
                 <div key={streamId} className={styles.streamCard}>
                   <div className={styles.thumbnailWrapper}>
@@ -155,12 +207,39 @@ export default function Highlighter() {
           <Button onClick={() => setView({ view: 'stream' })}>stream</Button>
           <Button onClick={() => setView({ view: 'clips', id: 'id' })}>clips</Button>
           <Button onClick={() => trimHighlightData()}>create clips</Button>
+          <Button onClick={() => setSinfo()}>setSInfo</Button>
+          <Button onClick={() => updSinfo()}>updSInfo</Button>
+          <Button onClick={() => rmSinfo()}>rmSInfo</Button>
           <Button onClick={async () => HighlighterService.actions.toggleAiHighlighter()}>
             AiHighlighter active: {v.useAiHighlighter.toString()}
           </Button>
         </div>
       </>
     );
+  }
+
+  function setSinfo() {
+    HighlighterService.actions.addStream({
+      id: 'Ninja-streamFortnite5',
+      game: 'string',
+      title: 'string',
+      date: 123,
+      state: 'done',
+    });
+  }
+
+  function updSinfo() {
+    HighlighterService.actions.updateStream({
+      id: 'Ninja-streamFortnite5',
+      game: 'string',
+      title: 'string',
+      date: 123,
+      state: 'rendering',
+    });
+  }
+
+  function rmSinfo() {
+    HighlighterService.actions.removeStream('DJ Naaaardi-Fortnite-5302024');
   }
 
   function setView(view: IViewState) {

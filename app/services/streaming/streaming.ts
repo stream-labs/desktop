@@ -1346,7 +1346,8 @@ export class StreamingService
           this.streamInfoForAiHighlighter.game = eventMetadata.game;
           const { title, description, tags } = this.getStreamGoLiveSettings(streamSettings.goLiveSettings)
           this.streamInfoForAiHighlighter.title = title
-          this.streamInfoForAiHighlighter.id = this.streamInfoForAiHighlighter.title + this.streamInfoForAiHighlighter.game + moment().day()
+          //TODO: Correct id to also be able to use it for replaybuffer clips
+          this.streamInfoForAiHighlighter.id = this.streamInfoForAiHighlighter.title + '-' + this.streamInfoForAiHighlighter.game + '-' + moment().day() + moment().week() + moment().year()
 
           if (this.streamInfoForAiHighlighter.game === "Fortnite") {
             // Check if game is supported via highlighter
