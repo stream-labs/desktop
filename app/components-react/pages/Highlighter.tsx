@@ -6,6 +6,7 @@ import { TClip, IHighlighterData } from 'services/highlighter';
 import { Services } from 'components-react/service-provider';
 import { Button } from 'antd';
 import moment from 'moment';
+import styles from '../highlighter/StreamView.m.less';
 
 interface TClipsViewState {
   view: 'clips';
@@ -73,22 +74,61 @@ export default function Highlighter() {
       return (
         <>
           {' '}
-          {devHeaderBar()}{' '}
-          <div>
-            {' '}
-            {streamsFromClipStreamInfo.map(streamId => (
-              <Button
-                key={streamId}
-                onClick={() =>
-                  setView({
-                    view: 'clips',
-                    id: streamId,
-                  })
-                }
-              >
-                {streamId}
-              </Button>
-            ))}
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '8px',
+              padding: '20px',
+            }}
+          >
+            {devHeaderBar()}{' '}
+            <div className={styles.streamsWrapper}>
+              {' '}
+              {streamsFromClipStreamInfo.map(streamId => (
+                <div key={streamId} className={styles.streamCard}>
+                  <div className={styles.thumbnailWrapper}>
+                    <img
+                      style={{ height: '100%' }}
+                      src={v.clips.find(clip => clip.streamInfo?.id === streamId)?.scrubSprite}
+                      alt=""
+                    />
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '8px',
+                      padding: '20px',
+                      paddingTop: '0px',
+                    }}
+                  >
+                    <div style={{}}>{streamId}</div>
+
+                    <div
+                      style={{
+                        display: 'flex',
+
+                        gap: '4px',
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      <Button
+                        onClick={() =>
+                          setView({
+                            view: 'clips',
+                            id: streamId,
+                          })
+                        }
+                      >
+                        Edit
+                      </Button>
+                      <Button type="primary">Export</Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </>
       );
@@ -96,7 +136,7 @@ export default function Highlighter() {
     case 'clips':
       return (
         <>
-          {devHeaderBar()}
+          <Button onClick={() => setView({ view: 'stream' })}>X</Button>
           <ClipsView id={viewState.id} />
         </>
       );
@@ -110,36 +150,15 @@ export default function Highlighter() {
   function devHeaderBar() {
     return (
       <>
-        <Button
-          style={{ marginTop: '16px', marginRight: '8px' }}
-          onClick={() => setView({ view: 'settings' })}
-        >
-          Settings
-        </Button>
-        <Button
-          style={{ marginTop: '16px', marginRight: '8px' }}
-          onClick={() => setView({ view: 'stream' })}
-        >
-          stream
-        </Button>
-        <Button
-          style={{ marginTop: '16px', marginRight: '8px' }}
-          onClick={() => setView({ view: 'clips', id: 'id' })}
-        >
-          clips
-        </Button>
-        <Button
-          style={{ marginTop: '16px', marginRight: '8px' }}
-          onClick={() => trimHighlightData()}
-        >
-          create clips
-        </Button>
-        <Button
-          style={{ marginTop: '16px', marginRight: '8px' }}
-          onClick={async () => HighlighterService.actions.toggleAiHighlighter()}
-        >
-          toggleState X{v.useAiHighlighter.toString()}X
-        </Button>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <Button onClick={() => setView({ view: 'settings' })}>Settings</Button>
+          <Button onClick={() => setView({ view: 'stream' })}>stream</Button>
+          <Button onClick={() => setView({ view: 'clips', id: 'id' })}>clips</Button>
+          <Button onClick={() => trimHighlightData()}>create clips</Button>
+          <Button onClick={async () => HighlighterService.actions.toggleAiHighlighter()}>
+            AiHighlighter active: {v.useAiHighlighter.toString()}
+          </Button>
+        </div>
       </>
     );
   }

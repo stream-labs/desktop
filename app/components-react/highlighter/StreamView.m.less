@@ -1,0 +1,31 @@
+@import "../../styles/index";
+
+
+.stream-card{
+  background-color: #2B383F;
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
+  gap: 16px;
+  height: fit-content;
+  width: fit-content;
+}
+
+.thumbnail-wrapper{
+
+  --thumbWith: 192px;
+  --thumbHeight: 108px;
+  overflow-x: clip; 
+  border-radius: 10px 10px 0 0;
+  
+  width: calc(var(--thumbWith) * 2);
+  height: calc(var(--thumbHeight) * 2);
+}
+
+.streams-wrapper{
+  display: grid;  
+  grid-template-columns: auto auto auto;
+
+  gap: 16px;
+
+}

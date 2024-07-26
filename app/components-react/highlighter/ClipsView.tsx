@@ -31,7 +31,9 @@ interface IClipsViewProps {
 export default function ClipsView(props: IClipsViewProps) {
   const { HighlighterService, HotkeysService, UsageStatisticsService } = Services;
   const v = useVuex(() => ({
-    clips: HighlighterService.views.clips as TClip[],
+    clips: (HighlighterService.views.clips as TClip[]).filter(
+      clip => clip.streamInfo?.id === props.id,
+    ),
     exportInfo: HighlighterService.views.exportInfo,
     uploadInfo: HighlighterService.views.uploadInfo,
     loadedCount: HighlighterService.views.loadedCount,
@@ -49,7 +51,7 @@ export default function ClipsView(props: IClipsViewProps) {
 
   useEffect(() => {
     if (v.clips.length) {
-      HighlighterService.actions.loadClips();
+      HighlighterService.actions.loadClips(props.id);
       setShowTutorial(false);
     }
   }, [v.clips.length]);

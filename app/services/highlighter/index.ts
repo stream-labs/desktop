@@ -731,14 +731,28 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     }
   }
 
-  async loadClips() {
+
+  // Only load the clips we need
+  async loadClips(streamInfoId?: string) {
+    let clipsToLoad: TClip[]
+    if (streamInfoId) {
+      clipsToLoad = this.views.clips.filter(clip => clip.streamInfo.id === streamInfoId)
+    }
+    else {
+      clipsToLoad = this.views.clips
+    }
+
+
+
+
+
     // TODO: Dont delete this directory, make sure that files get deleted
     // await this.ensureScrubDirectory();
 
     // Ensure we have a Clip class for every clip in the store
     // Also make sure they are the correct format
 
-    for (const c of this.views.clips) {
+    for (const c of clipsToLoad) {
 
       if (!this.fileExists(c.path)) {
         this.REMOVE_CLIP(c.path);
@@ -759,7 +773,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     }
 
     await pmap(
-      this.views.clips.filter(c => !c.loaded),
+      clipsToLoad.filter(c => !c.loaded),
       c => this.clips[c.path].init(),
       {
         concurrency: os.cpus().length,
