@@ -14,6 +14,10 @@ import { SwitchInput } from '../../shared/inputs';
 import { useGoLiveSettings, useGoLiveSettingsRoot } from './useGoLiveSettings';
 import { inject } from 'slap';
 import cx from 'classnames';
+import * as remote from '@electron/remote';
+import InfoBanner from 'components-react/shared/InfoBanner';
+import { EDismissable } from 'services/dismissables';
+import Translate from 'components-react/shared/Translate';
 
 export default function GoLiveWindow() {
   const { lifecycle, form } = useGoLiveSettingsRoot().extend(module => ({
@@ -80,6 +84,25 @@ function ModalFooter() {
 
   return (
     <Form layout={'inline'}>
+      <div className={styles.bannerWrapper}>
+        <InfoBanner
+          message={
+            <Translate
+              message={$t('You may be eligible for TikTok Live Access. <apply>Apply here.</apply>')}
+            >
+              <u slot="apply" />
+            </Translate>
+          }
+          type="info"
+          className={styles.banner}
+          onClick={() => {
+            // open the TikTok application page
+            remote.shell.openExternal(Services.TikTokService.applicationUrl);
+            Services.DismissablesService.actions.dismiss(EDismissable.TikTokEligible);
+          }}
+          dismissableKey={EDismissable.TikTokEligible}
+        />
+      </div>
       {/* CLOSE BUTTON */}
       <Button onClick={close}>{$t('Close')}</Button>
 
@@ -101,4 +124,8 @@ function ModalFooter() {
       )}
     </Form>
   );
+}
+
+function openApplicationInfoPage() {
+  remote.shell.openExternal(Services.TikTokService.applicationUrl);
 }

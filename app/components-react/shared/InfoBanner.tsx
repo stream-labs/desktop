@@ -6,7 +6,7 @@ import { useVuex } from 'components-react/hooks';
 import { Services } from 'components-react/service-provider';
 
 interface IInfoBannerProps {
-  message: string;
+  message: string | JSX.Element;
   type?: 'info' | 'warning';
   style?: CSSProperties;
   className?: string;
@@ -40,9 +40,7 @@ export default function InfoBanner(p: IInfoBannerProps) {
       onClick={p?.onClick}
     >
       <i className="icon-information" />
-      <span className="message" style={{ flex: 1 }}>
-        {p.message}
-      </span>
+      <span className={styles.message}>{p.message}</span>
       {p?.dismissableKey && (
         <i
           className={cx(styles.close, 'icon-close')}
