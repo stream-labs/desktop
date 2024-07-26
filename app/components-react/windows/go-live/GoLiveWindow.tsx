@@ -58,11 +58,7 @@ function ModalFooter() {
     error,
     lifecycle,
     checklist,
-    isMultiplatformMode,
-    isDualOutputMode,
     goLive,
-    isAdvancedMode,
-    switchAdvancedMode,
     close,
     goBackToSettings,
     isLoading,
@@ -79,23 +75,11 @@ function ModalFooter() {
   }));
 
   const shouldShowConfirm = ['prepopulate', 'waitForNewSettings'].includes(lifecycle);
-  const shouldShowAdvancedSwitch = shouldShowConfirm && (isMultiplatformMode || isDualOutputMode);
   const shouldShowGoBackButton =
     lifecycle === 'runChecklist' && error && checklist.startVideoTransmission !== 'done';
 
   return (
     <Form layout={'inline'}>
-      {shouldShowAdvancedSwitch && (
-        <SwitchInput
-          label={$t('Show Advanced Settings')}
-          name="advancedMode"
-          onChange={switchAdvancedMode}
-          value={isAdvancedMode}
-          debounce={200}
-          disabled={isLoading}
-        />
-      )}
-
       {/* CLOSE BUTTON */}
       <Button onClick={close}>{$t('Close')}</Button>
 
