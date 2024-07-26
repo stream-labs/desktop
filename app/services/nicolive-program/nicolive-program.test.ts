@@ -1,6 +1,5 @@
 import { createSetupFunction } from 'util/test-setup';
-import { WrappedResult } from './NicoliveClient';
-import { Community, ProgramInfo } from './ResponseTypes';
+import { ProgramInfo } from './ResponseTypes';
 import { MAX_PROGRAM_DURATION_SECONDS } from './nicolive-constants';
 
 type NicoliveProgramService = import('./nicolive-program').NicoliveProgramService;
@@ -264,17 +263,12 @@ test('fetchProgram:testのときはshowPlaceholderをtrueにする', async () =>
     .fn()
     .mockResolvedValue({ ok: true, value: [schedules.test] });
   instance.client.fetchProgram = jest.fn().mockResolvedValue({ ok: true, value: programs.test });
-  instance.client.fetchCommunity = jest.fn().mockResolvedValue({
-    ok: true,
-    value: { name: 'community.name', icon: { url: { size_64x64: 'symbol url' } } },
-  } as WrappedResult<Community>);
 
   (instance as any).setState = jest.fn();
 
   await expect(instance.fetchProgram()).resolves.toBeUndefined();
   expect(instance.client.fetchProgramSchedules).toHaveBeenCalledTimes(1);
   expect(instance.client.fetchProgram).toHaveBeenCalledTimes(1);
-  expect(instance.client.fetchCommunity).toHaveBeenCalledTimes(1);
   expect((instance as any).setState.mock.calls).toMatchInlineSnapshot(`
     [
       [
@@ -284,9 +278,6 @@ test('fetchProgram:testのときはshowPlaceholderをtrueにする', async () =>
       ],
       [
         {
-          "communityID": "co1",
-          "communityName": "community.name",
-          "communitySymbol": "symbol url",
           "description": "番組詳細情報",
           "endTime": 150,
           "isMemberOnly": true,
@@ -321,10 +312,6 @@ test('fetchProgram:成功', async () => {
     .fn()
     .mockResolvedValue({ ok: true, value: [schedules.onAir] });
   instance.client.fetchProgram = jest.fn().mockResolvedValue({ ok: true, value: programs.onAir });
-  instance.client.fetchCommunity = jest.fn().mockResolvedValue({
-    ok: true,
-    value: { name: 'community.name', icon: { url: { size_64x64: 'symbol url' } } },
-  } as WrappedResult<Community>);
 
   // TODO: StatefulServiceのモックをVue非依存にする
   (instance as any).setState = jest.fn();
@@ -332,7 +319,6 @@ test('fetchProgram:成功', async () => {
   await expect(instance.fetchProgram()).resolves.toBeUndefined();
   expect(instance.client.fetchProgramSchedules).toHaveBeenCalledTimes(1);
   expect(instance.client.fetchProgram).toHaveBeenCalledTimes(1);
-  expect(instance.client.fetchCommunity).toHaveBeenCalledTimes(1);
   expect((instance as any).setState.mock.calls).toMatchInlineSnapshot(`
     [
       [
@@ -342,9 +328,6 @@ test('fetchProgram:成功', async () => {
       ],
       [
         {
-          "communityID": "co1",
-          "communityName": "community.name",
-          "communitySymbol": "symbol url",
           "description": "番組詳細情報",
           "endTime": 150,
           "isMemberOnly": true,
@@ -378,10 +361,6 @@ test('fetchProgramで番組があったが取りに行ったらエラー', async
     ok: false,
     value,
   });
-  instance.client.fetchCommunity = jest.fn().mockResolvedValue({
-    ok: true,
-    value: { name: 'community.name', thumbnailUrl: { small: 'symbol url' } },
-  });
 
   (instance as any).setState = jest.fn();
 
@@ -396,7 +375,6 @@ test('fetchProgramで番組があったが取りに行ったらエラー', async
                         `);
   expect(instance.client.fetchProgramSchedules).toHaveBeenCalledTimes(1);
   expect(instance.client.fetchProgram).toHaveBeenCalledTimes(1);
-  expect(instance.client.fetchCommunity).toHaveBeenCalledTimes(1);
   expect((instance as any).setState).toHaveBeenCalledTimes(2);
 });
 
@@ -413,14 +391,12 @@ test('fetchProgramでコミュ情報がエラーでも番組があったら先�
     ok: true,
     value: programs.onAir,
   });
-  instance.client.fetchCommunity = jest.fn().mockResolvedValue({ ok: false, value });
 
   (instance as any).setState = jest.fn();
 
   await expect(instance.fetchProgram()).resolves.toBeUndefined();
   expect(instance.client.fetchProgramSchedules).toHaveBeenCalledTimes(1);
   expect(instance.client.fetchProgram).toHaveBeenCalledTimes(1);
-  expect(instance.client.fetchCommunity).toHaveBeenCalledTimes(1);
   expect((instance as any).setState.mock.calls).toMatchInlineSnapshot(`
     [
       [
@@ -430,9 +406,6 @@ test('fetchProgramでコミュ情報がエラーでも番組があったら先�
       ],
       [
         {
-          "communityID": "co1",
-          "communityName": "(コミュニティの取得に失敗しました)",
-          "communitySymbol": "",
           "description": "番組詳細情報",
           "endTime": 150,
           "isMemberOnly": true,

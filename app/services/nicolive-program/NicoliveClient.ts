@@ -5,8 +5,6 @@ import { handleErrors } from 'util/requests';
 import {
   BroadcastStreamData,
   CommonErrorResponse,
-  Communities,
-  Community,
   Extension,
   FilterRecord,
   Filters,
@@ -126,7 +124,6 @@ export class NicoliveClient {
   static live2ApiBaseURL = 'https://api.live2.nicovideo.jp';
   static publicBaseURL = 'https://public.api.nicovideo.jp';
   static nicoadBaseURL = 'https://api.nicoad.nicovideo.jp';
-  static communityBaseURL = 'https://com.nicovideo.jp';
   static userFollowBaseURL = 'https://user-follow-api.nicovideo.jp';
   static userIconBaseURL = 'https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/';
 
@@ -382,82 +379,6 @@ export class NicoliveClient {
   static defaultUserIconURL = `${NicoliveClient.userIconBaseURL}defaults/blank.jpg`;
 
   // 関心が別だが他の場所におく程の理由もないのでここにおく
-  /** コミュニティ情報を取得 */
-  async fetchCommunity(
-    communityId: string,
-    headers?: HeaderSeed,
-  ): Promise<WrappedResult<Community>> {
-    const url = new URL(`${NicoliveClient.communityBaseURL}/api/v2/communities.json`);
-    const communityNo = communityId.replace(/^co/, '');
-    const params = {
-      ids: communityNo,
-    };
-    for (const [key, value] of Object.entries(params)) {
-      url.searchParams.append(key, value);
-    }
-
-    let res = null;
-    try {
-      res = await fetch(
-        url,
-        NicoliveClient.createRequest('GET', {
-          headers: {
-            ...headers,
-            ...NicoliveClient.FrontendIdHeader,
-          },
-        }),
-      );
-    } catch (err) {
-      return NicoliveClient.wrapFetchError(err as Error);
-    }
-
-    const body = await res.text();
-    let obj: any = null;
-    try {
-      obj = JSON.parse(body);
-    } catch (e) {
-      // bodyがJSONになってない異常失敗
-
-      // breadcrumbsに載るようにログ
-      console.warn('non-json body', body);
-      return {
-        ok: false,
-        value: e as Error,
-      };
-    }
-
-    if (res.ok) {
-      const data = obj.data as Communities['data'];
-      const communities = data.communities?.communities || [];
-
-      const community = communities.find(c => c.global_id === communityId);
-      if (community) {
-        // 正常成功
-        return {
-          ok: true,
-          value: community,
-        };
-      } else {
-        // community not found
-        return {
-          ok: false,
-          value: {
-            meta: {
-              status: 404,
-              errorCode: 'NOT_FOUND',
-              errorMessage: `community ${communityId} not found`,
-            },
-          } as CommonErrorResponse,
-        };
-      }
-    }
-
-    // 正常失敗
-    return {
-      ok: false,
-      value: obj as CommonErrorResponse,
-    };
-  }
   /*
    * 放送可能なユーザー番組IDを取得する
    * 放送可能な番組がない場合はundefinedを返す
