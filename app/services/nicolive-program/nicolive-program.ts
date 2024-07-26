@@ -5,7 +5,7 @@ import { mutation, StatefulService } from 'services/core/stateful-service';
 import { UserService } from 'services/user';
 import { CreateResult, EditResult, isOk, NicoliveClient } from './NicoliveClient';
 import { NicoliveFailure, openErrorDialogFromFailure } from './NicoliveFailure';
-import { Community, ProgramSchedules } from './ResponseTypes';
+import { ProgramSchedules } from './ResponseTypes';
 import { NicoliveProgramStateService } from './state';
 import { MAX_PROGRAM_DURATION_SECONDS } from './nicolive-constants';
 import { isFakeMode } from 'util/fakeMode';
@@ -22,9 +22,6 @@ type ProgramState = {
   startTime: number;
   vposBaseTime: number;
   isMemberOnly: boolean;
-  communityID: string;
-  communityName: string;
-  communitySymbol: string;
   roomURL: string;
   roomThreadID: string;
   viewers: number;
@@ -34,15 +31,6 @@ type ProgramState = {
   showPlaceholder: boolean;
   moderatorViewUri?: string;
 };
-
-function getCommunityIconUrl(community: Community): string {
-  const urls = community.icon.url;
-  if (urls.size_64x64) {
-    return urls.size_64x64;
-  }
-  // 目的のサイズが存在しなかった場合、フォールバックとして存在する一つを返す
-  return urls[Object.keys(urls)[0]] || '';
-}
 
 interface INicoliveProgramState extends ProgramState {
   /**
@@ -85,9 +73,6 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     startTime: NaN,
     vposBaseTime: NaN,
     isMemberOnly: false,
-    communityID: '',
-    communityName: '',
-    communitySymbol: '',
     roomURL: '',
     roomThreadID: '',
     viewers: 0,
@@ -248,9 +233,6 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
         vposBaseTime: now,
         endTime: now + 60 * 60,
         isMemberOnly: true,
-        communityID: 'coDEBUG',
-        communityName: 'DEBUGコミュニティ',
-        communitySymbol: '',
         roomURL: 'URL',
         roomThreadID: 'thread',
       });
@@ -275,27 +257,11 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
       }
       const { nicoliveProgramId, socialGroupId } = programSchedule;
 
-      const [programResponse, communityResponse] = await Promise.all([
-        this.client.fetchProgram(nicoliveProgramId),
-        this.client.fetchCommunity(socialGroupId),
-      ]);
+      const [programResponse] = await Promise.all([this.client.fetchProgram(nicoliveProgramId)]);
       if (!isOk(programResponse)) {
         throw NicoliveFailure.fromClientError('fetchProgram', programResponse);
       }
-      if (!isOk(communityResponse)) {
-        // コミュニティ情報が取れなくても配信はできてよいはず
-        if (communityResponse.value instanceof Error) {
-          console.error('fetchCommunity', communityResponse.value);
-        } else {
-          console.error(
-            'fetchCommunity',
-            communityResponse.value.meta.status,
-            communityResponse.value.meta.errorMessage || '',
-          );
-        }
-      }
 
-      const community = isOk(communityResponse) && communityResponse.value;
       const program = programResponse.value;
 
       // アリーナのみ取得する
@@ -310,9 +276,6 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
         vposBaseTime: program.vposBaseAt,
         endTime: program.endAt,
         isMemberOnly: program.isMemberOnly,
-        communityID: socialGroupId,
-        communityName: community ? community.name : '(コミュニティの取得に失敗しました)',
-        communitySymbol: community ? getCommunityIconUrl(community) : '',
         roomURL: room ? room.webSocketUri : '',
         roomThreadID: room ? room.threadId : '',
         ...(program.moderatorViewUri ? { moderatorViewUri: program.moderatorViewUri } : {}),

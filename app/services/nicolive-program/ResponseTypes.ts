@@ -160,34 +160,6 @@ export interface NicoadStatistics {
   };
 }
 
-export interface Community {
-  // 使用しそうなものだけ雑に抜粋
-  id: string; // eg. '1'
-  global_id: string; // eg. 'co123'
-  name: string;
-  description: string;
-  public: 'open' | 'closed';
-  icon: {
-    id: number;
-    url: {
-      size_128x128: string;
-      size_64x64: string;
-    };
-  };
-}
-
-export interface Communities {
-  meta: {
-    status: 200;
-  };
-  data: {
-    communities: {
-      total: number;
-      communities: Community[];
-    };
-  };
-}
-
 export type FilterRecord = {
   id: number;
   type: 'word' | 'user' | 'command';
