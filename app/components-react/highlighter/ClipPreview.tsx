@@ -1,4 +1,4 @@
-import { TClip } from 'services/highlighter';
+import { IAiClip, TClip } from 'services/highlighter';
 import { SCRUB_HEIGHT, SCRUB_WIDTH, SCRUB_FRAMES } from 'services/highlighter/constants';
 import React, { useMemo, useState } from 'react';
 import path from 'path';
@@ -16,6 +16,8 @@ export default function ClipPreview(props: {
 }) {
   const { HighlighterService } = Services;
   const [scrubFrame, setScrubFrame] = useState(0);
+
+  const isAiClip = (clip: TClip): clip is IAiClip => clip.source === 'AiClip';
 
   // TODO: placeholder image + make sure to regenerate sprite if sprite doesnt exist
   let clipThumbnail = '';
@@ -135,7 +137,23 @@ export default function ClipPreview(props: {
           color: 'var(--highlighter-icon)',
         }}
       >
-        {`${props.clip.deleted ? '[DELETED] ' : ''}${filename}`}
+        <div>
+          {isAiClip(props.clip) ? (
+            <>
+              {' '}
+              Type{' '}
+              {`${
+                props.clip.aiInfo.moments[0].type === 'kill' ||
+                props.clip.aiInfo.moments[0].type === 'elimination'
+                  ? '💀 Kill'
+                  : props.clip.aiInfo.moments[0].type
+              }`}
+            </>
+          ) : (
+            <></>
+          )}
+        </div>
+        {/* {`${props.clip.deleted ? '[DELETED] ' : ''}${filename}`} */}
       </div>
     </div>
   );

@@ -54,16 +54,16 @@ interface IManualClip extends IBaseClip {
   source: 'Manual';
 }
 
-interface IAiClip extends IBaseClip {
+export interface IAiClip extends IBaseClip {
   source: 'AiClip';
   aiInfo: IAiClipInfo
 }
-interface IAiClipInfo {
+export interface IAiClipInfo {
   moments: { type: string }[]
   // hypescore -> (moments * hypefaktor) / duration
 }
 
-export type TClip = IReplayBufferClip | IManualClip | IAiClip
+export type TClip = IAiClip | IReplayBufferClip | IManualClip
 
 export interface IHighlighterData {
   type: string;
