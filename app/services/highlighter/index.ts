@@ -33,7 +33,9 @@ import { NavigationService } from 'services/navigation';
 import { SharedStorageService } from 'services/integrations/shared-storage';
 import execa from 'execa';
 
-export interface IClip {
+
+//TODO: Better way to order them. 
+interface IBaseClip {
   path: string;
   loaded: boolean;
   enabled: boolean;
@@ -42,9 +44,26 @@ export interface IClip {
   endTrim: number;
   duration?: number;
   deleted: boolean;
-  source: 'ReplayBuffer' | 'Manual' | 'AiDetected'
-  // id: string;
+  streamInfo: { id?: string } | undefined
 }
+interface IReplayBufferClip extends IBaseClip {
+  source: 'ReplayBuffer';
+}
+
+interface IManualClip extends IBaseClip {
+  source: 'Manual';
+}
+
+interface IAiClip extends IBaseClip {
+  source: 'AiClip';
+  aiInfo: IAiClipInfo
+}
+interface IAiClipInfo {
+  moments: { type: string }[]
+  // hypescore -> (moments * hypefaktor) / duration
+}
+
+export type TClip = IReplayBufferClip | IManualClip | IAiClip
 
 export interface IHighlighterData {
   type: string;
@@ -63,6 +82,8 @@ interface HighlighterApiResponse {
   type: string;
   origin: string;
 }
+
+export interface StreamInfoForAiHighlighter { id?: string, game?: string, title?: string }
 
 export type TFPS = 30 | 60;
 export type TResolution = 720 | 1080;
@@ -112,7 +133,7 @@ export interface IAudioInfo {
 }
 
 interface IHighligherState {
-  clips: Dictionary<IClip>;
+  clips: Dictionary<TClip>;
   clipOrder: string[];
   transition: ITransitionInfo;
   audio: IAudioInfo;
@@ -375,14 +396,14 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   directoryCleared = false;
 
   @mutation()
-  ADD_CLIP(clip: IClip) {
+  ADD_CLIP(clip: TClip) {
     Vue.set(this.state.clips, clip.path, clip);
     this.state.clipOrder.push(clip.path);
     this.state.export.exported = false;
   }
 
   @mutation()
-  UPDATE_CLIP(clip: Partial<IClip> & { path: string }) {
+  UPDATE_CLIP(clip: Partial<TClip> & { path: string }) {
     Vue.set(this.state.clips, clip.path, {
       ...this.state.clips[clip.path],
       ...clip,
@@ -531,10 +552,15 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
           endTrim: 0,
           deleted: false,
           source: 'Manual',
+          streamInfo: undefined
         });
       });
     } else {
       this.streamingService.replayBufferFileWrite.subscribe(clipPath => {
+
+        console.log('Add from', this.streamingService.replayBufferFileWrite);
+
+        //TODO: Get in streaminfo via subscribe
         this.ADD_CLIP({
           path: clipPath,
           loaded: false,
@@ -543,6 +569,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
           endTrim: 0,
           deleted: false,
           source: 'ReplayBuffer',
+          streamInfo: undefined
         });
       });
 
@@ -603,6 +630,27 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
         endTrim: 0,
         deleted: false,
         source: 'Manual',
+        streamInfo: undefined
+      });
+    });
+  }
+
+  addAiClips(clips: { path: string; aiClipInfo: IAiClipInfo }[], streamInfo: StreamInfoForAiHighlighter) {
+
+    clips.forEach(clip => {
+      // Don't allow adding the same clip twice
+      if (this.state.clips[clip.path]) return;
+
+      this.ADD_CLIP({
+        path: clip.path,
+        loaded: false,
+        enabled: true,
+        startTrim: 0,
+        endTrim: 0,
+        deleted: false,
+        source: 'AiClip',
+        aiInfo: clip.aiClipInfo,
+        streamInfo
       });
     });
   }
@@ -1136,11 +1184,10 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
 
 
-  async flow(filePath: string, eventMetadata?: Dictionary<any>) {
+  async flow(filePath: string, streamInfo: StreamInfoForAiHighlighter) {
 
 
-
-    console.log('eventMetadata', eventMetadata);
+    console.log('streamInfo', streamInfo);
 
     //// Highlighter flow
     // 1. Toggle on ai highlighter
@@ -1148,8 +1195,6 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     // 3. after stream finished wait for the recording to be done
     // 4. send recording to highlighterApi
     // 5. cut data into highlightClips
-    console.log('🔄 getHighlighterData');
-
 
     const highlighterData = [
       {
@@ -1164,8 +1209,6 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       },
     ]
 
-
-
     const videoUri = '/Users/marvinoffers/Movies/djnardi-short.mp4'; // replace with filepath
 
     console.log('🔄 HighlighterData');
@@ -1177,13 +1220,13 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     console.log('✅ formatHighlighterResponse', formattedHighlighterResponse);
 
     console.log('🔄 cutHighlightClips');
-    const paths = await this.cutHighlightClips(
+    const clipData = await this.cutHighlightClips(
       videoUri, formattedHighlighterResponse);
     console.log('✅ cutHighlightClips');
 
     // 6. add highlight clips
-    console.log('🔄 addClips');
-    this.addClips(paths)
+    console.log('🔄 addClips', clipData);
+    this.addAiClips(clipData, streamInfo)
     console.log('✅ addClips');
   }
 
@@ -1248,10 +1291,10 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   }
 
 
-  async cutHighlightClips(videoUri: string, highlighterData: IHighlighterData[]): Promise<string[]> {
-    const pathArray: string[] = []
+  async cutHighlightClips(videoUri: string, highlighterData: IHighlighterData[]): Promise<{ path: string, aiClipInfo: IAiClipInfo }[]> {
+    const pathArray: { path: string, aiClipInfo: IAiClipInfo }[] = []
 
-    for (const { start, end } of highlighterData) {
+    for (const { start, end, type } of highlighterData) {
       const outputUri = `${videoUri.slice(0, -4)}-${start}-${end}.mp4`;
 
       try {
@@ -1288,7 +1331,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
         console.log(`run FFMPEG with args: ${args}`);
         await execa(FFMPEG_EXE, args);
         console.log(`Created segment: ${outputUri}`);
-        pathArray.push(outputUri)
+        pathArray.push({ path: outputUri, aiClipInfo: { moments: [{ type }] } })
       } catch (error) {
         console.error(`Error creating segment: ${outputUri}`, error);
       }

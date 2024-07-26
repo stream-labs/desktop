@@ -1,4 +1,4 @@
-import { IClip } from 'services/highlighter';
+import { TClip } from 'services/highlighter';
 import { SCRUB_HEIGHT, SCRUB_WIDTH, SCRUB_FRAMES } from 'services/highlighter/constants';
 import React, { useMemo, useState } from 'react';
 import path from 'path';
@@ -10,7 +10,7 @@ import { Tooltip } from 'antd';
 import { $t } from 'services/i18n';
 
 export default function ClipPreview(props: {
-  clip: IClip;
+  clip: TClip;
   showTrim: () => void;
   showRemove: () => void;
 }) {

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, RefObject } from 'react';
-import { IClip } from 'services/highlighter';
+import { TClip } from 'services/highlighter';
 import { SCRUB_FRAMES, SCRUB_HEIGHT, SCRUB_WIDTH } from 'services/highlighter/constants';
 import { Services } from 'components-react/service-provider';
 import times from 'lodash/times';
@@ -27,7 +27,7 @@ function useStateRef<T>(initialValue: T): [RefObject<T>, (newValue: T) => void] 
   ];
 }
 
-export default function ClipTrimmer(props: { clip: IClip }) {
+export default function ClipTrimmer(props: { clip: TClip }) {
   const { HighlighterService, UsageStatisticsService } = Services;
   const videoRef = useRef<HTMLVideoElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);

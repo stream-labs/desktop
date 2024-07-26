@@ -58,7 +58,7 @@ interface ISystemClipboard {
   files: string[];
 }
 
-interface IClipboardState {
+interface TClipboardState {
   itemsSceneId: string;
   sceneNodesIds: string[];
   filterIds: string[];
@@ -71,7 +71,7 @@ interface IClipboardState {
   unloadedCollectionClipboard?: IUnloadedCollectionClipboard;
 }
 
-class ClipboardViews extends ViewHandler<IClipboardState> {
+class ClipboardViews extends ViewHandler<TClipboardState> {
   hasData(): boolean {
     return this.hasItems() || this.hasSystemClipboard();
   }
@@ -124,8 +124,8 @@ class ClipboardViews extends ViewHandler<IClipboardState> {
   }
 }
 
-export class ClipboardService extends StatefulService<IClipboardState> {
-  static initialState: IClipboardState = {
+export class ClipboardService extends StatefulService<TClipboardState> {
+  static initialState: TClipboardState = {
     itemsSceneId: '',
     sceneNodesIds: [],
     filterIds: [],
@@ -486,7 +486,7 @@ export class ClipboardService extends StatefulService<IClipboardState> {
           // use .NET API instead
           return execSync(
             'Powershell -command Add-Type -AssemblyName System.Windows.Forms;' +
-              '[System.Windows.Forms.Clipboard]::GetFileDropList()',
+            '[System.Windows.Forms.Clipboard]::GetFileDropList()',
           )
             .toString()
             .split('\n')

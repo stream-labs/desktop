@@ -2,7 +2,7 @@ import { useVuex } from 'components-react/hooks';
 import React, { useEffect, useState } from 'react';
 import { Services } from 'components-react/service-provider';
 import styles from './ClipsView.m.less';
-import { IClip } from 'services/highlighter';
+import { TClip } from 'services/highlighter';
 import ClipPreview from 'components-react/highlighter/ClipPreview';
 import ClipTrimmer from 'components-react/highlighter/ClipTrimmer';
 import { ReactSortable } from 'react-sortablejs';
@@ -24,14 +24,14 @@ import * as remote from '@electron/remote';
 
 type TModal = 'trim' | 'export' | 'preview' | 'remove';
 
-interface IClipsViewProps {
+interface TClipsViewProps {
   id: string;
 }
 
-export default function ClipsView(props: IClipsViewProps) {
+export default function ClipsView(props: TClipsViewProps) {
   const { HighlighterService, HotkeysService, UsageStatisticsService } = Services;
   const v = useVuex(() => ({
-    clips: HighlighterService.views.clips as IClip[],
+    clips: HighlighterService.views.clips as TClip[],
     exportInfo: HighlighterService.views.exportInfo,
     uploadInfo: HighlighterService.views.uploadInfo,
     loadedCount: HighlighterService.views.loadedCount,
@@ -190,7 +190,7 @@ export default function ClipsView(props: IClipsViewProps) {
   }
 
   const [inspectedClipPath, setInspectedClipPath] = useState<string | null>(null);
-  let inspectedClip: IClip | null;
+  let inspectedClip: TClip | null;
 
   if (inspectedClipPath) {
     inspectedClip = v.clips.find(c => c.path === inspectedClipPath) ?? null;
@@ -345,7 +345,7 @@ function AddClip() {
   );
 }
 
-function RemoveClip(p: { clip: IClip; close: () => void }) {
+function RemoveClip(p: { clip: TClip; close: () => void }) {
   const { HighlighterService } = Services;
 
   return (

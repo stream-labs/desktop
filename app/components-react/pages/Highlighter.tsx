@@ -2,12 +2,12 @@ import ClipsView from 'components-react/highlighter/ClipsView';
 import SettingsView from 'components-react/highlighter/SettingsView';
 import { useVuex } from 'components-react/hooks';
 import React, { useState } from 'react';
-import { IClip, IHighlighterData } from 'services/highlighter';
+import { TClip, IHighlighterData } from 'services/highlighter';
 import { Services } from 'components-react/service-provider';
 import { Button } from 'antd';
 import moment from 'moment';
 
-interface IClipsViewState {
+interface TClipsViewState {
   view: 'clips';
   id: string;
 }
@@ -19,14 +19,14 @@ interface ISettingsViewState {
   view: 'settings';
 }
 
-type IViewState = IClipsViewState | IStreamViewState | ISettingsViewState;
+type IViewState = TClipsViewState | IStreamViewState | ISettingsViewState;
 
 export default function Highlighter() {
   const [viewState, setViewState] = useState<IViewState>({ view: 'settings' });
 
   const { HighlighterService, RecordingModeService } = Services;
   const v = useVuex(() => ({
-    clips: HighlighterService.views.clips as IClip[],
+    clips: HighlighterService.views.clips as TClip[],
     dismissedTutorial: HighlighterService.views.dismissedTutorial,
     error: HighlighterService.views.error,
     useAiHighlighter: HighlighterService.views.useAiHighlighter,
@@ -147,6 +147,6 @@ export default function Highlighter() {
   }
 
   async function trimHighlightData() {
-    HighlighterService.actions.flow('das');
+    // HighlighterService.actions.flow('das', null);
   }
 }

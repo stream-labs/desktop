@@ -57,6 +57,9 @@ import { capitalize } from 'lodash';
 import { tiktokErrorMessages } from 'services/platforms/tiktok/api';
 import { TikTokService } from 'services/platforms/tiktok';
 import { HighlighterService } from 'app-services';
+import { ITwitchStartStreamOptions } from 'services/platforms/twitch';
+import { IYoutubeStartStreamOptions } from 'services/platforms/youtube';
+import { StreamInfoForAiHighlighter } from 'services/highlighter';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -1278,8 +1281,8 @@ export class StreamingService
   private outputErrorOpen = false;
   private streamErrorUserMessage = '';
   private streamErrorReportMessage = '';
+  private streamInfoForAiHighlighter: StreamInfoForAiHighlighter = {}
 
-  private eventMetadata: Dictionary<any> = {}
 
   private handleOBSOutputSignal(info: IOBSOutputSignalInfo) {
     console.debug('OBS Output signal: ', info);
@@ -1308,24 +1311,26 @@ export class StreamingService
           console.error('Error fetching stream encoder info: ', e);
         }
 
-        this.eventMetadata = {
+        const eventMetadata: Dictionary<any> = {
           ...streamEncoderInfo,
           game,
         };
-        console.log("🚀 ~ handleOBSOutputSignal ~ this.eventMetadata:", this.eventMetadata)
+
+
+        console.log("🚀 ~ handleOBSOutputSignal ~ eventMetadata:", eventMetadata)
 
         if (this.videoEncodingOptimizationService.state.useOptimizedProfile) {
-          this.eventMetadata.useOptimizedProfile = true;
+          eventMetadata.useOptimizedProfile = true;
         }
 
         const streamSettings = this.streamSettingsService.settings;
         console.log("🚀 ~ handleOBSOutputSignal ~ streamSettings:", streamSettings)
 
-        this.eventMetadata.streamType = streamSettings.streamType;
-        this.eventMetadata.platform = streamSettings.platform;
-        this.eventMetadata.server = streamSettings.server;
+        eventMetadata.streamType = streamSettings.streamType;
+        eventMetadata.platform = streamSettings.platform;
+        eventMetadata.server = streamSettings.server;
 
-        this.usageStatisticsService.recordEvent('stream_start', this.eventMetadata);
+        this.usageStatisticsService.recordEvent('stream_start', eventMetadata);
         this.usageStatisticsService.recordAnalyticsEvent('StreamingStatus', {
           code: info.code,
           status: EStreamingState.Live,
@@ -1333,9 +1338,20 @@ export class StreamingService
         });
         this.usageStatisticsService.recordFeatureUsage('Streaming');
 
+        // AiHighlighter logic
         if (this.highlighterService.views.state.useAiHighlighter) {
           this.highlighterService.isHighlighterRecording = true
-          this.toggleRecording()
+          this.streamInfoForAiHighlighter.id = eventMetadata.game;
+
+          this.streamInfoForAiHighlighter.game = eventMetadata.game;
+          const { title, description, tags } = this.getStreamGoLiveSettings(streamSettings.goLiveSettings)
+          this.streamInfoForAiHighlighter.title = title
+          this.streamInfoForAiHighlighter.id = this.streamInfoForAiHighlighter.title + this.streamInfoForAiHighlighter.game + moment().day()
+
+          if (this.streamInfoForAiHighlighter.game === "Fortnite") {
+            // Check if game is supported via highlighter
+            this.toggleRecording()
+          }
         }
 
       } else if (info.signal === EOBSOutputSignal.Starting && shouldResolve) {
@@ -1350,17 +1366,6 @@ export class StreamingService
           code: info.code,
           status: EStreamingState.Offline,
         });
-
-
-        if (this.state.recordingStatus === 'recording') {
-          // is Recording: Do nothing, we will need the eventmetadata when the recording stops
-          console.log('Dont clean up metadata');
-
-        } else {
-          // Clean up eventMetadata
-          this.eventMetadata = {};
-        }
-
       } else if (info.signal === EOBSOutputSignal.Stopping) {
         this.sendStreamEndEvent();
         this.SET_STREAMING_STATUS(EStreamingState.Ending, time);
@@ -1413,12 +1418,14 @@ export class StreamingService
 
         const isHighlighterRecording = this.highlighterService.isHighlighterRecording
         if (isHighlighterRecording) {
+          //TODO: Check if we should also do this via subject
           this.highlighterService.isHighlighterRecording = false
-          this.highlighterService.actions.flow(parsedFilename, this.eventMetadata)
+          this.highlighterService.actions.flow(parsedFilename, this.streamInfoForAiHighlighter)
+          this.streamInfoForAiHighlighter = {}
         }
 
         // Clean up eventMetadata after recording stops. We are doing this here because we need the metadata when saving the recording
-        this.eventMetadata = {};
+        // eventMetadata = {};
 
         return;
       }
@@ -1447,6 +1454,8 @@ export class StreamingService
           status: 'wrote',
           code: info.code,
         });
+
+        //TODO: Why not call the highlighterservice directly?
         this.replayBufferFileWrite.next(NodeObs.OBS_service_getLastReplay());
       }
     }
@@ -1630,6 +1639,35 @@ export class StreamingService
     this.usageStatisticsService.recordEvent('stream_end', data);
   }
 
+
+
+  //TODO: I think sth is not correct with the types.
+  private getStreamGoLiveSettings(goLiveSettings: any): { title?: string, description?: string, tags?: string[] } {
+    const platforms = goLiveSettings.platforms
+    const getStreamInfo: { title?: string, description?: string, tags?: string[] } = {}
+    for (const key in platforms) {
+      if (platforms.hasOwnProperty(key)) {
+
+        if (key === 'twitch') {
+          let data: ITwitchStartStreamOptions = platforms[key]
+          getStreamInfo.title = data.title
+          getStreamInfo.tags = data.tags
+          //Is it missing description here?
+
+
+        }
+        if (key === 'youtube') {
+          let data: IYoutubeStartStreamOptions = platforms[key]
+          getStreamInfo.title
+
+        }
+        break; // Assuming there's only one platform and you want the first one found
+      }
+    }
+
+    return getStreamInfo
+  }
+
   private recordGoals(duration: number) {
     if (!this.userService.isLoggedIn) return;
     const hoursStreamed = Math.floor(duration / 60 / 60);
@@ -1696,4 +1734,7 @@ export class StreamingService
   private SET_GO_LIVE_SETTINGS(settings: IGoLiveSettings) {
     this.state.info.settings = settings;
   }
+
+
+
 }
