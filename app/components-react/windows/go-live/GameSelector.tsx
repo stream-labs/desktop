@@ -133,7 +133,7 @@ export default function GameSelector(p: TProps) {
       }}
       filterOption={filterOption}
       debounce={500}
-      required={isTwitch || isTrovo || isTikTok}
+      required={isTwitch || isTrovo}
       hasImage={isTwitch || isTrovo}
       onBeforeSearch={onBeforeSearchHandler}
       imageSize={platformService.gameImageSize}
