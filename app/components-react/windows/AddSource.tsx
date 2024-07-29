@@ -13,6 +13,7 @@ import styles from './AddSource.m.less';
 import { TextInput, SwitchInput } from 'components-react/shared/inputs';
 import Form, { useForm } from 'components-react/shared/inputs/Form';
 import Scrollable from 'components-react/shared/Scrollable';
+import { IObsListOption } from '../../components/obs/inputs/ObsInput';
 
 export default function AddSource() {
   const {
@@ -57,6 +58,15 @@ export default function AddSource() {
 
   const existingSources = sources.map(source => ({ name: source.name, value: source.sourceId }));
 
+  // TODO: maybe refactor into a `useSourceTypes` hook
+  const [sourceTypes, setSourceTypes] = useState<IObsListOption<TSourceType>[]>([]);
+
+  useEffect(() => {
+    if (!sourceTypes.length) {
+      SourcesService.actions.return.getAvailableSourcesTypesList().then(setSourceTypes);
+    }
+  }, []);
+
   useEffect(() => {
     const suggestName = (name: string) => SourcesService.views.suggestName(name);
     let name;
@@ -80,14 +90,12 @@ export default function AddSource() {
     } else {
       const sourceDescription =
         sourceType &&
-        SourcesService.getAvailableSourcesTypesList().find(
-          sourceTypeDef => sourceTypeDef.value === sourceType,
-        )?.description;
+        sourceTypes.find(sourceTypeDef => sourceTypeDef.value === sourceType)?.description;
 
       name = suggestName(sourceDescription || '');
     }
     setName(name);
-  }, []);
+  }, [sourceTypes]);
 
   function close() {
     WindowsService.actions.closeChildWindow();
