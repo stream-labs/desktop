@@ -10,7 +10,7 @@
     "compile:ci": "yarn clear && webpack-cli --mode development",
     "compile:production": "yarn clear && webpack-cli --progress --mode production",
     "watch": "yarn clear && webpack-cli --watch --progress --mode development",
-    "start": "cross-env NAIR_FAKE_PROGRAM=1 node bin/start-with-auto-env.js",
+    "start": "node bin/start-with-auto-env.js",
     "dev:server": "webpack-cli serve --progress --hot --mode development",
     "dev:start": "cross-env NAIR_UNSTABLE=1 DEV_SERVER=\"http://localhost:8080/index.dev.html\" electron . && echo 'electron exited.'",
     "dev": "run-p dev:*",
