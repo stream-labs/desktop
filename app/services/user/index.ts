@@ -1192,11 +1192,12 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     merge = false,
   ): Promise<EPlatformCallResult> {
     const service = getPlatformService(platform);
-    const authUrl = merge ? service.mergeUrl : service.authUrl;
 
     if (merge && !this.isLoggedIn && !this.views.isPartialSLAuth) {
       throw new Error('Account merging can only be performed while logged in');
     }
+
+    const authUrl = merge ? await service.getMergeUrl() : service.authUrl;
 
     // HACK: faking instagram login
     if (platform === 'instagram') {

@@ -10,6 +10,7 @@ import {
 import { StreamingService } from 'services/streaming';
 import { UserService } from 'services/user';
 import { HostsService } from 'services/hosts';
+import { MagicLinkService } from 'services/magic-link';
 import { DualOutputService } from 'services/dual-output';
 import { IFacebookStartStreamOptions } from './facebook';
 import { StreamSettingsService } from '../settings/streaming';
@@ -34,6 +35,7 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
   @Inject() protected userService: UserService;
   @Inject() protected hostsService: HostsService;
   @Inject() protected streamSettingsService: StreamSettingsService;
+  @Inject() protected magicLinkService: MagicLinkService;
   @Inject() protected dualOutputService: DualOutputService;
   @Inject() protected videoSettingsService: VideoSettingsService;
 
@@ -46,10 +48,8 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
     return this.capabilities.has(capability);
   }
 
-  get mergeUrl() {
-    const host = this.hostsService.streamlabs;
-    const token = this.userService.apiToken;
-    return `https://${host}/slobs/merge/${token}/${this.platform}_account`;
+  async getMergeUrl(): Promise<string> {
+    return this.magicLinkService.getMergeUrl(this.platform);
   }
 
   averageViewers: number;
