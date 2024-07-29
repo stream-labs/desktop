@@ -274,7 +274,6 @@ export function convertChunkedResponseToMessageResponse(
       return convertGameUpdateToMessageResponse(common, msg.message.gameUpdate);
     }
   } else if (msg.state) {
-    console.info(msg.state);
     if (msg.state.marquee) {
       // 運コメ(放送者コメント)
       return convertMarqueeToMessageResponse(common, msg.state.marquee);

@@ -1,13 +1,13 @@
 import { getContentWithFilter } from '../getContentWithFilter';
-import { WrappedMessage, WrappedMessageWithComponent } from '../WrappedChat';
+import { WrappedChat, WrappedMessage, WrappedMessageWithComponent } from '../WrappedChat';
 import { ChatComponentType } from './ChatComponentType';
 import { isNicoadMessageV0, isNicoadMessageV1 } from './util';
 
-function getCommonComment(chat: WrappedMessage): string {
+function getCommonComment(chat: WrappedChat): string {
   if (chat.type === 'normal') {
     return getContentWithFilter(chat);
   }
-  return '';
+  return chat.value.content ?? '';
 }
 
 function getNicoadComment(chat: WrappedMessage): string {
@@ -49,7 +49,7 @@ function getSystemMessage(chat: WrappedMessage): string {
 }
 
 const displayTextMap: { [type in ChatComponentType]: (chat: WrappedMessage) => string } = {
-  common: getCommonComment,
+  common: getCommonComment as (chat: WrappedMessage) => string,
   nicoad: getNicoadComment,
   gift: getGiftComment,
   emotion: getEmotionComment,
