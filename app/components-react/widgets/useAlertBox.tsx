@@ -1,4 +1,4 @@
-import { createAlertsMap, ICustomCode, IWidgetState, useWidget, WidgetModule } from './common/useWidget';
+import { createAlertsMap, ICustomCode, ICustomField, IWidgetState, useWidget, WidgetModule } from './common/useWidget';
 import values from 'lodash/values';
 import cloneDeep from 'lodash/cloneDeep';
 import { IAlertConfig, TAlertType } from '../../services/widgets/alerts-config';
@@ -226,8 +226,11 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState, IAlertBoxStatic
     const userPlatforms = Object.keys(Services.UserService.views.platforms!) as TPlatform[];
 
     // TODO: this is complicated, unless we want to use a library, we need multiple level traversal of sorts, and filtering
-    // alertTypes = { streamlabs: { foo: "bar" }, twitch_account: { bar: "baz } }
 
+    // 1. alertTypes = {
+    //   streamlabs: { donation: { type: "donation", ... }, merch: { type: 'merch', ...}, ...},
+    //   twitch_account: {...}
+    // }
     const alertSources = Object.keys(this.staticConfig.alertTypes).filter(alertSource => {
       return (
         // Always add streamlabs (donation, merch, loyalty_store_redemption)
@@ -240,12 +243,12 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState, IAlertBoxStatic
     });
 
     const availableAlerts = alertSources.flatMap(platformOrIntegration => {
-      // { foo: "bar"}
-      return Object.values(this.staticConfig.alertTypes[platformOrIntegration]).map((alertConfig: IAlertType) => alertConfig.type);
+      // 2. { type: "donation", ...}
+      return Object.values(this.staticConfig.alertTypes[platformOrIntegration]).map((alertConfig: IAlertType) => alertConfig.type as TAlertType);
     });
+    // 3. ['donation', 'merch']
 
     assert(availableAlerts.includes('donation'));
-    // FIXME: available alerts does not match anymore
     this.setAvailableAlerts(availableAlerts);
 
     debugger;
@@ -402,12 +405,15 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState, IAlertBoxStatic
       custom_js,
       custom_json,
     } = variationSettings;
+    // With the new types, apparently being stronger, we need casts here
+    // TODO: find a way to simplify
     return {
-      custom_enabled: custom_html_enabled,
-      custom_css,
-      custom_js,
-      custom_html,
-      custom_json,
+      custom_enabled: (custom_html_enabled as boolean) ?? false,
+      custom_css: custom_css as string,
+      custom_js: custom_js as string,
+      custom_html: custom_html as string,
+      // TODO: verify
+      custom_json: custom_json as Record<string, ICustomField>,
     };
   }
 
@@ -448,7 +454,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState, IAlertBoxStatic
     alerts = topAlerts.concat(alerts.sort().filter(alert => !topAlerts.includes(alert)));
 
     // TODO: fbSupportGift is impossible to enable on backend
-    alerts = alerts.filter(alert => alert !== 'fbSupportGift');
+    alerts = alerts.filter(alert => alert !== 'facebook_support_gifter');
     this.widgetState.availableAlerts = alerts;
   }
 }
@@ -535,49 +541,60 @@ function getVariationsMetadata() {
         min: 0,
       }),
     },
-    twFollow: {},
-    fbFollow: {},
-    twRaid: {
-      message_template: getMessageTemplateMetadata('twRaid'),
+    follow: {},
+    facebook_follow: {},
+    raid: {
+      message_template: getMessageTemplateMetadata('raid'),
     },
-    twSubscription: {},
-    twCheer: {
-      message_template: getMessageTemplateMetadata('twCheer'),
+    sub: {},
+    bits: {
+      message_template: getMessageTemplateMetadata('bits'),
       alert_message_min_amount: metadata.number({
         label: $t('Min. Amount to Trigger Alert'),
         min: 0,
       }),
     },
-    ytSuperchat: {
+    fanfunding: {
       alert_message_min_amount: metadata.number({
         label: $t('Min. Amount to Trigger Alert'),
         min: 0,
       }),
     },
-    fbStars: {
-      message_template: getMessageTemplateMetadata('fbStars'),
+    facebook_stars: {
+      message_template: getMessageTemplateMetadata('facebook_stars'),
       alert_message_min_amount: metadata.number({
         label: $t('Min. Amount to Trigger Alert'),
         min: 0,
       }),
     },
-    fbSupport: {
-      message_template: getMessageTemplateMetadata('fbSupport'),
+    facebook_support: {
+      message_template: getMessageTemplateMetadata('facebook_support'),
     },
-    fbSupportGift: {},
-    fbShare: {},
-    fbLike: {},
+    facebook_support_gifter: {},
+    facebook_share: {},
+    facebook_like: {},
     merch: {
       message_template: getMessageTemplateMetadata('merch'),
       use_custom_image: metadata.bool({
         label: $t('Replace product image with custom image'),
       }),
     },
-    ytSubscriber: {},
-    ytMembership: {},
-    trFollow: {},
-    trSubscription: {},
-    trRaid: {},
+    subscriber: {},
+    sponsor: {},
+    trovo_follow: {},
+    trovo_sub: {},
+    trovo_raid: {},
+    donordrivedonation: {},
+    eldonation: {},
+    justgivingdonation: {},
+    loyalty_store_redemption: {},
+    membershipGift: {},
+    pledge: {},
+    resub: {},
+    streamlabscharitydonation: {},
+    tiltifydonation: {},
+    treat: {},
+    twitchcharitydonation: {},
   });
 
   // mix common and specific metadata and return it
@@ -593,6 +610,7 @@ function getVariationsMetadata() {
  * Returns metadata for the message_template field
  * @param alert
  */
+// TODO: should we get this from API
 function getMessageTemplateMetadata(alert?: TAlertType) {
   const tooltipTextHeader =
     $t('When an alert shows up, this will be the format of the message.') +
@@ -601,11 +619,12 @@ function getMessageTemplateMetadata(alert?: TAlertType) {
     '\n';
   let tooltipTokens = ' {name} ';
 
+  // TODO: they're a lot of cases not covered here
   switch (alert) {
     case 'donation':
-    case 'twCheer':
-    case 'fbStars':
-    case 'fbSupport':
+    case 'bits':
+    case 'facebook_stars':
+    case 'facebook_support':
       tooltipTokens =
         ' {name} ' +
         $t('The name of the donator') +
@@ -615,7 +634,7 @@ function getMessageTemplateMetadata(alert?: TAlertType) {
     case 'merch':
       tooltipTokens = '{name}, {product}';
       break;
-    case 'twRaid':
+    case 'raid':
       tooltipTokens =
         ' {name} ' +
         $t('The name of the streamer raiding you') +

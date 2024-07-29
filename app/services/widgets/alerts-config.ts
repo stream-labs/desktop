@@ -10,6 +10,7 @@ import { TPlatform } from '../platforms';
      Also, there's an unwritten rule that the backend will always have unique
      keys for what's essentially `alert.type`, but we would like to see if this
      is enforced.
+     JSDoc doesn't work here, so we'll add comments for just the unclear types :(
  */
 export type TAlertType =
   // Streamlabs
@@ -28,7 +29,7 @@ export type TAlertType =
   // YouTube
   | 'fanfunding' // Super Chat
   | 'membershipGift'
-  | 'sponsor'
+  | 'sponsor' // Membership
   | 'subscriber'
   // Trovo
   | 'trovo_follow'

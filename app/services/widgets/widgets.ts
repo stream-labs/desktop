@@ -203,9 +203,11 @@ export class WidgetsService
 
   @Throttle(1000)
   playAlert(alertType: TAlertType) {
-    const config = this.alertsConfig[alertType];
     const headers = authorizedHeaders(this.userService.apiToken);
-    fetch(new Request(config.url(), { headers }));
+    const host = this.hostsService.streamlabs;
+    return fetch(
+      new Request(`https://${host}/api/v5/widgets/desktop/test/${alertType}`, { headers }),
+    );
   }
 
   private previewSourceWatchers: Dictionary<Subscription> = {};
