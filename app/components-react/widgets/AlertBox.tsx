@@ -76,7 +76,7 @@ function TabContent() {
  * Renders general settings
  */
 function GeneralSettings() {
-  const { bind, switchToLegacyAlertbox } = useAlertBox();
+  const { bind } = useAlertBox();
 
   function openAdvancedAlertTesting() {
     Services.MagicLinkService.actions.openAdvancedAlertTesting();
@@ -94,15 +94,6 @@ function GeneralSettings() {
         debounce={500}
       />
 
-      <Info
-        message={$t('Looking for the old AlertBox settings?')}
-        onClick={switchToLegacyAlertbox}
-      />
-      {/* TODO: check this feature is working for prime and non-prime users */}
-      {/*<Info*/}
-      {/*  message={$t('Need to test your alerts with different scenarios?')}*/}
-      {/*  onClick={openAdvancedAlertTesting}*/}
-      {/*/>*/}
       <AdvancedSettingsPanel />
     </Form>
   );

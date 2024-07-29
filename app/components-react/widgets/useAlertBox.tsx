@@ -23,8 +23,9 @@ interface IAlertBoxState extends IWidgetState {
   data: {
     settings: {
       global: IAlertBoxApiSettings['global'],
-      platforms: IAlertBoxApiSettings['platforms'];
     };
+    integrations: IAlertBoxApiSettings['integrations'];
+    platforms: IAlertBoxApiSettings['platforms'];
     variations: TVariationsState;
     animationOptions: {
       show: IListOption<string>[];
@@ -224,13 +225,18 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState, IAlertBoxStatic
     /* define available alerts */
     const userPlatforms = Object.keys(Services.UserService.views.platforms!) as TPlatform[];
 
-    // FIXME: what about integrations? original code here specifically did not take those into account
-
     // TODO: this is complicated, unless we want to use a library, we need multiple level traversal of sorts, and filtering
     // alertTypes = { streamlabs: { foo: "bar" }, twitch_account: { bar: "baz } }
+
     const alertSources = Object.keys(this.staticConfig.alertTypes).filter(alertSource => {
-      // Always add streamlabs (donation, merch, loyalty_store_redemption)
-      return alertSource === 'streamlabs' || userPlatforms.includes(fromServerPlatform(alertSource as TServerPlatform));
+      return (
+        // Always add streamlabs (donation, merch, loyalty_store_redemption)
+        alertSource === 'streamlabs'
+        // User platforms
+        || userPlatforms.includes(fromServerPlatform(alertSource as TServerPlatform))
+        // Integrations, do we need to filter enabled or is it `linked` with the URL param enough?
+        || !!data.integrations[alertSource]
+      );
     });
 
     const availableAlerts = alertSources.flatMap(platformOrIntegration => {
@@ -240,7 +246,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState, IAlertBoxStatic
 
     assert(availableAlerts.includes('donation'));
     // FIXME: available alerts does not match anymore
-    this.setAvailableAlerts(availableAlerts as any);
+    this.setAvailableAlerts(availableAlerts);
 
     debugger;
     const allAlerts = values(this.eventsConfig) as IAlertConfig[];
