@@ -49,9 +49,9 @@ export function RemoteControlSettings() {
 
   function handleToggle() {
     if (remoteConnectionEnabled) {
-      enableConnection();
-    } else {
       disableConnection();
+    } else {
+      enableConnection();
     }
   }
 
@@ -79,7 +79,6 @@ export function RemoteControlSettings() {
                 </span>
               </div>
             ))}
-            ;
           </div>
         )}
       </div>
