@@ -41,10 +41,7 @@ function getEmotionComment(chat: WrappedMessage): string {
   return chat.value.content ?? '';
 }
 
-function getSystemMessage(chat: WrappedMessage): string {
-  if (chat.type !== 'system') {
-    return '';
-  }
+function getSystemMessage(chat: WrappedChat): string {
   return chat.value.content ?? '';
 }
 
@@ -53,7 +50,7 @@ const displayTextMap: { [type in ChatComponentType]: (chat: WrappedMessage) => s
   nicoad: getNicoadComment,
   gift: getGiftComment,
   emotion: getEmotionComment,
-  system: getSystemMessage,
+  system: getSystemMessage as (chat: WrappedMessage) => string,
 };
 
 export function getDisplayText(chat: WrappedMessageWithComponent): string {

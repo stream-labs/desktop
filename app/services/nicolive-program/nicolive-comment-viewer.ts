@@ -303,6 +303,8 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
                 map(({ notification }) => ({
                   type: classify({ notification }),
                   value: {
+                    date: notification.date,
+                    date_usec: notification.date_usec,
                     content: notification.message,
                   },
                 })),
