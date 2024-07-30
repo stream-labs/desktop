@@ -170,13 +170,11 @@ export class TikTokService
 
       try {
         streamInfo = await this.startStream(ttSettings);
-        console.log('streamInfo', JSON.stringify(streamInfo, null, 2));
         if (!streamInfo?.id) {
           await this.handleOpenLiveManager();
           throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED');
         }
       } catch (error: unknown) {
-        console.log('error', JSON.stringify(error, null, 2));
         this.SET_LIVE_SCOPE('relog');
         await this.handleOpenLiveManager();
         throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED', error as any);
@@ -383,7 +381,6 @@ export class TikTokService
 
     try {
       const response = await this.fetchLiveAccessStatus();
-      console.log('response', JSON.stringify(response, null, 2));
 
       const status = response as ITikTokLiveScopeResponse;
 
