@@ -5,6 +5,7 @@ import { NdgrClient } from './NdgrClient';
 
 const ENTRY_URL = 'http://example.com/entry';
 const MESSAGES_URL = 'http://example.com/messages';
+const PREV_MESSAGES_URL = 'http://example.com/prev';
 
 // protobufjs は class 要素を objectに変換しようとすると toJSONメソッドが呼ばれるが、
 // その変換ルールがデフォルトで Long と enum が Stringになってしまうので、Number に戻してアプリと挙動を合わせる
@@ -14,7 +15,24 @@ util.toJSONOptions = { longs: Number, enums: Number, bytes: String };
 const entries: dwango.nicolive.chat.service.edge.IChunkedEntry[] = [
   {
     segment: {
+      uri: PREV_MESSAGES_URL,
+    },
+  },
+  {
+    segment: {
       uri: MESSAGES_URL,
+    },
+  },
+];
+
+const prevMessages: dwango.nicolive.chat.data.INicoliveMessage[] = [
+  {
+    moderatorUpdated: {
+      operation: dwango.nicolive.chat.data.atoms.ModeratorUpdated.ModeratorOperation.ADD,
+      operator: {
+        userId: 3,
+        nickname: 'prev',
+      },
     },
   },
 ];
@@ -70,8 +88,9 @@ describe('NdgrClient', () => {
   jest.spyOn(Date, 'now').mockReturnValue(now);
   const ENTRY_URL_WITH_TIMESTAMP = `${ENTRY_URL}?at=now`;
 
-  const fetchMock = jest_fn<typeof fetch>().mockImplementation(
-    (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+  const fetchMock = jest_fn<typeof fetch>()
+    .mockName('fetch')
+    .mockImplementation((input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
       if (typeof input === 'string') {
         const headers = new Headers();
         headers.append('Content-Type', 'application/octet-stream');
@@ -89,6 +108,17 @@ describe('NdgrClient', () => {
             );
           }
 
+          case PREV_MESSAGES_URL:
+            return Promise.resolve(
+              new Response(
+                encodeMessages(
+                  msg => dwango.nicolive.chat.service.edge.ChunkedMessage.encodeDelimited(msg),
+                  prevMessages.map(message => ({ message })),
+                ),
+                { headers },
+              ),
+            );
+
           case MESSAGES_URL:
             return Promise.resolve(
               new Response(
@@ -102,8 +132,7 @@ describe('NdgrClient', () => {
         }
       }
       return Promise.reject(new Error(`Unknown URL: ${input}`));
-    },
-  );
+    });
   global.fetch = fetchMock;
 
   afterEach(() => {
@@ -112,19 +141,23 @@ describe('NdgrClient', () => {
 
   it('should emit received messages', async () => {
     const target = new NdgrClient(ENTRY_URL);
-    const onReceived = jest.fn<void, [dwango.nicolive.chat.service.edge.IChunkedMessage]>();
-    const onCompleted = jest.fn<void, []>();
+    const onReceived = jest
+      .fn<void, [dwango.nicolive.chat.service.edge.IChunkedMessage]>()
+      .mockName('onReceived');
+    const onCompleted = jest.fn<void, []>().mockName('onCompleted');
     target.messages.subscribe({
       next: msg => onReceived(msg.toJSON()), // class情報を落とすことで比較可能にする
       complete: onCompleted,
     });
     await target.connect();
     expect(fetchMock).toHaveBeenNthCalledWith(1, ENTRY_URL_WITH_TIMESTAMP);
-    expect(fetchMock).toHaveBeenNthCalledWith(2, MESSAGES_URL);
+    expect(fetchMock).toHaveBeenNthCalledWith(2, PREV_MESSAGES_URL);
+    expect(fetchMock).toHaveBeenNthCalledWith(3, MESSAGES_URL);
 
-    expect(onReceived).toHaveBeenCalledTimes(2);
-    for (let i = 0; i < 2; i++) {
-      expect(onReceived).toHaveBeenNthCalledWith(i + 1, { message: messages[i] });
+    const expectedMessages = [...prevMessages, ...messages];
+    expect(onReceived).toHaveBeenCalledTimes(expectedMessages.length);
+    for (let i = 0; i < expectedMessages.length; i++) {
+      expect(onReceived).toHaveBeenNthCalledWith(i + 1, { message: expectedMessages[i] });
     }
     target.dispose();
     expect(onCompleted).toHaveBeenCalledTimes(1);

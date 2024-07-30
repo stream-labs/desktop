@@ -45,13 +45,17 @@ export class NdgrClient {
 
   public async connect(from_unix_time?: number): Promise<void> {
     let next: number | Long | string = from_unix_time ?? 'now';
+    let initPhase = true;
     while (next && !this.isDisposed) {
       const fetchUri = `${this.uri}?at=${next}`;
       next = null;
       for await (const entry of this.retrieve(fetchUri, reader =>
         dwango.nicolive.chat.service.edge.ChunkedEntry.decodeDelimited(reader),
       )) {
-        if (entry.segment != null) {
+        if (entry.previous != null && initPhase) {
+          await this.retrieveMessages(entry.previous.uri);
+        } else if (entry.segment != null) {
+          initPhase = false;
           await this.retrieveMessages(entry.segment.uri);
         } else if (entry.next != null) {
           next = entry.next.at;
