@@ -293,9 +293,7 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
                 filter(isOperatorMessage),
                 map(({ operator }) => ({
                   type: 'operator' as const,
-                  value: {
-                    content: operator.content,
-                  },
+                  value: operator,
                 })),
               );
 
