@@ -95,6 +95,7 @@ function convertChatToMessageResponse(
   common: CommonComponent,
   chat: dwango.nicolive.chat.data.IChat,
 ): MessageResponse {
+  const user_id = chat.rawUserId ? chat.rawUserId.toString() : chat.hashedUserId;
   return {
     chat: {
       ...common,
@@ -103,7 +104,7 @@ function convertChatToMessageResponse(
       ...(chat.accountStatus === dwango.nicolive.chat.data.Chat.AccountStatus.Premium
         ? { premium: 1 }
         : {}),
-      ...(chat.hashedUserId ? { user_id: chat.hashedUserId } : {}),
+      ...(user_id ? { user_id } : {}),
       ...(chat.vpos !== undefined ? { vpos: chat.vpos } : {}),
       ...(chat.name ? { name: chat.name } : {}),
       ...(chat.modifier ? { mail: convertModifierToMail(chat.modifier) } : {}),
