@@ -340,7 +340,7 @@ export class TcpServerService
   async createStreamlabsRemoteConnection() {
     this.SET_ENABLE_REMOTE_CONNECTION(true);
     const io = await importSocketIOClient();
-    const url = `${
+    const url = `https://${
       this.hostsService.streamlabs
     }/api/v5/slobs/mobile-remote-io/config?device_name=${os.hostname()}`;
     const headers = authorizedHeaders(this.userService.apiToken);
