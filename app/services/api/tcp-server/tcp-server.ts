@@ -1,6 +1,6 @@
 import os from 'os';
 import crypto from 'crypto';
-import { PersistentStatefulService, Inject, mutation } from 'services/core';
+import { PersistentStatefulService, Inject, mutation, InitAfter } from 'services/core';
 import { IObsInput } from 'components/obs/inputs/ObsInput';
 import { ISettingsSubCategory } from 'services/settings/index';
 import {
@@ -67,6 +67,7 @@ const TCP_PORT = 28194;
 /**
  * A transport layer for TCP and Websockets communications with internal API
  */
+@InitAfter('UserService')
 export class TcpServerService
   extends PersistentStatefulService<ITcpServersSettings>
   implements ITcpServerServiceApi {
