@@ -597,6 +597,7 @@ export class TikTokService
 
   get promptReapply(): boolean {
     if (this.getHasScope('approved') || this.getHasScope('legacy')) return false;
+    if (!this.userService.state.createdAt) return false;
 
     // prompt users that have had desktop for 30+ days
     // and have streamed at least once in the past 30 days
@@ -615,6 +616,7 @@ export class TikTokService
     if (isOldAccount && !isTikTokLinked && isFrequentUser) return true;
 
     // prompt a user to reapply if they were rejected 30+ days ago
+    if (!this.state.dateDenied) return false;
     const deniedDate = new Date(this.state.dateDenied);
     const deniedDateDiff = (deniedDate.getTime() - today.getTime()) / (1000 * 3600 * 24);
     if (this.denied && deniedDateDiff >= 30) return true;
