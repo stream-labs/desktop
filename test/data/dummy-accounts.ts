@@ -64,7 +64,7 @@ export const tikTokUserLegacy: IDummyTestUser = {
   tikTokLiveScope: 'legacy',
 };
 
-export const tikTokUserDenied: IDummyTestUser = {
+export const tikTokUserRelog: IDummyTestUser = {
   email: 'tikTokUser4@email.com',
   workerId: 'tikTokWorkerId4',
   updated: 'tikTokUpdatedId4',
@@ -81,9 +81,9 @@ export const tikTokUserDenied: IDummyTestUser = {
 
 export const tikTokUsers = {
   approved: tikTokUserApproved,
-  ['denied']: tikTokUserNotApproved,
+  denied: tikTokUserNotApproved,
   legacy: tikTokUserLegacy,
-  denied: tikTokUserDenied,
+  relog: tikTokUserRelog,
 };
 
 /**
@@ -155,9 +155,9 @@ export function getDummyUser(
       case 'legacy':
         return tikTokUserLegacy;
       case 'relog':
-        return tikTokUserDenied;
+        return tikTokUserRelog;
       default:
-        return tikTokUserDenied;
+        return tikTokUserNotApproved;
     }
   }
 }
