@@ -20,6 +20,8 @@ class RecordingHistoryController {
   private UserService = Services.UserService;
   private SharedStorageService = Services.SharedStorageService;
   private NotificationsService = Services.NotificationsService;
+  private HighlighterService = Services.HighlighterService;
+  private NavigationService = Services.NavigationService;
   store = initStore({ showSLIDModal: false });
 
   get recordings() {
@@ -40,6 +42,11 @@ class RecordingHistoryController {
 
   get uploadOptions() {
     const opts = [
+      {
+        label: $t('Highlight'),
+        value: 'highlighter',
+        icon: 'icon-editor-7',
+      },
       {
         label: $t('Clip'),
         value: 'crossclip',
@@ -80,6 +87,12 @@ class RecordingHistoryController {
       this.postError($t('Upload already in progress'));
       return;
     }
+    if (platform === 'highlighter') {
+      this.HighlighterService.actions.getHighlightClips(filename);
+      this.NavigationService.actions.navigate('Highlighter');
+      return;
+    }
+
     if (platform === 'youtube') return this.uploadToYoutube(filename);
     if (this.hasSLID) {
       this.uploadToStorage(filename, platform);
