@@ -4,6 +4,9 @@ import { Reader } from 'protobufjs/minimal';
 import { Subject } from 'rxjs';
 import { FilterType } from './ResponseTypes';
 import { NdgrFetchError } from './NdgrFetchError';
+import { sleep } from 'util/sleep';
+
+const BACKWARD_SEGMENT_INTERVAL = 7; // in ms
 
 export function toNumber(num: Long | number): number {
   if (typeof num === 'number') {
@@ -43,7 +46,7 @@ export class NdgrClient {
     this.messages = new Subject();
   }
 
-  public async connect(from_unix_time?: number): Promise<void> {
+  public async connect(from_unix_time?: number | 'now', numBackward = 0): Promise<void> {
     let next: number | Long | string = from_unix_time ?? 'now';
     let initPhase = true;
     while (next && !this.isDisposed) {
@@ -52,8 +55,17 @@ export class NdgrClient {
       for await (const entry of this.retrieve(fetchUri, reader =>
         dwango.nicolive.chat.service.edge.ChunkedEntry.decodeDelimited(reader),
       )) {
-        if (entry.previous != null && initPhase) {
-          await this.retrieveMessages(entry.previous.uri);
+        if (entry.backward != null) {
+          if (initPhase && numBackward > 0) {
+            const backwards = await this.pullBackwards(entry.backward.segment.uri, numBackward);
+            for (const msg of backwards) {
+              this.messages.next(new dwango.nicolive.chat.service.edge.ChunkedMessage(msg));
+            }
+          }
+        } else if (entry.previous != null) {
+          if (initPhase) {
+            await this.retrieveMessages(entry.previous.uri);
+          }
         } else if (entry.segment != null) {
           initPhase = false;
           await this.retrieveMessages(entry.segment.uri);
@@ -62,6 +74,34 @@ export class NdgrClient {
         }
       }
     }
+  }
+
+  private async pullBackwards(
+    fetchUri: string,
+    want: number,
+  ): Promise<dwango.nicolive.chat.service.edge.IChunkedMessage[]> {
+    if (want === 0) {
+      return [];
+    }
+    const buf: dwango.nicolive.chat.service.edge.IChunkedMessage[][] = [];
+    let length = 0;
+
+    while (length < want) {
+      const resp = await fetch(fetchUri);
+      if (!resp.ok) throw new NdgrFetchError(resp.status, fetchUri);
+      const body = await resp.arrayBuffer();
+      const packed = dwango.nicolive.chat.service.edge.PackedSegment.decode(new Uint8Array(body));
+      buf.unshift(packed.messages);
+      length += packed.messages.length;
+      if (!packed.next) break;
+      await sleep(BACKWARD_SEGMENT_INTERVAL);
+      fetchUri = packed.next.uri;
+    }
+    const result = buf.flat();
+    if (result.length > want) {
+      return result.slice(result.length - want);
+    }
+    return result;
   }
 
   private async retrieveMessages(uri: string): Promise<void> {

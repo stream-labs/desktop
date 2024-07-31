@@ -4,6 +4,8 @@ import { IMessageServerClient } from './MessageServerClient';
 import { NdgrClient, toNumber } from './NdgrClient';
 import { MessageResponse, NotificationType, NotificationTypeTable } from './ChatMessage';
 
+const NUM_BACKWARD_COMMENTS = 100;
+
 function toHex2(n: number) {
   return n.toString(16).padStart(2, '0');
 }
@@ -305,7 +307,7 @@ export class NdgrCommentReceiver implements IMessageServerClient {
         }
       },
     });
-    this.ndgrClient.connect().catch(err => {
+    this.ndgrClient.connect('now', NUM_BACKWARD_COMMENTS).catch(err => {
       console.warn('Failed to connect to ndgr', err);
       this.messageSubject.error(err);
     });
