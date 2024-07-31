@@ -342,7 +342,8 @@ export class TcpServerService
     const io = await importSocketIOClient();
     const url = `https://${
       this.hostsService.streamlabs
-    }/api/v5/slobs/mobile-remote-io/config?device_name=${os.hostname()}`;
+    }/api/v5/slobs/modules/mobile-remote-io/config?device_name=${os.hostname()}`;
+    console.log(os.hostname());
     const headers = authorizedHeaders(this.userService.apiToken);
 
     const resp: ISLRemoteResponse = await jfetch(new Request(url, { headers }));
