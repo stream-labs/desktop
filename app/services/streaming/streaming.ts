@@ -1559,6 +1559,7 @@ export class StreamingService
     const data: Dictionary<any> = {};
     data.viewerCounts = {};
     data.duration = Math.round(moment().diff(moment(this.state.streamingStatusTime)) / 1000);
+    data.game = this.views.game;
 
     if (this.views.protectedModeEnabled) {
       data.platforms = this.views.enabledPlatforms;
