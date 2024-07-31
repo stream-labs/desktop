@@ -66,7 +66,11 @@ export function RemoteControlSettings() {
       </div>
 
       <div>
-        <SwitchInput label={$t('Allow remote connections')} onInput={handleToggle} />
+        <SwitchInput
+          label={$t('Allow remote connections')}
+          onInput={handleToggle}
+          value={remoteConnectionEnabled}
+        />
 
         {remoteConnectionEnabled && (
           <div>
