@@ -12,6 +12,7 @@ import { Services } from '../service-provider';
 import { initStore, useController } from '../hooks/zustand';
 import { useVuex } from '../hooks';
 import Translate from 'components-react/shared/Translate';
+import uuid from 'uuid/v4';
 
 const RecordingHistoryCtx = React.createContext<RecordingHistoryController | null>(null);
 
@@ -88,7 +89,10 @@ class RecordingHistoryController {
       return;
     }
     if (platform === 'highlighter') {
-      this.HighlighterService.actions.getHighlightClips(filename);
+      this.HighlighterService.actions.flow(filename, {
+        game: 'forntnite',
+        id: 'rec_' + uuid(),
+      });
       this.NavigationService.actions.navigate('Highlighter');
       return;
     }
