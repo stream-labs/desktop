@@ -6,6 +6,7 @@ type DateComponent = {
 };
 
 export type ChatMessage = DateComponent & {
+  id?: string; // meta.id
   content?: string;
   no?: number;
   premium?: number;

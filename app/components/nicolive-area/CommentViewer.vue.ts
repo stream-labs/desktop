@@ -225,7 +225,7 @@ export default class CommentViewer extends Vue {
             .addFilter({
               type: 'user',
               body: item.value.user_id,
-              messageId: `${item.value.no}`,
+              messageId: `${item.value.id}`,
               memo: item.value.content,
             })
             .catch(e => {

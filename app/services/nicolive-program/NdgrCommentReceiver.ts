@@ -96,11 +96,13 @@ type CommonComponent = { date: number; date_usec: number };
 function convertChatToMessageResponse(
   common: CommonComponent,
   chat: dwango.nicolive.chat.data.IChat,
+  id: string,
 ): MessageResponse {
   const user_id = chat.rawUserId ? chat.rawUserId.toString() : chat.hashedUserId;
   return {
     chat: {
       ...common,
+      id,
       ...(chat.content ? { content: chat.content } : {}),
       ...(chat.no !== undefined ? { no: chat.no } : {}),
       ...(chat.accountStatus === dwango.nicolive.chat.data.Chat.AccountStatus.Premium
@@ -266,7 +268,7 @@ export function convertChunkedResponseToMessageResponse(
   };
   if (msg.message) {
     if (msg.message.chat) {
-      return convertChatToMessageResponse(common, msg.message.chat);
+      return convertChatToMessageResponse(common, msg.message.chat, msg.meta?.id);
     } else if (msg.message.simpleNotification) {
       return convertSimpleNotificationToMessageResponse(common, msg.message.simpleNotification);
     } else if (msg.message.gift) {
