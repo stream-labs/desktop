@@ -405,7 +405,11 @@ export class TcpServerService
       this.onDisconnectHandler(client);
     });
 
-    // Listeners for SL Remote Control App
+    // The following three listeners are for SL Remote Control App
+    socket.on('message', (data: Buffer) => {
+      this.onRequestHandler(client, data.toString());
+    });
+
     socket.on('deviceConnected', (device: IConnectedDevice) => {
       this.SET_CONNECTED_DEVICES(this.state.remoteConnection.connectedDevices.concat([device]));
     });
