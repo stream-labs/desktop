@@ -806,7 +806,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     }
 
     // TODO: Dont delete this directory, make sure that files get deleted
-    // await this.ensureScrubDirectory();
+    await this.ensureScrubDirectory();
 
     // Ensure we have a Clip class for every clip in the store
     // Also make sure they are the correct format
@@ -855,11 +855,15 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
   private async ensureScrubDirectory() {
     // We clear this out once per application run
-    if (this.directoryCleared) return;
-    this.directoryCleared = true;
+    // if (this.directoryCleared) return;
+    // this.directoryCleared = true;
 
-    await fs.remove(SCRUB_SPRITE_DIRECTORY);
-    await fs.mkdir(SCRUB_SPRITE_DIRECTORY);
+    // await fs.remove(SCRUB_SPRITE_DIRECTORY);
+    try {
+      await fs.mkdir(SCRUB_SPRITE_DIRECTORY);
+    } catch (error: unknown) {
+      console.log('Error creating scrub sprite directory');
+    }
   }
 
   cancelExport() {
