@@ -131,6 +131,26 @@ export class NicoliveClient {
     'x-frontend-id': '134',
   } as const;
 
+  private static OpenWindows: { [key: string]: Electron.BrowserWindow | null } = {};
+
+  static registerWindow(key: 'createProgram' | 'editProgram', win: Electron.BrowserWindow) {
+    if (NicoliveClient.OpenWindows[key]) {
+      throw new Error(`NicoliveClient.registerWindow: Window already exists: ${key}`);
+    }
+    NicoliveClient.OpenWindows[key] = win;
+    win.on('close', () => {
+      NicoliveClient.OpenWindows[key] = null;
+    });
+  }
+  static closeOpenWindows() {
+    for (const key in NicoliveClient.OpenWindows) {
+      const win = NicoliveClient.OpenWindows[key];
+      if (win) {
+        win.close();
+      }
+    }
+  }
+
   /**
    *
    * @param options niconicoSession: ニコニコのセッションIDを外挿する場合に与える
@@ -454,6 +474,7 @@ export class NicoliveClient {
         nodeIntegrationInWorker: false,
       },
     });
+    NicoliveClient.registerWindow('createProgram', win);
     win.removeMenu();
     Sentry.addBreadcrumb({
       category: 'createProgram.open',
@@ -526,6 +547,7 @@ export class NicoliveClient {
         nodeIntegrationInWorker: false,
       },
     });
+    NicoliveClient.registerWindow('editProgram', win);
     win.removeMenu();
     this.editProgramWindow = win;
     this.editProgramId = programID;
