@@ -327,12 +327,12 @@ export class NicoliveClient {
   /** 運営コメントを送信 */
   async sendOperatorComment(
     programID: string,
-    { text, isPermanent }: { text: string; isPermanent?: boolean },
+    { text, isPermCommand }: { text: string; isPermCommand?: boolean },
   ): Promise<WrappedResult<void>> {
     return this.requestAPI<void>(
       'PUT',
       `${NicoliveClient.live2BaseURL}/watch/${programID}/operator_comment`,
-      NicoliveClient.jsonBody({ text, isPermanent }),
+      NicoliveClient.jsonBody({ text, isPermCommand }),
     );
   }
 

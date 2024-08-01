@@ -22,8 +22,7 @@ type ProgramState = {
   startTime: number;
   vposBaseTime: number;
   isMemberOnly: boolean;
-  roomURL: string;
-  roomThreadID: string;
+  viewUri: string; // Ndgr View URL
   viewers: number;
   comments: number;
   adPoint: number;
@@ -73,8 +72,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     startTime: NaN,
     vposBaseTime: NaN,
     isMemberOnly: false,
-    roomURL: '',
-    roomThreadID: '',
+    viewUri: '',
     viewers: 0,
     comments: 0,
     adPoint: 0,
@@ -233,8 +231,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
         vposBaseTime: now,
         endTime: now + 60 * 60,
         isMemberOnly: true,
-        roomURL: 'URL',
-        roomThreadID: 'thread',
+        viewUri: 'viewUri',
       });
       return;
     }
@@ -264,8 +261,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
 
       const program = programResponse.value;
 
-      // アリーナのみ取得する
-      const room = program.rooms.find(r => r.id === 0);
+      const room = program.rooms.length > 0 ? program.rooms[0] : undefined;
 
       this.setState({
         programID: nicoliveProgramId,
@@ -276,8 +272,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
         vposBaseTime: program.vposBaseAt,
         endTime: program.endAt,
         isMemberOnly: program.isMemberOnly,
-        roomURL: room ? room.webSocketUri : '',
-        roomThreadID: room ? room.threadId : '',
+        viewUri: room ? room.viewUri : '',
         ...(program.moderatorViewUri ? { moderatorViewUri: program.moderatorViewUri } : {}),
       });
       if (program.status === 'test') {
@@ -299,7 +294,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     }
 
     const program = programResponse.value;
-    const room = program.rooms.find(r => r.id === 0);
+    const room = program.rooms.length > 0 ? program.rooms[0] : undefined;
 
     this.setState({
       status: program.status,
@@ -308,8 +303,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
       startTime: program.beginAt,
       endTime: program.endAt,
       isMemberOnly: program.isMemberOnly,
-      roomURL: room ? room.webSocketUri : '',
-      roomThreadID: room ? room.threadId : '',
+      viewUri: room ? room.viewUri : '',
     });
   }
 
@@ -449,7 +443,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     }
     const result = await this.client.sendOperatorComment(this.state.programID, {
       text,
-      isPermanent,
+      isPermCommand: isPermanent,
     });
     if (!isOk(result)) {
       throw NicoliveFailure.fromClientError('sendOperatorComment', result);
