@@ -57,9 +57,9 @@ test('Streaming to TikTok', withUser('twitch', { multistream: false, prime: fals
   await stopStream();
 
   // test all other tiktok statuses
-  await testLiveScope(t, 'not-approved');
-  await testLiveScope(t, 'legacy');
   await testLiveScope(t, 'denied');
+  await testLiveScope(t, 'legacy');
+  await testLiveScope(t, 'relog');
 
   t.pass();
 });
@@ -75,7 +75,7 @@ async function testLiveScope(t: TExecutionContext, scope: TTikTokLiveScopeTypes)
   await clickGoLive();
 
   // denied scope should show prompt to remerge TikTok account
-  if (scope === 'denied') {
+  if (scope === 'relog') {
     skipCheckingErrorsInLog();
     t.true(await isDisplayed('div=Failed to update TikTok account', { timeout: 1000 }));
     return;

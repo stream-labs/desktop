@@ -32,6 +32,7 @@ import * as remote from '@electron/remote';
 import { WindowsService } from 'services/windows';
 import Utils from 'services/utils';
 import { UsageStatisticsService } from 'services/usage-statistics';
+import { DiagnosticsService } from 'services/diagnostics';
 
 interface ITikTokServiceState extends IPlatformState {
   settings: ITikTokStartStreamSettings;
@@ -39,8 +40,8 @@ interface ITikTokServiceState extends IPlatformState {
   username: string;
   error?: string | null;
   gameName: string;
+  dateDenied?: string | null;
 }
-
 interface ITikTokStartStreamSettings {
   serverUrl: string;
   streamKey: string;
@@ -74,7 +75,7 @@ export class TikTokService
     settings: {
       title: '',
       display: 'vertical',
-      liveScope: 'not-approved',
+      liveScope: 'denied',
       mode: 'portrait',
       serverUrl: '',
       streamKey: '',
@@ -86,6 +87,7 @@ export class TikTokService
   };
 
   @Inject() windowsService: WindowsService;
+  @Inject() diagnosticsService: DiagnosticsService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
 
   readonly apiBase = 'https://open.tiktokapis.com/v2';
@@ -113,13 +115,16 @@ export class TikTokService
   }
 
   get liveStreamingEnabled(): boolean {
-    const scope = this.state.settings?.liveScope ?? 'denied';
+    const scope = this.state.settings?.liveScope ?? 'relog';
     return ['approved', 'legacy'].includes(scope);
   }
 
-  // TODO: add logic to show rejected
-  get rejected(): boolean {
-    return false;
+  get approved(): boolean {
+    return this.state.settings.liveScope === 'approved';
+  }
+
+  get denied(): boolean {
+    return this.state.settings.liveScope === 'denied';
   }
 
   get defaultGame(): IGame {
@@ -170,7 +175,7 @@ export class TikTokService
           throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED');
         }
       } catch (error: unknown) {
-        this.SET_LIVE_SCOPE('denied');
+        this.SET_LIVE_SCOPE('relog');
         await this.handleOpenLiveManager();
         throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED', error as any);
       }
@@ -296,7 +301,7 @@ export class TikTokService
         : 'Connection failed';
 
       if (notApproved) {
-        this.SET_LIVE_SCOPE('denied');
+        this.SET_LIVE_SCOPE('relog');
       } else if (hasStream) {
         // show error stream exists
         throwStreamError('TIKTOK_STREAM_ACTIVE', e as any, details);
@@ -365,9 +370,9 @@ export class TikTokService
           return EPlatformCallResult.Success;
         case 'legacy':
           return EPlatformCallResult.Success;
-        case 'denied':
+        case 'relog':
           return EPlatformCallResult.TikTokScopeOutdated;
-        case 'not-approved':
+        case 'denied':
           return EPlatformCallResult.TikTokStreamScopeMissing;
         default:
           return EPlatformCallResult.TikTokStreamScopeMissing;
@@ -376,6 +381,7 @@ export class TikTokService
 
     try {
       const response = await this.fetchLiveAccessStatus();
+
       const status = response as ITikTokLiveScopeResponse;
 
       if (status?.user) {
@@ -383,19 +389,19 @@ export class TikTokService
         this.SET_USERNAME(status.user.username);
         this.SET_LIVE_SCOPE(scope);
 
-        // Note on the 'denied' response: A user who needs to reauthenticate with TikTok
+        // Note on the 'relog' response: A user who needs to reauthenticate with TikTok
         // due a change in the scope for our api, needs to be told to unlink and remerge their account.
-        if (scope === 'denied') {
+        if (scope === 'relog') {
           return EPlatformCallResult.TikTokScopeOutdated;
         }
       } else if (
         status?.info &&
         (!status?.reason || status?.reason === ETikTokLiveScopeReason.DENIED)
       ) {
-        this.SET_LIVE_SCOPE('denied');
+        this.SET_LIVE_SCOPE('relog');
         return EPlatformCallResult.TikTokScopeOutdated;
       } else {
-        this.SET_LIVE_SCOPE('not-approved');
+        this.SET_LIVE_SCOPE('denied');
         return EPlatformCallResult.TikTokStreamScopeMissing;
       }
 
@@ -413,7 +419,7 @@ export class TikTokService
         : EPlatformCallResult.TikTokStreamScopeMissing;
     } catch (e: unknown) {
       console.warn(this.getErrorMessage(e));
-      this.SET_LIVE_SCOPE('denied');
+      this.SET_LIVE_SCOPE('relog');
       return EPlatformCallResult.TikTokScopeOutdated;
     }
   }
@@ -490,6 +496,14 @@ export class TikTokService
     });
 
     console.debug('TikTok stream status: ', status);
+
+    // track the first date the user registered as denied so that after 30 days
+    // they are prompted to reapply
+    if (status === EPlatformCallResult.TikTokStreamScopeMissing && !this.state.dateDenied) {
+      this.SET_DENIED_DATE(new Date().toISOString());
+    } else {
+      this.SET_DENIED_DATE();
+    }
 
     if (status === EPlatformCallResult.TikTokScopeOutdated) {
       throwStreamError('TIKTOK_SCOPE_OUTDATED');
@@ -578,22 +592,51 @@ export class TikTokService
     return 'GL6399433079641606942';
   }
 
+  get promptReapply(): boolean {
+    if (this.getHasScope('approved') || this.getHasScope('legacy')) return false;
+    if (!this.userService.state.createdAt) return false;
+
+    // prompt users that have had desktop for 30+ days
+    // and have streamed at least once in the past 30 days
+    const createdAt = new Date(this.userService.state.createdAt);
+    const today = new Date(Date.now());
+    const dateDiff = (createdAt.getTime() - today.getTime()) / (1000 * 3600 * 24);
+    const isOldAccount = dateDiff >= 30;
+    const hasRecentlyStreamed = this.diagnosticsService.hasRecentlyStreamed;
+
+    if (isOldAccount && hasRecentlyStreamed) return true;
+
+    // prompt users that have had desktop for 30+ days
+    // are not logged in to TikTok and are frequent users
+    const isTikTokLinked = !!this.userService.views.auth?.platforms?.tiktok;
+    const isFrequentUser = this.diagnosticsService.isFrequentUser;
+    if (isOldAccount && !isTikTokLinked && isFrequentUser) return true;
+
+    // prompt a user to reapply if they were rejected 30+ days ago
+    if (!this.state.dateDenied) return false;
+    const deniedDate = new Date(this.state.dateDenied);
+    const deniedDateDiff = (deniedDate.getTime() - today.getTime()) / (1000 * 3600 * 24);
+    if (this.denied && deniedDateDiff >= 30) return true;
+
+    return false;
+  }
+
   convertScope(scope: number) {
     switch (scope) {
       case ETikTokLiveScopeReason.APPROVED: {
         return 'approved';
       }
       case ETikTokLiveScopeReason.NOT_APPROVED: {
-        return 'not-approved';
+        return 'denied';
       }
       case ETikTokLiveScopeReason.APPROVED_OBS: {
         return 'legacy';
       }
       case ETikTokLiveScopeReason.DENIED: {
-        return 'denied';
+        return 'relog';
       }
       default:
-        return 'denied';
+        return 'relog';
     }
   }
 
@@ -649,5 +692,10 @@ export class TikTokService
   @mutation()
   protected SET_GAME_NAME(gameName: string = '') {
     this.state.gameName = gameName;
+  }
+
+  @mutation()
+  protected SET_DENIED_DATE(date?: string) {
+    this.state.dateDenied = date ?? null;
   }
 }

@@ -5,12 +5,12 @@ import { Button } from 'antd';
 import { Services } from '../../service-provider';
 import GoLiveSettings from './GoLiveSettings';
 import DualOutputGoLiveSettings from './dual-output/DualOutputGoLiveSettings';
+import GoLiveBanner from './GoLiveInfoBanner';
 import React from 'react';
 import { $t } from '../../../services/i18n';
 import GoLiveChecklist from './GoLiveChecklist';
 import Form from '../../shared/inputs/Form';
 import Animation from 'rc-animate';
-import { SwitchInput } from '../../shared/inputs';
 import { useGoLiveSettings, useGoLiveSettingsRoot } from './useGoLiveSettings';
 import { inject } from 'slap';
 import cx from 'classnames';
@@ -62,6 +62,7 @@ function ModalFooter() {
     close,
     goBackToSettings,
     isLoading,
+    promptReapply,
   } = useGoLiveSettings().extend(module => ({
     windowsService: inject(WindowsService),
 
@@ -72,6 +73,10 @@ function ModalFooter() {
     goBackToSettings() {
       module.prepopulate();
     },
+
+    get promptReapply() {
+      return Services.TikTokService.promptReapply;
+    },
   }));
 
   const shouldShowConfirm = ['prepopulate', 'waitForNewSettings'].includes(lifecycle);
@@ -80,6 +85,7 @@ function ModalFooter() {
 
   return (
     <Form layout={'inline'}>
+      {promptReapply && <GoLiveBanner />}
       {/* CLOSE BUTTON */}
       <Button onClick={close}>{$t('Close')}</Button>
 
