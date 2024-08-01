@@ -1592,10 +1592,10 @@
     rollup-plugin-typescript2 "^0.34.1"
     typescript "^4.9.5"
 
-"@n-air-app/nicolive-comment-protobuf@2024.725.91748":
-  version "2024.725.91748"
-  resolved "https://npm.pkg.github.com/download/@n-air-app/nicolive-comment-protobuf/2024.725.91748/0d32703c55713b0b739ff6f71be22110bd5fb5c2#0d32703c55713b0b739ff6f71be22110bd5fb5c2"
-  integrity sha512-rzVF9MBif6CyLZu40DtKs0kisIl+/D6RJDwLRtKWFEccCmTwr+9zX3ApLRmC4T3RWVqGI+EdS8E8aUPC89z7Hw==
+"@n-air-app/nicolive-comment-protobuf@2024.801.103927":
+  version "2024.801.103927"
+  resolved "https://npm.pkg.github.com/download/@n-air-app/nicolive-comment-protobuf/2024.801.103927/d7f86b60c812cbeb5f84a8ea4ade0344ddfc1183#d7f86b60c812cbeb5f84a8ea4ade0344ddfc1183"
+  integrity sha512-YHxejvH/dYsuGxV2dbbLrduXhvb32fUEEYm8vX9eN1Q1TqR9GVLaeCuNzIkSmRfW+IZBCfLOGixT98Xw2P+vnA==
   dependencies:
     protobufjs "^7.3.2"
 
