@@ -19,8 +19,8 @@ export enum ETikTokLiveRoomDestinations {
 }
 
 export enum ETikTokLiveScopeReason {
-  DENIED = -1,
-  NOT_APPROVED = 0,
+  RELOG = -1,
+  NOT_APPROVED = 0, // also includes users that have been denied
   APPROVED = 1,
   APPROVED_OBS = 2,
 }
