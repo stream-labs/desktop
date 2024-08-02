@@ -153,17 +153,16 @@ export class TikTokService
   }
 
   async beforeGoLive(goLiveSettings: IGoLiveSettings, display?: TDisplayType) {
+    // return an approved dummy account when testing
+    if (Utils.isTestMode() && this.getHasScope('approved')) {
+      await this.testBeforeGoLive(goLiveSettings);
+      return;
+    }
+
     const ttSettings = getDefined(goLiveSettings.platforms.tiktok);
     const context = display ?? ttSettings?.display;
 
     if (this.getHasScope('approved')) {
-      // skip generate stream keys for tests
-      if (Utils.isTestMode()) {
-        await this.putChannelInfo(ttSettings);
-        this.setPlatformContext('tiktok');
-        return;
-      }
-
       // update server url and stream key if handling streaming via API
       // streaming with server url and stream key is default
       let streamInfo = {} as ITikTokStartStreamResponse;
@@ -396,7 +395,7 @@ export class TikTokService
         }
       } else if (
         status?.info &&
-        (!status?.reason || status?.reason === ETikTokLiveScopeReason.DENIED)
+        (!status?.reason || status?.reason === ETikTokLiveScopeReason.RELOG)
       ) {
         this.SET_LIVE_SCOPE('relog');
         return EPlatformCallResult.TikTokScopeOutdated;
@@ -475,10 +474,6 @@ export class TikTokService
         return games;
       })
       .catch(e => {
-        // return dummy game if running a test
-        if (Utils.isTestMode()) {
-          return [{ id: 'game1', name: 'test1' }, this.defaultGame];
-        }
         console.error('Error fetching TikTok categories: ', e);
         return [];
       });
@@ -593,8 +588,14 @@ export class TikTokService
   }
 
   get promptReapply(): boolean {
-    if (this.getHasScope('approved') || this.getHasScope('legacy')) return false;
-    if (!this.userService.state.createdAt) return false;
+    // never show for approved/legacy users or logged out users
+    if (
+      !this.getHasScope('denied') ||
+      !this.userService.state?.createdAt ||
+      !this.userService.isLoggedIn
+    ) {
+      return false;
+    }
 
     // prompt users that have had desktop for 30+ days
     // and have streamed at least once in the past 30 days
@@ -613,10 +614,10 @@ export class TikTokService
     if (isOldAccount && !isTikTokLinked && isFrequentUser) return true;
 
     // prompt a user to reapply if they were rejected 30+ days ago
-    if (!this.state.dateDenied) return false;
-    const deniedDate = new Date(this.state.dateDenied);
-    const deniedDateDiff = (deniedDate.getTime() - today.getTime()) / (1000 * 3600 * 24);
-    if (this.denied && deniedDateDiff >= 30) return true;
+    // if (!this.state.dateDenied) return false;
+    // const deniedDate = new Date(this.state.dateDenied);
+    // const deniedDateDiff = (deniedDate.getTime() - today.getTime()) / (1000 * 3600 * 24);
+    // if (this.denied && deniedDateDiff >= 30) return true;
 
     return false;
   }
@@ -632,11 +633,11 @@ export class TikTokService
       case ETikTokLiveScopeReason.APPROVED_OBS: {
         return 'legacy';
       }
-      case ETikTokLiveScopeReason.DENIED: {
+      case ETikTokLiveScopeReason.RELOG: {
         return 'relog';
       }
       default:
-        return 'relog';
+        return 'denied';
     }
   }
 
@@ -664,6 +665,19 @@ export class TikTokService
       win.setAlwaysOnTop(false);
       return Promise.resolve();
     }, 1000);
+  }
+
+  /**
+   * Test going live with approved status for TikTok
+   * @param goLiveSettings - all goLiveSettings
+   * @returns - Promise<void>
+   */
+  async testBeforeGoLive(goLiveSettings: IGoLiveSettings) {
+    const ttSettings = getDefined(goLiveSettings.platforms.tiktok);
+
+    // skip generate stream keys for tests
+    await this.putChannelInfo(ttSettings);
+    this.setPlatformContext('tiktok');
   }
 
   setLiveScope(scope: TTikTokLiveScopeTypes) {

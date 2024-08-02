@@ -81,7 +81,8 @@ export function TikTokEnterCredentialsFormInfo(
       <InputWrapper
         extra={
           <div style={{ display: 'flex', flexDirection: 'column' }} className="input-extra">
-            {p.denied ? <TikTokDenied /> : <TikTokInfo />}
+            <TikTokInfo />
+            {/* {p.denied ? <TikTokDenied /> : <TikTokInfo />} */}
           </div>
         }
       >
@@ -94,6 +95,7 @@ export function TikTokEnterCredentialsFormInfo(
 function TikTokDenied() {
   return (
     <InfoBanner
+      id="tiktok-denied"
       message={$t('TikTok Live Access not granted. Click here to learn more.')}
       type="info"
       onClick={openConfirmation}
@@ -105,10 +107,11 @@ function TikTokDenied() {
 function TikTokInfo() {
   return (
     <>
-      <a onClick={() => openInfoPage()}>
+      <a id="tiktok-faq" onClick={() => openInfoPage()}>
         {$t('Go live to TikTok with a single click. Click here to learn more.')}
       </a>
       <InfoBanner
+        id="tiktok-info"
         message={$t("Approvals are solely at TikTok's discretion.")}
         type="info"
         style={{ marginTop: '5px', marginBottom: '5px' }}
@@ -118,18 +121,20 @@ function TikTokInfo() {
 }
 
 function TikTokButtons(p: { denied: boolean }) {
-  const text = p.denied
-    ? $t('Reapply for TikTok Live Permission')
-    : $t('Apply for TikTok Live Permission');
+  // const text = p.denied
+  //   ? $t('Reapply for TikTok Live Permission')
+  //   : $t('Apply for TikTok Live Permission');
+  const text = $t('Apply for TikTok Live Permission');
 
   return (
     <>
       {!p.denied && (
-        <Button onClick={openProducer} style={{ marginBottom: '10px' }}>
+        <Button id="tiktok-locate-key" onClick={openProducer} style={{ marginBottom: '10px' }}>
           {$t('Locate my Stream Key')}
         </Button>
       )}
       <Button
+        id="tiktok-application"
         onClick={openApplicationInfoPage}
         style={{
           width: '100%',
