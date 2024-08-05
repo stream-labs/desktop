@@ -1,4 +1,12 @@
-import { mutation, StatefulService, ViewHandler, Inject, InitAfter, Service, PersistentStatefulService } from 'services/core';
+import {
+  mutation,
+  StatefulService,
+  ViewHandler,
+  Inject,
+  InitAfter,
+  Service,
+  PersistentStatefulService,
+} from 'services/core';
 import path from 'path';
 import Vue from 'vue';
 import fs from 'fs-extra';
@@ -13,7 +21,14 @@ import {
 } from 'services/platforms/youtube/uploader';
 import { YoutubeService } from 'services/platforms/youtube';
 import os from 'os';
-import { CLIP_DIR, FFMPEG_EXE, SCRUB_SPRITE_DIRECTORY, SUPPORTED_FILE_TYPES, TEST_MODE } from './constants';
+import {
+  CLIP_DIR,
+  FFMPEG_DIR,
+  FFMPEG_EXE,
+  SCRUB_SPRITE_DIRECTORY,
+  SUPPORTED_FILE_TYPES,
+  TEST_MODE,
+} from './constants';
 import { pmap } from 'util/pmap';
 import { Clip } from './clip';
 import { AudioCrossfader } from './audio-crossfader';
@@ -33,9 +48,9 @@ import { NavigationService } from 'services/navigation';
 import { SharedStorageService } from 'services/integrations/shared-storage';
 import execa from 'execa';
 import moment from 'moment';
+import { getHighlightClips } from './ai-highlighter';
 
-
-//TODO: Better way to order them. 
+//TODO: Better way to order them.
 interface IBaseClip {
   path: string;
   loaded: boolean;
@@ -45,7 +60,7 @@ interface IBaseClip {
   endTrim: number;
   duration?: number;
   deleted: boolean;
-  streamInfo: { id?: string } | undefined
+  streamInfo: { id?: string } | undefined;
 }
 interface IReplayBufferClip extends IBaseClip {
   source: 'ReplayBuffer';
@@ -57,14 +72,14 @@ interface IManualClip extends IBaseClip {
 
 export interface IAiClip extends IBaseClip {
   source: 'AiClip';
-  aiInfo: IAiClipInfo
+  aiInfo: IAiClipInfo;
 }
 export interface IAiClipInfo {
-  moments: { type: string }[]
+  moments: { type: string }[];
   // hypescore -> (moments * hypefaktor) / duration
 }
 
-export type TClip = IAiClip | IReplayBufferClip | IManualClip
+export type TClip = IAiClip | IReplayBufferClip | IManualClip;
 
 export interface IHighlighterData {
   type: string;
@@ -72,15 +87,18 @@ export interface IHighlighterData {
   end: number;
 }
 
-
 // TODO: Need to clean up all of this
-export interface StreamInfoForAiHighlighter { id?: string, game?: string, title?: string }
+export interface StreamInfoForAiHighlighter {
+  id?: string;
+  game?: string;
+  title?: string;
+}
 interface IHighlightedStream {
-  id: string
-  game: string
-  title: string
-  date: number
-  state: string
+  id: string;
+  game: string;
+  title: string;
+  date: number;
+  state: string;
 }
 
 export enum EExportStep {
@@ -94,8 +112,6 @@ interface HighlighterApiResponse {
   type: string;
   origin: string;
 }
-
-
 
 export type TFPS = 30 | 60;
 export type TResolution = 720 | 1080;
@@ -282,19 +298,18 @@ class HighligherViews extends ViewHandler<IHighligherState> {
   }
 
   /**
-     * Returns wether or not the AiHighlighter should be used
-     */
+   * Returns wether or not the AiHighlighter should be used
+   */
   get useAiHighlighter() {
-    return this.state.useAiHighlighter
+    return this.state.useAiHighlighter;
   }
 
   /**
-       * Returns wether or not the AiHighlighter should be used
-       */
+   * Returns wether or not the AiHighlighter should be used
+   */
   get highlightedStreams() {
-    return this.state.highlightedStreams
+    return this.state.highlightedStreams;
   }
-
 
   /**
    * Whether any clips need to be loaded
@@ -357,8 +372,7 @@ class HighligherViews extends ViewHandler<IHighligherState> {
 
 @InitAfter('StreamingService')
 export class HighlighterService extends PersistentStatefulService<IHighligherState> {
-
-  isHighlighterRecording: boolean = false
+  isHighlighterRecording: boolean = false;
 
   static defaultState: IHighligherState = {
     clips: {},
@@ -397,7 +411,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     dismissedTutorial: false,
     error: '',
     useAiHighlighter: false,
-    highlightedStreams: []
+    highlightedStreams: [],
   };
 
   @Inject() streamingService: StreamingService;
@@ -506,27 +520,29 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   @mutation()
   SET_USE_AI_HIGHLIGHTER(useAiHighlighter: boolean) {
     Vue.set(this.state, 'useAiHighlighter', useAiHighlighter);
-    this.state.useAiHighlighter = useAiHighlighter
+    this.state.useAiHighlighter = useAiHighlighter;
   }
-
 
   @mutation()
   ADD_HIGHLIGHTED_STREAM(streamInfo: IHighlightedStream) {
     // Vue.set(this.state, 'highlightedStreams', streamInfo);
-    this.state.highlightedStreams.push(streamInfo)
+    this.state.highlightedStreams.push(streamInfo);
   }
 
   @mutation()
   UPDATE_HIGHLIGHTED_STREAM(updatedStreamInfo: IHighlightedStream) {
-    let keepAsIs = this.state.highlightedStreams.filter(stream => stream.id !== updatedStreamInfo.id);
-    this.state.highlightedStreams = [...keepAsIs, updatedStreamInfo]
+    let keepAsIs = this.state.highlightedStreams.filter(
+      stream => stream.id !== updatedStreamInfo.id,
+    );
+    this.state.highlightedStreams = [...keepAsIs, updatedStreamInfo];
   }
 
   @mutation()
   REMOVE_HIGHLIGHTED_STREAM(id: string) {
-    this.state.highlightedStreams = this.state.highlightedStreams.filter(stream => stream.id !== id);
+    this.state.highlightedStreams = this.state.highlightedStreams.filter(
+      stream => stream.id !== id,
+    );
   }
-
 
   get views() {
     return new HighligherViews(this.state);
@@ -535,7 +551,6 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   init() {
     super.init();
     console.log('Init highlighter service');
-
     try {
       // On some very very small number of systems, we won't be able to fetch
       // the videos path from the system.
@@ -592,12 +607,11 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
           endTrim: 0,
           deleted: false,
           source: 'Manual',
-          streamInfo: undefined
+          streamInfo: undefined,
         });
       });
     } else {
       this.streamingService.replayBufferFileWrite.subscribe(clipPath => {
-
         console.log('Add from', this.streamingService.replayBufferFileWrite);
 
         //TODO: Get in streaminfo via subscribe
@@ -609,7 +623,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
           endTrim: 0,
           deleted: false,
           source: 'ReplayBuffer',
-          streamInfo: undefined
+          streamInfo: undefined,
         });
       });
 
@@ -670,13 +684,15 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
         endTrim: 0,
         deleted: false,
         source: 'Manual',
-        streamInfo: undefined
+        streamInfo: undefined,
       });
     });
   }
 
-  addAiClips(clips: { path: string; aiClipInfo: IAiClipInfo }[], streamInfo: StreamInfoForAiHighlighter) {
-
+  addAiClips(
+    clips: { path: string; aiClipInfo: IAiClipInfo }[],
+    streamInfo: StreamInfoForAiHighlighter,
+  ) {
     clips.forEach(clip => {
       // Don't allow adding the same clip twice
       if (this.state.clips[clip.path]) return;
@@ -690,7 +706,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
         deleted: false,
         source: 'AiClip',
         aiInfo: clip.aiClipInfo,
-        streamInfo
+        streamInfo,
       });
     });
   }
@@ -762,7 +778,6 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     return fs.existsSync(file);
   }
 
-
   addStream(streamInfo: IHighlightedStream) {
     this.ADD_HIGHLIGHTED_STREAM(streamInfo);
   }
@@ -782,33 +797,26 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     }
   }
 
-
   // Only load the clips we need
   async loadClips(streamInfoId?: string) {
-    let clipsToLoad: TClip[]
+    let clipsToLoad: TClip[];
     if (streamInfoId) {
-      clipsToLoad = this.views.clips.filter(clip => clip.streamInfo.id === streamInfoId)
+      clipsToLoad = this.views.clips.filter(clip => clip.streamInfo.id === streamInfoId);
+    } else {
+      clipsToLoad = this.views.clips;
     }
-    else {
-      clipsToLoad = this.views.clips
-    }
-
-
-
-
 
     // TODO: Dont delete this directory, make sure that files get deleted
-    // await this.ensureScrubDirectory();
+    await this.ensureScrubDirectory();
 
     // Ensure we have a Clip class for every clip in the store
     // Also make sure they are the correct format
 
     for (const c of clipsToLoad) {
-
       if (!this.fileExists(c.path)) {
         this.REMOVE_CLIP(c.path);
         //TODO: Make sure to also generate the scrub file
-        return
+        return;
       }
 
       if (!SUPPORTED_FILE_TYPES.map(e => `.${e}`).includes(path.parse(c.path).ext)) {
@@ -822,7 +830,9 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
       this.clips[c.path] = this.clips[c.path] ?? new Clip(c.path);
     }
-
+    console.log(Object.values(this.clips).length);
+    console.log(clipsToLoad.length);
+    console.log(clipsToLoad.filter(c => !c.loaded).length);
     await pmap(
       clipsToLoad.filter(c => !c.loaded),
       c => this.clips[c.path].init(),
@@ -848,11 +858,15 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
   private async ensureScrubDirectory() {
     // We clear this out once per application run
-    if (this.directoryCleared) return;
-    this.directoryCleared = true;
+    // if (this.directoryCleared) return;
+    // this.directoryCleared = true;
 
-    await fs.remove(SCRUB_SPRITE_DIRECTORY);
-    await fs.mkdir(SCRUB_SPRITE_DIRECTORY);
+    // await fs.remove(SCRUB_SPRITE_DIRECTORY);
+    try {
+      await fs.mkdir(SCRUB_SPRITE_DIRECTORY);
+    } catch (error: unknown) {
+      console.log('Error creating scrub sprite directory');
+    }
   }
 
   cancelExport() {
@@ -874,6 +888,9 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       return;
     }
 
+    console.log(this.views.clips);
+    console.log(Object.entries(this.clips));
+
     let clips = this.views.clips
       .filter(c => c.enabled)
       .map(c => {
@@ -889,11 +906,11 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     const exportOptions: IExportOptions = preview
       ? { width: 1280 / 4, height: 720 / 4, fps: 30, preset: 'ultrafast' }
       : {
-        width: this.views.exportInfo.resolution === 720 ? 1280 : 1920,
-        height: this.views.exportInfo.resolution === 720 ? 720 : 1080,
-        fps: this.views.exportInfo.fps,
-        preset: this.views.exportInfo.preset,
-      };
+          width: this.views.exportInfo.resolution === 720 ? 1280 : 1920,
+          height: this.views.exportInfo.resolution === 720 ? 720 : 1080,
+          fps: this.views.exportInfo.fps,
+          preset: this.views.exportInfo.preset,
+        };
 
     // Reset all clips
     await pmap(clips, c => c.reset(exportOptions), {
@@ -1245,74 +1262,64 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     this.CLEAR_UPLOAD();
   }
 
-
-
-
-
-  async flow(filePath: string, streamInfo: StreamInfoForAiHighlighter) {
-
-
+  async flow(filePath: string, streamInfo: StreamInfoForAiHighlighter): Promise<void> {
     console.log('streamInfo', streamInfo);
 
-    //// Highlighter flow
+    // Highlighter flow
     // 1. Toggle on ai highlighter
     // 2. auto-record streams
     // 3. after stream finished wait for the recording to be done
     // 4. send recording to highlighterApi
     // 5. cut data into highlightClips
 
-    const highlighterData = [
-      {
-        start: 322,
-        end: 324,
-        type: 'elimination',
-      },
-      {
-        start: 425,
-        end: 427,
-        type: 'elimination',
-      },
-    ]
+    const setStreamInfo: IHighlightedStream = {
+      state: 'Searching for highlights...',
+      date: moment().date(),
+      id: streamInfo.id || 'noId',
+      title: streamInfo.title || 'no title',
+      game: streamInfo.game || 'no title',
+    };
+    this.addStream(setStreamInfo);
 
-
-    let setStreamInfo: IHighlightedStream = { state: 'Searching for highlights...', date: moment().date(), id: streamInfo.id || 'noId', title: streamInfo.title || 'no title', game: streamInfo.game || 'no title', }
-    this.addStream(setStreamInfo)
-
-    const videoUri = '/Users/marvinoffers/Movies/djnardi-short.mp4'; // replace with filepath
+    // const videoUri = '/Users/marvinoffers/Movies/djnardi-short.mp4'; // replace with filepath
+    console.log('Test flow');
 
     console.log('🔄 HighlighterData');
-    const highlighterResponse = await this.getHighlightClips('/highlights', videoUri, undefined)
+    const highlighterResponse = await getHighlightClips(filePath);
     console.log('✅ HighlighterData', highlighterResponse);
 
     console.log('🔄 formatHighlighterResponse');
-    const formattedHighlighterResponse = this.formatHighlighterResponse(highlighterResponse as unknown as any)
+    const formattedHighlighterResponse = this.formatHighlighterResponse(
+      (highlighterResponse as unknown) as any,
+    );
     console.log('✅ formatHighlighterResponse', formattedHighlighterResponse);
 
     console.log('🔄 cutHighlightClips');
-    setStreamInfo.state = 'Generating clips'
-    this.updateStream(setStreamInfo)
-    const clipData = await this.cutHighlightClips(
-      videoUri, formattedHighlighterResponse);
+    this.updateStream({ state: 'Generating clips', ...setStreamInfo }); // alternate approach to update stream
+    const clipData = await this.cutHighlightClips(filePath, formattedHighlighterResponse);
     console.log('✅ cutHighlightClips');
 
     // 6. add highlight clips
-    setStreamInfo.state = 'Done'
-    this.updateStream(setStreamInfo)
+    setStreamInfo.state = 'Done';
+    this.updateStream(setStreamInfo);
 
     console.log('🔄 addClips', clipData);
-    this.addAiClips(clipData, streamInfo)
+    this.addAiClips(clipData, streamInfo);
     console.log('✅ addClips');
+    return;
   }
 
-
-  async getHighlightClips(type: string, video_uri: string, trim: { start_time: number, start_end: number } | undefined) {
-
+  async getHighlightClipsRest(
+    type: string,
+    video_uri: string,
+    trim: { start_time: number; start_end: number } | undefined,
+  ) {
     // Call highlighter code - replace with function
     try {
       const body = {
         video_uri,
         url,
-        trim
+        trim,
       };
 
       const controller = new AbortController();
@@ -1327,10 +1334,10 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
+          'Access-Control-Allow-Origin': '*',
         },
         body: JSON.stringify(body),
-        signal: signal
+        signal,
       });
 
       clearTimeout(fetchTimeout);
@@ -1342,7 +1349,6 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
       const data = await response.json();
       return data;
-
     } catch (error) {
       console.timeEnd('requestDuration');
 
@@ -1352,21 +1358,26 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
         console.error('Fetch error:', error);
       }
 
-      throw new Error("Error while fetching");
+      throw new Error('Error while fetching');
     }
   }
 
-
-
   formatHighlighterResponse(responseData: HighlighterApiResponse[]) {
-
     //TODO: Currently the colde failes if start and endtime are equal. Needs to be fixed with the config
-    return responseData.map((curr) => { return { "start": curr.start_time - 9, "end": curr.end_time !== null ? curr.end_time + 4 : curr.start_time + 4, 'type': curr.type } })
+    return responseData.map(curr => {
+      return {
+        start: curr.start_time - 9,
+        end: curr.end_time !== null ? curr.end_time + 4 : curr.start_time + 4,
+        type: curr.type,
+      };
+    });
   }
 
-
-  async cutHighlightClips(videoUri: string, highlighterData: IHighlighterData[]): Promise<{ path: string, aiClipInfo: IAiClipInfo }[]> {
-    const pathArray: { path: string, aiClipInfo: IAiClipInfo }[] = []
+  async cutHighlightClips(
+    videoUri: string,
+    highlighterData: IHighlighterData[],
+  ): Promise<{ path: string; aiClipInfo: IAiClipInfo }[]> {
+    const pathArray: { path: string; aiClipInfo: IAiClipInfo }[] = [];
 
     for (const { start, end, type } of highlighterData) {
       const outputUri = `${videoUri.slice(0, -4)}-${start}-${end}.mp4`;
@@ -1377,7 +1388,6 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
         // console.log(`Output file ${outputUri} already exists. Deleting it.`);
         await fs.unlink(outputUri);
       } catch (err) {
-
         if (err.code !== 'ENOENT') {
           console.error(`Error checking existence of ${outputUri}:`, err);
         }
@@ -1405,15 +1415,13 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
         console.log(`run FFMPEG with args: ${args}`);
         await execa(FFMPEG_EXE, args);
         console.log(`Created segment: ${outputUri}`);
-        pathArray.push({ path: outputUri, aiClipInfo: { moments: [{ type }] } })
+        pathArray.push({ path: outputUri, aiClipInfo: { moments: [{ type }] } });
       } catch (error) {
         console.error(`Error creating segment: ${outputUri}`, error);
       }
     }
-    return pathArray
+    return pathArray;
   }
-
-
 
   // async function test(path: string, highlighterData: IHighlighterData) {
   //   const { HighlighterService } = Services;
@@ -1451,6 +1459,4 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   //     duration - (highlighterData.end + 1),
   //   );
   // }
-
-
 }

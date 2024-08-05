@@ -130,6 +130,7 @@ export default function Highlighter() {
                       >
                         Edit
                       </Button>
+                      <Button onClick={() => removeStream(highlightedStream.id)}>Remove</Button>
                       <Button disabled={highlightedStream.state !== 'done'} type="primary">
                         Export
                       </Button>
@@ -175,6 +176,7 @@ export default function Highlighter() {
                       >
                         Edit
                       </Button>
+                      <Button onClick={() => removeStream(streamId)}>Remove</Button>
                       <Button type="primary">Export</Button>
                     </div>
                   </div>
@@ -240,6 +242,10 @@ export default function Highlighter() {
 
   function rmSinfo() {
     HighlighterService.actions.removeStream('DJ Naaaardi-Fortnite-5302024');
+  }
+  function removeStream(id?: string) {
+    if (!id) return;
+    HighlighterService.actions.removeStream(id);
   }
 
   function setView(view: IViewState) {
