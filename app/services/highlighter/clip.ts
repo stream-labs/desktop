@@ -21,7 +21,7 @@ export class Clip {
 
   deleted = false;
 
-  constructor(public readonly sourcePath: string) {}
+  constructor(public readonly sourcePath: string) { }
 
   /**
    * Performs all async operations needed to display
@@ -83,7 +83,16 @@ export class Clip {
   private async doInit() {
     await this.reset({ fps: 30, width: 1280, height: 720, preset: 'ultrafast' });
     if (this.deleted) return;
-    await this.frameSource.exportScrubbingSprite();
+    if (this.frameSource) {
+      try {
+        //TODO: errors more than it should
+        await this.frameSource.exportScrubbingSprite();
+      } catch (error) {
+        console.log('err', error);
+      }
+    } else {
+      console.log('No Framesource');
+    }
   }
 
   private async readDuration() {

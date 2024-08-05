@@ -1,29 +1,15 @@
 import ClipsView from 'components-react/highlighter/ClipsView';
 import SettingsView from 'components-react/highlighter/SettingsView';
 import { useVuex } from 'components-react/hooks';
-import React, { useState } from 'react';
-import { TClip, IHighlighterData } from 'services/highlighter';
+import React, { useEffect, useState } from 'react';
+import { TClip, IHighlighterData, IViewState } from 'services/highlighter';
 import { Services } from 'components-react/service-provider';
 import { Button } from 'antd';
 import moment from 'moment';
 import styles from '../highlighter/StreamView.m.less';
 
-interface TClipsViewState {
-  view: 'clips';
-  id: string | undefined;
-}
-interface IStreamViewState {
-  view: 'stream';
-}
-
-interface ISettingsViewState {
-  view: 'settings';
-}
-
-type IViewState = TClipsViewState | IStreamViewState | ISettingsViewState;
-
-export default function Highlighter() {
-  const [viewState, setViewState] = useState<IViewState>({ view: 'settings' });
+export default function Highlighter(props: { params?: { view: string } }) {
+  const openViewFromParams = props?.params?.view || '';
 
   const { HighlighterService, RecordingModeService } = Services;
   const v = useVuex(() => ({
@@ -34,6 +20,12 @@ export default function Highlighter() {
     recordings: RecordingModeService.views.sortedRecordings,
     highlightedStreams: HighlighterService.views.highlightedStreams,
   }));
+
+  const [viewState, setViewState] = useState<IViewState>(
+    openViewFromParams === 'stream' || v.dismissedTutorial
+      ? { view: 'stream' }
+      : { view: 'settings' },
+  );
 
   const streamsFromClipStreamInfo = v.clips
     ? [...new Set(v.clips!.map(d => d.streamInfo?.id))]
@@ -120,7 +112,7 @@ export default function Highlighter() {
                       }}
                     >
                       <Button
-                        disabled={highlightedStream.state !== 'done'}
+                        disabled={highlightedStream.state !== 'Done'}
                         onClick={() =>
                           setView({
                             view: 'clips',
@@ -131,53 +123,9 @@ export default function Highlighter() {
                         Edit
                       </Button>
                       <Button onClick={() => removeStream(highlightedStream.id)}>Remove</Button>
-                      <Button disabled={highlightedStream.state !== 'done'} type="primary">
+                      <Button disabled={highlightedStream.state !== 'Done'} type="primary">
                         Export
                       </Button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-              {streamsFromClipStreamInfo.map(streamId => (
-                <div key={streamId} className={styles.streamCard}>
-                  <div className={styles.thumbnailWrapper}>
-                    <img
-                      style={{ height: '100%' }}
-                      src={v.clips.find(clip => clip.streamInfo?.id === streamId)?.scrubSprite}
-                      alt=""
-                    />
-                  </div>
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '8px',
-                      padding: '20px',
-                      paddingTop: '0px',
-                    }}
-                  >
-                    <div style={{}}>{streamId}</div>
-
-                    <div
-                      style={{
-                        display: 'flex',
-
-                        gap: '4px',
-                        justifyContent: 'space-between',
-                      }}
-                    >
-                      <Button
-                        onClick={() =>
-                          setView({
-                            view: 'clips',
-                            id: streamId,
-                          })
-                        }
-                      >
-                        Edit
-                      </Button>
-                      <Button onClick={() => removeStream(streamId)}>Remove</Button>
-                      <Button type="primary">Export</Button>
                     </div>
                   </div>
                 </div>
@@ -207,7 +155,7 @@ export default function Highlighter() {
         <div style={{ display: 'flex', gap: '8px' }}>
           <Button onClick={() => setView({ view: 'settings' })}>Settings</Button>
           <Button onClick={() => setView({ view: 'stream' })}>stream</Button>
-          <Button onClick={() => setView({ view: 'clips', id: 'id' })}>clips</Button>
+          <Button onClick={() => setView({ view: 'clips', id: undefined })}>clips</Button>
           <Button onClick={() => trimHighlightData()}>create clips</Button>
           <Button onClick={() => setSinfo()}>setSInfo</Button>
           <Button onClick={() => updSinfo()}>updSInfo</Button>
@@ -244,7 +192,10 @@ export default function Highlighter() {
     HighlighterService.actions.removeStream('DJ Naaaardi-Fortnite-5302024');
   }
   function removeStream(id?: string) {
-    if (!id) return;
+    if (!id) {
+      console.error('Cant remove stream, missing id');
+      return;
+    }
     HighlighterService.actions.removeStream(id);
   }
 

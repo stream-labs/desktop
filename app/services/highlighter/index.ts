@@ -81,6 +81,22 @@ export interface IAiClipInfo {
 
 export type TClip = IAiClip | IReplayBufferClip | IManualClip;
 
+interface TClipsViewState {
+  view: 'clips';
+  id: string | undefined;
+}
+interface IStreamViewState {
+  view: 'stream';
+}
+
+interface ISettingsViewState {
+  view: 'settings';
+}
+
+export type IViewState = TClipsViewState | IStreamViewState | ISettingsViewState;
+
+
+
 export interface IHighlighterData {
   type: string;
   start: number;
@@ -551,6 +567,17 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   init() {
     super.init();
     console.log('Init highlighter service');
+
+    // Reset clips
+    // Set all clips to not loaded
+    //TODO: stuff is stored in the persistant storage that shouldnt be stored there eg loaded
+    this.views.clips.forEach(c => {
+      this.UPDATE_CLIP({
+        path: c.path,
+        loaded: false,
+      })
+    })
+
     try {
       // On some very very small number of systems, we won't be able to fetch
       // the videos path from the system.
@@ -788,7 +815,14 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
   removeStream(id: string) {
     this.REMOVE_HIGHLIGHTED_STREAM(id);
+
+    //Remove clips from that stream as well
+    const clipsToRemove = this.views.clips.filter(clip => clip.streamInfo.id === id);
+    clipsToRemove.forEach(clip => {
+      this.removeClip(clip.path)
+    })
   }
+
   toggleAiHighlighter() {
     if (this.state.useAiHighlighter) {
       this.SET_USE_AI_HIGHLIGHTER(false);
@@ -912,11 +946,11 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     const exportOptions: IExportOptions = preview
       ? { width: 1280 / 4, height: 720 / 4, fps: 30, preset: 'ultrafast' }
       : {
-          width: this.views.exportInfo.resolution === 720 ? 1280 : 1920,
-          height: this.views.exportInfo.resolution === 720 ? 720 : 1080,
-          fps: this.views.exportInfo.fps,
-          preset: this.views.exportInfo.preset,
-        };
+        width: this.views.exportInfo.resolution === 720 ? 1280 : 1920,
+        height: this.views.exportInfo.resolution === 720 ? 720 : 1080,
+        fps: this.views.exportInfo.fps,
+        preset: this.views.exportInfo.preset,
+      };
 
     // Reset all clips
     await pmap(clips, c => c.reset(exportOptions), {
@@ -1282,7 +1316,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       state: 'Searching for highlights...',
       date: moment().date(),
       id: streamInfo.id || 'noId',
-      title: streamInfo.title || 'no title',
+      title: streamInfo.title || filePath.substring(filePath.length - 10, filePath.length) || 'no title',
       game: streamInfo.game || 'no title',
     };
     this.addStream(setStreamInfo);

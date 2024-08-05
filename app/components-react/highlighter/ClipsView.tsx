@@ -31,13 +31,17 @@ interface IClipsViewProps {
 export default function ClipsView(props: IClipsViewProps) {
   const { HighlighterService, HotkeysService, UsageStatisticsService } = Services;
   const v = useVuex(() => ({
-    clips: (HighlighterService.views.clips as TClip[]).filter(
-      clip => clip.streamInfo?.id === props.id,
-    ),
+    clips: props.id
+      ? (HighlighterService.views.clips as TClip[]).filter(clip => clip.streamInfo?.id === props.id)
+      : (HighlighterService.views.clips as TClip[]),
     exportInfo: HighlighterService.views.exportInfo,
     uploadInfo: HighlighterService.views.uploadInfo,
     loadedCount: HighlighterService.views.loadedCount,
-    loaded: HighlighterService.views.loaded,
+    loaded: props.id
+      ? (HighlighterService.views.clips as TClip[])
+          .filter(clip => clip.streamInfo?.id === props.id)
+          .every(clip => clip.loaded)
+      : (HighlighterService.views.clips as TClip[]).every(clip => clip.loaded),
     transition: HighlighterService.views.transition,
     dismissedTutorial: HighlighterService.views.dismissedTutorial,
     audio: HighlighterService.views.audio,
@@ -51,6 +55,25 @@ export default function ClipsView(props: IClipsViewProps) {
 
   useEffect(() => {
     if (v.clips.length) {
+      (HighlighterService.views.clips as TClip[]).forEach(clip => {
+        HighlighterService.UPDATE_CLIP({
+          path: clip.path,
+          enabled: false,
+        });
+      });
+
+      const clipsToEnable = props.id
+        ? (HighlighterService.views.clips as TClip[]).filter(
+            clip => clip.streamInfo?.id === props.id,
+          )
+        : (HighlighterService.views.clips as TClip[]);
+
+      clipsToEnable.forEach(clip => {
+        HighlighterService.UPDATE_CLIP({
+          path: clip.path,
+          enabled: true,
+        });
+      });
       HighlighterService.actions.loadClips(props.id);
       setShowTutorial(false);
     }

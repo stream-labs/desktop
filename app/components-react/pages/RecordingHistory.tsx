@@ -93,7 +93,7 @@ class RecordingHistoryController {
         game: 'forntnite',
         id: 'rec_' + uuid(),
       });
-      this.NavigationService.actions.navigate('Highlighter');
+      this.NavigationService.actions.navigate('Highlighter', { view: 'stream' });
       return;
     }
 
