@@ -716,7 +716,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     });
   }
 
-  addAiClips(
+  async addAiClips(
     clips: { path: string; aiClipInfo: IAiClipInfo }[],
     streamInfo: StreamInfoForAiHighlighter,
   ) {
@@ -736,6 +736,8 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
         streamInfo,
       });
     });
+
+    await this.loadClips(streamInfo.id)
   }
 
   enableClip(path: string, enabled: boolean) {

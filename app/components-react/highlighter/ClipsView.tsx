@@ -56,7 +56,7 @@ export default function ClipsView(props: IClipsViewProps) {
   useEffect(() => {
     if (v.clips.length) {
       (HighlighterService.views.clips as TClip[]).forEach(clip => {
-        HighlighterService.UPDATE_CLIP({
+        HighlighterService.actions.UPDATE_CLIP({
           path: clip.path,
           enabled: false,
         });
@@ -69,7 +69,7 @@ export default function ClipsView(props: IClipsViewProps) {
         : (HighlighterService.views.clips as TClip[]);
 
       clipsToEnable.forEach(clip => {
-        HighlighterService.UPDATE_CLIP({
+        HighlighterService.actions.UPDATE_CLIP({
           path: clip.path,
           enabled: true,
         });
