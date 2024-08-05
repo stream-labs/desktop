@@ -863,7 +863,13 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
     // await fs.remove(SCRUB_SPRITE_DIRECTORY);
     try {
-      await fs.mkdir(SCRUB_SPRITE_DIRECTORY);
+      try {
+        //If possible to read, directory exists, if not, catch and mkdir
+        await fs.readdir(SCRUB_SPRITE_DIRECTORY);
+      } catch (error) {
+        console.log('mkdir');
+        await fs.mkdir(SCRUB_SPRITE_DIRECTORY);
+      }
     } catch (error: unknown) {
       console.log('Error creating scrub sprite directory');
     }
