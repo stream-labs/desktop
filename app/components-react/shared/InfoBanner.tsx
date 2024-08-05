@@ -6,7 +6,7 @@ import { useVuex } from 'components-react/hooks';
 import { Services } from 'components-react/service-provider';
 
 interface IInfoBannerProps {
-  message: string;
+  message: string | JSX.Element;
   type?: 'info' | 'warning';
   style?: CSSProperties;
   className?: string;
@@ -23,9 +23,17 @@ export default function InfoBanner(p: IInfoBannerProps) {
 
   if (!shouldShow) return <></>;
 
-  function dismiss() {
+  function handleDismiss(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
     if (!p?.dismissableKey) return;
+    e.stopPropagation();
     Services.DismissablesService.actions.dismiss(p?.dismissableKey);
+  }
+
+  function handleOnClick(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+    // this allows the banner to only be dismissed if the user clicks the x
+    if (!p?.onClick) return;
+    e.stopPropagation();
+    p?.onClick();
   }
 
   return (
@@ -37,20 +45,12 @@ export default function InfoBanner(p: IInfoBannerProps) {
         p.className,
       )}
       style={p.style ?? undefined}
-      onClick={p?.onClick}
+      onClick={handleOnClick}
     >
       <i className="icon-information" />
-      <span className="message" style={{ flex: 1 }}>
-        {p.message}
-      </span>
+      <span className={styles.message}>{p.message}</span>
       {p?.dismissableKey && (
-        <i
-          className={cx(styles.close, 'icon-close')}
-          onClick={e => {
-            e.stopPropagation();
-            dismiss();
-          }}
-        />
+        <i className={cx(styles.close, 'icon-close')} onClick={handleDismiss} />
       )}
     </div>
   );

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { IVolmeter } from 'services/audio';
 import { Subscription } from 'rxjs';
-import electron from 'electron';
+import electron, { ipcRenderer } from 'electron';
 import difference from 'lodash/difference';
 import { compileShader, createProgram } from 'util/webgl/utils';
 import vShaderSrc from 'util/webgl/shaders/volmeter.vert';
@@ -28,6 +28,7 @@ const RED = [252, 62, 63];
 
 interface IVolmeterSubscription {
   sourceId: string;
+  channelId?: string;
   channelsCount: number;
   // peakHolds show the maximum peak value for a given time range
   peakHoldCounters: number[];
@@ -40,7 +41,6 @@ interface IVolmeterSubscription {
   interpolatedPeaks: number[];
   // the time of last received peaks
   lastEventTime: number;
-  listener: (e: Electron.Event, volmeter: IVolmeter) => void;
 }
 
 /**
@@ -155,19 +155,18 @@ class GLVolmetersModule {
       if (this.subscriptions[sourceId]) return;
 
       // create listener
-      const listener = (sourceId => (e: Electron.Event, volmeter: IVolmeter) => {
+      const listener = (e: { data: IVolmeter }) => {
         const subscription = this.subscriptions[sourceId];
         if (!subscription) return;
-        subscription.channelsCount = volmeter.peak.length;
+        subscription.channelsCount = e.data.peak.length;
         subscription.prevPeaks = subscription.interpolatedPeaks;
-        subscription.currentPeaks = Array.from(volmeter.peak);
+        subscription.currentPeaks = Array.from(e.data.peak);
         subscription.lastEventTime = performance.now();
-      })(sourceId);
+      };
 
       // create a subscription object
       this.subscriptions[sourceId] = {
         sourceId,
-        listener,
         // Assume 2 channels until we know otherwise. This prevents too much
         // visual jank as the volmeters are initializing.
         channelsCount: 2,
@@ -179,11 +178,15 @@ class GLVolmetersModule {
         peakHoldCounters: [],
       };
 
-      // bind listener
-      electron.ipcRenderer.on(`volmeter-${sourceId}`, listener);
+      this.audioService.subscribeVolmeter(sourceId).then(id => {
+        ipcRenderer.once(`port-${id}`, e => {
+          if (!this.subscriptions[sourceId]) return;
+          this.subscriptions[sourceId].channelId = id;
+          e.ports[0].onmessage = listener;
+        });
 
-      // subscribe for event
-      electron.ipcRenderer.sendTo(this.workerId, 'volmeterSubscribe', sourceId);
+        ipcRenderer.send('request-message-channel-out', id);
+      });
     });
 
     // unsubscribe from not longer relevant volmeters
@@ -196,11 +199,13 @@ class GLVolmetersModule {
   }
 
   private unsubscribeVolmeter(sourceId: string) {
-    electron.ipcRenderer.removeListener(
-      `volmeter-${sourceId}`,
-      this.subscriptions[sourceId].listener,
-    );
-    electron.ipcRenderer.sendTo(this.workerId, 'volmeterUnsubscribe', sourceId);
+    if (this.subscriptions[sourceId].channelId) {
+      this.audioService.actions.unsubscribeVolmeter(
+        sourceId,
+        this.subscriptions[sourceId].channelId!,
+      );
+    }
+
     delete this.subscriptions[sourceId];
   }
 

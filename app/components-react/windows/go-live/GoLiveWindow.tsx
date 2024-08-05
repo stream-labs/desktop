@@ -5,12 +5,12 @@ import { Button } from 'antd';
 import { Services } from '../../service-provider';
 import GoLiveSettings from './GoLiveSettings';
 import DualOutputGoLiveSettings from './dual-output/DualOutputGoLiveSettings';
+import GoLiveBanner from './GoLiveInfoBanner';
 import React from 'react';
 import { $t } from '../../../services/i18n';
 import GoLiveChecklist from './GoLiveChecklist';
 import Form from '../../shared/inputs/Form';
 import Animation from 'rc-animate';
-import { SwitchInput } from '../../shared/inputs';
 import { useGoLiveSettings, useGoLiveSettingsRoot } from './useGoLiveSettings';
 import { inject } from 'slap';
 import cx from 'classnames';
@@ -58,14 +58,11 @@ function ModalFooter() {
     error,
     lifecycle,
     checklist,
-    isMultiplatformMode,
-    isDualOutputMode,
     goLive,
-    isAdvancedMode,
-    switchAdvancedMode,
     close,
     goBackToSettings,
     isLoading,
+    promptReapply,
   } = useGoLiveSettings().extend(module => ({
     windowsService: inject(WindowsService),
 
@@ -76,26 +73,19 @@ function ModalFooter() {
     goBackToSettings() {
       module.prepopulate();
     },
+
+    get promptReapply() {
+      return Services.TikTokService.promptReapply;
+    },
   }));
 
   const shouldShowConfirm = ['prepopulate', 'waitForNewSettings'].includes(lifecycle);
-  const shouldShowAdvancedSwitch = shouldShowConfirm && (isMultiplatformMode || isDualOutputMode);
   const shouldShowGoBackButton =
     lifecycle === 'runChecklist' && error && checklist.startVideoTransmission !== 'done';
 
   return (
     <Form layout={'inline'}>
-      {shouldShowAdvancedSwitch && (
-        <SwitchInput
-          label={$t('Show Advanced Settings')}
-          name="advancedMode"
-          onChange={switchAdvancedMode}
-          value={isAdvancedMode}
-          debounce={200}
-          disabled={isLoading}
-        />
-      )}
-
+      {promptReapply && <GoLiveBanner />}
       {/* CLOSE BUTTON */}
       <Button onClick={close}>{$t('Close')}</Button>
 

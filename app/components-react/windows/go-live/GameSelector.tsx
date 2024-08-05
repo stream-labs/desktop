@@ -103,7 +103,7 @@ export default function GameSelector(p: TProps) {
     twitch: $t('Twitch Category'),
     facebook: $t('Facebook Game'),
     trovo: $t('Trovo Category'),
-    tiktok: $t('TikTok Game'),
+    tiktok: $t('TikTok Category'),
   }[platform as string];
 
   const filterOption = (input: string, option?: { label: string; value: string }) => {
@@ -133,7 +133,7 @@ export default function GameSelector(p: TProps) {
       }}
       filterOption={filterOption}
       debounce={500}
-      required={isTwitch || isTrovo || isTikTok}
+      required={isTwitch || isTrovo}
       hasImage={isTwitch || isTrovo}
       onBeforeSearch={onBeforeSearchHandler}
       imageSize={platformService.gameImageSize}
