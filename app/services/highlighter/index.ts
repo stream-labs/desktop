@@ -23,6 +23,7 @@ import { YoutubeService } from 'services/platforms/youtube';
 import os from 'os';
 import {
   CLIP_DIR,
+  FFMPEG_DIR,
   FFMPEG_EXE,
   SCRUB_SPRITE_DIRECTORY,
   SUPPORTED_FILE_TYPES,
@@ -47,7 +48,7 @@ import { NavigationService } from 'services/navigation';
 import { SharedStorageService } from 'services/integrations/shared-storage';
 import execa from 'execa';
 import moment from 'moment';
-import * as child from 'child_process';
+import { getHighlightClips } from './ai-highlighter';
 
 //TODO: Better way to order them.
 interface IBaseClip {
@@ -829,7 +830,9 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
       this.clips[c.path] = this.clips[c.path] ?? new Clip(c.path);
     }
-
+    console.log(Object.values(this.clips).length);
+    console.log(clipsToLoad.length);
+    console.log(clipsToLoad.filter(c => !c.loaded).length);
     await pmap(
       clipsToLoad.filter(c => !c.loaded),
       c => this.clips[c.path].init(),
@@ -884,6 +887,9 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       console.error('Highlighter: Cannot export until current export operation is finished');
       return;
     }
+
+    console.log(this.views.clips);
+    console.log(Object.entries(this.clips));
 
     let clips = this.views.clips
       .filter(c => c.enabled)
@@ -1256,7 +1262,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     this.CLEAR_UPLOAD();
   }
 
-  async flow(filePath: string, streamInfo: StreamInfoForAiHighlighter) {
+  async flow(filePath: string, streamInfo: StreamInfoForAiHighlighter): Promise<void> {
     console.log('streamInfo', streamInfo);
 
     // Highlighter flow
@@ -1265,19 +1271,6 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     // 3. after stream finished wait for the recording to be done
     // 4. send recording to highlighterApi
     // 5. cut data into highlightClips
-
-    const highlighterData = [
-      {
-        start: 322,
-        end: 324,
-        type: 'elimination',
-      },
-      {
-        start: 425,
-        end: 427,
-        type: 'elimination',
-      },
-    ];
 
     const setStreamInfo: IHighlightedStream = {
       state: 'Searching for highlights...',
@@ -1292,7 +1285,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     console.log('Test flow');
 
     console.log('🔄 HighlighterData');
-    const highlighterResponse = await this.getHighlightClips(filePath);
+    const highlighterResponse = await getHighlightClips(filePath);
     console.log('✅ HighlighterData', highlighterResponse);
 
     console.log('🔄 formatHighlighterResponse');
@@ -1302,8 +1295,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     console.log('✅ formatHighlighterResponse', formattedHighlighterResponse);
 
     console.log('🔄 cutHighlightClips');
-    setStreamInfo.state = 'Generating clips';
-    this.updateStream(setStreamInfo);
+    this.updateStream({ state: 'Generating clips', ...setStreamInfo }); // alternate approach to update stream
     const clipData = await this.cutHighlightClips(filePath, formattedHighlighterResponse);
     console.log('✅ cutHighlightClips');
 
@@ -1314,47 +1306,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     console.log('🔄 addClips', clipData);
     this.addAiClips(clipData, streamInfo);
     console.log('✅ addClips');
-  }
-
-  async getHighlightClips(videoUri: string) {
-    console.log(`Get highlight clips for ${videoUri}`);
-
-    if (videoUri.includes('3-7')) {
-      console.log('Use djnardi test data');
-      return JSON.parse(
-        '[{"start_time":118.0,"end_time":null,"type":"deploy","origin":"deploy detection","start_timestamp":"00:01:58","end_timestamp":null},{"start_time":142.73400466241736,"end_time":null,"type":"kill","origin":"ocr crosshair, ocr lower","start_timestamp":"00:02:22","end_timestamp":null},{"start_time":245.73400466241736,"end_time":null,"type":"kill","origin":"ocr crosshair, ocr lower","start_timestamp":"00:04:05","end_timestamp":null}]',
-      );
-    } else if (videoUri.includes('stream.mp4')) {
-      return JSON.parse('');
-    }
-    const AI_PATH = 'path to highlighter executable';
-    console.log(AI_PATH);
-    console.log('Start Ai analysis');
-    const command = AI_PATH + ' ' + videoUri;
-    console.log('command', command);
-    return new Promise((resolve, reject) => {
-      const childProcess: child.ChildProcess = child.exec(command);
-      childProcess.stdout?.on('data', data => {
-        const message = data.toString() as string;
-        // console.log('Normal logs:', data.toString());
-        if (message.includes('>>>>') && message.includes('<<<<')) {
-          const start = message.indexOf('>>>>');
-          const end = message.indexOf('<<<<');
-
-          const jsonString = message.substring(start, end).replace('>>>>', '');
-
-          console.log('\n\n');
-          console.log(jsonString);
-          console.log('\n\n');
-
-          const jsonResponse = JSON.parse(jsonString);
-          resolve(jsonResponse);
-        }
-      });
-      childProcess.stderr?.on('data', (data: string) => {
-        console.log('Error logs:', data.toString());
-      });
-    });
+    return;
   }
 
   async getHighlightClipsRest(
