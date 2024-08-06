@@ -48,7 +48,7 @@ import { NavigationService } from 'services/navigation';
 import { SharedStorageService } from 'services/integrations/shared-storage';
 import execa from 'execa';
 import moment from 'moment';
-import { getHighlightClips } from './ai-highlighter';
+import { getHighlightClips, IHighlighterInput } from './ai-highlighter/ai-highlighter';
 
 //TODO: Better way to order them.
 interface IBaseClip {
@@ -95,8 +95,6 @@ interface ISettingsViewState {
 
 export type IViewState = TClipsViewState | IStreamViewState | ISettingsViewState;
 
-
-
 export interface IHighlighterData {
   type: string;
   start: number;
@@ -120,13 +118,6 @@ interface IHighlightedStream {
 export enum EExportStep {
   AudioMix = 'audio',
   FrameRender = 'frames',
-}
-
-interface HighlighterApiResponse {
-  start_time: number;
-  end_time: number;
-  type: string;
-  origin: string;
 }
 
 export type TFPS = 30 | 60;
@@ -575,8 +566,8 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       this.UPDATE_CLIP({
         path: c.path,
         loaded: false,
-      })
-    })
+      });
+    });
 
     try {
       // On some very very small number of systems, we won't be able to fetch
@@ -737,7 +728,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       });
     });
 
-    await this.loadClips(streamInfo.id)
+    await this.loadClips(streamInfo.id);
   }
 
   enableClip(path: string, enabled: boolean) {
@@ -821,8 +812,8 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     //Remove clips from that stream as well
     const clipsToRemove = this.views.clips.filter(clip => clip.streamInfo.id === id);
     clipsToRemove.forEach(clip => {
-      this.removeClip(clip.path)
-    })
+      this.removeClip(clip.path);
+    });
   }
 
   toggleAiHighlighter() {
@@ -837,7 +828,9 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   async loadClips(streamInfoId?: string | undefined) {
     let clipsToLoad: TClip[];
     if (streamInfoId) {
-      clipsToLoad = this.views.clips.filter(clip => clip.streamInfo?.id && clip.streamInfo.id === streamInfoId);
+      clipsToLoad = this.views.clips.filter(
+        clip => clip.streamInfo?.id && clip.streamInfo.id === streamInfoId,
+      );
     } else {
       clipsToLoad = this.views.clips;
     }
@@ -920,11 +913,9 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
    * Return true if the video was exported, or false if not.
    */
   async export(preview = false) {
-
     //only check if enabled clips are loaded
     //TODO: Remove views.loaded?
-    if (!this.views.clips
-      .filter(c => c.enabled).every(clip => clip.loaded)) {
+    if (!this.views.clips.filter(c => c.enabled).every(clip => clip.loaded)) {
       console.error('Highlighter: Export called while clips are not fully loaded!');
       return;
     }
@@ -952,11 +943,11 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     const exportOptions: IExportOptions = preview
       ? { width: 1280 / 4, height: 720 / 4, fps: 30, preset: 'ultrafast' }
       : {
-        width: this.views.exportInfo.resolution === 720 ? 1280 : 1920,
-        height: this.views.exportInfo.resolution === 720 ? 720 : 1080,
-        fps: this.views.exportInfo.fps,
-        preset: this.views.exportInfo.preset,
-      };
+          width: this.views.exportInfo.resolution === 720 ? 1280 : 1920,
+          height: this.views.exportInfo.resolution === 720 ? 720 : 1080,
+          fps: this.views.exportInfo.fps,
+          preset: this.views.exportInfo.preset,
+        };
 
     // Reset all clips
     await pmap(clips, c => c.reset(exportOptions), {
@@ -1322,7 +1313,8 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       state: 'Searching for highlights...',
       date: moment().date(),
       id: streamInfo.id || 'noId',
-      title: streamInfo.title || filePath.substring(filePath.length - 10, filePath.length) || 'no title',
+      title:
+        streamInfo.title || filePath.substring(filePath.length - 10, filePath.length) || 'no title',
       game: streamInfo.game || 'no title',
     };
     this.addStream(setStreamInfo);
@@ -1335,9 +1327,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     console.log('✅ HighlighterData', highlighterResponse);
 
     console.log('🔄 formatHighlighterResponse');
-    const formattedHighlighterResponse = this.formatHighlighterResponse(
-      (highlighterResponse as unknown) as any,
-    );
+    const formattedHighlighterResponse = this.formatHighlighterResponse(highlighterResponse);
     console.log('✅ formatHighlighterResponse', formattedHighlighterResponse);
 
     console.log('🔄 cutHighlightClips');
@@ -1395,10 +1385,10 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
       const data = await response.json();
       return data;
-    } catch (error) {
+    } catch (error: unknown) {
       console.timeEnd('requestDuration');
 
-      if (error.name === 'AbortError') {
+      if ((error as any).name === 'AbortError') {
         console.error('Fetch request timed out');
       } else {
         console.error('Fetch error:', error);
@@ -1408,7 +1398,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     }
   }
 
-  formatHighlighterResponse(responseData: HighlighterApiResponse[]) {
+  formatHighlighterResponse(responseData: IHighlighterInput[]) {
     //TODO: Currently the colde failes if start and endtime are equal. Needs to be fixed with the config
     return responseData.map(curr => {
       return {
@@ -1433,8 +1423,8 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
         await fs.access(outputUri);
         // console.log(`Output file ${outputUri} already exists. Deleting it.`);
         await fs.unlink(outputUri);
-      } catch (err) {
-        if (err.code !== 'ENOENT') {
+      } catch (err: unknown) {
+        if ((err as any).code !== 'ENOENT') {
           console.error(`Error checking existence of ${outputUri}:`, err);
         }
       }
@@ -1462,7 +1452,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
         await execa(FFMPEG_EXE, args);
         console.log(`Created segment: ${outputUri}`);
         pathArray.push({ path: outputUri, aiClipInfo: { moments: [{ type }] } });
-      } catch (error) {
+      } catch (error: unknown) {
         console.error(`Error creating segment: ${outputUri}`, error);
       }
     }
