@@ -834,10 +834,10 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   }
 
   // Only load the clips we need
-  async loadClips(streamInfoId?: string) {
+  async loadClips(streamInfoId?: string | undefined) {
     let clipsToLoad: TClip[];
     if (streamInfoId) {
-      clipsToLoad = this.views.clips.filter(clip => clip.streamInfo.id === streamInfoId);
+      clipsToLoad = this.views.clips.filter(clip => clip.streamInfo?.id && clip.streamInfo.id === streamInfoId);
     } else {
       clipsToLoad = this.views.clips;
     }
@@ -920,7 +920,11 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
    * Return true if the video was exported, or false if not.
    */
   async export(preview = false) {
-    if (!this.views.loaded) {
+
+    //only check if enabled clips are loaded
+    //TODO: Remove views.loaded?
+    if (!this.views.clips
+      .filter(c => c.enabled).every(clip => clip.loaded)) {
       console.error('Highlighter: Export called while clips are not fully loaded!');
       return;
     }

@@ -6,19 +6,15 @@ import { TClip, IHighlighterData, IViewState } from 'services/highlighter';
 import { Services } from 'components-react/service-provider';
 import { Button } from 'antd';
 import moment from 'moment';
-import styles from '../highlighter/StreamView.m.less';
+import StreamView from 'components-react/highlighter/StreamView';
 
 export default function Highlighter(props: { params?: { view: string } }) {
   const openViewFromParams = props?.params?.view || '';
 
   const { HighlighterService, RecordingModeService } = Services;
   const v = useVuex(() => ({
-    clips: HighlighterService.views.clips as TClip[],
     dismissedTutorial: HighlighterService.views.dismissedTutorial,
-    error: HighlighterService.views.error,
     useAiHighlighter: HighlighterService.views.useAiHighlighter,
-    recordings: RecordingModeService.views.sortedRecordings,
-    highlightedStreams: HighlighterService.views.highlightedStreams,
   }));
 
   const [viewState, setViewState] = useState<IViewState>(
@@ -27,23 +23,10 @@ export default function Highlighter(props: { params?: { view: string } }) {
       : { view: 'settings' },
   );
 
-  const streamsFromClipStreamInfo = v.clips
-    ? [...new Set(v.clips!.map(d => d.streamInfo?.id))]
-    : [];
-
   // TODO: Below is currently always true. Add the handle correctly
   // if (viewState.view !== 'settings' && !v.clips.length && !v.dismissedTutorial && !v.error || ) {
   //   setViewState({ view: 'settings' });
   // }
-
-  // let streamMockdata: { id: string; videoUri: string }[] = [{ id: '123', videoUri: '234' }];
-  let streamMockdata: { id: string; videoUri: string; highlighterData: any }[] = v.recordings.map(
-    recording => ({
-      id: recording.timestamp,
-      videoUri: recording.filename,
-      highlighterData: { start: 2, end: 4, type: 'lol' },
-    }),
-  );
 
   switch (viewState.view) {
     case 'settings':
@@ -66,80 +49,37 @@ export default function Highlighter(props: { params?: { view: string } }) {
     case 'stream':
       return (
         <>
-          {' '}
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '8px',
-              padding: '20px',
+          <StreamView
+            emitSetView={id => {
+              console.log('setViewInOverview:', id);
+              setView({
+                view: 'clips',
+                id: id,
+              });
             }}
-          >
-            {devHeaderBar()}{' '}
-            <div className={styles.streamsWrapper}>
-              {' '}
-              {v.highlightedStreams.map(highlightedStream => (
-                <div key={highlightedStream.id} className={styles.streamCard}>
-                  <div className={styles.thumbnailWrapper}>
-                    <img
-                      style={{ height: '100%' }}
-                      src={
-                        v.clips.find(clip => clip.streamInfo?.id === highlightedStream.id)
-                          ?.scrubSprite
-                      }
-                      alt=""
-                    />
-                  </div>
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '8px',
-                      padding: '20px',
-                      paddingTop: '0px',
-                    }}
-                  >
-                    <div style={{}}>
-                      {highlightedStream.title} - {highlightedStream.state}
-                    </div>
-
-                    <div
-                      style={{
-                        display: 'flex',
-
-                        gap: '4px',
-                        justifyContent: 'space-between',
-                      }}
-                    >
-                      <Button
-                        disabled={highlightedStream.state !== 'Done'}
-                        onClick={() =>
-                          setView({
-                            view: 'clips',
-                            id: highlightedStream.id,
-                          })
-                        }
-                      >
-                        Edit
-                      </Button>
-                      <Button onClick={() => removeStream(highlightedStream.id)}>Remove</Button>
-                      <Button disabled={highlightedStream.state !== 'Done'} type="primary">
-                        Export
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          />
         </>
       );
       break;
     case 'clips':
       return (
         <>
-          <Button onClick={() => setView({ view: 'stream' })}>X</Button>
-          <ClipsView id={viewState.id} />
+          <ClipsView
+            emitSetView={data => {
+              if (data.view === 'clips') {
+                console.log('setViewInOverview:', data.id);
+                setView({
+                  view: data.view,
+                  id: data.id,
+                });
+              } else {
+                setView({
+                  view: data.view,
+                });
+              }
+            }}
+            props={{ id: viewState.id }}
+          />
         </>
       );
       break;
@@ -190,13 +130,6 @@ export default function Highlighter(props: { params?: { view: string } }) {
 
   function rmSinfo() {
     HighlighterService.actions.removeStream('DJ Naaaardi-Fortnite-5302024');
-  }
-  function removeStream(id?: string) {
-    if (!id) {
-      console.error('Cant remove stream, missing id');
-      return;
-    }
-    HighlighterService.actions.removeStream(id);
   }
 
   function setView(view: IViewState) {

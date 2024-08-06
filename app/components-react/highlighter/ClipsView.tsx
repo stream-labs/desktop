@@ -2,7 +2,7 @@ import { useVuex } from 'components-react/hooks';
 import React, { useEffect, useState } from 'react';
 import { Services } from 'components-react/service-provider';
 import styles from './ClipsView.m.less';
-import { TClip } from 'services/highlighter';
+import { IViewState, TClip } from 'services/highlighter';
 import ClipPreview from 'components-react/highlighter/ClipPreview';
 import ClipTrimmer from 'components-react/highlighter/ClipTrimmer';
 import { ReactSortable } from 'react-sortablejs';
@@ -28,7 +28,13 @@ interface IClipsViewProps {
   id: string | undefined;
 }
 
-export default function ClipsView(props: IClipsViewProps) {
+export default function ClipsView({
+  props,
+  emitSetView,
+}: {
+  props: IClipsViewProps;
+  emitSetView: (data: IViewState) => void;
+}) {
   const { HighlighterService, HotkeysService, UsageStatisticsService } = Services;
   const v = useVuex(() => ({
     clips: props.id
@@ -74,6 +80,8 @@ export default function ClipsView(props: IClipsViewProps) {
           enabled: true,
         });
       });
+
+      console.log('clipsView - loadClips');
       HighlighterService.actions.loadClips(props.id);
       setShowTutorial(false);
     }
@@ -259,8 +267,8 @@ export default function ClipsView(props: IClipsViewProps) {
         className={styles.clipsViewRoot}
         onDrop={onDrop}
       >
-        <Scrollable style={{ flexGrow: 1, padding: '20px 0 20px 20px' }}>
-          <div style={{ display: 'flex', paddingRight: 20 }}>
+        <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ display: 'flex', padding: 20 }}>
             <div style={{ flexGrow: 1 }}>
               <h1>{$t('Highlighter')}</h1>
               <p>{$t('Drag & drop to reorder clips.')}</p>
@@ -270,46 +278,49 @@ export default function ClipsView(props: IClipsViewProps) {
                 <b style={{ marginRight: 20 }}>{getBindingString(hotkey.bindings[0])}</b>
               )}
               <Button onClick={() => setShowTutorial(true)}>{$t('View Tutorial')}</Button>
+              <Button onClick={() => emitSetView({ view: 'stream' })}>X</Button>
             </div>
           </div>
-          <ReactSortable
-            list={clipList}
-            setList={setClipOrder}
-            animation={200}
-            filter=".sortable-ignore"
-            onMove={e => {
-              return e.related.className.indexOf('sortable-ignore') === -1;
-            }}
-          >
-            <div
-              key="add"
-              style={{ margin: '10px 20px 10px 0', display: 'inline-block' }}
-              className="sortable-ignore"
+          <Scrollable style={{ flexGrow: 1, padding: '20px 0 20px 20px' }}>
+            <ReactSortable
+              list={clipList}
+              setList={setClipOrder}
+              animation={200}
+              filter=".sortable-ignore"
+              onMove={e => {
+                return e.related.className.indexOf('sortable-ignore') === -1;
+              }}
             >
-              <AddClip />
-            </div>
-            {v.clips.map(clip => {
-              return (
-                <div
-                  key={clip.path}
-                  style={{ margin: '10px 20px 10px 0', display: 'inline-block' }}
-                >
-                  <ClipPreview
-                    clip={clip}
-                    showTrim={() => {
-                      setInspectedClipPath(clip.path);
-                      setShowModal('trim');
-                    }}
-                    showRemove={() => {
-                      setInspectedClipPath(clip.path);
-                      setShowModal('remove');
-                    }}
-                  />
-                </div>
-              );
-            })}
-          </ReactSortable>
-        </Scrollable>
+              <div
+                key="add"
+                style={{ margin: '10px 20px 10px 0', display: 'inline-block' }}
+                className="sortable-ignore"
+              >
+                <AddClip />
+              </div>
+              {v.clips.map(clip => {
+                return (
+                  <div
+                    key={clip.path}
+                    style={{ margin: '10px 20px 10px 0', display: 'inline-block' }}
+                  >
+                    <ClipPreview
+                      clip={clip}
+                      showTrim={() => {
+                        setInspectedClipPath(clip.path);
+                        setShowModal('trim');
+                      }}
+                      showRemove={() => {
+                        setInspectedClipPath(clip.path);
+                        setShowModal('remove');
+                      }}
+                    />
+                  </div>
+                );
+              })}
+            </ReactSortable>
+          </Scrollable>
+        </div>
         {getControls()}
         <Modal
           getContainer={`.${styles.clipsViewRoot}`}
