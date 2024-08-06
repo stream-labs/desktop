@@ -648,7 +648,7 @@ export class TcpServerService
       if (!force && !this.forceRequests) return;
     }
 
-    if (client.socket instanceof WritableStream && !(client.socket as WritableStream).writable) {
+    if ((client.socket as WritableStream).write && !(client.socket as WritableStream).writable) {
       // prevent attempts to write to a closed socket
 
       this.log('cannot write to closed socket to send response', response);
@@ -662,6 +662,7 @@ export class TcpServerService
         (client.socket as WritableStream).write(`${JSON.stringify(response)}\n`);
       } else {
         (client.socket as SocketIOClient.Socket).send(`${JSON.stringify(response)}\n`);
+        (client.socket as SocketIOClient.Socket).emit('message', `${JSON.stringify(response)}\n`);
       }
     } catch (e: unknown) {
       // probably the client has been silently disconnected
