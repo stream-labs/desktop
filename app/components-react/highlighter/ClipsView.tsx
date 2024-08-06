@@ -110,7 +110,7 @@ export default function ClipsView(props: IClipsViewProps) {
     return (
       <div className={styles.clipLoader}>
         <h2>Loading</h2>
-        {v.loadedCount}/{v.clips.length} Clips
+        {v.clips.filter(clip => clip.loaded === true).length}/{v.clips.length} Clips
       </div>
     );
   }
