@@ -373,6 +373,13 @@ export class TcpServerService
     }
   }
 
+  disconnectRemoteDevice(device: IConnectedDevice) {
+    if (this.remoteSocket) {
+      this.remoteSocket.emit('disconnectDevice', { socketId: device.socketId });
+      this.REMOVE_CONNECTED_DEVICE(device);
+    }
+  }
+
   private onConnectionHandler(socket: WritableStream | SocketIOClient.Socket, server: IServer) {
     this.log('new connection');
 

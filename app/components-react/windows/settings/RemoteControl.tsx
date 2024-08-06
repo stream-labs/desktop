@@ -33,8 +33,7 @@ class RemoteControlModule {
   }
 
   disconnectDevice(device: IConnectedDevice) {
-    const socket = this.TcpServerService.remoteSocket;
-    if (socket) socket.emit('disconnectDevice', { socketId: device.socketId });
+    this.TcpServerService.actions.disconnectRemoteDevice(device);
   }
 }
 
