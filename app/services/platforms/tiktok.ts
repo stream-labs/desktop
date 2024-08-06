@@ -1,4 +1,4 @@
-import { InheritMutations, Inject, mutation } from '../core';
+import { InheritMutations, Inject, mutation, Service } from '../core';
 import { BasePlatformService } from './base-platform';
 import {
   EPlatformCallResult,
@@ -26,14 +26,15 @@ import {
   TTikTokLiveScopeTypes,
   ITikTokGamesData,
 } from './tiktok/api';
-import { I18nService } from 'services/i18n';
+import { $t, I18nService } from 'services/i18n';
 import { getDefined } from 'util/properties-type-guards';
 import * as remote from '@electron/remote';
 import { WindowsService } from 'services/windows';
 import Utils from 'services/utils';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { DiagnosticsService } from 'services/diagnostics';
-
+import { ENotificationType, NotificationsService } from 'services/notifications';
+import { JsonrpcService } from '../api/jsonrpc';
 interface ITikTokServiceState extends IPlatformState {
   settings: ITikTokStartStreamSettings;
   broadcastId: string;
@@ -89,6 +90,8 @@ export class TikTokService
   @Inject() windowsService: WindowsService;
   @Inject() diagnosticsService: DiagnosticsService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
+  @Inject() private notificationsService: NotificationsService;
+  @Inject() private jsonrpcService: JsonrpcService;
 
   readonly apiBase = 'https://open.tiktokapis.com/v2';
   readonly platform = 'tiktok';
@@ -213,6 +216,7 @@ export class TikTokService
   async afterStopStream(): Promise<void> {
     if (this.state.broadcastId) {
       await this.endStream(this.state.broadcastId);
+      this.showReplaysNotification();
     }
 
     // clear server url and stream key
@@ -537,6 +541,22 @@ export class TikTokService
     }
   }
 
+  /**
+   * Open link for replays in browser
+   * @remark This is a temporary solution until we can show replays in the app
+   */
+  showReplaysNotification() {
+    this.notificationsService.actions.push({
+      type: ENotificationType.SUCCESS,
+      message: $t('Click to view TikTok Replay in your browser.'),
+      action: this.jsonrpcService.createRequest(Service.getResourceId(this), 'openReplaysLink'),
+    });
+  }
+
+  openReplaysLink() {
+    remote.shell.openExternal(this.replaysUrl);
+  }
+
   get liveDockEnabled(): boolean {
     return true;
   }
@@ -581,6 +601,10 @@ export class TikTokService
 
   get confirmationUrl(): string {
     return 'https://www.tiktok.com/falcon/live_g/live_access_pc_apply/result/index.html?id=GL6399433079641606942';
+  }
+
+  get replaysUrl(): string {
+    return 'https://livecenter.tiktok.com/replay';
   }
 
   get locale(): string {
