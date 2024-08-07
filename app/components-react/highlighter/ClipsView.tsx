@@ -37,7 +37,7 @@ export default function ClipsView({
 }) {
   const { HighlighterService, HotkeysService, UsageStatisticsService } = Services;
   const v = useVuex(() => ({
-    clips: HighlighterService.getClips(HighlighterService.views.clips, props.id),
+    clips: HighlighterService.views.clips,
     exportInfo: HighlighterService.views.exportInfo,
     uploadInfo: HighlighterService.views.uploadInfo,
     loadedCount: HighlighterService.views.loadedCount,
@@ -54,8 +54,10 @@ export default function ClipsView({
   const [hotkey, setHotkey] = useState<IHotkey | null>(null);
   const [showTutorial, setShowTutorial] = useState(false);
 
+  console.log('das:', HighlighterService.getClips(HighlighterService.views.clips));
+
   useEffect(() => {
-    if (v.clips.length) {
+    if (HighlighterService.getClips(v.clips, props.id).length) {
       // Disable all clips
       (HighlighterService.views.clips as TClip[]).forEach(clip => {
         HighlighterService.actions.UPDATE_CLIP({
@@ -76,7 +78,7 @@ export default function ClipsView({
       HighlighterService.actions.loadClips(props.id);
       setShowTutorial(false);
     }
-  }, [v.clips.length]);
+  }, [HighlighterService.getClips(v.clips, props.id).length]);
 
   useEffect(() => {
     HotkeysService.actions.return.getGeneralHotkeyByName('SAVE_REPLAY').then(hotkey => {
@@ -111,7 +113,8 @@ export default function ClipsView({
         <h2>Loading</h2>
         <p>
           {' '}
-          {v.clips.filter(clip => clip.loaded === true).length}/{v.clips.length} Clips
+          {v.clips.filter(clip => clip.loaded === true).length}/
+          {HighlighterService.getClips(v.clips, props.id).length} Clips
         </p>
       </div>
     );
@@ -207,7 +210,7 @@ export default function ClipsView({
   function setClipOrder(clips: { id: string }[]) {
     // ReactDraggable fires setList on mount. To avoid sync IPC,
     // we only fire off a request if the order changed.
-    const oldOrder = v.clips.map(c => c.path);
+    const oldOrder = HighlighterService.getClips(v.clips, props.id).map(c => c.path);
     const newOrder = clips.filter(c => c.id !== 'add').map(c => c.id);
 
     if (!isEqual(oldOrder, newOrder)) {
@@ -235,7 +238,11 @@ export default function ClipsView({
   }
 
   function getClipsView() {
-    const clipList = [{ id: 'add', filtered: true }, ...v.clips.map(c => ({ id: c.path }))];
+    const clipList = [
+      { id: 'add', filtered: true },
+      ...v.clips.map(c => ({ id: c.path })).reverse(),
+    ];
+    console.log('🚀 ~ getClipsView ~ clipList:', clipList);
 
     function onDrop(e: React.DragEvent<HTMLDivElement>) {
       const extensions = SUPPORTED_FILE_TYPES.map(e => `.${e}`);
@@ -308,7 +315,7 @@ export default function ClipsView({
                 >
                   <AddClip />
                 </div>
-                {v.clips.map(clip => {
+                {HighlighterService.getClips(v.clips, props.id).map(clip => {
                   return (
                     <div
                       key={clip.path}

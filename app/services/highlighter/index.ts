@@ -1412,48 +1412,52 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     videoUri: string,
     highlighterData: IHighlighterData[],
   ): Promise<{ path: string; aiClipInfo: IAiClipInfo }[]> {
-    const tasks = highlighterData.map(({ start, end, type }) => {
-      return (async () => {
-        const outputUri = `${videoUri.slice(0, -4)}-${start}-${end}.mp4`;
+    const tasks = highlighterData
+      .sort((a, b) => a.start - b.start)
+      .map(({ start, end, type }) => {
+        return (async () => {
+          const formattedStart = start.toString().padStart(6, '0');
+          const formattedEnd = end.toString().padStart(6, '0');
+          const outputUri = `${videoUri.slice(0, -4)}-${formattedStart}-${formattedEnd}.mp4`;
 
-        try {
-          await fs.access(outputUri);
-          await fs.unlink(outputUri);
-        } catch (err: unknown) {
-          if ((err as any).code !== 'ENOENT') {
-            console.error(`Error checking existence of ${outputUri}:`, err);
+          try {
+            await fs.access(outputUri);
+            await fs.unlink(outputUri);
+          } catch (err: unknown) {
+            if ((err as any).code !== 'ENOENT') {
+              console.error(`Error checking existence of ${outputUri}:`, err);
+            }
           }
-        }
 
-        const args = [
-          '-i',
-          videoUri,
-          '-ss',
-          start.toString(),
-          '-to',
-          end.toString(),
-          '-c:v',
-          'libx264',
-          '-c:a',
-          'aac',
-          '-strict',
-          'experimental',
-          '-b:a',
-          '192k',
-          outputUri,
-        ];
+          const args = [
+            '-i',
+            videoUri,
+            '-ss',
+            start.toString(),
+            '-to',
+            end.toString(),
+            '-c:v',
+            'libx264',
+            '-c:a',
+            'aac',
+            '-strict',
+            'experimental',
+            '-b:a',
+            '192k',
+            outputUri,
+          ];
 
-        try {
-          console.log(`run FFMPEG with args: ${args}`);
-          await execa(FFMPEG_EXE, args);
-          console.log(`Created segment: ${outputUri}`);
-          return { path: outputUri, aiClipInfo: { moments: [{ type }] } };
-        } catch (error: unknown) {
-          console.error(`Error creating segment: ${outputUri}`, error);
-          return null; // Return null or similar to indicate the failed operation.
-        }
-      })();
-    });
+          try {
+            console.log(`run FFMPEG with args: ${args}`);
+            await execa(FFMPEG_EXE, args);
+            console.log(`Created segment: ${outputUri}`);
+            return { path: outputUri, aiClipInfo: { moments: [{ type }] } };
+          } catch (error: unknown) {
+            console.error(`Error creating segment: ${outputUri}`, error);
+            return null; // Return null or similar to indicate the failed operation.
+          }
+        })();
+      });
 
     const results = await Promise.allSettled(tasks);
     return results

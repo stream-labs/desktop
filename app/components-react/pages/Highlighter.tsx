@@ -123,6 +123,7 @@ export default function Highlighter(props: { params?: { view: string } }) {
     } else {
       setView({
         view: data.view,
+        id: undefined,
       });
     }
   }

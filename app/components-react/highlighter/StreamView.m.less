@@ -1,7 +1,7 @@
 @import "../../styles/index";
 
 
-.stream-card{
+.stream-card {
   background-color: #2B383F;
   display: flex;
   flex-direction: column;
@@ -11,25 +11,36 @@
   width: fit-content;
 }
 
-.thumbnail-wrapper{
+.thumbnail-wrapper {
   position: relative;
   --thumbWith: 192px;
   --thumbHeight: 108px;
-  overflow-x: clip; 
+  overflow-x: clip;
   border-radius: 10px 10px 0 0;
-  
+
   width: calc(var(--thumbWith) * 2.2);
   height: calc(var(--thumbHeight) * 2.2);
 }
 
+.video-skeleton {
+  animation: pulsate 8s ease-in-out infinite;
+}
 
-.thumbnail-wrapper-small{
+@keyframes pulsate {
+  0%, 100% {
+    background-color: #38484f;
+  }
+  50% {
+    background-color: #324148;
+  }
+}
+.thumbnail-wrapper-small {
   position: absolute;
   --thumbWith: 192px;
   --thumbHeight: 108px;
-  overflow-x: clip; 
+  overflow-x: clip;
   border-radius: 4px;
-  
+
   width: calc(var(--thumbWith) * 0.35); // Destroys the aspect ratio but is nicer in the ui
   height: calc(var(--thumbHeight) * 0.4);
   border: 2px #22292d solid;
@@ -38,20 +49,22 @@
 
 
 
-.centered-overlay-item{ 
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: white; /* Adjust text color as needed */
-    text-align: center;
-    font-size: 14px; /* Adjust font size as needed */
-    
-    z-index: 99;
+.centered-overlay-item {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  /* Adjust text color as needed */
+  text-align: center;
+  font-size: 14px;
+  /* Adjust font size as needed */
+
+  z-index: 99;
 }
 
-.streams-wrapper{
-  display: grid;  
+.streams-wrapper {
+  display: grid;
   grid-template-columns: auto auto auto;
 
   gap: 16px;
@@ -62,7 +75,8 @@
 .stream-view-root {
   position: relative;
 
-  :global(.ant-modal-wrap), :global(.ant-modal-mask) {
+  :global(.ant-modal-wrap),
+  :global(.ant-modal-mask) {
     position: absolute;
   }
 

@@ -165,8 +165,6 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
   }
 
   function getClipsView() {
-    const clipList = [{ id: 'add', filtered: true }, ...v.clips.map(c => ({ id: c.path }))];
-
     return (
       <div
         style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}
@@ -196,7 +194,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
           >
             {v.highlightedStreams.map(highlightedStream => (
               <div key={highlightedStream.id} className={styles.streamCard}>
-                <div className={styles.thumbnailWrapper}>
+                <div className={`${styles.thumbnailWrapper} ${styles.videoSkeleton}`}>
                   <img
                     style={{ height: '100%' }}
                     src={
