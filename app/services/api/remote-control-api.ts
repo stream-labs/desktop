@@ -172,7 +172,6 @@ export class RemoteControlService extends Service {
             code: E_JSON_RPC_ERROR.INVALID_PARAMS,
             message: errorMessage,
           });
-          this.sendResponse(errorResponse);
           return errorResponse;
         }
 
@@ -184,13 +183,11 @@ export class RemoteControlService extends Service {
             code: E_JSON_RPC_ERROR.INTERNAL_JSON_RPC_ERROR,
             message: 'The requested resource is not available.',
           });
-          this.sendResponse(err);
           return err;
         }
 
         const response = this.externalApiService.executeServiceRequest(request);
 
-        this.sendResponse(response);
         return response;
       } catch (e: unknown) {
         const errorResponse = this.jsonRpcService.createError(null, {
@@ -200,9 +197,6 @@ export class RemoteControlService extends Service {
             'If request string contains multiple requests, ensure requests are separated ' +
             'by a single newline character LF ( ASCII code 10)',
         });
-        this.sendResponse(
-          errorResponse
-        );
 
         // Disconnect and stop processing requests
         // IMPORTANT: For security reasons it is important we immediately stop
@@ -221,22 +215,6 @@ export class RemoteControlService extends Service {
     if (!request.params) message += ' params is required;';
     if (request.params && !request.params.resource) message += ' resource is required;';
     return message;
-  }
-
-  private sendResponse(response: IJsonRpcResponse<any>) {
-    console.log('sending response', response);
-    if (this.socket) {
-      try {
-        this.socket.emit('message', `${JSON.stringify(response)}\n`, (resp: any) => {
-          if (resp.error) {
-            throw resp.error;
-          }
-        });
-      } catch (e: unknown) {
-        // probably the client has been silently disconnected
-        console.info('unable to send response', response, e);
-      }
-    }
   }
 
   setEnableRemoteConnection(val: boolean) {

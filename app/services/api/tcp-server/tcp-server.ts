@@ -80,9 +80,6 @@ export class TcpServerService
   // enable to debug
   private enableLogs = false;
 
-  // Socket managing SL Remote Control Mobile App
-  remoteSocket: SocketIOClient.Socket | null = null;
-
   init() {
     super.init();
     this.externalApiService.serviceEvent.subscribe(event => this.onServiceEventHandler(event));
@@ -578,7 +575,6 @@ export class TcpServerService
   private disconnectClient(clientId: number) {
     const client = this.clients[clientId];
     client.socket.end();
-
     delete this.clients[clientId];
   }
 
