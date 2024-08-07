@@ -117,7 +117,6 @@ export class RemoteControlService extends Service {
     const url = `https://${
       this.hostsService.streamlabs
     }/api/v5/slobs/modules/mobile-remote-io/config?device_name=${os.hostname()}`;
-    console.log(os.hostname());
     const headers = authorizedHeaders(this.userService.apiToken);
 
     const resp: ISLRemoteResponse = await jfetch(new Request(url, { headers }));
@@ -138,14 +137,17 @@ export class RemoteControlService extends Service {
   listen() {
     if (this.socket) {
       this.socket.on('message', (data: Buffer) => {
+        console.log('message received', data.toString());
         this.requestHandler(data.toString());
       });
 
       this.socket.on('deviceConnected', (device: IConnectedDevice) => {
+        console.log('device connected', device);
         this.setConnectedDevices([...this.connectedDevices.devices, device]);
       });
 
       this.socket.on('deviceDisconnected', (device: IConnectedDevice) => {
+        console.log('device disconnected', device);
         this.removeConnectedDevice(device);
       });
 
@@ -221,11 +223,12 @@ export class RemoteControlService extends Service {
   }
 
   private sendResponse(response: IJsonRpcResponse<any>) {
+    console.log('sending response', response);
     if (this.socket) {
       try {
-        this.socket.emit('message', `${JSON.stringify(response)}\n`, (response: any) => {
-          if (response.error) {
-            throw response.error;
+        this.socket.emit('message', `${JSON.stringify(response)}\n`, (resp: any) => {
+          if (resp.error) {
+            throw resp.error;
           }
         });
       } catch (e: unknown) {
@@ -233,7 +236,6 @@ export class RemoteControlService extends Service {
         console.info('unable to send response', response, e);
       }
     }
-    // unhandled exceptions completely destroy Rx.Observable subscription
   }
 
   setEnableRemoteConnection(val: boolean) {
