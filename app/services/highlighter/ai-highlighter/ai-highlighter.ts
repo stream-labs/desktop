@@ -19,9 +19,9 @@ export interface IHighlighterInput {
 
 export type EHighlighterMessageTypes = 'progress' | 'inputs';
 
-interface IHighlighterMessage {
+export interface IHighlighterMessage {
   type: EHighlighterMessageTypes;
-  json: string;
+  json: {};
 }
 interface IHighlighterProgressMessage {
   progress: number;
@@ -44,43 +44,58 @@ export function getHighlightClips(
         const message = data.toString() as string;
         // console.log('Normal logs:', data.toString());
         const aiHighlighterMessage = parseAiHighlighterMessage(message);
-
-        switch (aiHighlighterMessage.type) {
-          case 'progress':
-            progressUpdate((aiHighlighterMessage.json as IHighlighterProgressMessage).progress);
-            break;
-          case 'inputs':
-            resolve(aiHighlighterMessage.json as IHighlighterInput[]);
-            break;
-
-          default:
-            console.log('\n\n');
-            console.log('Unrecognized message type:', aiHighlighterMessage);
-            console.log('\n\n');
-
-            break;
+        // console.log('Ai highlighter message:', aiHighlighterMessage);
+        if (typeof aiHighlighterMessage === 'string' || aiHighlighterMessage instanceof String) {
+          console.log('\n\n');
+          console.log('Python log:', aiHighlighterMessage);
+          console.log('\n\n');
+        } else {
+          switch (aiHighlighterMessage.type) {
+            case 'progress':
+              progressUpdate((aiHighlighterMessage.json as IHighlighterProgressMessage).progress);
+              break;
+            case 'inputs':
+              resolve(aiHighlighterMessage.json as IHighlighterInput[]);
+              break;
+            default:
+              console.log('\n\n');
+              console.log('Unrecognized message type:', aiHighlighterMessage);
+              console.log('\n\n');
+              break;
+          }
         }
       });
       childProcess.stderr?.on('data', (data: string) => {
-        console.log('Error logs:', data.toString());
+        // console.log('Error logs:', data.toString());
       });
     }
   });
 }
 
-function parseAiHighlighterMessage(
-  messageString: string,
-): { type: EHighlighterMessageTypes; json: unknown } | null {
+function parseAiHighlighterMessage(messageString: string): IHighlighterMessage | string | null {
   try {
     if (messageString.includes('>>>>') && messageString.includes('<<<<')) {
       const start = messageString.indexOf('>>>>');
       const end = messageString.indexOf('<<<<');
       const jsonString = messageString.substring(start, end).replace('>>>>', '');
+      console.log('Json string:', jsonString);
+
       const aiHighlighterMessage = JSON.parse(jsonString) as IHighlighterMessage;
-      const parseMessage = {
-        type: aiHighlighterMessage.type,
-        json: JSON.parse(aiHighlighterMessage.json),
-      };
+      console.log('Parsed ai highlighter message:', aiHighlighterMessage);
+      return aiHighlighterMessage;
+      // if (!aiHighlighterMessage.type || !aiHighlighterMessage.json) {
+      //   console.log('Invalid ai highlighter message:', aiHighlighterMessage);
+      //   return null;
+      // }
+      // const parsedMessage = {
+      //   type: aiHighlighterMessage.type,
+      //   json: JSON.parse(aiHighlighterMessage.json),
+      // };
+      // console.log('Parsed message:', parsedMessage);
+
+      // return parsedMessage;
+    } else {
+      return messageString;
     }
   } catch (error: unknown) {
     console.log('Error parsing ai highlighter message:', error);

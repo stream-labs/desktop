@@ -1310,7 +1310,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     // 5. cut data into highlightClips
 
     const setStreamInfo: IHighlightedStream = {
-      state: 'Searching for highlights...',
+      state: 'Searching for highlights 0%',
       date: moment().date(),
       id: streamInfo.id || 'noId',
       title:
@@ -1319,11 +1319,16 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     };
     this.addStream(setStreamInfo);
 
+    const updateStreamInfoProgress = (progress: number) => {
+      console.log('updateStreamInfoProgress progress', progress);
+      setStreamInfo.state = `Searching for highlights ${Math.round(progress * 100)}`;
+      this.updateStream(setStreamInfo);
+    };
     // const videoUri = '/Users/marvinoffers/Movies/djnardi-short.mp4'; // replace with filepath
     console.log('Test flow');
 
     console.log('🔄 HighlighterData');
-    const highlighterResponse = await getHighlightClips(filePath);
+    const highlighterResponse = await getHighlightClips(filePath, updateStreamInfoProgress);
     console.log('✅ HighlighterData', highlighterResponse);
 
     console.log('🔄 formatHighlighterResponse');
