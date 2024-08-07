@@ -1,57 +1,28 @@
-import React, { CSSProperties } from 'react';
+import React from 'react';
 import { ObsSettingsSection } from './ObsSettings';
 import { $t } from '../../../services/i18n';
 import { Services } from '../../service-provider';
-import { SwitchInput, TextInput } from '../../shared/inputs';
-import { Button, Col, Row, Space } from 'antd';
-import Utils from '../../../services/utils';
-import { injectState, mutation, useModule } from 'slap';
-import { IConnectedDevice } from 'services/api/tcp-server';
+import { SwitchInput } from '../../shared/inputs';
+import { IConnectedDevice } from 'services/api/remote-control-api';
 import styles from './RemoteControl.m.less';
-
-const QRCODE_SIZE = 350;
-
-class RemoteControlModule {
-  private get TcpServerService() {
-    return Services.TcpServerService;
-  }
-
-  get connectedDevices() {
-    return this.TcpServerService.state.remoteConnection.connectedDevices;
-  }
-
-  get remoteConnectionEnabled() {
-    return this.TcpServerService.state.remoteConnection.enabled;
-  }
-
-  enableConnection() {
-    this.TcpServerService.actions.createStreamlabsRemoteConnection();
-  }
-
-  disableConnection() {
-    this.TcpServerService.actions.disableStreamlabsRemoteConnection();
-  }
-
-  disconnectDevice(device: IConnectedDevice) {
-    this.TcpServerService.actions.disconnectRemoteDevice(device);
-  }
-}
+import { useRealmObject } from 'components-react/hooks/realm';
 
 export function RemoteControlSettings() {
-  const {
-    connectedDevices,
-    remoteConnectionEnabled,
-    enableConnection,
-    disableConnection,
-    disconnectDevice,
-  } = useModule(RemoteControlModule);
+  const { RemoteControlService } = Services;
+
+  const connectedDevices = useRealmObject(RemoteControlService.connectedDevices).devices;
+  const enabled = useRealmObject(RemoteControlService.state).enabled;
 
   function handleToggle() {
-    if (remoteConnectionEnabled) {
-      disableConnection();
+    if (enabled) {
+      RemoteControlService.actions.disconnect();
     } else {
-      enableConnection();
+      RemoteControlService.actions.createStreamlabsRemoteConnection();
     }
+  }
+
+  function disconnectDevice(device: IConnectedDevice) {
+    RemoteControlService.actions.disconnectDevice(device);
   }
 
   return (
@@ -68,10 +39,10 @@ export function RemoteControlSettings() {
         <SwitchInput
           label={$t('Allow remote connections')}
           onInput={handleToggle}
-          value={remoteConnectionEnabled}
+          value={enabled}
         />
 
-        {remoteConnectionEnabled && (
+        {enabled && (
           <div>
             <span className={styles.whisper}>{$t('Connected Devices')}</span>
             {connectedDevices.map(device => (

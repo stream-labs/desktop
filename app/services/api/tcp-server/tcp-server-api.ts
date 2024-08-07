@@ -11,16 +11,6 @@ export interface ITcpServersSettings {
     port: number;
     allowRemote: boolean;
   };
-  remoteConnection: {
-    enabled: boolean;
-    connectedDevices: IConnectedDevice[];
-  };
-}
-
-export interface IConnectedDevice {
-  socketId: string;
-  deviceName: string;
-  clientType: string;
 }
 
 export interface ITcpServerServiceApi {

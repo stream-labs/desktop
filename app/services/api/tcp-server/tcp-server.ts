@@ -10,12 +10,7 @@ import {
   IJsonRpcRequest,
   IJsonRpcResponse,
 } from 'services/api/jsonrpc/index';
-import {
-  IConnectedDevice,
-  IIPAddressDescription,
-  ITcpServerServiceApi,
-  ITcpServersSettings,
-} from './tcp-server-api';
+import { IIPAddressDescription, ITcpServerServiceApi, ITcpServersSettings } from './tcp-server-api';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { ExternalApiService } from '../external-api';
 import { SceneCollectionsService } from 'services/scene-collections';
@@ -23,27 +18,15 @@ import { SceneCollectionsService } from 'services/scene-collections';
 import WritableStream = NodeJS.WritableStream;
 import { $t } from 'services/i18n';
 import { OS, getOS } from 'util/operating-systems';
-import { HostsService, UserService } from 'app-services';
-import { authorizedHeaders, jfetch } from 'util/requests';
-import { importSocketIOClient } from 'util/slow-imports';
 
 const net = require('net');
 
 const LOCAL_HOST_NAME = '127.0.0.1';
 const WILDCARD_HOST_NAME = '0.0.0.0';
 
-interface ISLRemoteResponse {
-  success: boolean;
-  message: 'OK';
-  data: {
-    url: string;
-    token: string;
-  };
-}
-
 interface IClient {
   id: number;
-  socket: WritableStream | SocketIOClient.Socket;
+  socket: WritableStream;
   subscriptions: string[];
   isAuthorized: boolean;
 
@@ -82,28 +65,11 @@ export class TcpServerService
       port: 59650,
       allowRemote: false,
     },
-    remoteConnection: {
-      enabled: false,
-      connectedDevices: [],
-    },
   };
-
-  // Clear connected devices from state between app launches
-  static filter(state: ITcpServersSettings) {
-    return {
-      ...state,
-      remoteConnection: {
-        ...state.remoteConnection,
-        connectedDevices: [] as IConnectedDevice[],
-      },
-    };
-  }
 
   @Inject() private jsonrpcService: JsonrpcService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject() private externalApiService: ExternalApiService;
-  @Inject() private hostsService: HostsService;
-  @Inject() private userService: UserService;
   private clients: Dictionary<IClient> = {};
   private nextClientId = 1;
   private servers: IServer[] = [];
@@ -122,11 +88,6 @@ export class TcpServerService
   init() {
     super.init();
     this.externalApiService.serviceEvent.subscribe(event => this.onServiceEventHandler(event));
-    this.userService.userLogin.subscribe(() => {
-      if (this.state.remoteConnection.enabled) {
-        this.createStreamlabsRemoteConnection();
-      }
-    });
   }
 
   listen() {
@@ -337,53 +298,7 @@ export class TcpServerService
     };
   }
 
-  async createStreamlabsRemoteConnection() {
-    this.SET_ENABLE_REMOTE_CONNECTION(true);
-    const io = await importSocketIOClient();
-    const url = `https://${
-      this.hostsService.streamlabs
-    }/api/v5/slobs/modules/mobile-remote-io/config?device_name=${os.hostname()}`;
-    console.log(os.hostname());
-    const headers = authorizedHeaders(this.userService.apiToken);
-
-    const resp: ISLRemoteResponse = await jfetch(new Request(url, { headers }));
-    if (resp.success) {
-      const socket = io.default(`${resp.data.url}?token=${resp.data.token}`, {
-        transports: ['websocket'],
-      });
-
-      this.onConnectionHandler(socket, {
-        type: 'websockets',
-        nativeServer: null,
-        close: socket.disconnect,
-      });
-
-      socket.emit('getDevices', {}, (devices: IConnectedDevice[]) => {
-        this.SET_CONNECTED_DEVICES(devices);
-      });
-
-      this.remoteSocket = socket;
-    }
-  }
-
-  disableStreamlabsRemoteConnection() {
-    this.SET_ENABLE_REMOTE_CONNECTION(false);
-    if (this.remoteSocket) {
-      this.remoteSocket.disconnect();
-    }
-  }
-
-  disconnectRemoteDevice(device: IConnectedDevice) {
-    if (this.remoteSocket) {
-      this.remoteSocket.emit('disconnectDevice', { socketId: device.socketId }, (response: any) => {
-        if (!response.error) {
-          this.REMOVE_CONNECTED_DEVICE(device);
-        }
-      });
-    }
-  }
-
-  private onConnectionHandler(socket: WritableStream | SocketIOClient.Socket, server: IServer) {
+  private onConnectionHandler(socket: WritableStream, server: IServer) {
     this.log('new connection');
 
     const id = this.nextClientId++;
@@ -413,19 +328,6 @@ export class TcpServerService
 
     socket.on('close', () => {
       this.onDisconnectHandler(client);
-    });
-
-    // The following three listeners are for SL Remote Control App
-    socket.on('message', (data: Buffer) => {
-      this.onRequestHandler(client, data.toString());
-    });
-
-    socket.on('deviceConnected', (device: IConnectedDevice) => {
-      this.SET_CONNECTED_DEVICES(this.state.remoteConnection.connectedDevices.concat([device]));
-    });
-
-    socket.on('deviceDisconnected', (device: IConnectedDevice) => {
-      this.REMOVE_CONNECTED_DEVICE(device);
     });
 
     socket.on('error', e => {
@@ -658,7 +560,7 @@ export class TcpServerService
       if (!force && !this.forceRequests) return;
     }
 
-    if ((client.socket as WritableStream).write && !(client.socket as WritableStream).writable) {
+    if (!client.socket.writable) {
       // prevent attempts to write to a closed socket
 
       this.log('cannot write to closed socket to send response', response);
@@ -668,20 +570,7 @@ export class TcpServerService
     // unhandled exceptions completely destroy Rx.Observable subscription
     try {
       this.log('send response', response);
-      if ((client.socket as WritableStream).write) {
-        (client.socket as WritableStream).write(`${JSON.stringify(response)}\n`);
-      } else {
-        (client.socket as SocketIOClient.Socket).send(`${JSON.stringify(response)}\n`);
-        (client.socket as SocketIOClient.Socket).emit(
-          'message',
-          `${JSON.stringify(response)}\n`,
-          (response: any) => {
-            if (response.error) {
-              throw response.error;
-            }
-          },
-        );
-      }
+      client.socket.write(`${JSON.stringify(response)}\n`);
     } catch (e: unknown) {
       // probably the client has been silently disconnected
       console.info('unable to send response', response, e);
@@ -690,11 +579,8 @@ export class TcpServerService
 
   private disconnectClient(clientId: number) {
     const client = this.clients[clientId];
-    if ((client.socket as WritableStream).end) {
-      (client.socket as WritableStream).end();
-    } else {
-      (client.socket as SocketIOClient.Socket).disconnect();
-    }
+    client.socket.end();
+
     delete this.clients[clientId];
   }
 
@@ -706,22 +592,5 @@ export class TcpServerService
   @mutation()
   private SET_SETTINGS(patch: Partial<ITcpServersSettings>) {
     this.state = { ...this.state, ...patch };
-  }
-
-  @mutation()
-  private SET_ENABLE_REMOTE_CONNECTION(val: boolean) {
-    this.state.remoteConnection.enabled = val;
-  }
-
-  @mutation()
-  private SET_CONNECTED_DEVICES(devices: IConnectedDevice[]) {
-    this.state.remoteConnection.connectedDevices = devices;
-  }
-
-  @mutation()
-  private REMOVE_CONNECTED_DEVICE(device: IConnectedDevice) {
-    this.state.remoteConnection.connectedDevices = this.state.remoteConnection.connectedDevices.filter(
-      d => d.socketId !== device.socketId,
-    );
   }
 }
