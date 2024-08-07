@@ -44,8 +44,6 @@ export default function Highlighter(props: { params?: { view: string } }) {
         </>
       );
 
-      break;
-
     case 'stream':
       return (
         <>
@@ -56,7 +54,6 @@ export default function Highlighter(props: { params?: { view: string } }) {
           />
         </>
       );
-      break;
     case 'clips':
       return (
         <>
@@ -68,10 +65,8 @@ export default function Highlighter(props: { params?: { view: string } }) {
           />
         </>
       );
-      break;
     default:
       return <>DefaultView X{v.useAiHighlighter}X</>; // here it is undefined
-      break;
   }
 
   // Dev purposes

@@ -17,8 +17,6 @@ export default function ClipPreview(props: {
   const { HighlighterService } = Services;
   const [scrubFrame, setScrubFrame] = useState(0);
 
-  const isAiClip = (clip: TClip): clip is IAiClip => clip.source === 'AiClip';
-
   // TODO: placeholder image + make sure to regenerate sprite if sprite doesnt exist
   let clipThumbnail = '';
   if (props.clip.scrubSprite && HighlighterService.fileExists(props.clip.scrubSprite)) {
@@ -138,7 +136,7 @@ export default function ClipPreview(props: {
         }}
       >
         <div>
-          {isAiClip(props.clip) ? (
+          {HighlighterService.isAiClip(props.clip) ? (
             <>
               {' '}
               Type{' '}

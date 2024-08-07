@@ -2,7 +2,7 @@ import { useVuex } from 'components-react/hooks';
 import React, { useEffect, useState } from 'react';
 import { Services } from 'components-react/service-provider';
 // import styles from './ClipsView.m.less';
-import styles from '../highlighter/StreamView.m.less';
+import styles from './StreamView.m.less';
 import { IViewState, TClip } from 'services/highlighter';
 import ClipPreview from 'components-react/highlighter/ClipPreview';
 import ClipTrimmer from 'components-react/highlighter/ClipTrimmer';
@@ -78,6 +78,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
       return;
     }
     (HighlighterService.views.clips as TClip[]).forEach(clip => {
+      console.log('upd3');
       HighlighterService.actions.UPDATE_CLIP({
         path: clip.path,
         enabled: false,
@@ -86,18 +87,17 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
 
     const clipsToEnable = HighlighterService.getClips(HighlighterService.views.clips, id);
     clipsToEnable.forEach(clip => {
+      console.log('upd4');
       HighlighterService.actions.UPDATE_CLIP({
         path: clip.path,
         enabled: true,
       });
     });
 
-    console.log('startExport');
-
+    console.log('startLoading');
     await HighlighterService.loadClips(id);
 
     console.log('startExport');
-
     HighlighterService.actions.export();
     // HighlighterService.actions.removeStream(id);
   }
@@ -129,6 +129,39 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
     setShowModal(null);
 
     if (v.error) HighlighterService.actions.dismissError();
+  }
+
+  function getMomentTypeCount(clips: TClip[]): { [type: string]: number } {
+    const typeCounts: { [type: string]: number } = {};
+
+    clips.forEach(clip => {
+      if (HighlighterService.isAiClip(clip)) {
+        clip.aiInfo.moments.forEach(moment => {
+          const type = moment.type;
+          if (typeCounts[type]) {
+            typeCounts[type] += 1;
+          } else {
+            typeCounts[type] = 1;
+          }
+        });
+      }
+    });
+
+    return typeCounts;
+  }
+
+  function getWordingFromType(type: string): { emoji: string; description: string } {
+    switch (type) {
+      case 'kill':
+        return { emoji: '💀', description: 'kills' };
+
+      case 'deploy':
+        return { emoji: '🪂', description: 'games started' };
+
+      default:
+        break;
+    }
+    return { emoji: type, description: type };
   }
 
   function getClipsView() {
@@ -172,43 +205,94 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
                     }
                     alt=""
                   />
+                  <div className={styles.centeredOverlayItem}>
+                    {' '}
+                    <div>{highlightedStream.state !== 'Done' ? highlightedStream.state : ''}</div>
+                  </div>
                 </div>
                 <div
                   style={{
                     display: 'flex',
+                    flexDirection: 'column',
                     gap: '8px',
                     padding: '20px',
                     paddingTop: '0px',
                   }}
                 >
-                  <div style={{}}>
-                    {highlightedStream.title} - {highlightedStream.state}
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      gap: '8px',
+                      height: 'fit-content',
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '4px',
+                        height: 'fit-content',
+                      }}
+                    >
+                      <h2 style={{ margin: 0 }}>{highlightedStream.title}</h2>
+                      <p style={{ margin: 0, fontSize: '12px' }}>
+                        {new Date(highlightedStream.date).toDateString()}
+                      </p>
+                    </div>
+                    <div>clips</div>
+                  </div>
+                  <div style={{ paddingTop: '6px', paddingBottom: '6px' }}>
+                    <h3
+                      style={{ margin: 0, display: 'flex', gap: '16px', justifyContent: 'start' }}
+                    >
+                      {highlightedStream.state === 'Done'
+                        ? Object.entries(getMomentTypeCount(v.clips)).map(([type, count]) => (
+                            <div key={type} style={{ display: 'flex', gap: '8px' }}>
+                              <span key={type + 'emoji'}>{getWordingFromType(type).emoji} </span>{' '}
+                              <span key={type + 'desc'}>
+                                {' '}
+                                {count} {getWordingFromType(type).description}
+                              </span>
+                            </div>
+                          ))
+                        : 'Finding kills'}
+                    </h3>
                   </div>
 
                   <div
                     style={{
                       display: 'flex',
-
                       gap: '4px',
                       justifyContent: 'space-between',
                     }}
                   >
                     <Button
+                      size="large"
+                      style={{ display: 'flex', gap: '8px', alignItems: 'center' }}
                       disabled={highlightedStream.state !== 'Done'}
                       onClick={() => {
                         emitSetView({ view: 'clips', id: highlightedStream.id });
                       }}
                     >
-                      Edit
+                      <i className="icon-edit" /> Edit clips
                     </Button>
-                    <Button onClick={() => removeStream(highlightedStream.id)}>Remove</Button>
+                    <Button
+                      size="large"
+                      style={{ display: 'flex', gap: '8px', alignItems: 'center' }}
+                      onClick={() => removeStream(highlightedStream.id)}
+                    >
+                      <i className="icon-trash" />
+                    </Button>
                     {/* TODO: What clips should be included when user clicks this button + bring normal export modal in here */}
                     <Button
+                      size="large"
+                      style={{ display: 'flex', gap: '8px', alignItems: 'center' }}
                       disabled={highlightedStream.state !== 'Done'}
                       type="primary"
                       onClick={() => exportVideo(highlightedStream.id)}
                     >
-                      Export
+                      <i className="icon-download" /> Export highlight reel
                     </Button>
                   </div>
                 </div>
