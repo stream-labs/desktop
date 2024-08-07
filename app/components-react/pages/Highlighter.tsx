@@ -94,7 +94,7 @@ export default function Highlighter(props: { params?: { view: string } }) {
       id: 'Ninja-streamFortnite5',
       game: 'string',
       title: 'string',
-      date: 123,
+      date: '123',
       state: 'done',
     });
   }
@@ -104,7 +104,7 @@ export default function Highlighter(props: { params?: { view: string } }) {
       id: 'Ninja-streamFortnite5',
       game: 'string',
       title: 'string',
-      date: 123,
+      date: '123',
       state: 'rendering',
     });
   }
