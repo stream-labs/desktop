@@ -538,7 +538,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
   @mutation()
   UPDATE_HIGHLIGHTED_STREAM(updatedStreamInfo: IHighlightedStream) {
-    let keepAsIs = this.state.highlightedStreams.filter(
+    const keepAsIs = this.state.highlightedStreams.filter(
       stream => stream.id !== updatedStreamInfo.id,
     );
     this.state.highlightedStreams = [...keepAsIs, updatedStreamInfo];
@@ -807,10 +807,11 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   }
 
   removeStream(id: string) {
+    //Remove The highlighgted stream
     this.REMOVE_HIGHLIGHTED_STREAM(id);
 
-    //Remove clips from that stream as well
-    const clipsToRemove = this.views.clips.filter(clip => clip.streamInfo.id === id);
+    //Remove clips from stream as well
+    const clipsToRemove = this.getClips(this.views.clips, id);
     clipsToRemove.forEach(clip => {
       this.removeClip(clip.path);
     });
@@ -826,14 +827,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
   // Only load the clips we need
   async loadClips(streamInfoId?: string | undefined) {
-    let clipsToLoad: TClip[];
-    if (streamInfoId) {
-      clipsToLoad = this.views.clips.filter(
-        clip => clip.streamInfo?.id && clip.streamInfo.id === streamInfoId,
-      );
-    } else {
-      clipsToLoad = this.views.clips;
-    }
+    const clipsToLoad: TClip[] = this.getClips(this.views.clips, streamInfoId);
 
     // TODO: Dont delete this directory, make sure that files get deleted
     await this.ensureScrubDirectory();
@@ -895,7 +889,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       try {
         //If possible to read, directory exists, if not, catch and mkdir
         await fs.readdir(SCRUB_SPRITE_DIRECTORY);
-      } catch (error) {
+      } catch (error: unknown) {
         console.log('mkdir');
         await fs.mkdir(SCRUB_SPRITE_DIRECTORY);
       }
@@ -1464,6 +1458,23 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     return pathArray;
   }
 
+  getClips(clips: TClip[], id?: string): TClip[] {
+    const inputClips = clips;
+    let outputClips;
+
+    if (id) {
+      outputClips = inputClips.filter(clip => clip.streamInfo && clip.streamInfo?.id === id);
+    } else {
+      outputClips = inputClips;
+    }
+    return outputClips;
+  }
+
+  getClipsLoaded(clips: TClip[], id?: string): boolean {
+    return this.getClips(clips, id).every(clip => clip.loaded);
+  }
+
+  isAiClip = (clip: TClip): clip is IAiClip => clip.source === 'AiClip';
   // async function test(path: string, highlighterData: IHighlighterData) {
   //   const { HighlighterService } = Services;
 

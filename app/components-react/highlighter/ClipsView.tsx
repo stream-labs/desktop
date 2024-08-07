@@ -37,21 +37,16 @@ export default function ClipsView({
 }) {
   const { HighlighterService, HotkeysService, UsageStatisticsService } = Services;
   const v = useVuex(() => ({
-    clips: props.id
-      ? (HighlighterService.views.clips as TClip[]).filter(clip => clip.streamInfo?.id === props.id)
-      : (HighlighterService.views.clips as TClip[]),
+    clips: HighlighterService.getClips(HighlighterService.views.clips, props.id),
     exportInfo: HighlighterService.views.exportInfo,
     uploadInfo: HighlighterService.views.uploadInfo,
     loadedCount: HighlighterService.views.loadedCount,
-    loaded: props.id
-      ? (HighlighterService.views.clips as TClip[])
-          .filter(clip => clip.streamInfo?.id === props.id)
-          .every(clip => clip.loaded)
-      : (HighlighterService.views.clips as TClip[]).every(clip => clip.loaded),
+    loaded: HighlighterService.getClipsLoaded(HighlighterService.views.clips, props.id),
     transition: HighlighterService.views.transition,
     dismissedTutorial: HighlighterService.views.dismissedTutorial,
     audio: HighlighterService.views.audio,
     error: HighlighterService.views.error,
+    highlightedStreams: HighlighterService.views.highlightedStreams,
   }));
 
   const [showModal, rawSetShowModal] = useState<TModal | null>(null);
@@ -61,6 +56,7 @@ export default function ClipsView({
 
   useEffect(() => {
     if (v.clips.length) {
+      // Disable all clips
       (HighlighterService.views.clips as TClip[]).forEach(clip => {
         HighlighterService.actions.UPDATE_CLIP({
           path: clip.path,
@@ -68,12 +64,8 @@ export default function ClipsView({
         });
       });
 
-      const clipsToEnable = props.id
-        ? (HighlighterService.views.clips as TClip[]).filter(
-            clip => clip.streamInfo?.id === props.id,
-          )
-        : (HighlighterService.views.clips as TClip[]);
-
+      // Enable specific clips
+      const clipsToEnable = HighlighterService.getClips(HighlighterService.views.clips, props.id);
       clipsToEnable.forEach(clip => {
         HighlighterService.actions.UPDATE_CLIP({
           path: clip.path,
@@ -81,7 +73,6 @@ export default function ClipsView({
         });
       });
 
-      console.log('clipsView - loadClips');
       HighlighterService.actions.loadClips(props.id);
       setShowTutorial(false);
     }
@@ -116,9 +107,12 @@ export default function ClipsView({
 
   function getLoadingView() {
     return (
-      <div className={styles.clipLoader}>
+      <div className={styles.clipLoader} style={{ display: 'grid', placeContent: 'center' }}>
         <h2>Loading</h2>
-        {v.clips.filter(clip => clip.loaded === true).length}/{v.clips.length} Clips
+        <p>
+          {' '}
+          {v.clips.filter(clip => clip.loaded === true).length}/{v.clips.length} Clips
+        </p>
       </div>
     );
   }
@@ -270,56 +264,75 @@ export default function ClipsView({
         <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: 'flex', padding: 20 }}>
             <div style={{ flexGrow: 1 }}>
-              <h1>{$t('Highlighter')}</h1>
-              <p>{$t('Drag & drop to reorder clips.')}</p>
+              {/* <h1>{$t('Highlighter')}</h1> */}
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <div
+                  style={{ cursor: 'pointer', paddingTop: '2px' }}
+                  onClick={() => emitSetView({ view: 'stream' })}
+                >
+                  <i className="icon-back" />
+                </div>{' '}
+                <h1 onClick={() => emitSetView({ view: 'stream' })} style={{ margin: 0 }}>
+                  {' '}
+                  {props.id
+                    ? v.highlightedStreams.find(stream => stream.id === props.id)?.title ??
+                      'Stream highlight clips'
+                    : 'All highlight clips'}
+                </h1>
+              </div>
+              {/* <p>{$t('Drag & drop to reorder clips.')}</p> */}
             </div>
             <div>
               {hotkey && hotkey.bindings[0] && (
                 <b style={{ marginRight: 20 }}>{getBindingString(hotkey.bindings[0])}</b>
               )}
               <Button onClick={() => setShowTutorial(true)}>{$t('View Tutorial')}</Button>
-              <Button onClick={() => emitSetView({ view: 'stream' })}>X</Button>
             </div>
           </div>
-          <Scrollable style={{ flexGrow: 1, padding: '20px 0 20px 20px' }}>
-            <ReactSortable
-              list={clipList}
-              setList={setClipOrder}
-              animation={200}
-              filter=".sortable-ignore"
-              onMove={e => {
-                return e.related.className.indexOf('sortable-ignore') === -1;
-              }}
-            >
-              <div
-                key="add"
-                style={{ margin: '10px 20px 10px 0', display: 'inline-block' }}
-                className="sortable-ignore"
+
+          {v.loaded ? (
+            <Scrollable style={{ flexGrow: 1, padding: '20px 0 20px 20px' }}>
+              <ReactSortable
+                list={clipList}
+                setList={setClipOrder}
+                animation={200}
+                filter=".sortable-ignore"
+                onMove={e => {
+                  return e.related.className.indexOf('sortable-ignore') === -1;
+                }}
               >
-                <AddClip />
-              </div>
-              {v.clips.map(clip => {
-                return (
-                  <div
-                    key={clip.path}
-                    style={{ margin: '10px 20px 10px 0', display: 'inline-block' }}
-                  >
-                    <ClipPreview
-                      clip={clip}
-                      showTrim={() => {
-                        setInspectedClipPath(clip.path);
-                        setShowModal('trim');
-                      }}
-                      showRemove={() => {
-                        setInspectedClipPath(clip.path);
-                        setShowModal('remove');
-                      }}
-                    />
-                  </div>
-                );
-              })}
-            </ReactSortable>
-          </Scrollable>
+                <div
+                  key="add"
+                  style={{ margin: '10px 20px 10px 0', display: 'inline-block' }}
+                  className="sortable-ignore"
+                >
+                  <AddClip />
+                </div>
+                {v.clips.map(clip => {
+                  return (
+                    <div
+                      key={clip.path}
+                      style={{ margin: '10px 20px 10px 0', display: 'inline-block' }}
+                    >
+                      <ClipPreview
+                        clip={clip}
+                        showTrim={() => {
+                          setInspectedClipPath(clip.path);
+                          setShowModal('trim');
+                        }}
+                        showRemove={() => {
+                          setInspectedClipPath(clip.path);
+                          setShowModal('remove');
+                        }}
+                      />
+                    </div>
+                  );
+                })}
+              </ReactSortable>
+            </Scrollable>
+          ) : (
+            getLoadingView()
+          )}
         </div>
         {getControls()}
         <Modal
@@ -343,8 +356,6 @@ export default function ClipsView({
       </div>
     );
   }
-
-  if (!v.loaded) return getLoadingView();
 
   return getClipsView();
 }
