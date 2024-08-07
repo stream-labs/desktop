@@ -807,10 +807,11 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   }
 
   removeStream(id: string) {
+    //Remove The highlighgted stream
     this.REMOVE_HIGHLIGHTED_STREAM(id);
 
-    //Remove clips from that stream as well
-    const clipsToRemove = this.views.clips.filter(clip => clip.streamInfo.id === id);
+    //Remove clips from stream as well
+    const clipsToRemove = this.getClips(this.views.clips, id)
     clipsToRemove.forEach(clip => {
       this.removeClip(clip.path);
     });
@@ -826,14 +827,8 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
   // Only load the clips we need
   async loadClips(streamInfoId?: string | undefined) {
-    let clipsToLoad: TClip[];
-    if (streamInfoId) {
-      clipsToLoad = this.views.clips.filter(
-        clip => clip.streamInfo?.id && clip.streamInfo.id === streamInfoId,
-      );
-    } else {
-      clipsToLoad = this.views.clips;
-    }
+
+    let clipsToLoad: TClip[] = this.getClips(this.views.clips, streamInfoId)
 
     // TODO: Dont delete this directory, make sure that files get deleted
     await this.ensureScrubDirectory();
@@ -943,11 +938,11 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     const exportOptions: IExportOptions = preview
       ? { width: 1280 / 4, height: 720 / 4, fps: 30, preset: 'ultrafast' }
       : {
-          width: this.views.exportInfo.resolution === 720 ? 1280 : 1920,
-          height: this.views.exportInfo.resolution === 720 ? 720 : 1080,
-          fps: this.views.exportInfo.fps,
-          preset: this.views.exportInfo.preset,
-        };
+        width: this.views.exportInfo.resolution === 720 ? 1280 : 1920,
+        height: this.views.exportInfo.resolution === 720 ? 720 : 1080,
+        fps: this.views.exportInfo.fps,
+        preset: this.views.exportInfo.preset,
+      };
 
     // Reset all clips
     await pmap(clips, c => c.reset(exportOptions), {
@@ -1457,6 +1452,25 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       }
     }
     return pathArray;
+  }
+
+
+  getClips(clips: TClip[], id?: string): TClip[] {
+    const inputClips = clips
+    let outputClips
+
+    if (id) {
+      outputClips = inputClips.filter(clip => clip.streamInfo && clip.streamInfo?.id === id)
+    } else {
+      outputClips = inputClips
+    }
+    return outputClips
+  }
+
+  getClipsLoaded(clips: TClip[], id?: string): boolean {
+    return this.getClips(clips, id).every(
+      clip => clip.loaded,
+    )
   }
 
   // async function test(path: string, highlighterData: IHighlighterData) {

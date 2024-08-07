@@ -50,12 +50,8 @@ export default function Highlighter(props: { params?: { view: string } }) {
       return (
         <>
           <StreamView
-            emitSetView={id => {
-              console.log('setViewInOverview:', id);
-              setView({
-                view: 'clips',
-                id: id,
-              });
+            emitSetView={data => {
+              setViewFromEmit(data);
             }}
           />
         </>
@@ -66,17 +62,7 @@ export default function Highlighter(props: { params?: { view: string } }) {
         <>
           <ClipsView
             emitSetView={data => {
-              if (data.view === 'clips') {
-                console.log('setViewInOverview:', data.id);
-                setView({
-                  view: data.view,
-                  id: data.id,
-                });
-              } else {
-                setView({
-                  view: data.view,
-                });
-              }
+              setViewFromEmit(data);
             }}
             props={{ id: viewState.id }}
           />
@@ -130,6 +116,20 @@ export default function Highlighter(props: { params?: { view: string } }) {
 
   function rmSinfo() {
     HighlighterService.actions.removeStream('DJ Naaaardi-Fortnite-5302024');
+  }
+
+  function setViewFromEmit(data: IViewState) {
+    if (data.view === 'clips') {
+      console.log('setViewInOverview:', data.id);
+      setView({
+        view: data.view,
+        id: data.id,
+      });
+    } else {
+      setView({
+        view: data.view,
+      });
+    }
   }
 
   function setView(view: IViewState) {

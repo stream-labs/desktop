@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Services } from 'components-react/service-provider';
 // import styles from './ClipsView.m.less';
 import styles from '../highlighter/StreamView.m.less';
-import { TClip } from 'services/highlighter';
+import { IViewState, TClip } from 'services/highlighter';
 import ClipPreview from 'components-react/highlighter/ClipPreview';
 import ClipTrimmer from 'components-react/highlighter/ClipTrimmer';
 import { ReactSortable } from 'react-sortablejs';
@@ -29,7 +29,7 @@ interface IClipsViewProps {
   id: string | undefined;
 }
 
-export default function StreamView({ emitSetView }: { emitSetView: (id: string) => void }) {
+export default function StreamView({ emitSetView }: { emitSetView: (data: IViewState) => void }) {
   const { HighlighterService, HotkeysService, UsageStatisticsService } = Services;
   const v = useVuex(() => ({
     clips: HighlighterService.views.clips as TClip[],
@@ -64,15 +64,6 @@ export default function StreamView({ emitSetView }: { emitSetView: (id: string) 
     }
   }
 
-  // function getLoadingView() {
-  //   return (
-  //     <div className={styles.clipLoader}>
-  //       <h2>Loading</h2>
-  //       {v.clips.filter(clip => clip.loaded === true).length}/{v.clips.length} Clips
-  //     </div>
-  //   );
-  // }
-
   function removeStream(id?: string) {
     if (!id) {
       console.error('Cant remove stream, missing id');
@@ -83,7 +74,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (id: string) 
 
   async function exportVideo(id?: string) {
     if (!id) {
-      console.error('Cant remove stream, missing id');
+      console.error('Id needed to export stream clip collection, missing id');
       return;
     }
     (HighlighterService.views.clips as TClip[]).forEach(clip => {
@@ -93,16 +84,15 @@ export default function StreamView({ emitSetView }: { emitSetView: (id: string) 
       });
     });
 
-    const clipsToEnable = id
-      ? (HighlighterService.views.clips as TClip[]).filter(clip => clip.streamInfo?.id === id)
-      : (HighlighterService.views.clips as TClip[]);
-
+    const clipsToEnable = HighlighterService.getClips(HighlighterService.views.clips, id);
     clipsToEnable.forEach(clip => {
       HighlighterService.actions.UPDATE_CLIP({
         path: clip.path,
         enabled: true,
       });
     });
+
+    console.log('startExport');
 
     await HighlighterService.loadClips(id);
 
@@ -151,14 +141,15 @@ export default function StreamView({ emitSetView }: { emitSetView: (id: string) 
       >
         <div style={{ display: 'flex', padding: 20 }}>
           <div style={{ flexGrow: 1 }}>
-            <h1>{$t('Highlighter')}</h1>
-            <p>{$t('Drag & drop to reorder clips.')}</p>
+            {/* <h1>{$t('Highlighter')}</h1>
+            <p>{$t('Drag & drop to reorder clips.')}</p> */}
+            <h1 style={{ margin: 0 }}>My stream highlights</h1>
           </div>
           <div>
             {hotkey && hotkey.bindings[0] && (
               <b style={{ marginRight: 20 }}>{getBindingString(hotkey.bindings[0])}</b>
             )}
-            <Button onClick={() => setShowTutorial(true)}>{$t('View Tutorial')}</Button>
+            <Button onClick={() => emitSetView({ view: 'settings' })}>Settings</Button>
           </div>
         </div>
         <Scrollable style={{ flexGrow: 1, padding: '20px 0 20px 20px' }}>
@@ -168,7 +159,6 @@ export default function StreamView({ emitSetView }: { emitSetView: (id: string) 
               display: 'flex',
               flexWrap: 'wrap',
               gap: '8px',
-              padding: '20px',
             }}
           >
             {v.highlightedStreams.map(highlightedStream => (
@@ -206,9 +196,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (id: string) 
                     <Button
                       disabled={highlightedStream.state !== 'Done'}
                       onClick={() => {
-                        console.log(';emitsetView', highlightedStream.id);
-
-                        emitSetView(highlightedStream.id);
+                        emitSetView({ view: 'clips', id: highlightedStream.id });
                       }}
                     >
                       Edit
