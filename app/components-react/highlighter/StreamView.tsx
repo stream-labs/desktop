@@ -283,7 +283,11 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
                       style={{ margin: 0, display: 'flex', gap: '16px', justifyContent: 'start' }}
                     >
                       {highlightedStream.state === 'Done'
-                        ? Object.entries(getMomentTypeCount(v.clips)).map(([type, count]) => (
+                        ? Object.entries(
+                            getMomentTypeCount(
+                              HighlighterService.getClips(v.clips, highlightedStream.id),
+                            ),
+                          ).map(([type, count]) => (
                             <div key={type} style={{ display: 'flex', gap: '4px' }}>
                               <span key={type + 'emoji'}>{getWordingFromType(type).emoji} </span>{' '}
                               <span key={type + 'desc'}>
