@@ -1,6 +1,6 @@
 import os from 'os';
 import crypto from 'crypto';
-import { PersistentStatefulService, Inject, mutation, InitAfter } from 'services/core';
+import { PersistentStatefulService, Inject, mutation } from 'services/core';
 import { IObsInput } from 'components/obs/inputs/ObsInput';
 import { ISettingsSubCategory } from 'services/settings/index';
 import {
@@ -13,7 +13,6 @@ import {
 import { IIPAddressDescription, ITcpServerServiceApi, ITcpServersSettings } from './tcp-server-api';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { ExternalApiService } from '../external-api';
-import { SceneCollectionsService } from 'services/scene-collections';
 // eslint-disable-next-line no-undef
 import WritableStream = NodeJS.WritableStream;
 import { $t } from 'services/i18n';
@@ -50,7 +49,6 @@ const TCP_PORT = 28194;
 /**
  * A transport layer for TCP and Websockets communications with internal API
  */
-@InitAfter('UserService')
 export class TcpServerService
   extends PersistentStatefulService<ITcpServersSettings>
   implements ITcpServerServiceApi {

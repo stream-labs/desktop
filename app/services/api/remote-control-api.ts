@@ -138,7 +138,7 @@ export class RemoteControlService extends Service {
     if (this.socket) {
       this.socket.on('message', (data: Buffer) => {
         console.log('message received', data.toString());
-        this.requestHandler(data.toString());
+        return this.requestHandler(data.toString());
       });
 
       this.socket.on('deviceConnected', (device: IConnectedDevice) => {
@@ -173,34 +173,35 @@ export class RemoteControlService extends Service {
             message: errorMessage,
           });
           this.sendResponse(errorResponse);
-          return;
+          return errorResponse;
         }
 
         // Prevent access to certain particularly sensitive services
         const protectedResources = ['FileManagerService'];
 
         if (protectedResources.includes(request.params.resource)) {
-          this.sendResponse(
-            this.jsonRpcService.createError(request, {
-              code: E_JSON_RPC_ERROR.INTERNAL_JSON_RPC_ERROR,
-              message: 'The requested resource is not available.',
-            }),
-          );
-          return;
+          const err = this.jsonRpcService.createError(request, {
+            code: E_JSON_RPC_ERROR.INTERNAL_JSON_RPC_ERROR,
+            message: 'The requested resource is not available.',
+          });
+          this.sendResponse(err);
+          return err;
         }
 
         const response = this.externalApiService.executeServiceRequest(request);
 
         this.sendResponse(response);
+        return response;
       } catch (e: unknown) {
+        const errorResponse = this.jsonRpcService.createError(null, {
+          code: E_JSON_RPC_ERROR.INVALID_REQUEST,
+          message:
+            'Make sure that the request is valid json. ' +
+            'If request string contains multiple requests, ensure requests are separated ' +
+            'by a single newline character LF ( ASCII code 10)',
+        });
         this.sendResponse(
-          this.jsonRpcService.createError(null, {
-            code: E_JSON_RPC_ERROR.INVALID_REQUEST,
-            message:
-              'Make sure that the request is valid json. ' +
-              'If request string contains multiple requests, ensure requests are separated ' +
-              'by a single newline character LF ( ASCII code 10)',
-          }),
+          errorResponse
         );
 
         // Disconnect and stop processing requests
@@ -209,7 +210,7 @@ export class RemoteControlService extends Service {
         // Without this check, it is possible to send normal HTTP requests
         // from an unprivileged web page and make calls to this API.
         this.disconnect();
-        return;
+        return errorResponse;
       }
     }
   }
