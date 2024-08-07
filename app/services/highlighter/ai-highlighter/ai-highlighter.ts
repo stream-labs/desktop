@@ -50,7 +50,7 @@ export function getHighlightClips(
           console.log('Python log:', aiHighlighterMessage);
           console.log('\n\n');
         } else {
-          switch (aiHighlighterMessage.type) {
+          switch (aiHighlighterMessage?.type) {
             case 'progress':
               progressUpdate((aiHighlighterMessage.json as IHighlighterProgressMessage).progress);
               break;

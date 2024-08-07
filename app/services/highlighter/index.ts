@@ -111,7 +111,7 @@ interface IHighlightedStream {
   id: string;
   game: string;
   title: string;
-  date: number;
+  date: string;
   state: string;
 }
 
@@ -1304,8 +1304,8 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     // 5. cut data into highlightClips
 
     const setStreamInfo: IHighlightedStream = {
-      state: 'Searching for highlights 0%',
-      date: moment().date(),
+      state: 'Searching for highlights...',
+      date: moment().toISOString(),
       id: streamInfo.id || 'noId',
       title:
         streamInfo.title || filePath.substring(filePath.length - 10, filePath.length) || 'no title',
@@ -1412,50 +1412,56 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     videoUri: string,
     highlighterData: IHighlighterData[],
   ): Promise<{ path: string; aiClipInfo: IAiClipInfo }[]> {
-    const pathArray: { path: string; aiClipInfo: IAiClipInfo }[] = [];
+    const tasks = highlighterData.map(({ start, end, type }) => {
+      return (async () => {
+        const outputUri = `${videoUri.slice(0, -4)}-${start}-${end}.mp4`;
 
-    for (const { start, end, type } of highlighterData) {
-      const outputUri = `${videoUri.slice(0, -4)}-${start}-${end}.mp4`;
-
-      try {
-        // console.log('📁 Check if file already exists');
-        await fs.access(outputUri);
-        // console.log(`Output file ${outputUri} already exists. Deleting it.`);
-        await fs.unlink(outputUri);
-      } catch (err: unknown) {
-        if ((err as any).code !== 'ENOENT') {
-          console.error(`Error checking existence of ${outputUri}:`, err);
+        try {
+          await fs.access(outputUri);
+          await fs.unlink(outputUri);
+        } catch (err: unknown) {
+          if ((err as any).code !== 'ENOENT') {
+            console.error(`Error checking existence of ${outputUri}:`, err);
+          }
         }
-      }
 
-      const args = [
-        '-i',
-        videoUri,
-        '-ss',
-        start.toString(),
-        '-to',
-        end.toString(),
-        '-c:v',
-        'libx264',
-        '-c:a',
-        'aac',
-        '-strict',
-        'experimental',
-        '-b:a',
-        '192k',
-        outputUri,
-      ];
+        const args = [
+          '-i',
+          videoUri,
+          '-ss',
+          start.toString(),
+          '-to',
+          end.toString(),
+          '-c:v',
+          'libx264',
+          '-c:a',
+          'aac',
+          '-strict',
+          'experimental',
+          '-b:a',
+          '192k',
+          outputUri,
+        ];
 
-      try {
-        console.log(`run FFMPEG with args: ${args}`);
-        await execa(FFMPEG_EXE, args);
-        console.log(`Created segment: ${outputUri}`);
-        pathArray.push({ path: outputUri, aiClipInfo: { moments: [{ type }] } });
-      } catch (error: unknown) {
-        console.error(`Error creating segment: ${outputUri}`, error);
-      }
-    }
-    return pathArray;
+        try {
+          console.log(`run FFMPEG with args: ${args}`);
+          await execa(FFMPEG_EXE, args);
+          console.log(`Created segment: ${outputUri}`);
+          return { path: outputUri, aiClipInfo: { moments: [{ type }] } };
+        } catch (error: unknown) {
+          console.error(`Error creating segment: ${outputUri}`, error);
+          return null; // Return null or similar to indicate the failed operation.
+        }
+      })();
+    });
+
+    const results = await Promise.allSettled(tasks);
+    return results
+      .filter(result => result.status === 'fulfilled' && result.value !== null)
+      .map(
+        result =>
+          (result as PromiseFulfilledResult<{ path: string; aiClipInfo: IAiClipInfo }>).value,
+      );
   }
 
   getClips(clips: TClip[], id?: string): TClip[] {

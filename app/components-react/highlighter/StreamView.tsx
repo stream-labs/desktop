@@ -14,7 +14,7 @@ import { Modal, Button, Alert } from 'antd';
 import ExportModal from 'components-react/highlighter/ExportModal';
 import PreviewModal from 'components-react/highlighter/PreviewModal';
 import { SCRUB_HEIGHT, SCRUB_WIDTH, SUPPORTED_FILE_TYPES } from 'services/highlighter/constants';
-import path from 'path';
+import path, { relative } from 'path';
 import Scrollable from 'components-react/shared/Scrollable';
 import { IHotkey } from 'services/hotkeys';
 import { getBindingString } from 'components-react/shared/HotkeyBinding';
@@ -78,7 +78,6 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
       return;
     }
     (HighlighterService.views.clips as TClip[]).forEach(clip => {
-      console.log('upd3');
       HighlighterService.actions.UPDATE_CLIP({
         path: clip.path,
         enabled: false,
@@ -87,14 +86,12 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
 
     const clipsToEnable = HighlighterService.getClips(HighlighterService.views.clips, id);
     clipsToEnable.forEach(clip => {
-      console.log('upd4');
       HighlighterService.actions.UPDATE_CLIP({
         path: clip.path,
         enabled: true,
       });
     });
 
-    console.log('startLoading');
     await HighlighterService.loadClips(id);
 
     console.log('startExport');
@@ -154,7 +151,10 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
     switch (type) {
       case 'kill':
         return { emoji: '💀', description: 'kills' };
-
+      case 'death':
+        return { emoji: '🪦', description: 'deaths' };
+      case 'victory':
+        return { emoji: '🏆', description: 'victory' };
       case 'deploy':
         return { emoji: '🪂', description: 'games started' };
 
@@ -240,7 +240,43 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
                         {new Date(highlightedStream.date).toDateString()}
                       </p>
                     </div>
-                    <div>clips</div>
+                    <div style={{ width: '74px', position: 'relative' }}>
+                      <div
+                        className={styles.centeredOverlayItem}
+                        style={{ display: 'flex', gap: '3px', paddingRight: '3px' }}
+                      >
+                        <span>
+                          {
+                            v.clips.filter(clip => clip.streamInfo?.id === highlightedStream.id)
+                              .length
+                          }
+                        </span>
+
+                        <span>clips</span>
+                      </div>
+                      {v.clips
+                        .filter(clip => clip.streamInfo?.id === highlightedStream.id)
+                        .slice(0, 3) // Take only the first three clips that match
+                        .map((clip, index) => (
+                          <div
+                            className={styles.thumbnailWrapperSmall}
+                            style={{
+                              rotate: `${(index - 1) * 6}deg`,
+                              transform: `translate(${(index - 1) * 6}px, ${
+                                index === 1 ? 0 : 2
+                              }px)`,
+                              zIndex: index === 1 ? 10 : 0,
+                            }}
+                            key={index}
+                          >
+                            <img
+                              style={{ height: '100%' }}
+                              src={clip.scrubSprite}
+                              alt={`Clip ${index + 1}`}
+                            />
+                          </div>
+                        ))}
+                    </div>
                   </div>
                   <div style={{ paddingTop: '6px', paddingBottom: '6px' }}>
                     <h3
@@ -248,7 +284,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
                     >
                       {highlightedStream.state === 'Done'
                         ? Object.entries(getMomentTypeCount(v.clips)).map(([type, count]) => (
-                            <div key={type} style={{ display: 'flex', gap: '8px' }}>
+                            <div key={type} style={{ display: 'flex', gap: '4px' }}>
                               <span key={type + 'emoji'}>{getWordingFromType(type).emoji} </span>{' '}
                               <span key={type + 'desc'}>
                                 {' '}
@@ -256,7 +292,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
                               </span>
                             </div>
                           ))
-                        : 'Finding kills'}
+                        : 'Finding insteresting events...'}
                     </h3>
                   </div>
 

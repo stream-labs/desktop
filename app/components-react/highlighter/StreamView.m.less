@@ -22,6 +22,22 @@
   height: calc(var(--thumbHeight) * 2.2);
 }
 
+
+.thumbnail-wrapper-small{
+  position: absolute;
+  --thumbWith: 192px;
+  --thumbHeight: 108px;
+  overflow-x: clip; 
+  border-radius: 4px;
+  
+  width: calc(var(--thumbWith) * 0.35); // Destroys the aspect ratio but is nicer in the ui
+  height: calc(var(--thumbHeight) * 0.4);
+  border: 2px #22292d solid;
+}
+
+
+
+
 .centered-overlay-item{ 
     position: absolute;
     top: 50%;
@@ -29,9 +45,9 @@
     transform: translate(-50%, -50%);
     color: white; /* Adjust text color as needed */
     text-align: center;
-    font-size: 16px; /* Adjust font size as needed */
-    font-weight: bold; /* Adjust font weight as needed */
-  
+    font-size: 14px; /* Adjust font size as needed */
+    
+    z-index: 99;
 }
 
 .streams-wrapper{
