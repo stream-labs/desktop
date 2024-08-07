@@ -375,8 +375,11 @@ export class TcpServerService
 
   disconnectRemoteDevice(device: IConnectedDevice) {
     if (this.remoteSocket) {
-      this.remoteSocket.emit('disconnectDevice', { socketId: device.socketId });
-      this.REMOVE_CONNECTED_DEVICE(device);
+      this.remoteSocket.emit('disconnectDevice', { socketId: device.socketId }, (response: any) => {
+        if (!response.error) {
+          this.REMOVE_CONNECTED_DEVICE(device);
+        }
+      });
     }
   }
 
@@ -669,7 +672,15 @@ export class TcpServerService
         (client.socket as WritableStream).write(`${JSON.stringify(response)}\n`);
       } else {
         (client.socket as SocketIOClient.Socket).send(`${JSON.stringify(response)}\n`);
-        (client.socket as SocketIOClient.Socket).emit('message', `${JSON.stringify(response)}\n`);
+        (client.socket as SocketIOClient.Socket).emit(
+          'message',
+          `${JSON.stringify(response)}\n`,
+          (response: any) => {
+            if (response.error) {
+              throw response.error;
+            }
+          },
+        );
       }
     } catch (e: unknown) {
       // probably the client has been silently disconnected
