@@ -1308,7 +1308,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       date: moment().toISOString(),
       id: streamInfo.id || 'noId',
       title:
-        streamInfo.title || filePath.substring(filePath.length - 10, filePath.length) || 'no title',
+        streamInfo.title || filePath.substring(filePath.length - 15, filePath.length) || 'no title',
       game: streamInfo.game || 'no title',
     };
     this.addStream(setStreamInfo);
@@ -1485,40 +1485,22 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   }
 
   isAiClip = (clip: TClip): clip is IAiClip => clip.source === 'AiClip';
-  // async function test(path: string, highlighterData: IHighlighterData) {
-  //   const { HighlighterService } = Services;
 
-  //   const { stdout } = await execa(FFPROBE_EXE, [
-  //     '-v',
-  //     'error',
-  //     '-show_entries',
-  //     'format=duration',
-  //     '-of',
-  //     'default=noprint_wrappers=1:nokey=1',
-  //     path,
-  //   ]);
-  //   let duration = parseFloat(stdout);
+  enableOnlySpecificClips(clips: TClip[], id?: string) {
+    clips.forEach(clip => {
+      this.UPDATE_CLIP({
+        path: clip.path,
+        enabled: false,
+      });
+    });
 
-  //   console.log('ADD CLIP', path, duration);
-
-  //   HighlighterService.actions.ADD_CLIP({
-  //     path,
-  //     loaded: false,
-  //     enabled: true,
-  //     // Creates a 2 sec clip
-  //     startTrim: highlighterData.start - 1,
-  //     endTrim: duration - (highlighterData.end + 1),
-
-  //     deleted: false,
-  //     source: 'AiDetected',
-  //     // id: `${highlighterData.start.toString()}`,
-  //   });
-
-  //   console.log('🚀 ~ test ~ duration:', duration);
-  //   console.log('🚀 ~ test ~ highlighterData.start - 1:', highlighterData.start - 1);
-  //   console.log(
-  //     '🚀 ~ test ~ duration - (highlighterData.end - 1):',
-  //     duration - (highlighterData.end + 1),
-  //   );
-  // }
+    // Enable specific clips
+    const clipsToEnable = this.getClips(clips, id);
+    clipsToEnable.forEach(clip => {
+      this.UPDATE_CLIP({
+        path: clip.path,
+        enabled: true,
+      });
+    });
+  }
 }

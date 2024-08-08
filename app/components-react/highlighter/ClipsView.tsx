@@ -22,7 +22,7 @@ import TransitionSelector from 'components-react/highlighter/TransitionSelector'
 import { $t } from 'services/i18n';
 import * as remote from '@electron/remote';
 
-type TModal = 'trim' | 'export' | 'preview' | 'remove';
+type TModalClipsView = 'trim' | 'export' | 'preview' | 'remove';
 
 interface IClipsViewProps {
   id: string | undefined;
@@ -49,7 +49,7 @@ export default function ClipsView({
     highlightedStreams: HighlighterService.views.highlightedStreams,
   }));
 
-  const [showModal, rawSetShowModal] = useState<TModal | null>(null);
+  const [showModal, rawSetShowModal] = useState<TModalClipsView | null>(null);
   const [modalWidth, setModalWidth] = useState('700px');
   const [hotkey, setHotkey] = useState<IHotkey | null>(null);
   const [showTutorial, setShowTutorial] = useState(false);
@@ -58,22 +58,8 @@ export default function ClipsView({
 
   useEffect(() => {
     if (HighlighterService.getClips(v.clips, props.id).length) {
-      // Disable all clips
-      (HighlighterService.views.clips as TClip[]).forEach(clip => {
-        HighlighterService.actions.UPDATE_CLIP({
-          path: clip.path,
-          enabled: false,
-        });
-      });
-
-      // Enable specific clips
-      const clipsToEnable = HighlighterService.getClips(HighlighterService.views.clips, props.id);
-      clipsToEnable.forEach(clip => {
-        HighlighterService.actions.UPDATE_CLIP({
-          path: clip.path,
-          enabled: true,
-        });
-      });
+      // Disables unneeded clips, and enables needed clips
+      HighlighterService.actions.enableOnlySpecificClips(HighlighterService.views.clips, props.id);
 
       HighlighterService.actions.loadClips(props.id);
       setShowTutorial(false);
@@ -92,7 +78,7 @@ export default function ClipsView({
   // size while the closing animation is played. This is why modal
   // width has its own state. This makes sure we always set the right
   // size whenever displaying a modal.
-  function setShowModal(modal: TModal | null) {
+  function setShowModal(modal: TModalClipsView | null) {
     rawSetShowModal(modal);
 
     if (modal) {

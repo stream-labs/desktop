@@ -1,29 +1,22 @@
 import { useVuex } from 'components-react/hooks';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Services } from 'components-react/service-provider';
 // import styles from './ClipsView.m.less';
 import styles from './StreamView.m.less';
-import { IViewState, TClip } from 'services/highlighter';
-import ClipPreview from 'components-react/highlighter/ClipPreview';
-import ClipTrimmer from 'components-react/highlighter/ClipTrimmer';
-import { ReactSortable } from 'react-sortablejs';
-import Form from 'components-react/shared/inputs/Form';
+import { IViewState, StreamInfoForAiHighlighter, TClip } from 'services/highlighter';
 import isEqual from 'lodash/isEqual';
-import { SliderInput, FileInput, SwitchInput } from 'components-react/shared/inputs';
-import { Modal, Button, Alert } from 'antd';
+import { Modal, Button } from 'antd';
 import ExportModal from 'components-react/highlighter/ExportModal';
 import PreviewModal from 'components-react/highlighter/PreviewModal';
-import { SCRUB_HEIGHT, SCRUB_WIDTH, SUPPORTED_FILE_TYPES } from 'services/highlighter/constants';
-import path, { relative } from 'path';
+import { SUPPORTED_FILE_TYPES } from 'services/highlighter/constants';
 import Scrollable from 'components-react/shared/Scrollable';
 import { IHotkey } from 'services/hotkeys';
 import { getBindingString } from 'components-react/shared/HotkeyBinding';
-import Animate from 'rc-animate';
-import TransitionSelector from 'components-react/highlighter/TransitionSelector';
 import { $t } from 'services/i18n';
 import * as remote from '@electron/remote';
+import uuid from 'uuid';
 
-type TModal = 'trim' | 'export' | 'preview' | 'remove';
+type TModalStreamView = 'export' | 'preview' | 'upload';
 
 interface IClipsViewProps {
   id: string | undefined;
@@ -40,16 +33,17 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
     error: HighlighterService.views.error,
   }));
 
-  const [showModal, rawSetShowModal] = useState<TModal | null>(null);
+  const [showModal, rawSetShowModal] = useState<TModalStreamView | null>(null);
   const [modalWidth, setModalWidth] = useState('700px');
   const [hotkey, setHotkey] = useState<IHotkey | null>(null);
   const [showTutorial, setShowTutorial] = useState(false);
+  const [preparingExport, setPreparingExport] = useState<string | null>(null);
 
   // This is kind of weird, but ensures that modals stay the right
   // size while the closing animation is played. This is why modal
   // width has its own state. This makes sure we always set the right
   // size whenever displaying a modal.
-  function setShowModal(modal: TModal | null) {
+  function setShowModal(modal: TModalStreamView | null) {
     rawSetShowModal(modal);
 
     if (modal) {
@@ -59,6 +53,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
           preview: '700px',
           export: '700px',
           remove: '400px',
+          upload: '400px',
         }[modal],
       );
     }
@@ -72,31 +67,39 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
     HighlighterService.actions.removeStream(id);
   }
 
+  async function previewVideo(id?: string) {
+    if (!id) {
+      console.error('Id needed to preview stream clip collection, missing id');
+      return;
+    }
+    setPreparingExport(id);
+    HighlighterService.actions.enableOnlySpecificClips(HighlighterService.views.clips, id);
+    try {
+      await HighlighterService.loadClips(id);
+      setPreparingExport(null);
+      rawSetShowModal('preview');
+    } catch (error: unknown) {
+      setPreparingExport(null);
+    }
+  }
+
   async function exportVideo(id?: string) {
     if (!id) {
       console.error('Id needed to export stream clip collection, missing id');
       return;
     }
-    (HighlighterService.views.clips as TClip[]).forEach(clip => {
-      HighlighterService.actions.UPDATE_CLIP({
-        path: clip.path,
-        enabled: false,
-      });
-    });
 
-    const clipsToEnable = HighlighterService.getClips(HighlighterService.views.clips, id);
-    clipsToEnable.forEach(clip => {
-      HighlighterService.actions.UPDATE_CLIP({
-        path: clip.path,
-        enabled: true,
-      });
-    });
+    setPreparingExport(id);
+    HighlighterService.actions.enableOnlySpecificClips(HighlighterService.views.clips, id);
 
-    await HighlighterService.loadClips(id);
-
-    console.log('startExport');
-    HighlighterService.actions.export();
-    // HighlighterService.actions.removeStream(id);
+    try {
+      await HighlighterService.loadClips(id);
+      setPreparingExport(null);
+      rawSetShowModal('export');
+      console.log('startExport');
+    } catch (error: unknown) {
+      setPreparingExport(null);
+    }
   }
 
   function setClipOrder(clips: { id: string }[]) {
@@ -116,6 +119,80 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
 
   if (inspectedClipPath) {
     inspectedClip = v.clips.find(c => c.path === inspectedClipPath) ?? null;
+  }
+
+  function ImportStreamModal({ close }: { close: () => void }) {
+    const { HighlighterService } = Services;
+    const [inputValue, setInputValue] = useState<string>('');
+
+    function handleInputChange(event: any) {
+      setInputValue(event.target.value);
+    }
+
+    async function startAnalysis(title: string) {
+      const streamInfo: StreamInfoForAiHighlighter = {
+        id: 'manual_' + uuid(),
+        title,
+      };
+
+      const filePath = await importStreamFromDevice();
+      if (filePath) {
+        HighlighterService.actions.flow(filePath[0], streamInfo);
+        close();
+      }
+    }
+
+    return (
+      <>
+        <div
+          style={{
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+            padding: '8px',
+          }}
+        >
+          <div
+            style={{
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '8px',
+            }}
+          >
+            <h1 style={{ margin: 0 }}>Import stream</h1>
+            <input
+              style={{ width: '100%' }}
+              type="text"
+              name="name"
+              placeholder="Set a title for your stream"
+              onChange={handleInputChange}
+            />
+          </div>
+          <div style={{ display: 'flex', gap: '8px', justifyContent: 'space-between' }}>
+            {' '}
+            <Button type="default" onClick={() => close()}>
+              Cancel
+            </Button>
+            <Button type="primary" onClick={() => startAnalysis(inputValue)}>
+              Select video to start import
+            </Button>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  async function importStreamFromDevice() {
+    const selections = await remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
+      properties: ['openFile'],
+      filters: [{ name: $t('Video Files'), extensions: SUPPORTED_FILE_TYPES }],
+    });
+
+    if (selections && selections.filePaths) {
+      return selections.filePaths;
+    }
   }
 
   function closeModal() {
@@ -164,7 +241,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
     return { emoji: type, description: type };
   }
 
-  function getClipsView() {
+  function getStreamView() {
     return (
       <div
         style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}
@@ -176,10 +253,11 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
             <p>{$t('Drag & drop to reorder clips.')}</p> */}
             <h1 style={{ margin: 0 }}>My stream highlights</h1>
           </div>
-          <div>
+          <div style={{ display: 'flex', gap: '16px' }}>
             {hotkey && hotkey.bindings[0] && (
               <b style={{ marginRight: 20 }}>{getBindingString(hotkey.bindings[0])}</b>
             )}
+            <Button onClick={() => setShowModal('upload')}>Import</Button>
             <Button onClick={() => emitSetView({ view: 'settings' })}>Settings</Button>
           </div>
         </div>
@@ -194,7 +272,10 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
           >
             {v.highlightedStreams.map(highlightedStream => (
               <div key={highlightedStream.id} className={styles.streamCard}>
-                <div className={`${styles.thumbnailWrapper} ${styles.videoSkeleton}`}>
+                <div
+                  className={`${styles.thumbnailWrapper} ${styles.videoSkeleton}`}
+                  onClick={() => previewVideo(highlightedStream.id)}
+                >
                   <img
                     style={{ height: '100%' }}
                     src={
@@ -205,7 +286,16 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
                   />
                   <div className={styles.centeredOverlayItem}>
                     {' '}
-                    <div>{highlightedStream.state !== 'Done' ? highlightedStream.state : ''}</div>
+                    <div>
+                      {highlightedStream.state !== 'Done' ? highlightedStream.state : ''}
+                      {preparingExport === highlightedStream.id ? (
+                        <>
+                          <div className={styles.loader}></div>
+                        </>
+                      ) : (
+                        <>'▶️'</>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <div
@@ -325,53 +415,46 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
                     {/* TODO: What clips should be included when user clicks this button + bring normal export modal in here */}
                     <Button
                       size="large"
-                      style={{ display: 'flex', gap: '8px', alignItems: 'center' }}
+                      style={{
+                        display: 'flex',
+                        gap: '8px',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '100%',
+                      }}
                       disabled={highlightedStream.state !== 'Done'}
                       type="primary"
                       onClick={() => exportVideo(highlightedStream.id)}
                     >
-                      <i className="icon-download" /> Export highlight reel
+                      {preparingExport === highlightedStream.id ? (
+                        //  TODO: replace with correct loader
+                        <div className={styles.loader}></div>
+                      ) : (
+                        <>
+                          <i className="icon-download" /> Export highlight reel
+                        </>
+                      )}
                     </Button>
                   </div>
                 </div>
               </div>
             ))}
           </div>
-
-          {/* {v.clips.map(clip => {
-              return (
-                <div
-                  key={clip.path}
-                  style={{ margin: '10px 20px 10px 0', display: 'inline-block' }}
-                >
-                  <ClipPreview
-                    clip={clip}
-                    showTrim={() => {
-                      setInspectedClipPath(clip.path);
-                      setShowModal('trim');
-                    }}
-                    showRemove={() => {
-                      setInspectedClipPath(clip.path);
-                      setShowModal('remove');
-                    }}
-                  />
-                </div>
-              );
-            })} */}
         </Scrollable>
 
         <Modal
-          getContainer={`.${styles.clipsViewRoot}`}
+          getContainer={`.${styles.streamViewRoot}`}
           onCancel={closeModal}
           footer={null}
           width={modalWidth}
           closable={false}
-          visible={!!showModal || !!v.error}
+          visible={!!showModal}
           destroyOnClose={true}
           keyboard={false}
         >
-          {!!v.error && <Alert message={v.error} type="error" showIcon />}
+          {/* {!!v.error && <Alert message={v.error} type="error" showIcon />} */}
           {/* {inspectedClip && showModal === 'trim' && <ClipTrimmer clip={inspectedClip} />} */}
+          {showModal === 'upload' && <ImportStreamModal close={closeModal} />}
           {showModal === 'export' && <ExportModal close={closeModal} />}
           {showModal === 'preview' && <PreviewModal close={closeModal} />}
           {/* {inspectedClip && showModal === 'remove' && (
@@ -384,5 +467,5 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
 
   // if (!v.loaded) return getLoadingView();
 
-  return getClipsView();
+  return getStreamView();
 }

@@ -74,43 +74,14 @@ export default function Highlighter(props: { params?: { view: string } }) {
     return (
       <>
         <div style={{ display: 'flex', gap: '8px' }}>
-          <Button onClick={() => setView({ view: 'settings' })}>Settings</Button>
           <Button onClick={() => setView({ view: 'stream' })}>stream</Button>
           <Button onClick={() => setView({ view: 'clips', id: undefined })}>clips</Button>
-          <Button onClick={() => trimHighlightData()}>create clips</Button>
-          <Button onClick={() => setSinfo()}>setSInfo</Button>
-          <Button onClick={() => updSinfo()}>updSInfo</Button>
-          <Button onClick={() => rmSinfo()}>rmSInfo</Button>
           <Button onClick={async () => HighlighterService.actions.toggleAiHighlighter()}>
             AiHighlighter active: {v.useAiHighlighter.toString()}
           </Button>
         </div>
       </>
     );
-  }
-
-  function setSinfo() {
-    HighlighterService.actions.addStream({
-      id: 'Ninja-streamFortnite5',
-      game: 'string',
-      title: 'string',
-      date: '123',
-      state: 'done',
-    });
-  }
-
-  function updSinfo() {
-    HighlighterService.actions.updateStream({
-      id: 'Ninja-streamFortnite5',
-      game: 'string',
-      title: 'string',
-      date: '123',
-      state: 'rendering',
-    });
-  }
-
-  function rmSinfo() {
-    HighlighterService.actions.removeStream('DJ Naaaardi-Fortnite-5302024');
   }
 
   function setViewFromEmit(data: IViewState) {
@@ -130,9 +101,5 @@ export default function Highlighter(props: { params?: { view: string } }) {
 
   function setView(view: IViewState) {
     setViewState(view);
-  }
-
-  async function trimHighlightData() {
-    // HighlighterService.actions.flow('das', null);
   }
 }
