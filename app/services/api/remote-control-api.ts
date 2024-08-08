@@ -136,9 +136,9 @@ export class RemoteControlService extends Service {
 
   listen() {
     if (this.socket) {
-      this.socket.on('message', (data: Buffer) => {
+      this.socket.on('message', (data: Buffer, callback: Function) => {
         console.log('message received', data.toString());
-        return this.requestHandler(data.toString());
+        callback(this.requestHandler(data.toString()));
       });
 
       this.socket.on('deviceConnected', (device: IConnectedDevice) => {
