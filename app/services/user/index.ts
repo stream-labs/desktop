@@ -253,8 +253,7 @@ class UserViews extends ViewHandler<IUserServiceState> {
   }
 
   async appStoreUrl(params?: { appId?: string | undefined; type?: string | undefined }) {
-    // let url = `https://${this.hostsService.streamlabs}/library/app-store`;
-    let url = `https://beta.streamlabs.com/library/app-store`;
+    let url = `https://${this.hostsService.streamlabs}/library/app-store`;
 
     if (params?.appId) {
       url = `${url}/app/${params?.appId}`;
