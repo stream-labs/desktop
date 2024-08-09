@@ -90,7 +90,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
     });
 
     this.userService.scopeAdded.subscribe(() => {
-      this.chatView.webContents.loadURL(this.chatUrl);
+      this.refreshChat();
       this.platformAppsService.refreshApp('restream');
     });
   }
@@ -110,6 +110,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
   }
 
   get chatUrl() {
+    const nightMode = this.customizationService.isDarkTheme ? 'night' : 'day';
     const platforms = this.streamInfo.enabledPlatforms
       .filter(platform => ['youtube', 'twitch'].includes(platform))
       .join(',');
@@ -130,7 +131,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
     }
 
     if (platforms) {
-      return `https://${this.host}/embed/chat?oauth_token=${this.userService.apiToken}${fbParams}&mode=night&send=true&platforms=${platforms}`;
+      return `https://${this.host}/embed/chat?oauth_token=${this.userService.apiToken}${fbParams}&mode=${nightMode}&send=true&platforms=${platforms}`;
     } else {
       return `https://${this.host}/embed/chat?oauth_token=${this.userService.apiToken}${fbParams}`;
     }
