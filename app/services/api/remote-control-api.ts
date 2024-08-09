@@ -105,17 +105,18 @@ export class RemoteControlService extends Service {
     this.setConnectedDevices([]);
   }
 
-  disconnectDevice(device: IConnectedDevice) {
+  disconnectDevice(socketId: string) {
     if (this.socket) {
-      this.socket.emit('disconnectDevice', { socketId: device.socketId }, (response: any) => {
+      this.socket.emit('disconnectDevice', { socketId }, (response: any) => {
         if (!response.error) {
-          this.removeConnectedDevice(device);
+          this.removeConnectedDevice(socketId);
         }
       });
     }
   }
 
   async createStreamlabsRemoteConnection() {
+    if (!this.userService.isLoggedIn) return;
     this.setEnableRemoteConnection(true);
     const io = await importSocketIOClient();
     const url = `https://${
@@ -153,7 +154,7 @@ export class RemoteControlService extends Service {
       });
 
       this.socket.on('deviceDisconnected', (device: IConnectedDevice) => {
-        this.removeConnectedDevice(device);
+        this.removeConnectedDevice(device.socketId);
       });
 
       this.socket.on('error', (e: unknown) => {
@@ -250,10 +251,10 @@ export class RemoteControlService extends Service {
     });
   }
 
-  removeConnectedDevice(device: IConnectedDevice) {
+  removeConnectedDevice(socketId: string) {
     this.connectedDevices.db.write(() => {
       this.connectedDevices.devices = this.connectedDevices.devices.filter(
-        d => d.socketId !== device.socketId,
+        d => d.socketId !== socketId,
       );
     });
   }

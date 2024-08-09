@@ -6,12 +6,15 @@ import { SwitchInput } from '../../shared/inputs';
 import { IConnectedDevice } from 'services/api/remote-control-api';
 import styles from './RemoteControl.m.less';
 import { useRealmObject } from 'components-react/hooks/realm';
+import { useVuex } from 'components-react/hooks';
 
 export function RemoteControlSettings() {
-  const { RemoteControlService } = Services;
+  const { RemoteControlService, UserService } = Services;
 
   const connectedDevices = useRealmObject(RemoteControlService.connectedDevices).devices;
   const enabled = useRealmObject(RemoteControlService.state).enabled;
+
+  const { isLoggedIn } = useVuex(() => ({ isLoggedIn: UserService.views.isLoggedIn }));
 
   function handleToggle() {
     if (enabled) {
@@ -22,25 +25,27 @@ export function RemoteControlSettings() {
   }
 
   function disconnectDevice(device: IConnectedDevice) {
-    RemoteControlService.actions.disconnectDevice(device);
+    RemoteControlService.actions.disconnectDevice(device.socketId);
   }
 
   return (
     <ObsSettingsSection>
       <div>
         {$t(
-          'The free Streamlabs Controller app allows you to control Streamlabs Desktop from your iOS or Android device. Scan the QR code below to begin.',
+          'The free Streamlabs Controller app allows you to control Streamlabs Desktop from your iOS or Android device. You must be logged in to use this feature.',
         )}
         <br />
         <br />
       </div>
 
       <div>
-        <SwitchInput
-          label={$t('Allow remote connections')}
-          onInput={handleToggle}
-          value={enabled}
-        />
+        {isLoggedIn && (
+          <SwitchInput
+            label={$t('Allow remote connections')}
+            onInput={handleToggle}
+            value={enabled}
+          />
+        )}
 
         {enabled && (
           <div>
