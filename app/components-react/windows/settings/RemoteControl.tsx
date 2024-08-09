@@ -44,6 +44,7 @@ export function RemoteControlSettings() {
             label={$t('Allow remote connections')}
             onInput={handleToggle}
             value={enabled}
+            layout="horizontal"
           />
         )}
 
