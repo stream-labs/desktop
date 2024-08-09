@@ -10,6 +10,7 @@ import {
   E_JSON_RPC_ERROR,
   IJsonRpcRequest,
   IJsonRpcResponse,
+  IJsonRpcEvent,
 } from 'services/api/jsonrpc/index';
 
 export interface IConnectedDevice {
@@ -92,6 +93,9 @@ export class RemoteControlService extends Service {
     this.userService.userLogin.subscribe(() => {
       if (this.state.enabled) this.createStreamlabsRemoteConnection();
     });
+    this.externalApiService.serviceEvent.subscribe(event => {
+      this.sendMessage(event);
+    });
   }
 
   disconnect() {
@@ -137,17 +141,18 @@ export class RemoteControlService extends Service {
   listen() {
     if (this.socket) {
       this.socket.on('message', (data: Buffer, callback: Function) => {
-        console.log('message received', data.toString());
-        callback(this.requestHandler(data.toString()));
+        const response = this.requestHandler(data.toString());
+        callback(this.formatEvent(response));
       });
 
       this.socket.on('deviceConnected', (device: IConnectedDevice) => {
         console.log('device connected', device);
-        this.setConnectedDevices([...this.connectedDevices.devices, device]);
+        const devices = this.connectedDevices.devices;
+        if (devices.find(d => d.socketId === device.socketId)) return;
+        this.setConnectedDevices(devices.concat([device]));
       });
 
       this.socket.on('deviceDisconnected', (device: IConnectedDevice) => {
-        console.log('device disconnected', device);
         this.removeConnectedDevice(device);
       });
 
@@ -157,7 +162,19 @@ export class RemoteControlService extends Service {
     }
   }
 
-  requestHandler(data: string) {
+  sendMessage(event: IJsonRpcResponse<IJsonRpcEvent>) {
+    if (this.socket) {
+      try {
+        this.socket.emit('message', this.formatEvent(event), (response: any) => {
+          if (response.error) throw response.error;
+        });
+      } catch (e: unknown) {
+        console.error('Unable to send message', e);
+      }
+    }
+  }
+
+  private requestHandler(data: string) {
     const requests = data.split('\n');
 
     for (const requestString of requests) {
@@ -207,6 +224,10 @@ export class RemoteControlService extends Service {
         return errorResponse;
       }
     }
+  }
+
+  private formatEvent(event: IJsonRpcResponse<any>) {
+    return `${JSON.stringify(event)}\n`;
   }
 
   private validateRequest(request: IJsonRpcRequest): string {
