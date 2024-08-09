@@ -213,7 +213,7 @@ class StreamSettingsModule {
       : 'internal';
 
     await Services.UserService.actions.return.startAuth(platform, mode, true).then(res => {
-      Services.WindowsService.actions.setWindowOnTop(true);
+      Services.WindowsService.actions.setWindowOnTop('child');
       if (res === EPlatformCallResult.Error) {
         alertAsync(
           $t(

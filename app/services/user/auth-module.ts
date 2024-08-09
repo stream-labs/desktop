@@ -136,12 +136,12 @@ export class AuthModule {
             ['connected_with_another_account', 'unknown'].includes(query['reason'])
           ) {
             response.writeHead(302, {
-              Location: 'https://streamlabs.com/dashboard#/settings/account-settings/platforms',
+              Location: `https://${this.hostsService.streamlabs}/dashboard#/settings/account-settings/platforms`,
             });
             response.end();
           } else {
             response.writeHead(302, {
-              Location: 'https://streamlabs.com/streamlabs-obs/login-success',
+              Location: `https://${this.hostsService.streamlabs}/streamlabs-obs/login-success`,
             });
             response.end();
           }
@@ -161,7 +161,6 @@ export class AuthModule {
 
       this.authServer.on('listening', () => {
         const address = this.authServer.address();
-
         if (address && typeof address !== 'string') {
           const paramSeparator = merge ? '?' : '&';
           const url = `${authUrl}${paramSeparator}port=${address.port}&code_challenge=${codeChallenge}`;
