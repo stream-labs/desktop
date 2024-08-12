@@ -549,7 +549,7 @@ function CustomDestinationList() {
   const destinations = customDestinations;
   const isEditMode = editCustomDestMode !== false;
   const shouldShowAddForm = editCustomDestMode === true;
-  const canAddMoreDestinations = destinations.length <= 5;
+  const canAddMoreDestinations = destinations.length < 5;
   const shouldShowPrimeLabel = !isPrime && destinations.length > 0;
 
   return (
