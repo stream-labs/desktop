@@ -38,8 +38,7 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
   // to disable/enable platforms and open ultra link
   const promptConnectTikTok = !isPlatformLinked('tiktok');
 
-  const shouldDisableSwitchers = () => {
-    // Multistream users can always add destinations
+  const shouldDisableCustomDestinationSwitchers = () => {
     console.log(
       'isRestreamEnabled', isRestreamEnabled,
       'promptConnectTikTok', promptConnectTikTok,
@@ -47,21 +46,17 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
       'enabledPlatforms.length', enabledPlatforms.length
     );
 
+    // Multistream users can always add destinations
     if (isRestreamEnabled) {
       return false;
     }
 
-    // If TikTok is enabled we allow two platforms only, no custom
-    // TODO: revisit
-    if (promptConnectTikTok) {
-      return enabledPlatforms.length > 1;
-    }
-
-    // Otherwise, only a single platform and no custom
+    // Otherwise, only a single platform and no custom destinations,
+    // TikTok should be handled by platform switching
     return enabledPlatforms.length > 0;
   };
 
-  const disableSwitchers = shouldDisableSwitchers();
+  const disableCustomDestinationSwitchers = shouldDisableCustomDestinationSwitchers();
 
   const emitSwitch = useDebounce(500, (ind?: number, enabled?: boolean) => {
     if (ind !== undefined && enabled !== undefined) {
@@ -164,7 +159,7 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
           destination={dest}
           enabled={customDestinations[ind].enabled}
           onChange={enabled => switchCustomDestination(ind, enabled)}
-          disabled={disableSwitchers && !isEnabled(ind)}
+          disabled={disableCustomDestinationSwitchers && !isEnabled(ind)}
         />
       ))}
     </div>
