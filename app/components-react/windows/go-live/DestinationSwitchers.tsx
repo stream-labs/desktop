@@ -40,6 +40,13 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
 
   const shouldDisableSwitchers = () => {
     // Multistream users can always add destinations
+    console.log(
+      'isRestreamEnabled', isRestreamEnabled,
+      'promptConnectTikTok', promptConnectTikTok,
+      'enabledPlatforms', enabledPlatforms
+      'enabledPlatforms.length', enabledPlatforms.length
+    );
+
     if (isRestreamEnabled) {
       return false;
     }
