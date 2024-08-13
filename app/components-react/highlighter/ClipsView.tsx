@@ -223,7 +223,7 @@ export default function ClipsView({
     if (v.error) HighlighterService.actions.dismissError();
   }
 
-  function getClipsView() {
+  function getClipsView(streamId: string | undefined) {
     const clipList = [
       { id: 'add', filtered: true },
       ...v.clips.map(c => ({ id: c.path })).reverse(),
@@ -242,7 +242,7 @@ export default function ClipsView({
       const filtered = files.filter(f => extensions.includes(path.parse(f).ext));
 
       if (filtered.length) {
-        HighlighterService.actions.addClips(filtered);
+        HighlighterService.actions.addClips(filtered, streamId);
       }
 
       e.stopPropagation();
@@ -294,7 +294,7 @@ export default function ClipsView({
                   style={{ margin: '10px 20px 10px 0', display: 'inline-block' }}
                   className="sortable-ignore"
                 >
-                  <AddClip />
+                  <AddClip streamId={props.id} />
                 </div>
                 {HighlighterService.getClips(v.clips, props.id).map(clip => {
                   return (
@@ -345,10 +345,10 @@ export default function ClipsView({
     );
   }
 
-  return getClipsView();
+  return getClipsView(props.id);
 }
 
-function AddClip() {
+function AddClip({ streamId }: { streamId: string | undefined }) {
   const { HighlighterService } = Services;
 
   async function openClips() {
@@ -358,7 +358,7 @@ function AddClip() {
     });
 
     if (selections && selections.filePaths) {
-      HighlighterService.actions.addClips(selections.filePaths);
+      HighlighterService.actions.addClips(selections.filePaths, streamId);
     }
   }
 
