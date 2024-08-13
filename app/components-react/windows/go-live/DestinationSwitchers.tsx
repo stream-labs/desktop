@@ -37,8 +37,24 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
   // special handling for TikTok for non-ultra users
   // to disable/enable platforms and open ultra link
   const promptConnectTikTok = !isPlatformLinked('tiktok');
-  const disableSwitchers =
-    promptConnectTikTok && (enabledPlatforms.length > 1 || enabledDestinations.length > 0);
+
+  const shouldDisableSwitchers = () => {
+    // Multistream users can always add destinations
+    if (isRestreamEnabled) {
+      return false;
+    }
+
+    // If TikTok is enabled we allow two platforms only, no custom
+    // TODO: revisit
+    if (promptConnectTikTok) {
+      return enabledPlatforms.length > 1;
+    }
+
+    // Otherwise, only a single platform and no custom
+    return enabledPlatforms.length > 0;
+  };
+
+  const disableSwitchers = shouldDisableSwitchers();
 
   const emitSwitch = useDebounce(500, (ind?: number, enabled?: boolean) => {
     if (ind !== undefined && enabled !== undefined) {
