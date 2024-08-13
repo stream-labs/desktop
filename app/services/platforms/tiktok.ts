@@ -1,4 +1,4 @@
-import { InheritMutations, Inject, mutation } from '../core';
+import { InheritMutations, Inject, mutation, Service } from '../core';
 import { BasePlatformService } from './base-platform';
 import {
   EPlatformCallResult,
@@ -26,14 +26,15 @@ import {
   TTikTokLiveScopeTypes,
   ITikTokGamesData,
 } from './tiktok/api';
-import { I18nService } from 'services/i18n';
+import { $t, I18nService } from 'services/i18n';
 import { getDefined } from 'util/properties-type-guards';
 import * as remote from '@electron/remote';
 import { WindowsService } from 'services/windows';
 import Utils from 'services/utils';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { DiagnosticsService } from 'services/diagnostics';
-
+import { ENotificationType, NotificationsService } from 'services/notifications';
+import { JsonrpcService } from '../api/jsonrpc';
 interface ITikTokServiceState extends IPlatformState {
   settings: ITikTokStartStreamSettings;
   broadcastId: string;
@@ -89,6 +90,8 @@ export class TikTokService
   @Inject() windowsService: WindowsService;
   @Inject() diagnosticsService: DiagnosticsService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
+  @Inject() private notificationsService: NotificationsService;
+  @Inject() private jsonrpcService: JsonrpcService;
 
   readonly apiBase = 'https://open.tiktokapis.com/v2';
   readonly platform = 'tiktok';
@@ -153,17 +156,16 @@ export class TikTokService
   }
 
   async beforeGoLive(goLiveSettings: IGoLiveSettings, display?: TDisplayType) {
+    // return an approved dummy account when testing
+    if (Utils.isTestMode() && this.getHasScope('approved')) {
+      await this.testBeforeGoLive(goLiveSettings);
+      return;
+    }
+
     const ttSettings = getDefined(goLiveSettings.platforms.tiktok);
     const context = display ?? ttSettings?.display;
 
     if (this.getHasScope('approved')) {
-      // skip generate stream keys for tests
-      if (Utils.isTestMode()) {
-        await this.putChannelInfo(ttSettings);
-        this.setPlatformContext('tiktok');
-        return;
-      }
-
       // update server url and stream key if handling streaming via API
       // streaming with server url and stream key is default
       let streamInfo = {} as ITikTokStartStreamResponse;
@@ -213,6 +215,7 @@ export class TikTokService
   async afterStopStream(): Promise<void> {
     if (this.state.broadcastId) {
       await this.endStream(this.state.broadcastId);
+      this.showReplaysNotification();
     }
 
     // clear server url and stream key
@@ -396,7 +399,7 @@ export class TikTokService
         }
       } else if (
         status?.info &&
-        (!status?.reason || status?.reason === ETikTokLiveScopeReason.DENIED)
+        (!status?.reason || status?.reason === ETikTokLiveScopeReason.RELOG)
       ) {
         this.SET_LIVE_SCOPE('relog');
         return EPlatformCallResult.TikTokScopeOutdated;
@@ -475,10 +478,6 @@ export class TikTokService
         return games;
       })
       .catch(e => {
-        // return dummy game if running a test
-        if (Utils.isTestMode()) {
-          return [{ id: 'game1', name: 'test1' }, this.defaultGame];
-        }
         console.error('Error fetching TikTok categories: ', e);
         return [];
       });
@@ -537,6 +536,22 @@ export class TikTokService
     }
   }
 
+  /**
+   * Open link for replays in browser
+   * @remark This is a temporary solution until we can show replays in the app
+   */
+  showReplaysNotification() {
+    this.notificationsService.actions.push({
+      type: ENotificationType.SUCCESS,
+      message: $t('Click to view TikTok Replay in your browser.'),
+      action: this.jsonrpcService.createRequest(Service.getResourceId(this), 'openReplaysLink'),
+    });
+  }
+
+  openReplaysLink() {
+    remote.shell.openExternal(this.replaysUrl);
+  }
+
   get liveDockEnabled(): boolean {
     return true;
   }
@@ -583,6 +598,10 @@ export class TikTokService
     return 'https://www.tiktok.com/falcon/live_g/live_access_pc_apply/result/index.html?id=GL6399433079641606942';
   }
 
+  get replaysUrl(): string {
+    return 'https://livecenter.tiktok.com/replay';
+  }
+
   get locale(): string {
     return I18nService.instance.state.locale;
   }
@@ -593,8 +612,14 @@ export class TikTokService
   }
 
   get promptReapply(): boolean {
-    if (this.getHasScope('approved') || this.getHasScope('legacy')) return false;
-    if (!this.userService.state.createdAt) return false;
+    // never show for approved/legacy users or logged out users
+    if (
+      !this.getHasScope('denied') ||
+      !this.userService.state?.createdAt ||
+      !this.userService.isLoggedIn
+    ) {
+      return false;
+    }
 
     // prompt users that have had desktop for 30+ days
     // and have streamed at least once in the past 30 days
@@ -613,10 +638,10 @@ export class TikTokService
     if (isOldAccount && !isTikTokLinked && isFrequentUser) return true;
 
     // prompt a user to reapply if they were rejected 30+ days ago
-    if (!this.state.dateDenied) return false;
-    const deniedDate = new Date(this.state.dateDenied);
-    const deniedDateDiff = (deniedDate.getTime() - today.getTime()) / (1000 * 3600 * 24);
-    if (this.denied && deniedDateDiff >= 30) return true;
+    // if (!this.state.dateDenied) return false;
+    // const deniedDate = new Date(this.state.dateDenied);
+    // const deniedDateDiff = (deniedDate.getTime() - today.getTime()) / (1000 * 3600 * 24);
+    // if (this.denied && deniedDateDiff >= 30) return true;
 
     return false;
   }
@@ -632,11 +657,11 @@ export class TikTokService
       case ETikTokLiveScopeReason.APPROVED_OBS: {
         return 'legacy';
       }
-      case ETikTokLiveScopeReason.DENIED: {
+      case ETikTokLiveScopeReason.RELOG: {
         return 'relog';
       }
       default:
-        return 'relog';
+        return 'denied';
     }
   }
 
@@ -664,6 +689,19 @@ export class TikTokService
       win.setAlwaysOnTop(false);
       return Promise.resolve();
     }, 1000);
+  }
+
+  /**
+   * Test going live with approved status for TikTok
+   * @param goLiveSettings - all goLiveSettings
+   * @returns - Promise<void>
+   */
+  async testBeforeGoLive(goLiveSettings: IGoLiveSettings) {
+    const ttSettings = getDefined(goLiveSettings.platforms.tiktok);
+
+    // skip generate stream keys for tests
+    await this.putChannelInfo(ttSettings);
+    this.setPlatformContext('tiktok');
   }
 
   setLiveScope(scope: TTikTokLiveScopeTypes) {

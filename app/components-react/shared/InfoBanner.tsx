@@ -6,6 +6,7 @@ import { useVuex } from 'components-react/hooks';
 import { Services } from 'components-react/service-provider';
 
 interface IInfoBannerProps {
+  id?: string;
   message: string | JSX.Element;
   type?: 'info' | 'warning';
   style?: CSSProperties;
@@ -38,6 +39,7 @@ export default function InfoBanner(p: IInfoBannerProps) {
 
   return (
     <div
+      id={p?.id}
       className={cx(
         styles.infoBanner,
         { [styles.info]: p.type === 'info' },

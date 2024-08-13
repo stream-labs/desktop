@@ -49,7 +49,6 @@ test('Streaming to TikTok', withUser('twitch', { multistream: false, prime: fals
   await fillForm({
     title: 'Test stream',
     twitchGame: 'Fortnite',
-    tiktokGame: 'test1',
   });
   await submit();
   await waitForDisplayed('span=Update settings for TikTok');
