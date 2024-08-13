@@ -37,8 +37,10 @@
   height: calc(var(--thumbHeight) * 2.2);
 }
 
+//TODO: replace with more performant loader
 .video-skeleton {
-  animation: pulsate 8s ease-in-out infinite;
+  animation: pulsate 4s ease-in-out infinite;
+  will-change: background-color;
 }
 
 @keyframes pulsate {

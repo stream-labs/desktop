@@ -1307,8 +1307,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       state: 'Searching for highlights...',
       date: moment().toISOString(),
       id: streamInfo.id || 'noId',
-      title:
-        streamInfo.title || filePath.substring(filePath.length - 15, filePath.length) || 'no title',
+      title: streamInfo.title || filePath.split('/').pop() || 'Your awesome stream',
       game: streamInfo.game || 'no title',
     };
     this.addStream(setStreamInfo);

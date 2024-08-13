@@ -6,20 +6,30 @@ import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
 import { Button } from 'antd';
 import { SUPPORTED_FILE_TYPES } from 'services/highlighter/constants';
-import { SliderInput } from 'components-react/shared/inputs';
+import { SliderInput, SwitchInput } from 'components-react/shared/inputs';
 import Form from 'components-react/shared/inputs/Form';
 import Scrollable from 'components-react/shared/Scrollable';
-import styles from './ClipsView.m.less';
+import styles from './SettingsView.m.less';
 import { $t } from 'services/i18n';
 import Translate from 'components-react/shared/Translate';
+import { IViewState } from 'services/highlighter';
 
-export default function SettingsView(p: { close: () => void }) {
-  const { HotkeysService, SettingsService, StreamingService } = Services;
+export default function SettingsView({
+  emitSetView,
+  close,
+}: {
+  emitSetView: (data: IViewState) => void;
+  close: () => void;
+}) {
+  const { HotkeysService, SettingsService, StreamingService, HighlighterService } = Services;
   const [hotkey, setHotkey] = useState<IHotkey | null>(null);
   const hotkeyRef = useRef<IHotkey | null>(null);
+  const [useManualHighlighter, setUseManualHighlighter] = useState<boolean>(!!hotkey?.bindings[0]);
+
   const v = useVuex(() => ({
     settingsValues: SettingsService.views.values,
     isStreaming: StreamingService.isStreaming,
+    useAiHighlighter: HighlighterService.views.useAiHighlighter,
   }));
 
   const correctlyConfigured =
@@ -50,6 +60,7 @@ export default function SettingsView(p: { close: () => void }) {
   useEffect(() => {
     HotkeysService.actions.return.getGeneralHotkeyByName('SAVE_REPLAY').then(hotkey => {
       if (hotkey) setHotkey(hotkey);
+      if (hotkey) setUseManualHighlighter(true);
     });
   }, []);
 
@@ -90,101 +101,185 @@ export default function SettingsView(p: { close: () => void }) {
     SettingsService.actions.setSettingsPatch({ Output: { RecRBTime: time } });
   }
 
+  function toggleUseAiHighlighter() {
+    HighlighterService.actions.toggleAiHighlighter();
+  }
+
+  function toggleManualHighlighter() {
+    //TODO: add code to disable manual highlighter again
+  }
+
   return (
-    <div className={styles.clipsViewRoot} style={{ width: '100%', display: 'flex' }}>
-      <Scrollable style={{ padding: 24, width: '100%' }}>
-        <h1>{$t('Highlighter')}</h1>
-        <p>
-          {$t(
-            'The highlighter allows you to clip the best moments from your livestream and edit them together into an exciting highlight video you can upload directly to YouTube.',
-          )}
-        </p>
+    <div
+      className={styles.settingsViewRoot}
+      style={{ width: '100%', display: 'flex', flexDirection: 'column' }}
+    >
+      <div style={{ display: 'flex', padding: 20 }}>
+        <div style={{ flexGrow: 1 }}>
+          <h1 style={{ margin: 0 }}>{$t('Highlighter')}</h1>
+          <p>
+            {$t(
+              'The highlighter allows you to clip the best moments from your livestream and edit them together into an exciting highlight video you can upload directly to YouTube.',
+            )}
+          </p>
+        </div>
+        <div style={{ display: 'flex', gap: '16px' }}>
+          {/* <Button onClick={() => setShowModal('upload')}>Import</Button> */}
+          <Button onClick={() => emitSetView({ view: 'stream' })}>Streams</Button>
+          <Button onClick={() => emitSetView({ view: 'clips', id: undefined })}>All clips</Button>
+        </div>
+      </div>
+
+      <Scrollable style={{ flexGrow: 1, padding: '20px 0 20px 20px', width: '100%' }}>
         <div style={{ display: 'flex' }}>
-          <div style={{ width: 600, flexShrink: 0 }}>
-            <h2>{$t('Get Started')}</h2>
-            {!v.isStreaming && (
-              <div className="section">
-                {correctlyConfigured
-                  ? completedStepHeading($t('Configure the replay buffer'))
-                  : incompleteStepHeading($t('Configure the replay buffer'))}
-                {correctlyConfigured ? (
-                  <div>{$t('The replay buffer is correctly configured')}</div>
-                ) : (
-                  <Button onClick={configure}>{$t('Configure')}</Button>
-                )}
-              </div>
-            )}
-            {!v.isStreaming && (
-              <div className="section">
-                {completedStepHeading($t('Adjust replay duration'))}
-                <div>
-                  {$t('Set the duration of captured replays. You can always trim them down later.')}
+          <div className={styles.cardWrapper}>
+            <div className={styles.highlighterCard}>
+              <div className={styles.cardHeaderbarWrapper}>
+                <div className={styles.cardHeaderbar}>
+                  <i style={{ margin: 0, fontSize: '20px' }} className="icon-highlighter"></i>
+                  <h3 style={{ margin: 0, fontSize: '20px' }}> Ai Highlighter</h3>
                 </div>
-                <Form layout="inline">
-                  <SliderInput
-                    style={{ width: 400, marginTop: 8 }}
-                    label={$t('Replay Duration')}
-                    value={v.settingsValues.Output.RecRBTime}
-                    onChange={setReplayTime}
-                    min={1}
-                    max={120}
-                    step={1}
-                    debounce={200}
-                    hasNumberInput={false}
-                    tooltipPlacement="top"
-                    tipFormatter={v => `${v}s`}
-                  />
-                </Form>
+                <SwitchInput value={v.useAiHighlighter} onChange={toggleUseAiHighlighter} />
               </div>
-            )}
-            {!v.isStreaming && (
-              <div className="section">
-                {hotkey?.bindings.length
-                  ? completedStepHeading($t('Set a hotkey to capture replays'))
-                  : incompleteStepHeading($t('Set a hotkey to capture replays'))}
-                {hotkey && (
-                  <HotkeyBinding
-                    hotkey={hotkey}
-                    binding={hotkey.bindings[0] ?? null}
-                    onBind={binding => {
-                      const newHotkey = { ...hotkey };
-                      newHotkey.bindings.splice(0, 1, binding);
-                      setHotkey(newHotkey);
-                      hotkeyRef.current = newHotkey;
-                    }}
-                  />
-                )}
+
+              <p>
+                The AI highlighter automatically detects highlights in your stream and creates a
+                highlight video for you after you finished your stream.
+              </p>
+
+              <div
+                style={{
+                  backgroundColor: '#17242D',
+                  padding: '16px',
+                  display: 'flex',
+                  gap: '8px',
+                  borderRadius: '8px',
+                }}
+              >
+                <i
+                  style={{ margin: 0, paddingTop: '4px', opacity: '0.7' }}
+                  className="icon-information"
+                ></i>
+                <p style={{ margin: 0, opacity: '0.7' }}>
+                  Your streams will automatically be recorded in the background so that the
+                  highlights can be detected afterwards.
+                </p>
               </div>
-            )}
-            <div className="section">
-              {incompleteStepHeading($t('Capture a replay'))}
-              {!!hotkey?.bindings.length && (
-                <div>
-                  <Translate
-                    message={$t('highlighterHotkeyInstructions', {
-                      bindingStr: getBindingString(hotkey.bindings[0]),
-                    })}
-                  />
+            </div>
+            <div className={styles.highlighterCard}>
+              <div className={styles.cardHeaderbarWrapper}>
+                <div className={styles.cardHeaderbar}>
+                  <i style={{ margin: 0, fontSize: '20px' }} className="icon-hotkeys"></i>
+
+                  <h3 style={{ margin: 0, fontSize: '20px' }}> Manual highlighter</h3>
                 </div>
-              )}
-              {!hotkey?.bindings.length && (
-                <div>
-                  {$t('Start streaming and capture a replay. Check back here after your stream.')}
-                </div>
+
+                <SwitchInput
+                  value={useManualHighlighter}
+                  onChange={() => setUseManualHighlighter(!useManualHighlighter)}
+                />
+              </div>
+
+              <p>
+                The hotkey highlighter allows you to clip the best moments during your livestream
+                manually and edit them together afterwards.
+              </p>
+              {useManualHighlighter && (
+                <>
+                  {/* TODO: Check if it is fine to only show the step if it is not defined */}
+                  {!v.isStreaming && !correctlyConfigured && (
+                    <div className="section">
+                      {correctlyConfigured
+                        ? completedStepHeading($t('Configure the replay buffer'))
+                        : incompleteStepHeading($t('Configure the replay buffer'))}
+                      {correctlyConfigured ? (
+                        <div>{$t('The replay buffer is correctly configured')}</div>
+                      ) : (
+                        <Button onClick={configure}>{$t('Configure')}</Button>
+                      )}
+                    </div>
+                  )}
+                  {!v.isStreaming && (
+                    <div className="section">
+                      {completedStepHeading($t('Adjust replay duration'))}
+                      <div>
+                        {$t(
+                          'Set the duration of captured replays. You can always trim them down later.',
+                        )}
+                      </div>
+                      <Form layout="inline">
+                        <SliderInput
+                          style={{ width: 400, marginTop: 8 }}
+                          label={$t('Replay Duration')}
+                          value={v.settingsValues.Output.RecRBTime}
+                          onChange={setReplayTime}
+                          min={1}
+                          max={120}
+                          step={1}
+                          debounce={200}
+                          hasNumberInput={false}
+                          tooltipPlacement="top"
+                          tipFormatter={v => `${v}s`}
+                        />
+                      </Form>
+                    </div>
+                  )}
+                  {!v.isStreaming && (
+                    <div className="section">
+                      {hotkey?.bindings.length
+                        ? completedStepHeading($t('Set a hotkey to capture replays'))
+                        : incompleteStepHeading($t('Set a hotkey to capture replays'))}
+                      {hotkey && (
+                        <HotkeyBinding
+                          hotkey={hotkey}
+                          binding={hotkey.bindings[0] ?? null}
+                          onBind={binding => {
+                            const newHotkey = { ...hotkey };
+                            newHotkey.bindings.splice(0, 1, binding);
+                            setHotkey(newHotkey);
+                            hotkeyRef.current = newHotkey;
+                          }}
+                        />
+                      )}
+                    </div>
+                  )}
+
+                  <div className="section">
+                    {incompleteStepHeading($t('Capture a replay'))}
+                    {!!hotkey?.bindings.length && (
+                      <div>
+                        <Translate
+                          message={$t('highlighterHotkeyInstructions', {
+                            bindingStr: getBindingString(hotkey.bindings[0]),
+                          })}
+                        />
+                      </div>
+                    )}
+                    {!hotkey?.bindings.length && (
+                      <div>
+                        {$t(
+                          'Start streaming and capture a replay. Check back here after your stream.',
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </>
               )}
             </div>
-            <a onClick={p.close}>{$t('Or, import a clip from your computer')}</a>
+            <a onClick={close}>{$t('Or, import a clip from your computer')}</a>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', paddingLeft: 24 }}>
-            <video
-              style={{
-                width: '100%',
-                outline: 'none',
-              }}
-              controls
-              src="https://slobs-cdn.streamlabs.com/media/highlighter+promo+2.mp4"
-              poster="https://slobs-cdn.streamlabs.com/media/highlighter-video-thumbnail.png"
-            />
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', paddingLeft: 24 }}>
+              <video
+                style={{
+                  width: '100%',
+                  outline: 'none',
+                }}
+                controls
+                src="https://slobs-cdn.streamlabs.com/media/highlighter+promo+2.mp4"
+                poster="https://slobs-cdn.streamlabs.com/media/highlighter-video-thumbnail.png"
+              />
+            </div>
           </div>
         </div>
       </Scrollable>

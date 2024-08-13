@@ -40,6 +40,7 @@ export default function Highlighter(props: { params?: { view: string } }) {
               // TODO
               // setShowTutorial(false);
             }}
+            emitSetView={data => setViewFromEmit(data)}
           />
         </>
       );
@@ -73,13 +74,13 @@ export default function Highlighter(props: { params?: { view: string } }) {
   function devHeaderBar() {
     return (
       <>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        {/* <div style={{ display: 'flex', gap: '8px' }}>
           <Button onClick={() => setView({ view: 'stream' })}>stream</Button>
           <Button onClick={() => setView({ view: 'clips', id: undefined })}>clips</Button>
           <Button onClick={async () => HighlighterService.actions.toggleAiHighlighter()}>
             AiHighlighter active: {v.useAiHighlighter.toString()}
           </Button>
-        </div>
+        </div> */}
       </>
     );
   }

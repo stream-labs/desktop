@@ -254,9 +254,6 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
             <h1 style={{ margin: 0 }}>My stream highlights</h1>
           </div>
           <div style={{ display: 'flex', gap: '16px' }}>
-            {hotkey && hotkey.bindings[0] && (
-              <b style={{ marginRight: 20 }}>{getBindingString(hotkey.bindings[0])}</b>
-            )}
             <Button onClick={() => setShowModal('upload')}>Import</Button>
             <Button onClick={() => emitSetView({ view: 'settings' })}>Settings</Button>
           </div>

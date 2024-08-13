@@ -257,7 +257,6 @@ export default function ClipsView({
         <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: 'flex', padding: 20 }}>
             <div style={{ flexGrow: 1 }}>
-              {/* <h1>{$t('Highlighter')}</h1> */}
               <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                 <div
                   style={{ cursor: 'pointer', paddingTop: '2px' }}
@@ -273,12 +272,8 @@ export default function ClipsView({
                     : 'All highlight clips'}
                 </h1>
               </div>
-              {/* <p>{$t('Drag & drop to reorder clips.')}</p> */}
             </div>
             <div>
-              {hotkey && hotkey.bindings[0] && (
-                <b style={{ marginRight: 20 }}>{getBindingString(hotkey.bindings[0])}</b>
-              )}
               <Button onClick={() => setShowTutorial(true)}>{$t('View Tutorial')}</Button>
             </div>
           </div>
