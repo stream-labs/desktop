@@ -43,7 +43,7 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
     console.log(
       'isRestreamEnabled', isRestreamEnabled,
       'promptConnectTikTok', promptConnectTikTok,
-      'enabledPlatforms', enabledPlatforms
+      'enabledPlatforms', enabledPlatforms,
       'enabledPlatforms.length', enabledPlatforms.length
     );
 
