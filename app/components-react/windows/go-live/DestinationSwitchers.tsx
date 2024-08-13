@@ -39,13 +39,6 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
   const promptConnectTikTok = !isPlatformLinked('tiktok');
 
   const shouldDisableCustomDestinationSwitchers = () => {
-    console.log(
-      'isRestreamEnabled', isRestreamEnabled,
-      'promptConnectTikTok', promptConnectTikTok,
-      'enabledPlatforms', enabledPlatforms,
-      'enabledPlatforms.length', enabledPlatforms.length
-    );
-
     // Multistream users can always add destinations
     if (isRestreamEnabled) {
       return false;
