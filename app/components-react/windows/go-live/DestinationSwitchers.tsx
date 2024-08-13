@@ -215,6 +215,11 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
       return;
     }
 
+    // If we're disabling the switch we shouldn't be emitting anything past below
+    if (p.disabled) {
+      return;
+    }
+
     const enable = !p.enabled;
     p.onChange(enable);
     // always proxy the click to the SwitchInput
