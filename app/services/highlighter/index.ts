@@ -1330,7 +1330,11 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
     console.log('🔄 cutHighlightClips');
     this.updateStream({ state: 'Generating clips', ...setStreamInfo }); // alternate approach to update stream
-    const clipData = await this.cutHighlightClips(filePath, formattedHighlighterResponse);
+    const clipData = await this.cutHighlightClips(
+      filePath,
+      formattedHighlighterResponse,
+      setStreamInfo,
+    );
     console.log('✅ cutHighlightClips');
 
     // 6. add highlight clips
@@ -1410,14 +1414,42 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   async cutHighlightClips(
     videoUri: string,
     highlighterData: IHighlighterData[],
+    streamInfo: IHighlightedStream,
   ): Promise<{ path: string; aiClipInfo: IAiClipInfo }[]> {
+    let filePaths: string[] = []; // To keep track and dont render same videos multiple times
+
+    const fallbackTitle = 'awesome-stream';
+    const videoDir = path.dirname(videoUri);
+    const filename = path.basename(videoUri);
+    const folderName = `${filename}-Clips-${streamInfo.title || fallbackTitle}`;
+    const outputDir = path.join(videoDir, folderName);
+
+    try {
+      try {
+        //If possible to read, directory exists, if not, catch and mkdir
+        await fs.readdir(outputDir);
+      } catch (error: unknown) {
+        await fs.mkdir(outputDir);
+      }
+    } catch (error: unknown) {
+      console.error('Error creating file directory');
+      return null;
+    }
+
     const tasks = highlighterData
       .sort((a, b) => a.start - b.start)
       .map(({ start, end, type }) => {
         return (async () => {
           const formattedStart = start.toString().padStart(6, '0');
           const formattedEnd = end.toString().padStart(6, '0');
-          const outputUri = `${videoUri.slice(0, -4)}-${formattedStart}-${formattedEnd}.mp4`;
+          const outputFilename = `${folderName}-${formattedStart}-${formattedEnd}.mp4`;
+          const outputUri = path.join(outputDir, outputFilename);
+
+          if (filePaths.some(filename => filename === outputUri)) {
+            console.log('File already exists');
+            return null;
+          }
+          filePaths.push(outputUri);
 
           try {
             await fs.access(outputUri);
@@ -1448,17 +1480,34 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
           try {
             console.log(`run FFMPEG with args: ${args}`);
-            await execa(FFMPEG_EXE, args);
-            console.log(`Created segment: ${outputUri}`);
-            return { path: outputUri, aiClipInfo: { moments: [{ type }] } };
+            const subprocess = execa(FFMPEG_EXE, args);
+            const timeoutDuration = 1000 * 60 * 5;
+            const timeout = setTimeout(() => {
+              console.warn(`FFMPEG process timed out for ${outputUri}`);
+              subprocess.kill('SIGTERM', { forceKillAfterTimeout: 2000 });
+            }, timeoutDuration);
+
+            try {
+              await subprocess;
+              filePaths.push(outputUri);
+              console.log(`Created segment: ${outputUri}`);
+              return { path: outputUri, aiClipInfo: { moments: [{ type }] } };
+            } catch (error: unknown) {
+              console.warn(`Error during FFMPEG execution for ${outputUri}:`, error);
+              return null;
+            } finally {
+              clearTimeout(timeout);
+            }
           } catch (error: unknown) {
             console.error(`Error creating segment: ${outputUri}`, error);
-            return null; // Return null or similar to indicate the failed operation.
+            return null;
           }
         })();
       });
 
     const results = await Promise.allSettled(tasks);
+    filePaths = [];
+
     return results
       .filter(result => result.status === 'fulfilled' && result.value !== null)
       .map(
