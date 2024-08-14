@@ -2,8 +2,8 @@ import { getSharedResource } from '../../../util/get-shared-resource';
 const { spawn } = require('child_process');
 
 const AI_PATH_PROD = getSharedResource('app.exe');
-const AI_PATH_DEV = '/Users/jankalthoefer/Documents/Git/highlighter-api/highlighter_api/app.py'; // path to app.py of the highlighter repository
-const VENV_PATH = '/Users/jankalthoefer/Documents/Git/highlighter-api/.tiny-venv/bin/python'; // path to python in virtual environment
+const AI_PATH_DEV = '/Users/marvinoffers/Documents/github/GameHighlighter/highlighter_api/app.py';
+const VENV_PATH = 'python3'; // path to python in virtual environment
 
 export function getHighlighterProcess(videoUri: string) {
   const env = 'dev' as 'prod' | 'dev';

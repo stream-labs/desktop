@@ -21,6 +21,7 @@ import Animate from 'rc-animate';
 import TransitionSelector from 'components-react/highlighter/TransitionSelector';
 import { $t } from 'services/i18n';
 import * as remote from '@electron/remote';
+import { sort } from 'semver';
 
 type TModalClipsView = 'trim' | 'export' | 'preview' | 'remove';
 
@@ -53,8 +54,6 @@ export default function ClipsView({
   const [modalWidth, setModalWidth] = useState('700px');
   const [hotkey, setHotkey] = useState<IHotkey | null>(null);
   const [showTutorial, setShowTutorial] = useState(false);
-
-  console.log('das:', HighlighterService.getClips(HighlighterService.views.clips));
 
   useEffect(() => {
     if (HighlighterService.getClips(v.clips, props.id).length) {
@@ -193,16 +192,58 @@ export default function ClipsView({
     );
   }
 
-  function setClipOrder(clips: { id: string }[]) {
+  function setClipOrder(clips: { id: string }[], streamId: string | undefined) {
+    // HighlighterService.getClips(v.clips, props.id).
+
+    const newOrderClips = clips.filter(clip => clip.id !== 'add');
+    const newOrder = newOrderClips.map(c => c.id);
+    const oldOrderClips = HighlighterService.getClips(v.clips, streamId);
+    const oldOrder = oldOrderClips.map(c => c.path);
+
+    if (isEqual(oldOrder, newOrder)) {
+      console.log('equal');
+      return;
+    }
+
+    // console.log('newOrder', newOrder);
+    // console.log('oldOrder', oldOrder);
+
+    if (streamId) {
+      console.log(' ~ Stream Order changed', newOrderClips);
+      newOrderClips.forEach((clip, index) => {
+        const clipPath = clip.id;
+        HighlighterService.actions.UPDATE_CLIP({
+          path: clipPath,
+          streamInfo: {
+            ...v.clips.find(c => c.path === clipPath)?.streamInfo,
+            orderPosition: index,
+          },
+        });
+      });
+    } else {
+      console.log('🚀 ~ Global Order changed');
+    }
+    return;
+    clips.forEach((clip, index) => {
+      const clipPath = clip.id;
+      HighlighterService.actions.UPDATE_CLIP({
+        path: clipPath,
+        streamInfo: {
+          ...v.clips.find(c => c.path === clipPath)?.streamInfo,
+          orderPosition: index,
+        },
+      });
+    });
     // ReactDraggable fires setList on mount. To avoid sync IPC,
     // we only fire off a request if the order changed.
-    const oldOrder = HighlighterService.getClips(v.clips, props.id).map(c => c.path);
-    const newOrder = clips.filter(c => c.id !== 'add').map(c => c.id);
-
-    if (!isEqual(oldOrder, newOrder)) {
-      // Intentionally synchronous to avoid visual jank on drop
-      HighlighterService.setOrder(newOrder);
-    }
+    // const oldOrder = HighlighterService.getClips(v.clips, props.id).map(c => c.path);
+    // console.log('🚀 ~ setClipOrder ~ oldOrder:', oldOrder);
+    // const newOrder = clips.filter(c => c.id !== 'add').map(c => c.id);
+    // console.log('🚀 ~ setClipOrder ~ newOrder:', newOrder);
+    // if (!isEqual(oldOrder, newOrder)) {
+    //   // Intentionally synchronous to avoid visual jank on drop
+    //   HighlighterService.setOrder(newOrder);
+    // }
   }
 
   const [inspectedClipPath, setInspectedClipPath] = useState<string | null>(null);
@@ -223,12 +264,23 @@ export default function ClipsView({
     if (v.error) HighlighterService.actions.dismissError();
   }
 
+  //TODO: Need performance update!
   function getClipsView(streamId: string | undefined) {
-    const clipList = [
-      { id: 'add', filtered: true },
-      ...v.clips.map(c => ({ id: c.path })).reverse(),
-    ];
-    console.log('🚀 ~ getClipsView ~ clipList:', clipList);
+    const clipsWithOrder = HighlighterService.getClips(v.clips, props.id)
+      .filter(c => c.streamInfo && c.streamInfo?.orderPosition !== undefined)
+      .sort((a: TClip, b: TClip) => a.streamInfo!.orderPosition - b.streamInfo!.orderPosition)
+      .map(c => ({
+        id: c.path,
+      }));
+
+    const clipsWithOutOrder = HighlighterService.getClips(v.clips, props.id)
+      .filter(c => c.streamInfo === undefined || c.streamInfo.orderPosition === undefined)
+      .map(c => ({ id: c.path }));
+
+    //TODO: Why does it not work without {id: 'add', filtered: true}?
+    const clipList = [{ id: 'add', filtered: true }, ...clipsWithOrder, ...clipsWithOutOrder];
+
+    console.log('Rerender clips:', clipList);
 
     function onDrop(e: React.DragEvent<HTMLDivElement>) {
       const extensions = SUPPORTED_FILE_TYPES.map(e => `.${e}`);
@@ -282,7 +334,7 @@ export default function ClipsView({
             <Scrollable style={{ flexGrow: 1, padding: '20px 0 20px 20px' }}>
               <ReactSortable
                 list={clipList}
-                setList={setClipOrder}
+                setList={clips => setClipOrder(clips, props.id)} //
                 animation={200}
                 filter=".sortable-ignore"
                 onMove={e => {
@@ -296,7 +348,34 @@ export default function ClipsView({
                 >
                   <AddClip streamId={props.id} />
                 </div>
-                {HighlighterService.getClips(v.clips, props.id).map(clip => {
+                {clipList
+                  .filter(c => c.id !== 'add')
+                  .map(clip => {
+                    return (
+                      <div
+                        key={clip.id}
+                        style={{ margin: '10px 20px 10px 0', display: 'inline-block' }}
+                      >
+                        <ClipPreview
+                          clip={
+                            HighlighterService.getClips(v.clips, props.id).find(
+                              c => c.path === clip.id,
+                            )!
+                          }
+                          showTrim={() => {
+                            setInspectedClipPath(clip.id);
+                            setShowModal('trim');
+                          }}
+                          showRemove={() => {
+                            setInspectedClipPath(clip.id);
+                            setShowModal('remove');
+                          }}
+                        />
+                      </div>
+                    );
+                  })}
+
+                {/* {HighlighterService.getClips(v.clips, props.id).map(clip => {
                   return (
                     <div
                       key={clip.path}
@@ -315,7 +394,7 @@ export default function ClipsView({
                       />
                     </div>
                   );
-                })}
+                })} */}
               </ReactSortable>
             </Scrollable>
           ) : (
