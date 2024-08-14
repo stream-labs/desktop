@@ -1320,30 +1320,37 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     // const videoUri = '/Users/marvinoffers/Movies/djnardi-short.mp4'; // replace with filepath
     console.log('Test flow');
 
+    const renderHighlights = async (partialInputs: IHighlighterInput[]) => {
+      console.log('🔄 formatHighlighterResponse');
+      const formattedHighlighterResponse = this.formatHighlighterResponse(partialInputs);
+      console.log('✅ formatHighlighterResponse', formattedHighlighterResponse);
+
+      console.log('🔄 cutHighlightClips');
+      this.updateStream({ state: 'Generating clips', ...setStreamInfo }); // alternate approach to update stream
+      const clipData = await this.cutHighlightClips(
+        filePath,
+        formattedHighlighterResponse,
+        setStreamInfo,
+      );
+      console.log('✅ cutHighlightClips');
+
+      // 6. add highlight clips
+      setStreamInfo.state = 'Done';
+      this.updateStream(setStreamInfo);
+
+      console.log('🔄 addClips', clipData);
+      this.addAiClips(clipData, streamInfo);
+      console.log('✅ addClips');
+    };
+
     console.log('🔄 HighlighterData');
-    const highlighterResponse = await getHighlightClips(filePath, updateStreamInfoProgress);
-    console.log('✅ HighlighterData', highlighterResponse);
-
-    console.log('🔄 formatHighlighterResponse');
-    const formattedHighlighterResponse = this.formatHighlighterResponse(highlighterResponse);
-    console.log('✅ formatHighlighterResponse', formattedHighlighterResponse);
-
-    console.log('🔄 cutHighlightClips');
-    this.updateStream({ state: 'Generating clips', ...setStreamInfo }); // alternate approach to update stream
-    const clipData = await this.cutHighlightClips(
+    const highlighterResponse = await getHighlightClips(
       filePath,
-      formattedHighlighterResponse,
-      setStreamInfo,
+      renderHighlights,
+      updateStreamInfoProgress,
     );
-    console.log('✅ cutHighlightClips');
+    console.log('✅ Final HighlighterData', highlighterResponse);
 
-    // 6. add highlight clips
-    setStreamInfo.state = 'Done';
-    this.updateStream(setStreamInfo);
-
-    console.log('🔄 addClips', clipData);
-    this.addAiClips(clipData, streamInfo);
-    console.log('✅ addClips');
     return;
   }
 

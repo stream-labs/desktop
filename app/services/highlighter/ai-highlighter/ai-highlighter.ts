@@ -17,7 +17,7 @@ export interface IHighlighterInput {
   origin: string;
 }
 
-export type EHighlighterMessageTypes = 'progress' | 'inputs';
+export type EHighlighterMessageTypes = 'progress' | 'inputs' | 'inputs_partial';
 
 export interface IHighlighterMessage {
   type: EHighlighterMessageTypes;
@@ -29,6 +29,7 @@ interface IHighlighterProgressMessage {
 
 export function getHighlightClips(
   videoUri: string,
+  renderHighlights: (highlightClips: IHighlighterInput[]) => void,
   progressUpdate?: (progress: number) => void,
 ): Promise<IHighlighterInput[]> {
   return new Promise((resolve, reject) => {
@@ -38,24 +39,29 @@ export function getHighlightClips(
     if (testData) {
       resolve(testData);
     } else {
+      let partialInputsRendered = false;
       console.log('Start Ai analysis');
       const childProcess: child.ChildProcess = getHighlighterProcess(videoUri);
       childProcess.stdout?.on('data', data => {
         const message = data.toString() as string;
-        // console.log('Normal logs:', data.toString());
         const aiHighlighterMessage = parseAiHighlighterMessage(message);
-        // console.log('Ai highlighter message:', aiHighlighterMessage);
         if (typeof aiHighlighterMessage === 'string' || aiHighlighterMessage instanceof String) {
-          console.log('\n\n');
-          console.log('Python log:', aiHighlighterMessage);
-          console.log('\n\n');
+          console.log(aiHighlighterMessage);
         } else {
           switch (aiHighlighterMessage?.type) {
             case 'progress':
               progressUpdate((aiHighlighterMessage.json as IHighlighterProgressMessage).progress);
               break;
             case 'inputs':
+              if (partialInputsRendered === false) {
+                renderHighlights?.(aiHighlighterMessage.json as IHighlighterInput[]);
+              }
               resolve(aiHighlighterMessage.json as IHighlighterInput[]);
+              break;
+            case 'inputs_partial':
+              partialInputsRendered = true;
+              renderHighlights?.(aiHighlighterMessage.json as IHighlighterInput[]);
+              // resolve(aiHighlighterMessage.json as IHighlighterInput[]);
               break;
             default:
               console.log('\n\n');
