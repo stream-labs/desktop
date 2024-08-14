@@ -479,14 +479,14 @@ function ChatTabs(p: { visibleChat: string; setChat: (key: string) => void }) {
         ))}
       </Menu>
       <div className={styles.liveDockChatTabsIcons}>
-        {/* {ctrl.isPopOutAllowed && ( */}
-        <Tooltip title={$t('Pop out to new window')} placement="topRight">
-          <i
-            className={cx(styles.liveDockChatTabsPopout, 'icon-pop-out-1')}
-            onClick={() => ctrl.popOut()}
-          />
-        </Tooltip>
-        {/* )} */}
+        {ctrl.isPopOutAllowed && (
+          <Tooltip title={$t('Pop out to new window')} placement="topRight">
+            <i
+              className={cx(styles.liveDockChatTabsPopout, 'icon-pop-out-1')}
+              onClick={() => ctrl.popOut()}
+            />
+          </Tooltip>
+        )}
         <Tooltip
           title={$t(
             'You can now reply to Twitch, YouTube and Facebook messages in Multistream chat. Click to learn more.',
