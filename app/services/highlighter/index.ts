@@ -689,10 +689,12 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     });
   }
 
-  addClips(paths: string[]) {
+  addClips(paths: string[], streamId: string | undefined) {
     paths.forEach(path => {
       // Don't allow adding the same clip twice
       if (this.state.clips[path]) return;
+
+      const streamInfo: StreamInfoForAiHighlighter = streamId ? { id: streamId } : undefined;
 
       this.ADD_CLIP({
         path,
@@ -702,7 +704,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
         endTrim: 0,
         deleted: false,
         source: 'Manual',
-        streamInfo: undefined,
+        streamInfo,
       });
     });
   }
