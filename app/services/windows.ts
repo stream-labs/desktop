@@ -43,6 +43,7 @@ import {
   RecordingHistory,
   EditTransform,
   Blank,
+  MultistreamChatInfo,
 } from 'components/shared/ReactComponentList';
 
 import SourcePropertiesDeprecated from 'components/windows/SourceProperties.vue';
@@ -120,6 +121,7 @@ export function getComponents() {
     SupporterGoal,
     SubscriberGoal,
     SuperchatGoal,
+    MultistreamChatInfo,
     CharityGoal,
     Credits,
     EventList,

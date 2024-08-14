@@ -25,11 +25,9 @@ import { SourcesService } from 'app-services';
 
 export function enableBTTVEmotesScript(isDarkTheme: boolean) {
   /*eslint-disable */
-return `
+  return `
 localStorage.setItem('bttv_clickTwitchEmotes', true);
-localStorage.setItem('bttv_darkenedMode', ${
-  isDarkTheme ? 'true' : 'false'
-});
+localStorage.setItem('bttv_darkenedMode', ${isDarkTheme ? 'true' : 'false'});
 
 var bttvscript = document.createElement('script');
 bttvscript.setAttribute('src','https://cdn.betterttv.net/betterttv.js');
@@ -48,7 +46,7 @@ function loadLazyEmotes() {
 
 loadLazyEmotes();
 0;
-`
+`;
   /*eslint-enable */
 }
 
@@ -377,5 +375,20 @@ export class ChatService extends Service {
     if (changed.enableBTTVEmotes != null || changed.enableFFZEmotes != null) {
       this.refreshChat();
     }
+  }
+
+  showMultistreamChatWindow() {
+    // We use a generated window Id to prevent someobody popping out the
+    // same winow multiple times.
+    this.windowsService.createOneOffWindow({
+      componentName: 'MultistreamChatInfo',
+      title: $t('Multistream Chat Platform Support'),
+      size: {
+        width: 748,
+        height: 635,
+        minWidth: 748,
+        minHeight: 635,
+      },
+    });
   }
 }
