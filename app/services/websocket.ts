@@ -26,7 +26,8 @@ export type TSocketEvent =
   | ISLIDMerged
   | IUserAccountMerged
   | IUserAccountUnlinked
-  | IUserAccountMergeError;
+  | IUserAccountMergeError
+  | IAccountPermissionsRequired;
 
 interface IStreamlabelsSocketEvent {
   type: 'streamlabels';
@@ -56,7 +57,8 @@ export interface IEventSocketEvent {
     | 'tiltifydonation'
     | 'donordrivedonation'
     | 'justgivingdonation'
-    | 'treat';
+    | 'treat'
+    | 'account_permissions_required';
   for: string;
   message: IRecentEvent[];
 }
@@ -139,6 +141,15 @@ interface IUserAccountMergeError {
   platform: TPlatform;
   message: string;
   code: number;
+}
+
+interface IAccountPermissionsRequired {
+  type: 'account_permissions_required';
+  for: string;
+  message: {
+    platform: string;
+    url: any;
+  }[];
 }
 
 export class WebsocketService extends Service {

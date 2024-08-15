@@ -234,6 +234,10 @@ class LiveDockController {
   showEditStreamInfo() {
     this.streamingService.actions.showEditStream();
   }
+
+  showMultistreamChatInfo() {
+    this.chatService.actions.showMultistreamChatWindow();
+  }
 }
 
 export default function LiveDockWithContext(p: { onLeft?: boolean }) {
@@ -434,27 +438,8 @@ function LiveDock(p: { onLeft: boolean }) {
               (isPlatform(['twitch', 'trovo']) ||
                 (isStreaming && isPlatform(['youtube', 'facebook', 'twitter', 'tiktok']))) && (
                 <div className={styles.liveDockChat}>
-                  {hasChatTabs && (
-                    <div className="flex">
-                      <Menu
-                        defaultSelectedKeys={[visibleChat]}
-                        onClick={ev => setChat(ev.key)}
-                        mode="horizontal"
-                      >
-                        {chatTabs.map(tab => (
-                          <Menu.Item key={tab.value}>{tab.name}</Menu.Item>
-                        ))}
-                      </Menu>
-                      {isPopOutAllowed && (
-                        <Tooltip title={$t('Pop out to new window')} placement="left">
-                          <i
-                            className={cx(styles.liveDockChatAppsPopout, 'icon-pop-out-1')}
-                            onClick={() => ctrl.popOut()}
-                          />
-                        </Tooltip>
-                      )}
-                    </div>
-                  )}
+                  {hasChatTabs && <ChatTabs visibleChat={visibleChat} setChat={setChat} />}
+
                   {!applicationLoading && !collapsed && chat}
                   {!['default', 'restream'].includes(visibleChat) && (
                     <PlatformAppPageView
@@ -476,6 +461,45 @@ function LiveDock(p: { onLeft: boolean }) {
           </div>
         )}
       </Animation>
+    </div>
+  );
+}
+
+function ChatTabs(p: { visibleChat: string; setChat: (key: string) => void }) {
+  const ctrl = useController(LiveDockCtx);
+  return (
+    <div className="flex">
+      <Menu
+        defaultSelectedKeys={[p.visibleChat]}
+        onClick={ev => p.setChat(ev.key)}
+        mode="horizontal"
+      >
+        {ctrl.chatTabs.map(tab => (
+          <Menu.Item key={tab.value}>{tab.name}</Menu.Item>
+        ))}
+      </Menu>
+      <div className={styles.liveDockChatTabsIcons}>
+        {ctrl.isPopOutAllowed && (
+          <Tooltip title={$t('Pop out to new window')} placement="topRight">
+            <i
+              className={cx(styles.liveDockChatTabsPopout, 'icon-pop-out-1')}
+              onClick={() => ctrl.popOut()}
+            />
+          </Tooltip>
+        )}
+        <Tooltip
+          title={$t(
+            'You can now reply to Twitch, YouTube and Facebook messages in Multistream chat. Click to learn more.',
+          )}
+          placement="topRight"
+          onClick={ctrl.showMultistreamChatInfo}
+        >
+          <i
+            className={cx(styles.liveDockChatTabsInfo, 'icon-information')}
+            onClick={ctrl.showMultistreamChatInfo}
+          />
+        </Tooltip>
+      </div>
     </div>
   );
 }

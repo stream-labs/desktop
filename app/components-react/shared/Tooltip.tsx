@@ -28,6 +28,7 @@ interface ITooltipTipProps {
   content?: HTMLElement | boolean;
   disabled?: boolean;
   autoAdjustOverflow?: boolean;
+  onClick?: () => void;
 }
 
 export default function Tooltip(props: PropsWithChildren<ITooltipTipProps>) {
@@ -42,6 +43,7 @@ export default function Tooltip(props: PropsWithChildren<ITooltipTipProps>) {
     content,
     disabled = false,
     autoAdjustOverflow = true,
+    onClick,
   } = props;
 
   return (
@@ -49,6 +51,7 @@ export default function Tooltip(props: PropsWithChildren<ITooltipTipProps>) {
       id={id}
       className={className ? cx(className, styles.tooltipWrapper) : styles.tooltipWrapper}
       style={wrapperStyle}
+      onClick={onClick}
     >
       {disabled ? (
         <>
