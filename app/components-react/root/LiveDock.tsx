@@ -299,10 +299,6 @@ function LiveDock(p: { onLeft: boolean }) {
       ctrl.setCollapsed(false);
     }
 
-    if (isRestreaming) {
-      Services.RestreamService.actions.refreshChat();
-    }
-
     const elapsedInterval = window.setInterval(() => {
       if (streamingStatus === EStreamingState.Live) {
         setElapsedStreamTime(ctrl.getElapsedStreamTime());
@@ -312,7 +308,19 @@ function LiveDock(p: { onLeft: boolean }) {
     }, 200);
 
     return () => clearInterval(elapsedInterval);
-  }, [streamingStatus, isRestreaming]);
+  }, [streamingStatus]);
+
+  useEffect(() => {
+    if (isRestreaming && streamingStatus === EStreamingState.Starting) {
+      Services.RestreamService.actions.refreshChat();
+      return;
+    }
+
+    if (!isRestreaming && visibleChat === 'restream') {
+      setVisibleChat('default');
+      return;
+    }
+  }, [visibleChat, isRestreaming, streamingStatus]);
 
   function toggleCollapsed() {
     collapsed ? ctrl.setCollapsed(false) : ctrl.setCollapsed(true);
