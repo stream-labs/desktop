@@ -221,29 +221,16 @@ export default function ClipsView({
         });
       });
     } else {
+      clips.forEach((clip, index) => {
+        const clipPath = clip.id;
+        HighlighterService.actions.UPDATE_CLIP({
+          path: clipPath,
+          globalOrderPosition: index,
+        });
+      });
       console.log('🚀 ~ Global Order changed');
     }
     return;
-    clips.forEach((clip, index) => {
-      const clipPath = clip.id;
-      HighlighterService.actions.UPDATE_CLIP({
-        path: clipPath,
-        streamInfo: {
-          ...v.clips.find(c => c.path === clipPath)?.streamInfo,
-          orderPosition: index,
-        },
-      });
-    });
-    // ReactDraggable fires setList on mount. To avoid sync IPC,
-    // we only fire off a request if the order changed.
-    // const oldOrder = HighlighterService.getClips(v.clips, props.id).map(c => c.path);
-    // console.log('🚀 ~ setClipOrder ~ oldOrder:', oldOrder);
-    // const newOrder = clips.filter(c => c.id !== 'add').map(c => c.id);
-    // console.log('🚀 ~ setClipOrder ~ newOrder:', newOrder);
-    // if (!isEqual(oldOrder, newOrder)) {
-    //   // Intentionally synchronous to avoid visual jank on drop
-    //   HighlighterService.setOrder(newOrder);
-    // }
   }
 
   const [inspectedClipPath, setInspectedClipPath] = useState<string | null>(null);
@@ -264,22 +251,33 @@ export default function ClipsView({
     if (v.error) HighlighterService.actions.dismissError();
   }
 
-  //TODO: Need performance update!
+  //TODO: Need performance updateb
   function getClipsView(streamId: string | undefined) {
-    const clipsWithOrder = HighlighterService.getClips(v.clips, props.id)
-      .filter(c => c.streamInfo && c.streamInfo?.orderPosition !== undefined)
-      .sort((a: TClip, b: TClip) => a.streamInfo!.orderPosition - b.streamInfo!.orderPosition)
-      .map(c => ({
-        id: c.path,
-      }));
+    let clipList;
+    if (streamId) {
+      const clipsWithOrder = HighlighterService.getClips(v.clips, props.id)
+        .filter(c => c.streamInfo && c.streamInfo?.orderPosition !== undefined)
+        .sort((a: TClip, b: TClip) => a.streamInfo!.orderPosition - b.streamInfo!.orderPosition)
+        .map(c => ({
+          id: c.path,
+        }));
+      console.log('🚀 ~ getClipsView ~ clipsWithOrder:', clipsWithOrder);
 
-    const clipsWithOutOrder = HighlighterService.getClips(v.clips, props.id)
-      .filter(c => c.streamInfo === undefined || c.streamInfo.orderPosition === undefined)
-      .map(c => ({ id: c.path }));
+      const clipsWithOutOrder = HighlighterService.getClips(v.clips, props.id)
+        .filter(c => c.streamInfo === undefined || c.streamInfo.orderPosition === undefined)
+        .map(c => ({ id: c.path }));
+      console.log('🚀 ~ getClipsView ~ clipsWithOutOrder:', clipsWithOutOrder);
 
-    //TODO: Why does it not work without {id: 'add', filtered: true}?
-    const clipList = [{ id: 'add', filtered: true }, ...clipsWithOrder, ...clipsWithOutOrder];
+      //TODO: Why does it not work without {id: 'add', filtered: true}?
+      clipList = [{ id: 'add', filtered: true }, ...clipsWithOrder, ...clipsWithOutOrder];
+    } else {
+      const clipOrder = HighlighterService.getClips(v.clips, undefined)
+        .sort((a: TClip, b: TClip) => a.globalOrderPosition - b.globalOrderPosition)
+        .map(c => ({ id: c.path }));
 
+      //TODO: Why does it not work without {id: 'add', filtered: true}?A
+      clipList = [{ id: 'add', filtered: true }, ...clipOrder];
+    }
     console.log('Rerender clips:', clipList);
 
     function onDrop(e: React.DragEvent<HTMLDivElement>) {
@@ -414,8 +412,8 @@ export default function ClipsView({
         >
           {!!v.error && <Alert message={v.error} type="error" showIcon />}
           {inspectedClip && showModal === 'trim' && <ClipTrimmer clip={inspectedClip} />}
-          {showModal === 'export' && <ExportModal close={closeModal} />}
-          {showModal === 'preview' && <PreviewModal close={closeModal} />}
+          {showModal === 'export' && <ExportModal close={closeModal} streamId={streamId} />}
+          {showModal === 'preview' && <PreviewModal close={closeModal} streamId={streamId} />}
           {inspectedClip && showModal === 'remove' && (
             <RemoveClip close={closeModal} clip={inspectedClip} />
           )}

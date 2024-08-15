@@ -16,7 +16,11 @@ import { $t } from 'services/i18n';
 import * as remote from '@electron/remote';
 import uuid from 'uuid';
 
-type TModalStreamView = 'export' | 'preview' | 'upload';
+type TModalStreamView =
+  | { type: 'export'; id: string | undefined }
+  | { type: 'preview'; id: string | undefined }
+  | { type: 'upload' }
+  | null;
 
 interface IClipsViewProps {
   id: string | undefined;
@@ -46,7 +50,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
   function setShowModal(modal: TModalStreamView | null) {
     rawSetShowModal(modal);
 
-    if (modal) {
+    if (modal && modal.type) {
       setModalWidth(
         {
           trim: '60%',
@@ -54,7 +58,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
           export: '700px',
           remove: '400px',
           upload: '400px',
-        }[modal],
+        }[modal.type],
       );
     }
   }
@@ -77,7 +81,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
     try {
       await HighlighterService.loadClips(id);
       setPreparingExport(null);
-      rawSetShowModal('preview');
+      rawSetShowModal({ type: 'preview', id });
     } catch (error: unknown) {
       setPreparingExport(null);
     }
@@ -95,7 +99,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
     try {
       await HighlighterService.loadClips(id);
       setPreparingExport(null);
-      rawSetShowModal('export');
+      rawSetShowModal({ type: 'export', id });
       console.log('startExport');
     } catch (error: unknown) {
       setPreparingExport(null);
@@ -254,10 +258,11 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
             <h1 style={{ margin: 0 }}>My stream highlights</h1>
           </div>
           <div style={{ display: 'flex', gap: '16px' }}>
-            <Button onClick={() => setShowModal('upload')}>Import</Button>
+            <Button onClick={() => setShowModal({ type: 'upload' })}>Import</Button>
             <Button onClick={() => emitSetView({ view: 'settings' })}>Settings</Button>
           </div>
         </div>
+
         <Scrollable style={{ flexGrow: 1, padding: '20px 0 20px 20px' }}>
           <div
             style={{
@@ -464,9 +469,13 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
         >
           {/* {!!v.error && <Alert message={v.error} type="error" showIcon />} */}
           {/* {inspectedClip && showModal === 'trim' && <ClipTrimmer clip={inspectedClip} />} */}
-          {showModal === 'upload' && <ImportStreamModal close={closeModal} />}
-          {showModal === 'export' && <ExportModal close={closeModal} />}
-          {showModal === 'preview' && <PreviewModal close={closeModal} />}
+          {showModal?.type === 'upload' && <ImportStreamModal close={closeModal} />}
+          {showModal?.type === 'export' && (
+            <ExportModal close={closeModal} streamId={showModal.id} />
+          )}
+          {showModal?.type === 'preview' && (
+            <PreviewModal close={closeModal} streamId={showModal.id} />
+          )}
           {/* {inspectedClip && showModal === 'remove' && (
             <RemoveClip close={closeModal} clip={inspectedClip} />
           )} */}
