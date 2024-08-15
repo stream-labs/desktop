@@ -55,7 +55,6 @@ class GoLiveSettingsState extends StreamInfoView<IGoLiveSettingsState> {
       },
     };
     this.updateSettings(updated);
-    Services.StreamSettingsService.platformUpdated.next(platform);
   }
 
   switchPlatforms(enabledPlatforms: TPlatform[]) {

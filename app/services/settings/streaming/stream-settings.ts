@@ -14,7 +14,6 @@ import Vue from 'vue';
 import { IVideo } from 'obs-studio-node';
 import { DualOutputService } from 'services/dual-output';
 import { TOutputOrientation } from 'services/restream';
-import { Subject } from 'rxjs';
 
 interface ISavedGoLiveSettings {
   platforms: {
@@ -110,8 +109,6 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
   @Inject() private platformAppsService: PlatformAppsService;
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private dualOutputService: DualOutputService;
-
-  platformUpdated = new Subject<TPlatform>();
 
   static defaultState: IStreamSettingsState = {
     protectedModeEnabled: true,

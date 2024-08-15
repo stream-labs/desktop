@@ -455,10 +455,6 @@ export class RestreamService extends StatefulService<IRestreamState> {
       },
     );
 
-    this.streamSettingsService.platformUpdated.subscribe(() => {
-      this.refreshChat();
-    });
-
     this.chatView.webContents.loadURL(this.chatUrl);
 
     electron.ipcRenderer.send('webContents-preventPopup', this.chatView.webContents.id);

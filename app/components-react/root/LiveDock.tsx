@@ -299,6 +299,10 @@ function LiveDock(p: { onLeft: boolean }) {
       ctrl.setCollapsed(false);
     }
 
+    if (isRestreaming) {
+      Services.RestreamService.actions.refreshChat();
+    }
+
     const elapsedInterval = window.setInterval(() => {
       if (streamingStatus === EStreamingState.Live) {
         setElapsedStreamTime(ctrl.getElapsedStreamTime());
