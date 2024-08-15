@@ -310,6 +310,18 @@ function LiveDock(p: { onLeft: boolean }) {
     return () => clearInterval(elapsedInterval);
   }, [streamingStatus]);
 
+  useEffect(() => {
+    if (isRestreaming && streamingStatus === EStreamingState.Starting) {
+      Services.RestreamService.actions.refreshChat();
+      return;
+    }
+
+    if (!isRestreaming && visibleChat === 'restream') {
+      setVisibleChat('default');
+      return;
+    }
+  }, [visibleChat, isRestreaming, streamingStatus]);
+
   function toggleCollapsed() {
     collapsed ? ctrl.setCollapsed(false) : ctrl.setCollapsed(true);
   }
