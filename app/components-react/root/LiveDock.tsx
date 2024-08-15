@@ -312,7 +312,7 @@ function LiveDock(p: { onLeft: boolean }) {
     }, 200);
 
     return () => clearInterval(elapsedInterval);
-  }, [streamingStatus]);
+  }, [streamingStatus, isRestreaming]);
 
   function toggleCollapsed() {
     collapsed ? ctrl.setCollapsed(false) : ctrl.setCollapsed(true);
