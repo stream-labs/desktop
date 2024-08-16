@@ -106,18 +106,6 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
     }
   }
 
-  function setClipOrder(clips: { id: string }[]) {
-    // ReactDraggable fires setList on mount. To avoid sync IPC,
-    // we only fire off a request if the order changed.
-    const oldOrder = v.clips.map(c => c.path);
-    const newOrder = clips.filter(c => c.id !== 'add').map(c => c.id);
-
-    if (!isEqual(oldOrder, newOrder)) {
-      // Intentionally synchronous to avoid visual jank on drop
-      HighlighterService.setOrder(newOrder);
-    }
-  }
-
   const [inspectedClipPath, setInspectedClipPath] = useState<string | null>(null);
   let inspectedClip: TClip | null;
 

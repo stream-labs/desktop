@@ -171,7 +171,6 @@ export interface IAudioInfo {
 
 interface IHighligherState {
   clips: Dictionary<TClip>;
-  clipOrder: string[];
   transition: ITransitionInfo;
   audio: IAudioInfo;
   export: IExportInfo;
@@ -304,8 +303,6 @@ class HighligherViews extends ViewHandler<IHighligherState> {
    */
   get clips() {
     return Object.values(this.state.clips);
-    // TODO: Clean
-    // return this.state.clipOrder.map(p => this.state.clips[p]);
   }
 
   /**
@@ -387,7 +384,6 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
   static defaultState: IHighligherState = {
     clips: {},
-    clipOrder: [],
     transition: {
       type: 'fade',
       duration: 1,
@@ -445,7 +441,6 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   @mutation()
   ADD_CLIP(clip: TClip) {
     Vue.set(this.state.clips, clip.path, clip);
-    this.state.clipOrder.push(clip.path);
     this.state.export.exported = false;
   }
 
@@ -461,13 +456,6 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   @mutation()
   REMOVE_CLIP(clipPath: string) {
     Vue.delete(this.state.clips, clipPath);
-    this.state.clipOrder = this.state.clipOrder.filter(c => c !== clipPath);
-    this.state.export.exported = false;
-  }
-
-  @mutation()
-  SET_ORDER(order: string[]) {
-    this.state.clipOrder = order;
     this.state.export.exported = false;
   }
 
@@ -561,11 +549,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
   init() {
     super.init();
-    console.log('Init highlighter service');
-    //TODO: If ppl have globalClipOrder -> change it to the new orderStructure
 
-    // Reset clips
-    // Set all clips to not loaded
     //TODO: stuff is stored in the persistant storage that shouldnt be stored there eg loaded
     this.views.clips.forEach(c => {
       this.UPDATE_CLIP({
@@ -777,10 +761,6 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
   removeClip(path: string) {
     this.REMOVE_CLIP(path);
-  }
-
-  setOrder(order: string[]) {
-    this.SET_ORDER(order);
   }
 
   setTransition(transition: Partial<ITransitionInfo>) {
