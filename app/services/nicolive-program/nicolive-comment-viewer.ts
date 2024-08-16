@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/vue';
-import { EMPTY, Observable, Subject, Subscription, interval, merge, of } from 'rxjs';
+import { EMPTY, Observable, Subject, Subscription, from, merge, of } from 'rxjs';
 import {
   bufferTime,
   catchError,
@@ -47,7 +47,13 @@ import {
   isOperatorMessage,
   isStateMessage,
 } from './ChatMessage/util';
-import { MessageResponse } from './ChatMessage';
+import {
+  GiftMessage,
+  MessageResponse,
+  NicoadMessageV0,
+  NicoadMessageV1,
+  NotificationMessage,
+} from './ChatMessage';
 
 function makeEmulatedChat(
   content: string,
@@ -65,11 +71,51 @@ function makeEmulatedChat(
 // yarn dev 用: ダミーでコメントを5秒ごとに出し続ける
 class DummyMessageServerClient implements IMessageServerClient {
   connect(): Observable<MessageResponse> {
-    return interval(5000).pipe(
-      map(res => ({
-        chat: makeEmulatedChat(`${res}`).value,
-      })),
-    );
+    const date = Math.floor(Date.now() / 1000);
+    return from([
+      // ギフト
+      {
+        // GiftMessage
+        gift: {
+          itemId: '1',
+          advertiserUserId: 1,
+          advertiserName: '広告主',
+          point: 100,
+          message: 'ギフト',
+          itemName: 'アイテム',
+          contributionRank: 1,
+          date,
+        } as GiftMessage,
+      },
+      // ニコニ広告
+      {
+        nicoad: {
+          v0: {
+            latest: { advertiser: '広告主', point: 100, message: 'ニコニ広告v0' },
+            ranking: [
+              { advertiser: '広告主', rank: 1, message: 'ランキング1', userRank: 1 },
+              { advertiser: '広告主', rank: 2, message: 'ランキング2', userRank: 2 },
+            ],
+            totalPoint: 100,
+          },
+          date,
+        } as NicoadMessageV0,
+      },
+      {
+        nicoad: {
+          v1: { totalAdPoint: 100, message: 'ニコニ広告v1' },
+          date,
+        } as NicoadMessageV1,
+      },
+      // エモーション
+      {
+        notification: {
+          type: 'emotion',
+          message: 'エモーション',
+          date,
+        } as NotificationMessage,
+      },
+    ]);
   }
   close(): void {
     // do nothing
