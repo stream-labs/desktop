@@ -144,7 +144,7 @@ export class MediaGalleryService extends Service {
     audios: Array<IMediaGalleryFile>;
     images: Array<IMediaGalleryFile>;
   }> {
-    const req = this.formRequest('api/v5/slobs/widget/alertbox/stock-media');
+    const req = this.formRequest('api/v5/slobs/widget/alertbox/stock-media?alerts_panels=true');
     return jfetch(req);
   }
 
