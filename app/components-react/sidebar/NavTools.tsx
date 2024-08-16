@@ -24,6 +24,7 @@ export default function SideNav() {
     UsageStatisticsService,
     SideNavService,
     WindowsService,
+    UrlService,
   } = Services;
 
   const isDevMode = Utils.isDevMode();
@@ -90,9 +91,7 @@ export default function SideNav() {
 
   function openHelp() {
     UsageStatisticsService.actions.recordClick('SideNav2', 'help');
-    remote.shell.openExternal(
-      'https://streamlabs.com/content-hub/support/support-streamlabs-desktop',
-    );
+    remote.shell.openExternal(UrlService.supportLink);
   }
 
   async function upgradeToPrime() {
