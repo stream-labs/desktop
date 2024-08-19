@@ -400,6 +400,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
   private chatView: Electron.BrowserView;
 
   refreshChat() {
+    if (!this.chatView) return;
     this.chatView.webContents.loadURL(this.chatUrl);
   }
 

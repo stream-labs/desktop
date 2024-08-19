@@ -37,8 +37,19 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
   // special handling for TikTok for non-ultra users
   // to disable/enable platforms and open ultra link
   const promptConnectTikTok = !isPlatformLinked('tiktok');
-  const disableSwitchers =
-    promptConnectTikTok && (enabledPlatforms.length > 1 || enabledDestinations.length > 0);
+
+  const shouldDisableCustomDestinationSwitchers = () => {
+    // Multistream users can always add destinations
+    if (isRestreamEnabled) {
+      return false;
+    }
+
+    // Otherwise, only a single platform and no custom destinations,
+    // TikTok should be handled by platform switching
+    return enabledPlatforms.length > 0;
+  };
+
+  const disableCustomDestinationSwitchers = shouldDisableCustomDestinationSwitchers();
 
   const emitSwitch = useDebounce(500, (ind?: number, enabled?: boolean) => {
     if (ind !== undefined && enabled !== undefined) {
@@ -141,7 +152,7 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
           destination={dest}
           enabled={customDestinations[ind].enabled}
           onChange={enabled => switchCustomDestination(ind, enabled)}
-          disabled={disableSwitchers && !isEnabled(ind)}
+          disabled={disableCustomDestinationSwitchers && !isEnabled(ind)}
         />
       ))}
     </div>
@@ -196,6 +207,11 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
           Services.WindowsService.actions.closeChildWindow();
         },
       });
+      return;
+    }
+
+    // If we're disabling the switch we shouldn't be emitting anything past below
+    if (p.disabled) {
       return;
     }
 

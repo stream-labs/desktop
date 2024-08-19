@@ -48,7 +48,7 @@ export default function GoLiveSettings() {
       get canAddDestinations() {
         const linkedPlatforms = module.state.linkedPlatforms;
         const customDestinations = module.state.customDestinations;
-        return linkedPlatforms.length + customDestinations.length < 5;
+        return linkedPlatforms.length + customDestinations.length < 8;
       },
 
       // in single output mode, only show destination switcher when tiktok has not been linked
