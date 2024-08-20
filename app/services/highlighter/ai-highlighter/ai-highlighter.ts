@@ -70,8 +70,8 @@ export function getHighlightClips(
               resolve(aiHighlighterMessage.json as IHighlight[]);
               break;
             case 'highlights_partial':
-              partialInputsRendered = true;
-              renderHighlights?.(aiHighlighterMessage.json as IHighlight[]);
+              // partialInputsRendered = true;
+              // renderHighlights?.(aiHighlighterMessage.json as IHighlight[]);
               // resolve(aiHighlighterMessage.json as IHighlighterInput[]);
               break;
             default:
