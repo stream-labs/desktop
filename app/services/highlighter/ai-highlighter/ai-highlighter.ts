@@ -16,8 +16,18 @@ export interface IHighlighterInput {
   type: EHighlighterInputTypes;
   origin: string;
 }
+export interface IHighlight {
+  start_time: number;
+  end_time: number;
+  type: EHighlighterInputTypes;
+}
 
-export type EHighlighterMessageTypes = 'progress' | 'inputs' | 'inputs_partial';
+export type EHighlighterMessageTypes =
+  | 'progress'
+  | 'inputs'
+  | 'inputs_partial'
+  | 'highlights'
+  | 'highlights_partial';
 
 export interface IHighlighterMessage {
   type: EHighlighterMessageTypes;
@@ -29,9 +39,9 @@ interface IHighlighterProgressMessage {
 
 export function getHighlightClips(
   videoUri: string,
-  renderHighlights: (highlightClips: IHighlighterInput[]) => void,
+  renderHighlights: (highlightClips: IHighlight[]) => void,
   progressUpdate?: (progress: number) => void,
-): Promise<IHighlighterInput[]> {
+): Promise<IHighlight[]> {
   return new Promise((resolve, reject) => {
     console.log(`Get highlight clips for ${videoUri}`);
 
@@ -41,6 +51,7 @@ export function getHighlightClips(
     } else {
       let partialInputsRendered = false;
       console.log('Start Ai analysis');
+
       const childProcess: child.ChildProcess = getHighlighterProcess(videoUri);
       childProcess.stdout?.on('data', data => {
         const message = data.toString() as string;
@@ -52,15 +63,15 @@ export function getHighlightClips(
             case 'progress':
               progressUpdate((aiHighlighterMessage.json as IHighlighterProgressMessage).progress);
               break;
-            case 'inputs':
+            case 'highlights':
               if (partialInputsRendered === false) {
-                renderHighlights?.(aiHighlighterMessage.json as IHighlighterInput[]);
+                renderHighlights?.(aiHighlighterMessage.json as IHighlight[]);
               }
-              resolve(aiHighlighterMessage.json as IHighlighterInput[]);
+              resolve(aiHighlighterMessage.json as IHighlight[]);
               break;
-            case 'inputs_partial':
-              partialInputsRendered = true;
-              renderHighlights?.(aiHighlighterMessage.json as IHighlighterInput[]);
+            case 'highlights_partial':
+              // partialInputsRendered = true;
+              // renderHighlights?.(aiHighlighterMessage.json as IHighlight[]);
               // resolve(aiHighlighterMessage.json as IHighlighterInput[]);
               break;
             default:

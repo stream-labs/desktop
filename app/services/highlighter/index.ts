@@ -48,7 +48,7 @@ import { NavigationService } from 'services/navigation';
 import { SharedStorageService } from 'services/integrations/shared-storage';
 import execa from 'execa';
 import moment from 'moment';
-import { getHighlightClips, IHighlighterInput } from './ai-highlighter/ai-highlighter';
+import { getHighlightClips, IHighlight, IHighlighterInput } from './ai-highlighter/ai-highlighter';
 
 export type TStreamInfo = { id?: string; orderPosition: number } | undefined;
 
@@ -1344,18 +1344,14 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     // const videoUri = '/Users/marvinoffers/Movies/djnardi-short.mp4'; // replace with filepath
     console.log('Test flow');
 
-    const renderHighlights = async (partialInputs: IHighlighterInput[]) => {
-      console.log('🔄 formatHighlighterResponse');
-      const formattedHighlighterResponse = this.formatHighlighterResponse(partialInputs);
-      console.log('✅ formatHighlighterResponse', formattedHighlighterResponse);
+    const renderHighlights = async (partialHighlights: IHighlight[]) => {
+      // console.log('🔄 formatHighlighterResponse');
+      // const formattedHighlighterResponse = this.formatHighlighterResponse(partialInputs);
+      // console.log('✅ formatHighlighterResponse', formattedHighlighterResponse);
 
       console.log('🔄 cutHighlightClips');
       this.updateStream({ state: 'Generating clips', ...setStreamInfo }); // alternate approach to update stream
-      const clipData = await this.cutHighlightClips(
-        filePath,
-        formattedHighlighterResponse,
-        setStreamInfo,
-      );
+      const clipData = await this.cutHighlightClips(filePath, partialHighlights, setStreamInfo);
       console.log('✅ cutHighlightClips');
 
       // 6. add highlight clips
@@ -1444,7 +1440,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
   async cutHighlightClips(
     videoUri: string,
-    highlighterData: IHighlighterData[],
+    highlighterData: IHighlight[],
     streamInfo: IHighlightedStream,
   ): Promise<{ path: string; aiClipInfo: IAiClipInfo }[]> {
     let filePaths: string[] = []; // To keep track and dont render same videos multiple times
@@ -1468,11 +1464,11 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     }
 
     const tasks = highlighterData
-      .sort((a, b) => a.start - b.start)
-      .map(({ start, end, type }) => {
+      .sort((a, b) => a.start_time - b.start_time)
+      .map(({ start_time, end_time, type }) => {
         return (async () => {
-          const formattedStart = start.toString().padStart(6, '0');
-          const formattedEnd = end.toString().padStart(6, '0');
+          const formattedStart = start_time.toString().padStart(6, '0');
+          const formattedEnd = end_time.toString().padStart(6, '0');
           const outputFilename = `${folderName}-${formattedStart}-${formattedEnd}.mp4`;
           const outputUri = path.join(outputDir, outputFilename);
 
@@ -1495,9 +1491,9 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
             '-i',
             videoUri,
             '-ss',
-            start.toString(),
+            start_time.toString(),
             '-to',
-            end.toString(),
+            end_time.toString(),
             '-c:v',
             'libx264',
             '-c:a',
