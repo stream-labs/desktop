@@ -253,11 +253,8 @@ class UserViews extends ViewHandler<IUserServiceState> {
     return this.state.auth;
   }
 
-  appStoreUrl(params?: { appId?: string | undefined; type?: string | undefined }) {
-    const host = this.hostsService.platform;
-    const token = this.auth.apiToken;
-    const nightMode = this.customizationService.isDarkTheme ? 'night' : 'day';
-    let url = `https://${host}/slobs-store`;
+  async appStoreUrl(params?: { appId?: string | undefined; type?: string | undefined }) {
+    let url = `https://${this.hostsService.streamlabs}/library/app-store`;
 
     if (params?.appId) {
       url = `${url}/app/${params?.appId}`;
@@ -266,7 +263,9 @@ class UserViews extends ViewHandler<IUserServiceState> {
       url = `${url}/${params?.type}`;
     }
 
-    return `${url}?token=${token}&mode=${nightMode}`;
+    const magicUrl = await this.magicLinkService.actions.return.getMagicSessionUrl(url);
+
+    return magicUrl;
   }
 
   setPrimaryPlatform(platform: TPlatform) {
