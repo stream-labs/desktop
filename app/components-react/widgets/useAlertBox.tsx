@@ -187,7 +187,8 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
   override setData(data: IAlertBoxState['data']) {
     // save widget data instate and calculate additional state variables
     super.setData(data);
-    const allAlerts = values(this.eventsConfig) as IAlertConfig[];
+    // Get all defined alert configurations, unimplemented alerts will show as undefined, so we filter
+    const allAlerts = values(this.eventsConfig).filter(x => x) as IAlertConfig[];
 
     // group alertbox settings by alert types and store them in `state.data.variations`
     this.state.mutate(state => {
@@ -312,7 +313,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
     });
 
     // set the same message template for all Cheer variations
-    if (type === 'twCheer') {
+    if (type === 'bits') {
       const newBitsVariations = this.widgetData.settings.bit_variations.map((variation: any) => {
         const newVariation = cloneDeep(variation);
         newVariation.settings.text.format = newVariationSettings.message_template;
@@ -396,7 +397,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
     alerts = topAlerts.concat(alerts.sort().filter(alert => !topAlerts.includes(alert)));
 
     // TODO: fbSupportGift is impossible to enable on backend
-    alerts = alerts.filter(alert => alert !== 'fbSupportGift');
+    alerts = alerts.filter(alert => alert !== 'facebook_support_gifter');
     this.widgetState.availableAlerts = alerts;
   }
 }
@@ -483,49 +484,60 @@ function getVariationsMetadata() {
         min: 0,
       }),
     },
-    twFollow: {},
-    fbFollow: {},
-    twRaid: {
-      message_template: getMessageTemplateMetadata('twRaid'),
+    follow: {},
+    facebook_follow: {},
+    raid: {
+      message_template: getMessageTemplateMetadata('raid'),
     },
-    twSubscription: {},
-    twCheer: {
-      message_template: getMessageTemplateMetadata('twCheer'),
+    sub: {},
+    bits: {
+      message_template: getMessageTemplateMetadata('bits'),
       alert_message_min_amount: metadata.number({
         label: $t('Min. Amount to Trigger Alert'),
         min: 0,
       }),
     },
-    ytSuperchat: {
+    fanfunding: {
       alert_message_min_amount: metadata.number({
         label: $t('Min. Amount to Trigger Alert'),
         min: 0,
       }),
     },
-    fbStars: {
-      message_template: getMessageTemplateMetadata('fbStars'),
+    facebook_stars: {
+      message_template: getMessageTemplateMetadata('facebook_stars'),
       alert_message_min_amount: metadata.number({
         label: $t('Min. Amount to Trigger Alert'),
         min: 0,
       }),
     },
-    fbSupport: {
-      message_template: getMessageTemplateMetadata('fbSupport'),
+    facebook_support: {
+      message_template: getMessageTemplateMetadata('facebook_support'),
     },
-    fbSupportGift: {},
-    fbShare: {},
-    fbLike: {},
+    facebook_support_gifter: {},
+    facebook_share: {},
+    facebook_like: {},
     merch: {
       message_template: getMessageTemplateMetadata('merch'),
       use_custom_image: metadata.bool({
         label: $t('Replace product image with custom image'),
       }),
     },
-    ytSubscriber: {},
-    ytMembership: {},
-    trFollow: {},
-    trSubscription: {},
-    trRaid: {},
+    subscriber: {},
+    sponsor: {},
+    trovo_follow: {},
+    trovo_sub: {},
+    trovo_raid: {},
+    donordrive_donation: undefined,
+    eldonation: undefined,
+    justgiving_donation: undefined,
+    loyalty_store_redemption: undefined,
+    membershipGift: undefined,
+    pledge: undefined,
+    resub: undefined,
+    streamlabscharitydonation: undefined,
+    tiltify_donation: undefined,
+    treat: undefined,
+    twitchcharitydonation: undefined,
   });
 
   // mix common and specific metadata and return it
@@ -551,9 +563,9 @@ function getMessageTemplateMetadata(alert?: TAlertType) {
 
   switch (alert) {
     case 'donation':
-    case 'twCheer':
-    case 'fbStars':
-    case 'fbSupport':
+    case 'bits':
+    case 'facebook_stars':
+    case 'facebook_support':
       tooltipTokens =
         ' {name} ' +
         $t('The name of the donator') +
@@ -563,7 +575,7 @@ function getMessageTemplateMetadata(alert?: TAlertType) {
     case 'merch':
       tooltipTokens = '{name}, {product}';
       break;
-    case 'twRaid':
+    case 'raid':
       tooltipTokens =
         ' {name} ' +
         $t('The name of the streamer raiding you') +
