@@ -160,6 +160,13 @@ export class RemoteControlService extends Service {
       this.socket.on('error', (e: unknown) => {
         throw e;
       });
+
+      this.socket.on('disconnect', (reason: string) => {
+        console.log(reason);
+        if (reason !== 'io client disconnect') {
+          this.createStreamlabsRemoteConnection();
+        }
+      });
     }
   }
 
