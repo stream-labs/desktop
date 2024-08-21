@@ -3,10 +3,9 @@ import { Tooltip } from 'antd';
 import cx from 'classnames';
 import { useVuex } from '../hooks';
 import { Services } from '../service-provider';
-import cloneDeep from 'lodash/cloneDeep';
 import styles from './PerformanceMetrics.m.less';
 import { $t } from '../../services/i18n';
-import { useRealmObject } from 'components-react/hooks/realm';
+import { useRealmObject, useRealmObjectAdv } from 'components-react/hooks/realm';
 
 type TPerformanceMetricsMode = 'full' | 'limited';
 
@@ -16,7 +15,12 @@ export default function PerformanceMetrics(props: {
 }) {
   const { CustomizationService, PerformanceService } = Services;
 
-  const pinnedStats = useRealmObject(CustomizationService.state.pinnedStatistics);
+  const pinnedStats = useRealmObjectAdv(CustomizationService.state.pinnedStatistics, obj => [
+    obj.cpu,
+    obj.fps,
+    obj.droppedFrames,
+    obj.bandwidth
+  ]);
 
   const v = useVuex(
     () => ({
@@ -76,7 +80,7 @@ export default function PerformanceMetrics(props: {
         props.className,
       )}
     >
-      {shownCells.map(attribute => {
+      {shownCells.map((attribute) => {
         const data = metadata[attribute];
         return (
           <Tooltip placement="bottom" title={pinTooltip(data.label)} key={attribute}>
