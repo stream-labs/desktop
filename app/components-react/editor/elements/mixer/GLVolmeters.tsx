@@ -78,6 +78,7 @@ export default function GLVolmeters() {
 class GLVolmetersModule {
   private customizationService = Services.CustomizationService;
   private audioService = Services.AudioService;
+  private scenesService = Services.ScenesService
 
   subscriptions: Dictionary<IVolmeterSubscription> = {};
 
@@ -129,7 +130,10 @@ class GLVolmetersModule {
   // TODO: refactor into a single source of truth between Mixer and Volmeters
   get audioSources() {
     return this.audioService.views.sourcesForCurrentScene.filter(source => {
-      return !source.mixerHidden && source.isControlledViaObs;
+      return !source.mixerHidden &&
+             source.isControlledViaObs &&
+             // If visibility state is undefined, such items will be displayed (for example, microphone)
+             this.scenesService.views.activeScene?.getItems().find(item => item?.sourceId === source.sourceId)?.visible !== false
     });
   }
 
