@@ -27,9 +27,9 @@ export function initStore<TState extends any>(initialStateDraft: TState) {
   const useState = createBoundedUseStore(store);
   (store as any).useState = useState;
 
-  const update = (key: keyof TState, value: any) =>
+  const update = <T extends keyof Draft<TState>>(key: T, value: Draft<TState>[T]) =>
     store.setState((s: Draft<TState>) => {
-      (s as any)[key] = value;
+      s[key] = value;
     });
   (store as any).update = update;
 
@@ -87,7 +87,7 @@ export function useController<T>(ControllerCtx: Context<T>): NonNullable<T> {
       if (actionName === 'constructor') continue;
       if (!(controller as any)[actionName]?.bind) continue;
       // Run initialize actions if they exist
-      if (actionName === 'init') controller[actionName]();
+      if (actionName === 'init') (controller as any)[actionName]();
       actions[actionName] = (controller as any)[actionName].bind(controller);
     }
 
