@@ -109,12 +109,20 @@ export interface StreamInfoForAiHighlighter {
   game?: string;
   title?: string;
 }
-interface IHighlightedStream {
+export interface IHighlightedStream {
   id: string;
   game: string;
   title: string;
   date: string;
-  state: { description: string; progress: number };
+  state: {
+    type:
+      | 'initialized'
+      | 'detection-in-progress'
+      | 'error'
+      | 'detection-finished'
+      | 'detection-canceled-by-user';
+    progress: number;
+  };
 }
 
 export enum EExportStep {
@@ -550,6 +558,15 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   init() {
     super.init();
 
+    //Check if aiDetections were still running when the user closed desktop
+    this.views.highlightedStreams
+      .filter(stream => stream.state.type === 'detection-in-progress')
+      .forEach(stream => {
+        this.UPDATE_HIGHLIGHTED_STREAM({
+          ...stream,
+          state: { type: 'detection-canceled-by-user', progress: 0 },
+        });
+      });
     //TODO: stuff is stored in the persistant storage that shouldnt be stored there eg loaded
     this.views.clips.forEach(c => {
       this.UPDATE_CLIP({
@@ -1393,7 +1410,10 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     // 5. cut data into highlightClips
 
     const setStreamInfo: IHighlightedStream = {
-      state: { description: 'Searching for highlights...', progress: 0 },
+      state: {
+        type: 'detection-in-progress',
+        progress: 0,
+      },
       date: moment().toISOString(),
       id: streamInfo.id || 'noId',
       title: streamInfo.title || filePath.split('/').pop() || 'Your awesome stream',
@@ -1406,7 +1426,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     this.addStream(setStreamInfo);
 
     const updateStreamInfoProgress = (progress: number) => {
-      console.log('updateStreamInfoProgress progress', progress);
+      // console.log('updateStreamInfoProgress progress', progress);
       setStreamInfo.state.progress = Math.round(progress * 100);
       this.updateStream(setStreamInfo);
     };
@@ -1462,7 +1482,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       const clipData = await cutHighlightClipsWithProgress();
       console.log('✅ cutHighlightClips');
       // 6. add highlight clips
-      setStreamInfo.state.description = 'Done';
+      setStreamInfo.state.type = 'detection-finished';
       updateStreamInfoProgress(1);
       this.updateStream(setStreamInfo);
 
@@ -1497,7 +1517,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       console.log('✅ Final HighlighterData', highlighterResponse);
     } catch (error: unknown) {
       console.error('Error in highlight generation:', error);
-      setStreamInfo.state.description = 'Error occurred';
+      setStreamInfo.state.type = 'error';
       this.updateStream(setStreamInfo);
     } finally {
       stopProgressUpdates();

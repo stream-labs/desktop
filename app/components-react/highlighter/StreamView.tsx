@@ -15,6 +15,7 @@ import { getBindingString } from 'components-react/shared/HotkeyBinding';
 import { $t } from 'services/i18n';
 import * as remote from '@electron/remote';
 import uuid from 'uuid';
+import StreamCard from './StreamCard';
 
 type TModalStreamView =
   | { type: 'export'; id: string | undefined }
@@ -41,7 +42,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
   const [modalWidth, setModalWidth] = useState('700px');
   const [hotkey, setHotkey] = useState<IHotkey | null>(null);
   const [showTutorial, setShowTutorial] = useState(false);
-  const [preparingExport, setPreparingExport] = useState<string | null>(null);
+  const [clipsOfStreamAreLoading, setClipsOfStreamAreLoading] = useState<string | null>(null);
 
   // This is kind of weird, but ensures that modals stay the right
   // size while the closing animation is played. This is why modal
@@ -76,14 +77,14 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
       console.error('Id needed to preview stream clip collection, missing id');
       return;
     }
-    setPreparingExport(id);
+    setClipsOfStreamAreLoading(id);
     HighlighterService.actions.enableOnlySpecificClips(HighlighterService.views.clips, id);
     try {
       await HighlighterService.loadClips(id);
-      setPreparingExport(null);
+      setClipsOfStreamAreLoading(null);
       rawSetShowModal({ type: 'preview', id });
     } catch (error: unknown) {
-      setPreparingExport(null);
+      setClipsOfStreamAreLoading(null);
     }
   }
 
@@ -93,16 +94,16 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
       return;
     }
 
-    setPreparingExport(id);
+    setClipsOfStreamAreLoading(id);
     HighlighterService.actions.enableOnlySpecificClips(HighlighterService.views.clips, id);
 
     try {
       await HighlighterService.loadClips(id);
-      setPreparingExport(null);
+      setClipsOfStreamAreLoading(null);
       rawSetShowModal({ type: 'export', id });
       console.log('startExport');
     } catch (error: unknown) {
-      setPreparingExport(null);
+      setClipsOfStreamAreLoading(null);
     }
   }
 
@@ -197,42 +198,6 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
     if (v.error) HighlighterService.actions.dismissError();
   }
 
-  function getMomentTypeCount(clips: TClip[]): { [type: string]: number } {
-    const typeCounts: { [type: string]: number } = {};
-
-    clips.forEach(clip => {
-      if (HighlighterService.isAiClip(clip)) {
-        clip.aiInfo.moments.forEach(moment => {
-          const type = moment.type;
-          if (typeCounts[type]) {
-            typeCounts[type] += 1;
-          } else {
-            typeCounts[type] = 1;
-          }
-        });
-      }
-    });
-
-    return typeCounts;
-  }
-
-  function getWordingFromType(type: string): { emoji: string; description: string } {
-    switch (type) {
-      case 'kill':
-        return { emoji: '💀', description: 'kills' };
-      case 'death':
-        return { emoji: '🪦', description: 'deaths' };
-      case 'victory':
-        return { emoji: '🏆', description: 'victory' };
-      case 'deploy':
-        return { emoji: '🪂', description: 'games started' };
-
-      default:
-        break;
-    }
-    return { emoji: type, description: type };
-  }
-
   function getStreamView() {
     return (
       <div
@@ -247,7 +212,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
           </div>
           <div style={{ display: 'flex', gap: '16px' }}>
             <Button
-              disabled={v.highlightedStreams.some(s => s.state.description !== 'Done')}
+              disabled={v.highlightedStreams.some(s => s.state.type === 'detection-in-progress')}
               onClick={() => setShowModal({ type: 'upload' })}
             >
               Import
@@ -270,234 +235,16 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
             ) : (
               <>
                 {v.highlightedStreams.map(highlightedStream => (
-                  <div key={highlightedStream.id} className={styles.streamCard}>
-                    <div
-                      className={`${styles.thumbnailWrapper} ${styles.videoSkeleton}`}
-                      onClick={() => {
-                        if (highlightedStream.state.description === 'Done') {
-                          previewVideo(highlightedStream.id);
-                        }
-                      }}
-                    >
-                      <img
-                        style={{ height: '100%' }}
-                        src={
-                          v.clips.find(clip => clip.streamInfo?.id === highlightedStream.id)
-                            ?.scrubSprite
-                        }
-                        alt=""
-                      />
-                      <div className={styles.centeredOverlayItem}>
-                        {' '}
-                        <div>
-                          {highlightedStream.state.description !== 'Done'
-                            ? highlightedStream.state.description
-                            : '▶️'}
-                          {preparingExport === highlightedStream.id ? (
-                            <>
-                              <div className={styles.loader}></div>
-                            </>
-                          ) : (
-                            <></>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '8px',
-                        padding: '20px',
-                        paddingTop: '0px',
-                      }}
-                    >
-                      <div
-                        style={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          gap: '8px',
-                          height: 'fit-content',
-                        }}
-                      >
-                        <div
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '4px',
-                            height: 'fit-content',
-                          }}
-                        >
-                          <h2 style={{ margin: 0 }}>{highlightedStream.title}</h2>
-                          <p style={{ margin: 0, fontSize: '12px' }}>
-                            {new Date(highlightedStream.date).toDateString()}
-                          </p>
-                        </div>
-                        <div style={{ width: '74px', position: 'relative' }}>
-                          <div
-                            className={styles.centeredOverlayItem}
-                            style={{ display: 'flex', gap: '3px', paddingRight: '3px' }}
-                          >
-                            <span>
-                              {
-                                v.clips.filter(clip => clip.streamInfo?.id === highlightedStream.id)
-                                  .length
-                              }
-                            </span>
-
-                            <span>clips</span>
-                          </div>
-                          {v.clips
-                            .filter(clip => clip.streamInfo?.id === highlightedStream.id)
-                            .slice(0, 3) // Take only the first three clips that match
-                            .map((clip, index) => (
-                              <div
-                                className={styles.thumbnailWrapperSmall}
-                                style={{
-                                  rotate: `${(index - 1) * 6}deg`,
-                                  transform: `translate(${(index - 1) * 6}px, ${
-                                    index === 1 ? 0 : 2
-                                  }px)`,
-                                  zIndex: index === 1 ? 10 : 0,
-                                }}
-                                key={index}
-                              >
-                                <img
-                                  style={{ height: '100%' }}
-                                  src={clip.scrubSprite}
-                                  alt={`Clip ${index + 1}`}
-                                />
-                              </div>
-                            ))}
-                        </div>
-                      </div>
-                      <div style={{ paddingTop: '6px', paddingBottom: '6px' }}>
-                        <h3
-                          style={{
-                            margin: 0,
-                            display: 'flex',
-                            gap: '16px',
-                            justifyContent: 'start',
-                          }}
-                        >
-                          {highlightedStream.state.description === 'Done' ? (
-                            <>
-                              {HighlighterService.getClips(v.clips, highlightedStream.id).some(
-                                c => c.streamInfo?.id === highlightedStream.id,
-                              )
-                                ? Object.entries(
-                                    getMomentTypeCount(
-                                      HighlighterService.getClips(v.clips, highlightedStream.id),
-                                    ),
-                                  ).map(([type, count]) => (
-                                    <div key={type} style={{ display: 'flex', gap: '4px' }}>
-                                      <span key={type + 'emoji'}>
-                                        {getWordingFromType(type).emoji}{' '}
-                                      </span>{' '}
-                                      <span key={type + 'desc'}>
-                                        {' '}
-                                        {count} {getWordingFromType(type).description}
-                                      </span>
-                                    </div>
-                                  ))
-                                : 'No Highlights found'}
-                            </>
-                          ) : (
-                            'Finding insteresting events...'
-                          )}
-                        </h3>
-                      </div>
-
-                      {/* ProgressBar or actionRow */}
-                      {highlightedStream.state.description !== 'Done' ? (
-                        <div
-                          style={{
-                            width: '100%',
-                            height: '40px',
-                            backgroundColor: 'gray',
-                            borderRadius: '4px',
-                          }}
-                        >
-                          <div
-                            style={{
-                              height: '40px',
-                              display: 'flex',
-                              alignItems: 'center',
-                              paddingLeft: '16px',
-                              position: 'absolute',
-                              color: 'black',
-                              fontSize: '16px',
-                            }}
-                          >
-                            Creating AI highlights
-                          </div>
-                          <div
-                            style={{
-                              height: '100%',
-                              backgroundColor: '#F5F8FA',
-                              width: `${highlightedStream.state.progress}%`,
-                              borderRadius: '4px',
-                              transition: 'width 1s',
-                            }}
-                          ></div>{' '}
-                        </div>
-                      ) : (
-                        <div
-                          style={{
-                            display: 'flex',
-                            gap: '4px',
-                            justifyContent: 'space-between',
-                          }}
-                        >
-                          <Button
-                            size="large"
-                            style={{ display: 'flex', gap: '8px', alignItems: 'center' }}
-                            disabled={highlightedStream.state.description !== 'Done'}
-                            onClick={() => {
-                              emitSetView({ view: 'clips', id: highlightedStream.id });
-                            }}
-                          >
-                            <i className="icon-edit" /> Edit clips
-                          </Button>
-                          <Button
-                            size="large"
-                            style={{ display: 'flex', gap: '8px', alignItems: 'center' }}
-                            onClick={() => removeStream(highlightedStream.id)}
-                          >
-                            <i className="icon-trash" />
-                          </Button>
-                          {/* TODO: What clips should be included when user clicks this button + bring normal export modal in here */}
-                          <Button
-                            size="large"
-                            style={{
-                              display: 'flex',
-                              gap: '8px',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              width: '100%',
-                            }}
-                            disabled={
-                              highlightedStream.state.description !== 'Done' ||
-                              !HighlighterService.getClips(v.clips, highlightedStream.id).some(
-                                c => c.streamInfo?.id === highlightedStream.id,
-                              )
-                            }
-                            type="primary"
-                            onClick={() => exportVideo(highlightedStream.id)}
-                          >
-                            {preparingExport === highlightedStream.id ? (
-                              //  TODO: replace with correct loader
-                              <div className={styles.loader}></div>
-                            ) : (
-                              <>
-                                <i className="icon-download" /> Export highlight reel
-                              </>
-                            )}
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  <StreamCard
+                    key={highlightedStream.id}
+                    stream={highlightedStream}
+                    clips={HighlighterService.getClips(v.clips, highlightedStream.id)}
+                    emitSetView={data => emitSetView(data)}
+                    emitGeneratePreview={() => previewVideo(highlightedStream.id)}
+                    emitExportVideo={() => exportVideo(highlightedStream.id)}
+                    emitRemoveStream={() => removeStream(highlightedStream.id)}
+                    clipsOfStreamAreLoading={clipsOfStreamAreLoading}
+                  />
                 ))}
               </>
             )}
