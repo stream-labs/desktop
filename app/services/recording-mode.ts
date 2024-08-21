@@ -8,16 +8,23 @@ import { ELayout, ELayoutElement, LayoutService } from './layout';
 import { ScenesService } from './scenes';
 import { EObsSimpleEncoder, SettingsService } from './settings';
 import { AnchorPoint, ScalableRectangle } from 'util/ScalableRectangle';
-import { VideoSettingsService } from './settings-v2/video';
+import { VideoSettingsService, TDisplayType } from './settings-v2';
 import { ENotificationType, NotificationsService } from 'services/notifications';
 import { DefaultHardwareService } from './hardware';
 import { RunInLoadingMode } from './app/app-decorators';
 import { byOS, OS } from 'util/operating-systems';
 import { JsonrpcService } from './api/jsonrpc';
-import { NavigationService, UsageStatisticsService, SharedStorageService } from 'app-services';
+import {
+  NavigationService,
+  UsageStatisticsService,
+  SharedStorageService,
+  SideNavService,
+} from 'app-services';
 import { getPlatformService } from 'services/platforms';
 import { IYoutubeUploadResponse } from 'services/platforms/youtube/uploader';
 import { YoutubeService } from 'services/platforms/youtube';
+import { Subject } from 'rxjs';
+import { capitalize } from 'lodash';
 
 interface IRecordingEntry {
   timestamp: string;
@@ -65,6 +72,9 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
   @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject() private navigationService: NavigationService;
   @Inject() private sharedStorageService: SharedStorageService;
+  @Inject() private sideNavService: SideNavService;
+
+  recordingAdded = new Subject();
 
   static defaultState: IRecordingModeState = {
     enabled: false,
@@ -180,12 +190,24 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
     }, 10 * 1000);
   }
 
-  addRecordingEntry(filename: string) {
+  /**
+   * Add entry to recording history and show notification
+   * @param filename - name of file to show in recording history
+   * @param showNotification - primarily used when recording in dual output mode to only show the notification once
+   */
+  addRecordingEntry(filename: string, display?: TDisplayType) {
     const timestamp = moment().format();
     this.ADD_RECORDING_ENTRY(timestamp, filename);
+
+    const message = display
+      ? $t('A new %{displayType} Recording has been completed. Click for more info', {
+          displayType: $t(capitalize(display)),
+        })
+      : $t('A new Recording has been completed. Click for more info');
+
     this.notificationsService.actions.push({
       type: ENotificationType.SUCCESS,
-      message: $t('A new Recording has been completed. Click for more info'),
+      message,
       action: this.jsonrpcService.createRequest(
         Service.getResourceId(this),
         'showRecordingHistory',
@@ -207,6 +229,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
 
   showRecordingHistory() {
     this.navigationService.navigate('RecordingHistory');
+    this.sideNavService.setCurrentMenuItem('recording-history');
   }
 
   async uploadToYoutube(filename: string) {

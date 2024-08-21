@@ -15,20 +15,21 @@ import { EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
 import { EditorCommandsService } from 'services/editor-commands';
 import { Subject } from 'rxjs';
 import { TOutputOrientation } from 'services/restream';
-import { IVideoInfo } from 'obs-studio-node';
+import { IVideoInfo, ERecordingQuality } from 'obs-studio-node';
 import { ICustomStreamDestination, StreamSettingsService } from 'services/settings/streaming';
 import {
   ISceneCollectionsManifestEntry,
   SceneCollectionsService,
 } from 'services/scene-collections';
 import { UserService } from 'services/user';
-import { SelectionService, Selection } from 'services/selection';
+import { SelectionService } from 'services/selection';
 import { StreamingService } from 'services/streaming';
-import { SettingsService } from 'services/settings';
+import { OutputSettingsService, SettingsService } from 'services/settings';
 import { RunInLoadingMode } from 'services/app/app-decorators';
 import compact from 'lodash/compact';
 import invert from 'lodash/invert';
 import forEachRight from 'lodash/forEachRight';
+import { Selection } from 'services/selection/selection';
 
 interface IDisplayVideoSettings {
   horizontal: IVideoInfo;
@@ -38,13 +39,23 @@ interface IDisplayVideoSettings {
     vertical: boolean;
   };
 }
+
+interface IRecordingQuality {
+  singleOutput: ERecordingQuality;
+  dualOutput: ERecordingQuality;
+}
 interface IDualOutputServiceState {
   platformSettings: TDualOutputPlatformSettings;
   destinationSettings: Dictionary<IDualOutputDestinationSetting>;
   dualOutputMode: boolean;
+  recordVertical: boolean;
+  streamVertical: boolean;
   videoSettings: IDisplayVideoSettings;
+  recordingQuality: IRecordingQuality;
   isLoading: boolean;
 }
+
+export type TStreamMode = 'single' | 'dual';
 
 class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   @Inject() private scenesService: ScenesService;
@@ -62,6 +73,14 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
 
   get dualOutputMode(): boolean {
     return this.state.dualOutputMode;
+  }
+
+  get recordVertical(): boolean {
+    return this.state.recordVertical;
+  }
+
+  get streamVertical(): boolean {
+    return this.state.streamVertical;
   }
 
   get activeCollection(): ISceneCollectionsManifestEntry {
@@ -175,6 +194,10 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return this.activeDisplays.vertical && !this.activeDisplays.horizontal;
   }
 
+  get recordingQuality() {
+    return this.state.recordingQuality;
+  }
+
   getPlatformDisplay(platform: TPlatform) {
     return this.state.platformSettings[platform].display;
   }
@@ -283,7 +306,7 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     const verticalHasDestinations =
       platformDisplays.vertical.length > 0 || destinationDisplays.vertical.length > 0;
 
-    return horizontalHasDestinations && verticalHasDestinations;
+    return this.state.recordVertical || (horizontalHasDestinations && verticalHasDestinations);
   }
 
   /**
@@ -312,11 +335,14 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   @Inject() private selectionService: SelectionService;
   @Inject() private streamingService: StreamingService;
   @Inject() private settingsService: SettingsService;
+  @Inject() private outputSettingsService: OutputSettingsService;
 
   static defaultState: IDualOutputServiceState = {
     platformSettings: DualOutputPlatformSettings,
     destinationSettings: {},
     dualOutputMode: false,
+    recordVertical: false,
+    streamVertical: true,
     videoSettings: {
       horizontal: null,
       vertical: verticalDisplayData, // get settings for horizontal display from obs directly
@@ -324,6 +350,10 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         horizontal: true,
         vertical: false,
       },
+    },
+    recordingQuality: {
+      singleOutput: ERecordingQuality.HigherQuality,
+      dualOutput: ERecordingQuality.HigherQuality,
     },
     isLoading: false,
   };
@@ -389,6 +419,11 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         this.setDualOutputMode();
       }
     });
+
+    /**
+     * TODO: once backend fix implemented, remove dual output quality settings
+     */
+    this.SET_RECORDING_QUALITY('single', this.outputSettingsService.getRecordingQuality());
   }
 
   /**
@@ -427,6 +462,64 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     }
 
     this.SET_IS_LOADING(false);
+  }
+
+  // /**
+  //  * Edit dual output display settings
+  //  */
+
+  // @RunInLoadingMode()
+  // setdualOutputMode(status?: boolean) {
+  //   if (!this.userService.isLoggedIn) return;
+
+  //   this.SET_SHOW_DUAL_OUTPUT(status);
+
+  //   if (this.state.dualOutputMode) {
+  //     this.confirmOrCreateVerticalNodes(this.views.activeSceneId);
+
+  //     /**
+  //      * Selective recording only works with horizontal sources, so don't show the
+  //      * vertical display if toggling with selective recording active
+  //      */
+  //     if (!this.streamingService.state.selectiveRecording) {
+  //       this.toggleDisplay(true, 'vertical');
+  //     }
+  //     // TODO: remove when backed fix for new API recording is implemented
+  //     // save single output recording quality on the frontend
+  //     const recordingQuality = this.outputSettingsService.getRecordingQuality();
+  //     this.setDualOutputRecordingQuality('single', recordingQuality);
+  //     // to prevent errors, set old API settings to match dual output recording settings
+  //     this.settingsService.setSettingValue(
+  //       'Recording',
+  //       'RecQuality',
+  //       this.views.recordingQuality.dualOutput,
+  //     );
+  //   } else {
+  //     // restore single output recording settings
+  //     this.settingsService.setSettingValue(
+  //       'Recording',
+  //       'RecQuality',
+  //       this.views.recordingQuality.singleOutput,
+  //     );
+
+  //     this.selectionService.views.globalSelection.reset();
+  //   }
+
+  //   this.settingsService.showSettings('Video');
+  // }
+
+  /**
+   * Record vertical display
+   */
+  setRecordVertical(status: boolean) {
+    this.SET_RECORD_VERTICAL(status);
+  }
+
+  /**
+   * Stream vertical display
+   */
+  setStreamVertical(status: boolean) {
+    this.SET_STREAM_VERTICAL(status);
   }
 
   disableGlobalRescaleIfNeeded() {
@@ -839,8 +932,18 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     this.SET_IS_LOADING(status);
   }
 
+  /**
+   * Part of a workaround to set recording quality on the frontend to avoid a backend bug
+   * @remark TODO: remove when migrate output and stream settings to new API
+   * @param mode - single or dual output
+   * @param quality - recording quality
+   */
+  setDualOutputRecordingQuality(mode: TStreamMode, quality: ERecordingQuality) {
+    this.SET_RECORDING_QUALITY(mode, quality);
+  }
+
   @mutation()
-  private UPDATE_PLATFORM_SETTING(platform: TPlatform, display: TDisplayType) {
+  private UPDATE_PLATFORM_SETTING(platform: TPlatform | string, display: TDisplayType) {
     this.state.platformSettings = {
       ...this.state.platformSettings,
       [platform]: { ...this.state.platformSettings[platform], display },
@@ -899,5 +1002,27 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   @mutation()
   private SET_IS_LOADING(status: boolean) {
     this.state = { ...this.state, isLoading: status };
+  }
+
+  @mutation()
+  private SET_RECORD_VERTICAL(status: boolean) {
+    this.state = {
+      ...this.state,
+      recordVertical: status,
+    };
+  }
+
+  @mutation()
+  private SET_STREAM_VERTICAL(status: boolean) {
+    this.state = {
+      ...this.state,
+      streamVertical: status,
+    };
+  }
+
+  @mutation()
+  private SET_RECORDING_QUALITY(mode: TStreamMode, quality: ERecordingQuality) {
+    const outputMode = `${mode}Output`;
+    this.state.recordingQuality = { ...this.state.recordingQuality, [outputMode]: quality };
   }
 }

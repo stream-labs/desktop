@@ -3,6 +3,7 @@ import { $t } from 'services/i18n';
 import { Services } from '../../components-react/service-provider';
 import { IOBSOutputSignalInfo } from './streaming';
 import { capitalize } from 'lodash';
+import { EOutputSignal } from 'obs-studio-node';
 
 // the `message` is shown to the user in the error notification
 // the `action` is included in the diag report for further specificity
@@ -341,7 +342,7 @@ function createDefaultUnknownMessage(
  * @param info - IOBSOutputSignalInfo
  */
 export function formatUnknownErrorMessage(
-  info: IOBSOutputSignalInfo | string,
+  info: IOBSOutputSignalInfo | EOutputSignal | string,
   userMessage: string,
   reportMessage: string,
 ): IErrorMessages {

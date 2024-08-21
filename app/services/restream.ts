@@ -138,7 +138,11 @@ export class RestreamService extends StatefulService<IRestreamState> {
   }
 
   get shouldGoLiveWithRestream() {
-    return this.streamInfo.isMultiplatformMode || this.streamInfo.isDualOutputMode;
+    const verticalSecondDestination = this.streamingService.views.isVerticalSecondDestination;
+    return (
+      this.streamInfo.isMultiplatformMode ||
+      (this.streamInfo.isDualOutputMode && !verticalSecondDestination)
+    );
   }
 
   /**

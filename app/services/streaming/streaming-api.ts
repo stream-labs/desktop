@@ -10,6 +10,7 @@ import { ITrovoStartStreamOptions } from '../platforms/trovo';
 import { IVideo } from 'obs-studio-node';
 import { ITwitterStartStreamOptions } from 'services/platforms/twitter';
 import { IInstagramStartStreamOptions } from 'services/platforms/instagram';
+import { TPlatform } from 'services/platforms';
 
 export enum EStreamingState {
   Offline = 'offline',
@@ -92,9 +93,13 @@ export interface IPlatformFlags {
 
 export interface IStreamingServiceState {
   streamingStatus: EStreamingState;
+  verticalStreamingStatus: EStreamingState;
   streamingStatusTime: string;
+  verticalStreamingStatusTime: string;
   recordingStatus: ERecordingState;
+  verticalRecordingStatus: ERecordingState;
   recordingStatusTime: string;
+  verticalRecordingStatusTime: string;
   replayBufferStatus: EReplayBufferState;
   replayBufferStatusTime: string;
   selectiveRecording: boolean;

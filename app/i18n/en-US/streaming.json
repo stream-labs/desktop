@@ -106,7 +106,6 @@
   "prepopulateStreamSettingsError": "There was an error fetching your channel information. You can try <fetch-again-link>fetching the information again</fetch-again-link> or you can <just-go-live-link>just go live</just-go-live-link>. If this error persists, you can try logging out and back in.",
   "updateStreamSettingsError": "Something went wrong while updating your stream info. You can <try-again-link>try again</try-again-link>, or you can <just-go-live-link>just go live</just-go-live-link>. If this error persists, you can try logging out and back in.",
   "twitchMissedScopeError": "<p>It looks like you connected your Twitch account on the streamlabs.com website. To start streaming you should connect it again via Streamlabs Desktop</p><connect-button>Connect Twitch</connect-button>",
-  "tiktokReAuthError": "<p>There was an authentication error with TikTok. Please re-login with TikTok.</p><connect-button>Connect TikTok</connect-button>",
   "Multistreaming to these platforms requires Ultra": "Multistreaming to these platforms requires Ultra",
   "Become a Ultra member": "Become a Ultra member",
   "You must select a game for %{platformName}": "You must select a game for %{platformName}",
@@ -254,5 +253,11 @@
   "Disable Dual Output": "Disable Dual Output",
   "You can now reply to Twitch, YouTube and Facebook messages in Multistream chat. Click to learn more.": "You can now reply to Twitch, YouTube and Facebook messages in Multistream chat. Click to learn more.",
   "Multistream Chat Platform Support": "Multistream Chat Platform Support",
-  "You have selected %{colorFormat} as Color Format. Formats other than NV12 and P010 are commonly used for recording, and might incur high CPU usage or the streaming platform might not support it. Go to Settings -> Advanced -> Video to review.": "You have selected %{colorFormat} as Color Format. Formats other than NV12 and P010 are commonly used for recording, and might incur high CPU usage or the streaming platform might not support it. Go to Settings -> Advanced -> Video to review."
+  "You have selected %{colorFormat} as Color Format. Formats other than NV12 and P010 are commonly used for recording, and might incur high CPU usage or the streaming platform might not support it. Go to Settings -> Advanced -> Video to review.": "You have selected %{colorFormat} as Color Format. Formats other than NV12 and P010 are commonly used for recording, and might incur high CPU usage or the streaming platform might not support it. Go to Settings -> Advanced -> Video to review.",
+  "Vertical Recording Only": "Vertical Recording Only",
+  "Switch primary destination to horizontal output to proceed or toggle vertical recording off.": "Switch primary destination to horizontal output to proceed or toggle vertical recording off.",
+  "High, Medium File Size": "High, Medium File Size",
+  "Indistinguishable, Large File Size": "Indistinguishable, Large File Size",
+  "Lossless, Tremendously Large File Size": "Lossless, Tremendously Large File Size",
+  "A new %{displayType} Recording has been completed. Click for more info": "A new %{displayType} Recording has been completed. Click for more info"
 }

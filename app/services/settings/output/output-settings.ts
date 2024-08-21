@@ -1,11 +1,10 @@
 import { Service } from 'services/core/service';
 import { ISettingsSubCategory, SettingsService } from 'services/settings';
 import { VideoSettingsService } from 'services/settings-v2/video';
-import { HighlighterService } from 'services/highlighter';
 import { Inject } from 'services/core/injector';
 import { Dictionary } from 'vuex';
-import { AudioService } from 'app-services';
-import { parse } from 'path';
+import { DualOutputService } from 'app-services';
+import { ERecordingQuality, ERecordingFormat } from 'obs-studio-node';
 
 /**
  * list of encoders for simple mode
@@ -182,9 +181,8 @@ export function obsEncoderToEncoderFamily(
 
 export class OutputSettingsService extends Service {
   @Inject() private settingsService: SettingsService;
-  @Inject() private audioService: AudioService;
   @Inject() private videoSettingsService: VideoSettingsService;
-  @Inject() private highlighterService: HighlighterService;
+  @Inject() private dualOutputService: DualOutputService;
 
   /**
    * returns unified settings for the Streaming and Recording encoder
@@ -227,6 +225,119 @@ export class OutputSettingsService extends Service {
       streaming,
       recording,
       replayBuffer,
+    };
+  }
+
+  getRecordingQuality() {
+    const output = this.settingsService.state.Output.formData;
+    return this.settingsService.findSettingValue(output, 'Recording', 'RecQuality');
+  }
+
+  getSimpleRecordingSettings() {
+    const output = this.settingsService.state.Output.formData;
+    const advanced = this.settingsService.state.Advanced.formData;
+
+    const path: string = this.settingsService.findSettingValue(output, 'Recording', 'FilePath');
+
+    const format: ERecordingFormat = this.settingsService.findValidListValue(
+      output,
+      'Recording',
+      'RecFormat',
+    ) as ERecordingFormat;
+
+    let oldQualityName = this.settingsService.findSettingValue(output, 'Recording', 'RecQuality');
+    // brittle, remove when backend fix implemented
+    if (oldQualityName === 'Stream') {
+      oldQualityName = this.dualOutputService.views.recordingQuality;
+    }
+    let quality: ERecordingQuality = ERecordingQuality.HigherQuality;
+    switch (oldQualityName) {
+      case 'Small':
+        quality = ERecordingQuality.HighQuality;
+        break;
+      case 'HQ':
+        quality = ERecordingQuality.HigherQuality;
+        break;
+      case 'Lossless':
+        quality = ERecordingQuality.Lossless;
+        break;
+      case 'Stream':
+        quality = ERecordingQuality.Stream;
+        break;
+    }
+
+    const convertedEncoderName:
+      | EObsSimpleEncoder.x264_lowcpu
+      | EObsAdvancedEncoder = this.convertEncoderToNewAPI(this.getSettings().recording.encoder);
+
+    const encoder: EObsAdvancedEncoder =
+      convertedEncoderName === EObsSimpleEncoder.x264_lowcpu
+        ? EObsAdvancedEncoder.obs_x264
+        : convertedEncoderName;
+
+    const lowCPU: boolean = convertedEncoderName === EObsSimpleEncoder.x264_lowcpu;
+
+    const overwrite: boolean = this.settingsService.findSettingValue(
+      advanced,
+      'Recording',
+      'OverwriteIfExists',
+    );
+
+    const noSpace: boolean = this.settingsService.findSettingValue(
+      output,
+      'Recording',
+      'FileNameWithoutSpace',
+    );
+
+    return {
+      path,
+      format,
+      quality,
+      encoder,
+      lowCPU,
+      overwrite,
+      noSpace,
+    };
+  }
+
+  getAdvancedRecordingSettings() {
+    const output = this.settingsService.state.Output.formData;
+    const advanced = this.settingsService.state.Advanced.formData;
+
+    const path = this.settingsService.findSettingValue(output, 'Recording', 'RecFilePath');
+    const encoder = this.settingsService.findSettingValue(output, 'Recording', 'RecEncoder');
+    const rescaling = this.settingsService.findSettingValue(output, 'Recording', 'RecRescale');
+    const mixer = this.settingsService.findSettingValue(output, 'Recording', 'RecTracks');
+    const useStreamEncoders =
+      this.settingsService.findSettingValue(output, 'Recording', 'RecEncoder') === 'none';
+
+    const format = this.settingsService.findValidListValue(
+      output,
+      'Recording',
+      'RecFormat',
+    ) as ERecordingFormat;
+
+    const overwrite = this.settingsService.findSettingValue(
+      advanced,
+      'Recording',
+      'OverwriteIfExists',
+    );
+
+    const noSpace = this.settingsService.findSettingValue(
+      output,
+      'Recording',
+      'RecFileNameWithoutSpace',
+    );
+
+    return {
+      path,
+      format,
+      encoder,
+      overwrite,
+      noSpace,
+      rescaling,
+      mixer,
+      useStreamEncoders,
     };
   }
 
@@ -482,6 +593,25 @@ export class OutputSettingsService extends Service {
 
     if (settingsPatch.bitrate) {
       this.settingsService.setSettingValue('Output', 'Recbitrate', settingsPatch.bitrate);
+    }
+  }
+
+  convertEncoderToNewAPI(
+    encoder: EObsSimpleEncoder | string,
+  ): EObsSimpleEncoder.x264_lowcpu | EObsAdvancedEncoder {
+    switch (encoder) {
+      case EObsSimpleEncoder.x264:
+        return EObsAdvancedEncoder.obs_x264;
+      case EObsSimpleEncoder.nvenc:
+        return EObsAdvancedEncoder.ffmpeg_nvenc;
+      case EObsSimpleEncoder.amd:
+        return EObsAdvancedEncoder.amd_amf_h264;
+      case EObsSimpleEncoder.qsv:
+        return EObsAdvancedEncoder.obs_qsv11;
+      case EObsSimpleEncoder.jim_nvenc:
+        return EObsAdvancedEncoder.jim_nvenc;
+      case EObsSimpleEncoder.x264_lowcpu:
+        return EObsSimpleEncoder.x264_lowcpu;
     }
   }
 }

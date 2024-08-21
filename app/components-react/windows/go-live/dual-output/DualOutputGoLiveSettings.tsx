@@ -15,6 +15,7 @@ import UserSettingsUltra from './UserSettingsUltra';
 import UserSettingsNonUltra from './UserSettingsNonUltra';
 import PrimaryChatSwitcher from '../PrimaryChatSwitcher';
 import ColorSpaceWarnings from '../ColorSpaceWarnings';
+import StreamOptions from '../StreamOptions';
 
 /**
  * Renders settings for starting the stream
@@ -61,6 +62,7 @@ export default function DualOutputGoLiveSettings() {
           {isPrime && <UserSettingsUltra />}
           {!isPrime && <UserSettingsNonUltra />}
         </Scrollable>
+        <StreamOptions />
         {shouldShowPrimaryChatSwitcher && (
           <PrimaryChatSwitcher
             style={{ padding: '0 16px' }}

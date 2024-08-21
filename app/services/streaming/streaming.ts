@@ -1,10 +1,23 @@
 import Vue from 'vue';
 import { mutation, StatefulService } from 'services/core/stateful-service';
-import { EOutputCode, Global, NodeObs } from '../../../obs-api';
+import {
+  EOutputCode,
+  Global,
+  NodeObs,
+  AudioEncoderFactory,
+  SimpleRecordingFactory,
+  VideoEncoderFactory,
+  ISimpleRecording,
+  IAdvancedRecording,
+  AdvancedRecordingFactory,
+  EOutputSignal,
+  AudioTrackFactory,
+  ERecordingQuality,
+} from '../../../obs-api';
 import { Inject } from 'services/core/injector';
 import moment from 'moment';
 import padStart from 'lodash/padStart';
-import { IOutputSettings, OutputSettingsService } from 'services/settings';
+import { IOutputSettings, OutputSettingsService, SettingsService } from 'services/settings';
 import { WindowsService } from 'services/windows';
 import { Subject } from 'rxjs';
 import {
@@ -52,7 +65,7 @@ import * as remote from '@electron/remote';
 import { RecordingModeService } from 'services/recording-mode';
 import { MarkersService } from 'services/markers';
 import { byOS, OS } from 'util/operating-systems';
-import { DualOutputService } from 'services/dual-output';
+import { DualOutputService, TStreamMode } from 'services/dual-output';
 import { capitalize } from 'lodash';
 import { tiktokErrorMessages } from 'services/platforms/tiktok/api';
 import { TikTokService } from 'services/platforms/tiktok';
@@ -73,6 +86,13 @@ enum EOBSOutputSignal {
   ReconnectSuccess = 'reconnect_success',
   Wrote = 'wrote',
   WriteError = 'writing_error',
+}
+
+enum EOutputSignalState {
+  Start = 'start',
+  Stop = 'stop',
+  Stopping = 'stopping',
+  Wrote = 'wrote',
 }
 
 export interface IOBSOutputSignalInfo {
@@ -100,6 +120,7 @@ export class StreamingService
   @Inject() private videoSettingsService: VideoSettingsService;
   @Inject() private markersService: MarkersService;
   @Inject() private dualOutputService: DualOutputService;
+  @Inject() private settingsService: SettingsService;
   @Inject() private tikTokService: TikTokService;
 
   streamingStatusChange = new Subject<EStreamingState>();
@@ -112,17 +133,25 @@ export class StreamingService
 
   // Dummy subscription for stream deck
   streamingStateChange = new Subject<void>();
+  private recordingStopped = new Subject();
 
   powerSaveId: number;
 
   private resolveStartStreaming: Function = () => {};
   private rejectStartStreaming: Function = () => {};
 
+  private horizontalRecording: ISimpleRecording | IAdvancedRecording | null = null;
+  private verticalRecording: ISimpleRecording | IAdvancedRecording | null = null;
+
   static initialState: IStreamingServiceState = {
     streamingStatus: EStreamingState.Offline,
+    verticalStreamingStatus: EStreamingState.Offline,
     streamingStatusTime: new Date().toISOString(),
+    verticalStreamingStatusTime: new Date().toISOString(),
     recordingStatus: ERecordingState.Offline,
+    verticalRecordingStatus: ERecordingState.Offline,
     recordingStatusTime: new Date().toISOString(),
+    verticalRecordingStatusTime: new Date().toString(),
     replayBufferStatus: EReplayBufferState.Offline,
     replayBufferStatusTime: new Date().toISOString(),
     selectiveRecording: false,
@@ -864,7 +893,10 @@ export class StreamingService
   }
 
   get isRecording() {
-    return this.state.recordingStatus !== ERecordingState.Offline;
+    return (
+      this.state.recordingStatus !== ERecordingState.Offline ||
+      this.state.verticalRecordingStatus !== ERecordingState.Offline
+    );
   }
 
   get isReplayBufferActive() {
@@ -932,45 +964,78 @@ export class StreamingService
 
     this.powerSaveId = remote.powerSaveBlocker.start('prevent-display-sleep');
 
-    // start streaming
+    // handle start streaming and recording
     if (this.views.isDualOutputMode) {
       // start dual output
+      if (this.dualOutputService.views.recordVertical) {
+        // stream horizontal and record vertical
+        const horizontalContext = this.videoSettingsService.contexts.horizontal;
+        NodeObs.OBS_service_setVideoInfo(horizontalContext, 'horizontal');
 
-      const horizontalContext = this.videoSettingsService.contexts.horizontal;
-      const verticalContext = this.videoSettingsService.contexts.vertical;
+        const signalChanged = this.signalInfoChanged.subscribe(
+          async (signalInfo: IOBSOutputSignalInfo) => {
+            if (signalInfo.service === 'default') {
+              if (signalInfo.signal === EOBSOutputSignal.Start) {
+                // Refactor when migrate to new API, sleep to allow state to update
+                await new Promise(resolve => setTimeout(resolve, 300));
+                this.toggleRecording();
+                signalChanged.unsubscribe();
+              }
+            }
+          },
+        );
+        NodeObs.OBS_service_startStreaming('horizontal');
+      } else {
+        // stream horizontal and stream vertical
+        const horizontalContext = this.videoSettingsService.contexts.horizontal;
+        const verticalContext = this.videoSettingsService.contexts.vertical;
 
-      NodeObs.OBS_service_setVideoInfo(horizontalContext, 'horizontal');
-      NodeObs.OBS_service_setVideoInfo(verticalContext, 'vertical');
+        NodeObs.OBS_service_setVideoInfo(horizontalContext, 'horizontal');
+        NodeObs.OBS_service_setVideoInfo(verticalContext, 'vertical');
 
-      const signalChanged = this.signalInfoChanged.subscribe((signalInfo: IOBSOutputSignalInfo) => {
-        if (signalInfo.service === 'default') {
-          if (signalInfo.code !== 0) {
-            NodeObs.OBS_service_stopStreaming(true, 'horizontal');
-            NodeObs.OBS_service_stopStreaming(true, 'vertical');
-          }
+        const signalChanged = this.signalInfoChanged.subscribe(
+          (signalInfo: IOBSOutputSignalInfo) => {
+            if (signalInfo.service === 'default') {
+              if (signalInfo.code !== 0) {
+                NodeObs.OBS_service_stopStreaming(true, 'horizontal');
+                NodeObs.OBS_service_stopStreaming(true, 'vertical');
+                // Refactor when move streaming to new API
+                if (this.state.verticalStreamingStatus !== EStreamingState.Offline) {
+                  this.SET_VERTICAL_STREAMING_STATUS(EStreamingState.Offline);
+                }
+              }
 
-          if (signalInfo.signal === EOBSOutputSignal.Start) {
-            NodeObs.OBS_service_startStreaming('vertical');
-            signalChanged.unsubscribe();
-          }
-        }
-      });
+              if (signalInfo.signal === EOBSOutputSignal.Start) {
+                NodeObs.OBS_service_startStreaming('vertical');
 
-      NodeObs.OBS_service_startStreaming('horizontal');
-      // sleep for 1 second to allow the first stream to start
-      await new Promise(resolve => setTimeout(resolve, 1000));
+                // Refactor when move streaming to new API
+                const time = new Date().toISOString();
+                if (this.state.verticalStreamingStatus === EStreamingState.Offline) {
+                  this.SET_VERTICAL_STREAMING_STATUS(EStreamingState.Live, time);
+                }
+
+                signalChanged.unsubscribe();
+              }
+            }
+          },
+        );
+
+        NodeObs.OBS_service_startStreaming('horizontal');
+        // sleep for 1 second to allow the first stream to start
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
     } else {
       // start single output
       const horizontalContext = this.videoSettingsService.contexts.horizontal;
       NodeObs.OBS_service_setVideoInfo(horizontalContext, 'horizontal');
 
       NodeObs.OBS_service_startStreaming();
-    }
 
-    const recordWhenStreaming = this.streamSettingsService.settings.recordWhenStreaming;
+      const recordWhenStreaming = this.streamSettingsService.settings.recordWhenStreaming;
 
-    if (recordWhenStreaming && this.state.recordingStatus === ERecordingState.Offline) {
-      this.toggleRecording();
+      if (recordWhenStreaming && this.state.recordingStatus === ERecordingState.Offline) {
+        this.toggleRecording();
+      }
     }
 
     const replayWhenStreaming = this.streamSettingsService.settings.replayBufferWhileStreaming;
@@ -1046,7 +1111,7 @@ export class StreamingService
         remote.powerSaveBlocker.stop(this.powerSaveId);
       }
 
-      if (this.views.isDualOutputMode) {
+      if (this.views.isDualOutputMode && !this.dualOutputService.views.recordVertical) {
         const signalChanged = this.signalInfoChanged.subscribe(
           (signalInfo: IOBSOutputSignalInfo) => {
             if (
@@ -1054,6 +1119,10 @@ export class StreamingService
               signalInfo.signal === EOBSOutputSignal.Deactivate
             ) {
               NodeObs.OBS_service_stopStreaming(false, 'vertical');
+              // Refactor when move streaming to new API
+              if (this.state.verticalStreamingStatus !== EStreamingState.Offline) {
+                this.SET_VERTICAL_STREAMING_STATUS(EStreamingState.Offline);
+              }
               signalChanged.unsubscribe();
             }
           },
@@ -1067,7 +1136,10 @@ export class StreamingService
       }
 
       const keepRecording = this.streamSettingsService.settings.keepRecordingWhenStreamStops;
-      if (!keepRecording && this.state.recordingStatus === ERecordingState.Recording) {
+      const isRecording =
+        this.state.recordingStatus === ERecordingState.Recording ||
+        this.state.verticalRecordingStatus === ERecordingState.Recording;
+      if (!keepRecording && isRecording) {
         this.toggleRecording();
       }
 
@@ -1086,8 +1158,15 @@ export class StreamingService
     }
 
     if (this.state.streamingStatus === EStreamingState.Ending) {
-      if (this.views.isDualOutputMode) {
+      if (
+        this.views.isDualOutputMode &&
+        this.state.verticalRecordingStatus === ERecordingState.Offline
+      ) {
         NodeObs.OBS_service_stopStreaming(true, 'horizontal');
+        // Refactor when move streaming to new API
+        if (this.state.verticalStreamingStatus !== EStreamingState.Offline) {
+          this.SET_VERTICAL_STREAMING_STATUS(EStreamingState.Offline);
+        }
         NodeObs.OBS_service_stopStreaming(true, 'vertical');
       } else {
         NodeObs.OBS_service_stopStreaming(true);
@@ -1110,7 +1189,7 @@ export class StreamingService
     this.toggleRecording();
   }
 
-  toggleRecording() {
+  recordWithOldAPI() {
     if (this.state.recordingStatus === ERecordingState.Recording) {
       NodeObs.OBS_service_stopRecording();
       return;
@@ -1120,6 +1199,311 @@ export class StreamingService
       NodeObs.OBS_service_startRecording();
       return;
     }
+  }
+
+  /**
+   * Part of a workaround to set recording quality on the frontend to avoid a backend bug
+   * @remark TODO: remove when migrate output and stream settings to new API
+   * Because of a bug with the new API and having the `Same as stream` setting, temporarily store and set
+   * the recording quality on the frontend
+   * @param mode - single output or dual output
+   */
+  beforeStartRecording(mode: TStreamMode) {
+    /**
+     * When going live in dual output mode, `Same as stream` is a not valid setting because of a bug in the backend in the new API.
+    * To prevent errors, if the recording quality set on the old API object is `Same as Stream`
+    * temporarily change the recording quality set on the old API object to the same as the recording quality
+    * stored in the dual output service.
+
+    * To further prevent errors, until the output and stream settings are migrated to the new API,
+    * in single output mode, use the old api
+    */
+    if (mode === 'dual') {
+      // recording quality stored on the front in the dual output service
+      const dualOutputSingleRecordingQuality = this.dualOutputService.views.recordingQuality
+        .dualOutput;
+
+      // recording quality set on the old API object
+      const singleOutputRecordingQuality = this.outputSettingsService.getRecordingQuality();
+
+      if (singleOutputRecordingQuality === ERecordingQuality.Stream) {
+        // store the old API setting in the frontend
+        this.dualOutputService.setDualOutputRecordingQuality(
+          'single',
+          dualOutputSingleRecordingQuality,
+        );
+
+        // match the old API setting to the dual output setting
+        this.settingsService.setSettingValue(
+          'Recording',
+          'ReqQuality',
+          dualOutputSingleRecordingQuality,
+        );
+      }
+    } else {
+      // recording quality stored on the front in the dual output service
+      const dualOutputSingleRecordingQuality = this.dualOutputService.views.recordingQuality
+        .dualOutput;
+
+      // recording quality set on the old API object
+      const singleOutputRecordingQuality = this.outputSettingsService.getRecordingQuality();
+
+      // if needed, in single output mode restore the `Same as stream` setting on the old API
+      if (
+        singleOutputRecordingQuality !== dualOutputSingleRecordingQuality &&
+        dualOutputSingleRecordingQuality === ERecordingQuality.Stream
+      ) {
+        // when going live in single output mode, `Same as stream` is a valid setting
+        this.settingsService.setSettingValue('Recording', 'ReqQuality', ERecordingQuality.Stream);
+      }
+    }
+  }
+
+  /**
+   * Start/stop recording
+   * @remark for single output mode use the old API until output and stream settings are migrated to the new API
+   */
+  toggleRecording() {
+    const recordingMode = this.views.isDualOutputMode ? 'dual' : 'single';
+    this.beforeStartRecording(recordingMode);
+
+    if (!this.views.isDualOutputMode) {
+      // single output mode
+      this.recordWithOldAPI();
+    } else {
+      // dual output mode
+
+      // stop recording
+      if (
+        this.state.recordingStatus === ERecordingState.Recording &&
+        this.state.verticalRecordingStatus === ERecordingState.Recording
+      ) {
+        // stop recording both displays
+        let time = new Date().toISOString();
+
+        if (this.verticalRecording !== null) {
+          const recordingStopped = this.recordingStopped.subscribe(async () => {
+            await new Promise(resolve =>
+              // sleep for 2 seconds to allow a different time stamp to be generated
+              // because the recording history uses the time stamp as keys
+              // if the same time stamp is used, the entry will be replaced in the recording history
+              setTimeout(() => {
+                time = new Date().toISOString();
+                this.SET_RECORDING_STATUS(ERecordingState.Stopping, time, 'horizontal');
+                if (this.horizontalRecording !== null) {
+                  this.horizontalRecording.stop();
+                }
+              }, 2000),
+            );
+            recordingStopped.unsubscribe();
+          });
+
+          this.SET_RECORDING_STATUS(ERecordingState.Stopping, time, 'vertical');
+          this.verticalRecording.stop();
+          this.recordingStopped.next();
+        }
+
+        return;
+      } else if (
+        this.state.verticalRecordingStatus === ERecordingState.Recording &&
+        this.verticalRecording !== null
+      ) {
+        // stop recording vertical display
+        const time = new Date().toISOString();
+        this.SET_RECORDING_STATUS(ERecordingState.Stopping, time, 'vertical');
+        this.verticalRecording.stop();
+      } else if (
+        this.state.recordingStatus === ERecordingState.Recording &&
+        this.horizontalRecording !== null
+      ) {
+        const time = new Date().toISOString();
+        // stop recording horizontal display
+        this.SET_RECORDING_STATUS(ERecordingState.Stopping, time, 'horizontal');
+        this.horizontalRecording.stop();
+      }
+
+      // start recording
+      if (
+        this.state.recordingStatus === ERecordingState.Offline &&
+        this.state.verticalRecordingStatus === ERecordingState.Offline
+      ) {
+        if (this.views.isDualOutputMode) {
+          if (
+            this.dualOutputService.views.recordVertical &&
+            this.state.streamingStatus !== EStreamingState.Offline
+          ) {
+            // In dual output mode, if the streaming status is starting then this call to toggle recording came from the function to toggle streaming.
+            // In this case, only stream the horizontal display (don't record the horizontal display) and record the vertical display.
+            this.createRecording('vertical', 2);
+          } else {
+            // Otherwise, record both displays in dual output mode
+            this.createRecording('vertical', 2);
+            this.createRecording('horizontal', 1);
+          }
+        } else {
+          // In single output mode, recording only the horizontal display
+          // TODO: remove after migrate output and stream settings to new api
+          this.recordWithOldAPI();
+          // this.createRecording('horizontal', 1);
+        }
+      }
+    }
+  }
+
+  private createRecording(display: TDisplayType, index: number) {
+    const mode = this.outputSettingsService.getSettings().mode;
+
+    const recording =
+      mode === 'Advanced'
+        ? (AdvancedRecordingFactory.create() as IAdvancedRecording)
+        : (SimpleRecordingFactory.create() as ISimpleRecording);
+
+    const settings =
+      mode === 'Advanced'
+        ? this.outputSettingsService.getAdvancedRecordingSettings()
+        : this.outputSettingsService.getSimpleRecordingSettings();
+
+    // assign settings
+    Object.keys(settings).forEach(key => {
+      if (key === 'encoder') {
+        recording.videoEncoder = VideoEncoderFactory.create(settings.encoder, 'video-encoder');
+      } else {
+        recording[key] = settings[key];
+      }
+    });
+
+    // assign context
+    recording.video = this.videoSettingsService.contexts[display];
+
+    // set signal handler
+    recording.signalHandler = async signal => {
+      await this.handleRecordingSignal(signal, display);
+    };
+
+    // handle unique properties (including audio)
+    if (mode === 'Advanced') {
+      recording['outputWidth'] = this.dualOutputService.views.videoSettings[display].outputWidth;
+      recording['outputHeight'] = this.dualOutputService.views.videoSettings[display].outputHeight;
+
+      const trackName = `track${index}`;
+      const track = AudioTrackFactory.create(160, trackName);
+      AudioTrackFactory.setAtIndex(track, index);
+    } else {
+      recording['audioEncoder'] = AudioEncoderFactory.create();
+    }
+
+    // save in state
+    if (display === 'vertical') {
+      this.verticalRecording = recording;
+      this.verticalRecording.start();
+    } else {
+      this.horizontalRecording = recording;
+      this.horizontalRecording.start();
+    }
+  }
+
+  private async handleRecordingSignal(info: EOutputSignal, display: TDisplayType) {
+    // map signals to status
+    const nextState: ERecordingState = ({
+      [EOutputSignalState.Start]: ERecordingState.Recording,
+      [EOutputSignalState.Stop]: ERecordingState.Offline,
+      [EOutputSignalState.Stopping]: ERecordingState.Stopping,
+      [EOutputSignalState.Wrote]: ERecordingState.Wrote,
+    } as Dictionary<ERecordingState>)[info.signal];
+
+    // We received a signal we didn't recognize
+    if (!nextState) {
+      console.error('Received unrecognized signal: ', nextState);
+      return;
+    }
+
+    if (nextState === ERecordingState.Recording) {
+      const mode = this.views.isDualOutputMode ? 'dual' : 'single';
+      this.usageStatisticsService.recordFeatureUsage('Recording');
+      this.usageStatisticsService.recordAnalyticsEvent('RecordingStatus', {
+        status: ERecordingState.Recording,
+        code: info.code,
+        mode,
+        display,
+      });
+    }
+
+    if (nextState === ERecordingState.Wrote) {
+      const fileName = await this.getFileName(display);
+
+      const parsedName = byOS({
+        [OS.Mac]: fileName,
+        [OS.Windows]: fileName.replace(/\//, '\\'),
+      });
+
+      // in dual output mode, each confirmation should be labelled for each display
+      if (this.views.isDualOutputMode) {
+        this.recordingModeService.addRecordingEntry(parsedName, display);
+      } else {
+        this.recordingModeService.addRecordingEntry(parsedName);
+      }
+      await this.markersService.exportCsv(parsedName);
+
+      // destroy recording factory instances
+      if (this.outputSettingsService.getSettings().mode === 'Advanced') {
+        if (display === 'horizontal' && this.horizontalRecording) {
+          AdvancedRecordingFactory.destroy(this.horizontalRecording as IAdvancedRecording);
+          this.horizontalRecording = null;
+        } else if (display === 'vertical' && this.verticalRecording) {
+          AdvancedRecordingFactory.destroy(this.verticalRecording as IAdvancedRecording);
+          this.verticalRecording = null;
+        }
+      } else {
+        if (display === 'horizontal' && this.horizontalRecording) {
+          SimpleRecordingFactory.destroy(this.horizontalRecording as ISimpleRecording);
+          this.horizontalRecording = null;
+        } else if (display === 'vertical' && this.verticalRecording) {
+          SimpleRecordingFactory.destroy(this.verticalRecording as ISimpleRecording);
+          this.verticalRecording = null;
+        }
+      }
+
+      const time = new Date().toISOString();
+      this.SET_RECORDING_STATUS(ERecordingState.Offline, time, display);
+      this.recordingStatusChange.next(ERecordingState.Offline);
+
+      this.handleOutputCode(info);
+      return;
+    }
+
+    const time = new Date().toISOString();
+    this.SET_RECORDING_STATUS(nextState, time, display);
+    this.recordingStatusChange.next(nextState);
+
+    this.handleOutputCode(info);
+  }
+
+  /**
+   * Gets the filename of the recording
+   * @remark In the new API, there can be a delay between the wrote signal
+   * and the finalizing of the file in the directory. The existence of the file name
+   * is a signifier that it has been finalized. In order for the file name to populate
+   * in the recording history, make sure the file has been finalized
+   * @param display - determines which recording object to use
+   * @returns string file name
+   */
+  async getFileName(display: TDisplayType): Promise<string> {
+    return await new Promise(resolve => {
+      const wroteInterval = setInterval(() => {
+        // confirm vertical recording exists
+        let filename = '';
+        if (display === 'vertical' && this.verticalRecording) {
+          filename = this.verticalRecording.lastFile();
+        } else if (display === 'horizontal' && this.horizontalRecording) {
+          filename = this.horizontalRecording.lastFile();
+        }
+
+        if (filename !== '') {
+          resolve(filename);
+          clearInterval(wroteInterval);
+        }
+      }, 300);
+    });
   }
 
   splitFile() {
@@ -1229,6 +1613,13 @@ export class StreamingService
   }
 
   get formattedDurationInCurrentRecordingState() {
+    // in dual output mode, if using vertical recording as the second destination
+    // display the vertical recording status time
+    if (this.state.recordingStatus !== ERecordingState.Offline) {
+      this.formattedDurationSince(moment(this.state.recordingStatusTime));
+    } else if (this.state.verticalRecordingStatus !== ERecordingState.Offline) {
+      return this.formattedDurationSince(moment(this.state.verticalRecordingStatusTime));
+    }
     return this.formattedDurationSince(moment(this.state.recordingStatusTime));
   }
 
@@ -1279,8 +1670,22 @@ export class StreamingService
   private handleOBSOutputSignal(info: IOBSOutputSignalInfo) {
     console.debug('OBS Output signal: ', info);
 
+    /*
+     * Resolve when:
+     * - Single output mode: always resolve
+     * - Dual output mode: after vertical stream started
+     * - Dual output mode: when vertical display is second destination,
+     *   resolve after horizontal stream started
+     */
+    const isVerticalDisplayStartSignal =
+      info.service === 'vertical' && info.signal === EOBSOutputSignal.Start;
+
     const shouldResolve =
-      !this.views.isDualOutputMode || (this.views.isDualOutputMode && info.service === 'vertical');
+      !this.views.isDualOutputMode ||
+      (this.views.isDualOutputMode && isVerticalDisplayStartSignal) ||
+      (this.views.isDualOutputMode &&
+        info.signal === EOBSOutputSignal.Start &&
+        this.dualOutputService.views.recordVertical);
 
     const time = new Date().toISOString();
 
@@ -1358,6 +1763,10 @@ export class StreamingService
         this.clearReconnectingNotification();
       }
     } else if (info.type === EOBSOutputType.Recording) {
+      // TODO: remove when migrate to output and stream settings implemented
+      // Currently, single output mode uses the old api while dual output mode uses the new api.
+      // This listens for the signals in the new API while the signal handler used in toggleRecording
+      // is for the new API
       const nextState: ERecordingState = ({
         [EOBSOutputSignal.Start]: ERecordingState.Recording,
         [EOBSOutputSignal.Starting]: ERecordingState.Starting,
@@ -1367,7 +1776,10 @@ export class StreamingService
       } as Dictionary<ERecordingState>)[info.signal];
 
       // We received a signal we didn't recognize
-      if (!nextState) return;
+      if (!nextState) {
+        console.error('Received unrecognized signal: ', nextState);
+        return;
+      }
 
       if (info.signal === EOBSOutputSignal.Start) {
         this.usageStatisticsService.recordFeatureUsage('Recording');
@@ -1415,7 +1827,10 @@ export class StreamingService
         this.replayBufferFileWrite.next(NodeObs.OBS_service_getLastReplay());
       }
     }
+    this.handleOutputCode(info);
+  }
 
+  private handleOutputCode(info: IOBSOutputSignalInfo | EOutputSignal) {
     if (info.code) {
       if (this.outputErrorOpen) {
         console.warn('Not showing error message because existing window is open.', info);
@@ -1466,13 +1881,6 @@ export class StreamingService
       } else {
         // -4 is used for generic unknown messages in OBS. Both -4 and any other code
         // we don't recognize should fall into this branch and show a generic error.
-        // if (!this.userService.isLoggedIn) {
-        //   const messages;
-        //   errorText = $t(
-        //     'You are currently logged out. Please log in or confirm your server url and stream key.',
-        //   );
-        //   diagReportMessage = 'User is logged out and has invalid server url or stream key.';
-        // } else
 
         if (!this.userService.isLoggedIn) {
           const messages = formatStreamErrorMessage('LOGGED_OUT_ERROR');
@@ -1506,9 +1914,7 @@ export class StreamingService
       }[info.type];
 
       if (linkToDriverInfo) buttons.push($t('Learn More'));
-      if (showNativeErrorMessage) {
-        buttons.push($t('More'));
-      }
+      if (showNativeErrorMessage) buttons.push($t('More'));
 
       this.outputErrorOpen = true;
       const errorType = 'error';
@@ -1631,10 +2037,29 @@ export class StreamingService
     if (time) this.state.streamingStatusTime = time;
   }
 
+  /**
+   * Refactor when streaming moved to the new api
+   * Currently only used in dual output mode to show streaming status of the vertical display
+   */
   @mutation()
-  private SET_RECORDING_STATUS(status: ERecordingState, time: string) {
-    this.state.recordingStatus = status;
-    this.state.recordingStatusTime = time;
+  private SET_VERTICAL_STREAMING_STATUS(status: EStreamingState, time?: string) {
+    this.state.verticalStreamingStatus = status;
+    if (time) this.state.verticalStreamingStatusTime = time;
+  }
+
+  @mutation()
+  private SET_RECORDING_STATUS(
+    status: ERecordingState,
+    time: string,
+    display: TDisplayType = 'horizontal',
+  ) {
+    if (display === 'vertical') {
+      this.state.verticalRecordingStatus = status;
+      this.state.verticalRecordingStatusTime = time;
+    } else {
+      this.state.recordingStatus = status;
+      this.state.recordingStatusTime = time;
+    }
   }
 
   @mutation()

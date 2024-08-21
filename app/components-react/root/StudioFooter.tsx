@@ -13,7 +13,6 @@ import NotificationsArea from './NotificationsArea';
 import { Tooltip } from 'antd';
 import { confirmAsync } from 'components-react/modals';
 import { useModule } from 'slap';
-import { useRealmObject } from 'components-react/hooks/realm';
 
 export default function StudioFooterComponent() {
   const {
@@ -22,7 +21,6 @@ export default function StudioFooterComponent() {
     UsageStatisticsService,
     NavigationService,
     RecordingModeService,
-    PerformanceService,
   } = Services;
 
   const {
@@ -183,9 +181,11 @@ export default function StudioFooterComponent() {
 
 function RecordingButton() {
   const { StreamingService } = Services;
-  const { isRecording, recordingStatus } = useVuex(() => ({
+  const { isRecording, recordingStopping } = useVuex(() => ({
     isRecording: StreamingService.views.isRecording,
-    recordingStatus: StreamingService.state.recordingStatus,
+    recordingStopping:
+      StreamingService.state.recordingStatus === ERecordingState.Stopping ||
+      StreamingService.state.verticalRecordingStatus === ERecordingState.Stopping,
   }));
 
   function toggleRecording() {
@@ -204,13 +204,7 @@ function RecordingButton() {
             className={cx(styles.recordButton, 'record-button', { active: isRecording })}
             onClick={toggleRecording}
           >
-            <span>
-              {recordingStatus === ERecordingState.Stopping ? (
-                <i className="fa fa-spinner fa-pulse" />
-              ) : (
-                <>REC</>
-              )}
-            </span>
+            <span>{recordingStopping ? <i className="fa fa-spinner fa-pulse" /> : <>REC</>}</span>
           </button>
         </Tooltip>
       </div>
@@ -223,7 +217,7 @@ function RecordingTimer() {
   const [recordingTime, setRecordingTime] = useState('');
 
   const { isRecording } = useVuex(() => ({
-    isRecording: StreamingService.views.isRecording,
+    isRecording: StreamingService.views.isRecording || StreamingService.views.isVerticalRecording,
   }));
 
   useEffect(() => {

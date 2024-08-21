@@ -22,7 +22,6 @@ import difference from 'lodash/difference';
 import { Services } from '../../components-react/service-provider';
 import { getDefined } from '../../util/properties-type-guards';
 import { TDisplayType } from 'services/settings-v2';
-import compact from 'lodash/compact';
 
 /**
  * The stream info view is responsible for keeping
@@ -113,7 +112,7 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
   }
 
   /**
-   * Returns a list of linked platforms available
+   * Returns a list of linked platforms available for restream
    */
   get linkedPlatforms(): TPlatform[] {
     if (!this.userView.state.auth) return [];
@@ -158,10 +157,20 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
    * Returns a list of enabled for streaming platforms from the given settings object
    */
   getEnabledPlatforms(platforms: IStreamSettings['platforms']): TPlatform[] {
-    return Object.keys(platforms).filter(
+    const enabled = Object.keys(platforms).filter(
       (platform: TPlatform) =>
         this.linkedPlatforms.includes(platform) && platforms[platform]?.enabled,
     ) as TPlatform[];
+
+    // currently in dual output mode, when recording the vertical display
+    // it cannot also be streamed so does not need to be set up
+    if (this.isDualOutputMode && this.dualOutputView.recordVertical) {
+      return enabled.filter(
+        platform => this.dualOutputView.getPlatformDisplay(platform) === 'horizontal',
+      );
+    }
+
+    return enabled;
   }
 
   /**
@@ -181,6 +190,14 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
    */
   get isDualOutputMode(): boolean {
     return this.dualOutputView.dualOutputMode && this.userView.isLoggedIn;
+  }
+
+  get isVerticalSecondDestination(): boolean {
+    return (
+      this.isDualOutputMode &&
+      this.dualOutputView.recordVertical &&
+      this.streamingState.streamingStatus !== EStreamingState.Offline
+    );
   }
 
   get shouldMultistreamDisplay(): { horizontal: boolean; vertical: boolean } {
@@ -502,8 +519,20 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     return this.streamingState.streamingStatus !== EStreamingState.Offline;
   }
 
+  get isVerticalStreaming() {
+    return this.streamingState.verticalStreamingStatus !== EStreamingState.Offline;
+  }
+
   get isRecording() {
+    return this.isHorizontalRecording || this.isVerticalRecording;
+  }
+
+  get isHorizontalRecording() {
     return this.streamingState.recordingStatus !== ERecordingState.Offline;
+  }
+
+  get isVerticalRecording() {
+    return this.streamingState.verticalRecordingStatus !== ERecordingState.Offline;
   }
 
   get isReplayBufferActive() {

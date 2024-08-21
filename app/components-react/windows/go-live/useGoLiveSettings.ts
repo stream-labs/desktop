@@ -1,5 +1,5 @@
 import { IGoLiveSettings, StreamInfoView } from '../../../services/streaming';
-import { TPlatform, getPlatformService } from '../../../services/platforms';
+import { TPlatform } from '../../../services/platforms';
 import { TDisplayDestinations } from 'services/dual-output';
 import { ICustomStreamDestination } from 'services/settings/streaming';
 import { Services } from '../../service-provider';
@@ -286,6 +286,7 @@ export class GoLiveSettingsModule {
    * Determine if all dual output go live requirements are fulfilled
    */
   getCanStreamDualOutput() {
+    // confirm both displays have a platform or destination selected when streaming with dual output
     const platformDisplays = Services.StreamingService.views.activeDisplayPlatforms;
 
     // determine which enabled custom destinations use which displays
@@ -311,19 +312,20 @@ export class GoLiveSettingsModule {
    * Validate the form and show an error message
    */
   async validate() {
-    // TODO: comment authorization error back in after resolving legacy approval flow
-    // tiktok live authorization error
-    // if (this.state.isEnabled('tiktok') && !Services.TikTokService.liveStreamingEnabled) {
-    //   message.error($t('Streaming to TikTok not approved.'));
-    //   return false;
-    // }
-
     if (Services.DualOutputService.views.dualOutputMode && !this.getCanStreamDualOutput()) {
-      message.error(
-        $t(
-          'To use Dual Output you must stream to at least one horizontal and one vertical platform.',
-        ),
-      );
+      if (Services.DualOutputService.views.recordVertical) {
+        message.error(
+          $t(
+            'Switch primary destination to horizontal output to proceed or toggle vertical recording off.',
+          ),
+        );
+      } else {
+        message.error(
+          $t(
+            'To use Dual Output you must stream to at least one horizontal and one vertical platform.',
+          ),
+        );
+      }
       return false;
     }
 

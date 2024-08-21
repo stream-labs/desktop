@@ -18,7 +18,8 @@ export default function StartStreamingButton(p: { disabled?: boolean }) {
   } = Services;
 
   const { streamingStatus, delayEnabled, delaySeconds } = useVuex(() => ({
-    streamingStatus: StreamingService.state.streamingStatus,
+    streamingStatus:
+      StreamingService.state.streamingStatus || StreamingService.state.verticalStreamingStatus,
     delayEnabled: StreamingService.views.delayEnabled,
     delaySeconds: StreamingService.views.delaySeconds,
   }));
