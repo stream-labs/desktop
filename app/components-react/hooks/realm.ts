@@ -1,5 +1,6 @@
 import { useEffect, useReducer, useRef } from 'react';
 import { RealmObject } from 'services/realm';
+import { isEqual } from 'lodash';
 
 export function useRealmObject<T extends RealmObject>(obj: T) {
   const [_, forceUpdate] = useReducer(x => x + 1, 0);
@@ -27,7 +28,7 @@ export function useRealmObjectAdv<T extends RealmObject>(obj: T, selector: (obj:
     const listener = () => {
       const newValues = selector(obj);
 
-      if (!newValues.every((value, index) => value === previousValues.current[index])) {
+      if (!isEqual(newValues, previousValues.current)) {
         previousValues.current = newValues;
         forceUpdate();
       }
@@ -38,7 +39,7 @@ export function useRealmObjectAdv<T extends RealmObject>(obj: T, selector: (obj:
     return () => {
       obj.realmModel.removeListener(listener);
     };
-  }, [obj, selector]);
+  }, [obj.realmModel, selector]);
 
   return obj;
 }
