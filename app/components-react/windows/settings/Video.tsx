@@ -1,5 +1,6 @@
 import * as remote from '@electron/remote';
 import React from 'react';
+import { useModule, injectState } from 'slap';
 import { Services } from '../../service-provider';
 import { message } from 'antd';
 import FormFactory, { TInputValue } from 'components-react/shared/inputs/FormFactory';
@@ -12,7 +13,6 @@ import Tabs from 'components-react/shared/Tabs';
 import { invalidFps, IVideoInfoValue, TDisplayType } from 'services/settings-v2/video';
 import { AuthModal } from 'components-react/shared/AuthModal';
 import Utils from 'services/utils';
-import { useModule, injectState } from 'slap';
 
 const CANVAS_RES_OPTIONS = [
   { label: '1920x1080', value: '1920x1080' },
@@ -568,42 +568,6 @@ export function VideoSettings() {
     handleAuth,
     handleShowModal,
   } = useModule(VideoSettingsModule);
-
-  // const baseRes = display !== 'vertical' && hasCustomBaseRes ? 'custom' : settings[display].baseRes;
-
-  // const outputRes =
-  //   display !== 'vertical' && hasCustomOutputRes ? 'custom' : settings[display].outputRes;
-
-  // const values = {
-  //   ...settings[display],
-  //   baseRes,
-  //   outputRes,
-  //   customBaseRes,
-  //   customOutputRes,
-  // };
-
-  // const settings = useRealmObject(Services.VideoSettingsService.state).values;
-
-  // const values = c.store.useState(s => {
-  //   const display = s.display;
-  //   const baseRes =
-  //     display !== 'vertical' && s?.customBaseRes ? 'custom' : settings[display].baseRes;
-
-  //   const outputRes =
-  //     display !== 'vertical' && s?.customOutputRes ? 'custom' : settings[display].outputRes;
-
-  //   return {
-  //     baseRes,
-  //     outputRes,
-  //     customBaseRes: s.customBaseRes,
-  //     customOutputRes: s.customOutputRes,
-  //     customBaseResValue: s.customBaseResValue,
-  //     customOutputResValue: s.customOutputResValue,
-  //     fpsNum: s.fpsNum ?? settings[display].fpsNum,
-  //     fpsDen: s.fpsDen ?? settings[display].fpsDen,
-  //     fpsInt: s.fpsInt ?? settings[display].fpsInt,
-  //   };
-  // });
 
   return (
     <>
