@@ -246,7 +246,12 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
             <h1 style={{ margin: 0 }}>My stream highlights</h1>
           </div>
           <div style={{ display: 'flex', gap: '16px' }}>
-            <Button onClick={() => setShowModal({ type: 'upload' })}>Import</Button>
+            <Button
+              disabled={v.highlightedStreams.some(s => s.state.description !== 'Done')}
+              onClick={() => setShowModal({ type: 'upload' })}
+            >
+              Import
+            </Button>
             <Button onClick={() => emitSetView({ view: 'settings' })}>Settings</Button>
           </div>
         </div>
@@ -268,7 +273,11 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
                   <div key={highlightedStream.id} className={styles.streamCard}>
                     <div
                       className={`${styles.thumbnailWrapper} ${styles.videoSkeleton}`}
-                      onClick={() => previewVideo(highlightedStream.id)}
+                      onClick={() => {
+                        if (highlightedStream.state.description === 'Done') {
+                          previewVideo(highlightedStream.id);
+                        }
+                      }}
                     >
                       <img
                         style={{ height: '100%' }}
@@ -281,13 +290,15 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
                       <div className={styles.centeredOverlayItem}>
                         {' '}
                         <div>
-                          {highlightedStream.state !== 'Done' ? highlightedStream.state : ''}
+                          {highlightedStream.state.description !== 'Done'
+                            ? highlightedStream.state.description
+                            : '▶️'}
                           {preparingExport === highlightedStream.id ? (
                             <>
                               <div className={styles.loader}></div>
                             </>
                           ) : (
-                            <>'▶️'</>
+                            <></>
                           )}
                         </div>
                       </div>
@@ -369,74 +380,122 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
                             justifyContent: 'start',
                           }}
                         >
-                          {highlightedStream.state === 'Done'
-                            ? Object.entries(
-                                getMomentTypeCount(
-                                  HighlighterService.getClips(v.clips, highlightedStream.id),
-                                ),
-                              ).map(([type, count]) => (
-                                <div key={type} style={{ display: 'flex', gap: '4px' }}>
-                                  <span key={type + 'emoji'}>
-                                    {getWordingFromType(type).emoji}{' '}
-                                  </span>{' '}
-                                  <span key={type + 'desc'}>
-                                    {' '}
-                                    {count} {getWordingFromType(type).description}
-                                  </span>
-                                </div>
-                              ))
-                            : 'Finding insteresting events...'}
+                          {highlightedStream.state.description === 'Done' ? (
+                            <>
+                              {HighlighterService.getClips(v.clips, highlightedStream.id).some(
+                                c => c.streamInfo?.id === highlightedStream.id,
+                              )
+                                ? Object.entries(
+                                    getMomentTypeCount(
+                                      HighlighterService.getClips(v.clips, highlightedStream.id),
+                                    ),
+                                  ).map(([type, count]) => (
+                                    <div key={type} style={{ display: 'flex', gap: '4px' }}>
+                                      <span key={type + 'emoji'}>
+                                        {getWordingFromType(type).emoji}{' '}
+                                      </span>{' '}
+                                      <span key={type + 'desc'}>
+                                        {' '}
+                                        {count} {getWordingFromType(type).description}
+                                      </span>
+                                    </div>
+                                  ))
+                                : 'No Highlights found'}
+                            </>
+                          ) : (
+                            'Finding insteresting events...'
+                          )}
                         </h3>
                       </div>
 
-                      <div
-                        style={{
-                          display: 'flex',
-                          gap: '4px',
-                          justifyContent: 'space-between',
-                        }}
-                      >
-                        <Button
-                          size="large"
-                          style={{ display: 'flex', gap: '8px', alignItems: 'center' }}
-                          disabled={highlightedStream.state !== 'Done'}
-                          onClick={() => {
-                            emitSetView({ view: 'clips', id: highlightedStream.id });
+                      {/* ProgressBar or actionRow */}
+                      {highlightedStream.state.description !== 'Done' ? (
+                        <div
+                          style={{
+                            width: '100%',
+                            height: '40px',
+                            backgroundColor: 'gray',
+                            borderRadius: '4px',
                           }}
                         >
-                          <i className="icon-edit" /> Edit clips
-                        </Button>
-                        <Button
-                          size="large"
-                          style={{ display: 'flex', gap: '8px', alignItems: 'center' }}
-                          onClick={() => removeStream(highlightedStream.id)}
-                        >
-                          <i className="icon-trash" />
-                        </Button>
-                        {/* TODO: What clips should be included when user clicks this button + bring normal export modal in here */}
-                        <Button
-                          size="large"
+                          <div
+                            style={{
+                              height: '40px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              paddingLeft: '16px',
+                              position: 'absolute',
+                              color: 'black',
+                              fontSize: '16px',
+                            }}
+                          >
+                            Creating AI highlights
+                          </div>
+                          <div
+                            style={{
+                              height: '100%',
+                              backgroundColor: '#F5F8FA',
+                              width: `${highlightedStream.state.progress}%`,
+                              borderRadius: '4px',
+                              transition: 'width 1s',
+                            }}
+                          ></div>{' '}
+                        </div>
+                      ) : (
+                        <div
                           style={{
                             display: 'flex',
-                            gap: '8px',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            width: '100%',
+                            gap: '4px',
+                            justifyContent: 'space-between',
                           }}
-                          disabled={highlightedStream.state !== 'Done'}
-                          type="primary"
-                          onClick={() => exportVideo(highlightedStream.id)}
                         >
-                          {preparingExport === highlightedStream.id ? (
-                            //  TODO: replace with correct loader
-                            <div className={styles.loader}></div>
-                          ) : (
-                            <>
-                              <i className="icon-download" /> Export highlight reel
-                            </>
-                          )}
-                        </Button>
-                      </div>
+                          <Button
+                            size="large"
+                            style={{ display: 'flex', gap: '8px', alignItems: 'center' }}
+                            disabled={highlightedStream.state.description !== 'Done'}
+                            onClick={() => {
+                              emitSetView({ view: 'clips', id: highlightedStream.id });
+                            }}
+                          >
+                            <i className="icon-edit" /> Edit clips
+                          </Button>
+                          <Button
+                            size="large"
+                            style={{ display: 'flex', gap: '8px', alignItems: 'center' }}
+                            onClick={() => removeStream(highlightedStream.id)}
+                          >
+                            <i className="icon-trash" />
+                          </Button>
+                          {/* TODO: What clips should be included when user clicks this button + bring normal export modal in here */}
+                          <Button
+                            size="large"
+                            style={{
+                              display: 'flex',
+                              gap: '8px',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              width: '100%',
+                            }}
+                            disabled={
+                              highlightedStream.state.description !== 'Done' ||
+                              !HighlighterService.getClips(v.clips, highlightedStream.id).some(
+                                c => c.streamInfo?.id === highlightedStream.id,
+                              )
+                            }
+                            type="primary"
+                            onClick={() => exportVideo(highlightedStream.id)}
+                          >
+                            {preparingExport === highlightedStream.id ? (
+                              //  TODO: replace with correct loader
+                              <div className={styles.loader}></div>
+                            ) : (
+                              <>
+                                <i className="icon-download" /> Export highlight reel
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}

@@ -114,7 +114,7 @@ interface IHighlightedStream {
   game: string;
   title: string;
   date: string;
-  state: string;
+  state: { description: string; progress: number };
 }
 
 export enum EExportStep {
@@ -1317,6 +1317,71 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     this.CLEAR_UPLOAD();
   }
 
+  createProgressManager() {
+    const phases = [
+      { name: 'initial', progressShare: 0.004 },
+      { name: 'phase1', progressShare: 0.03 },
+      { name: 'phase2', progressShare: 0.02 },
+      { name: 'phase3', progressShare: 0.04 },
+      { name: 'phase4', progressShare: 0.64 },
+      { name: 'phase5', progressShare: 0.27 },
+    ];
+
+    let currentPhaseIndex = 0;
+    let startTime: number;
+    let phaseEnteredTime;
+    let currentProgress = 0;
+
+    let estimatedDuration = 999;
+
+    function getCurrentProgress(): number {
+      if (phases[currentPhaseIndex].name === 'initial') {
+        currentProgress = currentProgress + 0.0;
+
+        return currentProgress;
+      }
+      // phase 1: habe ne zeit wie lange es gebraucht hat dort anzukommen und wieviel prozent es ausmacht
+      const elapsedTime = (Date.now() - startTime) / 1000;
+
+      const movedProgressSpeed = (1 - currentProgress) / estimatedDuration;
+
+      currentProgress = currentProgress + movedProgressSpeed;
+
+      return currentProgress < 1 ? currentProgress : 1;
+    }
+
+    function setPhase(phaseName: string) {
+      const newPhaseIndex = phases.findIndex(p => p.name === phaseName);
+      if (newPhaseIndex !== -1) {
+        console.log(`Moved to phase: ${phaseName}`);
+        currentPhaseIndex = newPhaseIndex;
+
+        if (phaseName === 'initial') {
+          currentProgress = 0;
+          startTime = Date.now();
+          return;
+        }
+
+        const elapsedTime = (Date.now() - startTime) / 1000;
+
+        let combinedProgressShare: number = 0;
+        phases
+          .filter((p, i) => i > 0 && i <= currentPhaseIndex)
+          .forEach(
+            phases => (combinedProgressShare = combinedProgressShare + phases.progressShare),
+          );
+
+        estimatedDuration = (1 / combinedProgressShare) * elapsedTime;
+      } else {
+      }
+    }
+
+    return {
+      getCurrentProgress,
+      setPhase,
+    };
+  }
+
   async flow(filePath: string, streamInfo: StreamInfoForAiHighlighter): Promise<void> {
     console.log('streamInfo', streamInfo);
 
@@ -1328,20 +1393,37 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     // 5. cut data into highlightClips
 
     const setStreamInfo: IHighlightedStream = {
-      state: 'Searching for highlights...',
+      state: { description: 'Searching for highlights...', progress: 0 },
       date: moment().toISOString(),
       id: streamInfo.id || 'noId',
       title: streamInfo.title || filePath.split('/').pop() || 'Your awesome stream',
       game: streamInfo.game || 'no title',
     };
+
+    const progressManager = this.createProgressManager();
+    let intervalId: NodeJS.Timeout;
+
     this.addStream(setStreamInfo);
 
     const updateStreamInfoProgress = (progress: number) => {
       console.log('updateStreamInfoProgress progress', progress);
-      setStreamInfo.state = `Searching for highlights ${Math.round(progress * 100)}`;
+      setStreamInfo.state.progress = Math.round(progress * 100);
       this.updateStream(setStreamInfo);
     };
-    // const videoUri = '/Users/marvinoffers/Movies/djnardi-short.mp4'; // replace with filepath
+
+    // Start periodic progress updates
+    const startProgressUpdates = () => {
+      intervalId = setInterval(() => {
+        const progress = progressManager.getCurrentProgress();
+        updateStreamInfoProgress(progress);
+      }, 1000); // Update every second
+    };
+
+    // Stop progress updates
+    const stopProgressUpdates = () => {
+      clearInterval(intervalId);
+    };
+    startProgressUpdates();
     console.log('Test flow');
 
     const renderHighlights = async (partialHighlights: IHighlight[]) => {
@@ -1350,12 +1432,38 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       // console.log('✅ formatHighlighterResponse', formattedHighlighterResponse);
 
       console.log('🔄 cutHighlightClips');
-      this.updateStream({ state: 'Generating clips', ...setStreamInfo }); // alternate approach to update stream
-      const clipData = await this.cutHighlightClips(filePath, partialHighlights, setStreamInfo);
-      console.log('✅ cutHighlightClips');
+      this.updateStream({ state: 'Generating clips', ...setStreamInfo });
+      progressManager.setPhase('phase4');
 
+      // Wrap cutHighlightClips in a function that reports progress
+      const cutHighlightClipsWithProgress = async () => {
+        return new Promise<any>((resolve, reject) => {
+          let progress = 0;
+          const progressInterval = setInterval(() => {
+            progress += 0.01; // Increase progress by 1% every interval
+            if (progress >= 1) {
+              clearInterval(progressInterval);
+            }
+            updateStreamInfoProgress(progressManager.getCurrentProgress());
+          }, 1000); // Update every second
+
+          this.cutHighlightClips(filePath, partialHighlights, setStreamInfo)
+            .then(result => {
+              clearInterval(progressInterval);
+              resolve(result);
+            })
+            .catch(error => {
+              clearInterval(progressInterval);
+              reject(error);
+            });
+        });
+      };
+
+      const clipData = await cutHighlightClipsWithProgress();
+      console.log('✅ cutHighlightClips');
       // 6. add highlight clips
-      setStreamInfo.state = 'Done';
+      setStreamInfo.state.description = 'Done';
+      updateStreamInfoProgress(1);
       this.updateStream(setStreamInfo);
 
       console.log('🔄 addClips', clipData);
@@ -1364,12 +1472,36 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     };
 
     console.log('🔄 HighlighterData');
-    const highlighterResponse = await getHighlightClips(
-      filePath,
-      renderHighlights,
-      updateStreamInfoProgress,
-    );
-    console.log('✅ Final HighlighterData', highlighterResponse);
+    try {
+      const highlighterResponse = await getHighlightClips(
+        filePath,
+        renderHighlights,
+        (progress: number) => {
+          console.log('progress', progress);
+          // This callback might be called by getHighlightClips to report progress
+          // We can use it to move to the next phase if needed
+          if (progress === 0) {
+            progressManager.setPhase('initial');
+          }
+          if (progress === 0.1) {
+            progressManager.setPhase('phase1');
+          }
+          if (progress >= 0.3 && progress < 0.4) {
+            progressManager.setPhase('phase2');
+          }
+          if (progress >= 0.6 && progress < 0.7) {
+            progressManager.setPhase('phase3');
+          }
+        },
+      );
+      console.log('✅ Final HighlighterData', highlighterResponse);
+    } catch (error: unknown) {
+      console.error('Error in highlight generation:', error);
+      setStreamInfo.state.description = 'Error occurred';
+      this.updateStream(setStreamInfo);
+    } finally {
+      stopProgressUpdates();
+    }
 
     return;
   }
