@@ -7,6 +7,7 @@ import {
   IDualOutputPlatformSetting,
   TDisplayDestinations,
 } from './dual-output-data';
+import { verticalDisplayData } from '../settings-v2/default-settings-data';
 import { ScenesService, SceneItem, TSceneNode } from 'services/scenes';
 import { TDisplayType, VideoSettingsService } from 'services/settings-v2/video';
 import { TPlatform } from 'services/platforms';
@@ -14,6 +15,7 @@ import { EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
 import { EditorCommandsService } from 'services/editor-commands';
 import { Subject } from 'rxjs';
 import { TOutputOrientation } from 'services/restream';
+import { IVideoInfo } from 'obs-studio-node';
 import { ICustomStreamDestination, StreamSettingsService } from 'services/settings/streaming';
 import {
   ISceneCollectionsManifestEntry,
@@ -29,6 +31,8 @@ import invert from 'lodash/invert';
 import forEachRight from 'lodash/forEachRight';
 
 interface IDisplayVideoSettings {
+  horizontal: IVideoInfo;
+  vertical: IVideoInfo;
   activeDisplays: {
     horizontal: boolean;
     vertical: boolean;
@@ -314,6 +318,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     destinationSettings: {},
     dualOutputMode: false,
     videoSettings: {
+      horizontal: null,
+      vertical: verticalDisplayData, // get settings for horizontal display from obs directly
       activeDisplays: {
         horizontal: true,
         vertical: false,
@@ -817,6 +823,18 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     this.SET_DISPLAY_ACTIVE(status, display);
   }
 
+  /**
+   * Update Video Settings
+   */
+
+  setVideoSetting(setting: Partial<IVideoInfo>, display?: TDisplayType) {
+    this.SET_VIDEO_SETTING(setting, display);
+  }
+
+  updateVideoSettings(settings: IVideoInfo, display: TDisplayType = 'horizontal') {
+    this.UPDATE_VIDEO_SETTING(settings, display);
+  }
+
   setIsLoading(status: boolean) {
     this.SET_IS_LOADING(status);
   }
@@ -863,6 +881,19 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       ...this.state.videoSettings.activeDisplays,
       [display]: status,
     };
+  }
+
+  @mutation()
+  private SET_VIDEO_SETTING(setting: Partial<IVideoInfo>, display: TDisplayType = 'vertical') {
+    this.state.videoSettings[display] = {
+      ...this.state.videoSettings[display],
+      ...setting,
+    };
+  }
+
+  @mutation()
+  private UPDATE_VIDEO_SETTING(setting: IVideoInfo, display: TDisplayType = 'vertical') {
+    this.state.videoSettings[display] = { ...setting };
   }
 
   @mutation()
