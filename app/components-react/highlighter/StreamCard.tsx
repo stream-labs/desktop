@@ -4,27 +4,34 @@ import styles from './StreamView.m.less';
 import { Button } from 'antd';
 import { Services } from 'components-react/service-provider';
 import { isAiClip } from './utils';
+import { useVuex } from 'components-react/hooks';
 
 export default function StreamCard({
-  stream,
-  clips,
+  streamId,
   clipsOfStreamAreLoading,
   emitSetView,
   emitGeneratePreview,
   emitExportVideo,
   emitRemoveStream,
 }: {
-  stream: IHighlightedStream;
-  clips: TClip[];
+  streamId: string;
   clipsOfStreamAreLoading: string | null;
   emitSetView: (data: IViewState) => void;
   emitGeneratePreview: () => void;
   emitExportVideo: () => void;
   emitRemoveStream: () => void;
 }) {
+  const { HighlighterService } = Services;
+  const clips = useVuex(() =>
+    HighlighterService.views.clips.filter(c => c.streamInfo?.id === streamId),
+  );
+  const stream = useVuex(() =>
+    HighlighterService.views.highlightedStreams.find(s => s.id === streamId),
+  );
+  if (!stream) {
+    return <>error</>;
+  }
   function getMomentTypeCount(clips: TClip[]): { [type: string]: number } {
-    const { HighlighterService } = Services;
-
     const typeCounts: { [type: string]: number } = {};
 
     clips.forEach(clip => {
@@ -298,12 +305,12 @@ export default function StreamCard({
 
   function setExportButton(): { disabled: boolean; text: string } {
     const disabled =
-      stream.state.type !== 'detection-finished' ||
-      (stream.state.type !== 'detection-finished' && clips.length === 0) ||
-      !clips.some(c => c.streamInfo?.id === stream.id);
+      stream!.state.type !== 'detection-finished' ||
+      (stream!.state.type !== 'detection-finished' && clips.length === 0) ||
+      !clips.some(c => c.streamInfo?.id === stream!.id);
 
     const text =
-      stream.state.type === 'detection-finished' && clips.length === 0
+      stream!.state.type === 'detection-finished' && clips.length === 0
         ? 'No highlights found'
         : 'Export highlight reel';
 

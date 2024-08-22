@@ -1,5 +1,5 @@
 import { useVuex } from 'components-react/hooks';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Services } from 'components-react/service-provider';
 // import styles from './ClipsView.m.less';
 import styles from './StreamView.m.less';
@@ -30,13 +30,26 @@ interface IClipsViewProps {
 export default function StreamView({ emitSetView }: { emitSetView: (data: IViewState) => void }) {
   const { HighlighterService, HotkeysService, UsageStatisticsService } = Services;
   const v = useVuex(() => ({
-    clips: HighlighterService.views.clips as TClip[],
-    dismissedTutorial: HighlighterService.views.dismissedTutorial,
-    highlightedStreams: HighlighterService.views.highlightedStreams,
-
     exportInfo: HighlighterService.views.exportInfo,
     error: HighlighterService.views.error,
   }));
+
+  const viewRenderingHelper = useRef<string[]>();
+
+  const highlightedStreams = useVuex(() => {
+    const newStreamIds = HighlighterService.views.highlightedStreams.map(s => s.id);
+
+    if (
+      viewRenderingHelper.current === undefined ||
+      !isEqual(viewRenderingHelper.current, newStreamIds)
+    ) {
+      console.log('highlightedStreams');
+      console.log(newStreamIds);
+      console.log(viewRenderingHelper.current);
+      viewRenderingHelper.current = newStreamIds;
+    }
+    return viewRenderingHelper.current;
+  });
 
   const [showModal, rawSetShowModal] = useState<TModalStreamView | null>(null);
   const [modalWidth, setModalWidth] = useState('700px');
@@ -105,13 +118,6 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
     } catch (error: unknown) {
       setClipsOfStreamAreLoading(null);
     }
-  }
-
-  const [inspectedClipPath, setInspectedClipPath] = useState<string | null>(null);
-  let inspectedClip: TClip | null;
-
-  if (inspectedClipPath) {
-    inspectedClip = v.clips.find(c => c.path === inspectedClipPath) ?? null;
   }
 
   function ImportStreamModal({ close }: { close: () => void }) {
@@ -192,13 +198,14 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
     // Do not allow closing export modal while export/upload operations are in progress
     if (v.exportInfo.exporting) return;
 
-    setInspectedClipPath(null);
     setShowModal(null);
 
     if (v.error) HighlighterService.actions.dismissError();
   }
 
   function getStreamView() {
+    console.log('rerender StreamView');
+
     return (
       <div
         style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}
@@ -212,7 +219,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
           </div>
           <div style={{ display: 'flex', gap: '16px' }}>
             <Button
-              disabled={v.highlightedStreams.some(s => s.state.type === 'detection-in-progress')}
+              // disabled={v.highlightedStreams.some(s => s.state.type === 'detection-in-progress')}
               onClick={() => setShowModal({ type: 'upload' })}
             >
               Import
@@ -230,19 +237,18 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
               gap: '8px',
             }}
           >
-            {v.highlightedStreams.length === 0 ? (
+            {highlightedStreams.length === 0 ? (
               <>No highlight clips created from streams</>
             ) : (
               <>
-                {v.highlightedStreams.map(highlightedStream => (
+                {highlightedStreams.map(highlightedStream => (
                   <StreamCard
-                    key={highlightedStream.id}
-                    stream={highlightedStream}
-                    clips={HighlighterService.getClips(v.clips, highlightedStream.id)}
+                    key={highlightedStream}
+                    streamId={highlightedStream}
                     emitSetView={data => emitSetView(data)}
-                    emitGeneratePreview={() => previewVideo(highlightedStream.id)}
-                    emitExportVideo={() => exportVideo(highlightedStream.id)}
-                    emitRemoveStream={() => removeStream(highlightedStream.id)}
+                    emitGeneratePreview={() => previewVideo(highlightedStream)}
+                    emitExportVideo={() => exportVideo(highlightedStream)}
+                    emitRemoveStream={() => removeStream(highlightedStream)}
                     clipsOfStreamAreLoading={clipsOfStreamAreLoading}
                   />
                 ))}
