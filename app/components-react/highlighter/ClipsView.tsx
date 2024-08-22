@@ -245,6 +245,63 @@ export default function ClipsView({
     if (v.error) HighlighterService.actions.dismissError();
   }
 
+  function noClipsView(streamId: string | undefined) {
+    function onDrop(e: React.DragEvent<HTMLDivElement>) {
+      const extensions = SUPPORTED_FILE_TYPES.map(e => `.${e}`);
+      const files: string[] = [];
+      let fi = e.dataTransfer.files.length;
+      while (fi--) {
+        const file = e.dataTransfer.files.item(fi)?.path;
+        if (file) files.push(file);
+      }
+
+      const filtered = files.filter(f => extensions.includes(path.parse(f).ext));
+
+      if (filtered.length) {
+        //TODO M: New clips should be on position 0
+        HighlighterService.actions.addClips(filtered, streamId);
+      }
+
+      e.stopPropagation();
+    }
+
+    return (
+      <div
+        style={{ width: '100%', display: 'flex' }}
+        className={styles.clipsViewRoot}
+        onDrop={onDrop}
+      >
+        <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ display: 'flex', padding: 20 }}>
+            <div style={{ flexGrow: 1 }}>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <div
+                  style={{ cursor: 'pointer', paddingTop: '2px' }}
+                  onClick={() => emitSetView({ view: 'stream' })}
+                >
+                  <i className="icon-back" />
+                </div>{' '}
+                <h1 onClick={() => emitSetView({ view: 'stream' })} style={{ margin: 0 }}>
+                  {' '}
+                  {props.id
+                    ? v.highlightedStreams.find(stream => stream.id === props.id)?.title ??
+                      'Stream highlight clips'
+                    : 'All highlight clips'}
+                </h1>
+              </div>
+            </div>
+            <div>
+              <AddClip streamId={props.id} />
+            </div>
+          </div>{' '}
+          <Scrollable style={{ flexGrow: 1, padding: '20px 0 20px 20px' }}>
+            No clips found
+          </Scrollable>
+        </div>
+      </div>
+    );
+  }
+
   //TODO: Need performance updateb
   function getClipsView(streamId: string | undefined) {
     let clipList;
@@ -391,7 +448,7 @@ export default function ClipsView({
       </div>
     );
   }
-
+  if (loadedClips.length === 0) return noClipsView(props.id);
   return getClipsView(props.id);
 }
 
