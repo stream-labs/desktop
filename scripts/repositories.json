@@ -45,7 +45,7 @@
       "name": "node-window-rendering",
       "url": "https://slobs-node-window-rendering.s3-us-west-2.amazonaws.com/",
       "archive": "node-window-rendering-[VERSION]-[OS][ARCH].tar.gz",
-      "version": "1.0.20test",
+      "version": "1.0.20",
       "win64": false,
       "osx": true
     },
