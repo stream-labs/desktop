@@ -56,5 +56,11 @@
   "Arrange sources here for a vertical scene layout.": "在此處將來源安排為垂直場景配置。",
   "Arrange sources here for a horizontal scene layout.": "在此處將來源安排為水平場景配置。",
   "Toggle Dual Output Mode.": "切換 Dual Output 模式。",
-  "Cannot hide dual output toggles in dual output mode.": "在 Dual Output 模式中無法隱藏 Dual Output 切換開關。"
+  "Cannot hide dual output toggles in dual output mode.": "在 Dual Output 模式中無法隱藏 Dual Output 切換開關。",
+  "Choose a template from our overlay library": "Choose a template from our overlay library",
+  "Log in to choose a template from our overlay library": "Log in to choose a template from our overlay library",
+  "Loading scene...": "Loading scene...",
+  "Import from OBS": "Import from OBS",
+  "Import from Twitch": "Import from Twitch",
+  "Load existing scenes from Twitch Studio": "Load existing scenes from Twitch Studio"
 }
