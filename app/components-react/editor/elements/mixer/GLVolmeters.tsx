@@ -86,6 +86,9 @@ class GLVolmetersModule {
   private gl: WebGLRenderingContext;
   private program: WebGLProgram;
 
+  // As we limit FPS, force redraw is needed to avoid flickering when sources are updated/removed/deleted
+  private forceRedraw:boolean;
+
   // GL Attribute locations
   private positionLocation: number;
 
@@ -149,6 +152,7 @@ class GLVolmetersModule {
    */
 
   private subscribeVolmeters() {
+    this.forceRedraw = true;
     const audioSources = this.audioSources;
     const sourcesOrder = audioSources.map(source => source.sourceId);
 
@@ -267,7 +271,8 @@ class GLVolmetersModule {
     const timeBetweenFrames = 1000 / this.fpsLimit;
     const currentFrameNumber = Math.ceil(timeElapsed / timeBetweenFrames);
 
-    if (currentFrameNumber !== this.frameNumber) {
+    if (currentFrameNumber !== this.frameNumber || this.forceRedraw) {
+      this.forceRedraw = false;
       // it's time to render next frame
       this.frameNumber = currentFrameNumber;
       // don't render sources then channelsCount is 0
