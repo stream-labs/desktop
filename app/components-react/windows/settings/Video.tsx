@@ -54,6 +54,7 @@ const FPS_OPTIONS = [
   { label: '59.94', value: '60000-1001' },
   { label: '60', value: '60-1' },
 ];
+
 class VideoSettingsModule {
   service = Services.VideoSettingsService;
   userService = Services.UserService;
@@ -70,30 +71,26 @@ class VideoSettingsModule {
 
   get values(): Dictionary<TInputValue> {
     const display = this.state.display;
-    const baseRes =
-      display !== 'vertical' && this.state?.customBaseRes ? 'custom' : this.state.baseRes;
+    const vals = this.service.values[display];
+    const baseRes = display !== 'vertical' && this.state?.customBaseRes ? 'custom' : vals.baseRes;
     const outputRes =
-      display !== 'vertical' && this.state?.customOutputRes ? 'custom' : this.state.outputRes;
+      display !== 'vertical' && this.state?.customOutputRes ? 'custom' : vals.outputRes;
     return {
+      ...vals,
       baseRes,
       outputRes,
       customBaseRes: this.state.customBaseResValue,
       customOutputRes: this.state.customOutputResValue,
-      scaleType: this.state.scaleType,
-      fpsType: this.state.fpsType,
       fpsNum: this.state.fpsNum,
       fpsDen: this.state.fpsDen,
       fpsInt: this.state.fpsInt,
-      fpsCom: `${this.state.fpsNum}-${this.state.fpsDen}`,
     };
   }
 
   state = injectState({
     display: 'horizontal' as TDisplayType,
     showModal: false,
-    dualOutput: this.dualOutputService.views.dualOutputMode,
-    baseRes: this.service.values.horizontal.baseRes,
-    outputRes: this.service.values.horizontal.outputRes,
+    showDualOutputSettings: this.dualOutputService.views.dualOutputMode,
     customBaseRes: !this.baseResOptions.find(
       opt => opt.value === this.service.values.horizontal.baseRes,
     ),
@@ -102,8 +99,6 @@ class VideoSettingsModule {
     ),
     customBaseResValue: this.service.values.horizontal.baseRes,
     customOutputResValue: this.service.values.horizontal.outputRes,
-    scaleType: this.service.values.horizontal.scaleType,
-    fpsType: this.service.values.horizontal.fpsType,
     fpsNum: this.service.values.horizontal.fpsNum,
     fpsDen: this.service.values.horizontal.fpsDen,
     fpsInt: this.service.values.horizontal.fpsNum,
@@ -239,7 +234,7 @@ class VideoSettingsModule {
       return VERTICAL_OUTPUT_RES_OPTIONS;
     }
 
-    const baseRes = `${this.service.values.horizontal.baseRes}`;
+    const baseRes = `${this.service.state.horizontal.baseWidth}x${this.service.state.horizontal.baseHeight}`;
     if (!OUTPUT_RES_OPTIONS.find(opt => opt.value === baseRes)) {
       return [{ label: baseRes, value: baseRes }]
         .concat(OUTPUT_RES_OPTIONS)
@@ -304,14 +299,8 @@ class VideoSettingsModule {
     const display = this.state.display;
     if (key === 'outputRes') {
       this.state.setCustomOutputResValue(value);
-      if (value !== '') {
-        this.state.setOutputRes(value);
-      }
     } else if (key === 'baseRes') {
       this.state.setCustomBaseResValue(value);
-      if (value !== '') {
-        this.state.setBaseRes(value);
-      }
     }
 
     if (this.resolutionValidator.pattern.test(value)) {
@@ -327,44 +316,32 @@ class VideoSettingsModule {
       // when setting vertical dimensions
       if (display === 'horizontal') {
         const otherPrefix = key === 'baseRes' ? 'output' : 'base';
-
-        const verticalDimensions = VERTICAL_CANVAS_OPTIONS.map(option => option.value);
-        const horizontalDimensions = CANVAS_RES_OPTIONS.concat(OUTPUT_RES_OPTIONS).map(
+        const customRes = this.state.customBaseRes || this.state.customOutputRes;
+        const verticalValues = VERTICAL_CANVAS_OPTIONS.map(option => option.value);
+        const horizontalValues = CANVAS_RES_OPTIONS.concat(OUTPUT_RES_OPTIONS).map(
           option => option.value,
         );
+        const baseRes = this.values.baseRes.toString();
+        const outputRes = this.values.outputRes.toString();
 
-        const customRes = this.state.customBaseRes || this.state.customOutputRes;
-        const baseRes = this.state.baseRes;
-        const outputRes = this.state.outputRes;
+        const shouldSyncVertical =
+          !customRes &&
+          verticalValues.includes(value) &&
+          !verticalValues.includes(baseRes) &&
+          !verticalValues.includes(outputRes);
 
-        const verticalValue = !customRes && verticalDimensions.includes(value);
-        const verticalBase = !customRes && verticalDimensions.includes(baseRes);
-        const verticalOutput = !customRes && verticalDimensions.includes(outputRes);
+        const shouldSyncHorizontal =
+          !customRes &&
+          !verticalValues.includes(value) &&
+          !horizontalValues.includes(baseRes) &&
+          !horizontalValues.includes(outputRes);
 
-        const horizontalValue = !customRes && horizontalDimensions.includes(value);
-        const horizontalBase = !customRes && horizontalDimensions.includes(baseRes);
-        const horizontalOutput = !customRes && horizontalDimensions.includes(outputRes);
-
-        let shouldUpdate = false;
-
-        if ((verticalValue && !verticalBase) || (verticalValue && !verticalOutput)) {
-          shouldUpdate = true;
-        } else if ((horizontalValue && !horizontalBase) || (horizontalValue && !horizontalOutput)) {
-          shouldUpdate = true;
-        }
-
-        if (shouldUpdate) {
+        if (shouldSyncVertical || shouldSyncHorizontal) {
           settings[`${otherPrefix}Width`] = Number(width);
           settings[`${otherPrefix}Height`] = Number(height);
-
-          if (key === 'baseRes') {
-            this.state.setOutputRes(value);
-          } else {
-            this.state.setBaseRes(value);
-          }
         }
       }
-      this.service.actions.updateVideoSettings(settings, display);
+      this.service.actions.setSettings(settings, display);
     }
   }
 
@@ -395,9 +372,12 @@ class VideoSettingsModule {
 
   setScaleType(value: EScaleType) {
     this.service.actions.setVideoSetting('scaleType', value, 'horizontal');
-    this.service.actions.setVideoSetting('scaleType', value, 'vertical');
 
-    this.state.setScaleType(value);
+    if (this.service.contexts.vertical) {
+      this.service.actions.setVideoSetting('scaleType', value, 'vertical');
+    } else {
+      this.dualOutputService.actions.setVideoSetting({ scaleType: value }, 'vertical');
+    }
   }
 
   /**
@@ -407,13 +387,10 @@ class VideoSettingsModule {
    * Otherwise, update the vertical display persisted settings.
    */
   setFPSType(value: EFPSType) {
-    const settings = { fpsType: value, fpsNum: 30, fpsDen: 1 };
-    this.service.actions.updateVideoSettings(settings, 'horizontal');
-    this.service.actions.updateVideoSettings(settings, 'vertical');
-
-    this.state.setFpsType(value);
-    this.state.setFpsNum(30);
-    this.state.setFpsDen(1);
+    this.service.actions.setVideoSetting('fpsType', value, 'horizontal');
+    this.service.actions.setVideoSetting('fpsNum', 30, 'horizontal');
+    this.service.actions.setVideoSetting('fpsDen', 1, 'horizontal');
+    this.service.actions.syncFPSSettings();
   }
 
   /**
@@ -424,12 +401,10 @@ class VideoSettingsModule {
    */
   setCommonFPS(value: string) {
     const [fpsNum, fpsDen] = value.split('-');
-    const settings = { fpsNum: Number(fpsNum), fpsDen: Number(fpsDen) };
-    this.service.actions.updateVideoSettings(settings, 'horizontal');
-    this.service.actions.updateVideoSettings(settings, 'vertical');
 
-    this.state.setFpsNum(Number(fpsNum));
-    this.state.setFpsDen(Number(fpsDen));
+    this.service.actions.setVideoSetting('fpsNum', Number(fpsNum), 'horizontal');
+    this.service.actions.setVideoSetting('fpsDen', Number(fpsDen), 'horizontal');
+    this.service.actions.syncFPSSettings();
   }
   /**
    * Sets Integer FPS
@@ -440,10 +415,9 @@ class VideoSettingsModule {
   setIntegerFPS(value: string) {
     this.state.setFpsInt(Number(value));
     if (Number(value) > 0 && Number(value) < 1001) {
-      const settings = { fpsNum: Number(value), fpsDen: 1 };
-
-      this.service.actions.updateVideoSettings(settings, 'horizontal');
-      this.service.actions.updateVideoSettings(settings, 'vertical');
+      this.service.actions.setVideoSetting('fpsNum', Number(value), 'horizontal');
+      this.service.actions.setVideoSetting('fpsDen', 1, 'horizontal');
+      this.service.actions.syncFPSSettings();
     }
   }
 
@@ -479,14 +453,10 @@ class VideoSettingsModule {
     const customOutputRes = !this.outputResOptions.find(
       opt => opt.value === this.service.values[display].outputRes,
     );
-    this.state.setBaseRes(this.service.values[display].baseRes);
-    this.state.setOutputRes(this.service.values[display].outputRes);
     this.state.setCustomBaseRes(customBaseRes);
     this.state.setCustomOutputRes(customOutputRes);
     this.state.setCustomBaseResValue(this.service.values[display].baseRes);
     this.state.setCustomOutputResValue(this.service.values[display].outputRes);
-    this.state.setScaleType(this.service.values[display].scaleType);
-    this.state.setFpsType(this.service.values[display].fpsType);
     this.state.setFpsNum(this.service.values[display].fpsNum);
     this.state.setFpsDen(this.service.values[display].fpsDen);
     this.state.setFpsInt(this.service.values[display].fpsInt);
@@ -530,7 +500,7 @@ class VideoSettingsModule {
       this.dualOutputService.actions.setDualOutputMode(
         !this.dualOutputService.views.dualOutputMode,
       );
-      this.state.setDualOutput(!this.state.dualOutput);
+      this.state.setShowDualOutputSettings(!this.state.showDualOutputSettings);
       Services.UsageStatisticsService.recordFeatureUsage('DualOutput');
       Services.UsageStatisticsService.recordAnalyticsEvent('DualOutput', {
         type: 'ToggleOnDualOutput',
@@ -559,7 +529,7 @@ export function VideoSettings() {
   const {
     values,
     metadata,
-    dualOutput,
+    showDualOutputSettings,
     showModal,
     cantEditFields,
     onChange,
@@ -574,12 +544,13 @@ export function VideoSettings() {
       <div className={styles.videoSettingsHeader}>
         <h2>{$t('Video')}</h2>
         <div className={styles.doToggle}>
+          {/* THIS CHECKBOX TOGGLES DUAL OUTPUT MODE FOR THE ENTIRE APP */}
           <CheckboxInput
             id="dual-output-checkbox"
             name="dual-output-checkbox"
             data-name="dual-output-checkbox"
             label="Dual Output Checkbox"
-            value={dualOutput}
+            value={showDualOutputSettings}
             onChange={toggleDualOutput}
             className={styles.doCheckbox}
             disabled={cantEditFields}
@@ -596,8 +567,9 @@ export function VideoSettings() {
             <i className="icon-information" />
           </Tooltip>
         </div>
+        {/* )} */}
       </div>
-      {dualOutput && <Tabs onChange={setDisplay} />}
+      {showDualOutputSettings && <Tabs onChange={setDisplay} />}
 
       <div className={styles.formSection}>
         <FormFactory
