@@ -87,7 +87,7 @@ export default function Highlighter(props: { params?: { view: string } }) {
 
   function setViewFromEmit(data: IViewState) {
     if (data.view === 'clips') {
-      // console.log('setViewInOverview:', data.id);
+      console.log('setViewInOverview:', data.id);
       setView({
         view: data.view,
         id: data.id,

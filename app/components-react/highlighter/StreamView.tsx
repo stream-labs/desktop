@@ -34,32 +34,21 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
     error: HighlighterService.views.error,
   }));
 
-  const currentHighlightedStreamsIdsState = useRef<string[]>();
+  const viewRenderingHelper = useRef<string[]>();
+
   const highlightedStreams = useVuex(() => {
     const newStreamIds = HighlighterService.views.highlightedStreams.map(s => s.id);
 
     if (
-      currentHighlightedStreamsIdsState.current === undefined ||
-      !isEqual(currentHighlightedStreamsIdsState.current, newStreamIds)
+      viewRenderingHelper.current === undefined ||
+      !isEqual(viewRenderingHelper.current, newStreamIds)
     ) {
-      currentHighlightedStreamsIdsState.current = newStreamIds;
+      console.log('highlightedStreams');
+      console.log(newStreamIds);
+      console.log(viewRenderingHelper.current);
+      viewRenderingHelper.current = newStreamIds;
     }
-    return currentHighlightedStreamsIdsState.current;
-  });
-
-  const currentAiDetectionState = useRef<boolean>();
-  const aiDetectionInProgress = useVuex(() => {
-    const newDetectionInProgress = HighlighterService.views.highlightedStreams.some(
-      s => s.state.type === 'detection-in-progress',
-    );
-
-    if (
-      currentAiDetectionState.current === undefined ||
-      !isEqual(currentAiDetectionState.current, newDetectionInProgress)
-    ) {
-      currentAiDetectionState.current = newDetectionInProgress;
-    }
-    return currentAiDetectionState.current;
+    return viewRenderingHelper.current;
   });
 
   const [showModal, rawSetShowModal] = useState<TModalStreamView | null>(null);
@@ -230,7 +219,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
           </div>
           <div style={{ display: 'flex', gap: '16px' }}>
             <Button
-              disabled={aiDetectionInProgress === true}
+              // disabled={v.highlightedStreams.some(s => s.state.type === 'detection-in-progress')}
               onClick={() => setShowModal({ type: 'upload' })}
             >
               Import

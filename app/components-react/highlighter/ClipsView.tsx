@@ -49,11 +49,9 @@ export default function ClipsView({
     error: HighlighterService.views.error,
     highlightedStreams: HighlighterService.views.highlightedStreams,
   }));
-  const [tempList, setTempList] = useState<{ id: string }[] | undefined>(undefined);
+  const [tempList, setTempList] = useState<{ id: string }[]>([]);
   const [showModal, rawSetShowModal] = useState<TModalClipsView | null>(null);
   const [modalWidth, setModalWidth] = useState('700px');
-  const [inspectedClipPath, setInspectedClipPath] = useState<string | null>(null);
-  let inspectedClip: TClip | null;
 
   const loadedClips = useMemo(() => HighlighterService.getClips(v.clips, props.id), [
     v.clips,
@@ -68,8 +66,8 @@ export default function ClipsView({
     // Disables unneeded clips, and enables needed clips
     // console.log('loaded.clips length changed');
 
-    if (tempList && tempList.length > 0) {
-      setTempList(undefined);
+    if (tempList.length > 0) {
+      setTempList([]);
     }
 
     HighlighterService.actions.enableOnlySpecificClips(HighlighterService.views.clips, props.id);
@@ -77,8 +75,6 @@ export default function ClipsView({
   }, [loadedClips.length]);
 
   useEffect(() => UsageStatisticsService.actions.recordFeatureUsage('Highlighter'), []);
-
-  console.log('renderClipsView');
 
   // This is kind of weird, but ensures that modals stay the right
   // size while the closing animation is played. This is why modal
@@ -199,7 +195,7 @@ export default function ClipsView({
   }
 
   function setClipOrder(clips: { id: string }[], streamId: string | undefined) {
-    const oldClipArray = tempList?.map(c => c.id);
+    const oldClipArray = tempList.map(c => c.id);
     const newClipArray = clips.map(c => c.id);
 
     if (JSON.stringify(newClipArray) === JSON.stringify(oldClipArray)) {
@@ -231,6 +227,9 @@ export default function ClipsView({
     }
   }
 
+  const [inspectedClipPath, setInspectedClipPath] = useState<string | null>(null);
+  let inspectedClip: TClip | null;
+
   if (inspectedClipPath) {
     inspectedClip = loadedClips.find(c => c.path === inspectedClipPath) ?? null;
   }
@@ -250,7 +249,7 @@ export default function ClipsView({
   function getClipsView(streamId: string | undefined) {
     let clipList;
 
-    if (tempList === undefined) {
+    if (tempList.length === 0) {
       if (streamId) {
         const clipsWithOrder = loadedClips
           .filter(
@@ -278,9 +277,6 @@ export default function ClipsView({
 
         clipList = [...clipOrder];
       }
-
-      console.log('setTempList', clipList);
-
       setTempList(clipList);
     }
 
@@ -332,54 +328,48 @@ export default function ClipsView({
               <AddClip streamId={props.id} />
             </div>
           </div>
-          {tempList && tempList.length > 0 ? (
-            <>
-              {v.loaded ? (
-                <Scrollable style={{ flexGrow: 1, padding: '20px 0 20px 20px' }}>
-                  <ReactSortable
-                    list={tempList}
-                    setList={clips => setClipOrder(clips, props.id)} //
-                    animation={200}
-                    filter=".sortable-ignore"
-                    onMove={e => {
-                      return e.related.className.indexOf('sortable-ignore') === -1;
-                    }}
-                  >
-                    {tempList
-                      .filter(c => clipMap.has(c.id))
-                      .map(({ id }) => {
-                        const clip = clipMap.get(id)!;
-                        return (
-                          <div
-                            key={clip.path}
-                            style={{ margin: '10px 20px 10px 0', display: 'inline-block' }}
-                          >
-                            <ClipPreview
-                              clip={clip}
-                              showTrim={() => {
-                                setInspectedClipPath(clip.path);
-                                setShowModal('trim');
-                              }}
-                              showRemove={() => {
-                                setInspectedClipPath(clip.path);
-                                setShowModal('remove');
-                              }}
-                            />
-                          </div>
-                        );
-                      })}
-                  </ReactSortable>
-                </Scrollable>
-              ) : (
-                getLoadingView()
-              )}
-            </>
+
+          {v.loaded ? (
+            <Scrollable style={{ flexGrow: 1, padding: '20px 0 20px 20px' }}>
+              <ReactSortable
+                list={tempList}
+                setList={clips => setClipOrder(clips, props.id)} //
+                animation={200}
+                filter=".sortable-ignore"
+                onMove={e => {
+                  return e.related.className.indexOf('sortable-ignore') === -1;
+                }}
+              >
+                {tempList
+                  .filter(c => clipMap.has(c.id))
+                  .map(({ id }) => {
+                    const clip = clipMap.get(id)!;
+                    return (
+                      <div
+                        key={clip.path}
+                        style={{ margin: '10px 20px 10px 0', display: 'inline-block' }}
+                      >
+                        <ClipPreview
+                          clip={clip}
+                          showTrim={() => {
+                            setInspectedClipPath(clip.path);
+                            setShowModal('trim');
+                          }}
+                          showRemove={() => {
+                            setInspectedClipPath(clip.path);
+                            setShowModal('remove');
+                          }}
+                        />
+                      </div>
+                    );
+                  })}
+              </ReactSortable>
+            </Scrollable>
           ) : (
-            'No clips available'
+            getLoadingView()
           )}
         </div>
-        {tempList && tempList.length > 0 ? getControls() : <> </>}
-
+        {getControls()}
         <Modal
           getContainer={`.${styles.clipsViewRoot}`}
           onCancel={closeModal}
@@ -401,6 +391,7 @@ export default function ClipsView({
       </div>
     );
   }
+
   return getClipsView(props.id);
 }
 
