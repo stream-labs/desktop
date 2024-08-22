@@ -1,7 +1,7 @@
 {
   "Source: %{sourceName}": "Kilde: %{sourceName}",
   "Collab Cam": "Collab Cam",
-  "Invite a guest to join your stream from a web browser.": "Inviter en gæst til at deltage i din stream fra en webbrowser.",
+  "Invite guests to join your stream from a web browser or their Streamlabs Desktop. Stream games or IRL broadcasts together, use as additional camera angles and more.": "Invite guests to join your stream from a web browser or their Streamlabs Desktop. Stream games or IRL broadcasts together, use as additional camera angles and more.",
   "Guest Cam is currently listening for connecting guests, but is not broadcasting your microphone and webcam to your guests yet.": "Guest Cam lytter i øjeblikket efter gæster, men sender ikke din mikrofon og dit webcam til dine gæster endnu.",
   "No microphone source is selected. Your guest will not be able to hear you.": "Der er ikke valgt nogen mikrofonkilde. Din gæst vil ikke kunne høre dig.",
   "No webcam source is selected. Your guest will not be able to see you.": "Der er ikke valgt nogen webkamerakilde. Din gæst vil ikke kunne se dig.",
