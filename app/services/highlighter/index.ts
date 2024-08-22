@@ -1712,8 +1712,6 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     return this.getClips(clips, id).every(clip => clip.loaded);
   }
 
-  isAiClip = (clip: TClip): clip is IAiClip => clip.source === 'AiClip';
-
   enableOnlySpecificClips(clips: TClip[], id?: string) {
     clips.forEach(clip => {
       this.UPDATE_CLIP({

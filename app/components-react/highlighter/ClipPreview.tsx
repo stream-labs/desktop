@@ -8,6 +8,7 @@ import styles from './ClipsView.m.less';
 import cx from 'classnames';
 import { Tooltip } from 'antd';
 import { $t } from 'services/i18n';
+import { isAiClip } from './utils';
 
 export default function ClipPreview(props: {
   clip: TClip;
@@ -136,7 +137,7 @@ export default function ClipPreview(props: {
         }}
       >
         <div>
-          {HighlighterService.isAiClip(props.clip) ? (
+          {isAiClip(props.clip) ? (
             <>
               {' '}
               Type{' '}

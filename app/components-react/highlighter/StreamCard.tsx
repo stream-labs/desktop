@@ -3,6 +3,7 @@ import { HighlighterService, IHighlightedStream, IViewState, TClip } from 'servi
 import styles from './StreamView.m.less';
 import { Button } from 'antd';
 import { Services } from 'components-react/service-provider';
+import { isAiClip } from './utils';
 
 export default function StreamCard({
   stream,
@@ -27,7 +28,7 @@ export default function StreamCard({
     const typeCounts: { [type: string]: number } = {};
 
     clips.forEach(clip => {
-      if (HighlighterService.isAiClip(clip)) {
+      if (isAiClip(clip)) {
         clip.aiInfo.moments.forEach(moment => {
           const type = moment.type;
           if (typeCounts[type]) {
