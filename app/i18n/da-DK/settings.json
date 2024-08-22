@@ -109,6 +109,7 @@
   "Pipe Name": "Pipe-navn",
   "Websockets": "WebSockets",
   "Enabled": "Aktiveret",
+  "Disabled": "Disabled",
   "Allow Remote Connections": "Tillad fjernforbindelser",
   "Port": "Port",
   "Audio - Track 1": "Lyd – spor 1",
@@ -119,7 +120,7 @@
   "Audio - Track 6": "Lyd – spor 6",
   "Stream Key": "Streamnøgle",
   "You can not change these settings when you're live": "Du kan ikke ændre disse indstillinger, mens du er live",
-  "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk.": "Denne funktion er beregnet til overlay-designere til at eksportere deres arbejde til vores Tema-shop. Ikke alle kilder eksporteres – brug på egen risiko.",
+  "This feature is intended for overlay designers to export their work for our Overlay Library. Not all sources will be exported, use at your own risk.": "This feature is intended for overlay designers to export their work for our Overlay Library. Not all sources will be exported, use at your own risk.",
   "Change the look of Streamlabs Desktop with Ultra": "Skift udseende på Streamlabs Desktop med Ultra",
   "Virtual Webcam": "Virtuelt webkamera",
   "unlinked": "ikke linket",
@@ -251,5 +252,14 @@
   "%{fieldName} must be greater than 0": "%{fieldName} skal være større end 0",
   "Markers": "Markers",
   "Manage Dual Output": "Manage Dual Output",
-  "Auto optimizer disabled for dual output scenes": "Auto optimizer disabled for dual output scenes"
+  "Auto optimizer disabled for dual output scenes": "Auto optimizer disabled for dual output scenes",
+  "Scene Collection": "Scene Collection",
+  "High": "High",
+  "Above High": "Above High",
+  "Normal": "Normal",
+  "Below Normal": "Below Normal",
+  "Idle": "Idle",
+  "Please connect platforms directly from Streamlabs Desktop instead of adding Streamlabs Multistream as a custom destination": "Please connect platforms directly from Streamlabs Desktop instead of adding Streamlabs Multistream as a custom destination",
+  "Audio Encoder": "Audio Encoder",
+  "Additional Settings": "Additional Settings"
 }
