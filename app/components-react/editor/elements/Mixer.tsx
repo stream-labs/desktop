@@ -31,8 +31,9 @@ export function Mixer() {
       .filter(source =>
         !source.mixerHidden &&
         source.isControlledViaObs &&
-        // If visibility state is undefined, such items will be displayed (for example, microphone)
-        ScenesService.views.activeScene?.getItems().find(item => item?.sourceId === source.sourceId)?.visible !== false
+        // Global audio sources like microphone are not present among active scene items
+        (ScenesService.views.activeScene?.getItems().filter(item => item?.sourceId === source.sourceId).length == 0 ||
+         ScenesService.views.activeScene?.getItems().filter(item => item?.sourceId === source.sourceId).some(e => e.visible !== false))
       ).map(source => source.sourceId),
   }));
 

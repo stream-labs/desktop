@@ -132,8 +132,9 @@ class GLVolmetersModule {
     return this.audioService.views.sourcesForCurrentScene.filter(source => {
       return !source.mixerHidden &&
              source.isControlledViaObs &&
-             // If visibility state is undefined, such items will be displayed (for example, microphone)
-             this.scenesService.views.activeScene?.getItems().find(item => item?.sourceId === source.sourceId)?.visible !== false
+             // Global audio sources like microphone are not present among active scene items
+             (this.scenesService.views.activeScene?.getItems().filter(item => item?.sourceId === source.sourceId).length == 0 ||
+              this.scenesService.views.activeScene?.getItems().filter(item => item?.sourceId === source.sourceId).some(e => e.visible !== false))
     });
   }
 
