@@ -34,5 +34,8 @@
   "Only Me": "나만",
   "Do not change privacy settings": "개인정보 설정을 변경하지 않음",
   "Install %{overlayName}": "%{overlayName} 설치",
-  "Please note that while you can schedule streams to Facebook, some will not appear on this calendar due to API limitations": "Facebook에 스트리밍을 예약할 수 있지만, API 제한으로 일해 일부가 이 캘린더에 표시되지 않을 수도 있습니다."
+  "Please note that while you can schedule streams to Facebook, some will not appear on this calendar due to API limitations": "Facebook에 스트리밍을 예약할 수 있지만, API 제한으로 일해 일부가 이 캘린더에 표시되지 않을 수도 있습니다.",
+  "Your account is not eligible to stream on Facebook. Click to learn more.": "Your account is not eligible to stream on Facebook. Click to learn more",
+  "You're not eligible to Go Live, your profile needs to be at least 60 days old and your page needs to have at least 100 followers": "You're not eligible to Go Live, your profile needs to be at least 60 days old and your page needs to have at least 100 followers",
+  "You're not eligible to Go Live, your profile needs to be at least 60 days old and your page needs to have at least 100 followers. Click the notification to learn more.": "You're not eligible to Go Live, your profile needs to be at least 60 days old and your page needs to have at least 100 followers. Click the notification to learn more."
 }
