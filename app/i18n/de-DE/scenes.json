@@ -56,5 +56,11 @@
   "Arrange sources here for a vertical scene layout.": "Quellen für vertikales Szenenlayout hier anordnen.",
   "Arrange sources here for a horizontal scene layout.": "Quellen für horizontales Szenenlayout hier anordnen.",
   "Toggle Dual Output Mode.": "Dual Output Modus ein/aus.",
-  "Cannot hide dual output toggles in dual output mode.": "Im Dual Output Modus können die Umschalter für Dual Output nicht ausgeblendet werden."
+  "Cannot hide dual output toggles in dual output mode.": "Im Dual Output Modus können die Umschalter für Dual Output nicht ausgeblendet werden.",
+  "Choose a template from our overlay library": "Choose a template from our overlay library",
+  "Log in to choose a template from our overlay library": "Log in to choose a template from our overlay library",
+  "Loading scene...": "Loading scene...",
+  "Import from OBS": "Import from OBS",
+  "Import from Twitch": "Import from Twitch",
+  "Load existing scenes from Twitch Studio": "Load existing scenes from Twitch Studio"
 }

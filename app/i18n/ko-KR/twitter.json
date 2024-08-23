@@ -8,5 +8,18 @@
   "Unlink Twitter": "Twitter 연결 해제",
   "Tweet & Go Live": "트윗 및 라이브 하기",
   "Could not connect to Twitter": "Twitter에 연결 불가",
-  "Use Streamlabs URL": "Streamlabs URL 사용"
+  "Use Streamlabs URL": "Streamlabs URL 사용",
+  "X (Twitter) Chat Type": "X (Twitter) Chat Type",
+  "Disabled": "Disabled",
+  "Chat will be disabled": "Chat will be disabled",
+  "Everyone": "Everyone",
+  "All viewers will be able to chat": "All viewers will be able to chat",
+  "Verified Only": "Verified Only",
+  "Only verified viewers will be able to chat": "Only verified viewers will be able to chat",
+  "Followed Only": "Followed Only",
+  "Only accounts you follow will be able to chat": "Only accounts you follow will be able to chat",
+  "Subscriber Only": "Subscriber Only",
+  "Only viewers that subscribe to you will be able to chat": "Only viewers that subscribe to you will be able to chat",
+  "You need X premium account to go live on X.": "You need X premium account to go live on X.",
+  "You need X premium account to go live on X. Click to learn more": "You need X premium account to go live on X. Click to learn more"
 }
