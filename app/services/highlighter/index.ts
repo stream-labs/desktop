@@ -873,9 +873,6 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
       this.clips[c.path] = this.clips[c.path] ?? new Clip(c.path);
     }
-    console.log(Object.values(this.clips).length);
-    console.log(clipsToLoad.length);
-    console.log(clipsToLoad.filter(c => !c.loaded).length);
     await pmap(
       clipsToLoad.filter(c => !c.loaded),
       c => this.clips[c.path].init(),
@@ -1420,6 +1417,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       game: streamInfo.game || 'no title',
     };
 
+    this.updateStream(setStreamInfo);
     const progressManager = this.createProgressManager();
     let intervalId: NodeJS.Timeout;
 
