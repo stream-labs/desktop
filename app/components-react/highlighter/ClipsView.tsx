@@ -49,7 +49,7 @@ export default function ClipsView({
     error: HighlighterService.views.error,
     highlightedStreams: HighlighterService.views.highlightedStreams,
   }));
-  const [tempList, setTempList] = useState<{ id: string }[]>([]);
+  const [tempClipList, setTempClipList] = useState<{ id: string }[]>([]);
   const [showModal, rawSetShowModal] = useState<TModalClipsView | null>(null);
   const [modalWidth, setModalWidth] = useState('700px');
 
@@ -66,8 +66,8 @@ export default function ClipsView({
     // Disables unneeded clips, and enables needed clips
     // console.log('loaded.clips length changed');
 
-    if (tempList.length > 0) {
-      setTempList([]);
+    if (tempClipList.length > 0) {
+      setTempClipList([]);
     }
 
     HighlighterService.actions.enableOnlySpecificClips(HighlighterService.views.clips, props.id);
@@ -195,7 +195,7 @@ export default function ClipsView({
   }
 
   function setClipOrder(clips: { id: string }[], streamId: string | undefined) {
-    const oldClipArray = tempList.map(c => c.id);
+    const oldClipArray = tempClipList.map(c => c.id);
     const newClipArray = clips.map(c => c.id);
 
     if (JSON.stringify(newClipArray) === JSON.stringify(oldClipArray)) {
@@ -222,7 +222,7 @@ export default function ClipsView({
         });
       }
 
-      setTempList(clips);
+      setTempClipList(clips);
       return;
     }
   }
@@ -306,7 +306,7 @@ export default function ClipsView({
   function getClipsView(streamId: string | undefined) {
     let clipList;
 
-    if (tempList.length === 0) {
+    if (tempClipList.length === 0) {
       if (streamId) {
         const clipsWithOrder = loadedClips
           .filter(
@@ -334,7 +334,7 @@ export default function ClipsView({
 
         clipList = [...clipOrder];
       }
-      setTempList(clipList);
+      setTempClipList(clipList);
     }
 
     function onDrop(e: React.DragEvent<HTMLDivElement>) {
@@ -389,7 +389,7 @@ export default function ClipsView({
           {v.loaded ? (
             <Scrollable style={{ flexGrow: 1, padding: '20px 0 20px 20px' }}>
               <ReactSortable
-                list={tempList}
+                list={tempClipList}
                 setList={clips => setClipOrder(clips, props.id)} //
                 animation={200}
                 filter=".sortable-ignore"
@@ -397,7 +397,7 @@ export default function ClipsView({
                   return e.related.className.indexOf('sortable-ignore') === -1;
                 }}
               >
-                {tempList
+                {tempClipList
                   .filter(c => clipMap.has(c.id))
                   .map(({ id }) => {
                     const clip = clipMap.get(id)!;

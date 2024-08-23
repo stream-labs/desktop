@@ -34,21 +34,32 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
     error: HighlighterService.views.error,
   }));
 
-  const viewRenderingHelper = useRef<string[]>();
+  const currentStreams = useRef<string[]>();
 
   const highlightedStreams = useVuex(() => {
     const newStreamIds = HighlighterService.views.highlightedStreams.map(s => s.id);
 
-    if (
-      viewRenderingHelper.current === undefined ||
-      !isEqual(viewRenderingHelper.current, newStreamIds)
-    ) {
-      console.log('highlightedStreams');
-      console.log(newStreamIds);
-      console.log(viewRenderingHelper.current);
-      viewRenderingHelper.current = newStreamIds;
+    if (currentStreams.current === undefined || !isEqual(currentStreams.current, newStreamIds)) {
+      currentStreams.current = newStreamIds;
     }
-    return viewRenderingHelper.current;
+    return currentStreams.current;
+  });
+
+  const currentAiDetectionState = useRef<boolean>();
+
+  const aiDetectionInProgress = useVuex(() => {
+    const newDetectionInProgress = HighlighterService.views.highlightedStreams.some(
+      s => s.state.type === 'detection-in-progress',
+    );
+
+    if (
+      currentAiDetectionState.current === undefined ||
+      !isEqual(currentAiDetectionState.current, newDetectionInProgress)
+    ) {
+      currentAiDetectionState.current = newDetectionInProgress;
+    }
+
+    return currentAiDetectionState.current;
   });
 
   const [showModal, rawSetShowModal] = useState<TModalStreamView | null>(null);
@@ -219,7 +230,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
           </div>
           <div style={{ display: 'flex', gap: '16px' }}>
             <Button
-              // disabled={v.highlightedStreams.some(s => s.state.type === 'detection-in-progress')}
+              disabled={aiDetectionInProgress === true}
               onClick={() => setShowModal({ type: 'upload' })}
             >
               Import

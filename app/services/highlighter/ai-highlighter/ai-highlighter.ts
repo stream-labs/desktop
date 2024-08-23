@@ -83,7 +83,7 @@ export function getHighlightClips(
         }
       });
       childProcess.stderr?.on('data', (data: string) => {
-        // console.log('Error logs:', data.toString());
+        console.log('Error logs:', data.toString());
       });
     }
   });
