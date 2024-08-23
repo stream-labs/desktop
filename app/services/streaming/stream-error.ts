@@ -388,13 +388,23 @@ export function formatUnknownErrorMessage(
            * We intentionally skip all the logic below this point
            */
           try {
-            error = JSON.parse(info.error) as { platform: string };
+            error = JSON.parse(info.error) as {
+              code: string;
+              message: string;
+              platform: string;
+              details: string;
+            };
             platform = error.platform ? capitalize(error?.platform) : undefined;
           } catch {
             return obsStringErrorAsMessages(info);
           }
         } else {
-          error = (info.error as any) as { code: string; message: string; platform: string };
+          error = (info.error as any) as {
+            code: string;
+            message: string;
+            platform: string;
+            details: string;
+          };
           platform = capitalize(error.platform);
         }
 
