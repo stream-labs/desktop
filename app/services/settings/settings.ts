@@ -223,6 +223,25 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
     const colorSetting = advVideo.parameters.find(data => data.name === 'ColorFormat');
     return ['P010', 'I010'].includes(colorSetting.value as string);
   }
+
+  get recommendedColorSpaceWarnings() {
+    const advVideo = this.state.Advanced.formData.find(data => data.nameSubCategory === 'Video');
+    const colorSetting = advVideo.parameters.find(data => data.name === 'ColorFormat')
+      .value as string;
+
+    // If we ever want to validate color space for things like HDR
+    // const _colorSpace = advVideo.parameters.find(data => data.name === 'ColorSpace').value as string;
+
+    // Including HDR format I010 here without color space validation, to avoid annoying those users
+    if (!['NV12', 'P010', 'I010'].includes(colorSetting)) {
+      return $t(
+        'You have selected %{colorFormat} as Color Format. Formats other than NV12 and P010 are commonly used for recording, and might incur high CPU usage or the streaming platform might not support it. Go to Settings -> Advanced -> Video to review.',
+        { colorFormat: colorSetting },
+      );
+    }
+
+    return null;
+  }
 }
 
 export class SettingsService extends StatefulService<ISettingsServiceState> {
