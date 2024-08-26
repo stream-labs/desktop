@@ -15,6 +15,7 @@ import GoLiveError from './GoLiveError';
 import TwitterInput from './Twitter';
 import AddDestinationButton from 'components-react/shared/AddDestinationButton';
 import PrimaryChatSwitcher from './PrimaryChatSwitcher';
+import ColorSpaceWarnings from './ColorSpaceWarnings';
 
 const PlusIcon = PlusOutlined as Function;
 
@@ -113,12 +114,7 @@ export default function GoLiveSettings() {
         {shouldShowSettings && (
           <Scrollable style={{ height: '100%' }} snapToWindowEdge>
             {recommendedColorSpaceWarnings && (
-              <Alert
-                type="warning"
-                message={recommendedColorSpaceWarnings}
-                closable
-                style={{ marginBottom: 16 }}
-              />
+              <ColorSpaceWarnings warnings={recommendedColorSpaceWarnings} />
             )}
             {/*PLATFORM SETTINGS*/}
             <PlatformSettings />
