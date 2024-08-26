@@ -818,8 +818,14 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     return fs.existsSync(file);
   }
 
+  // TODO M: Temp way to solve the issue
   addStream(streamInfo: IHighlightedStream) {
-    this.ADD_HIGHLIGHTED_STREAM(streamInfo);
+    return new Promise<void>(resolve => {
+      this.ADD_HIGHLIGHTED_STREAM(streamInfo);
+      setTimeout(() => {
+        resolve();
+      }, 2000);
+    });
   }
 
   updateStream(streamInfo: IHighlightedStream) {
@@ -1417,11 +1423,10 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       game: streamInfo.game || 'no title',
     };
 
-    this.updateStream(setStreamInfo);
+    await this.addStream(setStreamInfo);
+
     const progressManager = this.createProgressManager();
     let intervalId: NodeJS.Timeout;
-
-    this.addStream(setStreamInfo);
 
     const updateStreamInfoProgress = (progress: number) => {
       // console.log('updateStreamInfoProgress progress', progress);
@@ -1442,7 +1447,6 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       clearInterval(intervalId);
     };
     startProgressUpdates();
-    console.log('Test flow');
 
     const renderHighlights = async (partialHighlights: IHighlight[]) => {
       // console.log('🔄 formatHighlighterResponse');
