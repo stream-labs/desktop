@@ -13,7 +13,7 @@ import { useRealmObject } from 'components-react/hooks/realm';
 const mins = { x: 150, y: 120 };
 
 export function Mixer() {
-  const { EditorCommandsService, AudioService, CustomizationService } = Services;
+  const { EditorCommandsService, AudioService, CustomizationService, ScenesService } = Services;
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -28,8 +28,13 @@ export function Mixer() {
   const performanceMode = useRealmObject(CustomizationService.state).performanceMode;
   const { audioSourceIds } = useVuex(() => ({
     audioSourceIds: AudioService.views.sourcesForCurrentScene
-      .filter(source => !source.mixerHidden && source.isControlledViaObs)
-      .map(source => source.sourceId),
+      .filter(source =>
+        !source.mixerHidden &&
+        source.isControlledViaObs &&
+        // Global audio sources like microphone are not present among active scene items
+        (ScenesService.views.activeScene?.getItems().filter(item => item?.sourceId === source.sourceId).length == 0 ||
+         ScenesService.views.activeScene?.getItems().filter(item => item?.sourceId === source.sourceId).some(e => e.visible !== false))
+      ).map(source => source.sourceId),
   }));
 
   function showAdvancedSettings() {
