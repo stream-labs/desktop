@@ -78,12 +78,16 @@ export default function GLVolmeters() {
 class GLVolmetersModule {
   private customizationService = Services.CustomizationService;
   private audioService = Services.AudioService;
+  private scenesService = Services.ScenesService
 
   subscriptions: Dictionary<IVolmeterSubscription> = {};
 
   // Used for WebGL rendering
   private gl: WebGLRenderingContext;
   private program: WebGLProgram;
+
+  // As we limit FPS, force redraw is needed to avoid flickering when sources are updated/removed/deleted
+  private forceRedraw:boolean;
 
   // GL Attribute locations
   private positionLocation: number;
@@ -129,7 +133,11 @@ class GLVolmetersModule {
   // TODO: refactor into a single source of truth between Mixer and Volmeters
   get audioSources() {
     return this.audioService.views.sourcesForCurrentScene.filter(source => {
-      return !source.mixerHidden && source.isControlledViaObs;
+      return !source.mixerHidden &&
+             source.isControlledViaObs &&
+             // Global audio sources like microphone are not present among active scene items
+             (this.scenesService.views.activeScene?.getItems().filter(item => item?.sourceId === source.sourceId).length == 0 ||
+              this.scenesService.views.activeScene?.getItems().filter(item => item?.sourceId === source.sourceId).some(e => e.visible !== false))
     });
   }
 
@@ -144,6 +152,7 @@ class GLVolmetersModule {
    */
 
   private subscribeVolmeters() {
+    this.forceRedraw = true;
     const audioSources = this.audioSources;
     const sourcesOrder = audioSources.map(source => source.sourceId);
 
@@ -262,7 +271,8 @@ class GLVolmetersModule {
     const timeBetweenFrames = 1000 / this.fpsLimit;
     const currentFrameNumber = Math.ceil(timeElapsed / timeBetweenFrames);
 
-    if (currentFrameNumber !== this.frameNumber) {
+    if (currentFrameNumber !== this.frameNumber || this.forceRedraw) {
+      this.forceRedraw = false;
       // it's time to render next frame
       this.frameNumber = currentFrameNumber;
       // don't render sources then channelsCount is 0
