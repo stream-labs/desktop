@@ -223,7 +223,7 @@ export class StreamSchedulerController {
   }
 
   get primaryPlatform() {
-    return getDefined(Services.UserService.platform).type;
+    return getDefined(Services.UserService.views.platform).type;
   }
 
   getPlatformDisplayName = this.streamingView.getPlatformDisplayName;
