@@ -139,16 +139,24 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
       setInputValue(event.target.value);
     }
 
-    async function startAnalysis(title: string) {
+    async function startAiDetection(title: string) {
       const streamInfo: StreamInfoForAiHighlighter = {
         id: 'manual_' + uuid(),
         title,
       };
 
-      const filePath = await importStreamFromDevice();
-      if (filePath) {
-        HighlighterService.actions.flow(filePath[0], streamInfo);
-        close();
+      let filePath: string[] | undefined = [];
+
+      try {
+        filePath = await importStreamFromDevice();
+        if (filePath && filePath.length > 0) {
+          HighlighterService.actions.flow(filePath[0], streamInfo);
+          close();
+        } else {
+          // No file selected
+        }
+      } catch (error: unknown) {
+        console.log('Error importing file from device', error);
       }
     }
 
@@ -173,7 +181,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
           >
             <h1 style={{ margin: 0 }}>Import stream</h1>
             <input
-              style={{ width: '100%' }}
+              style={{ width: '100%', color: 'black' }}
               type="text"
               name="name"
               placeholder="Set a title for your stream"
@@ -185,7 +193,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
             <Button type="default" onClick={() => close()}>
               Cancel
             </Button>
-            <Button type="primary" onClick={() => startAnalysis(inputValue)}>
+            <Button type="primary" onClick={() => startAiDetection(inputValue)}>
               Select video to start import
             </Button>
           </div>

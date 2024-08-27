@@ -94,7 +94,7 @@ export default function StreamCard({
               <>
                 {stream.state.type === 'detection-canceled-by-user' || stream.state.type === 'error'
                   ? 'Ai detection failed'
-                  : 'Seatching for highlights...'}
+                  : 'Searching for highlights...'}
               </>
             )}
             {clipsOfStreamAreLoading === stream.id ? (
