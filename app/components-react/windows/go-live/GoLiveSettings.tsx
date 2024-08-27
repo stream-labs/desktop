@@ -5,7 +5,7 @@ import { Services } from '../../service-provider';
 import { useGoLiveSettings } from './useGoLiveSettings';
 import { DestinationSwitchers } from './DestinationSwitchers';
 import { $t } from '../../../services/i18n';
-import { Row, Col } from 'antd';
+import { Alert, Row, Col } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { Section } from './Section';
 import PlatformSettings from './PlatformSettings';
@@ -15,6 +15,7 @@ import GoLiveError from './GoLiveError';
 import TwitterInput from './Twitter';
 import AddDestinationButton from 'components-react/shared/AddDestinationButton';
 import PrimaryChatSwitcher from './PrimaryChatSwitcher';
+import ColorSpaceWarnings from './ColorSpaceWarnings';
 
 const PlusIcon = PlusOutlined as Function;
 
@@ -41,6 +42,7 @@ export default function GoLiveSettings() {
     enabledPlatforms,
     primaryChat,
     setPrimaryChat,
+    recommendedColorSpaceWarnings,
   } = useGoLiveSettings().extend(module => {
     const { UserService, VideoEncodingOptimizationService, SettingsService } = Services;
 
@@ -111,6 +113,9 @@ export default function GoLiveSettings() {
         <GoLiveError />
         {shouldShowSettings && (
           <Scrollable style={{ height: '100%' }} snapToWindowEdge>
+            {recommendedColorSpaceWarnings && (
+              <ColorSpaceWarnings warnings={recommendedColorSpaceWarnings} />
+            )}
             {/*PLATFORM SETTINGS*/}
             <PlatformSettings />
             {/*ADD SOME SPACE IN ADVANCED MODE*/}
