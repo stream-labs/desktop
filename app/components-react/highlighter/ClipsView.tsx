@@ -319,7 +319,7 @@ export default function ClipsView({
           .filter(c => c.streamInfo?.[streamId]?.orderPosition !== undefined && c.deleted !== true)
           .sort(
             (a: TClip, b: TClip) =>
-              a.streamInfo[streamId]!.orderPosition - b.streamInfo[streamId]!.orderPosition,
+              a.streamInfo![streamId]!.orderPosition - b.streamInfo![streamId]!.orderPosition,
           )
           .map(c => ({
             id: c.path,
@@ -328,7 +328,8 @@ export default function ClipsView({
         const clipsWithOutOrder = loadedClips
           .filter(
             c =>
-              (c.streamInfo[streamId] === undefined ||
+              (c.streamInfo === undefined ||
+                c.streamInfo[streamId] === undefined ||
                 c.streamInfo[streamId]?.orderPosition === undefined) &&
               c.deleted !== true,
           )
@@ -451,7 +452,7 @@ export default function ClipsView({
           {showModal === 'export' && <ExportModal close={closeModal} streamId={streamId} />}
           {showModal === 'preview' && <PreviewModal close={closeModal} streamId={streamId} />}
           {inspectedClip && showModal === 'remove' && (
-            <RemoveClip close={closeModal} clip={inspectedClip} />
+            <RemoveClip close={closeModal} clip={inspectedClip} streamId={streamId} />
           )}
         </Modal>
       </div>
@@ -478,7 +479,7 @@ function AddClip({ streamId }: { streamId: string | undefined }) {
   return <Button onClick={() => openClips()}>{$t('Add Clip')}</Button>;
 }
 
-function RemoveClip(p: { clip: TClip; close: () => void }) {
+function RemoveClip(p: { clip: TClip; streamId: string | undefined; close: () => void }) {
   const { HighlighterService } = Services;
 
   return (
@@ -496,7 +497,7 @@ function RemoveClip(p: { clip: TClip; close: () => void }) {
         type="primary"
         danger
         onClick={() => {
-          HighlighterService.actions.removeClip(p.clip.path);
+          HighlighterService.actions.removeClip(p.clip.path, p.streamId);
           p.close();
         }}
       >

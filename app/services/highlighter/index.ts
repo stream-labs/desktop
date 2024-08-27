@@ -63,9 +63,11 @@ interface IBaseClip {
   duration?: number;
   deleted: boolean;
   globalOrderPosition: number;
-  streamInfo: {
-    [streamId: string]: TStreamInfo;
-  };
+  streamInfo:
+    | {
+        [streamId: string]: TStreamInfo;
+      }
+    | undefined;
 }
 interface IReplayBufferClip extends IBaseClip {
   source: 'ReplayBuffer';
@@ -310,7 +312,7 @@ export interface IExportOptions {
 
 class HighligherViews extends ViewHandler<IHighligherState> {
   /**
-   * Returns an array of clips in their display order
+   * Returns an array of clips
    */
   get clips() {
     return Object.values(this.state.clips);
@@ -705,14 +707,22 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       const currentHighestOrderPosition = this.getClips(this.views.clips, streamId).length;
       const getHighestGlobalOrderPosition = this.getClips(this.views.clips, undefined).length;
 
-      const streamInfo: { [key: string]: TStreamInfo } = {
+      const newStreamInfo: { [key: string]: TStreamInfo } = {
         [streamId]: {
           orderPosition: index + currentHighestOrderPosition + 1,
         },
       };
 
       if (this.state.clips[path]) {
-        // this.UPDATE_CLIP(path, {});
+        const updatedStreamInfo = {
+          ...this.state.clips[path].streamInfo,
+          ...newStreamInfo,
+        };
+
+        this.UPDATE_CLIP({
+          path,
+          streamInfo: updatedStreamInfo,
+        });
         return;
       } else {
         this.ADD_CLIP({
@@ -724,7 +734,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
           deleted: false,
           source: 'Manual',
           globalOrderPosition: index + getHighestGlobalOrderPosition + 1,
-          streamInfo,
+          streamInfo: streamId !== undefined ? newStreamInfo : undefined,
         });
       }
     });
@@ -738,7 +748,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     const getHighestGlobalOrderPosition = this.getClips(this.views.clips, undefined).length;
 
     clips.forEach((clip, index) => {
-      // Don't allow adding the same clip twice
+      // Don't allow adding the same clip twice for ai clips
       if (this.state.clips[clip.path]) return;
 
       const streamInfo: { [key: string]: TStreamInfo } = {
@@ -785,8 +795,24 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     });
   }
 
-  removeClip(path: string) {
-    this.REMOVE_CLIP(path);
+  removeClip(path: string, streamId: string | undefined) {
+    const clip: TClip = this.state.clips[path];
+
+    if (streamId) {
+      if (clip.streamInfo && Object.keys(clip.streamInfo).length > 1) {
+        const updatedStreamInfo = { ...clip.streamInfo };
+        delete updatedStreamInfo[streamId];
+
+        this.UPDATE_CLIP({
+          path: clip.path,
+          streamInfo: updatedStreamInfo,
+        });
+      } else {
+        this.REMOVE_CLIP(path);
+      }
+    } else {
+      this.REMOVE_CLIP(path);
+    }
   }
 
   setTransition(transition: Partial<ITransitionInfo>) {
@@ -841,14 +867,14 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     this.UPDATE_HIGHLIGHTED_STREAM(streamInfo);
   }
 
-  removeStream(id: string) {
+  removeStream(streamId: string) {
     //Remove The highlighgted stream
-    this.REMOVE_HIGHLIGHTED_STREAM(id);
+    this.REMOVE_HIGHLIGHTED_STREAM(streamId);
 
     //Remove clips from stream as well
-    const clipsToRemove = this.getClips(this.views.clips, id);
+    const clipsToRemove = this.getClips(this.views.clips, streamId);
     clipsToRemove.forEach(clip => {
-      this.removeClip(clip.path);
+      this.removeClip(clip.path, streamId);
     });
   }
 

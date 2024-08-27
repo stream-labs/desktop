@@ -179,7 +179,7 @@ export default function StreamCard({
           >
             {stream.state.type === 'detection-finished' ? (
               <>
-                {clips.some(c => c.streamInfo[streamId])
+                {clips.some(c => c.streamInfo?.[streamId])
                   ? Object.entries(getMomentTypeCount(clips)).map(([type, count]) => (
                       <div key={type} style={{ display: 'flex', gap: '4px' }}>
                         <span key={type + 'emoji'}>{getWordingFromType(type).emoji} </span>{' '}
@@ -305,7 +305,7 @@ export default function StreamCard({
     const disabled =
       stream!.state.type !== 'detection-finished' ||
       (stream!.state.type !== 'detection-finished' && clips.length === 0) ||
-      !clips.some(c => c.streamInfo[streamId]);
+      !clips.some(c => c.streamInfo?.[streamId]);
 
     const text =
       stream!.state.type === 'detection-finished' && clips.length === 0
