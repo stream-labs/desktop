@@ -2,7 +2,7 @@ import { useVuex } from 'components-react/hooks';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Services } from 'components-react/service-provider';
 import styles from './ClipsView.m.less';
-import { IViewState, TClip } from 'services/highlighter';
+import { IViewState, TClip, TStreamInfo } from 'services/highlighter';
 import ClipPreview from 'components-react/highlighter/ClipPreview';
 import ClipTrimmer from 'components-react/highlighter/ClipTrimmer';
 import { ReactSortable } from 'react-sortablejs';
@@ -204,12 +204,19 @@ export default function ClipsView({
       if (streamId) {
         newClipArray.forEach((clip, index) => {
           const clipPath = clip;
+
+          const existingClip = loadedClips.find(c => c.path === clipPath);
+          let updatedStreamInfo;
+          if (existingClip) {
+            updatedStreamInfo = { ...existingClip.streamInfo };
+            updatedStreamInfo[streamId] = {
+              orderPosition: index,
+            };
+          }
+
           HighlighterService.actions.UPDATE_CLIP({
             path: clipPath,
-            streamInfo: {
-              ...loadedClips.find(c => c.path === clipPath)?.streamInfo,
-              orderPosition: index,
-            },
+            streamInfo: updatedStreamInfo,
           });
         });
       } else {
@@ -309,10 +316,11 @@ export default function ClipsView({
     if (tempClipList.length === 0) {
       if (streamId) {
         const clipsWithOrder = loadedClips
-          .filter(
-            c => c.streamInfo && c.streamInfo?.orderPosition !== undefined && c.deleted !== true,
+          .filter(c => c.streamInfo?.[streamId]?.orderPosition !== undefined && c.deleted !== true)
+          .sort(
+            (a: TClip, b: TClip) =>
+              a.streamInfo[streamId]!.orderPosition - b.streamInfo[streamId]!.orderPosition,
           )
-          .sort((a: TClip, b: TClip) => a.streamInfo!.orderPosition - b.streamInfo!.orderPosition)
           .map(c => ({
             id: c.path,
           }));
@@ -320,8 +328,9 @@ export default function ClipsView({
         const clipsWithOutOrder = loadedClips
           .filter(
             c =>
-              c.streamInfo === undefined ||
-              (c.streamInfo.orderPosition === undefined && c.deleted !== true),
+              (c.streamInfo[streamId] === undefined ||
+                c.streamInfo[streamId]?.orderPosition === undefined) &&
+              c.deleted !== true,
           )
           .map(c => ({ id: c.path }));
 

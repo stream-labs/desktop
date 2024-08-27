@@ -51,7 +51,7 @@ import execa from 'execa';
 import moment from 'moment';
 import { getHighlightClips, IHighlight, IHighlighterInput } from './ai-highlighter/ai-highlighter';
 
-export type TStreamInfo = { id?: string; orderPosition: number } | undefined;
+export type TStreamInfo = { orderPosition: number } | undefined;
 
 interface IBaseClip {
   path: string;
@@ -63,7 +63,9 @@ interface IBaseClip {
   duration?: number;
   deleted: boolean;
   globalOrderPosition: number;
-  streamInfo: TStreamInfo;
+  streamInfo: {
+    [streamId: string]: TStreamInfo;
+  };
 }
 interface IReplayBufferClip extends IBaseClip {
   source: 'ReplayBuffer';
@@ -700,27 +702,31 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
   addClips(paths: string[], streamId: string | undefined) {
     paths.forEach((path, index) => {
-      // Don't allow adding the same clip twice
-      if (this.state.clips[path]) return;
-
       const currentHighestOrderPosition = this.getClips(this.views.clips, streamId).length;
       const getHighestGlobalOrderPosition = this.getClips(this.views.clips, undefined).length;
 
-      const newStreamInfo: TStreamInfo = streamId
-        ? { id: streamId, orderPosition: index + currentHighestOrderPosition + 1 }
-        : undefined;
+      const streamInfo: { [key: string]: TStreamInfo } = {
+        [streamId]: {
+          orderPosition: index + currentHighestOrderPosition + 1,
+        },
+      };
 
-      this.ADD_CLIP({
-        path,
-        loaded: false,
-        enabled: true,
-        startTrim: 0,
-        endTrim: 0,
-        deleted: false,
-        source: 'Manual',
-        globalOrderPosition: index + getHighestGlobalOrderPosition + 1,
-        streamInfo: newStreamInfo,
-      });
+      if (this.state.clips[path]) {
+        // this.UPDATE_CLIP(path, {});
+        return;
+      } else {
+        this.ADD_CLIP({
+          path,
+          loaded: false,
+          enabled: true,
+          startTrim: 0,
+          endTrim: 0,
+          deleted: false,
+          source: 'Manual',
+          globalOrderPosition: index + getHighestGlobalOrderPosition + 1,
+          streamInfo,
+        });
+      }
     });
   }
 
@@ -730,13 +736,15 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   ) {
     const currentHighestOrderPosition = this.getClips(this.views.clips, newStreamInfo.id).length;
     const getHighestGlobalOrderPosition = this.getClips(this.views.clips, undefined).length;
+
     clips.forEach((clip, index) => {
       // Don't allow adding the same clip twice
       if (this.state.clips[clip.path]) return;
 
-      const addStreamInfo = {
-        id: newStreamInfo.id,
-        orderPosition: index + currentHighestOrderPosition + 1,
+      const streamInfo: { [key: string]: TStreamInfo } = {
+        [newStreamInfo.id]: {
+          orderPosition: index + currentHighestOrderPosition + 1,
+        },
       };
 
       this.ADD_CLIP({
@@ -749,7 +757,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
         source: 'AiClip',
         aiInfo: clip.aiClipInfo,
         globalOrderPosition: index + getHighestGlobalOrderPosition + 1,
-        streamInfo: addStreamInfo,
+        streamInfo,
       });
     });
 
@@ -951,7 +959,10 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
       clips = this.views.clips
         .filter(c => c.enabled)
-        .sort((a: TClip, b: TClip) => a.streamInfo.orderPosition - b.streamInfo.orderPosition)
+        .sort(
+          (a: TClip, b: TClip) =>
+            a.streamInfo[streamId].orderPosition - b.streamInfo[streamId].orderPosition,
+        )
         .map(c => {
           const clip = this.clips[c.path];
 
@@ -1606,23 +1617,23 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   }
 
   //TODO: Wrap this in useMemo in each component?
-  getClips(clips: TClip[], id?: string): TClip[] {
+  getClips(clips: TClip[], streamId?: string): TClip[] {
     const inputClips = clips.filter(clip => clip.path !== 'add');
     let outputClips;
 
-    if (id) {
-      outputClips = inputClips.filter(clip => clip.streamInfo && clip.streamInfo?.id === id);
+    if (streamId) {
+      outputClips = inputClips.filter(clip => clip.streamInfo?.[streamId]);
     } else {
       outputClips = inputClips;
     }
     return outputClips;
   }
 
-  getClipsLoaded(clips: TClip[], id?: string): boolean {
-    return this.getClips(clips, id).every(clip => clip.loaded);
+  getClipsLoaded(clips: TClip[], streamId?: string): boolean {
+    return this.getClips(clips, streamId).every(clip => clip.loaded);
   }
 
-  enableOnlySpecificClips(clips: TClip[], id?: string) {
+  enableOnlySpecificClips(clips: TClip[], streamId?: string) {
     clips.forEach(clip => {
       this.UPDATE_CLIP({
         path: clip.path,
@@ -1631,7 +1642,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     });
 
     // Enable specific clips
-    const clipsToEnable = this.getClips(clips, id);
+    const clipsToEnable = this.getClips(clips, streamId);
     clipsToEnable.forEach(clip => {
       this.UPDATE_CLIP({
         path: clip.path,

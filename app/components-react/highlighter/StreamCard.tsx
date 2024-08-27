@@ -22,9 +22,7 @@ export default function StreamCard({
   emitRemoveStream: () => void;
 }) {
   const { HighlighterService } = Services;
-  const clips = useVuex(() =>
-    HighlighterService.views.clips.filter(c => c.streamInfo?.id === streamId),
-  );
+  const clips = useVuex(() => HighlighterService.views.clips.filter(c => c.streamInfo?.[streamId]));
   const stream = useVuex(() =>
     HighlighterService.views.highlightedStreams.find(s => s.id === streamId),
   );
@@ -80,7 +78,7 @@ export default function StreamCard({
         <img
           style={{ height: '100%' }}
           src={
-            clips.find(clip => clip.streamInfo?.orderPosition === 0)?.scrubSprite ||
+            clips.find(clip => clip?.streamInfo?.[streamId]?.orderPosition === 0)?.scrubSprite ||
             clips.find(clip => clip.scrubSprite)?.scrubSprite
           }
           alt=""
@@ -181,7 +179,7 @@ export default function StreamCard({
           >
             {stream.state.type === 'detection-finished' ? (
               <>
-                {clips.some(c => c.streamInfo?.id === stream.id)
+                {clips.some(c => c.streamInfo[streamId])
                   ? Object.entries(getMomentTypeCount(clips)).map(([type, count]) => (
                       <div key={type} style={{ display: 'flex', gap: '4px' }}>
                         <span key={type + 'emoji'}>{getWordingFromType(type).emoji} </span>{' '}
@@ -307,7 +305,7 @@ export default function StreamCard({
     const disabled =
       stream!.state.type !== 'detection-finished' ||
       (stream!.state.type !== 'detection-finished' && clips.length === 0) ||
-      !clips.some(c => c.streamInfo?.id === stream!.id);
+      !clips.some(c => c.streamInfo[streamId]);
 
     const text =
       stream!.state.type === 'detection-finished' && clips.length === 0
