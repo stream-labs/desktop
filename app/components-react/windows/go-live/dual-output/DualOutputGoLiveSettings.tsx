@@ -14,6 +14,7 @@ import GoLiveError from '../GoLiveError';
 import UserSettingsUltra from './UserSettingsUltra';
 import UserSettingsNonUltra from './UserSettingsNonUltra';
 import PrimaryChatSwitcher from '../PrimaryChatSwitcher';
+import ColorSpaceWarnings from '../ColorSpaceWarnings';
 
 /**
  * Renders settings for starting the stream
@@ -32,6 +33,7 @@ export default function DualOutputGoLiveSettings() {
     enabledPlatforms,
     primaryChat,
     setPrimaryChat,
+    recommendedColorSpaceWarnings,
   } = useGoLiveSettings().extend(module => {
     const { UserService, VideoEncodingOptimizationService } = Services;
 
@@ -74,6 +76,9 @@ export default function DualOutputGoLiveSettings() {
         <Spinner visible={isLoading} relative />
         <GoLiveError />
         <Scrollable style={{ height: '100%' }} snapToWindowEdge>
+          {recommendedColorSpaceWarnings && (
+            <ColorSpaceWarnings warnings={recommendedColorSpaceWarnings} />
+          )}
           {/*PLATFORM SETTINGS*/}
           <PlatformSettings />
           {/*ADD SOME SPACE IN ADVANCED MODE*/}
