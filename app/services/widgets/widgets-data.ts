@@ -1,6 +1,8 @@
 import { IWidgetTester, IWidget } from './widgets-api';
 import { AnchorPoint } from 'util/ScalableRectangle';
 import { $t } from 'services/i18n';
+import { TAlertType } from './alerts-config';
+import { TPlatform } from '../platforms';
 
 export interface IWidgetDisplayData {
   name: string;
@@ -43,109 +45,102 @@ export enum WidgetType {
   CustomWidget = 24,
 }
 
-export const WidgetTesters: IWidgetTester[] = [
-  {
-    type: 'follows',
-    name: 'Follow',
-    url(host, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/follow`;
+// TODO: there's some duplication between this and `WidgetsService.playAlert`
+export const makeWidgetTesters = (host: string): IWidgetTester[] => {
+  const prefix = `https://${host}/api/v5/widgets/desktop/test`;
+  const testUrl = (alertType: TAlertType) => `${prefix}/${alertType}`;
+
+  /**
+   * Return an alert type undecorated if the platform is Twitch, (e.g. sub),
+   * or with a platform prefix otherwise, (e.g. trovo_follow)
+   *
+   * Examples:
+   *
+   * alertTypeWithTwitchDefault('sub', 'twitch') => sub
+   * alertTypeWithTwitchDefault('follow', 'trovo') => trovo_follow
+   */
+  const alertTypeWithTwitchDefault = (alertType: TAlertType, platform: TPlatform): TAlertType => {
+    const alert = platform === ('twitch' as TPlatform) ? alertType : `${platform}_${alertType}`;
+    // TODO: there might be an elegant way to do this with `Extract` or something else, but clever code...?
+    return (alert as unknown) as TAlertType;
+  };
+
+  return [
+    {
+      type: 'follows',
+      name: 'Follow',
+      url(platform) {
+        return testUrl(alertTypeWithTwitchDefault('follow', platform));
+      },
+      platforms: ['twitch', 'facebook', 'trovo'],
     },
-    platforms: ['twitch', 'facebook', 'trovo'],
-  },
-  {
-    name: 'Subscriber',
-    url(host, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/follow`;
+    {
+      name: 'Subscriber',
+      url: testUrl('subscriber'),
+      platforms: ['youtube'],
     },
-    platforms: ['youtube'],
-  },
-  {
-    name: 'Subscription',
-    url(host, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/subscription`;
+    {
+      name: 'Subscription',
+      url(platform) {
+        return testUrl(alertTypeWithTwitchDefault('sub', platform));
+      },
+      platforms: ['twitch', 'trovo'],
     },
-    platforms: ['twitch', 'trovo'],
-  },
-  {
-    name: 'Membership',
-    url(host, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/subscription`;
+    {
+      name: 'Membership',
+      url: testUrl('fanfunding'),
+      platforms: ['youtube'],
     },
-    platforms: ['youtube'],
-  },
-  {
-    type: 'donations',
-    name: 'Tip',
-    url(host) {
-      return `https://${host}/api/v5/slobs/test/streamlabs/donation`;
+    {
+      type: 'donations',
+      name: 'Tip',
+      url: testUrl('donation'),
+      platforms: ['twitch', 'youtube', 'facebook', 'tiktok', 'trovo'],
     },
-    platforms: ['twitch', 'youtube', 'facebook', 'tiktok', 'trovo'],
-  },
-  {
-    type: 'bits',
-    name: 'Bits',
-    url(host, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/bits`;
+    {
+      type: 'bits',
+      name: 'Bits',
+      url: testUrl('bits'),
+      platforms: ['twitch'],
     },
-    platforms: ['twitch'],
-  },
-  {
-    name: 'Super Chat',
-    url(host, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/superchat`;
+    {
+      name: 'Super Chat',
+      url: testUrl('fanfunding'),
+      platforms: ['youtube'],
     },
-    platforms: ['youtube'],
-  },
-  {
-    name: 'Share',
-    url(host, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/share`;
+    {
+      name: 'Share',
+      url: testUrl('facebook_share'),
+      platforms: ['facebook'],
     },
-    platforms: ['facebook'],
-  },
-  {
-    name: 'Support',
-    url(host, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/support`;
+    {
+      name: 'Support',
+      url: testUrl('facebook_support'),
+      platforms: ['facebook'],
     },
-    platforms: ['facebook'],
-  },
-  {
-    name: 'Stars',
-    url(host, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/stars`;
+    {
+      name: 'Stars',
+      url: testUrl('facebook_stars'),
+      platforms: ['facebook'],
     },
-    platforms: ['facebook'],
-  },
-  {
-    name: 'Like',
-    url(host, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/like`;
+    {
+      name: 'Like',
+      url: testUrl('facebook_like'),
+      platforms: ['facebook'],
     },
-    platforms: ['facebook'],
-  },
-  {
-    name: 'Merch',
-    url(host, platform) {
-      return `https://${host}/api/v5/slobs/test/streamlabs/merch`;
+    {
+      name: 'Merch',
+      url: testUrl('merch'),
+      // TODO: is this only for YouTube?
+      platforms: ['youtube'],
     },
-    platforms: ['youtube'],
-  },
-  {
-    name: 'Cloudbot Redeem',
-    url(host, platform) {
-      return `https://${host}/api/v5/slobs/test/streamlabs/loyalty_store_redemption`;
+    {
+      name: 'Cloudbot Redeem',
+      url: testUrl('loyalty_store_redemption'),
+      platforms: ['youtube'],
     },
-    platforms: ['youtube'],
-  },
-  {
-    name: 'SL Ultra Gift',
-    url(host, platform) {
-      return `https://${host}/api/v5/slobs/test/streamlabs/prime_sub_gift`;
-    },
-    platforms: ['youtube'],
-  },
-];
+  ] as IWidgetTester[];
+};
 
 export const WidgetDefinitions: { [x: number]: IWidget } = {
   [WidgetType.AlertBox]: {
