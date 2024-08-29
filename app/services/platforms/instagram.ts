@@ -19,7 +19,6 @@ import Utils from 'services/utils';
 export interface IInstagramStartStreamOptions {
   streamUrl: string;
   streamKey: string;
-  title: string;
 }
 
 interface IInstagramServiceState extends IPlatformState {
@@ -43,7 +42,7 @@ export class InstagramService
 
   static initialState: IInstagramServiceState = {
     ...BasePlatformService.initialState,
-    settings: { title: '', streamUrl: '', streamKey: '' },
+    settings: { streamUrl: '', streamKey: '' },
   };
 
   readonly authWindowOptions = {};

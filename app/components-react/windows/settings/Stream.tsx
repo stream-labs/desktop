@@ -447,7 +447,7 @@ function Platform(p: { platform: TPlatform }) {
 
   const instagramUnlink = () => {
     // 1. reset stream key and url after unlinking if the user chooses to re-link immediately
-    updateInstagramSettings({ title: '', streamKey: '', streamUrl: '' });
+    updateInstagramSettings({ streamKey: '', streamUrl: '' });
     // 2. hide extra fields
     setShowInstagramFields(false);
     // 3. unlink platform
