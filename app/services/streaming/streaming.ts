@@ -56,10 +56,6 @@ import { DualOutputService } from 'services/dual-output';
 import { capitalize } from 'lodash';
 import { tiktokErrorMessages } from 'services/platforms/tiktok/api';
 import { TikTokService } from 'services/platforms/tiktok';
-import { HighlighterService } from 'app-services';
-import { ITwitchStartStreamOptions } from 'services/platforms/twitch';
-import { IYoutubeStartStreamOptions } from 'services/platforms/youtube';
-import { StreamInfoForAiHighlighter } from 'services/highlighter';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -105,13 +101,13 @@ export class StreamingService
   @Inject() private markersService: MarkersService;
   @Inject() private dualOutputService: DualOutputService;
   @Inject() private tikTokService: TikTokService;
-  @Inject() private highlighterService: HighlighterService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
   replayBufferStatusChange = new Subject<EReplayBufferState>();
   replayBufferFileWrite = new Subject<string>();
   streamInfoChanged = new Subject<StreamInfoView<any>>();
+  latestRecordingPath = new Subject<string>();
   signalInfoChanged = new Subject<IOBSOutputSignalInfo>();
   streamErrorCreated = new Subject<string>();
 
@@ -120,8 +116,8 @@ export class StreamingService
 
   powerSaveId: number;
 
-  private resolveStartStreaming: Function = () => { };
-  private rejectStartStreaming: Function = () => { };
+  private resolveStartStreaming: Function = () => {};
+  private rejectStartStreaming: Function = () => {};
 
   static initialState: IStreamingServiceState = {
     streamingStatus: EStreamingState.Offline,
@@ -1115,7 +1111,6 @@ export class StreamingService
     this.toggleRecording();
   }
 
-  // Toggle recording
   toggleRecording() {
     if (this.state.recordingStatus === ERecordingState.Recording) {
       NodeObs.OBS_service_stopRecording();
@@ -1281,19 +1276,14 @@ export class StreamingService
   private outputErrorOpen = false;
   private streamErrorUserMessage = '';
   private streamErrorReportMessage = '';
-  private streamInfoForAiHighlighter: StreamInfoForAiHighlighter = {}
-
 
   private handleOBSOutputSignal(info: IOBSOutputSignalInfo) {
     console.debug('OBS Output signal: ', info);
-    console.log('OBS Output signal: ', info);
 
     const shouldResolve =
       !this.views.isDualOutputMode || (this.views.isDualOutputMode && info.service === 'vertical');
 
     const time = new Date().toISOString();
-
-
 
     if (info.type === EOBSOutputType.Streaming) {
       if (info.signal === EOBSOutputSignal.Start && shouldResolve) {
@@ -1316,15 +1306,11 @@ export class StreamingService
           game,
         };
 
-
-        console.log("🚀 ~ handleOBSOutputSignal ~ eventMetadata:", eventMetadata)
-
         if (this.videoEncodingOptimizationService.state.useOptimizedProfile) {
           eventMetadata.useOptimizedProfile = true;
         }
 
         const streamSettings = this.streamSettingsService.settings;
-        console.log("🚀 ~ handleOBSOutputSignal ~ streamSettings:", streamSettings)
 
         eventMetadata.streamType = streamSettings.streamType;
         eventMetadata.platform = streamSettings.platform;
@@ -1337,24 +1323,6 @@ export class StreamingService
           service: streamSettings.service,
         });
         this.usageStatisticsService.recordFeatureUsage('Streaming');
-
-        // AiHighlighter logic
-        if (this.highlighterService.views.state.useAiHighlighter) {
-          this.highlighterService.isHighlighterRecording = true
-          this.streamInfoForAiHighlighter.id = eventMetadata.game;
-
-          this.streamInfoForAiHighlighter.game = eventMetadata.game;
-          const { title, description, tags } = this.getStreamGoLiveSettings(streamSettings.goLiveSettings)
-          this.streamInfoForAiHighlighter.title = title
-          //TODO: Correct id to also be able to use it for replaybuffer clips
-          this.streamInfoForAiHighlighter.id = this.streamInfoForAiHighlighter.title + '-' + this.streamInfoForAiHighlighter.game + '-' + moment().day() + moment().week() + moment().year()
-
-          if (this.streamInfoForAiHighlighter.game === "Fortnite") {
-            // Check if game is supported via highlighter
-            this.toggleRecording()
-          }
-        }
-
       } else if (info.signal === EOBSOutputSignal.Starting && shouldResolve) {
         this.SET_STREAMING_STATUS(EStreamingState.Starting, time);
         this.streamingStatusChange.next(EStreamingState.Starting);
@@ -1401,40 +1369,22 @@ export class StreamingService
       }
 
       if (info.signal === EOBSOutputSignal.Wrote) {
-        console.log('Record: EOBSOutputSignal.Wrote');
-
         const filename = NodeObs.OBS_service_getLastRecording();
         const parsedFilename = byOS({
           [OS.Mac]: filename,
           [OS.Windows]: filename.replace(/\//, '\\'),
         });
-
         this.recordingModeService.actions.addRecordingEntry(parsedFilename);
         this.markersService.actions.exportCsv(parsedFilename);
         this.recordingModeService.addRecordingEntry(parsedFilename);
-
-        console.log('parsedFilename', parsedFilename);
+        this.latestRecordingPath.next(filename);
         // Wrote signals come after Offline, so we return early here
         // to not falsely set our state out of Offline
-
-        const isHighlighterRecording = this.highlighterService.isHighlighterRecording
-        if (isHighlighterRecording) {
-          //TODO: Check if we should also do this via subject
-          this.highlighterService.isHighlighterRecording = false
-          this.highlighterService.actions.flow(parsedFilename, this.streamInfoForAiHighlighter)
-          this.streamInfoForAiHighlighter = {}
-        }
-
-        // Clean up eventMetadata after recording stops. We are doing this here because we need the metadata when saving the recording
-        // eventMetadata = {};
-
         return;
       }
 
       this.SET_RECORDING_STATUS(nextState, time);
 
-
-      // Sub to rec
       this.recordingStatusChange.next(nextState);
     } else if (info.type === EOBSOutputType.ReplayBuffer) {
       const nextState: EReplayBufferState = ({
@@ -1455,8 +1405,6 @@ export class StreamingService
           status: 'wrote',
           code: info.code,
         });
-
-        //TODO: Why not call the highlighterservice directly?
         this.replayBufferFileWrite.next(NodeObs.OBS_service_getLastReplay());
       }
     }
@@ -1641,35 +1589,6 @@ export class StreamingService
     this.usageStatisticsService.recordEvent('stream_end', data);
   }
 
-
-
-  //TODO: I think sth is not correct with the types.
-  private getStreamGoLiveSettings(goLiveSettings: any): { title?: string, description?: string, tags?: string[] } {
-    const platforms = goLiveSettings.platforms
-    const getStreamInfo: { title?: string, description?: string, tags?: string[] } = {}
-    for (const key in platforms) {
-      if (platforms.hasOwnProperty(key)) {
-
-        if (key === 'twitch') {
-          let data: ITwitchStartStreamOptions = platforms[key]
-          getStreamInfo.title = data.title
-          getStreamInfo.tags = data.tags
-          //Is it missing description here?
-
-
-        }
-        if (key === 'youtube') {
-          let data: IYoutubeStartStreamOptions = platforms[key]
-          getStreamInfo.title
-
-        }
-        break; // Assuming there's only one platform and you want the first one found
-      }
-    }
-
-    return getStreamInfo
-  }
-
   private recordGoals(duration: number) {
     if (!this.userService.isLoggedIn) return;
     const hoursStreamed = Math.floor(duration / 60 / 60);
@@ -1736,7 +1655,4 @@ export class StreamingService
   private SET_GO_LIVE_SETTINGS(settings: IGoLiveSettings) {
     this.state.info.settings = settings;
   }
-
-
-
 }
