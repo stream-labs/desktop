@@ -12,6 +12,7 @@ import Message from '../../../shared/Message';
 import { Row, Col, Select } from 'antd';
 import { IListOption } from 'components/shared/inputs';
 import TwitchContentClassificationInput from './TwitchContentClassificationInput';
+import AiHighlighterToggle from '../AiHighlighterToggle';
 
 export function TwitchEditStreamInfo(p: IPlatformComponentParams<'twitch'>) {
   const twSettings = p.value;
@@ -24,6 +25,7 @@ export function TwitchEditStreamInfo(p: IPlatformComponentParams<'twitch'>) {
 
   const optionalFields = (
     <div key="optional">
+      <AiHighlighterToggle game={bind.game?.value} />
       <TwitchTagsInput label={$t('Twitch Tags')} {...bind.tags} />
       <TwitchContentClassificationInput {...bind.contentClassificationLabels} />
       <InputWrapper>
