@@ -12,7 +12,7 @@ import Vue from 'vue';
 import fs from 'fs-extra';
 import url from 'url';
 import * as remote from '@electron/remote';
-import { EStreamingState, StreamingService } from 'services/streaming';
+import { ERecordingState, EStreamingState, StreamingService } from 'services/streaming';
 import { getPlatformService } from 'services/platforms';
 import { UserService } from 'services/user';
 import {
@@ -50,7 +50,7 @@ import { SharedStorageService } from 'services/integrations/shared-storage';
 import execa from 'execa';
 import moment from 'moment';
 import { getHighlightClips, IHighlight, IHighlighterInput } from './ai-highlighter/ai-highlighter';
-
+import uuid from 'uuid';
 export type TStreamInfo = { orderPosition: number } | undefined;
 
 interface IBaseClip {
@@ -393,8 +393,6 @@ class HighligherViews extends ViewHandler<IHighligherState> {
 
 @InitAfter('StreamingService')
 export class HighlighterService extends PersistentStatefulService<IHighligherState> {
-  isHighlighterRecording: boolean = false;
-
   static defaultState: IHighligherState = {
     clips: {},
     transition: {
@@ -692,6 +690,60 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
         }
       });
     }
+
+    let aiRecordingInProgress = false;
+    let streamInfo: StreamInfoForAiHighlighter;
+    this.streamingService.streamingStatusChange.subscribe(status => {
+      if (status === EStreamingState.Live) {
+        // console.log('live', this.streamingService.views.settings.platforms.twitch.title);
+
+        // console.log('useHighlighter', this.views.useAiHighlighter);
+        // console.log(
+        //   `is the game: ${this.streamingService.views.game} ai detectable?:`,
+        //   this.streamingService.views.game === 'Fortnite',
+        // );
+
+        if (
+          this.views.useAiHighlighter === false ||
+          this.streamingService.views.game !== 'Fortnite'
+        ) {
+          // console.log('Highlighter not enabled or not Fortnite');
+          return;
+        }
+
+        // console.log('recording Alreadyt running?:', this.streamingService.views.isRecording);
+
+        if (this.streamingService.views.isRecording) {
+          // console.log('Recording is already running');
+        } else {
+          this.streamingService.toggleRecording();
+        }
+        streamInfo = {
+          id: 'autoStarted_' + uuid(),
+          title: this.streamingService.views.settings.platforms.twitch.title,
+          game: this.streamingService.views.game,
+        };
+        aiRecordingInProgress = true;
+      }
+      if (status === EStreamingState.Ending) {
+        if (!aiRecordingInProgress) {
+          return;
+        }
+        this.streamingService.toggleRecording();
+      }
+    });
+
+    this.streamingService.latestRecordingPath.subscribe(path => {
+      if (!aiRecordingInProgress) {
+        return;
+      }
+
+      aiRecordingInProgress = false;
+      this.flow(path, streamInfo);
+
+      this.navigationService.actions.navigate('Highlighter', { view: 'stream' });
+      // console.log('latest recording path', path);
+    });
   }
 
   notificationAction() {
