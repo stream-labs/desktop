@@ -147,7 +147,6 @@ export class RemoteControlService extends Service {
       });
 
       this.socket.on('deviceConnected', (device: IConnectedDevice) => {
-        console.log('device connected', device);
         const devices = this.connectedDevices.devices;
         if (devices.find(d => d.socketId === device.socketId)) return;
         this.setConnectedDevices(devices.concat([device]));
@@ -162,7 +161,6 @@ export class RemoteControlService extends Service {
       });
 
       this.socket.on('disconnect', (reason: string) => {
-        console.log(reason);
         if (reason !== 'io client disconnect') {
           this.createStreamlabsRemoteConnection();
         }
@@ -254,7 +252,7 @@ export class RemoteControlService extends Service {
 
   setConnectedDevices(devices: IConnectedDevice[]) {
     this.connectedDevices.db.write(() => {
-      this.connectedDevices.devices = devices;
+      this.connectedDevices.devices = devices.filter(device => device.deviceName !== os.hostname());
     });
   }
 

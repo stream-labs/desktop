@@ -9,5 +9,6 @@
   "The free Streamlabs Controller app allows you to control Streamlabs Desktop from your iOS or Android device. You must be logged in to use this feature.": "The free Streamlabs Controller app allows you to control Streamlabs Desktop from your iOS or Android device. You must be logged in to use this feature.",
   "Allow remote connections": "Allow remote connections",
   "Connected Devices": "Connected Devices",
-  "Disconnect": "Disconnect"
+  "Disconnect": "Disconnect",
+  "No devices connected": "No devices connected"
 }

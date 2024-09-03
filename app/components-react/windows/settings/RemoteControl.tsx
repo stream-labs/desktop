@@ -49,8 +49,11 @@ export function RemoteControlSettings() {
         )}
 
         {enabled && (
-          <div>
-            <span className={styles.whisper}>{$t('Connected Devices')}</span>
+          <div style={{ paddingBottom: 8 }}>
+            <span>{$t('Connected Devices')}</span>
+            {connectedDevices.length < 1 && (
+              <span className={styles.whisper}>{$t('No devices connected')}</span>
+            )}
             {connectedDevices.map(device => (
               <div className={styles.device}>
                 <span>{device.deviceName}</span>
