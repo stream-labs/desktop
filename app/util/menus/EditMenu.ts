@@ -23,6 +23,7 @@ import { BlendingModeMenu } from './BlendingModeMenu';
 import { BlendingMethodMenu } from './BlendingMethodMenu';
 import { DeinterlacingModeMenu } from './DeinterlacingModeMenu';
 import { DualOutputService } from 'services/dual-output';
+import { getOS, OS } from 'util/operating-systems';
 
 interface IEditMenuOptions {
   selectedSourceId?: string;
@@ -436,7 +437,10 @@ export class EditMenu extends Menu {
   }
 
   private showProperties() {
-    if (this.options.showAudioMixerMenu || !this.source.video) {
+    // HACK: we should investigate why `video` seems to be false on Mac instead
+    if (getOS() === OS.Mac && this.source.type === 'browser_source') {
+      this.sourcesService.actions.showSourceProperties(this.source.sourceId);
+    } else if (this.options.showAudioMixerMenu || !this.source.video) {
       this.audioService.actions.showAdvancedSettings(this.source.sourceId);
     } else {
       this.sourcesService.actions.showSourceProperties(this.source.sourceId);

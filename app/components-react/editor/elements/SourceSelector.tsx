@@ -22,6 +22,7 @@ import { useVuex } from 'components-react/hooks';
 import * as remote from '@electron/remote';
 import { AuthModal } from 'components-react/shared/AuthModal';
 import Utils from 'services/utils';
+import { getOS, OS } from 'util/operating-systems';
 
 interface ISourceMetadata {
   id: string;
@@ -265,6 +266,12 @@ class SourceSelectorController {
 
     if (item.type === 'scene') {
       this.scenesService.actions.makeSceneActive(item.sourceId);
+      return;
+    }
+
+    if (getOS() === OS.Mac && item.type === 'browser_source') {
+      // HACK: we should investigate why `video` seems to be false on Mac instead
+      this.sourcesService.actions.showSourceProperties(item.sourceId);
       return;
     }
 
