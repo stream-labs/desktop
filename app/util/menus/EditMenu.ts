@@ -436,6 +436,7 @@ export class EditMenu extends Menu {
   }
 
   private showProperties() {
+    debugger;
     if (this.options.showAudioMixerMenu || !this.source.video) {
       this.audioService.actions.showAdvancedSettings(this.source.sourceId);
     } else {
