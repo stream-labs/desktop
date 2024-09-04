@@ -263,6 +263,8 @@ class SourceSelectorController {
 
     if (!item) return;
 
+    debugger;
+
     if (item.type === 'scene') {
       this.scenesService.actions.makeSceneActive(item.sourceId);
       return;
