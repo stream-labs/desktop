@@ -1427,6 +1427,17 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     this.CLEAR_UPLOAD();
   }
 
+  extractDateTimeFromPath(filePath: string): string | undefined {
+    try {
+      const parts = filePath.split(/[/\\]/);
+      const fileName = parts[parts.length - 1];
+      const dateTimePart = fileName.split('.')[0];
+      return dateTimePart;
+    } catch (error: unknown) {
+      return undefined;
+    }
+  }
+
   async flow(filePath: string, streamInfo: StreamInfoForAiHighlighter): Promise<void> {
     console.log('streamInfo', streamInfo);
 
@@ -1437,6 +1448,11 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     // 4. send recording to highlighterApi
     // 5. cut data into highlightClips
 
+    const fallbackTitle = 'awesome-stream';
+    const sanitizedTitle = streamInfo.title
+      ? streamInfo.title.replace(/[\\/:"*?<>|]+/g, ' ')
+      : this.extractDateTimeFromPath(filePath) || fallbackTitle;
+
     const setStreamInfo: IHighlightedStream = {
       state: {
         type: 'detection-in-progress',
@@ -1444,7 +1460,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       },
       date: moment().toISOString(),
       id: streamInfo.id || 'noId',
-      title: streamInfo.title || filePath.split('/').pop() || 'Your awesome stream',
+      title: sanitizedTitle,
       game: streamInfo.game || 'no title',
     };
 
