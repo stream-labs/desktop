@@ -1594,8 +1594,6 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     highlighterData: IHighlight[],
     streamInfo: IHighlightedStream,
   ): Promise<{ path: string; aiClipInfo: IAiClipInfo }[]> {
-    let filePaths: string[] = []; // To keep track and dont render same videos multiple times
-
     const fallbackTitle = 'awesome-stream';
     const videoDir = path.dirname(videoUri);
     const filename = path.basename(videoUri);
@@ -1614,20 +1612,26 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       return null;
     }
 
-    const tasks = highlighterData
-      .sort((a, b) => a.start_time - b.start_time)
-      .map(({ start_time, end_time, type }) => {
-        return (async () => {
+    const sortedHighlights = highlighterData.sort((a, b) => a.start_time - b.start_time);
+    const results: { path: string; aiClipInfo: IAiClipInfo }[] = [];
+    const processedFiles = new Set<string>();
+
+    // Process in batches of 5
+    for (let i = 0; i < sortedHighlights.length; i += 5) {
+      const batch = sortedHighlights.slice(i, i + 5);
+      const batchTasks = batch.map(({ start_time, end_time, type }) => {
+        return async () => {
           const formattedStart = start_time.toString().padStart(6, '0');
           const formattedEnd = end_time.toString().padStart(6, '0');
           const outputFilename = `${folderName}-${formattedStart}-${formattedEnd}.mp4`;
           const outputUri = path.join(outputDir, outputFilename);
 
-          if (filePaths.some(filename => filename === outputUri)) {
+          if (processedFiles.has(outputUri)) {
             console.log('File already exists');
             return null;
           }
-          filePaths.push(outputUri);
+
+          processedFiles.add(outputUri);
 
           try {
             await fs.access(outputUri);
@@ -1660,38 +1664,33 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
             console.log(`run FFMPEG with args: ${args}`);
             const subprocess = execa(FFMPEG_EXE, args);
             const timeoutDuration = 1000 * 60 * 5;
-            const timeout = setTimeout(() => {
+            const timeoutId = setTimeout(() => {
               console.warn(`FFMPEG process timed out for ${outputUri}`);
               subprocess.kill('SIGTERM', { forceKillAfterTimeout: 2000 });
             }, timeoutDuration);
 
             try {
               await subprocess;
-              filePaths.push(outputUri);
               console.log(`Created segment: ${outputUri}`);
               return { path: outputUri, aiClipInfo: { moments: [{ type }] } };
             } catch (error: unknown) {
               console.warn(`Error during FFMPEG execution for ${outputUri}:`, error);
               return null;
             } finally {
-              clearTimeout(timeout);
+              clearTimeout(timeoutId);
             }
           } catch (error: unknown) {
             console.error(`Error creating segment: ${outputUri}`, error);
             return null;
           }
-        })();
+        };
       });
 
-    const results = await Promise.allSettled(tasks);
-    filePaths = [];
+      const batchResults = await Promise.all(batchTasks.map(task => task()));
+      results.push(...batchResults.filter(result => result !== null));
+    }
 
-    return results
-      .filter(result => result.status === 'fulfilled' && result.value !== null)
-      .map(
-        result =>
-          (result as PromiseFulfilledResult<{ path: string; aiClipInfo: IAiClipInfo }>).value,
-      );
+    return results;
   }
 
   //TODO: Wrap this in useMemo in each component?
