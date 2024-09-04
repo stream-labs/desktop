@@ -566,6 +566,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
   getAvailableSourcesTypesList(): IObsListOption<TSourceType>[] {
     const obsAvailableTypes = obs.InputFactory.types();
+    debugger;
     const allowlistedTypes: IObsListOption<TSourceType>[] = [
       { description: 'Image', value: 'image_source' },
       { description: 'Color Block', value: 'color_source' },
