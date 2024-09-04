@@ -92,6 +92,7 @@ class RecordingHistoryController {
       this.HighlighterService.actions.flow(filename, {
         game: 'forntnite',
         id: 'rec_' + uuid(),
+        title: extractDateTimeFromPath(filename) || 'Recording',
       });
       this.NavigationService.actions.navigate('Highlighter', { view: 'stream' });
       return;
@@ -104,6 +105,17 @@ class RecordingHistoryController {
       this.store.setState(s => {
         s.showSLIDModal = true;
       });
+    }
+
+    function extractDateTimeFromPath(filePath: string): string | undefined {
+      try {
+        const parts = filePath.split(/[/\\]/);
+        const fileName = parts[parts.length - 1];
+        const dateTimePart = fileName.split('.')[0];
+        return dateTimePart;
+      } catch (error: unknown) {
+        return undefined;
+      }
     }
   }
 

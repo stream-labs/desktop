@@ -1597,7 +1597,10 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     const fallbackTitle = 'awesome-stream';
     const videoDir = path.dirname(videoUri);
     const filename = path.basename(videoUri);
-    const folderName = `${filename}-Clips-${streamInfo.title || fallbackTitle}`;
+    const sanitizedTitle = streamInfo.title
+      ? streamInfo.title.replace(/[\\/:"*?<>|]+/g, ' ')
+      : fallbackTitle;
+    const folderName = `${filename}-Clips-${sanitizedTitle}`;
     const outputDir = path.join(videoDir, folderName);
 
     try {
