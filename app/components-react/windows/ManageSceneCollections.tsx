@@ -159,14 +159,24 @@ export default function ManageSceneCollections() {
                 </div>
               </div>
             )}
-            <button onClick={importFromObs} className={cx('button', styles.button, styles.lg)}>
+            {/* If we're displaying the Ultra button, both import options are on the same row */}
+            <button
+              onClick={importFromObs}
+              className={cx('button', styles.button, { [styles.lg]: isPrime })}
+            >
               <i className="icon-cloud-backup" />
               <strong>{$t('Import from OBS')}</strong>
               <p>{$t('Load existing scenes from OBS')}</p>
             </button>
-            <button onClick={importFromTwitch} className={cx('button', styles.button, styles.lg)}>
+            <button
+              onClick={importFromTwitch}
+              className={cx('button', styles.button, { [styles.lg]: isPrime })}
+            >
               <i className="icon-cloud-backup" />
-              <strong>{$t('Import from Twitch Studio')}</strong>
+              {/* Since the Ultra button takes an entire row, make text shorter here */}
+              <strong>
+                {isPrime ? $t('Import from Twitch Studio') : $t('Import from Twitch')}
+              </strong>
               <p>{$t('Load existing scenes from Twitch Studio')}</p>
             </button>
           </div>
