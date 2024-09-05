@@ -14,7 +14,6 @@ interface ISingleOutputSwitcherProps {
   destination: TPlatform | ICustomStreamDestination;
   enabled: boolean;
   onChange: (enabled: boolean) => unknown;
-  isPrimary?: boolean;
   promptConnectTikTok?: boolean;
   disabled?: boolean;
 }
@@ -37,7 +36,6 @@ export function SingleOutputDestinationSwitchers(p: ISingleOutputDestinationSwit
     linkedPlatforms,
     customDestinations,
     disableCustomDestinationSwitchers,
-    isPrimaryPlatform,
   } = useGoLiveSettings().extend(module => {
     return {
       get disableCustomDestinationSwitchers() {
@@ -52,10 +50,6 @@ export function SingleOutputDestinationSwitchers(p: ISingleOutputDestinationSwit
         // TikTok should be handled by platform switching
         return module.enabledPlatforms.length > maxAddlPlatforms;
       },
-
-      isPrimaryPlatform(platform: TPlatform) {
-        return module.isPrimaryPlatform(platform) || linkedPlatforms.length === 1;
-      },
     };
   });
 
@@ -68,7 +62,6 @@ export function SingleOutputDestinationSwitchers(p: ISingleOutputDestinationSwit
           enabled={p.isEnabled(platform)}
           onChange={enabled => p.togglePlatform(platform, enabled)}
           promptConnectTikTok={false}
-          isPrimary={isPrimaryPlatform(platform)}
         />
       ))}
 
@@ -111,6 +104,9 @@ export const SingleOutputDestinationSwitcher = React.forwardRef<{}, ISingleOutpu
     // TODO: this kind of logic should belong on caller, but ideally we would refactor all this
     const tiktokDisabled =
       platform === 'tiktok' && !Services.StreamingService.views.isPlatformLinked('tiktok');
+
+    const onlyPlatformEnabled =
+      Services.StreamingService.views.enabledPlatforms.length === 1 && p.enabled;
 
     function onClickHandler(ev: MouseEvent) {
       if (p.promptConnectTikTok) {
@@ -166,7 +162,7 @@ export const SingleOutputDestinationSwitcher = React.forwardRef<{}, ISingleOutpu
               inputRef={switchInputRef}
               value={p.enabled}
               name={platform}
-              disabled={tiktokDisabled}
+              disabled={tiktokDisabled || onlyPlatformEnabled}
               uncontrolled
             />
           ),

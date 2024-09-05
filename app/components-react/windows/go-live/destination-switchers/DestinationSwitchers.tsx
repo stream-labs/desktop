@@ -37,7 +37,7 @@ export function DestinationSwitchers() {
     if (typeof target === 'number') {
       return enabledDestRef.current.includes(target);
     } else {
-      if (target === 'tiktok' && isEnabled('tiktok')) {
+      if (target === 'tiktok' && !isEnabled('tiktok')) {
         return false;
       }
 
