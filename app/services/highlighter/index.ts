@@ -639,28 +639,48 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
         });
       });
     } else {
-      this.streamingService.replayBufferFileWrite.subscribe(clipPath => {
-        console.log('Add from', this.streamingService.replayBufferFileWrite);
+      let streamStarted = false;
+      let aiRecordingInProgress = false;
+      let streamInfo: StreamInfoForAiHighlighter;
 
+      this.streamingService.replayBufferFileWrite.subscribe(clipPath => {
+        console.log('Add from', this.streamingService.replayBufferFileWrite, streamInfo);
         //TODO: Get in streaminfo + stream order via subscribe
-        this.ADD_CLIP({
-          path: clipPath,
-          loaded: false,
-          enabled: true,
-          startTrim: 0,
-          endTrim: 0,
-          deleted: false,
-          source: 'ReplayBuffer',
-          globalOrderPosition: -1,
-          streamInfo: undefined,
-        });
+
+        this.addClips([clipPath], streamInfo.id, 'ReplayBuffer');
       });
 
-      let streamStarted = false;
-
-      this.streamingService.streamingStatusChange.subscribe(status => {
+      this.streamingService.streamingStatusChange.subscribe(async status => {
         if (status === EStreamingState.Live) {
-          streamStarted = true;
+          streamStarted = true; // console.log('live', this.streamingService.views.settings.platforms.twitch.title);
+
+          // console.log('useHighlighter', this.views.useAiHighlighter);
+          // console.log(
+          //   `is the game: ${this.streamingService.views.game} ai detectable?:`,
+          //   this.streamingService.views.game === 'Fortnite',
+          // );
+
+          if (
+            this.views.useAiHighlighter === false ||
+            this.streamingService.views.game !== 'Fortnite'
+          ) {
+            // console.log('Highlighter not enabled or not Fortnite');
+            return;
+          }
+
+          // console.log('recording Alreadyt running?:', this.streamingService.views.isRecording);
+
+          if (this.streamingService.views.isRecording) {
+            // console.log('Recording is already running');
+          } else {
+            this.streamingService.toggleRecording();
+          }
+          streamInfo = {
+            id: 'fromStreamRecording' + uuid(),
+            title: this.streamingService.views.settings.platforms.twitch.title,
+            game: this.streamingService.views.game,
+          };
+          aiRecordingInProgress = true;
         }
 
         if (status === EStreamingState.Offline) {
@@ -688,62 +708,28 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
           streamStarted = false;
         }
-      });
-    }
-
-    let aiRecordingInProgress = false;
-    let streamInfo: StreamInfoForAiHighlighter;
-    this.streamingService.streamingStatusChange.subscribe(status => {
-      if (status === EStreamingState.Live) {
-        // console.log('live', this.streamingService.views.settings.platforms.twitch.title);
-
-        // console.log('useHighlighter', this.views.useAiHighlighter);
-        // console.log(
-        //   `is the game: ${this.streamingService.views.game} ai detectable?:`,
-        //   this.streamingService.views.game === 'Fortnite',
-        // );
-
-        if (
-          this.views.useAiHighlighter === false ||
-          this.streamingService.views.game !== 'Fortnite'
-        ) {
-          // console.log('Highlighter not enabled or not Fortnite');
-          return;
-        }
-
-        // console.log('recording Alreadyt running?:', this.streamingService.views.isRecording);
-
-        if (this.streamingService.views.isRecording) {
-          // console.log('Recording is already running');
-        } else {
+        if (status === EStreamingState.Ending) {
+          if (!aiRecordingInProgress) {
+            return;
+          }
+          // Load potential replaybuffer clips
+          await this.loadClips(streamInfo.id);
           this.streamingService.toggleRecording();
         }
-        streamInfo = {
-          id: 'autoStarted_' + uuid(),
-          title: this.streamingService.views.settings.platforms.twitch.title,
-          game: this.streamingService.views.game,
-        };
-        aiRecordingInProgress = true;
-      }
-      if (status === EStreamingState.Ending) {
+      });
+
+      this.streamingService.latestRecordingPath.subscribe(path => {
         if (!aiRecordingInProgress) {
           return;
         }
-        this.streamingService.toggleRecording();
-      }
-    });
 
-    this.streamingService.latestRecordingPath.subscribe(path => {
-      if (!aiRecordingInProgress) {
-        return;
-      }
+        aiRecordingInProgress = false;
+        this.flow(path, streamInfo);
 
-      aiRecordingInProgress = false;
-      this.flow(path, streamInfo);
-
-      this.navigationService.actions.navigate('Highlighter', { view: 'stream' });
-      // console.log('latest recording path', path);
-    });
+        this.navigationService.actions.navigate('Highlighter', { view: 'stream' });
+        // console.log('latest recording path', path);
+      });
+    }
   }
 
   notificationAction() {
@@ -754,7 +740,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     });
   }
 
-  addClips(paths: string[], streamId: string | undefined) {
+  addClips(paths: string[], streamId: string | undefined, source: 'Manual' | 'ReplayBuffer') {
     paths.forEach((path, index) => {
       const currentHighestOrderPosition = this.getClips(this.views.clips, streamId).length;
       const getHighestGlobalOrderPosition = this.getClips(this.views.clips, undefined).length;
@@ -784,7 +770,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
           startTrim: 0,
           endTrim: 0,
           deleted: false,
-          source: 'Manual',
+          source,
           globalOrderPosition: index + getHighestGlobalOrderPosition + 1,
           streamInfo: streamId !== undefined ? newStreamInfo : undefined,
         });
@@ -901,7 +887,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     this.DISMISS_TUTORIAL();
   }
 
-  fileExists(file: string) {
+  fileExists(file: string): boolean {
     return fs.existsSync(file);
   }
 
