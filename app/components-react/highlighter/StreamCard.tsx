@@ -76,7 +76,9 @@ export default function StreamCard({
 
   function getEmojiSection(): JSX.Element | string {
     const eventTypeMap = Object.entries(getMomentTypeCount(clips));
-    const manualClips = clips.filter(clip => clip.source === 'ReplayBuffer');
+    const manualClips = clips.filter(
+      clip => clip.source === 'ReplayBuffer' || clip.source === 'Manual',
+    );
 
     function manualClip() {
       return (
@@ -365,9 +367,6 @@ export default function StreamCard({
             {getEmojiSection()}
           </h3>
         </div>
-
-        {/* ProgressBar or actionRow */}
-
         {getActionRow()}
       </div>
     </div>

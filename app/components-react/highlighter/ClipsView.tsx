@@ -252,31 +252,30 @@ export default function ClipsView({
     if (v.error) HighlighterService.actions.dismissError();
   }
 
-  function noClipsView(streamId: string | undefined) {
-    function onDrop(e: React.DragEvent<HTMLDivElement>) {
-      const extensions = SUPPORTED_FILE_TYPES.map(e => `.${e}`);
-      const files: string[] = [];
-      let fi = e.dataTransfer.files.length;
-      while (fi--) {
-        const file = e.dataTransfer.files.item(fi)?.path;
-        if (file) files.push(file);
-      }
-
-      const filtered = files.filter(f => extensions.includes(path.parse(f).ext));
-
-      if (filtered.length) {
-        //TODO M: New clips should be on position 0
-        HighlighterService.actions.addClips(filtered, streamId);
-      }
-
-      e.stopPropagation();
+  function onDrop(e: React.DragEvent<HTMLDivElement>, streamId: string | undefined) {
+    const extensions = SUPPORTED_FILE_TYPES.map(e => `.${e}`);
+    const files: string[] = [];
+    let fi = e.dataTransfer.files.length;
+    while (fi--) {
+      const file = e.dataTransfer.files.item(fi)?.path;
+      if (file) files.push(file);
     }
 
+    const filtered = files.filter(f => extensions.includes(path.parse(f).ext));
+
+    if (filtered.length) {
+      //TODO M: New clips should be on position 0
+      HighlighterService.actions.addClips(filtered, streamId, 'Manual');
+    }
+
+    e.stopPropagation();
+  }
+  function noClipsView(streamId: string | undefined) {
     return (
       <div
         style={{ width: '100%', display: 'flex' }}
         className={styles.clipsViewRoot}
-        onDrop={onDrop}
+        onDrop={event => onDrop(event, streamId)}
       >
         <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: 'flex', padding: 20 }}>
@@ -347,30 +346,11 @@ export default function ClipsView({
       setTempClipList(clipList);
     }
 
-    function onDrop(e: React.DragEvent<HTMLDivElement>) {
-      const extensions = SUPPORTED_FILE_TYPES.map(e => `.${e}`);
-      const files: string[] = [];
-      let fi = e.dataTransfer.files.length;
-      while (fi--) {
-        const file = e.dataTransfer.files.item(fi)?.path;
-        if (file) files.push(file);
-      }
-
-      const filtered = files.filter(f => extensions.includes(path.parse(f).ext));
-
-      if (filtered.length) {
-        //TODO M: New clips should be on position 0
-        HighlighterService.actions.addClips(filtered, streamId);
-      }
-
-      e.stopPropagation();
-    }
-
     return (
       <div
         style={{ width: '100%', display: 'flex' }}
         className={styles.clipsViewRoot}
-        onDrop={onDrop}
+        onDrop={event => onDrop(event, streamId)}
       >
         <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: 'flex', padding: 20 }}>
@@ -472,7 +452,7 @@ function AddClip({ streamId }: { streamId: string | undefined }) {
     });
 
     if (selections && selections.filePaths) {
-      HighlighterService.actions.addClips(selections.filePaths, streamId);
+      HighlighterService.actions.addClips(selections.filePaths, streamId, 'Manual');
     }
   }
 
