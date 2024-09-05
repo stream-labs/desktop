@@ -110,38 +110,26 @@ export default function ManageSceneCollections() {
             ))}
           </Scrollable>
         </Sider>
-        <Content style={{ paddingLeft: '24px' }}>
+        <Content style={{ paddingLeft: '16px' }}>
           <div>{$t('Add New Scene Collection:')}</div>
           <div className={styles.buttonContainer}>
-            <button onClick={create} className={cx('button', styles.button, styles.new)}>
-              <i className="icon-stream-labels" />
-              <strong>{$t('New')}</strong>
+            <button onClick={create} className={cx('button', styles.button)}>
+              <i className="fa fa-solid fa-file" />
+              <strong>{$t('Start Fresh')}</strong>
               <p>{$t('Start fresh and build from scratch')}</p>
-            </button>
-            <button onClick={importFromObs} className={cx('button', styles.button)}>
-              <i className="icon-cloud-backup" />
-              <strong>{$t('Import from OBS')}</strong>
-              <p>{$t('Load existing scenes from OBS')}</p>
-            </button>
-            <button onClick={importFromTwitch} className={cx('button', styles.button)}>
-              <i className="icon-twitch" />
-              <strong>{$t('Import from Twitch')}</strong>
-              <p>{$t('Load existing scenes from Twitch Studio')}</p>
             </button>
             <button
               disabled={!isLoggedIn}
               onClick={goToThemes}
-              className={cx('button', styles.button, styles.lg)}
+              className={cx('button', styles.button)}
             >
-              <div>
-                <strong>{$t('Template')}</strong>
-                {isLoggedIn ? (
-                  <p>{$t('Choose a template from our overlay library')}</p>
-                ) : (
-                  <p>{$t('Log in to choose a template from our overlay library')}</p>
-                )}
-              </div>
-              <img src={$i('images/prime-themes.png')} />
+              <i className="fa fa-solid fa-brush" />
+              <strong>{$t('Overlays')}</strong>
+              <p>
+                {isLoggedIn
+                  ? $t('Choose a template from our overlay library')
+                  : $t('Log in to choose a template from our overlay library')}
+              </p>
             </button>
             {!isPrime && (
               <div onClick={upgradeToPrime} className={cx('button', styles.button, styles.lg)}>
@@ -171,6 +159,16 @@ export default function ManageSceneCollections() {
                 </div>
               </div>
             )}
+            <button onClick={importFromObs} className={cx('button', styles.button, styles.lg)}>
+              <i className="icon-cloud-backup" />
+              <strong>{$t('Import from OBS')}</strong>
+              <p>{$t('Load existing scenes from OBS')}</p>
+            </button>
+            <button onClick={importFromTwitch} className={cx('button', styles.button, styles.lg)}>
+              <i className="icon-cloud-backup" />
+              <strong>{$t('Import from Twitch Studio')}</strong>
+              <p>{$t('Load existing scenes from Twitch Studio')}</p>
+            </button>
           </div>
         </Content>
       </Layout>
