@@ -17,7 +17,7 @@ test('Go through onboarding login and signup', async t => {
   const app = t.context.app;
   await focusMain();
 
-  if (!(await isDisplayed('h2=Live Streaming'))) return;
+  waitForDisplayed('h2=Live Streaming');
 
   await click('h2=Live Streaming');
   await click('h2=Beginner');
@@ -28,24 +28,23 @@ test('Go through onboarding login and signup', async t => {
 
   // Click on Login on the signup page, then wait for the auth screen to appear
   await click('a=Login');
-  await isDisplayed('button=Log in with Twitch');
 
   t.truthy(
     await Promise.all(
-      ['Twitch', 'YouTube', 'Facebook'].map(async platform =>
-        (await app.client.$(`button=Log in with ${platform}`)).isExisting(),
+      ['Twitch', 'YouTube', 'Facebook', 'Twitter', 'TikTok'].map(async platform =>
+        waitForDisplayed(`button=Log in with ${platform}`),
       ),
     ),
-    'Shows login buttons for Twitch, YouTube, and Facebook',
+    'Shows login buttons for Twitch, YouTube, Facebook, Twitter and TikTok',
   );
 
   t.truthy(
     await Promise.all(
-      ['Trovo', 'TikTok', 'Dlive', 'NimoTV'].map(async platform =>
-        (await app.client.$(`aria/Login with ${platform}`)).isExisting(),
+      ['Trovo', 'Dlive', 'NimoTV'].map(async platform =>
+        waitForDisplayed(`aria/Log in with ${platform}`),
       ),
     ),
-    'Shows icon buttons for Trovo, TikTok, Dlive, and NimoTV',
+    'Shows icon buttons for Trovo, Dlive, and NimoTV',
   );
 
   t.true(await isDisplayed('a=Sign up'), 'Has a link to go back to Sign Up');
@@ -55,7 +54,7 @@ test('Go through onboarding as beginner user', async t => {
   const app = t.context.app;
   await focusMain();
 
-  if (!(await isDisplayed('h2=Live Streaming'))) return;
+  waitForDisplayed('h2=Live Streaming');
 
   await click('h2=Live Streaming');
   // Choose Beginner onboarding
@@ -64,7 +63,7 @@ test('Go through onboarding as beginner user', async t => {
 
   // Click on Login on the signup page, then wait for the auth screen to appear
   await click('a=Login');
-  await isDisplayed('button=Log in with Twitch');
+  waitForDisplayed('button=Log in with Twitch');
 
   await logIn(t, 'twitch', { prime: false }, false, true);
   await sleep(1000);
@@ -106,7 +105,7 @@ test('Go through onboarding as intermediate user', async t => {
   const app = t.context.app;
   await focusMain();
 
-  if (!(await isDisplayed('h2=Live Streaming'))) return;
+  waitForDisplayed('h2=Live Streaming');
 
   await click('h2=Live Streaming');
   // Choose Intermediate onboarding
@@ -115,7 +114,7 @@ test('Go through onboarding as intermediate user', async t => {
 
   // Click on Login on the signup page, then wait for the auth screen to appear
   await click('a=Login');
-  await isDisplayed('button=Log in with Twitch');
+  waitForDisplayed('button=Log in with Twitch');
 
   await logIn(t, 'twitch', { prime: false }, false, true);
   await sleep(1000);
@@ -157,7 +156,7 @@ test('Go through onboarding as advanced user', async t => {
   const app = t.context.app;
   await focusMain();
 
-  if (!(await isDisplayed('h2=Live Streaming'))) return;
+  waitForDisplayed('h2=Live Streaming');
 
   await click('h2=Live Streaming');
   // Choose Advanced onboarding
@@ -166,7 +165,7 @@ test('Go through onboarding as advanced user', async t => {
 
   // Click on Login on the signup page, then wait for the auth screen to appear
   await click('a=Login');
-  await isDisplayed('button=Log in with Twitch');
+  waitForDisplayed('button=Log in with Twitch');
 
   await logIn(t, 'twitch', { prime: false }, false, true);
   await sleep(1000);
@@ -198,7 +197,7 @@ test.skip('Go through the onboarding and autoconfig', async t => {
   const app = t.context.app;
   await focusMain();
 
-  if (!(await isDisplayed('h2=Live Streaming'))) return;
+  waitForDisplayed('h2=Live Streaming');
 
   await click('h2=Live Streaming');
   await click('h2=Beginner');
@@ -207,7 +206,7 @@ test.skip('Go through the onboarding and autoconfig', async t => {
   // Click on Login on the signup page, then wait for the auth screen to appear
   await click('a=Login');
   // prettier-ignore
-  await (await app.client.$('button=Log in with Twitch')).isExisting();
+  waitForDisplayed('button=Log in with Twitch');
 
   await logIn(t, 'twitch', { prime: false }, false, true);
   await sleep(1000);

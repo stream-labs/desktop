@@ -133,6 +133,13 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
   }
 
   /**
+   * Returns a list of enabled for streaming platforms
+   */
+  get enabledCustomDestinations(): ICustomStreamDestination[] {
+    return this.settings.customDestinations.filter(dest => dest.enabled);
+  }
+
+  /**
    * Returns the host from the rtmp url
    */
   get enabledCustomDestinationHosts() {

@@ -2,31 +2,24 @@ import React, { useRef, MouseEvent, useCallback } from 'react';
 import { getPlatformService, TPlatform } from 'services/platforms';
 import cx from 'classnames';
 import { $t } from 'services/i18n';
-import styles from './DualOutputGoLive.m.less';
+import styles from './DestinationSwitchers.m.less';
 import { ICustomStreamDestination } from 'services/settings/streaming';
 import { Services } from 'components-react/service-provider';
 import { SwitchInput } from 'components-react/shared/inputs';
 import PlatformLogo from 'components-react/shared/PlatformLogo';
-import InfoBadge from 'components-react/shared/InfoBadge';
 import DisplaySelector from 'components-react/shared/DisplaySelector';
 import { useGoLiveSettings } from '../useGoLiveSettings';
 import { alertAsync } from 'components-react/modals';
-import Translate from 'components-react/shared/Translate';
 import { useDebounce } from 'components-react/hooks';
-
-interface IUltraDestinationSwitchers {
-  type?: 'default' | 'ultra';
-}
 
 /**
  * Allows enabling/disabling platforms and custom destinations for the stream
  */
-export function UltraDestinationSwitchers(p: IUltraDestinationSwitchers) {
+export function UltraDestinationSwitchers() {
   const {
     enabledPlatforms,
     linkedPlatforms,
     customDestinations,
-    isDualOutputMode,
     isPrimaryPlatform,
     isPlatformLinked,
     switchPlatforms,
@@ -40,6 +33,7 @@ export function UltraDestinationSwitchers(p: IUltraDestinationSwitchers) {
   const emitSwitch = useDebounce(500, () => {
     switchPlatforms(enabledPlatformsRef.current);
   });
+
   const isEnabled = useCallback((target: TPlatform) => {
     if (target === 'tiktok' && promptConnectTikTok) {
       return false;
@@ -62,17 +56,7 @@ export function UltraDestinationSwitchers(p: IUltraDestinationSwitchers) {
   }, []);
 
   return (
-    <div className={styles.switchWrapper}>
-      {isDualOutputMode && (
-        <InfoBadge
-          content={
-            <Translate message="<dualoutput>Dual Output</dualoutput> is enabled - you must stream to one horizontal and one vertical platform.">
-              <u slot="dualoutput" />
-            </Translate>
-          }
-          style={{ marginBottom: '15px' }}
-        />
-      )}
+    <div id="ultra-switchers" className={styles.dualOutputSwitchers}>
       {linkedPlatforms.map((platform: TPlatform, index: number) => (
         <DestinationSwitcher
           key={platform}
@@ -182,6 +166,7 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
             platform={platform}
             className={cx(styles.logo, styles[`platform-logo-${platform}`])}
             size={36}
+            // fontIcon={platform}
           />
         ),
         Switch: () => (
@@ -195,7 +180,8 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
                 : p?.isPrimary || (p.promptConnectTikTok && platform === 'tiktok')
             }
             uncontrolled
-            className={styles.platformSwitch}
+            nolabel
+            className={styles.dualOutputPlatformSwitch}
             checkedChildren={<i className="icon-check-mark" />}
           />
         ),
@@ -206,13 +192,16 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
       return {
         title: destination.name,
         description: destination.url,
-        Logo: () => <i className={cx(styles.destinationLogo, 'fa fa-globe')} />,
+        Logo: () => (
+          <i className={cx('fa fa-globe', styles.logo, styles[`platform-logo-${platform}`])} />
+        ),
         Switch: () => (
           <SwitchInput
             inputRef={switchInputRef}
             value={destination?.enabled}
             name={`destination_${destination?.name}`}
             uncontrolled
+            nolabel
             className={styles.platformSwitch}
             checkedChildren={<i className="icon-check-mark" />}
           />
@@ -225,25 +214,24 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
     <div
       ref={containerRef}
       data-test="ultra-switcher"
-      className={cx(styles.platformSwitcher, { [styles.platformDisabled]: !p.enabled })}
+      className={cx(styles.dualOutputPlatformSwitcher, { [styles.platformDisabled]: !p.enabled })}
       onClick={() => {
         if (p.promptConnectTikTok) {
           showTikTokConnectModal();
         }
       }}
     >
-      <div className={styles.switcherHeader}>
-        <div className={styles.platformInfoWrapper}>
-          {/* LOGO */}
-          <Logo />
-          {/* INFO */}
-          <div className={styles.platformInfo}>
-            <span className={styles.platformName}>{title}</span>
-            <span className={styles.platformUsername}>{description}</span>
-          </div>
+      <div className={styles.dualOutputPlatformInfo}>
+        {/* LOGO */}
+        <Logo />
+        {/* INFO */}
+        <div className={styles.colAccount}>
+          <span className={styles.platformName}>{title}</span>
+          <span className={styles.platformUsername}>{description}</span>
         </div>
         {/* SWITCH */}
         <div
+          className={cx(styles.colInput)}
           onClick={e => {
             if (p.promptConnectTikTok) {
               showTikTokConnectModal();
@@ -257,10 +245,14 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
           <Switch />
         </div>
       </div>
-      <div className={styles.platformDisplay}>
-        <span className={styles.label}>{`${$t('Output')}:`}</span>
-        <DisplaySelector title={title} platform={platform} index={p.index} nolabel nomargin />
-      </div>
+
+      <DisplaySelector
+        title={title}
+        className={styles.dualOutputDisplaySelector}
+        platform={platform}
+        label={$t('Output')}
+        index={p.index}
+      />
     </div>
   );
 }

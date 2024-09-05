@@ -7,12 +7,21 @@ import {
   waitForSettingsWindowLoaded,
   waitForStreamStart,
 } from '../../helpers/modules/streaming';
-import { fillForm, useForm } from '../../helpers/modules/forms';
-import { click, clickButton, isDisplayed, waitForDisplayed } from '../../helpers/modules/core';
+import { fillForm, readFields, useForm } from '../../helpers/modules/forms';
+import {
+  click,
+  clickButton,
+  focusChild,
+  getNumElements,
+  isDisplayed,
+  waitForDisplayed,
+} from '../../helpers/modules/core';
 import { logIn } from '../../helpers/modules/user';
 import { releaseUserInPool, reserveUserFromPool, withUser } from '../../helpers/webdriver/user';
 import { showSettingsWindow } from '../../helpers/modules/settings/settings';
 import { test, useWebdriver } from '../../helpers/webdriver';
+import { toggleDualOutputMode } from '../../helpers/modules/dual-output';
+import { sleep } from '../../helpers/sleep';
 
 useWebdriver();
 
@@ -144,6 +153,10 @@ test('Custom stream destinations', async t => {
     t.true(await isDisplayed('span=MyCustomDest'), 'Destination is available');
     await click('span=MyCustomDest'); // switch the destination on
 
+    // all 5 destination cards show in single output mode
+    let numElements = await getNumElements('[data-test=destination-single-output]');
+    t.true(numElements === 5, 'All 5 destinations cards are displayed in single output mode.');
+
     // try to stream
     await fillForm({
       title: 'Test stream',
@@ -156,6 +169,15 @@ test('Custom stream destinations', async t => {
     await waitForStreamStart();
     await stopStream();
 
+    // all 5 destination cards show in dual output mode
+    await toggleDualOutputMode();
+
+    await clickGoLive();
+
+    await focusChild();
+    numElements = await getNumElements('[data-test=destination-dual-output]');
+    t.true(numElements === 5, 'All 5 destinations cards are displayed in dual output mode.');
+
     // delete existing destinations
     await showSettingsWindow('Stream');
     for (let i = 0; i < 5; i++) {
@@ -166,4 +188,6 @@ test('Custom stream destinations', async t => {
     await releaseUserInPool(user);
     await releaseUserInPool(loggedInUser);
   }
+
+  t.pass();
 });

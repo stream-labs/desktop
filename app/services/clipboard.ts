@@ -149,7 +149,6 @@ export class ClipboardService extends StatefulService<IClipboardState> {
   @Inject() private editorCommandsService: EditorCommandsService;
   @Inject() private navigationService: NavigationService;
   @Inject() private dualOutputService: DualOutputService;
-  @Inject() private videoSettingsService: VideoSettingsService;
 
   get views() {
     return new ClipboardViews(this.state);

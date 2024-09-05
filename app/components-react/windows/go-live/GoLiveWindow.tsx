@@ -4,7 +4,6 @@ import { ModalLayout } from '../../shared/ModalLayout';
 import { Button } from 'antd';
 import { Services } from '../../service-provider';
 import GoLiveSettings from './GoLiveSettings';
-import DualOutputGoLiveSettings from './dual-output/DualOutputGoLiveSettings';
 import GoLiveBanner from './GoLiveInfoBanner';
 import React from 'react';
 import { $t } from '../../../services/i18n';
@@ -16,7 +15,7 @@ import { inject } from 'slap';
 import cx from 'classnames';
 
 export default function GoLiveWindow() {
-  const { lifecycle, form } = useGoLiveSettingsRoot().extend(module => ({
+  const { lifecycle, form, isDualOutputMode } = useGoLiveSettingsRoot().extend(module => ({
     destroy() {
       // clear failed checks and warnings on window close
       if (module.checklist.startVideoTransmission !== 'done') {
@@ -27,12 +26,11 @@ export default function GoLiveWindow() {
 
   const shouldShowSettings = ['empty', 'prepopulate', 'waitForNewSettings'].includes(lifecycle);
   const shouldShowChecklist = ['runChecklist', 'live'].includes(lifecycle);
-  const showDualOutput = shouldShowSettings && Services.DualOutputService.views.dualOutputMode;
 
   return (
     <ModalLayout
       footer={<ModalFooter />}
-      className={cx({ [styles.dualOutputGoLive]: showDualOutput })}
+      className={cx({ [styles.dualOutputGoLive]: isDualOutputMode })}
     >
       <Form
         form={form!}
@@ -42,8 +40,7 @@ export default function GoLiveWindow() {
       >
         <Animation transitionName={shouldShowChecklist ? 'slideright' : ''}>
           {/* STEP 1 - FILL OUT THE SETTINGS FORM */}
-          {showDualOutput && <DualOutputGoLiveSettings key={'settings'} />}
-          {shouldShowSettings && !showDualOutput && <GoLiveSettings key={'settings'} />}
+          {shouldShowSettings && <GoLiveSettings key={'settings'} />}
 
           {/* STEP 2 - RUN THE CHECKLIST */}
           {shouldShowChecklist && <GoLiveChecklist className={styles.page} key={'checklist'} />}

@@ -1,11 +1,11 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { $t } from 'services/i18n';
 import { TPlatform, platformLabels } from 'services/platforms';
 import { useGoLiveSettings } from '../useGoLiveSettings';
 import { Select } from 'antd';
 import PlatformLogo from 'components-react/shared/PlatformLogo';
 import { Services } from 'components-react/service-provider';
-import styles from './DualOutputGoLive.m.less';
+import styles from './DestinationSelector.m.less';
 import { ICustomStreamDestination } from 'services/settings/streaming';
 import cx from 'classnames';
 
@@ -21,18 +21,17 @@ interface IPlatformSelectorProps {
  * Render platform selector
  */
 
-export default function DualOutputPlatformSelector(p: IPlatformSelectorProps) {
+export default function DestinationSelector(p: IPlatformSelectorProps) {
   const {
     linkedPlatforms,
     shouldAddTikTok,
     enabledPlatforms,
     customDestinations,
-    isDualOutputMode,
     isEnabled,
   } = useGoLiveSettings().extend(module => {
     return {
       get shouldAddTikTok() {
-        return !module.isPlatformLinked('tiktok') && !module.isDualOutputMode;
+        return !module.isPlatformLinked('tiktok');
       },
     };
   });
@@ -67,7 +66,7 @@ export default function DualOutputPlatformSelector(p: IPlatformSelectorProps) {
         value: destination.name,
         label: (
           <>
-            <i className={cx(styles.selectorIcon, 'fa fa-globe')} />
+            <i className={cx(styles.selectorIcon, styles.destinationLogo, 'fa fa-globe')} />
             {destination.name}
           </>
         ),
@@ -82,7 +81,7 @@ export default function DualOutputPlatformSelector(p: IPlatformSelectorProps) {
       value: 'default',
       label: (
         <div>
-          <i className={cx('icon-add', styles.icon)} />
+          <i className={cx('icon-add', styles.addIcon)} />
           {'Add Destination'}
         </div>
       ),
@@ -93,12 +92,9 @@ export default function DualOutputPlatformSelector(p: IPlatformSelectorProps) {
     <Select
       data-test="do-platform-selector"
       defaultValue={defaultLabel[0]}
-      className={cx(styles.platformsSelector, { [styles.dualOutputSelector]: isDualOutputMode })}
+      className={cx(styles.dualOutputPlatformSelector)}
       onChange={(option: { value: string; label: React.ReactNode }) => {
-        if (
-          option.value === 'add' ||
-          (option.value === 'tiktok' && !isEnabled('tiktok') && !isDualOutputMode)
-        ) {
+        if (option.value === 'add' || (option.value === 'tiktok' && shouldAddTikTok)) {
           // navigate to stream settings
           showStreamSettings();
         } else {
@@ -119,12 +115,12 @@ export default function DualOutputPlatformSelector(p: IPlatformSelectorProps) {
       value={defaultLabel[0]}
     >
       {options.map(option => (
-        <Option key={option.value} value={option.value ?? ''}>
+        <Option key={option.value} value={option.value ?? ''} className={styles.optionBtn}>
           {option.label}
         </Option>
       ))}
       <Option key="add" value="add" className={styles.optionBtn}>
-        <i className={cx('icon-add-circle', styles.selectorIcon)} />
+        <i className={cx('icon-add-circle', styles.optionIcon)} />
         {$t('Other')}
       </Option>
     </Select>

@@ -10,6 +10,8 @@ import { ITrovoStartStreamOptions } from '../platforms/trovo';
 import { IVideo } from 'obs-studio-node';
 import { ITwitterStartStreamOptions } from 'services/platforms/twitter';
 import { IInstagramStartStreamOptions } from 'services/platforms/instagram';
+import { TDisplayType } from 'services/settings-v2';
+import { TOutputOrientation } from 'services/restream';
 
 export enum EStreamingState {
   Offline = 'offline',
@@ -87,6 +89,7 @@ export interface IGoLiveSettings extends IStreamSettings {
 export interface IPlatformFlags {
   enabled: boolean;
   useCustomFields: boolean;
+  display?: TDisplayType;
   video?: IVideo;
 }
 

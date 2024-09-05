@@ -9,7 +9,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { TwitchService } from 'services/platforms/twitch';
 import { PlatformAppsService } from 'services/platform-apps';
 import { IGoLiveSettings, IPlatformFlags } from 'services/streaming';
-import { TDisplayType } from 'services/settings-v2/video';
+import { VideoSettingsService, TDisplayType } from 'services/settings-v2/video';
 import Vue from 'vue';
 import { IVideo } from 'obs-studio-node';
 import { DualOutputService } from 'services/dual-output';
@@ -109,6 +109,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
   @Inject() private platformAppsService: PlatformAppsService;
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private dualOutputService: DualOutputService;
+  @Inject() private videoSettingsService: VideoSettingsService;
 
   static defaultState: IStreamSettingsState = {
     protectedModeEnabled: true,
@@ -207,16 +208,17 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     // transform IGoLiveSettings to ISavedGoLiveSettings
     const patch: Partial<ISavedGoLiveSettings> = settingsPatch;
     if (settingsPatch.platforms) {
-      const pickedFields: (keyof IPlatformFlags)[] = ['enabled', 'useCustomFields'];
+      const pickedFields: (keyof IPlatformFlags)[] = ['enabled', 'useCustomFields', 'display'];
       const platforms: Dictionary<IPlatformFlags> = {};
-      Object.keys(settingsPatch.platforms).map(platform => {
+      Object.keys(settingsPatch.platforms).map((platform: TPlatform) => {
         const platformSettings = pick(settingsPatch.platforms![platform], pickedFields);
 
         if (this.dualOutputService.views.dualOutputMode) {
-          platformSettings.video = this.dualOutputService.views.getPlatformContext(
-            platform as TPlatform,
-          );
+          platformSettings.video = this.videoSettingsService.getContext(platformSettings.display);
+        } else {
+          platformSettings.video = this.videoSettingsService.getContext('horizontal');
         }
+
         return (platforms[platform] = platformSettings);
       });
       patch.platforms = platforms as ISavedGoLiveSettings['platforms'];
