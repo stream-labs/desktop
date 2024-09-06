@@ -1596,13 +1596,14 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     highlighterData: IHighlight[],
     streamInfo: IHighlightedStream,
   ): Promise<{ path: string; aiClipInfo: IAiClipInfo }[]> {
+    const id = streamInfo.id;
     const fallbackTitle = 'awesome-stream';
     const videoDir = path.dirname(videoUri);
     const filename = path.basename(videoUri);
     const sanitizedTitle = streamInfo.title
       ? streamInfo.title.replace(/[\\/:"*?<>|]+/g, ' ')
       : fallbackTitle;
-    const folderName = `${filename}-Clips-${sanitizedTitle}`;
+    const folderName = `${filename}-Clips-${sanitizedTitle}-${id.slice(id.length - 4, id.length)}`;
     const outputDir = path.join(videoDir, folderName);
 
     try {
