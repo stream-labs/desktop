@@ -561,6 +561,13 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   init() {
     super.init();
 
+    //Check if files are existent, if not, delete
+    this.views.clips.forEach(c => {
+      if (!this.fileExists(c.path)) {
+        this.removeClip(c.path, undefined);
+      }
+    });
+
     //Check if aiDetections were still running when the user closed desktop
     this.views.highlightedStreams
       .filter(stream => stream.state.type === 'detection-in-progress')
@@ -835,21 +842,45 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
   removeClip(path: string, streamId: string | undefined) {
     const clip: TClip = this.state.clips[path];
+    if (!clip) {
+      console.warn(`Clip not found for path: ${path}`);
+      return;
+    }
+    if (
+      this.fileExists(path) &&
+      streamId &&
+      clip.streamInfo &&
+      Object.keys(clip.streamInfo).length > 1
+    ) {
+      const updatedStreamInfo = { ...clip.streamInfo };
+      delete updatedStreamInfo[streamId];
 
-    if (streamId) {
-      if (clip.streamInfo && Object.keys(clip.streamInfo).length > 1) {
-        const updatedStreamInfo = { ...clip.streamInfo };
-        delete updatedStreamInfo[streamId];
-
-        this.UPDATE_CLIP({
-          path: clip.path,
-          streamInfo: updatedStreamInfo,
-        });
-      } else {
-        this.REMOVE_CLIP(path);
-      }
+      this.UPDATE_CLIP({
+        path: clip.path,
+        streamInfo: updatedStreamInfo,
+      });
     } else {
       this.REMOVE_CLIP(path);
+    }
+
+    if (clip.streamInfo !== undefined || streamId !== undefined) {
+      const ids: string[] = streamId ? [streamId] : Object.keys(clip.streamInfo);
+      const length = this.views.clips.length;
+
+      ids.forEach(id => {
+        let found = false;
+        if (length !== 0) {
+          for (let i = 0; i < length; i++) {
+            if (this.views.clips[i].streamInfo[id] !== undefined) {
+              found = true;
+              break;
+            }
+          }
+        }
+        if (!found) {
+          this.REMOVE_HIGHLIGHTED_STREAM(id);
+        }
+      });
     }
   }
 
@@ -1702,12 +1733,21 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   //TODO: Wrap this in useMemo in each component?
   getClips(clips: TClip[], streamId?: string): TClip[] {
     const inputClips = clips.filter(clip => clip.path !== 'add');
-    let outputClips;
+    let wantedClips;
 
     if (streamId) {
-      outputClips = inputClips.filter(clip => clip.streamInfo?.[streamId]);
+      wantedClips = inputClips.filter(clip => clip.streamInfo?.[streamId]);
     } else {
-      outputClips = inputClips;
+      wantedClips = inputClips;
+    }
+
+    const outputClips = wantedClips.filter(c => this.fileExists(c.path));
+    if (outputClips.length !== wantedClips.length) {
+      wantedClips
+        .filter(c => !this.fileExists(c.path))
+        .forEach(clip => {
+          this.removeClip(clip.path, streamId);
+        });
     }
     return outputClips;
   }
