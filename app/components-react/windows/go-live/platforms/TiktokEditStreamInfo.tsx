@@ -17,9 +17,10 @@ import { EDismissable } from 'services/dismissables';
  * @remark The filename for this component is intentionally not consistent with capitalization to preserve the commit history
  */
 export function TikTokEditStreamInfo(p: IPlatformComponentParams<'tiktok'>) {
+  const { TikTokService } = Services;
   const ttSettings = p.value;
-  const approved = Services.TikTokService.scope === 'approved';
-  const rejected = Services.TikTokService.rejected;
+  const approved = TikTokService.scope === 'approved';
+  const denied = TikTokService.scope === 'denied' && !TikTokService.promptReapply;
 
   function updateSettings(patch: Partial<ITikTokStartStreamOptions>) {
     p.onChange({ ...ttSettings, ...patch });
@@ -40,22 +41,17 @@ export function TikTokEditStreamInfo(p: IPlatformComponentParams<'tiktok'>) {
             onChange={updateSettings}
           />
         }
-        requiredFields={
-          approved ? (
-            <GameSelector key="required" platform={'tiktok'} {...bind.game} />
-          ) : (
-            <div key="empty-tiktok" />
-          )
-        }
+        requiredFields={<div key="empty-tiktok" />}
       />
-
-      {!approved && <TikTokEnterCredentialsFormInfo {...p} />}
-      {rejected && <TikTokNotApprovedWarning {...p} />}
+      {approved && <GameSelector key="optional" platform={'tiktok'} {...bind.game} />}
+      {!approved && <TikTokEnterCredentialsFormInfo {...p} denied={denied} />}
     </Form>
   );
 }
 
-export function TikTokEnterCredentialsFormInfo(p: IPlatformComponentParams<'tiktok'>) {
+export function TikTokEnterCredentialsFormInfo(
+  p: IPlatformComponentParams<'tiktok'> & { denied: boolean },
+) {
   const bind = createBinding(p.value, updatedSettings =>
     p.onChange({ ...p.value, ...updatedSettings }),
   );
@@ -84,90 +80,71 @@ export function TikTokEnterCredentialsFormInfo(p: IPlatformComponentParams<'tikt
       />
       <InputWrapper
         extra={
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <Button
-              onClick={openApplicationInfoPage}
-              style={{
-                marginBottom: '10px',
-                background: 'var(--tiktok-btn)',
-                color: 'var(--black)',
-              }}
-            >
-              {$t('Apply for TikTok Live Permission')}
-            </Button>
-            <a onClick={() => openInfoPage()}>
-              {$t('Go live to TikTok with a single click. Click here to learn more.')}
-            </a>
-            <InfoBanner
-              message={$t("Approvals are solely at TikTok's discretion.")}
-              type="info"
-              style={{ marginTop: '5px' }}
-            />
+          <div style={{ display: 'flex', flexDirection: 'column' }} className="input-extra">
+            <TikTokInfo />
+            {/* {p.denied ? <TikTokDenied /> : <TikTokInfo />} */}
           </div>
         }
       >
-        <Button onClick={openProducer} style={{ marginBottom: '10px' }}>
-          {$t('Locate my Stream Key')}
-        </Button>
+        <TikTokButtons denied={p.denied} />
       </InputWrapper>
     </>
   );
 }
 
-export function TikTokNotApprovedWarning(p: IPlatformComponentParams<'tiktok'>) {
-  const bind = createBinding(p.value, updatedSettings =>
-    p.onChange({ ...p.value, ...updatedSettings }),
+function TikTokDenied() {
+  return (
+    <InfoBanner
+      id="tiktok-denied"
+      message={$t('TikTok Live Access not granted. Click here to learn more.')}
+      type="info"
+      onClick={openConfirmation}
+      dismissableKey={EDismissable.TikTokRejected}
+    />
   );
+}
+
+function TikTokInfo() {
+  return (
+    <>
+      <a id="tiktok-faq" onClick={() => openInfoPage()}>
+        {$t('Go live to TikTok with a single click. Click here to learn more.')}
+      </a>
+      <InfoBanner
+        id="tiktok-info"
+        message={$t("Approvals are solely at TikTok's discretion.")}
+        type="info"
+        style={{ marginTop: '5px', marginBottom: '5px' }}
+      />
+    </>
+  );
+}
+
+function TikTokButtons(p: { denied: boolean }) {
+  // const text = p.denied
+  //   ? $t('Reapply for TikTok Live Permission')
+  //   : $t('Apply for TikTok Live Permission');
+  const text = $t('Apply for TikTok Live Permission');
 
   return (
     <>
-      <TextInput
-        label={
-          <Tooltip title={$t('Generate with "Locate my Stream Key"')} placement="right">
-            {$t('TikTok Server URL')}
-            <i className="icon-information" style={{ marginLeft: '5px' }} />
-          </Tooltip>
-        }
-        required
-        {...bind.serverUrl}
-      />
-      <TextInput
-        label={
-          <Tooltip title={$t('Generate with "Locate my Stream Key"')} placement="right">
-            {$t('TikTok Stream Key')}
-            <i className="icon-information" style={{ marginLeft: '5px' }} />
-          </Tooltip>
-        }
-        required
-        {...bind.streamKey}
-      />
-      <InputWrapper
-        extra={
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <InfoBanner
-              message={$t('TikTok Live Access not granted. Click here to learn more.')}
-              type="info"
-              style={{ marginTop: '5px' }}
-              onClick={() => {
-                openConfirmation();
-                Services.DismissablesService.actions.dismiss(EDismissable.TikTokRejected);
-              }}
-              dismissableKey={EDismissable.TikTokRejected}
-            />
-          </div>
-        }
-      >
-        <Button
-          onClick={openApplicationInfoPage}
-          style={{
-            marginBottom: '10px',
-            background: 'var(--tiktok-btn)',
-            color: 'var(--black)',
-          }}
-        >
-          {$t('Reapply for TikTok Live Permission')}
+      {!p.denied && (
+        <Button id="tiktok-locate-key" onClick={openProducer} style={{ marginBottom: '10px' }}>
+          {$t('Locate my Stream Key')}
         </Button>
-      </InputWrapper>
+      )}
+      <Button
+        id="tiktok-application"
+        onClick={openApplicationInfoPage}
+        style={{
+          width: '100%',
+          marginBottom: '10px',
+          background: 'var(--tiktok-btn)',
+          color: 'var(--black)',
+        }}
+      >
+        {text}
+      </Button>
     </>
   );
 }

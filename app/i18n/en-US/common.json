@@ -152,6 +152,10 @@
   "Trovo": "Trovo",
   "TikTok": "TikTok",
   "Instagram": "Instagram",
+  "Instagram Live": "Instagram Live",
+  "X (Twitter)": "X (Twitter)",
+  "Facebook Profiles": "Facebook Profiles",
+  "Facebook Pages": "Facebook Pages",
   "Alert Box": "Alert Box",
   "Widget": "Widget",
   "Creator Sites": "Creator Sites",
@@ -164,5 +168,4 @@
   "Alert Box Library": "Alert Box Library",
   "Alert Box Settings": "Alert Box Settings",
   "Alerts and Widgets": "Alerts and Widgets"
-
 }

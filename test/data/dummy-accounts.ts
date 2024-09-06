@@ -20,63 +20,70 @@ export interface IDummyTestUser extends ITestUser {
  */
 
 export const tikTokUserApproved: IDummyTestUser = {
-  email: 'ttUser1@email.com',
-  workerId: 'ttWorkerId1',
-  updated: 'ttUpdatedId1',
-  username: 'ttUser1',
+  email: 'tikTokUser1@email.com',
+  workerId: 'tikTokWorkerId1',
+  updated: 'tikTokUpdatedId1',
+  username: 'tikTokUser1',
   type: 'tiktok',
-  id: 'ttId1',
-  token: 'ttToken1',
-  apiToken: 'ttApiToken1',
-  widgetToken: 'ttWidgetToken1',
-  serverUrl: 'rtmps://ttStreamUrl1:443/rtmp/',
-  streamKey: 'ttStreamKey1',
+  id: 'tikTokId1',
+  token: 'tikTokToken1',
+  apiToken: 'tikTokApiToken1',
+  widgetToken: 'tikTokWidgetToken1',
+  serverUrl: 'rtmps://tikTokStreamUrl1:443/rtmp/',
+  streamKey: 'tikTokStreamKey1',
   tikTokLiveScope: 'approved',
 };
 
 export const tikTokUserNotApproved: IDummyTestUser = {
-  email: 'ttUser2@email.com',
-  workerId: 'ttWorkerId2',
-  updated: 'ttUpdatedId2',
-  username: 'ttUser2',
+  email: 'tikTokUser2@email.com',
+  workerId: 'tikTokWorkerId2',
+  updated: 'tikTokUpdatedId2',
+  username: 'tikTokUser2',
   type: 'tiktok',
-  id: 'ttId2',
-  token: 'ttToken2',
-  apiToken: 'ttApiToken2',
-  widgetToken: 'ttWidgetToken2',
-  serverUrl: 'rtmps://ttStreamUrl2:443/rtmp/',
-  streamKey: 'ttStreamKey2',
-  tikTokLiveScope: 'not-approved',
+  id: 'tikTokId2',
+  token: 'tikTokToken2',
+  apiToken: 'tikTokApiToken2',
+  widgetToken: 'tikTokWidgetToken2',
+  serverUrl: 'rtmps://tikTokStreamUrl2:443/rtmp/',
+  streamKey: 'tikTokStreamKey2',
+  tikTokLiveScope: 'denied',
 };
 
 export const tikTokUserLegacy: IDummyTestUser = {
-  email: 'ttUser3@email.com',
-  workerId: 'ttWorkerId3',
-  updated: 'ttUpdatedId3',
-  username: 'ttUser3',
+  email: 'tikTokUser3@email.com',
+  workerId: 'tikTokWorkerId3',
+  updated: 'tikTokUpdatedId3',
+  username: 'tikTokUser3',
   type: 'tiktok',
-  id: 'ttId3',
-  token: 'ttToken3',
-  apiToken: 'ttApiToken3',
-  widgetToken: 'ttWidgetToken3',
-  serverUrl: 'rtmps://ttStreamUrl3:443/rtmp/',
-  streamKey: 'ttStreamKey3',
+  id: 'tikTokId3',
+  token: 'tikTokToken3',
+  apiToken: 'tikTokApiToken3',
+  widgetToken: 'tikTokWidgetToken3',
+  serverUrl: 'rtmps://tikTokStreamUrl3:443/rtmp/',
+  streamKey: 'tikTokStreamKey3',
   tikTokLiveScope: 'legacy',
 };
 
-export const tikTokUserDenied: IDummyTestUser = {
-  email: 'ttUser4@email.com',
-  workerId: 'ttWorkerId4',
-  updated: 'ttUpdatedId4',
-  username: 'ttUser4',
+export const tikTokUserRelog: IDummyTestUser = {
+  email: 'tikTokUser4@email.com',
+  workerId: 'tikTokWorkerId4',
+  updated: 'tikTokUpdatedId4',
+  username: 'tikTokUser4',
   type: 'tiktok',
-  id: 'ttId4',
-  token: 'ttToken4',
-  apiToken: 'ttApiToken4',
-  widgetToken: 'ttWidgetToken4',
-  serverUrl: 'rtmps://ttStreamUrl4:443/rtmp/',
-  streamKey: 'ttStreamKey4',
-  tikTokLiveScope: 'denied',
+  id: 'tikTokId4',
+  token: 'tikTokToken4',
+  apiToken: 'tikTokApiToken4',
+  widgetToken: 'tikTokWidgetToken4',
+  serverUrl: 'rtmps://tikTokStreamUrl4:443/rtmp/',
+  streamKey: 'tikTokStreamKey4',
+  tikTokLiveScope: 'relog',
+};
+
+export const tikTokUsers = {
+  approved: tikTokUserApproved,
+  denied: tikTokUserNotApproved,
+  legacy: tikTokUserLegacy,
+  relog: tikTokUserRelog,
 };
 
 /**
@@ -143,14 +150,14 @@ export function getDummyUser(
     switch (tikTokLiveScope) {
       case 'approved':
         return tikTokUserApproved;
-      case 'not-approved':
+      case 'denied':
         return tikTokUserNotApproved;
       case 'legacy':
         return tikTokUserLegacy;
-      case 'denied':
-        return tikTokUserDenied;
+      case 'relog':
+        return tikTokUserRelog;
       default:
-        return tikTokUserDenied;
+        return tikTokUserNotApproved;
     }
   }
 }

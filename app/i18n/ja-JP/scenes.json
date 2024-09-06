@@ -56,5 +56,11 @@
   "Arrange sources here for a vertical scene layout.": "縦方向シーンレイアウト用のソースをここに配置します。",
   "Arrange sources here for a horizontal scene layout.": "横方向シーンレイアウト用のソースをここに配置します。",
   "Toggle Dual Output Mode.": "Dual Output モードを切り替えます。",
-  "Cannot hide dual output toggles in dual output mode.": "Dual Output モードでは Dual Output トグルを非表示にできません。"
+  "Cannot hide dual output toggles in dual output mode.": "Dual Output モードでは Dual Output トグルを非表示にできません。",
+  "Choose a template from our overlay library": "Choose a template from our overlay library",
+  "Log in to choose a template from our overlay library": "Log in to choose a template from our overlay library",
+  "Loading scene...": "Loading scene...",
+  "Import from OBS": "Import from OBS",
+  "Import from Twitch": "Import from Twitch",
+  "Load existing scenes from Twitch Studio": "Load existing scenes from Twitch Studio"
 }

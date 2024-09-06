@@ -17,8 +17,7 @@ import { VideoSettingsService, TDisplayType } from './settings-v2/video';
 import { DualOutputService } from './dual-output';
 import { TwitterPlatformService } from './platforms/twitter';
 import { InstagramService } from './platforms/instagram';
-import Utils from './utils';
-import { difference } from 'lodash';
+import { PlatformAppsService } from './platform-apps';
 
 export type TOutputOrientation = 'landscape' | 'portrait';
 interface IRestreamTarget {
@@ -60,6 +59,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
   @Inject() videoSettingsService: VideoSettingsService;
   @Inject() dualOutputService: DualOutputService;
   @Inject('TwitterPlatformService') twitterService: TwitterPlatformService;
+  @Inject() platformAppsService: PlatformAppsService;
 
   settings: IUserSettingsResponse;
 
@@ -88,6 +88,11 @@ export class RestreamService extends StatefulService<IRestreamState> {
       this.settings = null;
       this.SET_ENABLED(false);
     });
+
+    this.userService.scopeAdded.subscribe(() => {
+      this.refreshChat();
+      this.platformAppsService.refreshApp('restream');
+    });
   }
 
   get views() {
@@ -105,6 +110,11 @@ export class RestreamService extends StatefulService<IRestreamState> {
   }
 
   get chatUrl() {
+    const nightMode = this.customizationService.isDarkTheme ? 'night' : 'day';
+    const platforms = this.streamInfo.enabledPlatforms
+      .filter(platform => ['youtube', 'twitch', 'facebook'].includes(platform))
+      .join(',');
+
     const hasFBTarget = this.streamInfo.enabledPlatforms.includes('facebook' as TPlatform);
     let fbParams = '';
     if (hasFBTarget) {
@@ -119,7 +129,12 @@ export class RestreamService extends StatefulService<IRestreamState> {
        */
       fbParams += `&fbToken=${token}`;
     }
-    return `https://${this.host}/embed/chat?oauth_token=${this.userService.apiToken}${fbParams}`;
+
+    if (platforms) {
+      return `https://${this.host}/embed/chat?oauth_token=${this.userService.apiToken}${fbParams}&mode=${nightMode}&send=true&platforms=${platforms}`;
+    } else {
+      return `https://${this.host}/embed/chat?oauth_token=${this.userService.apiToken}${fbParams}`;
+    }
   }
 
   get shouldGoLiveWithRestream() {
@@ -270,20 +285,6 @@ export class RestreamService extends StatefulService<IRestreamState> {
         ),
     ];
 
-    if (Utils.isTestMode()) {
-      // don't actually attempt to go live with dummy accounts, but confirm data exists
-      const dummyRelayTargets = newTargets
-        .filter(t => ['tiktok', 'twitter', 'instagram'].includes(t.platform))
-        .map(t => t);
-
-      const hasCredentials = this.testRelayPlatformTargets(dummyRelayTargets);
-
-      if (hasCredentials) {
-        await this.createTargets(difference(newTargets, dummyRelayTargets));
-      }
-      return;
-    }
-
     // treat tiktok as a custom destination
     const tikTokTarget = newTargets.find(t => t.platform === 'tiktok');
     if (tikTokTarget) {
@@ -392,50 +393,6 @@ export class RestreamService extends StatefulService<IRestreamState> {
     return fetch(request).then(res => res.json());
   }
 
-  /**
-   * Used for testing platforms that are restreamed as relay targets
-   * @param relayTargets - targets to test for credentials
-   * @returns boolean for if targets all have credentials
-   */
-  private testRelayPlatformTargets(
-    relayTargets: {
-      platform: TPlatform | 'relay';
-      streamKey: string;
-      mode?: TOutputOrientation;
-    }[],
-  ) {
-    if (!Utils.isTestMode()) return;
-    return relayTargets.reduce((hasCredentials: boolean, target) => {
-      if (
-        target.platform === 'tiktok' &&
-        [
-          this.tiktokService.state.settings.serverUrl,
-          this.tiktokService.state.settings.streamKey,
-        ].includes('')
-      ) {
-        hasCredentials = false;
-      }
-
-      if (
-        target.platform === 'twitter' &&
-        [this.twitterService.state.ingest, this.twitterService.state.streamKey].includes('')
-      ) {
-        hasCredentials = false;
-      }
-
-      if (
-        target.platform === 'instagram' &&
-        [
-          this.instagramService.state.settings.streamUrl,
-          this.instagramService.state.settings.streamKey,
-        ].includes('')
-      ) {
-        hasCredentials = false;
-      }
-      return hasCredentials;
-    }, true);
-  }
-
   /* Chat Handling
    * TODO: Lots of this is copy-pasted from the chat service
    * The chat service needs to be refactored\
@@ -443,6 +400,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
   private chatView: Electron.BrowserView;
 
   refreshChat() {
+    if (!this.chatView) return;
     this.chatView.webContents.loadURL(this.chatUrl);
   }
 
@@ -487,6 +445,8 @@ export class RestreamService extends StatefulService<IRestreamState> {
       webPreferences: {
         partition,
         nodeIntegration: false,
+        contextIsolation: true,
+        sandbox: false,
       },
     });
 

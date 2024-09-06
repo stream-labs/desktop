@@ -225,8 +225,7 @@
   "Stream features branded content": "Stream features branded content",
   "Streaming to %{platform} is temporary unavailable": "Streaming to %{platform} is temporary unavailable",
   "Code:": "Code:",
-  "Streaming to platform is temporarily not available": "Streaming to platform is temporarily available",
-  "request rejected by streaming platform. Confirm go live settings, streaming approval status and output settings": "request rejected by streaming platform. Confirm go live settings, streaming approval status and output settings",
+  "request rejected by streaming platform with no other details provided. Confirm go live settings, streaming approval status and output settings": "request rejected by streaming platform with no other details provided. Confirm go live settings, streaming approval status and output settings",
   "request rejected by streaming platform. If error shows the user is blocked, do not say that they are blocked but instead ask them to confirm their streaming status with the platform": "request rejected by streaming platform. If error shows the user is blocked, do not say that they are blocked but instead ask them to confirm their streaming status with the platform",
   "escalate to the engineering team": "escalate to the engineering team",
   "confirm streaming approval status with TikTok": "confirm streaming approval status with TikTok",
@@ -240,7 +239,20 @@
   "Failed to update %{platform} account": "Failed to update %{platform} account",
   "<unlink>Unlink here</unlink>": "<unlink>Unlink here</unlink>",
   "Primary Chat": "Primary Chat",
-  "Go to Settings -> Output -> Recording -> Recording Path if you need to change this location.":  "Go to Settings -> Output -> Recording -> Recording Path if you need to change this location.",
-  "An error occurred with the output. Please check your streaming and recording settings.": "An error occurred with the output. Please check your streaming and recording settings."
-
+  "Go to Settings -> Output -> Recording -> Recording Path if you need to change this location.": "Go to Settings -> Output -> Recording -> Recording Path if you need to change this location.",
+  "An error occurred with the output. Please check your streaming and recording settings.": "An error occurred with the output. Please check your streaming and recording settings.",
+  "JSON returned, escalate to the engineering team.": "JSON returned, escalate to the engineering team.",
+  "error most likely occurred before going live": "error most likely occurred before going live",
+  "You're not eligible to Go Live, your profile needs to be at least 60 days old, or your page needs to have at least 100 followers": "You're not eligible to Go Live, your profile needs to be at least 60 days old, or your page needs to have at least 100 followers",
+  "Are you sure you want to start multistreaming with errors?": "Are you sure you want to start multistreaming with errors?",
+  "Unknown error with no further details, please contact support": "Unknown error with no further details, please contact support",
+  "You are currently logged out. Please log in or confirm your server url and stream key": "You are currently logged out. Please log in or confirm your server url and stream key",
+  "user probably has an invalid server url or stream key": "user probably has an invalid server url or stream key",
+  "Your computer is locked": "Your computer is locked",
+  "Please try again. If the issue persists, you can stream in single output mode instead.": "Please try again. If the issue persists, you can stream in single output mode instead.",
+  "Enable Dual Output to stream to horizontal & vertical platforms simultaneously": "Enable Dual Output to stream to horizontal & vertical platforms simultaneously",
+  "Disable Dual Output": "Disable Dual Output",
+  "You can now reply to Twitch, YouTube and Facebook messages in Multistream chat. Click to learn more.": "You can now reply to Twitch, YouTube and Facebook messages in Multistream chat. Click to learn more.",
+  "Multistream Chat Platform Support": "Multistream Chat Platform Support",
+  "You have selected %{colorFormat} as Color Format. Formats other than NV12 and P010 are commonly used for recording, and might incur high CPU usage or the streaming platform might not support it. Go to Settings -> Advanced -> Video to review.": "You have selected %{colorFormat} as Color Format. Formats other than NV12 and P010 are commonly used for recording, and might incur high CPU usage or the streaming platform might not support it. Go to Settings -> Advanced -> Video to review."
 }

@@ -16,6 +16,7 @@ export enum EDismissable {
   CustomMenuSettings = 'custom_menu_settings',
   LoginPrompt = 'login_prompt',
   TikTokRejected = 'tiktok_rejected',
+  TikTokEligible = 'tiktok_eligible',
 }
 
 interface IDismissablesServiceState {
@@ -56,7 +57,9 @@ export class DismissablesService extends PersistentStatefulService<IDismissables
   }
 
   dismissAll() {
-    Object.keys(EDismissable).forEach(key => this.dismiss(EDismissable[key]));
+    Object.keys(EDismissable).forEach((key: keyof typeof EDismissable) =>
+      this.dismiss(EDismissable[key]),
+    );
   }
 
   /**

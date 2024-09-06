@@ -1,10 +1,9 @@
 import {
-  TExecutionContext,
   skipCheckingErrorsInLog,
   test,
+  TExecutionContext,
   useWebdriver,
 } from '../../helpers/webdriver';
-import { logIn } from '../../helpers/modules/user';
 import {
   clickGoLive,
   prepareToGoLive,
@@ -13,19 +12,18 @@ import {
   waitForSettingsWindowLoaded,
   waitForStreamStart,
 } from '../../helpers/modules/streaming';
-import { addDummyAccount, releaseUserInPool } from '../../helpers/webdriver/user';
+import { addDummyAccount, withUser } from '../../helpers/webdriver/user';
 import { fillForm, readFields } from '../../helpers/modules/forms';
-import { IDummyTestUser } from '../../data/dummy-accounts';
+import { IDummyTestUser, tikTokUsers } from '../../data/dummy-accounts';
 import { TTikTokLiveScopeTypes } from 'services/platforms/tiktok/api';
 import { isDisplayed, waitForDisplayed } from '../../helpers/modules/core';
 
 useWebdriver();
 
-test('Streaming to TikTok', async t => {
-  const user = await logIn('twitch', { multistream: false, prime: false });
-
+test('Streaming to TikTok', withUser('twitch', { multistream: false, prime: false }), async t => {
   // test approved status
-  await addDummyAccount('tiktok', { tiktokLiveScope: 'approved' });
+  const { tikTokLiveScope, serverUrl, streamKey } = tikTokUsers.approved;
+  await addDummyAccount('tiktok', { tikTokLiveScope, serverUrl, streamKey });
 
   await prepareToGoLive();
   await clickGoLive();
@@ -33,9 +31,12 @@ test('Streaming to TikTok', async t => {
 
   // enable tiktok
   await fillForm({
+    twitch: true,
     tiktok: true,
   });
   await waitForSettingsWindowLoaded();
+  await waitForDisplayed('div[data-name="tiktok-settings"]');
+
   const fields = await readFields();
 
   // tiktok always shows regardless of ultra status
@@ -48,7 +49,6 @@ test('Streaming to TikTok', async t => {
   await fillForm({
     title: 'Test stream',
     twitchGame: 'Fortnite',
-    tiktokGame: 'test1',
   });
   await submit();
   await waitForDisplayed('span=Update settings for TikTok');
@@ -56,21 +56,25 @@ test('Streaming to TikTok', async t => {
   await stopStream();
 
   // test all other tiktok statuses
-  await testLiveScope(t, 'not-approved');
-  await testLiveScope(t, 'legacy');
   await testLiveScope(t, 'denied');
+  await testLiveScope(t, 'legacy');
+  await testLiveScope(t, 'relog');
 
-  await releaseUserInPool(user);
   t.pass();
 });
 
 async function testLiveScope(t: TExecutionContext, scope: TTikTokLiveScopeTypes) {
-  const user: IDummyTestUser = await addDummyAccount('tiktok', { tiktokLiveScope: scope });
+  const { serverUrl, streamKey } = tikTokUsers[scope];
+  const user: IDummyTestUser = await addDummyAccount('tiktok', {
+    tikTokLiveScope: scope,
+    serverUrl,
+    streamKey,
+  });
 
   await clickGoLive();
 
   // denied scope should show prompt to remerge TikTok account
-  if (scope === 'denied') {
+  if (scope === 'relog') {
     skipCheckingErrorsInLog();
     t.true(await isDisplayed('div=Failed to update TikTok account', { timeout: 1000 }));
     return;
@@ -82,6 +86,7 @@ async function testLiveScope(t: TExecutionContext, scope: TTikTokLiveScopeTypes)
     tiktok: true,
   });
   await waitForSettingsWindowLoaded();
+  await waitForDisplayed('div[data-name="tiktok-settings"]');
 
   const settings = {
     title: 'Test stream',

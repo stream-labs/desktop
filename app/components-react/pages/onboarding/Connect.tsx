@@ -17,21 +17,20 @@ import Translate from 'components-react/shared/Translate';
 export function Connect() {
   const ctx = useContext(SkipContext);
 
-  const {
-    isRelog,
-    selectedExtraPlatform,
-    loading,
-    authInProgress,
-    authPlatform,
-    setExtraPlatform,
-  } = useModule(LoginModule);
+  const { isRelog, loading, authInProgress, authPlatform } = useModule(LoginModule);
   const { next, isLogin } = useModule(OnboardingModule);
   // If we come from login singleton view, default to false
   const [isSignup, setIsSignup] = useState(() => !isLogin);
+  const [selectedExtraPlatform, setExtraPlatform] = useState<TExtraPlatform | undefined>(undefined);
   const { UsageStatisticsService, OnboardingService, RecordingModeService } = Services;
 
   if (selectedExtraPlatform) {
-    return <ExtraPlatformConnect />;
+    return (
+      <ExtraPlatformConnect
+        selectedExtraPlatform={selectedExtraPlatform}
+        setExtraPlatform={setExtraPlatform}
+      />
+    );
   }
 
   function onSkip() {
@@ -222,10 +221,6 @@ const SVGOvalLeftBackground = () => (
 type TExtraPlatform = 'nimotv' | 'dlive';
 
 export class LoginModule {
-  state = injectState({
-    selectedExtraPlatform: undefined as TExtraPlatform | undefined,
-  });
-
   get UserService() {
     return Services.UserService;
   }
@@ -310,10 +305,5 @@ export class LoginModule {
     }
 
     return result;
-  }
-
-  @mutation()
-  setExtraPlatform(val: TExtraPlatform | undefined) {
-    this.state.selectedExtraPlatform = val;
   }
 }

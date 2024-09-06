@@ -109,6 +109,7 @@
   "Pipe Name": "파이프 이름",
   "Websockets": "웹 소켓",
   "Enabled": "활성화됨",
+  "Disabled": "Disabled",
   "Allow Remote Connections": "원격 연결 허용",
   "Port": "포트",
   "Audio - Track 1": "오디오 - 트랙 1",
@@ -119,7 +120,7 @@
   "Audio - Track 6": "오디오 - 트랙 6",
   "Stream Key": "스트리밍 키",
   "You can not change these settings when you're live": "라이브 중에는 이 설정을 변경할 수 없습니다",
-  "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk.": "오버레이 디자이너가 테마 스토어에 작품을 내보낼 수 있도록 설계된 기능입니다. 모든 소스를 내보낼 수는 없으니 사용에 대한 책임은 본인에게 있습니다.",
+  "This feature is intended for overlay designers to export their work for our Overlay Library. Not all sources will be exported, use at your own risk.": "This feature is intended for overlay designers to export their work for our Overlay Library. Not all sources will be exported, use at your own risk.",
   "Change the look of Streamlabs Desktop with Ultra": "Ultra로 Streamlabs Desktop 디자인 변경하기",
   "Virtual Webcam": "가상 웹캠",
   "unlinked": "연결 해제됨",
@@ -251,5 +252,14 @@
   "%{fieldName} must be greater than 0": "%{fieldName}에는 0보다 큰 숫자를 입력해야 합니다",
   "Markers": "Markers",
   "Manage Dual Output": "Manage Dual Output",
-  "Auto optimizer disabled for dual output scenes": "Auto optimizer disabled for dual output scenes"
+  "Auto optimizer disabled for dual output scenes": "Auto optimizer disabled for dual output scenes",
+  "Scene Collection": "Scene Collection",
+  "High": "High",
+  "Above High": "Above High",
+  "Normal": "Normal",
+  "Below Normal": "Below Normal",
+  "Idle": "Idle",
+  "Please connect platforms directly from Streamlabs Desktop instead of adding Streamlabs Multistream as a custom destination": "Please connect platforms directly from Streamlabs Desktop instead of adding Streamlabs Multistream as a custom destination",
+  "Audio Encoder": "Audio Encoder",
+  "Additional Settings": "Additional Settings"
 }

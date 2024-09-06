@@ -109,6 +109,7 @@
   "Pipe Name": "Název roury",
   "Websockets": "WebSockety",
   "Enabled": "Povoleno",
+  "Disabled": "Disabled",
   "Allow Remote Connections": "Povolit vzdálené připojení",
   "Port": "Port",
   "Audio - Track 1": "Zvuk – stopa 1",
@@ -119,7 +120,7 @@
   "Audio - Track 6": "Zvuk – stopa 6",
   "Stream Key": "Klíč pro stream",
   "You can not change these settings when you're live": "Tato nastavení není možné změnit během živého vysílání",
-  "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk.": "Tato funkce je určena pro designéry překrytí a umožňuje exportovat práci do našeho obchodu s motivy. Některé zdroje nemusí být exportovány. Používejte na vlastní nebezpečí.",
+  "This feature is intended for overlay designers to export their work for our Overlay Library. Not all sources will be exported, use at your own risk.": "This feature is intended for overlay designers to export their work for our Overlay Library. Not all sources will be exported, use at your own risk.",
   "Change the look of Streamlabs Desktop with Ultra": "Změňte vzhled Streamlabs Desktop se službou Ultra",
   "Virtual Webcam": "Virtual Webcam",
   "unlinked": "zrušeno propojení",
@@ -251,5 +252,14 @@
   "%{fieldName} must be greater than 0": "%{fieldName} musí být větší než 0",
   "Markers": "Markers",
   "Manage Dual Output": "Manage Dual Output",
-  "Auto optimizer disabled for dual output scenes": "Auto optimizer disabled for dual output scenes"
+  "Auto optimizer disabled for dual output scenes": "Auto optimizer disabled for dual output scenes",
+  "Scene Collection": "Scene Collection",
+  "High": "High",
+  "Above High": "Above High",
+  "Normal": "Normal",
+  "Below Normal": "Below Normal",
+  "Idle": "Idle",
+  "Please connect platforms directly from Streamlabs Desktop instead of adding Streamlabs Multistream as a custom destination": "Please connect platforms directly from Streamlabs Desktop instead of adding Streamlabs Multistream as a custom destination",
+  "Audio Encoder": "Audio Encoder",
+  "Additional Settings": "Additional Settings"
 }

@@ -10,7 +10,7 @@ import {
 import { fillForm, useForm } from '../../helpers/modules/forms';
 import { click, clickButton, isDisplayed, waitForDisplayed } from '../../helpers/modules/core';
 import { logIn } from '../../helpers/modules/user';
-import { releaseUserInPool, reserveUserFromPool } from '../../helpers/webdriver/user';
+import { releaseUserInPool, reserveUserFromPool, withUser } from '../../helpers/webdriver/user';
 import { showSettingsWindow } from '../../helpers/modules/settings/settings';
 import { test, useWebdriver } from '../../helpers/webdriver';
 
@@ -23,9 +23,7 @@ async function enableAllPlatforms() {
   }
 }
 
-test('Multistream default mode', async t => {
-  // login to via Twitch because it doesn't have strict rate limits
-  const user = await logIn('twitch', { multistream: true });
+test('Multistream default mode', withUser('twitch', { multistream: true }), async t => {
   await prepareToGoLive();
   await clickGoLive();
   await waitForSettingsWindowLoaded();
@@ -46,13 +44,10 @@ test('Multistream default mode', async t => {
   await waitForDisplayed('span=Configure the Multistream service');
   await waitForDisplayed("h1=You're live!", { timeout: 60000 });
   await stopStream();
-  await releaseUserInPool(user);
-  await t.pass();
+  t.pass();
 });
 
-test('Multistream advanced mode', async t => {
-  // login to via Twitch because it doesn't have strict rate limits
-  const user = await logIn('twitch', { multistream: true });
+test('Multistream advanced mode', withUser('twitch', { multistream: true }), async t => {
   await prepareToGoLive();
   await clickGoLive();
   await waitForSettingsWindowLoaded();
@@ -89,8 +84,7 @@ test('Multistream advanced mode', async t => {
   await waitForDisplayed('span=Configure the Multistream service');
   await waitForDisplayed("h1=You're live!", { timeout: 60000 });
   await stopStream();
-  await releaseUserInPool(user);
-  await t.pass();
+  t.pass();
 });
 
 test('Custom stream destinations', async t => {
@@ -99,63 +93,77 @@ test('Custom stream destinations', async t => {
   // fetch a new stream key
   const user = await reserveUserFromPool(t, 'twitch');
 
-  // add new destination
-  await showSettingsWindow('Stream');
-  await click('span=Add Destination');
+  try {
+    // add new destination
+    await showSettingsWindow('Stream');
+    await click('span=Add Destination');
 
-  const { fillForm } = useForm();
-  await fillForm({
-    name: 'MyCustomDest',
-    url: 'rtmp://live.twitch.tv/app/',
-    streamKey: user.streamKey,
-  });
-  await clickButton('Save');
-  t.true(await isDisplayed('span=MyCustomDest'), 'New destination should be created');
+    const { fillForm } = useForm();
+    await fillForm({
+      name: 'MyCustomDest',
+      url: 'rtmp://live.twitch.tv/app/',
+      streamKey: user.streamKey,
+    });
+    await clickButton('Save');
+    t.true(await isDisplayed('span=MyCustomDest'), 'New destination should be created');
 
-  // update destinations
-  await click('i.fa-pen');
-  await fillForm({
-    name: 'MyCustomDestUpdated',
-  });
-  await clickButton('Save');
+    // update destinations
+    await click('i.fa-pen');
+    await fillForm({
+      name: 'MyCustomDestUpdated',
+    });
+    await clickButton('Save');
 
-  t.true(await isDisplayed('span=MyCustomDestUpdated'), 'Destination should be updated');
+    t.true(await isDisplayed('span=MyCustomDestUpdated'), 'Destination should be updated');
 
-  // add one more destination
-  await click('span=Add Destination');
-  await fillForm({
-    name: 'MyCustomDest',
-    url: 'rtmp://live.twitch.tv/app/',
-    streamKey: user.streamKey,
-  });
-  await clickButton('Save');
+    await click('span=Add Destination');
+    await fillForm({
+      name: `MyCustomDest`,
+      url: 'rtmp://live.twitch.tv/app/',
+      streamKey: user.streamKey,
+    });
+    await clickButton('Save');
 
-  await t.false(await isDisplayed('span=Add Destination'), 'Do not allow more than 2 custom dest');
+    // add 3 more destinations (up to 5)
+    for (let i = 0; i < 3; i++) {
+      await click('span=Add Destination');
+      await fillForm({
+        name: `MyCustomDest${i}`,
+        url: 'rtmp://live.twitch.tv/app/',
+        streamKey: user.streamKey,
+      });
+      await clickButton('Save');
+    }
 
-  // open the GoLiveWindow and check destinations
-  await prepareToGoLive();
-  await clickGoLive();
-  await waitForSettingsWindowLoaded();
-  t.true(await isDisplayed('span=MyCustomDest'), 'Destination is available');
-  await click('span=MyCustomDest'); // switch the destination on
+    t.false(await isDisplayed('span=Add Destination'), 'Do not allow more than 5 custom dest');
 
-  // try to stream
-  await fillForm({
-    title: 'Test stream',
-    twitchGame: 'Fortnite',
-  });
-  await waitForSettingsWindowLoaded();
-  await submit();
-  await waitForDisplayed('span=Configure the Multistream service');
-  await waitForDisplayed("h1=You're live!", { timeout: 60000 });
-  await waitForStreamStart();
-  await stopStream();
-  await releaseUserInPool(user);
+    // open the GoLiveWindow and check destinations
+    await prepareToGoLive();
+    await clickGoLive();
+    await waitForSettingsWindowLoaded();
+    t.true(await isDisplayed('span=MyCustomDest'), 'Destination is available');
+    await click('span=MyCustomDest'); // switch the destination on
 
-  // delete existing destinations
-  await showSettingsWindow('Stream');
-  await click('i.fa-trash');
-  await click('i.fa-trash');
-  await releaseUserInPool(loggedInUser);
-  t.false(await isDisplayed('i.fa-trash'), 'Destinations should be removed');
+    // try to stream
+    await fillForm({
+      title: 'Test stream',
+      twitchGame: 'Fortnite',
+    });
+    await waitForSettingsWindowLoaded();
+    await submit();
+    await waitForDisplayed('span=Configure the Multistream service');
+    await waitForDisplayed("h1=You're live!", { timeout: 60000 });
+    await waitForStreamStart();
+    await stopStream();
+
+    // delete existing destinations
+    await showSettingsWindow('Stream');
+    for (let i = 0; i < 5; i++) {
+      await click('i.fa-trash');
+    }
+    t.false(await isDisplayed('i.fa-trash'), 'Destinations should be removed');
+  } finally {
+    await releaseUserInPool(user);
+    await releaseUserInPool(loggedInUser);
+  }
 });
