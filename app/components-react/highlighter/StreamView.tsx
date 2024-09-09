@@ -34,15 +34,21 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
     error: HighlighterService.views.error,
   }));
 
-  const currentStreams = useRef<string[]>();
+  const currentStreams = useRef<{ id: string; date: string }[]>();
 
   const highlightedStreams = useVuex(() => {
-    const newStreamIds = HighlighterService.views.highlightedStreams.map(s => s.id);
+    const newStreamIds = [
+      ...HighlighterService.views.highlightedStreams.map(s => {
+        return { id: s.id, date: s.date };
+      }),
+    ];
 
     if (currentStreams.current === undefined || !isEqual(currentStreams.current, newStreamIds)) {
       currentStreams.current = newStreamIds;
     }
-    return currentStreams.current;
+    return currentStreams.current.sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+    );
   });
 
   const currentAiDetectionState = useRef<boolean>();
@@ -262,12 +268,12 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
               <>
                 {highlightedStreams.map(highlightedStream => (
                   <StreamCard
-                    key={highlightedStream}
-                    streamId={highlightedStream}
+                    key={highlightedStream.id}
+                    streamId={highlightedStream.id}
                     emitSetView={data => emitSetView(data)}
-                    emitGeneratePreview={() => previewVideo(highlightedStream)}
-                    emitExportVideo={() => exportVideo(highlightedStream)}
-                    emitRemoveStream={() => removeStream(highlightedStream)}
+                    emitGeneratePreview={() => previewVideo(highlightedStream.id)}
+                    emitExportVideo={() => exportVideo(highlightedStream.id)}
+                    emitRemoveStream={() => removeStream(highlightedStream.id)}
                     clipsOfStreamAreLoading={clipsOfStreamAreLoading}
                   />
                 ))}
