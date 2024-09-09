@@ -208,13 +208,14 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     // transform IGoLiveSettings to ISavedGoLiveSettings
     const patch: Partial<ISavedGoLiveSettings> = settingsPatch;
     if (settingsPatch.platforms) {
-      const pickedFields: (keyof IPlatformFlags)[] = ['enabled', 'useCustomFields', 'display'];
+      const pickedFields: (keyof IPlatformFlags)[] = ['enabled', 'useCustomFields'];
       const platforms: Dictionary<IPlatformFlags> = {};
       Object.keys(settingsPatch.platforms).map((platform: TPlatform) => {
         const platformSettings = pick(settingsPatch.platforms![platform], pickedFields);
+        const display = settingsPatch.platforms![platform]?.display ?? 'horizontal';
 
         if (this.dualOutputService.views.dualOutputMode) {
-          platformSettings.video = this.videoSettingsService.getContext(platformSettings.display);
+          platformSettings.video = this.videoSettingsService.getContext(display);
         } else {
           platformSettings.video = this.videoSettingsService.getContext('horizontal');
         }
