@@ -25,6 +25,7 @@ import {
   ITikTokStartStreamResponse,
   TTikTokLiveScopeTypes,
   ITikTokGamesData,
+  ITikTokAudienceControlsInfo,
 } from './tiktok/api';
 import { $t, I18nService } from 'services/i18n';
 import { getDefined } from 'util/properties-type-guards';
@@ -35,6 +36,7 @@ import { UsageStatisticsService } from 'services/usage-statistics';
 import { DiagnosticsService } from 'services/diagnostics';
 import { ENotificationType, NotificationsService } from 'services/notifications';
 import { JsonrpcService } from '../api/jsonrpc';
+
 interface ITikTokServiceState extends IPlatformState {
   settings: ITikTokStartStreamSettings;
   broadcastId: string;
@@ -42,7 +44,9 @@ interface ITikTokServiceState extends IPlatformState {
   error?: string | null;
   gameName: string;
   dateDenied?: string | null;
+  audienceControlsInfo: ITikTokAudienceControls;
 }
+
 interface ITikTokStartStreamSettings {
   serverUrl: string;
   streamKey: string;
@@ -50,8 +54,15 @@ interface ITikTokStartStreamSettings {
   liveScope: TTikTokLiveScopeTypes;
   game: string;
   display: TDisplayType;
+  audienceType?: string;
   video?: IVideo;
   mode?: TOutputOrientation;
+}
+
+interface ITikTokAudienceControls {
+  disable: boolean;
+  audienceType: string;
+  types: { value: string; label: string }[];
 }
 
 export interface ITikTokStartStreamOptions {
@@ -60,7 +71,9 @@ export interface ITikTokStartStreamOptions {
   streamKey: string;
   display: TDisplayType;
   game: string;
+  audienceType?: string;
 }
+
 interface ITikTokRequestHeaders extends Dictionary<string> {
   Accept: string;
   'Content-Type': string;
@@ -85,6 +98,7 @@ export class TikTokService
     broadcastId: '',
     username: '',
     gameName: '',
+    audienceControlsInfo: { disable: true, audienceType: '0', types: [] },
   };
 
   @Inject() windowsService: WindowsService;
@@ -153,6 +167,10 @@ export class TikTokService
    */
   get viewersCount(): number {
     return 0;
+  }
+
+  get audienceControls() {
+    return this.state.audienceControlsInfo;
   }
 
   async beforeGoLive(goLiveSettings: IGoLiveSettings, display?: TDisplayType) {
@@ -326,6 +344,7 @@ export class TikTokService
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/tiktok/stream/start`;
     const headers = authorizedHeaders(this.userService.apiToken!);
+
     const body = new FormData();
     body.append('title', opts.title);
     body.append('device_platform', getOS());
@@ -333,6 +352,10 @@ export class TikTokService
     // pass an empty string for the 'Other' game option
     const game = opts.game === this.defaultGame.id ? '' : opts.game;
     body.append('category', game);
+
+    if (opts?.audienceType) {
+      body.append('audience_type', opts.audienceType);
+    }
 
     const request = new Request(url, { headers, method: 'POST', body });
 
@@ -406,6 +429,25 @@ export class TikTokService
       } else {
         this.SET_LIVE_SCOPE('denied');
         return EPlatformCallResult.TikTokStreamScopeMissing;
+      }
+
+      if (status?.audience_controls_info) {
+        this.setAudienceControls(status.audience_controls_info);
+      } else {
+        this.setAudienceControls({
+          disable: true,
+          info_type: 0,
+          types: [
+            {
+              key: 0,
+              label: 'Everyone',
+            },
+            {
+              key: 1,
+              label: 'Adult Only',
+            },
+          ],
+        });
       }
 
       // clear any leftover server url or stream key
@@ -712,6 +754,21 @@ export class TikTokService
     this.SET_GAME_NAME(gameName);
   }
 
+  setAudienceControls(audienceControlsInfo: ITikTokAudienceControlsInfo) {
+    // convert audience types to match the ListInput component options
+    const types = audienceControlsInfo.types.map(type => ({
+      value: type.key.toString(),
+      label: type.label,
+    }));
+    const audienceType = audienceControlsInfo.info_type.toString();
+
+    this.SET_AUDIENCE_CONTROLS({
+      ...audienceControlsInfo,
+      audienceType,
+      types,
+    });
+  }
+
   @mutation()
   SET_LIVE_SCOPE(scope: TTikTokLiveScopeTypes) {
     this.state.settings.liveScope = scope;
@@ -735,5 +792,10 @@ export class TikTokService
   @mutation()
   protected SET_DENIED_DATE(date?: string) {
     this.state.dateDenied = date ?? null;
+  }
+
+  @mutation()
+  protected SET_AUDIENCE_CONTROLS(audienceControlsInfo: ITikTokAudienceControls) {
+    this.state.audienceControlsInfo = audienceControlsInfo;
   }
 }
