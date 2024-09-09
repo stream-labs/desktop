@@ -316,7 +316,17 @@ export default function StreamCard({
               height: 'fit-content',
             }}
           >
-            <h2 style={{ margin: 0 }}>{stream.title}</h2>
+            <h2
+              style={{
+                margin: 0,
+                width: '275px',
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {stream.title}
+            </h2>
             <p style={{ margin: 0, fontSize: '12px' }}>{new Date(stream.date).toDateString()}</p>
           </div>
           <div style={{ width: '74px', position: 'relative' }}>
