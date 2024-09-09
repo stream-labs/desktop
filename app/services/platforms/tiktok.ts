@@ -433,21 +433,6 @@ export class TikTokService
 
       if (status?.audience_controls_info) {
         this.setAudienceControls(status.audience_controls_info);
-      } else {
-        this.setAudienceControls({
-          disable: true,
-          info_type: 0,
-          types: [
-            {
-              key: 0,
-              label: 'Everyone',
-            },
-            {
-              key: 1,
-              label: 'Adult Only',
-            },
-          ],
-        });
       }
 
       // clear any leftover server url or stream key
