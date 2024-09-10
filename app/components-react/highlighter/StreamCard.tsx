@@ -177,13 +177,7 @@ export default function StreamCard({
           >
             <i className="icon-edit" /> Edit clips
           </Button>
-          <Button
-            size="large"
-            style={{ display: 'flex', gap: '8px', alignItems: 'center' }}
-            onClick={() => emitRemoveStream()}
-          >
-            <i className="icon-trash" />
-          </Button>
+
           {/* TODO: What clips should be included when user clicks this button + bring normal export modal in here */}
           <Button
             size="large"
@@ -195,7 +189,10 @@ export default function StreamCard({
               width: '100%',
             }}
             type="primary"
-            onClick={() => emitExportVideo()}
+            onClick={e => {
+              emitExportVideo();
+              e.stopPropagation();
+            }}
           >
             {clipsOfStreamAreLoading === stream.id ? (
               //  TODO: replace with correct loader
@@ -273,16 +270,32 @@ export default function StreamCard({
   }
 
   return (
-    <div className={styles.streamCard}>
-      <div
-        className={`${styles.thumbnailWrapper} ${styles.videoSkeleton}`}
-        onClick={() => {
-          if (stream.state.type !== 'detection-in-progress') {
-            emitGeneratePreview();
-          }
-        }}
-      >
+    <div
+      className={styles.streamCard}
+      onClick={() => {
+        emitSetView({ view: 'clips', id: stream.id });
+      }}
+    >
+      <div className={`${styles.thumbnailWrapper} ${styles.videoSkeleton}`}>
+        {' '}
+        <Button
+          size="large"
+          className={styles.deleteButton}
+          onClick={e => {
+            emitRemoveStream();
+            e.stopPropagation();
+          }}
+          style={{ backgroundColor: '#00000040', border: 'none', position: 'absolute' }}
+        >
+          <i className="icon-trash" />
+        </Button>
         <img
+          onClick={e => {
+            if (stream.state.type !== 'detection-in-progress') {
+              emitGeneratePreview();
+              e.stopPropagation();
+            }
+          }}
           style={{ height: '100%' }}
           src={
             clips.find(clip => clip?.streamInfo?.[streamId]?.orderPosition === 0)?.scrubSprite ||
@@ -292,7 +305,16 @@ export default function StreamCard({
         />
         <div className={styles.centeredOverlayItem}>
           {' '}
-          <div>{getThumbnailText()}</div>
+          <div
+            onClick={e => {
+              if (stream.state.type !== 'detection-in-progress') {
+                emitGeneratePreview();
+                e.stopPropagation();
+              }
+            }}
+          >
+            {getThumbnailText()}
+          </div>
         </div>
       </div>
       <div
