@@ -26,6 +26,7 @@ import { getWidgetsConfig } from './widgets-config';
 import { WidgetDisplayData } from '.';
 import { DualOutputService } from 'services/dual-output';
 import { TDisplayType, VideoSettingsService } from 'services/settings-v2';
+import { IOverlayFilter, SourceFiltersService } from 'services/source-filters';
 
 export interface IWidgetSourcesState {
   widgetSources: Dictionary<IWidgetSource>;
@@ -83,6 +84,7 @@ export class WidgetsService
   @Inject() editorCommandsService: EditorCommandsService;
   @Inject() dualOutputService: DualOutputService;
   @Inject() videoSettingsService: VideoSettingsService;
+  @Inject() sourceFiltersService: SourceFiltersService;
 
   widgetDisplayData = WidgetDisplayData(); // cache widget display data
 
@@ -353,8 +355,9 @@ export class WidgetsService
    * Load a widget file from the given path
    * @param path the path to the widget file to laod
    * @param sceneId the id of the scene to load into
+   * @param filter optional filter attached to a library widget (ie hue adjust)
    */
-  async loadWidgetFile(path: string, sceneId: string) {
+  async loadWidgetFile(path: string, sceneId: string, filter?: IOverlayFilter) {
     const scene = this.scenesService.views.getScene(sceneId);
     const json = await new Promise<string>((resolve, reject) => {
       fs.readFile(path, (err, data) => {
@@ -367,7 +370,7 @@ export class WidgetsService
     });
 
     const widget = JSON.parse(json);
-    this.importWidgetJSON(widget, scene);
+    this.importWidgetJSON(widget, scene, filter);
   }
 
   /**
@@ -375,7 +378,7 @@ export class WidgetsService
    * @param widget the widget to import
    * @param scene the scene to import into
    */
-  private importWidgetJSON(widget: ISerializableWidget, scene: Scene) {
+  private importWidgetJSON(widget: ISerializableWidget, scene: Scene, filter?: IOverlayFilter) {
     let widgetItem: SceneItem;
 
     // First, look for an existing widget of the same type
@@ -400,6 +403,10 @@ export class WidgetsService
       this.videoSettingsService.baseResolutions.horizontal.baseHeight,
       'horizontal',
     );
+
+    if (filter) {
+      this.sourceFiltersService.actions.addOverlayFilter(widgetItem.sourceId, filter);
+    }
 
     // if this is a dual output scene, also create the vertical scene item
     if (this.dualOutputService.views.hasNodeMap()) {

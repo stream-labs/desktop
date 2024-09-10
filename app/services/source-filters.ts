@@ -10,7 +10,7 @@ import {
 import { metadata } from 'components/shared/inputs';
 import path from 'path';
 import { Inject } from './core/injector';
-import { SourcesService } from './sources';
+import { SourcesService, TSourceType } from './sources';
 import { WindowsService } from './windows';
 import * as obs from '../../obs-api';
 import namingHelpers from '../util/NamingHelpers';
@@ -59,6 +59,11 @@ interface ISourceFilterType {
   video: boolean;
   audio: boolean;
   async: boolean;
+}
+
+export interface IOverlayFilter {
+  type: TSourceFilterType;
+  settings: Dictionary<TObsValue>;
 }
 
 export interface ISourceFilter {
@@ -271,7 +276,6 @@ export class SourceFiltersService extends StatefulService<IFiltersServiceState> 
 
     const obsSource = source.getObsInput();
     obsSource.addFilter(obsFilter);
-    // The filter should be created with the settings provided, is this necessary?
     if (settings) obsFilter.update(settings);
     const filterReference = obsSource.findFilter(filterName);
     // There is now 2 references to the filter at that point
@@ -452,6 +456,35 @@ export class SourceFiltersService extends StatefulService<IFiltersServiceState> 
 
   getObsFilter(sourceId: string, filterName: string): obs.IFilter {
     return this.sourcesService.views.getSource(sourceId).getObsInput().findFilter(filterName);
+  }
+
+  sourceCanHaveOverlayFilters(sourceType: TSourceType) {
+    return [
+      'image_source',
+      'color_source',
+      'ffmpeg_source',
+      'text_gdiplus',
+      'text_ft2_source',
+      'browser_source',
+      'slideshow',
+    ].includes(sourceType);
+  }
+
+  applyFilterToOverlay(filter: IOverlayFilter) {
+    const sources = this.sourcesService.views.getSources();
+    sources.forEach(source => {
+      if (!this.sourceCanHaveOverlayFilters(source.type)) return;
+      this.addOverlayFilter(source.sourceId, filter);
+    });
+  }
+
+  addOverlayFilter(sourceId: string, filter: IOverlayFilter) {
+    const filterTypes = this.views.getTypesForSource(sourceId);
+    const applicableFilter = filterTypes.find(filterType => filterType.type === filter.type);
+    if (applicableFilter) {
+      const name = this.views.suggestName(sourceId, applicableFilter.description);
+      this.add(sourceId, filter.type, name, filter.settings);
+    }
   }
 
   @mutation()
