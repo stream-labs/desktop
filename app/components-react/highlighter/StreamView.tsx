@@ -22,6 +22,7 @@ type TModalStreamView =
   | { type: 'export'; id: string | undefined }
   | { type: 'preview'; id: string | undefined }
   | { type: 'upload' }
+  | { type: 'remove'; id: string | undefined }
   | null;
 
 interface IClipsViewProps {
@@ -288,7 +289,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
                           emitSetView={data => emitSetView(data)}
                           emitGeneratePreview={() => previewVideo(stream.id)}
                           emitExportVideo={() => exportVideo(stream.id)}
-                          emitRemoveStream={() => removeStream(stream.id)}
+                          emitRemoveStream={() => setShowModal({ type: 'remove', id: stream.id })}
                           clipsOfStreamAreLoading={clipsOfStreamAreLoading}
                         />
                       ))}
@@ -318,9 +319,9 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
           {showModal?.type === 'preview' && (
             <PreviewModal close={closeModal} streamId={showModal.id} />
           )}
-          {/* {inspectedClip && showModal === 'remove' && (
-            <RemoveClip close={closeModal} clip={inspectedClip} />
-          )} */}
+          {showModal?.type === 'remove' && (
+            <RemoveStream close={closeModal} streamId={showModal.id} />
+          )}
         </Modal>
       </div>
     );
@@ -329,4 +330,36 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
   // if (!v.loaded) return getLoadingView();
 
   return getStreamView();
+}
+
+function RemoveStream(p: { streamId: string | undefined; close: () => void }) {
+  const { HighlighterService } = Services;
+
+  return (
+    <div style={{ textAlign: 'center' }}>
+      <h2>{'Delete highlighted Stream?'}</h2>
+      <p>
+        {
+          'Are you sure you want to delete this stream and all its associated clips? This action cannot be undone.'
+        }
+      </p>
+      <Button style={{ marginRight: 8 }} onClick={p.close}>
+        {$t('Cancel')}
+      </Button>
+      <Button
+        type="primary"
+        danger
+        onClick={() => {
+          if (p.streamId === undefined) {
+            console.error('Cant remove stream, missing id');
+            return;
+          }
+          HighlighterService.actions.REMOVE_HIGHLIGHTED_STREAM(p.streamId);
+          p.close();
+        }}
+      >
+        {'Delete'}
+      </Button>
+    </div>
+  );
 }
