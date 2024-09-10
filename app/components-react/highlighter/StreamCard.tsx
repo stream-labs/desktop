@@ -81,6 +81,9 @@ export default function StreamCard({
     );
 
     function manualClip() {
+      if (manualClips.length === 0) {
+        return <></>;
+      }
       return (
         <div key={'manualClips'} style={{ display: 'flex', gap: '4px' }}>
           <span>🎬</span>
