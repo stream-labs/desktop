@@ -17,6 +17,7 @@ import * as remote from '@electron/remote';
 import uuid from 'uuid';
 import StreamCard from './StreamCard';
 import { groupStreamsByTimePeriod } from './utils';
+import path from 'path';
 
 type TModalStreamView =
   | { type: 'export'; id: string | undefined }
@@ -230,6 +231,24 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
     if (v.error) HighlighterService.actions.dismissError();
   }
 
+  function onDrop(e: React.DragEvent<HTMLDivElement>) {
+    const extensions = SUPPORTED_FILE_TYPES.map(e => `.${e}`);
+    const files: string[] = [];
+    let fi = e.dataTransfer.files.length;
+    while (fi--) {
+      const file = e.dataTransfer.files.item(fi)?.path;
+      if (file) files.push(file);
+    }
+
+    const filtered = files.filter(f => extensions.includes(path.parse(f).ext));
+
+    if (filtered.length) {
+      HighlighterService.actions.flow(filtered[0], { id: 'manual_' + uuid() });
+    }
+
+    e.stopPropagation();
+  }
+
   function getStreamView() {
     console.log('rerender StreamView');
 
@@ -237,6 +256,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
       <div
         style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}
         className={styles.streamViewRoot}
+        onDrop={event => onDrop(event)}
       >
         <div style={{ display: 'flex', padding: 20 }}>
           <div style={{ flexGrow: 1 }}>
@@ -245,12 +265,17 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
             <h1 style={{ margin: 0 }}>My stream highlights</h1>
           </div>
           <div style={{ display: 'flex', gap: '16px' }}>
-            <Button
-              disabled={aiDetectionInProgress === true}
-              onClick={() => setShowModal({ type: 'upload' })}
+            <div
+              className={styles.uploadWrapper}
+              style={{
+                opacity: aiDetectionInProgress ? '0.7' : '1',
+                cursor: aiDetectionInProgress ? 'not-allowed' : 'pointer',
+              }}
+              onClick={() => !aiDetectionInProgress && setShowModal({ type: 'upload' })}
             >
-              Import
-            </Button>
+              <i className="icon-upload-image" /> Drag or click to browse your file{' '}
+              <Button disabled={aiDetectionInProgress === true}>Import</Button>
+            </div>
             <Button onClick={() => emitSetView({ view: 'settings' })}>Settings</Button>
           </div>
         </div>
