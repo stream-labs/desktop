@@ -243,7 +243,7 @@ export default function StreamCard({
     }
 
     if (clips.length > 0) {
-      return '▶️';
+      return <PlayButton />;
     }
 
     if (stream?.state.type === 'detection-in-progress') {
@@ -255,8 +255,9 @@ export default function StreamCard({
         return 'Not enough highlights found';
       }
 
-      return '▶️';
+      return <PlayButton />;
     }
+
     if (stream?.state.type === 'detection-canceled-by-user') {
       return 'Ai-detection cancelled';
     }
@@ -382,3 +383,14 @@ export default function StreamCard({
     </div>
   );
 }
+
+const PlayButton = () => (
+  <svg width="26" height="32" viewBox="0 0 26 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M24.2563 14.5427L3.94511 0.772117C2.52332 -0.211497 0.695312 0.772117 0.695312 2.3459V29.8871C0.695312 31.4609 2.52332 32.4445 3.94511 31.4609L24.2563 17.6903C25.2719 16.9034 25.2719 15.3296 24.2563 14.5427Z"
+      fill="white"
+    />
+  </svg>
+);
