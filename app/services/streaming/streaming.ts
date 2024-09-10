@@ -1314,6 +1314,16 @@ export class StreamingService
         eventMetadata.streamType = streamSettings.streamType;
         eventMetadata.platform = streamSettings.platform;
         eventMetadata.server = streamSettings.server;
+        eventMetadata.platforms = this.views.protectedModeEnabled
+          ? [
+              ...this.views.enabledPlatforms,
+              /*
+               * This is to be consistent with `stream_end`, unsure what multiple `custom_rtmp`'s
+               * provide on their own without URL, but it could be a privacy or payload size issue.
+               */
+              ...this.views.customDestinations.filter(d => d.enabled).map(_ => 'custom_rtmp'),
+            ]
+          : ['custom_rtmp'];
 
         this.usageStatisticsService.recordEvent('stream_start', eventMetadata);
         this.usageStatisticsService.recordAnalyticsEvent('StreamingStatus', {
