@@ -16,6 +16,7 @@ import { $t } from 'services/i18n';
 import * as remote from '@electron/remote';
 import uuid from 'uuid';
 import StreamCard from './StreamCard';
+import { groupStreamsByTimePeriod } from './utils';
 
 type TModalStreamView =
   | { type: 'export'; id: string | undefined }
@@ -254,32 +255,48 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
         </div>
 
         <Scrollable style={{ flexGrow: 1, padding: '20px 0 20px 20px' }}>
-          <div
-            style={{
-              width: '100%',
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: '8px',
-            }}
-          >
-            {highlightedStreams.length === 0 ? (
-              <>No highlight clips created from streams</>
-            ) : (
-              <>
-                {highlightedStreams.map(highlightedStream => (
-                  <StreamCard
-                    key={highlightedStream.id}
-                    streamId={highlightedStream.id}
-                    emitSetView={data => emitSetView(data)}
-                    emitGeneratePreview={() => previewVideo(highlightedStream.id)}
-                    emitExportVideo={() => exportVideo(highlightedStream.id)}
-                    emitRemoveStream={() => removeStream(highlightedStream.id)}
-                    clipsOfStreamAreLoading={clipsOfStreamAreLoading}
-                  />
-                ))}
-              </>
-            )}
-          </div>
+          {highlightedStreams.length === 0 ? (
+            <>No highlight clips created from streams</>
+          ) : (
+            Object.entries(groupStreamsByTimePeriod(highlightedStreams)).map(
+              ([period, streams]) =>
+                streams.length > 0 && (
+                  <React.Fragment key={period}>
+                    <div
+                      style={{
+                        borderBottom: '1px solid var(--border)',
+                        margin: '20px 0',
+                        paddingBottom: '10px',
+                        fontSize: '18px',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      {period}
+                    </div>
+                    <div
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        gap: '8px',
+                      }}
+                    >
+                      {streams.map(stream => (
+                        <StreamCard
+                          key={stream.id}
+                          streamId={stream.id}
+                          emitSetView={data => emitSetView(data)}
+                          emitGeneratePreview={() => previewVideo(stream.id)}
+                          emitExportVideo={() => exportVideo(stream.id)}
+                          emitRemoveStream={() => removeStream(stream.id)}
+                          clipsOfStreamAreLoading={clipsOfStreamAreLoading}
+                        />
+                      ))}
+                    </div>
+                  </React.Fragment>
+                ),
+            )
+          )}
         </Scrollable>
 
         <Modal
