@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { $t } from '../../../services/i18n';
 import { ICustomStreamDestination } from '../../../services/settings/streaming';
 import { EStreamingState } from '../../../services/streaming';
-import { getPlatformService, TPlatform } from '../../../services/platforms';
+import { EPlatformCallResult, getPlatformService, TPlatform } from '../../../services/platforms';
 import cloneDeep from 'lodash/cloneDeep';
 import namingHelpers from '../../../util/NamingHelpers';
 import { Services } from '../../service-provider';
@@ -11,7 +11,6 @@ import css from './Stream.m.less';
 import cx from 'classnames';
 import { Button, message, Tooltip } from 'antd';
 import PlatformLogo from '../../shared/PlatformLogo';
-import { FormInstance } from 'antd/lib/form';
 import { injectState, mutation, useModule } from 'slap';
 import UltraIcon from 'components-react/shared/UltraIcon';
 import ButtonHighlighted from 'components-react/shared/ButtonHighlighted';
@@ -22,6 +21,8 @@ import { InstagramEditStreamInfo } from '../go-live/platforms/InstagramEditStrea
 import { IInstagramStartStreamOptions } from 'services/platforms/instagram';
 import { metadata } from 'components-react/shared/inputs/metadata';
 import FormFactory, { TInputValue } from 'components-react/shared/inputs/FormFactory';
+import { alertAsync } from '../../modals';
+import { EAuthProcessState } from '../../../services/user';
 
 function censorWord(str: string) {
   if (str.length < 3) return str;
@@ -206,6 +207,26 @@ class StreamSettingsModule {
     this.windowsService.actions.closeChildWindow();
   }
 
+  async platformMergeInline(platform: TPlatform) {
+    const mode = ['youtube', 'twitch', 'twitter', 'tiktok'].includes(platform)
+      ? 'external'
+      : 'internal';
+
+    await Services.UserService.actions.return.startAuth(platform, mode, true).then(res => {
+      Services.WindowsService.actions.setWindowOnTop('child');
+      if (res === EPlatformCallResult.Error) {
+        alertAsync(
+          $t(
+            'This account is already linked to another Streamlabs Account. Please use a different account.',
+          ),
+        );
+        return;
+      }
+
+      Services.StreamSettingsService.actions.setSettings({ protectedModeEnabled: true });
+    });
+  }
+
   platformUnlink(platform: TPlatform) {
     getPlatformService(platform).unlink();
   }
@@ -312,7 +333,7 @@ export function StreamSettings() {
 StreamSettings.page = 'Stream';
 
 function SLIDBlock() {
-  const { UserService } = Services;
+  const { UserService, SettingsService } = Services;
   const { hasSLID, username } = useVuex(() => ({
     hasSLID: UserService.views.hasSLID,
     username: UserService.views.auth?.slid?.username,
@@ -324,6 +345,12 @@ function SLIDBlock() {
 
   function openTwoFactorLink() {
     remote.shell.openExternal('https://id.streamlabs.com/security/tfa?companyId=streamlabs');
+  }
+
+  async function mergeSLID() {
+    const resp = await UserService.actions.return.startSLMerge();
+    if (resp !== EPlatformCallResult.Success) return;
+    SettingsService.actions.showSettings('Stream');
   }
 
   return (
@@ -343,7 +370,7 @@ function SLIDBlock() {
           )}
         </div>
         {!hasSLID && (
-          <Button type="primary" onClick={() => UserService.actions.startSLMerge()}>
+          <Button type="primary" onClick={mergeSLID}>
             {$t('Setup')}
           </Button>
         )}
@@ -376,7 +403,14 @@ function SLIDBlock() {
 function Platform(p: { platform: TPlatform }) {
   const platform = p.platform;
   const { UserService, StreamingService, InstagramService } = Services;
-  const { canEditSettings, platformMerge, platformUnlink } = useStreamSettings();
+  const { canEditSettings, platformMergeInline, platformUnlink } = useStreamSettings();
+
+  const { isLoading, authInProgress, instagramSettings } = useVuex(() => ({
+    isLoading: UserService.state.authProcessState === EAuthProcessState.Loading,
+    authInProgress: UserService.state.authProcessState === EAuthProcessState.InProgress,
+    instagramSettings: InstagramService.state.settings,
+  }));
+
   const isMerged = StreamingService.views.isPlatformLinked(platform);
   const platformObj = UserService.state.auth!.platforms[platform];
   const username = platformObj?.username;
@@ -392,12 +426,9 @@ function Platform(p: { platform: TPlatform }) {
    * but since we're adding it, might as well make other small changes to make it look better
    */
   const isInstagram = platform === 'instagram';
-  const { instagramSettings } = useVuex(() => ({
-    instagramSettings: InstagramService.state.settings,
-  }));
-
   const [showInstagramFields, setShowInstagramFields] = useState(isInstagram && isMerged);
   const shouldShowUsername = !isInstagram;
+
   const usernameOrBlank = shouldShowUsername ? (
     <>
       <br />
@@ -426,8 +457,9 @@ function Platform(p: { platform: TPlatform }) {
   const ConnectButton = () => (
     <span>
       <Button
-        onClick={isInstagram ? instagramConnect : () => platformMerge(platform)}
+        onClick={isInstagram ? instagramConnect : () => platformMergeInline(platform)}
         className={cx({ [css.tiktokConnectBtn]: platform === 'tiktok' })}
+        disabled={isLoading || authInProgress}
         style={{
           backgroundColor: `var(--${platform})`,
           borderColor: 'transparent',
@@ -517,7 +549,7 @@ function CustomDestinationList() {
   const destinations = customDestinations;
   const isEditMode = editCustomDestMode !== false;
   const shouldShowAddForm = editCustomDestMode === true;
-  const canAddMoreDestinations = destinations.length < 2;
+  const canAddMoreDestinations = destinations.length < 5;
   const shouldShowPrimeLabel = !isPrime && destinations.length > 0;
 
   return (

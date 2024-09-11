@@ -339,6 +339,9 @@ export class UltraIcon extends ReactComponent<{
   className?: string;
 }> {}
 
+@Component({ props: { name: { default: 'AuthModal' } } })
+export class AuthModal extends ReactComponent {}
+
 @Component({
   props: {
     name: { default: 'Hotkeys' },
@@ -356,3 +359,23 @@ export class Hotkeys extends ReactComponent<{
   highlightSearch: (searchStr: string) => void;
   scanning: boolean;
 }> {}
+
+@Component({
+  props: {
+    name: { default: 'GLVolmeters' },
+    wrapperStyles: {
+      default: () => ({ position: 'absolute', left: '17px', right: '17px', height: '100%' }),
+    },
+  },
+})
+export class GLVolmeters extends ReactComponent {}
+
+@Component({
+  props: {
+    name: { default: 'MultistreamChatInfo' },
+    wrapperStyles: {
+      default: () => ({ width: '100%', height: '100%', minWidth: '748px', minHeight: '635px' }),
+    },
+  },
+})
+export class MultistreamChatInfo extends ReactComponent {}

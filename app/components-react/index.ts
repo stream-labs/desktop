@@ -32,6 +32,7 @@ import SideNav from './sidebar/SideNav';
 import WelcomeToPrime from './windows/WelcomeToPrime';
 import Notifications from './windows/notifications/Notifications';
 import NotificationsAndNews from './windows/notifications';
+import MultistreamChatInfo from './windows/MultistreamChatInfo';
 import Blank from './windows/Blank';
 import PlatformAppPageView from './shared/PlatformAppPageView';
 import PlatformAppPopOut from './windows/PlatformAppPopOut';
@@ -44,6 +45,7 @@ import Hotkeys from './windows/settings/Hotkeys';
 import Main from './windows/Main';
 import Loader from './pages/Loader';
 import StartStreamingButton from './root/StartStreamingButton';
+import { PlatformMerge, PlatformAppStore, PlatformAppMainPage } from './pages';
 
 // list of React components to be used inside Vue components
 export const components = {
@@ -81,6 +83,10 @@ export const components = {
   WelcomeToPrime,
   Notifications,
   NotificationsAndNews,
+  MultistreamChatInfo,
+  PlatformMerge,
+  PlatformAppStore,
+  PlatformAppMainPage,
   PlatformAppPageView,
   PlatformAppPopOut,
   NewBadge,

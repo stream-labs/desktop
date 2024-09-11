@@ -8,18 +8,15 @@ import Translate from 'components-react/shared/Translate';
 import UploadProgress from './UploadProgress';
 import styles from './ExportModal.m.less';
 import VideoPreview from './VideoPreview';
+import { EPlatformCallResult } from 'services/platforms';
 
 export default function StorageUpload(p: { onClose: () => void; platform: string }) {
-  const { UserService, HighlighterService, OnboardingService, SharedStorageService } = Services;
+  const { UserService, HighlighterService, SharedStorageService } = Services;
 
   const { uploadInfo, hasSLID } = useVuex(() => ({
     uploadInfo: HighlighterService.views.uploadInfo,
     hasSLID: !!UserService.views.auth?.slid?.id,
   }));
-
-  function connectSLID() {
-    OnboardingService.actions.start({ isLogin: true });
-  }
 
   function uploadStorage() {
     HighlighterService.actions.uploadStorage(p.platform);
@@ -40,7 +37,7 @@ export default function StorageUpload(p: { onClose: () => void; platform: string
     return () => HighlighterService.actions.dismissError();
   }, []);
 
-  if (!hasSLID) return <GetSLID onClick={connectSLID} />;
+  if (!hasSLID) return <GetSLID />;
   if (uploadInfo.uploading) return <UploadProgress />;
   return (
     <div className={styles.crossclipContainer}>
@@ -57,9 +54,26 @@ export default function StorageUpload(p: { onClose: () => void; platform: string
   );
 }
 
-export function GetSLID(p: { onClick: () => void }) {
-  function signUp() {
-    remote.shell.openExternal('https://id.streamlabs.com/register');
+export function GetSLID(p: { onLogin?: () => void }) {
+  const { UserService, OnboardingService } = Services;
+
+  async function clickLink(signup?: boolean) {
+    let resp: EPlatformCallResult;
+    const platform = UserService.views.platform?.type;
+
+    if (UserService.views.isLoggedIn) {
+      resp = await UserService.actions.return.startSLMerge();
+    } else {
+      resp = await UserService.actions.return.startSLAuth({ signup });
+    }
+
+    if (resp !== EPlatformCallResult.Success) return;
+    if (platform) {
+      UserService.actions.setPrimaryPlatform(platform);
+    } else {
+      OnboardingService.actions.start({ isLogin: true });
+    }
+    if (p.onLogin) p.onLogin();
   }
 
   return (
@@ -68,13 +82,13 @@ export function GetSLID(p: { onClick: () => void }) {
       <button
         className="button button--action"
         style={{ width: '300px', margin: '32px' }}
-        onClick={signUp}
+        onClick={() => clickLink(true)}
       >
         {$t('Sign up for Streamlabs ID')}
       </button>
       <span className={styles.login}>
         <Translate message="Already have a Streamlabs ID? <link>Login</link>">
-          <a slot="link" onClick={p.onClick} />
+          <a slot="link" onClick={() => clickLink()} />
         </Translate>
       </span>
     </div>

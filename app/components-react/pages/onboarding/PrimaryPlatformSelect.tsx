@@ -86,7 +86,7 @@ export function PrimaryPlatformSelect() {
   // is by being in the `isPartialSLAuth` state.  The only way to move past
   // this step is to get out of the `isPartialSLAuth` state, which will cause
   // this step to disappear from the flow, and we don't need to increment the
-  // step counter.  In the case of a normal login outside of onaobarding, we do
+  // step counter.  In the case of a normal login outside of onboarding, we do
   // call finish on the onboarding service.
 
   async function afterLogin(platform: TPlatform) {

@@ -205,6 +205,7 @@ import { SharedStorageService } from 'services/integrations/shared-storage';
 import { RealmService } from 'services/realm';
 import { InstagramService } from 'services/platforms/instagram';
 import { TwitchStudioImporterService } from 'services/ts-importer';
+import { UrlService } from 'services/hosts';
 
 export const AppServices = {
   AppService,
@@ -283,4 +284,5 @@ export const AppServices = {
   MarkersService,
   SharedStorageService,
   RealmService,
+  UrlService,
 };

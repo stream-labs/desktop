@@ -352,7 +352,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
     if (!newCollectionId) return;
 
-    this.dualOutputService.setdualOutputMode(false);
+    this.dualOutputService.setDualOutputMode(false);
 
     await this.load(newCollectionId);
 
@@ -523,6 +523,9 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    */
   private async readCollectionDataAndLoadIntoApplicationState(id: string): Promise<void> {
     const exists = await this.stateService.collectionFileExists(id);
+
+    // necessary for validating a dual output scene collection
+    this.dualOutputService.setIsLoading(true);
 
     if (exists) {
       let data: string;

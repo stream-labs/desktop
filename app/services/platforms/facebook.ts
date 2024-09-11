@@ -400,7 +400,14 @@ export class FacebookService
     } catch (e: unknown) {
       const ACCOUNT_NOT_OLD_ENOUGH = 1363120;
       const NOT_ENOUGH_FOLLOWERS_FOR_PAGE = 1363144;
-      const notEligibleErrorCodes = [ACCOUNT_NOT_OLD_ENOUGH, NOT_ENOUGH_FOLLOWERS_FOR_PAGE];
+      // We don't know what this is, but their API started returning this shortly after, with the same messaging
+      // it is possible the two above have been merged into this
+      const UNKNOWN_SUBCODE = 1969070;
+      const notEligibleErrorCodes = [
+        ACCOUNT_NOT_OLD_ENOUGH,
+        NOT_ENOUGH_FOLLOWERS_FOR_PAGE,
+        UNKNOWN_SUBCODE,
+      ];
       const error = (e as any).result?.error;
 
       if (error && notEligibleErrorCodes.includes(error.error_subcode)) {
@@ -413,7 +420,7 @@ export class FacebookService
             'openStreamIneligibleHelp',
           ),
         });
-        throwStreamError('FACEBOOK_STREAMING_DISABLED', e);
+        throwStreamError('FACEBOOK_STREAMING_DISABLED', e as any);
       }
 
       const details = error ? `${error.type} ${error.message}` : 'Connection failed';

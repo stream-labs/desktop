@@ -17,6 +17,7 @@ import { VideoSettingsService, TDisplayType } from './settings-v2/video';
 import { DualOutputService } from './dual-output';
 import { TwitterPlatformService } from './platforms/twitter';
 import { InstagramService } from './platforms/instagram';
+import { PlatformAppsService } from './platform-apps';
 
 export type TOutputOrientation = 'landscape' | 'portrait';
 interface IRestreamTarget {
@@ -58,6 +59,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
   @Inject() videoSettingsService: VideoSettingsService;
   @Inject() dualOutputService: DualOutputService;
   @Inject('TwitterPlatformService') twitterService: TwitterPlatformService;
+  @Inject() platformAppsService: PlatformAppsService;
 
   settings: IUserSettingsResponse;
 
@@ -86,6 +88,11 @@ export class RestreamService extends StatefulService<IRestreamState> {
       this.settings = null;
       this.SET_ENABLED(false);
     });
+
+    this.userService.scopeAdded.subscribe(() => {
+      this.refreshChat();
+      this.platformAppsService.refreshApp('restream');
+    });
   }
 
   get views() {
@@ -103,6 +110,11 @@ export class RestreamService extends StatefulService<IRestreamState> {
   }
 
   get chatUrl() {
+    const nightMode = this.customizationService.isDarkTheme ? 'night' : 'day';
+    const platforms = this.streamInfo.enabledPlatforms
+      .filter(platform => ['youtube', 'twitch', 'facebook'].includes(platform))
+      .join(',');
+
     const hasFBTarget = this.streamInfo.enabledPlatforms.includes('facebook' as TPlatform);
     let fbParams = '';
     if (hasFBTarget) {
@@ -117,7 +129,12 @@ export class RestreamService extends StatefulService<IRestreamState> {
        */
       fbParams += `&fbToken=${token}`;
     }
-    return `https://${this.host}/embed/chat?oauth_token=${this.userService.apiToken}${fbParams}`;
+
+    if (platforms) {
+      return `https://${this.host}/embed/chat?oauth_token=${this.userService.apiToken}${fbParams}&mode=${nightMode}&send=true&platforms=${platforms}`;
+    } else {
+      return `https://${this.host}/embed/chat?oauth_token=${this.userService.apiToken}${fbParams}`;
+    }
   }
 
   get shouldGoLiveWithRestream() {
@@ -383,6 +400,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
   private chatView: Electron.BrowserView;
 
   refreshChat() {
+    if (!this.chatView) return;
     this.chatView.webContents.loadURL(this.chatUrl);
   }
 
@@ -427,6 +445,8 @@ export class RestreamService extends StatefulService<IRestreamState> {
       webPreferences: {
         partition,
         nodeIntegration: false,
+        contextIsolation: true,
+        sandbox: false,
       },
     });
 

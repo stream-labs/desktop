@@ -132,10 +132,7 @@ export async function stopRecording() {
 }
 
 export async function waitForSettingsWindowLoaded() {
-  // the spinner can take some time to appear
-  await sleep(500);
-  // wait for at least one input to be displayed
-  return waitForDisplayed('[data-role="input"][data-type="text"]', { timeout: 15000 });
+  return waitForEnabled('button[data-testid=confirmGoLiveBtn]');
 }
 
 export async function switchAdvancedMode() {

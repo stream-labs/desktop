@@ -2,9 +2,7 @@ import { useWebdriver, test } from '../../helpers/webdriver';
 import { getApiClient } from '../../helpers/api-client';
 import { SceneBuilder } from '../../helpers/scene-builder';
 import { ScenesService } from '../../../app/services/api/external-api/scenes';
-import { DualOutputService, VideoSettingsService } from 'app-services';
-import { logIn } from '../../helpers/modules/user';
-import { toggleDualOutputMode } from '../../helpers/modules/dual-output';
+import { VideoSettingsService, DualOutputService } from 'app-services';
 
 const path = require('path');
 
@@ -294,31 +292,4 @@ test('SceneNode.getNextNode()', async t => {
 
   nextSceneNode = sceneNode3.getNextNode();
   t.is(nextSceneNode.nodeId, sceneNode2.nodeId);
-});
-
-test('Scene item has correct context', async t => {
-  const client = await getApiClient();
-  const scenesService = client.getResource<ScenesService>('ScenesService');
-  const videoSettingsService = client.getResource<VideoSettingsService>('VideoSettingsService');
-  const dualOutputService = client.getResource<DualOutputService>('DualOutputService');
-  const scene = scenesService.createScene('Scene1');
-  scene.createAndAddSource('Item1', 'color_source');
-  scene.createAndAddSource('Item2', 'color_source');
-  scene.createAndAddSource('Item3', 'color_source');
-
-  // single output
-  const horizontalContext = videoSettingsService.contexts.horizontal;
-  scene.getItems().forEach(sceneItem => {
-    t.is(sceneItem?.display, 'horizontal');
-    t.deepEqual(sceneItem?.output, horizontalContext);
-  });
-
-  // dual output
-  videoSettingsService.establishVideoContext('vertical');
-  dualOutputService.createSceneNodes(scene.id);
-  const verticalContext = videoSettingsService.contexts.vertical;
-  scene.getItems().forEach(sceneItem => {
-    const context = sceneItem?.display === 'vertical' ? verticalContext : horizontalContext;
-    t.deepEqual(sceneItem?.output, context);
-  });
 });

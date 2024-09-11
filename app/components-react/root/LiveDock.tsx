@@ -235,6 +235,10 @@ class LiveDockController {
   showEditStreamInfo() {
     this.streamingService.actions.showEditStream();
   }
+
+  showMultistreamChatInfo() {
+    this.chatService.actions.showMultistreamChatWindow();
+  }
 }
 
 interface ILiveDockProps {
@@ -317,6 +321,18 @@ function LiveDock(p: ILiveDockProps) {
     return () => clearInterval(elapsedInterval);
   }, [streamingStatus]);
 
+  useEffect(() => {
+    if (isRestreaming && streamingStatus === EStreamingState.Starting) {
+      Services.RestreamService.actions.refreshChat();
+      return;
+    }
+
+    if (!isRestreaming && visibleChat === 'restream') {
+      setVisibleChat('default');
+      return;
+    }
+  }, [visibleChat, isRestreaming, streamingStatus]);
+
   function toggleCollapsed() {
     collapsed ? ctrl.setCollapsed(false) : ctrl.setCollapsed(true);
   }
@@ -337,9 +353,10 @@ function LiveDock(p: ILiveDockProps) {
 
   const chat = useMemo(() => {
     const primaryChat = Services.UserService.state.auth!.primaryPlatform;
-    const showTiktokInfo = visibleChat === 'tiktok' || primaryChat === 'tiktok';
+    const showTiktokInfo =
+      visibleChat === 'tiktok' || (visibleChat === 'default' && primaryChat === 'tiktok');
 
-    if (showTiktokInfo && !isRestreaming) {
+    if (showTiktokInfo) {
       return <TikTokChatInfo />;
     }
 
@@ -543,6 +560,45 @@ function LiveDock(p: ILiveDockProps) {
           </ResizeBar>
         )}
       </Animation>
+    </div>
+  );
+}
+
+function ChatTabs(p: { visibleChat: string; setChat: (key: string) => void }) {
+  const ctrl = useController(LiveDockCtx);
+  return (
+    <div className="flex">
+      <Menu
+        defaultSelectedKeys={[p.visibleChat]}
+        onClick={ev => p.setChat(ev.key)}
+        mode="horizontal"
+      >
+        {ctrl.chatTabs.map(tab => (
+          <Menu.Item key={tab.value}>{tab.name}</Menu.Item>
+        ))}
+      </Menu>
+      <div className={styles.liveDockChatTabsIcons}>
+        {ctrl.isPopOutAllowed && (
+          <Tooltip title={$t('Pop out to new window')} placement="topRight">
+            <i
+              className={cx(styles.liveDockChatTabsPopout, 'icon-pop-out-1')}
+              onClick={() => ctrl.popOut()}
+            />
+          </Tooltip>
+        )}
+        <Tooltip
+          title={$t(
+            'You can now reply to Twitch, YouTube and Facebook messages in Multistream chat. Click to learn more.',
+          )}
+          placement="topRight"
+          onClick={ctrl.showMultistreamChatInfo}
+        >
+          <i
+            className={cx(styles.liveDockChatTabsInfo, 'icon-information')}
+            onClick={ctrl.showMultistreamChatInfo}
+          />
+        </Tooltip>
+      </div>
     </div>
   );
 }

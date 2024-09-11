@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import urlLib from 'url';
 import { Service } from 'services';
+import Utils from 'services/utils';
 import { ENotificationType } from 'services/notifications';
 import { $t } from 'services/i18n';
 import BrowserView from 'components-react/shared/BrowserView';
@@ -57,6 +58,12 @@ export default function BrowseOverlays(p: {
       }
 
       return { action: 'deny' };
+    });
+
+    view.webContents.on('did-finish-load', () => {
+      if (Utils.isDevMode()) {
+        view.webContents.openDevTools();
+      }
     });
   }
 

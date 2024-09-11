@@ -6,13 +6,14 @@ import { TPlatform } from '../../../services/platforms';
 import { TwitchEditStreamInfo } from './platforms/TwitchEditStreamInfo';
 import { Section } from './Section';
 import { YoutubeEditStreamInfo } from './platforms/YoutubeEditStreamInfo';
+import { TikTokEditStreamInfo } from './platforms/TiktokEditStreamInfo';
 import FacebookEditStreamInfo from './platforms/FacebookEditStreamInfo';
-import { TikTokEditStreamInfo } from './platforms/TikTokEditStreamInfo';
 import { IPlatformComponentParams, TLayoutMode } from './platforms/PlatformSettingsLayout';
 import { getDefined } from '../../../util/properties-type-guards';
 import { TrovoEditStreamInfo } from './platforms/TrovoEditStreamInfo';
 import { TwitterEditStreamInfo } from './platforms/TwitterEditStreamInfo';
 import { InstagramEditStreamInfo } from './platforms/InstagramEditStreamInfo';
+import AdvancedSettingsSwitch from './AdvancedSettingsSwitch';
 
 export default function PlatformSettings() {
   const {
@@ -70,6 +71,8 @@ export default function PlatformSettings() {
     <div style={{ minHeight: '150px' }}>
       {shouldShowSettings && (
         <div style={{ width: '100%' }}>
+          <AdvancedSettingsSwitch />
+
           {/*COMMON FIELDS*/}
           {canShowAdvancedMode && (
             <Section isSimpleMode={!isAdvancedMode} title={$t('Common Stream Settings')}>

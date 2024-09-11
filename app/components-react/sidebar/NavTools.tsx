@@ -8,13 +8,13 @@ import { Services } from '../service-provider';
 import { useVuex } from '../hooks';
 import styles from './NavTools.m.less';
 import * as remote from '@electron/remote';
-import { Badge, Button, Form, Menu, Modal } from 'antd';
+import { Badge, Menu } from 'antd';
 import { EMenuItemKey, ENavName, IMenuItem, IParentMenuItem, menuTitles } from 'services/side-nav';
-import PlatformLogo from 'components-react/shared/PlatformLogo';
 import SubMenu from 'components-react/shared/SubMenu';
 import MenuItem from 'components-react/shared/MenuItem';
 import UltraIcon from 'components-react/shared/UltraIcon';
 import PlatformIndicator from './PlatformIndicator';
+import { AuthModal } from 'components-react/shared/AuthModal';
 
 export default function SideNav() {
   const {
@@ -24,6 +24,7 @@ export default function SideNav() {
     UsageStatisticsService,
     SideNavService,
     WindowsService,
+    UrlService,
   } = Services;
 
   const isDevMode = Utils.isDevMode();
@@ -84,11 +85,13 @@ export default function SideNav() {
       ? UserService.username
       : undefined;
 
+  const confirmMsg = username
+    ? $t('Are you sure you want to log out %{username}?', { username })
+    : $t('Are you sure you want to log out?');
+
   function openHelp() {
     UsageStatisticsService.actions.recordClick('SideNav2', 'help');
-    remote.shell.openExternal(
-      'https://streamlabs.com/content-hub/support/support-streamlabs-desktop',
-    );
+    remote.shell.openExternal(UrlService.supportLink);
   }
 
   async function upgradeToPrime() {
@@ -198,11 +201,12 @@ export default function SideNav() {
           }
         })}
       </Menu>
-      <LogoutModal
+      <AuthModal
+        title={$t('Confirm')}
+        prompt={confirmMsg}
         showModal={showModal}
         handleAuth={handleAuth}
         handleShowModal={handleShowModal}
-        username={username}
       />
     </>
   );
@@ -256,37 +260,6 @@ function DashboardSubMenu(p: {
         </MenuItem>
       ))}
     </>
-  );
-}
-
-function LogoutModal(p: {
-  showModal: boolean;
-  handleAuth: () => void;
-  handleShowModal: (status: boolean) => void;
-  username?: string;
-}) {
-  const { username } = p;
-  const confirmMsg = username
-    ? $t('Are you sure you want to log out %{username}?', { username })
-    : $t('Are you sure you want to log out?');
-
-  return (
-    <Modal
-      footer={null}
-      visible={p.showModal}
-      onCancel={() => p.handleShowModal(false)}
-      getContainer={false}
-      className={styles.confirmLogout}
-    >
-      <Form className={styles.confirmLogout}>
-        <h2>{$t('Confirm')}</h2>
-        {confirmMsg}
-        <div className={styles.buttons}>
-          <Button onClick={() => p.handleAuth()}>{$t('Yes')}</Button>
-          <Button onClick={() => p.handleShowModal(false)}>{$t('No')}</Button>
-        </div>
-      </Form>
-    </Modal>
   );
 }
 

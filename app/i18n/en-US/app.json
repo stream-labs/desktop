@@ -13,5 +13,10 @@
   "This account is already linked to another Streamlabs Account. Please use a different account.": "This account is already linked to another Streamlabs Account. Please use a different account.",
   "Successfully unlinked account": "Successfully unlinked account",
   "Successfully merged account": "Successfully merged account",
-  "Account merge error": "Account merge error"
+  "Account merge error": "Account merge error",
+  "Error Code: %{code}": "Error Code: %{code}",
+  "Unknown error, please contact support": "Unknown error, please contact support",
+  "Custom Destination": "Custom Destination",
+  "This app is currently popped out in another window.": "This app is currently popped out in another window.",
+  "Error granting chat permissions.": "Error granting chat permissions."
 }

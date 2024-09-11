@@ -2,10 +2,10 @@
  * The core module provides methods for the most frequent actions
  */
 
-import { getContext } from '../webdriver';
+import { getContext } from '../webdriver/index';
 import { getApiClient } from '../api-client';
 import { WindowsService } from '../../../app/services/windows';
-import { ClickOptions, WaitForOptions } from 'webdriverio';
+import type { ClickOptions, WaitForOptions } from 'webdriverio';
 
 export type TSelectorOrEl = string | WebdriverIO.Element;
 
@@ -28,7 +28,7 @@ export async function select(selectorOrEl: TSelectorOrEl): Promise<WebdriverIO.E
 /**
  * A shortcut for client.$$()
  */
-export async function selectElements(selector: string): Promise<WebdriverIO.Element[]> {
+export async function selectElements(selector: string): Promise<WebdriverIO.ElementArray> {
   return getClient().$$(selector);
 }
 
