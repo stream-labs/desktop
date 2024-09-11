@@ -40,6 +40,8 @@ export default class MainWindow extends TsxComponent {
   }
 
   render() {
+    return this.uiReady && <Main />;
+
     return (
       <div style={{ height: '100%' }} className={this.theme}>
         {this.uiReady && <Main />}

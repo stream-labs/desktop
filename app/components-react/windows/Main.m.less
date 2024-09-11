@@ -20,14 +20,17 @@
   flex-grow: 1;
   height: 100%;
   position: relative;
+  overflow: auto;
 }
 
 .main-contents--right {
-  grid-template-columns: [sidebar] auto [livedock] auto [page] 1fr;
+  //grid-template-columns: [sidebar] auto [livedock] auto [page] 1fr;
+  grid-template-columns: auto auto 1fr;
 }
 
 .main-contents--left {
-  grid-template-columns: [sidebar] auto [page] 1fr [livedock] auto;
+  //grid-template-columns: [sidebar] auto [page] 1fr [livedock] auto;
+  grid-template-columns: auto 1fr auto;
 }
 
 .main-contents--onboarding {
