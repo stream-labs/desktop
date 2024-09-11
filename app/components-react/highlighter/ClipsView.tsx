@@ -208,9 +208,12 @@ export default function ClipsView({
           const existingClip = loadedClips.find(c => c.path === clipPath);
           let updatedStreamInfo;
           if (existingClip) {
-            updatedStreamInfo = { ...existingClip.streamInfo };
-            updatedStreamInfo[streamId] = {
-              orderPosition: index,
+            updatedStreamInfo = {
+              ...existingClip.streamInfo,
+              [streamId]: {
+                ...existingClip.streamInfo?.[streamId],
+                orderPosition: index,
+              },
             };
           }
 
@@ -264,8 +267,11 @@ export default function ClipsView({
     const filtered = files.filter(f => extensions.includes(path.parse(f).ext));
 
     if (filtered.length) {
-      //TODO M: New clips should be on position 0
-      HighlighterService.actions.addClips(filtered, streamId, 'Manual');
+      HighlighterService.actions.addClips(
+        filtered.map(path => ({ path })),
+        streamId,
+        'Manual',
+      );
     }
 
     e.stopPropagation();
@@ -452,7 +458,11 @@ function AddClip({ streamId }: { streamId: string | undefined }) {
     });
 
     if (selections && selections.filePaths) {
-      HighlighterService.actions.addClips(selections.filePaths, streamId, 'Manual');
+      HighlighterService.actions.addClips(
+        selections.filePaths.map(path => ({ path })),
+        streamId,
+        'Manual',
+      );
     }
   }
 

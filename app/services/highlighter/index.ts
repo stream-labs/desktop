@@ -51,7 +51,13 @@ import execa from 'execa';
 import moment from 'moment';
 import { getHighlightClips, IHighlight, IHighlighterInput } from './ai-highlighter/ai-highlighter';
 import uuid from 'uuid';
-export type TStreamInfo = { orderPosition: number } | undefined;
+export type TStreamInfo =
+  | {
+      orderPosition: number;
+      initialStartTime?: number;
+      initialEndTime?: number;
+    }
+  | undefined; // initialTimesInStream
 
 interface IBaseClip {
   path: string;
@@ -648,13 +654,29 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     } else {
       let streamStarted = false;
       let aiRecordingInProgress = false;
+      let aiRecordingStartTime = moment();
       let streamInfo: StreamInfoForAiHighlighter;
 
       this.streamingService.replayBufferFileWrite.subscribe(clipPath => {
-        console.log('Add from', this.streamingService.replayBufferFileWrite, streamInfo);
-        //TODO: Get in streaminfo + stream order via subscribe
+        console.log(
+          'Add from replaybuffer',
+          this.streamingService.replayBufferFileWrite,
+          streamInfo,
+        );
+        const streamId = streamInfo?.id || undefined;
 
-        this.addClips([clipPath], streamInfo.id, 'ReplayBuffer');
+        let endTime: number;
+
+        if (streamId) {
+          endTime = moment().diff(aiRecordingStartTime, 'seconds');
+        } else {
+          endTime = undefined;
+        }
+
+        const REPLAY_BUFFER_DURATION = 20; // TODO M: Replace with settingsservice
+        const startTime = Math.max(0, endTime ? endTime - REPLAY_BUFFER_DURATION : 0);
+
+        this.addClips([{ path: clipPath, startTime, endTime }], streamId, 'ReplayBuffer');
       });
 
       this.streamingService.streamingStatusChange.subscribe(async status => {
@@ -688,6 +710,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
             game: this.streamingService.views.game,
           };
           aiRecordingInProgress = true;
+          aiRecordingStartTime = moment();
         }
 
         if (status === EStreamingState.Offline) {
@@ -719,9 +742,10 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
           if (!aiRecordingInProgress) {
             return;
           }
+          this.streamingService.toggleRecording();
+
           // Load potential replaybuffer clips
           await this.loadClips(streamInfo.id);
-          this.streamingService.toggleRecording();
         }
       });
 
@@ -747,31 +771,59 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     });
   }
 
-  addClips(paths: string[], streamId: string | undefined, source: 'Manual' | 'ReplayBuffer') {
-    paths.forEach((path, index) => {
-      const currentHighestOrderPosition = this.getClips(this.views.clips, streamId).length;
+  addClips(
+    newClips: { path: string; startTime?: number; endTime?: number }[],
+    streamId: string | undefined,
+    source: 'Manual' | 'ReplayBuffer',
+  ) {
+    newClips.forEach((clipData, index) => {
+      const currentClips = this.getClips(this.views.clips, streamId);
       const getHighestGlobalOrderPosition = this.getClips(this.views.clips, undefined).length;
 
-      const newStreamInfo: { [key: string]: TStreamInfo } = {
-        [streamId]: {
-          orderPosition: index + currentHighestOrderPosition + 1,
-        },
-      };
-
-      if (this.state.clips[path]) {
+      let newStreamInfo: { [key: string]: TStreamInfo };
+      if (source === 'Manual') {
+        // Move all current clips one to the right
+        currentClips.forEach(clip => {
+          const updatedStreamInfo = {
+            ...clip.streamInfo,
+            [streamId]: {
+              ...clip.streamInfo[streamId],
+              orderPosition: clip.streamInfo[streamId].orderPosition + 1,
+            },
+          };
+          this.UPDATE_CLIP({
+            path: clip.path,
+            streamInfo: updatedStreamInfo,
+          });
+        });
+        newStreamInfo = {
+          [streamId]: {
+            orderPosition: 0,
+          },
+        };
+      } else {
+        newStreamInfo = {
+          [streamId]: {
+            orderPosition: index + currentClips.length + 1,
+            initialStartTime: clipData.startTime,
+            initialEndTime: clipData.endTime,
+          },
+        };
+      }
+      if (this.state.clips[clipData.path]) {
         const updatedStreamInfo = {
-          ...this.state.clips[path].streamInfo,
+          ...this.state.clips[clipData.path].streamInfo,
           ...newStreamInfo,
         };
 
         this.UPDATE_CLIP({
-          path,
+          path: clipData.path,
           streamInfo: updatedStreamInfo,
         });
         return;
       } else {
         this.ADD_CLIP({
-          path,
+          path: clipData.path,
           loaded: false,
           enabled: true,
           startTrim: 0,
@@ -786,19 +838,21 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   }
 
   async addAiClips(
-    clips: { path: string; aiClipInfo: IAiClipInfo }[],
+    newClips: { path: string; aiClipInfo: IAiClipInfo; startTime: number; endTime: number }[],
     newStreamInfo: StreamInfoForAiHighlighter,
   ) {
     const currentHighestOrderPosition = this.getClips(this.views.clips, newStreamInfo.id).length;
     const getHighestGlobalOrderPosition = this.getClips(this.views.clips, undefined).length;
 
-    clips.forEach((clip, index) => {
+    newClips.forEach((clip, index) => {
       // Don't allow adding the same clip twice for ai clips
       if (this.state.clips[clip.path]) return;
 
       const streamInfo: { [key: string]: TStreamInfo } = {
         [newStreamInfo.id]: {
           orderPosition: index + currentHighestOrderPosition + 1,
+          initialStartTime: clip.startTime,
+          initialEndTime: clip.endTime,
         },
       };
 
@@ -815,8 +869,31 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
         streamInfo,
       });
     });
-
+    this.sortStreamClipsByStartTime(this.views.clips, newStreamInfo);
     await this.loadClips(newStreamInfo.id);
+  }
+
+  sortStreamClipsByStartTime(clips: TClip[], newStreamInfo: StreamInfoForAiHighlighter) {
+    const allClips = this.getClips(clips, newStreamInfo.id);
+
+    const sortedClips = allClips.sort(
+      (a, b) =>
+        a.streamInfo[newStreamInfo.id].initialStartTime -
+        b.streamInfo[newStreamInfo.id].initialStartTime,
+    );
+
+    // Update order positions based on the sorted order
+    sortedClips.forEach((clip, index) => {
+      this.UPDATE_CLIP({
+        path: clip.path,
+        streamInfo: {
+          [newStreamInfo.id]: {
+            ...clip.streamInfo[newStreamInfo.id],
+            orderPosition: index + 1,
+          },
+        },
+      });
+    });
   }
 
   enableClip(path: string, enabled: boolean) {
@@ -871,7 +948,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
         let found = false;
         if (length !== 0) {
           for (let i = 0; i < length; i++) {
-            if (this.views.clips[i].streamInfo[id] !== undefined) {
+            if (this.views.clips[i].streamInfo?.[id] !== undefined) {
               found = true;
               break;
             }
@@ -1626,7 +1703,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     videoUri: string,
     highlighterData: IHighlight[],
     streamInfo: IHighlightedStream,
-  ): Promise<{ path: string; aiClipInfo: IAiClipInfo }[]> {
+  ): Promise<{ path: string; aiClipInfo: IAiClipInfo; startTime: number; endTime: number }[]> {
     const id = streamInfo.id;
     const fallbackTitle = 'awesome-stream';
     const videoDir = path.dirname(videoUri);
@@ -1650,7 +1727,12 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     }
 
     const sortedHighlights = highlighterData.sort((a, b) => a.start_time - b.start_time);
-    const results: { path: string; aiClipInfo: IAiClipInfo }[] = [];
+    const results: {
+      path: string;
+      aiClipInfo: IAiClipInfo;
+      startTime: number;
+      endTime: number;
+    }[] = [];
     const processedFiles = new Set<string>();
 
     // Process in batches of 5
@@ -1709,7 +1791,12 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
             try {
               await subprocess;
               console.log(`Created segment: ${outputUri}`);
-              return { path: outputUri, aiClipInfo: { moments: [{ type }] } };
+              return {
+                path: outputUri,
+                aiClipInfo: { moments: [{ type }] },
+                startTime: start_time,
+                endTime: end_time,
+              };
             } catch (error: unknown) {
               console.warn(`Error during FFMPEG execution for ${outputUri}:`, error);
               return null;
