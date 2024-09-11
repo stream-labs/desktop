@@ -517,27 +517,7 @@ function LiveDock(p: ILiveDockProps) {
                 (isPlatform(['twitch', 'trovo']) ||
                   (isStreaming && isPlatform(['youtube', 'facebook', 'twitter', 'tiktok']))) && (
                   <div className={styles.liveDockChat}>
-                    {hasChatTabs && (
-                      <div className="flex">
-                        <Menu
-                          defaultSelectedKeys={[visibleChat]}
-                          onClick={ev => setChat(ev.key)}
-                          mode="horizontal"
-                        >
-                          {chatTabs.map(tab => (
-                            <Menu.Item key={tab.value}>{tab.name}</Menu.Item>
-                          ))}
-                        </Menu>
-                        {isPopOutAllowed && (
-                          <Tooltip title={$t('Pop out to new window')} placement="left">
-                            <i
-                              className={cx(styles.liveDockChatAppsPopout, 'icon-pop-out-1')}
-                              onClick={() => ctrl.popOut()}
-                            />
-                          </Tooltip>
-                        )}
-                      </div>
-                    )}
+                    {hasChatTabs && <ChatTabs visibleChat={visibleChat} setChat={setChat} />}
                     {!applicationLoading && !collapsed && chat}
                     {!['default', 'restream'].includes(visibleChat) && (
                       <PlatformAppPageView
