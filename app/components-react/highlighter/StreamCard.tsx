@@ -172,7 +172,7 @@ export default function StreamCard({
             size="large"
             style={{ display: 'flex', gap: '8px', alignItems: 'center' }}
             onClick={() => {
-              emitSetView({ view: 'clips', id: stream.id });
+              showStreamClips();
             }}
           >
             <i className="icon-edit" /> Edit clips
@@ -269,11 +269,16 @@ export default function StreamCard({
     return '';
   }
 
+  function showStreamClips() {
+    if (stream?.state.type !== 'detection-in-progress') {
+      emitSetView({ view: 'clips', id: stream?.id });
+    }
+  }
   return (
     <div
       className={styles.streamCard}
       onClick={() => {
-        emitSetView({ view: 'clips', id: stream.id });
+        showStreamClips();
       }}
     >
       <div className={`${styles.thumbnailWrapper} ${styles.videoSkeleton}`}>
