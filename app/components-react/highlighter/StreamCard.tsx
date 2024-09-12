@@ -362,10 +362,16 @@ export default function StreamCard({
           </div>
           <div style={{ width: '74px', position: 'relative' }}>
             {clips.length > 0 ? (
-              <>
+              <div style={{ transform: 'translateX(-10px)' }}>
                 <div
                   className={styles.centeredOverlayItem}
-                  style={{ display: 'flex', gap: '3px', paddingRight: '3px' }}
+                  style={{
+                    display: 'flex',
+                    gap: '3px',
+                    paddingRight: '3px',
+                    textShadow: '0px 0px 6px black',
+                    transform: 'translate(-24px, 26px)',
+                  }}
                 >
                   <span>{clips.length}</span>
                   <span>clips</span>
@@ -375,7 +381,10 @@ export default function StreamCard({
                     className={styles.thumbnailWrapperSmall}
                     style={{
                       rotate: `${(index - 1) * 6}deg`,
-                      transform: `translate(${(index - 1) * 6}px, ${index === 1 ? 0 : 2}px)`,
+                      scale: '1.2',
+                      transform: `translate(${(index - 1) * 9}px, ${
+                        index === 1 ? 0 + 12 : 2 + 12
+                      }px)`,
                       zIndex: index === 1 ? 10 : 0,
                     }}
                     key={index}
@@ -390,7 +399,7 @@ export default function StreamCard({
                     />
                   </div>
                 ))}{' '}
-              </>
+              </div>
             ) : (
               ''
             )}

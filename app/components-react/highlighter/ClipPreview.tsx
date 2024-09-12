@@ -44,6 +44,22 @@ export default function ClipPreview(props: {
     HighlighterService.actions.enableClip(props.clip.path, enabled);
   }
 
+  function getInitialTime() {
+    if (!props.clip.streamInfo) {
+      return 'noStreamInfo';
+    }
+
+    const streamIds = Object.keys(props.clip.streamInfo);
+    if (streamIds.length === 0) {
+      return 'noStreamId';
+    }
+
+    const firstStreamId = streamIds[0]; // TODO M: Pass streamId here? or need to find the stream where the initialTime is not undefined
+    const startTime = props.clip.streamInfo[firstStreamId]?.initialStartTime;
+    const endTime = props.clip.streamInfo[firstStreamId]?.initialEndTime;
+
+    return startTime !== undefined ? `${startTime} -${endTime}  ` : 'startTimeUndefined';
+  }
   return (
     <div style={{ height: `${SCRUB_HEIGHT}px`, position: 'relative' }}>
       {!props.clip.deleted && (
@@ -137,6 +153,7 @@ export default function ClipPreview(props: {
         }}
       >
         <div>
+          {getInitialTime()}
           {isAiClip(props.clip) ? (
             <>
               {' '}
