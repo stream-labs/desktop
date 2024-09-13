@@ -215,6 +215,8 @@ class GLVolmetersController {
   }
 
   beforeDestroy() {
+    // TODO: index
+    // @ts-ignore
     if (this.gl) window['activeWebglContexts'] -= 1;
     clearInterval(this.canvasWidthInterval);
     // unsubscribe all volmeters

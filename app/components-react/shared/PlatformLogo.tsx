@@ -37,6 +37,8 @@ export default function PlatformLogo(p: IProps & HTMLAttributes<unknown>) {
       instagram: 'instagram',
     }[p.platform];
   }
+  // TODO: index
+  // @ts-ignore
   const size = p.size && (sizeMap[p.size] ?? p.size);
   const sizeStyle = size
     ? {

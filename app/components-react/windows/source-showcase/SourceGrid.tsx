@@ -56,6 +56,8 @@ export default function SourceGrid(p: { activeTab: string }) {
       Object.keys(WidgetType)
         .filter((type: string) => isNaN(Number(type)) && type !== 'SubscriberGoal')
         .filter((type: string) => {
+          // TODO: index
+          // @ts-ignore
           const widgetPlatforms = WidgetDisplayData(primaryPlatform)[WidgetType[type]]?.platforms;
           if (!widgetPlatforms) return true;
           return linkedPlatforms?.some(
@@ -66,6 +68,8 @@ export default function SourceGrid(p: { activeTab: string }) {
           // show only supported widgets
           const whitelist = primaryPlatformService?.widgetsWhitelist;
           if (!whitelist) return true;
+          // TODO: index
+          // @ts-ignore
           return whitelist.includes(WidgetType[type]);
         }),
     [],
@@ -100,6 +104,8 @@ export default function SourceGrid(p: { activeTab: string }) {
       ].includes(source.value),
     );
     const essentialWidgets = iterableWidgetTypes.filter(type =>
+      // TODO: index
+      // @ts-ignore
       [WidgetType.AlertBox, WidgetType.EventList].includes(WidgetType[type]),
     );
     return { essentialDefaults, essentialWidgets };

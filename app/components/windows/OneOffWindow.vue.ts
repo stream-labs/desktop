@@ -22,6 +22,8 @@ export default class OneOffWindow extends Vue {
   }
 
   mounted() {
+    // TODO: index
+    // @ts-ignore
     antdThemes[this.theme].use();
   }
 
@@ -43,7 +45,11 @@ export default class OneOffWindow extends Vue {
 
   @Watch('theme')
   updateAntd(newTheme: string, oldTheme: string) {
+    // TODO: index
+    // @ts-ignore
     antdThemes[oldTheme].unuse();
+    // TODO: index
+    // @ts-ignore
     antdThemes[newTheme].use();
   }
 

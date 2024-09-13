@@ -28,7 +28,11 @@ export default function SideBar() {
             <img
               key={layout}
               className={currentLayout === layout ? styles.active : ''}
+              // TODO: index
+              // @ts-ignore
               onClick={() => setCurrentLayout(ELayout[layout])}
+              // TODO: index
+              // @ts-ignore
               src={layoutImage(ELayout[layout])}
             />
           ))}

@@ -209,6 +209,8 @@ export class OnboardingModule {
   get currentStep(): IOnboardingStep {
     // Useful for testing in development
     if (Utils.env.SLD_FORCE_ONBOARDING_STEP) {
+      // TODO: index
+      // @ts-ignore
       return ONBOARDING_STEPS()[Utils.env.SLD_FORCE_ONBOARDING_STEP];
     }
 

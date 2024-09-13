@@ -106,6 +106,8 @@ export default class WidgetEditor extends TsxComponent<WidgetEditorProps> {
     ) {
       return;
     }
+    // TODO: index
+    // @ts-ignore
     return this.wData.settings[this.props.selectedAlert].variations.find(
       (variation: IAlertBoxVariation) => variation.id === this.props.selectedId,
     );

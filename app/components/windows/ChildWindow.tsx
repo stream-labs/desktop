@@ -27,6 +27,8 @@ export default class ChildWindow extends Vue {
       theme: 'theme',
     });
 
+    // TODO: index
+    // @ts-ignore
     antdThemes[this.theme].use();
     WindowsService.modalChanged.subscribe(modalOptions => {
       this.modalOptions = { ...this.modalOptions, ...modalOptions };
@@ -62,7 +64,11 @@ export default class ChildWindow extends Vue {
 
   @Watch('theme')
   updateAntd(newTheme: string, oldTheme: string) {
+    // TODO: index
+    // @ts-ignore
     antdThemes[oldTheme].unuse();
+    // TODO: index
+    // @ts-ignore
     antdThemes[newTheme].use();
   }
 
@@ -152,6 +158,8 @@ export default class ChildWindow extends Vue {
         <ModalWrapper renderFn={this.modalOptions?.renderFn} />
 
         {this.componentsToRender.map((comp, index) => {
+          // TODO: index
+          // @ts-ignore
           const ChildWindowComponent = getComponents()[comp.componentName];
           return (
             <ChildWindowComponent key={`${comp.componentName}-${index}`} vShow={comp.isShown} />

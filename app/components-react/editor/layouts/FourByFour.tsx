@@ -18,7 +18,11 @@ export function FourByFour(p: React.PropsWithChildren<LayoutProps>) {
         className={styles.cell}
         style={{ height: `${100 - (resizes.bar1 + resizes.bar2) * 100}%` }}
       >
-        {p.children?.['1'] || <></>}
+        {
+          // TODO: index
+          // @ts-ignore
+          p.children?.['1'] || <></>
+        }
       </div>
       <ResizeBar
         position="top"
@@ -28,8 +32,20 @@ export function FourByFour(p: React.PropsWithChildren<LayoutProps>) {
         min={mins.bar1}
       >
         <div className={styles.segmented} style={{ height: `${resizes.bar1 * 100}%` }}>
-          <div className={cx(styles.cell, 'no-top-padding')}>{p.children?.['2'] || <></>}</div>
-          <div className={cx(styles.cell, 'no-top-padding')}>{p.children?.['3'] || <></>}</div>
+          <div className={cx(styles.cell, 'no-top-padding')}>
+            {
+              // TODO: index
+              // @ts-ignore
+              p.children?.['2'] || <></>
+            }
+          </div>
+          <div className={cx(styles.cell, 'no-top-padding')}>
+            {
+              // TODO: index
+              // @ts-ignore
+              p.children?.['3'] || <></>
+            }
+          </div>
         </div>
       </ResizeBar>
       <ResizeBar
@@ -43,8 +59,20 @@ export function FourByFour(p: React.PropsWithChildren<LayoutProps>) {
           className={styles.segmented}
           style={{ height: `${resizes.bar2 * 100}%`, padding: '0 8px' }}
         >
-          <div className={cx(styles.cell, 'no-top-padding')}>{p.children?.['4'] || <></>}</div>
-          <div className={cx(styles.cell, 'no-top-padding')}>{p.children?.['5'] || <></>}</div>
+          <div className={cx(styles.cell, 'no-top-padding')}>
+            {
+              // TODO: index
+              // @ts-ignore
+              p.children?.['4'] || <></>
+            }
+          </div>
+          <div className={cx(styles.cell, 'no-top-padding')}>
+            {
+              // TODO: index
+              // @ts-ignore
+              p.children?.['5'] || <></>
+            }
+          </div>
         </div>
       </ResizeBar>
     </div>

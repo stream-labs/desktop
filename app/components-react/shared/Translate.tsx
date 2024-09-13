@@ -71,6 +71,8 @@ export default function Translate(p: {
     }
 
     // render slots if found
+    // TODO: index
+    // @ts-ignore
     const slotName = camelize(xmlNode['tagName']);
     const namedReactNode = s.namedReactNodes[slotName];
     if (namedReactNode) {
