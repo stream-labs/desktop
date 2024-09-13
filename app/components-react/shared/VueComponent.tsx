@@ -34,7 +34,7 @@ export class VueComponent extends Component<IProps, { id: string; vueInstance: V
       methods: {
         updateProps(newProps: { componentClass: typeof Vue; componentProps: unknown }) {
           this['componentClass'] = newProps.componentClass;
-          this['componenentProps'] = newProps.componentProps;
+          this['componentProps'] = newProps.componentProps;
         },
       },
       render(h) {
