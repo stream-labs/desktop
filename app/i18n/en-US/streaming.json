@@ -255,7 +255,6 @@
   "Multistream Chat Platform Support": "Multistream Chat Platform Support",
   "You have selected %{colorFormat} as Color Format. Formats other than NV12 and P010 are commonly used for recording, and might incur high CPU usage or the streaming platform might not support it. Go to Settings -> Advanced -> Video to review.": "You have selected %{colorFormat} as Color Format. Formats other than NV12 and P010 are commonly used for recording, and might incur high CPU usage or the streaming platform might not support it. Go to Settings -> Advanced -> Video to review.",
   "Vertical Recording Only": "Vertical Recording Only",
-  "Switch primary destination to horizontal output to proceed or toggle vertical recording off.": "Switch primary destination to horizontal output to proceed or toggle vertical recording off.",
   "High, Medium File Size": "High, Medium File Size",
   "Indistinguishable, Large File Size": "Indistinguishable, Large File Size",
   "Lossless, Tremendously Large File Size": "Lossless, Tremendously Large File Size",

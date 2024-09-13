@@ -312,21 +312,17 @@ export class GoLiveSettingsModule {
    * Validate the form and show an error message
    */
   async validate() {
-    if (Services.DualOutputService.views.dualOutputMode && !this.getCanStreamDualOutput()) {
-      if (Services.DualOutputService.views.recordVertical) {
-        message.error(
-          $t(
-            'Switch primary destination to horizontal output to proceed or toggle vertical recording off.',
-          ),
-        );
-      } else {
-        message.error(
-          $t(
-            'To use Dual Output you must stream to at least one horizontal and one vertical platform.',
-          ),
-        );
-      }
-      return false;
+    if (
+      Services.DualOutputService.views.dualOutputMode &&
+      !this.getCanStreamDualOutput() &&
+      !Services.DualOutputService.views.recordVertical
+    ) {
+      message.error(
+        $t(
+          'To use Dual Output you must stream to at least one horizontal and one vertical platform.',
+        ),
+      );
+      return;
     }
 
     try {
