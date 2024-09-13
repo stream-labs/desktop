@@ -2548,12 +2548,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/codemirror@npm:5.60.4":
-  version: 5.60.4
-  resolution: "@types/codemirror@npm:5.60.4"
+"@types/codemirror@npm:5.60.10":
+  version: 5.60.10
+  resolution: "@types/codemirror@npm:5.60.10"
   dependencies:
     "@types/tern": "*"
-  checksum: 542be5cfef8b36defdaba0b4a0c200d8ba8566d7a6a3b7dcef5f11a59a2232aa402d040df5037a0ada8d4aedc99398854d4efef826625f161ab3425d34742a1e
+  checksum: c5977db03939f2a208f0ec7958be70b4fb205dd3f3122b2175ff28287a5424da95f9030b2838c61d37e6278ec53795861dec12439967c1e1da885b2b2a65b299
   languageName: node
   linkType: hard
 
@@ -13140,7 +13140,7 @@ __metadata:
     "@sentry/integrations": 5.21.4
     "@types/archiver": 2.1.3
     "@types/classnames": 2.2.11
-    "@types/codemirror": 5.60.4
+    "@types/codemirror": 5.60.10
     "@types/extract-zip": 1.6.2
     "@types/fs-extra": 8.1.1
     "@types/humps": 1.1.3
