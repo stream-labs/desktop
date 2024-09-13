@@ -210,6 +210,8 @@ class GLVolmetersModule {
   }
 
   beforeDestroy() {
+    // TODO: index
+    // @ts-ignore
     if (this.gl) window['activeWebglContexts'] -= 1;
     clearInterval(this.canvasWidthInterval);
     // unsubscribe all volmeters
@@ -282,14 +284,7 @@ class GLVolmetersModule {
 
     // Vertex geometry for a unit square
     // eslint-disable-next-line
-    const positions = [
-      0, 0,
-      0, 1,
-      1, 0,
-      1, 0,
-      0, 1,
-      1, 1,
-    ];
+    const positions = [0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 1];
 
     this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(positions), this.gl.STATIC_DRAW);
 
@@ -326,7 +321,10 @@ class GLVolmetersModule {
   private setColorUniform(uniform: string, color: number[]) {
     const location = this.gl.getUniformLocation(this.program, uniform);
     // eslint-disable-next-line
-    this.gl.uniform3fv(location, color.map(c => c / 255));
+    this.gl.uniform3fv(
+      location,
+      color.map(c => c / 255),
+    );
   }
 
   private setCanvasSize() {

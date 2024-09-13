@@ -47,6 +47,8 @@ class LayoutEditorModule {
     let existingEl;
     if (id && ['1', '2', '3', '4', '5', '6'].includes(id)) {
       existingEl = Object.keys(this.state.slottedElements).find(
+        // TODO: index
+        // @ts-ignore
         existing => this.state.slottedElements[existing].slot === id,
       ) as ELayoutElement;
       if (existingEl && this.state.slottedElements[el]) {

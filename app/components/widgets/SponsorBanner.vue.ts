@@ -52,6 +52,8 @@ export default class SponsorBanner extends WidgetSettings<
   }
 
   addImage(placement: string) {
+    // TODO: index
+    // @ts-ignore
     this.wData.settings[`placement_${placement}_images`].push({
       href: $t('No Image'),
       duration: 10,
@@ -59,6 +61,8 @@ export default class SponsorBanner extends WidgetSettings<
   }
 
   removeImage(href: string, placement: string) {
+    // TODO: index
+    // @ts-ignore
     this.wData.settings[`placement_${placement}_images`] = this.wData.settings[
       `placement_${placement}_images`
     ].filter((image: { href: string }) => image.href !== href);

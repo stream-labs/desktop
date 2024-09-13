@@ -74,6 +74,8 @@ export default class EventFilterMenu extends TsxComponent<{}> {
     return (
       <div class={styles.generalFilters}>
         {Object.keys(this.mainFilters).map(filter => (
+          // TODO: index
+          // @ts-ignore
           <div>{this.renderBooleanInput(filter, this.mainFilters[filter])}</div>
         ))}
       </div>
@@ -87,6 +89,8 @@ export default class EventFilterMenu extends TsxComponent<{}> {
         {this.subsEnabled &&
           Object.keys(this.subFilters)
             .filter(filter => filter !== 'subscription')
+            // TODO: index
+            // @ts-ignore
             .map(filter => <div>{this.renderBooleanInput(filter, this.subFilters[filter])}</div>)}
       </div>
     );
@@ -106,6 +110,8 @@ export default class EventFilterMenu extends TsxComponent<{}> {
                   key !== 'filter_subscription_minimum_enabled',
               )
               .map(filter => (
+                // TODO: index
+                // @ts-ignore
                 <div>{this.renderBooleanInput(filter, this.resubFilters[filter])}</div>
               ))}
         </div>

@@ -103,6 +103,8 @@ export default function HotkeyBinding(p: {
     };
 
     p.onBind({
+      // TODO: index
+      // @ts-ignore
       key: code[key],
       modifiers: getModifiers(event),
     });

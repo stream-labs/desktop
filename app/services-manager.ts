@@ -37,6 +37,8 @@ export class ServicesManager extends Service {
   init() {
     // this helps to debug services from the console
     if (Utils.isDevMode() || process.env.SLOBS_PRODUCTION_DEBUG) {
+      // TODO: index
+      // @ts-ignore
       window['sm'] = this;
     }
 
@@ -77,6 +79,8 @@ export class ServicesManager extends Service {
       const isStatefulService = ServiceClass['initialState'];
       const isMutator = ServiceClass.prototype.mutations;
       if (!isStatefulService && !isMutator) return;
+      // TODO: index
+      // @ts-ignore
       statefulServices[serviceName] = this.services[serviceName];
     });
     return statefulServices;

@@ -231,6 +231,8 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
     const newPatch = omit(patch, 'fader');
 
     Object.keys(newPatch).forEach(name => {
+      // TODO: index
+      // @ts-ignore
       const value = newPatch[name];
       if (value === void 0) return;
 
@@ -245,6 +247,8 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
       } else if (name === 'muted') {
         this.sourcesService.setMuted(sourceId, value);
       } else {
+        // TODO: index
+        // @ts-ignore
         obsInput[name] = value;
       }
     });

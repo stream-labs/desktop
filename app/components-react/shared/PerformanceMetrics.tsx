@@ -30,6 +30,8 @@ export default function PerformanceMetrics(props: {
   );
 
   function showAttribute(attribute: string) {
+    // TODO: index
+    // @ts-ignore
     return props.mode === 'full' || pinnedStats[attribute];
   }
 
@@ -39,6 +41,8 @@ export default function PerformanceMetrics(props: {
 
   function classForStat(stat: string) {
     if (props.mode === 'limited') return '';
+    // TODO: index
+    // @ts-ignore
     return `clickable ${pinnedStats[stat] ? 'active' : ''}`;
   }
 
@@ -77,6 +81,8 @@ export default function PerformanceMetrics(props: {
       )}
     >
       {shownCells.map(attribute => {
+        // TODO: index
+        // @ts-ignore
         const data = metadata[attribute];
         return (
           <Tooltip placement="bottom" title={pinTooltip(data.label)} key={attribute}>
@@ -86,6 +92,8 @@ export default function PerformanceMetrics(props: {
                 classForStat(attribute),
                 'performance-metric-wrapper',
               )}
+              // TODO: index
+              // @ts-ignore
               onClick={() => updatePinnedStats(attribute, !pinnedStats[attribute])}
             >
               <i className={cx(styles.performanceMetricIcon, data.icon)} />

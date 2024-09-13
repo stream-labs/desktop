@@ -32,6 +32,8 @@ export default class WidgetProperties extends Vue {
   async navigateWidgetSettings() {
     const widgetType = this.source.getPropertiesManagerSettings().widgetType;
 
+    // TODO: index
+    // @ts-ignore
     const subPage = {
       [WidgetType.AlertBox]: 'alertbox',
       [WidgetType.DonationGoal]: 'donationgoal',
