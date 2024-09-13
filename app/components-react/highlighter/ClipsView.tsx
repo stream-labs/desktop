@@ -274,6 +274,7 @@ export default function ClipsView({
       );
     }
 
+    e.preventDefault();
     e.stopPropagation();
   }
   function noClipsView(streamId: string | undefined) {

@@ -245,7 +245,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
     if (filtered.length) {
       HighlighterService.actions.flow(filtered[0], { id: 'manual_' + uuid() });
     }
-
+    e.preventDefault();
     e.stopPropagation();
   }
 
