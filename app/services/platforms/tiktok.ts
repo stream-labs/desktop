@@ -611,7 +611,7 @@ export class TikTokService
     return 'GL6399433079641606942';
   }
 
-  get promptReapply(): boolean {
+  get promptApply(): boolean {
     // never show for approved/legacy users or logged out users
     if (
       !this.getHasScope('denied') ||
@@ -637,11 +637,17 @@ export class TikTokService
     const isFrequentUser = this.diagnosticsService.isFrequentUser;
     if (isOldAccount && !isTikTokLinked && isFrequentUser) return true;
 
+    return false;
+  }
+
+  get promptReapply(): boolean {
     // prompt a user to reapply if they were rejected 30+ days ago
-    // if (!this.state.dateDenied) return false;
-    // const deniedDate = new Date(this.state.dateDenied);
-    // const deniedDateDiff = (deniedDate.getTime() - today.getTime()) / (1000 * 3600 * 24);
-    // if (this.denied && deniedDateDiff >= 30) return true;
+    if (!this.state.dateDenied) return false;
+
+    const today = new Date(Date.now());
+    const deniedDate = new Date(this.state.dateDenied);
+    const deniedDateDiff = (deniedDate.getTime() - today.getTime()) / (1000 * 3600 * 24);
+    if (this.denied && deniedDateDiff >= 30) return true;
 
     return false;
   }
