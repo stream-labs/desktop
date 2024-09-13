@@ -96,6 +96,8 @@ export default class Main extends Vue {
       liveDockSize: 'livedockSize',
     });
 
+    // TODO: index
+    // @ts-ignore
     antdThemes[this.theme].use();
     WindowsService.modalChanged.subscribe(modalOptions => {
       this.modalOptions = { ...this.modalOptions, ...modalOptions };
@@ -109,7 +111,11 @@ export default class Main extends Vue {
 
   @Watch('theme')
   updateAntd(newTheme: string, oldTheme: string) {
+    // TODO: index
+    // @ts-ignore
     antdThemes[oldTheme].unuse();
+    // TODO: index
+    // @ts-ignore
     antdThemes[newTheme].use();
   }
 

@@ -29,6 +29,8 @@ export default class CodeInput extends BaseInput<string, IInputMetadata> {
   mounted() {
     const $textarea = this.$el.querySelector('textarea');
     const options = {
+      // TODO: index
+      // @ts-ignore
       ...this.editorOptions[this.metadata.type],
       theme: this.theme,
     };

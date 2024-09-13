@@ -6,6 +6,8 @@ export function createProps<TProps extends new () => any>(
   const propsObj = {};
   const props = new propsClass();
   Object.keys(props).forEach((key: string) => {
+    // TODO: index
+    // @ts-ignore
     propsObj[key] = { default: props[key] };
   });
   return propsObj;

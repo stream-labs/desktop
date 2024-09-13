@@ -63,7 +63,11 @@ for (let i = 0; i < styleSheets.length; i++) {
 }
 
 function wrapLogFn(fn: string) {
+  // TODO: index
+  // @ts-ignore
   const old: Function = console[fn];
+  // TODO: index
+  // @ts-ignore
   console[fn] = (...args: any[]) => {
     old.apply(console, args);
 
@@ -101,8 +105,14 @@ window.addEventListener('unhandledrejection', e => {
 
 // Remove the startup event listener that catches bundle parse errors and other
 // critical issues starting up the renderer.
+// TODO: index
+// @ts-ignore
 if (window['_startupErrorHandler']) {
+  // TODO: index
+  // @ts-ignore
   window.removeEventListener('error', window['_startupErrorHandler']);
+  // TODO: index
+  // @ts-ignore
   delete window['_startupErrorHandler'];
 }
 
@@ -288,6 +298,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const obsUserPluginsService: ObsUserPluginsService = ObsUserPluginsService.instance;
 
     // This is used for debugging
+    // TODO: index
+    // @ts-ignore
     window['obs'] = obs;
 
     // Host a new OBS server instance

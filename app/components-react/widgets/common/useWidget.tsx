@@ -206,6 +206,8 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
   }
 
   get config(): IWidgetConfig {
+    // TODO: index
+    // @ts-ignore
     return this.widgetsConfig[this.state.type];
   }
 

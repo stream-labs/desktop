@@ -291,6 +291,8 @@ export abstract class RpcApi extends Service {
     } while (proto.constructor.name !== 'Object');
 
     keys.forEach(key => {
+      // TODO: index
+      // @ts-ignore
       resourceScheme[key] = typeof resource[key];
     });
 
@@ -298,7 +300,11 @@ export abstract class RpcApi extends Service {
   }
 
   private getResourceModel(helper: Object): Object {
+    // TODO: index
+    // @ts-ignore
     if (helper['getModel'] && typeof helper['getModel'] === 'function') {
+      // TODO: index
+      // @ts-ignore
       return helper['getModel']();
     }
     return {};

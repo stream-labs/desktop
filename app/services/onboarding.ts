@@ -297,6 +297,8 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   }
 
   themeUrl(id: number) {
+    // TODO: index
+    // @ts-ignore
     return this.themeMetadata[id];
   }
 

@@ -45,6 +45,8 @@ export class VueComponent extends Component<IProps, { id: string; vueInstance: V
   }
 
   componentDidUpdate(props: IProps): void {
+    // TODO: index
+    // @ts-ignore
     this.state.vueInstance!['updateProps'](props);
   }
 

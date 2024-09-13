@@ -71,6 +71,8 @@ export default class TipJar extends WidgetSettings<ITipJarData, TipJarService> {
   }
 
   titleFromKey(key: string) {
+    // TODO: index
+    // @ts-ignore
     return nameMap()[key];
   }
 
@@ -85,7 +87,11 @@ export default class TipJar extends WidgetSettings<ITipJarData, TipJarService> {
   }
 
   get mediaGalleryInputs() {
+    // TODO: index
+    // @ts-ignore
     if (!mediaGalleryInputs[this.platform]) return [];
+    // TODO: index
+    // @ts-ignore
     return mediaGalleryInputs[this.platform];
   }
 

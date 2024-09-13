@@ -158,6 +158,8 @@ export class CustomizationState extends RealmObject {
   }
 
   get displayBackground() {
+    // TODO: index
+    // @ts-ignore
     return DISPLAY_BACKGROUNDS[this.theme];
   }
 }
@@ -226,10 +228,14 @@ export class CustomizationService extends Service {
   }
 
   get themeBackground() {
+    // TODO: index
+    // @ts-ignore
     return THEME_BACKGROUNDS[this.currentTheme];
   }
 
   get sectionBackground() {
+    // TODO: index
+    // @ts-ignore
     return SECTION_BACKGROUNDS[this.currentTheme];
   }
 

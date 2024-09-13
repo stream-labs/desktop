@@ -13,6 +13,8 @@ export default function SvgContainer(p: {
     const attrs = {};
     let attrMatch;
     while ((attrMatch = SVG_ATTRS_REGEX.exec(svgTag)) !== null) {
+      // TODO: index
+      // @ts-ignore
       attrs[attrMatch[1]] = attrMatch[2];
     }
     return attrs;

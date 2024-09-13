@@ -22,6 +22,8 @@ class ObsColorInput extends ObsInput<IObsInput<number>> {
   @debounce(500)
   setValue(hex: string) {
     const rgba = this.hexToRGB(hex);
+    // TODO: index
+    // @ts-ignore
     if (!Object.keys(rgba).every(key => rgba[key] === this.obsColor[key])) {
       const intColor = Utils.rgbaToInt(rgba.r, rgba.g, rgba.b, rgba.a);
       this.emitInput({ ...this.value, value: intColor });

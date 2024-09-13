@@ -257,8 +257,12 @@ export default class StreamlabelProperties extends Vue {
           {Object.keys(this.labelSettings).map(key => (
             <HFormGroup
               key={key}
+              // TODO: index
+              // @ts-ignore
               vModel={this.labelSettings[key]}
               onInput={() => this.debouncedSetSettings()}
+              // TODO: index
+              // @ts-ignore
               metadata={this.metadata[key]}
             />
           ))}

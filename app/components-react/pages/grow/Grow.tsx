@@ -232,7 +232,13 @@ function StreamPulse(p: { analytics: IDashboardAnalytics }) {
           <div className={styles.card} key={stat.value}>
             <i className={stat.icon} />
             <span className={styles.title}>{stat.title}</span>
-            <span className={styles.stat}>{stats[stat.value]}</span>
+            <span className={styles.stat}>
+              {
+                // TODO: index
+                // @ts-ignore
+                stats[stat.value]
+              }
+            </span>
           </div>
         ))}
       </div>

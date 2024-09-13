@@ -172,6 +172,8 @@ export default class Utils {
   static getChangedParams<T>(obj: T, patch: T): Partial<T> {
     const result: Dictionary<any> = {};
     Object.keys(patch).forEach(key => {
+      // TODO: index
+      // @ts-ignore
       if (!isEqual(obj[key], patch[key])) result[key] = cloneDeep(patch[key]);
     });
     return result as Partial<T>;
@@ -183,10 +185,18 @@ export default class Utils {
     if (obj == null) return patch;
 
     Object.keys(patch).forEach(key => {
+      // TODO: index
+      // @ts-ignore
       if (!isEqual(obj[key], patch[key])) {
+        // TODO: index
+        // @ts-ignore
         if (patch[key] && typeof patch[key] === 'object' && !Array.isArray(patch[key])) {
+          // TODO: index
+          // @ts-ignore
           result[key] = this.getDeepChangedParams(obj[key], patch[key]);
         } else {
+          // TODO: index
+          // @ts-ignore
           result[key] = patch[key];
         }
       }
