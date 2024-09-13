@@ -177,7 +177,7 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
 
   getPlatformContext(platform: TPlatform) {
     const display = this.getPlatformDisplay(platform);
-    return this.videoSettingsService.state[display];
+    return this.videoSettingsService.contexts[display];
   }
 
   getPlatformMode(platform: TPlatform): TOutputOrientation {

@@ -8,7 +8,7 @@ import invert from 'lodash/invert';
 import cloneDeep from 'lodash/cloneDeep';
 import { TwitchService } from 'services/platforms/twitch';
 import { PlatformAppsService } from 'services/platform-apps';
-import { IGoLiveSettings, IPlatformFlags } from 'services/streaming';
+import { IGoLiveSettings, IPlatformFlags, IPlatformSettings } from 'services/streaming';
 import { VideoSettingsService, TDisplayType } from 'services/settings-v2/video';
 import Vue from 'vue';
 import { IVideo } from 'obs-studio-node';
@@ -16,13 +16,7 @@ import { DualOutputService } from 'services/dual-output';
 import { TOutputOrientation } from 'services/restream';
 
 interface ISavedGoLiveSettings {
-  platforms: {
-    twitch?: IPlatformFlags;
-    facebook?: IPlatformFlags;
-    youtube?: IPlatformFlags;
-    trovo?: IPlatformFlags;
-    tiktok?: IPlatformFlags;
-  };
+  platforms: IPlatformSettings;
   customDestinations?: ICustomStreamDestination[];
   advancedMode: boolean;
 }
@@ -204,23 +198,20 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     this.settingsService.setSettings(streamName, streamFormData);
   }
 
-  setGoLiveSettings(settingsPatch: Partial<IGoLiveSettings>) {
+  setGoLiveSettings(settingsPatch: Partial<IGoLiveSettings> & { platforms?: IPlatformSettings }) {
     // transform IGoLiveSettings to ISavedGoLiveSettings
-    const patch: Partial<ISavedGoLiveSettings> = settingsPatch;
+    const patch: Partial<ISavedGoLiveSettings> & { platforms?: IPlatformSettings } = settingsPatch;
     if (settingsPatch.platforms) {
-      const pickedFields: (keyof IPlatformFlags)[] = ['enabled', 'useCustomFields'];
+      const pickedFields: (keyof IPlatformFlags)[] = ['enabled', 'useCustomFields', 'display'];
       const platforms: Dictionary<IPlatformFlags> = {};
       Object.keys(settingsPatch.platforms).map((platform: TPlatform) => {
         const platformSettings = pick(settingsPatch.platforms![platform], pickedFields);
-        const display = settingsPatch.platforms![platform]?.display ?? 'horizontal';
 
-        if (this.dualOutputService.views.dualOutputMode) {
-          platformSettings.video = this.videoSettingsService.getContext(display);
-        } else {
-          platformSettings.video = this.videoSettingsService.getContext('horizontal');
-        }
+        const video = this.dualOutputService.views.dualOutputMode
+          ? this.dualOutputService.views.getPlatformContext(platform as TPlatform)
+          : this.videoSettingsService.contexts.horizontal;
 
-        return (platforms[platform] = platformSettings);
+        return (platforms[platform] = { ...platformSettings, video });
       });
       patch.platforms = platforms as ISavedGoLiveSettings['platforms'];
     }
@@ -379,7 +370,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
 
   @mutation()
   private SET_LOCAL_STORAGE_SETTINGS(settings: Partial<IStreamSettingsState>) {
-    Object.keys(settings).forEach(prop => {
+    Object.keys(settings).forEach((prop: keyof IStreamSettingsState) => {
       Vue.set(this.state, prop, settings[prop]);
     });
   }

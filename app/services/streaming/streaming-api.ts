@@ -63,16 +63,18 @@ export interface IStreamInfo {
 
 export type TGoLiveChecklistItemState = 'not-started' | 'pending' | 'done' | 'failed';
 
+export interface IPlatformSettings {
+  twitch?: IPlatformFlags & ITwitchStartStreamOptions;
+  youtube?: IPlatformFlags & IYoutubeStartStreamOptions;
+  facebook?: IPlatformFlags & IFacebookStartStreamOptions;
+  tiktok?: IPlatformFlags & ITikTokStartStreamOptions;
+  trovo?: IPlatformFlags & ITrovoStartStreamOptions;
+  twitter?: IPlatformFlags & ITwitterStartStreamOptions;
+  instagram?: IPlatformFlags & IInstagramStartStreamOptions;
+}
+
 export interface IStreamSettings {
-  platforms: {
-    twitch?: IPlatformFlags & ITwitchStartStreamOptions;
-    youtube?: IPlatformFlags & IYoutubeStartStreamOptions;
-    facebook?: IPlatformFlags & IFacebookStartStreamOptions;
-    tiktok?: IPlatformFlags & ITikTokStartStreamOptions;
-    trovo?: IPlatformFlags & ITrovoStartStreamOptions;
-    twitter?: IPlatformFlags & ITwitterStartStreamOptions;
-    instagram?: IPlatformFlags & IInstagramStartStreamOptions;
-  };
+  platforms: IPlatformSettings;
   customDestinations: ICustomStreamDestination[];
   advancedMode: boolean;
 }
