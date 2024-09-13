@@ -6,6 +6,7 @@ import { TPlatform, getPlatformService } from 'services/platforms';
 import pick from 'lodash/pick';
 import invert from 'lodash/invert';
 import cloneDeep from 'lodash/cloneDeep';
+import defaults from 'lodash/defaults';
 import { TwitchService } from 'services/platforms/twitch';
 import { PlatformAppsService } from 'services/platform-apps';
 import { IGoLiveSettings, IPlatformFlags, IPlatformSettings } from 'services/streaming';
@@ -205,11 +206,23 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
       const pickedFields: (keyof IPlatformFlags)[] = ['enabled', 'useCustomFields', 'display'];
       const platforms: Dictionary<IPlatformFlags> = {};
       Object.keys(settingsPatch.platforms).map((platform: TPlatform) => {
-        const platformSettings = pick(settingsPatch.platforms![platform], pickedFields);
-
         const video = this.dualOutputService.views.dualOutputMode
           ? this.dualOutputService.views.getPlatformContext(platform as TPlatform)
           : this.videoSettingsService.contexts.horizontal;
+        const pickedSettings = pick(settingsPatch.platforms![platform], pickedFields);
+        const display =
+          this.dualOutputService.views.dualOutputMode && pickedSettings?.display
+            ? pickedSettings?.display
+            : 'horizontal';
+
+        const platformSettings = defaults(
+          {
+            enabled: true,
+            useCustomFields: false,
+            video: this.videoSettingsService.getContext(display),
+          },
+          settingsPatch.platforms![platform],
+        );
 
         return (platforms[platform] = { ...platformSettings, video });
       });
