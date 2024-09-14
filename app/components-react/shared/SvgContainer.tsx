@@ -21,6 +21,9 @@ export default function SvgContainer(p: {
   }
 
   function derivePaths() {
+    // FIXME: do we want dotAll? if so we need to change our target to `es2018`
+    // ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/dotAll
+    // @ts-ignore
     const pathsMatch = p.src.match(/>\s*(<.*>)\s*</s);
 
     return (pathsMatch && pathsMatch[1]) || '';
