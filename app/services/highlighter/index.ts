@@ -51,6 +51,7 @@ import execa from 'execa';
 import moment from 'moment';
 import { getHighlightClips, IHighlight, IHighlighterInput } from './ai-highlighter/ai-highlighter';
 import uuid from 'uuid';
+import { getSharedResource } from 'util/get-shared-resource';
 export type TStreamInfo =
   | {
       orderPosition: number;
@@ -564,7 +565,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     return new HighligherViews(this.state);
   }
 
-  init() {
+  async init() {
     super.init();
 
     //Check if files are existent, if not, delete
@@ -638,19 +639,15 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
         // path.join(CLIP_DIR, '2021-05-25 08-56-03.mp4'),
       ];
 
-      clipsToLoad.forEach((c, index) => {
-        this.ADD_CLIP({
-          path: c,
-          loaded: false,
-          enabled: true,
-          startTrim: 0,
-          endTrim: 0,
-          deleted: false,
-          source: 'Manual',
-          globalOrderPosition: index,
-          streamInfo: undefined,
-        });
+      await this.addStream({
+        id: 'demo123',
+        game: 'Fortnite',
+        title: 'Demo Stream',
+        date: '1726234396290',
+        state: { type: 'detection-finished', progress: 0 },
       });
+      const newClips = [getSharedResource('replay123.mp4')].map(path => ({ path }));
+      this.addClips(newClips, 'demo123', 'Manual');
     } else {
       let streamStarted = false;
       let aiRecordingInProgress = false;
