@@ -379,7 +379,7 @@ function RemoveStream(p: { streamId: string | undefined; close: () => void }) {
             console.error('Cant remove stream, missing id');
             return;
           }
-          HighlighterService.actions.REMOVE_HIGHLIGHTED_STREAM(p.streamId);
+          HighlighterService.actions.removeStream(p.streamId);
           p.close();
         }}
       >
