@@ -193,9 +193,19 @@ export default class OverlaySettings extends Vue {
     );
   }
 
+  async createSceneCollection() {
+    // TODO: don't have a way to prompt for name, rather port this to React
+    const name = this.sceneCollectionsService.suggestName('Scenes');
+    this.sceneCollectionsService.actions.create({ name });
+  }
+
   render() {
     return (
       <div>
+        <div class="section">
+          {this.button($t('Create Scene Collection'), () => this.createSceneCollection())}
+          {this.button($t('Import Widget File in Current Scene'), () => this.loadWidget())}
+        </div>
         <div class="section">
           <p>
             {$t(
@@ -213,9 +223,6 @@ export default class OverlaySettings extends Vue {
           />
           <br />
           {this.message}
-        </div>
-        <div class="section">
-          {this.button($t('Import Widget File in Current Scene'), () => this.loadWidget())}
         </div>
         <div class="section">
           <div class="section-content">
