@@ -15,7 +15,7 @@
 }
 
 .stream-card {
-  background-color: #2b383f;
+  background: var(--Day-Colors-Dark-3, #2b383f);
   display: flex;
   flex-direction: column;
   border-radius: 10px;
@@ -34,23 +34,9 @@
 
   width: calc(var(--thumbWith) * 2.2);
   height: calc(var(--thumbHeight) * 2.2);
+  background: var(--Day-Colors-Dark-4, #4f5e65);
 }
 
-//TODO: replace with more performant loader
-.video-skeleton {
-  animation: pulsate 4s ease-in-out infinite;
-  will-change: background-color;
-}
-
-@keyframes pulsate {
-  0%,
-  100% {
-    background-color: #38484f;
-  }
-  50% {
-    background-color: #324148;
-  }
-}
 .thumbnail-wrapper-small {
   position: absolute;
   --thumbWith: 192px;
@@ -126,6 +112,22 @@
     width: 100% !important;
     height: 100% !important;
   }
+}
+
+.progressbar-background {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  height: '40px';
+
+  border-radius: 4px;
+  background: var(--Day-Colors-Dark-4, #4f5e65);
+}
+
+.progressbar-progress {
+  height: 100%;
+  border-radius: 4px;
+  background: var(--Night-Colors-Light-2, #f5f8fa);
 }
 
 .upload-wrapper {

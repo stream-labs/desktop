@@ -126,16 +126,7 @@ export default function StreamCard({
   function getActionRow(): JSX.Element {
     if (stream?.state.type === 'detection-in-progress') {
       return (
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            width: '100%',
-            height: '40px',
-            backgroundColor: 'gray',
-            borderRadius: '4px',
-          }}
-        >
+        <div className={styles.progressbarBackground}>
           <div
             style={{
               height: '40px',
@@ -150,11 +141,9 @@ export default function StreamCard({
             Creating ai highlights...
           </div>
           <div
+            className={styles.progressbarProgress}
             style={{
-              height: '100%',
-              backgroundColor: '#F5F8FA',
               width: `${stream.state.progress}%`,
-              borderRadius: '4px',
               transition: 'width 1s',
             }}
           ></div>{' '}
@@ -284,7 +273,7 @@ export default function StreamCard({
         showStreamClips();
       }}
     >
-      <div className={`${styles.thumbnailWrapper} ${styles.videoSkeleton}`}>
+      <div className={`${styles.thumbnailWrapper} `}>
         {' '}
         <Button
           size="large"
