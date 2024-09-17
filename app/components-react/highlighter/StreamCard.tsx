@@ -51,13 +51,15 @@ export default function StreamCard({
   function getWordingFromType(type: string): { emoji: string; description: string } {
     switch (type) {
       case 'kill':
-        return { emoji: '💀', description: 'kills' };
+        return { emoji: '💀', description: 'eliminated' };
+      case 'knocked':
+        return { emoji: '🥊', description: 'knocked' };
       case 'death':
         return { emoji: '🪦', description: 'deaths' };
       case 'victory':
-        return { emoji: '🏆', description: 'victory' };
+        return { emoji: '🏆', description: 'win' };
       case 'deploy':
-        return { emoji: '🪂', description: 'games started' };
+        return { emoji: '🪂', description: 'deploy' };
 
       default:
         break;
@@ -76,6 +78,8 @@ export default function StreamCard({
 
   function getEmojiSection(): JSX.Element | string {
     const eventTypeMap = Object.entries(getMomentTypeCount(clips));
+    const filteredEventTypeMap =
+      eventTypeMap.length > 3 ? eventTypeMap.filter(([type]) => type !== 'deploy') : eventTypeMap;
     const manualClips = clips.filter(
       clip => clip.source === 'ReplayBuffer' || clip.source === 'Manual',
     );
@@ -87,9 +91,7 @@ export default function StreamCard({
       return (
         <div key={'manualClips'} style={{ display: 'flex', gap: '4px' }}>
           <span>🎬</span>
-          <span>{`${manualClips.length} ${
-            manualClips.length === 1 ? ' manual clip' : ' manual clips'
-          }`}</span>
+          <span>{`${manualClips.length} ${manualClips.length === 1 ? ' manual' : ' manual'}`}</span>
         </div>
       );
     }
@@ -100,16 +102,19 @@ export default function StreamCard({
       }
       return (
         <>
-          {eventTypeMap.map(([type, count]) => (
-            <div key={type} style={{ display: 'flex', gap: '4px' }}>
-              <span key={type + 'emoji'}>{getWordingFromType(type).emoji} </span>{' '}
-              <span key={type + 'desc'}>
-                {' '}
-                {count} {getWordingFromType(type).description}
-              </span>
-            </div>
+          {filteredEventTypeMap.map(([type, count]) => (
+            <>
+              <div key={type} style={{ display: 'flex', gap: '4px' }}>
+                <span key={type + 'emoji'}>{getWordingFromType(type).emoji} </span>{' '}
+                <span key={type + 'desc'}>
+                  {' '}
+                  {count} {getWordingFromType(type).description}
+                </span>
+              </div>
+            </>
           ))}
           {manualClip()}
+          {eventTypeMap.length > 3 ? '...' : ''}
         </>
       );
     }
@@ -383,7 +388,7 @@ export default function StreamCard({
                       rotate: `${(index - 1) * 6}deg`,
                       scale: '1.2',
                       transform: `translate(${(index - 1) * 9}px, ${
-                        index === 1 ? 0 + 12 : 2 + 12
+                        index === 1 ? 0 + 4 : 2 + 4
                       }px)`,
                       zIndex: index === 1 ? 10 : 0,
                     }}
@@ -410,7 +415,7 @@ export default function StreamCard({
             style={{
               margin: 0,
               display: 'flex',
-              gap: '16px',
+              gap: '10px',
               justifyContent: 'start',
             }}
           >
