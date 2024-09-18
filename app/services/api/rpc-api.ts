@@ -280,7 +280,7 @@ export abstract class RpcApi extends Service {
       this.requestErrors.push(`Resource not found: ${resourceId}`);
       return null;
     }
-    const resourceScheme = {};
+    const resourceScheme: Dictionary<string> = {};
 
     // collect resource keys from the whole prototype chain
     const keys: string[] = [];
@@ -291,8 +291,6 @@ export abstract class RpcApi extends Service {
     } while (proto.constructor.name !== 'Object');
 
     keys.forEach(key => {
-      // TODO: index
-      // @ts-ignore
       resourceScheme[key] = typeof resource[key];
     });
 
@@ -300,12 +298,8 @@ export abstract class RpcApi extends Service {
   }
 
   private getResourceModel(helper: Object): Object {
-    // TODO: index
-    // @ts-ignore
-    if (helper['getModel'] && typeof helper['getModel'] === 'function') {
-      // TODO: index
-      // @ts-ignore
-      return helper['getModel']();
+    if ('getModel' in helper && typeof helper.getModel === 'function') {
+      return helper.getModel();
     }
     return {};
   }

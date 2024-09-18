@@ -27,6 +27,8 @@ export class Vec2 extends Vector2 {
     return new Proxy(this, {
       get: (target, propName) => {
         // TODO: index
+        // maybe use `Object.hasOwnProperty` or the `in` operator (if we care
+        // about inheritance).
         // @ts-ignore
         if (typeof target[propName] !== 'function' || !Vector2.prototype[propName]) {
           // TODO: index
