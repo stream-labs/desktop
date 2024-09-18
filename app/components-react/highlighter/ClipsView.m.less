@@ -1,4 +1,4 @@
-@import "../../styles/index";
+@import '../../styles/index';
 
 .clip-loader {
   width: 100%;
@@ -9,7 +9,8 @@
 .clips-view-root {
   position: relative;
 
-  :global(.ant-modal-wrap), :global(.ant-modal-mask) {
+  :global(.ant-modal-wrap),
+  :global(.ant-modal-mask) {
     position: absolute;
   }
 
@@ -32,7 +33,7 @@
   cursor: pointer;
 
   &:hover {
-    opacity: 1.0;
+    opacity: 1;
   }
 }
 
@@ -42,4 +43,21 @@
   &:hover {
     color: var(--title);
   }
+}
+
+.type-tag {
+  background-color: #4f5e65;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hypescore-wrapper {
+  display: flex;
+  font-size: 12px;
+  text-align: end;
+  align-items: end;
 }

@@ -12,6 +12,7 @@ import { isAiClip } from './utils';
 
 export default function ClipPreview(props: {
   clip: TClip;
+  streamId: string | undefined;
   showTrim: () => void;
   showRemove: () => void;
 }) {
@@ -54,7 +55,7 @@ export default function ClipPreview(props: {
       return 'noStreamId';
     }
 
-    const firstStreamId = streamIds[0]; // TODO M: Pass streamId here? or need to find the stream where the initialTime is not undefined
+    const firstStreamId = props.streamId || streamIds[0]; // TODO M: Pass streamId here? or need to find the stream where the initialTime is not undefined
     const startTime = props.clip.streamInfo[firstStreamId]?.initialStartTime;
     const endTime = props.clip.streamInfo[firstStreamId]?.initialEndTime;
 
@@ -156,28 +157,39 @@ export default function ClipPreview(props: {
           flexDirection: 'column',
           justifyContent: 'space-between',
           width: '100%',
-          padding: '0 10px',
           borderRadius: '0 0 10px 10px',
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex' }}>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
             <div
               style={{
                 fontSize: '16px',
-                width: '240px',
+                width: '184px',
                 textOverflow: 'ellipsis',
                 overflow: 'hidden',
                 whiteSpace: 'nowrap',
               }}
             >
-              {props.clip.path}
+              {filename}
             </div>
-            <div style={{}}>
-              {isAiClip(props.clip) ? props.clip.aiInfo.moments[0].type : 'ReplayBuffer'}
+            <div className={styles.typeTag}>
+              {isAiClip(props.clip) ? (
+                <>
+                  <i className="icon-super-chat-goal" />
+                  {props.clip.aiInfo.moments[0].type}
+                </>
+              ) : (
+                <>
+                  <i className="icon-highlighter" /> {props.clip.source}
+                </>
+              )}
             </div>
           </div>
-          <div>94/100</div>
+          <div className={styles.hypescoreWrapper}>
+            <span style={{ fontSize: '21px', color: 'white' }}>94</span>
+            <span style={{ paddingBottom: '4px', paddingLeft: '2px' }}>/100</span>
+          </div>
         </div>
         <div
           style={{
@@ -187,7 +199,15 @@ export default function ClipPreview(props: {
             flexWrap: 'wrap',
           }}
         >
-          <div style={{ fontSize: '16px' }}>1:23:11 - 1:24:42</div>
+          <div style={{ fontSize: '16px' }}>
+            {`${
+              props.streamId &&
+              formatSecondsToHHMMSS(props.clip.streamInfo?.[props.streamId]?.initialStartTime)
+            } - ${
+              props.streamId &&
+              formatSecondsToHHMMSS(props.clip.streamInfo?.[props.streamId]?.initialEndTime)
+            } `}
+          </div>
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             {' '}
             <Button
@@ -234,4 +254,16 @@ export default function ClipPreview(props: {
       </div>
     </div>
   );
+}
+
+function formatSecondsToHHMMSS(seconds: number | undefined): string {
+  if (seconds === undefined) {
+    return '00:00:00';
+  }
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const remainingSeconds = seconds % 60;
+  return `${hours.toString().padStart(2, '0')}:${minutes
+    .toString()
+    .padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
 }

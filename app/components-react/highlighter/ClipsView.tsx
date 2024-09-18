@@ -417,6 +417,7 @@ export default function ClipsView({
                             setInspectedClipPath(clip.path);
                             setShowModal('remove');
                           }}
+                          streamId={streamId}
                         />
                       </div>
                     );
