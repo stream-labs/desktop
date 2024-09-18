@@ -280,13 +280,10 @@ export class DragHandler {
     );
   }
 
-  private pageSpaceToCanvasSpace(vec: IVec2, display = 'horizontal') {
-    // TODO: index
-    // @ts-ignore
+  private pageSpaceToCanvasSpace(vec: IVec2, display: 'horizontal' | 'vertical' = 'horizontal') {
     const baseWidth = this.videoSettingsService.baseResolutions[display].baseWidth;
-    // TODO: index
-    // @ts-ignore
     const baseHeight = this.videoSettingsService.baseResolutions[display].baseHeight;
+
     return {
       x: (vec.x * this.scaleFactor * baseWidth) / this.displaySize.x,
       y: (vec.y * this.scaleFactor * baseHeight) / this.displaySize.y,
