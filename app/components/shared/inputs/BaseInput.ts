@@ -92,11 +92,9 @@ export abstract class BaseInput<
    */
   get validate() {
     const validations = this.getValidations();
-    Object.keys(validations).forEach(key => {
+    Object.keys(validations).forEach((key: keyof typeof validations) => {
       // VeeValidate recognizes undefined values as valid constraints
       // so just remove it
-      // TODO: index
-      // @ts-ignore
       if (validations[key] == null) delete validations[key];
     });
 

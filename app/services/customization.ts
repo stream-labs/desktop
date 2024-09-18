@@ -9,6 +9,7 @@ import { AppService } from './app';
 import * as obs from '../../obs-api';
 import { RealmObject } from './realm';
 import { ObjectSchema } from 'realm';
+import { Theme } from 'styles/antd';
 
 // Maps to --background
 const THEME_BACKGROUNDS = {
@@ -218,8 +219,9 @@ export class CustomizationService extends Service {
     this.settingsChanged.next(settingsPatch);
   }
 
-  get currentTheme() {
-    return this.state.theme;
+  get currentTheme(): Theme {
+    // TODO: one level deeper is Realm, keep string for now
+    return this.state.theme as Theme;
   }
 
   setTheme(theme: string) {
@@ -228,14 +230,10 @@ export class CustomizationService extends Service {
   }
 
   get themeBackground() {
-    // TODO: index
-    // @ts-ignore
     return THEME_BACKGROUNDS[this.currentTheme];
   }
 
   get sectionBackground() {
-    // TODO: index
-    // @ts-ignore
     return SECTION_BACKGROUNDS[this.currentTheme];
   }
 

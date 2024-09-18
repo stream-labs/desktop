@@ -37,9 +37,7 @@ export class ServicesManager extends Service {
   init() {
     // this helps to debug services from the console
     if (Utils.isDevMode() || process.env.SLOBS_PRODUCTION_DEBUG) {
-      // TODO: index
-      // @ts-ignore
-      window['sm'] = this;
+      (window as typeof window & { sm: ServicesManager }).sm = this;
     }
 
     // Renderer windows access services in the worker window via proxy API
@@ -72,17 +70,17 @@ export class ServicesManager extends Service {
   }
 
   getStatefulServicesAndMutators(): Dictionary<typeof StatefulService> {
-    const statefulServices = {};
+    const statefulServices: Dictionary<typeof StatefulService> = {};
+
     Object.keys(this.services).forEach(serviceName => {
       const ServiceClass = this.services[serviceName];
       if (typeof ServiceClass === 'object') return; // skip AppServices object
       const isStatefulService = ServiceClass['initialState'];
       const isMutator = ServiceClass.prototype.mutations;
       if (!isStatefulService && !isMutator) return;
-      // TODO: index
-      // @ts-ignore
       statefulServices[serviceName] = this.services[serviceName];
     });
+
     return statefulServices;
   }
 

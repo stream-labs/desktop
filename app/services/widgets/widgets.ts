@@ -134,6 +134,7 @@ export class WidgetsService
     if (!this.userService.isLoggedIn) return;
 
     // TODO: index
+    // DonationGoal is not defined in widgetsConfig, lots of them commented out
     // @ts-ignore
     const widget = this.widgetsConfig[type] || WidgetDefinitions[type];
     // TODO: index
@@ -293,7 +294,6 @@ export class WidgetsService
    * returns -1 if it's no type detected
    */
   getWidgetTypeByUrl(url: string): WidgetType | -1 {
-    // FIXME: return value
     if (!this.userService.views.isLoggedIn) return -1;
 
     const type = Number(

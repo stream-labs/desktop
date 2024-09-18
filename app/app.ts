@@ -62,12 +62,8 @@ for (let i = 0; i < styleSheets.length; i++) {
   }
 }
 
-function wrapLogFn(fn: string) {
-  // TODO: index
-  // @ts-ignore
+function wrapLogFn(fn: 'debug' | 'error' | 'info' | 'log') {
   const old: Function = console[fn];
-  // TODO: index
-  // @ts-ignore
   console[fn] = (...args: any[]) => {
     old.apply(console, args);
 
@@ -105,15 +101,18 @@ window.addEventListener('unhandledrejection', e => {
 
 // Remove the startup event listener that catches bundle parse errors and other
 // critical issues starting up the renderer.
-// TODO: index
-// @ts-ignore
-if (window['_startupErrorHandler']) {
-  // TODO: index
-  // @ts-ignore
-  window.removeEventListener('error', window['_startupErrorHandler']);
-  // TODO: index
-  // @ts-ignore
-  delete window['_startupErrorHandler'];
+declare global {
+  interface Window {
+    _startupErrorHandler: EventListenerOrEventListenerObject | undefined;
+  }
+}
+
+// TODO: can't find `_startupErrorHandler` in electron or chromium sources
+// This might no longer be relevant, we should breakpoint below and see if
+// it exists.
+if (window._startupErrorHandler) {
+  window.removeEventListener('error', window._startupErrorHandler);
+  delete window._startupErrorHandler;
 }
 
 // Used by Eddy for debugging on mac.
@@ -298,9 +297,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const obsUserPluginsService: ObsUserPluginsService = ObsUserPluginsService.instance;
 
     // This is used for debugging
-    // TODO: index
-    // @ts-ignore
-    window['obs'] = obs;
+    (window as typeof window & { obs: typeof obs }).obs = obs;
 
     // Host a new OBS server instance
     obs.IPC.host(remote.process.env.IPC_UUID);
