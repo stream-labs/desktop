@@ -384,7 +384,7 @@ export default function ClipsView({
           </div>
 
           {v.loaded ? (
-            <Scrollable style={{ flexGrow: 1, padding: '20px 0 20px 20px' }}>
+            <Scrollable style={{ flexGrow: 1, padding: '20px 20px 20px 20px' }}>
               <ReactSortable
                 list={tempClipList}
                 setList={clips => setClipOrder(clips, props.id)} //
@@ -401,7 +401,11 @@ export default function ClipsView({
                     return (
                       <div
                         key={clip.path}
-                        style={{ margin: '10px 20px 10px 0', display: 'inline-block' }}
+                        style={{
+                          margin: '10px 20px 10px 0',
+                          width: '100%',
+                          display: 'inline-block',
+                        }}
                       >
                         <ClipPreview
                           clip={clip}

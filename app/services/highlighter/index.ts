@@ -639,15 +639,15 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
         // path.join(CLIP_DIR, '2021-05-25 08-56-03.mp4'),
       ];
 
-      await this.addStream({
-        id: 'demo123',
-        game: 'Fortnite',
-        title: 'Demo Stream',
-        date: '1726234396290',
-        state: { type: 'detection-finished', progress: 0 },
-      });
-      const newClips = [getSharedResource('replay123.mp4')].map(path => ({ path }));
-      this.addClips(newClips, 'demo123', 'Manual');
+      //  await this.addStream({
+      //  id: 'demo123',
+      // game: 'Fortnite',
+      //title: 'Demo Stream',
+      //date: '1726234396290',
+      //state: { type: 'detection-finished', progress: 0 },
+      //});
+      //const newClips = [getSharedResource('replay123.mp4')].map(path => ({ path }));
+      //this.addClips(newClips, 'demo123', 'Manual');
     } else {
       let streamStarted = false;
       let aiRecordingInProgress = false;
