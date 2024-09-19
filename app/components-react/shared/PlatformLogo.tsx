@@ -26,7 +26,7 @@ export default function PlatformLogo(p: IProps & HTMLAttributes<unknown>) {
   function iconForPlatform() {
     return {
       twitch: 'fab fa-twitch',
-      youtube: 'fab fa-youtube',
+      youtube: 'youtube',
       facebook: 'fab fa-facebook',
       tiktok: 'tiktok',
       trovo: 'fab fa-trovo',

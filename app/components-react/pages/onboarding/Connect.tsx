@@ -132,7 +132,7 @@ export function Connect() {
                     loading={loading}
                     onClick={() => authPlatform(platform, afterLogin)}
                     key={platform}
-                    logoSize={['twitter', 'tiktok'].includes(platform) ? 15 : undefined}
+                    logoSize={['twitter', 'tiktok', 'youtube'].includes(platform) ? 15 : undefined}
                   >
                     <Translate
                       message={$t('Log in with <span>%{platform}</span>', {
