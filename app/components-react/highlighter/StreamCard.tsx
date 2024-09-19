@@ -5,6 +5,7 @@ import { Button } from 'antd';
 import { Services } from 'components-react/service-provider';
 import { isAiClip } from './utils';
 import { useVuex } from 'components-react/hooks';
+import { InputEmojiSection } from './InputEmojiSection';
 
 export default function StreamCard({
   streamId,
@@ -29,43 +30,7 @@ export default function StreamCard({
   if (!stream) {
     return <>error</>;
   }
-  function getMomentTypeCount(clips: TClip[]): { [type: string]: number } {
-    const typeCounts: { [type: string]: number } = {};
 
-    clips.forEach(clip => {
-      if (isAiClip(clip)) {
-        clip.aiInfo.moments.forEach(moment => {
-          const type = moment.type;
-          if (typeCounts[type]) {
-            typeCounts[type] += 1;
-          } else {
-            typeCounts[type] = 1;
-          }
-        });
-      }
-    });
-
-    return typeCounts;
-  }
-
-  function getWordingFromType(type: string): { emoji: string; description: string } {
-    switch (type) {
-      case 'kill':
-        return { emoji: '💀', description: 'eliminated' };
-      case 'knocked':
-        return { emoji: '🥊', description: 'knocked' };
-      case 'death':
-        return { emoji: '🪦', description: 'deaths' };
-      case 'victory':
-        return { emoji: '🏆', description: 'win' };
-      case 'deploy':
-        return { emoji: '🪂', description: 'deploy' };
-
-      default:
-        break;
-    }
-    return { emoji: type, description: type };
-  }
   function getFailedText(): string {
     if (stream?.state.type === 'error') {
       return 'Ai detection failed';
@@ -74,53 +39,6 @@ export default function StreamCard({
       return 'Ai-detection cancelled';
     }
     return '';
-  }
-
-  function getEmojiSection(): JSX.Element | string {
-    const eventTypeMap = Object.entries(getMomentTypeCount(clips));
-    const filteredEventTypeMap =
-      eventTypeMap.length > 3 ? eventTypeMap.filter(([type]) => type !== 'deploy') : eventTypeMap;
-    const manualClips = clips.filter(
-      clip => clip.source === 'ReplayBuffer' || clip.source === 'Manual',
-    );
-
-    function manualClip() {
-      if (manualClips.length === 0) {
-        return <></>;
-      }
-      return (
-        <div key={'manualClips'} style={{ display: 'flex', gap: '4px' }}>
-          <span>🎬</span>
-          <span>{`${manualClips.length} ${manualClips.length === 1 ? ' manual' : ' manual'}`}</span>
-        </div>
-      );
-    }
-
-    if (stream?.state.type === 'detection-finished') {
-      if (clips.length === 0) {
-        return 'Detection wasnt able to pick up any highlights';
-      }
-      return (
-        <>
-          {filteredEventTypeMap.map(([type, count]) => (
-            <div key={type} style={{ display: 'flex', gap: '4px' }}>
-              <span key={type + 'emoji'}>{getWordingFromType(type).emoji} </span>{' '}
-              <span key={type + 'desc'}>
-                {' '}
-                {count} {getWordingFromType(type).description}
-              </span>
-            </div>
-          ))}
-          {manualClip()}
-          {eventTypeMap.length > 3 ? '...' : ''}
-        </>
-      );
-    }
-    if (clips.length > 0) {
-      return manualClip();
-    }
-
-    return <div style={{ height: '22px' }}></div>;
   }
 
   function getActionRow(): JSX.Element {
@@ -198,6 +116,8 @@ export default function StreamCard({
         </div>
       );
     }
+
+    //if failed
     return (
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
@@ -207,18 +127,12 @@ export default function StreamCard({
           <Button
             size="large"
             style={{ display: 'flex', gap: '8px', alignItems: 'center' }}
-            onClick={() => {
+            onClick={e => {
               emitSetView({ view: 'clips', id: stream!.id });
+              e.stopPropagation();
             }}
           >
             Add clips
-          </Button>
-          <Button
-            size="large"
-            style={{ display: 'flex', gap: '8px', alignItems: 'center' }}
-            onClick={() => emitRemoveStream()}
-          >
-            <i className="icon-trash" />
           </Button>
         </div>
       </div>
@@ -406,7 +320,7 @@ export default function StreamCard({
               justifyContent: 'start',
             }}
           >
-            {getEmojiSection()}
+            <InputEmojiSection clips={clips} />
           </h3>
         </div>
         {getActionRow()}

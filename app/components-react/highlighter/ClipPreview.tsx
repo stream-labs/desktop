@@ -9,6 +9,7 @@ import cx from 'classnames';
 import { Button, Tooltip } from 'antd';
 import { $t } from 'services/i18n';
 import { isAiClip } from './utils';
+import { InputEmojiSection } from './InputEmojiSection';
 
 export default function ClipPreview(props: {
   clip: TClip;
@@ -69,6 +70,7 @@ export default function ClipPreview(props: {
         borderRadius: '16px',
         display: 'flex',
         gap: '16px',
+        opacity: props.clip.enabled ? 1.0 : 0.3,
       }}
     >
       <div style={{ height: `${SCRUB_HEIGHT}px`, position: 'relative' }}>
@@ -81,7 +83,6 @@ export default function ClipPreview(props: {
               objectFit: 'none',
               objectPosition: `-${scrubFrame * SCRUB_WIDTH}px`,
               borderRadius: '10px',
-              opacity: props.clip.enabled ? 1.0 : 0.3,
             }}
             onMouseMove={mouseMove}
             onClick={props.showTrim}
@@ -127,6 +128,19 @@ export default function ClipPreview(props: {
             checkboxActiveStyles={{ background: 'var(--teal-hover)' }}
           />
         </span>
+        <span
+          style={{
+            position: 'absolute',
+            bottom: '10px',
+            right: '10px',
+            padding: '2px 4px',
+            backgroundColor: 'black',
+            borderRadius: '2px',
+            opacity: 0.7,
+          }}
+        >
+          {formatSecondsToHMS(props.clip.duration || 0)}
+        </span>
         {/* <div
           style={{
             position: 'absolute',
@@ -162,7 +176,7 @@ export default function ClipPreview(props: {
       >
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            <div
+            {/* <div
               style={{
                 fontSize: '16px',
                 width: '184px',
@@ -172,12 +186,11 @@ export default function ClipPreview(props: {
               }}
             >
               {filename}
-            </div>
+            </div> */}
             <div className={styles.typeTag}>
               {isAiClip(props.clip) ? (
                 <>
-                  <i className="icon-super-chat-goal" />
-                  {props.clip.aiInfo.moments[0].type}
+                  <InputEmojiSection clips={[props.clip]} />{' '}
                 </>
               ) : (
                 <>
@@ -186,9 +199,10 @@ export default function ClipPreview(props: {
               )}
             </div>
           </div>
-          <div className={styles.hypescoreWrapper}>
-            <span style={{ fontSize: '21px', color: 'white' }}>94</span>
-            <span style={{ paddingBottom: '4px', paddingLeft: '2px' }}>/100</span>
+          <div>
+            {props.clip.source == 'AiClip' && <Flamehypescore score={30}></Flamehypescore>}
+            {/* <span style={{ fontSize: '21px', color: 'white' }}>{reachedPoints}</span>
+            <span style={{ paddingBottom: '4px', paddingLeft: '2px' }}>/100</span> */}
           </div>
         </div>
         <div
@@ -200,13 +214,17 @@ export default function ClipPreview(props: {
           }}
         >
           <div style={{ fontSize: '16px' }}>
-            {`${
-              props.streamId &&
-              formatSecondsToHHMMSS(props.clip.streamInfo?.[props.streamId]?.initialStartTime)
-            } - ${
-              props.streamId &&
-              formatSecondsToHHMMSS(props.clip.streamInfo?.[props.streamId]?.initialEndTime)
-            } `}
+            {props.clip.source !== 'Manual' && (
+              <>
+                {`${
+                  props.streamId &&
+                  formatSecondsToHHMMSS(props.clip.streamInfo?.[props.streamId]?.initialStartTime)
+                } - ${
+                  props.streamId &&
+                  formatSecondsToHHMMSS(props.clip.streamInfo?.[props.streamId]?.initialEndTime)
+                } `}
+              </>
+            )}
           </div>
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             {' '}
@@ -260,10 +278,44 @@ function formatSecondsToHHMMSS(seconds: number | undefined): string {
   if (seconds === undefined) {
     return '00:00:00';
   }
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const remainingSeconds = seconds % 60;
+  const totalSeconds = Math.round(seconds);
+
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const remainingSeconds = totalSeconds % 60;
   return `${hours.toString().padStart(2, '0')}:${minutes
     .toString()
     .padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+}
+
+function formatSecondsToHMS(seconds: number): string {
+  const totalSeconds = Math.round(seconds);
+
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const remainingSeconds = totalSeconds % 60;
+  return `${hours !== 0 ? hours.toString() + 'h ' : ''} ${
+    minutes !== 0 ? minutes.toString() + 'm ' : ''
+  }${remainingSeconds !== 0 ? remainingSeconds.toString() + 's' : ''}`;
+}
+
+function Flamehypescore({ score }: { score: number }) {
+  // Ensure score is between 0 and 100
+  const normalizedScore = Math.min(100, Math.max(0, score));
+
+  // Calculate how many flames should be fully lit
+  const fullFlames = Math.ceil((normalizedScore / 100) * 5);
+
+  return (
+    <div className="flex items-center gap-1" style={{ fontSize: '19px' }}>
+      {[...Array(fullFlames)].map((_, index) => (
+        <React.Fragment key={'on' + index}>🔥</React.Fragment>
+      ))}
+      {[...Array(5 - fullFlames)].map((_, index) => (
+        <span key={'off' + index} style={{ opacity: '0.3' }}>
+          🔥
+        </span>
+      ))}
+    </div>
+  );
 }
