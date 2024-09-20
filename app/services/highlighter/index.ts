@@ -938,6 +938,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       });
     } else {
       this.REMOVE_CLIP(path);
+      this.removeScrubFile(clip.scrubSprite);
     }
 
     if (clip.streamInfo !== undefined || streamId !== undefined) {
@@ -1022,6 +1023,14 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     clipsToRemove.forEach(clip => {
       this.removeClip(clip.path, streamId);
     });
+  }
+
+  async removeScrubFile(clipPath: string) {
+    try {
+      await fs.remove(clipPath);
+    } catch (error: unknown) {
+      console.error('Error removing scrub file', error);
+    }
   }
 
   toggleAiHighlighter() {
