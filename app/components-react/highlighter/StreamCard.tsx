@@ -56,7 +56,7 @@ export default function StreamCard({
               fontSize: '16px',
             }}
           >
-            Creating ai highlights...
+            Creating Ai highlights...
           </div>
           <div
             className={styles.progressbarProgress}
