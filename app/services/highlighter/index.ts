@@ -51,7 +51,7 @@ import execa from 'execa';
 import moment from 'moment';
 import { getHighlightClips, IHighlight, IHighlighterInput } from './ai-highlighter/ai-highlighter';
 import uuid from 'uuid';
-import { getSharedResource } from 'util/get-shared-resource';
+import { EMenuItemKey } from 'services/side-nav';
 export type TStreamInfo =
   | {
       orderPosition: number;
@@ -754,8 +754,11 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
         aiRecordingInProgress = false;
         this.flow(path, streamInfo);
 
-        this.navigationService.actions.navigate('Highlighter', { view: 'stream' });
-        // console.log('latest recording path', path);
+        this.navigationService.actions.navigate(
+          'Highlighter',
+          { view: 'stream' },
+          EMenuItemKey.Highlighter,
+        );
       });
     }
   }

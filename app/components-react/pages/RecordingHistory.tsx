@@ -13,6 +13,7 @@ import { initStore, useController } from '../hooks/zustand';
 import { useVuex } from '../hooks';
 import Translate from 'components-react/shared/Translate';
 import uuid from 'uuid/v4';
+import { EMenuItemKey } from 'services/side-nav';
 
 const RecordingHistoryCtx = React.createContext<RecordingHistoryController | null>(null);
 
@@ -93,7 +94,11 @@ class RecordingHistoryController {
         game: 'forntnite',
         id: 'rec_' + uuid(),
       });
-      this.NavigationService.actions.navigate('Highlighter', { view: 'stream' });
+      this.NavigationService.actions.navigate(
+        'Highlighter',
+        { view: 'stream' },
+        EMenuItemKey.Highlighter,
+      );
       return;
     }
 
