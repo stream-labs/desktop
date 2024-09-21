@@ -1,13 +1,11 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { IVolmeter } from 'services/audio';
-import { Subscription } from 'rxjs';
 import electron, { ipcRenderer } from 'electron';
 import difference from 'lodash/difference';
 import { compileShader, createProgram } from 'util/webgl/utils';
 import vShaderSrc from 'util/webgl/shaders/volmeter.vert';
 import fShaderSrc from 'util/webgl/shaders/volmeter.frag';
 import { Services } from 'components-react/service-provider';
-import { injectWatch, useModule } from 'slap';
 import { assertIsDefined, getDefined } from 'util/properties-type-guards';
 
 // Configuration
@@ -47,13 +45,20 @@ interface IVolmeterSubscription {
  * Component that renders the volume for audio sources via WebGL
  */
 export default function GLVolmeters() {
-  const { setupNewCanvas } = useModule(GLVolmetersModule);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // init controller on mount
+  const controller = useMemo(() => {
+    const controller = new GLVolmetersController();
+    controller.init();
+    return controller;
+  }, []);
 
   // start rendering volmeters when the canvas is ready
   useEffect(() => {
     assertIsDefined(canvasRef.current);
-    setupNewCanvas(canvasRef.current);
+    controller.setupNewCanvas(canvasRef.current);
+    return () => controller.beforeDestroy(); // cleanup on unmount
   }, []);
 
   return (
@@ -75,9 +80,10 @@ export default function GLVolmeters() {
   );
 }
 
-class GLVolmetersModule {
+class GLVolmetersController {
   private customizationService = Services.CustomizationService;
   private audioService = Services.AudioService;
+  private sourcesService = Services.SourcesService;
 
   subscriptions: Dictionary<IVolmeterSubscription> = {};
 
@@ -113,7 +119,6 @@ class GLVolmetersModule {
   private workerId: number;
   private requestedFrameId: number;
   private bgMultiplier = this.customizationService.isDarkTheme ? 0.2 : 0.5;
-  private customizationServiceSubscription: Subscription = null!;
 
   init() {
     this.workerId = electron.ipcRenderer.sendSync('getWorkerWindowId');
@@ -132,12 +137,6 @@ class GLVolmetersModule {
       return !source.mixerHidden && source.isControlledViaObs;
     });
   }
-
-  // update volmeters subscriptions when audio sources change
-  watchAudioSources = injectWatch(
-    () => this.audioSources,
-    () => this.subscribeVolmeters(),
-  );
 
   /**
    * add or remove subscription for volmeters depending on current scene
@@ -217,7 +216,6 @@ class GLVolmetersModule {
 
     // cancel next frame rendering
     cancelAnimationFrame(this.requestedFrameId);
-    this.customizationServiceSubscription.unsubscribe();
   }
 
   setupNewCanvas($canvasEl: HTMLCanvasElement) {
