@@ -9,6 +9,12 @@ import { GuestApiHandler } from 'util/guest-api-handler';
 import { IDownloadProgress } from 'util/requests';
 import * as remote from '@electron/remote';
 import { Services } from 'components-react/service-provider';
+import { IOverlayFilter } from 'services/source-filters';
+
+interface IOverlayOptions {
+  mergePlatform?: boolean;
+  filter?: IOverlayFilter;
+}
 
 export default function BrowseOverlays(p: {
   params: { type?: 'overlay' | 'widget-themes' | 'site-themes'; id?: string; install?: string };
@@ -24,13 +30,18 @@ export default function BrowseOverlays(p: {
     NotificationsService,
     JsonrpcService,
     RestreamService,
+    SourceFiltersService,
   } = Services;
   const [downloading, setDownloading] = useState(false);
   const [overlaysUrl, setOverlaysUrl] = useState('');
 
   useEffect(() => {
     async function getOverlaysUrl() {
-      const url = await UserService.actions.return.overlaysUrl(p.params?.type, p.params?.id, p.params?.install);
+      const url = await UserService.actions.return.overlaysUrl(
+        p.params?.type,
+        p.params?.id,
+        p.params?.install,
+      );
       if (!url) return;
       setOverlaysUrl(url);
     }
@@ -70,13 +81,14 @@ export default function BrowseOverlays(p: {
     url: string,
     name: string,
     progressCallback?: (progress: IDownloadProgress) => void,
-    mergePlatform = false,
+    opts: IOverlayOptions = { mergePlatform: false },
   ) {
     try {
-      await installOverlayBase(url, name, progressCallback, mergePlatform);
+      await installOverlayBase(url, name, progressCallback, opts);
       NavigationService.actions.navigate('Studio');
-    } catch(e) {
+    } catch (e: unknown) {
       // If the overlay requires platform merge, navigate to the platform merge page
+      // @ts-ignore we know this type of error
       if (e.message === 'REQUIRES_PLATFORM_MERGE') {
         NavigationService.actions.navigate('PlatformMerge', { overlayUrl: url, overlayName: name });
       } else {
@@ -89,7 +101,7 @@ export default function BrowseOverlays(p: {
     url: string,
     name: string,
     progressCallback?: (progress: IDownloadProgress) => void,
-    mergePlatform = false
+    opts: IOverlayOptions = { mergePlatform: false },
   ) {
     return new Promise<void>((resolve, reject) => {
       const host = new urlLib.URL(url).hostname;
@@ -106,7 +118,7 @@ export default function BrowseOverlays(p: {
       // User should be eligible to enable restream for this behavior to work.
       // If restream is already set up, then just install as normal.
       if (
-        mergePlatform &&
+        opts.mergePlatform &&
         UserService.state.auth?.platforms.facebook &&
         RestreamService.views.canEnableRestream &&
         !RestreamService.shouldGoLiveWithRestream
@@ -115,11 +127,17 @@ export default function BrowseOverlays(p: {
       } else {
         setDownloading(true);
         const sub = SceneCollectionsService.downloadProgress.subscribe(progressCallback);
-        SceneCollectionsService.actions.return.installOverlay(url, name)
+        SceneCollectionsService.actions.return
+          .installOverlay(url, name)
           .then(() => {
             sub.unsubscribe();
             setDownloading(false);
             resolve();
+          })
+          .then(() => {
+            if (opts.filter) {
+              SourceFiltersService.actions.applyFilterToOverlay(opts.filter);
+            }
           })
           .catch((e: unknown) => {
             sub.unsubscribe();
@@ -130,8 +148,8 @@ export default function BrowseOverlays(p: {
     });
   }
 
-  async function installWidgets(urls: string[]) {
-    await installWidgetsBase(urls);
+  async function installWidgets(urls: string[], opts?: IOverlayOptions) {
+    await installWidgetsBase(urls, opts);
     NavigationService.actions.navigate('Studio');
 
     NotificationsService.actions.push({
@@ -146,7 +164,7 @@ export default function BrowseOverlays(p: {
     });
   }
 
-  async function installWidgetsBase(urls: string[]) {
+  async function installWidgetsBase(urls: string[], opts?: IOverlayOptions) {
     for (const url of urls) {
       const host = new urlLib.URL(url).hostname;
       const trustedHosts = ['cdn.streamlabs.com'];
@@ -157,16 +175,25 @@ export default function BrowseOverlays(p: {
       }
 
       const path = await OverlaysPersistenceService.actions.return.downloadOverlay(url);
-      await WidgetsService.actions.return.loadWidgetFile(path, ScenesService.views.activeSceneId);
+      await WidgetsService.actions.return.loadWidgetFile(
+        path,
+        ScenesService.views.activeSceneId,
+        opts?.filter,
+      );
     }
   }
 
-  async function installOverlayAndWidgets(overlayUrl: string, overlayName: string, widgetUrls: string[]) {
+  async function installOverlayAndWidgets(
+    overlayUrl: string,
+    overlayName: string,
+    widgetUrls: string[],
+    opts: IOverlayOptions = { mergePlatform: false },
+  ) {
     try {
-      await installOverlayBase(overlayUrl, overlayName);
-      await installWidgetsBase(widgetUrls);
+      await installOverlayBase(overlayUrl, overlayName, () => {}, opts);
+      await installWidgetsBase(widgetUrls, opts);
       NavigationService.actions.navigate('Studio');
-    } catch (e) {
+    } catch (e: unknown) {
       console.error(e);
     }
   }
