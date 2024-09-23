@@ -49,7 +49,12 @@ import { NavigationService } from 'services/navigation';
 import { SharedStorageService } from 'services/integrations/shared-storage';
 import execa from 'execa';
 import moment from 'moment';
-import { getHighlightClips, IHighlight, IHighlighterInput } from './ai-highlighter/ai-highlighter';
+import {
+  EHighlighterInputTypes,
+  getHighlightClips,
+  IHighlight,
+  IHighlighterInput,
+} from './ai-highlighter/ai-highlighter';
 import uuid from 'uuid';
 import { EMenuItemKey } from 'services/side-nav';
 export type TStreamInfo =
@@ -89,7 +94,7 @@ export interface IAiClip extends IBaseClip {
   aiInfo: IAiClipInfo;
 }
 export interface IAiClipInfo {
-  moments: { type: string }[];
+  moments: { type: EHighlighterInputTypes }[];
   // hypescore -> (moments * hypefaktor) / duration
 }
 
@@ -1703,7 +1708,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       return {
         start: curr.start_time - 9,
         end: curr.end_time !== null ? curr.end_time + 4 : curr.start_time + 4,
-        type: curr.type,
+        types: curr.input_types,
       };
     });
   }
@@ -1747,7 +1752,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     // Process in batches of 5
     for (let i = 0; i < sortedHighlights.length; i += 5) {
       const batch = sortedHighlights.slice(i, i + 5);
-      const batchTasks = batch.map(({ start_time, end_time, type }) => {
+      const batchTasks = batch.map(({ start_time, end_time, input_types }) => {
         return async () => {
           const formattedStart = start_time.toString().padStart(6, '0');
           const formattedEnd = end_time.toString().padStart(6, '0');
@@ -1802,7 +1807,9 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
               console.log(`Created segment: ${outputUri}`);
               return {
                 path: outputUri,
-                aiClipInfo: { moments: [{ type }] },
+                aiClipInfo: {
+                  moments: input_types.map(type => ({ type })),
+                },
                 startTime: start_time,
                 endTime: end_time,
               };

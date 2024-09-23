@@ -1,6 +1,7 @@
 import React from 'react';
 import { TClip } from 'services/highlighter';
 import { isAiClip } from './utils';
+import { EHighlighterInputTypes } from 'services/highlighter/ai-highlighter/ai-highlighter';
 
 export function InputEmojiSection({ clips }: { clips: TClip[] }): JSX.Element {
   const inputTypeMap = Object.entries(getMomentTypeCount(clips));
@@ -17,7 +18,7 @@ export function InputEmojiSection({ clips }: { clips: TClip[] }): JSX.Element {
     return (
       <div key={'manualClips'} style={{ display: 'flex', gap: '4px' }}>
         <span>🎬</span>
-        <span>{`${manualClips.length} ${manualClips.length === 1 ? ' manual' : ' manual'}`}</span>
+        <span>{`${manualClips.length} ${manualClips.length === 1 ? 'manual' : 'manuals'}`}</span>
       </div>
     );
   }
@@ -26,10 +27,10 @@ export function InputEmojiSection({ clips }: { clips: TClip[] }): JSX.Element {
     <div style={{ height: '22px', display: 'flex', gap: '12px' }}>
       {filteredinputTypeMap.map(([type, count]) => (
         <div key={type} style={{ display: 'flex', gap: '4px' }}>
-          <span key={type + 'emoji'}>{getTypeWordingFromType(type).emoji} </span>{' '}
+          <span key={type + 'emoji'}>{getTypeWordingFromType(type, count).emoji} </span>{' '}
           <span key={type + 'desc'}>
             {' '}
-            {count} {getTypeWordingFromType(type).description}
+            {count} {getTypeWordingFromType(type, count).description}
           </span>
         </div>
       ))}
@@ -38,28 +39,30 @@ export function InputEmojiSection({ clips }: { clips: TClip[] }): JSX.Element {
     </div>
   );
 }
-function getTypeWordingFromType(type: string): { emoji: string; description: string } {
-  switch (type) {
-    case 'kill':
-      return { emoji: '💀', description: 'eliminated' };
-    case 'knocked':
-      return { emoji: '🥊', description: 'knocked' };
-    case 'death':
-      return { emoji: '🪦', description: 'deaths' };
-    case 'victory':
-      return { emoji: '🏆', description: 'win' };
-    case 'deploy':
-      return { emoji: '🪂', description: 'deploy' };
 
+function getTypeWordingFromType(
+  type: string,
+  count: number,
+): { emoji: string; description: string } {
+  switch (type) {
+    case EHighlighterInputTypes.KILL:
+      return { emoji: '💀', description: count > 1 ? 'eliminations' : 'elimination' };
+    case EHighlighterInputTypes.KNOCKED:
+      return { emoji: '🥊', description: count > 1 ? 'knockeds' : 'knocked' };
+    case EHighlighterInputTypes.DEATH:
+      return { emoji: '🪦', description: count > 1 ? 'deaths' : 'death' };
+    case EHighlighterInputTypes.VICTORY:
+      return { emoji: '🏆', description: count > 1 ? 'wins' : 'win' };
+    case EHighlighterInputTypes.DEPLOY:
+      return { emoji: '🪂', description: count > 1 ? 'deploys' : 'deploy' };
     default:
       break;
   }
-  return { emoji: type, description: type };
+  return { emoji: type, description: count > 1 ? `${type}s` : type };
 }
 
 function getMomentTypeCount(clips: TClip[]): { [type: string]: number } {
   const typeCounts: { [type: string]: number } = {};
-
   clips.forEach(clip => {
     if (isAiClip(clip)) {
       clip.aiInfo.moments.forEach(moment => {
@@ -72,6 +75,5 @@ function getMomentTypeCount(clips: TClip[]): { [type: string]: number } {
       });
     }
   });
-
   return typeCounts;
 }

@@ -8,18 +8,19 @@ export enum EHighlighterInputTypes {
   DEATH = 'death',
   VICTORY = 'victory',
   DEPLOY = 'deploy',
+  KNOCKED = 'knocked',
 }
 
 export interface IHighlighterInput {
   start_time: number;
   end_time?: number;
-  type: EHighlighterInputTypes;
+  input_types: EHighlighterInputTypes[];
   origin: string;
 }
 export interface IHighlight {
   start_time: number;
   end_time: number;
-  type: EHighlighterInputTypes;
+  input_types: EHighlighterInputTypes[];
 }
 
 export type EHighlighterMessageTypes =
