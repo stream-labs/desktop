@@ -149,6 +149,26 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     }
 
     this.overlay.start(crashHandlerLogPath);
+    // Input collection setup
+    const logInputEvent = (message: string) => {
+      const timestamp = new Date().toISOString();
+      console.log(`[${timestamp}] ${message}`);
+    };
+
+    // Set mouse callback to capture and log mouse events
+    this.overlay.setMouseCallback((eventType: number, x: number, y: number, modifier: number) => {
+      logInputEvent(`MouseCallback: eventType=${eventType}, x=${x}, y=${y}, modifier=${modifier}`);
+      return 3; // Can return any value as required
+    });
+
+    // Set keyboard callback to capture and log keyboard events
+    this.overlay.setKeyboardCallback((eventType: number, keyCode: number) => {
+      logInputEvent(`KeyboardCallback: eventType=${eventType}, keyCode=${keyCode}`);
+      return 1; // Can return any value as required
+    });
+
+    // Enable input collection
+    this.overlay.switchInputCollection(true);
 
     this.assignCommonWindowOptions();
     const partition = this.userService.state.auth.partition;
