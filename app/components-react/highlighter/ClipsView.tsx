@@ -1,5 +1,5 @@
 import { useVuex } from 'components-react/hooks';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Services } from 'components-react/service-provider';
 import styles from './ClipsView.m.less';
 import { IViewState, TClip, TStreamInfo } from 'services/highlighter';
@@ -49,6 +49,7 @@ export default function ClipsView({
     error: HighlighterService.views.error,
     highlightedStreams: HighlighterService.views.highlightedStreams,
   }));
+
   const [tempClipList, setTempClipList] = useState<{ id: string }[]>([]);
   const [showModal, rawSetShowModal] = useState<TModalClipsView | null>(null);
   const [modalWidth, setModalWidth] = useState('700px');
@@ -318,7 +319,6 @@ export default function ClipsView({
   //TODO: Need performance updateb
   function getClipsView(streamId: string | undefined) {
     let clipList;
-
     if (tempClipList.length === 0) {
       if (streamId) {
         const clipsWithOrder = loadedClips
@@ -352,6 +352,9 @@ export default function ClipsView({
       }
       setTempClipList(clipList);
     }
+    const [hoveredId, setHoveredId] = useState<string | null>(null);
+    const [onMove, setOnMove] = useState<boolean>(false);
+    // console.log('rendering clips view');
 
     return (
       <div
@@ -382,51 +385,114 @@ export default function ClipsView({
               <AddClip streamId={props.id} />
             </div>
           </div>
-
           {v.loaded ? (
-            <Scrollable style={{ flexGrow: 1, padding: '20px 20px 20px 20px' }}>
-              <ReactSortable
-                list={tempClipList}
-                setList={clips => setClipOrder(clips, props.id)} //
-                animation={200}
-                filter=".sortable-ignore"
-                onMove={e => {
-                  return e.related.className.indexOf('sortable-ignore') === -1;
+            <>
+              <div
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  padding: '16px 0',
+                  justifyContent: 'space-between',
                 }}
               >
-                {tempClipList
-                  .filter(c => clipMap.has(c.id))
-                  .map(({ id }) => {
-                    const clip = clipMap.get(id)!;
-                    return (
-                      <div
-                        key={clip.path}
-                        style={{
-                          margin: '10px 20px 10px 0',
-                          width: '100%',
-                          display: 'inline-block',
-                        }}
-                      >
-                        <ClipPreview
-                          clip={clip}
-                          showTrim={() => {
-                            setInspectedClipPath(clip.path);
-                            setShowModal('trim');
+                {' '}
+                <span> 0:00</span> <span> 10:23 </span>
+              </div>
+              <Scrollable
+                horizontal={true}
+                style={{
+                  width: '100%',
+                  paddingLeft: '8px',
+                  paddingRight: '8px',
+                  height: '42px',
+                }}
+              >
+                <ReactSortable
+                  style={{
+                    width: 'max-content',
+                    minWidth: '100%',
+                    display: 'flex',
+                    gap: '4px',
+                    justifyContent: 'center',
+                  }}
+                  list={tempClipList}
+                  setList={clips => setClipOrder(clips, props.id)} //
+                  animation={200}
+                  filter=".sortable-ignore"
+                  onEnd={() => setOnMove(false)}
+                  onMove={e => {
+                    setOnMove(true);
+                    return e.related.className.indexOf('sortable-ignore') === -1;
+                  }}
+                >
+                  {tempClipList
+                    .filter(c => clipMap.has(c.id) && clipMap.get(c.id)!.enabled)
+                    .map(({ id }) => {
+                      const clip = clipMap.get(id)!;
+                      return (
+                        <div
+                          key={'mini' + clip.path}
+                          onMouseEnter={() => setHoveredId(id)}
+                          onMouseLeave={() => setHoveredId(null)}
+                        >
+                          <MiniClipPreview
+                            clip={clip}
+                            highlighted={hoveredId === id && !onMove}
+                          ></MiniClipPreview>
+                        </div>
+                      );
+                    })}
+                </ReactSortable>
+              </Scrollable>
+              <Scrollable style={{ flexGrow: 1, padding: '20px 20px 20px 20px' }}>
+                <ReactSortable
+                  list={tempClipList}
+                  setList={clips => setClipOrder(clips, props.id)} //
+                  animation={200}
+                  filter=".sortable-ignore"
+                  onMove={e => {
+                    setOnMove(true);
+                    return e.related.className.indexOf('sortable-ignore') === -1;
+                  }}
+                  onEnd={() => setOnMove(false)}
+                >
+                  {tempClipList
+                    .filter(c => clipMap.has(c.id))
+                    .map(({ id }) => {
+                      const clip = clipMap.get(id)!;
+                      return (
+                        <div
+                          key={clip.path}
+                          onMouseEnter={() => setHoveredId(id)}
+                          onMouseLeave={() => setHoveredId(null)}
+                          style={{
+                            margin: '10px 20px 10px 0',
+                            width: '100%',
+                            display: 'inline-block',
                           }}
-                          showRemove={() => {
-                            setInspectedClipPath(clip.path);
-                            setShowModal('remove');
-                          }}
-                          streamId={streamId}
-                        />
-                      </div>
-                    );
-                  })}
-              </ReactSortable>
-            </Scrollable>
+                        >
+                          <ClipPreview
+                            clip={clip}
+                            showTrim={() => {
+                              setInspectedClipPath(clip.path);
+                              setShowModal('trim');
+                            }}
+                            showRemove={() => {
+                              setInspectedClipPath(clip.path);
+                              setShowModal('remove');
+                            }}
+                            streamId={streamId}
+                            highlighted={hoveredId === id && !onMove}
+                          />
+                        </div>
+                      );
+                    })}
+                </ReactSortable>
+              </Scrollable>
+            </>
           ) : (
             getLoadingView()
-          )}
+          )}{' '}
         </div>
         {getControls()}
         <Modal
@@ -452,6 +518,30 @@ export default function ClipsView({
   }
   if (loadedClips.length === 0) return noClipsView(props.id);
   return getClipsView(props.id);
+}
+
+function MiniClipPreview({ clip, highlighted }: { clip: TClip; highlighted: boolean }) {
+  return (
+    <div
+      key={clip.path}
+      style={{
+        display: 'inline-block',
+        borderRadius: '4px',
+        border: `solid 2px ${highlighted ? '#4F5E65' : 'transparent'}`,
+      }}
+    >
+      <img
+        src={clip.scrubSprite}
+        style={{
+          width: `${SCRUB_WIDTH / 6}px`,
+          height: `${SCRUB_HEIGHT / 6}px`,
+          objectFit: 'cover',
+          objectPosition: 'left top',
+          borderRadius: '4px',
+        }}
+      ></img>
+    </div>
+  );
 }
 
 function AddClip({ streamId }: { streamId: string | undefined }) {
