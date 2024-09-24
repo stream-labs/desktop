@@ -142,7 +142,9 @@ export default function ClipPreview(props: {
             opacity: 0.7,
           }}
         >
-          {formatSecondsToHMS(props.clip.duration || 0)}
+          {formatSecondsToHMS(
+            props.clip.duration! - (props.clip.startTrim + props.clip.endTrim) || 0,
+          )}
         </span>
         {/* <div
           style={{
@@ -291,8 +293,11 @@ function formatSecondsToHHMMSS(seconds: number | undefined): string {
     .padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
 }
 
-function formatSecondsToHMS(seconds: number): string {
+export function formatSecondsToHMS(seconds: number): string {
   const totalSeconds = Math.round(seconds);
+  if (totalSeconds === 0) {
+    return '0s';
+  }
 
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);

@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Services } from 'components-react/service-provider';
 import styles from './ClipsView.m.less';
 import { IViewState, TClip, TStreamInfo } from 'services/highlighter';
-import ClipPreview from 'components-react/highlighter/ClipPreview';
+import ClipPreview, { formatSecondsToHMS } from 'components-react/highlighter/ClipPreview';
 import ClipTrimmer from 'components-react/highlighter/ClipTrimmer';
 import { ReactSortable } from 'react-sortablejs';
 import Form from 'components-react/shared/inputs/Form';
@@ -355,7 +355,9 @@ export default function ClipsView({
     const [hoveredId, setHoveredId] = useState<string | null>(null);
     const [onMove, setOnMove] = useState<boolean>(false);
     // console.log('rendering clips view');
-
+    const totalDuration = loadedClips
+      .filter(c => c.enabled)
+      .reduce((acc, clip) => acc + clip.duration! - clip.startTrim! - clip.endTrim!, 0);
     return (
       <div
         style={{ width: '100%', display: 'flex' }}
@@ -387,63 +389,69 @@ export default function ClipsView({
           </div>
           {v.loaded ? (
             <>
-              <div
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  padding: '16px 0',
-                  justifyContent: 'space-between',
-                }}
-              >
-                {' '}
-                <span> 0:00</span> <span> 10:23 </span>
-              </div>
-              <Scrollable
-                horizontal={true}
-                style={{
-                  width: '100%',
-                  paddingLeft: '8px',
-                  paddingRight: '8px',
-                  height: '42px',
-                }}
-              >
-                <ReactSortable
-                  style={{
-                    width: 'max-content',
-                    minWidth: '100%',
-                    display: 'flex',
-                    gap: '4px',
-                    justifyContent: 'center',
-                  }}
-                  list={tempClipList}
-                  setList={clips => setClipOrder(clips, props.id)} //
-                  animation={200}
-                  filter=".sortable-ignore"
-                  onEnd={() => setOnMove(false)}
-                  onMove={e => {
-                    setOnMove(true);
-                    return e.related.className.indexOf('sortable-ignore') === -1;
-                  }}
-                >
-                  {tempClipList
-                    .filter(c => clipMap.has(c.id) && clipMap.get(c.id)!.enabled)
-                    .map(({ id }) => {
-                      const clip = clipMap.get(id)!;
-                      return (
-                        <div
-                          key={'mini' + clip.path}
-                          onMouseEnter={() => setHoveredId(id)}
-                          onMouseLeave={() => setHoveredId(null)}
-                        >
-                          <MiniClipPreview
-                            clip={clip}
-                            highlighted={hoveredId === id && !onMove}
-                          ></MiniClipPreview>
-                        </div>
-                      );
-                    })}
-                </ReactSortable>
-              </Scrollable>
+              {streamId ? (
+                <>
+                  <Scrollable
+                    horizontal={true}
+                    style={{
+                      width: '100%',
+                      paddingLeft: '8px',
+                      paddingRight: '8px',
+                      height: '42px',
+                    }}
+                  >
+                    <ReactSortable
+                      style={{
+                        width: 'max-content',
+                        minWidth: '100%',
+                        display: 'flex',
+                        gap: '4px',
+                        justifyContent: 'center',
+                      }}
+                      list={tempClipList}
+                      setList={clips => setClipOrder(clips, props.id)} //
+                      animation={200}
+                      filter=".sortable-ignore"
+                      onEnd={() => setOnMove(false)}
+                      onMove={e => {
+                        setOnMove(true);
+                        return e.related.className.indexOf('sortable-ignore') === -1;
+                      }}
+                    >
+                      {tempClipList
+                        .filter(c => clipMap.has(c.id) && clipMap.get(c.id)!.enabled)
+                        .map(({ id }) => {
+                          const clip = clipMap.get(id)!;
+                          return (
+                            <div
+                              key={'mini' + clip.path}
+                              onMouseEnter={() => setHoveredId(id)}
+                              onMouseLeave={() => setHoveredId(null)}
+                            >
+                              <MiniClipPreview
+                                clip={clip}
+                                highlighted={hoveredId === id && !onMove}
+                              ></MiniClipPreview>
+                            </div>
+                          );
+                        })}
+                    </ReactSortable>
+                  </Scrollable>{' '}
+                  <div
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      padding: '8px 16px',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    {' '}
+                    <span>0m 0s</span> <span> {formatSecondsToHMS(totalDuration)} </span>
+                  </div>
+                </>
+              ) : (
+                <></>
+              )}
               <Scrollable style={{ flexGrow: 1, padding: '20px 20px 20px 20px' }}>
                 <ReactSortable
                   list={tempClipList}
