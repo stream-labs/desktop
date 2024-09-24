@@ -22,12 +22,7 @@ export default function ClipPreview(props: {
   const [scrubFrame, setScrubFrame] = useState(0);
 
   // TODO: placeholder image + make sure to regenerate sprite if sprite doesnt exist
-  let clipThumbnail = '';
-  if (props.clip.scrubSprite && HighlighterService.fileExists(props.clip.scrubSprite)) {
-    clipThumbnail = props.clip.scrubSprite;
-  } else {
-    clipThumbnail = '';
-  }
+  let clipThumbnail = props.clip.scrubSprite || '';
 
   const filename = useMemo(() => {
     return path.basename(props.clip.path);

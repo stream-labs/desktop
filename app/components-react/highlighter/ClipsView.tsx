@@ -54,6 +54,7 @@ export default function ClipsView({
   const [showModal, rawSetShowModal] = useState<TModalClipsView | null>(null);
   const [modalWidth, setModalWidth] = useState('700px');
 
+  // await HighlighterService.actions.return.getClip. TODO M: Check if it cal stay like this
   const loadedClips = useMemo(() => HighlighterService.getClips(v.clips, props.id), [
     v.clips,
     JSON.stringify(props.id),
@@ -70,7 +71,7 @@ export default function ClipsView({
     if (tempClipList.length > 0) {
       setTempClipList([]);
     }
-
+    //TODO M: This overwrites currently enabled and disabled states
     HighlighterService.actions.enableOnlySpecificClips(HighlighterService.views.clips, props.id);
     HighlighterService.actions.loadClips(props.id);
   }, [loadedClips.length]);
@@ -441,11 +442,10 @@ export default function ClipsView({
                     style={{
                       width: '100%',
                       display: 'flex',
-                      padding: '8px 16px',
+                      padding: '0px 24px',
                       justifyContent: 'space-between',
                     }}
                   >
-                    {' '}
                     <span>0m 0s</span> <span> {formatSecondsToHMS(totalDuration)} </span>
                   </div>
                 </>
