@@ -13,7 +13,7 @@ import namingHelpers from 'util/NamingHelpers';
 import uuid from 'uuid/v4';
 import { DualOutputService } from 'services/dual-output';
 import { TDisplayType } from 'services/settings-v2/video';
-import { InitAfter, ViewHandler } from 'services/core';
+import { ExecuteInWorkerProcess, InitAfter, ViewHandler } from 'services/core';
 
 export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
 
@@ -266,6 +266,16 @@ class ScenesViews extends ViewHandler<IScenesState> {
 
     return false;
   }
+
+  createAndAddSource(
+    sceneId: string,
+    name: string,
+    sourceType: TSourceType,
+    settings: Dictionary<any>,
+  ) {
+    const scene = this.getScene(sceneId);
+    return scene?.createAndAddSource(name, sourceType, settings).sceneItemId;
+  }
 }
 
 @InitAfter('DualOutputService')
@@ -440,6 +450,15 @@ export class ScenesService extends StatefulService<IScenesState> {
 
   getModel(): IScenesState {
     return this.state;
+  }
+
+  createAndAddSource(
+    sceneId: string,
+    sourceName: string,
+    sourceType: TSourceType,
+    settings: Dictionary<unknown>,
+  ) {
+    return this.views.createAndAddSource(sceneId, sourceName, sourceType, settings);
   }
 
   // TODO: Remove all of this in favor of the new "views" methods

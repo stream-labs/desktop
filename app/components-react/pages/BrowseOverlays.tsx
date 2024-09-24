@@ -9,6 +9,8 @@ import { GuestApiHandler } from 'util/guest-api-handler';
 import { IDownloadProgress } from 'util/requests';
 import * as remote from '@electron/remote';
 import { Services } from 'components-react/service-provider';
+import { pick } from 'lodash';
+import { ESourceType } from 'obs-studio-node';
 
 export default function BrowseOverlays(p: {
   params: { type?: 'overlay' | 'widget-themes' | 'site-themes'; id?: string; install?: string };
@@ -24,13 +26,19 @@ export default function BrowseOverlays(p: {
     NotificationsService,
     JsonrpcService,
     RestreamService,
+    // TODO: we're grabbing this just to suggest name
+    SourcesService,
   } = Services;
   const [downloading, setDownloading] = useState(false);
   const [overlaysUrl, setOverlaysUrl] = useState('');
 
   useEffect(() => {
     async function getOverlaysUrl() {
-      const url = await UserService.actions.return.overlaysUrl(p.params?.type, p.params?.id, p.params?.install);
+      const url = await UserService.actions.return.overlaysUrl(
+        p.params?.type,
+        p.params?.id,
+        p.params?.install,
+      );
       if (!url) return;
       setOverlaysUrl(url);
     }
@@ -43,6 +51,8 @@ export default function BrowseOverlays(p: {
       installOverlay,
       installWidgets,
       installOverlayAndWidgets,
+      getScenes,
+      addCollectibleToScene,
       eligibleToRestream: () => {
         // assume all users are eligible
         return Promise.resolve(true);
@@ -75,7 +85,7 @@ export default function BrowseOverlays(p: {
     try {
       await installOverlayBase(url, name, progressCallback, mergePlatform);
       NavigationService.actions.navigate('Studio');
-    } catch(e) {
+    } catch (e) {
       // If the overlay requires platform merge, navigate to the platform merge page
       if (e.message === 'REQUIRES_PLATFORM_MERGE') {
         NavigationService.actions.navigate('PlatformMerge', { overlayUrl: url, overlayName: name });
@@ -85,11 +95,65 @@ export default function BrowseOverlays(p: {
     }
   }
 
+  /**
+   * Get a list of scenes in the active scene collection
+   *
+   * @returns An array of scenes with items including only `id` and `name`
+   */
+  async function getScenes() {
+    return ScenesService.views.scenes.map(scene => ({
+      id: scene.id,
+      name: scene.name,
+    }));
+  }
+
+  /**
+   * Adds a collectible to a scene.
+   *
+   * Collectibles are just a CDN URL of an image or video, this API provides
+   * embedded pages with a convenience method for creating sources based on those.
+   *
+   * @param sceneId - ID of the scene where the collectible will be added to
+   * @param assetURL - CDN URL of the collectible asset
+   * @param type - Type of source that will be created, `image` or `video`
+   *
+   * @returns string - ID of the scene item that was created for the source.
+   * @throws When type is not image or video.
+   * @throws When URL is a not a Streamlabs CDN URL.
+   * @throws When scene for the provided scene ID can't be found.
+   * @throws When it fails to create the source.
+   */
+  async function addCollectibleToScene(sceneId: string, assetURL: string, type: 'image' | 'video') {
+    if (!['image', 'video'].includes(type)) {
+      throw new Error("Unsupported type. Use 'image' or 'video'");
+    }
+
+    if (!assetURL.startsWith('https://cdn.streamlabs.com/marketplace')) {
+      throw new Error('Invalid asset URL');
+    }
+
+    const sourceSettings =
+      type === 'video' ? { is_local_file: false, input: assetURL } : { file: assetURL };
+
+    // TODO: find or create enum
+    const sourceType = type === 'video' ? 'ffmpeg_source' : 'image_source';
+
+    // TODO: do we want the caller to provide name?
+    const sourceName = SourcesService.views.suggestName('Collectible');
+
+    return ScenesService.actions.return.createAndAddSource(
+      sceneId,
+      sourceName,
+      sourceType,
+      sourceSettings,
+    );
+  }
+
   async function installOverlayBase(
     url: string,
     name: string,
     progressCallback?: (progress: IDownloadProgress) => void,
-    mergePlatform = false
+    mergePlatform = false,
   ) {
     return new Promise<void>((resolve, reject) => {
       const host = new urlLib.URL(url).hostname;
@@ -115,7 +179,8 @@ export default function BrowseOverlays(p: {
       } else {
         setDownloading(true);
         const sub = SceneCollectionsService.downloadProgress.subscribe(progressCallback);
-        SceneCollectionsService.actions.return.installOverlay(url, name)
+        SceneCollectionsService.actions.return
+          .installOverlay(url, name)
           .then(() => {
             sub.unsubscribe();
             setDownloading(false);
@@ -161,7 +226,11 @@ export default function BrowseOverlays(p: {
     }
   }
 
-  async function installOverlayAndWidgets(overlayUrl: string, overlayName: string, widgetUrls: string[]) {
+  async function installOverlayAndWidgets(
+    overlayUrl: string,
+    overlayName: string,
+    widgetUrls: string[],
+  ) {
     try {
       await installOverlayBase(overlayUrl, overlayName);
       await installWidgetsBase(widgetUrls);
