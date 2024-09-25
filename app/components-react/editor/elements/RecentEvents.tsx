@@ -129,7 +129,7 @@ function EventCell(p: { event: IRecentEvent }) {
     const platform = p.event.platform;
     return {
       twitch_account: <PlatformLogo platform="twitch" />,
-      youtube_account: <PlatformLogo platform="youtube" />,
+      youtube_account: <PlatformLogo platform="youtube" size={16} />,
       facebook_account: <PlatformLogo platform="facebook" />,
       trovo_account: <PlatformLogo platform="trovo" size={16} />,
       streamlabs: <PlatformLogo platform="streamlabs" size={16} />,
