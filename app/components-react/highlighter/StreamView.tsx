@@ -316,6 +316,9 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
                           emitExportVideo={() => exportVideo(stream.id)}
                           emitRemoveStream={() => setShowModal({ type: 'remove', id: stream.id })}
                           clipsOfStreamAreLoading={clipsOfStreamAreLoading}
+                          emitCancelHighlightGeneration={() => {
+                            HighlighterService.actions.cancelHighlightGeneration(stream.id);
+                          }}
                         />
                       ))}
                     </div>

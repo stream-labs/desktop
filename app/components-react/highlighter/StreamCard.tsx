@@ -1,5 +1,5 @@
 import React from 'react';
-import { HighlighterService, IHighlightedStream, IViewState, TClip } from 'services/highlighter';
+import { IViewState, TClip } from 'services/highlighter';
 import styles from './StreamView.m.less';
 import { Button } from 'antd';
 import { Services } from 'components-react/service-provider';
@@ -14,6 +14,7 @@ export default function StreamCard({
   emitGeneratePreview,
   emitExportVideo,
   emitRemoveStream,
+  emitCancelHighlightGeneration,
 }: {
   streamId: string;
   clipsOfStreamAreLoading: string | null;
@@ -21,6 +22,7 @@ export default function StreamCard({
   emitGeneratePreview: () => void;
   emitExportVideo: () => void;
   emitRemoveStream: () => void;
+  emitCancelHighlightGeneration: () => void;
 }) {
   const { HighlighterService } = Services;
   const clips = useVuex(() => HighlighterService.views.clips.filter(c => c.streamInfo?.[streamId]));
@@ -64,7 +66,24 @@ export default function StreamCard({
               width: `${stream.state.progress}%`,
               transition: 'width 1s',
             }}
-          ></div>{' '}
+          ></div>
+
+          <Button
+            size="large"
+            style={{
+              border: 'none',
+              backgroundColor: 'transparent',
+              color: 'black',
+              display: 'flex',
+              alignItems: 'center',
+            }}
+            onClick={e => {
+              e.stopPropagation();
+              emitCancelHighlightGeneration();
+            }}
+          >
+            <i className="icon-close" />
+          </Button>
         </div>
       );
     }
@@ -193,6 +212,9 @@ export default function StreamCard({
           size="large"
           className={styles.deleteButton}
           onClick={e => {
+            if (stream.state.type === 'detection-in-progress') {
+              emitCancelHighlightGeneration();
+            }
             emitRemoveStream();
             e.stopPropagation();
           }}
