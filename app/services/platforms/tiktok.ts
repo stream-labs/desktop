@@ -410,6 +410,10 @@ export class TikTokService
 
       const status = response as ITikTokLiveScopeResponse;
 
+      if (status?.audience_controls_info) {
+        this.setAudienceControls(status.audience_controls_info);
+      }
+
       if (status?.user) {
         const scope = this.convertScope(status.reason);
         this.SET_USERNAME(status.user.username);
@@ -429,10 +433,6 @@ export class TikTokService
       } else {
         this.SET_LIVE_SCOPE('denied');
         return EPlatformCallResult.TikTokStreamScopeMissing;
-      }
-
-      if (status?.audience_controls_info) {
-        this.setAudienceControls(status.audience_controls_info);
       }
 
       // clear any leftover server url or stream key
