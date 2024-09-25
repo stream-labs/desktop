@@ -87,8 +87,8 @@ export default function ResizeBar(p: React.PropsWithChildren<ResizeBarProps>) {
       {...resizableProps}
       handle={
         <div
-          className={cx(styles.resizeBar, styles[p.position], {
-            [styles['unset']]: v.hideStyleBlockers,
+          className={cx(styles.resizeBar, styles[p.position], p.className, {
+            [styles.unset]: v.hideStyleBlockers,
           })}
         >
           <div className={styles.resizeLine} />
