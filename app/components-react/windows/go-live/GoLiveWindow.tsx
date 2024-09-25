@@ -62,7 +62,7 @@ function ModalFooter() {
     close,
     goBackToSettings,
     isLoading,
-    promptReapply,
+    promptApply,
   } = useGoLiveSettings().extend(module => ({
     windowsService: inject(WindowsService),
 
@@ -74,8 +74,8 @@ function ModalFooter() {
       module.prepopulate();
     },
 
-    get promptReapply() {
-      return Services.TikTokService.promptReapply;
+    get promptApply() {
+      return Services.TikTokService.promptApply;
     },
   }));
 
@@ -85,7 +85,7 @@ function ModalFooter() {
 
   return (
     <Form layout={'inline'}>
-      {promptReapply && <GoLiveBanner />}
+      {promptApply && <GoLiveBanner />}
       {/* CLOSE BUTTON */}
       <Button onClick={close}>{$t('Close')}</Button>
 
