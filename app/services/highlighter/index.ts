@@ -140,6 +140,7 @@ export interface IHighlightedStream {
       | 'detection-canceled-by-user';
     progress: number;
   };
+  abortController?: AbortController;
 }
 
 export enum EExportStep {
@@ -1570,6 +1571,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       id: streamInfo.id || 'noId',
       title: sanitizedTitle,
       game: streamInfo.game || 'no title',
+      abortController: new AbortController(),
     };
 
     await this.addStream(setStreamInfo);
@@ -1631,22 +1633,34 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       const highlighterResponse = await getHighlightClips(
         filePath,
         renderHighlights,
+        setStreamInfo.abortController.signal,
         (progress: number) => {
           console.log('progress', progress);
-          // This callback might be called by getHighlightClips to report progress
-          // We can use it to move to the next phase if needed
         },
       );
       console.log('✅ Final HighlighterData', highlighterResponse);
     } catch (error: unknown) {
-      console.error('Error in highlight generation:', error);
-      setStreamInfo.state.type = 'error';
-      this.updateStream(setStreamInfo);
+      if (error instanceof Error && error.message === 'Highlight generation canceled') {
+        setStreamInfo.state.type = 'detection-canceled-by-user';
+      } else {
+        console.error('Error in highlight generation:', error);
+        setStreamInfo.state.type = 'error';
+      }
     } finally {
+      setStreamInfo.abortController = undefined;
+      this.updateStream(setStreamInfo);
       stopProgressUpdates();
     }
 
     return;
+  }
+
+  cancelHighlightGeneration(streamId: string): void {
+    const stream = this.views.highlightedStreams.find(s => s.id === streamId);
+    if (stream && stream.abortController) {
+      console.log('cancelHighlightGeneration', streamId);
+      stream.abortController.abort();
+    }
   }
 
   async getHighlightClipsRest(

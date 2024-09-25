@@ -41,6 +41,7 @@ interface IHighlighterProgressMessage {
 export function getHighlightClips(
   videoUri: string,
   renderHighlights: (highlightClips: IHighlight[]) => void,
+  cancelSignal: AbortSignal,
   progressUpdate?: (progress: number) => void,
 ): Promise<IHighlight[]> {
   return new Promise((resolve, reject) => {
@@ -54,6 +55,14 @@ export function getHighlightClips(
       console.log('Start Ai analysis');
 
       const childProcess: child.ChildProcess = getHighlighterProcess(videoUri);
+
+      if (cancelSignal) {
+        cancelSignal.addEventListener('abort', () => {
+          childProcess.kill();
+          reject(new Error('Highlight generation canceled'));
+        });
+      }
+
       childProcess.stdout?.on('data', data => {
         const message = data.toString() as string;
         const aiHighlighterMessage = parseAiHighlighterMessage(message);
