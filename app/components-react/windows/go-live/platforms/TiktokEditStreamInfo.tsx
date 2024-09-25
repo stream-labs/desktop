@@ -81,8 +81,7 @@ export function TikTokEnterCredentialsFormInfo(
       <InputWrapper
         extra={
           <div style={{ display: 'flex', flexDirection: 'column' }} className="input-extra">
-            <TikTokInfo />
-            {/* {p.denied ? <TikTokDenied /> : <TikTokInfo />} */}
+            {p.denied ? <TikTokDenied /> : <TikTokInfo />}
           </div>
         }
       >
@@ -98,7 +97,12 @@ function TikTokDenied() {
       id="tiktok-denied"
       message={$t('TikTok Live Access not granted. Click here to learn more.')}
       type="info"
-      onClick={openConfirmation}
+      onClick={() => {
+        openConfirmation();
+        Services.UsageStatisticsService.recordAnalyticsEvent('TikTokApplyPrompt', {
+          component: 'NotGrantedBannerDismissed',
+        });
+      }}
       dismissableKey={EDismissable.TikTokRejected}
     />
   );
@@ -121,10 +125,16 @@ function TikTokInfo() {
 }
 
 function TikTokButtons(p: { denied: boolean }) {
-  // const text = p.denied
-  //   ? $t('Reapply for TikTok Live Permission')
-  //   : $t('Apply for TikTok Live Permission');
-  const text = $t('Apply for TikTok Live Permission');
+  const status = Services.TikTokService.promptApply ? 'prompted' : 'not-prompted';
+  const component = p.denied ? 'ReapplyButton' : 'ApplyButton';
+  const text = p.denied
+    ? $t('Reapply for TikTok Live Permission')
+    : $t('Apply for TikTok Live Permission');
+
+  const data = {
+    component,
+    status: !p.denied ? status : undefined,
+  };
 
   return (
     <>
@@ -135,7 +145,10 @@ function TikTokButtons(p: { denied: boolean }) {
       )}
       <Button
         id="tiktok-application"
-        onClick={openApplicationInfoPage}
+        onClick={() => {
+          Services.UsageStatisticsService.recordAnalyticsEvent('TikTokApplyPrompt', data);
+          openApplicationInfoPage();
+        }}
         style={{
           width: '100%',
           marginBottom: '10px',
