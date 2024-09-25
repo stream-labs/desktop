@@ -18,13 +18,14 @@ import Loader from 'components-react/pages/Loader';
 import antdThemes from 'styles/antd/index';
 import { getPlatformService } from 'services/platforms';
 import { IModalOptions } from 'services/windows';
+import { TApplicationTheme } from 'services/customization';
 import styles from './Main.m.less';
 import { StatefulService } from 'services';
 import { useRealmObject } from 'components-react/hooks/realm';
 
 const MainCtx = React.createContext<MainController | null>(null);
 
-const loadedTheme = () => {
+const loadedTheme = (): TApplicationTheme | undefined => {
   const customizationState = localStorage.getItem('PersistentStatefulService-CustomizationService');
   if (customizationState) {
     return JSON.parse(customizationState)?.theme;
@@ -75,7 +76,7 @@ class MainController {
     return this.windowsService.state.main.hideStyleBlockers;
   }
 
-  theme(bulkLoadFinished: boolean) {
+  theme(bulkLoadFinished: boolean): TApplicationTheme {
     if (bulkLoadFinished) {
       return this.customizationService.currentTheme;
     }
@@ -310,7 +311,7 @@ function Main() {
     };
   }, [hideStyleBlockers]);
 
-  const oldTheme = useRef<string | null>(null);
+  const oldTheme = useRef<TApplicationTheme | null>(null);
   useEffect(() => {
     if (!theme) return;
     if (oldTheme.current && oldTheme.current !== theme) antdThemes[oldTheme.current].unuse();
@@ -339,7 +340,7 @@ function Main() {
     className: string;
     params: any;
     onTotalWidth: (width: number) => void;
-  }> = appPages[page];
+  }> = (appPages as Dictionary<React.FunctionComponent>)[page];
 
   return (
     <div

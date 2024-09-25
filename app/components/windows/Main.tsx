@@ -7,6 +7,7 @@ import { Inject } from 'services';
 import { CustomizationService } from 'app-services';
 import antdThemes from 'styles/antd/index';
 import styles from 'components-react/windows/Main.m.less';
+import { TApplicationTheme } from 'services/customization';
 
 const loadedTheme = () => {
   const customizationState = localStorage.getItem('PersistentStatefulService-CustomizationService');
@@ -23,7 +24,7 @@ export default class MainWindow extends TsxComponent {
     return this.$store.state.bulkLoadFinished && this.$store.state.i18nReady;
   }
 
-  theme = 'night-theme';
+  theme: TApplicationTheme = 'night-theme';
 
   unbind: () => void;
 
@@ -40,8 +41,6 @@ export default class MainWindow extends TsxComponent {
   }
 
   render() {
-    return this.uiReady && <Main />;
-
     return (
       <div style={{ height: '100%' }} className={this.theme}>
         {this.uiReady && <Main />}
