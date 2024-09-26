@@ -160,3 +160,15 @@ i.destination-logo {
 .option-btn {
   border: 1px solid var(--nav-icon-inactive);
 }
+
+.dual-output-toggle {
+  &:global(.ant-tooltip-placement-top .ant-tooltip-arrow) {
+    bottom: -2px;
+    right: 12px;
+  }
+
+  &:global(.ant-tooltip-placement-rightTop .ant-tooltip-arrow) {
+    bottom: 12px;
+    left: -2px;
+  }
+}

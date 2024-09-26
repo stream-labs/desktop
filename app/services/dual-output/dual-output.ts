@@ -396,7 +396,11 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    */
 
   @RunInLoadingMode()
-  setDualOutputMode(status: boolean = true, skipShowVideoSettings?: boolean) {
+  setDualOutputMode(
+    status: boolean = true,
+    skipShowVideoSettings: boolean = false,
+    showGoLiveWindow?: boolean,
+  ) {
     if (!this.userService.isLoggedIn) return;
 
     this.SET_SHOW_DUAL_OUTPUT(status);
@@ -424,6 +428,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
     if (!skipShowVideoSettings) {
       this.settingsService.showSettings('Video');
+    } else if (showGoLiveWindow) {
+      this.streamingService.showGoLiveWindow();
     }
 
     this.SET_IS_LOADING(false);

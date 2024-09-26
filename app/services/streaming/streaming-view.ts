@@ -518,4 +518,8 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
   get hasDestinations() {
     return this.enabledPlatforms.length > 0 || this.customDestinations.length > 0;
   }
+
+  get selectiveRecording() {
+    return this.streamingState.selectiveRecording;
+  }
 }

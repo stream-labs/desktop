@@ -13,6 +13,7 @@ import { useGoLiveSettings } from '../useGoLiveSettings';
 import { alertAsync } from 'components-react/modals';
 import Translate from 'components-react/shared/Translate';
 import { useDebounce } from 'components-react/hooks';
+import DualOutputToggle from '../../../shared/DualOutputToggle';
 
 interface IUltraDestinationSwitchers {
   type?: 'default' | 'ultra';
@@ -66,9 +67,12 @@ export function UltraDestinationSwitchers(p: IUltraDestinationSwitchers) {
       {isDualOutputMode && (
         <InfoBadge
           content={
-            <Translate message="<dualoutput>Dual Output</dualoutput> is enabled - you must stream to one horizontal and one vertical platform.">
-              <u slot="dualoutput" />
-            </Translate>
+            <>
+              <DualOutputToggle placement="topRight" className={styles.dualOutputToggle} />
+              <Translate message="<dualoutput>Dual Output</dualoutput> is enabled - you must stream to one horizontal and one vertical platform.">
+                <u slot="dualoutput" />
+              </Translate>
+            </>
           }
           style={{ marginBottom: '15px' }}
         />

@@ -12,6 +12,7 @@ import { useForm } from '../../shared/inputs/Form';
 import { getDefined } from '../../../util/properties-type-guards';
 import isEqual from 'lodash/isEqual';
 import { TDisplayType } from 'services/settings-v2';
+import { alertAsync } from 'components-react/modals';
 
 type TCommonFieldName = 'title' | 'description';
 
@@ -319,6 +320,7 @@ export class GoLiveSettingsModule {
     // }
 
     if (Services.DualOutputService.views.dualOutputMode && !this.getCanStreamDualOutput()) {
+      alertAsync();
       message.error(
         $t(
           'To use Dual Output you must stream to at least one horizontal and one vertical platform.',
@@ -338,8 +340,14 @@ export class GoLiveSettingsModule {
 
   /**
    * Validate the form and start streaming
+   * @remark Returning false from this function signifies that
    */
   async goLive() {
+    const canGoLive = await this.validate();
+    if (canGoLive && Services.DualOutputService.views.dualOutputMode) {
+      return false;
+    }
+
     if (await this.validate()) {
       Services.StreamingService.actions.goLive(this.state.settings);
     }

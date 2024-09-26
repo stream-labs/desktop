@@ -16,6 +16,7 @@ import TwitterInput from './Twitter';
 import AddDestinationButton from 'components-react/shared/AddDestinationButton';
 import PrimaryChatSwitcher from './PrimaryChatSwitcher';
 import ColorSpaceWarnings from './ColorSpaceWarnings';
+import DualOutputToggle from '../../shared/DualOutputToggle';
 
 const PlusIcon = PlusOutlined as Function;
 
@@ -85,6 +86,7 @@ export default function GoLiveSettings() {
       {shouldShowLeftCol && (
         <Col span={8}>
           <Scrollable style={{ height: '81%' }} snapToWindowEdge>
+            <DualOutputToggle />
             {/*DESTINATION SWITCHERS*/}
             <DestinationSwitchers showSelector={showSelector} />
             {/*ADD DESTINATION BUTTON*/}

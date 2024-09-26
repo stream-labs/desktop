@@ -14,6 +14,7 @@ import { alertAsync } from 'components-react/modals';
 import Translate from 'components-react/shared/Translate';
 import DualOutputPlatformSelector from './DualOutputPlatformSelector';
 import { useDebounce } from 'components-react/hooks';
+import DualOutputToggle from '../../../shared/DualOutputToggle';
 
 interface INonUltraDestinationSwitchers {
   showSelector?: boolean;
@@ -59,9 +60,12 @@ export function NonUltraDestinationSwitchers(p: INonUltraDestinationSwitchers) {
       {isDualOutputMode && (
         <InfoBadge
           content={
-            <Translate message="<dualoutput>Dual Output</dualoutput> is enabled - you must stream to one horizontal and one vertical platform.">
-              <u slot="dualoutput" />
-            </Translate>
+            <>
+              <DualOutputToggle placement="topRight" className={styles.dualOutputToggle} />
+              <Translate message="<dualoutput>Dual Output</dualoutput> is enabled - you must stream to one horizontal and one vertical platform.">
+                <u slot="dualoutput" />
+              </Translate>
+            </>
           }
           style={{ marginBottom: '15px' }}
         />

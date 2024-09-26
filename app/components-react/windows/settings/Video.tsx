@@ -13,6 +13,7 @@ import Tabs from 'components-react/shared/Tabs';
 import { invalidFps, IVideoInfoValue, TDisplayType } from 'services/settings-v2/video';
 import { AuthModal } from 'components-react/shared/AuthModal';
 import Utils from 'services/utils';
+import DualOutputToggle from '../../shared/DualOutputToggle';
 
 const CANVAS_RES_OPTIONS = [
   { label: '1920x1080', value: '1920x1080' },
@@ -543,31 +544,13 @@ export function VideoSettings() {
     <>
       <div className={styles.videoSettingsHeader}>
         <h2>{$t('Video')}</h2>
-        <div className={styles.doToggle}>
-          {/* THIS CHECKBOX TOGGLES DUAL OUTPUT MODE FOR THE ENTIRE APP */}
-          <CheckboxInput
-            id="dual-output-checkbox"
-            name="dual-output-checkbox"
-            data-name="dual-output-checkbox"
-            label="Dual Output Checkbox"
-            value={showDualOutputSettings}
-            onChange={toggleDualOutput}
-            className={styles.doCheckbox}
-            disabled={cantEditFields}
-          />
-          {$t('Enable Dual Output')}
-          <Tooltip
-            title={$t(
-              'Stream to horizontal and vertical platforms simultaneously. Recordings will be in horizontal only.',
-            )}
-            className={styles.doTooltip}
-            placement="bottomRight"
-            lightShadow
-          >
-            <i className="icon-information" />
-          </Tooltip>
-        </div>
-        {/* )} */}
+        <DualOutputToggle
+          value={showDualOutputSettings}
+          onChange={toggleDualOutput}
+          disabled={cantEditFields}
+          placement="topRight"
+          lightShadow={true}
+        />
       </div>
       {showDualOutputSettings && <Tabs onChange={setDisplay} />}
 
