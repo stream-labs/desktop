@@ -3,6 +3,7 @@
   "The scene name is required": "장면 이름이 필요합니다",
   "Please enter the name of the scene": "장면의 이름을 입력합니다",
   "Manage Scene Collections": "장면 컬렉션 관리",
+  "Create Scene Collection": "Create Scene Collection",
   "There needs to be at least one scene.": "최소한 한 개의 장면이 있어야 합니다.",
   "Projector:": "프로젝터:",
   "Projector: Output": "프로젝터: 출력",
@@ -62,5 +63,7 @@
   "Loading scene...": "Loading scene...",
   "Import from OBS": "Import from OBS",
   "Import from Twitch": "Import from Twitch",
-  "Load existing scenes from Twitch Studio": "Load existing scenes from Twitch Studio"
+  "Import from Twitch Studio": "Import from Twitch Studio",
+  "Load existing scenes from Twitch Studio": "Load existing scenes from Twitch Studio",
+  "Start Fresh": "Start Fresh"
 }

@@ -3,6 +3,7 @@
   "The scene name is required": "Sahne ismi gerekli",
   "Please enter the name of the scene": "Lütfen bir sahne ismi girin",
   "Manage Scene Collections": "Sahne Koleksiyonlarını Düzenle",
+  "Create Scene Collection": "Create Scene Collection",
   "There needs to be at least one scene.": "En az bir sahneniz olması gerekir.",
   "Projector:": "Projektör:",
   "Projector: Output": "Projektör: Çıkış",
@@ -62,5 +63,7 @@
   "Loading scene...": "Loading scene...",
   "Import from OBS": "Import from OBS",
   "Import from Twitch": "Import from Twitch",
-  "Load existing scenes from Twitch Studio": "Load existing scenes from Twitch Studio"
+  "Import from Twitch Studio": "Import from Twitch Studio",
+  "Load existing scenes from Twitch Studio": "Load existing scenes from Twitch Studio",
+  "Start Fresh": "Start Fresh"
 }
