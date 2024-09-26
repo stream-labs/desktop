@@ -59,13 +59,20 @@ export function getHighlightClips(
       const childProcess: child.ChildProcess = getHighlighterProcess(videoUri);
 
       let timeoutId: NodeJS.Timeout;
+      const cancelAfterDuration = 60000;
 
       const resetTimeout = () => {
         if (timeoutId) clearTimeout(timeoutId);
         timeoutId = setTimeout(() => {
           childProcess.kill();
-          reject(new Error('No new messages received for 60 seconds. Process terminated.'));
-        }, 60000);
+          reject(
+            new Error(
+              `No new messages received for ${
+                cancelAfterDuration / 1000
+              } seconds. Process terminated.`,
+            ),
+          );
+        }, cancelAfterDuration);
       };
 
       if (cancelSignal) {
