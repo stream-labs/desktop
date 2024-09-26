@@ -91,9 +91,10 @@ export class Clip {
 
         const scrubFileExists = await this.fileExists(scrubPath);
         if (scrubFileExists) {
-          return;
+          this.frameSource.scrubJpg = scrubPath;
+        } else {
+          await this.frameSource.exportScrubbingSprite(scrubPath);
         }
-        await this.frameSource.exportScrubbingSprite(scrubPath);
       } catch (error) {
         console.log('err', error);
       }
