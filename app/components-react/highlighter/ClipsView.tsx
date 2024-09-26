@@ -22,8 +22,9 @@ import TransitionSelector from 'components-react/highlighter/TransitionSelector'
 import { $t } from 'services/i18n';
 import * as remote from '@electron/remote';
 import { sort } from 'semver';
+import { EditingControls } from './EditingControls';
 
-type TModalClipsView = 'trim' | 'export' | 'preview' | 'remove';
+export type TModalClipsView = 'trim' | 'export' | 'preview' | 'remove';
 
 interface IClipsViewProps {
   id: string | undefined;
@@ -36,6 +37,8 @@ export default function ClipsView({
   props: IClipsViewProps;
   emitSetView: (data: IViewState) => void;
 }) {
+  console.log('Render ClipsView');
+
   const { HighlighterService, HotkeysService, UsageStatisticsService } = Services;
   const v = useVuex(() => ({
     clips: HighlighterService.views.clips,
@@ -70,6 +73,8 @@ export default function ClipsView({
 
     if (tempClipList.length > 0) {
       setTempClipList([]);
+    } else {
+      initialSortedClipList(props.id);
     }
     //TODO M: This overwrites currently enabled and disabled states
     HighlighterService.actions.enableOnlySpecificClips(HighlighterService.views.clips, props.id);
@@ -109,93 +114,42 @@ export default function ClipsView({
     );
   }
 
-  function getControls() {
-    function setTransitionDuration(duration: number) {
-      HighlighterService.actions.setTransition({ duration });
+  function initialSortedClipList(streamId: string | undefined) {
+    let clipList;
+    if (tempClipList.length === 0) {
+      if (streamId) {
+        const clipsWithOrder = loadedClips
+          .filter(c => c.streamInfo?.[streamId]?.orderPosition !== undefined && c.deleted !== true)
+          .sort(
+            (a: TClip, b: TClip) =>
+              a.streamInfo![streamId]!.orderPosition - b.streamInfo![streamId]!.orderPosition,
+          )
+          .map(c => ({
+            id: c.path,
+          }));
+
+        const clipsWithOutOrder = loadedClips
+          .filter(
+            c =>
+              (c.streamInfo === undefined ||
+                c.streamInfo[streamId] === undefined ||
+                c.streamInfo[streamId]?.orderPosition === undefined) &&
+              c.deleted !== true,
+          )
+          .map(c => ({ id: c.path }));
+
+        clipList = [...clipsWithOrder, ...clipsWithOutOrder];
+      } else {
+        const clipOrder = loadedClips
+          .filter(c => c.deleted !== true)
+          .sort((a: TClip, b: TClip) => a.globalOrderPosition - b.globalOrderPosition)
+          .map(c => ({ id: c.path }));
+
+        clipList = [...clipOrder];
+      }
+      setTempClipList(clipList);
     }
-
-    function setMusicEnabled(enabled: boolean) {
-      HighlighterService.actions.setAudio({ musicEnabled: enabled });
-    }
-
-    const musicExtensions = ['mp3', 'wav', 'flac'];
-
-    function setMusicFile(file: string) {
-      if (!musicExtensions.map(e => `.${e}`).includes(path.parse(file).ext)) return;
-      HighlighterService.actions.setAudio({ musicPath: file });
-    }
-
-    function setMusicVolume(volume: number) {
-      HighlighterService.actions.setAudio({ musicVolume: volume });
-    }
-
-    return (
-      <Scrollable
-        style={{
-          width: '300px',
-          flexShrink: 0,
-          background: 'var(--section)',
-          borderLeft: '1px solid var(--border)',
-          padding: '20px',
-        }}
-      >
-        <Form layout="vertical">
-          <TransitionSelector />
-          <SliderInput
-            label={$t('Transition Duration')}
-            value={v.transition.duration}
-            onChange={setTransitionDuration}
-            min={0.5}
-            max={5}
-            step={0.1}
-            debounce={200}
-            hasNumberInput={false}
-            tooltipPlacement="top"
-            tipFormatter={v => `${v}s`}
-          />
-          <SwitchInput
-            label={$t('Background Music')}
-            value={v.audio.musicEnabled}
-            onChange={setMusicEnabled}
-          />
-          <Animate transitionName="ant-slide-up">
-            {v.audio.musicEnabled && (
-              <div>
-                <FileInput
-                  label={$t('Music File')}
-                  value={v.audio.musicPath}
-                  filters={[{ name: $t('Audio File'), extensions: musicExtensions }]}
-                  onChange={setMusicFile}
-                />
-                <SliderInput
-                  label={$t('Music Volume')}
-                  value={v.audio.musicVolume}
-                  onChange={setMusicVolume}
-                  min={0}
-                  max={100}
-                  step={1}
-                  debounce={200}
-                  hasNumberInput={false}
-                  tooltipPlacement="top"
-                  tipFormatter={v => `${v}%`}
-                />
-              </div>
-            )}
-          </Animate>
-        </Form>
-        <Button
-          style={{ marginTop: '16px', marginRight: '8px' }}
-          onClick={() => setShowModal('preview')}
-        >
-          {$t('Preview')}
-        </Button>
-        <Button type="primary" style={{ marginTop: '16px' }} onClick={() => setShowModal('export')}>
-          {$t('Export')}
-        </Button>
-      </Scrollable>
-    );
   }
-
   function setClipOrder(clips: { id: string }[], streamId: string | undefined) {
     const oldClipArray = tempClipList.map(c => c.id);
     const newClipArray = clips.map(c => c.id);
@@ -279,80 +233,9 @@ export default function ClipsView({
     e.preventDefault();
     e.stopPropagation();
   }
-  function noClipsView(streamId: string | undefined) {
-    return (
-      <div
-        style={{ width: '100%', display: 'flex' }}
-        className={styles.clipsViewRoot}
-        onDrop={event => onDrop(event, streamId)}
-      >
-        <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
-          <div style={{ display: 'flex', padding: 20 }}>
-            <div style={{ flexGrow: 1 }}>
-              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                <div
-                  style={{ cursor: 'pointer', paddingTop: '2px' }}
-                  onClick={() => emitSetView({ view: 'stream' })}
-                >
-                  <i className="icon-back" />
-                </div>{' '}
-                <h1 onClick={() => emitSetView({ view: 'stream' })} style={{ margin: 0 }}>
-                  {' '}
-                  {props.id
-                    ? v.highlightedStreams.find(stream => stream.id === props.id)?.title ??
-                      'Stream highlight clips'
-                    : 'All highlight clips'}
-                </h1>
-              </div>
-            </div>
-            <div>
-              <AddClip streamId={props.id} />
-            </div>
-          </div>{' '}
-          <Scrollable style={{ flexGrow: 1, padding: '20px 0 20px 20px' }}>
-            No clips found
-          </Scrollable>
-        </div>
-      </div>
-    );
-  }
 
   //TODO: Need performance updateb
   function getClipsView(streamId: string | undefined) {
-    let clipList;
-    if (tempClipList.length === 0) {
-      if (streamId) {
-        const clipsWithOrder = loadedClips
-          .filter(c => c.streamInfo?.[streamId]?.orderPosition !== undefined && c.deleted !== true)
-          .sort(
-            (a: TClip, b: TClip) =>
-              a.streamInfo![streamId]!.orderPosition - b.streamInfo![streamId]!.orderPosition,
-          )
-          .map(c => ({
-            id: c.path,
-          }));
-
-        const clipsWithOutOrder = loadedClips
-          .filter(
-            c =>
-              (c.streamInfo === undefined ||
-                c.streamInfo[streamId] === undefined ||
-                c.streamInfo[streamId]?.orderPosition === undefined) &&
-              c.deleted !== true,
-          )
-          .map(c => ({ id: c.path }));
-
-        clipList = [...clipsWithOrder, ...clipsWithOutOrder];
-      } else {
-        const clipOrder = loadedClips
-          .filter(c => c.deleted !== true)
-          .sort((a: TClip, b: TClip) => a.globalOrderPosition - b.globalOrderPosition)
-          .map(c => ({ id: c.path }));
-
-        clipList = [...clipOrder];
-      }
-      setTempClipList(clipList);
-    }
     const [hoveredId, setHoveredId] = useState<string | null>(null);
     const [onMove, setOnMove] = useState<boolean>(false);
     // console.log('rendering clips view');
@@ -388,9 +271,11 @@ export default function ClipsView({
               <AddClip streamId={props.id} />
             </div>
           </div>
-          {v.loaded ? (
+          {loadedClips.length === 0 ? (
+            <> No clips found</>
+          ) : (
             <>
-              {streamId ? (
+              {v.loaded ? (
                 <>
                   <Scrollable
                     horizontal={true}
@@ -448,61 +333,79 @@ export default function ClipsView({
                   >
                     <span>0m 0s</span> <span> {formatSecondsToHMS(totalDuration)} </span>
                   </div>
+                  <Scrollable style={{ flexGrow: 1, padding: '20px 20px 20px 20px' }}>
+                    <ReactSortable
+                      list={tempClipList}
+                      setList={clips => setClipOrder(clips, props.id)} //
+                      animation={200}
+                      filter=".sortable-ignore"
+                      onMove={e => {
+                        setOnMove(true);
+                        return e.related.className.indexOf('sortable-ignore') === -1;
+                      }}
+                      onEnd={() => setOnMove(false)}
+                    >
+                      {tempClipList
+                        .filter(c => clipMap.has(c.id))
+                        .map(({ id }) => {
+                          const clip = clipMap.get(id)!;
+                          return (
+                            <div
+                              key={clip.path}
+                              onMouseEnter={() => setHoveredId(id)}
+                              onMouseLeave={() => setHoveredId(null)}
+                              style={{
+                                margin: '10px 20px 10px 0',
+                                width: '100%',
+                                display: 'inline-block',
+                              }}
+                            >
+                              <ClipPreview
+                                clip={clip}
+                                showTrim={() => {
+                                  setInspectedClipPath(clip.path);
+                                  setShowModal('trim');
+                                }}
+                                showRemove={() => {
+                                  setInspectedClipPath(clip.path);
+                                  setShowModal('remove');
+                                }}
+                                streamId={streamId}
+                                highlighted={hoveredId === id && !onMove}
+                              />
+                            </div>
+                          );
+                        })}
+                    </ReactSortable>
+                  </Scrollable>
                 </>
               ) : (
-                <></>
+                getLoadingView()
               )}
-              <Scrollable style={{ flexGrow: 1, padding: '20px 20px 20px 20px' }}>
-                <ReactSortable
-                  list={tempClipList}
-                  setList={clips => setClipOrder(clips, props.id)} //
-                  animation={200}
-                  filter=".sortable-ignore"
-                  onMove={e => {
-                    setOnMove(true);
-                    return e.related.className.indexOf('sortable-ignore') === -1;
-                  }}
-                  onEnd={() => setOnMove(false)}
-                >
-                  {tempClipList
-                    .filter(c => clipMap.has(c.id))
-                    .map(({ id }) => {
-                      const clip = clipMap.get(id)!;
-                      return (
-                        <div
-                          key={clip.path}
-                          onMouseEnter={() => setHoveredId(id)}
-                          onMouseLeave={() => setHoveredId(null)}
-                          style={{
-                            margin: '10px 20px 10px 0',
-                            width: '100%',
-                            display: 'inline-block',
-                          }}
-                        >
-                          <ClipPreview
-                            clip={clip}
-                            showTrim={() => {
-                              setInspectedClipPath(clip.path);
-                              setShowModal('trim');
-                            }}
-                            showRemove={() => {
-                              setInspectedClipPath(clip.path);
-                              setShowModal('remove');
-                            }}
-                            streamId={streamId}
-                            highlighted={hoveredId === id && !onMove}
-                          />
-                        </div>
-                      );
-                    })}
-                </ReactSortable>
-              </Scrollable>
             </>
-          ) : (
-            getLoadingView()
-          )}{' '}
+          )}
         </div>
-        {getControls()}
+        {
+          <EditingControls
+            audio={v.audio}
+            transition={v.transition}
+            emitSetTransitionDuration={(duration: number) => {
+              HighlighterService.actions.setTransition({ duration });
+            }}
+            emitSetMusicEnabled={(enabled: boolean) => {
+              HighlighterService.actions.setAudio({ musicEnabled: enabled });
+            }}
+            emitSetMusicFile={(file: string) => {
+              HighlighterService.actions.setAudio({ musicPath: file });
+            }}
+            emitSetMusicVolume={(volume: number) => {
+              HighlighterService.actions.setAudio({ musicVolume: volume });
+            }}
+            emitSetShowModal={(modal: TModalClipsView) => {
+              setShowModal(modal);
+            }}
+          />
+        }
         <Modal
           getContainer={`.${styles.clipsViewRoot}`}
           onCancel={closeModal}
@@ -524,7 +427,6 @@ export default function ClipsView({
       </div>
     );
   }
-  if (loadedClips.length === 0) return noClipsView(props.id);
   return getClipsView(props.id);
 }
 
