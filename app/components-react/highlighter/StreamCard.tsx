@@ -75,6 +75,8 @@ export default function StreamCard({
               backgroundColor: 'transparent',
               color: 'black',
               display: 'flex',
+              position: 'absolute',
+              right: '0',
               alignItems: 'center',
             }}
             onClick={e => {
