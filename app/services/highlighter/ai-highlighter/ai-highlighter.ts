@@ -38,6 +38,8 @@ interface IHighlighterProgressMessage {
   progress: number;
 }
 
+import { setTimeout, clearTimeout } from 'timers';
+
 export function getHighlightClips(
   videoUri: string,
   renderHighlights: (highlightClips: IHighlight[]) => void,
@@ -56,14 +58,27 @@ export function getHighlightClips(
 
       const childProcess: child.ChildProcess = getHighlighterProcess(videoUri);
 
+      let timeoutId: NodeJS.Timeout;
+
+      const resetTimeout = () => {
+        if (timeoutId) clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          childProcess.kill();
+          reject(new Error('No new messages received for 60 seconds. Process terminated.'));
+        }, 60000);
+      };
+
       if (cancelSignal) {
         cancelSignal.addEventListener('abort', () => {
+          console.log('cancelSignal.addEventListener');
+          if (timeoutId) clearTimeout(timeoutId);
           childProcess.kill();
           reject(new Error('Highlight generation canceled'));
         });
       }
 
       childProcess.stdout?.on('data', data => {
+        resetTimeout(); // Reset the timeout on each new message
         const message = data.toString() as string;
         const aiHighlighterMessage = parseAiHighlighterMessage(message);
         if (typeof aiHighlighterMessage === 'string' || aiHighlighterMessage instanceof String) {
@@ -77,6 +92,7 @@ export function getHighlightClips(
               if (partialInputsRendered === false) {
                 renderHighlights?.(aiHighlighterMessage.json as IHighlight[]);
               }
+              if (timeoutId) clearTimeout(timeoutId); // Clear the timeout before resolving
               resolve(aiHighlighterMessage.json as IHighlight[]);
               break;
             case 'highlights_partial':
@@ -92,9 +108,20 @@ export function getHighlightClips(
           }
         }
       });
+
       childProcess.stderr?.on('data', (data: string) => {
+        resetTimeout(); // Reset the timeout on error messages too
         console.log('Error logs:', data.toString());
       });
+
+      childProcess.on('close', code => {
+        if (timeoutId) clearTimeout(timeoutId);
+        if (code !== 0) {
+          reject(new Error(`Child process exited with code ${code}`));
+        }
+      });
+
+      resetTimeout(); // Start the initial timeout
     }
   });
 }
