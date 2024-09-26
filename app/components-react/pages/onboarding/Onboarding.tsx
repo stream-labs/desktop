@@ -8,7 +8,7 @@ import cx from 'classnames';
 import { $t } from 'services/i18n';
 import * as stepComponents from './steps';
 import Utils from 'services/utils';
-import { IOnboardingStep, ONBOARDING_STEPS, StreamerKnowledgeMode } from 'services/onboarding';
+import { IOnboardingStep, ONBOARDING_STEPS } from 'services/onboarding';
 import Scrollable from 'components-react/shared/Scrollable';
 import StreamlabsDesktopLogo from 'components-react/shared/StreamlabsDesktopLogo';
 import StreamlabsLogo from 'components-react/shared/StreamlabsLogo';
@@ -233,10 +233,6 @@ export class OnboardingModule {
     return this.steps.filter(step => step.isPreboarding).length;
   }
 
-  get streamerKnowledgeMode() {
-    return this.OnboardingService.views.streamerKnowledgeMode;
-  }
-
   get isLogin() {
     return this.OnboardingService.state.options.isLogin;
   }
@@ -258,10 +254,6 @@ export class OnboardingModule {
 
   setImportFromTwitch() {
     this.OnboardingService.setImport('twitch');
-  }
-
-  setStreamerKnowledgeMode(mode: StreamerKnowledgeMode | null) {
-    this.OnboardingService.setStreamerKnowledgeMode(mode);
   }
 
   finish() {
