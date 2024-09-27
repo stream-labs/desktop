@@ -104,6 +104,7 @@ export default function BrowseOverlays(p: {
     return ScenesService.views.scenes.map(scene => ({
       id: scene.id,
       name: scene.name,
+      isActiveScene: scene.id === ScenesService.views.activeSceneId,
     }));
   }
 
