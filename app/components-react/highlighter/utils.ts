@@ -40,3 +40,36 @@ export function groupStreamsByTimePeriod(streams: { id: string; date: string }[]
 
   return { ...groups, ...monthGroups };
 }
+
+export function sortClips(clips: TClip[], streamId: string | undefined): TClip[] {
+  let sortedClips;
+
+  if (streamId) {
+    const clipsWithOrder = clips
+      .filter(c => c.streamInfo?.[streamId]?.orderPosition !== undefined && c.deleted !== true)
+      .sort(
+        (a: TClip, b: TClip) =>
+          a.streamInfo![streamId]!.orderPosition - b.streamInfo![streamId]!.orderPosition,
+      );
+
+    const clipsWithOutOrder = clips.filter(
+      c =>
+        (c.streamInfo === undefined ||
+          c.streamInfo[streamId] === undefined ||
+          c.streamInfo[streamId]?.orderPosition === undefined) &&
+        c.deleted !== true,
+    );
+
+    sortedClips = [...clipsWithOrder, ...clipsWithOutOrder];
+  } else {
+    sortedClips = clips
+      .filter(c => c.deleted !== true)
+      .sort((a: TClip, b: TClip) => a.globalOrderPosition - b.globalOrderPosition);
+  }
+
+  return sortedClips;
+}
+
+export function clipsToStringArray(clips: TClip[]): { id: string }[] {
+  return clips.map(c => ({ id: c.path }));
+}

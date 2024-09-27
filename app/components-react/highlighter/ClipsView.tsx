@@ -23,6 +23,8 @@ import { $t } from 'services/i18n';
 import * as remote from '@electron/remote';
 import { sort } from 'semver';
 import { EditingControls } from './EditingControls';
+import ClipsFilter from './ClipsFilter';
+import { sortClips } from './utils';
 
 export type TModalClipsView = 'trim' | 'export' | 'preview' | 'remove';
 
@@ -53,10 +55,14 @@ export default function ClipsView({
     highlightedStreams: HighlighterService.views.highlightedStreams,
   }));
 
-  const [tempClipList, setTempClipList] = useState<{ id: string }[]>([]);
+  // const [tempClipList, setTempClipList] = useState<{ id: string }[]>([]);
   const [showModal, rawSetShowModal] = useState<TModalClipsView | null>(null);
   const [modalWidth, setModalWidth] = useState('700px');
-
+  const [activeFilter, setActiveFilter] = useState('all');
+  const sortedClips = useRef<TClip[]>([]);
+  const sortedFilteredClips = useRef<TClip[]>([]);
+  const sortedClipStrings = useRef<{ id: string }[]>([]);
+  const sortedFilteredClipStrings = useRef<{ id: string }[]>([]);
   // await HighlighterService.actions.return.getClip. TODO M: Check if it cal stay like this
   const loadedClips = useMemo(() => HighlighterService.getClips(v.clips, props.id), [
     v.clips,
@@ -68,18 +74,30 @@ export default function ClipsView({
   }, [loadedClips]);
 
   useEffect(() => {
-    // Disables unneeded clips, and enables needed clips
-    // console.log('loaded.clips length changed');
+    sortedClips.current = sortClips(loadedClips, props.id);
+    sortedFilteredClips.current = sortedClips.current.filter(clip => {
+      switch (activeFilter) {
+        case 'ai':
+          return clip.source === 'AiClip';
+        case 'manual':
+          return clip.source === 'Manual' || clip.source === 'ReplayBuffer';
+        case 'all':
+        default:
+          return true;
+      }
+    });
+    sortedClipStrings.current = sortedClips.current.map(clip => ({ id: clip.path }));
+    sortedFilteredClipStrings.current = sortedFilteredClips.current.map(clip => ({
+      id: clip.path,
+    }));
 
-    if (tempClipList.length > 0) {
-      setTempClipList([]);
-    } else {
-      initialSortedClipList(props.id);
-    }
+    // Disables unneeded clips, and enables needed clips
+    // console.log('loaded.clips length changed');/
+
     //TODO M: This overwrites currently enabled and disabled states
     HighlighterService.actions.enableOnlySpecificClips(HighlighterService.views.clips, props.id);
     HighlighterService.actions.loadClips(props.id);
-  }, [loadedClips.length]);
+  }, [loadedClips.length, activeFilter]);
 
   useEffect(() => UsageStatisticsService.actions.recordFeatureUsage('Highlighter'), []);
 
@@ -114,44 +132,8 @@ export default function ClipsView({
     );
   }
 
-  function initialSortedClipList(streamId: string | undefined) {
-    let clipList;
-    if (tempClipList.length === 0) {
-      if (streamId) {
-        const clipsWithOrder = loadedClips
-          .filter(c => c.streamInfo?.[streamId]?.orderPosition !== undefined && c.deleted !== true)
-          .sort(
-            (a: TClip, b: TClip) =>
-              a.streamInfo![streamId]!.orderPosition - b.streamInfo![streamId]!.orderPosition,
-          )
-          .map(c => ({
-            id: c.path,
-          }));
-
-        const clipsWithOutOrder = loadedClips
-          .filter(
-            c =>
-              (c.streamInfo === undefined ||
-                c.streamInfo[streamId] === undefined ||
-                c.streamInfo[streamId]?.orderPosition === undefined) &&
-              c.deleted !== true,
-          )
-          .map(c => ({ id: c.path }));
-
-        clipList = [...clipsWithOrder, ...clipsWithOutOrder];
-      } else {
-        const clipOrder = loadedClips
-          .filter(c => c.deleted !== true)
-          .sort((a: TClip, b: TClip) => a.globalOrderPosition - b.globalOrderPosition)
-          .map(c => ({ id: c.path }));
-
-        clipList = [...clipOrder];
-      }
-      setTempClipList(clipList);
-    }
-  }
   function setClipOrder(clips: { id: string }[], streamId: string | undefined) {
-    const oldClipArray = tempClipList.map(c => c.id);
+    const oldClipArray = sortedClipStrings.current.map(c => c.id);
     const newClipArray = clips.map(c => c.id);
 
     if (JSON.stringify(newClipArray) === JSON.stringify(oldClipArray)) {
@@ -188,7 +170,8 @@ export default function ClipsView({
         });
       }
 
-      setTempClipList(clips);
+      sortedClipStrings.current = clips;
+      sortedFilteredClipStrings.current = clips;
       return;
     }
   }
@@ -235,7 +218,11 @@ export default function ClipsView({
   }
 
   //TODO: Need performance updateb
-  function getClipsView(streamId: string | undefined) {
+  function getClipsView(
+    streamId: string | undefined,
+    sortedFilteredList: { id: string }[],
+    sortedList: { id: string }[],
+  ) {
     const [hoveredId, setHoveredId] = useState<string | null>(null);
     const [onMove, setOnMove] = useState<boolean>(false);
     // console.log('rendering clips view');
@@ -271,6 +258,7 @@ export default function ClipsView({
               <AddClip streamId={props.id} />
             </div>
           </div>
+          <ClipsFilter activeFilter={activeFilter} onFilterChange={setActiveFilter} />
           {loadedClips.length === 0 ? (
             <> No clips found</>
           ) : (
@@ -294,7 +282,7 @@ export default function ClipsView({
                         gap: '4px',
                         justifyContent: 'center',
                       }}
-                      list={tempClipList}
+                      list={sortedList}
                       setList={clips => setClipOrder(clips, props.id)} //
                       animation={200}
                       filter=".sortable-ignore"
@@ -304,7 +292,7 @@ export default function ClipsView({
                         return e.related.className.indexOf('sortable-ignore') === -1;
                       }}
                     >
-                      {tempClipList
+                      {sortedList
                         .filter(c => clipMap.has(c.id) && clipMap.get(c.id)!.enabled)
                         .map(({ id }) => {
                           const clip = clipMap.get(id)!;
@@ -335,7 +323,7 @@ export default function ClipsView({
                   </div>
                   <Scrollable style={{ flexGrow: 1, padding: '20px 20px 20px 20px' }}>
                     <ReactSortable
-                      list={tempClipList}
+                      list={sortedFilteredList}
                       setList={clips => setClipOrder(clips, props.id)} //
                       animation={200}
                       filter=".sortable-ignore"
@@ -345,7 +333,7 @@ export default function ClipsView({
                       }}
                       onEnd={() => setOnMove(false)}
                     >
-                      {tempClipList
+                      {sortedFilteredList
                         .filter(c => clipMap.has(c.id))
                         .map(({ id }) => {
                           const clip = clipMap.get(id)!;
@@ -427,7 +415,7 @@ export default function ClipsView({
       </div>
     );
   }
-  return getClipsView(props.id);
+  return getClipsView(props.id, sortedFilteredClipStrings.current, sortedClipStrings.current);
 }
 
 function MiniClipPreview({ clip, highlighted }: { clip: TClip; highlighted: boolean }) {
