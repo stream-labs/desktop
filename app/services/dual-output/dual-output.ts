@@ -275,15 +275,21 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   }
 
   getCanStreamDualOutput() {
+    return this.horizontalHasTargets && this.verticalHasTargets;
+  }
+
+  get horizontalHasTargets() {
     const platformDisplays = this.streamingService.views.activeDisplayPlatforms;
     const destinationDisplays = this.streamingService.views.activeDisplayDestinations;
 
-    const horizontalHasDestinations =
-      platformDisplays.horizontal.length > 0 || destinationDisplays.horizontal.length > 0;
-    const verticalHasDestinations =
-      platformDisplays.vertical.length > 0 || destinationDisplays.vertical.length > 0;
+    return platformDisplays.horizontal.length > 0 || destinationDisplays.horizontal.length > 0;
+  }
 
-    return horizontalHasDestinations && verticalHasDestinations;
+  get verticalHasTargets() {
+    const platformDisplays = this.streamingService.views.activeDisplayPlatforms;
+    const destinationDisplays = this.streamingService.views.activeDisplayDestinations;
+
+    return platformDisplays.vertical.length > 0 || destinationDisplays.vertical.length > 0;
   }
 
   /**

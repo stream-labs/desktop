@@ -1,5 +1,5 @@
 import styles from './GoLive.m.less';
-import { WindowsService } from 'app-services';
+import { WindowsService, DualOutputService } from 'app-services';
 import { ModalLayout } from '../../shared/ModalLayout';
 import { Button } from 'antd';
 import { Services } from '../../service-provider';
@@ -9,7 +9,9 @@ import GoLiveBanner from './GoLiveInfoBanner';
 import React from 'react';
 import { $t } from '../../../services/i18n';
 import GoLiveChecklist from './GoLiveChecklist';
+import { alertAsync } from 'components-react/modals';
 import Form from '../../shared/inputs/Form';
+import Translate from 'components-react/shared/Translate';
 import Animation from 'rc-animate';
 import { useGoLiveSettings, useGoLiveSettingsRoot } from './useGoLiveSettings';
 import { inject } from 'slap';
@@ -61,10 +63,12 @@ function ModalFooter() {
     goLive,
     close,
     goBackToSettings,
+    toggleDualOutputMode,
     isLoading,
     promptApply,
   } = useGoLiveSettings().extend(module => ({
     windowsService: inject(WindowsService),
+    dualOutputService: inject(DualOutputService),
 
     close() {
       this.windowsService.actions.closeChildWindow();
@@ -72,6 +76,10 @@ function ModalFooter() {
 
     goBackToSettings() {
       module.prepopulate();
+    },
+
+    toggleDualOutputMode() {
+      this.dualOutputService.actions.setDualOutputMode(false, true, true);
     },
 
     get promptApply() {
@@ -82,6 +90,72 @@ function ModalFooter() {
   const shouldShowConfirm = ['prepopulate', 'waitForNewSettings'].includes(lifecycle);
   const shouldShowGoBackButton =
     lifecycle === 'runChecklist' && error && checklist.startVideoTransmission !== 'done';
+
+  function handleGoLive() {
+    if (
+      Services.DualOutputService.views.dualOutputMode &&
+      !Services.DualOutputService.views.getCanStreamDualOutput()
+    ) {
+      handleConfirmGoLive();
+      return;
+    }
+
+    goLive();
+  }
+
+  function handleConfirmGoLive() {
+    const display = Services.DualOutputService.views.horizontalHasTargets
+      ? $t('Horizontal')
+      : $t('Vertical');
+
+    // if (Services.UserService.views.isPrime) {
+    //   alertAsync({
+    //     type: 'warning',
+    //     title: $t('Confirm Horizontal and Vertical Platforms'),
+    //     closable: true,
+    //     content: (
+    //       <Translate
+    //         message={$t(
+    //           'All platforms are currently assigned to the <display></display> display. Please reassign platform displays or bypass and go live with only the <display></display> display.',
+    //         )}
+    //         renderSlots={{
+    //           display: () => {
+    //             return <span>{display}</span>;
+    //           },
+    //         }}
+    //       ></Translate>
+    //     ),
+    //     cancelText: $t('Reassign'),
+    //     okText: $t('Bypass'),
+    //     okButtonProps: { type: 'primary' },
+    //     onOk: () => goLive(),
+    //     cancelButtonProps: { style: { display: 'inline' } },
+    //   });
+    // } else {
+    alertAsync({
+      type: 'warning',
+      title: $t('Confirm Horizontal and Vertical Platforms'),
+      closable: true,
+      content: (
+        <Translate
+          message={$t(
+            'All platforms are currently assigned to the <display></display> display. To use Dual Output you must stream to one horizontal and one vertical platform. Do you want to go live in single output mode with the Horizonal display?',
+          )}
+          renderSlots={{
+            display: () => {
+              return <span>{display}</span>;
+            },
+          }}
+        ></Translate>
+      ),
+      cancelText: $t('Close'),
+      okText: $t('Confirm'),
+      okButtonProps: { type: 'primary' },
+      onOk: () => toggleDualOutputMode(),
+      cancelButtonProps: { style: { display: 'inline' } },
+    });
+    // }
+  }
 
   return (
     <Form layout={'inline'}>
@@ -99,7 +173,7 @@ function ModalFooter() {
         <Button
           data-testid="confirmGoLiveBtn"
           type="primary"
-          onClick={goLive}
+          onClick={handleGoLive}
           disabled={isLoading || !!error}
         >
           {$t('Confirm & Go Live')}

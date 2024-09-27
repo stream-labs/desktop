@@ -44,6 +44,7 @@ interface INextStats {
   framesRendered: number;
   laggedFactor: number;
   droppedFramesFactor: number;
+  dualOutputCpuFactor: number;
 }
 
 // How frequently parformance stats should be updated
@@ -128,6 +129,7 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
   private historicalDroppedFrames: number[] = [];
   private historicalSkippedFrames: number[] = [];
   private historicalLaggedFrames: number[] = [];
+  private historicalCPU: number[] = [];
   private shutdown = false;
   private statsRequestInProgress = false;
 
@@ -142,7 +144,7 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
 
   @mutation()
   private SET_PERFORMANCE_STATS(stats: Partial<IPerformanceState>) {
-    Object.keys(stats).forEach(stat => {
+    Object.keys(stats).forEach((stat: keyof Partial<IPerformanceState>) => {
       Vue.set(this.state, stat, stats[stat]);
     });
   }
@@ -242,6 +244,7 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
     this.addSample(this.historicalDroppedFrames, nextStats.droppedFramesFactor);
     this.addSample(this.historicalSkippedFrames, nextStats.skippedFactor);
     this.addSample(this.historicalLaggedFrames, nextStats.laggedFactor);
+    this.addSample(this.historicalCPU, nextStats.dualOutputCpuFactor);
 
     this.sendNotifications(currentStats, nextStats);
 
@@ -266,6 +269,8 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
 
     const droppedFramesFactor = this.state.percentageDroppedFrames / 100;
 
+    const dualOutputCpuFactor = this.state.CPU;
+
     return {
       framesSkipped,
       framesEncoded,
@@ -274,6 +279,7 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
       framesRendered,
       laggedFactor,
       droppedFramesFactor,
+      dualOutputCpuFactor,
     };
   }
 
@@ -324,20 +330,28 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
     ) {
       this.pushDroppedFramesNotify(this.averageFactor(this.historicalDroppedFrames));
     }
+
+    // Check if CPU usage in dual output mode exceeds notification threshold
+    if (
+      troubleshooterSettings.dualOutputCpuEnabled &&
+      this.checkNotification(troubleshooterSettings.dualOutputCpuThreshold, this.historicalCPU)
+    ) {
+      this.pushDualOutputHighCPUNotify(this.averageFactor(this.historicalCPU));
+    }
   }
 
   @throttle(NOTIFICATION_THROTTLE_INTERVAL)
-  private pushSkippedFramesNotify(factor: number) {
-    const code: TIssueCode = 'FRAMES_SKIPPED';
+  private pushDualOutputHighCPUNotify(factor: number) {
+    const code: TIssueCode = 'HIGH_CPU_USAGE';
     this.notificationsService.push({
       code,
       type: ENotificationType.WARNING,
       data: factor,
       lifeTime: 2 * 60 * 1000,
       showTime: true,
-      subType: ENotificationSubType.SKIPPED,
+      subType: ENotificationSubType.CPU,
       // tslint:disable-next-line:prefer-template
-      message: $t('Skipped frames detected:') + Math.round(factor * 100) + '% over last 2 minutes',
+      message: $t('High CPU Usage: ') + Math.round(factor * 100) + '% over last 20 seconds',
       action: this.jsonrpcService.createRequest(
         Service.getResourceId(this.troubleshooterService),
         'showTroubleshooter',
@@ -376,6 +390,26 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
       showTime: true,
       subType: ENotificationSubType.DROPPED,
       message: `Dropped frames detected: ${Math.round(factor * 100)}%  over last 2 minutes`,
+      action: this.jsonrpcService.createRequest(
+        Service.getResourceId(this.troubleshooterService),
+        'showTroubleshooter',
+        code,
+      ),
+    });
+  }
+
+  @throttle(NOTIFICATION_THROTTLE_INTERVAL)
+  private pushSkippedFramesNotify(factor: number) {
+    const code: TIssueCode = 'FRAMES_SKIPPED';
+    this.notificationsService.push({
+      code,
+      type: ENotificationType.WARNING,
+      data: factor,
+      lifeTime: 2 * 60 * 1000,
+      showTime: true,
+      subType: ENotificationSubType.SKIPPED,
+      // tslint:disable-next-line:prefer-template
+      message: $t('Skipped frames detected:') + Math.round(factor * 100) + '% over last 2 minutes',
       action: this.jsonrpcService.createRequest(
         Service.getResourceId(this.troubleshooterService),
         'showTroubleshooter',

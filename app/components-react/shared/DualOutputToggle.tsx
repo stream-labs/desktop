@@ -92,6 +92,7 @@ export default function DualOutputToggle(p: IDualOutputToggleProps) {
 
 function showSelectiveRecordingModal() {
   const { StreamingService } = Services;
+
   alertAsync({
     type: 'confirm',
     title: $t('Selective Recording Enabled'),
@@ -103,17 +104,19 @@ function showSelectiveRecordingModal() {
         )}
       </span>
     ),
-    cancelText: $t('Cancel'),
+    cancelText: $t('Close'),
     okText: $t('Disable'),
+    okButtonProps: { type: 'primary' },
     onOk: () => {
       StreamingService.actions.setSelectiveRecording(!StreamingService.state.selectiveRecording);
     },
-    onCancel: () => {},
+    cancelButtonProps: { style: { display: 'inline' } },
   });
 }
 
 function showStudioModeModal() {
   const { TransitionsService } = Services;
+
   alertAsync({
     type: 'confirm',
     title: $t('Studio Mode Enabled'),
@@ -125,11 +128,12 @@ function showStudioModeModal() {
         )}
       </span>
     ),
-    cancelText: $t('Cancel'),
+    cancelText: $t('Close'),
     okText: $t('Disable'),
+    okButtonProps: { type: 'primary' },
     onOk: () => {
-      TransitionsService.actions.disableStudioMode();
+      Services.TransitionsService.actions.disableStudioMode();
     },
-    onCancel: () => {},
+    cancelButtonProps: { style: { display: 'inline' } },
   });
 }
