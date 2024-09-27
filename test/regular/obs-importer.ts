@@ -48,7 +48,6 @@ test('OBS Importer', async t => {
 
   if (!(await isDisplayed('h2=Live Streaming'))) return;
   await click('h2=Live Streaming');
-  await click('h2=Advanced');
   await click('button=Continue');
   await click('button=Skip');
 
@@ -58,15 +57,6 @@ test('OBS Importer', async t => {
   await click('button=Skip');
   */
 
-  /*
-   * TODO: "Advanced" flow doesn't have a login, but we couldn't get this to pass
-   * when trying to go through the Intermediate flow which does have login.
-   * After fixing everything step-related there, it was stuck on the loader after
-   * switching to the Widgets collection.
-   * Since going through Onboarding as Intermediate (or any other mode) is already
-   * covered by their own tests, we're faking login here while remaining on the
-   * Advanced flow. We need the login for widget assertions below to pass.
-   */
   await logIn(t, 'twitch', { prime: false }, false, true);
   await sleep(1000);
 
@@ -76,6 +66,7 @@ test('OBS Importer', async t => {
 
   // skip Ultra
   await waitForDisplayed('div=Choose Starter');
+  // skip Themes
   await click('button=Skip');
 
   await waitForDisplayed('[data-name=SceneSelector]');
