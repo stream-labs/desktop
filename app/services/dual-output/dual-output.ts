@@ -350,6 +350,13 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     // Disable global Rescale Output
     this.disableGlobalRescaleIfNeeded();
 
+    // Toggle dual output by default for new users
+    this.userService.userLoginFinished.subscribe(() => {
+      if (this.userService.state.createdAt === new Date().valueOf()) {
+        this.setDualOutputMode(true, true);
+      }
+    });
+
     /**
      * Ensures that scene collection loads correctly for dual output
      * @remark This validates an existing scene collection, or converts a single output scene collection
