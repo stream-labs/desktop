@@ -73,3 +73,40 @@ export function sortClips(clips: TClip[], streamId: string | undefined): TClip[]
 export function clipsToStringArray(clips: TClip[]): { id: string }[] {
   return clips.map(c => ({ id: c.path }));
 }
+
+export function createFinalSortedArray(
+  newOrderOfSomeItems: string[],
+  allItemArray: string[],
+): string[] {
+  const finalArray: (string | null)[] = new Array(allItemArray.length).fill(null);
+  const itemsNotInNewOrder = allItemArray.filter(item => !newOrderOfSomeItems.includes(item));
+
+  itemsNotInNewOrder.forEach(item => {
+    const index = allItemArray.indexOf(item);
+    finalArray[index] = item;
+  });
+
+  let newOrderIndex = 0;
+  for (let i = 0; i < finalArray.length; i++) {
+    if (finalArray[i] === null) {
+      finalArray[i] = newOrderOfSomeItems[newOrderIndex];
+      newOrderIndex++;
+    }
+  }
+
+  return finalArray.filter((item): item is string => item !== null);
+}
+
+export function filterClips(clips: TClip[], filter: string) {
+  return clips.filter(clip => {
+    switch (filter) {
+      case 'ai':
+        return clip.source === 'AiClip';
+      case 'manual':
+        return clip.source === 'Manual' || clip.source === 'ReplayBuffer';
+      case 'all':
+      default:
+        return true;
+    }
+  });
+}

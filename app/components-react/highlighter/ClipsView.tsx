@@ -24,7 +24,7 @@ import * as remote from '@electron/remote';
 import { sort } from 'semver';
 import { EditingControls } from './EditingControls';
 import ClipsFilter from './ClipsFilter';
-import { sortClips } from './utils';
+import { createFinalSortedArray, filterClips, sortClips } from './utils';
 
 export type TModalClipsView = 'trim' | 'export' | 'preview' | 'remove';
 
@@ -75,17 +75,7 @@ export default function ClipsView({
 
   useEffect(() => {
     sortedClips.current = sortClips(loadedClips, props.id);
-    sortedFilteredClips.current = sortedClips.current.filter(clip => {
-      switch (activeFilter) {
-        case 'ai':
-          return clip.source === 'AiClip';
-        case 'manual':
-          return clip.source === 'Manual' || clip.source === 'ReplayBuffer';
-        case 'all':
-        default:
-          return true;
-      }
-    });
+    sortedFilteredClips.current = filterClips(sortedClips.current, activeFilter);
     sortedClipStrings.current = sortedClips.current.map(clip => ({ id: clip.path }));
     sortedFilteredClipStrings.current = sortedFilteredClips.current.map(clip => ({
       id: clip.path,
@@ -133,8 +123,12 @@ export default function ClipsView({
   }
 
   function setClipOrder(clips: { id: string }[], streamId: string | undefined) {
+    let newOrderOfSomeItems = clips.map(c => c.id);
+    let allItemArray = sortedClipStrings.current.map(c => c.id);
+    const newClipArray = createFinalSortedArray(newOrderOfSomeItems, allItemArray);
+
     const oldClipArray = sortedClipStrings.current.map(c => c.id);
-    const newClipArray = clips.map(c => c.id);
+    // const newClipArray = clips.map(c => c.id);
 
     if (JSON.stringify(newClipArray) === JSON.stringify(oldClipArray)) {
       return;
@@ -170,8 +164,21 @@ export default function ClipsView({
         });
       }
 
-      sortedClipStrings.current = clips;
-      sortedFilteredClipStrings.current = clips;
+      sortedClipStrings.current = newClipArray.map(c => ({ id: c }));
+      sortedFilteredClipStrings.current = clips.filter(clip => {
+        const fullClip = clipMap.get(clip.id);
+        if (!fullClip) return false; // Skip if the clip is not found in the map
+
+        switch (activeFilter) {
+          case 'ai':
+            return fullClip.source === 'AiClip';
+          case 'manual':
+            return fullClip.source === 'Manual' || fullClip.source === 'ReplayBuffer';
+          case 'all':
+          default:
+            return true;
+        }
+      });
       return;
     }
   }
