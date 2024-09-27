@@ -329,6 +329,7 @@ export function useTextInput<
 }
 
 /**
+ * @deprecated use bindFormState instead
  * 2-way binding util for inputs
  *
  * @example
@@ -354,6 +355,38 @@ export function createBinding<TState extends object, TExtraProps extends object 
 ) {
   return createFormBinding(stateGetter, stateSetter, extraPropsGenerator).proxy;
 }
+
+type TFormBindings<TState, TExtraProps = {}> = {
+  [K in keyof TState]: {
+    name: K;
+    value: TState[K];
+    onChange: (newVal: TState[K]) => unknown;
+  };
+} &
+  TExtraProps;
+
+export function bindFormState<TFormState, TExtraProps = {}>(
+  getFormState: () => TFormState,
+  updateFormState: (statePatch: Partial<TFormState>) => unknown,
+  extraProps?: TExtraProps,
+) {
+  const formState = getFormState();
+  const result = {} as any;
+  for (const fieldName in formState) {
+    result[fieldName] = {
+      name: fieldName,
+      value: formState[fieldName],
+      onChange: (value: any) => {
+        updateFormState({ [fieldName]: value } as Partial<TFormState>);
+      },
+    };
+  }
+
+  extraProps ?? Object.assign(result, extraProps);
+
+  return result as TFormBindings<TFormState, TExtraProps>;
+}
+
 
 function createValidationRules(type: TInputType, inputProps: IInputCommonProps<unknown>) {
   const rules = inputProps.rules ? [...inputProps.rules] : [];
