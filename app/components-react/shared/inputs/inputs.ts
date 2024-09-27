@@ -387,7 +387,6 @@ export function bindFormState<TFormState, TExtraProps = {}>(
   return result as TFormBindings<TFormState, TExtraProps>;
 }
 
-
 function createValidationRules(type: TInputType, inputProps: IInputCommonProps<unknown>) {
   const rules = inputProps.rules ? [...inputProps.rules] : [];
   if (inputProps.required) {
