@@ -25,16 +25,36 @@ export function TwoPane(p: React.PropsWithChildren<LayoutProps>) {
           style={{ width: `${100 - (resizes.bar1 + resizes.bar2) * 100}%` }}
           className={styles.cell}
         >
-          {p.children?.['2'] || <></>}
+          {
+            // TODO: index
+            // @ts-ignore
+            p.children?.['2'] || <></>
+          }
         </div>
       </ResizeBar>
       <div className={styles.rows} style={{ width: `${resizes.bar1 * 100}%`, paddingTop: '16px' }}>
         <div style={{ height: '100%' }} className={styles.cell}>
-          {p.children?.['1'] || <></>}
+          {
+            // TODO: index
+            // @ts-ignore
+            p.children?.['1'] || <></>
+          }
         </div>
         <div className={styles.segmented}>
-          <div className={styles.cell}>{p.children?.['3'] || <></>}</div>
-          <div className={styles.cell}>{p.children?.['4'] || <></>}</div>
+          <div className={styles.cell}>
+            {
+              // TODO: index
+              // @ts-ignore
+              p.children?.['3'] || <></>
+            }
+          </div>
+          <div className={styles.cell}>
+            {
+              // TODO: index
+              // @ts-ignore
+              p.children?.['4'] || <></>
+            }
+          </div>
         </div>
       </div>
       <ResizeBar
@@ -46,7 +66,11 @@ export function TwoPane(p: React.PropsWithChildren<LayoutProps>) {
         transformScale={1}
       >
         <div style={{ width: `${resizes.bar2 * 100}%` }} className={styles.cell}>
-          {p.children?.['5'] || <></>}
+          {
+            // TODO: index
+            // @ts-ignore
+            p.children?.['5'] || <></>
+          }
         </div>
       </ResizeBar>
     </div>

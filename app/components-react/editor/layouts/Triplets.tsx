@@ -31,7 +31,11 @@ export function Triplets(p: React.PropsWithChildren<LayoutProps>) {
         >
           {['1', '4'].map(slot => (
             <div key={slot} className={styles.cell}>
-              {p.children?.[slot] || <></>}
+              {
+                // TODO: index
+                // @ts-ignore
+                p.children?.[slot] || <></>
+              }
             </div>
           ))}
         </div>
@@ -39,7 +43,11 @@ export function Triplets(p: React.PropsWithChildren<LayoutProps>) {
       <div className={styles.stacked} style={{ width: `${resizes.bar1 * 100}%` }}>
         {['2', '5'].map(slot => (
           <div key={slot} className={styles.cell}>
-            {p.children?.[slot] || <></>}
+            {
+              // TODO: index
+              // @ts-ignore
+              p.children?.[slot] || <></>
+            }
           </div>
         ))}
       </div>
@@ -54,7 +62,11 @@ export function Triplets(p: React.PropsWithChildren<LayoutProps>) {
         <div className={styles.stacked} style={{ width: `${resizes.bar2 * 100}%` }}>
           {['3', '6'].map(slot => (
             <div key={slot} className={styles.cell}>
-              {p.children?.[slot] || <></>}
+              {
+                // TODO: index
+                // @ts-ignore
+                p.children?.[slot] || <></>
+              }
             </div>
           ))}
         </div>

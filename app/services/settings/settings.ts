@@ -154,7 +154,11 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
     for (const groupName in this.state) {
       this.state[groupName].formData.forEach(subGroup => {
         subGroup.parameters.forEach(parameter => {
+          // TODO: index
+          // @ts-ignore
           settingsValues[groupName] = settingsValues[groupName] || {};
+          // TODO: index
+          // @ts-ignore
           settingsValues[groupName][parameter.name] = parameter.value;
         });
       });
@@ -346,6 +350,8 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
     // load configuration from nodeObs to state
     const settingsFormData = {};
     this.getCategories().forEach(categoryName => {
+      // TODO: index
+      // @ts-ignore
       settingsFormData[categoryName] = this.fetchSettingsFromObs(categoryName);
     });
     this.SET_SETTINGS(settingsFormData);
@@ -603,6 +609,8 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
     // in the future.
 
     Object.keys(patch).forEach(categoryName => {
+      // TODO: index
+      // @ts-ignore
       const category: Dictionary<any> = patch[categoryName];
       const formSubCategories = this.fetchSettingsFromObs(categoryName).formData;
 

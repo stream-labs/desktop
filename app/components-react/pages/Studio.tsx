@@ -22,6 +22,8 @@ export default function Studio(p: { onTotalWidth: (width: Number) => void }) {
     layout: LayoutService.views.component,
   }));
 
+  // TODO: index
+  // @ts-ignore
   const Layout = layouts[layout];
 
   const { children, childrenMins } = useMemo(() => {
@@ -29,6 +31,8 @@ export default function Studio(p: { onTotalWidth: (width: Number) => void }) {
     const childrenMins: Dictionary<IVec2> = {};
     elementsToRender.forEach((el: ELayoutElement) => {
       const componentName = LayoutService.views.elementComponent(el);
+      // TODO: index
+      // @ts-ignore
       const Component = elements[componentName];
       const slot = slottedElements[el]?.slot;
       if (slot && Component) {

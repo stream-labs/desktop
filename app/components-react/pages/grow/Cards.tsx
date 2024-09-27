@@ -174,7 +174,13 @@ export function PlatformCard(p: { platform: ICommunityReach }) {
     <div className={styles.card}>
       <div className={styles.cardHeader}>
         <PlatformLogo platform={icon} className={styles.cardIcon} />
-        <span className={cx(styles.title, styles[icon])}>{nameMap[icon]}</span>
+        <span className={cx(styles.title, styles[icon])}>
+          {
+            // TODO: index
+            // @ts-ignore
+            nameMap[icon]
+          }
+        </span>
       </div>
       {followers != null ? (
         <span>{$t('%{followers} followers', { followers })}</span>

@@ -129,6 +129,8 @@ function FeatureCards() {
   return (
     <div className={styles.container}>
       {recommendedFeatures.map(feature => {
+        // TODO: index
+        // @ts-ignore
         const data = featuresMetadata[feature];
         return (
           <div className={styles.card} key={feature}>

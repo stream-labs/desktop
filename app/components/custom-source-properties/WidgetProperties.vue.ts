@@ -30,7 +30,9 @@ export default class WidgetProperties extends Vue {
   disabled = false;
 
   async navigateWidgetSettings() {
-    const widgetType = this.source.getPropertiesManagerSettings().widgetType;
+    // TODO: explicit cast here, can it ever be different or null?
+    // `number` is inferred from usage
+    const widgetType: number = this.source.getPropertiesManagerSettings().widgetType;
 
     const subPage = {
       [WidgetType.AlertBox]: 'alertbox',

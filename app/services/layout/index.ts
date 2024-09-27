@@ -41,6 +41,8 @@ class LayoutViews extends ViewHandler<ILayoutServiceState> {
 
   get elementsToRender() {
     return Object.keys(this.currentTab.slottedElements).filter(
+      // TODO: index
+      // @ts-ignore
       key => this.currentTab.slottedElements[key].slot,
     );
   }
@@ -99,6 +101,8 @@ class LayoutViews extends ViewHandler<ILayoutServiceState> {
 
   aggregateMinimum(orientation: 'x' | 'y', slots: IVec2Array) {
     const minimums = slots.map(mins => {
+      // TODO: index
+      // @ts-ignore
       if (mins) return mins[orientation];
       return 10;
     });
@@ -173,9 +177,17 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
     const slottedElements = {};
     if (this.state.currentTab !== 'default') return;
     Object.keys(this.state.tabs.default.slottedElements).forEach(el => {
+      // TODO: index
+      // @ts-ignore
       if (typeof this.state.tabs.default.slottedElements[el] === 'string') {
+        // TODO: index
+        // @ts-ignore
         slottedElements[el] = { slot: this.state.tabs.default.slottedElements[el] };
+        // TODO: index
+        // @ts-ignore
       } else if (this.state.tabs.default.slottedElements[el]) {
+        // TODO: index
+        // @ts-ignore
         slottedElements[el] = this.state.tabs.default.slottedElements[el];
       }
     });
@@ -234,7 +246,11 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
     if (LayoutService.defaultState.tabs[this.state.currentTab]) {
       Object.keys(LayoutService.defaultState.tabs[this.state.currentTab].slottedElements).forEach(
         el => {
+          // TODO: index
+          // @ts-ignore
           if (!slottedElements[el]) {
+            // TODO: index
+            // @ts-ignore
             slottedElements[el] = { slot: null };
           }
         },
