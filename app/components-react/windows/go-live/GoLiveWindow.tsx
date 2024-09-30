@@ -108,30 +108,6 @@ function ModalFooter() {
       ? $t('Horizontal')
       : $t('Vertical');
 
-    // if (Services.UserService.views.isPrime) {
-    //   alertAsync({
-    //     type: 'warning',
-    //     title: $t('Confirm Horizontal and Vertical Platforms'),
-    //     closable: true,
-    //     content: (
-    //       <Translate
-    //         message={$t(
-    //           'All platforms are currently assigned to the <display></display> display. Please reassign platform displays or bypass and go live with only the <display></display> display.',
-    //         )}
-    //         renderSlots={{
-    //           display: () => {
-    //             return <span>{display}</span>;
-    //           },
-    //         }}
-    //       ></Translate>
-    //     ),
-    //     cancelText: $t('Reassign'),
-    //     okText: $t('Bypass'),
-    //     okButtonProps: { type: 'primary' },
-    //     onOk: () => goLive(),
-    //     cancelButtonProps: { style: { display: 'inline' } },
-    //   });
-    // } else {
     alertAsync({
       type: 'warning',
       title: $t('Confirm Horizontal and Vertical Platforms'),
@@ -154,7 +130,6 @@ function ModalFooter() {
       onOk: () => toggleDualOutputMode(),
       cancelButtonProps: { style: { display: 'inline' } },
     });
-    // }
   }
 
   return (

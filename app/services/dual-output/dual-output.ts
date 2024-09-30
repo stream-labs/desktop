@@ -25,10 +25,13 @@ import { UserService } from 'services/user';
 import { SelectionService, Selection } from 'services/selection';
 import { StreamingService } from 'services/streaming';
 import { SettingsService } from 'services/settings';
+import { SourcesService, TSourceType } from 'services/sources';
+import { WidgetsService, WidgetType } from 'services/widgets';
 import { RunInLoadingMode } from 'services/app/app-decorators';
 import compact from 'lodash/compact';
 import invert from 'lodash/invert';
 import forEachRight from 'lodash/forEachRight';
+import { byOS, OS } from 'util/operating-systems';
 
 interface IDisplayVideoSettings {
   horizontal: IVideoInfo;
@@ -318,6 +321,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   @Inject() private selectionService: SelectionService;
   @Inject() private streamingService: StreamingService;
   @Inject() private settingsService: SettingsService;
+  @Inject() private sourcesService: SourcesService;
+  @Inject() private widgetsService: WidgetsService;
 
   static defaultState: IDualOutputServiceState = {
     platformSettings: DualOutputPlatformSettings,
@@ -351,10 +356,46 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     this.disableGlobalRescaleIfNeeded();
 
     // Toggle dual output by default for new users
-    this.userService.userLoginFinished.subscribe(() => {
+    const userLoginFinished = this.userService.userLoginFinished.subscribe(() => {
       if (this.userService.state.createdAt === new Date().valueOf()) {
         this.setDualOutputMode(true, true);
+
+        let scene = this.scenesService.views.activeScene;
+
+        // create a scene if there is no active scene
+        if (!scene) {
+          scene = this.scenesService.createScene('Scene 1', { makeActive: true });
+        }
+
+        // add webcam source
+        const type = byOS({
+          [OS.Windows]: 'dshow_input',
+          [OS.Mac]: 'av_capture_input',
+        }) as TSourceType;
+        const webCam = this.sourcesService.views.sources.find(s => s.type === type);
+
+        if (!webCam) {
+          const cam = scene.createAndAddSource('Webcam', type, { display: 'horizontal' });
+          this.createPartnerNode(cam);
+        } else {
+          const cam = scene.addSource(webCam.sourceId, { display: 'horizontal' });
+          this.createPartnerNode(cam);
+        }
+
+        // add game capture source
+        const gameCapture = scene.createAndAddSource(
+          'Game Capture',
+          'game_capture',
+          {},
+          { display: 'horizontal' },
+        );
+        this.createPartnerNode(gameCapture);
+
+        // add alert box widget
+        this.widgetsService.createWidget(WidgetType.AlertBox, 'Alert Box');
       }
+
+      userLoginFinished.unsubscribe();
     });
 
     /**
