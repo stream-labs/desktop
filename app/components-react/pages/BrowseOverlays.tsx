@@ -129,7 +129,10 @@ export default function BrowseOverlays(p: {
       throw new Error("Unsupported type. Use 'image' or 'video'");
     }
 
-    if (!assetURL.startsWith('https://cdn.streamlabs.com/marketplace')) {
+    if (
+      !assetURL.startsWith('https://cdn.streamlabs.com/marketplace') ||
+      !assetURL.startsWith('https://streamlabs-marketplace-staging.streamlabs.com')
+    ) {
       throw new Error('Invalid asset URL');
     }
 
