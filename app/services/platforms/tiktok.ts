@@ -757,7 +757,8 @@ export class TikTokService
     // convert audience types to match the ListInput component options
     const types = audienceControlsInfo.types.map(type => ({
       value: type.key.toString(),
-      label: type.label,
+      // TODO: revisit as to why cast is needed here, `string|null` on type def
+      label: type.label as string,
     }));
     const audienceType = audienceControlsInfo.info_type.toString();
 
