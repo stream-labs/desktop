@@ -2,7 +2,7 @@ import React, { useRef, MouseEvent, useCallback } from 'react';
 import { getPlatformService, TPlatform } from 'services/platforms';
 import cx from 'classnames';
 import { $t } from 'services/i18n';
-import styles from './DualOutputGoLive.m.less';
+import styles from '../GoLive.m.less';
 import { ICustomStreamDestination } from 'services/settings/streaming';
 import { Services } from 'components-react/service-provider';
 import { SwitchInput } from 'components-react/shared/inputs';
@@ -68,7 +68,7 @@ export function UltraDestinationSwitchers(p: IUltraDestinationSwitchers) {
         <InfoBadge
           content={
             <>
-              <DualOutputToggle placement="topRight" className={styles.dualOutputToggle} />
+              <DualOutputToggle lightShadow />
               <Translate message="<dualoutput>Dual Output</dualoutput> is enabled - you must stream to one horizontal and one vertical platform.">
                 <u slot="dualoutput" />
               </Translate>

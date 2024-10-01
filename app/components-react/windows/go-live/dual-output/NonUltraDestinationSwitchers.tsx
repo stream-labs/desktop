@@ -2,13 +2,12 @@ import React, { useRef, useCallback } from 'react';
 import { getPlatformService, TPlatform } from 'services/platforms';
 import cx from 'classnames';
 import { $t } from 'services/i18n';
-import styles from './DualOutputGoLive.m.less';
+import styles from '../GoLive.m.less';
 import { ICustomStreamDestination } from 'services/settings/streaming';
 import { Services } from 'components-react/service-provider';
 import PlatformLogo from 'components-react/shared/PlatformLogo';
 import InfoBadge from 'components-react/shared/InfoBadge';
 import DisplaySelector from 'components-react/shared/DisplaySelector';
-import { assertIsDefined } from 'util/properties-type-guards';
 import { useGoLiveSettings } from '../useGoLiveSettings';
 import { alertAsync } from 'components-react/modals';
 import Translate from 'components-react/shared/Translate';
@@ -61,7 +60,7 @@ export function NonUltraDestinationSwitchers(p: INonUltraDestinationSwitchers) {
         <InfoBadge
           content={
             <>
-              <DualOutputToggle placement="topRight" className={styles.dualOutputToggle} />
+              <DualOutputToggle lightShadow />
               <Translate message="<dualoutput>Dual Output</dualoutput> is enabled - you must stream to one horizontal and one vertical platform.">
                 <u slot="dualoutput" />
               </Translate>

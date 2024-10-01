@@ -4,8 +4,6 @@ import { useModule, injectState } from 'slap';
 import { Services } from '../../service-provider';
 import { message } from 'antd';
 import FormFactory, { TInputValue } from 'components-react/shared/inputs/FormFactory';
-import { CheckboxInput } from 'components-react/shared/inputs';
-import Tooltip from 'components-react/shared/Tooltip';
 import { EScaleType, EFPSType, IVideoInfo } from '../../../../obs-api';
 import { $t } from 'services/i18n';
 import styles from './Common.m.less';
@@ -548,8 +546,8 @@ export function VideoSettings() {
           value={showDualOutputSettings}
           onChange={toggleDualOutput}
           disabled={cantEditFields}
-          placement="topRight"
-          lightShadow={true}
+          placement="bottomRight"
+          lightShadow
         />
       </div>
       {showDualOutputSettings && <Tabs onChange={setDisplay} />}

@@ -5,7 +5,7 @@ import { useGoLiveSettings } from '../useGoLiveSettings';
 import { Select } from 'antd';
 import PlatformLogo from 'components-react/shared/PlatformLogo';
 import { Services } from 'components-react/service-provider';
-import styles from './DualOutputGoLive.m.less';
+import styles from '../GoLive.m.less';
 import { ICustomStreamDestination } from 'services/settings/streaming';
 import cx from 'classnames';
 

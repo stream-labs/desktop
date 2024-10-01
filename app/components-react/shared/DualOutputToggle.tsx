@@ -34,7 +34,7 @@ export default function DualOutputToggle(p: IDualOutputToggleProps) {
 
   const label = v.dualOutputMode ? $t('Disable Dual Output') : $t('Enable Dual Output');
   const value = p?.value ?? v.dualOutputMode;
-  const placement = p?.placement ?? 'top';
+  const placement = p?.placement ?? 'bottom';
 
   function toggleDualOutput(val: boolean) {
     if (p?.onChange !== undefined) {
@@ -65,7 +65,7 @@ export default function DualOutputToggle(p: IDualOutputToggleProps) {
   }
 
   return (
-    <div className={cx(p?.style, styles.doToggle)} style={p?.style}>
+    <div className={cx(p?.className, styles.doToggle)} style={p?.style}>
       <CheckboxInput
         id="dual-output-checkbox"
         name="dual-output-checkbox"

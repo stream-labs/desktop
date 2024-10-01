@@ -124,7 +124,7 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
     isPrimaryPlatform(platform) || linkedPlatforms.length === 1;
 
   return (
-    <div>
+    <div className={styles.switchWrapper}>
       {linkedPlatforms.map(platform => (
         <DestinationSwitcher
           key={platform}
