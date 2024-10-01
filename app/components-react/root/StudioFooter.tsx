@@ -12,8 +12,6 @@ import StartStreamingButton from './StartStreamingButton';
 import NotificationsArea from './NotificationsArea';
 import { Tooltip } from 'antd';
 import { confirmAsync } from 'components-react/modals';
-import { useModule } from 'slap';
-import { useRealmObject } from 'components-react/hooks/realm';
 
 export default function StudioFooterComponent() {
   const {
