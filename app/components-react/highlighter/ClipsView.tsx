@@ -63,6 +63,12 @@ export default function ClipsView({
   const sortedFilteredClips = useRef<TClip[]>([]);
   const sortedClipStrings = useRef<{ id: string }[]>([]);
   const sortedFilteredClipStrings = useRef<{ id: string }[]>([]);
+  const [updateTrigger, setUpdateTrigger] = useState(0);
+
+  const [shownSortedFilteredClipStrings, setShownSortedFilteredClipStrings] = useState<
+    { id: string }[]
+  >([]);
+  const [shownSortedClipStrings, setShownSortedClipStrings] = useState<{ id: string }[]>([]);
   // await HighlighterService.actions.return.getClip. TODO M: Check if it cal stay like this
   const loadedClips = useMemo(() => HighlighterService.getClips(v.clips, props.id), [
     v.clips,
@@ -74,21 +80,28 @@ export default function ClipsView({
   }, [loadedClips]);
 
   useEffect(() => {
+    // Disables unneeded clips, and enables needed clips
+    // console.log('loaded.clips length changed');/
+
+    //TODO M: This overwrites currently enabled and disabled states
+    // HighlighterService.actions.enableOnlySpecificClips(HighlighterService.views.clips, props.id);
+    HighlighterService.actions.loadClips(props.id);
+  }, [loadedClips.length]);
+
+  useEffect(() => {
     sortedClips.current = sortClips(loadedClips, props.id);
     sortedFilteredClips.current = filterClips(sortedClips.current, activeFilter);
     sortedClipStrings.current = sortedClips.current.map(clip => ({ id: clip.path }));
     sortedFilteredClipStrings.current = sortedFilteredClips.current.map(clip => ({
       id: clip.path,
     }));
+    setUpdateTrigger(prev => prev + 1); // This will cause a re-render
+  }, [activeFilter]);
 
-    // Disables unneeded clips, and enables needed clips
-    // console.log('loaded.clips length changed');/
-
-    //TODO M: This overwrites currently enabled and disabled states
-    HighlighterService.actions.enableOnlySpecificClips(HighlighterService.views.clips, props.id);
-    HighlighterService.actions.loadClips(props.id);
-  }, [loadedClips.length, activeFilter]);
-
+  useEffect(() => {
+    setShownSortedFilteredClipStrings(sortedFilteredClipStrings.current);
+    setShownSortedClipStrings(sortedClipStrings.current);
+  }, [updateTrigger]);
   useEffect(() => UsageStatisticsService.actions.recordFeatureUsage('Highlighter'), []);
 
   // This is kind of weird, but ensures that modals stay the right
@@ -179,6 +192,7 @@ export default function ClipsView({
             return true;
         }
       });
+      setUpdateTrigger(prev => prev + 1);
       return;
     }
   }
@@ -265,7 +279,6 @@ export default function ClipsView({
               <AddClip streamId={props.id} />
             </div>
           </div>
-          <ClipsFilter activeFilter={activeFilter} onFilterChange={setActiveFilter} />
           {loadedClips.length === 0 ? (
             <> No clips found</>
           ) : (
@@ -328,6 +341,7 @@ export default function ClipsView({
                   >
                     <span>0m 0s</span> <span> {formatSecondsToHMS(totalDuration)} </span>
                   </div>
+                  <ClipsFilter activeFilter={activeFilter} onFilterChange={setActiveFilter} />
                   <Scrollable style={{ flexGrow: 1, padding: '20px 20px 20px 20px' }}>
                     <ReactSortable
                       list={sortedFilteredList}
@@ -422,7 +436,7 @@ export default function ClipsView({
       </div>
     );
   }
-  return getClipsView(props.id, sortedFilteredClipStrings.current, sortedClipStrings.current);
+  return getClipsView(props.id, shownSortedFilteredClipStrings, shownSortedClipStrings);
 }
 
 function MiniClipPreview({ clip, highlighted }: { clip: TClip; highlighted: boolean }) {
