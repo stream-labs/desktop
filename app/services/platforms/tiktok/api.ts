@@ -31,6 +31,7 @@ export enum ETikTokAudienceType {
 }
 
 export type TTikTokLiveScopeTypes = 'approved' | 'denied' | 'legacy' | 'relog';
+export type TTikTokApplicationStatus = 'approved' | 'rejected' | 'never-applied';
 
 export interface ITikTokLiveScopeResponse {
   platform: TPlatform | string;
@@ -39,6 +40,7 @@ export interface ITikTokLiveScopeResponse {
   user?: ITikTokUserData;
   info?: any[] | null[] | undefined[] | ITikTokGame[] | ITikTokGamesData | any;
   audience_controls_info: ITikTokAudienceControlsInfo;
+  application_status: ITikTokApplicationStatus;
 }
 
 export interface ITikTokGamesData extends ITikTokLiveScopeResponse {
@@ -63,7 +65,12 @@ export interface ITikTokAudienceControlsInfo {
 
 export interface ITikTokAudienceControlType {
   key: ETikTokAudienceType;
-  label: string;
+  label: string | null;
+}
+
+export interface ITikTokApplicationStatus {
+  status: string;
+  timestamp: string | null;
 }
 
 export interface ITikTokUserData {
