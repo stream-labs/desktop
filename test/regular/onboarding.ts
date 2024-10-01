@@ -82,8 +82,8 @@ test('Go through onboarding', async t => {
 
   // Skip purchasing prime
   // TODO: is this timeout because of autoconfig?
-  await waitForDisplayed('div=Choose Starter', { timeout: 60000 });
-  await click('div=Choose Starter');
+  await waitForDisplayed('div[data-testid=choose-free-plan-btn]', { timeout: 60000 });
+  await click('div=[data-testid=choose-free-plan-btn]');
 
   await waitForDisplayed('span=Sources', { timeout: 60000 });
 
@@ -130,8 +130,8 @@ test.skip('Go through the onboarding and autoconfig', async t => {
 
   // Skip purchasing prime
   // TODO: is this timeout because of autoconfig?
-  await waitForDisplayed('div=Choose Starter', { timeout: 60000 });
-  await click('div=Choose Starter');
+  await waitForDisplayed('div[data-testid=choose-free-plan-btn]', { timeout: 60000 });
+  await click('div[data-testid=choose-free-plan-btn]');
 
   await waitForDisplayed('span=Sources', { timeout: 60000 });
 

@@ -65,7 +65,7 @@ test('OBS Importer', async t => {
   await click('div=Start');
 
   // skip Ultra
-  await waitForDisplayed('div=Choose Starter');
+  await waitForDisplayed('div[data-testid=choose-free-plan-btn]');
   // skip Themes
   await click('button=Skip');
 

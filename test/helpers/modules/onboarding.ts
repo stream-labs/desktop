@@ -16,6 +16,6 @@ export async function skipOnboarding() {
     // Themes
     await click('button=Skip');
     // Ultra
-    await clickIfDisplayed('div=Choose Starter');
+    await clickIfDisplayed('div[data-testid=choose-free-plan-btn]');
   });
 }
