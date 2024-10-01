@@ -313,12 +313,15 @@ export default function ClipsView({
                       }}
                     >
                       {sortedList
-                        .filter(c => clipMap.has(c.id) && clipMap.get(c.id)!.enabled)
+                        .filter(c => clipMap.has(c.id))
                         .map(({ id }) => {
                           const clip = clipMap.get(id)!;
                           return (
                             <div
                               key={'mini' + clip.path}
+                              style={{
+                                display: clip.enabled ? 'inline-block' : 'none',
+                              }}
                               onMouseEnter={() => setHoveredId(id)}
                               onMouseLeave={() => setHoveredId(null)}
                             >
