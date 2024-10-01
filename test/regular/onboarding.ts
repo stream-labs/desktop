@@ -20,7 +20,6 @@ test('Go through onboarding login and signup', async t => {
   if (!(await isDisplayed('h2=Live Streaming'))) return;
 
   await click('h2=Live Streaming');
-  await click('h2=Beginner');
   await click('button=Continue');
 
   t.true(await isDisplayed('h1=Sign Up'), 'Shows signup page by default');
