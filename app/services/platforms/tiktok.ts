@@ -414,6 +414,13 @@ export class TikTokService
         this.setAudienceControls(status.audience_controls_info);
       }
 
+      if (status?.application_status) {
+        // show prompt to apply if user has never applied
+        if (status.application_status.status === 'never-applied') {
+          return EPlatformCallResult.TikTokStreamScopeMissing;
+        }
+      }
+
       if (status?.user) {
         const scope = this.convertScope(status.reason);
         this.SET_USERNAME(status.user.username);
@@ -525,11 +532,12 @@ export class TikTokService
 
     // track the first date the user registered as denied so that after 30 days
     // they are prompted to reapply
-    if (status === EPlatformCallResult.TikTokStreamScopeMissing && !this.state.dateDenied) {
-      this.SET_DENIED_DATE(new Date().toISOString());
-    } else {
-      this.SET_DENIED_DATE();
-    }
+    // TODO: fix denied date logic
+    // if (status === EPlatformCallResult.TikTokStreamScopeMissing && !this.state.dateDenied) {
+    //   this.SET_DENIED_DATE(new Date().toISOString());
+    // } else {
+    //   this.SET_DENIED_DATE();
+    // }
 
     if (status === EPlatformCallResult.TikTokScopeOutdated) {
       throwStreamError('TIKTOK_SCOPE_OUTDATED');
@@ -749,7 +757,8 @@ export class TikTokService
     // convert audience types to match the ListInput component options
     const types = audienceControlsInfo.types.map(type => ({
       value: type.key.toString(),
-      label: type.label,
+      // TODO: revisit as to why cast is needed here, `string|null` on type def
+      label: type.label as string,
     }));
     const audienceType = audienceControlsInfo.info_type.toString();
 

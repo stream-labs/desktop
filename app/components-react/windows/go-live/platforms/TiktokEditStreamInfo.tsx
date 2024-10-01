@@ -45,7 +45,7 @@ export function TikTokEditStreamInfo(p: IPlatformComponentParams<'tiktok'>) {
         requiredFields={<div key="empty-tiktok" />}
       />
       {approved && <GameSelector key="optional" platform={'tiktok'} {...bind.game} />}
-      {!controls.disable && (
+      {approved && !controls.disable && (
         <RadioInput
           key="audience-ctrl"
           options={controls.types}
@@ -151,11 +151,14 @@ function TikTokButtons(p: { denied: boolean }) {
 
   return (
     <>
-      {!p.denied && (
-        <Button id="tiktok-locate-key" onClick={openProducer} style={{ marginBottom: '10px' }}>
-          {$t('Locate my Stream Key')}
-        </Button>
-      )}
+      <Button
+        id="tiktok-locate-key"
+        onClick={openProducer}
+        style={{ marginBottom: '10px', width: '100%' }}
+      >
+        {$t('Locate my Stream Key')}
+      </Button>
+
       <Button
         id="tiktok-application"
         onClick={() => {
