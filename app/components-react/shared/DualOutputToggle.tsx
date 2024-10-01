@@ -9,6 +9,7 @@ import { alertAsync } from 'components-react/modals';
 import cx from 'classnames';
 
 interface IDualOutputToggleProps {
+  type?: 'dual' | 'single';
   value?: boolean;
   className?: string;
   style?: CSSProperties;
@@ -65,7 +66,13 @@ export default function DualOutputToggle(p: IDualOutputToggleProps) {
   }
 
   return (
-    <div className={cx(p?.className, styles.doToggle)} style={p?.style}>
+    <div
+      className={cx(p?.className, styles.dualOutputToggle, {
+        [styles.doTooltip]: p.type === 'dual',
+        [styles.soTooltip]: p.type === 'single',
+      })}
+      style={p?.style}
+    >
       <CheckboxInput
         id="dual-output-checkbox"
         name="dual-output-checkbox"
@@ -91,8 +98,6 @@ export default function DualOutputToggle(p: IDualOutputToggleProps) {
 }
 
 function showSelectiveRecordingModal() {
-  const { StreamingService } = Services;
-
   alertAsync({
     type: 'confirm',
     title: $t('Selective Recording Enabled'),
@@ -108,15 +113,15 @@ function showSelectiveRecordingModal() {
     okText: $t('Disable'),
     okButtonProps: { type: 'primary' },
     onOk: () => {
-      StreamingService.actions.setSelectiveRecording(!StreamingService.state.selectiveRecording);
+      Services.StreamingService.actions.setSelectiveRecording(
+        !Services.StreamingService.state.selectiveRecording,
+      );
     },
     cancelButtonProps: { style: { display: 'inline' } },
   });
 }
 
 function showStudioModeModal() {
-  const { TransitionsService } = Services;
-
   alertAsync({
     type: 'confirm',
     title: $t('Studio Mode Enabled'),

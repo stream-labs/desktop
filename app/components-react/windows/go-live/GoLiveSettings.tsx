@@ -19,6 +19,7 @@ import ColorSpaceWarnings from './ColorSpaceWarnings';
 import DualOutputToggle from 'components-react/shared/DualOutputToggle';
 import { DestinationSwitchers } from './DestinationSwitchers';
 import AddDestinationButton from 'components-react/shared/AddDestinationButton';
+import cx from 'classnames';
 
 const PlusIcon = PlusOutlined as Function;
 
@@ -92,13 +93,16 @@ export default function DualOutputGoLiveSettings() {
     ? isRestreamEnabled && hasMultiplePlatforms
     : hasMultiplePlatforms;
   // TODO: make sure this doesn't jank the UI
-  const leftPaneHeight = shouldShowPrimaryChatSwitcher ? '82%' : '100%';
+  const leftPaneHeight = shouldShowPrimaryChatSwitcher ? '81%' : '100%';
 
   return (
     <Row gutter={16} className={styles.settingsRow}>
       {/*LEFT COLUMN*/}
       {shouldShowLeftCol && (
-        <Col span={8} className={styles.leftColumn}>
+        <Col
+          span={8}
+          className={cx(styles.leftColumn, { [styles.columnPadding]: !isDualOutputMode })}
+        >
           {isDualOutputMode ? (
             <Scrollable style={{ height: leftPaneHeight }}>
               {isPrime && <UserSettingsUltra />}
@@ -113,7 +117,7 @@ export default function DualOutputGoLiveSettings() {
           )}
           {shouldShowPrimaryChatSwitcher && (
             <PrimaryChatSwitcher
-              style={{ padding: '0 16px' }}
+              className={styles.columnPadding}
               enabledPlatforms={enabledPlatforms}
               onSetPrimaryChat={setPrimaryChat}
               primaryChat={primaryChat}
@@ -154,15 +158,22 @@ function SingleOutputSettings(p: {
 }) {
   return (
     <Scrollable style={{ height: '81%' }} snapToWindowEdge>
-      <DualOutputToggle className={styles.dualOutputToggle} lightShadow />
+      <DualOutputToggle
+        className={cx(styles.dualOutputToggle, styles.columnPadding)}
+        type="single"
+        lightShadow
+      />
       {/*DESTINATION SWITCHERS*/}
       <DestinationSwitchers showSelector={p.showSelector} />
+
       {/*ADD DESTINATION BUTTON*/}
       {p.shouldShowAddDestButton ? (
-        <a className={styles.addDestinationBtn} onClick={p.addDestination}>
-          <PlusIcon style={{ paddingLeft: '17px', fontSize: '24px' }} />
-          <span style={{ flex: 1 }}>{$t('Add Destination')}</span>
-        </a>
+        <div className={styles.columnPadding}>
+          <a className={styles.addDestinationBtn} onClick={p.addDestination}>
+            <PlusIcon style={{ paddingLeft: '17px', fontSize: '24px' }} />
+            <span style={{ flex: 1 }}>{$t('Add Destination')}</span>
+          </a>
+        </div>
       ) : (
         <AddDestinationButton />
       )}

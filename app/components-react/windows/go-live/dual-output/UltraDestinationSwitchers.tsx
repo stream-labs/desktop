@@ -63,12 +63,12 @@ export function UltraDestinationSwitchers(p: IUltraDestinationSwitchers) {
   }, []);
 
   return (
-    <div className={styles.switchWrapper}>
+    <div className={cx(styles.switchWrapper, styles.columnPadding)}>
       {isDualOutputMode && (
         <InfoBadge
           content={
             <>
-              <DualOutputToggle lightShadow />
+              <DualOutputToggle type="dual" lightShadow />
               <Translate message="<dualoutput>Dual Output</dualoutput> is enabled - you must stream to one horizontal and one vertical platform.">
                 <u slot="dualoutput" />
               </Translate>
@@ -184,7 +184,7 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
         Logo: () => (
           <PlatformLogo
             platform={platform}
-            className={cx(styles.logo, styles[`platform-logo-${platform}`])}
+            className={cx(styles.platformLogo, styles[`platform-logo-${platform}`])}
             size={36}
           />
         ),
