@@ -357,46 +357,53 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
     // Toggle dual output by default for new users
     this.userService.userLoginFinished.subscribe(() => {
-      if (new Date(this.userService.state.createdAt).toDateString() === new Date().toDateString()) {
-        this.setDualOutputMode(true, true);
-
-        let scene = this.scenesService.views.activeScene;
-
-        // create a scene if there is no active scene
-        if (!scene) {
-          scene = this.scenesService.createScene('Scene', { makeActive: true });
-        }
-
-        // if the user doesn't have a scene collection installed, add some default sources to the empty scene
-        if (!scene.getNodes().length) {
-          // add webcam source
-          const type = byOS({
-            [OS.Windows]: 'dshow_input',
-            [OS.Mac]: 'av_capture_input',
-          }) as TSourceType;
-          const webCam = this.sourcesService.views.sources.find(s => s.type === type);
-
-          if (!webCam) {
-            const cam = scene.createAndAddSource('Webcam', type, { display: 'horizontal' });
-            this.createPartnerNode(cam);
-          } else {
-            const cam = scene.addSource(webCam.sourceId, { display: 'horizontal' });
-            this.createPartnerNode(cam);
-          }
-
-          // add game capture source
-          const gameCapture = scene.createAndAddSource(
-            'Game Capture',
-            'game_capture',
-            {},
-            { display: 'horizontal' },
-          );
-          this.createPartnerNode(gameCapture);
-
-          // add alert box widget
-          this.widgetsService.createWidget(WidgetType.AlertBox, 'Alert Box');
-        }
+      // check for a new user by comparing the user's creation date to the login (current) date
+      if (new Date(this.userService.state.createdAt).toDateString() !== new Date().toDateString()) {
+        return;
       }
+
+      let scene = this.scenesService.views.activeScene;
+
+      // create a scene if there is no active scene
+      if (!scene) {
+        scene = this.scenesService.createScene('Scene', { makeActive: true });
+      }
+
+      // conditions that show this is not the user's first login
+      if (this.views.dualOutputMode) return;
+      if (scene.getNodes().length) return;
+      if (this.scenesService.views.scenes.length > 1) return;
+      if (this.sceneCollectionsService.collections.length > 1) return;
+
+      // set dual output as default for new users and add default sources to scene
+      this.setDualOutputMode(true, true);
+
+      // add webcam source
+      const type = byOS({
+        [OS.Windows]: 'dshow_input',
+        [OS.Mac]: 'av_capture_input',
+      }) as TSourceType;
+      const webCam = this.sourcesService.views.sources.find(s => s.type === type);
+
+      if (!webCam) {
+        const cam = scene.createAndAddSource('Webcam', type, { display: 'horizontal' });
+        this.createPartnerNode(cam);
+      } else {
+        const cam = scene.addSource(webCam.sourceId, { display: 'horizontal' });
+        this.createPartnerNode(cam);
+      }
+
+      // add game capture source
+      const gameCapture = scene.createAndAddSource(
+        'Game Capture',
+        'game_capture',
+        {},
+        { display: 'horizontal' },
+      );
+      this.createPartnerNode(gameCapture);
+
+      // add alert box widget
+      this.widgetsService.createWidget(WidgetType.AlertBox, 'Alert Box');
     });
 
     /**
@@ -447,9 +454,11 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   }
 
   /**
-   * Edit dual output display settings
+   * Set Dual Output mode with side effects
+   * @param status - Whether to enable or disable dual output mode
+   * @param skipShowVideoSettings - Whether to skip showing the video settings window
+   * @param showGoLiveWindow - Whether to show the go live window
    */
-
   @RunInLoadingMode()
   setDualOutputMode(
     status: boolean = true,
@@ -458,7 +467,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   ) {
     if (!this.userService.isLoggedIn) return;
 
-    this.SET_SHOW_DUAL_OUTPUT(status);
+    this.toggleDualOutputMode(status);
 
     if (this.state.dualOutputMode) {
       this.disableGlobalRescaleIfNeeded();
@@ -488,6 +497,14 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     }
 
     this.SET_IS_LOADING(false);
+  }
+
+  /**
+   * Toggle dual output mode
+   * @remark Primarily a wrapper for the mutation to toggle dual output mode
+   */
+  toggleDualOutputMode(status: boolean) {
+    this.SET_SHOW_DUAL_OUTPUT(status);
   }
 
   disableGlobalRescaleIfNeeded() {
