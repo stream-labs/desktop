@@ -108,7 +108,7 @@ function ModalFooter() {
       content: (
         <Translate
           message={$t(
-            'All platforms are currently assigned to the <display></display> display. To use Dual Output you must stream to one horizontal and one vertical platform. Do you want to go live in single output mode with the Horizonal display?',
+            'All platforms are currently assigned to the <display></display> display. To use Dual Output you must stream to one horizontal and one vertical platform. Do you want to go live in single output mode with the Horizontal display?',
           )}
           renderSlots={{
             display: () => {

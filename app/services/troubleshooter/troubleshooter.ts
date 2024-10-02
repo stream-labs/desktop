@@ -120,7 +120,7 @@ export class TroubleshooterService
         name: 'dualOutputCpuThreshold',
         description: $t('CPU usage threshold in Dual Output mode'),
         type: 'OBS_PROPERTY_SLIDER',
-        minVal: 5,
+        minVal: 0,
         maxVal: 1,
         stepVal: 0.01,
         visible: settings.dualOutputCpuEnabled,
