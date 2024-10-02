@@ -58,12 +58,12 @@
   "Arrange sources here for a horizontal scene layout.": "Расположите источники здесь для горизонтального макета сцены.",
   "Toggle Dual Output Mode.": "Переключите режим Dual Output.",
   "Cannot hide dual output toggles in dual output mode.": "Нельзя скрыть переключатели Dual Output в режиме Dual Output.",
-  "Choose a template from our overlay library": "Choose a template from our overlay library",
-  "Log in to choose a template from our overlay library": "Log in to choose a template from our overlay library",
-  "Loading scene...": "Loading scene...",
-  "Import from OBS": "Import from OBS",
-  "Import from Twitch": "Import from Twitch",
+  "Choose a template from our overlay library": "Выберите шаблон из библиотеки наложений",
+  "Log in to choose a template from our overlay library": "Войдите в систему, чтобы выбрать шаблон из библиотеки наложений",
+  "Loading scene...": "Загрузка сцены…",
+  "Import from OBS": "Импортировать из OBS",
+  "Import from Twitch": "Импортировать из Twitch",
   "Import from Twitch Studio": "Import from Twitch Studio",
-  "Load existing scenes from Twitch Studio": "Load existing scenes from Twitch Studio",
+  "Load existing scenes from Twitch Studio": "Загрузите существующие сцены из Twitch Studio",
   "Start Fresh": "Start Fresh"
 }
