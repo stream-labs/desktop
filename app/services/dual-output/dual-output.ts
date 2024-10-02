@@ -356,7 +356,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     this.disableGlobalRescaleIfNeeded();
 
     // Toggle dual output by default for new users
-    const userLoginFinished = this.userService.userLoginFinished.subscribe(() => {
+    this.userService.userLoginFinished.subscribe(() => {
       if (this.userService.state.createdAt === new Date().valueOf()) {
         this.setDualOutputMode(true, true);
 
@@ -364,38 +364,39 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
         // create a scene if there is no active scene
         if (!scene) {
-          scene = this.scenesService.createScene('Scene 1', { makeActive: true });
+          scene = this.scenesService.createScene('Scene', { makeActive: true });
         }
 
-        // add webcam source
-        const type = byOS({
-          [OS.Windows]: 'dshow_input',
-          [OS.Mac]: 'av_capture_input',
-        }) as TSourceType;
-        const webCam = this.sourcesService.views.sources.find(s => s.type === type);
+        // if the user doesn't have a scene collection installed, add some default sources to the empty scene
+        if (!scene.getNodes().length) {
+          // add webcam source
+          const type = byOS({
+            [OS.Windows]: 'dshow_input',
+            [OS.Mac]: 'av_capture_input',
+          }) as TSourceType;
+          const webCam = this.sourcesService.views.sources.find(s => s.type === type);
 
-        if (!webCam) {
-          const cam = scene.createAndAddSource('Webcam', type, { display: 'horizontal' });
-          this.createPartnerNode(cam);
-        } else {
-          const cam = scene.addSource(webCam.sourceId, { display: 'horizontal' });
-          this.createPartnerNode(cam);
+          if (!webCam) {
+            const cam = scene.createAndAddSource('Webcam', type, { display: 'horizontal' });
+            this.createPartnerNode(cam);
+          } else {
+            const cam = scene.addSource(webCam.sourceId, { display: 'horizontal' });
+            this.createPartnerNode(cam);
+          }
+
+          // add game capture source
+          const gameCapture = scene.createAndAddSource(
+            'Game Capture',
+            'game_capture',
+            {},
+            { display: 'horizontal' },
+          );
+          this.createPartnerNode(gameCapture);
+
+          // add alert box widget
+          this.widgetsService.createWidget(WidgetType.AlertBox, 'Alert Box');
         }
-
-        // add game capture source
-        const gameCapture = scene.createAndAddSource(
-          'Game Capture',
-          'game_capture',
-          {},
-          { display: 'horizontal' },
-        );
-        this.createPartnerNode(gameCapture);
-
-        // add alert box widget
-        this.widgetsService.createWidget(WidgetType.AlertBox, 'Alert Box');
       }
-
-      userLoginFinished.unsubscribe();
     });
 
     /**
