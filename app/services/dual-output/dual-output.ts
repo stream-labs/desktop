@@ -357,7 +357,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
     // Toggle dual output by default for new users
     this.userService.userLoginFinished.subscribe(() => {
-      if (this.userService.state.createdAt === new Date().valueOf()) {
+      if (new Date(this.userService.state.createdAt).toDateString() === new Date().toDateString()) {
         this.setDualOutputMode(true, true);
 
         let scene = this.scenesService.views.activeScene;
