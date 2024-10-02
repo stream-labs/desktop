@@ -58,12 +58,12 @@
   "Arrange sources here for a horizontal scene layout.": "Yatay sahne düzeni için kaynakları buraya ekleyin.",
   "Toggle Dual Output Mode.": "Dual Output Modunu Değiştir.",
   "Cannot hide dual output toggles in dual output mode.": "Dual Output modundayken Dual Output değişiklileri gizlenemez.",
-  "Choose a template from our overlay library": "Choose a template from our overlay library",
-  "Log in to choose a template from our overlay library": "Log in to choose a template from our overlay library",
-  "Loading scene...": "Loading scene...",
-  "Import from OBS": "Import from OBS",
-  "Import from Twitch": "Import from Twitch",
+  "Choose a template from our overlay library": "Katman kütüphanemizden bir şablon seçin",
+  "Log in to choose a template from our overlay library": "Katman kütüphanemizden bir şablon seçmek için giriş yapın",
+  "Loading scene...": "Sahne yükleniyor...",
+  "Import from OBS": "OBS’den Aktar",
+  "Import from Twitch": "Twitch'ten içe aktarın",
   "Import from Twitch Studio": "Import from Twitch Studio",
-  "Load existing scenes from Twitch Studio": "Load existing scenes from Twitch Studio",
+  "Load existing scenes from Twitch Studio": "Twitch Studio'dan mevcut sahneleri yükleyin",
   "Start Fresh": "Start Fresh"
 }
