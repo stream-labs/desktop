@@ -12,8 +12,6 @@ import StartStreamingButton from './StartStreamingButton';
 import NotificationsArea from './NotificationsArea';
 import { Tooltip } from 'antd';
 import { confirmAsync } from 'components-react/modals';
-import { useModule } from 'slap';
-import { useRealmObject } from 'components-react/hooks/realm';
 
 export default function StudioFooterComponent() {
   const {
@@ -23,6 +21,8 @@ export default function StudioFooterComponent() {
     NavigationService,
     RecordingModeService,
     PerformanceService,
+    SettingsService,
+    UserService,
   } = Services;
 
   const {
@@ -35,7 +35,19 @@ export default function StudioFooterComponent() {
     replayBufferSaving,
     recordingModeEnabled,
     replayBufferEnabled,
-  } = useModule(FooterModule);
+  } = useVuex(() => ({
+    streamingStatus: StreamingService.views.streamingStatus,
+    isLoggedIn: UserService.views.isLoggedIn,
+    canSchedule:
+      StreamingService.views.supports('stream-schedule') &&
+      !RecordingModeService.views.isRecordingModeEnabled,
+    streamQuality: PerformanceService.views.streamQuality,
+    replayBufferOffline: StreamingService.state.replayBufferStatus === EReplayBufferState.Offline,
+    replayBufferStopping: StreamingService.state.replayBufferStatus === EReplayBufferState.Stopping,
+    replayBufferSaving: StreamingService.state.replayBufferStatus === EReplayBufferState.Saving,
+    recordingModeEnabled: RecordingModeService.views.isRecordingModeEnabled,
+    replayBufferEnabled: SettingsService.views.values.Output.RecRB,
+  }));
 
   function performanceIconClassName() {
     if (!streamingStatus || streamingStatus === EStreamingState.Offline) {
@@ -240,47 +252,4 @@ function RecordingTimer() {
 
   if (!isRecording) return <></>;
   return <div className={cx(styles.navItem, styles.recordTime)}>{recordingTime}</div>;
-}
-
-class FooterModule {
-  state = {};
-
-  get replayBufferEnabled() {
-    return Services.SettingsService.views.values.Output.RecRB;
-  }
-
-  get streamingStatus() {
-    return Services.StreamingService.views.streamingStatus;
-  }
-
-  get streamQuality() {
-    return Services.PerformanceService.views.streamQuality;
-  }
-
-  get isLoggedIn() {
-    return Services.UserService.views.isLoggedIn;
-  }
-
-  get canSchedule() {
-    return (
-      Services.StreamingService.views.supports('stream-schedule') &&
-      !Services.RecordingModeService.views.isRecordingModeEnabled
-    );
-  }
-
-  get replayBufferOffline() {
-    return Services.StreamingService.state.replayBufferStatus === EReplayBufferState.Offline;
-  }
-
-  get replayBufferStopping() {
-    return Services.StreamingService.state.replayBufferStatus === EReplayBufferState.Stopping;
-  }
-
-  get replayBufferSaving() {
-    return Services.StreamingService.state.replayBufferStatus === EReplayBufferState.Saving;
-  }
-
-  get recordingModeEnabled() {
-    return Services.RecordingModeService.views.isRecordingModeEnabled;
-  }
 }
