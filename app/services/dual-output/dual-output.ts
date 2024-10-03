@@ -370,7 +370,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       }
 
       // conditions that show this is not the user's first login
-      if (this.views.dualOutputMode) return;
       if (scene.getNodes().length) return;
       if (this.scenesService.views.scenes.length > 1) return;
       if (this.sceneCollectionsService.collections.length > 1) return;

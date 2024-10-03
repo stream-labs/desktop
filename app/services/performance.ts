@@ -349,7 +349,7 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
     if (
       troubleshooterSettings.dualOutputCpuEnabled &&
       this.checkNotification(
-        troubleshooterSettings.dualOutputCpuThreshold * 100,
+        troubleshooterSettings.dualOutputCpuThreshold,
         this.historicalCPU,
         NUMBER_OF_CPU_SAMPLES,
       )
@@ -362,8 +362,16 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
 
   @throttle(NOTIFICATION_THROTTLE_INTERVAL)
   private pushDualOutputHighCPUNotify(factor: number) {
-    console.log('factor', factor);
     const code: TIssueCode = 'HIGH_CPU_USAGE';
+
+    const message =
+      factor > 0.5
+        ? 'High CPU usage: click here to improve'
+        : $t('High CPU Usage: %{percentage}% over last %{seconds} seconds', {
+            percentage: factor.toFixed(1),
+            seconds: CPU_SAMPLING_DURATION / 1000,
+          });
+
     this.notificationsService.push({
       code,
       type: ENotificationType.WARNING,
@@ -371,11 +379,7 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
       lifeTime: 2 * 60 * 1000,
       showTime: true,
       subType: ENotificationSubType.CPU,
-      // tslint:disable-next-line:prefer-template
-      message: $t('High CPU Usage: %{percentage}% over last %{seconds} seconds', {
-        percentage: factor.toFixed(1),
-        seconds: CPU_SAMPLING_DURATION / 1000,
-      }),
+      message,
       action: this.jsonrpcService.createRequest(
         Service.getResourceId(this.troubleshooterService),
         'showTroubleshooter',
