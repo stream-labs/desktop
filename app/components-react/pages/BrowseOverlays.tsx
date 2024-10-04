@@ -130,8 +130,10 @@ export default function BrowseOverlays(p: {
     }
 
     if (
-      !assetURL.startsWith('https://cdn.streamlabs.com/marketplace') ||
-      !assetURL.startsWith('https://streamlabs-marketplace-staging.streamlabs.com')
+      !(
+        assetURL.startsWith('https://cdn.streamlabs.com/marketplace') ||
+        assetURL.startsWith('https://streamlabs-marketplace-staging.streamlabs.com')
+      )
     ) {
       throw new Error('Invalid asset URL');
     }
