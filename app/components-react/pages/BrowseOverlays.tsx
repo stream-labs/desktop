@@ -114,6 +114,7 @@ export default function BrowseOverlays(p: {
    * Collectibles are just a CDN URL of an image or video, this API provides
    * embedded pages with a convenience method for creating sources based on those.
    *
+   * @param name - Name of the collectible, used as source name
    * @param sceneId - ID of the scene where the collectible will be added to
    * @param assetURL - CDN URL of the collectible asset
    * @param type - Type of source that will be created, `image` or `video`
@@ -124,7 +125,12 @@ export default function BrowseOverlays(p: {
    * @throws When scene for the provided scene ID can't be found.
    * @throws When it fails to create the source.
    */
-  async function addCollectibleToScene(sceneId: string, assetURL: string, type: 'image' | 'video') {
+  async function addCollectibleToScene(
+    name: string,
+    sceneId: string,
+    assetURL: string,
+    type: 'image' | 'video',
+  ) {
     if (!['image', 'video'].includes(type)) {
       throw new Error("Unsupported type. Use 'image' or 'video'");
     }
@@ -145,7 +151,7 @@ export default function BrowseOverlays(p: {
     const sourceType = type === 'video' ? 'ffmpeg_source' : 'image_source';
 
     // TODO: do we want the caller to provide name?
-    const sourceName = SourcesService.views.suggestName('Collectible');
+    const sourceName = name;
 
     return ScenesService.actions.return.createAndAddSource(
       sceneId,
