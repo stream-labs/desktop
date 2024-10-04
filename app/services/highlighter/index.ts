@@ -584,6 +584,13 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       }
     });
 
+    if (this.views.exportInfo.exporting) {
+      this.SET_EXPORT_INFO({
+        exporting: false,
+        error: null,
+        cancelRequested: false,
+      });
+    }
     //Check if aiDetections were still running when the user closed desktop
     this.views.highlightedStreams
       .filter(stream => stream.state.type === 'detection-in-progress')
@@ -792,19 +799,25 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       let newStreamInfo: { [key: string]: TStreamInfo };
       if (source === 'Manual') {
         // Move all current clips one to the right
-        currentClips.forEach(clip => {
-          const updatedStreamInfo = {
-            ...clip.streamInfo,
-            [streamId]: {
-              ...clip.streamInfo[streamId],
-              orderPosition: clip.streamInfo[streamId].orderPosition + 1,
-            },
-          };
-          this.UPDATE_CLIP({
-            path: clip.path,
-            streamInfo: updatedStreamInfo,
+        console.log('streamId', streamId);
+        if (streamId) {
+          currentClips.forEach(clip => {
+            console.log(clip, ';', clip.streamInfo);
+            console.log(clip, ';', clip.streamInfo[streamId].orderPosition);
+
+            const updatedStreamInfo = {
+              ...clip.streamInfo,
+              [streamId]: {
+                ...clip.streamInfo[streamId],
+                orderPosition: clip.streamInfo[streamId].orderPosition + 1,
+              },
+            };
+            this.UPDATE_CLIP({
+              path: clip.path,
+              streamInfo: updatedStreamInfo,
+            });
           });
-        });
+        }
         newStreamInfo = {
           [streamId]: {
             orderPosition: 0,
@@ -819,6 +832,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
           },
         };
       }
+
       if (this.state.clips[clipData.path]) {
         const updatedStreamInfo = {
           ...this.state.clips[clipData.path].streamInfo,
@@ -1089,6 +1103,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
             type: 'ClipImport',
             source: completed.source,
           });
+          console.log('completed', completed.path);
 
           this.UPDATE_CLIP({
             path: completed.path,
@@ -1134,9 +1149,30 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     //TODO: Remove views.loaded?
     console.log('streamId', streamId);
 
+    // Make sure all clips are really loaded
+    await this.loadClips(streamId);
+    console.log('after load all clips');
+
     // TODO: Need to respect order here
-    if (!this.views.clips.filter(c => c.enabled).every(clip => clip.loaded)) {
-      console.error('Highlighter: Export called while clips are not fully loaded!');
+    if (
+      !this.views.clips
+        .filter(c => c.enabled)
+        .filter(c => {
+          if (!streamId) return true;
+          return c.streamInfo && c.streamInfo[streamId] !== undefined;
+        })
+        .every(clip => clip.loaded)
+    ) {
+      console.error(
+        'Highlighter: Export called while clips are not fully loaded!: ',
+        this.views.clips
+          .filter(c => c.enabled)
+          .filter(clip => !clip.loaded)
+          .filter(c => {
+            if (!streamId) return true;
+            return c.streamInfo && c.streamInfo[streamId] !== undefined;
+          }),
+      );
       return;
     }
 
@@ -1144,13 +1180,28 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       console.error('Highlighter: Cannot export until current export operation is finished');
       return;
     }
+    console.log('streamId', streamId);
 
     let clips: Clip[] = [];
     if (streamId) {
       console.log('orderByStreamId');
+      // the missing clips have a different id
+      console.log(
+        'streams without orderPosition',
+        this.views.clips
+          .filter(c => c.enabled)
+          .filter(c => {
+            return c.streamInfo && c.streamInfo[streamId] !== undefined;
+          }),
+      );
 
-      clips = this.views.clips
+      console.log('generate clips');
+
+      clips = this.getClips(this.views.clips, streamId)
         .filter(c => c.enabled)
+        .filter(c => {
+          return c.streamInfo && c.streamInfo[streamId] !== undefined;
+        })
         .sort(
           (a: TClip, b: TClip) =>
             a.streamInfo[streamId].orderPosition - b.streamInfo[streamId].orderPosition,
@@ -1161,11 +1212,11 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
           // Set trims on the frame source
           clip.startTrim = c.startTrim;
           clip.endTrim = c.endTrim;
+          console.log('clip', clip);
 
           return clip;
         });
     } else {
-      console.log('orderByGlobalId');
       clips = this.views.clips
         .filter(c => c.enabled)
         .sort((a: TClip, b: TClip) => a.globalOrderPosition - b.globalOrderPosition)
@@ -1176,11 +1227,10 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
           clip.startTrim = c.startTrim;
           clip.endTrim = c.endTrim;
 
+          console.log('clip', clip);
           return clip;
         });
     }
-
-    console.log('clips', clips);
 
     const exportOptions: IExportOptions = preview
       ? { width: 1280 / 4, height: 720 / 4, fps: 30, preset: 'ultrafast' }
@@ -1216,6 +1266,8 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     const numTransitions = clips.length - 1;
     const transitionFrames = this.views.transitionDuration * exportOptions.fps;
     const totalFramesAfterTransitions = totalFrames - numTransitions * transitionFrames;
+
+    console.log('startExport');
 
     this.SET_EXPORT_INFO({
       exporting: true,
@@ -1373,6 +1425,8 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
         }
       }
     } catch (e: unknown) {
+      console.error(e);
+
       Sentry.withScope(scope => {
         scope.setTag('feature', 'highlighter');
         console.error('Highlighter export error', e);

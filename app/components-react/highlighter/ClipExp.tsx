@@ -3,7 +3,7 @@ import * as remote from '@electron/remote';
 import { Services } from 'components-react/service-provider';
 import styles from './ClipsView.m.less';
 import { IViewState, TClip } from 'services/highlighter';
-import ClipPreview from 'components-react/highlighter/ClipPreview';
+import ClipPreview, { formatSecondsToHMS } from 'components-react/highlighter/ClipPreview';
 import { ReactSortable } from 'react-sortablejs';
 import Scrollable from 'components-react/shared/Scrollable';
 import { EditingControls } from './EditingControls';
@@ -12,8 +12,9 @@ import ClipsViewModal from './ClipsViewModal';
 import ClipsFilter from './ClipsFilter';
 import { useVuex } from 'components-react/hooks';
 import { Button } from 'antd';
-import { SUPPORTED_FILE_TYPES } from 'services/highlighter/constants';
+import { SCRUB_HEIGHT, SCRUB_WIDTH, SUPPORTED_FILE_TYPES } from 'services/highlighter/constants';
 import { $t } from 'services/i18n';
+import path from 'path';
 
 export type TModalClipsView = 'trim' | 'export' | 'preview' | 'remove';
 
@@ -111,11 +112,31 @@ export default function ClipExp({
         sorted: newClipArray.map(c => ({ id: c })),
         sortedFiltered: filterClips(updatedClips, activeFilter).map(c => ({ id: c.path })),
       });
-      // setUpdateTrigger(prev => prev + 1);
       return;
     }
   }
+  function onDrop(e: React.DragEvent<HTMLDivElement>, streamId: string | undefined) {
+    const extensions = SUPPORTED_FILE_TYPES.map(e => `.${e}`);
+    const files: string[] = [];
+    let fi = e.dataTransfer.files.length;
+    while (fi--) {
+      const file = e.dataTransfer.files.item(fi)?.path;
+      if (file) files.push(file);
+    }
 
+    const filtered = files.filter(f => extensions.includes(path.parse(f).ext));
+
+    if (filtered.length) {
+      HighlighterService.actions.addClips(
+        filtered.map(path => ({ path })),
+        streamId,
+        'Manual',
+      );
+    }
+
+    e.preventDefault();
+    e.stopPropagation();
+  }
   //TODO: Need performance updateb
   function getClipsView(
     streamId: string | undefined,
@@ -126,7 +147,7 @@ export default function ClipExp({
       <div
         style={{ width: '100%', display: 'flex' }}
         className={styles.clipsViewRoot}
-        // onDrop={event => onDrop(event, streamId)}
+        onDrop={event => onDrop(event, streamId)}
       >
         <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: 'flex', padding: 20 }}>
@@ -155,12 +176,70 @@ export default function ClipExp({
               />
             </div>
           </div>
-          {sortedFilteredList.length === 0 ? (
+          {sortedList.length === 0 ? (
             <> No clips found</>
           ) : (
             <>
               {loaded ? (
                 <>
+                  <Scrollable
+                    horizontal={true}
+                    style={{
+                      width: '100%',
+                      paddingLeft: '8px',
+                      paddingRight: '8px',
+                      height: '42px',
+                    }}
+                  >
+                    <ReactSortable
+                      style={{
+                        width: 'max-content',
+                        minWidth: '100%',
+                        display: 'flex',
+                        gap: '4px',
+                        justifyContent: 'center',
+                      }}
+                      list={sortedList}
+                      setList={clips => setClipOrder(clips, props.id)} //
+                      animation={200}
+                      filter=".sortable-ignore"
+                      // onEnd={() => setOnMove(false)}
+                      onMove={e => {
+                        // setOnMove(true);
+                        return e.related.className.indexOf('sortable-ignore') === -1;
+                      }}
+                    >
+                      {sortedList.map(({ id }) => {
+                        const clip = HighlighterService.views.clipsDictionary[id];
+                        return (
+                          <div
+                            key={'mini' + clip.path}
+                            style={{
+                              display: clip.enabled ? 'inline-block' : 'none',
+                            }}
+                            // onMouseEnter={() => setHoveredId(id)}
+                            // onMouseLeave={() => setHoveredId(null)}
+                          >
+                            <MiniClipPreview
+                              clip={clip}
+                              // highlighted={hoveredId === id && !onMove}
+                              highlighted={false}
+                            ></MiniClipPreview>
+                          </div>
+                        );
+                      })}
+                    </ReactSortable>
+                  </Scrollable>{' '}
+                  <div
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      padding: '0px 24px',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <span>0m 0s</span> <span> {formatSecondsToHMS(0)} </span>
+                  </div>
                   <ClipsFilter activeFilter={activeFilter} onFilterChange={setActiveFilter} />
                   <Scrollable style={{ flexGrow: 1, padding: '20px 20px 20px 20px' }}>
                     <ReactSortable
@@ -174,66 +253,62 @@ export default function ClipExp({
                       }}
                       // onEnd={() => setOnMove(false)}
                     >
-                      {sortedFilteredList
-                        // .filter(c => clipMap.has(c.id))
-                        .map(({ id }) => {
-                          const clip = HighlighterService.views.clipsDictionary[id];
-                          return (
-                            <div
-                              key={clip.path}
-                              // onMouseEnter={() => setHoveredId(id)}
-                              // onMouseLeave={() => setHoveredId(null)}
-                              style={{
-                                margin: '10px 20px 10px 0',
-                                width: '100%',
-                                display: 'inline-block',
+                      {sortedFilteredList.map(({ id }) => {
+                        const clip = HighlighterService.views.clipsDictionary[id];
+                        return (
+                          <div
+                            key={clip.path}
+                            // onMouseEnter={() => setHoveredId(id)}
+                            // onMouseLeave={() => setHoveredId(null)}
+                            style={{
+                              margin: '10px 20px 10px 0',
+                              width: '100%',
+                              display: 'inline-block',
+                            }}
+                          >
+                            <ClipPreview
+                              clipId={id}
+                              showTrim={() => {}}
+                              showRemove={() => {
+                                setModal({ modal: 'remove', inspectedPathId: id });
+                                // HighlighterService.views.clips.filter(c => c.path !== clip.path),
+                                // HighlighterService.actions.removeClip(clip.path, streamId);
                               }}
-                            >
-                              <ClipPreview
-                                clipId={id}
-                                showTrim={() => {}}
-                                showRemove={() => {
-                                  setModal({ modal: 'remove', inspectedPathId: id });
-                                  // HighlighterService.views.clips.filter(c => c.path !== clip.path),
-                                  // HighlighterService.actions.removeClip(clip.path, streamId);
-                                }}
-                                streamId={streamId}
-                                highlighted={false}
-                                // highlighted={hoveredId === id && !onMove}
-                              />
-                            </div>
-                          );
-                        })}
+                              streamId={streamId}
+                              highlighted={false}
+                              // highlighted={hoveredId === id && !onMove}
+                            />
+                          </div>
+                        );
+                      })}
                     </ReactSortable>
                   </Scrollable>{' '}
-                  {
-                    <EditingControls
-                      emitSetShowModal={(modal: TModalClipsView) => {
-                        setModal({ modal });
-                      }}
-                    />
-                  }
                 </>
               ) : (
                 <ClipsLoadingView clips={clips.sorted} />
               )}
             </>
           )}
-          <ClipsViewModal
-            streamId={props.id}
-            modal={modal}
-            onClose={() => setModal(null)}
-            deleteClip={(clipId, streamId) =>
-              setClips(
-                sortAndFilterClips(
-                  HighlighterService.views.clips.filter(c => c.path !== clipId),
-                  streamId,
-                  'all',
-                ),
-              )
-            }
-          />
         </div>
+        <EditingControls
+          emitSetShowModal={(modal: TModalClipsView) => {
+            setModal({ modal });
+          }}
+        />
+        <ClipsViewModal
+          streamId={props.id}
+          modal={modal}
+          onClose={() => setModal(null)}
+          deleteClip={(clipId, streamId) =>
+            setClips(
+              sortAndFilterClips(
+                HighlighterService.views.clips.filter(c => c.path !== clipId),
+                streamId,
+                'all',
+              ),
+            )
+          }
+        />
       </div>
     );
   }
@@ -272,6 +347,30 @@ function AddClip({
   }
 
   return <Button onClick={() => openClips()}>{$t('Add Clip')}</Button>;
+}
+
+function MiniClipPreview({ clip, highlighted }: { clip: TClip; highlighted: boolean }) {
+  return (
+    <div
+      key={clip.path}
+      style={{
+        display: 'inline-block',
+        borderRadius: '4px',
+        border: `solid 2px ${highlighted ? '#4F5E65' : 'transparent'}`,
+      }}
+    >
+      <img
+        src={clip.scrubSprite}
+        style={{
+          width: `${SCRUB_WIDTH / 6}px`,
+          height: `${SCRUB_HEIGHT / 6}px`,
+          objectFit: 'cover',
+          objectPosition: 'left top',
+          borderRadius: '4px',
+        }}
+      ></img>
+    </div>
+  );
 }
 function ClipsLoadingView({ clips }: { clips: { id: string }[] }) {
   console.log('Render ClipsLoadingView');
