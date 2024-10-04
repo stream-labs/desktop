@@ -109,7 +109,7 @@
       <div v-if="issue.code === 'HIGH_CPU_USAGE'">
         <h4>
           <span class="fa fa-warning"></span>
-          {{ issue.message }}
+          {{ issue.message.split(':')[0] }}
         </h4>
         <p>
           {{ $t('Streamlabs has detected high CPU usage in Dual Output mode') }}

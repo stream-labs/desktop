@@ -56,10 +56,8 @@ const NOTIFICATION_THROTTLE_INTERVAL = 2 * 60 * 1000;
 const SAMPLING_DURATION = 2 * 60 * 1000;
 // How many samples we should take
 const NUMBER_OF_SAMPLES = Math.round(SAMPLING_DURATION / STATS_UPDATE_INTERVAL);
-// Time window for averaging CPU usage issue notifications
-const CPU_SAMPLING_DURATION = 20 * 1000;
-// How many samples we should take for CPU usage
-const NUMBER_OF_CPU_SAMPLES = Math.round(CPU_SAMPLING_DURATION / STATS_UPDATE_INTERVAL);
+// Limit on interval between CPU usage notifications
+const CPU_NOTIFICATION_THROTTLE_INTERVAL = 10 * 60 * 1000;
 
 interface IMonitorState {
   framesLagged: number;
@@ -209,6 +207,7 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
     this.streamStartRenderedFrames = obs.Global.totalFrames;
     this.streamStartEncodedFrames = this.videoSettingsService.contexts.horizontal.encodedFrames;
     this.streamStartTime = new Date();
+    this.historicalCPU = [];
   }
 
   stopStreamQualityMonitoring() {
@@ -224,12 +223,16 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
       100;
     const streamDropped = this.state.percentageDroppedFrames;
     const streamDuration = new Date().getTime() - this.streamStartTime.getTime();
+    const averageCPU = this.averageFactor(this.historicalCPU);
+    const streamType = this.dualOutputService.views.dualOutputMode ? 'dual' : 'single';
 
     this.usageStatisticsService.recordAnalyticsEvent('StreamPerformance', {
       streamLagged,
       streamSkipped,
       streamDropped,
       streamDuration,
+      averageCPU,
+      streamType,
     });
   }
 
@@ -303,15 +306,12 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
     record.push(current);
   }
 
-  averageFactor(record: number[], numRecords?: number) {
-    const numSamples = numRecords ?? NUMBER_OF_SAMPLES;
-    return record.reduce((a, b) => a + b, 0) / numSamples;
+  averageFactor(record: number[]) {
+    return record.reduce((a, b) => a + b, 0) / NUMBER_OF_SAMPLES;
   }
 
-  checkNotification(target: number, record: number[], numSamplesToCheck?: number) {
-    const numSamples = numSamplesToCheck ?? NUMBER_OF_SAMPLES;
-    if (record.length < numSamples) return false;
-    return this.averageFactor(record, numSamples) >= target;
+  checkNotification(target: number, record: number[]) {
+    return this.averageFactor(record) >= target;
   }
 
   // Check if any notification thresholds are met and send applicable notification
@@ -346,30 +346,26 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
       this.pushDroppedFramesNotify(this.averageFactor(this.historicalDroppedFrames));
     }
 
+    // only show CPU usage notifications when live in dual output mode
     if (
+      this.dualOutputService.views.dualOutputMode &&
+      this.streamingService.views.isMidStreamMode &&
       troubleshooterSettings.dualOutputCpuEnabled &&
-      this.checkNotification(
-        troubleshooterSettings.dualOutputCpuThreshold,
-        this.historicalCPU,
-        NUMBER_OF_CPU_SAMPLES,
-      )
+      this.state.CPU > troubleshooterSettings.dualOutputCpuThreshold * 100
     ) {
-      this.pushDualOutputHighCPUNotify(
-        this.averageFactor(this.historicalCPU, NUMBER_OF_CPU_SAMPLES),
-      );
+      this.pushDualOutputHighCPUNotify(this.state.CPU);
     }
   }
 
-  @throttle(NOTIFICATION_THROTTLE_INTERVAL)
+  @throttle(CPU_NOTIFICATION_THROTTLE_INTERVAL)
   private pushDualOutputHighCPUNotify(factor: number) {
     const code: TIssueCode = 'HIGH_CPU_USAGE';
 
     const message =
-      factor > 0.5
-        ? 'High CPU usage: click here to improve'
-        : $t('High CPU Usage: %{percentage}% over last %{seconds} seconds', {
+      factor > 50
+        ? $t('High CPU Usage: Detected')
+        : $t('High CPU Usage: %{percentage}% used', {
             percentage: factor.toFixed(1),
-            seconds: CPU_SAMPLING_DURATION / 1000,
           });
 
     this.notificationsService.push({
