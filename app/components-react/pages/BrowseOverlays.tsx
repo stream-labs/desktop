@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import path from 'path';
 import urlLib from 'url';
 import { Service } from 'services';
 import Utils from 'services/utils';
@@ -6,11 +7,9 @@ import { ENotificationType } from 'services/notifications';
 import { $t } from 'services/i18n';
 import BrowserView from 'components-react/shared/BrowserView';
 import { GuestApiHandler } from 'util/guest-api-handler';
-import { IDownloadProgress } from 'util/requests';
+import { downloadFile, IDownloadProgress } from 'util/requests';
 import * as remote from '@electron/remote';
 import { Services } from 'components-react/service-provider';
-import { pick } from 'lodash';
-import { ESourceType } from 'obs-studio-node';
 
 export default function BrowseOverlays(p: {
   params: { type?: 'overlay' | 'widget-themes' | 'site-themes'; id?: string; install?: string };
@@ -28,6 +27,7 @@ export default function BrowseOverlays(p: {
     RestreamService,
     // TODO: we're grabbing this just to suggest name
     SourcesService,
+    MediaBackupService,
   } = Services;
   const [downloading, setDownloading] = useState(false);
   const [overlaysUrl, setOverlaysUrl] = useState('');
@@ -144,14 +144,30 @@ export default function BrowseOverlays(p: {
       throw new Error('Invalid asset URL');
     }
 
-    const sourceSettings =
-      type === 'video' ? { is_local_file: false, input: assetURL } : { file: assetURL };
-
     // TODO: find or create enum
     const sourceType = type === 'video' ? 'ffmpeg_source' : 'image_source';
 
     // TODO: do we want the caller to provide name?
     const sourceName = name;
+
+    const filename = path.basename(assetURL);
+    const dest = path.join(MediaBackupService.mediaDirectory, filename);
+
+    // TODO: refactor all this
+    // TODO: media backup
+    let localFile;
+
+    try {
+      await downloadFile(assetURL, dest);
+      localFile = dest;
+    } catch {
+      throw new Error('Error downloading file to local system');
+    }
+
+    console.log('File downloaded');
+
+    const sourceSettings =
+      type === 'video' ? { looping: true, local_file: localFile } : { file: localFile };
 
     return ScenesService.actions.return.createAndAddSource(
       sceneId,

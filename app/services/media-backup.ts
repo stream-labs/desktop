@@ -325,7 +325,7 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
     }
   }
 
-  private get mediaDirectory() {
+  get mediaDirectory() {
     return path.join(this.appService.appDataDirectory, 'Media');
   }
 
