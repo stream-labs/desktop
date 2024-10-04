@@ -7,6 +7,7 @@ import { Services } from 'components-react/service-provider';
 import { Button } from 'antd';
 import moment from 'moment';
 import StreamView from 'components-react/highlighter/StreamView';
+import ClipExp from 'components-react/highlighter/ClipExp';
 
 export default function Highlighter(props: { params?: { view: string } }) {
   const openViewFromParams = props?.params?.view || '';
@@ -58,12 +59,28 @@ export default function Highlighter(props: { params?: { view: string } }) {
     case 'clips':
       return (
         <>
-          <ClipsView
+          <ClipExp
             emitSetView={data => {
               setViewFromEmit(data);
             }}
-            props={{ id: viewState.id }}
+            props={{
+              id: viewState.id,
+              streamTitle: HighlighterService.views.highlightedStreams.find(
+                s => s.id === viewState.id,
+              )?.title,
+            }}
           />
+          {/* <ClipsView
+            emitSetView={data => {
+              setViewFromEmit(data);
+            }}
+            props={{
+              id: viewState.id,
+              streamTitle: HighlighterService.views.highlightedStreams.find(
+                s => s.id === viewState.id,
+              )?.title,
+            }}
+          /> */}
         </>
       );
     default:

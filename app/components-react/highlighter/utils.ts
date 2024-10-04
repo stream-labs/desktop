@@ -110,3 +110,13 @@ export function filterClips(clips: TClip[], filter: string) {
     }
   });
 }
+export function sortAndFilterClips(clips: TClip[], streamId: string | undefined, filter: string) {
+  const sortedClips = sortClips(clips, streamId);
+  const filteredClips = filterClips(sortedClips, filter);
+  const sorted = sortedClips.map(clip => ({ id: clip.path }));
+  const sortedFiltered = filteredClips.map(clip => ({
+    id: clip.path,
+  }));
+
+  return { sorted, sortedFiltered };
+}

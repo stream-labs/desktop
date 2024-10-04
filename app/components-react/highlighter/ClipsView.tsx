@@ -30,6 +30,7 @@ export type TModalClipsView = 'trim' | 'export' | 'preview' | 'remove';
 
 interface IClipsViewProps {
   id: string | undefined;
+  streamTitle: string | undefined;
 }
 
 export default function ClipsView({
@@ -48,66 +49,68 @@ export default function ClipsView({
     uploadInfo: HighlighterService.views.uploadInfo,
     loadedCount: HighlighterService.views.loadedCount,
     loaded: HighlighterService.getClipsLoaded(HighlighterService.views.clips, props.id),
-    transition: HighlighterService.views.transition,
     dismissedTutorial: HighlighterService.views.dismissedTutorial,
-    audio: HighlighterService.views.audio,
     error: HighlighterService.views.error,
-    highlightedStreams: HighlighterService.views.highlightedStreams,
   }));
-
+  console.log('iv', HighlighterService.views.clips);
+  console.log('v', v.clips);
+  const loadedClips = v.clips;
+  const clipMap = new Map(loadedClips.map(clip => [clip.path, clip]));
+  HighlighterService.actions.loadClips();
   // const [tempClipList, setTempClipList] = useState<{ id: string }[]>([]);
   const [showModal, rawSetShowModal] = useState<TModalClipsView | null>(null);
   const [modalWidth, setModalWidth] = useState('700px');
   const [activeFilter, setActiveFilter] = useState('all');
   const sortedClips = useRef<TClip[]>([]);
   const sortedFilteredClips = useRef<TClip[]>([]);
+
   const sortedClipStrings = useRef<{ id: string }[]>([]);
   const sortedFilteredClipStrings = useRef<{ id: string }[]>([]);
-  const [updateTrigger, setUpdateTrigger] = useState(0);
+  // const [updateTrigger, setUpdateTrigger] = useState(0);
 
-  const [shownSortedFilteredClipStrings, setShownSortedFilteredClipStrings] = useState<
-    { id: string }[]
-  >([]);
-  const [shownSortedClipStrings, setShownSortedClipStrings] = useState<{ id: string }[]>([]);
-  // await HighlighterService.actions.return.getClip. TODO M: Check if it cal stay like this
-  const loadedClips = useMemo(() => HighlighterService.getClips(v.clips, props.id), [
-    v.clips,
-    JSON.stringify(props.id),
-  ]);
+  sortedClips.current = sortClips(loadedClips, props.id);
+  sortedFilteredClips.current = filterClips(sortedClips.current, activeFilter);
+  sortedClipStrings.current = sortedClips.current.map(clip => ({ id: clip.path }));
+  sortedFilteredClipStrings.current = sortedFilteredClips.current.map(clip => ({
+    id: clip.path,
+  }));
 
-  const clipMap = useMemo(() => {
-    return new Map(loadedClips.map(clip => [clip.path, clip]));
-  }, [loadedClips]);
+  // const [shownSortedFilteredClipStrings, setShownSortedFilteredClipStrings] = useState<
+  //   { id: string }[]
+  // >([]);
+  // const [shownSortedClipStrings, setShownSortedClipStrings] = useState<{ id: string }[]>([]);
+  // // await HighlighterService.actions.return.getClip. TODO M: Check if it cal stay like this
 
-  useEffect(() => {
-    // Disables unneeded clips, and enables needed clips
-    // console.log('loaded.clips length changed');/
+  // const { loadedClips, clipMap } = useMemo(() => {
+  //   const loadedClips = HighlighterService.getClips(v.clips, props.id);
+  //   console.log('run');
+  //   HighlighterService.actions.loadClips(props.id);
+  //   return {
+  //     loadedClips,
+  //     clipMap: new Map(loadedClips.map(clip => [clip.path, clip])),
+  //   };
+  // }, [v.clips, props.id]);
 
-    //TODO M: This overwrites currently enabled and disabled states
-    // HighlighterService.actions.enableOnlySpecificClips(HighlighterService.views.clips, props.id);
-    HighlighterService.actions.loadClips(props.id);
-  }, [loadedClips.length]);
+  // useEffect(() => {
+  //   sortedClips.current = sortClips(loadedClips, props.id);
+  //   sortedFilteredClips.current = filterClips(sortedClips.current, activeFilter);
+  //   sortedClipStrings.current = sortedClips.current.map(clip => ({ id: clip.path }));
+  //   sortedFilteredClipStrings.current = sortedFilteredClips.current.map(clip => ({
+  //     id: clip.path,
+  //   }));
+  //   setUpdateTrigger(prev => prev + 1); // This will cause a re-render
+  // }, [activeFilter, loadedClips]);
 
-  useEffect(() => {
-    sortedClips.current = sortClips(loadedClips, props.id);
-    sortedFilteredClips.current = filterClips(sortedClips.current, activeFilter);
-    sortedClipStrings.current = sortedClips.current.map(clip => ({ id: clip.path }));
-    sortedFilteredClipStrings.current = sortedFilteredClips.current.map(clip => ({
-      id: clip.path,
-    }));
-    setUpdateTrigger(prev => prev + 1); // This will cause a re-render
-  }, [activeFilter]);
+  // useEffect(() => {
+  //   setShownSortedFilteredClipStrings(sortedFilteredClipStrings.current);
+  //   setShownSortedClipStrings(sortedClipStrings.current);
+  // }, [updateTrigger]);
+  // useEffect(() => UsageStatisticsService.actions.recordFeatureUsage('Highlighter'), []);
 
-  useEffect(() => {
-    setShownSortedFilteredClipStrings(sortedFilteredClipStrings.current);
-    setShownSortedClipStrings(sortedClipStrings.current);
-  }, [updateTrigger]);
-  useEffect(() => UsageStatisticsService.actions.recordFeatureUsage('Highlighter'), []);
-
-  // This is kind of weird, but ensures that modals stay the right
-  // size while the closing animation is played. This is why modal
-  // width has its own state. This makes sure we always set the right
-  // size whenever displaying a modal.
+  // // This is kind of weird, but ensures that modals stay the right
+  // // size while the closing animation is played. This is why modal
+  // // width has its own state. This makes sure we always set the right
+  // // size whenever displaying a modal.
   function setShowModal(modal: TModalClipsView | null) {
     rawSetShowModal(modal);
 
@@ -192,7 +195,7 @@ export default function ClipsView({
             return true;
         }
       });
-      setUpdateTrigger(prev => prev + 1);
+      // setUpdateTrigger(prev => prev + 1);
       return;
     }
   }
@@ -244,8 +247,8 @@ export default function ClipsView({
     sortedFilteredList: { id: string }[],
     sortedList: { id: string }[],
   ) {
-    const [hoveredId, setHoveredId] = useState<string | null>(null);
-    const [onMove, setOnMove] = useState<boolean>(false);
+    // const [hoveredId, setHoveredId] = useState<string | null>(null);
+    // const [onMove, setOnMove] = useState<boolean>(false);
     // console.log('rendering clips view');
     const totalDuration = loadedClips
       .filter(c => c.enabled)
@@ -268,10 +271,7 @@ export default function ClipsView({
                 </div>{' '}
                 <h1 onClick={() => emitSetView({ view: 'stream' })} style={{ margin: 0 }}>
                   {' '}
-                  {props.id
-                    ? v.highlightedStreams.find(stream => stream.id === props.id)?.title ??
-                      'Stream highlight clips'
-                    : 'All highlight clips'}
+                  {props.streamTitle ?? 'All highlight clips'}
                 </h1>
               </div>
             </div>
@@ -306,9 +306,9 @@ export default function ClipsView({
                       setList={clips => setClipOrder(clips, props.id)} //
                       animation={200}
                       filter=".sortable-ignore"
-                      onEnd={() => setOnMove(false)}
+                      // onEnd={() => setOnMove(false)}
                       onMove={e => {
-                        setOnMove(true);
+                        // setOnMove(true);
                         return e.related.className.indexOf('sortable-ignore') === -1;
                       }}
                     >
@@ -322,12 +322,13 @@ export default function ClipsView({
                               style={{
                                 display: clip.enabled ? 'inline-block' : 'none',
                               }}
-                              onMouseEnter={() => setHoveredId(id)}
-                              onMouseLeave={() => setHoveredId(null)}
+                              // onMouseEnter={() => setHoveredId(id)}
+                              // onMouseLeave={() => setHoveredId(null)}
                             >
                               <MiniClipPreview
                                 clip={clip}
-                                highlighted={hoveredId === id && !onMove}
+                                // highlighted={hoveredId === id && !onMove}
+                                highlighted={false}
                               ></MiniClipPreview>
                             </div>
                           );
@@ -352,10 +353,10 @@ export default function ClipsView({
                       animation={200}
                       filter=".sortable-ignore"
                       onMove={e => {
-                        setOnMove(true);
+                        // setOnMove(true);
                         return e.related.className.indexOf('sortable-ignore') === -1;
                       }}
-                      onEnd={() => setOnMove(false)}
+                      // onEnd={() => setOnMove(false)}
                     >
                       {sortedFilteredList
                         .filter(c => clipMap.has(c.id))
@@ -364,8 +365,8 @@ export default function ClipsView({
                           return (
                             <div
                               key={clip.path}
-                              onMouseEnter={() => setHoveredId(id)}
-                              onMouseLeave={() => setHoveredId(null)}
+                              // onMouseEnter={() => setHoveredId(id)}
+                              // onMouseLeave={() => setHoveredId(null)}
                               style={{
                                 margin: '10px 20px 10px 0',
                                 width: '100%',
@@ -373,7 +374,7 @@ export default function ClipsView({
                               }}
                             >
                               <ClipPreview
-                                clip={clip}
+                                clipId={id}
                                 showTrim={() => {
                                   setInspectedClipPath(clip.path);
                                   setShowModal('trim');
@@ -383,7 +384,8 @@ export default function ClipsView({
                                   setShowModal('remove');
                                 }}
                                 streamId={streamId}
-                                highlighted={hoveredId === id && !onMove}
+                                highlighted={false}
+                                // highlighted={hoveredId === id && !onMove}
                               />
                             </div>
                           );
@@ -399,20 +401,6 @@ export default function ClipsView({
         </div>
         {
           <EditingControls
-            audio={v.audio}
-            transition={v.transition}
-            emitSetTransitionDuration={(duration: number) => {
-              HighlighterService.actions.setTransition({ duration });
-            }}
-            emitSetMusicEnabled={(enabled: boolean) => {
-              HighlighterService.actions.setAudio({ musicEnabled: enabled });
-            }}
-            emitSetMusicFile={(file: string) => {
-              HighlighterService.actions.setAudio({ musicPath: file });
-            }}
-            emitSetMusicVolume={(volume: number) => {
-              HighlighterService.actions.setAudio({ musicVolume: volume });
-            }}
             emitSetShowModal={(modal: TModalClipsView) => {
               setShowModal(modal);
             }}
@@ -439,7 +427,8 @@ export default function ClipsView({
       </div>
     );
   }
-  return getClipsView(props.id, shownSortedFilteredClipStrings, shownSortedClipStrings);
+  // return getClipsView(props.id, shownSortedFilteredClipStrings, shownSortedClipStrings);
+  return getClipsView(props.id, sortedFilteredClipStrings.current, sortedClipStrings.current);
 }
 
 function MiniClipPreview({ clip, highlighted }: { clip: TClip; highlighted: boolean }) {

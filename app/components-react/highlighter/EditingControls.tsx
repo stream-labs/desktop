@@ -7,47 +7,40 @@ import Scrollable from 'components-react/shared/Scrollable';
 import Animate from 'rc-animate';
 import TransitionSelector from 'components-react/highlighter/TransitionSelector';
 import { $t } from 'services/i18n';
-import { IAudioInfo, ITransitionInfo } from 'services/highlighter';
 import { TModalClipsView } from './ClipsView';
+import { useVuex } from 'components-react/hooks';
+import { Services } from 'components-react/service-provider';
 
 export function EditingControls({
-  audio,
-  transition,
-  emitSetTransitionDuration,
-  emitSetMusicEnabled,
-  emitSetMusicFile,
-  emitSetMusicVolume,
   emitSetShowModal,
 }: {
-  audio: IAudioInfo;
-  transition: ITransitionInfo;
-  emitSetTransitionDuration: (duration: number) => void;
-  emitSetMusicEnabled: (enabled: boolean) => void;
-  emitSetMusicFile: (file: string) => void;
-  emitSetMusicVolume: (volume: number) => void;
   emitSetShowModal: (modal: TModalClipsView | null) => void;
 }) {
+  const { HighlighterService } = Services;
+
+  const v = useVuex(() => ({
+    transition: HighlighterService.views.transition,
+    audio: HighlighterService.views.audio,
+    error: HighlighterService.views.error,
+  }));
+
   function setTransitionDuration(duration: number) {
-    emitSetTransitionDuration(duration);
-    // HighlighterService.actions.setTransition({ duration });
+    HighlighterService.actions.setTransition({ duration });
   }
 
   function setMusicEnabled(enabled: boolean) {
-    emitSetMusicEnabled(enabled);
-    // HighlighterService.actions.setAudio({ musicEnabled: enabled });
+    HighlighterService.actions.setAudio({ musicEnabled: enabled });
   }
 
   const musicExtensions = ['mp3', 'wav', 'flac'];
 
   function setMusicFile(file: string) {
     if (!musicExtensions.map(e => `.${e}`).includes(path.parse(file).ext)) return;
-    emitSetMusicFile(file);
-    // HighlighterService.actions.setAudio({ musicPath: file });
+    HighlighterService.actions.setAudio({ musicPath: file });
   }
 
   function setMusicVolume(volume: number) {
-    emitSetMusicVolume(volume);
-    // HighlighterService.actions.setAudio({ musicVolume: volume });
+    HighlighterService.actions.setAudio({ musicVolume: volume });
   }
 
   return (
@@ -64,7 +57,7 @@ export function EditingControls({
         <TransitionSelector />
         <SliderInput
           label={$t('Transition Duration')}
-          value={transition.duration}
+          value={v.transition.duration}
           onChange={setTransitionDuration}
           min={0.5}
           max={5}
@@ -76,21 +69,21 @@ export function EditingControls({
         />
         <SwitchInput
           label={$t('Background Music')}
-          value={audio.musicEnabled}
+          value={v.audio.musicEnabled}
           onChange={setMusicEnabled}
         />
         <Animate transitionName="ant-slide-up">
-          {audio.musicEnabled && (
+          {v.audio.musicEnabled && (
             <div>
               <FileInput
                 label={$t('Music File')}
-                value={audio.musicPath}
+                value={v.audio.musicPath}
                 filters={[{ name: $t('Audio File'), extensions: musicExtensions }]}
                 onChange={setMusicFile}
               />
               <SliderInput
                 label={$t('Music Volume')}
-                value={audio.musicVolume}
+                value={v.audio.musicVolume}
                 onChange={setMusicVolume}
                 min={0}
                 max={100}

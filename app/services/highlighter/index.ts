@@ -330,6 +330,9 @@ class HighligherViews extends ViewHandler<IHighligherState> {
   get clips() {
     return Object.values(this.state.clips);
   }
+  get clipsDictionary() {
+    return this.state.clips;
+  }
 
   /**
    * Returns wether or not the AiHighlighter should be used
@@ -1096,6 +1099,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
         },
       },
     );
+    return;
   }
 
   private async ensureScrubDirectory() {
