@@ -5,21 +5,24 @@ import { TModalClipsView } from './ClipsView';
 import { TClip } from 'services/highlighter';
 import styles from './ClipsView.m.less';
 import ClipTrimmer from 'components-react/highlighter/ClipTrimmer';
-import { Modal, Alert } from 'antd';
+import { Modal, Alert, Button } from 'antd';
 import ExportModal from 'components-react/highlighter/ExportModal';
 import PreviewModal from 'components-react/highlighter/PreviewModal';
 import React from 'react';
+import { $t } from 'services/i18n';
 
 export default function ClipsViewModal({
   streamId,
   modal,
   onClose,
+  deleteClip,
 }: {
   streamId: string | undefined;
-  modal: TModalClipsView | null;
+  modal: { modal: TModalClipsView; inspectedPathId?: string } | null;
   onClose: () => void;
+  deleteClip: (clipPath: string, streamId: string | undefined) => void;
 }) {
-  const { HighlighterService, HotkeysService, UsageStatisticsService } = Services;
+  const { HighlighterService } = Services;
   const v = useVuex(() => ({
     exportInfo: HighlighterService.views.exportInfo,
     uploadInfo: HighlighterService.views.uploadInfo,
@@ -27,13 +30,16 @@ export default function ClipsViewModal({
   }));
   const [showModal, rawSetShowModal] = useState<TModalClipsView | null>(null);
   const [modalWidth, setModalWidth] = useState('700px');
+  const [inspectedClip, setInspectedClip] = useState<TClip | null>(null);
+
   useEffect(() => {
-    setShowModal(modal);
+    if (modal?.inspectedPathId) {
+      setInspectedClip(HighlighterService.views.clipsDictionary[modal.inspectedPathId]);
+    }
+    if (modal?.modal) {
+      setShowModal(modal.modal);
+    }
   }, [modal]);
-  const [inspectedClipPath, setInspectedClipPath] = useState<string | null>(null);
-  const inspectedClip: TClip | null = inspectedClipPath
-    ? HighlighterService.views.clipsDictionary[inspectedClipPath] ?? null
-    : null;
 
   function setShowModal(modal: TModalClipsView | null) {
     rawSetShowModal(modal);
@@ -54,7 +60,7 @@ export default function ClipsViewModal({
     if (v.exportInfo.exporting) return;
     if (v.uploadInfo.uploading) return;
 
-    setInspectedClipPath(null);
+    setInspectedClip(null);
     setShowModal(null);
     onClose();
     if (v.error) HighlighterService.actions.dismissError();
@@ -75,11 +81,48 @@ export default function ClipsViewModal({
       {inspectedClip && showModal === 'trim' && <ClipTrimmer clip={inspectedClip} />}
       {showModal === 'export' && <ExportModal close={closeModal} streamId={streamId} />}
       {showModal === 'preview' && <PreviewModal close={closeModal} streamId={streamId} />}
-      {/* {inspectedClip && showModal === 'remove' && (
-          <RemoveClip close={closeModal} clip={inspectedClip} streamId={streamId} />
-        )} */}
+      {inspectedClip && showModal === 'remove' && (
+        <RemoveClip
+          close={closeModal}
+          clip={inspectedClip}
+          streamId={streamId}
+          deleteClip={deleteClip}
+        />
+      )}
     </Modal>
   );
 }
 
-// I need to react properly here when the modalType changes
+function RemoveClip(p: {
+  clip: TClip;
+  streamId: string | undefined;
+  close: () => void;
+  deleteClip: (clipPath: string, streamId: string | undefined) => void;
+}) {
+  const { HighlighterService } = Services;
+
+  return (
+    <div style={{ textAlign: 'center' }}>
+      <h2>{$t('Remove the clip?')}</h2>
+      <p>
+        {$t(
+          'Are you sure you want to remove the clip? You will need to manually import it again to reverse this action.',
+        )}
+      </p>
+      <Button style={{ marginRight: 8 }} onClick={p.close}>
+        {$t('Cancel')}
+      </Button>
+      <Button
+        type="primary"
+        danger
+        onClick={() => {
+          HighlighterService.actions.removeClip(p.clip.path, p.streamId);
+          p.deleteClip(p.clip.path, p.streamId);
+          p.close();
+        }}
+      >
+        {$t('Remove')}
+      </Button>
+    </div>
+  );
+}

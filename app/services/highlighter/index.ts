@@ -844,6 +844,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
         });
       }
     });
+    return;
   }
 
   async addAiClips(
