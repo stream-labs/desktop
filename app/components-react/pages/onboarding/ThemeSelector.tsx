@@ -105,12 +105,10 @@ export function ThemeSelector() {
 
   return (
     <div style={{ width: '100%' }}>
-      <h1 className={commonStyles.titleContainer} style={{ marginTop: '20px' }}>
-        {$t('Add your first overlay')}
-      </h1>
+      <h1 className={commonStyles.titleContainer}>{$t('Add your first theme')}</h1>
 
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
-        {$t('Try you first overlay now, browse hundreds more themes later on.')}
+      <div className={commonStyles.subtitleContainer}>
+        {$t('Try you first theme now, browse hundreds of more themes later on.')}
       </div>
 
       <div>
