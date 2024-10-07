@@ -228,18 +228,14 @@ export default function ClipExp({
                       }}
                     >
                       {sortedList.map(({ id }) => {
-                        const clip = HighlighterService.views.clipsDictionary[id];
                         return (
                           <div
-                            key={'mini' + clip.path}
-                            style={{
-                              display: clip.enabled ? 'inline-block' : 'none',
-                            }}
+                            key={'mini' + id}
                             // onMouseEnter={() => setHoveredId(id)}
                             // onMouseLeave={() => setHoveredId(null)}
                           >
                             <MiniClipPreview
-                              clip={clip}
+                              clipId={id}
                               // highlighted={hoveredId === id && !onMove}
                               highlighted={false}
                             ></MiniClipPreview>
@@ -365,18 +361,19 @@ function AddClip({
       addedClips();
     }
   }
-
   return <Button onClick={() => openClips()}>{$t('Add Clip')}</Button>;
 }
 
-function MiniClipPreview({ clip, highlighted }: { clip: TClip; highlighted: boolean }) {
+function MiniClipPreview({ clipId, highlighted }: { clipId: string; highlighted: boolean }) {
+  const { HighlighterService } = Services;
+  const clip = useVuex(() => HighlighterService.views.clipsDictionary[clipId] as TClip);
   return (
     <div
       key={clip.path}
       style={{
-        display: 'inline-block',
+        display: clip.enabled ? 'inline-block' : 'none',
         borderRadius: '4px',
-        border: `solid 2px ${highlighted ? '#4F5E65' : 'transparent'}`,
+        border: `solid ${clip.enabled ? '2px' : '0px'}  ${highlighted ? '#4F5E65' : 'transparent'}`,
       }}
     >
       <img
