@@ -212,7 +212,6 @@ export class TwitterPlatformService
   get chatUrl() {
     const username = this.userService.state.auth?.platforms?.twitter?.username;
     if (!username) return '';
-    console.log('chatUrl`;', `${this.domain}/${username}/chat`);
     return `${this.domain}/${username}/chat`;
   }
 
