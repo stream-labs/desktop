@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as remote from '@electron/remote';
 import { Services } from 'components-react/service-provider';
 import styles from './ClipsView.m.less';
@@ -7,7 +7,12 @@ import ClipPreview, { formatSecondsToHMS } from 'components-react/highlighter/Cl
 import { ReactSortable } from 'react-sortablejs';
 import Scrollable from 'components-react/shared/Scrollable';
 import { EditingControls } from './EditingControls';
-import { createFinalSortedArray, filterClips, sortAndFilterClips } from './utils';
+import {
+  createFinalSortedArray,
+  filterClips,
+  sortAndFilterClips,
+  useOptimizedHover,
+} from './utils';
 import ClipsViewModal from './ClipsViewModal';
 import ClipsFilter from './ClipsFilter';
 import { useVuex } from 'components-react/hooks';
@@ -151,6 +156,10 @@ export default function ClipExp({
     e.preventDefault();
     e.stopPropagation();
   }
+  console.log('rerender');
+
+  const containerRef = useOptimizedHover();
+
   //TODO: Need performance updateb
   function getClipsView(
     streamId: string | undefined,
@@ -159,6 +168,7 @@ export default function ClipExp({
   ) {
     return (
       <div
+        ref={containerRef}
         style={{ width: '100%', display: 'flex' }}
         className={styles.clipsViewRoot}
         onDrop={event => onDrop(event, streamId)}
@@ -231,6 +241,8 @@ export default function ClipExp({
                         return (
                           <div
                             key={'mini' + id}
+                            data-clip-id={id}
+                            style={{ borderRadius: '6px' }}
                             // onMouseEnter={() => setHoveredId(id)}
                             // onMouseLeave={() => setHoveredId(null)}
                           >
@@ -262,36 +274,37 @@ export default function ClipExp({
                       animation={200}
                       filter=".sortable-ignore"
                       onMove={e => {
-                        // setOnMove(true);
                         return e.related.className.indexOf('sortable-ignore') === -1;
                       }}
-                      // onEnd={() => setOnMove(false)}
                     >
                       {sortedFilteredList.map(({ id }) => {
                         const clip = HighlighterService.views.clipsDictionary[id];
                         return (
                           <div
                             key={clip.path}
-                            // onMouseEnter={() => setHoveredId(id)}
-                            // onMouseLeave={() => setHoveredId(null)}
+                            data-clip-id={id}
                             style={{
+                              padding: '2px',
+                              borderRadius: '18px',
                               margin: '10px 20px 10px 0',
                               width: '100%',
-                              display: 'inline-block',
                             }}
                           >
-                            <ClipPreview
-                              clipId={id}
-                              showTrim={() => {}}
-                              showRemove={() => {
-                                setModal({ modal: 'remove', inspectedPathId: id });
-                                // HighlighterService.views.clips.filter(c => c.path !== clip.path),
-                                // HighlighterService.actions.removeClip(clip.path, streamId);
+                            <div
+                              style={{
+                                backgroundColor: '#111111',
+                                borderRadius: '16px',
                               }}
-                              streamId={streamId}
-                              highlighted={false}
-                              // highlighted={hoveredId === id && !onMove}
-                            />
+                            >
+                              <ClipPreview
+                                clipId={id}
+                                showTrim={() => {}}
+                                showRemove={() => {
+                                  setModal({ modal: 'remove', inspectedPathId: id });
+                                }}
+                                streamId={streamId}
+                              />
+                            </div>
                           </div>
                         );
                       })}
@@ -336,6 +349,7 @@ export default function ClipExp({
     clips.sortedFiltered.map(c => ({ id: c.id })),
   );
 }
+
 function AddClip({
   streamId,
   addedClips,
@@ -373,7 +387,7 @@ function MiniClipPreview({ clipId, highlighted }: { clipId: string; highlighted:
       style={{
         display: clip.enabled ? 'inline-block' : 'none',
         borderRadius: '4px',
-        border: `solid ${clip.enabled ? '2px' : '0px'}  ${highlighted ? '#4F5E65' : 'transparent'}`,
+        border: `solid ${clip.enabled ? '2px' : '0px'}  transparent`,
       }}
     >
       <img

@@ -17,7 +17,6 @@ export default function ClipPreview(props: {
   streamId: string | undefined;
   showTrim: () => void;
   showRemove: () => void;
-  highlighted: boolean;
 }) {
   const { HighlighterService } = Services;
   const v = useVuex(() => ({
@@ -73,7 +72,6 @@ export default function ClipPreview(props: {
         backgroundColor: '#2B383F',
         borderRadius: '16px',
         display: 'flex',
-        border: `solid 1px ${props.highlighted ? '#4F5E65' : 'transparent'}`,
         gap: '16px',
         opacity: v.clip.enabled ? 1.0 : 0.3,
       }}

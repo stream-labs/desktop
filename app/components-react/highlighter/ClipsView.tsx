@@ -306,9 +306,7 @@ export default function ClipsView({
                       setList={clips => setClipOrder(clips, props.id)} //
                       animation={200}
                       filter=".sortable-ignore"
-                      // onEnd={() => setOnMove(false)}
                       onMove={e => {
-                        // setOnMove(true);
                         return e.related.className.indexOf('sortable-ignore') === -1;
                       }}
                     >
@@ -322,14 +320,8 @@ export default function ClipsView({
                               style={{
                                 display: clip.enabled ? 'inline-block' : 'none',
                               }}
-                              // onMouseEnter={() => setHoveredId(id)}
-                              // onMouseLeave={() => setHoveredId(null)}
                             >
-                              <MiniClipPreview
-                                clip={clip}
-                                // highlighted={hoveredId === id && !onMove}
-                                highlighted={false}
-                              ></MiniClipPreview>
+                              <MiniClipPreview clip={clip}></MiniClipPreview>
                             </div>
                           );
                         })}
@@ -384,8 +376,6 @@ export default function ClipsView({
                                   setShowModal('remove');
                                 }}
                                 streamId={streamId}
-                                highlighted={false}
-                                // highlighted={hoveredId === id && !onMove}
                               />
                             </div>
                           );
@@ -431,14 +421,14 @@ export default function ClipsView({
   return getClipsView(props.id, sortedFilteredClipStrings.current, sortedClipStrings.current);
 }
 
-function MiniClipPreview({ clip, highlighted }: { clip: TClip; highlighted: boolean }) {
+function MiniClipPreview({ clip }: { clip: TClip }) {
   return (
     <div
       key={clip.path}
       style={{
         display: 'inline-block',
         borderRadius: '4px',
-        border: `solid 2px ${highlighted ? '#4F5E65' : 'transparent'}`,
+        border: `solid 2px transparent`,
       }}
     >
       <img
