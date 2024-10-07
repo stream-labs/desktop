@@ -298,7 +298,9 @@ export default function ClipExp({
                             >
                               <ClipPreview
                                 clipId={id}
-                                showTrim={() => {}}
+                                showTrim={() => {
+                                  setModal({ modal: 'trim', inspectedPathId: id });
+                                }}
                                 showRemove={() => {
                                   setModal({ modal: 'remove', inspectedPathId: id });
                                 }}
