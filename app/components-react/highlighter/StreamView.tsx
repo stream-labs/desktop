@@ -111,7 +111,6 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
       return;
     }
     setClipsOfStreamAreLoading(id);
-    HighlighterService.actions.enableOnlySpecificClips(HighlighterService.views.clips, id);
     try {
       await HighlighterService.loadClips(id);
       setClipsOfStreamAreLoading(null);
@@ -128,7 +127,6 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
     }
 
     setClipsOfStreamAreLoading(id);
-    HighlighterService.actions.enableOnlySpecificClips(HighlighterService.views.clips, id);
 
     try {
       await HighlighterService.loadClips(id);
