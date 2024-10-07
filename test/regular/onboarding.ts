@@ -73,7 +73,7 @@ test('Go through onboarding', async t => {
   await clickIfDisplayed('div=Start Fresh');
 
   // Skip hardware config
-  await waitForDisplayed('h1=Set Up Mic and Webcam');
+  await waitForDisplayed('h1=Set up your mic & webcam');
   await clickIfDisplayed('button=Skip');
 
   // Skip picking a theme
@@ -116,7 +116,7 @@ test.skip('Go through the onboarding and autoconfig', async t => {
   await clickIfDisplayed('div=Start Fresh');
 
   // Skip hardware config
-  await waitForDisplayed('h1=Set Up Mic and Webcam');
+  await waitForDisplayed('h1=Set up your mic & webcam');
   await clickIfDisplayed('button=Skip');
 
   // Skip picking a theme
