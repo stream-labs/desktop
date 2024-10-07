@@ -49,7 +49,8 @@ export class TwitterPlatformService
   };
 
   readonly capabilities = new Set<TPlatformCapability>(['title', 'viewerCount']);
-  readonly apiBase = 'https://api.twitter.com/2';
+  readonly apiBase = 'https://api.x.com/2';
+  readonly domain = 'https://x.com';
   readonly platform = 'twitter';
   readonly displayName = 'X (Twitter)';
   readonly gameImageSize = { width: 30, height: 40 };
@@ -209,9 +210,9 @@ export class TwitterPlatformService
   }
 
   get chatUrl() {
-    const broadcastId = this.state.broadcastId;
-    if (!broadcastId) return '';
-    return `https://twitter.com/i/broadcasts/${broadcastId}/chat`;
+    const username = this.userService.state.auth?.platforms?.twitter?.username;
+    if (!username) return '';
+    return `${this.domain}/${username}/chat`;
   }
 
   @mutation()
@@ -225,7 +226,7 @@ export class TwitterPlatformService
   }
 
   openStreamIneligibleHelp() {
-    const url = 'https://x.com/Live/status/1812291533162590577';
+    const url = `${this.domain}/Live/status/1812291533162590577`;
     return remote.shell.openExternal(url);
   }
 }
