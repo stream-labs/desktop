@@ -48,15 +48,29 @@ export default function ClipExp({
       setLoaded(true);
       console.log('clips loaded');
     }
+    console.log(props.id);
+
     setLoaded(false);
-    setClips(sortAndFilterClips(HighlighterService.views.clips, props.id, activeFilter));
+    setClips(
+      sortAndFilterClips(
+        HighlighterService.getClips(HighlighterService.views.clips, props.id),
+        props.id,
+        activeFilter,
+      ),
+    );
     loadClips();
   }, [props.id]);
 
   useEffect(() => {
     console.log('activeFilter', activeFilter);
 
-    setClips(sortAndFilterClips(HighlighterService.views.clips, props.id, activeFilter));
+    setClips(
+      sortAndFilterClips(
+        HighlighterService.getClips(HighlighterService.views.clips, props.id),
+        props.id,
+        activeFilter,
+      ),
+    );
   }, [activeFilter]);
 
   const [modal, setModal] = useState<{ modal: TModalClipsView; inspectedPathId?: string } | null>(
@@ -170,7 +184,11 @@ export default function ClipExp({
                 streamId={props.id}
                 addedClips={() => {
                   setClips(
-                    sortAndFilterClips(HighlighterService.views.clips, props.id, activeFilter),
+                    sortAndFilterClips(
+                      HighlighterService.getClips(HighlighterService.views.clips, props.id),
+                      props.id,
+                      activeFilter,
+                    ),
                   );
                 }}
               />
@@ -302,7 +320,9 @@ export default function ClipExp({
           deleteClip={(clipId, streamId) =>
             setClips(
               sortAndFilterClips(
-                HighlighterService.views.clips.filter(c => c.path !== clipId),
+                HighlighterService.getClips(HighlighterService.views.clips, props.id).filter(
+                  c => c.path !== clipId,
+                ),
                 streamId,
                 'all',
               ),
