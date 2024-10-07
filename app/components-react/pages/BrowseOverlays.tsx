@@ -25,8 +25,6 @@ export default function BrowseOverlays(p: {
     NotificationsService,
     JsonrpcService,
     RestreamService,
-    // TODO: we're grabbing this just to suggest name
-    SourcesService,
     MediaBackupService,
   } = Services;
   const [downloading, setDownloading] = useState(false);
@@ -124,6 +122,11 @@ export default function BrowseOverlays(p: {
    * @throws When URL is a not a Streamlabs CDN URL.
    * @throws When scene for the provided scene ID can't be found.
    * @throws When it fails to create the source.
+   *
+   * @remarks When using a gif, the type should be set to `video` due to some
+   * inconsistencies we found with image source, namely around playback being
+   * shoppy or sometimes not displaying at all. Granted, we tested remote files
+   * at the start, so this might not be true for local files which are now downloaded.
    */
   async function addCollectibleToScene(
     name: string,
@@ -147,14 +150,13 @@ export default function BrowseOverlays(p: {
     // TODO: find or create enum
     const sourceType = type === 'video' ? 'ffmpeg_source' : 'image_source';
 
-    // TODO: do we want the caller to provide name?
     const sourceName = name;
 
     const filename = path.basename(assetURL);
     const dest = path.join(MediaBackupService.mediaDirectory, filename);
 
     // TODO: refactor all this
-    // TODO: media backup
+    // TODO: test if media backup is working automatically or we need changes
     let localFile;
 
     try {
@@ -163,8 +165,6 @@ export default function BrowseOverlays(p: {
     } catch {
       throw new Error('Error downloading file to local system');
     }
-
-    console.log('File downloaded');
 
     const sourceSettings =
       type === 'video' ? { looping: true, local_file: localFile } : { file: localFile };
