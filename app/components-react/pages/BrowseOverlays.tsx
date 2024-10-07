@@ -139,10 +139,10 @@ export default function BrowseOverlays(p: {
     }
 
     if (
-      !(
-        assetURL.startsWith('https://cdn.streamlabs.com/marketplace') ||
-        assetURL.startsWith('https://streamlabs-marketplace-staging.streamlabs.com')
-      )
+      !hasValidHost(assetURL, [
+        'cdn.streamlabs.com',
+        'streamlabs-marketplace-staging.streamlabs.com',
+      ])
     ) {
       throw new Error('Invalid asset URL');
     }
@@ -177,6 +177,11 @@ export default function BrowseOverlays(p: {
     );
   }
 
+  function hasValidHost(url: string, trustedHosts: string[]) {
+    const host = new urlLib.URL(url).hostname;
+    return trustedHosts.includes(host);
+  }
+
   async function installOverlayBase(
     url: string,
     name: string,
@@ -184,6 +189,7 @@ export default function BrowseOverlays(p: {
     mergePlatform = false,
   ) {
     return new Promise<void>((resolve, reject) => {
+      // TODO: refactor to use hasValidHost
       const host = new urlLib.URL(url).hostname;
       const trustedHosts = ['cdn.streamlabs.com'];
       if (!trustedHosts.includes(host)) {
