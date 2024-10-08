@@ -1093,6 +1093,8 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
       this.clips[c.path] = this.clips[c.path] ?? new Clip(c.path);
     }
+
+    //TODO M: tracking type not correct
     await pmap(
       clipsToLoad.filter(c => !c.loaded),
       c => this.clips[c.path].init(),
@@ -1103,8 +1105,6 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
             type: 'ClipImport',
             source: completed.source,
           });
-          console.log('completed', completed.path);
-
           this.UPDATE_CLIP({
             path: completed.path,
             loaded: true,

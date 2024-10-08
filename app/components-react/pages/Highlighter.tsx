@@ -1,4 +1,3 @@
-import ClipsView from 'components-react/highlighter/ClipsView';
 import SettingsView from 'components-react/highlighter/SettingsView';
 import { useVuex } from 'components-react/hooks';
 import React, { useEffect, useState } from 'react';
@@ -7,7 +6,7 @@ import { Services } from 'components-react/service-provider';
 import { Button } from 'antd';
 import moment from 'moment';
 import StreamView from 'components-react/highlighter/StreamView';
-import ClipExp from 'components-react/highlighter/ClipExp';
+import ClipsView from 'components-react/highlighter/ClipsView';
 
 export default function Highlighter(props: { params?: { view: string } }) {
   const openViewFromParams = props?.params?.view || '';
@@ -59,7 +58,7 @@ export default function Highlighter(props: { params?: { view: string } }) {
     case 'clips':
       return (
         <>
-          <ClipExp
+          <ClipsView
             emitSetView={data => {
               setViewFromEmit(data);
             }}

@@ -1,30 +1,25 @@
-import { useVuex } from 'components-react/hooks';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import * as remote from '@electron/remote';
 import { Services } from 'components-react/service-provider';
 import styles from './ClipsView.m.less';
-import { IViewState, TClip, TStreamInfo } from 'services/highlighter';
+import { IViewState, TClip } from 'services/highlighter';
 import ClipPreview, { formatSecondsToHMS } from 'components-react/highlighter/ClipPreview';
-import ClipTrimmer from 'components-react/highlighter/ClipTrimmer';
 import { ReactSortable } from 'react-sortablejs';
-import Form from 'components-react/shared/inputs/Form';
-import isEqual from 'lodash/isEqual';
-import { SliderInput, FileInput, SwitchInput } from 'components-react/shared/inputs';
-import { Modal, Button, Alert } from 'antd';
-import ExportModal from 'components-react/highlighter/ExportModal';
-import PreviewModal from 'components-react/highlighter/PreviewModal';
-import { SCRUB_HEIGHT, SCRUB_WIDTH, SUPPORTED_FILE_TYPES } from 'services/highlighter/constants';
-import path from 'path';
 import Scrollable from 'components-react/shared/Scrollable';
-import { IHotkey } from 'services/hotkeys';
-import { getBindingString } from 'components-react/shared/HotkeyBinding';
-import Animate from 'rc-animate';
-import TransitionSelector from 'components-react/highlighter/TransitionSelector';
-import { $t } from 'services/i18n';
-import * as remote from '@electron/remote';
-import { sort } from 'semver';
 import { EditingControls } from './EditingControls';
+import {
+  createFinalSortedArray,
+  filterClips,
+  sortAndFilterClips,
+  useOptimizedHover,
+} from './utils';
+import ClipsViewModal from './ClipsViewModal';
 import ClipsFilter from './ClipsFilter';
-import { createFinalSortedArray, filterClips, sortClips } from './utils';
+import { useVuex } from 'components-react/hooks';
+import { Button } from 'antd';
+import { SCRUB_HEIGHT, SCRUB_WIDTH, SUPPORTED_FILE_TYPES } from 'services/highlighter/constants';
+import { $t } from 'services/i18n';
+import path from 'path';
 
 export type TModalClipsView = 'trim' | 'export' | 'preview' | 'remove';
 
@@ -40,120 +35,64 @@ export default function ClipsView({
   props: IClipsViewProps;
   emitSetView: (data: IViewState) => void;
 }) {
-  console.log('Render ClipsView');
+  const { HighlighterService, UsageStatisticsService } = Services;
 
-  const { HighlighterService, HotkeysService, UsageStatisticsService } = Services;
-  const v = useVuex(() => ({
-    clips: HighlighterService.views.clips,
-    exportInfo: HighlighterService.views.exportInfo,
-    uploadInfo: HighlighterService.views.uploadInfo,
-    loadedCount: HighlighterService.views.loadedCount,
-    loaded: HighlighterService.getClipsLoaded(HighlighterService.views.clips, props.id),
-    dismissedTutorial: HighlighterService.views.dismissedTutorial,
-    error: HighlighterService.views.error,
-  }));
-  console.log('iv', HighlighterService.views.clips);
-  console.log('v', v.clips);
-  const loadedClips = v.clips;
-  const clipMap = new Map(loadedClips.map(clip => [clip.path, clip]));
-  HighlighterService.actions.loadClips();
-  // const [tempClipList, setTempClipList] = useState<{ id: string }[]>([]);
-  const [showModal, rawSetShowModal] = useState<TModalClipsView | null>(null);
-  const [modalWidth, setModalWidth] = useState('700px');
+  const [clips, setClips] = useState<{
+    sorted: { id: string }[];
+    sortedFiltered: { id: string }[];
+  }>({ sorted: [], sortedFiltered: [] });
+
   const [activeFilter, setActiveFilter] = useState('all');
-  const sortedClips = useRef<TClip[]>([]);
-  const sortedFilteredClips = useRef<TClip[]>([]);
 
-  const sortedClipStrings = useRef<{ id: string }[]>([]);
-  const sortedFilteredClipStrings = useRef<{ id: string }[]>([]);
-  // const [updateTrigger, setUpdateTrigger] = useState(0);
-
-  sortedClips.current = sortClips(loadedClips, props.id);
-  sortedFilteredClips.current = filterClips(sortedClips.current, activeFilter);
-  sortedClipStrings.current = sortedClips.current.map(clip => ({ id: clip.path }));
-  sortedFilteredClipStrings.current = sortedFilteredClips.current.map(clip => ({
-    id: clip.path,
-  }));
-
-  // const [shownSortedFilteredClipStrings, setShownSortedFilteredClipStrings] = useState<
-  //   { id: string }[]
-  // >([]);
-  // const [shownSortedClipStrings, setShownSortedClipStrings] = useState<{ id: string }[]>([]);
-  // // await HighlighterService.actions.return.getClip. TODO M: Check if it cal stay like this
-
-  // const { loadedClips, clipMap } = useMemo(() => {
-  //   const loadedClips = HighlighterService.getClips(v.clips, props.id);
-  //   console.log('run');
-  //   HighlighterService.actions.loadClips(props.id);
-  //   return {
-  //     loadedClips,
-  //     clipMap: new Map(loadedClips.map(clip => [clip.path, clip])),
-  //   };
-  // }, [v.clips, props.id]);
-
-  // useEffect(() => {
-  //   sortedClips.current = sortClips(loadedClips, props.id);
-  //   sortedFilteredClips.current = filterClips(sortedClips.current, activeFilter);
-  //   sortedClipStrings.current = sortedClips.current.map(clip => ({ id: clip.path }));
-  //   sortedFilteredClipStrings.current = sortedFilteredClips.current.map(clip => ({
-  //     id: clip.path,
-  //   }));
-  //   setUpdateTrigger(prev => prev + 1); // This will cause a re-render
-  // }, [activeFilter, loadedClips]);
-
-  // useEffect(() => {
-  //   setShownSortedFilteredClipStrings(sortedFilteredClipStrings.current);
-  //   setShownSortedClipStrings(sortedClipStrings.current);
-  // }, [updateTrigger]);
-  // useEffect(() => UsageStatisticsService.actions.recordFeatureUsage('Highlighter'), []);
-
-  // // This is kind of weird, but ensures that modals stay the right
-  // // size while the closing animation is played. This is why modal
-  // // width has its own state. This makes sure we always set the right
-  // // size whenever displaying a modal.
-  function setShowModal(modal: TModalClipsView | null) {
-    rawSetShowModal(modal);
-
-    if (modal) {
-      setModalWidth(
-        {
-          trim: '60%',
-          preview: '700px',
-          export: '700px',
-          remove: '400px',
-        }[modal],
-      );
+  const [loaded, setLoaded] = useState<boolean>(false);
+  useEffect(() => {
+    async function loadClips() {
+      await HighlighterService.actions.return.loadClips(props.id);
+      setLoaded(true);
     }
-  }
+    console.log(props.id);
 
-  function getLoadingView() {
-    return (
-      <div className={styles.clipLoader} style={{ display: 'grid', placeContent: 'center' }}>
-        <h2>Loading</h2>
-        <p>
-          {' '}
-          {loadedClips.filter(clip => clip.loaded === true).length}/{loadedClips.length} Clips
-        </p>
-      </div>
+    setLoaded(false);
+    setClips(
+      sortAndFilterClips(
+        HighlighterService.getClips(HighlighterService.views.clips, props.id),
+        props.id,
+        activeFilter,
+      ),
     );
-  }
+    loadClips();
+  }, [props.id]);
 
-  function setClipOrder(clips: { id: string }[], streamId: string | undefined) {
-    let newOrderOfSomeItems = clips.map(c => c.id);
-    let allItemArray = sortedClipStrings.current.map(c => c.id);
+  useEffect(() => {
+    setClips(
+      sortAndFilterClips(
+        HighlighterService.getClips(HighlighterService.views.clips, props.id),
+        props.id,
+        activeFilter,
+      ),
+    );
+  }, [activeFilter]);
+
+  useEffect(() => UsageStatisticsService.actions.recordFeatureUsage('Highlighter'), []);
+
+  const [modal, setModal] = useState<{ modal: TModalClipsView; inspectedPathId?: string } | null>(
+    null,
+  );
+
+  function setClipOrder(listClips: { id: string }[], streamId: string | undefined) {
+    let newOrderOfSomeItems = listClips.map(c => c.id);
+    let allItemArray = clips.sorted.map(c => c.id);
     const newClipArray = createFinalSortedArray(newOrderOfSomeItems, allItemArray);
+    const oldClipArray = clips.sorted.map(c => c.id);
 
-    const oldClipArray = sortedClipStrings.current.map(c => c.id);
     // const newClipArray = clips.map(c => c.id);
 
     if (JSON.stringify(newClipArray) === JSON.stringify(oldClipArray)) {
       return;
     } else {
       if (streamId) {
-        newClipArray.forEach((clip, index) => {
-          const clipPath = clip;
-
-          const existingClip = loadedClips.find(c => c.path === clipPath);
+        newClipArray.forEach((clipId, index) => {
+          const existingClip = HighlighterService.views.clipsDictionary[clipId];
           let updatedStreamInfo;
           if (existingClip) {
             updatedStreamInfo = {
@@ -166,7 +105,7 @@ export default function ClipsView({
           }
 
           HighlighterService.actions.UPDATE_CLIP({
-            path: clipPath,
+            path: clipId,
             streamInfo: updatedStreamInfo,
           });
         });
@@ -180,44 +119,17 @@ export default function ClipsView({
         });
       }
 
-      sortedClipStrings.current = newClipArray.map(c => ({ id: c }));
-      sortedFilteredClipStrings.current = clips.filter(clip => {
-        const fullClip = clipMap.get(clip.id);
-        if (!fullClip) return false; // Skip if the clip is not found in the map
+      const updatedClips = newClipArray.map(
+        clipId => HighlighterService.views.clipsDictionary[clipId],
+      );
 
-        switch (activeFilter) {
-          case 'ai':
-            return fullClip.source === 'AiClip';
-          case 'manual':
-            return fullClip.source === 'Manual' || fullClip.source === 'ReplayBuffer';
-          case 'all':
-          default:
-            return true;
-        }
+      setClips({
+        sorted: newClipArray.map(c => ({ id: c })),
+        sortedFiltered: filterClips(updatedClips, activeFilter).map(c => ({ id: c.path })),
       });
-      // setUpdateTrigger(prev => prev + 1);
       return;
     }
   }
-
-  const [inspectedClipPath, setInspectedClipPath] = useState<string | null>(null);
-  let inspectedClip: TClip | null;
-
-  if (inspectedClipPath) {
-    inspectedClip = loadedClips.find(c => c.path === inspectedClipPath) ?? null;
-  }
-
-  function closeModal() {
-    // Do not allow closing export modal while export/upload operations are in progress
-    if (v.exportInfo.exporting) return;
-    if (v.uploadInfo.uploading) return;
-
-    setInspectedClipPath(null);
-    setShowModal(null);
-
-    if (v.error) HighlighterService.actions.dismissError();
-  }
-
   function onDrop(e: React.DragEvent<HTMLDivElement>, streamId: string | undefined) {
     const extensions = SUPPORTED_FILE_TYPES.map(e => `.${e}`);
     const files: string[] = [];
@@ -241,20 +153,17 @@ export default function ClipsView({
     e.stopPropagation();
   }
 
+  const containerRef = useOptimizedHover();
+
   //TODO: Need performance updateb
   function getClipsView(
     streamId: string | undefined,
-    sortedFilteredList: { id: string }[],
     sortedList: { id: string }[],
+    sortedFilteredList: { id: string }[],
   ) {
-    // const [hoveredId, setHoveredId] = useState<string | null>(null);
-    // const [onMove, setOnMove] = useState<boolean>(false);
-    // console.log('rendering clips view');
-    const totalDuration = loadedClips
-      .filter(c => c.enabled)
-      .reduce((acc, clip) => acc + clip.duration! - clip.startTrim! - clip.endTrim!, 0);
     return (
       <div
+        ref={containerRef}
         style={{ width: '100%', display: 'flex' }}
         className={styles.clipsViewRoot}
         onDrop={event => onDrop(event, streamId)}
@@ -276,14 +185,25 @@ export default function ClipsView({
               </div>
             </div>
             <div>
-              <AddClip streamId={props.id} />
+              <AddClip
+                streamId={props.id}
+                addedClips={() => {
+                  setClips(
+                    sortAndFilterClips(
+                      HighlighterService.getClips(HighlighterService.views.clips, props.id),
+                      props.id,
+                      activeFilter,
+                    ),
+                  );
+                }}
+              />
             </div>
           </div>
-          {loadedClips.length === 0 ? (
+          {sortedList.length === 0 ? (
             <> No clips found</>
           ) : (
             <>
-              {v.loaded ? (
+              {loaded ? (
                 <>
                   <Scrollable
                     horizontal={true}
@@ -306,25 +226,29 @@ export default function ClipsView({
                       setList={clips => setClipOrder(clips, props.id)} //
                       animation={200}
                       filter=".sortable-ignore"
+                      // onEnd={() => setOnMove(false)}
                       onMove={e => {
+                        // setOnMove(true);
                         return e.related.className.indexOf('sortable-ignore') === -1;
                       }}
                     >
-                      {sortedList
-                        .filter(c => clipMap.has(c.id))
-                        .map(({ id }) => {
-                          const clip = clipMap.get(id)!;
-                          return (
-                            <div
-                              key={'mini' + clip.path}
-                              style={{
-                                display: clip.enabled ? 'inline-block' : 'none',
-                              }}
-                            >
-                              <MiniClipPreview clip={clip}></MiniClipPreview>
-                            </div>
-                          );
-                        })}
+                      {sortedList.map(({ id }) => {
+                        return (
+                          <div
+                            key={'mini' + id}
+                            data-clip-id={id}
+                            style={{ borderRadius: '6px' }}
+                            // onMouseEnter={() => setHoveredId(id)}
+                            // onMouseLeave={() => setHoveredId(null)}
+                          >
+                            <MiniClipPreview
+                              clipId={id}
+                              // highlighted={hoveredId === id && !onMove}
+                              highlighted={false}
+                            ></MiniClipPreview>
+                          </div>
+                        );
+                      })}
                     </ReactSortable>
                   </Scrollable>{' '}
                   <div
@@ -335,7 +259,8 @@ export default function ClipsView({
                       justifyContent: 'space-between',
                     }}
                   >
-                    <span>0m 0s</span> <span> {formatSecondsToHMS(totalDuration)} </span>
+                    <span>0m 0s</span>
+                    <VideoDuration streamId={streamId} />
                   </div>
                   <ClipsFilter activeFilter={activeFilter} onFilterChange={setActiveFilter} />
                   <Scrollable style={{ flexGrow: 1, padding: '20px 20px 20px 20px' }}>
@@ -345,90 +270,136 @@ export default function ClipsView({
                       animation={200}
                       filter=".sortable-ignore"
                       onMove={e => {
-                        // setOnMove(true);
                         return e.related.className.indexOf('sortable-ignore') === -1;
                       }}
-                      // onEnd={() => setOnMove(false)}
                     >
-                      {sortedFilteredList
-                        .filter(c => clipMap.has(c.id))
-                        .map(({ id }) => {
-                          const clip = clipMap.get(id)!;
-                          return (
+                      {sortedFilteredList.map(({ id }) => {
+                        const clip = HighlighterService.views.clipsDictionary[id];
+                        return (
+                          <div
+                            key={clip.path}
+                            data-clip-id={id}
+                            style={{
+                              padding: '2px',
+                              borderRadius: '18px',
+                              margin: '10px 20px 10px 0',
+                              width: '100%',
+                            }}
+                          >
                             <div
-                              key={clip.path}
-                              // onMouseEnter={() => setHoveredId(id)}
-                              // onMouseLeave={() => setHoveredId(null)}
                               style={{
-                                margin: '10px 20px 10px 0',
-                                width: '100%',
-                                display: 'inline-block',
+                                backgroundColor: '#111111',
+                                borderRadius: '16px',
                               }}
                             >
                               <ClipPreview
                                 clipId={id}
                                 showTrim={() => {
-                                  setInspectedClipPath(clip.path);
-                                  setShowModal('trim');
+                                  setModal({ modal: 'trim', inspectedPathId: id });
                                 }}
                                 showRemove={() => {
-                                  setInspectedClipPath(clip.path);
-                                  setShowModal('remove');
+                                  setModal({ modal: 'remove', inspectedPathId: id });
                                 }}
                                 streamId={streamId}
                               />
                             </div>
-                          );
-                        })}
+                          </div>
+                        );
+                      })}
                     </ReactSortable>
                   </Scrollable>
                 </>
               ) : (
-                getLoadingView()
+                <ClipsLoadingView clips={clips.sorted} />
               )}
             </>
           )}
         </div>
-        {
-          <EditingControls
-            emitSetShowModal={(modal: TModalClipsView) => {
-              setShowModal(modal);
-            }}
-          />
-        }
-        <Modal
-          getContainer={`.${styles.clipsViewRoot}`}
-          onCancel={closeModal}
-          footer={null}
-          width={modalWidth}
-          closable={false}
-          visible={!!showModal || !!v.error}
-          destroyOnClose={true}
-          keyboard={false}
-        >
-          {!!v.error && <Alert message={v.error} type="error" showIcon />}
-          {inspectedClip && showModal === 'trim' && <ClipTrimmer clip={inspectedClip} />}
-          {showModal === 'export' && <ExportModal close={closeModal} streamId={streamId} />}
-          {showModal === 'preview' && <PreviewModal close={closeModal} streamId={streamId} />}
-          {inspectedClip && showModal === 'remove' && (
-            <RemoveClip close={closeModal} clip={inspectedClip} streamId={streamId} />
-          )}
-        </Modal>
+        <EditingControls
+          emitSetShowModal={(modal: TModalClipsView) => {
+            setModal({ modal });
+          }}
+        />
+        <ClipsViewModal
+          streamId={props.id}
+          modal={modal}
+          onClose={() => setModal(null)}
+          deleteClip={(clipId, streamId) =>
+            setClips(
+              sortAndFilterClips(
+                HighlighterService.getClips(HighlighterService.views.clips, props.id).filter(
+                  c => c.path !== clipId,
+                ),
+                streamId,
+                'all',
+              ),
+            )
+          }
+        />
       </div>
     );
   }
+
   // return getClipsView(props.id, shownSortedFilteredClipStrings, shownSortedClipStrings);
-  return getClipsView(props.id, sortedFilteredClipStrings.current, sortedClipStrings.current);
+  return getClipsView(
+    props.id,
+    clips.sorted.map(c => ({ id: c.id })),
+    clips.sortedFiltered.map(c => ({ id: c.id })),
+  );
 }
 
-function MiniClipPreview({ clip }: { clip: TClip }) {
+function VideoDuration({ streamId }: { streamId: string | undefined }) {
+  const { HighlighterService } = Services;
+
+  const clips = useVuex(() =>
+    HighlighterService.getClips(HighlighterService.views.clips, streamId),
+  );
+
+  const totalDuration = clips
+    .filter(c => c.enabled)
+    .reduce((acc, clip) => acc + clip.duration! - clip.startTrim! - clip.endTrim!, 0);
+
+  return <span>{formatSecondsToHMS(totalDuration)}</span>;
+}
+
+function AddClip({
+  streamId,
+  addedClips,
+}: {
+  streamId: string | undefined;
+  addedClips: () => void;
+}) {
+  const { HighlighterService } = Services;
+
+  async function openClips() {
+    const selections = await remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
+      properties: ['openFile', 'multiSelections'],
+      filters: [{ name: $t('Video Files'), extensions: SUPPORTED_FILE_TYPES }],
+    });
+
+    if (selections && selections.filePaths) {
+      await HighlighterService.actions.return.addClips(
+        selections.filePaths.map(path => ({ path })),
+        streamId,
+        'Manual',
+      );
+      await HighlighterService.actions.return.loadClips(streamId);
+      addedClips();
+    }
+  }
+  return <Button onClick={() => openClips()}>{$t('Add Clip')}</Button>;
+}
+
+function MiniClipPreview({ clipId, highlighted }: { clipId: string; highlighted: boolean }) {
+  const { HighlighterService } = Services;
+  const clip = useVuex(() => HighlighterService.views.clipsDictionary[clipId] as TClip);
   return (
     <div
       key={clip.path}
       style={{
-        display: 'inline-block',
+        display: clip.enabled ? 'inline-block' : 'none',
         borderRadius: '4px',
-        border: `solid 2px transparent`,
+        border: `solid ${clip.enabled ? '2px' : '0px'}  transparent`,
       }}
     >
       <img
@@ -444,52 +415,19 @@ function MiniClipPreview({ clip }: { clip: TClip }) {
     </div>
   );
 }
-
-function AddClip({ streamId }: { streamId: string | undefined }) {
+function ClipsLoadingView({ clips }: { clips: { id: string }[] }) {
   const { HighlighterService } = Services;
-
-  async function openClips() {
-    const selections = await remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
-      properties: ['openFile', 'multiSelections'],
-      filters: [{ name: $t('Video Files'), extensions: SUPPORTED_FILE_TYPES }],
-    });
-
-    if (selections && selections.filePaths) {
-      HighlighterService.actions.addClips(
-        selections.filePaths.map(path => ({ path })),
-        streamId,
-        'Manual',
-      );
-    }
-  }
-
-  return <Button onClick={() => openClips()}>{$t('Add Clip')}</Button>;
-}
-
-function RemoveClip(p: { clip: TClip; streamId: string | undefined; close: () => void }) {
-  const { HighlighterService } = Services;
+  const v = useVuex(() => ({
+    loadedCount: HighlighterService.views.loadedCount,
+  }));
 
   return (
-    <div style={{ textAlign: 'center' }}>
-      <h2>{$t('Remove the clip?')}</h2>
+    <div className={styles.clipLoader} style={{ display: 'grid', placeContent: 'center' }}>
+      <h2>Loading</h2>
       <p>
-        {$t(
-          'Are you sure you want to remove the clip? You will need to manually import it again to reverse this action.',
-        )}
+        {' '}
+        {v.loadedCount}/{clips.length} Clips
       </p>
-      <Button style={{ marginRight: 8 }} onClick={p.close}>
-        {$t('Cancel')}
-      </Button>
-      <Button
-        type="primary"
-        danger
-        onClick={() => {
-          HighlighterService.actions.removeClip(p.clip.path, p.streamId);
-          p.close();
-        }}
-      >
-        {$t('Remove')}
-      </Button>
     </div>
   );
 }
