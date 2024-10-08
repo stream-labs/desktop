@@ -377,6 +377,18 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       // set dual output as default for new users and add default sources to scene
       this.setDualOutputMode(true, true);
 
+      // add game capture source
+      const gameCapture = scene.createAndAddSource(
+        'Game Capture',
+        'game_capture',
+        {},
+        { display: 'horizontal' },
+      );
+      this.createPartnerNode(gameCapture);
+
+      // add alert box widget
+      this.widgetsService.createWidget(WidgetType.AlertBox, 'Alert Box');
+
       // add webcam source
       const type = byOS({
         [OS.Windows]: 'dshow_input',
@@ -391,18 +403,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         const cam = scene.addSource(webCam.sourceId, { display: 'horizontal' });
         this.createPartnerNode(cam);
       }
-
-      // add game capture source
-      const gameCapture = scene.createAndAddSource(
-        'Game Capture',
-        'game_capture',
-        {},
-        { display: 'horizontal' },
-      );
-      this.createPartnerNode(gameCapture);
-
-      // add alert box widget
-      this.widgetsService.createWidget(WidgetType.AlertBox, 'Alert Box');
     });
 
     /**
