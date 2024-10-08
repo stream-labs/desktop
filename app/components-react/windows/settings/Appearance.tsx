@@ -5,8 +5,6 @@ import { Row, Col, Select } from 'antd';
 import { CheckboxInput, ListInput, SliderInput, SwitchInput } from '../../shared/inputs';
 import { getDefined } from '../../../util/properties-type-guards';
 import { ObsSettingsSection } from './ObsSettings';
-import * as remote from '@electron/remote';
-import { injectFormBinding, useModule } from 'slap';
 import { ENavName, EMenuItemKey, IAppMenuItem, menuTitles } from 'services/side-nav';
 import { useVuex } from 'components-react/hooks';
 import styles from './Appearance.m.less';
@@ -16,6 +14,7 @@ import Scrollable from 'components-react/shared/Scrollable';
 import UltraIcon from 'components-react/shared/UltraIcon';
 import { CustomizationState } from 'services/customization';
 import { useRealmObject } from 'components-react/hooks/realm';
+import { bindFormState } from 'components-react/shared/inputs';
 
 const { Option } = Select;
 
@@ -33,17 +32,10 @@ export function AppearanceSettings() {
   // Hooks up reactivity for Customization state
   useRealmObject(CustomizationService.state);
 
-  const { bind } = useModule(() => {
-    function getSettings() {
-      return CustomizationService.state.toObject() as CustomizationState;
-    }
-
-    function setSettings(newSettings: CustomizationState) {
-      CustomizationService.actions.setSettings(newSettings as any);
-    }
-
-    return { bind: injectFormBinding(getSettings, setSettings) };
-  });
+  const bind = bindFormState(
+    () => CustomizationService.state.toObject() as CustomizationState,
+    (newSettings: CustomizationState) => CustomizationService.setSettings(newSettings as any),
+  );
 
   const {
     compactView,

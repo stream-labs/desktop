@@ -1317,6 +1317,7 @@ export class StreamingService
         eventMetadata.streamType = streamSettings.streamType;
         eventMetadata.platform = streamSettings.platform;
         eventMetadata.server = streamSettings.server;
+        eventMetadata.outputMode = this.views.isDualOutputMode ? 'dual' : 'single';
         eventMetadata.platforms = this.views.protectedModeEnabled
           ? [
               ...this.views.enabledPlatforms,
@@ -1573,6 +1574,7 @@ export class StreamingService
     data.viewerCounts = {};
     data.duration = Math.round(moment().diff(moment(this.state.streamingStatusTime)) / 1000);
     data.game = this.views.game;
+    data.outputMode = this.views.isDualOutputMode ? 'dual' : 'single';
 
     if (this.views.protectedModeEnabled) {
       data.platforms = this.views.enabledPlatforms;

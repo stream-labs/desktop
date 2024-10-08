@@ -25,7 +25,13 @@ export enum ETikTokLiveScopeReason {
   APPROVED_OBS = 2,
 }
 
+export enum ETikTokAudienceType {
+  ALL = 0,
+  MATURE = 1,
+}
+
 export type TTikTokLiveScopeTypes = 'approved' | 'denied' | 'legacy' | 'relog';
+export type TTikTokApplicationStatus = 'approved' | 'rejected' | 'never-applied';
 
 export interface ITikTokLiveScopeResponse {
   platform: TPlatform | string;
@@ -33,6 +39,8 @@ export interface ITikTokLiveScopeResponse {
   can_be_live?: boolean;
   user?: ITikTokUserData;
   info?: any[] | null[] | undefined[] | ITikTokGame[] | ITikTokGamesData | any;
+  audience_controls_info: ITikTokAudienceControlsInfo;
+  application_status: ITikTokApplicationStatus;
 }
 
 export interface ITikTokGamesData extends ITikTokLiveScopeResponse {
@@ -47,6 +55,22 @@ export interface ITikTokGamesData extends ITikTokLiveScopeResponse {
 interface ITikTokGame {
   full_name: string;
   game_mask_id: string;
+}
+
+export interface ITikTokAudienceControlsInfo {
+  disable: boolean;
+  info_type: ETikTokAudienceType;
+  types: ITikTokAudienceControlType[];
+}
+
+export interface ITikTokAudienceControlType {
+  key: ETikTokAudienceType;
+  label: string | null;
+}
+
+export interface ITikTokApplicationStatus {
+  status: string;
+  timestamp: string | null;
 }
 
 export interface ITikTokUserData {

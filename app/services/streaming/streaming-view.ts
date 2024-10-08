@@ -483,8 +483,14 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
       settings['liveVideoId'] = '';
     }
 
+    // make sure platforms assigned to the vertical display in dual output mode still go live in single output mode
+    const display = this.isDualOutputMode
+      ? this.dualOutputView.getPlatformDisplay(platform)
+      : 'horizontal';
+
     return {
       ...settings,
+      display,
       enabled,
       useCustomFields,
     };
