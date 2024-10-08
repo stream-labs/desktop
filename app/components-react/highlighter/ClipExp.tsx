@@ -264,7 +264,8 @@ export default function ClipExp({
                       justifyContent: 'space-between',
                     }}
                   >
-                    <span>0m 0s</span> <span> {formatSecondsToHMS(0)} </span>
+                    <span>0m 0s</span>
+                    <VideoDuration streamId={streamId} />
                   </div>
                   <ClipsFilter activeFilter={activeFilter} onFilterChange={setActiveFilter} />
                   <Scrollable style={{ flexGrow: 1, padding: '20px 20px 20px 20px' }}>
@@ -311,7 +312,7 @@ export default function ClipExp({
                         );
                       })}
                     </ReactSortable>
-                  </Scrollable>{' '}
+                  </Scrollable>
                 </>
               ) : (
                 <ClipsLoadingView clips={clips.sorted} />
@@ -350,6 +351,20 @@ export default function ClipExp({
     clips.sorted.map(c => ({ id: c.id })),
     clips.sortedFiltered.map(c => ({ id: c.id })),
   );
+}
+
+function VideoDuration({ streamId }: { streamId: string | undefined }) {
+  const { HighlighterService } = Services;
+
+  const clips = useVuex(() =>
+    HighlighterService.getClips(HighlighterService.views.clips, streamId),
+  );
+
+  const totalDuration = clips
+    .filter(c => c.enabled)
+    .reduce((acc, clip) => acc + clip.duration! - clip.startTrim! - clip.endTrim!, 0);
+
+  return <span>{formatSecondsToHMS(totalDuration)}</span>;
 }
 
 function AddClip({
