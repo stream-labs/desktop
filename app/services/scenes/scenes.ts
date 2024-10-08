@@ -266,16 +266,6 @@ class ScenesViews extends ViewHandler<IScenesState> {
 
     return false;
   }
-
-  createAndAddSource(
-    sceneId: string,
-    name: string,
-    sourceType: TSourceType,
-    settings: Dictionary<any>,
-  ) {
-    const scene = this.getScene(sceneId);
-    return scene?.createAndAddSource(name, sourceType, settings).sceneItemId;
-  }
 }
 
 @InitAfter('DualOutputService')
@@ -458,7 +448,11 @@ export class ScenesService extends StatefulService<IScenesState> {
     sourceType: TSourceType,
     settings: Dictionary<unknown>,
   ) {
-    return this.views.createAndAddSource(sceneId, sourceName, sourceType, settings);
+    const scene = this.views.getScene(sceneId);
+    if (!scene) {
+      throw new Error(`Can't find scene with ID: ${sceneId}`);
+    }
+    return scene.createAndAddSource(sourceName, sourceType, settings).sceneItemId;
   }
 
   // TODO: Remove all of this in favor of the new "views" methods
