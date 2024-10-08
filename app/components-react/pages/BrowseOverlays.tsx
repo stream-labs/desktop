@@ -153,6 +153,11 @@ export default function BrowseOverlays(p: {
     const sourceName = name;
 
     const filename = path.basename(assetURL);
+
+    // On a fresh cache with login and not restarting the app this
+    // directory might not exist, based on testing
+    await MediaBackupService.actions.return.ensureMediaDirectory();
+
     const dest = path.join(MediaBackupService.mediaDirectory, filename);
 
     // TODO: refactor all this

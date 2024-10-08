@@ -319,7 +319,7 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
     return { Authorization: `Bearer ${this.userService.apiToken}` };
   }
 
-  private ensureMediaDirectory() {
+  ensureMediaDirectory() {
     if (!fs.existsSync(this.mediaDirectory)) {
       fs.mkdirSync(this.mediaDirectory);
     }
