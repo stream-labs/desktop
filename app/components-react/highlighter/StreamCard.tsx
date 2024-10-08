@@ -1,5 +1,5 @@
 import React from 'react';
-import { IViewState, TClip } from 'services/highlighter';
+import { IViewState, StreamInfoForAiHighlighter, TClip } from 'services/highlighter';
 import styles from './StreamView.m.less';
 import { Button } from 'antd';
 import { Services } from 'components-react/service-provider';
@@ -145,16 +145,29 @@ export default function StreamCard({
           {getFailedText()}
         </div>
         <div style={{ display: 'flex', gap: '4px' }}>
-          <Button
-            size="large"
-            style={{ display: 'flex', gap: '8px', alignItems: 'center' }}
-            onClick={e => {
-              emitSetView({ view: 'clips', id: stream!.id });
-              e.stopPropagation();
-            }}
-          >
-            Add clips
-          </Button>
+          {stream?.state.type === 'detection-canceled-by-user' ? (
+            <Button
+              size="large"
+              style={{ display: 'flex', gap: '8px', alignItems: 'center' }}
+              onClick={e => {
+                HighlighterService.actions.restartAiDetection(stream.path, stream);
+                e.stopPropagation();
+              }}
+            >
+              Restart ai-detection
+            </Button>
+          ) : (
+            <Button
+              size="large"
+              style={{ display: 'flex', gap: '8px', alignItems: 'center' }}
+              onClick={e => {
+                emitSetView({ view: 'clips', id: stream!.id });
+                e.stopPropagation();
+              }}
+            >
+              Add clips
+            </Button>
+          )}
         </div>
       </div>
     );

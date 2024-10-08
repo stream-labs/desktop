@@ -122,8 +122,8 @@ export interface IHighlighterData {
 
 // TODO: Need to clean up all of this
 export interface StreamInfoForAiHighlighter {
-  id?: string;
-  game?: string;
+  id: string;
+  game: string;
   title?: string;
 }
 export interface IHighlightedStream {
@@ -141,6 +141,7 @@ export interface IHighlightedStream {
     progress: number;
   };
   abortController?: AbortController;
+  path: string;
 }
 
 export enum EExportStep {
@@ -1606,16 +1607,18 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     }
   }
 
+  restartAiDetection(filePath: string, streamInfo: IHighlightedStream) {
+    this.removeStream(streamInfo.id);
+    const streamInfoForHighlighter: StreamInfoForAiHighlighter = {
+      id: streamInfo.id,
+      title: streamInfo.title,
+      game: streamInfo.game,
+    };
+
+    this.flow(filePath, streamInfoForHighlighter);
+  }
+
   async flow(filePath: string, streamInfo: StreamInfoForAiHighlighter): Promise<void> {
-    console.log('streamInfo', streamInfo);
-
-    // Highlighter flow
-    // 1. Toggle on ai highlighter
-    // 2. auto-record streams
-    // 3. after stream finished wait for the recording to be done
-    // 4. send recording to highlighterApi
-    // 5. cut data into highlightClips
-
     const fallbackTitle = 'awesome-stream';
     const sanitizedTitle = streamInfo.title
       ? streamInfo.title.replace(/[\\/:"*?<>|]+/g, ' ')
@@ -1631,6 +1634,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       title: sanitizedTitle,
       game: streamInfo.game || 'no title',
       abortController: new AbortController(),
+      path: filePath,
     };
 
     await this.addStream(setStreamInfo);
