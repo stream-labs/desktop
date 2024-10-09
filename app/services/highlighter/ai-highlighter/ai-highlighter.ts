@@ -58,7 +58,6 @@ export function getHighlightClips(
 
       if (cancelSignal) {
         cancelSignal.addEventListener('abort', () => {
-          console.log('cancelSignal.addEventListener');
           childProcess.kill();
           reject(new Error('Highlight generation canceled'));
         });

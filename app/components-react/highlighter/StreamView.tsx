@@ -111,7 +111,6 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
       return;
     }
     setClipsOfStreamAreLoading(id);
-    HighlighterService.actions.enableOnlySpecificClips(HighlighterService.views.clips, id);
     try {
       await HighlighterService.loadClips(id);
       setClipsOfStreamAreLoading(null);
@@ -128,7 +127,6 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
     }
 
     setClipsOfStreamAreLoading(id);
-    HighlighterService.actions.enableOnlySpecificClips(HighlighterService.views.clips, id);
 
     try {
       await HighlighterService.loadClips(id);
@@ -152,6 +150,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
       const streamInfo: StreamInfoForAiHighlighter = {
         id: 'manual_' + uuid(),
         title,
+        game: 'Fortnite',
       };
 
       let filePath: string[] | undefined = [];
@@ -243,7 +242,11 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
     const filtered = files.filter(f => extensions.includes(path.parse(f).ext));
 
     if (filtered.length) {
-      HighlighterService.actions.flow(filtered[0], { id: 'manual_' + uuid() });
+      const StreamInfoForAiHighlighter: StreamInfoForAiHighlighter = {
+        id: 'manual_' + uuid(),
+        game: 'Fortnite',
+      };
+      HighlighterService.actions.flow(filtered[0], StreamInfoForAiHighlighter);
     }
     e.preventDefault();
     e.stopPropagation();

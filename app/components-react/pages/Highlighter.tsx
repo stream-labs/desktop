@@ -1,4 +1,3 @@
-import ClipsView from 'components-react/highlighter/ClipsView';
 import SettingsView from 'components-react/highlighter/SettingsView';
 import { useVuex } from 'components-react/hooks';
 import React, { useEffect, useState } from 'react';
@@ -7,6 +6,7 @@ import { Services } from 'components-react/service-provider';
 import { Button } from 'antd';
 import moment from 'moment';
 import StreamView from 'components-react/highlighter/StreamView';
+import ClipsView from 'components-react/highlighter/ClipsView';
 
 export default function Highlighter(props: { params?: { view: string } }) {
   const openViewFromParams = props?.params?.view || '';
@@ -62,8 +62,24 @@ export default function Highlighter(props: { params?: { view: string } }) {
             emitSetView={data => {
               setViewFromEmit(data);
             }}
-            props={{ id: viewState.id }}
+            props={{
+              id: viewState.id,
+              streamTitle: HighlighterService.views.highlightedStreams.find(
+                s => s.id === viewState.id,
+              )?.title,
+            }}
           />
+          {/* <ClipsView
+            emitSetView={data => {
+              setViewFromEmit(data);
+            }}
+            props={{
+              id: viewState.id,
+              streamTitle: HighlighterService.views.highlightedStreams.find(
+                s => s.id === viewState.id,
+              )?.title,
+            }}
+          /> */}
         </>
       );
     default:

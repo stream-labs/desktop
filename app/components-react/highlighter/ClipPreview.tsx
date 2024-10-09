@@ -11,24 +11,30 @@ import { $t } from 'services/i18n';
 import { isAiClip } from './utils';
 import { InputEmojiSection } from './InputEmojiSection';
 
+import { useVuex } from 'components-react/hooks';
 export default function ClipPreview(props: {
-  clip: TClip;
+  clipId: string;
   streamId: string | undefined;
   showTrim: () => void;
   showRemove: () => void;
-  highlighted: boolean;
 }) {
   const { HighlighterService } = Services;
-  const [scrubFrame, setScrubFrame] = useState(0);
+  const v = useVuex(() => ({
+    clip: HighlighterService.views.clipsDictionary[props.clipId] as TClip,
+  }));
 
+  if (!v.clip) {
+    return <div>deleted</div>;
+  }
+  const [scrubFrame, setScrubFrame] = useState(0);
   // TODO: placeholder image + make sure to regenerate sprite if sprite doesnt exist
-  let clipThumbnail = props.clip.scrubSprite || '';
+  let clipThumbnail = v.clip.scrubSprite || '';
 
   const filename = useMemo(() => {
-    return path.basename(props.clip.path);
-  }, [props.clip.path]);
+    return path.basename(v.clip.path);
+  }, [v.clip.path]);
   // Deleted clips always show as disabled
-  const enabled = props.clip.deleted ? false : props.clip.enabled;
+  const enabled = v.clip.deleted ? false : v.clip.enabled;
 
   function mouseMove(e: React.MouseEvent) {
     const frameIdx = Math.floor((e.nativeEvent.offsetX / SCRUB_WIDTH) * SCRUB_FRAMES);
@@ -39,22 +45,22 @@ export default function ClipPreview(props: {
   }
 
   function setEnabled(enabled: boolean) {
-    HighlighterService.actions.enableClip(props.clip.path, enabled);
+    HighlighterService.actions.enableClip(v.clip.path, enabled);
   }
 
   function getInitialTime() {
-    if (!props.clip.streamInfo) {
+    if (!v.clip.streamInfo) {
       return 'noStreamInfo';
     }
 
-    const streamIds = Object.keys(props.clip.streamInfo);
+    const streamIds = Object.keys(v.clip.streamInfo);
     if (streamIds.length === 0) {
       return 'noStreamId';
     }
 
     const firstStreamId = props.streamId || streamIds[0]; // TODO M: Pass streamId here? or need to find the stream where the initialTime is not undefined
-    const startTime = props.clip.streamInfo[firstStreamId]?.initialStartTime;
-    const endTime = props.clip.streamInfo[firstStreamId]?.initialEndTime;
+    const startTime = v.clip.streamInfo[firstStreamId]?.initialStartTime;
+    const endTime = v.clip.streamInfo[firstStreamId]?.initialEndTime;
 
     return startTime !== undefined ? `${startTime} -${endTime}  ` : 'startTimeUndefined';
   }
@@ -66,13 +72,12 @@ export default function ClipPreview(props: {
         backgroundColor: '#2B383F',
         borderRadius: '16px',
         display: 'flex',
-        border: `solid 1px ${props.highlighted ? '#4F5E65' : 'transparent'}`,
         gap: '16px',
-        opacity: props.clip.enabled ? 1.0 : 0.3,
+        opacity: v.clip.enabled ? 1.0 : 0.3,
       }}
     >
       <div style={{ height: `${SCRUB_HEIGHT}px`, position: 'relative' }}>
-        {!props.clip.deleted && (
+        {!v.clip.deleted && (
           <img
             src={clipThumbnail}
             style={{
@@ -86,7 +91,7 @@ export default function ClipPreview(props: {
             onClick={props.showTrim}
           ></img>
         )}
-        {props.clip.deleted && (
+        {v.clip.deleted && (
           <div
             style={{
               width: `${SCRUB_WIDTH}px`,
@@ -137,9 +142,7 @@ export default function ClipPreview(props: {
             opacity: 0.7,
           }}
         >
-          {formatSecondsToHMS(
-            props.clip.duration! - (props.clip.startTrim + props.clip.endTrim) || 0,
-          )}
+          {formatSecondsToHMS(v.clip.duration! - (v.clip.startTrim + v.clip.endTrim) || 0)}
         </span>
         {/* <div
           style={{
@@ -188,19 +191,19 @@ export default function ClipPreview(props: {
               {filename}
             </div> */}
             <div className={styles.typeTag}>
-              {isAiClip(props.clip) ? (
+              {isAiClip(v.clip) ? (
                 <>
-                  <InputEmojiSection clips={[props.clip]} />{' '}
+                  <InputEmojiSection clips={[v.clip]} />{' '}
                 </>
               ) : (
                 <>
-                  <i className="icon-highlighter" /> {props.clip.source}
+                  <i className="icon-highlighter" /> {v.clip.source}
                 </>
               )}
             </div>
           </div>
           <div>
-            {props.clip.source == 'AiClip' && <Flamehypescore score={30}></Flamehypescore>}
+            {v.clip.source == 'AiClip' && <Flamehypescore score={30}></Flamehypescore>}
             {/* <span style={{ fontSize: '21px', color: 'white' }}>{reachedPoints}</span>
             <span style={{ paddingBottom: '4px', paddingLeft: '2px' }}>/100</span> */}
           </div>
@@ -214,14 +217,14 @@ export default function ClipPreview(props: {
           }}
         >
           <div style={{ fontSize: '16px' }}>
-            {props.clip.source !== 'Manual' && (
+            {v.clip.source !== 'Manual' && (
               <>
                 {`${
                   props.streamId &&
-                  formatSecondsToHHMMSS(props.clip.streamInfo?.[props.streamId]?.initialStartTime)
+                  formatSecondsToHHMMSS(v.clip.streamInfo?.[props.streamId]?.initialStartTime)
                 } - ${
                   props.streamId &&
-                  formatSecondsToHHMMSS(props.clip.streamInfo?.[props.streamId]?.initialEndTime)
+                  formatSecondsToHHMMSS(v.clip.streamInfo?.[props.streamId]?.initialEndTime)
                 } `}
               </>
             )}
@@ -268,7 +271,7 @@ export default function ClipPreview(props: {
             </Tooltip> */}
           </div>
         </div>
-        {/* {`${props.clip.deleted ? '[DELETED] ' : ''}${filename}`} */}
+        {/* {`${v.clip.deleted ? '[DELETED] ' : ''}${filename}`} */}
       </div>
     </div>
   );
