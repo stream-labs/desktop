@@ -396,6 +396,7 @@ function LiveDock(p: { onLeft: boolean }) {
                 <span className={styles.liveDockTimer}>{elapsedStreamTime}</span>
               </div>
               <div className={styles.liveDockViewerCount}>
+              {/*
                 <i
                   className={cx({
                     ['icon-view']: !hideViewerCount,
@@ -403,6 +404,7 @@ function LiveDock(p: { onLeft: boolean }) {
                   })}
                   onClick={() => ctrl.toggleViewerCount()}
                 />
+                */}
                 <span className={styles.liveDockViewerCountCount}>{viewerCount}</span>
                 {Number(viewerCount) >= 0 && <span>{$t('viewers')}</span>}
               </div>
