@@ -1827,8 +1827,9 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     const processedFiles = new Set<string>();
 
     // Process in batches of 5
-    for (let i = 0; i < sortedHighlights.length; i += 5) {
-      const batch = sortedHighlights.slice(i, i + 5);
+    const BATCH_SIZE = 5;
+    for (let i = 0; i < sortedHighlights.length; i += BATCH_SIZE) {
+      const batch = sortedHighlights.slice(i, i + BATCH_SIZE);
       const batchTasks = batch.map(({ start_time, end_time, input_types }) => {
         return async () => {
           const formattedStart = start_time.toString().padStart(6, '0');
