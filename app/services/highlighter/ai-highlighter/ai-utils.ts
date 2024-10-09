@@ -1,4 +1,5 @@
 import { getSharedResource } from '../../../util/get-shared-resource';
+import { FFMPEG_DIR, FFMPEG_EXE } from '../constants';
 import { IHighlight } from './ai-highlighter';
 const { spawn } = require('child_process');
 
@@ -10,9 +11,9 @@ export function getHighlighterProcess(videoUri: string) {
   const env = 'dev' as 'prod' | 'dev';
 
   if (env === 'dev') {
-    return spawn(VENV_PATH, [AI_PATH_DEV, videoUri]);
+    return spawn(VENV_PATH, [AI_PATH_DEV, videoUri, '--ffmpeg_path', FFMPEG_EXE]);
   } else {
-    return spawn(AI_PATH_PROD, [videoUri]);
+    return spawn(AI_PATH_PROD, [videoUri, '--ffmpeg_path', FFMPEG_EXE]);
   }
 }
 
