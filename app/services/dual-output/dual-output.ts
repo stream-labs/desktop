@@ -359,13 +359,13 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     this.userService.userLoginFinished.subscribe(() => {
       const createdAt = new Date(this.userService.state.createdAt);
       const currentDate = new Date();
-      const sameDay = createdAt.toDateString() === currentDate.toDateString();
+      const createdSameDay = createdAt.toDateString() === currentDate.toDateString();
 
       const differenceInMilliseconds = Math.abs(createdAt.getTime() - currentDate.getTime());
       const differenceInHours = differenceInMilliseconds / (1000 * 60 * 60);
 
       // check for a new user by comparing the user's creation date to the login (current) date
-      if (sameDay || (sameDay && differenceInHours > 6)) {
+      if (!createdSameDay || differenceInHours > 6) {
         return;
       }
 
