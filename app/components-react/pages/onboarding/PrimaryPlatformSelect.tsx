@@ -32,7 +32,7 @@ export function PrimaryPlatformSelect() {
     {
       value: 'youtube',
       label: 'YouTube',
-      image: <PlatformLogo platform="youtube" />,
+      image: <PlatformLogo platform="youtube" size={16} />,
     },
     {
       value: 'facebook',
