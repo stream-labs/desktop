@@ -35,7 +35,8 @@ export default function FeaturesNav() {
     if (!UserService.views.isLoggedIn && !loggedOutMenuItemTargets.includes(page)) return;
 
     if (trackingTarget) {
-      UsageStatisticsService.actions.recordClick('SideNav2', trackingTarget);
+      const target = trackingTarget === 'themes' && type ? type : trackingTarget;
+      UsageStatisticsService.actions.recordClick('SideNav2', target);
     }
 
     if (type) {
