@@ -35,7 +35,10 @@ export default function FeaturesNav() {
     if (!UserService.views.isLoggedIn && !loggedOutMenuItemTargets.includes(page)) return;
 
     if (trackingTarget) {
-      UsageStatisticsService.actions.recordClick('SideNav2', trackingTarget);
+      // NOTE: For themes, the submenu items are tracked instead of the menu item
+      // to distinguish between theme feature usage
+      const target = trackingTarget === 'themes' && type ? type : trackingTarget;
+      UsageStatisticsService.actions.recordClick('SideNav2', target);
     }
 
     if (type) {
