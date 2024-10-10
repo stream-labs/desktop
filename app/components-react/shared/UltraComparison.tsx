@@ -10,8 +10,8 @@ interface IUltraComparisonProps {
   onSkip?: () => void;
   condensed?: boolean;
   featureData?: {
-    standard: { text: string; icon: string }[];
-    ultra: { text: string; icon: string }[];
+    standard: { text: string; icon?: string }[];
+    ultra: { text: string; icon?: string }[];
   };
   refl: string;
 }
@@ -28,7 +28,7 @@ export function UltraComparison(p: IUltraComparisonProps) {
       { icon: 'icon-smart-record', text: $t('Selective Recording') },
       { icon: 'icon-editor-3', text: $t('Game Overlay') },
       { icon: 'icon-dual-output', text: $t('Dual Output (1 platform + TikTok)') },
-      { icon: 'icon-more', text: $t('And many more free features') },
+      { text: $t('And many more free features') },
     ],
     ultra: [
       { icon: 'icon-streamlabs', text: $t('All free features') },
@@ -39,7 +39,7 @@ export function UltraComparison(p: IUltraComparisonProps) {
       { icon: 'icon-dual-output', text: $t('Dual Output (3+ destinations)') },
       { icon: 'icon-team', text: $t('Collab Cam up to 11 guests') },
       { icon: 'icon-ultra', text: $t('Pro tier across the rest of the suite') },
-      { icon: 'icon-more', text: $t('And many more Ultra features') },
+      { text: $t('And many more Ultra features') },
     ],
   };
 
@@ -74,7 +74,7 @@ export function UltraComparison(p: IUltraComparisonProps) {
           <div className={styles.features}>
             {featureData.standard.map(data => (
               <div key={data.text} className={styles.row}>
-                <i className={data.icon} />
+                {data.icon && <i className={data.icon} />}
                 <span>{data.text}</span>
               </div>
             ))}
@@ -112,7 +112,7 @@ export function UltraComparison(p: IUltraComparisonProps) {
         <div className={styles.features}>
           {featureData.ultra.map(data => (
             <div className={styles.row} key={data.text}>
-              <i className={data.icon} />
+              {data.icon && <i className={data.icon} />}
               <span>{data.text}</span>
             </div>
           ))}
