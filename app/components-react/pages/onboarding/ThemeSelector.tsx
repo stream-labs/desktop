@@ -14,7 +14,7 @@ import sortBy from 'lodash/sortBy';
 import { Button } from 'antd';
 import Translate from 'components-react/shared/Translate';
 
-const MAX_SIDEBAR_THEMES = 3;
+const MAX_SIDEBAR_THEMES = 5;
 
 export function ThemeSelector() {
   const { OnboardingService, SceneCollectionsService, UserService } = Services;
