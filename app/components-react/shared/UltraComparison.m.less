@@ -113,6 +113,10 @@
 }
 
 .prime-card-container {
+  color: var(--title);
+  border: 2px solid transparent;
+  background: linear-gradient(var(--background), var(--background)) padding-box, var(--ultra) border-box;
+
   h1 {
     background: var(--ultra);
     -webkit-background-clip: text;
@@ -130,6 +134,16 @@
 .prime-button {
   background: var(--ultra);
   color: var(--section);
+}
+
+.prime-backing {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--ultra);
+  opacity: 0.08;
 }
 
 .whisper {

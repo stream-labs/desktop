@@ -87,6 +87,7 @@ export function UltraComparison(p: IUltraComparisonProps) {
         })}
         onClick={linkToPrime}
       >
+        <div className={styles.primeBacking} />
         <div className={styles.header}>
           <h1>
             <UltraIcon type="night" style={{ marginRight: '5px' }} />
