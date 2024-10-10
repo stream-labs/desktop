@@ -8,11 +8,9 @@ import cx from 'classnames';
 import { $t } from 'services/i18n';
 import * as stepComponents from './steps';
 import Utils from 'services/utils';
-import { IOnboardingStep, ONBOARDING_STEPS, StreamerKnowledgeMode } from 'services/onboarding';
+import { IOnboardingStep, ONBOARDING_STEPS } from 'services/onboarding';
 import Scrollable from 'components-react/shared/Scrollable';
-import StreamlabsDesktopLogo from 'components-react/shared/StreamlabsDesktopLogo';
-import StreamlabsLogo from 'components-react/shared/StreamlabsLogo';
-import StreamlabsUltraLogo from 'components-react/shared/StreamlabsUltraLogo';
+import StreamlabsDesktopIcon from 'components-react/shared/StreamlabsDesktopIcon';
 import { SkipContext } from './OnboardingContext';
 
 export default function Onboarding() {
@@ -135,23 +133,11 @@ function Footer({ currentStep, totalSteps, onSkip, isProcessing, currentStepInde
 }
 
 function TopBarLogo({ component }: { component: string }) {
-  switch (component) {
-    case 'StreamingOrRecording':
-      return <StreamlabsLogo />;
-    case 'Prime':
-      return <StreamlabsUltraLogo />;
-    default:
-      return <StreamlabsDesktopLogo />;
-  }
+  return <StreamlabsDesktopIcon />;
 }
 
 function TopBar() {
   const component = useModule(OnboardingModule).currentStep.component;
-  // We decided to skip the top bar for Theme Selection as the cards are big and make Footer overlap
-  if (component === 'ThemeSelector') {
-    return <></>;
-  }
-
   return (
     <div
       className={cx(styles.topBarContainer, {
@@ -233,10 +219,6 @@ export class OnboardingModule {
     return this.steps.filter(step => step.isPreboarding).length;
   }
 
-  get streamerKnowledgeMode() {
-    return this.OnboardingService.views.streamerKnowledgeMode;
-  }
-
   get isLogin() {
     return this.OnboardingService.state.options.isLogin;
   }
@@ -258,10 +240,6 @@ export class OnboardingModule {
 
   setImportFromTwitch() {
     this.OnboardingService.setImport('twitch');
-  }
-
-  setStreamerKnowledgeMode(mode: StreamerKnowledgeMode | null) {
-    this.OnboardingService.setStreamerKnowledgeMode(mode);
   }
 
   finish() {

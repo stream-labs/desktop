@@ -84,8 +84,12 @@ export function HardwareSetup() {
       }}
     >
       <h1 className={commonStyles.titleContainer} style={{ marginBottom: 0 }}>
-        {$t('Set Up Mic and Webcam')}
+        {$t('Set up your mic & webcam')}
       </h1>
+      <div className={commonStyles.subtitleContainer}>
+        {$t('Connect your most essential devices now or later on.')}
+      </div>
+
       <div className={styles.contentContainer}>
         <DisplaySection />
         {!!v.videoDevices.length && (

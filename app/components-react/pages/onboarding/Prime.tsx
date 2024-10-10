@@ -86,6 +86,14 @@ export function Prime() {
   return (
     <div className={styles.container}>
       <div style={{ width: '100%' }}>
+        <h1 className={commonStyles.titleContainer} style={{ marginTop: '20px' }}>
+          {$t('Choose your plan')}
+        </h1>
+
+        <div className={commonStyles.subtitleContainer}>
+          {$t('Choose the best plan to fit your content creation needs.')}
+        </div>
+
         <UltraComparison onSkip={next} refl="slobs-onboarding" {...tableProps} />
       </div>
     </div>

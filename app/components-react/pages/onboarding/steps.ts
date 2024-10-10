@@ -8,4 +8,3 @@ export * from './ThemeSelector';
 export * from './Optimize';
 export * from './Prime';
 export * from './StreamingOrRecording';
-export * from './Tips';

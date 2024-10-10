@@ -1,4 +1,4 @@
-@import "../../../styles/index";
+@import '../../../styles/index';
 @import '../../../styles/badges';
 
 .logo {
@@ -42,24 +42,6 @@
   justify-content: center;
   column-gap: 24px;
   width: 100%;
-}
-
-.streamer-knowledge-mode-container {
-  display: none;
-
-  &.active {
-    display: block;
-  }
-  
-  .option {
-    flex-direction: column;
-    
-    & > div {
-      flex-direction: row;
-      display: flex;
-      align-items: center;
-    }
-  }
 }
 
 .option {
@@ -156,8 +138,9 @@
 @media (max-height: 750px) {
   .footer {
     img {
-      transform: scale(0.5) translate(-50%, 50%)
+      transform: scale(0.5) translate(-50%, 50%);
     }
+
     svg {
       transform: rotateY(180deg) translateX(40%);
     }

@@ -6,7 +6,6 @@ export async function skipOnboarding() {
     if (!(await isDisplayed('h2=Live Streaming'))) return;
     // Uses advanced onboarding
     await click('h2=Live Streaming');
-    await click('h2=Advanced');
     await click('button=Continue');
     // Auth
     await click('button=Skip');
@@ -14,7 +13,9 @@ export async function skipOnboarding() {
     await clickIfDisplayed('div=Start Fresh');
     // Hardware setup
     await click('button=Skip');
-    // Ultra
+    // Themes
     await click('button=Skip');
+    // Ultra
+    await clickIfDisplayed('div[data-testid=choose-free-plan-btn]');
   });
 }
