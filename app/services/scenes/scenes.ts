@@ -452,7 +452,12 @@ export class ScenesService extends StatefulService<IScenesState> {
     if (!scene) {
       throw new Error(`Can't find scene with ID: ${sceneId}`);
     }
-    return scene.createAndAddSource(sourceName, sourceType, settings).sceneItemId;
+
+    const sceneItem = scene.createAndAddSource(sourceName, sourceType, settings);
+
+    this.dualOutputService.createPartnerNode(sceneItem);
+
+    return sceneItem.sceneItemId;
   }
 
   // TODO: Remove all of this in favor of the new "views" methods
