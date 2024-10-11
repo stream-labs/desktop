@@ -102,6 +102,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   collectionUpdated = new Subject<ISceneCollectionsManifestEntry>();
   collectionInitialized = new Subject<void>();
   collectionActivated = new Subject<ISceneCollectionsManifestEntry>();
+  newUserAdded = new Subject<void>();
 
   /**
    * Whether a valid collection is currently loaded.
@@ -150,6 +151,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   @RunInLoadingMode()
   async setupNewUser() {
     await this.initialize();
+    this.newUserAdded.next();
   }
 
   /**

@@ -355,61 +355,10 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     // Disable global Rescale Output
     this.disableGlobalRescaleIfNeeded();
 
-    // Toggle dual output by default for new users
-    this.userService.userLoginFinished.subscribe(() => {
-      const createdAt = new Date(this.userService.state.createdAt);
-      const currentDate = new Date();
-      const createdSameDay = createdAt.toDateString() === currentDate.toDateString();
-
-      const differenceInMilliseconds = Math.abs(createdAt.getTime() - currentDate.getTime());
-      const differenceInHours = differenceInMilliseconds / (1000 * 60 * 60);
-
-      // check for a new user by comparing the user's creation date to the login (current) date
-      if (!createdSameDay || differenceInHours > 6) {
-        return;
-      }
-
-      let scene = this.scenesService.views.activeScene;
-
-      // create a scene if there is no active scene
-      if (!scene) {
-        scene = this.scenesService.createScene('Scene', { makeActive: true });
-      }
-
-      // conditions that show this is not the user's first login
-      if (scene.getNodes().length) return;
-      if (this.scenesService.views.scenes.length > 1) return;
-      if (this.sceneCollectionsService.collections.length > 1) return;
-
-      // set dual output as default for new users and add default sources to scene
-      this.setDualOutputMode(true, true);
-
-      // add game capture source
-      const gameCapture = scene.createAndAddSource(
-        'Game Capture',
-        'game_capture',
-        {},
-        { display: 'horizontal' },
-      );
-      this.createPartnerNode(gameCapture);
-
-      // add alert box widget
-      this.widgetsService.createWidget(WidgetType.AlertBox, 'Alert Box');
-
-      // add webcam source
-      const type = byOS({
-        [OS.Windows]: 'dshow_input',
-        [OS.Mac]: 'av_capture_input',
-      }) as TSourceType;
-      const webCam = this.sourcesService.views.sources.find(s => s.type === type);
-
-      if (!webCam) {
-        const cam = scene.createAndAddSource('Webcam', type, { display: 'horizontal' });
-        this.createPartnerNode(cam);
-      } else {
-        const cam = scene.addSource(webCam.sourceId, { display: 'horizontal' });
-        this.createPartnerNode(cam);
-      }
+    // New users should have dual output enabled by default
+    // with a few default sources
+    this.sceneCollectionsService.newUserAdded.subscribe(() => {
+      this.setupDefaultSources();
     });
 
     /**
@@ -895,6 +844,45 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         this.streamSettingsService.setGoLiveSettings({ customDestinations: updatedDestinations });
       }
     });
+  }
+
+  /**
+   * Creates default sources for new users
+   * @remark New users should have dual output toggled and a few default sources
+   */
+  setupDefaultSources() {
+    const scene =
+      this.scenesService.views.activeScene ??
+      this.scenesService.createScene('Scene', { makeActive: true });
+
+    this.setDualOutputMode(true, true);
+
+    // add game capture source
+    const gameCapture = scene.createAndAddSource(
+      'Game Capture',
+      'game_capture',
+      {},
+      { display: 'horizontal' },
+    );
+    this.createPartnerNode(gameCapture);
+
+    // add alert box widget
+    this.widgetsService.createWidget(WidgetType.AlertBox, 'Alert Box');
+
+    // add webcam source
+    const type = byOS({
+      [OS.Windows]: 'dshow_input',
+      [OS.Mac]: 'av_capture_input',
+    }) as TSourceType;
+    const webCam = this.sourcesService.views.sources.find(s => s.type === type);
+
+    if (!webCam) {
+      const cam = scene.createAndAddSource('Webcam', type, { display: 'horizontal' });
+      this.createPartnerNode(cam);
+    } else {
+      const cam = scene.addSource(webCam.sourceId, { display: 'horizontal' });
+      this.createPartnerNode(cam);
+    }
   }
 
   /**
