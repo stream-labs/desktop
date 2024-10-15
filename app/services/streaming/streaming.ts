@@ -228,6 +228,7 @@ export class StreamingService
 
     // successfully prepopulated
     this.UPDATE_STREAM_INFO({ lifecycle: 'waitForNewSettings' });
+    return this.views.savedSettings;
   }
 
   /**
@@ -1170,6 +1171,21 @@ export class StreamingService
     });
   }
 
+  showGoLiveWindowV2(prepopulateOptions?: IGoLiveSettings['prepopulateOptions']) {
+    const height = this.views.linkedPlatforms.length > 1 ? 750 : 650;
+    const width = 900;
+
+    this.windowsService.showWindow({
+      componentName: 'GoLiveWindowV2',
+      title: $t('Go Live'),
+      size: {
+        height,
+        width,
+      },
+      queryParams: prepopulateOptions,
+    });
+  }
+
   showEditStream() {
     const height = 750;
     const width = 900;
@@ -1665,3 +1681,5 @@ export class StreamingService
     this.state.info.settings = settings;
   }
 }
+
+export type StreamingServiceType = InstanceType<typeof StreamingService>;

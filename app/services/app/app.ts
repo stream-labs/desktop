@@ -44,6 +44,7 @@ import { DualOutputService } from 'services/dual-output';
 import { OS, getOS } from 'util/operating-systems';
 import * as remote from '@electron/remote';
 import { RealmService } from 'services/realm';
+import { listenTrpc } from '../api/trpc-api/trpc';
 
 interface IAppState {
   loading: boolean;
@@ -161,6 +162,7 @@ export class AppService extends StatefulService<IAppState> {
 
     this.ipcServerService.listen();
     this.tcpServerService.listen();
+    listenTrpc();
 
     this.patchNotesService.showPatchNotesIfRequired(this.state.onboarded);
 

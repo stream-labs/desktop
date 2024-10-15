@@ -42,7 +42,7 @@ export interface IStreamInfo {
     | 'runChecklist' // applying new settings and start the stream
     | 'live'; // stream has been successfully started
   error: IStreamError | null;
-  warning: 'YT_AUTO_START_IS_DISABLED' | '';
+  warning: string;
   settings: IGoLiveSettings | null; // settings for the current attempt of going live
   checklist: {
     applyOptimizedSettings: TGoLiveChecklistItemState;

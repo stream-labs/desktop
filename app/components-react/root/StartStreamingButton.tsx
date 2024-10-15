@@ -139,18 +139,21 @@ export default function StartStreamingButton(p: { disabled?: boolean }) {
   }
 
   return (
-    <button
-      style={{ minWidth: '130px' }}
-      className={cx('button button--action', { 'button--soft-warning': getIsRedButton })}
-      disabled={isDisabled}
-      onClick={toggleStreaming}
-    >
-      <StreamButtonLabel
-        streamingStatus={streamingStatus}
-        delayEnabled={delayEnabled}
-        delaySecondsRemaining={delaySecondsRemaining}
-      />
-    </button>
+    <>
+      <button
+        style={{ minWidth: '130px' }}
+        className={cx('button button--action', { 'button--soft-warning': getIsRedButton })}
+        disabled={isDisabled}
+        onClick={toggleStreaming}
+      >
+        <StreamButtonLabel
+          streamingStatus={streamingStatus}
+          delayEnabled={delayEnabled}
+          delaySecondsRemaining={delaySecondsRemaining}
+        />
+      </button>
+      <button onClick={() => StreamingService.actions.showGoLiveWindowV2()}> GoLive </button>
+    </>
   );
 }
 

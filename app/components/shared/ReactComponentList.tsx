@@ -115,6 +115,13 @@ export class EditTransform extends ReactComponent {}
   },
 })
 export class GoLiveWindow extends ReactComponent {}
+@Component({
+  props: {
+    name: { default: 'GoLiveWindowV2' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class GoLiveWindowV2 extends ReactComponent {}
 
 @Component({
   props: {

@@ -286,3 +286,6 @@ export const AppServices = {
   RealmService,
   UrlService,
 };
+
+// for the components that needs only types
+export type TAppServices = typeof AppServices;
