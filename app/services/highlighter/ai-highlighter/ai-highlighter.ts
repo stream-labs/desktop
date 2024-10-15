@@ -21,6 +21,8 @@ export interface IHighlight {
   start_time: number;
   end_time: number;
   input_types: EHighlighterInputTypes[];
+  score: number;
+  metadata: { round: number };
 }
 
 export type EHighlighterMessageTypes =

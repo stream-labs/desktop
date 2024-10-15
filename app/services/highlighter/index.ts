@@ -95,7 +95,8 @@ export interface IAiClip extends IBaseClip {
 }
 export interface IAiClipInfo {
   moments: { type: EHighlighterInputTypes }[];
-  // hypescore -> (moments * hypefaktor) / duration
+  score: number;
+  metadata: { round: number };
 }
 
 export type TClip = IAiClip | IReplayBufferClip | IManualClip;
@@ -1830,7 +1831,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     const BATCH_SIZE = 5;
     for (let i = 0; i < sortedHighlights.length; i += BATCH_SIZE) {
       const batch = sortedHighlights.slice(i, i + BATCH_SIZE);
-      const batchTasks = batch.map(({ start_time, end_time, input_types }) => {
+      const batchTasks = batch.map(({ start_time, end_time, input_types, score, metadata }) => {
         return async () => {
           const formattedStart = start_time.toString().padStart(6, '0');
           const formattedEnd = end_time.toString().padStart(6, '0');
@@ -1887,6 +1888,8 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
                 path: outputUri,
                 aiClipInfo: {
                   moments: input_types.map(type => ({ type })),
+                  score: score,
+                  metadata: metadata,
                 },
                 startTime: start_time,
                 endTime: end_time,

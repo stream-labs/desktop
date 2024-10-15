@@ -203,7 +203,9 @@ export default function ClipPreview(props: {
             </div>
           </div>
           <div>
-            {v.clip.source == 'AiClip' && <Flamehypescore score={30}></Flamehypescore>}
+            {v.clip.source == 'AiClip' && (
+              <FlameHypeScore score={v.clip.aiInfo.score}></FlameHypeScore>
+            )}
             {/* <span style={{ fontSize: '21px', color: 'white' }}>{reachedPoints}</span>
             <span style={{ paddingBottom: '4px', paddingLeft: '2px' }}>/100</span> */}
           </div>
@@ -305,12 +307,12 @@ export function formatSecondsToHMS(seconds: number): string {
   }${remainingSeconds !== 0 ? remainingSeconds.toString() + 's' : ''}`;
 }
 
-function Flamehypescore({ score }: { score: number }) {
-  // Ensure score is between 0 and 100
-  const normalizedScore = Math.min(100, Math.max(0, score));
-
-  // Calculate how many flames should be fully lit
-  const fullFlames = Math.ceil((normalizedScore / 100) * 5);
+function FlameHypeScore({ score }: { score: number }) {
+  if (score === undefined) {
+    return <></>;
+  }
+  const normalizedScore = Math.min(1, Math.max(0, score));
+  const fullFlames = Math.ceil(normalizedScore * 5);
 
   return (
     <div className="flex items-center gap-1" style={{ fontSize: '19px' }}>
