@@ -101,8 +101,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   collectionWillSwitch = new Subject<void>();
   collectionUpdated = new Subject<ISceneCollectionsManifestEntry>();
   collectionInitialized = new Subject<void>();
-  collectionActivated = new Subject<ISceneCollectionsManifestEntry>();
-  newUserAdded = new Subject<void>();
 
   /**
    * Whether a valid collection is currently loaded.
@@ -114,6 +112,11 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * true if the scene-collections sync in progress
    */
   private syncPending = false;
+
+  /**
+   * Used to handle actions for users on their first login
+   */
+  newUserFirstLogin = false;
 
   /**
    * Does not use the standard init function so we can have asynchronous
@@ -151,7 +154,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   @RunInLoadingMode()
   async setupNewUser() {
     await this.initialize();
-    this.newUserAdded.next();
   }
 
   /**
@@ -811,6 +813,16 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     if (!this.canSync()) return;
 
     const serverCollections = (await this.serverApi.fetchSceneCollections()).data;
+
+    // A user who has never logged in before and did not install a
+    // theme during onboarding will have no collections. To prevent
+    // special handling of the default theme for a user who installed
+    //  a theme during onboarding
+    if (serverCollections.length === 0) {
+      this.newUserFirstLogin = true;
+    } else if (this.newUserFirstLogin && serverCollections.length > 0) {
+      this.newUserFirstLogin = false;
+    }
 
     let failed = false;
 

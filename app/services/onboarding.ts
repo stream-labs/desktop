@@ -434,8 +434,8 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
       });
     }
 
-    this.navigationService.navigate('Studio');
     this.onboardingCompleted.next();
+    this.navigationService.navigate('Studio');
   }
 
   get isTwitchAuthed() {

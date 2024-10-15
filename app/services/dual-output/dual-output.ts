@@ -32,6 +32,8 @@ import compact from 'lodash/compact';
 import invert from 'lodash/invert';
 import forEachRight from 'lodash/forEachRight';
 import { byOS, OS } from 'util/operating-systems';
+import { DefaultHardwareService } from 'services/hardware/default-hardware';
+import { OnboardingService } from 'services/onboarding';
 
 interface IDisplayVideoSettings {
   horizontal: IVideoInfo;
@@ -323,6 +325,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   @Inject() private settingsService: SettingsService;
   @Inject() private sourcesService: SourcesService;
   @Inject() private widgetsService: WidgetsService;
+  @Inject() private defaultHardwareService: DefaultHardwareService;
+  @Inject() private onboardingService: OnboardingService;
 
   static defaultState: IDualOutputServiceState = {
     platformSettings: DualOutputPlatformSettings,
@@ -357,8 +361,12 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
     // New users should have dual output enabled by default
     // with a few default sources
-    this.sceneCollectionsService.newUserAdded.subscribe(() => {
-      this.setupDefaultSources();
+    this.onboardingService.onboardingCompleted.subscribe(() => {
+      const onlyDefaultCollection = this.sceneCollectionsService.collections.length === 1;
+
+      if (this.sceneCollectionsService.newUserFirstLogin && onlyDefaultCollection) {
+        this.setupDefaultSources();
+      }
     });
 
     /**
@@ -484,6 +492,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
   convertSingleOutputToDualOutputCollection() {
     this.SET_IS_LOADING(true);
+
     // establish vertical context if it doesn't exist
     if (!this.videoSettingsService.contexts.vertical) {
       this.videoSettingsService.establishVideoContext('vertical');
@@ -496,7 +505,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       });
     } catch (error: unknown) {
       console.error('Error converting to single output collection to dual output: ', error);
-      this.collectionHandled.next(null);
+      this.collectionHandled.next();
     }
 
     this.collectionHandled.next(this.sceneCollectionsService.sceneNodeMaps);
@@ -639,7 +648,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       });
     } catch (error: unknown) {
       console.error('Error validating dual output collection: ', error);
-      this.collectionHandled.next(null);
+      this.collectionHandled.next();
     }
     this.collectionHandled.next(this.sceneCollectionsService.sceneNodeMaps);
   }
@@ -848,14 +857,19 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
   /**
    * Creates default sources for new users
-   * @remark New users should have dual output toggled and a few default sources
+   * @remark New users should have dual output toggled and a few default sources.
+   * Create all the sources before toggling dual output for a better user experience.
    */
   setupDefaultSources() {
+    this.setIsLoading(true);
+
+    if (!this.videoSettingsService.contexts.vertical) {
+      this.videoSettingsService.establishVideoContext('vertical');
+    }
+
     const scene =
       this.scenesService.views.activeScene ??
       this.scenesService.createScene('Scene', { makeActive: true });
-
-    this.setDualOutputMode(true, true);
 
     // add game capture source
     const gameCapture = scene.createAndAddSource(
@@ -874,7 +888,12 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       [OS.Windows]: 'dshow_input',
       [OS.Mac]: 'av_capture_input',
     }) as TSourceType;
-    const webCam = this.sourcesService.views.sources.find(s => s.type === type);
+
+    const defaultSource = this.defaultHardwareService.state.defaultVideoDevice;
+
+    const webCam = defaultSource
+      ? this.sourcesService.views.getSource(defaultSource)
+      : this.sourcesService.views.sources.find(s => s?.type === type);
 
     if (!webCam) {
       const cam = scene.createAndAddSource('Webcam', type, { display: 'horizontal' });
@@ -883,6 +902,12 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       const cam = scene.addSource(webCam.sourceId, { display: 'horizontal' });
       this.createPartnerNode(cam);
     }
+
+    // toggle dual output mode and vertical display
+    this.toggleDualOutputMode(true);
+    this.toggleDisplay(true, 'vertical');
+
+    this.collectionHandled.next();
   }
 
   /**
