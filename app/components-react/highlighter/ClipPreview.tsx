@@ -189,17 +189,34 @@ export default function ClipPreview(props: {
               }}
             >
               {filename}
-            </div> */}
-            <div className={styles.typeTag}>
-              {isAiClip(v.clip) ? (
-                <>
-                  <InputEmojiSection clips={[v.clip]} />{' '}
-                </>
-              ) : (
-                <>
-                  <i className="icon-highlighter" /> {v.clip.source}
-                </>
-              )}
+            </div> */}{' '}
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <div className={styles.typeTag}>
+                {isAiClip(v.clip) ? (
+                  <>
+                    <div style={{ height: '22px', display: 'flex', gap: '8px' }}>
+                      {v.clip.aiInfo.metadata.round ? `Round: ${v.clip.aiInfo.metadata.round}` : ''}
+                    </div>
+                  </>
+                ) : (
+                  <></>
+                )}
+              </div>
+              <div className={styles.typeTag}>
+                {isAiClip(v.clip) ? (
+                  <>
+                    <InputEmojiSection
+                      clips={[v.clip]}
+                      includeRounds={false}
+                      includeDeploy={true}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <i className="icon-highlighter" /> {v.clip.source}
+                  </>
+                )}
+              </div>
             </div>
           </div>
           <div>
@@ -247,7 +264,7 @@ export default function ClipPreview(props: {
             >
               <i className="icon-trim" /> Trim
             </Button>
-            <Button
+            {/* <Button
               size="large"
               style={{ display: 'flex', gap: '8px', alignItems: 'center' }}
               onClick={() => {}}
@@ -260,7 +277,7 @@ export default function ClipPreview(props: {
               onClick={() => {}}
             >
               <i className="icon-download" /> Export clip
-            </Button>
+            </Button> */}
             {/* <Tooltip title={$t('Trim clip')} placement="top">
               <i
                 className={cx('icon-studio-mode-3', styles.clipAction)}

@@ -3,14 +3,24 @@ import { TClip } from 'services/highlighter';
 import { isAiClip } from './utils';
 import { EHighlighterInputTypes } from 'services/highlighter/ai-highlighter/ai-highlighter';
 
-export function InputEmojiSection({ clips }: { clips: TClip[] }): JSX.Element {
+export function InputEmojiSection({
+  clips,
+  includeRounds,
+  includeDeploy,
+}: {
+  clips: TClip[];
+  includeRounds: boolean;
+  includeDeploy: boolean;
+}): JSX.Element {
   const inputTypeMap = Object.entries(getMomentTypeCount(clips));
   const filteredinputTypeMap =
-    inputTypeMap.length > 3 ? inputTypeMap.filter(([type]) => type !== 'deploy') : inputTypeMap;
+    inputTypeMap.length > 2 || includeDeploy === false
+      ? inputTypeMap.filter(([type]) => type !== 'deploy')
+      : inputTypeMap;
   const manualClips = clips.filter(
     clip => clip.source === 'ReplayBuffer' || clip.source === 'Manual',
   );
-
+  const rounds = getAmountOfRounds(clips);
   function manualClip() {
     if (manualClips.length === 0) {
       return <></>;
@@ -24,12 +34,19 @@ export function InputEmojiSection({ clips }: { clips: TClip[] }): JSX.Element {
   }
 
   return (
-    <div style={{ height: '22px', display: 'flex', gap: '12px' }}>
+    <div style={{ height: '22px', display: 'flex', gap: '8px' }}>
+      {includeRounds && (
+        <div key={'rounds'} style={{ display: 'flex', gap: '4px' }}>
+          <span key={'rounds' + 'emoji'}> {getTypeWordingFromType('rounds', rounds).emoji} </span>{' '}
+          <span key={'rounds' + 'desc'}>
+            {rounds} {getTypeWordingFromType('rounds', rounds).description}
+          </span>
+        </div>
+      )}
       {filteredinputTypeMap.map(([type, count]) => (
         <div key={type} style={{ display: 'flex', gap: '4px' }}>
           <span key={type + 'emoji'}>{getTypeWordingFromType(type, count).emoji} </span>{' '}
           <span key={type + 'desc'}>
-            {' '}
             {count} {getTypeWordingFromType(type, count).description}
           </span>
         </div>
@@ -55,6 +72,8 @@ function getTypeWordingFromType(
       return { emoji: '🏆', description: count > 1 ? 'wins' : 'win' };
     case EHighlighterInputTypes.DEPLOY:
       return { emoji: '🪂', description: count > 1 ? 'deploys' : 'deploy' };
+    case 'rounds':
+      return { emoji: '🏁', description: count > 1 ? 'rounds' : 'round' };
     default:
       break;
   }
@@ -76,4 +95,12 @@ function getMomentTypeCount(clips: TClip[]): { [type: string]: number } {
     }
   });
   return typeCounts;
+}
+
+function getAmountOfRounds(clips: TClip[]): number {
+  const rounds: number[] = [];
+  clips.filter(isAiClip).forEach(clip => {
+    rounds.push(clip.aiInfo.metadata?.round || 1);
+  });
+  return Math.max(...rounds);
 }

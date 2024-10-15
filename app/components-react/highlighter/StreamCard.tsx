@@ -357,7 +357,11 @@ export default function StreamCard({
               justifyContent: 'start',
             }}
           >
-            <InputEmojiSection clips={clips} />
+            {stream.state.type === 'detection-finished' ? (
+              <InputEmojiSection clips={clips} includeRounds={true} includeDeploy={false} />
+            ) : (
+              <div style={{ height: '22px' }}> </div>
+            )}
           </h3>
         </div>
         {getActionRow()}
