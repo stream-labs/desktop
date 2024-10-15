@@ -258,6 +258,21 @@ export class AnnouncementsService extends Service {
     }
   }
 
+  async closeNews(newsId: number) {
+    const endpoint = 'api/v5/slobs/announcement/close';
+    const req = this.formRequest(endpoint, {
+      method: 'POST',
+      headers: new Headers({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({
+        clientId: this.userService.getLocalUserId(),
+        announcementId: newsId,
+        clickType: 'action',
+      }),
+    });
+
+    return jfetch(req);
+  }
+
   async closeBanner(clickType: 'action' | 'dismissal') {
     const endpoint = 'api/v5/slobs/announcement/close';
     const req = this.formRequest(endpoint, {
