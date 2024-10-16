@@ -94,7 +94,7 @@ export default function PreviewModal({
   }, [playlist.length]);
 
   useEffect(() => {
-    if (videoPlayerA.current === null || videoPlayerB.current === null) {
+    if (videoPlayerA.current === null || videoPlayerB.current === null || playlist.length === 0) {
       return;
     }
 
