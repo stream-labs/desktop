@@ -422,7 +422,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   }
 
   private getDeviceIdFor(sourceName: 'Desktop Audio' | 'Mic/Aux'): string | undefined {
-    return this.sourcesService.views.getSourcesByName(sourceName)[0].getSettings()?.device_id;
+    return this.sourcesService.views.getSourcesByName(sourceName)[0]?.getSettings()?.device_id;
   }
 
   /**
