@@ -7,7 +7,6 @@ import { IViewState, StreamInfoForAiHighlighter, TClip } from 'services/highligh
 import isEqual from 'lodash/isEqual';
 import { Modal, Button } from 'antd';
 import ExportModal from 'components-react/highlighter/ExportModal';
-import PreviewModal from 'components-react/highlighter/PreviewModal';
 import { SUPPORTED_FILE_TYPES } from 'services/highlighter/constants';
 import Scrollable from 'components-react/shared/Scrollable';
 import { IHotkey } from 'services/hotkeys';
@@ -18,6 +17,7 @@ import uuid from 'uuid';
 import StreamCard from './StreamCard';
 import { groupStreamsByTimePeriod } from './utils';
 import path from 'path';
+import PreviewModal from './PreviewModal';
 
 type TModalStreamView =
   | { type: 'export'; id: string | undefined }
@@ -349,6 +349,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
           )}
           {showModal?.type === 'preview' && (
             <PreviewModal close={closeModal} streamId={showModal.id} />
+            // <PreviewModal close={closeModal} streamId={showModal.id} />
           )}
           {showModal?.type === 'remove' && (
             <RemoveStream close={closeModal} streamId={showModal.id} />

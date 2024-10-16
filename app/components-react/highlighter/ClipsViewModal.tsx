@@ -7,9 +7,9 @@ import styles from './ClipsView.m.less';
 import ClipTrimmer from 'components-react/highlighter/ClipTrimmer';
 import { Modal, Alert, Button } from 'antd';
 import ExportModal from 'components-react/highlighter/ExportModal';
-import PreviewModal from 'components-react/highlighter/PreviewModal';
 import React from 'react';
 import { $t } from 'services/i18n';
+import PreviewModal from './PreviewModal';
 
 export default function ClipsViewModal({
   streamId,
