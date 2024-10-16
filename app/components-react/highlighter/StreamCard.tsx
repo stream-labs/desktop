@@ -370,13 +370,19 @@ export default function StreamCard({
   );
 }
 
-const PlayButton = () => (
-  <svg width="26" height="32" viewBox="0 0 26 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+export const PlayButton = () => (
+  <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
       fillRule="evenodd"
       clipRule="evenodd"
-      d="M24.2563 14.5427L3.94511 0.772117C2.52332 -0.211497 0.695312 0.772117 0.695312 2.3459V29.8871C0.695312 31.4609 2.52332 32.4445 3.94511 31.4609L24.2563 17.6903C25.2719 16.9034 25.2719 15.3296 24.2563 14.5427Z"
+      d="M31.3111 17.05L12.9395 4.36284C11.6534 3.45661 10 4.36284 10 5.8128V31.1872C10 32.6372 11.6534 33.5434 12.9395 32.6372L31.3111 19.95C32.2296 19.225 32.2296 17.775 31.3111 17.05"
       fill="white"
     />
+  </svg>
+);
+export const PauseButton = () => (
+  <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="7" y="5" width="10" height="28" rx="2" fill="white" />
+    <rect x="21" y="5" width="10" height="28" rx="2" fill="white" />
   </svg>
 );

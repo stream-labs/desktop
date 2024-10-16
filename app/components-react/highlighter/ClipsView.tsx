@@ -20,6 +20,7 @@ import { Button } from 'antd';
 import { SCRUB_HEIGHT, SCRUB_WIDTH, SUPPORTED_FILE_TYPES } from 'services/highlighter/constants';
 import { $t } from 'services/i18n';
 import path from 'path';
+import MiniClipPreview from './MiniClipPreview';
 
 export type TModalClipsView = 'trim' | 'export' | 'preview' | 'remove';
 
@@ -390,31 +391,6 @@ function AddClip({
   return <Button onClick={() => openClips()}>{$t('Add Clip')}</Button>;
 }
 
-function MiniClipPreview({ clipId, highlighted }: { clipId: string; highlighted: boolean }) {
-  const { HighlighterService } = Services;
-  const clip = useVuex(() => HighlighterService.views.clipsDictionary[clipId] as TClip);
-  return (
-    <div
-      key={clip.path}
-      style={{
-        display: clip.enabled ? 'inline-block' : 'none',
-        borderRadius: '4px',
-        border: `solid ${clip.enabled ? '2px' : '0px'}  transparent`,
-      }}
-    >
-      <img
-        src={clip.scrubSprite}
-        style={{
-          width: `${SCRUB_WIDTH / 6}px`,
-          height: `${SCRUB_HEIGHT / 6}px`,
-          objectFit: 'cover',
-          objectPosition: 'left top',
-          borderRadius: '4px',
-        }}
-      ></img>
-    </div>
-  );
-}
 function ClipsLoadingView({ clips }: { clips: { id: string }[] }) {
   const { HighlighterService } = Services;
   const v = useVuex(() => ({

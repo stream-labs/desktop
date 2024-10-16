@@ -4,6 +4,9 @@ import { Services } from 'components-react/service-provider';
 import { $t } from 'services/i18n';
 import { TClip } from 'services/highlighter';
 import { sortClips } from './utils';
+import MiniClipPreview from './MiniClipPreview';
+import Scrollable from 'components-react/shared/Scrollable';
+import { PauseButton, PlayButton } from './StreamCard';
 
 export default function PreviewModal({
   close,
@@ -18,7 +21,9 @@ export default function PreviewModal({
   const { HighlighterService } = Services;
   const clips = HighlighterService.getClips(HighlighterService.views.clips, streamId);
   const [currentClipIndex, setCurrentClipIndex] = useState(0);
-  const playlist = sortClips(clips, streamId)
+  const sortedClips = sortClips(clips, streamId);
+
+  const playlist = sortedClips
     .filter(c => c.enabled)
     .map((clip: TClip) => ({
       src: clip.path + `#t=${clip.startTrim},${clip.duration! - clip.endTrim}`,
@@ -30,6 +35,7 @@ export default function PreviewModal({
   const videoPlayerB = useRef<HTMLVideoElement>(null);
   const [activePlayer, setActivePlayer] = useState<'A' | 'B'>('A');
   const isChangingClip = useRef(false);
+  const [isPlaying, setIsPlaying] = useState(true);
 
   function isOdd(num: number): boolean {
     return num % 2 === 1;
@@ -38,7 +44,6 @@ export default function PreviewModal({
     return Math.abs(a - b) <= tolerance;
   }
   useEffect(() => {
-    console.log('playlist', playlist);
     //Pause gets also triggered when the video ends. We dont want to change the clip in that case
     const nextClip = () => {
       if (!isChangingClip.current) {
@@ -51,19 +56,11 @@ export default function PreviewModal({
       }
     };
     const handleEnded = () => {
-      console.log('ended from ended');
       nextClip();
     };
 
     const handlePause = () => {
       const currentPlayer = activePlayer === 'A' ? videoPlayerA.current : videoPlayerB.current;
-      // console.log('currentPlayer?.currentTime', currentPlayer?.currentTime);
-      // console.log('playlist[currentClipIndex].end', playlist[currentClipIndex].end);
-      // console.log(
-      //   'true!',
-      //   isRoughlyEqual(currentPlayer!.currentTime, playlist[currentClipIndex].end),
-      // );
-      // console.log('isBigger', currentPlayer!.currentTime > playlist[currentClipIndex].end);
       if (!currentPlayer) {
         return;
       }
@@ -71,21 +68,28 @@ export default function PreviewModal({
         currentPlayer.currentTime > playlist[currentClipIndex].end ||
         isRoughlyEqual(currentPlayer.currentTime, playlist[currentClipIndex].end)
       ) {
-        console.log('ended from pause');
         nextClip();
       }
     };
 
+    const handlePlay = () => {
+      setIsPlaying(true);
+    };
+
     videoPlayerA.current?.addEventListener('ended', handleEnded);
     videoPlayerB.current?.addEventListener('ended', handleEnded);
+    videoPlayerA.current?.addEventListener('play', handlePlay);
+    videoPlayerB.current?.addEventListener('play', handlePlay);
     videoPlayerA.current?.addEventListener('pause', handlePause);
     videoPlayerB.current?.addEventListener('pause', handlePause);
 
     return () => {
       videoPlayerA.current?.removeEventListener('ended', handleEnded);
       videoPlayerB.current?.removeEventListener('ended', handleEnded);
-      videoPlayerA.current?.addEventListener('pause', handlePause);
-      videoPlayerB.current?.addEventListener('pause', handlePause);
+      videoPlayerA.current?.removeEventListener('play', handlePlay);
+      videoPlayerB.current?.removeEventListener('play', handlePlay);
+      videoPlayerA.current?.removeEventListener('pause', handlePause);
+      videoPlayerB.current?.removeEventListener('pause', handlePause);
     };
   }, [playlist.length]);
 
@@ -93,19 +97,19 @@ export default function PreviewModal({
     if (videoPlayerA.current === null || videoPlayerB.current === null) {
       return;
     }
-    console.log(
-      'currentClipIndex',
-      currentClipIndex,
-      !isOdd(currentClipIndex) ? 'should A' : ' should  B',
-    );
+
     if (currentClipIndex === 0) {
       videoPlayerA.current!.src = playlist[currentClipIndex].src;
       videoPlayerA.current!.load();
     }
 
     if (!isOdd(currentClipIndex)) {
-      console.log('set A');
       setActivePlayer('A');
+      videoPlayerA.current!.play().catch(e => console.error('Error playing video A:', e));
+      if (videoPlayerB.current && !videoPlayerB.current.paused && !videoPlayerB.current.ended) {
+        videoPlayerB.current.pause();
+      }
+
       if (currentClipIndex + 1 < playlist.length) {
         setTimeout(() => {
           videoPlayerB.current!.src = playlist[currentClipIndex + 1].src;
@@ -113,9 +117,12 @@ export default function PreviewModal({
         }, 100);
       }
     } else {
-      console.log('set B');
-
       setActivePlayer('B');
+      videoPlayerB.current!.play().catch(e => console.error('Error playing video B:', e));
+      if (videoPlayerA.current && !videoPlayerA.current.paused && !videoPlayerA.current.ended) {
+        videoPlayerA.current.pause();
+      }
+
       if (currentClipIndex + 1 < playlist.length) {
         setTimeout(() => {
           videoPlayerA.current!.src = playlist[currentClipIndex + 1].src;
@@ -125,46 +132,42 @@ export default function PreviewModal({
     }
   }, [currentClipIndex]);
 
-  useEffect(() => {
-    console.log('activePlayer changed', activePlayer);
-
-    if (activePlayer === 'A') {
-      console.log('play  - event A');
-
-      videoPlayerA.current!.play().catch(e => console.error('Error playing video A:', e));
-      if (videoPlayerB.current && !videoPlayerB.current.paused && !videoPlayerB.current.ended) {
-        console.log('pause B');
-        videoPlayerB.current.pause();
-      }
-    } else {
-      console.log('play b');
-
-      videoPlayerB.current!.play().catch(e => console.error('Error playing video B:', e));
-      if (videoPlayerA.current && !videoPlayerA.current.paused && !videoPlayerA.current.ended) {
-        console.log('pause A');
-        videoPlayerA.current.pause();
-      }
-    }
-  }, [activePlayer]);
-
   function togglePlay() {
     const currentPlayer = activePlayer === 'A' ? videoPlayerA.current : videoPlayerB.current;
     if (currentPlayer?.paused) {
       currentPlayer.play().catch(e => console.error('Error playing video:', e));
     } else {
-      console.log('pause');
-
+      setIsPlaying(false);
       currentPlayer?.pause();
     }
   }
 
+  function playPauseButton() {
+    if (isPlaying) {
+      return <PauseButton />;
+    } else {
+      return <PlayButton />;
+    }
+  }
+
+  function jumpToClip(index: number) {
+    if (!isOdd(index)) {
+      //Will use player A
+      videoPlayerA.current!.src = playlist[index].src;
+      videoPlayerA.current!.load();
+    } else {
+      //Will use player B
+      videoPlayerB.current!.src = playlist[index].src;
+      videoPlayerB.current!.load();
+    }
+    setCurrentClipIndex(index);
+  }
+
   return (
     <div>
-      <h2>{$t('Render Preview')}</h2>
+      <h2>{$t('Preview')}</h2>
       <p>
-        {$t(
-          'The render preview shows a low-quality preview of the final rendered video. The final exported video will be higher resolution, framerate, and quality.',
-        )}
+        This is just a preview of your highlight reel. Loading times between clips are possible.
       </p>
       <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9' }}>
         <video
@@ -191,6 +194,57 @@ export default function PreviewModal({
             display: activePlayer === 'B' ? 'block' : 'none',
           }}
         />
+      </div>
+      <div style={{ display: 'flex', marginTop: '16px' }}>
+        <div style={{ cursor: 'pointer' }} onClick={() => togglePlay()}>
+          {playPauseButton()}
+        </div>
+        <Scrollable
+          horizontal={true}
+          style={{
+            width: '100%',
+            paddingLeft: '8px',
+            paddingRight: '8px',
+            height: '48px',
+            display: 'flex',
+          }}
+        >
+          <div
+            style={{
+              width: 'max-content',
+              minWidth: '100%',
+              display: 'flex',
+              gap: '4px',
+              paddingBottom: '6px',
+              justifyContent: 'center',
+            }}
+          >
+            {sortedClips.map(({ path }, index) => {
+              return (
+                <div
+                  key={'preview-mini' + path}
+                  style={{
+                    cursor: 'pointer',
+                    borderRadius: '6px',
+                    width: 'fit-content',
+                    border: `solid 2px ${
+                      sortedClips[currentClipIndex].path === path ? 'white' : 'transparent'
+                    }`,
+                  }}
+                  onClick={() => {
+                    jumpToClip(index);
+                  }}
+                >
+                  <MiniClipPreview
+                    clipId={path}
+                    // highlighted={hoveredId === id && !onMove}
+                    highlighted={false}
+                  ></MiniClipPreview>
+                </div>
+              );
+            })}
+          </div>
+        </Scrollable>{' '}
       </div>
     </div>
   );
