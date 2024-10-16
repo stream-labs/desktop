@@ -368,12 +368,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         this.scenesService.views.scenes[0].name === 'Scene' &&
         this.scenesService.views.scenes[0].getNodes().length === 0;
 
-      console.log('onlyDefaultCollection', JSON.stringify(onlyDefaultCollection, null, 2));
-      console.log(
-        'this.sceneCollectionsService.newUserFirstLogin',
-        JSON.stringify(this.sceneCollectionsService.newUserFirstLogin, null, 2),
-      );
-
       if (!onlyDefaultCollection) {
         this.sceneCollectionsService.newUserFirstLogin = false;
         return;
@@ -388,16 +382,13 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       // Check for the creation date being within the past 24 hours or up to 6 hours
       // into the future. NOTE: This is to accommodate for discrepancies in time zone settings between the app and the user's device
       const creationDate = this.userService.state?.createdAt;
-      console.log('creationDate', JSON.stringify(creationDate, null, 2));
       if (!creationDate) return;
 
       const now = new Date().getTime();
       const creationTime = new Date(creationDate).getTime();
       const millisecondsInAnHour = 1000 * 60 * 60;
 
-      const isWithinRange =
-        now - creationTime < millisecondsInAnHour * 24 &&
-        creationTime - now < millisecondsInAnHour * 6;
+      const isWithinRange = creationTime < now && creationTime - now < millisecondsInAnHour * 6;
 
       if (isWithinRange) {
         this.setupDefaultSources();
