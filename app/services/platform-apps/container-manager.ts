@@ -332,6 +332,7 @@ export class PlatformContainerManager {
             'static.twitchcdn.net',
             'www.google.com',
             'www.gstatic.com',
+            'assets.twitch.tv',
           ];
 
           const parsed = url.parse(details.url);
