@@ -191,17 +191,13 @@ export default function ClipPreview(props: {
               {filename}
             </div> */}{' '}
             <div style={{ display: 'flex', gap: '8px' }}>
-              <div className={styles.typeTag}>
-                {isAiClip(v.clip) ? (
-                  <>
-                    <div style={{ height: '22px', display: 'flex', gap: '8px' }}>
-                      {v.clip.aiInfo.metadata.round ? `Round: ${v.clip.aiInfo.metadata.round}` : ''}
-                    </div>
-                  </>
-                ) : (
-                  <></>
-                )}
-              </div>
+              {isAiClip(v.clip) && v.clip.aiInfo?.metadata?.round && (
+                <div className={styles.typeTag}>
+                  <div style={{ height: '22px', display: 'flex', gap: '8px' }}>
+                    {`Round: ${v.clip.aiInfo.metadata.round}`}
+                  </div>
+                </div>
+              )}
               <div className={styles.typeTag}>
                 {isAiClip(v.clip) ? (
                   <>
