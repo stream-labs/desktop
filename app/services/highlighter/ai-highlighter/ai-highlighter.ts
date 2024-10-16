@@ -3,12 +3,16 @@ import { getHighlighterProcess, getTestData } from './ai-utils';
 
 export enum EHighlighterInputTypes {
   KILL = 'kill',
+  KNOCKED = 'knocked',
   GAME_SEQUENCE = 'game_sequence',
+  GAME_START = 'start_game',
+  GAME_END = 'end_game',
   VOICE_ACTIVITY = 'voice_activity',
   DEATH = 'death',
   VICTORY = 'victory',
   DEPLOY = 'deploy',
-  KNOCKED = 'knocked',
+  META_DURATION = 'meta_duration',
+  LOW_HEALTH = 'low_health',
 }
 
 export interface IHighlighterInput {

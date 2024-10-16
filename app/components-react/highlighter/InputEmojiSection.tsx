@@ -12,11 +12,21 @@ export function InputEmojiSection({
   includeRounds: boolean;
   includeDeploy: boolean;
 }): JSX.Element {
+  const excludeTypes = [
+    EHighlighterInputTypes.GAME_SEQUENCE,
+    EHighlighterInputTypes.GAME_START,
+    EHighlighterInputTypes.GAME_END,
+    EHighlighterInputTypes.VOICE_ACTIVITY,
+    EHighlighterInputTypes.META_DURATION,
+    EHighlighterInputTypes.LOW_HEALTH,
+  ];
+
   const inputTypeMap = Object.entries(getMomentTypeCount(clips));
-  const filteredinputTypeMap =
-    inputTypeMap.length > 2 || includeDeploy === false
-      ? inputTypeMap.filter(([type]) => type !== 'deploy')
-      : inputTypeMap;
+  const filteredInputTypeMap = inputTypeMap.filter(
+    ([type]) =>
+      !excludeTypes.includes(type as EHighlighterInputTypes) &&
+      (inputTypeMap.length <= 2 || includeDeploy || type !== 'deploy'),
+  );
   const manualClips = clips.filter(
     clip => clip.source === 'ReplayBuffer' || clip.source === 'Manual',
   );
@@ -43,7 +53,7 @@ export function InputEmojiSection({
           </span>
         </div>
       )}
-      {filteredinputTypeMap.map(([type, count]) => (
+      {filteredInputTypeMap.map(([type, count]) => (
         <div key={type} style={{ display: 'flex', gap: '4px' }}>
           <span key={type + 'emoji'}>{getTypeWordingFromType(type, count).emoji} </span>{' '}
           <span key={type + 'desc'}>
@@ -77,6 +87,7 @@ function getTypeWordingFromType(
     default:
       break;
   }
+  return { emoji: '', description: '' };
   return { emoji: type, description: count > 1 ? `${type}s` : type };
 }
 
