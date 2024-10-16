@@ -817,11 +817,10 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     // A user who has never logged in before and did not install a
     // theme during onboarding will have no collections. To prevent
     // special handling of the default theme for a user who installed
-    //  a theme during onboarding
+    // a theme during onboarding. NOTE: this will be set to false after
+    // onboarding in the dual output service
     if (serverCollections.length === 0) {
       this.newUserFirstLogin = true;
-    } else if (this.newUserFirstLogin && serverCollections.length > 0) {
-      this.newUserFirstLogin = false;
     }
 
     let failed = false;
