@@ -171,9 +171,21 @@
   gap: 16px;
 }
 
-.live-dock-chat-apps__popout {
-  .padding();
-  .cursor--pointer();
+.live-dock-chat-tabs__icons {
+  display: flex;
+  flex-grow: 1;
+  width: 100%;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 8px 0 8px 8px;
+}
+
+.live-dock-chat-tabs__popout {
+  cursor: pointer;
+}
+
+.live-dock-chat-tabs__info {
+  cursor: pointer;
 }
 
 .live-dock-platform-app-webview {

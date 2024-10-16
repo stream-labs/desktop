@@ -46,7 +46,7 @@ export const tikTokUserNotApproved: IDummyTestUser = {
   widgetToken: 'tikTokWidgetToken2',
   serverUrl: 'rtmps://tikTokStreamUrl2:443/rtmp/',
   streamKey: 'tikTokStreamKey2',
-  tikTokLiveScope: 'not-approved',
+  tikTokLiveScope: 'denied',
 };
 
 export const tikTokUserLegacy: IDummyTestUser = {
@@ -64,7 +64,7 @@ export const tikTokUserLegacy: IDummyTestUser = {
   tikTokLiveScope: 'legacy',
 };
 
-export const tikTokUserDenied: IDummyTestUser = {
+export const tikTokUserRelog: IDummyTestUser = {
   email: 'tikTokUser4@email.com',
   workerId: 'tikTokWorkerId4',
   updated: 'tikTokUpdatedId4',
@@ -76,14 +76,14 @@ export const tikTokUserDenied: IDummyTestUser = {
   widgetToken: 'tikTokWidgetToken4',
   serverUrl: 'rtmps://tikTokStreamUrl4:443/rtmp/',
   streamKey: 'tikTokStreamKey4',
-  tikTokLiveScope: 'denied',
+  tikTokLiveScope: 'relog',
 };
 
 export const tikTokUsers = {
   approved: tikTokUserApproved,
-  ['not-approved']: tikTokUserNotApproved,
+  denied: tikTokUserNotApproved,
   legacy: tikTokUserLegacy,
-  denied: tikTokUserDenied,
+  relog: tikTokUserRelog,
 };
 
 /**
@@ -150,14 +150,14 @@ export function getDummyUser(
     switch (tikTokLiveScope) {
       case 'approved':
         return tikTokUserApproved;
-      case 'not-approved':
+      case 'denied':
         return tikTokUserNotApproved;
       case 'legacy':
         return tikTokUserLegacy;
-      case 'denied':
-        return tikTokUserDenied;
+      case 'relog':
+        return tikTokUserRelog;
       default:
-        return tikTokUserDenied;
+        return tikTokUserNotApproved;
     }
   }
 }

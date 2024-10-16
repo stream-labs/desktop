@@ -1,13 +1,11 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { IVolmeter } from 'services/audio';
-import { Subscription } from 'rxjs';
-import electron from 'electron';
+import electron, { ipcRenderer } from 'electron';
 import difference from 'lodash/difference';
 import { compileShader, createProgram } from 'util/webgl/utils';
 import vShaderSrc from 'util/webgl/shaders/volmeter.vert';
 import fShaderSrc from 'util/webgl/shaders/volmeter.frag';
 import { Services } from 'components-react/service-provider';
-import { injectWatch, useModule } from 'slap';
 import { assertIsDefined, getDefined } from 'util/properties-type-guards';
 
 // Configuration
@@ -28,6 +26,7 @@ const RED = [252, 62, 63];
 
 interface IVolmeterSubscription {
   sourceId: string;
+  channelId?: string;
   channelsCount: number;
   // peakHolds show the maximum peak value for a given time range
   peakHoldCounters: number[];
@@ -40,20 +39,26 @@ interface IVolmeterSubscription {
   interpolatedPeaks: number[];
   // the time of last received peaks
   lastEventTime: number;
-  listener: (e: Electron.Event, volmeter: IVolmeter) => void;
 }
 
 /**
  * Component that renders the volume for audio sources via WebGL
  */
 export default function GLVolmeters() {
-  const { setupNewCanvas } = useModule(GLVolmetersModule);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // init controller on mount
+  const controller = useMemo(() => {
+    const controller = new GLVolmetersController();
+    controller.init();
+    return controller;
+  }, []);
 
   // start rendering volmeters when the canvas is ready
   useEffect(() => {
     assertIsDefined(canvasRef.current);
-    setupNewCanvas(canvasRef.current);
+    controller.setupNewCanvas(canvasRef.current);
+    return () => controller.beforeDestroy(); // cleanup on unmount
   }, []);
 
   return (
@@ -75,9 +80,10 @@ export default function GLVolmeters() {
   );
 }
 
-class GLVolmetersModule {
+class GLVolmetersController {
   private customizationService = Services.CustomizationService;
   private audioService = Services.AudioService;
+  private sourcesService = Services.SourcesService;
 
   subscriptions: Dictionary<IVolmeterSubscription> = {};
 
@@ -113,7 +119,6 @@ class GLVolmetersModule {
   private workerId: number;
   private requestedFrameId: number;
   private bgMultiplier = this.customizationService.isDarkTheme ? 0.2 : 0.5;
-  private customizationServiceSubscription: Subscription = null!;
 
   init() {
     this.workerId = electron.ipcRenderer.sendSync('getWorkerWindowId');
@@ -133,12 +138,6 @@ class GLVolmetersModule {
     });
   }
 
-  // update volmeters subscriptions when audio sources change
-  watchAudioSources = injectWatch(
-    () => this.audioSources,
-    () => this.subscribeVolmeters(),
-  );
-
   /**
    * add or remove subscription for volmeters depending on current scene
    */
@@ -155,19 +154,18 @@ class GLVolmetersModule {
       if (this.subscriptions[sourceId]) return;
 
       // create listener
-      const listener = (sourceId => (e: Electron.Event, volmeter: IVolmeter) => {
+      const listener = (e: { data: IVolmeter }) => {
         const subscription = this.subscriptions[sourceId];
         if (!subscription) return;
-        subscription.channelsCount = volmeter.peak.length;
+        subscription.channelsCount = e.data.peak.length;
         subscription.prevPeaks = subscription.interpolatedPeaks;
-        subscription.currentPeaks = Array.from(volmeter.peak);
+        subscription.currentPeaks = Array.from(e.data.peak);
         subscription.lastEventTime = performance.now();
-      })(sourceId);
+      };
 
       // create a subscription object
       this.subscriptions[sourceId] = {
         sourceId,
-        listener,
         // Assume 2 channels until we know otherwise. This prevents too much
         // visual jank as the volmeters are initializing.
         channelsCount: 2,
@@ -179,11 +177,15 @@ class GLVolmetersModule {
         peakHoldCounters: [],
       };
 
-      // bind listener
-      electron.ipcRenderer.on(`volmeter-${sourceId}`, listener);
+      this.audioService.subscribeVolmeter(sourceId).then(id => {
+        ipcRenderer.once(`port-${id}`, e => {
+          if (!this.subscriptions[sourceId]) return;
+          this.subscriptions[sourceId].channelId = id;
+          e.ports[0].onmessage = listener;
+        });
 
-      // subscribe for event
-      electron.ipcRenderer.sendTo(this.workerId, 'volmeterSubscribe', sourceId);
+        ipcRenderer.send('request-message-channel-out', id);
+      });
     });
 
     // unsubscribe from not longer relevant volmeters
@@ -196,11 +198,13 @@ class GLVolmetersModule {
   }
 
   private unsubscribeVolmeter(sourceId: string) {
-    electron.ipcRenderer.removeListener(
-      `volmeter-${sourceId}`,
-      this.subscriptions[sourceId].listener,
-    );
-    electron.ipcRenderer.sendTo(this.workerId, 'volmeterUnsubscribe', sourceId);
+    if (this.subscriptions[sourceId].channelId) {
+      this.audioService.actions.unsubscribeVolmeter(
+        sourceId,
+        this.subscriptions[sourceId].channelId!,
+      );
+    }
+
     delete this.subscriptions[sourceId];
   }
 
@@ -212,7 +216,6 @@ class GLVolmetersModule {
 
     // cancel next frame rendering
     cancelAnimationFrame(this.requestedFrameId);
-    this.customizationServiceSubscription.unsubscribe();
   }
 
   setupNewCanvas($canvasEl: HTMLCanvasElement) {

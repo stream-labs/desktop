@@ -26,7 +26,7 @@ export enum EAvailableFeatures {
    * availability at launch.
    */
   guestCamBeta = 'slobs--guest-join',
-  guestCaProduction = 'slobs--guest-join-prod',
+  guestCamProduction = 'slobs--guest-join-prod',
 }
 
 interface IIncrementalRolloutServiceState {

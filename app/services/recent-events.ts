@@ -53,6 +53,7 @@ export interface IRecentEvent {
   read: boolean;
   hash: string;
   isTest?: boolean;
+  isPreview?: boolean;
   repeat?: boolean;
   // uuid is local and will NOT persist across app restarts/ fetches
   uuid: string;
@@ -884,7 +885,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
 
   onEventSocket(e: IEventSocketEvent) {
     const messages = e.message
-      .filter(msg => !msg.isTest && !msg.repeat)
+      .filter(msg => !msg.isTest && !msg.isPreview && !msg.repeat)
       .map(msg => {
         msg.platform = e.for;
         msg.type = e.type;

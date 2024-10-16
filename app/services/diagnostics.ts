@@ -164,6 +164,28 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
     return this.appService.appDataDirectory;
   }
 
+  get hasRecentlyStreamed(): boolean {
+    return this.state.streams.length > 0;
+  }
+
+  get isFrequentUser(): boolean {
+    // At least 5 streams in the last 30 days
+    const numStreams = this.state.streams.reduce((num: number, stream: IStreamDiagnosticInfo) => {
+      const streamDate = new Date(stream.endTime);
+      const today = new Date(Date.now());
+      const numDaysSinceStream = Math.floor(
+        (today.getTime() - streamDate.getTime()) / (1000 * 3600 * 24),
+      );
+
+      if (numDaysSinceStream >= 30) {
+        num = num + 1;
+        return num;
+      }
+    }, 0);
+
+    return numStreams > 4;
+  }
+
   static defaultState: IDiagnosticsServiceState = {
     streams: [],
   };
