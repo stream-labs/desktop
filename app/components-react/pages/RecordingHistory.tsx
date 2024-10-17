@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
+import cx from 'classnames';
 import * as remote from '@electron/remote';
 import { Tooltip } from 'antd';
 import { $t } from 'services/i18n';
@@ -247,14 +248,18 @@ function EditModal() {
   const showEditModal = store.useState(s => s.showEditModal);
   const recording = store.useState(s => s.fileEdited);
 
-  function editFile(platform: string) {
-    if (!recording) throw new Error('File not found');
-
-    uploadToStorage(recording.filename, platform);
+  function close() {
     store.setState(s => {
       s.showEditModal = false;
       s.fileEdited = null;
     });
+  }
+
+  function editFile(platform: string) {
+    if (!recording) throw new Error('File not found');
+
+    uploadToStorage(recording.filename, platform);
+    close();
   }
 
   if (!showEditModal) return <></>;
@@ -265,28 +270,30 @@ function EditModal() {
         hideFooter
         wrapperStyle={{
           width: '750px',
-          height: '300px',
+          height: '320px',
         }}
         bodyStyle={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-around',
           width: '100%',
+          background: 'var(--section)',
+          position: 'relative',
         }}
       >
         <>
           <h2>{$t('Choose how to edit your recording')}</h2>
-          {editOptions.map(editOpt => (
-            <div
-              className={styles.editCell}
-              key={editOpt.value}
-              onClick={() => editFile(editOpt.value)}
-            >
-              <img src={$i(`images/products/${editOpt.src}`)} />
-              <span className={styles.editTitle}>{editOpt.label}</span>
-              <span>{editOpt.description}</span>
-            </div>
-          ))}
+          <i className={cx('icon-close', styles.closeIcon)} onClick={close} />
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}>
+            {editOptions.map(editOpt => (
+              <div
+                className={styles.editCell}
+                key={editOpt.value}
+                onClick={() => editFile(editOpt.value)}
+              >
+                <img src={$i(`images/products/${editOpt.src}`)} />
+                <span className={styles.editTitle}>{editOpt.label}</span>
+                <span>{editOpt.description}</span>
+              </div>
+            ))}
+          </div>
         </>
       </ModalLayout>
     </div>
