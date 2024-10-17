@@ -25,10 +25,14 @@ import { UserService } from 'services/user';
 import { SelectionService, Selection } from 'services/selection';
 import { StreamingService } from 'services/streaming';
 import { SettingsService } from 'services/settings';
+import { SourcesService, TSourceType } from 'services/sources';
+import { WidgetsService, WidgetType } from 'services/widgets';
 import { RunInLoadingMode } from 'services/app/app-decorators';
 import compact from 'lodash/compact';
 import invert from 'lodash/invert';
 import forEachRight from 'lodash/forEachRight';
+import { byOS, OS } from 'util/operating-systems';
+import { DefaultHardwareService } from 'services/hardware/default-hardware';
 
 interface IDisplayVideoSettings {
   horizontal: IVideoInfo;
@@ -275,15 +279,21 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   }
 
   getCanStreamDualOutput() {
+    return this.horizontalHasTargets && this.verticalHasTargets;
+  }
+
+  get horizontalHasTargets() {
     const platformDisplays = this.streamingService.views.activeDisplayPlatforms;
     const destinationDisplays = this.streamingService.views.activeDisplayDestinations;
 
-    const horizontalHasDestinations =
-      platformDisplays.horizontal.length > 0 || destinationDisplays.horizontal.length > 0;
-    const verticalHasDestinations =
-      platformDisplays.vertical.length > 0 || destinationDisplays.vertical.length > 0;
+    return platformDisplays.horizontal.length > 0 || destinationDisplays.horizontal.length > 0;
+  }
 
-    return horizontalHasDestinations && verticalHasDestinations;
+  get verticalHasTargets() {
+    const platformDisplays = this.streamingService.views.activeDisplayPlatforms;
+    const destinationDisplays = this.streamingService.views.activeDisplayDestinations;
+
+    return platformDisplays.vertical.length > 0 || destinationDisplays.vertical.length > 0;
   }
 
   /**
@@ -312,6 +322,9 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   @Inject() private selectionService: SelectionService;
   @Inject() private streamingService: StreamingService;
   @Inject() private settingsService: SettingsService;
+  @Inject() private sourcesService: SourcesService;
+  @Inject() private widgetsService: WidgetsService;
+  @Inject() private defaultHardwareService: DefaultHardwareService;
 
   static defaultState: IDualOutputServiceState = {
     platformSettings: DualOutputPlatformSettings,
@@ -392,14 +405,20 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   }
 
   /**
-   * Edit dual output display settings
+   * Set Dual Output mode with side effects
+   * @param status - Whether to enable or disable dual output mode
+   * @param skipShowVideoSettings - Whether to skip showing the video settings window
+   * @param showGoLiveWindow - Whether to show the go live window
    */
-
   @RunInLoadingMode()
-  setDualOutputMode(status: boolean = true, skipShowVideoSettings?: boolean) {
+  setDualOutputMode(
+    status: boolean = true,
+    skipShowVideoSettings: boolean = false,
+    showGoLiveWindow?: boolean,
+  ) {
     if (!this.userService.isLoggedIn) return;
 
-    this.SET_SHOW_DUAL_OUTPUT(status);
+    this.toggleDualOutputMode(status);
 
     if (this.state.dualOutputMode) {
       this.disableGlobalRescaleIfNeeded();
@@ -424,9 +443,19 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
     if (!skipShowVideoSettings) {
       this.settingsService.showSettings('Video');
+    } else if (showGoLiveWindow) {
+      this.streamingService.showGoLiveWindow();
     }
 
     this.SET_IS_LOADING(false);
+  }
+
+  /**
+   * Toggle dual output mode
+   * @remark Primarily a wrapper for the mutation to toggle dual output mode
+   */
+  toggleDualOutputMode(status: boolean) {
+    this.SET_SHOW_DUAL_OUTPUT(status);
   }
 
   disableGlobalRescaleIfNeeded() {
@@ -451,6 +480,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
   convertSingleOutputToDualOutputCollection() {
     this.SET_IS_LOADING(true);
+
     // establish vertical context if it doesn't exist
     if (!this.videoSettingsService.contexts.vertical) {
       this.videoSettingsService.establishVideoContext('vertical');
@@ -463,7 +493,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       });
     } catch (error: unknown) {
       console.error('Error converting to single output collection to dual output: ', error);
-      this.collectionHandled.next(null);
+      this.collectionHandled.next();
     }
 
     this.collectionHandled.next(this.sceneCollectionsService.sceneNodeMaps);
@@ -606,7 +636,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       });
     } catch (error: unknown) {
       console.error('Error validating dual output collection: ', error);
-      this.collectionHandled.next(null);
+      this.collectionHandled.next();
     }
     this.collectionHandled.next(this.sceneCollectionsService.sceneNodeMaps);
   }
@@ -811,6 +841,61 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         this.streamSettingsService.setGoLiveSettings({ customDestinations: updatedDestinations });
       }
     });
+  }
+
+  /**
+   * Creates default sources for new users
+   * @remark New users should have dual output toggled and a few default sources.
+   * Create all the sources before toggling dual output for a better user experience.
+   */
+  setupDefaultSources() {
+    this.setIsLoading(true);
+
+    if (!this.videoSettingsService.contexts.vertical) {
+      this.videoSettingsService.establishVideoContext('vertical');
+    }
+
+    const scene =
+      this.scenesService.views.activeScene ??
+      this.scenesService.createScene('Scene', { makeActive: true });
+
+    // add game capture source
+    const gameCapture = scene.createAndAddSource(
+      'Game Capture',
+      'game_capture',
+      {},
+      { display: 'horizontal' },
+    );
+    this.createPartnerNode(gameCapture);
+
+    // add alert box widget
+    this.widgetsService.createWidget(WidgetType.AlertBox, 'Alert Box');
+
+    // add webcam source
+    const type = byOS({
+      [OS.Windows]: 'dshow_input',
+      [OS.Mac]: 'av_capture_input',
+    }) as TSourceType;
+
+    const defaultSource = this.defaultHardwareService.state.defaultVideoDevice;
+
+    const webCam = defaultSource
+      ? this.sourcesService.views.getSource(defaultSource)
+      : this.sourcesService.views.sources.find(s => s?.type === type);
+
+    if (!webCam) {
+      const cam = scene.createAndAddSource('Webcam', type, { display: 'horizontal' });
+      this.createPartnerNode(cam);
+    } else {
+      const cam = scene.addSource(webCam.sourceId, { display: 'horizontal' });
+      this.createPartnerNode(cam);
+    }
+
+    // toggle dual output mode and vertical display
+    this.toggleDisplay(true, 'vertical');
+    this.toggleDualOutputMode(true);
+
+    this.collectionHandled.next();
   }
 
   /**

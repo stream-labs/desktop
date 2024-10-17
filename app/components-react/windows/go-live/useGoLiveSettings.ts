@@ -311,19 +311,9 @@ export class GoLiveSettingsModule {
    * Validate the form and show an error message
    */
   async validate() {
-    // TODO: comment authorization error back in after resolving legacy approval flow
     // tiktok live authorization error
-    // if (this.state.isEnabled('tiktok') && !Services.TikTokService.liveStreamingEnabled) {
-    //   message.error($t('Streaming to TikTok not approved.'));
-    //   return false;
-    // }
-
-    if (Services.DualOutputService.views.dualOutputMode && !this.getCanStreamDualOutput()) {
-      message.error(
-        $t(
-          'To use Dual Output you must stream to at least one horizontal and one vertical platform.',
-        ),
-      );
+    if (this.state.isEnabled('tiktok') && !Services.TikTokService.liveStreamingEnabled) {
+      message.error($t('Streaming to TikTok not approved.'));
       return false;
     }
 
@@ -338,6 +328,7 @@ export class GoLiveSettingsModule {
 
   /**
    * Validate the form and start streaming
+   * @remark Returning false from this function signifies that
    */
   async goLive() {
     if (await this.validate()) {

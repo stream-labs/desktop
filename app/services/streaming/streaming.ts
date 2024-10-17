@@ -889,7 +889,10 @@ export class StreamingService
     // Dual output cannot be toggled while live
     if (this.state.streamingStatus !== EStreamingState.Offline) return;
 
-    if (enabled) this.usageStatisticsService.recordFeatureUsage('DualOutput');
+    if (enabled) {
+      this.dualOutputService.actions.setDualOutputMode(true, true);
+      this.usageStatisticsService.recordFeatureUsage('DualOutput');
+    }
 
     this.SET_DUAL_OUTPUT_MODE(enabled);
   }
