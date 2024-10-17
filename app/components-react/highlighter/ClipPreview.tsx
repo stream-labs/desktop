@@ -48,23 +48,6 @@ export default function ClipPreview(props: {
     HighlighterService.actions.enableClip(v.clip.path, enabled);
   }
 
-  function getInitialTime() {
-    if (!v.clip.streamInfo) {
-      return 'noStreamInfo';
-    }
-
-    const streamIds = Object.keys(v.clip.streamInfo);
-    if (streamIds.length === 0) {
-      return 'noStreamId';
-    }
-
-    const firstStreamId = props.streamId || streamIds[0]; // TODO M: Pass streamId here? or need to find the stream where the initialTime is not undefined
-    const startTime = v.clip.streamInfo[firstStreamId]?.initialStartTime;
-    const endTime = v.clip.streamInfo[firstStreamId]?.initialEndTime;
-
-    return startTime !== undefined ? `${startTime} -${endTime}  ` : 'startTimeUndefined';
-  }
-
   return (
     <div
       style={{
@@ -232,15 +215,13 @@ export default function ClipPreview(props: {
           }}
         >
           <div style={{ fontSize: '16px' }}>
-            {v.clip.source !== 'Manual' && (
+            {v.clip.source !== 'Manual' && props.streamId && (
               <>
-                {`${
-                  props.streamId &&
-                  formatSecondsToHHMMSS(v.clip.streamInfo?.[props.streamId]?.initialStartTime)
-                } - ${
-                  props.streamId &&
-                  formatSecondsToHHMMSS(v.clip.streamInfo?.[props.streamId]?.initialEndTime)
-                } `}
+                {`${formatSecondsToHHMMSS(
+                  v.clip.streamInfo?.[props.streamId]?.initialStartTime,
+                )} - ${formatSecondsToHHMMSS(
+                  v.clip.streamInfo?.[props.streamId]?.initialEndTime,
+                )} `}
               </>
             )}
           </div>
