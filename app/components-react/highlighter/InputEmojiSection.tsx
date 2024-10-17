@@ -2,6 +2,7 @@ import React from 'react';
 import { TClip } from 'services/highlighter';
 import { isAiClip } from './utils';
 import { EHighlighterInputTypes } from 'services/highlighter/ai-highlighter/ai-highlighter';
+import styles from './InputEmojiSection.m.less';
 
 export function InputEmojiSection({
   clips,
@@ -31,6 +32,7 @@ export function InputEmojiSection({
     clip => clip.source === 'ReplayBuffer' || clip.source === 'Manual',
   );
   const rounds = getAmountOfRounds(clips);
+
   function manualClip() {
     if (manualClips.length === 0) {
       return <></>;
@@ -38,17 +40,21 @@ export function InputEmojiSection({
     return (
       <div key={'manualClips'} style={{ display: 'flex', gap: '4px' }}>
         <span>🎬</span>
-        <span>{`${manualClips.length} ${manualClips.length === 1 ? 'manual' : 'manuals'}`}</span>
+        <span className={styles.description}>{`${manualClips.length} ${
+          manualClips.length === 1 ? 'manual' : 'manuals'
+        }`}</span>
       </div>
     );
   }
 
   return (
-    <div style={{ height: '22px', display: 'flex', gap: '8px' }}>
+    <div
+      style={{ height: '22px', display: 'flex', gap: '8px', flexWrap: 'wrap', overflow: 'hidden' }}
+    >
       {includeRounds && (
         <div key={'rounds'} style={{ display: 'flex', gap: '4px' }}>
           <span key={'rounds' + 'emoji'}> {getTypeWordingFromType('rounds', rounds).emoji} </span>{' '}
-          <span key={'rounds' + 'desc'}>
+          <span className={styles.description} key={'rounds' + 'desc'}>
             {rounds} {getTypeWordingFromType('rounds', rounds).description}
           </span>
         </div>
@@ -56,7 +62,7 @@ export function InputEmojiSection({
       {filteredInputTypeMap.map(([type, count]) => (
         <div key={type} style={{ display: 'flex', gap: '4px' }}>
           <span key={type + 'emoji'}>{getTypeWordingFromType(type, count).emoji} </span>{' '}
-          <span key={type + 'desc'}>
+          <span className={styles.description} key={type + 'desc'}>
             {count} {getTypeWordingFromType(type, count).description}
           </span>
         </div>
