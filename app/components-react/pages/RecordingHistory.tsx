@@ -197,7 +197,7 @@ export function RecordingHistory() {
           <span
             className={styles.action}
             key={opt.value}
-            style={{ color: `var(--${opt.value === 'youtube' ? 'title' : opt.value})` }}
+            style={{ color: `var(--${opt.value === 'edit' ? 'teal' : 'title'})` }}
             onClick={() => handleSelect(p.recording, opt.value)}
           >
             <i className={opt.icon} />
