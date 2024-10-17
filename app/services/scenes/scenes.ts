@@ -455,7 +455,9 @@ export class ScenesService extends StatefulService<IScenesState> {
 
     const sceneItem = scene.createAndAddSource(sourceName, sourceType, settings);
 
-    this.dualOutputService.createPartnerNode(sceneItem);
+    if (this.dualOutputService.state.dualOutputMode) {
+      this.dualOutputService.createPartnerNode(sceneItem);
+    }
 
     return sceneItem.sceneItemId;
   }
