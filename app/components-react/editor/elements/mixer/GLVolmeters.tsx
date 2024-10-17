@@ -163,13 +163,19 @@ class GLVolmetersController {
         subscription.lastEventTime = performance.now();
       };
 
+      const IDLE_PEAK = -60;
+      const INITIAL_PEAKS = [IDLE_PEAK, IDLE_PEAK];
+
       // create a subscription object
       this.subscriptions[sourceId] = {
         sourceId,
         // Assume 2 channels until we know otherwise. This prevents too much
         // visual jank as the volmeters are initializing.
         channelsCount: 2,
-        currentPeaks: [],
+        // HACK: Initialize currentPeaks to an idle-ish peak, if the source
+        // has never emitted any events, volmeters won't get drawn and we get
+        // a missing bar on app load our source device switch.
+        currentPeaks: INITIAL_PEAKS,
         prevPeaks: [],
         interpolatedPeaks: [],
         lastEventTime: 0,
@@ -280,14 +286,7 @@ class GLVolmetersController {
 
     // Vertex geometry for a unit square
     // eslint-disable-next-line
-    const positions = [
-      0, 0,
-      0, 1,
-      1, 0,
-      1, 0,
-      0, 1,
-      1, 1,
-    ];
+    const positions = [0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 1];
 
     this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(positions), this.gl.STATIC_DRAW);
 
@@ -324,7 +323,10 @@ class GLVolmetersController {
   private setColorUniform(uniform: string, color: number[]) {
     const location = this.gl.getUniformLocation(this.program, uniform);
     // eslint-disable-next-line
-    this.gl.uniform3fv(location, color.map(c => c / 255));
+    this.gl.uniform3fv(
+      location,
+      color.map(c => c / 255),
+    );
   }
 
   private setCanvasSize() {
