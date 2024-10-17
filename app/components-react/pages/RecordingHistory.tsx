@@ -13,6 +13,13 @@ import { initStore, useController } from '../hooks/zustand';
 import { useVuex } from '../hooks';
 import Translate from 'components-react/shared/Translate';
 import { $i } from 'services/utils';
+import { IRecordingEntry } from 'services/recording-mode';
+
+interface IRecordingHistoryStore {
+  showSLIDModal: boolean;
+  showEditModal: boolean;
+  fileEdited: IRecordingEntry | null;
+}
 
 const RecordingHistoryCtx = React.createContext<RecordingHistoryController | null>(null);
 
@@ -21,7 +28,11 @@ class RecordingHistoryController {
   private UserService = Services.UserService;
   private SharedStorageService = Services.SharedStorageService;
   private NotificationsService = Services.NotificationsService;
-  store = initStore({ showSLIDModal: false, showEditModal: false, fileEdited: '' });
+  store = initStore<IRecordingHistoryStore>({
+    showSLIDModal: false,
+    showEditModal: false,
+    fileEdited: null,
+  });
 
   get recordings() {
     return this.RecordingModeService.views.sortedRecordings;
@@ -96,16 +107,17 @@ class RecordingHistoryController {
     });
   }
 
-  handleSelect(filename: string, platform: string) {
+  handleSelect(recording: IRecordingEntry, platform: string) {
     if (this.uploadInfo.uploading) {
       this.postError($t('Upload already in progress'));
       return;
     }
-    if (platform === 'youtube') return this.uploadToYoutube(filename);
+    if (platform === 'youtube') return this.uploadToYoutube(recording.filename);
+    if (platform === 'remove') return this.removeEntry(recording.timestamp);
     if (this.hasSLID) {
       this.store.setState(s => {
         s.showEditModal = true;
-        s.fileEdited = filename;
+        s.fileEdited = recording;
       });
     } else {
       this.store.setState(s => {
@@ -128,6 +140,10 @@ class RecordingHistoryController {
     const id = await this.RecordingModeService.actions.return.uploadToStorage(filename, platform);
     if (!id) return;
     remote.shell.openExternal(this.SharedStorageService.views.getPlatformLink(platform, id));
+  }
+
+  removeEntry(timestamp: string) {
+    this.RecordingModeService.actions.removeRecordingEntry(timestamp);
   }
 
   showFile(filename: string) {
@@ -173,7 +189,7 @@ export function RecordingHistory() {
     Services.SettingsService.actions.showSettings('Hotkeys');
   }
 
-  function UploadActions(p: { filename: string }) {
+  function UploadActions(p: { recording: IRecordingEntry }) {
     return (
       <span className={styles.actionGroup}>
         {uploadOptions.map(opt => (
@@ -181,7 +197,7 @@ export function RecordingHistory() {
             className={styles.action}
             key={opt.value}
             style={{ color: `var(--${opt.value === 'youtube' ? 'title' : opt.value})` }}
-            onClick={() => handleSelect(p.filename, opt.value)}
+            onClick={() => handleSelect(p.recording, opt.value)}
           >
             <i className={opt.icon} />
             &nbsp;
@@ -214,7 +230,7 @@ export function RecordingHistory() {
                   {recording.filename}
                 </span>
               </Tooltip>
-              {uploadOptions.length > 0 && <UploadActions filename={recording.filename} />}
+              {uploadOptions.length > 0 && <UploadActions recording={recording} />}
             </div>
           ))}
         </Scrollable>
@@ -229,15 +245,15 @@ export function RecordingHistory() {
 function EditModal() {
   const { store, editOptions, uploadToStorage } = useController(RecordingHistoryCtx);
   const showEditModal = store.useState(s => s.showEditModal);
-  const filename = store.useState(s => s.fileEdited);
+  const recording = store.useState(s => s.fileEdited);
 
   function editFile(platform: string) {
-    if (!filename) throw new Error('File not found');
+    if (!recording) throw new Error('File not found');
 
-    uploadToStorage(filename, platform);
+    uploadToStorage(recording.filename, platform);
     store.setState(s => {
       s.showEditModal = false;
-      s.fileEdited = '';
+      s.fileEdited = null;
     });
   }
 
