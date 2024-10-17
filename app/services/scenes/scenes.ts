@@ -13,7 +13,7 @@ import namingHelpers from 'util/NamingHelpers';
 import uuid from 'uuid/v4';
 import { DualOutputService } from 'services/dual-output';
 import { TDisplayType } from 'services/settings-v2/video';
-import { InitAfter, ViewHandler } from 'services/core';
+import { ExecuteInWorkerProcess, InitAfter, ViewHandler } from 'services/core';
 
 export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
 
@@ -440,6 +440,24 @@ export class ScenesService extends StatefulService<IScenesState> {
 
   getModel(): IScenesState {
     return this.state;
+  }
+
+  createAndAddSource(
+    sceneId: string,
+    sourceName: string,
+    sourceType: TSourceType,
+    settings: Dictionary<unknown>,
+  ) {
+    const scene = this.views.getScene(sceneId);
+    if (!scene) {
+      throw new Error(`Can't find scene with ID: ${sceneId}`);
+    }
+
+    const sceneItem = scene.createAndAddSource(sourceName, sourceType, settings);
+
+    this.dualOutputService.createPartnerNode(sceneItem);
+
+    return sceneItem.sceneItemId;
   }
 
   // TODO: Remove all of this in favor of the new "views" methods
