@@ -174,7 +174,7 @@ class GLVolmetersController {
         channelsCount: 2,
         // HACK: Initialize currentPeaks to an idle-ish peak, if the source
         // has never emitted any events, volmeters won't get drawn and we get
-        // a missing bar on app load our source device switch.
+        // a missing bar on app load or source device switch.
         currentPeaks: INITIAL_PEAKS,
         prevPeaks: [],
         interpolatedPeaks: [],
