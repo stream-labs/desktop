@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import without from 'lodash/without';
 import { Subject } from 'rxjs';
+import { filter, take, tap } from 'rxjs/operators';
 import { mutation, StatefulService } from 'services/core/stateful-service';
 import { TransitionsService } from 'services/transitions';
 import { WindowsService } from 'services/windows';
@@ -455,8 +456,19 @@ export class ScenesService extends StatefulService<IScenesState> {
 
     const sceneItem = scene.createAndAddSource(sourceName, sourceType, settings);
 
+    const createVerticalNode = () => this.dualOutputService.createPartnerNode(sceneItem);
+
     if (this.dualOutputService.state.dualOutputMode) {
-      this.dualOutputService.createPartnerNode(sceneItem);
+      createVerticalNode();
+    } else {
+      // Schedule vertical node to be created if the user toggles on dual output in the same session
+      this.dualOutputService.dualOutputModeChanged
+        .pipe(
+          filter(gotEnabled => !!gotEnabled),
+          take(1),
+          tap(createVerticalNode),
+        )
+        .subscribe();
     }
 
     return sceneItem.sceneItemId;
