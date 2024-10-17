@@ -368,7 +368,26 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         this.scenesService.views.scenes[0].name === 'Scene' &&
         this.scenesService.views.scenes[0].getNodes().length === 0;
 
-      if (!onlyDefaultCollection) {
+      console.log('onlyDefaultCollection', JSON.stringify(onlyDefaultCollection, null, 2));
+      console.log(
+        'this.sceneCollectionsService.collections.length === 1',
+        JSON.stringify(this.sceneCollectionsService.collections.length === 1, null, 2),
+      );
+      console.log(
+        'this.scenesService.views.scenes.length === 1',
+        JSON.stringify(this.scenesService.views.scenes.length === 1, null, 2),
+      );
+      console.log(
+        'this.scenesService.views.scenes[0].name === Scene',
+        JSON.stringify(this.scenesService.views.scenes[0].name === 'Scene', null, 2),
+      );
+      console.log(
+        'this.scenesService.views.scenes[0].getNodes().length === 0',
+        JSON.stringify(this.scenesService.views.scenes[0].getNodes().length === 0, null, 2),
+      );
+
+      if (!onlyDefaultCollection && this.sceneCollectionsService.newUserFirstLogin) {
+        this.setDualOutputMode(true, true);
         this.sceneCollectionsService.newUserFirstLogin = false;
         return;
       }
