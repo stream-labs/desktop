@@ -12,6 +12,7 @@ import { Services } from '../service-provider';
 import { initStore, useController } from '../hooks/zustand';
 import { useVuex } from '../hooks';
 import Translate from 'components-react/shared/Translate';
+import { $i } from 'services/utils';
 
 const RecordingHistoryCtx = React.createContext<RecordingHistoryController | null>(null);
 
@@ -20,7 +21,7 @@ class RecordingHistoryController {
   private UserService = Services.UserService;
   private SharedStorageService = Services.SharedStorageService;
   private NotificationsService = Services.NotificationsService;
-  store = initStore({ showSLIDModal: false });
+  store = initStore({ showSLIDModal: false, showEditModal: false, fileEdited: '' });
 
   get recordings() {
     return this.RecordingModeService.views.sortedRecordings;
@@ -41,19 +42,14 @@ class RecordingHistoryController {
   get uploadOptions() {
     const opts = [
       {
-        label: $t('Clip'),
-        value: 'crossclip',
-        icon: 'icon-editor-7',
-      },
-      {
-        label: $t('Subtitle'),
-        value: 'typestudio',
-        icon: 'icon-mic',
-      },
-      {
         label: $t('Edit'),
-        value: 'videoeditor',
-        icon: 'icon-play-round',
+        value: 'edit',
+        icon: 'icon-trim',
+      },
+      {
+        label: '',
+        value: 'remove',
+        icon: 'icon-trash',
       },
     ];
     if (this.hasYoutube) {
@@ -65,6 +61,31 @@ class RecordingHistoryController {
     }
 
     return opts;
+  }
+
+  get editOptions() {
+    return [
+      {
+        value: 'videoeditor',
+        label: 'Video Editor',
+        description: $t('Edit video professionally from your browser with Video Editor'),
+        src: 'video-editor.png',
+      },
+      {
+        value: 'crossclip',
+        label: 'Cross Clip',
+        description: $t(
+          'Turn your videos into mobile-friendly short-form TikToks, Reels, and Shorts with Cross Clip',
+        ),
+        src: 'crossclip.png',
+      },
+      {
+        value: 'typestudio',
+        label: 'Podcast Edtior',
+        description: $t('Polish your videos with text-based and AI powered Podcast Editor'),
+        src: 'podcast-editor.png',
+      },
+    ];
   }
 
   postError(message: string) {
@@ -82,7 +103,10 @@ class RecordingHistoryController {
     }
     if (platform === 'youtube') return this.uploadToYoutube(filename);
     if (this.hasSLID) {
-      this.uploadToStorage(filename, platform);
+      this.store.setState(s => {
+        s.showEditModal = true;
+        s.fileEdited = filename;
+      });
     } else {
       this.store.setState(s => {
         s.showSLIDModal = true;
@@ -196,7 +220,59 @@ export function RecordingHistory() {
         </Scrollable>
       </div>
       <ExportModal />
+      <EditModal />
       {!hasSLID && <SLIDModal />}
+    </div>
+  );
+}
+
+function EditModal() {
+  const { store, editOptions, uploadToStorage } = useController(RecordingHistoryCtx);
+  const showEditModal = store.useState(s => s.showEditModal);
+  const filename = store.useState(s => s.fileEdited);
+
+  function editFile(platform: string) {
+    if (!filename) throw new Error('File not found');
+
+    uploadToStorage(filename, platform);
+    store.setState(s => {
+      s.showEditModal = false;
+      s.fileEdited = '';
+    });
+  }
+
+  if (!showEditModal) return <></>;
+
+  return (
+    <div className={styles.modalBackdrop}>
+      <ModalLayout
+        hideFooter
+        wrapperStyle={{
+          width: '750px',
+          height: '300px',
+        }}
+        bodyStyle={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-around',
+          width: '100%',
+        }}
+      >
+        <>
+          <h2>{$t('Choose how to edit your recording')}</h2>
+          {editOptions.map(editOpt => (
+            <div
+              className={styles.editCell}
+              key={editOpt.value}
+              onClick={() => editFile(editOpt.value)}
+            >
+              <img src={$i(`images/products/${editOpt.src}`)} />
+              <span className={styles.editTitle}>{editOpt.label}</span>
+              <span>{editOpt.description}</span>
+            </div>
+          ))}
+        </>
+      </ModalLayout>
     </div>
   );
 }
