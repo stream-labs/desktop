@@ -33,7 +33,6 @@ import invert from 'lodash/invert';
 import forEachRight from 'lodash/forEachRight';
 import { byOS, OS } from 'util/operating-systems';
 import { DefaultHardwareService } from 'services/hardware/default-hardware';
-import { OnboardingService } from 'services/onboarding';
 
 interface IDisplayVideoSettings {
   horizontal: IVideoInfo;
@@ -326,7 +325,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   @Inject() private sourcesService: SourcesService;
   @Inject() private widgetsService: WidgetsService;
   @Inject() private defaultHardwareService: DefaultHardwareService;
-  @Inject() private onboardingService: OnboardingService;
 
   static defaultState: IDualOutputServiceState = {
     platformSettings: DualOutputPlatformSettings,
@@ -358,61 +356,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
     // Disable global Rescale Output
     this.disableGlobalRescaleIfNeeded();
-
-    // New users should have dual output enabled by default
-    // with a few default sources
-    this.onboardingService.onboardingCompleted.subscribe(() => {
-      const onlyDefaultCollection =
-        this.sceneCollectionsService.collections.length === 1 &&
-        this.scenesService.views.scenes.length === 1 &&
-        this.scenesService.views.scenes[0].name === 'Scene' &&
-        this.scenesService.views.scenes[0].getNodes().length === 0;
-
-      console.log('onlyDefaultCollection', JSON.stringify(onlyDefaultCollection, null, 2));
-      console.log(
-        'this.sceneCollectionsService.collections.length === 1',
-        JSON.stringify(this.sceneCollectionsService.collections.length === 1, null, 2),
-      );
-      console.log(
-        'this.scenesService.views.scenes.length === 1',
-        JSON.stringify(this.scenesService.views.scenes.length === 1, null, 2),
-      );
-      console.log(
-        'this.scenesService.views.scenes[0].name === Scene',
-        JSON.stringify(this.scenesService.views.scenes[0].name === 'Scene', null, 2),
-      );
-      console.log(
-        'this.scenesService.views.scenes[0].getNodes().length === 0',
-        JSON.stringify(this.scenesService.views.scenes[0].getNodes().length === 0, null, 2),
-      );
-
-      if (!onlyDefaultCollection && this.sceneCollectionsService.newUserFirstLogin) {
-        this.setDualOutputMode(true, true);
-        this.sceneCollectionsService.newUserFirstLogin = false;
-        return;
-      }
-
-      if (this.sceneCollectionsService.newUserFirstLogin) {
-        this.setupDefaultSources();
-        this.sceneCollectionsService.newUserFirstLogin = false;
-        return;
-      }
-
-      // Check for the creation date being within the past 24 hours or up to 6 hours
-      // into the future. NOTE: This is to accommodate for discrepancies in time zone settings between the app and the user's device
-      const creationDate = this.userService.state?.createdAt;
-      if (!creationDate) return;
-
-      const now = new Date().getTime();
-      const creationTime = new Date(creationDate).getTime();
-      const millisecondsInAnHour = 1000 * 60 * 60;
-
-      const isWithinRange = creationTime < now && creationTime - now < millisecondsInAnHour * 6;
-
-      if (isWithinRange) {
-        this.setupDefaultSources();
-      }
-    });
 
     /**
      * Ensures that scene collection loads correctly for dual output
@@ -949,8 +892,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     }
 
     // toggle dual output mode and vertical display
-    this.toggleDualOutputMode(true);
     this.toggleDisplay(true, 'vertical');
+    this.toggleDualOutputMode(true);
 
     this.collectionHandled.next();
   }

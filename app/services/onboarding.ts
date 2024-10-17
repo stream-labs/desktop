@@ -16,6 +16,7 @@ import { RecordingModeService } from './recording-mode';
 import { THEME_METADATA, IThemeMetadata } from './onboarding/theme-metadata';
 export type { IThemeMetadata } from './onboarding/theme-metadata';
 import { TwitchStudioImporterService } from './ts-importer';
+import { DualOutputService } from 'services/dual-output';
 
 enum EOnboardingSteps {
   MacPermissions = 'MacPermissions',
@@ -268,6 +269,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   @Inject() userService: UserService;
   @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() outputSettingsService: OutputSettingsService;
+  @Inject() dualOutputService: DualOutputService;
 
   @mutation()
   SET_OPTIONS(options: Partial<IOnboardingOptions>) {
@@ -356,6 +358,14 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
         inputResolution,
         streaming: { outputResolution },
       });
+    }
+
+    // On their first login, users should have dual output mode enabled by default.
+    // If the user has not selected a scene collection during onboarding, add a few
+    // default sources to the default scene collection.
+    if (this.sceneCollectionsService.newUserFirstLogin && !this.existingSceneCollections) {
+      this.dualOutputService.setupDefaultSources();
+      this.sceneCollectionsService.newUserFirstLogin = false;
     }
 
     this.onboardingCompleted.next();

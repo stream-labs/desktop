@@ -592,6 +592,12 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
     await root.load();
     this.hotkeysService.bindHotkeys();
+
+    // Users who selected a theme during onboarding should have it loaded in dual output mode by default
+    if (this.newUserFirstLogin) {
+      this.dualOutputService.setDualOutputMode(true, true);
+      this.newUserFirstLogin = false;
+    }
   }
 
   /**
