@@ -21,16 +21,14 @@ export default function PreviewModal({
   const { HighlighterService } = Services;
   const clips = HighlighterService.getClips(HighlighterService.views.clips, streamId);
   const [currentClipIndex, setCurrentClipIndex] = useState(0);
-  const sortedClips = sortClips(clips, streamId);
+  const sortedClips = sortClips(clips, streamId).filter(c => c.enabled);
 
-  const playlist = sortedClips
-    .filter(c => c.enabled)
-    .map((clip: TClip) => ({
-      src: clip.path + `#t=${clip.startTrim},${clip.duration! - clip.endTrim}`,
-      start: clip.startTrim,
-      end: clip.duration! - clip.endTrim,
-      type: 'video/mp4',
-    }));
+  const playlist = sortedClips.map((clip: TClip) => ({
+    src: clip.path + `#t=${clip.startTrim},${clip.duration! - clip.endTrim}`,
+    start: clip.startTrim,
+    end: clip.duration! - clip.endTrim,
+    type: 'video/mp4',
+  }));
   const videoPlayerA = useRef<HTMLVideoElement>(null);
   const videoPlayerB = useRef<HTMLVideoElement>(null);
   const [activePlayer, setActivePlayer] = useState<'A' | 'B'>('A');
