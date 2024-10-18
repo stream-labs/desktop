@@ -868,9 +868,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     );
     this.createPartnerNode(gameCapture);
 
-    // add alert box widget
-    this.widgetsService.createWidget(WidgetType.AlertBox, 'Alert Box');
-
     // add webcam source
     const type = byOS({
       [OS.Windows]: 'dshow_input',
@@ -890,6 +887,9 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       const cam = scene.addSource(webCam.sourceId, { display: 'horizontal' });
       this.createPartnerNode(cam);
     }
+
+    // add alert box widget
+    this.widgetsService.createWidget(WidgetType.AlertBox, 'Alert Box');
 
     // toggle dual output mode and vertical display
     this.toggleDisplay(true, 'vertical');
