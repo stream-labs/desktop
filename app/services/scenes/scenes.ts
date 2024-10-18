@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import without from 'lodash/without';
 import { Subject } from 'rxjs';
-import { filter, take, tap } from 'rxjs/operators';
+import { filter, take, takeUntil, tap } from 'rxjs/operators';
 import { mutation, StatefulService } from 'services/core/stateful-service';
 import { TransitionsService } from 'services/transitions';
 import { WindowsService } from 'services/windows';
@@ -13,6 +13,7 @@ import { $t } from 'services/i18n';
 import namingHelpers from 'util/NamingHelpers';
 import uuid from 'uuid/v4';
 import { DualOutputService } from 'services/dual-output';
+import { SceneCollectionsService } from 'services/scene-collections';
 import { TDisplayType } from 'services/settings-v2/video';
 import { ExecuteInWorkerProcess, InitAfter, ViewHandler } from 'services/core';
 
@@ -272,6 +273,7 @@ class ScenesViews extends ViewHandler<IScenesState> {
 @InitAfter('DualOutputService')
 export class ScenesService extends StatefulService<IScenesState> {
   @Inject() private dualOutputService: DualOutputService;
+  @Inject() private sceneCollectionsService: SceneCollectionsService;
 
   static initialState: IScenesState = {
     activeSceneId: '',
@@ -464,6 +466,9 @@ export class ScenesService extends StatefulService<IScenesState> {
       // Schedule vertical node to be created if the user toggles on dual output in the same session
       this.dualOutputService.dualOutputModeChanged
         .pipe(
+          // If we switch collections before we enable dual output drop it
+          // we don't wanna create nodes on inactive scene collections
+          takeUntil(this.sceneCollectionsService.collectionWillSwitch),
           filter(gotEnabled => !!gotEnabled),
           take(1),
           tap(createVerticalNode),
