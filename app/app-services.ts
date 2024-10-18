@@ -81,6 +81,7 @@ export { InstagramService } from 'services/platforms/instagram';
 export { UsageStatisticsService } from './services/usage-statistics';
 export { GameOverlayService } from 'services/game-overlay';
 export { SharedStorageService } from 'services/integrations/shared-storage';
+export { RemoteControlService } from 'services/api/remote-control-api';
 
 export { MediaGalleryService } from 'services/media-gallery';
 export { MediaBackupService } from 'services/media-backup';
@@ -205,6 +206,7 @@ import { SharedStorageService } from 'services/integrations/shared-storage';
 import { RealmService } from 'services/realm';
 import { InstagramService } from 'services/platforms/instagram';
 import { TwitchStudioImporterService } from 'services/ts-importer';
+import { RemoteControlService } from 'services/api/remote-control-api';
 import { UrlService } from 'services/hosts';
 
 export const AppServices = {
@@ -284,5 +286,6 @@ export const AppServices = {
   MarkersService,
   SharedStorageService,
   RealmService,
+  RemoteControlService,
   UrlService,
 };
