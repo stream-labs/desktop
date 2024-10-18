@@ -1,9 +1,14 @@
 @import '../../styles/index.less';
 
 .add-destination-group {
+  width: 100%;
   gap: 15px;
-  margin: 15px 0px;
-  padding-bottom: 15px;
+  padding: 0px 15px 15px 15px;
+
+  &.ultra-btn-group {
+    width: calc(100% - 6px);
+    margin: 15px 3px;
+  }
 
   :global(.ant-space-item) {
     width: 100%;
@@ -62,9 +67,5 @@
         width: 15px;
       }
     }
-  }
-
-  .dual-output {
-    margin: 15px;
   }
 }
