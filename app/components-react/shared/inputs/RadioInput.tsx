@@ -8,7 +8,12 @@ type TRadioInputProps = TSlobsInputProps<
     label?: string;
     nolabel?: boolean;
     nomargin?: boolean;
-    options: { value: string; label: string; description?: string; defaultValue?: string }[];
+    options: {
+      value: string | number;
+      label: string;
+      description?: string;
+      defaultValue?: string;
+    }[];
     buttons?: boolean;
     direction?: 'vertical' | 'horizontal';
     disabled?: boolean;

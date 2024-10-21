@@ -31,8 +31,9 @@
   }
 
   @media (max-height: 600px) {
-    & > h1,
-    & > p {
+
+    &>h1,
+    &>p {
       display: none;
     }
   }
@@ -56,6 +57,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
+
+  :global(.button--youtube) {
+    overflow: hidden;
+  }
+
+  :global(.youtube) {
+    max-height: 160px !important;
+    max-width: 200px !important;
+    width: 200px !important;
+    height: 92px !important;
+    background-size: cover;
+    background-position-x: -33px;
+  }
 }
 
 .loginButton {
