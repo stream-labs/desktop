@@ -1,17 +1,29 @@
 import styles from '../go-live/GoLive.m.less';
 import { Button, Col, Input, Row, Form } from 'antd';
 import React, { useEffect, useState } from 'react';
+import { ApiClient, createApiClient } from '../../../../browser/src/api-client';
 // import Form from '../../shared/inputs/Form';
 
-import { initStore, useController, Controller } from '../../hooks/zustandV2';
+import { initStore, useController, Controller } from '../../../../browser/src/store/Controller';
 import { IStreamInfo } from '../../../services/streaming/streaming-api';
+import { TAppServiceInstancess } from 'app-services';
 const TextArea = Input.TextArea;
 
+const client = new ApiClient('http://192.168.1.220:59650/api', 'f9ebd973b12ab4228bb5cc856dd936aa1b644ded');
+const api = createApiClient<TAppServiceInstancess>(client);
 
 class GoLiveController extends Controller {
   store = initStore({ lifecycle: 'waitForNewSettings', settings: { platforms: [] } });
   onMount() {
     console.log('GoLiveController mounted');
+
+    api.StreamingService.prepopulateInfo();
+    api.StreamingService.streamInfoChanged.subscribe(changes => {
+        this.store.setState(s => {
+          return { ...s, ...changes.state.info };
+        });
+    })
+
 
     // const streamingService = Services.StreamingService;
     //

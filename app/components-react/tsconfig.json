@@ -7,6 +7,6 @@
       "react"
     ]
   },
-  "include": ["./**/*", "../index.d.ts"],
+  "include": ["./**/*", "../index.d.ts", "../../browser/src/store/Controller.tsx],
   "exclude": ["**/node_modules/@realm/fetch/dist/types/types.d.ts"]
 }

@@ -288,4 +288,7 @@ export const AppServices = {
 };
 
 // for the components that needs only types
-export type TAppServices = typeof AppServices;
+export type TAppServiceClasses = typeof AppServices;
+export type TAppServiceInstancess = {
+  [K in keyof TAppServiceClasses]: InstanceType<TAppServiceClasses[K]>
+};
