@@ -143,8 +143,7 @@ export interface IOnboardingStep {
     | 'HardwareSetup'
     | 'ThemeSelector'
     | 'Optimize'
-    | 'Prime'
-    | 'Tips';
+    | 'Prime';
   hideButton?: boolean;
   label?: string;
   isPreboarding?: boolean;
@@ -298,6 +297,8 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   }
 
   themeUrl(id: number) {
+    // TODO: index
+    // @ts-ignore
     return this.themeMetadata[id];
   }
 

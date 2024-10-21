@@ -19,12 +19,34 @@ export function OnePaneR(p: React.PropsWithChildren<LayoutProps>) {
         style={{ width: `${100 - resizes.bar1 * 100}%`, paddingTop: '16px' }}
       >
         <div className={styles.cell} style={{ height: '100%' }}>
-          {p.children?.['1'] || <></>}
+          {
+            // TODO: index
+            // @ts-ignore
+            p.children?.['1'] || <></>
+          }
         </div>
         <div className={styles.segmented}>
-          <div className={styles.cell}>{p.children?.['3'] || <></>}</div>
-          <div className={styles.cell}>{p.children?.['4'] || <></>}</div>
-          <div className={styles.cell}>{p.children?.['5'] || <></>}</div>
+          <div className={styles.cell}>
+            {
+              // TODO: index
+              // @ts-ignore
+              p.children?.['3'] || <></>
+            }
+          </div>
+          <div className={styles.cell}>
+            {
+              // TODO: index
+              // @ts-ignore
+              p.children?.['4'] || <></>
+            }
+          </div>
+          <div className={styles.cell}>
+            {
+              // TODO: index
+              // @ts-ignore
+              p.children?.['5'] || <></>
+            }
+          </div>
         </div>
       </div>
       <ResizeBar
@@ -35,7 +57,11 @@ export function OnePaneR(p: React.PropsWithChildren<LayoutProps>) {
         min={mins.bar1}
       >
         <div style={{ width: `${resizes.bar1 * 100}%` }} className={styles.cell}>
-          {p.children?.['2'] || <></>}
+          {
+            // TODO: index
+            // @ts-ignore
+            p.children?.['2'] || <></>
+          }
         </div>
       </ResizeBar>
     </div>

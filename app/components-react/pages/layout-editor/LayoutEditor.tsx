@@ -53,6 +53,8 @@ function DisplayedLayout() {
 
   function elementInSlot(slot: LayoutSlot) {
     return Object.keys(slottedElements).find(
+      // TODO: index
+      // @ts-ignore
       el => slottedElements[el].slot === slot,
     ) as ELayoutElement;
   }

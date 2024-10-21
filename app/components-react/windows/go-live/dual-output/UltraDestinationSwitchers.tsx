@@ -115,7 +115,7 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
   const switchInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const platform = typeof p.destination === 'string' ? (p.destination as TPlatform) : null;
-  const enable = !p.enabled ?? (p.promptConnectTikTok && p.promptConnectTikTok === true);
+  const enable = (p.promptConnectTikTok && p.promptConnectTikTok === true) || !p.enabled;
   const { RestreamService, MagicLinkService } = Services;
   const canDisablePrimary = p.canDisablePrimary;
 

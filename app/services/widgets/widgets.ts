@@ -130,7 +130,12 @@ export class WidgetsService
   createWidget(type: WidgetType, name?: string): SceneItem {
     if (!this.userService.isLoggedIn) return;
 
+    // TODO: index
+    // DonationGoal is not defined in widgetsConfig, lots of them commented out
+    // @ts-ignore
     const widget = this.widgetsConfig[type] || WidgetDefinitions[type];
+    // TODO: index
+    // @ts-ignore
     const widgetTransform = this.widgetsConfig[type]?.defaultTransform || WidgetDefinitions[type];
 
     const suggestedName =
@@ -158,6 +163,8 @@ export class WidgetsService
       suggestedName,
       'browser_source',
       {
+        // TODO: index
+        // @ts-ignore
         url: this.widgetsConfig[type]
           ? widget.url
           : widget.url(this.hostsService.streamlabs, this.userService.widgetToken),
@@ -240,6 +247,8 @@ export class WidgetsService
         const source = widget.getSource();
         const newPreviewSettings = cloneDeep(source.getSettings());
         delete newPreviewSettings.shutdown;
+        // TODO: index
+        // @ts-ignore
         const config = this.widgetsConfig[widget.type];
         newPreviewSettings.url =
           config?.previewUrl || widget.getSettingsService().getApiSettings().previewUrl;
@@ -281,11 +290,13 @@ export class WidgetsService
    * Used for converting browser_source to streamlabs widgets when importing OBS scene collection
    * returns -1 if it's no type detected
    */
-  getWidgetTypeByUrl(url: string): WidgetType {
+  getWidgetTypeByUrl(url: string): WidgetType | -1 {
     if (!this.userService.views.isLoggedIn) return -1;
 
     const type = Number(
       Object.keys(WidgetDefinitions).find(WidgetType => {
+        // TODO: index
+        // @ts-ignore
         let regExpStr = WidgetDefinitions[WidgetType].url(this.hostsService.streamlabs, '')
           .split('?')[0]
           .replace(/\//g, '\\/');
