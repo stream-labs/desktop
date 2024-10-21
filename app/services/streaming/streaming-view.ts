@@ -519,7 +519,10 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     }
 
     // make sure platforms assigned to the vertical display in dual output mode still go live in single output mode
-    const display = this.isDualOutputMode ? savedDestinations[platform]?.display : 'horizontal';
+    const display =
+      this.isDualOutputMode && savedDestinations
+        ? savedDestinations[platform]?.display
+        : 'horizontal';
 
     return {
       ...settings,
