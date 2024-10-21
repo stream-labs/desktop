@@ -330,6 +330,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
   sceneNodeHandled = new Subject<number>();
   collectionHandled = new Subject<{ [sceneId: string]: Dictionary<string> } | null>();
+  dualOutputModeChanged = new Subject<boolean>();
 
   get views() {
     return new DualOutputViews(this.state);
@@ -427,6 +428,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     }
 
     this.SET_IS_LOADING(false);
+    this.dualOutputModeChanged.next(status);
   }
 
   disableGlobalRescaleIfNeeded() {
