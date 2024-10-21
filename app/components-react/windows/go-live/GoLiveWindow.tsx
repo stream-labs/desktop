@@ -56,9 +56,12 @@ function ModalFooter() {
     goLive,
     close,
     goBackToSettings,
+    getCanStreamDualOutput,
     toggleDualOutputMode,
     isLoading,
     promptApply,
+    isDualOutputMode,
+    horizontalHasTargets,
   } = useGoLiveSettings().extend(module => ({
     windowsService: inject(WindowsService),
     dualOutputService: inject(DualOutputService),
@@ -75,7 +78,18 @@ function ModalFooter() {
       this.dualOutputService.actions.setDualOutputMode(false, true, true);
     },
 
+    get horizontalHasTargets() {
+      const platformDisplays = module.state.activeDisplayPlatforms;
+      const destinationDisplays = module.state.activeDisplayDestinations;
+
+      return platformDisplays.horizontal.length > 0 || destinationDisplays.horizontal.length > 0;
+    },
+
     get promptApply() {
+      return Services.TikTokService.promptApply;
+    },
+
+    get isDualOutputMode() {
       return Services.TikTokService.promptApply;
     },
   }));
@@ -85,10 +99,7 @@ function ModalFooter() {
     lifecycle === 'runChecklist' && error && checklist.startVideoTransmission !== 'done';
 
   function handleGoLive() {
-    if (
-      Services.DualOutputService.views.dualOutputMode &&
-      !Services.DualOutputService.views.getCanStreamDualOutput()
-    ) {
+    if (isDualOutputMode && !getCanStreamDualOutput()) {
       handleConfirmGoLive();
       return;
     }
@@ -97,9 +108,7 @@ function ModalFooter() {
   }
 
   function handleConfirmGoLive() {
-    const display = Services.DualOutputService.views.horizontalHasTargets
-      ? $t('Horizontal')
-      : $t('Vertical');
+    const display = horizontalHasTargets ? $t('Horizontal') : $t('Vertical');
 
     alertAsync({
       type: 'warning',

@@ -819,7 +819,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     if (!this.canSync()) return;
 
     const serverCollections = (await this.serverApi.fetchSceneCollections()).data;
-    console.log('serverCollections', JSON.stringify(serverCollections, null, 2));
 
     // A user who has never logged in before and did not install a
     // theme during onboarding will have no collections. To prevent

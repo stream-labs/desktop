@@ -1,5 +1,5 @@
 import { IGoLiveSettings, StreamInfoView } from '../../../services/streaming';
-import { TPlatform, getPlatformService } from '../../../services/platforms';
+import { TPlatform } from '../../../services/platforms';
 import { TDisplayDestinations } from 'services/dual-output';
 import { ICustomStreamDestination } from 'services/settings/streaming';
 import { Services } from '../../service-provider';
@@ -286,25 +286,7 @@ export class GoLiveSettingsModule {
    * Determine if all dual output go live requirements are fulfilled
    */
   getCanStreamDualOutput() {
-    const platformDisplays = Services.StreamingService.views.activeDisplayPlatforms;
-
-    // determine which enabled custom destinations use which displays
-    const destinationDisplays = this.state.customDestinations.reduce(
-      (displays: TDisplayDestinations, destination: ICustomStreamDestination, index: number) => {
-        if (destination.enabled && destination?.display) {
-          displays[destination.display].push(destination.name);
-        }
-        return displays;
-      },
-      { horizontal: [], vertical: [] },
-    );
-    // determine if both displays are selected for active platforms
-    const horizontalHasDestinations =
-      platformDisplays.horizontal.length > 0 || destinationDisplays.horizontal.length > 0;
-    const verticalHasDestinations =
-      platformDisplays.vertical.length > 0 || destinationDisplays.vertical.length > 0;
-
-    return horizontalHasDestinations && verticalHasDestinations;
+    return this.state.getCanStreamDualOutput(this.state);
   }
 
   /**
