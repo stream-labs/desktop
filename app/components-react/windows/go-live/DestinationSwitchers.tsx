@@ -150,9 +150,9 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
         <DestinationSwitcher
           key={ind}
           destination={dest}
-          enabled={customDestinations[ind].enabled}
+          enabled={customDestinations[ind].enabled && !disableCustomDestinationSwitchers}
           onChange={enabled => switchCustomDestination(ind, enabled)}
-          disabled={disableCustomDestinationSwitchers && !isEnabled(ind)}
+          disabled={disableCustomDestinationSwitchers}
         />
       ))}
     </div>
@@ -287,7 +287,7 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
         Switch: () => (
           <SwitchInput
             inputRef={switchInputRef}
-            value={destination.enabled}
+            value={p.enabled}
             name={`destination_${destination.name}`}
             disabled={p.disabled}
             uncontrolled
