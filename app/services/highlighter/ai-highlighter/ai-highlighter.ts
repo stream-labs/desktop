@@ -13,6 +13,7 @@ export enum EHighlighterInputTypes {
   DEPLOY = 'deploy',
   META_DURATION = 'meta_duration',
   LOW_HEALTH = 'low_health',
+  PLAYER_KNOCKED = 'player_knocked',
 }
 
 export interface IHighlighterInput {

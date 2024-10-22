@@ -88,12 +88,13 @@ function getTypeWordingFromType(
       return { emoji: '🏆', description: count > 1 ? 'wins' : 'win' };
     case EHighlighterInputTypes.DEPLOY:
       return { emoji: '🪂', description: count > 1 ? 'deploys' : 'deploy' };
+    case EHighlighterInputTypes.PLAYER_KNOCKED:
+      return { emoji: '😵', description: count > 1 ? 'got knockeds' : 'got knocked' };
     case 'rounds':
       return { emoji: '🏁', description: count > 1 ? 'rounds' : 'round' };
     default:
       break;
   }
-  return { emoji: '', description: '' };
   return { emoji: type, description: count > 1 ? `${type}s` : type };
 }
 
