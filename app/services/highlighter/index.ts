@@ -1827,7 +1827,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     }[] = [];
     const processedFiles = new Set<string>();
 
-    const BATCH_SIZE = 2;
+    const BATCH_SIZE = 1;
     for (let i = 0; i < sortedHighlights.length; i += BATCH_SIZE) {
       const batch = sortedHighlights.slice(i, i + BATCH_SIZE);
       const batchTasks = batch.map(({ start_time, end_time, input_types, score, metadata }) => {
@@ -1906,8 +1906,19 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
         };
       });
 
-      const batchResults = await Promise.all(batchTasks.map(task => task()));
-      results.push(...batchResults.filter(result => result !== null));
+      const batchResults = await Promise.allSettled(batchTasks.map(task => task()));
+      results.push(
+        ...batchResults
+          .filter(result => result.status === 'fulfilled')
+          .map(result => result.value)
+          .filter(value => value !== null),
+      );
+
+      const failedResults = batchResults.filter(result => result.status === 'rejected');
+
+      if (failedResults.length > 0) {
+        console.error('Failed exports:', failedResults);
+      }
     }
 
     return results;
