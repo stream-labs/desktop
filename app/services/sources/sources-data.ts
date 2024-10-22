@@ -181,7 +181,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
   vlc_source: {
     name: $t('VLC Source'),
     description: $t('Add playlists of videos to your scene.'),
-    icon: 'fas fa-file',
+    icon: 'fas fa-play',
   },
   coreaudio_input_capture: {
     name: $t('Audio Input Capture'),
@@ -190,7 +190,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     ),
     demoFilename: 'audio-input.png',
     supportList: [$t('Built in microphones'), $t('USB microphones'), $t('Other USB devices')],
-    icon: 'fas fa-file',
+    icon: 'icon-mic',
   },
   coreaudio_output_capture: {
     name: $t('Audio Output Capture'),
@@ -199,7 +199,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     ),
     demoFilename: 'audio-output.png',
     supportList: [$t('Desktop audio')],
-    icon: 'fas fa-file',
+    icon: 'icon-audio',
   },
   av_capture_input: {
     name: $t('Video Capture Device'),
@@ -210,7 +210,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
       $t('Logitech webcam'),
       $t('Capture cards (Elgato, Avermedia, BlackMagic)'),
     ],
-    icon: 'fas fa-file',
+    icon: 'icon-webcam',
   },
   display_capture: {
     name: $t('Display Capture'),
@@ -224,7 +224,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     description: $t("Capture a game you're playing on your computer."),
     demoFilename: 'game-capture.png',
     supportList: [$t('Built in works with most modern computer games')],
-    icon: 'fas fa-file',
+    icon: 'fas fa-gamepad',
   },
   audio_line: {
     name: $t('JACK Input Client'),
@@ -242,7 +242,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     name: $t('Instant Replay'),
     description: $t('Automatically plays your most recently captured replay in your stream.'),
     demoFilename: 'media.png',
-    icon: 'fas fa-file',
+    icon: 'icon-replay-buffer',
   },
   icon_library: {
     name: $t('Custom Icon'),
