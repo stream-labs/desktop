@@ -6,5 +6,9 @@
   "Port": "Port",
   "IP addresses": "Adresy IP",
   "Click to show": "Kliknij, aby wyświetlić",
-  "The free Streamlabs Controller app allows you to control Streamlabs Desktop from your iOS or Android device. Scan the QR code below to begin.": "Bezpłatna aplikacja Streamlabs Controller umożliwia sterowanie pulpitem Streamlabs Desktop z urządzenia z systemem iOS lub Android. Aby rozpocząć, zeskanuj poniższy kod QR."
+  "The free Streamlabs Controller app allows you to control Streamlabs Desktop from your iOS or Android device. You must be logged in to use this feature.": "The free Streamlabs Controller app allows you to control Streamlabs Desktop from your iOS or Android device. You must be logged in to use this feature.",
+  "Allow remote connections": "Allow remote connections",
+  "Connected Devices": "Connected Devices",
+  "Disconnect": "Disconnect",
+  "No devices connected": "No devices connected"
 }
