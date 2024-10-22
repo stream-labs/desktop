@@ -6,7 +6,10 @@ import { GuestApiHandler } from 'util/guest-api-handler';
 import * as remote from '@electron/remote';
 import { Services } from 'components-react/service-provider';
 
-export default function PlatformAppStore(p: { params: { appId?: string; type?: string } }) {
+export default function PlatformAppStore(p: {
+  params: { appId?: string; type?: string };
+  className?: string;
+}) {
   const { UserService, PlatformAppsService, PlatformAppStoreService, NavigationService } = Services;
   const [platformAppsUrl, setPlatformAppsUrl] = useState('');
 
@@ -70,6 +73,7 @@ export default function PlatformAppStore(p: { params: { appId?: string; type?: s
   if (!platformAppsUrl) return <></>;
   return (
     <BrowserView
+      className={p.className}
       style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}
       src={platformAppsUrl}
       onReady={onBrowserViewReady}
