@@ -1827,6 +1827,27 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     }[] = [];
     const processedFiles = new Set<string>();
 
+    // First check the codec
+    const probeArgs = [
+      '-v',
+      'error',
+      '-select_streams',
+      'v:0',
+      '-show_entries',
+      'stream=codec_name',
+      '-of',
+      'default=nokey=1:noprint_wrappers=1',
+      videoUri,
+    ];
+    let codec = '';
+    try {
+      const codecResult = await execa(FFPROBE_EXE, probeArgs);
+      codec = codecResult.stdout.trim();
+      console.log(`Codec for ${videoUri}: ${codec}`);
+    } catch (error) {
+      console.error(`Error checking codec for ${videoUri}:`, error);
+    }
+    console.time('export');
     const BATCH_SIZE = 1;
     for (let i = 0; i < sortedHighlights.length; i += BATCH_SIZE) {
       const batch = sortedHighlights.slice(i, i + BATCH_SIZE);
@@ -1854,20 +1875,22 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
           }
 
           const args = [
-            '-i',
-            videoUri,
             '-ss',
             start_time.toString(),
             '-to',
             end_time.toString(),
+            '-i',
+            videoUri,
             '-c:v',
-            'libx264',
+            codec === 'h264' ? 'copy' : 'libx264',
             '-c:a',
-            'aac',
+            'copy',
             '-strict',
             'experimental',
             '-b:a',
             '192k',
+            '-movflags',
+            'faststart',
             outputUri,
           ];
 
@@ -1921,6 +1944,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       }
     }
 
+    console.timeEnd('export');
     return results;
   }
 
