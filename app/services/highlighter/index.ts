@@ -1909,7 +1909,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       const batchResults = await Promise.allSettled(batchTasks.map(task => task()));
       results.push(
         ...batchResults
-          .filter(result => result.status === 'fulfilled')
+          .filter((result): result is PromiseFulfilledResult<any> => result.status === 'fulfilled')
           .map(result => result.value)
           .filter(value => value !== null),
       );
