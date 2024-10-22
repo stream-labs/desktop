@@ -82,6 +82,8 @@ export function getHighlightClips(
               break;
             case 'highlights':
               if (partialInputsRendered === false) {
+                console.log(' call Render highlights:');
+
                 renderHighlights?.(aiHighlighterMessage.json as IHighlight[]);
               }
               resolve(aiHighlighterMessage.json as IHighlight[]);
