@@ -5,7 +5,7 @@
       "url": "https://s3-us-west-2.amazonaws.com/obsstudionodes3.streamlabs.com/",
       "archive": "osn-[VERSION]-release-[OS][ARCH].tar.gz",
       "version": "0.24.43",
-      "mac_version": "0.24.43mb15",
+      "mac_version": "0.24.43mb16",
       "win64": true,
       "osx": true
     },
