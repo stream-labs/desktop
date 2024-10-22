@@ -545,32 +545,37 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
       try {
         data = this.stateService.readCollectionFile(id);
-        if (data == null) throw new Error('Got blank data from collection file');
+        if (!data) throw new Error('Got blank data from collection file');
         await this.loadDataIntoApplicationState(data);
       } catch (e: unknown) {
-        console.error('Error while loading collection, restoring backup', e);
+        console.error('Error while loading collection, restoring backup:', e instanceof Error ? e.message : e);
 
         try {
           const backupExists = await this.stateService.collectionFileExists(id, true);
-
-          if (!backupExists) throw e;
+          if (!backupExists) throw e; // Rethrow the original error if no backup exists
 
           data = this.stateService.readCollectionFile(id, true);
+          if (!data) throw new Error('Got blank data from backup collection file');
           await this.loadDataIntoApplicationState(data);
         } catch (backupError) {
-          console.error('Error while loading backup collection', backupError);
-          throw backupError;
+          console.error('Error while loading backup collection:', backupError instanceof Error ? backupError.message : backupError);
+          return; // Prevent further execution by returning early
         }
       }
 
       if (this.scenesService.views.scenes.length === 0) {
-        throw new Error('Scene collection was loaded but there were no scenes.');
+        console.error('Scene collection was loaded but there were no scenes.');
+        return; // Return early to prevent writing a backup for an empty scene collection
       }
 
       this.stateService.writeDataToCollectionFile(id, data, true);
       this.collectionLoaded = true;
     } else {
-      await this.attemptRecovery(id);
+      try {
+        await this.attemptRecovery(id);
+      } catch (recoveryError) {
+        console.error('Error during collection recovery:', recoveryError instanceof Error ? recoveryError.message : recoveryError);
+      }
     }
   }
 
