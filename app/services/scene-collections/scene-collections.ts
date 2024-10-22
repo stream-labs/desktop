@@ -538,7 +538,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   private async readCollectionDataAndLoadIntoApplicationState(id: string): Promise<void> {
     const exists = await this.stateService.collectionFileExists(id);
 
-    // necessary for validating a dual output scene collection
     this.dualOutputService.setIsLoading(true);
 
     if (exists) {
@@ -549,29 +548,25 @@ export class SceneCollectionsService extends Service implements ISceneCollection
         if (data == null) throw new Error('Got blank data from collection file');
         await this.loadDataIntoApplicationState(data);
       } catch (e: unknown) {
-        /*
-         * FIXME: we invoke `loadDataIntoApplicationState` a second time below,
-         *  which can cause partial state from the call above to still
-         *  be present and result in duplicate items (for instance, scenes)
-         *  and methods being invoked (like `updateRegisteredHotkeys`) as
-         *  part of the loading process.
-         */
         console.error('Error while loading collection, restoring backup', e);
-        // Check for a backup and load it
-        const exists = await this.stateService.collectionFileExists(id, true);
 
-        // If there's no backup, throw the original error
-        if (!exists) throw e;
+        const backupExists = await this.stateService.collectionFileExists(id, true);
 
-        data = this.stateService.readCollectionFile(id, true);
-        await this.loadDataIntoApplicationState(data);
+        if (!backupExists) throw e;
+
+        try {
+          data = this.stateService.readCollectionFile(id, true);
+          await this.loadDataIntoApplicationState(data);
+        } catch (backupError) {
+          console.error('Error while loading backup collection', backupError);
+          throw backupError;
+        }
       }
 
       if (this.scenesService.views.scenes.length === 0) {
         throw new Error('Scene collection was loaded but there were no scenes.');
       }
 
-      // Everything was successful, write a backup
       this.stateService.writeDataToCollectionFile(id, data, true);
       this.collectionLoaded = true;
     } else {
