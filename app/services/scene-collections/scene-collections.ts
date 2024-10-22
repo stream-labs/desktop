@@ -550,11 +550,11 @@ export class SceneCollectionsService extends Service implements ISceneCollection
       } catch (e: unknown) {
         console.error('Error while loading collection, restoring backup', e);
 
-        const backupExists = await this.stateService.collectionFileExists(id, true);
-
-        if (!backupExists) throw e;
-
         try {
+          const backupExists = await this.stateService.collectionFileExists(id, true);
+
+          if (!backupExists) throw e;
+
           data = this.stateService.readCollectionFile(id, true);
           await this.loadDataIntoApplicationState(data);
         } catch (backupError) {
