@@ -601,8 +601,9 @@ export class SourcesService extends StatefulService<ISourcesState> {
       { description: 'Spout2 capture', value: 'spout_capture' },
     ];
 
-    const availableAllowlistedTypes = allowlistedTypes.filter(type =>
-      obsAvailableTypes.includes(type.value),
+    const availableAllowlistedTypes = allowlistedTypes.filter(
+      type => true,
+      //obsAvailableTypes.includes(type.value),
     );
     // 'scene' is not an obs input type so we have to set it manually
     availableAllowlistedTypes.push({ description: 'Scene', value: 'scene' });
