@@ -144,8 +144,7 @@ export interface IOnboardingStep {
     | 'HardwareSetup'
     | 'ThemeSelector'
     | 'Optimize'
-    | 'Prime'
-    | 'Tips';
+    | 'Prime';
   hideButton?: boolean;
   label?: string;
   isPreboarding?: boolean;

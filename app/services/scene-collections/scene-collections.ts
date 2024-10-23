@@ -395,6 +395,16 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    */
   @RunInLoadingMode()
   async loadOverlay(filePath: string, name: string) {
+    // Save the current audio devices for Desktop Audio and Mic so when we
+    // install a new overlay they're preserved.
+    // TODO: this only works if the user sources have the default names
+
+    // We always pass a desktop audio device in, since we might've found a bug that
+    // when installing a new overlay the device is not set and while it seems
+    // to behave correctly, it is blank on device properties.
+    const desktopAudioDevice = this.getDeviceIdFor('Desktop Audio') || 'default';
+    const micDevice = this.getDeviceIdFor('Mic/Aux');
+
     await this.deloadCurrentApplicationState();
 
     const id: string = uuid();
@@ -403,7 +413,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
     try {
       await this.overlaysPersistenceService.loadOverlay(filePath);
-      this.setupDefaultAudio();
+      this.setupDefaultAudio(desktopAudioDevice, micDevice);
     } catch (e: unknown) {
       // We tried really really hard :(
       console.error('Overlay installation failed', e);
@@ -413,6 +423,10 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
     this.collectionLoaded = true;
     await this.save();
+  }
+
+  private getDeviceIdFor(sourceName: 'Desktop Audio' | 'Mic/Aux'): string | undefined {
+    return this.sourcesService.views.getSourcesByName(sourceName)[0]?.getSettings()?.device_id;
   }
 
   /**
@@ -695,14 +709,14 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   /**
    * Creates the default audio sources
    */
-  private setupDefaultAudio() {
+  private setupDefaultAudio(desktopAudioDevice?: string, micDevice?: string) {
     // On macOS, most users will not have an audio capture device, so
     // we do not create it automatically.
     if (getOS() === OS.Windows) {
       this.sourcesService.createSource(
         'Desktop Audio',
         byOS({ [OS.Windows]: 'wasapi_output_capture', [OS.Mac]: 'coreaudio_output_capture' }),
-        {},
+        { device_id: desktopAudioDevice },
         { channel: E_AUDIO_CHANNELS.OUTPUT_1 },
       );
     }
@@ -713,7 +727,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     this.sourcesService.createSource(
       'Mic/Aux',
       byOS({ [OS.Windows]: 'wasapi_input_capture', [OS.Mac]: 'coreaudio_input_capture' }),
-      { device_id: defaultId },
+      { device_id: micDevice || defaultId },
       { channel: E_AUDIO_CHANNELS.INPUT_1 },
     );
   }

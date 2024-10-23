@@ -71,12 +71,6 @@ export const YoutubeEditStreamInfo = InputComponent((p: IPlatformComponentParams
       });
   }, [broadcastId]);
 
-  function openThumbnailsEditor() {
-    remote.shell.openExternal(
-      'https://streamlabs.com/dashboard#/prime/thumbnails?refl=slobs-thumbnail-editor',
-    );
-  }
-
   function fieldIsDisabled(fieldName: keyof IYoutubeStartStreamOptions): boolean {
     // selfDeclaredMadeForKids can be set only on the broadcast creating step
     if (broadcastId && fieldName === 'selfDeclaredMadeForKids') {
@@ -153,7 +147,6 @@ export const YoutubeEditStreamInfo = InputComponent((p: IPlatformComponentParams
             <ImageInput
               label={$t('Thumbnail')}
               maxFileSize={2 * 1024 * 1024} // 2 mb
-              extra={<a onClick={openThumbnailsEditor}>{$t('Try our new thumbnail editor')}</a>}
               {...bind.thumbnail}
             />
 

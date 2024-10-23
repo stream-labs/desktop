@@ -1,4 +1,4 @@
-@import "../../../styles/index.less";
+@import '../../../styles/index.less';
 
 .container {
   display: flex;
@@ -8,12 +8,12 @@
   height: 100%;
 }
 
-
 // make timeline icons and text bigger
 .container :global(.ant-timeline-item-tail) {
-    top: 15px;
-    height: calc(100% - 20px);
+  top: 15px;
+  height: calc(100% - 20px);
 }
+
 .container :global(.ant-timeline-item) {
   padding-bottom: 30px;
 }
@@ -22,12 +22,14 @@
   font-size: 25px;
   margin-top: 8px;
 
-  &:not(:global(.anticon-loading)){
+  &:not(:global(.anticon-loading)) {
     color: var(--primary);
+
     // add a bounce animation
     :global {
       animation: 0.8s ease-out bounce;
     }
+
     // add a fade animation
     &:after {
       content: ' ';
@@ -40,18 +42,20 @@
       position: relative;
       top: -18px;
       left: 7px;
-      :global{
-        animation: 0.8s ease-out scaleAndFadeOut
+
+      :global {
+        animation: 0.8s ease-out scaleAndFadeOut;
       }
     }
   }
 }
-.container :global(.ant-timeline .anticon-close-circle) {
-  color: var(--red);
+
+.container :global(.ant-timeline .anticon.anticon-close-circle) {
+  color: var(--red) !important;
 }
 
 .container :global(.ant-timeline .anticon-loading) {
-  color: orange;
+  color: orange !important;
   margin-top: -2px;
 }
 
@@ -65,6 +69,7 @@
   :global(.ant-timeline-item-content) {
     color: var(--midtone);
   }
+
   &.done :global(.ant-timeline-item-content) {
     color: var(--paragraph);
   }
@@ -78,7 +83,7 @@
 
 // add animation to the success message
 .success h1 {
-  :global{
+  :global {
     animation: 0.8s ease-out bounce;
   }
 }
