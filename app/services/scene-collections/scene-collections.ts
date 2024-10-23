@@ -602,8 +602,8 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     // triggered by incorrect reasons and its result confused users.
     // Instead of that, now we will just remove unsuppported sources here.
     if (root.data.sources.removeUnsupported()) {
-  // The underlying function already wrote all details to the log.
-  // Users will see a very basic information.
+      // The underlying function already wrote all details to the log.
+      // Users will see a very basic information.
       await remote.dialog.showMessageBox(Utils.getMainWindow(), {
         title: 'Unsupported Sources',
         type: 'warning',
