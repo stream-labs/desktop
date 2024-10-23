@@ -528,8 +528,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     return this.stateService.sceneNodeMaps;
   }
 
-  /* PRIVATE ----------------------------------------------------- */
-
   /**
    * Loads the scenes/sources/etc associated with a scene collection
    * from disk into the current application state.
@@ -550,13 +548,16 @@ export class SceneCollectionsService extends Service implements ISceneCollection
         await this.loadDataIntoApplicationState(data);
       } catch (e: unknown) {
         /*
-       * FIXME: we invoke `loadDataIntoApplicationState` a second time below,
-       *  which can cause partial state from the call above to still
-       *  be present and result in duplicate items (for instance, scenes)
-       *  and methods being invoked (like `updateRegisteredHotkeys`) as
-       *  part of the loading process.
-       */
-        console.error('Error while loading collection, restoring backup:', e instanceof Error ? e.message : e);
+         * FIXME: we invoke `loadDataIntoApplicationState` a second time below,
+         *  which can cause partial state from the call above to still
+         *  be present and result in duplicate items (for instance, scenes)
+         *  and methods being invoked (like `updateRegisteredHotkeys`) as
+         *  part of the loading process.
+         */
+        console.error(
+          'Error while loading collection, restoring backup:',
+          e instanceof Error ? e.message : e,
+        ); // <-- Inserted trailing comma
 
         try {
           // Check for a backup and load it
@@ -567,8 +568,11 @@ export class SceneCollectionsService extends Service implements ISceneCollection
           data = this.stateService.readCollectionFile(id, true);
           if (!data) throw new Error('Got blank data from backup collection file');
           await this.loadDataIntoApplicationState(data);
-        } catch (backupError) {
-          console.error('Error while loading backup collection:', backupError instanceof Error ? backupError.message : backupError);
+        } catch (backupError: unknown) {
+          console.error(
+            'Error while loading backup collection:',
+            backupError instanceof Error ? backupError.message : backupError,
+          ); // <-- Inserted trailing comma
           return; // Prevent further execution by returning early
         }
       }
@@ -584,8 +588,11 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     } else {
       try {
         await this.attemptRecovery(id);
-      } catch (recoveryError) {
-        console.error('Error during collection recovery:', recoveryError instanceof Error ? recoveryError.message : recoveryError);
+      } catch (recoveryError: unknown) {
+        console.error(
+          'Error during collection recovery:',
+          recoveryError instanceof Error ? recoveryError.message : recoveryError,
+        ); // <-- Inserted trailing comma
       }
     }
   }
