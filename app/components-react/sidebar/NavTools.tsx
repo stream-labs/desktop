@@ -283,6 +283,7 @@ function LoginMenuItem(p: {
 
   return (
     <MenuItem
+      data-testid="nav-auth"
       title={!isLoggedIn ? menuTitles(menuItem.key) : $t('Log Out')}
       className={cx(styles.login, !isOpen && styles.loginClosed)}
       icon={!isOpen && <i className="icon-user" />}

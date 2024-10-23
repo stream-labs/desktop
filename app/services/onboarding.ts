@@ -368,6 +368,11 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
       this.sceneCollectionsService.newUserFirstLogin = false;
     }
 
+    if (this.sceneCollectionsService.newUserFirstLogin && this.existingSceneCollections) {
+      this.dualOutputService.setDualOutputMode(true, true);
+      this.sceneCollectionsService.newUserFirstLogin = false;
+    }
+
     this.onboardingCompleted.next();
     this.navigationService.navigate('Studio');
   }
