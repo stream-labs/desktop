@@ -549,13 +549,13 @@ export class SceneCollectionsService extends Service implements ISceneCollection
         if (!data) throw new Error('Got blank data from collection file');
         await this.loadDataIntoApplicationState(data);
       } catch (e: unknown) {
-          /*
-         * FIXME: we invoke `loadDataIntoApplicationState` a second time below,
-         *  which can cause partial state from the call above to still
-         *  be present and result in duplicate items (for instance, scenes)
-         *  and methods being invoked (like `updateRegisteredHotkeys`) as
-         *  part of the loading process.
-         */
+        /*
+       * FIXME: we invoke `loadDataIntoApplicationState` a second time below,
+       *  which can cause partial state from the call above to still
+       *  be present and result in duplicate items (for instance, scenes)
+       *  and methods being invoked (like `updateRegisteredHotkeys`) as
+       *  part of the loading process.
+       */
         console.error('Error while loading collection, restoring backup:', e instanceof Error ? e.message : e);
 
         try {
@@ -602,8 +602,8 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     // triggered by incorrect reasons and its result confused users.
     // Instead of that, now we will just remove unsuppported sources here.
     if (root.data.sources.removeUnsupported()) {
-      // The underlying function already wrote all details to the log.
-      // Users will see a very basic information.
+  // The underlying function already wrote all details to the log.
+  // Users will see a very basic information.
       await remote.dialog.showMessageBox(Utils.getMainWindow(), {
         title: 'Unsupported Sources',
         type: 'warning',
