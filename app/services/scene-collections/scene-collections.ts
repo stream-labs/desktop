@@ -559,7 +559,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
         console.error(
           'Error while loading collection, restoring backup:',
           e instanceof Error ? e.message : e,
-        ); // <-- Inserted trailing comma
+        );
 
         try {
           // Check for a backup and load it
@@ -574,7 +574,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
           console.error(
             'Error while loading backup collection:',
             backupError instanceof Error ? backupError.message : backupError,
-          ); // <-- Inserted trailing comma
+          );
           return; // Prevent further execution by returning early
         }
       }
@@ -594,7 +594,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
         console.error(
           'Error during collection recovery:',
           recoveryError instanceof Error ? recoveryError.message : recoveryError,
-        ); // <-- Inserted trailing comma
+        );
       }
     }
   }
