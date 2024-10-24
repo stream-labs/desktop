@@ -2,7 +2,7 @@ import React, { useRef, MouseEvent, useCallback } from 'react';
 import { getPlatformService, TPlatform } from 'services/platforms';
 import cx from 'classnames';
 import { $t } from 'services/i18n';
-import styles from './DualOutputGoLive.m.less';
+import styles from '../GoLive.m.less';
 import { ICustomStreamDestination } from 'services/settings/streaming';
 import { Services } from 'components-react/service-provider';
 import { SwitchInput } from 'components-react/shared/inputs';
@@ -13,6 +13,7 @@ import { useGoLiveSettings } from '../useGoLiveSettings';
 import { alertAsync } from 'components-react/modals';
 import Translate from 'components-react/shared/Translate';
 import { useDebounce } from 'components-react/hooks';
+import DualOutputToggle from '../../../shared/DualOutputToggle';
 
 interface IUltraDestinationSwitchers {
   type?: 'default' | 'ultra';
@@ -62,13 +63,16 @@ export function UltraDestinationSwitchers(p: IUltraDestinationSwitchers) {
   }, []);
 
   return (
-    <div className={styles.switchWrapper}>
+    <div className={cx(styles.switchWrapper, styles.columnPadding)}>
       {isDualOutputMode && (
         <InfoBadge
           content={
-            <Translate message="<dualoutput>Dual Output</dualoutput> is enabled - you must stream to one horizontal and one vertical platform.">
-              <u slot="dualoutput" />
-            </Translate>
+            <>
+              <DualOutputToggle type="dual" lightShadow />
+              <Translate message="<dualoutput>Dual Output</dualoutput> is enabled - you must stream to one horizontal and one vertical platform.">
+                <u slot="dualoutput" />
+              </Translate>
+            </>
           }
           style={{ marginBottom: '15px' }}
         />
@@ -180,7 +184,7 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
         Logo: () => (
           <PlatformLogo
             platform={platform}
-            className={cx(styles.logo, styles[`platform-logo-${platform}`])}
+            className={cx(styles.platformLogo, styles[`platform-logo-${platform}`])}
             size={36}
           />
         ),

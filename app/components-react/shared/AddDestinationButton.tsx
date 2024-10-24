@@ -16,46 +16,50 @@ interface IAddDestinationButtonProps {
 }
 
 export default function AddDestinationButton(p: IAddDestinationButtonProps) {
-  const { addDestination, shouldShowPrimeLabel, isDualOutputMode } = useGoLiveSettings().extend(
-    module => {
-      const {
-        RestreamService,
-        SettingsService,
-        MagicLinkService,
-        UserService,
-        UsageStatisticsService,
-        WebsocketService,
-      } = Services;
+  const {
+    addDestination,
+    shouldShowPrimeLabel,
+    isDualOutputMode,
+    isPrime,
+  } = useGoLiveSettings().extend(module => {
+    const {
+      RestreamService,
+      SettingsService,
+      MagicLinkService,
+      UserService,
+      UsageStatisticsService,
+      WebsocketService,
+    } = Services;
 
-      return {
-        addDestination() {
-          // open the stream settings or prime page
-          if (UserService.views.isPrime) {
-            SettingsService.actions.showSettings('Stream');
-          } else if (isDualOutputMode) {
-            // record dual output analytics event
-            const ultraSubscription = WebsocketService.ultraSubscription.subscribe(() => {
-              UsageStatisticsService.recordAnalyticsEvent('DualOutput', {
-                type: 'UpgradeToUltra',
-              });
-              ultraSubscription.unsubscribe();
+    return {
+      addDestination() {
+        // open the stream settings or prime page
+        if (UserService.views.isPrime) {
+          SettingsService.actions.showSettings('Stream');
+        } else if (isDualOutputMode) {
+          // record dual output analytics event
+          const ultraSubscription = WebsocketService.ultraSubscription.subscribe(() => {
+            UsageStatisticsService.recordAnalyticsEvent('DualOutput', {
+              type: 'UpgradeToUltra',
             });
-            MagicLinkService.linkToPrime('slobs-multistream');
-          } else {
-            MagicLinkService.linkToPrime('slobs-multistream');
-          }
-        },
+            ultraSubscription.unsubscribe();
+          });
+          MagicLinkService.linkToPrime('slobs-multistream');
+        } else {
+          MagicLinkService.linkToPrime('slobs-multistream');
+        }
+      },
 
-        shouldShowPrimeLabel:
-          p.type === 'ultra' ||
-          (!RestreamService.state.grandfathered && !UserService.views.isPrime),
-      };
-    },
-  );
+      shouldShowPrimeLabel:
+        p.type === 'ultra' || (!RestreamService.state.grandfathered && !module.isPrime),
+    };
+  });
 
   return (
     <ButtonGroup
-      className={cx(styles.addDestinationGroup, { [styles.dualOutput]: isDualOutputMode })}
+      className={cx(styles.addDestinationGroup, {
+        [styles.ultraBtnGroup]: !isPrime,
+      })}
       align="center"
       direction="vertical"
       size="middle"

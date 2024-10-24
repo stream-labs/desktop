@@ -67,6 +67,10 @@ export class SceneCollectionsService {
     };
   }
 
+  get newUserFirstLogin(): boolean {
+    return this.sceneCollectionsService.newUserFirstLogin;
+  }
+
   /**
    * Provides the scene collection's schema including all scenes, scene nodes
    * and sources. This operation is expensive and should be avoided if possible.

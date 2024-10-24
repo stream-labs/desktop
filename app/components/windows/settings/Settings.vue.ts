@@ -16,6 +16,7 @@ import VirtualWebcamSettings from './VirtualWebcamSettings';
 import { MagicLinkService } from 'services/magic-link';
 import { UserService } from 'services/user';
 import { DismissablesService, EDismissable } from 'services/dismissables';
+import { DualOutputService } from 'services/dual-output';
 import Scrollable from 'components/shared/Scrollable';
 import {
   ObsSettings,
@@ -57,6 +58,7 @@ export default class Settings extends Vue {
   @Inject() magicLinkService: MagicLinkService;
   @Inject() userService: UserService;
   @Inject() dismissablesService: DismissablesService;
+  @Inject() dualOutputService: DualOutputService;
 
   $refs: { settingsContainer: HTMLElement & SearchablePages };
 
@@ -273,6 +275,7 @@ export default class Settings extends Vue {
         })
         .then(({ response }) => {
           if (response === 0) {
+            this.dualOutputService.setDualOutputMode(false, true);
             this.userService.logOut();
           }
         });
