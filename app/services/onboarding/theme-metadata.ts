@@ -3,7 +3,7 @@ export interface IThemeMetadata {
     id: number;
     name: string;
     custom_images: Dictionary<string>;
-    designer: {
+    designer?: {
       name: string;
       avatar: string;
       website: string;
