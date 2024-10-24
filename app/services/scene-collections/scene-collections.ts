@@ -528,6 +528,8 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     return this.stateService.sceneNodeMaps;
   }
 
+  /* PRIVATE ----------------------------------------------------- */
+
   /**
    * Loads the scenes/sources/etc associated with a scene collection
    * from disk into the current application state.
