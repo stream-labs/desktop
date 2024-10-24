@@ -132,26 +132,30 @@ export function ThemeSelector() {
                 </div>
                 <div className={cx(styles.detailPanel, styles.right)}>
                   <div className={styles.detailHeader}>
-                    <img className={styles.designerLogo} src={detailTheme.data.designer.avatar} />
+                    {detailTheme.data.designer && (
+                      <img className={styles.designerLogo} src={detailTheme.data.designer.avatar} />
+                    )}
                     <div className={styles.themeDetails}>
                       <h1>{detailTheme.data.name}</h1>
-                      <Translate
-                        message={$t('by <designer>%{designerName}</designer>', {
-                          designerName: detailTheme.data.designer.name,
-                        })}
-                      >
-                        <span
-                          slot="designer"
-                          className={cx(styles.designerName, {
-                            ['has-link']: !!detailTheme.data.designer.website,
+                      {detailTheme.data.designer && (
+                        <Translate
+                          message={$t('by <designer>%{designerName}</designer>', {
+                            designerName: detailTheme.data.designer.name,
                           })}
-                          onClick={() => {
-                            if (detailTheme.data.designer.website) {
-                              remote.shell.openExternal(detailTheme.data.designer.website);
-                            }
-                          }}
-                        />
-                      </Translate>
+                        >
+                          <span
+                            slot="designer"
+                            className={cx(styles.designerName, {
+                              ['has-link']: !!detailTheme.data.designer.website,
+                            })}
+                            onClick={() => {
+                              if (detailTheme.data.designer?.website) {
+                                remote.shell.openExternal(detailTheme.data.designer.website);
+                              }
+                            }}
+                          />
+                        </Translate>
+                      )}
                     </div>
                     <Button
                       shape="round"
