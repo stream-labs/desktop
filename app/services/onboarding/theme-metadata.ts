@@ -14,18 +14,18 @@ export interface IThemeMetadata {
 // churn count: 2, if we need to change this one more time we're gonna need an API :D
 export const THEME_METADATA = {
   FREE: {
-    // Purple Burst
-    1658: 'https://cdn.streamlabs.com/marketplace/overlays/60327649/5a2ad75/5a2ad75.overlay',
-    // Streamlabs Neon
-    1645: 'https://cdn.streamlabs.com/marketplace/overlays/4921216/483af56/483af56.overlay',
-    // Streamlabs Dark Mode
-    1583: 'https://cdn.streamlabs.com/marketplace/overlays/4921216/1b2f6cc/1b2f6cc.overlay',
-    // Streamlabs Light Mode
-    1584: 'https://cdn.streamlabs.com/marketplace/overlays/4921216/fb61932/fb61932.overlay',
-    // Red Glitch
-    1673: 'https://cdn.streamlabs.com/marketplace/overlays/60327649/9259e55/9259e55.overlay',
-    // Midnight Red
-    1674: 'https://cdn.streamlabs.com/marketplace/overlays/60327649/985817a/985817a.overlay',
+    // Purple Burst 1658
+    2639: 'https://cdn.streamlabs.com/marketplace/overlays/60327649/5a2ad75/5a2ad75.overlay',
+    // Streamlabs Neon 1645
+    2624: 'https://cdn.streamlabs.com/marketplace/overlays/4921216/483af56/483af56.overlay',
+    // Streamlabs Dark Mode 1583
+    2559: 'https://cdn.streamlabs.com/marketplace/overlays/4921216/1b2f6cc/1b2f6cc.overlay',
+    // Streamlabs Light Mode 1584
+    2560: 'https://cdn.streamlabs.com/marketplace/overlays/4921216/fb61932/fb61932.overlay',
+    // Red Glitch 1673
+    2209: 'https://cdn.streamlabs.com/marketplace/overlays/60327649/9259e55/9259e55.overlay',
+    // Midnight Red 1674
+    2657: 'https://cdn.streamlabs.com/marketplace/overlays/60327649/985817a/985817a.overlay',
   },
   PAID: {
     // Waves (paid version), free: 3216
