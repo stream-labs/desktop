@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Button } from 'antd';
 import { ObsSettingsSection } from './ObsSettings';
 import { $t } from '../../../services/i18n';
 import { Services } from '../../service-provider';
@@ -14,9 +15,11 @@ export function RemoteControlSettings() {
   const connectedDevices = useRealmObject(RemoteControlService.connectedDevices).devices;
   const enabled = useRealmObject(RemoteControlService.state).enabled;
 
-  const { isLoggedIn, websocketsEnabled } = useVuex(() => ({
+  const { isLoggedIn, websocketsEnabled, token, port } = useVuex(() => ({
     isLoggedIn: UserService.views.isLoggedIn,
     websocketsEnabled: TcpServerService.state.websockets.enabled,
+    token: TcpServerService.state.token,
+    port: TcpServerService.state.websockets.port,
   }));
 
   function handleToggle() {
@@ -40,6 +43,10 @@ export function RemoteControlSettings() {
       .filter(address => !address.internal)
       .map(address => address.address)
       .join(', ');
+  }
+
+  function generateToken() {
+    TcpServerService.actions.generateToken();
   }
 
   function disconnectDevice(device: IConnectedDevice) {
@@ -109,15 +116,12 @@ export function RemoteControlSettings() {
           {websocketsEnabled && (
             <div className={styles.websocketsForm}>
               <TextInput label={$t('IP Addresses')} value={getIPAddresses()} readOnly />
-              <TextInput
-                label={$t('Port')}
-                value={`${TcpServerService.state.websockets.port}`}
-                readOnly
-              />
+              <TextInput label={$t('Port')} value={port.toString(10)} readOnly />
               <TextInput
                 label={$t('API Token')}
-                value={UserService.views.auth?.apiToken}
+                value={token}
                 readOnly
+                addonAfter={<Button onClick={generateToken}>{$t('Generate new')}</Button>}
               />
             </div>
           )}
