@@ -16,7 +16,7 @@ import { CustomizationService } from 'services/customization';
 import * as Sentry from '@sentry/browser';
 import { RunInLoadingMode } from 'services/app/app-decorators';
 import { SceneCollectionsService } from 'services/scene-collections';
-import { Subject, Subscription } from 'rxjs';
+import { BehaviorSubject, Subject, Subscription } from 'rxjs';
 import Utils from 'services/utils';
 import { WindowsService } from 'services/windows';
 import { $t, I18nService } from 'services/i18n';
@@ -432,6 +432,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   @lazyModule(AuthModule) private authModule: AuthModule;
 
+  /**
+   * Used to sync the user's state via API
+   */
+  state$ = new BehaviorSubject(this.state);
+
   async init() {
     super.init();
     this.MIGRATE_AUTH();
@@ -481,6 +486,12 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         const platform = event.message[0].platform.split('_')[0];
         await this.startChatAuth(platform as TPlatform);
       }
+    });
+
+    // Notify the API subscribers of all state changes
+    this.store.subscribe((mutation, state) => {
+      if (!mutation.type.startsWith('UserService')) return;
+      this.state$.next(state.UserService);
     });
   }
 

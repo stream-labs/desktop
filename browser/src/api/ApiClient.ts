@@ -17,7 +17,7 @@ type SWRHook<R, A extends any[]> = (...args: A) => SWRResponse<R, any>;
 type SubscribeHook<T> = (callback: (data: T) => void) => void;
 
 type AttachSWR<T extends (...args: any[]) => Promise<any>> = T & {
-  useSWR: SWRHook<Awaited<ReturnType<T>>, Parameters<T>>;
+  useQuery: SWRHook<Awaited<ReturnType<T>>, Parameters<T>>;
 };
 
 type AttachSubscribe<T> = EventStream<T> & {
@@ -38,10 +38,10 @@ class ApiClient {
   private socket: SockJS;
   private nextRequestId = 1;
   private requests: {
-    [id: number]: { resolve: Function; reject: Function };
+    [id: string]: { resolve: Function; reject: Function };
   } = {};
   private subscriptions: {
-    [id: number]: { resourceId: string; callback: Function };
+    [id: string]: { resourceId: string; id: string, callback: Function, once?: boolean };
   } = {};
   private token: string;
   private connectionStatus: 'disconnected' | 'pending' | 'connected' = 'disconnected';
@@ -57,11 +57,11 @@ class ApiClient {
     this.socket = new SockJS(this.url);
 
     this.socket.onopen = () => {
-      console.log('SockJS connection opened.');
+      console.debug('SockJS connection opened.');
       // Authenticate with the token
       this.request('TcpServerService', 'auth', this.token)
         .then(() => {
-          console.log('Authenticated');
+          console.debug('Authenticated');
           this.connectionStatus = 'connected';
         })
         .catch((error) => {
@@ -73,7 +73,7 @@ class ApiClient {
     this.socket.onmessage = this.onMessage.bind(this);
 
     this.socket.onclose = (event) => {
-      console.log('SockJS connection closed:', event);
+      console.debug('SockJS connection closed:', event);
       this.connectionStatus = 'disconnected';
       // Optionally handle reconnection logic here
     };
@@ -83,35 +83,76 @@ class ApiClient {
     };
   }
 
+  
+  public disconnect() {
+    if (this.socket) {
+      this.socket.close();
+      this.socket = null;
+    }
+    this.connectionStatus = 'disconnected';
+    this.requests = {};
+    this.subscriptions = {};
+    console.debug('ApiClient disconnected.');
+  }
+
   private onMessage(event: MessageEvent) {
     const message = JSON.parse(event.data);
     const { id, result, error } = message;
+    const isResponse = id && this.requests[id];   
 
-    if (id && this.requests[id]) {
+
+    if (isResponse) {
       const pending = this.requests[id];
       if (error) {
         pending.reject(error);
       } else {
-        pending.resolve(result);
+        const { resourceId, emitter } = result;
+        if (emitter === 'PROMISE') {
+          // If the result is a promise, we need to subscribe to the result
+          this.subscriptions[id] = {
+            id,
+            resourceId,
+            callback: data => pending.resolve(data),
+            once: true,
+          };
+          console.debug(`%c<<TASK STARTED`, 'color: orange', id, message);
+        } else { //otherwise, resolve the request promise with the result
+          if (result._type === 'SUBSCRIPTION') {
+            console.debug(`%c<<SUBSCRIPTION CONFIRMED`, 'color: orange', id, message);
+          } else {
+            console.debug(`%c<<RESPONSE`, 'color: lightgreen', id, message);
+          }
+          pending.resolve(result);
+        }
       }
+      // Remove the request from the pending requests
       delete this.requests[id];
-    } else if (result && result._type === 'EVENT') {
+    } else if (result && result._type === 'EVENT') { // if the message is an event, call the subscription callback
       const { resourceId, data } = result;
-      const subscription = Object.values(this.subscriptions).find(
+      const subscriptions = Object.values(this.subscriptions).filter(
         (sub) => sub.resourceId === resourceId
       );
-      if (subscription) {
-        subscription.callback(data);
+      for (const subscription of subscriptions) {
+        
+          if (subscription.once) {
+            this.unsubscribe(id);
+            console.debug(`%c<<TASK COMPLETED`, 'color: orange', subscription.id, message);
+          } else {
+            console.debug(`%c<<EVENT`, 'color: orange', subscription.id, message);
+          }
+          subscription.callback(data);
+       
       }
+     
     }
   }
 
   public request(
     resourceId: string,
     methodName: string,
-    ...args: any[]
-  ): Promise<any> {
-    const id = this.nextRequestId++;
+    ...args: unknown[]
+  ): Promise<unknown> {
+    const id = `${resourceId}.${methodName}.${this.nextRequestId++}`;
     const requestBody = {
       jsonrpc: '2.0',
       id,
@@ -120,13 +161,16 @@ class ApiClient {
     };
     return new Promise((resolve, reject) => {
       this.requests[id] = { resolve, reject };
+      const json = JSON.stringify(requestBody);
       if (this.socket.readyState === SockJS.OPEN) {
-        this.socket.send(JSON.stringify(requestBody));
+        this.socket.send(json);
       } else {
+        
         this.socket.addEventListener('open', () => {
-          this.socket.send(JSON.stringify(requestBody));
+          this.socket.send(json);
         });
       }
+      console.debug(`%c>>SEND ${id}`,'color: lightgreen', requestBody);
     });
   }
 
@@ -135,7 +179,7 @@ class ApiClient {
     channelName: string,
     callback: Function
   ): Subscription {
-    const id = this.nextRequestId++;
+    const id = `${resourceId}.${channelName}.${this.nextRequestId++}`;
     const requestBody = {
       jsonrpc: '2.0',
       id,
@@ -146,6 +190,7 @@ class ApiClient {
     this.requests[id] = {
       resolve: (subscriptionInfo: any) => {
         this.subscriptions[id] = {
+          id,
           resourceId: subscriptionInfo.resourceId,
           callback,
         };
@@ -162,6 +207,7 @@ class ApiClient {
         this.socket.send(JSON.stringify(requestBody));
       });
     }
+    console.debug(`%c>>SUBSCRIBE ${id}`,'color: lightgreen', requestBody);
 
     return {
       unsubscribe: () => {
@@ -180,9 +226,14 @@ function createApiClient<T extends object>(client: ApiClient): PromisifyMethods<
     get(target, serviceName: string) {
       const serviceProxyHandler: ProxyHandler<any> = {
         get(target, methodName: string) {
+
+
+          const subscribe = (callback: any) => client.subscribe(serviceName, methodName, callback);
+
+          // Custom hook to subscribe to events
           const useSubscribe = (callback: (data: any) => void) => {
             useEffect(() => {
-              const subscription = client.subscribe(serviceName, methodName, callback);
+              const subscription = subscribe(callback);
               return () => {
                 subscription.unsubscribe();
               };
@@ -196,7 +247,7 @@ function createApiClient<T extends object>(client: ApiClient): PromisifyMethods<
 
           // Attach the 'subscribe' method to the function
           Object.defineProperty(method, 'subscribe', {
-            value: useSubscribe,
+            value: subscribe,
             writable: false,
           });
 
@@ -207,14 +258,14 @@ function createApiClient<T extends object>(client: ApiClient): PromisifyMethods<
           });
 
           // Attach useSWR for getter methods
-          Object.defineProperty(method, 'useSWR', {
+          Object.defineProperty(method, 'useQuery', {
             value: (...args: any[]) => {
               const key = [serviceName, methodName, ...args];
               const swrResponse = useSWR(key, () => method(...args));
-
+          
               // Redefine mutate to automatically invalidate the SWR cache
               const newMutate = () => globalMutate(key);
-
+          
               return {
                 ...swrResponse,
                 mutate: newMutate,

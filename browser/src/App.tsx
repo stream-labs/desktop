@@ -2,12 +2,14 @@ import './App.css';
 import { useEffect } from "react";
 import { TAppServiceInstancess } from "../../app/app-services";
 import { ApiClient, createApiClient } from "./api-client";
-import GoLiveWindowV2 from './components/GoLiveWindow';
+import GoLiveWindowV2 from '@/features/live/GoLiveWindow';
+import TodosApp from '@/features/todos/Todos.tsx';
+import { api } from './api/api.ts';
+import { ConfigProvider, theme } from 'antd';
 
 
 // const client = new ApiClient('http://192.168.1.220:59650/api', 'f9ebd973b12ab4228bb5cc856dd936aa1b644ded');
-const client = new ApiClient('http://192.168.1.192:59650/api', 'f9ebd973b12ab4228bb5cc856dd936aa1b644ded');
-const api = createApiClient<TAppServiceInstancess>(client);
+
 
 async function fetchActiveScene() {
   const scenesServiceModel = await api.ScenesService.getModel();
@@ -15,20 +17,26 @@ async function fetchActiveScene() {
 }
 
 
-async  function sayHello(): string {
-  // const response = await trpc.hello.query({ name: 'tRPC' });
-  // console.log(response); // { greeting: 'Hello tRPC' }
-  // const service = null as StreamingServiceType | null;
-  // service?.actions.prepopulateInfo();
-  // api.services.StreamingService?.prepopulateInfo();
-}
+
 
 export default function App() {
-  sayHello();
-  return <>
-    <GoLiveWindowV2 />
+  return (
+  <>
+      <ConfigProvider
+    theme={{
+      // 1. Use dark algorithm
+      algorithm: theme.darkAlgorithm,
+
+      // 2. Combine dark algorithm and compact algorithm
+      // algorithm: [theme.darkAlgorithm, theme.compactAlgorithm],
+    }}
+    >
+          <GoLiveWindowV2 />
+    {/* <TodosApp/> */}
     <ActiveSceneComponent/>
-  </>
+  </ConfigProvider>
+  </>);
+
 }
 
 
@@ -36,20 +44,12 @@ export default function App() {
 
 
 function ActiveSceneComponent() {
-  const { data, mutate } = api.ScenesService.getModel.useSWR();
-  const scene = data?.scenes[data.activeSceneId];
+  const scene = {name: 'test'};
+  // const { data, mutate } = api.ScenesService.getModel.useSWR();
+  // const scene = data?.scenes[data.activeSceneId];
+  //
+  // api.ScenesService.sceneSwitched.useSubscribe(() => mutate())
 
-  api.ScenesService.sceneSwitched.useSubscribe(() => mutate())
-
-  // useEffect(() => {
-  //   const subscription = api.ScenesService.sceneSwitched.subscribe((scene) => {
-  //     mutate('activeScene');
-  //   });
-
-  //   return () => {
-  //     subscription.unsubscribe();
-  //   };
-  // }, []);
 
   return (
     <div>

@@ -64,7 +64,7 @@ import InstalledApps from './windows/settings/InstalledApps';
 import Hotkeys from './windows/settings/Hotkeys';
 import Studio from './pages/Studio';
 import LiveDock from './root/LiveDock';
-import GoLiveWindowV2 from './windows/go-live-v2/GoLiveWindow';
+// import GoLiveWindowV2 from './windows/go-live-v2/GoLiveWindow';
 
 // list of React components to be used inside Vue components
 export const components = {
@@ -74,7 +74,7 @@ export const components = {
   NameScene,
   BrowserView,
   GoLiveWindow: createRoot(GoLiveWindow),
-  GoLiveWindowV2: createRoot(GoLiveWindowV2),
+  // GoLiveWindowV2: createRoot(GoLiveWindowV2),
   EditStreamWindow: createRoot(EditStreamWindow),
   IconLibraryProperties,
   ScreenCaptureProperties,
