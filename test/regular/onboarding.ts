@@ -1,13 +1,17 @@
 import { test, useWebdriver } from '../helpers/webdriver';
-import { logIn } from '../helpers/webdriver/user';
+import { logIn, withPoolUser } from '../helpers/webdriver/user';
 import { sleep } from '../helpers/sleep';
 import {
   click,
   clickIfDisplayed,
+  clickWhenDisplayed,
   focusMain,
   isDisplayed,
   waitForDisplayed,
 } from '../helpers/modules/core';
+import { getApiClient } from '../helpers/api-client';
+import { ScenesService } from '../../app/services/api/external-api/scenes';
+import { DualOutputService } from '../../app/services/dual-output';
 
 // not a react hook
 // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -52,6 +56,7 @@ test('Go through onboarding login and signup', async t => {
 
 test('Go through onboarding', async t => {
   const app = t.context.app;
+
   await focusMain();
 
   if (!(await isDisplayed('h2=Live Streaming'))) return;
@@ -63,32 +68,41 @@ test('Go through onboarding', async t => {
   await click('a=Login');
   await isDisplayed('button=Log in with Twitch');
 
-  await logIn(t, 'twitch', { prime: false }, false, true);
-  await sleep(1000);
+  const user = await logIn(t, 'twitch', { prime: false }, false, true);
 
+  await sleep(1000);
   // We seem to skip the login step after login internally
   await clickIfDisplayed('button=Skip');
 
-  // Don't Import from OBS
-  await clickIfDisplayed('div=Start Fresh');
+  // Finish onboarding flow
+  await withPoolUser(user, async () => {
+    // Skip hardware config
+    await waitForDisplayed('h1=Set up your mic & webcam');
+    await clickIfDisplayed('button=Skip');
 
-  // Skip hardware config
-  await waitForDisplayed('h1=Set up your mic & webcam');
-  await clickIfDisplayed('button=Skip');
+    // Skip picking a theme
+    await waitForDisplayed('h1=Add your first theme');
+    await clickIfDisplayed('button=Skip');
 
-  // Skip picking a theme
-  await waitForDisplayed('h1=Add an Overlay');
-  await clickIfDisplayed('button=Skip');
+    // Skip purchasing prime
+    await clickWhenDisplayed('div[data-testid=choose-free-plan-btn]', { timeout: 60000 });
 
-  // Skip purchasing prime
-  // TODO: is this timeout because of autoconfig?
-  await waitForDisplayed('div[data-testid=choose-free-plan-btn]', { timeout: 60000 });
-  await click('div=[data-testid=choose-free-plan-btn]');
+    await waitForDisplayed('span=Sources', { timeout: 60000 });
 
-  await waitForDisplayed('span=Sources', { timeout: 60000 });
+    // editor successfully loaded
+    t.true(await (await app.client.$('span=Sources')).isDisplayed(), 'Sources selector is visible');
 
-  // success?
-  t.true(await (await app.client.$('span=Sources')).isDisplayed(), 'Sources selector is visible');
+    const api = await getApiClient();
+    const scenesService = api.getResource<ScenesService>('ScenesService');
+    const dualOutputService = api.getResource<DualOutputService>('DualOutputService');
+
+    t.is(
+      scenesService.activeScene.getItems().length,
+      0,
+      'New user not logged in without theme has no sources',
+    );
+    t.is(dualOutputService.state.dualOutputMode, false, 'Dual output not enabled.');
+  });
 });
 
 // TODO: this test is the same as beginner except with autoconfig, make specific assertions here once re-enabled

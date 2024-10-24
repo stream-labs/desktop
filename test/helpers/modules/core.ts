@@ -50,6 +50,11 @@ export async function clickIfDisplayed(selectorOrEl: TSelectorOrEl) {
   }
 }
 
+export async function clickWhenDisplayed(selectorOrEl: TSelectorOrEl, options?: WaitForOptions) {
+  await waitForDisplayed(selectorOrEl, options);
+  await click(selectorOrEl);
+}
+
 export async function clickText(text: string) {
   await (await select(`*=${text}`)).click();
 }
