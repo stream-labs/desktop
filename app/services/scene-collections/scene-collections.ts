@@ -546,7 +546,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
       try {
         data = this.stateService.readCollectionFile(id);
-        if (data == null) throw new Error('Got blank data from collection file');
+        if (!data) throw new Error('Got blank data from collection file');
         await this.loadDataIntoApplicationState(data);
       } catch (e: unknown) {
         /*
@@ -556,26 +556,46 @@ export class SceneCollectionsService extends Service implements ISceneCollection
          *  and methods being invoked (like `updateRegisteredHotkeys`) as
          *  part of the loading process.
          */
-        console.error('Error while loading collection, restoring backup', e);
-        // Check for a backup and load it
-        const exists = await this.stateService.collectionFileExists(id, true);
+        console.error(
+          'Error while loading collection, restoring backup:',
+          e instanceof Error ? e.message : e,
+        );
 
-        // If there's no backup, throw the original error
-        if (!exists) throw e;
+        try {
+          // Check for a backup and load it
+          const backupExists = await this.stateService.collectionFileExists(id, true);
+          // Rethrow the original error if no backup exists
+          if (!backupExists) throw e;
 
-        data = this.stateService.readCollectionFile(id, true);
-        await this.loadDataIntoApplicationState(data);
+          data = this.stateService.readCollectionFile(id, true);
+          if (!data) throw new Error('Got blank data from backup collection file');
+          await this.loadDataIntoApplicationState(data);
+        } catch (backupError: unknown) {
+          console.error(
+            'Error while loading backup collection:',
+            backupError instanceof Error ? backupError.message : backupError,
+          );
+          return; // Prevent further execution by returning early
+        }
       }
 
       if (this.scenesService.views.scenes.length === 0) {
-        throw new Error('Scene collection was loaded but there were no scenes.');
+        console.error('Scene collection was loaded but there were no scenes.');
+        return; // Return early to prevent writing a backup for an empty scene collection
       }
 
       // Everything was successful, write a backup
       this.stateService.writeDataToCollectionFile(id, data, true);
       this.collectionLoaded = true;
     } else {
-      await this.attemptRecovery(id);
+      try {
+        await this.attemptRecovery(id);
+      } catch (recoveryError: unknown) {
+        console.error(
+          'Error during collection recovery:',
+          recoveryError instanceof Error ? recoveryError.message : recoveryError,
+        );
+      }
     }
   }
 
