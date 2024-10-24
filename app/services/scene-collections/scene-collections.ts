@@ -110,9 +110,18 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   private collectionLoaded = false;
 
   /**
+   * Whether the error dialogue is currently open.
+   * Used to prevent multiple error dialogues from opening when the user
+   * tries to load a collection that fails to load, mostly like due to
+   * missing scenes or sources.
+   */
+  private collectionErrorOpen = false;
+
+  /**
    * true if the scene-collections sync in progress
    */
   private syncPending = false;
+  scenesServices: any;
 
   /**
    * Does not use the standard init function so we can have asynchronous
@@ -197,11 +206,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
         await this.attemptRecovery(id);
       } else {
         console.warn(`Unsuccessful recovery of scene collection ${id} attempted`);
-        remote.dialog.showMessageBox(Utils.getMainWindow(), {
-          title: 'Streamlabs Desktop',
-          message: $t('Failed to load scene collection.  A new one will be created instead.'),
-        });
-        await this.create();
+        this.handleCollectionLoadError();
       }
     }
   }
@@ -549,19 +554,21 @@ export class SceneCollectionsService extends Service implements ISceneCollection
         if (!data) throw new Error('Got blank data from collection file');
         await this.loadDataIntoApplicationState(data);
       } catch (e: unknown) {
-        /*
-         * FIXME: we invoke `loadDataIntoApplicationState` a second time below,
-         *  which can cause partial state from the call above to still
-         *  be present and result in duplicate items (for instance, scenes)
-         *  and methods being invoked (like `updateRegisteredHotkeys`) as
-         *  part of the loading process.
-         */
         console.error(
           'Error while loading collection, restoring backup:',
           e instanceof Error ? e.message : e,
         );
 
         try {
+          /*
+           *  Attempt to deload application state because we invoke `loadDataIntoApplicationState` a second time below,
+           *  which can cause partial state from the call above to still
+           *  be present and result in duplicate items (for instance, scenes)
+           *  and methods being invoked (like `updateRegisteredHotkeys`) as
+           *  part of the loading process.
+           */
+          this.deloadPartialApplicationState();
+
           // Check for a backup and load it
           const backupExists = await this.stateService.collectionFileExists(id, true);
           // Rethrow the original error if no backup exists
@@ -575,18 +582,19 @@ export class SceneCollectionsService extends Service implements ISceneCollection
             'Error while loading backup collection:',
             backupError instanceof Error ? backupError.message : backupError,
           );
-          return; // Prevent further execution by returning early
+          await this.handleCollectionLoadError();
         }
-      }
 
-      if (this.scenesService.views.scenes.length === 0) {
-        console.error('Scene collection was loaded but there were no scenes.');
-        return; // Return early to prevent writing a backup for an empty scene collection
-      }
+        // to prevent errors, add a default scene if somehow there are no scenes
+        if (this.scenesService.views.scenes.length === 0) {
+          console.error('Scene collection was loaded but there were no scenes.');
+          await this.handleCollectionLoadError();
+        }
 
-      // Everything was successful, write a backup
-      this.stateService.writeDataToCollectionFile(id, data, true);
-      this.collectionLoaded = true;
+        // Everything was successful, write a backup
+        this.stateService.writeDataToCollectionFile(id, data, true);
+        this.collectionLoaded = true;
+      }
     } else {
       try {
         await this.attemptRecovery(id);
@@ -595,8 +603,24 @@ export class SceneCollectionsService extends Service implements ISceneCollection
           'Error during collection recovery:',
           recoveryError instanceof Error ? recoveryError.message : recoveryError,
         );
+
+        await this.handleCollectionLoadError();
       }
     }
+  }
+
+  private async handleCollectionLoadError() {
+    if (this.collectionErrorOpen) return;
+
+    remote.dialog
+      .showMessageBox(Utils.getMainWindow(), {
+        title: 'Streamlabs Desktop',
+        message: $t('Failed to load scene collection.  A new one will be created instead.'),
+      })
+      .then(() => (this.collectionErrorOpen = false));
+
+    this.collectionErrorOpen = true;
+    await this.create();
   }
 
   /**
@@ -613,15 +637,22 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     if (root.data.sources.removeUnsupported()) {
       // The underlying function already wrote all details to the log.
       // Users will see a very basic information.
-      await remote.dialog.showMessageBox(Utils.getMainWindow(), {
-        title: 'Unsupported Sources',
-        type: 'warning',
-        message: 'One or more scene items were removed because they are not supported',
-      });
+      this.showUnsupportedSourcesDialog();
     }
 
     await root.load();
     this.hotkeysService.bindHotkeys();
+  }
+
+  private async showUnsupportedSourcesDialog() {
+    await remote.dialog
+      .showMessageBox(Utils.getMainWindow(), {
+        title: 'Unsupported Sources',
+        type: 'warning',
+        message: 'One or more scene items were removed because they are not supported',
+      })
+      .then(() => (this.collectionErrorOpen = false));
+    this.collectionErrorOpen = true;
   }
 
   /**
@@ -674,8 +705,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   private async deloadCurrentApplicationState() {
     this.tcpServerService.stopRequestsHandling();
 
-    this.collectionWillSwitch.next();
-
     await this.disableAutoSave();
     await this.save();
 
@@ -700,6 +729,51 @@ export class SceneCollectionsService extends Service implements ISceneCollection
       this.streamingService.setSelectiveRecording(false);
     } catch (e: unknown) {
       console.error('Error deloading application state', e);
+    }
+
+    this.hotkeysService.clearAllHotkeys();
+    this.collectionLoaded = false;
+  }
+
+  /**
+   * Deloads all scenes and sources when app state is partially loaded.
+   * @remark Primarily used to clear state when the app is partially loaded
+   * due to an error when loading the scene collection sources. This should
+   * only ever be performed while the application is already in a "LOADING" state.
+   * @remark This method is a slight refactor of `deloadCurrentApplicationState`.
+   */
+  private async deloadPartialApplicationState() {
+    this.tcpServerService.stopRequestsHandling();
+
+    await this.disableAutoSave();
+
+    try {
+      // remove any scenes that were partially loaded
+      if (this.scenesServices.views.scenes.length > 0) {
+        this.scenesService.views.scenes.forEach(scene => {
+          if (scene.id === this.scenesService.views.activeSceneId) return;
+          scene.remove(true);
+        });
+
+        if (this.scenesService.views.activeScene) {
+          this.scenesService.views.activeScene.remove(true);
+        }
+      }
+
+      // remove any sources that were partially loaded
+      if (this.sourcesService.views.sources.length > 0) {
+        this.sourcesService.views.sources.forEach(source => {
+          if (source.type !== 'scene') source.remove();
+        });
+      }
+
+      this.transitionsService.deleteAllTransitions();
+      this.transitionsService.deleteAllConnections();
+
+      this.streamingService.setSelectiveRecording(false);
+    } catch (e: unknown) {
+      console.error('Error deloading partially loaded application state', e);
+      throw new Error('Error deloading partially loaded application state');
     }
 
     this.hotkeysService.clearAllHotkeys();
