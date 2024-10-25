@@ -305,12 +305,14 @@ export class SourcesNode extends Node<ISchema, {}> {
       const sources = obs.createSources(sourceCreateData);
 
       if (sourceCreateData.length !== sources.length) {
-        console.error('Error during sources creation when loading scene collection.');
+        const sourcesNotCreated = sourceCreateData.filter(source => !sources.some(s => s.name === source.name));
+        const sourceNames = sourcesNotCreated.map(source => source.name).join(', ');
+        console.error('Error during sources creation when loading scene collection.', JSON.stringify(sourcesNotCreated));
 
         remote.dialog.showMessageBox(Utils.getMainWindow(), {
           title: 'Unsupported Sources',
           type: 'warning',
-          message: 'One or more scene items were removed because they are not supported',
+          message: `Scene items were removed because there were an error loading them: ${sourceNames}`,
         });
       }
 
