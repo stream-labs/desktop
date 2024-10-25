@@ -45,7 +45,7 @@ export function initStore<TState extends object>(initialState: TState) {
   const useShallowSelector = <StateSlice>(
     selector: (state: TState) => StateSlice
   ) => {
-    return baseStore(selector, shallow);
+    return useBaseStore(selector, shallow);
   };
 
   const setState = useBaseStore.setState;

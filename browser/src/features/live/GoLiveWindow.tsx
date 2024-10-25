@@ -4,24 +4,26 @@ import React, { useEffect, useState, createContext, useMemo } from 'react';
 import { Controller, initStore, useController } from '@/store/Controller';
 import { api } from '@/api/api.ts';
 import { omit } from 'lodash';
-import { from } from 'rxjs';
-import { atom } from 'jotai';
 // import Form from '../../shared/inputs/Form';
 
 const TextArea = Input.TextArea;
 
 
-class GoLiveController {
+class GoLiveController extends Controller {
  // static ctx = createContext<GoLiveController | null>(null);
   store = initStore({
     lifecycle: 'prepopulate',
-    settings: { platforms: {} as unknown },
-    // user: fromChannel(api.UserService.state$).pick(user => ({ id: user.id, name: user.name })),
-    // scenes: fromChannel(api.SceneService.state$)
-    // notifications: fromChannel(api.NotificationService.state$),
+    settings: {
+      general: {
+        title: '',
+        description: ''
+      },
+      platforms: {} as unknown 
+    },
   });
 
-  streamInfo = atom(api.StreamingService.prepopulateInfo);
+  streamInfoStore = this.observe(api.StreamingService.state$);
+  userStore = this.observe(api.UserService.state$).pick(user => ({ id: user.id, name: user.name }));
 
   instanceId = Date.now();
 
@@ -53,15 +55,9 @@ class GoLiveController {
       });
     });
 
-    // subscribe to `userStateChanged` to keep the user info in sync
-    const userSub = api.UserService.state$.subscribe(user => {
-      this.store.setState(s => {
-        s.user = user;
-      });
-    });
 
     // return the dispose function that cleanups the subscription
-    return () => [streamInfoSub, userSub].forEach(sub => sub.unsubscribe());
+    return () => [streamInfoSub].forEach(sub => sub.unsubscribe());
   }
 
 }
@@ -71,8 +67,9 @@ class GoLiveController {
 
 export default function GoLiveWindow() {
     console.log('RENDER GoLiveWindowV2');
-    const { store } = useController(GoLiveController);
+    const { store, userStore } = useController(GoLiveController);
   const lifecycle = store.useSelector(s => s.lifecycle);
+  const user = userStore.useStateValue();
   const isLoading = lifecycle === 'prepopulate' || lifecycle === 'empty';
 
   const shouldShowSettings = ['waitForNewSettings'].includes(lifecycle);
