@@ -23,7 +23,7 @@ export const THEME_METADATA = {
     // Streamlabs Light Mode 1584
     2560: 'https://cdn.streamlabs.com/marketplace/overlays/4921216/fb61932/fb61932.overlay',
     // Red Glitch 1673
-    2209: 'https://cdn.streamlabs.com/marketplace/overlays/60327649/9259e55/9259e55.overlay',
+    2656: 'https://cdn.streamlabs.com/marketplace/overlays/60327649/9259e55/9259e55.overlay',
     // Midnight Red 1674
     2657: 'https://cdn.streamlabs.com/marketplace/overlays/60327649/985817a/985817a.overlay',
   },
