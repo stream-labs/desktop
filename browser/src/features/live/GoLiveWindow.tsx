@@ -5,6 +5,7 @@ import { Controller, initStore, useController } from '@/store/Controller';
 import { api } from '@/api/api.ts';
 import { omit } from 'lodash';
 import { from } from 'rxjs';
+import { atom } from 'jotai';
 // import Form from '../../shared/inputs/Form';
 
 const TextArea = Input.TextArea;
@@ -15,11 +16,12 @@ class GoLiveController {
   store = initStore({
     lifecycle: 'prepopulate',
     settings: { platforms: {} as unknown },
-    user: fromChannel(api.UserService.state$).pick(user => ({ id: user.id, name: user.name })),
-    scenes: fromChannel(api.SceneService.state$)
-    notifications: fromChannel(api.NotificationService.state$),
+    // user: fromChannel(api.UserService.state$).pick(user => ({ id: user.id, name: user.name })),
+    // scenes: fromChannel(api.SceneService.state$)
+    // notifications: fromChannel(api.NotificationService.state$),
   });
 
+  streamInfo = atom(api.StreamingService.prepopulateInfo);
 
   instanceId = Date.now();
 

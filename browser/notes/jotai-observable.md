@@ -1,11 +1,3 @@
-**Yes, you're absolutely correct.** In my previous example, I unsubscribed from the RxJS `BehaviorSubject` after receiving the first value, which means subsequent updates to the user data would not be reflected in the UI. If the user data can change on the server and you need the UI to update accordingly, the subscription should remain active to listen for all changes.
-
-To handle continuous updates from the `BehaviorSubject`, we need to:
-
-- **Keep the subscription active** so it receives all emitted values.
-- **Update the atom's state** whenever the `BehaviorSubject` emits a new value.
-- **Manage subscriptions properly** to avoid memory leaks by unsubscribing when the component unmounts.
-
 ### **Solution with Jotai**
 
 Jotai provides a utility function called `atomWithObservable` in the `jotai/utils` package, which is designed specifically for integrating observables like RxJS `BehaviorSubject` with atoms. This utility creates an atom that subscribes to an observable and updates its state whenever the observable emits a new value.
@@ -267,7 +259,7 @@ Given that you need continuous updates from the `BehaviorSubject` and want to ke
 
 ### **Additional Resources**
 
-- [Jotai Documentation - atomWithObservable](https://jotai.org/docs/utils/atom-with-observable)
+- [Jotai Documentation - atomWithObservable](https://jotai.org/docs/utilities/async#atomwithobservable)
 - [RxJS Documentation - BehaviorSubject](https://rxjs.dev/api/index/class/BehaviorSubject)
 - [React Suspense Documentation](https://reactjs.org/docs/concurrent-mode-suspense.html)
 
