@@ -644,7 +644,10 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     this.hotkeysService.bindHotkeys();
   }
 
-  private async showUnsupportedSourcesDialog() {
+  async showUnsupportedSourcesDialog(e?: Error | unknown) {
+    const message = e && e instanceof Error ? e.message : e ?? '';
+    console.error('Error during sources creation when loading scene collection:', message);
+
     await remote.dialog
       .showMessageBox(Utils.getMainWindow(), {
         title: 'Unsupported Sources',

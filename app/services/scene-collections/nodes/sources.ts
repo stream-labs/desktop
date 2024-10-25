@@ -21,6 +21,8 @@ import {
   SourceFiltersService,
   TSourceFilterType,
 } from 'services/source-filters';
+import * as remote from '@electron/remote';
+import Utils from 'services/utils';
 
 interface ISchema {
   items: ISourceInfo[];
@@ -297,58 +299,72 @@ export class SourcesNode extends Node<ISchema, {}> {
     // before creating any sources in OBS.
     this.sourcesService;
 
-    const sources = obs.createSources(sourceCreateData);
     const promises: Promise<void>[] = [];
 
-    sources.forEach(async (source, index) => {
-      const sourceInfo = supportedSources[index];
+    try {
+      const sources = obs.createSources(sourceCreateData);
 
-      this.sourcesService.addSource(source, supportedSources[index].name, {
-        channel: sourceInfo.channel,
-        propertiesManager: sourceInfo.propertiesManager,
-        propertiesManagerSettings: sourceInfo.propertiesManagerSettings || {},
-        deinterlaceMode: sourceInfo.deinterlaceMode,
-        deinterlaceFieldOrder: sourceInfo.deinterlaceFieldOrder,
-      });
+      if (sourceCreateData.length !== sources.length) {
+        console.error('Error during sources creation when loading scene collection.');
 
-      if (source.audioMixers) {
-        this.audioService.views
-          .getSource(sourceInfo.id)
-          .setMul(sourceInfo.volume != null ? sourceInfo.volume : 1);
-
-        const defaultMonitoring =
-          (source.id as TSourceType) === 'browser_source'
-            ? obs.EMonitoringType.MonitoringOnly
-            : obs.EMonitoringType.None;
-
-        this.audioService.views.getSource(sourceInfo.id).setSettings({
-          forceMono: defaultTo(sourceInfo.forceMono, false),
-          syncOffset: AudioService.timeSpecToMs(
-            defaultTo(sourceInfo.syncOffset, { sec: 0, nsec: 0 }),
-          ),
-          audioMixers: defaultTo(sourceInfo.audioMixers, 255),
-          monitoringType: defaultTo(sourceInfo.monitoringType, defaultMonitoring),
+        remote.dialog.showMessageBox(Utils.getMainWindow(), {
+          title: 'Unsupported Sources',
+          type: 'warning',
+          message: 'One or more scene items were removed because they are not supported',
         });
-        this.audioService.views.getSource(sourceInfo.id).setHidden(!!sourceInfo.mixerHidden);
       }
 
-      if (sourceInfo.hotkeys) {
-        promises.push(supportedSources[index].hotkeys.load({ sourceId: sourceInfo.id }));
-      }
+      sources.forEach(async (source, index) => {
+        const sourceInfo = supportedSources[index];
+        this.sourcesService.addSource(source, supportedSources[index].name, {
+          channel: sourceInfo.channel,
+          propertiesManager: sourceInfo.propertiesManager,
+          propertiesManagerSettings: sourceInfo.propertiesManagerSettings || {},
+          deinterlaceMode: sourceInfo.deinterlaceMode,
+          deinterlaceFieldOrder: sourceInfo.deinterlaceFieldOrder,
+        });
 
-      this.sourceFiltersService.loadFilterData(
-        sourceInfo.id,
-        sourceCreateData[index].filters.map(f => {
-          return {
-            name: f.name,
-            type: f.type,
-            visible: f.enabled,
-            settings: f.settings,
-            displayType: f.displayType,
-          };
-        }),
-      );
-    });
+        if (source.audioMixers) {
+          this.audioService.views
+            .getSource(sourceInfo.id)
+            .setMul(sourceInfo.volume != null ? sourceInfo.volume : 1);
+
+          const defaultMonitoring =
+            (source.id as TSourceType) === 'browser_source'
+              ? obs.EMonitoringType.MonitoringOnly
+              : obs.EMonitoringType.None;
+
+          this.audioService.views.getSource(sourceInfo.id).setSettings({
+            forceMono: defaultTo(sourceInfo.forceMono, false),
+            syncOffset: AudioService.timeSpecToMs(
+              defaultTo(sourceInfo.syncOffset, { sec: 0, nsec: 0 }),
+            ),
+            audioMixers: defaultTo(sourceInfo.audioMixers, 255),
+            monitoringType: defaultTo(sourceInfo.monitoringType, defaultMonitoring),
+          });
+          this.audioService.views.getSource(sourceInfo.id).setHidden(!!sourceInfo.mixerHidden);
+        }
+
+        if (sourceInfo.hotkeys) {
+          promises.push(supportedSources[index].hotkeys.load({ sourceId: sourceInfo.id }));
+        }
+
+        this.sourceFiltersService.loadFilterData(
+          sourceInfo.id,
+          sourceCreateData[index].filters.map(f => {
+            return {
+              name: f.name,
+              type: f.type,
+              visible: f.enabled,
+              settings: f.settings,
+              displayType: f.displayType,
+            };
+          }),
+        );
+      });
+    } catch (e: unknown) {
+      console.error('Error loading scene collection source nodes: ', e);
+    }
 
     return new Promise(resolve => {
       Promise.all(promises).then(() => resolve());
