@@ -65,6 +65,8 @@ export type TStreamInfo =
     }
   | undefined; // initialTimesInStream
 
+//TODO M: Shouldnt stay here
+const isAiClip = (clip: TClip): clip is IAiClip => clip.source === 'AiClip';
 interface IBaseClip {
   path: string;
   loaded: boolean;
@@ -93,8 +95,13 @@ export interface IAiClip extends IBaseClip {
   source: 'AiClip';
   aiInfo: IAiClipInfo;
 }
+
+export interface IMoments {
+  type: EHighlighterInputTypes;
+}
+
 export interface IAiClipInfo {
-  moments: { type: EHighlighterInputTypes }[];
+  moments: IMoments[];
   score: number;
   metadata: { round: number };
 }
@@ -926,6 +933,12 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     this.UPDATE_CLIP({
       path,
       enabled,
+    });
+  }
+  disableClip(path: string) {
+    this.UPDATE_CLIP({
+      path,
+      enabled: false,
     });
   }
 
@@ -1972,6 +1985,25 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
   getClipsLoaded(clips: TClip[], streamId?: string): boolean {
     return this.getClips(clips, streamId).every(clip => clip.loaded);
+  }
+
+  getRounds(clips: TClip[]): { round: number; moments: IMoments[] }[] {
+    const roundsMap: { [key: number]: IMoments[] } = {};
+    clips.forEach(clip => {
+      const aiClip = isAiClip(clip) ? clip : undefined;
+      const round = aiClip?.aiInfo?.metadata?.round ?? undefined;
+      if (round) {
+        if (!roundsMap[round]) {
+          roundsMap[round] = [];
+        }
+        roundsMap[round].push(...aiClip.aiInfo.moments);
+      }
+    });
+
+    return Object.keys(roundsMap).map(round => ({
+      round: parseInt(round, 10),
+      moments: roundsMap[parseInt(round, 10)],
+    }));
   }
 
   enableOnlySpecificClips(clips: TClip[], streamId?: string) {

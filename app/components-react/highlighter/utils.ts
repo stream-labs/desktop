@@ -1,6 +1,7 @@
 import moment from 'moment';
 import { IAiClip, TClip } from 'services/highlighter';
-
+import { useRef, useEffect, useCallback } from 'react';
+import { EHighlighterInputTypes } from 'services/highlighter/ai-highlighter/ai-highlighter';
 import styles from './ClipsView.m.less';
 export const isAiClip = (clip: TClip): clip is IAiClip => clip.source === 'AiClip';
 
@@ -121,7 +122,6 @@ export function sortAndFilterClips(clips: TClip[], streamId: string | undefined,
 
   return { sorted, sortedFiltered };
 }
-import { useRef, useEffect, useCallback } from 'react';
 
 export const useOptimizedHover = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -167,3 +167,141 @@ export const useOptimizedHover = () => {
 
   return containerRef;
 };
+
+export interface IFilterOptions {
+  rounds: number[];
+  targetDuration: number;
+  includeAllEvents: boolean;
+}
+
+export function aiFilterClips(
+  clips: TClip[],
+  streamId: string | undefined,
+  options: IFilterOptions,
+): TClip[] {
+  const { rounds, targetDuration, includeAllEvents } = options;
+
+  const selectedRounds =
+    rounds.length === 1 && rounds[0] === 0
+      ? [
+          ...new Set(
+            clips
+              .filter(clip => clip.source === 'AiClip')
+              .map(clip => (clip as IAiClip).aiInfo.metadata?.round),
+          ),
+        ]
+      : rounds;
+
+  // console.log('selectedRounds', selectedRounds);
+
+  // Sort rounds by score (descending)
+  const sortedRounds = selectedRounds.sort(
+    (a, b) => getRoundScore(b, clips) - getRoundScore(a, clips),
+  );
+
+  // console.log('sortedRounds by rooundScore', sortedRounds);
+
+  let clipsFromRounds: TClip[] = [];
+
+  let totalDuration = 0;
+  for (var i = 0; i < sortedRounds.length; ++i) {
+    if (totalDuration > targetDuration) {
+      // console.log(`Duration: ${totalDuration} more than target: ${targetDuration}`);
+      break;
+    } else {
+      // console.log(`Duration: ${totalDuration} less than target: ${targetDuration}`);
+      //Todo M: how do sort? Per round or all together and then the rounds are in the stream order again?
+      const roundIndex = sortedRounds[i];
+      // console.log('include round ', roundIndex);
+
+      const roundClips = sortClips(getClipsOfRound(roundIndex, clips), streamId);
+      // console.log(
+      //   'roundClips before adding:',
+      //   roundClips.map(c => ({
+      //     duration: c.duration,
+      //   })),
+      // );
+
+      clipsFromRounds = [...clipsFromRounds, ...roundClips];
+
+      // console.log(
+      //   'clipsFromRounds after adding:',
+      //   clipsFromRounds.map(c => ({
+      //     duration: c.duration,
+      //   })),
+      // );
+      totalDuration = getTotalDuration(clipsFromRounds);
+      // console.log('new totalDuration:', totalDuration);
+    }
+    // console.log('clipsFromRounds', clipsFromRounds);
+  }
+  const contextTypes = [
+    EHighlighterInputTypes.DEPLOY,
+    EHighlighterInputTypes.DEATH,
+    EHighlighterInputTypes.VICTORY,
+  ];
+  const clipsSortedByScore = clipsFromRounds
+    .filter(
+      clips =>
+        !(clips as IAiClip).aiInfo.moments.some(moment => contextTypes.includes(moment.type)),
+    )
+    .sort((a, b) => (a as IAiClip).aiInfo.score - (b as IAiClip).aiInfo.score);
+  // console.log(
+  //   'clipsSortedByScore',
+  //   clipsSortedByScore.map(clip => {
+  //     return {
+  //       score: (clip as IAiClip).aiInfo.score,
+  //       moments: JSON.stringify((clip as IAiClip).aiInfo.moments),
+  //     };
+  //   }),
+  // );
+  // console.log('clipsFromRounds', clipsFromRounds);
+
+  let filteredClips: TClip[] = clipsFromRounds;
+  let currentDuration = getTotalDuration(filteredClips);
+
+  // console.log('remove clipswise to get closer to target');
+
+  const BUFFER_SEC = 0;
+  while (currentDuration > targetDuration + BUFFER_SEC) {
+    // console.log('ruuun currentDuration', currentDuration);
+    if (clipsSortedByScore === undefined || clipsSortedByScore.length === 0) {
+      break;
+    }
+
+    const clipToRemove = clipsSortedByScore[0];
+    clipsSortedByScore.splice(0, 1); // remove from our sorted array
+
+    const index = filteredClips.findIndex(clip => clip.path === clipToRemove.path);
+
+    if (index > -1) {
+      filteredClips.splice(index, 1); // 2nd parameter means remove one item only
+      currentDuration = getTotalDuration(filteredClips);
+      // console.log(
+      //   'removed, new currentDuration:',
+      //   currentDuration,
+      //   'target:',
+      //   targetDuration + BUFFER_SEC,
+      // );
+    }
+  }
+
+  return filteredClips;
+}
+
+function getTotalDuration(clips: TClip[]): number {
+  return clips.reduce((sum, clip) => sum + (clip.duration || 0), 0);
+}
+
+function getClipsOfRound(round: number, clips: TClip[]): TClip[] {
+  return clips.filter(
+    clip => clip.source === 'AiClip' && (clip as IAiClip).aiInfo.metadata.round === round,
+  );
+}
+
+function getRoundScore(round: number, clips: TClip[]): number {
+  return getClipsOfRound(round, clips).reduce(
+    (sum, clip) => sum + ((clip as IAiClip).aiInfo?.score || 0),
+    0,
+  );
+}
