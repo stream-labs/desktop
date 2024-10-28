@@ -582,19 +582,25 @@ export class SceneCollectionsService extends Service implements ISceneCollection
             'Error while loading backup collection:',
             backupError instanceof Error ? backupError.message : backupError,
           );
-          await this.handleCollectionLoadError();
+          return; // Prevent further execution by returning early
         }
-
-        // to prevent errors, add a default scene if somehow there are no scenes
-        if (this.scenesService.views.scenes.length === 0) {
-          console.error('Scene collection was loaded but there were no scenes.');
-          await this.handleCollectionLoadError();
-        }
-
-        // Everything was successful, write a backup
-        this.stateService.writeDataToCollectionFile(id, data, true);
-        this.collectionLoaded = true;
       }
+
+      if (!data) {
+        await this.create({ auto: true });
+        return;
+      }
+
+      if (this.scenesService.views.scenes.length === 0) {
+        console.error('Scene collection was loaded but there were no scenes.');
+        this.setupEmptyCollection();
+        this.collectionLoaded = true;
+        return; // Return early to prevent writing a backup for an empty scene collection
+      }
+
+      // Everything was successful, write a backup
+      this.stateService.writeDataToCollectionFile(id, data, true);
+      this.collectionLoaded = true;
     } else {
       try {
         await this.attemptRecovery(id);
@@ -620,7 +626,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
       .then(() => (this.collectionErrorOpen = false));
 
     this.collectionErrorOpen = true;
-    await this.create();
   }
 
   /**
@@ -707,6 +712,8 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    */
   private async deloadCurrentApplicationState() {
     this.tcpServerService.stopRequestsHandling();
+
+    this.collectionWillSwitch.next();
 
     await this.disableAutoSave();
     await this.save();
