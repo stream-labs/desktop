@@ -289,7 +289,7 @@ export function aiFilterClips(
   return filteredClips;
 }
 
-function getTotalDuration(clips: TClip[]): number {
+export function getTotalDuration(clips: TClip[]): number {
   return clips.reduce((sum, clip) => sum + (clip.duration || 0), 0);
 }
 

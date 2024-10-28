@@ -38,9 +38,11 @@ const optionStyles = {
 };
 
 export default function HighlightGeneratorUI({
+  maxDuration,
   rounds,
   emitSetFilter,
 }: {
+  maxDuration: number;
   rounds: {
     round: number;
     moments: IMoments[];
@@ -51,8 +53,18 @@ export default function HighlightGeneratorUI({
 
   const [selectedRounds, setSelectedRounds] = useState<number[]>([0]);
   const [filterType, setFilterType] = useState<'duration' | 'hypescore'>('duration');
-  const [targetDuration, setTargetDuration] = useState(10);
-
+  const [targetDuration, setTargetDuration] = useState(999);
+  const options = [
+    { value: 1, label: '1 minute' },
+    { value: 2, label: '2 minutes' },
+    { value: 5, label: '5 minutes' },
+    { value: 10, label: '10 minutes' },
+    { value: 12, label: '12 minutes' },
+    { value: 15, label: '15 minutes' },
+    { value: 20, label: '20 minutes' },
+    { value: 30, label: '30 minutes' },
+  ];
+  const filteredOptions = options.filter(option => option.value * 60 <= maxDuration);
   const handleRoundSelect = (value: number[]) => {
     if (value.includes(0)) {
       setSelectedRounds([0]);
@@ -106,7 +118,6 @@ export default function HighlightGeneratorUI({
       <h3 style={{ color: '#FFFFFF', margin: 0, fontWeight: 400 }}>
         🤖 Generate highlight video of
       </h3>
-
       <Select
         style={selectStyles}
         mode="multiple"
@@ -170,9 +181,7 @@ export default function HighlightGeneratorUI({
           </div>
         )}
       />
-
       <h3 style={{ color: '#FFFFFF', margin: 0, fontWeight: 400 }}>with a duration of</h3>
-
       {/* <Select
         style={selectStyles}
         value={filterType}
@@ -186,44 +195,28 @@ export default function HighlightGeneratorUI({
           Hype Score
         </Option>
       </Select> */}
-
       {/* <h3 style={{ color: '#FFFFFF' }}>of</h3> */}
-
       <Select
         style={{ ...selectStyles, width: '116px' }}
         value={targetDuration}
         onChange={value => setTargetDuration(value)}
         dropdownStyle={dropdownStyles}
       >
-        <Option value={1} style={optionStyles}>
-          1 minute
-        </Option>
-        <Option value={2} style={optionStyles}>
-          2 minutes
-        </Option>
-        <Option value={5} style={optionStyles}>
-          5 minutes
-        </Option>
-        <Option value={10} style={optionStyles}>
-          10 minutes
-        </Option>
-        <Option value={15} style={optionStyles}>
-          15 minutes
-        </Option>
-        <Option value={20} style={optionStyles}>
-          20 minutes
-        </Option>
+        {filteredOptions.map(option => (
+          <Option key={option.value} value={option.value} style={optionStyles}>
+            {option.label}
+          </Option>
+        ))}
         <Option value={999} style={optionStyles}>
           unlimited
         </Option>
       </Select>
-
       <Button
         type="text"
         onClick={() => {
           setSelectedRounds([0]);
           setFilterType('duration');
-          setTargetDuration(10);
+          setTargetDuration(999);
         }}
         icon={<span style={{ color: '#666666', fontSize: '20px' }}>&times;</span>}
         style={{
