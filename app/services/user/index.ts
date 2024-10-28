@@ -940,7 +940,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   async overlaysUrl(
-    type?: 'overlay' | 'widget-themes' | 'site-themes',
+    type?: 'overlay' | 'widget-themes' | 'site-themes' | 'collectibles',
     id?: string,
     install?: string,
   ) {

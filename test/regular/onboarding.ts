@@ -182,7 +182,9 @@ test('Go through onboarding and install theme', async t => {
     await clickWhenDisplayed('button=Install');
 
     // Skip purchasing prime
-    await clickWhenDisplayed('div[data-testid=choose-free-plan-btn]', { timeout: 60000 });
+    // TODO: is this timeout because of autoconfig?
+    await waitForDisplayed('div[data-testid=choose-free-plan-btn]', { timeout: 60000 });
+    await click('div=[data-testid=choose-free-plan-btn]');
 
     await waitForDisplayed('span=Sources', { timeout: 60000 });
 
