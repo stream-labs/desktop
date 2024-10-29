@@ -711,10 +711,8 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
           //   this.streamingService.views.game === 'Fortnite',
           // );
 
-          if (
-            this.views.useAiHighlighter === false ||
-            this.streamingService.views.game !== 'Fortnite'
-          ) {
+          if (this.views.useAiHighlighter === false) {
+            console.log('HighlighterService: Game:', this.streamingService.views.game);
             // console.log('Highlighter not enabled or not Fortnite');
             return;
           }
