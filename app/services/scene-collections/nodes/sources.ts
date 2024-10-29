@@ -301,6 +301,26 @@ export class SourcesNode extends Node<ISchema, {}> {
 
     const sources = obs.createSources(sourceCreateData);
     const promises: Promise<void>[] = [];
+    let sourcesNotCreatedNames: string[] = [];
+
+    if (sourceCreateData.length !== sources.length) {
+      const sourcesNotCreated = sourceCreateData.filter(
+        source => !sources.some(s => s.name === source.name),
+      );
+
+      sourcesNotCreatedNames = sourcesNotCreated.map(source => source.name);
+      const sourceNames = sourcesNotCreatedNames.join(', ');
+      console.error(
+        'Error during sources creation when loading scene collection.',
+        JSON.stringify(sourcesNotCreated),
+      );
+
+      remote.dialog.showMessageBox(Utils.getMainWindow(), {
+        title: 'Unsupported Sources',
+        type: 'warning',
+        message: `Scene items were removed because there were an error loading them: ${sourceNames}`,
+      });
+    }
 
     sources.forEach(async (source, index) => {
       const sourceInfo = supportedSources[index];
@@ -335,6 +355,10 @@ export class SourcesNode extends Node<ISchema, {}> {
       }
 
       if (sourceInfo.hotkeys) {
+        if (sourcesNotCreatedNames.length > 0 && sourcesNotCreatedNames.includes(sourceInfo.name)) {
+          console.error('Attempting to load hotkey for not created source:', sourceInfo.name);
+        }
+
         promises.push(supportedSources[index].hotkeys.load({ sourceId: sourceInfo.id }));
       }
 
