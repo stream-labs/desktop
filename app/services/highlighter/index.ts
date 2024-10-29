@@ -1072,6 +1072,10 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     }
   }
 
+  setAiHighlighter(state: boolean) {
+    this.SET_USE_AI_HIGHLIGHTER(state);
+  }
+
   toggleAiHighlighter() {
     if (this.state.useAiHighlighter) {
       this.SET_USE_AI_HIGHLIGHTER(false);

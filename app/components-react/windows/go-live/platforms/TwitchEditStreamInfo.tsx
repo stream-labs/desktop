@@ -25,7 +25,6 @@ export function TwitchEditStreamInfo(p: IPlatformComponentParams<'twitch'>) {
 
   const optionalFields = (
     <div key="optional">
-      <AiHighlighterToggle game={bind.game?.value} />
       <TwitchTagsInput label={$t('Twitch Tags')} {...bind.tags} />
       <TwitchContentClassificationInput {...bind.contentClassificationLabels} />
       <InputWrapper>
@@ -46,7 +45,12 @@ export function TwitchEditStreamInfo(p: IPlatformComponentParams<'twitch'>) {
             onChange={updateSettings}
           />
         }
-        requiredFields={<GameSelector key="required" platform={'twitch'} {...bind.game} />}
+        requiredFields={
+          <React.Fragment key="required-fields">
+            <GameSelector key="required" platform={'twitch'} {...bind.game} />{' '}
+            <AiHighlighterToggle key="ai-toggle" game={bind.game?.value} cardIsExpanded={true} />
+          </React.Fragment>
+        }
         optionalFields={optionalFields}
       />
     </Form>
