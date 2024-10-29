@@ -18,6 +18,7 @@
     "eslint-plugin-react-refresh": "^0.4.12",
     "globals": "^15.9.0",
     "immer": "^10.1.1",
+    "jotai-immer": "^0.4.1",
     "react": "19.0.0-rc-1631855f-20241023",
     "react-dom": "19.0.0-rc-1631855f-20241023",
     "sockjs-client": "^1.6.1",
