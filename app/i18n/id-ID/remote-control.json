@@ -1,14 +1,18 @@
 {
   "Show details": "Tampilkan detail",
   "Hide details": "Sembunyikan detail",
-  "API token": "Token API",
+  "API Token": "API Token",
   "Generate new": "Buat baru",
   "Port": "Port",
-  "IP addresses": "Alamat IP",
+  "IP Addresses": "IP Addresses",
   "Click to show": "Klik untuk menampilkan",
   "The free Streamlabs Controller app allows you to control Streamlabs Desktop from your iOS or Android device. You must be logged in to use this feature.": "The free Streamlabs Controller app allows you to control Streamlabs Desktop from your iOS or Android device. You must be logged in to use this feature.",
-  "Allow remote connections": "Allow remote connections",
+  "Allow Controller app connections": "Allow Controller app connections",
   "Connected Devices": "Connected Devices",
   "Disconnect": "Disconnect",
-  "No devices connected": "No devices connected"
+  "No devices connected": "No devices connected",
+  "Some third party applications connect to Streamlabs Desktop via websockets connection. Toggle this to allow such connections and display connection info.": "Some third party applications connect to Streamlabs Desktop via websockets connection. Toggle this to allow such connections and display connection info.",
+  "Warning: Displaying this portion on stream may leak sensitive information.": "Warning: Displaying this portion on stream may leak sensitive information.",
+  "Allow third party connections": "Allow third party connections",
+  "Host": "Host"
 }
