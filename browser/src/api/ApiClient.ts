@@ -83,7 +83,7 @@ class ApiClient {
     };
   }
 
-  
+
   public disconnect() {
     if (this.socket) {
       this.socket.close();
@@ -98,7 +98,7 @@ class ApiClient {
   private onMessage(event: MessageEvent) {
     const message = JSON.parse(event.data);
     const { id, result, error } = message;
-    const isResponse = id && this.requests[id];   
+    const isResponse = id && this.requests[id];
 
 
     if (isResponse) {
@@ -118,9 +118,14 @@ class ApiClient {
           console.debug(`%c<<TASK STARTED`, 'color: orange', id, message);
         } else { //otherwise, resolve the request promise with the result
           if (result._type === 'SUBSCRIPTION') {
-            console.debug(`%c<<SUBSCRIPTION CONFIRMED`, 'color: orange', id, message);
+            if ('value' in result) {
+              console.debug(`%c<<SUBSCRIPTION CONFIRMED with value`, 'color: orange', id, message);
+              callSubscriptionCallback(this.subscriptions[id], result.value);
+            } else {
+              console.debug(`%c<<SUBSCRIPTION CONFIRMED`, 'color: orange', id, message);
+            }
           } else {
-            console.debug(`%c<<RESPONSE`, 'color: lightgreen', id, message);
+            console.debug(`%c<<RESPONSE`, 'color: orange', id, message);
           }
           pending.resolve(result);
         }
@@ -133,17 +138,16 @@ class ApiClient {
         (sub) => sub.resourceId === resourceId
       );
       for (const subscription of subscriptions) {
-        
+
           if (subscription.once) {
             this.unsubscribe(id);
             console.debug(`%c<<TASK COMPLETED`, 'color: orange', subscription.id, message);
           } else {
             console.debug(`%c<<EVENT`, 'color: orange', subscription.id, message);
           }
-          subscription.callback(data);
-       
+          callSubscriptionCallback(subscription, data);
       }
-     
+
     }
   }
 
@@ -165,7 +169,7 @@ class ApiClient {
       if (this.socket.readyState === SockJS.OPEN) {
         this.socket.send(json);
       } else {
-        
+
         this.socket.addEventListener('open', () => {
           this.socket.send(json);
         });
@@ -187,13 +191,19 @@ class ApiClient {
       params: { resource: resourceId, args: [] },
     };
 
+    // create a new subscription object locally
+    this.subscriptions[id] = {
+      id,
+      channelName,
+      callback,
+      resourceId: null // resourceId will be set when the subscription is confirmed
+    };
+
+    // create a new request to the server
     this.requests[id] = {
       resolve: (subscriptionInfo: any) => {
-        this.subscriptions[id] = {
-          id,
-          resourceId: subscriptionInfo.resourceId,
-          callback,
-        };
+        // the server has confirmed the subscription
+        this.subscriptions[id].resourceId = subscriptionInfo.resourceId;
       },
       reject: (error: any) => {
         console.error('Subscription error:', error);
@@ -262,10 +272,10 @@ function createApiClient<T extends object>(client: ApiClient): PromisifyMethods<
             value: (...args: any[]) => {
               const key = [serviceName, methodName, ...args];
               const swrResponse = useSWR(key, () => method(...args));
-          
+
               // Redefine mutate to automatically invalidate the SWR cache
               const newMutate = () => globalMutate(key);
-          
+
               return {
                 ...swrResponse,
                 mutate: newMutate,
@@ -283,6 +293,14 @@ function createApiClient<T extends object>(client: ApiClient): PromisifyMethods<
   };
 
   return new Proxy({}, apiProxyHandler) as PromisifyMethods<T>;
+}
+
+function callSubscriptionCallback(subscription: { callback: Function | { next: Function, error: Function, complete: Function} }, data: any) {
+  if (typeof subscription.callback === 'function') {
+    subscription.callback(data);
+    return;
+  }
+  return subscription.callback.next(data);
 }
 
 export { ApiClient, createApiClient };

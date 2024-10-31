@@ -433,9 +433,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @lazyModule(AuthModule) private authModule: AuthModule;
 
   /**
-   * Used to sync the user's state via API
+   * Useful to sync the user's state via API
    */
-  state$ = new BehaviorSubject(this.state);
+  state$ = this.createBehaviorSubject();
 
   async init() {
     super.init();
@@ -486,12 +486,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         const platform = event.message[0].platform.split('_')[0];
         await this.startChatAuth(platform as TPlatform);
       }
-    });
-
-    // Notify the API subscribers of all state changes
-    this.store.subscribe((mutation, state) => {
-      if (!mutation.type.startsWith('UserService')) return;
-      this.state$.next(state.UserService);
     });
   }
 

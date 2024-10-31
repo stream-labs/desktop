@@ -1,8 +1,8 @@
 import './App.css';
-import { useEffect } from "react";
+import { Suspense } from "react";
 import { TAppServiceInstancess } from "../../app/app-services";
 import { ApiClient, createApiClient } from "./api-client";
-import GoLiveWindowV2 from '@/features/live/GoLiveWindow';
+import { GoLiveWindow } from '@/features/live/GoLiveWindow';
 import TodosApp from '@/features/todos/Todos.tsx';
 import { api } from './api/api.ts';
 import { ConfigProvider, theme } from 'antd';
@@ -23,17 +23,12 @@ export default function App() {
   return (
   <>
       <ConfigProvider
-    theme={{
-      // 1. Use dark algorithm
-      algorithm: theme.darkAlgorithm,
-
-      // 2. Combine dark algorithm and compact algorithm
-      // algorithm: [theme.darkAlgorithm, theme.compactAlgorithm],
-    }}
-    >
-          <GoLiveWindowV2 />
+    theme={{ algorithm: theme.darkAlgorithm }}>
+        <Suspense fallback={<span> App is loading...</span>}>
+          <GoLiveWindow />
+        </Suspense>
     {/* <TodosApp/> */}
-    <ActiveSceneComponent/>
+    {/*<ActiveSceneComponent/>*/}
   </ConfigProvider>
   </>);
 

@@ -157,22 +157,35 @@ export abstract class RpcApi extends Service {
     if (responsePayload instanceof Observable) {
       // each subscription has unique id
       const subscriptionId = `${request.params.resource}.${request.method}`;
+      let subscription = this.subscriptions[subscriptionId];
 
       // create the subscription if it doesn't exist
-      if (!this.subscriptions[subscriptionId]) {
+      if (!subscription) {
         const subscriptionName = subscriptionId.split('.')[1];
-        this.subscriptions[subscriptionId] = resource[subscriptionName].subscribe((data: any) => {
-          this.serviceEvent.next(
-            this.jsonrpc.createEvent({ data, emitter: 'STREAM', resourceId: subscriptionId }),
-          );
-        });
+        subscription = this.subscriptions[subscriptionId] = resource[subscriptionName].subscribe(
+          (data: any) => {
+            this.serviceEvent.next(
+              this.jsonrpc.createEvent({ data, emitter: 'STREAM', resourceId: subscriptionId }),
+            );
+          },
+        );
       }
+
+      // if the subscription already exists and has a value that means it's a RXJS.BehaviorSubject
+      // so we have to send the value immediately
+      let value;
+      const isBehaviorSubject = 'value' in (subscription as any)._subscriptions[0].subject;
+      if (isBehaviorSubject) {
+        value = (subscription as any)._subscriptions[0].subject.value;
+      }
+
       // return subscription
       // the API client can use subscriptionId to listen events from this subscription
       return this.jsonrpc.createResponse(request.id, {
         _type: 'SUBSCRIPTION',
         resourceId: subscriptionId,
         emitter: 'STREAM',
+        ...(isBehaviorSubject ? { value } : {}),
       });
     }
 

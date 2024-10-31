@@ -6,7 +6,7 @@ import moment from 'moment';
 import padStart from 'lodash/padStart';
 import { IOutputSettings, OutputSettingsService } from 'services/settings';
 import { WindowsService } from 'services/windows';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import {
   ERecordingState,
   EReplayBufferState,
@@ -148,6 +148,8 @@ export class StreamingService
     },
   };
 
+  state$ = this.createBehaviorSubject();
+
   init() {
     NodeObs.OBS_service_connectOutputSignals((info: IOBSOutputSignalInfo) => {
       this.signalInfoChanged.next(info);
@@ -179,6 +181,17 @@ export class StreamingService
 
   get views() {
     return new StreamInfoView(this.state);
+  }
+
+
+  // Expose API endpoint
+  getSavedSettings() {
+    return this.views.savedSettings;
+  }
+
+  // Expose API endpoint
+  getCommonFields() {
+    return this.views.commonFields;
   }
 
   /**

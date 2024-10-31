@@ -2,6 +2,7 @@ import Vue from 'vue';
 import { Store, Module } from 'vuex';
 import { Service } from './service';
 import Utils from 'services/utils';
+import { BehaviorSubject } from 'rxjs';
 
 interface IMutationOptions {
   unsafe?: boolean;
@@ -141,6 +142,19 @@ export abstract class StatefulService<TState extends object> extends Service {
 
   get views(): ViewHandler<TState> | void {
     return;
+  }
+
+  /**
+   * Creates a behavior subject that emits the state of the service
+   * Useful for creating observable API endpoints
+   */
+  createBehaviorSubject(): BehaviorSubject<TState> {
+    const behaviorSubject = new BehaviorSubject(this.state);
+    this.store.subscribe((mutation, state) => {
+      if (!mutation.type.startsWith(this.serviceName)) return;
+      behaviorSubject.next(state[this.serviceName]);
+    });
+    return behaviorSubject;
   }
 }
 
