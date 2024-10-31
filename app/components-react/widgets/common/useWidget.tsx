@@ -252,11 +252,13 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
   @throttle(500)
   private async saveSettings(settings: TWidgetState['data']['settings']) {
     const body = this.patchBeforeSend(settings);
+    const method = this.config.useNewWidgetAPI ? 'PUT' : 'POST';
+
     try {
       return await this.actions.return.request({
         body,
+        method,
         url: this.config.settingsSaveUrl,
-        method: 'POST',
       });
     } catch (e: unknown) {
       await alertAsync({

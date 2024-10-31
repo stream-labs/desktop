@@ -25,7 +25,7 @@ export const WIDGET_INITIAL_STATE: IWidgetSettingsGenericState = {
   pendingRequests: 0,
 };
 
-export type THttpMethod = 'GET' | 'POST' | 'DELETE';
+export type THttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
 interface ISocketEvent {
   type: string;
