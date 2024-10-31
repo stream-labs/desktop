@@ -149,6 +149,8 @@ export class ChatBoxModule extends WidgetModule<IChatBoxState> {
     if (this.config.useNewWidgetAPI) {
       return { global: obj };
     }
+
+    return obj;
   }
 }
 
