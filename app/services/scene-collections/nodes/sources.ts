@@ -21,8 +21,6 @@ import {
   SourceFiltersService,
   TSourceFilterType,
 } from 'services/source-filters';
-import * as remote from '@electron/remote';
-import Utils from 'services/utils';
 
 interface ISchema {
   items: ISourceInfo[];
@@ -309,23 +307,45 @@ export class SourcesNode extends Node<ISchema, {}> {
       );
 
       sourcesNotCreatedNames = sourcesNotCreated.map(source => source.name);
-      const sourceNames = sourcesNotCreatedNames.join(', ');
       console.error(
         'Error during sources creation when loading scene collection.',
-        JSON.stringify(sourcesNotCreated),
+        JSON.stringify(sourcesNotCreatedNames.join(', ')),
       );
 
-      remote.dialog.showMessageBox(Utils.getMainWindow(), {
-        title: 'Unsupported Sources',
-        type: 'warning',
-        message: `Scene items were removed because there were an error loading them: ${sourceNames}`,
-      });
+      this.sourcesService.missingInputs = sourcesNotCreated.map(
+        source => this.sourcesService.sourceDisplayData[source.type]?.name,
+      );
     }
 
-    sources.forEach(async (source, index) => {
-      const sourceInfo = supportedSources[index];
+    // To prevent errors, reference the item data for the source using a map
+    // Note:
+    const sourceData = supportedSources.reduce((data, source, index) => {
+      // `supportedSources` and `sourceCreateData` should be the same length but
+      // to prevent possible errors, if they are not at the same index then find
+      // the correct source data
+      const createData =
+        sourceCreateData[index].name === source.id
+          ? sourceCreateData[index]
+          : sourceCreateData.find(createSource => createSource.name === source.id);
 
-      this.sourcesService.addSource(source, supportedSources[index].name, {
+      const filters = createData.filters.map((f: IFilterInfo) => {
+        return {
+          name: f.name,
+          type: f.type,
+          visible: f.enabled,
+          settings: f.settings,
+          displayType: f.displayType,
+        };
+      });
+
+      data[source.id] = { ...source, filters };
+      return data;
+    }, {});
+
+    sources.forEach(async source => {
+      const sourceInfo = sourceData[source.name];
+
+      this.sourcesService.addSource(source, sourceInfo.name, {
         channel: sourceInfo.channel,
         propertiesManager: sourceInfo.propertiesManager,
         propertiesManagerSettings: sourceInfo.propertiesManagerSettings || {},
@@ -355,25 +375,14 @@ export class SourcesNode extends Node<ISchema, {}> {
       }
 
       if (sourceInfo.hotkeys) {
-        if (sourcesNotCreatedNames.length > 0 && sourcesNotCreatedNames.includes(sourceInfo.name)) {
-          console.error('Attempting to load hotkey for not created source:', sourceInfo.name);
+        if (sourcesNotCreatedNames.length > 0 && sourcesNotCreatedNames.includes(sourceInfo.id)) {
+          console.error('Attempting to load hotkey for not created source:', sourceInfo.id);
         }
 
-        promises.push(supportedSources[index].hotkeys.load({ sourceId: sourceInfo.id }));
+        promises.push(sourceInfo.hotkeys.load({ sourceId: sourceInfo.id }));
       }
 
-      this.sourceFiltersService.loadFilterData(
-        sourceInfo.id,
-        sourceCreateData[index].filters.map(f => {
-          return {
-            name: f.name,
-            type: f.type,
-            visible: f.enabled,
-            settings: f.settings,
-            displayType: f.displayType,
-          };
-        }),
-      );
+      this.sourceFiltersService.loadFilterData(sourceInfo.id, sourceInfo.filters);
     });
 
     return new Promise(resolve => {

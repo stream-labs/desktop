@@ -13,7 +13,7 @@ import { HotkeysNode } from './nodes/hotkeys';
 import { SceneFiltersNode } from './nodes/scene-filters';
 import path from 'path';
 import { parse } from './parse';
-import { ScenesService, TSceneNode } from 'services/scenes';
+import { Scene, ScenesService, TSceneNode } from 'services/scenes';
 import { SourcesService } from 'services/sources';
 import { E_AUDIO_CHANNELS } from 'services/audio';
 import { AppService } from 'services/app';
@@ -586,11 +586,13 @@ export class SceneCollectionsService extends Service implements ISceneCollection
         }
       }
 
+      // create an empty scene collection if failed to load both the collection and the backup
       if (!data) {
         await this.create({ auto: true });
         return;
       }
 
+      // the app cannot load without a default scene
       if (this.scenesService.views.scenes.length === 0) {
         console.error('Scene collection was loaded but there were no scenes.');
         this.setupEmptyCollection();
@@ -611,7 +613,9 @@ export class SceneCollectionsService extends Service implements ISceneCollection
         );
 
         await this.handleCollectionLoadError();
+        this.setupEmptyCollection();
       }
+      this.collectionLoaded = true;
     }
   }
 
@@ -638,7 +642,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     // Since scene collections are already segmented by OS,
     // the source code below which restored collections was
     // triggered by incorrect reasons and its result confused users.
-    // Instead of that, now we will just remove unsuppported sources here.
+    // Instead of that, now we will just remove unsupported sources here.
     if (root.data.sources.removeUnsupported()) {
       // The underlying function already wrote all details to the log.
       // Users will see a very basic information.
@@ -647,6 +651,21 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
     await root.load();
     this.hotkeysService.bindHotkeys();
+
+    if (this.sourcesService.missingInputs.length > 0) {
+      const inputs = this.sourcesService.missingInputs.join(', ');
+
+      await remote.dialog
+        .showMessageBox(Utils.getMainWindow(), {
+          title: 'Unsupported Sources',
+          type: 'warning',
+          message: `Scene items were removed because there was an error loading them: ${inputs}`,
+        })
+        .then(() => {
+          this.collectionErrorOpen = false;
+        });
+      this.collectionErrorOpen = true;
+    }
   }
 
   async showUnsupportedSourcesDialog(e?: Error | unknown) {
@@ -750,41 +769,63 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * @remark Primarily used to clear state when the app is partially loaded
    * due to an error when loading the scene collection sources. This should
    * only ever be performed while the application is already in a "LOADING" state.
-   * @remark This method is a slight refactor of `deloadCurrentApplicationState`.
+   * @remark This method is a refactor of `deloadCurrentApplicationState` and
+   * should never be used outside of the scene collections service because it
+   * directly mutates the states of other services.
    */
   private async deloadPartialApplicationState() {
     this.tcpServerService.stopRequestsHandling();
 
     await this.disableAutoSave();
 
-    try {
-      // remove any scenes that were partially loaded
-      if (this.scenesServices.views.scenes.length > 0) {
-        this.scenesService.views.scenes.forEach(scene => {
-          if (scene.id === this.scenesService.views.activeSceneId) return;
-          scene.remove(true);
-        });
+    this.collectionWillSwitch.next();
 
-        if (this.scenesService.views.activeScene) {
-          this.scenesService.views.activeScene.remove(true);
-        }
+    // remove any scenes that were partially loaded
+    const scenesState = this.scenesService.state.scenes;
+    const activeSceneId = this.scenesService.state.activeSceneId;
+    for (const sceneId in scenesState) {
+      if (sceneId === activeSceneId) continue;
+
+      if (scenesState[sceneId]) {
+        const scene = new Scene(sceneId);
+        scene.remove();
       }
-
-      // remove any sources that were partially loaded
-      if (this.sourcesService.views.sources.length > 0) {
-        this.sourcesService.views.sources.forEach(source => {
-          if (source.type !== 'scene') source.remove();
-        });
-      }
-
-      this.transitionsService.deleteAllTransitions();
-      this.transitionsService.deleteAllConnections();
-
-      this.streamingService.setSelectiveRecording(false);
-    } catch (e: unknown) {
-      console.error('Error deloading partially loaded application state', e);
-      throw new Error('Error deloading partially loaded application state');
     }
+
+    if (scenesState[activeSceneId]) {
+      const scene = new Scene(activeSceneId);
+      scene.remove();
+    }
+
+    // remove any sources that were partially loaded
+    const sources = this.sourcesService.state.sources;
+    for (const sourceId in sources) {
+      if (sources[sourceId].type === 'scene') continue;
+
+      try {
+        // if a source does not exist, this function will throw an error
+        this.sourcesService.removeSource(sourceId);
+      } catch (e: unknown) {
+        console.error('Attempted to deload source from partial state: ', e);
+      }
+    }
+
+    // Delete all transitions except for the studio mode transition, which is needed
+    // for the studio editor to render
+    if (this.transitionsService.state.transitions.length > 0) {
+      this.transitionsService.deleteAllTransitions();
+      this.transitionsService.state.transitions.forEach(transition => {
+        if (transition.id !== this.transitionsService.studioModeTransition.id) {
+          this.transitionsService.deleteTransition(transition.id);
+        }
+      });
+    }
+
+    if (this.transitionsService.state.connections) {
+      this.transitionsService.deleteAllConnections();
+    }
+
+    this.streamingService.setSelectiveRecording(false);
 
     this.hotkeysService.clearAllHotkeys();
     this.collectionLoaded = false;
