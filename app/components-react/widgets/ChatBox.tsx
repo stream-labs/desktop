@@ -1,5 +1,5 @@
 import React from 'react';
-import { IWidgetCommonState, useWidget, WidgetModule } from './common/useWidget';
+import { IWidgetCommonState, useWidget, WidgetModule, settingsToGlobal } from './common/useWidget';
 import { WidgetLayout } from './common/WidgetLayout';
 import { $t } from '../../services/i18n';
 import { metadata } from '../shared/inputs/metadata';
@@ -125,19 +125,6 @@ export class ChatBoxModule extends WidgetModule<IChatBoxState> {
     return result;
   }
 
-  // TODO: move these to widget module in a more generic way
-  protected patchAfterFetch(resp: any) {
-    if (this.config.useNewWidgetAPI) {
-      const data = {
-        settings: resp.data.settings.global,
-      };
-
-      return data;
-    }
-
-    return resp;
-  }
-
   // The server sends and recieves these duration fields at different precision
   protected patchBeforeSend(settings: IChatBoxState['data']['settings']) {
     const obj = {
@@ -147,7 +134,7 @@ export class ChatBoxModule extends WidgetModule<IChatBoxState> {
     };
 
     if (this.config.useNewWidgetAPI) {
-      return { global: obj };
+      return settingsToGlobal(obj);
     }
 
     return obj;

@@ -272,15 +272,45 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
 
   /**
    * override this method to patch data after fetching
+   *
+   * @remarks If you override this method, and the widget is using the new widget
+   * API (at `/api/v5/widgets/desktop/{type}`) you need to either replicate this
+   * method, or adapt the widget to read its settings from inside a nested `global`
+   * object.
+   * @see `settingsFromGlobal` provided for convenience.
    */
   protected patchAfterFetch(data: any): any {
+    if (this.config.useNewWidgetAPI) {
+      return settingsFromGlobal(data);
+    }
+
     return data;
   }
 
+  /* The reason these base methods are now aware of new API and do their own
+   * checks and transforms, is that some code spawns WidgetModule by itself,
+   * and skips the inheritance chain, namely Custom Code and Custom Fields.
+   * This bypasses the overrides from any widget that chooses to modify these,
+   * and as a result, the data is sent and received unmodified.
+   * This is ultimately where all code should live while we transition all
+   * our widgets and then we can finally remove them once they actually use
+   * the new structure provided by the new API.
+   */
+
   /**
    * override this method to patch data before save
+   *
+   * @remarks If you override this method, and the widget is using the new widget
+   * API (at `/api/v5/widgets/desktop/{type}`) you need to either replicate this
+   * method, or adapt the widget to send most settings inside a nested `global`
+   * object.
+   * @see `settingsToGlobal` provided for convenience.
    */
   protected patchBeforeSend(settings: any): any {
+    if (this.config.useNewWidgetAPI) {
+      return settingsToGlobal(settings);
+    }
+
     return settings;
   }
 
@@ -385,4 +415,14 @@ export interface ICustomField {
   max?: number;
   min?: number;
   steps?: number;
+}
+
+export function settingsFromGlobal(data: any) {
+  return {
+    settings: data.data.settings.global,
+  };
+}
+
+export function settingsToGlobal(settings: unknown) {
+  return { global: settings };
 }
