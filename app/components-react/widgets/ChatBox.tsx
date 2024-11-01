@@ -112,7 +112,9 @@ export class ChatBoxModule extends WidgetModule<IChatBoxState> {
       muted_chatters: metadata.textarea({ label: $t('Muted Chatters') }),
     };
 
-    if (this.config.useNewWidgetAPI) {
+    // TODO: this shouldn't trigger since we do check loading state but somehow
+    // `this.config` is undefined on first render
+    if (this.config?.useNewWidgetAPI) {
       return {
         ...result,
         alert_enabled: metadata.switch({
