@@ -1,5 +1,5 @@
-import { atom, useAtom, useAtomValue } from 'jotai';
-import { atomWithDefault, atomWithObservable } from 'jotai/utils';
+import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { atomWithDefault, atomWithObservable, selectAtom } from 'jotai/utils';
 import { atomWithImmer } from 'jotai-immer';
 import { Suspense, useEffect, useMemo } from 'react';
 import { api } from '@/api/api';
@@ -9,12 +9,12 @@ import { focusAtom } from 'jotai-optics'
 
 const streamStateAtom = atomWithObservable(() => api.StreamingService.state$);
 const userAtom = atomWithObservable(() => api.UserService.state$);
-const appDataAtom = atom(async () => {
-  const data = await new Promise<{appName: string}>(r => {
-    setTimeout(() => r({appName: 'My App'}), 3000)
-  });
-  return data;
-});
+// const appDataAtom = atom(async () => {
+//   const data = await new Promise<{appName: string}>(r => {
+//     setTimeout(() => r({appName: 'My App'}), 3000)
+//   });
+//   return data;
+// });
 
 /**
  * Root component for the Go Live window.
@@ -57,16 +57,51 @@ export function GoLiveWindow() {
 
 
 // Atom to store Go Live settings
-const streamSettingsAtom = atomWithDefault(async get => {
-  const savedSettings = await api.StreamingService.getSavedSettings();
-  const commonFields = await api.StreamingService.getCommonFields();
-  console.log('Saved settings:', savedSettings);
+// const streamSettingsAtom = atomWithDefault(async get => {
+//   const savedSettings = await api.StreamingService.getSavedSettings();
+//   const commonFields = await api.StreamingService.getCommonFields();
+//   console.log('Saved settings:', savedSettings);
+//
+//   return {
+//     commonFields,
+//     ...savedSettings
+//   }
+// });
 
-  return {
-    commonFields,
-    ...savedSettings
+// const streamSettingsAtom = atom({
+//   isLoaded: false,
+//   platforms: {},
+// });
+
+// streamSettingsAtom.onMount = (set) => {
+//   console.log('MOUNT');
+
+//   Promise.all([
+//     api.StreamingService.getSavedSettings(),
+//     api.StreamingService.getCommonFields(),
+//   ]).then(([savedSettings, commonFields]) => {
+//     console.log('State loaded:', {isLoaded: true, commonFields, ...savedSettings});
+//     set(s => ({isLoaded: true, commonFields, ...savedSettings}));
+//   });
+// }
+
+const streamSettingsAtom = atom(
+  async () => {
+    const [savedSettings, commonFields] = await Promise.all([
+      api.StreamingService.getSavedSettings(),
+      api.StreamingService.getCommonFields(),
+    ]);
+    return { commonFields, ...savedSettings };
+  },
+  // Updated write function
+  (get, set, update) => {
+    const currentSettings = get(streamSettingsAtom);
+    const newSettings =
+      typeof update === 'function' ? update(currentSettings) : update;
+    set(streamSettingsAtom, newSettings);
   }
-});
+);
+
 
 /**
  * Renders the general stream settings and destination list.
@@ -76,6 +111,10 @@ function GoLiveSettings() {
   const descriptionIsRequired = true;
   const [settings, setSettings] = useAtom(streamSettingsAtom);
   const userId = useAtomValue(userAtom).userId;
+
+  // if (!settings.isLoaded) {
+  //   return <div>Loading...</div>;
+  // }
 
   const handleInputChange =
     (field: 'title' | 'description') =>
@@ -121,11 +160,10 @@ function GoLiveSettings() {
     </>
   );
 }
-const platformsAtom = atom(async (get) => {
-  const settings = await get(streamSettingsAtom);
+const platformsAtom = atom((get) => {
+  const settings = get(streamSettingsAtom);
   return settings.platforms;
 });
-
 /**
  * Renders the list of stream destinations.
  * Destinations can be connected platforms or a custom RTMP server.
@@ -135,19 +173,33 @@ const platformsAtom = atom(async (get) => {
 function DestinationPicker() {
   console.log('Render DestinationPicker');
 
-  // THIS IS WORKING FINE
+  const platforms = useAtomValue(platformsAtom); // Read-only
+  // const platforms = useAtomValue(streamSettingsAtom).platforms; // Read-only
+  const setSettings = useSetAtom(streamSettingsAtom); // Setter without subscribing
+
+  function onPlatformChange(platformKey, newPlatformSettings) {
+    setSettings((prevSettings) => ({
+      ...prevSettings,
+      platforms: {
+        ...prevSettings.platforms,
+        [platformKey]: newPlatformSettings,
+      },
+    }));
+  }
+
+  // // THIS IS WORKING FINE
   // const [settings, setSettings] = useAtom(streamSettingsAtom);
   // const { platforms } = settings;
 
-  // THIS IS NOT WORKING, platforms are undefined
-  const platforms = useAtomValue(platformsAtom);
+  // // THIS IS NOT WORKING, platforms are undefined
+  // // const platforms = useAtomValue(platformsAtom);
 
 
-  function onPlatformChange(platform, newSettings) {
-    // setSettings((s) => {
-    //   // s.platforms[platform] = newSettings;
-    // });
-  }
+  // function onPlatformChange(platform, newSettings) {
+  //   // setSettings((s) => {
+  //   //   // s.platforms[platform] = newSettings;
+  //   // });
+  // }
 
   return (
   <div>
