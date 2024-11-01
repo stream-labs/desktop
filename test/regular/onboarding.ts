@@ -7,39 +7,23 @@ import {
   clickWhenDisplayed,
   focusMain,
   isDisplayed,
+  getNumElements,
   waitForDisplayed,
 } from '../helpers/modules/core';
 import { getApiClient } from '../helpers/api-client';
-import { Scene, ScenesService } from '../../app/services/api/external-api/scenes';
-import { DualOutputService } from '../../app/services/dual-output';
-import { SceneCollectionsService } from '../../app/services/api/external-api/scene-collections';
-
-/**
- * Testing default sources for onboarding and new users
- * @remark New users on their first login have special handling. To optimize testing,
- * some of the cases are tested within existing tests.
- *
- * CASE 1: Old user logged in during onboarding, no theme installed (Go through onboarding)
- * CASE 2: Old user logged in during onboarding, theme installed (Go through onboarding and install theme)
- * CASE 3: New user logged in during onboarding, no theme installed (Go through onboarding as a new user)
- * CASE 4: New user logged in during onboarding, theme installed (Go through onboarding as a new user and install theme)
- * CASE 5: No user logged in during onboarding, no theme installed, then log in new user (Login new user after onboarding skipped)
- * CASE 6: No user logged in during onboarding, theme installed, then log in new user (Login new user after onboarding skipped and theme installed)
- */
+import { ScenesService } from '../../app/services/api/external-api/scenes';
 
 // not a react hook
 // eslint-disable-next-line react-hooks/rules-of-hooks
-useWebdriver({ skipOnboarding: false });
+useWebdriver({ skipOnboarding: false, noSync: true });
 
-async function confirmDefaultSources(
-  t: TExecutionContext,
-  scene: Scene,
-  hasDefaultSources: boolean,
-) {
+async function confirmDefaultSources(t: TExecutionContext, hasDefaultSources = true) {
+  const api = await getApiClient();
+  const scenesService = api.getResource<ScenesService>('ScenesService');
   const defaultSources = ['Game Capture', 'Webcam', 'Alert Box'];
   const numDefaultSources = defaultSources.length;
 
-  const numSceneItems = scene
+  const numSceneItems = scenesService.activeScene
     .getItems()
     .map(item => item.getModel())
     .reduce((sources, item) => {
@@ -60,17 +44,17 @@ async function confirmDefaultSources(
 
     t.is(Object.keys(numSceneItems).length, numDefaultSources, 'Scene has correct default sources');
   } else {
-    // overlays installed during onboarding should have no default sources
+    // overlays installed during onboarding should have default sources more or less sources than the defaults
     const numDefaultSources = Object.keys(numSceneItems).filter(
       name => defaultSources.includes(name) && numSceneItems[name] > 1,
     ).length;
 
-    t.not(numDefaultSources, 0, 'Scene has no default sources');
+    t.not(Object.keys(numSceneItems).length, numDefaultSources, 'Scene has no default sources');
   }
 }
 
 /*
- * Helper function to go through the onboarding flow
+ * Helper function to go through the onboarding flow through the login step
  * @remark This function is a simplification of the `Go through onboarding` test
  * @param t - Test execution context
  * @param installTheme - Whether to install a theme during onboarding
@@ -78,6 +62,8 @@ async function confirmDefaultSources(
  */
 async function goThroughOnboarding(
   t: TExecutionContext,
+  login = false,
+  newUser = false,
   installTheme = false,
   fn: () => Promise<void>,
 ) {
@@ -91,38 +77,66 @@ async function goThroughOnboarding(
   await click('a=Login');
 
   // Complete login
-  await isDisplayed('button=Log in with Twitch');
-  const user = await logIn(t, 'twitch', { prime: false }, false, true);
-  await sleep(1000);
-  // We seem to skip the login step after login internally
-  await clickIfDisplayed('button=Skip');
+  if (login) {
+    await isDisplayed('button=Log in with Twitch');
+    const user = await logIn(t, 'twitch', { prime: false }, false, true, newUser);
+    await sleep(1000);
 
-  // Finish onboarding flow
-  await withPoolUser(user, async () => {
-    // Skip hardware config
-    await waitForDisplayed('h1=Set up your mic & webcam');
+    // We seem to skip the login step after login internally
     await clickIfDisplayed('button=Skip');
 
-    // Theme install
-    if (installTheme) {
-      await waitForDisplayed('h1=Add your first theme');
-      await clickWhenDisplayed('button=Install');
-      await waitForDisplayed('span=100%');
-    } else {
-      await waitForDisplayed('h1=Add your first theme');
-      await clickIfDisplayed('button=Skip');
-    }
-
-    // Skip purchasing prime
-    await clickWhenDisplayed('div[data-testid=choose-free-plan-btn]', { timeout: 60000 });
-
-    await isDisplayed('span=Sources'), 'Sources selector is visible';
-
+    // Finish onboarding flow
+    await withPoolUser(user, async () => {
+      await finishOnboarding(installTheme);
+      await fn();
+    });
+  } else {
+    // skip login
+    await clickIfDisplayed('button=Skip');
+    await finishOnboarding(installTheme);
     await fn();
+  }
 
-    t.pass();
-  });
+  t.pass();
 }
+
+/*
+ * Helper function to go through the onboarding flow from the login step to the end
+ * @param installTheme - Whether to install a theme during onboarding
+ */
+async function finishOnboarding(installTheme = false) {
+  // Skip hardware config
+  await waitForDisplayed('h1=Set up your mic & webcam');
+  await clickIfDisplayed('button=Skip');
+
+  // Theme install
+  if (installTheme) {
+    await waitForDisplayed('h1=Add your first theme');
+    await clickWhenDisplayed('button=Install');
+    await waitForDisplayed('span=100%');
+  } else {
+    await waitForDisplayed('h1=Add your first theme');
+    await clickIfDisplayed('button=Skip');
+  }
+
+  // Skip purchasing prime
+  await clickWhenDisplayed('div[data-testid=choose-free-plan-btn]', { timeout: 60000 });
+
+  await isDisplayed('span=Sources');
+}
+
+/**
+ * Testing default sources for onboarding and new users
+ * @remark New users on their first login have special handling. To optimize testing,
+ * some of the cases are tested within existing tests.
+ *
+ ** CASE 1: Old user logged in during onboarding, no theme installed (Go through onboarding)
+ ** CASE 2: Old user logged in during onboarding, theme installed (Go through onboarding and install theme)
+ * CASE 3: New user logged in during onboarding, no theme installed (Go through onboarding as a new user)
+ * CASE 4: New user logged in during onboarding, theme installed (Go through onboarding as a new user and install theme)
+ * CASE 5: No user logged in during onboarding, no theme installed, then log in new user (Login new user after onboarding skipped)
+ ** CASE 6: No user logged in during onboarding, theme installed, then log in new user (Go through onboarding and install theme)
+ */
 
 // CASE 1: Old user logged in during onboarding, no theme installed
 test('Go through onboarding', async t => {
@@ -147,9 +161,9 @@ test('Go through onboarding', async t => {
   t.true(await isDisplayed('button=Log in with TikTok'), 'Shows TikTok button');
 
   // Check for all the login icons
-  t.true(await isDisplayed('[datatest-id=platform-icon-button-trovo]'), 'Shows Trovo button');
-  t.true(await isDisplayed('[datatest-id=platform-icon-button-dlive]'), 'Shows Dlive button');
-  t.true(await isDisplayed('[datatest-id=platform-icon-button-nimotv]'), 'Shows NimoTV button');
+  t.true(await isDisplayed('[data-testid=platform-icon-button-trovo]'), 'Shows Trovo button');
+  t.true(await isDisplayed('[data-testid=platform-icon-button-dlive]'), 'Shows Dlive button');
+  t.true(await isDisplayed('[data-testid=platform-icon-button-nimotv]'), 'Shows NimoTV button');
 
   t.true(await isDisplayed('a=Sign up'), 'Has a link to go back to Sign Up');
 
@@ -175,58 +189,55 @@ test('Go through onboarding', async t => {
 
     t.true(await isDisplayed('span=Sources'), 'Sources selector is visible');
 
-    const api = await getApiClient();
-    const scenesService = api.getResource<ScenesService>('ScenesService');
-    const dualOutputService = api.getResource<DualOutputService>('DualOutputService');
-
+    // Confirm sources and dual output status
     t.is(
-      scenesService.activeScene.getItems().length,
+      await getNumElements('div[data-role=source]'),
       0,
-      'New user not logged in without theme has no sources',
+      'Old user onboarded without theme has no sources',
     );
-    t.is(dualOutputService.state.dualOutputMode, false, 'Dual output not enabled.');
+    t.true(await isDisplayed('i[data-testid=dual-output-inactive]'), 'Dual output not enabled');
   });
 
   t.pass();
 });
 
 // CASE 2: New user not logged in during onboarding, theme installed
+// CASE 6: No user logged in during onboarding, theme installed, then log in new user
 test('Go through onboarding and install theme', async t => {
-  const api = await getApiClient();
+  const login = false;
+  const newUser = true;
+  const installTheme = true;
 
-  await goThroughOnboarding(t, true, async () => {
-    const scenesService = api.getResource<ScenesService>('ScenesService');
-    const dualOutputService = api.getResource<DualOutputService>('DualOutputService');
+  await goThroughOnboarding(t, login, newUser, installTheme, async () => {
+    // Confirm sources and dual output status
+    t.not(await getNumElements('div[data-role=source]'), 0, 'Theme installed before login');
+    t.true(await isDisplayed('i[data-testid=dual-output-inactive]'), 'Dual output not enabled');
 
-    t.not(
-      scenesService.activeScene.getItems().length,
-      0,
-      'Old user logged in with theme has sources',
-    );
-    t.is(dualOutputService.state.dualOutputMode, false, 'Dual output not enabled.');
+    // login new user after onboarding
+    await clickIfDisplayed('li[data-testid=nav-auth]');
+
+    await isDisplayed('button=Log in with Twitch');
+    await logIn(t, 'twitch', { prime: false }, false, false, true);
+    await sleep(1000);
+
+    // Confirm switched to scene with default sources and dual output status
+    await confirmDefaultSources(t);
+    t.true(await isDisplayed('i[data-testid=dual-output-active]'), 'Dual output enabled.');
   });
-
-  const sceneCollectionsService = api.getResource<SceneCollectionsService>(
-    'SceneCollectionsService',
-  );
-  sceneCollectionsService.delete();
 
   t.pass();
 });
 
 // CASE 3: New user logged in during onboarding, no theme installed
 test('Go through onboarding as a new user', async t => {
-  await goThroughOnboarding(t, true, async () => {
-    const api = await getApiClient();
-    const scenesService = api.getResource<ScenesService>('ScenesService');
-    const dualOutputService = api.getResource<DualOutputService>('DualOutputService');
+  const login = true;
+  const newUser = true;
+  const installTheme = false;
 
-    t.not(
-      scenesService.activeScene.getItems().length,
-      0,
-      'Old user logged in with theme has sources',
-    );
-    t.is(dualOutputService.state.dualOutputMode, false, 'Dual output not enabled.');
+  await goThroughOnboarding(t, login, newUser, installTheme, async () => {
+    // Confirm sources and dual output status
+    await confirmDefaultSources(t);
+    t.true(await isDisplayed('i[data-testid=dual-output-active]'), 'Dual output enabled.');
   });
 
   t.pass();
@@ -234,104 +245,38 @@ test('Go through onboarding as a new user', async t => {
 
 // CASE 4: New user logged in during onboarding, theme installed
 test('Go through onboarding as a new user and install theme', async t => {
-  const app = t.context.app;
+  const login = true;
+  const newUser = true;
+  const installTheme = true;
+  const hasDefaultSources = false;
 
-  // start onboarding flow
-  await focusMain();
-  if (!(await isDisplayed('h2=Live Streaming'))) return;
-  await click('h2=Live Streaming');
-  await click('button=Continue');
-  await click('a=Login');
-  await isDisplayed('button=Log in with Twitch');
-  const user = await logIn(t, 'twitch', {}, false, true, true);
-  await sleep(1000);
-  await clickIfDisplayed('button=Skip');
-
-  await withPoolUser(user, async () => {
-    // finish onboarding flow
-    await waitForDisplayed('h1=Set up your mic & webcam');
-    await clickIfDisplayed('button=Skip');
-    await waitForDisplayed('h1=Add your first theme');
-    await clickWhenDisplayed('button=Install');
-    await waitForDisplayed('div[data-testid=choose-free-plan-btn]', { timeout: 60000 });
-    await click('div=[data-testid=choose-free-plan-btn]');
-    await waitForDisplayed('span=Sources', { timeout: 60000 });
-
-    // editor successfully loaded
-    t.true(await (await app.client.$('span=Sources')).isDisplayed(), 'Sources selector is visible');
-
-    const api = await getApiClient();
-    const scenesService = api.getResource<ScenesService>('ScenesService');
-    const dualOutputService = api.getResource<DualOutputService>('DualOutputService');
-
-    t.not(scenesService.getScenes().length, 1, 'New user has theme installed');
-    t.is(dualOutputService.state.dualOutputMode, true, 'Dual output enabled.');
+  await goThroughOnboarding(t, login, newUser, installTheme, async () => {
+    // Confirm sources and dual output status
+    await confirmDefaultSources(t, hasDefaultSources);
+    t.false(await isDisplayed('i[data-testid=dual-output-inactive]'), 'Dual output enabled.');
   });
+
+  t.pass();
 });
 
 // CASE 5: No user logged in during onboarding, no theme installed, then log in new user
 test('Login new user after onboarding skipped', async t => {
-  // start onboarding flow
-  await focusMain();
-  if (!(await isDisplayed('h2=Live Streaming'))) return;
-  await click('h2=Live Streaming');
-  await click('button=Continue');
-  await clickIfDisplayed('button=Skip'); // skip login
-  await clickIfDisplayed('button=Skip'); // skip hardware setup
-  await clickIfDisplayed('button=Skip'); // skip theme install
-  await clickIfDisplayed('button=Skip'); // skip plan selection
+  const login = false;
+  const newUser = false;
+  const installTheme = false;
 
-  await waitForDisplayed('span=Sources', { timeout: 60000 });
+  await goThroughOnboarding(t, login, newUser, installTheme, async () => {
+    // login new user after onboarding
+    await clickIfDisplayed('li[data-testid=nav-auth]');
 
-  const api = await getApiClient();
-  const scenesService = api.getResource<ScenesService>('ScenesService');
-  const dualOutputService = api.getResource<DualOutputService>('DualOutputService');
+    await isDisplayed('button=Log in with Twitch');
+    await logIn(t, 'twitch', { prime: false }, false, false, true);
+    await sleep(1000);
 
-  t.is(
-    scenesService.activeScene.getItems().length,
-    0,
-    'No sources after onboarding skipped before login',
-  );
-  t.is(dualOutputService.state.dualOutputMode, false, 'Dual output not enabled before login');
-
-  await clickIfDisplayed('li[data-testid=nav-auth]');
-
-  await isDisplayed('button=Log in with Twitch');
-  await logIn(t, 'twitch', {}, false, false, true);
-  await sleep(1000);
-  await confirmDefaultSources(t, scenesService.activeScene, true);
-  t.is(dualOutputService.state.dualOutputMode, true, 'Dual output enabled after login');
-});
-
-// CASE 6: No user logged in during onboarding, theme installed, then log in new user
-test('Login new user after onboarding skipped and theme installed', async t => {
-  // start onboarding flow
-  await focusMain();
-  if (!(await isDisplayed('h2=Live Streaming'))) return;
-  await click('h2=Live Streaming');
-  await click('button=Continue');
-  await clickIfDisplayed('button=Skip'); // skip login
-  await clickIfDisplayed('button=Skip'); // skip hardware setup
-  await waitForDisplayed('h1=Add your first theme'); // install theme
-  await clickWhenDisplayed('button=Install');
-  await clickIfDisplayed('button=Skip'); // skip plan selection
-
-  await waitForDisplayed('span=Sources', { timeout: 60000 });
-
-  const api = await getApiClient();
-  const scenesService = api.getResource<ScenesService>('ScenesService');
-  const dualOutputService = api.getResource<DualOutputService>('DualOutputService');
-
-  t.not(scenesService.getScenes().length, 1, 'Theme installed before login');
-  t.is(dualOutputService.state.dualOutputMode, false, 'Dual output not enabled before login');
-
-  await clickIfDisplayed('li[data-testid=nav-auth]');
-
-  await isDisplayed('button=Log in with Twitch');
-  await logIn(t, 'twitch', { prime: false }, false, false, true);
-  await sleep(1000);
-  await confirmDefaultSources(t, scenesService.activeScene, true);
-  t.is(dualOutputService.state.dualOutputMode, true, 'Dual output enabled after login');
+    // Confirm switched to scene with default sources and dual output status
+    await confirmDefaultSources(t);
+    t.true(await isDisplayed('i[data-testid=dual-output-active]'), 'Dual output enabled.');
+  });
 
   t.pass();
 });

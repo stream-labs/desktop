@@ -45,7 +45,7 @@ export const PlatformIconButton = ({
 
   return (
     <Button
-      datatest-id={datatest}
+      data-testid={datatest}
       className={cx(styles.platformIconButton, platform ? `platform-icon-button--${platform}` : '')}
       onClick={onClick}
       disabled={disabled}
