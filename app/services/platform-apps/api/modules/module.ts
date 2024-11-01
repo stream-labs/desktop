@@ -11,6 +11,12 @@ export enum EApiPermissions {
   ExternalLinks = 'slobs.external-links',
   Notifications = 'slobs.notifications',
   Hotkeys = 'slobs.hotkeys',
+
+  // WARNING: This is an exceptionally dangerous permission. Apps
+  // have to be explicitly allowlisted to even request this permission,
+  // and only internal Streamlabs apps should be on that list. You have
+  // been warned.
+  Native = 'slobs.native'
 }
 
 /**

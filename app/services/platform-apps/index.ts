@@ -91,6 +91,12 @@ interface IAppPage {
   };
 }
 
+interface INativeAppPackage {
+  id: string; // A unique identifier for the package
+  version: string; // Increment when native package updates
+  file: string; // Relative path to zip on CDN
+}
+
 interface IAppManifest {
   name: string;
   version: string;
@@ -101,6 +107,9 @@ interface IAppManifest {
   authorizationUrls: string[];
   mediaDomains: string[];
   icon?: string;
+
+  // Only apps with the native permission can do anything with this
+  nativePackages?: INativeAppPackage[];
 }
 
 interface IProductionAppResponse {
