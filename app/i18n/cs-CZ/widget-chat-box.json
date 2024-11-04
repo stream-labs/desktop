@@ -26,5 +26,7 @@
   "Disable Message Animations": "Zakázat animace zpráv",
   "Hide Characters": "Skrýt znaky",
   "Hide Common Chat Bots": "Skrýt běžné chatovací boty",
-  "Hide commands starting with `!`": "Skrýt příkazy začínající `!`"
+  "Hide commands starting with `!`": "Skrýt příkazy začínající `!`",
+  "Chat Notifications": "Chat Notifications",
+  "Trigger a sound to notify you when there is new chat activity": "Trigger a sound to notify you when there is new chat activity"
 }

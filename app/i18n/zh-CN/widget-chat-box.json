@@ -26,5 +26,7 @@
   "Disable Message Animations": "禁用消息动画",
   "Hide Characters": "隐藏文字",
   "Hide Common Chat Bots": "隐藏通用聊天机器人",
-  "Hide commands starting with `!`": "隐藏以“!”开头的命令"
+  "Hide commands starting with `!`": "隐藏以“!”开头的命令",
+  "Chat Notifications": "Chat Notifications",
+  "Trigger a sound to notify you when there is new chat activity": "Trigger a sound to notify you when there is new chat activity"
 }
