@@ -451,9 +451,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     this.SET_IS_LOADING(true);
 
     // establish vertical context if it doesn't exist
-    if (!this.videoSettingsService.contexts.vertical) {
-      this.videoSettingsService.establishVideoContext('vertical');
-    }
+    this.videoSettingsService.validateVideoContext();
 
     try {
       // convert all scenes in the single output collection to dual output
@@ -590,9 +588,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   validateDualOutputCollection() {
     this.SET_IS_LOADING(true);
     // establish vertical context if it doesn't exist
-    if (!this.videoSettingsService.contexts.vertical) {
-      this.videoSettingsService.establishVideoContext('vertical');
-    }
+    this.videoSettingsService.validateVideoContext();
 
     try {
       this.scenesService.views.scenes.forEach(scene => {
@@ -690,7 +686,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     const horizontalNode = node.display === 'horizontal' ? node : partnerNode;
     const verticalNode = node.display === 'vertical' ? node : partnerNode;
     const matchVisibility = node.display === 'horizontal';
-    const { visible, ...settings } = Object.assign(verticalNode.getSettings());
+    const { visible, output, ...settings } = Object.assign(verticalNode.getSettings());
     const verticalNodeId = verticalNode.id;
 
     // remove old node
@@ -808,9 +804,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   setupDefaultSources() {
     this.setIsLoading(true);
 
-    if (!this.videoSettingsService.contexts.vertical) {
-      this.videoSettingsService.establishVideoContext('vertical');
-    }
+    this.videoSettingsService.validateVideoContext();
 
     const scene =
       this.scenesService.views.activeScene ??

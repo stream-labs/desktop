@@ -283,7 +283,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
    * @param display - Optional, the context's display name
    * @returns Boolean denoting success
    */
-  establishVideoContext(display: TDisplayType = 'horizontal') {
+  private establishVideoContext(display: TDisplayType = 'horizontal') {
     if (this.contexts[display]) return;
     this.SET_VIDEO_CONTEXT(display);
     this.contexts[display] = VideoFactory.create();
@@ -303,6 +303,12 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     }
 
     return !!this.contexts[display];
+  }
+
+  validateVideoContext(display: TDisplayType = 'vertical') {
+    if (!this.contexts[display]) {
+      this.establishVideoContext(display);
+    }
   }
 
   createDefaultFps(display: TDisplayType = 'horizontal') {

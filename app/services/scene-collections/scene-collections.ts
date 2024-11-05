@@ -1051,9 +1051,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    */
 
   initNodeMaps(sceneNodeMap?: { [sceneId: string]: Dictionary<string> }) {
-    if (!this.videoSettingsService.contexts.vertical) {
-      this.videoSettingsService.establishVideoContext('vertical');
-    }
+    this.videoSettingsService.validateVideoContext();
 
     if (!this.activeCollection) return;
 
