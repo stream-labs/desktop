@@ -653,13 +653,14 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     this.hotkeysService.bindHotkeys();
 
     if (this.sourcesService.missingInputs.length > 0) {
-      const inputs = this.sourcesService.missingInputs.join(', ');
-
       await remote.dialog
         .showMessageBox(Utils.getMainWindow(), {
           title: 'Unsupported Sources',
           type: 'warning',
-          message: `Scene items were removed because there was an error loading them: ${inputs}`,
+          message: $t(
+            'Scene items were removed because there was an error loading them: %{inputs}.\n\nPlease accept or reject permissions to view the Streamlabs Editor panel',
+            { inputs: this.sourcesService.missingInputs.join(', ') },
+          ),
         })
         .then(() => {
           this.collectionErrorOpen = false;
@@ -676,7 +677,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
       .showMessageBox(Utils.getMainWindow(), {
         title: 'Unsupported Sources',
         type: 'warning',
-        message: 'One or more scene items were removed because they are not supported',
+        message: $t('One or more scene items were removed because they are not supported'),
       })
       .then(() => (this.collectionErrorOpen = false));
     this.collectionErrorOpen = true;
