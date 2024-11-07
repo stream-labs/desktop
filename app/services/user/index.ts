@@ -101,6 +101,7 @@ interface IUserServiceState {
   userId?: number;
   createdAt?: number;
   isRelog?: boolean;
+  ultraDisplayPrices: UltraDisplayPrices | null;
 }
 
 interface ILinkedPlatform {
@@ -142,6 +143,30 @@ export type LoginLifecycle = {
 interface ISentryContext {
   username: string;
   platform: string;
+}
+
+interface UltraDisplayPricesResponse {
+  currency: string;
+  default_plan_period: string;
+  gateways: { id: string; type: string }[];
+  plans: {
+    currency: string;
+    frequency: number;
+    gateway_id: string;
+    id: string;
+    is_mobile: boolean;
+    /** Price in cents **/
+    price: number;
+    processor_type: string;
+    tag: 'ultra' | string;
+    period: 'month' | 'year' | string;
+  }[];
+}
+
+export interface UltraDisplayPrices {
+  currency: string;
+  monthlyPriceInCents: number;
+  yearlyPriceInCents: number;
 }
 
 export function setSentryContext(ctx: ISentryContext) {
@@ -253,6 +278,10 @@ class UserViews extends ViewHandler<IUserServiceState> {
     return this.state.auth;
   }
 
+  get ultraDisplayPrices() {
+    return this.state.ultraDisplayPrices;
+  }
+
   async appStoreUrl(params?: { appId?: string | undefined; type?: string | undefined }) {
     let url = `https://${this.hostsService.streamlabs}/library/app-store`;
 
@@ -324,6 +353,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @mutation()
   SET_PRIME(isPrime: boolean) {
     this.state.isPrime = isPrime;
+  }
+
+  @mutation()
+  SET_ULTRA_DISPLAY_PRICES(val: UltraDisplayPrices) {
+    this.state.ultraDisplayPrices = val;
   }
 
   @mutation()
@@ -767,6 +801,32 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     }>(request)
       .then(response => this.validatePrimeStatus(response))
       .catch(() => null);
+  }
+
+  // TODO: why isn't this on the endpoint above, we have to do an extra request
+  async setDisplayUltraPrices() {
+    const host = this.hostsService.streamlabs;
+    // TODO: hardcoded currency, why can't backend infer
+    const url = 'https://api-id.streamlabs.dev/v1/subscriptions/plans?currency=USD';
+    const headers = authorizedHeaders(this.apiToken);
+    const request = new Request(url, { headers });
+    return jfetch<UltraDisplayPricesResponse>(request).then(response => {
+      const currency = response.currency;
+      // Apparently first is ok
+
+      const monthlyPriceInCents = response.plans.find(
+        p => p.tag === 'ultra' && p.period === 'month',
+      )?.price;
+
+      const yearlyPriceInCents = response.plans.find(p => p.tag === 'ultra' && p.period === 'year')
+        ?.price;
+
+      if (currency && monthlyPriceInCents && yearlyPriceInCents) {
+        this.SET_ULTRA_DISPLAY_PRICES({ currency, monthlyPriceInCents, yearlyPriceInCents });
+      } else {
+        throw new Error('Invalid Ultra prices display data');
+      }
+    });
   }
 
   validatePrimeStatus(response: {

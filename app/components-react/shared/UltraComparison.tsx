@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { $t } from 'services/i18n';
 import styles from './UltraComparison.m.less';
 import cx from 'classnames';
@@ -17,7 +17,7 @@ interface IUltraComparisonProps {
 }
 
 export function UltraComparison(p: IUltraComparisonProps) {
-  const { MagicLinkService } = Services;
+  const { MagicLinkService, UserService } = Services;
 
   const featureData = p.featureData || {
     standard: [
@@ -43,9 +43,27 @@ export function UltraComparison(p: IUltraComparisonProps) {
     ],
   };
 
+  useEffect(UserService.actions.setDisplayUltraPrices, []);
+
   function linkToPrime() {
     MagicLinkService.actions.linkToPrime(p.refl);
   }
+
+  const ultraDisplayPrices = UserService.views.ultraDisplayPrices;
+
+  if (!ultraDisplayPrices) {
+    return null;
+  }
+
+  const formatter = Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: ultraDisplayPrices.currency,
+    maximumFractionDigits: 0,
+    // @ts-ignore: this exists
+    roundingMode: 'floor',
+  });
+  const monthlyPrice = formatter.format(ultraDisplayPrices.monthlyPriceInCents / 100);
+  const yearlyPrice = formatter.format(ultraDisplayPrices.yearlyPriceInCents / 100);
 
   return (
     <div
@@ -97,8 +115,8 @@ export function UltraComparison(p: IUltraComparisonProps) {
             <span>{$t('Premium features for your stream.')}</span>
             <span>
               {$t('%{monthlyPrice}/mo or %{yearlyPrice}/year', {
-                monthlyPrice: '$19',
-                yearlyPrice: '$149',
+                monthlyPrice,
+                yearlyPrice,
               })}
             </span>
           </div>
