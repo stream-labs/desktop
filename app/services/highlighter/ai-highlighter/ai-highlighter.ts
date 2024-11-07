@@ -28,7 +28,7 @@ export interface IHighlight {
   end_time: number;
   input_types: EHighlighterInputTypes[];
   score: number;
-  metadata: { round: number };
+  metadata: { round: number; place?: number };
 }
 
 export type EHighlighterMessageTypes =
@@ -52,6 +52,12 @@ class MessageBufferHandler {
   private readonly startToken: string = '>>>>';
   private readonly endToken: string = '<<<<';
 
+  hasCompleteMessage(): boolean {
+    const hasStart = this.buffer.includes(this.startToken);
+    const hasEnd = this.buffer.includes(this.endToken);
+    return hasStart && hasEnd;
+  }
+
   isMessageComplete(message: string): boolean {
     const combined = this.buffer + message;
     const hasStart = combined.includes(this.startToken);
@@ -63,22 +69,22 @@ class MessageBufferHandler {
     this.buffer += message;
   }
 
-  extractCompleteMessage(): string | null {
-    if (this.isMessageComplete(this.buffer)) {
+  extractCompleteMessages(): string[] {
+    const messages = [];
+    while (this.hasCompleteMessage()) {
       const start = this.buffer.indexOf(this.startToken);
       const end = this.buffer.indexOf(this.endToken);
-      console.log(this.buffer);
 
       if (start !== -1 && end !== -1 && start < end) {
         const completeMessage = this.buffer.substring(start, end + this.endToken.length);
         // Clear the buffer of the extracted message
         this.buffer = this.buffer.substring(end + this.endToken.length);
 
-        return completeMessage;
+        messages.push(completeMessage);
       }
     }
     console.log('message not complete', this.buffer);
-    return null;
+    return messages;
   }
 
   clear() {
@@ -119,11 +125,10 @@ export function getHighlightClips(
         messageBuffer.appendToBuffer(message);
 
         // Try to extract a complete message
-        const completeMessage = messageBuffer.extractCompleteMessage();
-        console.log('completeMessage ?: ', completeMessage);
+        const completeMessages = messageBuffer.extractCompleteMessages();
 
-        if (completeMessage) {
-          messageBuffer.clear();
+        for (const completeMessage of completeMessages) {
+          // messageBuffer.clear();
           const aiHighlighterMessage = parseAiHighlighterMessage(completeMessage);
           console.log('parsed aiHighlighterMessage', aiHighlighterMessage);
 
@@ -210,10 +215,10 @@ export function testSplitMessages() {
   messageBuffer.appendToBuffer(message2);
   console.log('Message complete?', messageBuffer.isMessageComplete(message2));
 
-  const completeMessage = messageBuffer.extractCompleteMessage();
-  console.log('Extracted complete message:', completeMessage);
+  const completeMessages = messageBuffer.extractCompleteMessages();
+  console.log('Extracted complete message:', completeMessages);
 
-  if (completeMessage) {
+  for (const completeMessage of completeMessages) {
     const parsed = parseAiHighlighterMessage(completeMessage);
     console.log('Parsed message:', parsed);
   }
