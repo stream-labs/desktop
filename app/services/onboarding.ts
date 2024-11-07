@@ -114,7 +114,8 @@ export const ONBOARDING_STEPS = () => ({
     component: 'Prime' as const,
     hideButton: true,
     label: $t('Ultra'),
-    cond: ({ isUltra }: OnboardingStepContext) => !isUltra,
+    //cond: ({ isUltra }: OnboardingStepContext) => !isUltra,
+    cond: () => true,
     isSkippable: true,
   },
 });
@@ -370,6 +371,8 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   }
 
   startOnboardingIfRequired() {
+    this.start();
+    return true;
     // Useful for testing in dev env
     if (Utils.env.SLD_FORCE_ONBOARDING_STEP) {
       this.start();
