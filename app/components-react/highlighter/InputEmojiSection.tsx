@@ -1,5 +1,5 @@
 import React from 'react';
-import { TClip } from 'services/highlighter';
+import { IAiClip, TClip } from 'services/highlighter';
 import { isAiClip } from './utils';
 import { EHighlighterInputTypes } from 'services/highlighter/ai-highlighter/ai-highlighter';
 import styles from './InputEmojiSection.m.less';
@@ -22,12 +22,13 @@ export function InputEmojiSection({
     EHighlighterInputTypes.LOW_HEALTH,
   ];
 
-  const inputTypeMap = Object.entries(getMomentTypeCount(clips));
+  const inputTypeMap = Object.entries(getInputTypeCount(clips));
   const filteredInputTypeMap = inputTypeMap.filter(
     ([type]) =>
       !excludeTypes.includes(type as EHighlighterInputTypes) &&
       (inputTypeMap.length <= 2 || includeDeploy || type !== 'deploy'),
   );
+
   const manualClips = clips.filter(
     clip => clip.source === 'ReplayBuffer' || clip.source === 'Manual',
   );
@@ -63,7 +64,9 @@ export function InputEmojiSection({
         <div key={type} style={{ display: 'flex', gap: '4px' }}>
           <span key={type + 'emoji'}>{getTypeWordingFromType(type, count).emoji} </span>{' '}
           <span className={styles.description} key={type + 'desc'}>
-            {count} {getTypeWordingFromType(type, count).description}
+            {count} {getTypeWordingFromType(type, count).description}{' '}
+            {isDeath(type) ? '#' + getGamePlacement(clips) : ''}
+            {/* if death and metadata  # metadata.okace */}
           </span>
         </div>
       ))}
@@ -98,12 +101,12 @@ function getTypeWordingFromType(
   return { emoji: type, description: count > 1 ? `${type}s` : type };
 }
 
-function getMomentTypeCount(clips: TClip[]): { [type: string]: number } {
+function getInputTypeCount(clips: TClip[]): { [type: string]: number } {
   const typeCounts: { [type: string]: number } = {};
   clips.forEach(clip => {
     if (isAiClip(clip)) {
-      clip.aiInfo.moments.forEach(moment => {
-        const type = moment.type;
+      clip.aiInfo.inputs.forEach(input => {
+        const type = input.type;
         if (typeCounts[type]) {
           typeCounts[type] += 1;
         } else {
@@ -114,7 +117,21 @@ function getMomentTypeCount(clips: TClip[]): { [type: string]: number } {
   });
   return typeCounts;
 }
+function isDeath(type: string): boolean {
+  return type === EHighlighterInputTypes.DEATH;
+}
 
+function getGamePlacement(clips: TClip[]): number {
+  const deathClip = clips.find(
+    clip =>
+      isAiClip(clip) &&
+      clip.aiInfo.inputs.some(input => input.type === EHighlighterInputTypes.DEATH),
+  ) as IAiClip;
+  const deathInput = deathClip.aiInfo.inputs.find(
+    input => input.type === EHighlighterInputTypes.DEATH,
+  );
+  return deathInput?.metadata?.place || null;
+}
 function getAmountOfRounds(clips: TClip[]): number {
   const rounds: number[] = [];
   clips.filter(isAiClip).forEach(clip => {

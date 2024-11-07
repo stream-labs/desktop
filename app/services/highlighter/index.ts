@@ -96,12 +96,13 @@ export interface IAiClip extends IBaseClip {
   aiInfo: IAiClipInfo;
 }
 
-export interface IMoments {
+export interface IInput {
   type: EHighlighterInputTypes;
+  metadata: any;
 }
 
 export interface IAiClipInfo {
-  moments: IMoments[];
+  inputs: IInput[];
   score: number;
   metadata: { round: number };
 }
@@ -586,6 +587,14 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   async init() {
     super.init();
 
+    //
+    this.views.clips.forEach(clip => {
+      if (isAiClip(clip) && (clip.aiInfo as any).moments) {
+        clip.aiInfo.inputs = (clip.aiInfo as any).moments;
+        delete (clip.aiInfo as any).moments;
+      }
+    });
+    //
     //Check if files are existent, if not, delete
     this.views.clips.forEach(c => {
       if (!this.fileExists(c.path)) {
@@ -1671,13 +1680,13 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
     let intervalId: NodeJS.Timeout;
 
-    let intervallCount = 0;
+    let intervalCount = 0;
     // Start periodic progress updates
     const startProgressUpdates = () => {
       intervalId = setInterval(() => {
-        intervallCount++;
+        intervalCount++;
         setStreamInfo.state.progress = Math.round(
-          intervallCount * (100 / estimatedDuration) + 100 / estimatedDuration,
+          intervalCount * (100 / estimatedDuration) + 100 / estimatedDuration,
         );
         this.updateStream(setStreamInfo);
       }, 1000); // Update every second
@@ -1690,10 +1699,6 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     startProgressUpdates();
 
     const renderHighlights = async (partialHighlights: IHighlight[]) => {
-      // console.log('🔄 formatHighlighterResponse');
-      // const formattedHighlighterResponse = this.formatHighlighterResponse(partialInputs);
-      // console.log('✅ formatHighlighterResponse', formattedHighlighterResponse);
-
       console.log('🔄 cutHighlightClips');
       this.updateStream({ state: 'Generating clips', ...setStreamInfo });
       const clipData = await this.cutHighlightClips(filePath, partialHighlights, setStreamInfo);
@@ -1795,17 +1800,6 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     }
   }
 
-  formatHighlighterResponse(responseData: IHighlighterInput[]) {
-    //TODO: Currently the colde failes if start and endtime are equal. Needs to be fixed with the config
-    return responseData.map(curr => {
-      return {
-        start: curr.start_time - 9,
-        end: curr.end_time !== null ? curr.end_time + 4 : curr.start_time + 4,
-        types: curr.input_types,
-      };
-    });
-  }
-
   async cutHighlightClips(
     videoUri: string,
     highlighterData: IHighlight[],
@@ -1865,8 +1859,10 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     console.time('export');
     const BATCH_SIZE = 1;
     for (let i = 0; i < sortedHighlights.length; i += BATCH_SIZE) {
-      const batch = sortedHighlights.slice(i, i + BATCH_SIZE);
-      const batchTasks = batch.map(({ start_time, end_time, input_types, score, metadata }) => {
+      const highlightBatch = sortedHighlights.slice(i, i + BATCH_SIZE);
+      const batchTasks = highlightBatch.map((highlight: IHighlight) => {
+        const start_time = highlight.start_time;
+        const end_time = highlight.end_time;
         return async () => {
           const formattedStart = start_time.toString().padStart(6, '0');
           const formattedEnd = end_time.toString().padStart(6, '0');
@@ -1924,9 +1920,9 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
               return {
                 path: outputUri,
                 aiClipInfo: {
-                  moments: input_types.map(type => ({ type })),
-                  score: score,
-                  metadata: metadata,
+                  inputs: highlight.inputs,
+                  score: highlight.score,
+                  metadata: highlight.metadata,
                 },
                 startTime: start_time,
                 endTime: end_time,
@@ -1989,8 +1985,8 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     return this.getClips(clips, streamId).every(clip => clip.loaded);
   }
 
-  getRounds(clips: TClip[]): { round: number; moments: IMoments[] }[] {
-    const roundsMap: { [key: number]: IMoments[] } = {};
+  getRounds(clips: TClip[]): { round: number; inputs: IInput[] }[] {
+    const roundsMap: { [key: number]: IInput[] } = {};
     clips.forEach(clip => {
       const aiClip = isAiClip(clip) ? clip : undefined;
       const round = aiClip?.aiInfo?.metadata?.round ?? undefined;
@@ -1998,13 +1994,13 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
         if (!roundsMap[round]) {
           roundsMap[round] = [];
         }
-        roundsMap[round].push(...aiClip.aiInfo.moments);
+        roundsMap[round].push(...aiClip.aiInfo.inputs);
       }
     });
 
     return Object.keys(roundsMap).map(round => ({
       round: parseInt(round, 10),
-      moments: roundsMap[parseInt(round, 10)],
+      inputs: roundsMap[parseInt(round, 10)],
     }));
   }
 

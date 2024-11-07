@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Button, Select, Checkbox, Typography } from 'antd';
 import { DownOutlined, RobotOutlined } from '@ant-design/icons';
 import { IFilterOptions } from './utils';
-import { IMoments } from 'services/highlighter';
+import { IInput } from 'services/highlighter';
 import { InputEmojiSection } from './InputEmojiSection';
 import { EHighlighterInputTypes } from 'services/highlighter/ai-highlighter/ai-highlighter';
 
@@ -45,7 +45,7 @@ export default function HighlightGeneratorUI({
   maxDuration: number;
   rounds: {
     round: number;
-    moments: IMoments[];
+    inputs: IInput[];
   }[];
   emitSetFilter: (filter: IFilterOptions) => void;
 }) {
@@ -84,17 +84,17 @@ export default function HighlightGeneratorUI({
     console.log('sth changed');
   }, [selectedRounds, filterType, targetDuration]);
 
-  function highlightGeneratorUI(moments: IMoments[]) {
-    const combinedKillAndKnocked = moments.reduce((count, moment) => {
+  function highlightGeneratorUI(inputs: IInput[]) {
+    const combinedKillAndKnocked = inputs.reduce((count, input) => {
       if (
-        moment.type === EHighlighterInputTypes.KILL ||
-        moment.type === EHighlighterInputTypes.KNOCKED
+        input.type === EHighlighterInputTypes.KILL ||
+        input.type === EHighlighterInputTypes.KNOCKED
       ) {
         return count + 1;
       }
       return count;
     }, 0);
-    const won = moments.some(moment => moment.type === EHighlighterInputTypes.VICTORY);
+    const won = inputs.some(input => input.type === EHighlighterInputTypes.VICTORY);
 
     return (
       <>
@@ -173,7 +173,7 @@ export default function HighlightGeneratorUI({
                     }}
                   >
                     Round {roundInfo.round} <br />
-                    {highlightGeneratorUI(roundInfo.moments)}
+                    {highlightGeneratorUI(roundInfo.inputs)}
                   </Checkbox>
                 </div>
               ))}

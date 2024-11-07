@@ -242,8 +242,7 @@ export function aiFilterClips(
   ];
   const clipsSortedByScore = clipsFromRounds
     .filter(
-      clips =>
-        !(clips as IAiClip).aiInfo.moments.some(moment => contextTypes.includes(moment.type)),
+      clips => !(clips as IAiClip).aiInfo.inputs.some(input => contextTypes.includes(input.type)),
     )
     .sort((a, b) => (a as IAiClip).aiInfo.score - (b as IAiClip).aiInfo.score);
   // console.log(
@@ -251,7 +250,7 @@ export function aiFilterClips(
   //   clipsSortedByScore.map(clip => {
   //     return {
   //       score: (clip as IAiClip).aiInfo.score,
-  //       moments: JSON.stringify((clip as IAiClip).aiInfo.moments),
+  //       inputs: JSON.stringify((clip as IAiClip).aiInfo.inputs),
   //     };
   //   }),
   // );

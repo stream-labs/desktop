@@ -17,18 +17,23 @@ export enum EHighlighterInputTypes {
   PLAYER_KNOCKED = 'player_knocked',
 }
 
+export type DeathMetadata = {
+  place: number;
+};
 export interface IHighlighterInput {
   start_time: number;
   end_time?: number;
-  input_types: EHighlighterInputTypes[];
+  type: EHighlighterInputTypes;
   origin: string;
+  metadata?: DeathMetadata | any;
 }
 export interface IHighlight {
   start_time: number;
   end_time: number;
   input_types: EHighlighterInputTypes[];
+  inputs: IHighlighterInput[];
   score: number;
-  metadata: { round: number; place?: number };
+  metadata: { round: number };
 }
 
 export type EHighlighterMessageTypes =
