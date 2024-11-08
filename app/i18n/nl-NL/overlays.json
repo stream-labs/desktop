@@ -16,5 +16,7 @@
   "Assign Vertical Sources to Horizontal Display": "Verticale bronnen aan horizontale weergave toewijzen",
   "The below will create a copy of the active scene collection, set the copy as the active collection, and then apply the function.": "Hiermee wordt een kopie van de actieve scèneverzameling gemaakt, de kopie ingesteld als de actieve verzameling en de functie toegepast.",
   "Manage Dual Output Scene": "Dual Output-scène beheren",
-  "Unable to convert dual output collection.": "Kan Dual Output-verzameling niet converteren."
+  "Unable to convert dual output collection.": "Kan Dual Output-verzameling niet converteren.",
+  "One or more scene items were removed because they are not supported": "One or more scene items were removed because they are not supported",
+  "Scene items were removed because there was an error loading them: %{inputs}.\n\nPlease accept or reject permissions to view the Streamlabs Editor panel": "Scene items were removed because there was an error loading them: %{inputs}.\n\nPlease accept or reject permissions to view the Streamlabs Editor panel"
 }
