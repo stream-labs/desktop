@@ -233,11 +233,7 @@ export default function PreviewModal({
                     jumpToClip(index);
                   }}
                 >
-                  <MiniClipPreview
-                    clipId={path}
-                    // highlighted={hoveredId === id && !onMove}
-                    highlighted={false}
-                  ></MiniClipPreview>
+                  <MiniClipPreview clipId={path}></MiniClipPreview>
                 </div>
               );
             })}

@@ -83,8 +83,8 @@ export default function ClipsView({
   );
 
   function setClipOrder(listClips: { id: string }[], streamId: string | undefined) {
-    let newOrderOfSomeItems = listClips.map(c => c.id);
-    let allItemArray = clips.sorted.map(c => c.id);
+    const newOrderOfSomeItems = listClips.map(c => c.id);
+    const allItemArray = clips.sorted.map(c => c.id);
     const newClipArray = createFinalSortedArray(newOrderOfSomeItems, allItemArray);
     const oldClipArray = clips.sorted.map(c => c.id);
 
@@ -223,18 +223,8 @@ export default function ClipsView({
                     >
                       {sortedList.map(({ id }) => {
                         return (
-                          <div
-                            key={'mini' + id}
-                            data-clip-id={id}
-                            style={{ borderRadius: '6px' }}
-                            // onMouseEnter={() => setHoveredId(id)}
-                            // onMouseLeave={() => setHoveredId(null)}
-                          >
-                            <MiniClipPreview
-                              clipId={id}
-                              // highlighted={hoveredId === id && !onMove}
-                              highlighted={false}
-                            ></MiniClipPreview>
+                          <div key={'mini' + id} data-clip-id={id} style={{ borderRadius: '6px' }}>
+                            <MiniClipPreview clipId={id}></MiniClipPreview>
                           </div>
                         );
                       })}
@@ -384,7 +374,6 @@ export default function ClipsView({
     );
   }
 
-  // return getClipsView(props.id, shownSortedFilteredClipStrings, shownSortedClipStrings);
   return getClipsView(
     props.id,
     clips.sorted.map(c => ({ id: c.id })),

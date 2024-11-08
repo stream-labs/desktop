@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Button, Select, Checkbox, Typography } from 'antd';
 import { DownOutlined, RobotOutlined } from '@ant-design/icons';
 import { IFilterOptions } from './utils';
@@ -74,8 +74,13 @@ export default function HighlightGeneratorUI({
       setSelectedRounds(value.filter(item => item !== 0));
     }
   };
-
+  const isFirstRender = useRef(true);
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
     emitSetFilter({
       rounds: selectedRounds,
       targetDuration: filterType === 'duration' ? targetDuration * 60 : 9999,

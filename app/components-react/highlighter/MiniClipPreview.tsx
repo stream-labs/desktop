@@ -4,13 +4,7 @@ import React from 'react';
 import { TClip } from 'services/highlighter';
 import { SCRUB_HEIGHT, SCRUB_WIDTH } from 'services/highlighter/constants';
 
-export default function MiniClipPreview({
-  clipId,
-  highlighted,
-}: {
-  clipId: string;
-  highlighted: boolean;
-}) {
+export default function MiniClipPreview({ clipId }: { clipId: string }) {
   const { HighlighterService } = Services;
   const clip = useVuex(() => HighlighterService.views.clipsDictionary[clipId] as TClip);
   return (
