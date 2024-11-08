@@ -16,5 +16,7 @@
   "Assign Vertical Sources to Horizontal Display": "分配垂直源至水平显示",
   "The below will create a copy of the active scene collection, set the copy as the active collection, and then apply the function.": "下面将创建活动场景集的副本，将副本设置为活动集，然后应用该功能。",
   "Manage Dual Output Scene": "管理 Dual Output 场景",
-  "Unable to convert dual output collection.": "无法转换 Dual Output 集。"
+  "Unable to convert dual output collection.": "无法转换 Dual Output 集。",
+  "One or more scene items were removed because they are not supported": "One or more scene items were removed because they are not supported",
+  "Scene items were removed because there was an error loading them: %{inputs}.\n\nPlease accept or reject permissions to view the Streamlabs Editor panel": "Scene items were removed because there was an error loading them: %{inputs}.\n\nPlease accept or reject permissions to view the Streamlabs Editor panel"
 }
