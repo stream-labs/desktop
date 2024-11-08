@@ -206,6 +206,11 @@ export class SourcesService extends StatefulService<ISourcesState> {
    */
   propertiesManagers: Dictionary<IActivePropertyManager> = {};
 
+  /**
+   * Sources that failed to create obs inputs on initial load
+   */
+  missingInputs: string[] = [];
+
   protected init() {
     obs.NodeObs.RegisterSourceCallback((objs: IObsSourceCallbackInfo[]) =>
       this.handleSourceCallback(objs),
@@ -310,6 +315,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       obsInputSettings.is_media_flag = false;
     }
 
+    // This call to obs to create the input must be caught, otherwise it causes an app crash
     try {
       const obsInput = obs.InputFactory.create(type, id, obsInputSettings);
 
@@ -343,7 +349,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
         );
       }
     } catch (e: unknown) {
-      console.log('Error creating source: ', e);
+      console.log('Error creating obs source: ', e);
     }
 
     return this.views.getSource(id)!;
