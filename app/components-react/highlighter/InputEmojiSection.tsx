@@ -54,7 +54,7 @@ export function InputEmojiSection({
     >
       {includeRounds && (
         <div key={'rounds'} style={{ display: 'flex', gap: '4px' }}>
-          <span key={'rounds' + 'emoji'}> {getTypeWordingFromType('rounds', rounds).emoji} </span>{' '}
+          <span key={'rounds-emoji'}> {getTypeWordingFromType('rounds', rounds).emoji} </span>{' '}
           <span className={styles.description} key={'rounds' + 'desc'}>
             {rounds} {getTypeWordingFromType('rounds', rounds).description}
           </span>
@@ -65,8 +65,9 @@ export function InputEmojiSection({
           <span key={type + 'emoji'}>{getTypeWordingFromType(type, count).emoji} </span>{' '}
           <span className={styles.description} key={type + 'desc'}>
             {count} {getTypeWordingFromType(type, count).description}{' '}
-            {isDeath(type) ? '#' + getGamePlacement(clips) : ''}
-            {/* if death and metadata  # metadata.okace */}
+            {!includeRounds && isDeath(type) && getGamePlacement(clips)
+              ? '#' + getGamePlacement(clips)
+              : ''}
           </span>
         </div>
       ))}
