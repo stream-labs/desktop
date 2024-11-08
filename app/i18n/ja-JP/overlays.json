@@ -16,5 +16,7 @@
   "Assign Vertical Sources to Horizontal Display": "縦方向ソースを横方向ディスプレイに割り当てる",
   "The below will create a copy of the active scene collection, set the copy as the active collection, and then apply the function.": "以下では、アクティブなシーンコレクションのコピーを作成し、コピーをアクティブなコレクションとして設定してから、機能を適用します。",
   "Manage Dual Output Scene": "Dual Output シーンを管理",
-  "Unable to convert dual output collection.": "Dual Output コレクションを変換できません。"
+  "Unable to convert dual output collection.": "Dual Output コレクションを変換できません。",
+  "One or more scene items were removed because they are not supported": "One or more scene items were removed because they are not supported",
+  "Scene items were removed because there was an error loading them: %{inputs}.\n\nPlease accept or reject permissions to view the Streamlabs Editor panel": "Scene items were removed because there was an error loading them: %{inputs}.\n\nPlease accept or reject permissions to view the Streamlabs Editor panel"
 }
