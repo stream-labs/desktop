@@ -1,4 +1,4 @@
-import { WidgetType } from '../../../services/widgets';
+import { WidgetDefinitions, WidgetType } from '../../../services/widgets';
 import { Services } from '../../service-provider';
 import { throttle } from 'lodash-decorators';
 import { assertIsDefined, getDefined } from '../../../util/properties-type-guards';
@@ -28,6 +28,7 @@ export interface IWidgetCommonState {
   prevSettings: any;
   canRevert: boolean;
   widgetData: IWidgetState;
+  staticConfig: unknown;
 }
 
 /**
@@ -58,6 +59,7 @@ export const DEFAULT_WIDGET_STATE: IWidgetCommonState = {
   prevSettings: {},
   canRevert: false,
   browserSourceProps: (null as any) as TObsFormData,
+  staticConfig: null,
 } as IWidgetCommonState;
 
 /**
@@ -72,6 +74,7 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
     sourceId: this.params.sourceId,
     shouldCreatePreviewSource: this.params.shouldCreatePreviewSource ?? true,
     selectedTab: this.params.selectedTab ?? 'general',
+    staticConfig: null,
   } as IWidgetCommonState);
 
   // create shortcuts for widgetsConfig and eventsInfo
@@ -238,11 +241,56 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
    * Fetch settings from the server
    */
   private async fetchData(): Promise<TWidgetState['data']> {
+    const widgetType = WidgetDefinitions[this.config.type].humanType;
+
     // load widget settings data into state
-    const rawData = await this.actions.return.request({
-      url: this.config.dataFetchUrl,
-      method: 'GET',
-    });
+    // TODO: this is duplicate/very similar to the version that was done for Vue
+    const [rawData, staticConfig] = await Promise.all([
+      this.actions.return.request({
+        url: this.config.dataFetchUrl,
+        method: 'GET',
+      }),
+      // TODO: duplicate from vue version
+      this.state.staticConfig
+        ? Promise.resolve(this.state.staticConfig)
+        : this.actions.return.request({
+            url: `https://${this.widgetsService.hostsService.streamlabs}/api/v5/widgets/static/config/${widgetType}`,
+            method: 'GET',
+          }),
+    ]);
+
+    this.setStaticConfig(staticConfig);
+    if (staticConfig) {
+      // I miss lenses
+      const makeLenses = (type: 'html' | 'css' | 'js') => {
+        const prop = `custom_${type}`;
+        if (this.config.useNewWidgetAPI) {
+          return {
+            get: () => rawData.data.settings.global[prop],
+            set: (val: string) => {
+              rawData.data.settings.global[prop] = val;
+            },
+          };
+        }
+
+        return {
+          get: () => rawData.settings[prop],
+          set: (val: string) => {
+            rawData.settings[prop] = val;
+          },
+        };
+      };
+      // If we have a default for custom code and the fields are empty in the
+      // response, prefill that with the default, this is what backend should
+      // also do
+      ['html', 'css', 'js'].forEach((customType: 'html' | 'css' | 'js') => {
+        const { get, set } = makeLenses(customType);
+        if (staticConfig.data.custom_code[customType] && !get()) {
+          set(staticConfig.data.custom_code[customType]);
+        }
+      });
+    }
+
     return this.patchAfterFetch(rawData);
   }
 
@@ -367,6 +415,12 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
     ];
     const sortedProps = propsOrder.map(propName => props.find(p => p.name === propName)!);
     this.state.setBrowserSourceProps(sortedProps);
+  }
+
+  private setStaticConfig(resp: unknown) {
+    this.state.mutate(state => {
+      state.staticConfig = resp;
+    });
   }
 }
 
