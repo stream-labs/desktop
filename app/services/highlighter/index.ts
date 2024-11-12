@@ -1990,7 +1990,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     clips.forEach(clip => {
       const aiClip = isAiClip(clip) ? clip : undefined;
       const round = aiClip?.aiInfo?.metadata?.round ?? undefined;
-      if (round) {
+      if (aiClip?.aiInfo?.inputs && round) {
         if (!roundsMap[round]) {
           roundsMap[round] = [];
         }
