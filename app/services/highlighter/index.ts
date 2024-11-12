@@ -1896,6 +1896,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
             // codec === 'h264' ? 'copy' : 'libx264',
             'libx264',
             '-c:a',
+            // 'copy'
             'aac',
             '-strict',
             'experimental',
