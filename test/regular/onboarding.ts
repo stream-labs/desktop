@@ -13,6 +13,20 @@ import {
 import { getApiClient } from '../helpers/api-client';
 import { ScenesService } from '../../app/services/api/external-api/scenes';
 
+/**
+ * Testing default sources for onboarding and new users
+ * @remark New users on their first login have special handling. To optimize testing,
+ * some of the cases are tested within existing tests.
+ *
+ * CASE 1: Old user logged in during onboarding, no theme installed (Go through onboarding)
+ * CASE 2: Old user logged in during onboarding, theme installed (Go through onboarding and install theme)
+ * CASE 3: New user logged in during onboarding, no theme installed (Go through onboarding as a new user)
+ * CASE 4: New user logged in during onboarding, theme installed (Go through onboarding as a new user and install theme)
+ * CASE 5: No user logged in during onboarding, no theme installed, then log in new user (Login new user after onboarding skipped)
+ * CASE 6: No user logged in during onboarding, theme installed, then log in new user (Login new user after onboarding skipped and theme installed)
+ * CASE 7: No user logged in during onboarding, no theme installed, then log in an old user (Scene-collections cloud-backup) <- tested in the cloud-backup test
+ */
+
 // not a react hook
 // eslint-disable-next-line react-hooks/rules-of-hooks
 useWebdriver({ skipOnboarding: false, noSync: true });
@@ -124,19 +138,6 @@ async function finishOnboarding(installTheme = false) {
 
   await isDisplayed('span=Sources');
 }
-
-/**
- * Testing default sources for onboarding and new users
- * @remark New users on their first login have special handling. To optimize testing,
- * some of the cases are tested within existing tests.
- *
- ** CASE 1: Old user logged in during onboarding, no theme installed (Go through onboarding)
- ** CASE 2: Old user logged in during onboarding, theme installed (Go through onboarding and install theme)
- * CASE 3: New user logged in during onboarding, no theme installed (Go through onboarding as a new user)
- * CASE 4: New user logged in during onboarding, theme installed (Go through onboarding as a new user and install theme)
- * CASE 5: No user logged in during onboarding, no theme installed, then log in new user (Login new user after onboarding skipped)
- ** CASE 6: No user logged in during onboarding, theme installed, then log in new user (Go through onboarding and install theme)
- */
 
 // CASE 1: Old user logged in during onboarding, no theme installed
 test('Go through onboarding', async t => {

@@ -839,8 +839,10 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     // special handling of the default theme for a user who installed
     // a theme during onboarding. NOTE: this will be set to false after
     // onboarding in the dual output service
-    if (serverCollections.length === 0) {
+    if (!serverCollections || serverCollections.length === 0) {
       this.newUserFirstLogin = true;
+    } else {
+      this.newUserFirstLogin = false;
     }
 
     let failed = false;

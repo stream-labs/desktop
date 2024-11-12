@@ -686,7 +686,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     const horizontalNode = node.display === 'horizontal' ? node : partnerNode;
     const verticalNode = node.display === 'vertical' ? node : partnerNode;
     const matchVisibility = node.display === 'horizontal';
-    const { visible, output, ...settings } = Object.assign(verticalNode.getSettings());
+    const { visible, ...settings } = Object.assign(verticalNode.getSettings());
     const verticalNodeId = verticalNode.id;
 
     // remove old node
@@ -700,7 +700,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       verticalNodeId,
       horizontalNode.sourceId,
     ) as SceneItem;
-    newPartner.setSettings(settings);
+    const context = this.videoSettingsService.contexts[newPartner.display];
+    newPartner.setSettings({ ...settings, output: context });
     newPartner.setVisibility(visible);
 
     return partnerNode;

@@ -317,6 +317,27 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
     );
   }
 
+  get createDefaultNewUserScene() {
+    const creationDate = this.userService.state?.createdAt;
+
+    if (!creationDate) {
+      return this.sceneCollectionsService.newUserFirstLogin && !this.existingSceneCollections;
+    }
+
+    const now = new Date().getTime();
+    const creationTime = new Date(creationDate).getTime();
+    const millisecondsInAnHour = 1000 * 60 * 60;
+
+    const isWithinCreationDateRange =
+      creationTime < now && creationTime - now < millisecondsInAnHour * 6;
+
+    return (
+      !isWithinCreationDateRange &&
+      this.sceneCollectionsService.newUserFirstLogin &&
+      !this.existingSceneCollections
+    );
+  }
+
   init() {
     this.setExistingCollections();
   }
@@ -362,7 +383,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
     // On their first login, users should have dual output mode enabled by default.
     // If the user has not selected a scene collection during onboarding, add a few
     // default sources to the default scene collection.
-    if (this.sceneCollectionsService.newUserFirstLogin && !this.existingSceneCollections) {
+    if (this.createDefaultNewUserScene) {
       this.dualOutputService.setupDefaultSources();
       this.sceneCollectionsService.newUserFirstLogin = false;
     }

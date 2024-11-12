@@ -498,6 +498,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     isOnboardingTest: boolean = false,
     isNewUser: boolean = false,
   ) {
+    if (!Utils.isTestMode()) return;
+
     const service = getPlatformService(auth.primaryPlatform);
     this.streamSettingsService.resetStreamSettings();
     await this.login(service, auth);

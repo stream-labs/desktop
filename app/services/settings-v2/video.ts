@@ -283,7 +283,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
    * @param display - Optional, the context's display name
    * @returns Boolean denoting success
    */
-  private establishVideoContext(display: TDisplayType = 'horizontal') {
+  establishVideoContext(display: TDisplayType = 'horizontal') {
     if (this.contexts[display]) return;
     this.SET_VIDEO_CONTEXT(display);
     this.contexts[display] = VideoFactory.create();
@@ -294,12 +294,20 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     Video.video = this.state.horizontal;
     Video.legacySettings = this.state.horizontal;
 
-    // ensure vertical context as the same fps settings as the horizontal context
     if (display === 'vertical') {
+      // ensure vertical context as the same fps settings as the horizontal context
       const updated = this.syncFPSSettings();
       if (updated) {
         this.settingsService.refreshVideoSettings();
       }
+
+      // ensure that the v1 video resolution settings are the same as the horizontal context
+      this.settingsService.setSettingValue('Video', 'Base', `${this.baseWidth}x${this.baseHeight}`);
+      this.settingsService.setSettingValue(
+        'Video',
+        'Output',
+        `${this.outputResolutions.horizontal.outputWidth}x${this.outputResolutions.horizontal.outputHeight}`,
+      );
     }
 
     return !!this.contexts[display];
