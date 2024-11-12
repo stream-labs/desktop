@@ -121,12 +121,13 @@ export default function AiHighlighterToggle({
                         height: '187px',
                         display: 'grid',
                         placeContent: 'center',
-                        backgroundColor: 'gray',
+                        backgroundImage:
+                          'url(https://slobs-cdn.streamlabs.com/media/highlighter-image.png)',
+                        backgroundPosition: 'center',
+                        backgroundSize: 'contain',
+                        backgroundRepeat: 'no-repeat',
                       }}
-                    >
-                      TODO: <br />
-                      explainer image
-                    </div>
+                    ></div>
                   </div>
                 </div>
               </>

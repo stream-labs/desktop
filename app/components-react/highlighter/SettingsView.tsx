@@ -24,7 +24,6 @@ export default function SettingsView({
   const { HotkeysService, SettingsService, StreamingService, HighlighterService } = Services;
   const [hotkey, setHotkey] = useState<IHotkey | null>(null);
   const hotkeyRef = useRef<IHotkey | null>(null);
-  const [useManualHighlighter, setUseManualHighlighter] = useState<boolean>(!!hotkey?.bindings[0]);
 
   const v = useVuex(() => ({
     settingsValues: SettingsService.views.values,
@@ -60,7 +59,6 @@ export default function SettingsView({
   useEffect(() => {
     HotkeysService.actions.return.getGeneralHotkeyByName('SAVE_REPLAY').then(hotkey => {
       if (hotkey) setHotkey(hotkey);
-      if (hotkey) setUseManualHighlighter(true);
     });
   }, []);
 
@@ -81,8 +79,8 @@ export default function SettingsView({
 
   function completedStepHeading(title: string) {
     return (
-      <h3>
-        <CheckCircleOutlined style={{ color: 'var(--teal)', fontSize: 24, marginRight: 8 }} />
+      <h3 style={{ height: '32px' }}>
+        {/* <CheckCircleOutlined style={{ color: 'var(--teal)', fontSize: 24, marginRight: 8 }} /> */}
         <span style={{ lineHeight: '24px', verticalAlign: 'top' }}>{title}</span>
       </h3>
     );
@@ -90,7 +88,7 @@ export default function SettingsView({
 
   function incompleteStepHeading(title: string) {
     return (
-      <h3>
+      <h3 style={{ height: '32px' }}>
         <InfoCircleOutlined style={{ color: 'var(--info)', fontSize: 24, marginRight: 8 }} />
         <span style={{ lineHeight: '24px', verticalAlign: 'top' }}>{title}</span>
       </h3>
@@ -107,6 +105,23 @@ export default function SettingsView({
 
   function toggleManualHighlighter() {
     //TODO: add code to disable manual highlighter again
+  }
+
+  function headerBarTag(text: string) {
+    return (
+      <div
+        style={{
+          margin: 0,
+          marginLeft: '4px',
+          fontSize: '14px',
+          padding: '2px 6px',
+          borderRadius: '4px',
+          backgroundColor: '#2B383F',
+        }}
+      >
+        <p style={{ margin: 0 }}>{text}</p>
+      </div>
+    );
   }
 
   return (
@@ -130,157 +145,173 @@ export default function SettingsView({
         </div>
       </div>
 
-      <Scrollable style={{ flexGrow: 1, padding: '20px 0 20px 20px', width: '100%' }}>
-        <div style={{ display: 'flex' }}>
+      <Scrollable style={{ flexGrow: 1, padding: '20px 20px 20px 20px', width: '100%' }}>
+        <div
+          style={{
+            display: 'flex',
+            backgroundColor: '#09161D',
+            padding: '56px',
+            borderRadius: '24px',
+            gap: '24px',
+          }}
+        >
           <div className={styles.cardWrapper}>
             <div className={styles.highlighterCard}>
               <div className={styles.cardHeaderbarWrapper}>
                 <div className={styles.cardHeaderbar}>
                   <i style={{ margin: 0, fontSize: '20px' }} className="icon-highlighter"></i>
                   <h3 style={{ margin: 0, fontSize: '20px' }}> Ai Highlighter</h3>
+                  {headerBarTag('For Fortnite streams (Beta)')}
                 </div>
-                <SwitchInput value={v.useAiHighlighter} onChange={toggleUseAiHighlighter} />
               </div>
 
-              <p>
+              <p style={{ margin: 0 }}>
                 The AI highlighter automatically detects highlights in your stream and creates a
                 highlight video for you after you finished your stream.
               </p>
 
+              <SwitchInput
+                style={{ margin: 0, marginLeft: '-10px' }}
+                size="default"
+                value={v.useAiHighlighter}
+                onChange={toggleUseAiHighlighter}
+              />
               <div
                 style={{
-                  backgroundColor: '#17242D',
-                  padding: '16px',
-                  display: 'flex',
-                  gap: '8px',
-                  borderRadius: '8px',
+                  position: 'absolute',
+                  right: 0,
+                  bottom: 0,
+                  borderRadius: '16px 0 9px 0',
+                  padding: '8px',
+                  paddingBottom: '5px',
+                  backgroundColor: '#2b5bd7',
+                  height: 'fit-content',
                 }}
               >
-                <i
-                  style={{ margin: 0, paddingTop: '4px', opacity: '0.7' }}
-                  className="icon-information"
-                ></i>
-                <p style={{ margin: 0, opacity: '0.7' }}>
-                  Your streams will automatically be recorded in the background so that the
-                  highlights can be detected afterwards.
-                </p>
+                Recommended
               </div>
             </div>
-            <div className={styles.highlighterCard}>
+            <div className={styles.manualCard}>
               <div className={styles.cardHeaderbarWrapper}>
                 <div className={styles.cardHeaderbar}>
-                  <i style={{ margin: 0, fontSize: '20px' }} className="icon-hotkeys"></i>
-
-                  <h3 style={{ margin: 0, fontSize: '20px' }}> Manual highlighter</h3>
+                  <h3 style={{ margin: 0, fontSize: '20px' }}> Or use the manual highlighter</h3>
                 </div>
-
-                <SwitchInput
-                  value={useManualHighlighter}
-                  onChange={() => setUseManualHighlighter(!useManualHighlighter)}
-                />
               </div>
-
               <p>
                 The hotkey highlighter allows you to clip the best moments during your livestream
                 manually and edit them together afterwards.
               </p>
-              {useManualHighlighter && (
-                <>
-                  {/* TODO: Check if it is fine to only show the step if it is not defined */}
-                  {!v.isStreaming && !correctlyConfigured && (
-                    <div className="section">
-                      {correctlyConfigured
-                        ? completedStepHeading($t('Configure the replay buffer'))
-                        : incompleteStepHeading($t('Configure the replay buffer'))}
-                      {correctlyConfigured ? (
-                        <div>{$t('The replay buffer is correctly configured')}</div>
-                      ) : (
-                        <Button onClick={configure}>{$t('Configure')}</Button>
-                      )}
-                    </div>
-                  )}
-                  {!v.isStreaming && (
-                    <div className="section">
-                      {completedStepHeading($t('Adjust replay duration'))}
-                      <div>
-                        {$t(
-                          'Set the duration of captured replays. You can always trim them down later.',
-                        )}
-                      </div>
-                      <Form layout="inline">
-                        <SliderInput
-                          style={{ width: 400, marginTop: 8 }}
-                          label={$t('Replay Duration')}
-                          value={v.settingsValues.Output.RecRBTime}
-                          onChange={setReplayTime}
-                          min={1}
-                          max={120}
-                          step={1}
-                          debounce={200}
-                          hasNumberInput={false}
-                          tooltipPlacement="top"
-                          tipFormatter={v => `${v}s`}
-                        />
-                      </Form>
-                    </div>
-                  )}
-                  {!v.isStreaming && (
-                    <div className="section">
-                      {hotkey?.bindings.length
-                        ? completedStepHeading($t('Set a hotkey to capture replays'))
-                        : incompleteStepHeading($t('Set a hotkey to capture replays'))}
-                      {hotkey && (
-                        <HotkeyBinding
-                          hotkey={hotkey}
-                          binding={hotkey.bindings[0] ?? null}
-                          onBind={binding => {
-                            const newHotkey = { ...hotkey };
-                            newHotkey.bindings.splice(0, 1, binding);
-                            setHotkey(newHotkey);
-                            hotkeyRef.current = newHotkey;
-                          }}
-                        />
-                      )}
-                    </div>
-                  )}
-
+              <div style={{ display: 'flex', gap: '16px' }}>
+                {/* TODO: Check if it is fine to only show the step if it is not defined */}
+                {/* {!v.isStreaming && !correctlyConfigured && (
                   <div className="section">
-                    {incompleteStepHeading($t('Capture a replay'))}
-                    {!!hotkey?.bindings.length && (
-                      <div>
-                        <Translate
-                          message={$t('highlighterHotkeyInstructions', {
-                            bindingStr: getBindingString(hotkey.bindings[0]),
-                          })}
-                        />
-                      </div>
-                    )}
-                    {!hotkey?.bindings.length && (
-                      <div>
-                        {$t(
-                          'Start streaming and capture a replay. Check back here after your stream.',
-                        )}
-                      </div>
+                    {correctlyConfigured
+                      ? completedStepHeading($t('Configure the replay buffer'))
+                      : incompleteStepHeading($t('Configure the replay buffer'))}
+                    {correctlyConfigured ? (
+                      <div>{$t('The replay buffer is correctly configured')}</div>
+                    ) : (
+                      <Button onClick={configure}>{$t('Configure')}</Button>
                     )}
                   </div>
-                </>
-              )}
+                )} */}
+                {v.isStreaming && (
+                  <div className={styles.settingSection} style={{ width: '100%' }}>
+                    <p>End your stream to change the Hotkey or the replay duration.</p>
+                  </div>
+                )}
+
+                {!v.isStreaming && (
+                  <div
+                    className={styles.settingSection}
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    {hotkey?.bindings.length
+                      ? completedStepHeading($t('Set a hotkey to capture replays'))
+                      : incompleteStepHeading($t('Set a hotkey to capture replays'))}
+                    {hotkey && (
+                      //TODO: if now label is added, remove the min width of the label div and remove the -16 margin left here
+                      <HotkeyBinding
+                        style={{ width: 'calc(100% + 14px)', marginLeft: '-10px' }}
+                        hotkey={hotkey}
+                        binding={hotkey.bindings[0] ?? null}
+                        onBind={binding => {
+                          const newHotkey = { ...hotkey };
+                          newHotkey.bindings.splice(0, 1, binding);
+                          setHotkey(newHotkey);
+                          hotkeyRef.current = newHotkey;
+                        }}
+                      />
+                    )}
+                  </div>
+                )}
+                {!v.isStreaming && (
+                  <div className={styles.settingSection} style={{ width: '100%' }}>
+                    {completedStepHeading($t('Adjust replay duration'))}
+                    {/* <div>
+                      {$t(
+                        'Set the duration of captured replays. You can always trim them down later.',
+                      )}
+                    </div> */}
+                    <Form layout="inline">
+                      <SliderInput
+                        style={{ width: 'calc(100% + 14px)', marginLeft: '-10px' }}
+                        // label={$t('Replay Duration')}
+                        label={null}
+                        value={v.settingsValues.Output.RecRBTime}
+                        onChange={setReplayTime}
+                        min={1}
+                        max={120}
+                        step={1}
+                        debounce={200}
+                        hasNumberInput={false}
+                        tooltipPlacement="top"
+                        tipFormatter={v => `${v}s`}
+                      />
+                    </Form>
+                  </div>
+                )}
+                {/* <div className="section">
+                  {incompleteStepHeading($t('Capture a replay'))}
+                  {!!hotkey?.bindings.length && (
+                    <div>
+                      <Translate
+                        message={$t('highlighterHotkeyInstructions', {
+                          bindingStr: getBindingString(hotkey.bindings[0]),
+                        })}
+                      />
+                    </div>
+                  )}
+                  {!hotkey?.bindings.length && (
+                    <div>
+                      {$t(
+                        'Start streaming and capture a replay. Check back here after your stream.',
+                      )}
+                    </div>
+                  )}
+                </div> */}
+              </div>
+              {/* <a onClick={close}>{$t('Or, import a clip from your computer')}</a> */}
             </div>
-            <a onClick={close}>{$t('Or, import a clip from your computer')}</a>
           </div>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', paddingLeft: 24 }}>
-              <video
-                style={{
-                  width: '100%',
-                  outline: 'none',
-                }}
-                controls
-                src="https://slobs-cdn.streamlabs.com/media/highlighter+promo+2.mp4"
-                poster="https://slobs-cdn.streamlabs.com/media/highlighter-video-thumbnail.png"
-              />
-            </div>
-          </div>
+
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              paddingLeft: 24,
+              width: '100%',
+              backgroundImage: 'url(https://slobs-cdn.streamlabs.com/media/highlighter-image.png)',
+              backgroundPosition: 'center',
+              backgroundSize: 'contain',
+              backgroundRepeat: 'no-repeat',
+            }}
+          ></div>
         </div>
       </Scrollable>
     </div>

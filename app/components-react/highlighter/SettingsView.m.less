@@ -1,10 +1,10 @@
-@import "../../styles/index";
-
+@import '../../styles/index';
 
 .settings-view-root {
   position: relative;
 
-  :global(.ant-modal-wrap), :global(.ant-modal-mask) {
+  :global(.ant-modal-wrap),
+  :global(.ant-modal-mask) {
     position: absolute;
   }
 
@@ -14,31 +14,54 @@
   }
 }
 
-
-.card-wrapper{
-
+.card-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 48px;
   max-width: 700px;
+  // min-width: 500px;
   width: 100%;
 }
 
-
-.highlighter-card{
-  background-color: #2B383F;
+.highlighter-card {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  position: relative;
+  background-color: #17242d;
   padding: 40px;
+  border-radius: 16px;
+  border: solid 2px #2b5bd7;
+}
+
+.manual-card {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  position: relative;
+  // background-color: #2b383f;
+  // padding: 40px;
   border-radius: 10px;
 }
 
-.card-headerbar-wrapper{
-display: flex;
-align-items: start;
-justify-content: space-between;
+.card-headerbar-wrapper {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
 }
 
-.card-headerbar{
+.card-headerbar {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.setting-section {
+  background-color: #17242d;
+  h3 {
+    color: #bdc2c4;
   }
+
+  padding: 24px;
+  border-radius: 16px;
+}
