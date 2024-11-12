@@ -79,7 +79,7 @@ export default function SettingsView({
 
   function completedStepHeading(title: string) {
     return (
-      <h3 style={{ height: '32px' }}>
+      <h3>
         {/* <CheckCircleOutlined style={{ color: 'var(--teal)', fontSize: 24, marginRight: 8 }} /> */}
         <span style={{ lineHeight: '24px', verticalAlign: 'top' }}>{title}</span>
       </h3>
@@ -88,7 +88,7 @@ export default function SettingsView({
 
   function incompleteStepHeading(title: string) {
     return (
-      <h3 style={{ height: '32px' }}>
+      <h3>
         <InfoCircleOutlined style={{ color: 'var(--info)', fontSize: 24, marginRight: 8 }} />
         <span style={{ lineHeight: '24px', verticalAlign: 'top' }}>{title}</span>
       </h3>
