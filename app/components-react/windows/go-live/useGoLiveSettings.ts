@@ -370,6 +370,10 @@ export class GoLiveSettingsModule {
   get isRestreamEnabled() {
     return Services.RestreamService.views.canEnableRestream;
   }
+
+  get recommendedColorSpaceWarnings() {
+    return Services.SettingsService.views.recommendedColorSpaceWarnings;
+  }
 }
 
 export function useGoLiveSettings() {

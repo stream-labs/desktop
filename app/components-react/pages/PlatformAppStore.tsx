@@ -1,11 +1,24 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Utils from 'services/utils';
+import urlLib from 'url';
 import BrowserView from 'components-react/shared/BrowserView';
 import { GuestApiHandler } from 'util/guest-api-handler';
 import * as remote from '@electron/remote';
 import { Services } from 'components-react/service-provider';
+
 export default function PlatformAppStore(p: { params: { appId?: string; type?: string } }) {
   const { UserService, PlatformAppsService, PlatformAppStoreService, NavigationService } = Services;
+  const [platformAppsUrl, setPlatformAppsUrl] = useState('');
+
+  useEffect(() => {
+    async function getPlatformAppsUrl() {
+      const url = await UserService.views.appStoreUrl(p.params);
+      if (!url) return;
+      setPlatformAppsUrl(url);
+    }
+
+    getPlatformAppsUrl();
+  }, [p.params]);
 
   function onBrowserViewReady(view: Electron.BrowserView) {
     new GuestApiHandler().exposeApi(view.webContents.id, {
@@ -13,6 +26,16 @@ export default function PlatformAppStore(p: { params: { appId?: string; type?: s
       openLinkInBrowser,
       onPaypalAuthSuccess,
       navigateToApp,
+    });
+
+    view.webContents.setWindowOpenHandler(details => {
+      const protocol = urlLib.parse(details.url).protocol;
+
+      if (protocol === 'http:' || protocol === 'https:') {
+        remote.shell.openExternal(details.url);
+      }
+
+      return { action: 'deny' };
     });
 
     view.webContents.on('did-finish-load', () => {
@@ -44,10 +67,11 @@ export default function PlatformAppStore(p: { params: { appId?: string; type?: s
     NavigationService.actions.navigate('PlatformAppMainPage', { appId });
   }
 
+  if (!platformAppsUrl) return <></>;
   return (
     <BrowserView
       style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}
-      src={UserService.views.appStoreUrl(p.params)}
+      src={platformAppsUrl}
       onReady={onBrowserViewReady}
       enableGuestApi
     />

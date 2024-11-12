@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
+import cx from 'classnames';
 import * as remote from '@electron/remote';
 import { Tooltip } from 'antd';
 import { $t } from 'services/i18n';
@@ -14,6 +15,14 @@ import { useVuex } from '../hooks';
 import Translate from 'components-react/shared/Translate';
 import uuid from 'uuid/v4';
 import { EMenuItemKey } from 'services/side-nav';
+import { $i } from 'services/utils';
+import { IRecordingEntry } from 'services/recording-mode';
+
+interface IRecordingHistoryStore {
+  showSLIDModal: boolean;
+  showEditModal: boolean;
+  fileEdited: IRecordingEntry | null;
+}
 
 const RecordingHistoryCtx = React.createContext<RecordingHistoryController | null>(null);
 
@@ -24,7 +33,11 @@ class RecordingHistoryController {
   private NotificationsService = Services.NotificationsService;
   private HighlighterService = Services.HighlighterService;
   private NavigationService = Services.NavigationService;
-  store = initStore({ showSLIDModal: false });
+  store = initStore<IRecordingHistoryStore>({
+    showSLIDModal: false,
+    showEditModal: false,
+    fileEdited: null,
+  });
 
   get recordings() {
     return this.RecordingModeService.views.sortedRecordings;
@@ -61,8 +74,13 @@ class RecordingHistoryController {
       },
       {
         label: $t('Edit'),
-        value: 'videoeditor',
-        icon: 'icon-play-round',
+        value: 'edit',
+        icon: 'icon-trim',
+      },
+      {
+        label: '',
+        value: 'remove',
+        icon: 'icon-trash',
       },
     ];
     if (this.hasYoutube) {
@@ -76,6 +94,31 @@ class RecordingHistoryController {
     return opts;
   }
 
+  get editOptions() {
+    return [
+      {
+        value: 'videoeditor',
+        label: 'Video Editor',
+        description: $t('Edit video professionally from your browser with Video Editor'),
+        src: 'video-editor.png',
+      },
+      {
+        value: 'crossclip',
+        label: 'Cross Clip',
+        description: $t(
+          'Turn your videos into mobile-friendly short-form TikToks, Reels, and Shorts with Cross Clip',
+        ),
+        src: 'crossclip.png',
+      },
+      {
+        value: 'typestudio',
+        label: 'Podcast Edtior',
+        description: $t('Polish your videos with text-based and AI powered Podcast Editor'),
+        src: 'podcast-editor.png',
+      },
+    ];
+  }
+
   postError(message: string) {
     this.NotificationsService.actions.push({
       message,
@@ -84,13 +127,13 @@ class RecordingHistoryController {
     });
   }
 
-  handleSelect(filename: string, platform: string) {
+  handleSelect(recording: IRecordingEntry, platform: string) {
     if (this.uploadInfo.uploading) {
       this.postError($t('Upload already in progress'));
       return;
     }
     if (platform === 'highlighter') {
-      this.HighlighterService.actions.flow(filename, {
+      this.HighlighterService.actions.flow(recording.filename, {
         game: 'forntnite',
         id: 'rec_' + uuid(),
       });
@@ -102,9 +145,13 @@ class RecordingHistoryController {
       return;
     }
 
-    if (platform === 'youtube') return this.uploadToYoutube(filename);
+    if (platform === 'youtube') return this.uploadToYoutube(recording.filename);
+    if (platform === 'remove') return this.removeEntry(recording.timestamp);
     if (this.hasSLID) {
-      this.uploadToStorage(filename, platform);
+      this.store.setState(s => {
+        s.showEditModal = true;
+        s.fileEdited = recording;
+      });
     } else {
       this.store.setState(s => {
         s.showSLIDModal = true;
@@ -126,6 +173,10 @@ class RecordingHistoryController {
     const id = await this.RecordingModeService.actions.return.uploadToStorage(filename, platform);
     if (!id) return;
     remote.shell.openExternal(this.SharedStorageService.views.getPlatformLink(platform, id));
+  }
+
+  removeEntry(timestamp: string) {
+    this.RecordingModeService.actions.removeRecordingEntry(timestamp);
   }
 
   showFile(filename: string) {
@@ -171,15 +222,15 @@ export function RecordingHistory() {
     Services.SettingsService.actions.showSettings('Hotkeys');
   }
 
-  function UploadActions(p: { filename: string }) {
+  function UploadActions(p: { recording: IRecordingEntry }) {
     return (
       <span className={styles.actionGroup}>
         {uploadOptions.map(opt => (
           <span
             className={styles.action}
             key={opt.value}
-            style={{ color: `var(--${opt.value === 'youtube' ? 'title' : opt.value})` }}
-            onClick={() => handleSelect(p.filename, opt.value)}
+            style={{ color: `var(--${opt.value === 'edit' ? 'teal' : 'title'})` }}
+            onClick={() => handleSelect(p.recording, opt.value)}
           >
             <i className={opt.icon} />
             &nbsp;
@@ -212,13 +263,71 @@ export function RecordingHistory() {
                   {recording.filename}
                 </span>
               </Tooltip>
-              {uploadOptions.length > 0 && <UploadActions filename={recording.filename} />}
+              {uploadOptions.length > 0 && <UploadActions recording={recording} />}
             </div>
           ))}
         </Scrollable>
       </div>
       <ExportModal />
+      <EditModal />
       {!hasSLID && <SLIDModal />}
+    </div>
+  );
+}
+
+function EditModal() {
+  const { store, editOptions, uploadToStorage } = useController(RecordingHistoryCtx);
+  const showEditModal = store.useState(s => s.showEditModal);
+  const recording = store.useState(s => s.fileEdited);
+
+  function close() {
+    store.setState(s => {
+      s.showEditModal = false;
+      s.fileEdited = null;
+    });
+  }
+
+  function editFile(platform: string) {
+    if (!recording) throw new Error('File not found');
+
+    uploadToStorage(recording.filename, platform);
+    close();
+  }
+
+  if (!showEditModal) return <></>;
+
+  return (
+    <div className={styles.modalBackdrop}>
+      <ModalLayout
+        hideFooter
+        wrapperStyle={{
+          width: '750px',
+          height: '320px',
+        }}
+        bodyStyle={{
+          width: '100%',
+          background: 'var(--section)',
+          position: 'relative',
+        }}
+      >
+        <>
+          <h2>{$t('Choose how to edit your recording')}</h2>
+          <i className={cx('icon-close', styles.closeIcon)} onClick={close} />
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}>
+            {editOptions.map(editOpt => (
+              <div
+                className={styles.editCell}
+                key={editOpt.value}
+                onClick={() => editFile(editOpt.value)}
+              >
+                <img src={$i(`images/products/${editOpt.src}`)} />
+                <span className={styles.editTitle}>{editOpt.label}</span>
+                <span>{editOpt.description}</span>
+              </div>
+            ))}
+          </div>
+        </>
+      </ModalLayout>
     </div>
   );
 }

@@ -9,7 +9,7 @@ import fs from 'fs';
 import { ServicesManager } from 'services-manager';
 import { authorizedHeaders, handleResponse } from 'util/requests';
 import { ISerializableWidget, IWidgetSource, IWidgetsServiceApi } from './widgets-api';
-import { WidgetType, WidgetDefinitions, WidgetTesters } from './widgets-data';
+import { WidgetType, WidgetDefinitions, makeWidgetTesters } from './widgets-data';
 import { mutation, StatefulService, ViewHandler } from '../core/stateful-service';
 import { WidgetSource } from './widget-source';
 import { InitAfter } from 'services/core/service-initialization-observer';
@@ -26,6 +26,8 @@ import { getWidgetsConfig } from './widgets-config';
 import { WidgetDisplayData } from '.';
 import { DualOutputService } from 'services/dual-output';
 import { TDisplayType, VideoSettingsService } from 'services/settings-v2';
+import { IncrementalRolloutService } from 'app-services';
+import { EAvailableFeatures } from 'services/incremental-rollout';
 
 export interface IWidgetSourcesState {
   widgetSources: Dictionary<IWidgetSource>;
@@ -49,14 +51,22 @@ class WidgetsServiceViews extends ViewHandler<IWidgetSourcesState> {
 
   get testers(): { name: string; url: string }[] {
     if (!this.userService.isLoggedIn) return;
-    return WidgetTesters.filter(tester => {
-      return tester.platforms.includes(this.userService.platform.type);
-    }).map(tester => {
-      return {
-        name: tester.name,
-        url: tester.url(this.hostsService.streamlabs, this.userService.platform.type),
-      };
-    });
+    const widgetTesters = makeWidgetTesters(this.hostsService.streamlabs);
+    return widgetTesters
+      .filter(tester => {
+        return tester.platforms.includes(this.userService.platform.type);
+      })
+      .map(tester => {
+        const url =
+          typeof tester.url === 'function'
+            ? tester.url(this.userService.platform.type)
+            : tester.url;
+
+        return {
+          url,
+          name: tester.name,
+        };
+      });
   }
 }
 
@@ -75,6 +85,7 @@ export class WidgetsService
   @Inject() editorCommandsService: EditorCommandsService;
   @Inject() dualOutputService: DualOutputService;
   @Inject() videoSettingsService: VideoSettingsService;
+  @Inject() incrementalRolloutService: IncrementalRolloutService;
 
   widgetDisplayData = WidgetDisplayData(); // cache widget display data
 
@@ -198,14 +209,21 @@ export class WidgetsService
   test(testerName: string) {
     const tester = this.views.testers.find(tester => tester.name === testerName);
     const headers = authorizedHeaders(this.userService.apiToken);
-    fetch(new Request(tester.url, { headers }));
+    return fetch(new Request(tester.url, { headers, method: 'POST' }));
   }
 
   @Throttle(1000)
   playAlert(alertType: TAlertType) {
     const config = this.alertsConfig[alertType];
+    const host = this.hostsService.streamlabs;
     const headers = authorizedHeaders(this.userService.apiToken);
-    fetch(new Request(config.url(), { headers }));
+
+    return fetch(
+      new Request(`https://${host}/api/v5/widgets/desktop/test/${alertType}`, {
+        headers,
+        method: 'POST',
+      }),
+    );
   }
 
   private previewSourceWatchers: Dictionary<Subscription> = {};
@@ -433,7 +451,19 @@ export class WidgetsService
   }
 
   get widgetsConfig() {
-    return getWidgetsConfig(this.hostsService.streamlabs, this.userService.widgetToken);
+    // Widgets that have been ported to the new backend API at /api/v5/widgets/desktop
+    const widgetsWithNewAPI: WidgetType[] = [];
+
+    // The new chatbox requires the new widget API, add it here if the user is under incremental
+    if (this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.newChatBox)) {
+      widgetsWithNewAPI.push(WidgetType.ChatBox);
+    }
+
+    return getWidgetsConfig(
+      this.hostsService.streamlabs,
+      this.userService.widgetToken,
+      widgetsWithNewAPI,
+    );
   }
 
   get alertsConfig() {

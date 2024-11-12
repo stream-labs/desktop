@@ -1315,6 +1315,17 @@ export class StreamingService
         eventMetadata.streamType = streamSettings.streamType;
         eventMetadata.platform = streamSettings.platform;
         eventMetadata.server = streamSettings.server;
+        eventMetadata.outputMode = this.views.isDualOutputMode ? 'dual' : 'single';
+        eventMetadata.platforms = this.views.protectedModeEnabled
+          ? [
+              ...this.views.enabledPlatforms,
+              /*
+               * This is to be consistent with `stream_end`, unsure what multiple `custom_rtmp`'s
+               * provide on their own without URL, but it could be a privacy or payload size issue.
+               */
+              ...this.views.customDestinations.filter(d => d.enabled).map(_ => 'custom_rtmp'),
+            ]
+          : ['custom_rtmp'];
 
         this.usageStatisticsService.recordEvent('stream_start', eventMetadata);
         this.usageStatisticsService.recordAnalyticsEvent('StreamingStatus', {
@@ -1563,6 +1574,7 @@ export class StreamingService
     data.viewerCounts = {};
     data.duration = Math.round(moment().diff(moment(this.state.streamingStatusTime)) / 1000);
     data.game = this.views.game;
+    data.outputMode = this.views.isDualOutputMode ? 'dual' : 'single';
 
     if (this.views.protectedModeEnabled) {
       data.platforms = this.views.enabledPlatforms;

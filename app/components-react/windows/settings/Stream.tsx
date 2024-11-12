@@ -213,7 +213,7 @@ class StreamSettingsModule {
       : 'internal';
 
     await Services.UserService.actions.return.startAuth(platform, mode, true).then(res => {
-      Services.WindowsService.actions.setWindowOnTop(true);
+      Services.WindowsService.actions.setWindowOnTop('child');
       if (res === EPlatformCallResult.Error) {
         alertAsync(
           $t(
@@ -549,7 +549,7 @@ function CustomDestinationList() {
   const destinations = customDestinations;
   const isEditMode = editCustomDestMode !== false;
   const shouldShowAddForm = editCustomDestMode === true;
-  const canAddMoreDestinations = destinations.length < 2;
+  const canAddMoreDestinations = destinations.length < 5;
   const shouldShowPrimeLabel = !isPrime && destinations.length > 0;
 
   return (

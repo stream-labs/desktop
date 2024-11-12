@@ -43,6 +43,7 @@ import {
   RecordingHistory,
   EditTransform,
   Blank,
+  MultistreamChatInfo,
 } from 'components/shared/ReactComponentList';
 
 import SourcePropertiesDeprecated from 'components/windows/SourceProperties.vue';
@@ -120,6 +121,7 @@ export function getComponents() {
     SupporterGoal,
     SubscriberGoal,
     SuperchatGoal,
+    MultistreamChatInfo,
     CharityGoal,
     Credits,
     EventList,
@@ -359,12 +361,23 @@ export class WindowsService extends StatefulService<IWindowsState> {
    * @remark copied from the external auth function
    * @param child bring child window to front
    */
-  setWindowOnTop(child: boolean = false) {
-    const win = child ? Utils.getChildWindow() : Utils.getMainWindow();
+  setWindowOnTop(window: 'child' | 'main' | 'all' = 'main') {
+    const win = window === 'child' ? Utils.getChildWindow() : Utils.getMainWindow();
     win.setAlwaysOnTop(true);
     win.show();
     win.focus();
     win.setAlwaysOnTop(false);
+
+    // by default, we only bring the main window to the front
+    // so to bring them all to the front, the child window
+    // needs to go in front of the main window
+    if (window === 'all') {
+      const child = Utils.getChildWindow();
+      child.setAlwaysOnTop(true);
+      child.show();
+      child.focus();
+      child.setAlwaysOnTop(false);
+    }
   }
 
   async closeChildWindow() {

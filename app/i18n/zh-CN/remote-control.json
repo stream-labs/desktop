@@ -1,10 +1,18 @@
 {
   "Show details": "显示详情",
   "Hide details": "隐藏详情",
-  "API token": "API 令牌",
+  "API Token": "API Token",
   "Generate new": "生成新令牌",
   "Port": "端口",
-  "IP addresses": "IP 地址",
+  "IP Addresses": "IP Addresses",
   "Click to show": "点击显示",
-  "The free Streamlabs Controller app allows you to control Streamlabs Desktop from your iOS or Android device. Scan the QR code below to begin.": "使用免费的 Streamlabs Controller 应用程序可以从 iOS 或 Android 设备控制 Streamlabs Desktop。扫描下方二维码开始。"
+  "The free Streamlabs Controller app allows you to control Streamlabs Desktop from your iOS or Android device. You must be logged in to use this feature.": "The free Streamlabs Controller app allows you to control Streamlabs Desktop from your iOS or Android device. You must be logged in to use this feature.",
+  "Allow Controller app connections": "Allow Controller app connections",
+  "Connected Devices": "Connected Devices",
+  "Disconnect": "Disconnect",
+  "No devices connected": "No devices connected",
+  "Some third party applications connect to Streamlabs Desktop via websockets connection. Toggle this to allow such connections and display connection info.": "Some third party applications connect to Streamlabs Desktop via websockets connection. Toggle this to allow such connections and display connection info.",
+  "Warning: Displaying this portion on stream may leak sensitive information.": "Warning: Displaying this portion on stream may leak sensitive information.",
+  "Allow third party connections": "Allow third party connections",
+  "Host": "Host"
 }

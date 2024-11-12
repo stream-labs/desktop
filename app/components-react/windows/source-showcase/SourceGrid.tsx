@@ -74,7 +74,7 @@ export default function SourceGrid(p: { activeTab: string }) {
   const availableSources = useMemo(() => {
     const guestCamAvailable =
       (IncrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.guestCamBeta) ||
-        IncrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.guestCaProduction)) &&
+        IncrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.guestCamProduction)) &&
       UserService.views.isLoggedIn;
 
     return SourcesService.getAvailableSourcesTypesList().filter(type => {
@@ -107,7 +107,6 @@ export default function SourceGrid(p: { activeTab: string }) {
 
   function showContent(key: string) {
     const correctKey = ['all', key].includes(p.activeTab);
-    if (UserService.state.auth?.primaryPlatform === 'tiktok' && key === 'widgets') return false;
     if (key === 'apps') {
       return correctKey && availableAppSources.length > 0;
     }

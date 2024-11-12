@@ -11,6 +11,9 @@ export function GoLiveBanner() {
   function openApplicationInfoPage() {
     remote.shell.openExternal(Services.TikTokService.applicationUrl);
     Services.DismissablesService.actions.dismiss(EDismissable.TikTokEligible);
+    Services.UsageStatisticsService.recordAnalyticsEvent('TikTokApplyPrompt', {
+      component: 'GoLiveWindowBanner',
+    });
   }
 
   return (

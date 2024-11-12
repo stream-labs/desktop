@@ -206,6 +206,11 @@ export class SourcesService extends StatefulService<ISourcesState> {
    */
   propertiesManagers: Dictionary<IActivePropertyManager> = {};
 
+  /**
+   * Sources that failed to create obs inputs on initial load
+   */
+  missingInputs: string[] = [];
+
   protected init() {
     obs.NodeObs.RegisterSourceCallback((objs: IObsSourceCallbackInfo[]) =>
       this.handleSourceCallback(objs),
@@ -288,7 +293,10 @@ export class SourcesService extends StatefulService<ISourcesState> {
   private UPDATE_SOURCE(sourcePatch: TPatch<ISource>) {
     if (this.state.sources[sourcePatch.id]) {
       Object.assign(this.state.sources[sourcePatch.id], sourcePatch);
+    } else if (this.state.temporarySources[sourcePatch.id]) {
+      Object.assign(this.state.temporarySources[sourcePatch.id], sourcePatch);
     } else {
+      this.state.temporarySources[sourcePatch.id] = {} as ISource;
       Object.assign(this.state.temporarySources[sourcePatch.id], sourcePatch);
     }
   }
@@ -299,7 +307,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
     settings: Dictionary<any> = {},
     options: ISourceAddOptions = {},
   ): Source {
-    const id: string = options.sourceId || `${type}_${uuid()}`;
+    const id: string = options?.sourceId || `${type}_${uuid()}`;
     const obsInputSettings = this.getObsSourceCreateSettings(type, settings);
 
     // Universally disabled for security reasons
@@ -307,30 +315,41 @@ export class SourcesService extends StatefulService<ISourcesState> {
       obsInputSettings.is_media_flag = false;
     }
 
-    const obsInput = obs.InputFactory.create(type, id, obsInputSettings);
+    // This call to obs to create the input must be caught, otherwise it causes an app crash
+    try {
+      const obsInput = obs.InputFactory.create(type, id, obsInputSettings);
 
-    // For Guest Cam, we default sources to monitor so the streamer can hear guests
-    if (type === 'mediasoupconnector' && !options.audioSettings?.monitoringType) {
-      options.audioSettings ??= {};
-      options.audioSettings.monitoringType = EMonitoringType.MonitoringOnly;
-    }
+      // For Guest Cam, we default sources to monitor so the streamer can hear guests
+      if (type === 'mediasoupconnector' && !options.audioSettings?.monitoringType) {
+        options.audioSettings ??= {};
+        options.audioSettings.monitoringType = EMonitoringType.MonitoringOnly;
+      }
 
-    this.addSource(obsInput, name, options);
+      this.addSource(obsInput, name, options);
 
-    if (
-      this.defaultHardwareService.state.defaultVideoDevice === obsInputSettings.video_device_id &&
-      this.defaultHardwareService.state.presetFilter !== '' &&
-      this.defaultHardwareService.state.presetFilter !== 'none'
-    ) {
-      this.sourceFiltersService.addPresetFilter(id, this.defaultHardwareService.state.presetFilter);
-    }
+      if (
+        this.defaultHardwareService.state.defaultVideoDevice === obsInputSettings.video_device_id &&
+        this.defaultHardwareService.state.presetFilter !== '' &&
+        this.defaultHardwareService.state.presetFilter !== 'none'
+      ) {
+        this.sourceFiltersService.addPresetFilter(
+          id,
+          this.defaultHardwareService.state.presetFilter,
+        );
+      }
 
-    if (
-      this.defaultHardwareService.state.defaultVideoDevice === obsInputSettings.device &&
-      this.defaultHardwareService.state.presetFilter !== '' &&
-      this.defaultHardwareService.state.presetFilter !== 'none'
-    ) {
-      this.sourceFiltersService.addPresetFilter(id, this.defaultHardwareService.state.presetFilter);
+      if (
+        this.defaultHardwareService.state.defaultVideoDevice === obsInputSettings.device &&
+        this.defaultHardwareService.state.presetFilter !== '' &&
+        this.defaultHardwareService.state.presetFilter !== 'none'
+      ) {
+        this.sourceFiltersService.addPresetFilter(
+          id,
+          this.defaultHardwareService.state.presetFilter,
+        );
+      }
+    } catch (e: unknown) {
+      console.log('Error creating obs source: ', e);
     }
 
     return this.views.getSource(id)!;

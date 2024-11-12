@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import without from 'lodash/without';
 import { Subject } from 'rxjs';
+import { filter, take, takeUntil, tap } from 'rxjs/operators';
 import { mutation, StatefulService } from 'services/core/stateful-service';
 import { TransitionsService } from 'services/transitions';
 import { WindowsService } from 'services/windows';
@@ -12,8 +13,9 @@ import { $t } from 'services/i18n';
 import namingHelpers from 'util/NamingHelpers';
 import uuid from 'uuid/v4';
 import { DualOutputService } from 'services/dual-output';
+import { SceneCollectionsService } from 'services/scene-collections';
 import { TDisplayType } from 'services/settings-v2/video';
-import { InitAfter, ViewHandler } from 'services/core';
+import { ExecuteInWorkerProcess, InitAfter, ViewHandler } from 'services/core';
 
 export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
 
@@ -271,6 +273,7 @@ class ScenesViews extends ViewHandler<IScenesState> {
 @InitAfter('DualOutputService')
 export class ScenesService extends StatefulService<IScenesState> {
   @Inject() private dualOutputService: DualOutputService;
+  @Inject() private sceneCollectionsService: SceneCollectionsService;
 
   static initialState: IScenesState = {
     activeSceneId: '',
@@ -440,6 +443,40 @@ export class ScenesService extends StatefulService<IScenesState> {
 
   getModel(): IScenesState {
     return this.state;
+  }
+
+  createAndAddSource(
+    sceneId: string,
+    sourceName: string,
+    sourceType: TSourceType,
+    settings: Dictionary<unknown>,
+  ) {
+    const scene = this.views.getScene(sceneId);
+    if (!scene) {
+      throw new Error(`Can't find scene with ID: ${sceneId}`);
+    }
+
+    const sceneItem = scene.createAndAddSource(sourceName, sourceType, settings);
+
+    const createVerticalNode = () => this.dualOutputService.createPartnerNode(sceneItem);
+
+    if (this.dualOutputService.state.dualOutputMode) {
+      createVerticalNode();
+    } else {
+      // Schedule vertical node to be created if the user toggles on dual output in the same session
+      this.dualOutputService.dualOutputModeChanged
+        .pipe(
+          // If we switch collections before we enable dual output drop it
+          // we don't wanna create nodes on inactive scene collections
+          takeUntil(this.sceneCollectionsService.collectionWillSwitch),
+          filter(gotEnabled => !!gotEnabled),
+          take(1),
+          tap(createVerticalNode),
+        )
+        .subscribe();
+    }
+
+    return sceneItem.sceneItemId;
   }
 
   // TODO: Remove all of this in favor of the new "views" methods
