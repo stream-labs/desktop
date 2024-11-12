@@ -1,9 +1,8 @@
-import React, { CSSProperties, useMemo } from 'react';
+import React, { CSSProperties } from 'react';
 import { $t } from 'services/i18n';
 import { useVuex } from 'components-react/hooks';
 import { Services } from 'components-react/service-provider';
 import { RadioInput } from './inputs';
-import { displayLabels } from 'services/dual-output';
 import { TDisplayType } from 'services/settings-v2';
 import { TPlatform, platformLabels } from 'services/platforms';
 import { useGoLiveSettings } from 'components-react/windows/go-live/useGoLiveSettings';
@@ -37,11 +36,11 @@ export default function DisplaySelector(p: IDisplaySelectorProps) {
 
   const displays = [
     {
-      label: displayLabels('horizontal') ?? $t('Horizontal'),
+      label: $t('Horizontal'),
       value: 'horizontal',
     },
     {
-      label: displayLabels('vertical') ?? $t('Vertical'),
+      label: $t('Vertical'),
       value: 'vertical',
     },
   ];

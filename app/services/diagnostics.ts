@@ -532,7 +532,7 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
 
     // get settings for all active displays
     displays.forEach((display: TDisplayType) => {
-      const setting = this.videoSettingsService.formatVideoSettings(display, true);
+      const setting = this.videoSettingsService.formatVideoDiagValues(display);
       const maxHeight = display === 'horizontal' ? 1080 : 1280;
       const minHeight = 720;
 
