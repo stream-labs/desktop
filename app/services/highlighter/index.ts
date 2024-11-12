@@ -1893,9 +1893,10 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
             '-i',
             videoUri,
             '-c:v',
-            codec === 'h264' ? 'copy' : 'libx264',
+            // codec === 'h264' ? 'copy' : 'libx264',
+            'libx264',
             '-c:a',
-            'copy',
+            'aac',
             '-strict',
             'experimental',
             '-b:a',
@@ -1990,7 +1991,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     clips.forEach(clip => {
       const aiClip = isAiClip(clip) ? clip : undefined;
       const round = aiClip?.aiInfo?.metadata?.round ?? undefined;
-      if (round) {
+      if (aiClip?.aiInfo?.inputs && round) {
         if (!roundsMap[round]) {
           roundsMap[round] = [];
         }

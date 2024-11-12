@@ -104,9 +104,12 @@ function getTypeWordingFromType(
 
 function getInputTypeCount(clips: TClip[]): { [type: string]: number } {
   const typeCounts: { [type: string]: number } = {};
+  if (clips.length === 0) {
+    return typeCounts;
+  }
   clips.forEach(clip => {
     if (isAiClip(clip)) {
-      clip.aiInfo.inputs.forEach(input => {
+      clip.aiInfo.inputs?.forEach(input => {
         const type = input.type;
         if (typeCounts[type]) {
           typeCounts[type] += 1;
