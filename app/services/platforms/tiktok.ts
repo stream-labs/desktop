@@ -9,7 +9,7 @@ import {
   TPlatformCapability,
 } from './index';
 import { authorizedHeaders, jfetch } from '../../util/requests';
-import { throwStreamError } from '../streaming/stream-error';
+import { throwStreamError, formatStreamErrorMessage } from '../streaming/stream-error';
 import { platformAuthorizedRequest } from './utils';
 import { getOS } from 'util/operating-systems';
 import { IGoLiveSettings } from '../streaming';
@@ -340,7 +340,7 @@ export class TikTokService
    * of Streamlabs attempts to go live to TikTok, the first stream will be ended
    * and Desktop will enter a reconnecting state, which eventually times out.
    */
-  async startStream(opts: ITikTokStartStreamOptions) {
+  async startStream(opts: ITikTokStartStreamOptions): Promise<ITikTokStartStreamResponse> {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/tiktok/stream/start`;
     const headers = authorizedHeaders(this.userService.apiToken!);
@@ -359,7 +359,16 @@ export class TikTokService
 
     const request = new Request(url, { headers, method: 'POST', body });
 
-    return jfetch<ITikTokStartStreamResponse>(request);
+    return jfetch<ITikTokStartStreamResponse>(request).catch((e: ITikTokError) => {
+      console.error('Error streaming to TikTok:', e);
+
+      if (e.status === 422) {
+        const message = `TikTok user blocked. Error: ${e.message}`;
+        formatStreamErrorMessage('TIKTOK_STREAM_SCOPE_MISSING', message);
+        throwStreamError('TIKTOK_STREAM_SCOPE_MISSING', e);
+      }
+      throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED', e);
+    });
   }
 
   async endStream(id: string) {
@@ -409,22 +418,31 @@ export class TikTokService
       const response = await this.fetchLiveAccessStatus();
 
       const status = response as ITikTokLiveScopeResponse;
+      const scope = this.convertScope(status.reason, status.application_status?.status);
+      this.SET_LIVE_SCOPE(scope);
 
       if (status?.audience_controls_info) {
         this.setAudienceControls(status.audience_controls_info);
       }
 
       if (status?.application_status) {
+        const applicationStatus = status.application_status?.status;
+        const timestamp = status.application_status?.timestamp;
+
+        // show prompt to apply if user has never applied or was rejected 30+ days ago
+        if (applicationStatus === 'rejected' && timestamp) {
+          this.SET_DENIED_DATE(timestamp);
+          return EPlatformCallResult.TikTokStreamScopeMissing;
+        }
+
         // show prompt to apply if user has never applied
-        if (status.application_status.status === 'never-applied') {
+        if (applicationStatus === 'never-applied') {
           return EPlatformCallResult.TikTokStreamScopeMissing;
         }
       }
 
       if (status?.user) {
-        const scope = this.convertScope(status.reason);
         this.SET_USERNAME(status.user.username);
-        this.SET_LIVE_SCOPE(scope);
 
         // Note on the 'relog' response: A user who needs to reauthenticate with TikTok
         // due a change in the scope for our api, needs to be told to unlink and remerge their account.
@@ -438,7 +456,6 @@ export class TikTokService
         this.SET_LIVE_SCOPE('relog');
         return EPlatformCallResult.TikTokScopeOutdated;
       } else {
-        this.SET_LIVE_SCOPE('denied');
         return EPlatformCallResult.TikTokStreamScopeMissing;
       }
 
@@ -486,8 +503,8 @@ export class TikTokService
         }
         return res;
       })
-      .catch(() => {
-        console.warn('Error fetching TikTok Live Access status.');
+      .catch(e => {
+        console.warn('Error fetching TikTok Live Access status: ', e);
       });
   }
 
@@ -649,7 +666,7 @@ export class TikTokService
   get promptApply(): boolean {
     // never show for approved/legacy users or logged out users
     if (
-      !this.getHasScope('denied') ||
+      !this.getHasScope('never-applied') ||
       !this.userService.state?.createdAt ||
       !this.userService.isLoggedIn
     ) {
@@ -677,7 +694,7 @@ export class TikTokService
 
   get promptReapply(): boolean {
     // prompt a user to reapply if they were rejected 30+ days ago
-    if (!this.state.dateDenied) return false;
+    if (!this.getHasScope('denied') || !this.state.dateDenied) return false;
 
     const today = new Date(Date.now());
     const deniedDate = new Date(this.state.dateDenied);
@@ -687,7 +704,10 @@ export class TikTokService
     return false;
   }
 
-  convertScope(scope: number) {
+  convertScope(scope: number, applicationStatus?: string): TTikTokLiveScopeTypes {
+    console.log('applicationStatus', applicationStatus);
+    if (applicationStatus === 'never_applied') return 'never-applied';
+
     switch (scope) {
       case ETikTokLiveScopeReason.APPROVED: {
         return 'approved';

@@ -30,8 +30,8 @@ export enum ETikTokAudienceType {
   MATURE = 1,
 }
 
-export type TTikTokLiveScopeTypes = 'approved' | 'denied' | 'legacy' | 'relog';
-export type TTikTokApplicationStatus = 'approved' | 'rejected' | 'never-applied';
+export type TTikTokLiveScopeTypes = 'approved' | 'denied' | 'legacy' | 'relog' | 'never-applied';
+export type TTikTokApplicationStatus = 'approved' | 'rejected' | 'never_applied';
 
 export interface ITikTokLiveScopeResponse {
   platform: TPlatform | string;
@@ -40,7 +40,7 @@ export interface ITikTokLiveScopeResponse {
   user?: ITikTokUserData;
   info?: any[] | null[] | undefined[] | ITikTokGame[] | ITikTokGamesData | any;
   audience_controls_info: ITikTokAudienceControlsInfo;
-  application_status: ITikTokApplicationStatus;
+  application_status?: ITikTokApplicationStatus;
 }
 
 export interface ITikTokGamesData extends ITikTokLiveScopeResponse {
@@ -88,10 +88,14 @@ export interface ITikTokUserData {
 }
 
 export interface ITikTokError {
-  code: string;
-  message: string;
-  log_id: string;
-  http_status_code: number;
+  status?: number;
+  error?: boolean;
+  success?: boolean;
+  message?: string;
+  data?: {
+    message: string;
+    code: ETikTokErrorTypes;
+  };
 }
 
 export enum ETikTokErrorTypes {
