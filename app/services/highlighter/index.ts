@@ -895,7 +895,6 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
           initialEndTime: clip.endTime,
         },
       };
-      console.log('clip', clip);
 
       this.ADD_CLIP({
         path: clip.path,
@@ -1806,9 +1805,9 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     const folderName = `${filename}-Clips-${sanitizedTitle}-${id.slice(id.length - 4, id.length)}`;
     const outputDir = path.join(videoDir, folderName);
 
+    // Check if directory for clips exists, if not create it
     try {
       try {
-        //If possible to read, directory exists, if not, catch and mkdir
         await fs.readdir(outputDir);
       } catch (error: unknown) {
         await fs.mkdir(outputDir);
@@ -1865,6 +1864,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
           }
           processedFiles.add(outputUri);
 
+          // Check if the file with that name already exists and delete it if it does
           try {
             await fs.access(outputUri);
             await fs.unlink(outputUri);
@@ -1891,8 +1891,12 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
             codec === 'h264' ? 'copy' : 'libx264',
             //'libx264',
             '-c:a',
-            'copy',
-            // 'aac',
+            // 'copy',
+            'aac',
+            // '-vsync',
+            // '2',
+            // '-async',
+            // '1',
             '-strict',
             'experimental',
             '-b:a',
