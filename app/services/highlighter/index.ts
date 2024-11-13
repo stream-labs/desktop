@@ -98,7 +98,7 @@ export interface IAiClip extends IBaseClip {
 
 export interface IInput {
   type: EHighlighterInputTypes;
-  metadata: any;
+  metadata?: any;
 }
 
 export interface IAiClipInfo {
@@ -123,17 +123,20 @@ interface ISettingsViewState {
 
 export type IViewState = TClipsViewState | IStreamViewState | ISettingsViewState;
 
-export interface IHighlighterData {
-  type: string;
-  start: number;
-  end: number;
-}
-
 // TODO: Need to clean up all of this
 export interface StreamInfoForAiHighlighter {
   id: string;
   game: string;
   title?: string;
+}
+
+export interface INewClipData {
+  path: string;
+  aiClipInfo: IAiClipInfo;
+  startTime: number;
+  endTime: number;
+  startTrim: number;
+  endTrim: number;
 }
 export interface IHighlightedStream {
   id: string;
@@ -877,10 +880,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     return;
   }
 
-  async addAiClips(
-    newClips: { path: string; aiClipInfo: IAiClipInfo; startTime: number; endTime: number }[],
-    newStreamInfo: StreamInfoForAiHighlighter,
-  ) {
+  async addAiClips(newClips: INewClipData[], newStreamInfo: StreamInfoForAiHighlighter) {
     const currentHighestOrderPosition = this.getClips(this.views.clips, newStreamInfo.id).length;
     const getHighestGlobalOrderPosition = this.getClips(this.views.clips, undefined).length;
 
@@ -895,13 +895,14 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
           initialEndTime: clip.endTime,
         },
       };
+      console.log('clip', clip);
 
       this.ADD_CLIP({
         path: clip.path,
         loaded: false,
         enabled: true,
-        startTrim: 0,
-        endTrim: 0,
+        startTrim: clip.startTrim,
+        endTrim: clip.endTrim,
         deleted: false,
         source: 'AiClip',
         aiInfo: clip.aiClipInfo,
@@ -1663,19 +1664,9 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     };
 
     await this.addStream(setStreamInfo);
-
-    const { stdout } = await execa(FFPROBE_EXE, [
-      '-v',
-      'error',
-      '-show_entries',
-      'format=duration',
-      '-of',
-      'default=noprint_wrappers=1:nokey=1',
-      filePath,
-    ]);
+    const videoDuration = await this.getVideoDuration(filePath);
     const initialTime = 30; // length to boot up process
-    const videoLength = parseFloat(stdout);
-    const variableProcessingTime = videoLength / 2;
+    const variableProcessingTime = videoDuration / 2;
     const estimatedDuration = initialTime + variableProcessingTime;
 
     let intervalId: NodeJS.Timeout;
@@ -1804,7 +1795,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     videoUri: string,
     highlighterData: IHighlight[],
     streamInfo: IHighlightedStream,
-  ): Promise<{ path: string; aiClipInfo: IAiClipInfo; startTime: number; endTime: number }[]> {
+  ): Promise<INewClipData[]> {
     const id = streamInfo.id;
     const fallbackTitle = 'awesome-stream';
     const videoDir = path.dirname(videoUri);
@@ -1828,13 +1819,11 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     }
 
     const sortedHighlights = highlighterData.sort((a, b) => a.start_time - b.start_time);
-    const results: {
-      path: string;
-      aiClipInfo: IAiClipInfo;
-      startTime: number;
-      endTime: number;
-    }[] = [];
+    const results: INewClipData[] = [];
     const processedFiles = new Set<string>();
+
+    const duration = await this.getVideoDuration(videoUri);
+    console.log('video duration', duration);
 
     // First check the codec
     const probeArgs = [
@@ -1843,7 +1832,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       '-select_streams',
       'v:0',
       '-show_entries',
-      'stream=codec_name',
+      'stream=codec_name,format=duration',
       '-of',
       'default=nokey=1:noprint_wrappers=1',
       videoUri,
@@ -1853,19 +1842,20 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       const codecResult = await execa(FFPROBE_EXE, probeArgs);
       codec = codecResult.stdout.trim();
       console.log(`Codec for ${videoUri}: ${codec}`);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(`Error checking codec for ${videoUri}:`, error);
     }
     console.time('export');
     const BATCH_SIZE = 1;
+    const DEFAULT_START_TRIM = 10;
+    const DEFAULT_END_TRIM = 10;
+
     for (let i = 0; i < sortedHighlights.length; i += BATCH_SIZE) {
       const highlightBatch = sortedHighlights.slice(i, i + BATCH_SIZE);
       const batchTasks = highlightBatch.map((highlight: IHighlight) => {
-        const start_time = highlight.start_time;
-        const end_time = highlight.end_time;
         return async () => {
-          const formattedStart = start_time.toString().padStart(6, '0');
-          const formattedEnd = end_time.toString().padStart(6, '0');
+          const formattedStart = highlight.start_time.toString().padStart(6, '0');
+          const formattedEnd = highlight.end_time.toString().padStart(6, '0');
           const outputFilename = `${folderName}-${formattedStart}-${formattedEnd}.mp4`;
           const outputUri = path.join(outputDir, outputFilename);
 
@@ -1873,7 +1863,6 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
             console.log('File already exists');
             return null;
           }
-
           processedFiles.add(outputUri);
 
           try {
@@ -1885,11 +1874,17 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
             }
           }
 
+          // Calculate new start and end times + new clip duration
+          const newClipStartTime = Math.max(0, highlight.start_time - DEFAULT_START_TRIM);
+          const actualStartTrim = highlight.start_time - newClipStartTime;
+          const newClipEndTime = Math.min(duration, highlight.end_time + DEFAULT_END_TRIM);
+          const actualEndTrim = newClipEndTime - highlight.end_time;
+
           const args = [
             '-ss',
-            start_time.toString(),
+            newClipStartTime.toString(),
             '-to',
-            end_time.toString(),
+            newClipEndTime.toString(),
             '-i',
             videoUri,
             '-c:v',
@@ -1919,16 +1914,19 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
             try {
               await subprocess;
               console.log(`Created segment: ${outputUri}`);
-              return {
+              const newClipData: INewClipData = {
                 path: outputUri,
                 aiClipInfo: {
                   inputs: highlight.inputs,
                   score: highlight.score,
                   metadata: highlight.metadata,
                 },
-                startTime: start_time,
-                endTime: end_time,
+                startTime: highlight.start_time,
+                endTime: highlight.end_time,
+                startTrim: actualStartTrim,
+                endTrim: actualEndTrim,
               };
+              return newClipData;
             } catch (error: unknown) {
               console.warn(`Error during FFMPEG execution for ${outputUri}:`, error);
               return null;
@@ -2004,6 +2002,20 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       round: parseInt(round, 10),
       inputs: roundsMap[parseInt(round, 10)],
     }));
+  }
+
+  async getVideoDuration(filePath: string): Promise<number> {
+    const { stdout } = await execa(FFPROBE_EXE, [
+      '-v',
+      'error',
+      '-show_entries',
+      'format=duration',
+      '-of',
+      'default=noprint_wrappers=1:nokey=1',
+      filePath,
+    ]);
+    const duration = parseFloat(stdout);
+    return duration;
   }
 
   enableOnlySpecificClips(clips: TClip[], streamId?: string) {

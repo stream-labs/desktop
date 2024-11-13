@@ -1,10 +1,8 @@
 import SettingsView from 'components-react/highlighter/SettingsView';
 import { useVuex } from 'components-react/hooks';
-import React, { useEffect, useState } from 'react';
-import { TClip, IHighlighterData, IViewState } from 'services/highlighter';
+import React, { useState } from 'react';
+import { IViewState } from 'services/highlighter';
 import { Services } from 'components-react/service-provider';
-import { Button } from 'antd';
-import moment from 'moment';
 import StreamView from 'components-react/highlighter/StreamView';
 import ClipsView from 'components-react/highlighter/ClipsView';
 
