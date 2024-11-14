@@ -55,7 +55,7 @@ export function InputEmojiSection({
       {includeRounds && (
         <div key={'rounds'} style={{ display: 'flex', gap: '4px' }}>
           <span key={'rounds-emoji'}> {getTypeWordingFromType('rounds', rounds).emoji} </span>{' '}
-          <span className={styles.description} key={'rounds' + 'desc'}>
+          <span className={styles.description} key={'rounds-description'}>
             {rounds} {getTypeWordingFromType('rounds', rounds).description}
           </span>
         </div>
@@ -63,7 +63,7 @@ export function InputEmojiSection({
       {filteredInputTypeMap.map(([type, count]) => (
         <div key={type} style={{ display: 'flex', gap: '4px' }}>
           <span key={type + 'emoji'}>{getTypeWordingFromType(type, count).emoji} </span>{' '}
-          <span className={styles.description} key={type + 'desc'}>
+          <span className={styles.description} key={type + 'description'}>
             {count} {getTypeWordingFromType(type, count).description}{' '}
             {!includeRounds && isDeath(type) && getGamePlacement(clips)
               ? '#' + getGamePlacement(clips)
@@ -95,7 +95,10 @@ function getTypeWordingFromType(
     case EHighlighterInputTypes.PLAYER_KNOCKED:
       return { emoji: '😵', description: count > 1 ? 'got knockeds' : 'got knocked' };
     case 'rounds':
-      return { emoji: '🏁', description: count > 1 ? 'rounds' : 'round' };
+      return {
+        emoji: '🏁',
+        description: count === 0 || count > 1 ? `rounds ${count === 0 ? 'detected' : ''}` : 'round',
+      };
     default:
       break;
   }
@@ -139,7 +142,7 @@ function getAmountOfRounds(clips: TClip[]): number {
   clips.filter(isAiClip).forEach(clip => {
     rounds.push(clip.aiInfo.metadata?.round || 1);
   });
-  return Math.max(...rounds);
+  return Math.max(0, ...rounds);
 }
 
 export function getPlacementFromInputs(inputs: IInput[]): number {
