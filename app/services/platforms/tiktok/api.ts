@@ -1,4 +1,3 @@
-import { $t } from 'services/i18n';
 import { TPlatform } from '..';
 
 export type TTikTokScope =
@@ -120,17 +119,3 @@ export interface ITikTokStartStreamResponse {
 export interface ITikTokEndStreamResponse {
   success: boolean;
 }
-
-export const tiktokErrorMessages = (error: string) => {
-  return {
-    TIKTOK_OAUTH_EXPIRED: $t('tiktokReAuthError'),
-    TIKTOK_GENERATE_CREDENTIALS_FAILED: $t(
-      'Failed to generate TikTok stream credentials. Confirm Live Access with TikTok.',
-    ),
-    TIKTOK_STREAM_SCOPE_MISSING: $t('Your TikTok account is not enabled for live streaming.'),
-    TIKTOK_SCOPE_OUTDATED: $t(
-      'Failed to update TikTok account. Please unlink and reconnect your TikTok account.',
-    ),
-    TIKTOK_STREAM_ACTIVE: $t('You are already live on a another device'),
-  }[error];
-};

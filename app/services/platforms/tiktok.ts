@@ -9,7 +9,12 @@ import {
   TPlatformCapability,
 } from './index';
 import { authorizedHeaders, jfetch } from '../../util/requests';
-import { throwStreamError, formatStreamErrorMessage } from '../streaming/stream-error';
+import {
+  throwStreamError,
+  StreamError,
+  errorTypes,
+  TStreamErrorType,
+} from '../streaming/stream-error';
 import { platformAuthorizedRequest } from './utils';
 import { getOS } from 'util/operating-systems';
 import { IGoLiveSettings } from '../streaming';
@@ -186,18 +191,12 @@ export class TikTokService
     if (this.getHasScope('approved')) {
       // update server url and stream key if handling streaming via API
       // streaming with server url and stream key is default
-      let streamInfo = {} as ITikTokStartStreamResponse;
+      const streamInfo = await this.startStream(ttSettings);
 
-      try {
-        streamInfo = await this.startStream(ttSettings);
-        if (!streamInfo?.id) {
-          await this.handleOpenLiveManager();
-          throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED');
-        }
-      } catch (error: unknown) {
-        this.SET_LIVE_SCOPE('relog');
+      // if the stream did not start successfully, prevent going live
+      if (!streamInfo?.id) {
         await this.handleOpenLiveManager();
-        throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED', error as any);
+        throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED');
       }
 
       ttSettings.serverUrl = streamInfo.rtmp;
@@ -359,15 +358,13 @@ export class TikTokService
 
     const request = new Request(url, { headers, method: 'POST', body });
 
-    return jfetch<ITikTokStartStreamResponse>(request).catch((e: ITikTokError) => {
-      console.error('Error streaming to TikTok:', e);
-
-      if (e.status === 422) {
-        const message = `TikTok user blocked. Error: ${e.message}`;
-        formatStreamErrorMessage('TIKTOK_STREAM_SCOPE_MISSING', message);
-        throwStreamError('TIKTOK_STREAM_SCOPE_MISSING', e);
+    return jfetch<ITikTokStartStreamResponse>(request).catch((e: unknown) => {
+      if (e instanceof StreamError) {
+        throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED', e as any);
       }
-      throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED', e);
+
+      const error = this.handleStartStreamError((e as ITikTokError)?.status);
+      throwStreamError(error.type, { status: error.status });
     });
   }
 
@@ -705,7 +702,6 @@ export class TikTokService
   }
 
   convertScope(scope: number, applicationStatus?: string): TTikTokLiveScopeTypes {
-    console.log('applicationStatus', applicationStatus);
     if (applicationStatus === 'never_applied') return 'never-applied';
 
     switch (scope) {
@@ -750,6 +746,35 @@ export class TikTokService
       win.setAlwaysOnTop(false);
       return Promise.resolve();
     }, 1000);
+  }
+
+  handleStartStreamError(status?: number) {
+    const title = $t('TikTok Stream Error');
+    const type: TStreamErrorType =
+      status === 422 ? 'TIKTOK_USER_BANNED' : 'TIKTOK_GENERATE_CREDENTIALS_FAILED';
+    const message = errorTypes[type].message;
+
+    if (type !== 'TIKTOK_USER_BANNED') {
+      this.SET_LIVE_SCOPE('relog');
+      this.handleOpenLiveManager();
+    }
+
+    remote.dialog
+      .showMessageBox(Utils.getMainWindow(), {
+        title,
+        type: 'error',
+        message,
+        buttons: [$t('Open TikTok Live Center'), $t('Close')],
+      })
+      .then(({ response }) => {
+        if (response === 0) {
+          this.handleOpenLiveManager(true);
+        }
+      });
+
+    this.windowsService.actions.closeChildWindow();
+
+    return { type, status };
   }
 
   /**

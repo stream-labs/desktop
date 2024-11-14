@@ -77,13 +77,12 @@ export const errorTypes = {
     get message() {
       return $t('Failed to authenticate with TikTok, re-login or re-merge TikTok account');
     },
-    get action() {
-      return $t('re-login or re-merge TikTok account');
-    },
   },
   TIKTOK_SCOPE_OUTDATED: {
     get message() {
-      return $t('Failed to update TikTok account');
+      return $t(
+        'Failed to update TikTok account. Please unlink and reconnect your TikTok account.',
+      );
     },
     get action() {
       return $t('unlink and re-merge TikTok account, then restart Desktop');
@@ -107,10 +106,17 @@ export const errorTypes = {
   },
   TIKTOK_GENERATE_CREDENTIALS_FAILED: {
     get message() {
-      return $t('Error generating TikTok stream credentials');
+      return $t('Failed to generate TikTok stream credentials. Confirm Live Access with TikTok.');
+    },
+  },
+  TIKTOK_USER_BANNED: {
+    get message() {
+      return $t('Failed to generate TikTok stream credentials. Confirm Live Access with TikTok.');
     },
     get action() {
-      return $t('confirm streaming approval status with TikTok');
+      return $t(
+        'do not tell user that they are banned from streaming to TikTok. Refer them to TikTok',
+      );
     },
   },
   X_PREMIUM_ACCOUNT_REQUIRED: {
@@ -297,12 +303,11 @@ export function formatStreamErrorMessage(
       messages.user.push(details);
     }
 
-    // show all available info in diag report
-    const errorMessage = (error as any)?.action
-      ? `${error.message}, ${(error as any).action}`
-      : error.message;
+    message = error.message.replace(/\s*\.$/, '');
+    // trim trailing periods so that the message joins correctly
+    const errorMessage = (error as any)?.action ? `${message}, ${(error as any).action}` : message;
+
     messages.report.push(errorMessage);
-    if (errorTypeOrError?.message) messages.report.push(message);
     if (details) messages.report.push(details);
     if (code) messages.report.push($t('Error Code: %{code}', { code }));
   } else {
