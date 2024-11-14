@@ -422,24 +422,24 @@ export class TikTokService
       }
 
       if (status?.user) {
-        // const scope = this.convertScope(status.reason);
+        const scope = this.convertScope(status.reason);
         this.SET_USERNAME(status.user.username);
-        // this.SET_LIVE_SCOPE(scope);
+        this.SET_LIVE_SCOPE(scope);
 
         // Note on the 'relog' response: A user who needs to reauthenticate with TikTok
         // due a change in the scope for our api, needs to be told to unlink and remerge their account.
-        // if (scope === 'relog') {
-        //   return EPlatformCallResult.TikTokScopeOutdated;
-        // }
-        // } else if (
-        //   status?.info &&
-        //   (!status?.reason || status?.reason === ETikTokLiveScopeReason.RELOG)
-        // ) {
+        if (scope === 'relog') {
+          return EPlatformCallResult.TikTokScopeOutdated;
+        }
+      } else if (
+        status?.info &&
+        (!status?.reason || status?.reason === ETikTokLiveScopeReason.RELOG)
+      ) {
         this.SET_LIVE_SCOPE('relog');
         return EPlatformCallResult.TikTokScopeOutdated;
-        // } else {
-        //   this.SET_LIVE_SCOPE('denied');
-        //   return EPlatformCallResult.TikTokStreamScopeMissing;
+      } else {
+        this.SET_LIVE_SCOPE('denied');
+        return EPlatformCallResult.TikTokStreamScopeMissing;
       }
 
       // clear any leftover server url or stream key

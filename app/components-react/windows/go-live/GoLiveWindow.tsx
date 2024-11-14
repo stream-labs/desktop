@@ -1,7 +1,7 @@
 import styles from './GoLive.m.less';
 import { WindowsService, DualOutputService } from 'app-services';
 import { ModalLayout } from '../../shared/ModalLayout';
-import { Button } from 'antd';
+import { Button, message } from 'antd';
 import { Services } from '../../service-provider';
 import GoLiveSettings from './GoLiveSettings';
 import GoLiveBanner from './GoLiveInfoBanner';
@@ -27,6 +27,8 @@ export default function GoLiveWindow() {
 
   const shouldShowSettings = ['empty', 'prepopulate', 'waitForNewSettings'].includes(lifecycle);
   const shouldShowChecklist = ['runChecklist', 'live'].includes(lifecycle);
+
+  // message.error({ content: $t('Streaming to TikTok not approved.'), duration: 200 });
 
   return (
     <ModalLayout footer={<ModalFooter />} className={styles.dualOutputGoLive}>

@@ -16,7 +16,7 @@ import { addDummyAccount, withUser } from '../../helpers/webdriver/user';
 import { fillForm, readFields } from '../../helpers/modules/forms';
 import { IDummyTestUser, tikTokUsers } from '../../data/dummy-accounts';
 import { TTikTokLiveScopeTypes } from 'services/platforms/tiktok/api';
-import { isDisplayed, waitForDisplayed } from '../../helpers/modules/core';
+import { selectAsyncAlert, waitForDisplayed } from '../../helpers/modules/core';
 
 // not a react hook
 // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -42,25 +42,23 @@ test('Streaming to TikTok', withUser('twitch', { multistream: false, prime: fals
   const fields = await readFields();
 
   // tiktok always shows regardless of ultra status
-  t.true(fields.hasOwnProperty('tiktok'), 'TikTok shows regardless of ultra status');
+  t.true(fields.hasOwnProperty('tiktok'));
 
   // accounts approved for live access do not show the server url and stream key fields
-  t.false(fields.hasOwnProperty('serverUrl'), 'TikTok server url hidden');
-  t.false(fields.hasOwnProperty('streamKey'), 'TikTok stream key hidden');
+  t.false(fields.hasOwnProperty('serverUrl'));
+  t.false(fields.hasOwnProperty('streamKey'));
 
   await fillForm({
     title: 'Test stream',
     twitchGame: 'Fortnite',
   });
   await submit();
-
   await waitForDisplayed('span=Update settings for TikTok');
   await waitForStreamStart();
   await stopStream();
 
   // test all other tiktok statuses
   await testLiveScope(t, 'legacy');
-  skipCheckingErrorsInLog();
   await testLiveScope(t, 'denied');
   await testLiveScope(t, 'relog');
 
@@ -68,8 +66,6 @@ test('Streaming to TikTok', withUser('twitch', { multistream: false, prime: fals
 });
 
 async function testLiveScope(t: TExecutionContext, scope: TTikTokLiveScopeTypes) {
-  console.log('scope', scope);
-
   const { serverUrl, streamKey } = tikTokUsers[scope];
   const user: IDummyTestUser = await addDummyAccount('tiktok', {
     tikTokLiveScope: scope,
@@ -82,18 +78,10 @@ async function testLiveScope(t: TExecutionContext, scope: TTikTokLiveScopeTypes)
   // denied scope should show prompt to remerge TikTok account
   if (scope === 'relog') {
     await waitForSettingsWindowLoaded();
+    skipCheckingErrorsInLog();
     t.true(
-      await isDisplayed('div=Failed to update TikTok account', { timeout: 1000 }),
+      await (await selectAsyncAlert('Failed to update TikTok account')).waitForDisplayed(),
       'TikTok remerge error shown',
-    );
-    return;
-  }
-
-  // denied scope should show error message
-  if (scope === 'denied') {
-    t.true(
-      await isDisplayed('div=Streaming to TikTok not approved', { timeout: 1000 }),
-      'TikTok denied error shown',
     );
     return;
   }

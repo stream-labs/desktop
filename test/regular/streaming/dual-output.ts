@@ -9,6 +9,7 @@ import {
   focusChild,
   focusMain,
   isDisplayed,
+  selectAsyncAlert,
   waitForDisplayed,
 } from '../../helpers/modules/core';
 import { logIn } from '../../helpers/modules/user';
@@ -110,7 +111,13 @@ test(
 
     // cannot use dual output mode with only one platform linked
     await submit();
-    await waitForDisplayed('span=Confirm Horizontal and Vertical Platforms');
+
+    t.true(
+      await (
+        await selectAsyncAlert('Confirm Horizontal and Vertical Platforms')
+      ).waitForDisplayed(),
+      'Alert is open',
+    );
 
     t.pass();
   },
@@ -130,7 +137,12 @@ test(
 
     // cannot use dual output mode with all platforms assigned to one display
     await submit();
-    await waitForDisplayed('span=Confirm Horizontal and Vertical Platforms');
+    t.true(
+      await (
+        await selectAsyncAlert('Confirm Horizontal and Vertical Platforms')
+      ).waitForDisplayed(),
+      'Alert is open',
+    );
 
     t.pass();
   },
