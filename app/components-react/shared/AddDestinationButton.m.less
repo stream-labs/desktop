@@ -1,14 +1,9 @@
 @import '../../styles/index.less';
 
 .add-destination-group {
-  width: 100%;
   gap: 15px;
+  margin: 15px 0px;
   padding: 0px 15px 15px 15px;
-
-  &.ultra-btn-group {
-    width: calc(100% - 6px);
-    margin: 15px 3px;
-  }
 
   :global(.ant-space-item) {
     width: 100%;
@@ -18,54 +13,67 @@
     width: 100%;
   }
 
-  button.add-destination-btn {
-    width: 100%;
-    flex-direction: row;
-    justify-content: center;
+  &.ultra-btn-group {
+    margin: 15px 3px;
+  }
+}
+
+button.add-destination-btn {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  margin: auto;
+  background-color: var(--background);
+
+  &:hover {
+    transition: 0.3s !important;
+    box-shadow: 0 0 50px rgba(255, 255, 255, 0.1) inset;
+  }
+
+  .add-destination-icon {
+    font-size: 18px;
+    margin-right: 10px;
+  }
+
+  .btn-text {
+    display: flex;
     align-items: center;
-    text-align: center;
-    position: relative;
-    margin: auto;
+    font-weight: 500;
+  }
 
-    &:global(.ant-btn) {
-      display: flex;
-      font-weight: 500;
-      padding: 20px 10px;
-      background: var(--dropdown-bg);
+  .btn-text:hover {
+    font-weight: 500;
+  }
+}
 
-      &:hover {
-        transition: 0.3s !important;
-      }
+.single-output-btn:extend(button.add-destination-btn) {
+  border: 1px dashed var(--border) !important;
+  min-height: 58px;
+  transition: border 0.3s, box-shadow 0.3s !important;
+  margin-bottom: 15px;
 
-      &.default {
-        min-height: 58px;
-        transition: box-shadow 0.3s;
-        border: 1px solid var(--dropdown-bg);
-        border-radius: 4px;
+  &:hover {
+    border: 1px solid var(--button) !important;
+  }
+}
 
-        &:hover {
-          box-shadow: 0 0 50px rgba(255, 255, 255, 0.1) inset;
-        }
-      }
-    }
+.dual-output-btn:extend(button.add-destination-btn) {
+  min-height: 58px;
+  justify-content: center !important;
+  transition: box-shadow 0.3s !important;
+  border: unset !important;
+  background-color: var(--dropdown-bg) !important;
+}
 
-    i.add-destination-icon {
-      font-size: 18px;
-      margin-right: 10px;
-    }
+.ultra-btn:extend(button.add-destination-btn) {
+  font-weight: 500;
 
-    .btn-text {
-      display: flex;
-      align-items: center;
-    }
-
-    &.ultra-btn {
-      justify-content: space-between;
-
-      .ultra-icon {
-        height: 15px;
-        width: 15px;
-      }
-    }
+  .ultra-icon {
+    height: 15px;
+    width: 15px;
   }
 }

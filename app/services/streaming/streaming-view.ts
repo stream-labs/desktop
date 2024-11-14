@@ -138,6 +138,13 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
   }
 
   /**
+   * Returns a list of enabled for streaming platforms
+   */
+  get enabledCustomDestinations(): ICustomStreamDestination[] {
+    return this.settings.customDestinations.filter(dest => dest.enabled);
+  }
+
+  /**
    * Returns a list of enabled platforms with useCustomFields==false
    */
   get platformsWithoutCustomFields(): TPlatform[] {
