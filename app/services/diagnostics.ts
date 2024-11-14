@@ -992,7 +992,7 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
           s?.error.split(' ').at(-1) === '422'
         ) {
           this.logProblem(
-            'TikTok user is banned from streaming to TikTok. Do not tell the user that they are banned. Refer them to TikTok to confirm Live Access status.',
+            'TikTok user might be blocked from streaming to TikTok. Do not tell the user that they are blocked because only TikTok can confirm. Refer them to TikTok to confirm Live Access status.',
           );
         }
 

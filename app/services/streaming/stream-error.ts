@@ -115,7 +115,7 @@ export const errorTypes = {
     },
     get action() {
       return $t(
-        'do not tell user that they are banned from streaming to TikTok. Refer them to TikTok',
+        'user might be blocked from streaming to TikTok but do not say they are. Refer them to TikTok',
       );
     },
   },
