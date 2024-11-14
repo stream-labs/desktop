@@ -1,5 +1,5 @@
 import React from 'react';
-import { IAiClip, TClip } from 'services/highlighter';
+import { IAiClip, IInput, TClip } from 'services/highlighter';
 import { isAiClip } from './utils';
 import { EHighlighterInputTypes } from 'services/highlighter/ai-highlighter/ai-highlighter';
 import styles from './InputEmojiSection.m.less';
@@ -131,10 +131,8 @@ function getGamePlacement(clips: TClip[]): number {
       isAiClip(clip) &&
       clip.aiInfo.inputs.some(input => input.type === EHighlighterInputTypes.DEATH),
   ) as IAiClip;
-  const deathInput = deathClip.aiInfo.inputs.find(
-    input => input.type === EHighlighterInputTypes.DEATH,
-  );
-  return deathInput?.metadata?.place || null;
+
+  return getPlacementFromInputs(deathClip.aiInfo.inputs);
 }
 function getAmountOfRounds(clips: TClip[]): number {
   const rounds: number[] = [];
@@ -142,4 +140,9 @@ function getAmountOfRounds(clips: TClip[]): number {
     rounds.push(clip.aiInfo.metadata?.round || 1);
   });
   return Math.max(...rounds);
+}
+
+export function getPlacementFromInputs(inputs: IInput[]): number {
+  const deathInput = inputs.find(input => input.type === EHighlighterInputTypes.DEATH);
+  return deathInput?.metadata?.place || null;
 }
