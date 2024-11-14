@@ -544,15 +544,6 @@ export class TikTokService
 
     console.debug('TikTok stream status: ', status);
 
-    // track the first date the user registered as denied so that after 30 days
-    // they are prompted to reapply
-    // TODO: fix denied date logic
-    // if (status === EPlatformCallResult.TikTokStreamScopeMissing && !this.state.dateDenied) {
-    //   this.SET_DENIED_DATE(new Date().toISOString());
-    // } else {
-    //   this.SET_DENIED_DATE();
-    // }
-
     if (status === EPlatformCallResult.TikTokScopeOutdated) {
       throwStreamError('TIKTOK_SCOPE_OUTDATED');
     }
@@ -757,6 +748,8 @@ export class TikTokService
     if (type !== 'TIKTOK_USER_BANNED') {
       this.SET_LIVE_SCOPE('relog');
       this.handleOpenLiveManager();
+    } else {
+      this.SET_LIVE_SCOPE('denied');
     }
 
     remote.dialog
