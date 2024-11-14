@@ -739,11 +739,18 @@ export class TikTokService
     }, 1000);
   }
 
+  async handleOpenProducer() {
+    remote.shell.openExternal(this.legacyDashboardUrl);
+  }
+
   handleStartStreamError(status?: number) {
     const title = $t('TikTok Stream Error');
     const type: TStreamErrorType =
       status === 422 ? 'TIKTOK_USER_BANNED' : 'TIKTOK_GENERATE_CREDENTIALS_FAILED';
     const message = errorTypes[type].message;
+
+    const buttonText = status === 422 ? $t('Open TikTok Producer') : $t('Open TikTok Live Manager');
+    const url = status === 422 ? this.legacyDashboardUrl : this.dashboardUrl;
 
     if (type !== 'TIKTOK_USER_BANNED') {
       this.SET_LIVE_SCOPE('relog');
@@ -757,11 +764,11 @@ export class TikTokService
         title,
         type: 'error',
         message,
-        buttons: [$t('Open TikTok Live Center'), $t('Close')],
+        buttons: [buttonText, $t('Close')],
       })
       .then(({ response }) => {
         if (response === 0) {
-          this.handleOpenLiveManager(true);
+          remote.shell.openExternal(url);
         }
       });
 
