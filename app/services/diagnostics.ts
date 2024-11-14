@@ -26,7 +26,6 @@ import {
   StreamSettingsService,
   TransitionsService,
   VideoSettingsService,
-  TikTokService,
 } from 'app-services';
 import * as remote from '@electron/remote';
 import { AppService } from 'services/app';
@@ -160,7 +159,6 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
   @Inject() dualOutputService: DualOutputService;
   @Inject() streamSettingsService: StreamSettingsService;
   @Inject() videoSettingsService: VideoSettingsService;
-  @Inject('TikTokService') tiktokService: TikTokService;
 
   get cacheDir() {
     return this.appService.appDataDirectory;
@@ -985,15 +983,19 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
   }
 
   private generateStreamsSection() {
-    if (this.tiktokService.getHasScope('denied')) {
-      this.logProblem(
-        'TikTok user is banned from streaming to TikTok. Do not tell the user that they are banned. Refer them to TikTok to confirm Live Access status.',
-      );
-    }
-
     return new Section(
       'Streams',
       this.state.streams.map(s => {
+        if (
+          s?.type === 'Single Output' &&
+          s?.platforms.includes('tiktok') &&
+          s?.error.split(' ').at(-1) === '422'
+        ) {
+          this.logProblem(
+            'TikTok user is banned from streaming to TikTok. Do not tell the user that they are banned. Refer them to TikTok to confirm Live Access status.',
+          );
+        }
+
         return {
           'Start Time': new Date(s.startTime).toString(),
           'End Time': s.endTime ? new Date(s.endTime).toString() : 'Stream did not end cleanly',
