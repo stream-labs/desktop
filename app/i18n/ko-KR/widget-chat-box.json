@@ -27,6 +27,6 @@
   "Hide Characters": "캐릭터 숨김",
   "Hide Common Chat Bots": "일반 Chatbot 숨김",
   "Hide commands starting with `!`": "'!'로 시작하는 명령어 숨김",
-  "Chat Notifications": "Chat Notifications",
-  "Trigger a sound to notify you when there is new chat activity": "Trigger a sound to notify you when there is new chat activity"
+  "Chat Notifications": "채팅 알림",
+  "Trigger a sound to notify you when there is new chat activity": "새로운 채팅 활동이 있을 때 알림 사운드 재생"
 }
