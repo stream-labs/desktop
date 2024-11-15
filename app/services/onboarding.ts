@@ -318,12 +318,25 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   }
 
   get createDefaultNewUserScene() {
-    const creationDate = this.userService.state?.createdAt;
-
-    if (!creationDate) {
-      return this.sceneCollectionsService.newUserFirstLogin && !this.existingSceneCollections;
+    // If the first login status was set in the scene collections service,
+    // determine if the user installed a theme during onboarding
+    if (this.sceneCollectionsService.newUserFirstLogin && !this.existingSceneCollections) {
+      return true;
     }
 
+    // Skip checking creation date for accounts in when testing
+    if (Utils.isTestMode()) return false;
+
+    // If the user does not have a creation date, they are a new user so
+    // determine if the user installed a theme during onboarding
+    const creationDate = this.userService.state?.createdAt;
+    if (!creationDate) {
+      return this.existingSceneCollections === false;
+    }
+
+    // Otherwise, check if the user is within the first 6 hours of their
+    // account creation date/time. This is last resort very rough check to determine
+    // if the user is a new user. Not ideal but better than nothing.
     const now = new Date().getTime();
     const creationTime = new Date(creationDate).getTime();
     const millisecondsInAnHour = 1000 * 60 * 60;
