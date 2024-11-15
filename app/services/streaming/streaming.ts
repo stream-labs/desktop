@@ -42,6 +42,7 @@ import {
   TStreamErrorType,
   formatUnknownErrorMessage,
   formatStreamErrorMessage,
+  throwStreamError,
 } from './stream-error';
 import { authorizedHeaders } from 'util/requests';
 import { HostsService } from '../hosts';
@@ -54,7 +55,6 @@ import { MarkersService } from 'services/markers';
 import { byOS, OS } from 'util/operating-systems';
 import { DualOutputService } from 'services/dual-output';
 import { capitalize } from 'lodash';
-import { tiktokErrorMessages } from 'services/platforms/tiktok/api';
 import { TikTokService } from 'services/platforms/tiktok';
 
 enum EOBSOutputType {
@@ -568,30 +568,13 @@ export class StreamingService
     } catch (e: unknown) {
       this.handleSetupPlatformError(e, platform);
 
-      if (platform === 'tiktok') {
-        const error = e as StreamError;
-        const title = $t('TikTok Stream Error');
-        const message = tiktokErrorMessages(error.type) ?? title;
-        this.outputErrorOpen = true;
-
-        remote.dialog
-          .showMessageBox(Utils.getMainWindow(), {
-            title,
-            type: 'error',
-            message,
-            buttons: [$t('Open TikTok Live Center'), $t('Close')],
-          })
-          .then(({ response }) => {
-            if (response === 0) {
-              this.tikTokService.handleOpenLiveManager(true);
-            }
-            this.outputErrorOpen = false;
-          })
-          .catch(() => {
-            this.outputErrorOpen = false;
-          });
-
-        this.windowsService.actions.closeChildWindow();
+      // if TikTok is the only platform going live and the user is banned, prevent the stream from attempting to start
+      if (
+        e instanceof StreamError &&
+        e.type === 'TIKTOK_USER_BANNED' &&
+        this.views.enabledPlatforms.length === 1
+      ) {
+        throwStreamError('TIKTOK_USER_BANNED', e);
       }
     }
   }
