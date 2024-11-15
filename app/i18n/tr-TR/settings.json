@@ -261,5 +261,6 @@
   "Idle": "Beklemede",
   "Please connect platforms directly from Streamlabs Desktop instead of adding Streamlabs Multistream as a custom destination": "Lütfen Streamlabs Multistream'i özel bir hedef olarak eklemek yerine platformları doğrudan Streamlabs Desktop'tan bağlayın",
   "Audio Encoder": "Ses Kodlayıcı",
-  "Additional Settings": "Ek Ayarlar"
+  "Additional Settings": "Ek Ayarlar",
+  "Bearer Token": "Bearer Token"
 }
