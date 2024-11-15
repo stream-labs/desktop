@@ -1995,7 +1995,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     return this.getClips(clips, streamId).every(clip => clip.loaded);
   }
 
-  getRounds(clips: TClip[]): { round: number; inputs: IInput[] }[] {
+  getRoundDetails(clips: TClip[]): { round: number; inputs: IInput[] }[] {
     const roundsMap: { [key: number]: IInput[] } = {};
     clips.forEach(clip => {
       const aiClip = isAiClip(clip) ? clip : undefined;

@@ -3,7 +3,7 @@ import { Button, Select, Checkbox, Typography } from 'antd';
 import { DownOutlined, RobotOutlined } from '@ant-design/icons';
 import { IFilterOptions } from './utils';
 import { IInput } from 'services/highlighter';
-import { InputEmojiSection } from './InputEmojiSection';
+import { getPlacementFromInputs, InputEmojiSection } from './InputEmojiSection';
 import { EHighlighterInputTypes } from 'services/highlighter/ai-highlighter/ai-highlighter';
 
 const { Option } = Select;
@@ -38,12 +38,12 @@ const optionStyles = {
 };
 
 export default function HighlightGeneratorUI({
-  maxDuration,
-  rounds,
+  combinedClipsDuration,
+  roundDetails,
   emitSetFilter,
 }: {
-  maxDuration: number;
-  rounds: {
+  combinedClipsDuration: number; // Maximum duration the highligh reel can be long - only used to restrict the targetDuration options
+  roundDetails: {
     round: number;
     inputs: IInput[];
   }[];
@@ -64,7 +64,7 @@ export default function HighlightGeneratorUI({
     { value: 20, label: '20 minutes' },
     { value: 30, label: '30 minutes' },
   ];
-  const filteredOptions = options.filter(option => option.value * 60 <= maxDuration);
+  const filteredOptions = options.filter(option => option.value * 60 <= combinedClipsDuration);
   const handleRoundSelect = (value: number[]) => {
     if (value.includes(0)) {
       setSelectedRounds([0]);
@@ -89,8 +89,8 @@ export default function HighlightGeneratorUI({
     console.log('sth changed');
   }, [selectedRounds, filterType, targetDuration]);
 
-  function highlightGeneratorUI(inputs: IInput[]) {
-    const combinedKillAndKnocked = inputs.reduce((count, input) => {
+  function roundDropdownDetails(roundDetails: { round: number; inputs: IInput[] }) {
+    const combinedKillAndKnocked = roundDetails.inputs.reduce((count, input) => {
       if (
         input.type === EHighlighterInputTypes.KILL ||
         input.type === EHighlighterInputTypes.KNOCKED
@@ -99,11 +99,15 @@ export default function HighlightGeneratorUI({
       }
       return count;
     }, 0);
-    const won = inputs.some(input => input.type === EHighlighterInputTypes.VICTORY);
-
+    const won = roundDetails.inputs.some(input => input.type === EHighlighterInputTypes.VICTORY);
+    let rank = null;
+    if (!won) {
+      rank = getPlacementFromInputs(roundDetails.inputs);
+    }
     return (
       <>
-        🔫: {combinedKillAndKnocked} | {won ? <>🏆</> : <>🪦</>}
+        Round {roundDetails.round} <br />
+        🔫: {combinedKillAndKnocked} | {won ? <>🏆 #1</> : <>🪦 {`${rank ? '#' + rank : ''}`}</>}
       </>
     );
   }
@@ -159,26 +163,25 @@ export default function HighlightGeneratorUI({
               </Checkbox>
             </div>
             <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
-              {rounds.map(roundInfo => (
-                <div key={roundInfo.round} style={checkboxContainerStyles}>
+              {roundDetails.map(roundDetails => (
+                <div key={roundDetails.round} style={checkboxContainerStyles}>
                   <Checkbox
                     style={checkboxStyles}
-                    checked={selectedRounds.includes(roundInfo.round)}
+                    checked={selectedRounds.includes(roundDetails.round)}
                     onChange={e => {
                       if (e.target.checked) {
                         const newSelection = [
                           ...selectedRounds.filter(r => r !== 0),
-                          roundInfo.round,
+                          roundDetails.round,
                         ];
                         setSelectedRounds(newSelection);
                       } else {
-                        const newSelection = selectedRounds.filter(r => r !== roundInfo.round);
+                        const newSelection = selectedRounds.filter(r => r !== roundDetails.round);
                         setSelectedRounds(newSelection.length === 0 ? [0] : newSelection);
                       }
                     }}
                   >
-                    Round {roundInfo.round} <br />
-                    {highlightGeneratorUI(roundInfo.inputs)}
+                    {roundDropdownDetails(roundDetails)}
                   </Checkbox>
                 </div>
               ))}

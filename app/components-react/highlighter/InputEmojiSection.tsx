@@ -1,5 +1,5 @@
 import React from 'react';
-import { IAiClip, TClip } from 'services/highlighter';
+import { IAiClip, IInput, TClip } from 'services/highlighter';
 import { isAiClip } from './utils';
 import { EHighlighterInputTypes } from 'services/highlighter/ai-highlighter/ai-highlighter';
 import styles from './InputEmojiSection.m.less';
@@ -55,7 +55,7 @@ export function InputEmojiSection({
       {includeRounds && (
         <div key={'rounds'} style={{ display: 'flex', gap: '4px' }}>
           <span key={'rounds-emoji'}> {getTypeWordingFromType('rounds', rounds).emoji} </span>{' '}
-          <span className={styles.description} key={'rounds' + 'desc'}>
+          <span className={styles.description} key={'rounds-description'}>
             {rounds} {getTypeWordingFromType('rounds', rounds).description}
           </span>
         </div>
@@ -63,7 +63,7 @@ export function InputEmojiSection({
       {filteredInputTypeMap.map(([type, count]) => (
         <div key={type} style={{ display: 'flex', gap: '4px' }}>
           <span key={type + 'emoji'}>{getTypeWordingFromType(type, count).emoji} </span>{' '}
-          <span className={styles.description} key={type + 'desc'}>
+          <span className={styles.description} key={type + 'description'}>
             {count} {getTypeWordingFromType(type, count).description}{' '}
             {!includeRounds && isDeath(type) && getGamePlacement(clips)
               ? '#' + getGamePlacement(clips)
@@ -95,7 +95,10 @@ function getTypeWordingFromType(
     case EHighlighterInputTypes.PLAYER_KNOCKED:
       return { emoji: '😵', description: count > 1 ? 'got knockeds' : 'got knocked' };
     case 'rounds':
-      return { emoji: '🏁', description: count > 1 ? 'rounds' : 'round' };
+      return {
+        emoji: '🏁',
+        description: count === 0 || count > 1 ? `rounds ${count === 0 ? 'detected' : ''}` : 'round',
+      };
     default:
       break;
   }
@@ -131,15 +134,18 @@ function getGamePlacement(clips: TClip[]): number {
       isAiClip(clip) &&
       clip.aiInfo.inputs.some(input => input.type === EHighlighterInputTypes.DEATH),
   ) as IAiClip;
-  const deathInput = deathClip.aiInfo.inputs.find(
-    input => input.type === EHighlighterInputTypes.DEATH,
-  );
-  return deathInput?.metadata?.place || null;
+
+  return getPlacementFromInputs(deathClip.aiInfo.inputs);
 }
 function getAmountOfRounds(clips: TClip[]): number {
   const rounds: number[] = [];
   clips.filter(isAiClip).forEach(clip => {
     rounds.push(clip.aiInfo.metadata?.round || 1);
   });
-  return Math.max(...rounds);
+  return Math.max(0, ...rounds);
+}
+
+export function getPlacementFromInputs(inputs: IInput[]): number {
+  const deathInput = inputs.find(input => input.type === EHighlighterInputTypes.DEATH);
+  return deathInput?.metadata?.place || null;
 }

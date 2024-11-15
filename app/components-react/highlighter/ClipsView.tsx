@@ -11,7 +11,7 @@ import {
   aiFilterClips,
   createFinalSortedArray,
   filterClips,
-  getTotalDuration,
+  getCombinedClipsDuration,
   sortAndFilterClips,
   useOptimizedHover,
 } from './utils';
@@ -287,10 +287,10 @@ export default function ClipsView({
                             }
                           });
                         }}
-                        maxDuration={getTotalDuration(
+                        combinedClipsDuration={getCombinedClipsDuration(
                           HighlighterService.getClips(HighlighterService.views.clips, props.id),
                         )}
-                        rounds={HighlighterService.getRounds(
+                        roundDetails={HighlighterService.getRoundDetails(
                           HighlighterService.getClips(HighlighterService.views.clips, props.id),
                         )}
                       />

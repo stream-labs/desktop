@@ -230,7 +230,7 @@ export function aiFilterClips(
       //     duration: c.duration,
       //   })),
       // );
-      totalDuration = getTotalDuration(clipsFromRounds);
+      totalDuration = getCombinedClipsDuration(clipsFromRounds);
       // console.log('new totalDuration:', totalDuration);
     }
     // console.log('clipsFromRounds', clipsFromRounds);
@@ -257,7 +257,7 @@ export function aiFilterClips(
   // console.log('clipsFromRounds', clipsFromRounds);
 
   let filteredClips: TClip[] = clipsFromRounds;
-  let currentDuration = getTotalDuration(filteredClips);
+  let currentDuration = getCombinedClipsDuration(filteredClips);
 
   // console.log('remove clipswise to get closer to target');
 
@@ -275,7 +275,7 @@ export function aiFilterClips(
 
     if (index > -1) {
       filteredClips.splice(index, 1); // 2nd parameter means remove one item only
-      currentDuration = getTotalDuration(filteredClips);
+      currentDuration = getCombinedClipsDuration(filteredClips);
       // console.log(
       //   'removed, new currentDuration:',
       //   currentDuration,
@@ -288,7 +288,7 @@ export function aiFilterClips(
   return filteredClips;
 }
 
-export function getTotalDuration(clips: TClip[]): number {
+export function getCombinedClipsDuration(clips: TClip[]): number {
   return clips.reduce((sum, clip) => sum + (clip.duration || 0), 0);
 }
 
