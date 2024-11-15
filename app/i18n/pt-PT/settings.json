@@ -261,5 +261,6 @@
   "Idle": "Inativo",
   "Please connect platforms directly from Streamlabs Desktop instead of adding Streamlabs Multistream as a custom destination": "Liga as plataformas diretamente a partir do Streamlabs Desktop em vez de adicionares o Streamlabs Multistream como um destino personalizado",
   "Audio Encoder": "Codificador de áudio",
-  "Additional Settings": "Definições adicionais"
+  "Additional Settings": "Definições adicionais",
+  "Bearer Token": "Bearer Token"
 }
