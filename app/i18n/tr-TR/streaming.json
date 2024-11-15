@@ -220,6 +220,8 @@
   "Error generating TikTok stream credentials": "TikTok yayın kimlik bilgileri oluşturulurken hata oluştu",
   "You are already live on a another device": "Başka bir cihazda zaten canlı yayındasınız",
   "Connect your TikTok account to stream to TikTok and one additional platform for free.": "TikTok'a ve bir ek platforma ücretsiz yayın yapmak için TikTok hesabınızı bağlayın.",
+  "Failed to authenticate with TikTok, re-login or re-merge TikTok account": "Failed to authenticate with TikTok, re-login or re-merge TikTok account",
+  "user might be blocked from streaming to TikTok but do not say they are. Refer them to TikTok": "user might be blocked from streaming to TikTok but do not say they are. Refer them to TikTok",
   "While updating your Twitch channel info, some tags were removed due to moderation rules: %{tags}": "Twitch kanal bilgilerinizi güncellerken, bazı etiketler moderasyon kuralları nedeniyle kaldırıldı: %{tags}",
   "Content Classification": "İçerik Sınıflandırması",
   "Stream features branded content": "Yayın markalı içerik sunuyor",
