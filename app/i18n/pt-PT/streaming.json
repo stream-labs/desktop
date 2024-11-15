@@ -254,6 +254,6 @@
   "Disable Dual Output": "Desativar Dual Output",
   "You can now reply to Twitch, YouTube and Facebook messages in Multistream chat. Click to learn more.": "Agora podes responder a mensagens da Twitch, do YouTube e do Facebook no chat multitransmissão. Clica para saber mais.",
   "Multistream Chat Platform Support": "Suporte à plataforma de chat multitransmissão",
-  "You have selected %{colorFormat} as Color Format. Formats other than NV12 and P010 are commonly used for recording, and might incur high CPU usage or the streaming platform might not support it. Go to Settings -> Advanced -> Video to review.": "You have selected %{colorFormat} as Color Format. Formats other than NV12 and P010 are commonly used for recording, and might incur high CPU usage or the streaming platform might not support it. Go to Settings -> Advanced -> Video to review.",
-  "TikTok Audience": "TikTok Audience"
+  "You have selected %{colorFormat} as Color Format. Formats other than NV12 and P010 are commonly used for recording, and might incur high CPU usage or the streaming platform might not support it. Go to Settings -> Advanced -> Video to review.": "Selecionaste %{colorFormat} como Formato de cor. Os formatos diferentes de NV12 e P010 são normalmente utilizados para gravação e podem implicar uma utilização elevada da CPU ou a plataforma de transmissão pode não os suportar. Vai a Definições -> Avançadas -> Vídeo para rever.",
+  "TikTok Audience": "Audiência do TikTok"
 }
