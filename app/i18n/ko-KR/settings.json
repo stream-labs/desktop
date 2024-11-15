@@ -261,6 +261,5 @@
   "Idle": "유휴",
   "Please connect platforms directly from Streamlabs Desktop instead of adding Streamlabs Multistream as a custom destination": "Streamlabs 멀티스트림을 사용자 지정 대상으로 추가하는 대신 Streamlabs Desktop에서 직접 플랫폼을 연결하십시오",
   "Audio Encoder": "오디오 인코더",
-  "Additional Settings": "추가 설정",
-  "Bearer Token": "Bearer Token"
+  "Additional Settings": "추가 설정"
 }
