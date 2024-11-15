@@ -123,7 +123,7 @@ function ModalFooter() {
           )}
           renderSlots={{
             display: () => {
-              return <span>{display}</span>;
+              return <span key={display}>{display}</span>;
             },
           }}
         ></Translate>
