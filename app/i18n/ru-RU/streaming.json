@@ -220,6 +220,8 @@
   "Error generating TikTok stream credentials": "Ошибка при генерации учетных данных трансляции TikTok",
   "You are already live on a another device": "Вы уже запустили трансляцию на другом устройстве",
   "Connect your TikTok account to stream to TikTok and one additional platform for free.": "Подключите свою учетную запись TikTok, чтобы бесплатно транслировать на TikTok и еще одну дополнительную платформу.",
+  "Failed to authenticate with TikTok, re-login or re-merge TikTok account": "Failed to authenticate with TikTok, re-login or re-merge TikTok account",
+  "user might be blocked from streaming to TikTok but do not say they are. Refer them to TikTok": "user might be blocked from streaming to TikTok but do not say they are. Refer them to TikTok",
   "While updating your Twitch channel info, some tags were removed due to moderation rules: %{tags}": "При обновлении информации о вашем канале Twitch некоторые теги были удалены в соответствии с правилами модерации: %{tags}",
   "Content Classification": "Классификация контента",
   "Stream features branded content": "Трансляция включает в себя фирменный контент",
