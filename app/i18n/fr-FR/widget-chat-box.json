@@ -27,6 +27,6 @@
   "Hide Characters": "Masquer les caractères",
   "Hide Common Chat Bots": "Masquer les bots les plus communs",
   "Hide commands starting with `!`": "Masquer les commandes commençant par `!`",
-  "Chat Notifications": "Chat Notifications",
-  "Trigger a sound to notify you when there is new chat activity": "Trigger a sound to notify you when there is new chat activity"
+  "Chat Notifications": "Notifications de chat",
+  "Trigger a sound to notify you when there is new chat activity": "Déclenche un son pour te prévenir en cas de nouvelle activité sur le chat."
 }
