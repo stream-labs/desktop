@@ -25,9 +25,10 @@ interface IAIHighlighterManifest {
  * the paths to the highlighter binary and manifest.
  */
 export class AIHighlighterUpdater {
-  basepath: string;
-  manifestPath: string;
-  manifest: IAIHighlighterManifest | null;
+  private basepath: string;
+  private manifestPath: string;
+  private manifest: IAIHighlighterManifest | null;
+  private isCurrentlyUpdating: boolean = false;
 
   constructor() {
     this.basepath = getSharedResource('ai-highlighter');
@@ -70,6 +71,13 @@ export class AIHighlighterUpdater {
   }
 
   /**
+   * Check if an update is currently in progress
+   */
+  public get updateInProgress(): boolean {
+    return this.isCurrentlyUpdating;
+  }
+
+  /**
    * Check if AI Highlighter requires an update
    */
   public async checkForUpdates(): Promise<boolean> {
@@ -106,6 +114,15 @@ export class AIHighlighterUpdater {
    * Update highlighter to the latest version
    */
   public async update(progressCallback?: (progress: IDownloadProgress) => void): Promise<void> {
+    try {
+      this.isCurrentlyUpdating = true;
+      await this.performUpdate(progressCallback);
+    } finally {
+      this.isCurrentlyUpdating = false;
+    }
+  }
+
+  private async performUpdate(progressCallback: (progress: IDownloadProgress) => void) {
     if (!this.manifest) {
       throw new Error('Manifest not found, cannot update');
     }
