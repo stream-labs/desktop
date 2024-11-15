@@ -986,6 +986,16 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
     return new Section(
       'Streams',
       this.state.streams.map(s => {
+        if (
+          s?.type === 'Single Output' &&
+          s?.platforms.includes('tiktok') &&
+          s?.error.split(' ').at(-1) === '422'
+        ) {
+          this.logProblem(
+            'TikTok user might be blocked from streaming. Refer them to TikTok producer page or support to confirm live access status',
+          );
+        }
+
         return {
           'Start Time': new Date(s.startTime).toString(),
           'End Time': s.endTime ? new Date(s.endTime).toString() : 'Stream did not end cleanly',
