@@ -261,5 +261,6 @@
   "Idle": "Простой",
   "Please connect platforms directly from Streamlabs Desktop instead of adding Streamlabs Multistream as a custom destination": "Не добавляйте многопоточную трансляцию Streamlabs в качестве пользовательского назначения, вместо этого подключайте платформы непосредственно из Streamlabs Desktop",
   "Audio Encoder": "Аудиокодер",
-  "Additional Settings": "Дополнительные настройки"
+  "Additional Settings": "Дополнительные настройки",
+  "Bearer Token": "Bearer Token"
 }
