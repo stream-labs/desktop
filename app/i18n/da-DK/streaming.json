@@ -220,6 +220,8 @@
   "Error generating TikTok stream credentials": "Fejl ved generering af legitimationsoplysninger til TikTok-stream",
   "You are already live on a another device": "Du er allerede live på en anden enhed",
   "Connect your TikTok account to stream to TikTok and one additional platform for free.": "Tilknyt din TikTok-konto for at streame gratis til TikTok og en ekstra platform.",
+  "Failed to authenticate with TikTok, re-login or re-merge TikTok account": "Failed to authenticate with TikTok, re-login or re-merge TikTok account",
+  "user might be blocked from streaming to TikTok but do not say they are. Refer them to TikTok": "user might be blocked from streaming to TikTok but do not say they are. Refer them to TikTok",
   "While updating your Twitch channel info, some tags were removed due to moderation rules: %{tags}": "Under opdateringen af dine Twitch-kanaloplysninger blev nogle tags fjernet på grund af moderationsregler: %{tags}",
   "Content Classification": "Klassificering af indhold",
   "Stream features branded content": "Stream har branded indhold",
