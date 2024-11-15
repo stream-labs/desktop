@@ -261,5 +261,6 @@
   "Idle": "Inaktiv",
   "Please connect platforms directly from Streamlabs Desktop instead of adding Streamlabs Multistream as a custom destination": "Forbind platforme direkte fra Streamlabs Desktop i stedet for at tilføje Streamlabs Multistream som en brugerdefineret destination",
   "Audio Encoder": "Lydkoder",
-  "Additional Settings": "Flere indstillinger"
+  "Additional Settings": "Flere indstillinger",
+  "Bearer Token": "Bearer Token"
 }
