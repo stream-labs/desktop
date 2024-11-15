@@ -261,5 +261,6 @@
   "Idle": "アイドル",
   "Please connect platforms directly from Streamlabs Desktop instead of adding Streamlabs Multistream as a custom destination": "Streamlabs Multistreamをカスタム宛先として追加する代わりに、Streamlabs Desktopから直接プラットフォームを接続してください",
   "Audio Encoder": "オーディオエンコーダー",
-  "Additional Settings": "追加設定"
+  "Additional Settings": "追加設定",
+  "Bearer Token": "Bearer Token"
 }
