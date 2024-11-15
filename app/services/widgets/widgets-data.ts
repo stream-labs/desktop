@@ -506,6 +506,33 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
     y: 1,
     anchor: AnchorPoint.SouthWest,
   },
+  // TODO: it seems we've half way transitioned to getWidgetsConfig but
+  // this list is still referenced
+  [WidgetType.GameWidget]: {
+    name: 'Game Widget',
+    humanType: 'game_widget',
+    width: 400,
+    height: 750,
+    x: 0.5,
+    y: 0,
+    anchor: AnchorPoint.North,
+
+    url(host, token) {
+      return `https://${host}/widgets/game-widget?token=${token}`;
+    },
+  },
+  [WidgetType.CustomWidget]: {
+    name: 'Custom Widget',
+    humanType: 'custom_widget',
+    width: 400,
+    height: 750,
+    x: 0.5,
+    y: 0,
+    anchor: AnchorPoint.North,
+    url(host, token) {
+      return `https://${host}/widgets/custom-widget?token=${token}`;
+    },
+  },
 };
 
 export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisplayData } => ({
