@@ -261,6 +261,5 @@
   "Idle": "空闲",
   "Please connect platforms directly from Streamlabs Desktop instead of adding Streamlabs Multistream as a custom destination": "请直接从 Streamlabs Desktop 连接平台，而不是添加 Streamlabs Multistream 作为自定义目的地",
   "Audio Encoder": "音频编码器",
-  "Additional Settings": "其他设置",
-  "Bearer Token": "Bearer Token"
+  "Additional Settings": "其他设置"
 }
