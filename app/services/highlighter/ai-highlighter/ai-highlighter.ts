@@ -1,6 +1,6 @@
 import * as child from 'child_process';
-import { getHighlighterProcess, getTestData } from './ai-utils';
 import EventEmitter from 'events';
+import { AIHighlighterUpdater } from './updater';
 
 export enum EHighlighterInputTypes {
   KILL = 'kill',
@@ -107,80 +107,74 @@ export function getHighlightClips(
   return new Promise((resolve, reject) => {
     console.log(`Get highlight clips for ${videoUri}`);
 
-    const testData = getTestData(videoUri);
-    if (testData) {
-      resolve(testData);
-    } else {
-      let partialInputsRendered = false;
-      console.log('Start Ai analysis');
+    const partialInputsRendered = false;
+    console.log('Start Ai analysis');
 
-      const childProcess: child.ChildProcess = mockChildProcess || getHighlighterProcess(videoUri);
-      const messageBuffer = new MessageBufferHandler();
+    const childProcess: child.ChildProcess =
+      mockChildProcess || AIHighlighterUpdater.startHighlighterProcess(videoUri);
+    const messageBuffer = new MessageBufferHandler();
 
-      if (cancelSignal) {
-        cancelSignal.addEventListener('abort', () => {
-          childProcess.kill();
-          messageBuffer.clear();
-          reject(new Error('Highlight generation canceled'));
-        });
-      }
-
-      childProcess.stdout?.on('data', (data: Buffer) => {
-        const message = data.toString();
-        messageBuffer.appendToBuffer(message);
-
-        // Try to extract a complete message
-        const completeMessages = messageBuffer.extractCompleteMessages();
-
-        for (const completeMessage of completeMessages) {
-          // messageBuffer.clear();
-          const aiHighlighterMessage = parseAiHighlighterMessage(completeMessage);
-          console.log('parsed aiHighlighterMessage', aiHighlighterMessage);
-
-          if (typeof aiHighlighterMessage === 'string' || aiHighlighterMessage instanceof String) {
-            console.log('message type of string', aiHighlighterMessage);
-          } else if (aiHighlighterMessage) {
-            console.log('message NOT type of string', aiHighlighterMessage);
-            switch (aiHighlighterMessage.type) {
-              case 'progress':
-                progressUpdate?.(
-                  (aiHighlighterMessage.json as IHighlighterProgressMessage).progress,
-                );
-                break;
-              case 'highlights':
-                if (!partialInputsRendered) {
-                  console.log('call Render highlights:');
-                  renderHighlights?.(aiHighlighterMessage.json as IHighlight[]);
-                }
-                resolve(aiHighlighterMessage.json as IHighlight[]);
-                break;
-              case 'highlights_partial':
-                // Handle partial highlights if needed
-                break;
-              default:
-                console.log('\n\n');
-                console.log('Unrecognized message type:', aiHighlighterMessage);
-                console.log('\n\n');
-                break;
-            }
-          }
-        }
-      });
-
-      childProcess.stderr?.on('data', (data: Buffer) => {
-        console.log('Error logs:', data.toString());
-      });
-
-      childProcess.on('error', error => {
+    if (cancelSignal) {
+      cancelSignal.addEventListener('abort', () => {
+        childProcess.kill();
         messageBuffer.clear();
-        reject(new Error(`Child process threw an error. Error message: ${error.message}.`));
-      });
-
-      childProcess.on('exit', (code, signal) => {
-        messageBuffer.clear();
-        reject(new Error(`Child process exited with code ${code} and signal ${signal}`));
+        reject(new Error('Highlight generation canceled'));
       });
     }
+
+    childProcess.stdout?.on('data', (data: Buffer) => {
+      const message = data.toString();
+      messageBuffer.appendToBuffer(message);
+
+      // Try to extract a complete message
+      const completeMessages = messageBuffer.extractCompleteMessages();
+
+      for (const completeMessage of completeMessages) {
+        // messageBuffer.clear();
+        const aiHighlighterMessage = parseAiHighlighterMessage(completeMessage);
+        console.log('parsed aiHighlighterMessage', aiHighlighterMessage);
+
+        if (typeof aiHighlighterMessage === 'string' || aiHighlighterMessage instanceof String) {
+          console.log('message type of string', aiHighlighterMessage);
+        } else if (aiHighlighterMessage) {
+          console.log('message NOT type of string', aiHighlighterMessage);
+          switch (aiHighlighterMessage.type) {
+            case 'progress':
+              progressUpdate?.((aiHighlighterMessage.json as IHighlighterProgressMessage).progress);
+              break;
+            case 'highlights':
+              if (!partialInputsRendered) {
+                console.log('call Render highlights:');
+                renderHighlights?.(aiHighlighterMessage.json as IHighlight[]);
+              }
+              resolve(aiHighlighterMessage.json as IHighlight[]);
+              break;
+            case 'highlights_partial':
+              // Handle partial highlights if needed
+              break;
+            default:
+              console.log('\n\n');
+              console.log('Unrecognized message type:', aiHighlighterMessage);
+              console.log('\n\n');
+              break;
+          }
+        }
+      }
+    });
+
+    childProcess.stderr?.on('data', (data: Buffer) => {
+      console.log('Error logs:', data.toString());
+    });
+
+    childProcess.on('error', error => {
+      messageBuffer.clear();
+      reject(new Error(`Child process threw an error. Error message: ${error.message}.`));
+    });
+
+    childProcess.on('exit', (code, signal) => {
+      messageBuffer.clear();
+      reject(new Error(`Child process exited with code ${code} and signal ${signal}`));
+    });
   });
 }
 

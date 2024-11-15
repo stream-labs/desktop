@@ -57,6 +57,7 @@ import {
 } from './ai-highlighter/ai-highlighter';
 import uuid from 'uuid';
 import { EMenuItemKey } from 'services/side-nav';
+import { AIHighlighterUpdater } from './ai-highlighter/updater';
 export type TStreamInfo =
   | {
       orderPosition: number;
@@ -589,6 +590,11 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
   async init() {
     super.init();
+
+    // const updater = new AIHighlighterUpdater();
+    // if (await updater.checkForUpdates()) {
+    //   await updater.update();
+    // }
 
     //
     this.views.clips.forEach(clip => {
