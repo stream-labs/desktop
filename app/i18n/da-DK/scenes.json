@@ -3,7 +3,7 @@
   "The scene name is required": "Scenenavn skal angives",
   "Please enter the name of the scene": "Angiv navnet på scenen",
   "Manage Scene Collections": "Administrer scenesamlinger",
-  "Create Scene Collection": "Create Scene Collection",
+  "Create Scene Collection": "Opret scenesamling",
   "There needs to be at least one scene.": "Der skal være mindst én scene.",
   "Projector:": "Projektor:",
   "Projector: Output": "Projektor: Udgang",
@@ -63,7 +63,7 @@
   "Loading scene...": "Indlæser scene ...",
   "Import from OBS": "Importér fra OBS",
   "Import from Twitch": "Importér fra Twitch",
-  "Import from Twitch Studio": "Import from Twitch Studio",
+  "Import from Twitch Studio": "Import fra Twitch Studio",
   "Load existing scenes from Twitch Studio": "Indlæs eksisterende scener fra Twitch Studio",
-  "Start Fresh": "Start Fresh"
+  "Start Fresh": "Start på en frisk"
 }
