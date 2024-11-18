@@ -344,7 +344,7 @@ export default function ClipsView({
                   </Scrollable>
                 </>
               ) : (
-                <ClipsLoadingView clips={clips.sorted} />
+                <ClipsLoadingView streamId={props.id} />
               )}
             </>
           )}
@@ -432,18 +432,17 @@ function AddClip({
   );
 }
 
-function ClipsLoadingView({ clips }: { clips: { id: string }[] }) {
+function ClipsLoadingView({ streamId }: { streamId: string | undefined }) {
   const { HighlighterService } = Services;
-  const v = useVuex(() => ({
-    loadedCount: HighlighterService.views.loadedCount,
-  }));
+  const clips = useVuex(() =>
+    HighlighterService.getClips(HighlighterService.views.clips, streamId),
+  );
 
   return (
     <div className={styles.clipLoader} style={{ display: 'grid', placeContent: 'center' }}>
       <h2>Loading</h2>
       <p>
-        {' '}
-        {v.loadedCount}/{clips.length} Clips
+        {clips.filter(clip => clip.loaded).length}/{clips.length} Clips
       </p>
     </div>
   );
