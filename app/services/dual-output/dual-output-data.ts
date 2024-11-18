@@ -58,9 +58,3 @@ export const DualOutputPlatformSettings: TDualOutputPlatformSettings = {
     display: EOutputDisplayType.Vertical,
   },
 };
-
-export const displayLabels = (display: EOutputDisplayType | string) =>
-  ({
-    [EOutputDisplayType.Horizontal]: $t('Horizontal'),
-    [EOutputDisplayType.Vertical]: $t('Vertical'),
-  }[display]);
