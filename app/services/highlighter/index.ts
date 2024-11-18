@@ -97,9 +97,16 @@ export interface IAiClip extends IBaseClip {
   aiInfo: IAiClipInfo;
 }
 
+export interface IDeathMetadata {
+  place: number;
+}
+export interface IKillMetadata {
+  bot_kill: boolean;
+}
+
 export interface IInput {
   type: EHighlighterInputTypes;
-  metadata?: any;
+  metadata?: IDeathMetadata | IKillMetadata;
 }
 
 export interface IAiClipInfo {
