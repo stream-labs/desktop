@@ -216,9 +216,23 @@ export interface IAudioInfo {
   musicVolume: number;
 }
 
+export interface IIntroInfo {
+  path: string;
+  duration: number | null;
+}
+export interface IOutroInfo {
+  path: string;
+  duration: number | null;
+}
+export interface IVideoInfo {
+  intro: IIntroInfo;
+  outro: IOutroInfo;
+}
+
 interface IHighligherState {
   clips: Dictionary<TClip>;
   transition: ITransitionInfo;
+  video: IVideoInfo;
   audio: IAudioInfo;
   export: IExportInfo;
   upload: IUploadInfo;
@@ -402,6 +416,10 @@ class HighligherViews extends ViewHandler<IHighligherState> {
     return this.state.audio;
   }
 
+  get video() {
+    return this.state.video;
+  }
+
   get transitionDuration() {
     return this.transition.type === 'None' ? 0 : this.state.transition.duration;
   }
@@ -435,6 +453,10 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     transition: {
       type: 'fade',
       duration: 1,
+    },
+    video: {
+      intro: { path: '', duration: null },
+      outro: { path: '', duration: null },
     },
     audio: {
       musicEnabled: false,
@@ -550,6 +572,15 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     this.state.audio = {
       ...this.state.audio,
       ...audioInfo,
+    };
+    this.state.export.exported = false;
+  }
+
+  @mutation()
+  SET_VIDEO_INFO(videoInfo: Partial<IVideoInfo>) {
+    this.state.video = {
+      ...this.state.video,
+      ...videoInfo,
     };
     this.state.export.exported = false;
   }
@@ -1029,6 +1060,10 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     this.SET_AUDIO_INFO(audio);
   }
 
+  setVideo(video: Partial<IVideoInfo>) {
+    this.SET_VIDEO_INFO(video);
+  }
+
   setExportFile(file: string) {
     this.SET_EXPORT_INFO({ file });
   }
@@ -1269,6 +1304,21 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
           console.log('clip', clip);
           return clip;
         });
+    }
+
+    if (this.views.video.intro.path) {
+      const intro: Clip = new Clip(this.views.video.intro.path);
+      await intro.init();
+      intro.startTrim = 0;
+      intro.endTrim = 0;
+      clips.unshift(intro);
+    }
+    if (this.views.video.outro.path) {
+      const outro = new Clip(this.views.video.outro.path);
+      await outro.init();
+      outro.startTrim = 0;
+      outro.endTrim = 0;
+      clips.push(outro);
     }
 
     const exportOptions: IExportOptions = preview

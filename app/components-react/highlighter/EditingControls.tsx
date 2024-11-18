@@ -10,6 +10,8 @@ import { $t } from 'services/i18n';
 import { TModalClipsView } from './ClipsView';
 import { useVuex } from 'components-react/hooks';
 import { Services } from 'components-react/service-provider';
+import { SUPPORTED_FILE_TYPES } from 'services/highlighter/constants';
+import { Clip } from 'services/highlighter/clip';
 
 export function EditingControls({
   emitSetShowModal,
@@ -21,6 +23,7 @@ export function EditingControls({
   const v = useVuex(() => ({
     transition: HighlighterService.views.transition,
     audio: HighlighterService.views.audio,
+    video: HighlighterService.views.video,
     error: HighlighterService.views.error,
   }));
 
@@ -33,10 +36,21 @@ export function EditingControls({
   }
 
   const musicExtensions = ['mp3', 'wav', 'flac'];
+  const videoExtensions = SUPPORTED_FILE_TYPES;
 
   function setMusicFile(file: string) {
     if (!musicExtensions.map(e => `.${e}`).includes(path.parse(file).ext)) return;
     HighlighterService.actions.setAudio({ musicPath: file });
+  }
+
+  async function setVideoFile(file: string, type: 'intro' | 'outro') {
+    if (!videoExtensions.map(e => `.${e}`).includes(path.parse(file).ext)) return;
+    const tempClip = new Clip(file);
+    await tempClip.init();
+    HighlighterService.actions.setVideo({ [type]: { path: file, duration: tempClip.duration } });
+  }
+  function removeVideoFile(type: 'intro' | 'outro') {
+    HighlighterService.actions.setVideo({ [type]: { path: '', duration: null } });
   }
 
   function setMusicVolume(volume: number) {
@@ -72,6 +86,46 @@ export function EditingControls({
           value={v.audio.musicEnabled}
           onChange={setMusicEnabled}
         />
+        <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+          <FileInput
+            style={{ width: '100%' }}
+            label={'Intro'}
+            value={v.video.intro.path}
+            filters={[{ name: 'Video file', extensions: videoExtensions }]}
+            onChange={e => {
+              setVideoFile(e, 'intro');
+            }}
+          />
+          {v.video.intro.path && (
+            <div style={{ marginBottom: '24px', marginLeft: '4px' }}>
+              <Button
+                type="ghost"
+                onClick={() => removeVideoFile('intro')}
+                icon={<span style={{ color: '#ffffff', fontSize: '20px' }}>&times;</span>}
+              />
+            </div>
+          )}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+          <FileInput
+            style={{ width: '100%' }}
+            label={'Outro'}
+            value={v.video.outro.path}
+            filters={[{ name: 'Video file', extensions: videoExtensions }]}
+            onChange={e => {
+              setVideoFile(e, 'outro');
+            }}
+          />
+          {v.video.outro.path && (
+            <div style={{ marginBottom: '24px', marginLeft: '4px' }}>
+              <Button
+                type="ghost"
+                onClick={() => removeVideoFile('outro')}
+                icon={<span style={{ color: '#ffffff', fontSize: '20px' }}>&times;</span>}
+              />
+            </div>
+          )}
+        </div>
         <Animate transitionName="ant-slide-up">
           {v.audio.musicEnabled && (
             <div>

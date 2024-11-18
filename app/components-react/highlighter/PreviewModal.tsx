@@ -20,15 +20,41 @@ export default function PreviewModal({
   }
   const { HighlighterService } = Services;
   const clips = HighlighterService.getClips(HighlighterService.views.clips, streamId);
+  const { intro, outro } = HighlighterService.views.video;
   const [currentClipIndex, setCurrentClipIndex] = useState(0);
-  const sortedClips = sortClips(clips, streamId).filter(c => c.enabled);
+  const sortedClips = [...sortClips(clips, streamId).filter(c => c.enabled)];
 
-  const playlist = sortedClips.map((clip: TClip) => ({
-    src: clip.path + `#t=${clip.startTrim},${clip.duration! - clip.endTrim}`,
-    start: clip.startTrim,
-    end: clip.duration! - clip.endTrim,
-    type: 'video/mp4',
-  }));
+  const playlist = [
+    ...(intro.duration
+      ? [
+          {
+            src: intro.path,
+            path: intro.path,
+            start: 0,
+            end: intro.duration!,
+            type: 'video/mp4',
+          },
+        ]
+      : []),
+    ...sortedClips.map((clip: TClip) => ({
+      src: clip.path + `#t=${clip.startTrim},${clip.duration! - clip.endTrim}`,
+      path: clip.path,
+      start: clip.startTrim,
+      end: clip.duration! - clip.endTrim,
+      type: 'video/mp4',
+    })),
+    ...(outro.duration && outro.path
+      ? [
+          {
+            src: outro.path,
+            path: outro.path,
+            start: 0,
+            end: outro.duration!,
+            type: 'video/mp4',
+          },
+        ]
+      : []),
+  ];
   const videoPlayerA = useRef<HTMLVideoElement>(null);
   const videoPlayerB = useRef<HTMLVideoElement>(null);
   const [activePlayer, setActivePlayer] = useState<'A' | 'B'>('A');
@@ -217,7 +243,38 @@ export default function PreviewModal({
               justifyContent: 'center',
             }}
           >
-            {sortedClips.map(({ path }, index) => {
+            {playlist.map(({ path }, index) => {
+              let content;
+              if (path === intro.path) {
+                content = (
+                  <div style={{ height: '34px' }}>
+                    <video
+                      style={{ height: '100%' }}
+                      src={intro.path}
+                      controls={false}
+                      autoPlay={false}
+                      muted
+                      playsInline
+                    ></video>
+                  </div>
+                );
+              } else if (path === outro.path) {
+                content = (
+                  <div style={{ height: '34px' }}>
+                    <video
+                      style={{ height: '100%' }}
+                      src={outro.path}
+                      controls={false}
+                      autoPlay={false}
+                      muted
+                      playsInline
+                    ></video>
+                  </div>
+                );
+              } else {
+                content = <MiniClipPreview clipId={path}></MiniClipPreview>;
+              }
+
               return (
                 <div
                   key={'preview-mini' + path}
@@ -226,14 +283,14 @@ export default function PreviewModal({
                     borderRadius: '6px',
                     width: 'fit-content',
                     border: `solid 2px ${
-                      sortedClips[currentClipIndex].path === path ? 'white' : 'transparent'
+                      playlist[currentClipIndex].path === path ? 'white' : 'transparent'
                     }`,
                   }}
                   onClick={() => {
                     jumpToClip(index);
                   }}
                 >
-                  <MiniClipPreview clipId={path}></MiniClipPreview>
+                  {content}
                 </div>
               );
             })}
