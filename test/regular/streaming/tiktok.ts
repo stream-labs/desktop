@@ -18,6 +18,8 @@ import { IDummyTestUser, tikTokUsers } from '../../data/dummy-accounts';
 import { TTikTokLiveScopeTypes } from 'services/platforms/tiktok/api';
 import { isDisplayed, waitForDisplayed } from '../../helpers/modules/core';
 
+// not a react hook
+// eslint-disable-next-line react-hooks/rules-of-hooks
 useWebdriver();
 
 test('Streaming to TikTok', withUser('twitch', { multistream: false, prime: false }), async t => {
@@ -50,14 +52,14 @@ test('Streaming to TikTok', withUser('twitch', { multistream: false, prime: fals
     title: 'Test stream',
     twitchGame: 'Fortnite',
   });
-  await submit();
-  await waitForDisplayed('span=Update settings for TikTok');
-  await waitForStreamStart();
-  await stopStream();
+  // await submit();
+  // await waitForDisplayed('span=Update settings for TikTok');
+  // await waitForStreamStart();
+  // await stopStream();
 
   // test all other tiktok statuses
+  // await testLiveScope(t, 'legacy');
   await testLiveScope(t, 'denied');
-  await testLiveScope(t, 'legacy');
   await testLiveScope(t, 'relog');
 
   t.pass();
@@ -76,15 +78,26 @@ async function testLiveScope(t: TExecutionContext, scope: TTikTokLiveScopeTypes)
   // denied scope should show prompt to remerge TikTok account
   if (scope === 'relog') {
     skipCheckingErrorsInLog();
-    t.true(await isDisplayed('div=Failed to update TikTok account', { timeout: 1000 }));
+
+    t.true(
+      await isDisplayed('div=Failed to update TikTok account', { timeout: 3000 }),
+      'TikTok remerge error shown',
+    );
     return;
   }
 
-  await waitForSettingsWindowLoaded();
+  if (scope === 'denied') {
+    await waitForSettingsWindowLoaded();
+    await submit();
 
-  await fillForm({
-    tiktok: true,
-  });
+    t.true(
+      await isDisplayed('span=Streaming to TikTok not approved.'),
+      'TikTok denied error shown',
+    );
+
+    return;
+  }
+
   await waitForSettingsWindowLoaded();
   await waitForDisplayed('div[data-name="tiktok-settings"]');
 

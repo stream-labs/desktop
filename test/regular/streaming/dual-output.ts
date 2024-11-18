@@ -9,6 +9,7 @@ import {
   focusChild,
   focusMain,
   isDisplayed,
+  selectAsyncAlert,
   waitForDisplayed,
 } from '../../helpers/modules/core';
 import { logIn } from '../../helpers/modules/user';
@@ -23,6 +24,8 @@ import { withUser } from '../../helpers/webdriver/user';
 import { SceneBuilder } from '../../helpers/scene-builder';
 import { getApiClient } from '../../helpers/api-client';
 
+// not a react hook
+// eslint-disable-next-line react-hooks/rules-of-hooks
 useWebdriver();
 
 /**
@@ -108,8 +111,12 @@ test(
 
     // cannot use dual output mode with only one platform linked
     await submit();
-    await waitForDisplayed(
-      'div=To use Dual Output you must stream to at least one horizontal and one vertical platform.',
+
+    t.true(
+      await (
+        await selectAsyncAlert('Confirm Horizontal and Vertical Platforms')
+      ).waitForDisplayed(),
+      'Alert is open',
     );
 
     t.pass();
@@ -130,8 +137,11 @@ test(
 
     // cannot use dual output mode with all platforms assigned to one display
     await submit();
-    await waitForDisplayed(
-      'div=To use Dual Output you must stream to at least one horizontal and one vertical platform.',
+    t.true(
+      await (
+        await selectAsyncAlert('Confirm Horizontal and Vertical Platforms')
+      ).waitForDisplayed(),
+      'Alert is open',
     );
 
     t.pass();
