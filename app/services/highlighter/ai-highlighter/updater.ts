@@ -24,11 +24,14 @@ interface IAIHighlighterManifest {
  * Responsible for storing the manifest and updating the highlighter binary, and maintains
  * the paths to the highlighter binary and manifest.
  */
-export class AIHighlighterUpdater {
+export class AiHighlighterUpdater {
   private basepath: string;
   private manifestPath: string;
   private manifest: IAIHighlighterManifest | null;
   private isCurrentlyUpdating: boolean = false;
+  private versionChecked: boolean = false;
+
+  public currentUpdate: Promise<void> | null = null;
 
   constructor() {
     this.basepath = getSharedResource('ai-highlighter');
@@ -80,7 +83,13 @@ export class AIHighlighterUpdater {
   /**
    * Check if AI Highlighter requires an update
    */
-  public async checkForUpdates(): Promise<boolean> {
+  public async isNewVersionAvailable(): Promise<boolean> {
+    // check if updater checked version in current session already
+    if (this.versionChecked) {
+      return false;
+    }
+
+    this.versionChecked = true;
     console.log('checking for highlighter updates...');
     // fetch the latest version of the manifest for win x86_64 target
     const newManifest = await jfetch<IAIHighlighterManifest>(
@@ -116,7 +125,8 @@ export class AIHighlighterUpdater {
   public async update(progressCallback?: (progress: IDownloadProgress) => void): Promise<void> {
     try {
       this.isCurrentlyUpdating = true;
-      await this.performUpdate(progressCallback);
+      this.currentUpdate = this.performUpdate(progressCallback);
+      await this.currentUpdate;
     } finally {
       this.isCurrentlyUpdating = false;
     }

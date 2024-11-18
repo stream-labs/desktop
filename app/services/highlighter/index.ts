@@ -57,7 +57,8 @@ import {
 } from './ai-highlighter/ai-highlighter';
 import uuid from 'uuid';
 import { EMenuItemKey } from 'services/side-nav';
-import { AIHighlighterUpdater } from './ai-highlighter/updater';
+import { AiHighlighterUpdater } from './ai-highlighter/updater';
+import { IDownloadProgress } from 'util/requests';
 export type TStreamInfo =
   | {
       orderPosition: number;
@@ -240,6 +241,8 @@ interface IHighligherState {
   error: string;
   useAiHighlighter: boolean;
   highlightedStreams: IHighlightedStream[];
+  updaterProgress: number;
+  isUpdaterRunning: boolean;
 }
 
 // Capitalization is not consistent because it matches with the
@@ -489,6 +492,8 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     error: '',
     useAiHighlighter: false,
     highlightedStreams: [],
+    updaterProgress: 0,
+    isUpdaterRunning: false,
   };
 
   @Inject() streamingService: StreamingService;
@@ -499,6 +504,8 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   @Inject() jsonrpcService: JsonrpcService;
   @Inject() navigationService: NavigationService;
   @Inject() sharedStorageService: SharedStorageService;
+
+  aiHighlighterUpdater: AiHighlighterUpdater;
 
   /**
    * A dictionary of actual clip classes.
@@ -622,6 +629,16 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     );
   }
 
+  @mutation()
+  SET_UPDATER_PROGRESS(progress: number) {
+    this.state.updaterProgress = progress;
+  }
+
+  @mutation()
+  SET_UPDATER_STATE(isRunning: boolean) {
+    this.state.isUpdaterRunning = isRunning;
+  }
+
   get views() {
     return new HighligherViews(this.state);
   }
@@ -629,10 +646,14 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   async init() {
     super.init();
 
-    // const updater = new AIHighlighterUpdater();
-    // if (await updater.checkForUpdates()) {
-    //   await updater.update();
-    // }
+    if (!this.aiHighlighterUpdater) {
+      this.aiHighlighterUpdater = new AiHighlighterUpdater();
+    }
+
+    // check if ai highlighter is activated and we need to update it
+    if (this.views.useAiHighlighter && (await this.aiHighlighterUpdater.isNewVersionAvailable())) {
+      await this.startUpdater();
+    }
 
     //
     this.views.clips.forEach(clip => {
@@ -1707,6 +1728,13 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   }
 
   async flow(filePath: string, streamInfo: StreamInfoForAiHighlighter): Promise<void> {
+    // if update is already in progress, need to wait until it's done
+    if (this.aiHighlighterUpdater.updateInProgress) {
+      await this.aiHighlighterUpdater.currentUpdate;
+    } else if (await this.aiHighlighterUpdater.isNewVersionAvailable()) {
+      await this.startUpdater();
+    }
+
     const fallbackTitle = 'awesome-stream';
     const sanitizedTitle = streamInfo.title
       ? streamInfo.title.replace(/[\\/:"*?<>|]+/g, ' ')
@@ -2101,5 +2129,22 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
         enabled: true,
       });
     });
+  }
+
+  private updateProgress(progress: IDownloadProgress) {
+    // this is a lie and its not a percent, its float from 0 and 1
+    this.SET_UPDATER_PROGRESS(progress.percent * 100);
+  }
+
+  /**
+   * Start updater process
+   */
+  private async startUpdater() {
+    try {
+      this.SET_UPDATER_STATE(true);
+      await this.aiHighlighterUpdater.update(progress => this.updateProgress(progress));
+    } finally {
+      this.SET_UPDATER_STATE(false);
+    }
   }
 }
