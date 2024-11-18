@@ -1244,6 +1244,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         hasRelogged: true,
       };
 
+      // TODO: index
+      // @ts-ignore
       this.UPDATE_PLATFORM(auth.platforms[auth.primaryPlatform]);
       return EPlatformCallResult.Success;
     }

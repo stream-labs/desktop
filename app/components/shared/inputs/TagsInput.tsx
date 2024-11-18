@@ -91,6 +91,8 @@ export default class TagsInput extends BaseInput<
     // onSearchChange event from vue-multiselect doesn't work in tsx mode
     // so bind a native listener for the search input
     this.$el.querySelector('input[type=text]').addEventListener('keyup', (e: InputEvent) => {
+      // TODO: index
+      // @ts-ignore
       this.onSearchChangeHandler(e.currentTarget['value']);
     });
   }

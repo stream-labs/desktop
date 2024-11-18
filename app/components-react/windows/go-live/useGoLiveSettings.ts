@@ -118,6 +118,8 @@ class GoLiveSettingsState extends StreamInfoView<IGoLiveSettingsState> {
       platforms.forEach(platform => {
         if (!view.supports(fieldName, [platform])) return;
         const platformSettings = getDefined(this.state.platforms[platform]);
+        // TODO: index
+        // @ts-ignore
         platformSettings[fieldName] = value;
       });
     });
@@ -193,6 +195,8 @@ export class GoLiveSettingsModule {
     // prefill the form if `prepopulateOptions` provided
     if (prepopulateOptions) {
       Object.keys(prepopulateOptions).forEach(platform => {
+        // TODO: index
+        // @ts-ignore
         Object.assign(settings.platforms[platform], prepopulateOptions[platform]);
       });
     }

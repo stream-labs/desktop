@@ -137,7 +137,11 @@ export default function BrowserView(p: BrowserViewProps) {
       // ignore some common errors
       // that happen when the window has been closed before BrowserView accomplished the request
       if (e && typeof e === 'object') {
+        // TODO: index
+        // @ts-ignore
         if (e['code'] === 'ERR_ABORTED') return;
+        // TODO: index
+        // @ts-ignore
         if (e['message'] && e['message'].match(/\(\-3\) loading/)) return;
       }
       throw e;
