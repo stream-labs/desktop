@@ -15,6 +15,7 @@
 }
 
 .stream-card {
+  overflow: hidden;
   background: var(--border);
   display: flex;
   flex-direction: column;
@@ -27,10 +28,10 @@
 
 .thumbnail-wrapper {
   position: relative;
+
   --thumbWith: 192px;
   --thumbHeight: 108px;
   overflow-x: clip;
-  border-radius: 10px 10px 0 0;
 
   width: calc(var(--thumbWith) * 2.2);
   height: calc(var(--thumbHeight) * 2.2);
