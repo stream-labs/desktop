@@ -9,9 +9,10 @@ import cx from 'classnames';
 import { Button, Tooltip } from 'antd';
 import { $t } from 'services/i18n';
 import { isAiClip } from './utils';
-import { InputEmojiSection } from './InputEmojiSection';
+import { getInputTypeCount, InputEmojiSection } from './InputEmojiSection';
 
 import { useVuex } from 'components-react/hooks';
+import { EHighlighterInputTypes } from 'services/highlighter/ai-highlighter/ai-highlighter';
 export default function ClipPreview(props: {
   clipId: string;
   streamId: string | undefined;
@@ -23,19 +24,19 @@ export default function ClipPreview(props: {
     clip: HighlighterService.views.clipsDictionary[props.clipId] as TClip,
   }));
 
-  if (!v.clip) {
-    return <div>deleted</div>;
-  }
-  const [scrubFrame, setScrubFrame] = useState(0);
+  const [scrubFrame, setScrubFrame] = useState<number>(0);
+
   // TODO: placeholder image + make sure to regenerate sprite if sprite doesnt exist
-  let clipThumbnail = v.clip.scrubSprite || '';
+  const clipThumbnail = v.clip.scrubSprite || '';
 
   const filename = useMemo(() => {
     return path.basename(v.clip.path);
   }, [v.clip.path]);
   // Deleted clips always show as disabled
   const enabled = v.clip.deleted ? false : v.clip.enabled;
-
+  if (!v.clip) {
+    return <div>deleted</div>;
+  }
   function mouseMove(e: React.MouseEvent) {
     const frameIdx = Math.floor((e.nativeEvent.offsetX / SCRUB_WIDTH) * SCRUB_FRAMES);
 
@@ -50,8 +51,9 @@ export default function ClipPreview(props: {
 
   return (
     <div
+      className={styles.previewClip}
       style={{
-        padding: '16px',
+        // padding: '16px',
         backgroundColor: '#2B383F',
         borderRadius: '16px',
         display: 'flex',
@@ -98,6 +100,11 @@ export default function ClipPreview(props: {
             />
           </div>
         )}
+        <div style={{ position: 'absolute', top: '7px', right: '9px' }}>
+          {v.clip.source === 'AiClip' && (
+            <FlameHypeScore score={v.clip.aiInfo.score}></FlameHypeScore>
+          )}
+        </div>
         <span style={{ position: 'absolute', top: '10px', left: '10px' }}>
           <BoolButtonInput
             tooltip={enabled ? $t('Disable clip') : $t('Enable clip')}
@@ -114,119 +121,84 @@ export default function ClipPreview(props: {
             checkboxActiveStyles={{ background: 'var(--teal-hover)' }}
           />
         </span>
-        <span
+        <div
+          className={styles.previewClipMoving}
           style={{
             position: 'absolute',
             bottom: '10px',
-            right: '10px',
-            padding: '2px 4px',
-            backgroundColor: 'black',
-            borderRadius: '2px',
-            opacity: 0.7,
+            paddingLeft: '10px',
+            paddingRight: '10px',
+            left: '0',
+            width: '320px',
+            height: '130px',
+            justifyContent: 'end',
+            display: 'flex',
+            alignItems: 'center',
+            flexDirection: 'column',
+            gap: '8px',
           }}
         >
-          {formatSecondsToHMS(v.clip.duration! - (v.clip.startTrim + v.clip.endTrim) || 0)}
-        </span>
-        {/* <div
-          style={{
-            position: 'absolute',
-            top: '6px',
-            right: '6px',
-            fontSize: 18,
-            padding: '2px 8px 0',
-            borderRadius: '5px',
-            background: 'rgba(0,0,0,0.5)',
-            color: 'var(--highlighter-icon)',
-          }}
-        >
-          <Tooltip title={$t('Trim clip')} placement="top">
-            <i
-              className={cx('icon-studio-mode-3', styles.clipAction)}
-              style={{ marginRight: 12 }}
-              onClick={props.showTrim}
-            />
-          </Tooltip>
-          <Tooltip title={$t('Remove clip')} placement="top">
-            <i className={cx('icon-trash', styles.clipAction)} onClick={props.showRemove} />
-          </Tooltip>
-        </div> */}
-      </div>
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-          width: '100%',
-          borderRadius: '0 0 10px 10px',
-        }}
-      >
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            {/* <div
+          <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
+            {' '}
+            {/* left */}
+            <div
               style={{
-                fontSize: '16px',
-                width: '184px',
-                textOverflow: 'ellipsis',
-                overflow: 'hidden',
-                whiteSpace: 'nowrap',
+                display: 'flex',
               }}
             >
-              {filename}
-            </div> */}{' '}
-            <div style={{ display: 'flex', gap: '8px' }}>
-              {isAiClip(v.clip) && v.clip.aiInfo?.metadata?.round && (
-                <div className={styles.typeTag}>
-                  <div style={{ height: '22px', display: 'flex', gap: '8px' }}>
-                    {`Round: ${v.clip.aiInfo.metadata.round}`}
-                  </div>
-                </div>
-              )}
-              <div className={styles.typeTag}>
+              <span
+                style={{
+                  padding: '4px 6px',
+                  backgroundColor: '#00000070',
+                  borderRadius: '4px',
+                  color: 'white',
+                }}
+              >
+                {formatSecondsToHMS(v.clip.duration! - (v.clip.startTrim + v.clip.endTrim) || 0)}
+              </span>
+            </div>
+            {/* right */}
+            <div style={{ display: 'flex', gap: '4px' }}>
+              <div
+                style={{
+                  fontSize: '19px',
+                  transform: 'translateY(1px)',
+                }}
+              >
                 {isAiClip(v.clip) ? (
                   <>
                     <InputEmojiSection
                       clips={[v.clip]}
                       includeRounds={false}
                       includeDeploy={true}
+                      showCount={false}
+                      showDescription={false}
                     />
                   </>
                 ) : (
-                  <>
-                    <i className="icon-highlighter" /> {v.clip.source}
-                  </>
+                  <div style={{}}>
+                    <i className="icon-highlighter" />{' '}
+                  </div>
                 )}
               </div>
+              {isAiClip(v.clip) && v.clip.aiInfo?.metadata?.round && (
+                <div
+                  style={{
+                    padding: '4px 6px',
+                    backgroundColor: '#00000070',
+                    borderRadius: '4px',
+                    color: 'white',
+                  }}
+                >
+                  {`Round: ${v.clip.aiInfo.metadata.round}`}
+                </div>
+              )}
             </div>
           </div>
-          <div>
-            {v.clip.source == 'AiClip' && (
-              <FlameHypeScore score={v.clip.aiInfo.score}></FlameHypeScore>
-            )}
-            {/* <span style={{ fontSize: '21px', color: 'white' }}>{reachedPoints}</span>
-            <span style={{ paddingBottom: '4px', paddingLeft: '2px' }}>/100</span> */}
-          </div>
-        </div>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-          }}
-        >
-          <div style={{ fontSize: '16px' }}>
-            {v.clip.source !== 'Manual' && props.streamId && (
-              <>
-                {`${formatSecondsToHHMMSS(
-                  v.clip.streamInfo?.[props.streamId]?.initialStartTime,
-                )} - ${formatSecondsToHHMMSS(
-                  v.clip.streamInfo?.[props.streamId]?.initialEndTime,
-                )} `}
-              </>
-            )}
-          </div>
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            {' '}
+          <div
+            className={styles.previewClipBottomBar}
+            style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}
+          >
             <Button
               size="large"
               style={{ display: 'flex', gap: '8px', alignItems: 'center' }}
@@ -241,33 +213,8 @@ export default function ClipPreview(props: {
             >
               <i className="icon-trim" /> Trim
             </Button>
-            {/* <Button
-              size="large"
-              style={{ display: 'flex', gap: '8px', alignItems: 'center' }}
-              onClick={() => {}}
-            >
-              <i className="icon-crossclip" /> Export vertical
-            </Button>
-            <Button
-              size="large"
-              style={{ display: 'flex', gap: '8px', alignItems: 'center' }}
-              onClick={() => {}}
-            >
-              <i className="icon-download" /> Export clip
-            </Button> */}
-            {/* <Tooltip title={$t('Trim clip')} placement="top">
-              <i
-                className={cx('icon-studio-mode-3', styles.clipAction)}
-                style={{ marginRight: 12 }}
-                onClick={props.showTrim}
-              />
-            </Tooltip> */}
-            {/* <Tooltip title={$t('Remove clip')} placement="top">
-              <i className={cx('icon-trash', styles.clipAction)} onClick={props.showRemove} />
-            </Tooltip> */}
           </div>
         </div>
-        {/* {`${v.clip.deleted ? '[DELETED] ' : ''}${filename}`} */}
       </div>
     </div>
   );
