@@ -194,7 +194,7 @@ export default function ClipsView({
             <>
               {loaded ? (
                 <>
-                  <Scrollable
+                  {/* <Scrollable
                     horizontal={true}
                     style={{
                       width: '100%',
@@ -240,7 +240,7 @@ export default function ClipsView({
                   >
                     <span>0m 0s</span>
                     <VideoDuration streamId={streamId} />
-                  </div>
+                  </div> */}
                   <div
                     style={{
                       display: 'flex',
@@ -314,10 +314,9 @@ export default function ClipsView({
                             key={clip.path}
                             data-clip-id={id}
                             style={{
-                              padding: '2px',
                               borderRadius: '18px',
                               margin: '10px 20px 10px 0',
-                              width: '100%',
+                              display: 'inline-block',
                             }}
                           >
                             <div

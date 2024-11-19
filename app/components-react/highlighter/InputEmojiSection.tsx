@@ -8,10 +8,14 @@ export function InputEmojiSection({
   clips,
   includeRounds,
   includeDeploy,
+  showCount,
+  showDescription,
 }: {
   clips: TClip[];
   includeRounds: boolean;
   includeDeploy: boolean;
+  showCount?: boolean;
+  showDescription?: boolean;
 }): JSX.Element {
   const excludeTypes = [
     EHighlighterInputTypes.GAME_SEQUENCE,
@@ -63,12 +67,15 @@ export function InputEmojiSection({
       {filteredInputTypeMap.map(([type, count]) => (
         <div key={type} style={{ display: 'flex', gap: '4px' }}>
           <span key={type + 'emoji'}>{getTypeWordingFromType(type, count).emoji} </span>{' '}
-          <span className={styles.description} key={type + 'description'}>
-            {count} {getTypeWordingFromType(type, count).description}{' '}
-            {!includeRounds && isDeath(type) && getGamePlacement(clips)
-              ? '#' + getGamePlacement(clips)
-              : ''}
-          </span>
+          {(showCount !== false || showDescription !== false) && (
+            <span className={styles.description} key={type + 'description'}>
+              {showCount !== false && `${count} `}
+              {showDescription !== false && `${getTypeWordingFromType(type, count).description} `}
+              {!includeRounds && isDeath(type) && getGamePlacement(clips)
+                ? '#' + getGamePlacement(clips)
+                : ''}
+            </span>
+          )}
         </div>
       ))}
       {manualClip()}
@@ -107,7 +114,7 @@ function getTypeWordingFromType(
   // return { emoji: type, description: count > 1 ? `${type}s` : type };
 }
 
-function getInputTypeCount(clips: TClip[]): { [type: string]: number } {
+export function getInputTypeCount(clips: TClip[]): { [type: string]: number } {
   const typeCounts: { [type: string]: number } = {};
   if (clips.length === 0) {
     return typeCounts;
