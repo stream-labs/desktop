@@ -81,6 +81,13 @@ export class AiHighlighterUpdater {
   }
 
   /**
+   * Get version that is about to be installed
+   */
+  public get version(): string | null {
+    return this.manifest?.version || null;
+  }
+
+  /**
    * Check if AI Highlighter requires an update
    */
   public async isNewVersionAvailable(): Promise<boolean> {

@@ -5,6 +5,7 @@ import { IViewState } from 'services/highlighter';
 import { Services } from 'components-react/service-provider';
 import StreamView from 'components-react/highlighter/StreamView';
 import ClipsView from 'components-react/highlighter/ClipsView';
+import UpdateModal from 'components-react/highlighter/UpdateModal';
 
 export default function Highlighter(props: { params?: { view: string } }) {
   const openViewFromParams = props?.params?.view || '';
@@ -13,6 +14,9 @@ export default function Highlighter(props: { params?: { view: string } }) {
   const v = useVuex(() => ({
     dismissedTutorial: HighlighterService.views.dismissedTutorial,
     useAiHighlighter: HighlighterService.views.useAiHighlighter,
+    isUpdaterRunning: HighlighterService.views.isUpdaterRunning,
+    higlighterVersion: HighlighterService.views.highlighterVersion,
+    progress: HighlighterService.views.updaterProgress,
   }));
 
   const [viewState, setViewState] = useState<IViewState>(
@@ -25,6 +29,13 @@ export default function Highlighter(props: { params?: { view: string } }) {
   // if (viewState.view !== 'settings' && !v.clips.length && !v.dismissedTutorial && !v.error || ) {
   //   setViewState({ view: 'settings' });
   // }
+  const updaterModal = (
+    <UpdateModal
+      version={v.higlighterVersion}
+      progress={v.progress}
+      isVisible={v.isUpdaterRunning}
+    />
+  );
 
   switch (viewState.view) {
     case 'settings':
@@ -32,6 +43,7 @@ export default function Highlighter(props: { params?: { view: string } }) {
       return (
         <>
           {devHeaderBar()}
+          {updaterModal}
           <SettingsView
             close={() => {
               HighlighterService.actions.dismissTutorial();
@@ -46,6 +58,7 @@ export default function Highlighter(props: { params?: { view: string } }) {
     case 'stream':
       return (
         <>
+          {updaterModal}
           <StreamView
             emitSetView={data => {
               setViewFromEmit(data);
@@ -56,6 +69,7 @@ export default function Highlighter(props: { params?: { view: string } }) {
     case 'clips':
       return (
         <>
+          {updaterModal}
           <ClipsView
             emitSetView={data => {
               setViewFromEmit(data);

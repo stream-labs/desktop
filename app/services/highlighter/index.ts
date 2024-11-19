@@ -243,6 +243,7 @@ interface IHighligherState {
   highlightedStreams: IHighlightedStream[];
   updaterProgress: number;
   isUpdaterRunning: boolean;
+  highlighterVersion: string;
 }
 
 // Capitalization is not consistent because it matches with the
@@ -439,6 +440,18 @@ class HighligherViews extends ViewHandler<IHighligherState> {
     return this.state.error;
   }
 
+  get highlighterVersion() {
+    return this.state.highlighterVersion;
+  }
+
+  get isUpdaterRunning() {
+    return this.state.isUpdaterRunning;
+  }
+
+  get updaterProgress() {
+    return this.state.updaterProgress;
+  }
+
   /**
    * Takes a filepath to a video and returns a file:// url with a random
    * component to prevent the browser from caching it and missing changes.
@@ -494,6 +507,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     highlightedStreams: [],
     updaterProgress: 0,
     isUpdaterRunning: false,
+    highlighterVersion: '',
   };
 
   @Inject() streamingService: StreamingService;
@@ -637,6 +651,11 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   @mutation()
   SET_UPDATER_STATE(isRunning: boolean) {
     this.state.isUpdaterRunning = isRunning;
+  }
+
+  @mutation()
+  SET_HIGHLIGHTER_VERSION(version: string) {
+    this.state.highlighterVersion = version;
   }
 
   get views() {
@@ -2142,6 +2161,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   private async startUpdater() {
     try {
       this.SET_UPDATER_STATE(true);
+      this.SET_HIGHLIGHTER_VERSION(this.aiHighlighterUpdater.version || '');
       await this.aiHighlighterUpdater.update(progress => this.updateProgress(progress));
     } finally {
       this.SET_UPDATER_STATE(false);
