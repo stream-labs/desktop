@@ -1,6 +1,6 @@
 import * as child from 'child_process';
 import EventEmitter from 'events';
-import { AIHighlighterUpdater } from './updater';
+import { AiHighlighterUpdater } from './updater';
 
 export enum EHighlighterInputTypes {
   KILL = 'kill',
@@ -111,7 +111,7 @@ export function getHighlightClips(
     console.log('Start Ai analysis');
 
     const childProcess: child.ChildProcess =
-      mockChildProcess || AIHighlighterUpdater.startHighlighterProcess(videoUri);
+      mockChildProcess || AiHighlighterUpdater.startHighlighterProcess(videoUri);
     const messageBuffer = new MessageBufferHandler();
 
     if (cancelSignal) {
