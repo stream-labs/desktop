@@ -784,6 +784,7 @@ function StudioControls() {
             active: ctrl.isDualOutputActive,
           })}
           onClick={() => ctrl.toggleDualOutput()}
+          data-testid={ctrl.isDualOutputActive ? 'dual-output-active' : 'dual-output-inactive'}
         />
       </Tooltip>
 

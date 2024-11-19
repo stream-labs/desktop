@@ -493,10 +493,21 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    * to do this because Twitch adds a captcha when we try to
    * actually log in from integration tests.
    */
-  async testingFakeAuth(auth: IUserAuth, isOnboardingTest: boolean) {
+  async testingFakeAuth(
+    auth: IUserAuth,
+    isOnboardingTest: boolean = false,
+    isNewUser: boolean = false,
+  ) {
+    if (!Utils.isTestMode()) return;
+
     const service = getPlatformService(auth.primaryPlatform);
     this.streamSettingsService.resetStreamSettings();
     await this.login(service, auth);
+
+    if (isNewUser) {
+      this.sceneCollectionsService.newUserFirstLogin = true;
+    }
+
     if (!isOnboardingTest) this.onboardingService.finish();
   }
 
