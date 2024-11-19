@@ -147,7 +147,7 @@ export function Connect() {
               <div className={styles.extraPlatformsContainer}>
                 {shouldAddTrovo && (
                   <PlatformIconButton
-                    datatest={`platform-icon-button-${EPlatform.Trovo}`}
+                    name={EPlatform.Trovo}
                     platform={EPlatform.Trovo}
                     disabled={loading || authInProgress}
                     loading={loading}
@@ -159,7 +159,7 @@ export function Connect() {
                 )}
                 {extraPlatforms.map(platform => (
                   <PlatformIconButton
-                    datatest={`platform-icon-button-${platform.value}`}
+                    name={platform.value}
                     key={platform.value}
                     logo={platform.image}
                     disabled={loading || authInProgress}
