@@ -18,5 +18,8 @@
   "Manage Dual Output Scene": "Administrer Dual Output-scene",
   "Unable to convert dual output collection.": "Kan ikke konvertere samling med dobbeltoutput.",
   "One or more scene items were removed because they are not supported": "One or more scene items were removed because they are not supported",
-  "Scene items were removed because there was an error loading them: %{inputs}.\n\nPlease accept or reject permissions to view the Streamlabs Editor panel": "Scene items were removed because there was an error loading them: %{inputs}.\n\nPlease accept or reject permissions to view the Streamlabs Editor panel"
+  "Scene items were removed because there was an error loading them: %{inputs}.\n\nPlease accept or reject permissions to view the Streamlabs Editor panel": "Scene items were removed because there was an error loading them: %{inputs}.\n\nPlease accept or reject permissions to view the Streamlabs Editor panel",
+  "default_width": "default_width",
+  "default_height": "default_height",
+  "GameCapture.WindowInternalMode": "GameCapture.WindowInternalMode"
 }
