@@ -613,7 +613,7 @@ export class YoutubeService
       const moneyInfo = broadcast.monetizationDetails.cuepointSchedule;
       monetizationDetails = {
         cuepointSchedule: {
-          enabled: moneyInfo.enabled,
+          enabled: isMidStreamMode ? moneyInfo.enabled : params.monetizationEnabled,
           pauseAdsUntil: moneyInfo.pauseAdsUntil,
           scheduleStrategy: moneyInfo.scheduleStrategy,
           repeatIntervalSecs: moneyInfo.repeatIntervalSecs,

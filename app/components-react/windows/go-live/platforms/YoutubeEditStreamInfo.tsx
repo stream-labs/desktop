@@ -40,6 +40,8 @@ export const YoutubeEditStreamInfo = InputComponent((p: IPlatformComponentParams
     fieldName => ({ disabled: fieldIsDisabled(fieldName as keyof IYoutubeStartStreamOptions) }),
   );
 
+  const monetizationElligible = true;
+
   const { broadcastsQuery } = useModule(() => {
     const youtube = inject(YoutubeService);
 
@@ -206,6 +208,9 @@ export const YoutubeEditStreamInfo = InputComponent((p: IPlatformComponentParams
                     "Features like personalized ads and live chat won't be available on live streams made for kids.",
                   )}
                 </p>
+              )}
+              {monetizationElligible && (
+                <CheckboxInput label={$t('Enable Monetization')} {...bind.monetizationEnabled} />
               )}
             </>
           )}
