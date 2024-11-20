@@ -12,7 +12,6 @@ import OverlaySettings from './OverlaySettings';
 import NotificationsSettings from './NotificationsSettings.vue';
 import SearchablePages from 'components/shared/SearchablePages';
 import FormInput from 'components/shared/inputs/FormInput.vue';
-import VirtualWebcamSettings from './VirtualWebcamSettings';
 import { MagicLinkService } from 'services/magic-link';
 import { UserService } from 'services/user';
 import { DismissablesService, EDismissable } from 'services/dismissables';
@@ -43,7 +42,6 @@ import Utils from '../../../services/utils';
     NotificationsSettings,
     InstalledApps,
     FormInput,
-    VirtualWebcamSettings,
     Scrollable,
     PlatformLogo,
     ObsSettings,
@@ -143,7 +141,7 @@ export default class Settings extends Vue {
       // 'Notifications',
       'Appearance',
       'Remote Control',
-      // 'VirtualWebcam',
+      'Virtual Webcam',
       'Game Overlay',
       'Get Support',
       'Ultra',
@@ -167,7 +165,6 @@ export default class Settings extends Vue {
       'Experimental',
       'Remote Control',
       'Installed Apps',
-      'Virtual Webcam',
       'Developer',
     ].includes(this.categoryName);
   }
