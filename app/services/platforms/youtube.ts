@@ -42,6 +42,7 @@ export interface IYoutubeStartStreamOptions extends IExtraBroadcastSettings {
   privacyStatus?: 'private' | 'public' | 'unlisted';
   scheduledStartTime?: number;
   mode?: TOutputOrientation;
+  monetizationEnabled?: boolean;
 }
 
 /**
@@ -95,7 +96,21 @@ export interface IYoutubeLiveBroadcast {
     madeForKids: boolean;
     selfDeclaredMadeForKids: boolean;
   };
+  monetizationDetails?: {
+    cuepointSchedule: {
+      enabled?: boolean;
+      pauseAdsUntil?: Date;
+      scheduleStrategy?: string;
+      repeatIntervalSecs?: number;
+    };
+  };
 }
+
+type TYoutubeLiveBroadcastKey = keyof IYoutubeLiveBroadcast;
+interface IYoutubeLiveBroadcastPatch
+  extends Partial<
+    Record<TYoutubeLiveBroadcastKey, Partial<IYoutubeLiveBroadcast[TYoutubeLiveBroadcastKey]>>
+  > {}
 
 /**
  * A liveStream resource contains information about the video stream that you are transmitting to YouTube.
@@ -501,7 +516,7 @@ export class YoutubeService
     const scheduledStartTime = params.scheduledStartTime
       ? new Date(params.scheduledStartTime)
       : new Date();
-    const data: Dictionary<any> = {
+    const data: IYoutubeLiveBroadcastPatch = {
       snippet: {
         title: params.title,
         scheduledStartTime: scheduledStartTime.toISOString(),
@@ -519,6 +534,14 @@ export class YoutubeService
         selfDeclaredMadeForKids: params.selfDeclaredMadeForKids,
       },
     };
+
+    if (params.monetizationEnabled) {
+      data.monetizationDetails = {
+        cuepointSchedule: {
+          enabled: params.monetizationEnabled,
+        },
+      };
+    }
 
     const broadcast = await this.requestYoutube<IYoutubeLiveBroadcast>({
       body: JSON.stringify(data),
@@ -553,7 +576,7 @@ export class YoutubeService
       scheduledStartTime: scheduledStartTime.toISOString(),
     };
 
-    const contentDetails: Dictionary<any> = {
+    const contentDetails: Partial<IYoutubeLiveBroadcast['contentDetails']> = {
       enableAutoStart: isMidStreamMode
         ? broadcast.contentDetails.enableAutoStart
         : params.enableAutoStart,
@@ -582,8 +605,30 @@ export class YoutubeService
     };
 
     const fields = ['snippet', 'status', 'contentDetails'];
+
+    let monetizationDetails: Partial<IYoutubeLiveBroadcast['monetizationDetails']>;
+    if (broadcast.monetizationDetails) {
+      fields.push('monetizationDetails');
+
+      const moneyInfo = broadcast.monetizationDetails.cuepointSchedule;
+      monetizationDetails = {
+        cuepointSchedule: {
+          enabled: moneyInfo.enabled,
+          pauseAdsUntil: moneyInfo.pauseAdsUntil,
+          scheduleStrategy: moneyInfo.scheduleStrategy,
+          repeatIntervalSecs: moneyInfo.repeatIntervalSecs,
+        },
+      };
+    }
+
     const endpoint = `liveBroadcasts?part=${fields.join(',')}&id=${id}`;
-    const body: Dictionary<any> = { id, snippet, contentDetails, status };
+    const body: IYoutubeLiveBroadcastPatch = {
+      id,
+      snippet,
+      contentDetails,
+      status,
+      monetizationDetails,
+    };
 
     broadcast = await this.requestYoutube<IYoutubeLiveBroadcast>({
       body: JSON.stringify(body),
