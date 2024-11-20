@@ -248,6 +248,10 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
   get virtualWebcamSettings() {
     return this.state['Virtual Webcam'].formData;
   }
+
+  get virtualWebcamOutputSelection() {
+    return this.values['Virtual Webcam'].OutputSelection;
+  }
 }
 
 export class SettingsService extends StatefulService<ISettingsServiceState> {

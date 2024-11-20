@@ -372,5 +372,8 @@
   "Hide from Vertical": "Hide from Vertical",
   "Show in Vertical": "Show in Vertical",
   "Streamlabs Charity Donation Goal": "Streamlabs Charity Donation Goal",
-  "macOS Screen Capture": "macOS Screen Capture"
+  "macOS Screen Capture": "macOS Screen Capture",
+  "The Virtual Webcam plugin needs to be updated before it can be started. This requires administrator privileges.": "The Virtual Webcam plugin needs to be updated before it can be started. This requires administrator privileges.",
+  "Virtual camera output selection": "Virtual camera output selection",
+  "Virtual camera output type": "Virtual camera output type"
 }
