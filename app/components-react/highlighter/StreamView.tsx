@@ -1,28 +1,20 @@
 import { useVuex } from 'components-react/hooks';
 import React, { useRef, useState } from 'react';
 import { Services } from 'components-react/service-provider';
-// import styles from './ClipsView.m.less';
 import styles from './StreamView.m.less';
-import {
-  EHighlighterView,
-  IViewState,
-  StreamInfoForAiHighlighter,
-  TClip,
-} from 'services/highlighter';
+import { EHighlighterView, IViewState, StreamInfoForAiHighlighter } from 'services/highlighter';
 import isEqual from 'lodash/isEqual';
-import { Modal, Button } from 'antd';
+import { Modal, Button, Alert } from 'antd';
 import ExportModal from 'components-react/highlighter/ExportModal';
 import { SUPPORTED_FILE_TYPES } from 'services/highlighter/constants';
 import Scrollable from 'components-react/shared/Scrollable';
-import { IHotkey } from 'services/hotkeys';
-import { getBindingString } from 'components-react/shared/HotkeyBinding';
 import { $t } from 'services/i18n';
 import * as remote from '@electron/remote';
 import uuid from 'uuid';
 import StreamCard from './StreamCard';
-import { groupStreamsByTimePeriod } from './utils';
 import path from 'path';
 import PreviewModal from './PreviewModal';
+import moment from 'moment';
 
 type TModalStreamView =
   | { type: 'export'; id: string | undefined }
@@ -31,23 +23,21 @@ type TModalStreamView =
   | { type: 'remove'; id: string | undefined }
   | null;
 
-interface IClipsViewProps {
-  id: string | undefined;
-}
-
 export default function StreamView({ emitSetView }: { emitSetView: (data: IViewState) => void }) {
   const { HighlighterService, HotkeysService, UsageStatisticsService } = Services;
   const v = useVuex(() => ({
     exportInfo: HighlighterService.views.exportInfo,
     error: HighlighterService.views.error,
+    uploadInfo: HighlighterService.views.uploadInfo,
   }));
 
+  // Below is only used because useVueX doesnt work as expected
+  // there probably is a better way to do this
   const currentStreams = useRef<{ id: string; date: string }[]>();
-
   const highlightedStreams = useVuex(() => {
     const newStreamIds = [
-      ...HighlighterService.views.highlightedStreams.map(s => {
-        return { id: s.id, date: s.date };
+      ...HighlighterService.views.highlightedStreams.map(stream => {
+        return { id: stream.id, date: stream.date };
       }),
     ];
 
@@ -63,7 +53,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
 
   const aiDetectionInProgress = useVuex(() => {
     const newDetectionInProgress = HighlighterService.views.highlightedStreams.some(
-      s => s.state.type === 'detection-in-progress',
+      stream => stream.state.type === 'detection-in-progress',
     );
 
     if (
@@ -72,14 +62,11 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
     ) {
       currentAiDetectionState.current = newDetectionInProgress;
     }
-
     return currentAiDetectionState.current;
   });
 
   const [showModal, rawSetShowModal] = useState<TModalStreamView | null>(null);
   const [modalWidth, setModalWidth] = useState('700px');
-  const [hotkey, setHotkey] = useState<IHotkey | null>(null);
-  const [showTutorial, setShowTutorial] = useState(false);
   const [clipsOfStreamAreLoading, setClipsOfStreamAreLoading] = useState<string | null>(null);
 
   // This is kind of weird, but ensures that modals stay the right
@@ -102,43 +89,28 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
     }
   }
 
-  function removeStream(id?: string) {
-    if (!id) {
-      console.error('Cant remove stream, missing id');
-      return;
-    }
-    HighlighterService.actions.removeStream(id);
-  }
-
-  async function previewVideo(id?: string) {
-    if (!id) {
-      console.error('Id needed to preview stream clip collection, missing id');
-      return;
-    }
+  async function previewVideo(id: string) {
     setClipsOfStreamAreLoading(id);
+
     try {
-      await HighlighterService.loadClips(id);
+      await HighlighterService.actions.return.loadClips(id);
       setClipsOfStreamAreLoading(null);
       rawSetShowModal({ type: 'preview', id });
     } catch (error: unknown) {
+      console.error('Error loading clips for preview export', error);
       setClipsOfStreamAreLoading(null);
     }
   }
 
-  async function exportVideo(id?: string) {
-    if (!id) {
-      console.error('Id needed to export stream clip collection, missing id');
-      return;
-    }
-
+  async function exportVideo(id: string) {
     setClipsOfStreamAreLoading(id);
 
     try {
-      await HighlighterService.loadClips(id);
+      await HighlighterService.actions.return.loadClips(id);
       setClipsOfStreamAreLoading(null);
       rawSetShowModal({ type: 'export', id });
-      console.log('startExport');
     } catch (error: unknown) {
+      console.error('Error loading clips for export', error);
       setClipsOfStreamAreLoading(null);
     }
   }
@@ -151,7 +123,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
       setInputValue(event.target.value);
     }
 
-    async function startAiDetection(title: string) {
+    async function aiDetectionForManualUpload(title: string) {
       const streamInfo: StreamInfoForAiHighlighter = {
         id: 'manual_' + uuid(),
         title,
@@ -169,7 +141,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
           // No file selected
         }
       } catch (error: unknown) {
-        console.log('Error importing file from device', error);
+        console.error('Error importing file from device', error);
       }
     }
 
@@ -206,7 +178,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
             <Button type="default" onClick={() => close()}>
               Cancel
             </Button>
-            <Button type="primary" onClick={() => startAiDetection(inputValue)}>
+            <Button type="primary" onClick={() => aiDetectionForManualUpload(inputValue)}>
               Select video to start import
             </Button>
           </div>
@@ -229,6 +201,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
   function closeModal() {
     // Do not allow closing export modal while export/upload operations are in progress
     if (v.exportInfo.exporting) return;
+    if (v.uploadInfo.uploading) return;
 
     setShowModal(null);
 
@@ -245,7 +218,6 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
     }
 
     const filtered = files.filter(f => extensions.includes(path.parse(f).ext));
-
     if (filtered.length) {
       const StreamInfoForAiHighlighter: StreamInfoForAiHighlighter = {
         id: 'manual_' + uuid(),
@@ -253,13 +225,12 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
       };
       HighlighterService.actions.flow(filtered[0], StreamInfoForAiHighlighter);
     }
+
     e.preventDefault();
     e.stopPropagation();
   }
 
   function getStreamView() {
-    console.log('rerender StreamView');
-
     return (
       <div
         style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}
@@ -268,8 +239,6 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
       >
         <div style={{ display: 'flex', padding: 20 }}>
           <div style={{ flexGrow: 1 }}>
-            {/* <h1>{$t('Highlighter')}</h1>
-            <p>{$t('Drag & drop to reorder clips.')}</p> */}
             <h1 style={{ margin: 0 }}>My stream highlights</h1>
           </div>
           <div style={{ display: 'flex', gap: '16px' }}>
@@ -292,7 +261,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
 
         <Scrollable style={{ flexGrow: 1, padding: '20px 0 20px 20px' }}>
           {highlightedStreams.length === 0 ? (
-            <>No highlight clips created from streams</>
+            <>No highlight clips created from streams</> // TODO: Add empty state
           ) : (
             Object.entries(groupStreamsByTimePeriod(highlightedStreams)).map(
               ([period, streams]) =>
@@ -348,15 +317,13 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
           destroyOnClose={true}
           keyboard={false}
         >
-          {/* {!!v.error && <Alert message={v.error} type="error" showIcon />} */}
-          {/* {inspectedClip && showModal === 'trim' && <ClipTrimmer clip={inspectedClip} />} */}
+          {!!v.error && <Alert message={v.error} type="error" showIcon />}
           {showModal?.type === 'upload' && <ImportStreamModal close={closeModal} />}
           {showModal?.type === 'export' && (
             <ExportModal close={closeModal} streamId={showModal.id} />
           )}
           {showModal?.type === 'preview' && (
             <PreviewModal close={closeModal} streamId={showModal.id} />
-            // <PreviewModal close={closeModal} streamId={showModal.id} />
           )}
           {showModal?.type === 'remove' && (
             <RemoveStream close={closeModal} streamId={showModal.id} />
@@ -366,8 +333,6 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
     );
   }
 
-  // if (!v.loaded) return getLoadingView();
-
   return getStreamView();
 }
 
@@ -376,11 +341,10 @@ function RemoveStream(p: { streamId: string | undefined; close: () => void }) {
 
   return (
     <div style={{ textAlign: 'center' }}>
-      <h2>{'Delete highlighted Stream?'}</h2>
+      <h2>Delete highlighted Stream?</h2>
       <p>
-        {
-          'Are you sure you want to delete this stream and all its associated clips? This action cannot be undone.'
-        }
+        Are you sure you want to delete this stream and all its associated clips? This action cannot
+        be undone.
       </p>
       <Button style={{ marginRight: 8 }} onClick={p.close}>
         {$t('Cancel')}
@@ -401,4 +365,42 @@ function RemoveStream(p: { streamId: string | undefined; close: () => void }) {
       </Button>
     </div>
   );
+}
+
+export function groupStreamsByTimePeriod(streams: { id: string; date: string }[]) {
+  const now = moment();
+  const groups: { [key: string]: typeof streams } = {
+    Today: [],
+    Yesterday: [],
+    'This week': [],
+    'Last week': [],
+    'This month': [],
+    'Last month': [],
+  };
+  const monthGroups: { [key: string]: typeof streams } = {};
+
+  streams.forEach(stream => {
+    const streamDate = moment(stream.date);
+    if (streamDate.isSame(now, 'day')) {
+      groups['Today'].push(stream);
+    } else if (streamDate.isSame(now.clone().subtract(1, 'day'), 'day')) {
+      groups['Yesterday'].push(stream);
+    } else if (streamDate.isSame(now, 'week')) {
+      groups['This week'].push(stream);
+    } else if (streamDate.isSame(now.clone().subtract(1, 'week'), 'week')) {
+      groups['Last week'].push(stream);
+    } else if (streamDate.isSame(now, 'month')) {
+      groups['This month'].push(stream);
+    } else if (streamDate.isSame(now.clone().subtract(1, 'month'), 'month')) {
+      groups['Last month'].push(stream);
+    } else {
+      const monthKey = streamDate.format('MMMM YYYY');
+      if (!monthGroups[monthKey]) {
+        monthGroups[monthKey] = [];
+      }
+      monthGroups[monthKey].push(stream);
+    }
+  });
+
+  return { ...groups, ...monthGroups };
 }
