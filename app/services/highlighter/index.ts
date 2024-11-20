@@ -1,6 +1,5 @@
 import {
   mutation,
-  StatefulService,
   ViewHandler,
   Inject,
   InitAfter,
@@ -12,7 +11,7 @@ import Vue from 'vue';
 import fs from 'fs-extra';
 import url from 'url';
 import * as remote from '@electron/remote';
-import { ERecordingState, EStreamingState, StreamingService } from 'services/streaming';
+import { EStreamingState, StreamingService } from 'services/streaming';
 import { getPlatformService } from 'services/platforms';
 import { UserService } from 'services/user';
 import {
@@ -23,7 +22,6 @@ import { YoutubeService } from 'services/platforms/youtube';
 import os from 'os';
 import {
   CLIP_DIR,
-  FFMPEG_DIR,
   FFMPEG_EXE,
   SCRUB_SPRITE_DIRECTORY,
   SUPPORTED_FILE_TYPES,
@@ -53,7 +51,6 @@ import {
   EHighlighterInputTypes,
   getHighlightClips,
   IHighlight,
-  IHighlighterInput,
 } from './ai-highlighter/ai-highlighter';
 import uuid from 'uuid';
 import { EMenuItemKey } from 'services/side-nav';
@@ -118,16 +115,22 @@ export interface IAiClipInfo {
 
 export type TClip = IAiClip | IReplayBufferClip | IManualClip;
 
+export enum EHighlighterView {
+  CLIPS = 'clips',
+  STREAM = 'stream',
+  SETTINGS = 'settings',
+}
+
 interface TClipsViewState {
-  view: 'clips';
+  view: EHighlighterView.CLIPS;
   id: string | undefined;
 }
 interface IStreamViewState {
-  view: 'stream';
+  view: EHighlighterView.STREAM;
 }
 
 interface ISettingsViewState {
-  view: 'settings';
+  view: EHighlighterView.SETTINGS;
 }
 
 export type IViewState = TClipsViewState | IStreamViewState | ISettingsViewState;

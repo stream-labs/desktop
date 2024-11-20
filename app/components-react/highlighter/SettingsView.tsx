@@ -12,7 +12,7 @@ import Scrollable from 'components-react/shared/Scrollable';
 import styles from './SettingsView.m.less';
 import { $t } from 'services/i18n';
 import Translate from 'components-react/shared/Translate';
-import { IViewState } from 'services/highlighter';
+import { EHighlighterView, IViewState } from 'services/highlighter';
 
 export default function SettingsView({
   emitSetView,
@@ -140,8 +140,10 @@ export default function SettingsView({
         </div>
         <div style={{ display: 'flex', gap: '16px' }}>
           {/* <Button onClick={() => setShowModal('upload')}>Import</Button> */}
-          <Button onClick={() => emitSetView({ view: 'stream' })}>Streams</Button>
-          <Button onClick={() => emitSetView({ view: 'clips', id: undefined })}>All clips</Button>
+          <Button onClick={() => emitSetView({ view: EHighlighterView.STREAM })}>Streams</Button>
+          <Button onClick={() => emitSetView({ view: EHighlighterView.CLIPS, id: undefined })}>
+            All clips
+          </Button>
         </div>
       </div>
 

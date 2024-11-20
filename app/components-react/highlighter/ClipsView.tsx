@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import * as remote from '@electron/remote';
 import { Services } from 'components-react/service-provider';
 import styles from './ClipsView.m.less';
-import { IAiClip, IViewState } from 'services/highlighter';
+import { EHighlighterView, IAiClip, IViewState } from 'services/highlighter';
 import ClipPreview, { formatSecondsToHMS } from 'components-react/highlighter/ClipPreview';
 import { ReactSortable } from 'react-sortablejs';
 import Scrollable from 'components-react/shared/Scrollable';
@@ -177,11 +177,14 @@ export default function ClipsView({
               <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                 <div
                   style={{ cursor: 'pointer', paddingTop: '2px' }}
-                  onClick={() => emitSetView({ view: 'stream' })}
+                  onClick={() => emitSetView({ view: EHighlighterView.STREAM })}
                 >
                   <i className="icon-back" />
                 </div>{' '}
-                <h1 onClick={() => emitSetView({ view: 'stream' })} style={{ margin: 0 }}>
+                <h1
+                  onClick={() => emitSetView({ view: EHighlighterView.STREAM })}
+                  style={{ margin: 0 }}
+                >
                   {' '}
                   {props.streamTitle ?? 'All highlight clips'}
                 </h1>

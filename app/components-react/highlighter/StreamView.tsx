@@ -3,7 +3,12 @@ import React, { useRef, useState } from 'react';
 import { Services } from 'components-react/service-provider';
 // import styles from './ClipsView.m.less';
 import styles from './StreamView.m.less';
-import { IViewState, StreamInfoForAiHighlighter, TClip } from 'services/highlighter';
+import {
+  EHighlighterView,
+  IViewState,
+  StreamInfoForAiHighlighter,
+  TClip,
+} from 'services/highlighter';
 import isEqual from 'lodash/isEqual';
 import { Modal, Button } from 'antd';
 import ExportModal from 'components-react/highlighter/ExportModal';
@@ -279,7 +284,9 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
               <i className="icon-upload-image" /> Drag or click to browse your file{' '}
               <Button disabled={aiDetectionInProgress === true}>Import</Button>
             </div>
-            <Button onClick={() => emitSetView({ view: 'settings' })}>Settings</Button>
+            <Button onClick={() => emitSetView({ view: EHighlighterView.SETTINGS })}>
+              Settings
+            </Button>
           </div>
         </div>
 

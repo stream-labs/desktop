@@ -1,7 +1,7 @@
 import SettingsView from 'components-react/highlighter/SettingsView';
 import { useVuex } from 'components-react/hooks';
 import React, { useState } from 'react';
-import { IViewState } from 'services/highlighter';
+import { EHighlighterView, IViewState } from 'services/highlighter';
 import { Services } from 'components-react/service-provider';
 import StreamView from 'components-react/highlighter/StreamView';
 import ClipsView from 'components-react/highlighter/ClipsView';
@@ -10,52 +10,31 @@ import UpdateModal from 'components-react/highlighter/UpdateModal';
 export default function Highlighter(props: { params?: { view: string } }) {
   const openViewFromParams = props?.params?.view || '';
 
-  const { HighlighterService, RecordingModeService } = Services;
+  const { HighlighterService } = Services;
   const v = useVuex(() => ({
     dismissedTutorial: HighlighterService.views.dismissedTutorial,
     useAiHighlighter: HighlighterService.views.useAiHighlighter,
     isUpdaterRunning: HighlighterService.views.isUpdaterRunning,
-    higlighterVersion: HighlighterService.views.highlighterVersion,
+    highlighterVersion: HighlighterService.views.highlighterVersion,
     progress: HighlighterService.views.updaterProgress,
   }));
 
   const [viewState, setViewState] = useState<IViewState>(
-    openViewFromParams === 'stream' || v.dismissedTutorial
-      ? { view: 'stream' }
-      : { view: 'settings' },
+    openViewFromParams === EHighlighterView.STREAM || v.dismissedTutorial
+      ? { view: EHighlighterView.STREAM }
+      : { view: EHighlighterView.SETTINGS },
   );
 
-  // TODO: Below is currently always true. Add the handle correctly
-  // if (viewState.view !== 'settings' && !v.clips.length && !v.dismissedTutorial && !v.error || ) {
-  //   setViewState({ view: 'settings' });
-  // }
   const updaterModal = (
     <UpdateModal
-      version={v.higlighterVersion}
+      version={v.highlighterVersion}
       progress={v.progress}
       isVisible={v.isUpdaterRunning}
     />
   );
 
   switch (viewState.view) {
-    case 'settings':
-      // TODO: Add show tutorial
-      return (
-        <>
-          {devHeaderBar()}
-          {updaterModal}
-          <SettingsView
-            close={() => {
-              HighlighterService.actions.dismissTutorial();
-              // TODO
-              // setShowTutorial(false);
-            }}
-            emitSetView={data => setViewFromEmit(data)}
-          />
-        </>
-      );
-
-    case 'stream':
+    case EHighlighterView.STREAM:
       return (
         <>
           {updaterModal}
@@ -66,7 +45,7 @@ export default function Highlighter(props: { params?: { view: string } }) {
           />
         </>
       );
-    case 'clips':
+    case EHighlighterView.CLIPS:
       return (
         <>
           {updaterModal}
@@ -81,41 +60,24 @@ export default function Highlighter(props: { params?: { view: string } }) {
               )?.title,
             }}
           />
-          {/* <ClipsView
-            emitSetView={data => {
-              setViewFromEmit(data);
-            }}
-            props={{
-              id: viewState.id,
-              streamTitle: HighlighterService.views.highlightedStreams.find(
-                s => s.id === viewState.id,
-              )?.title,
-            }}
-          /> */}
         </>
       );
     default:
-      return <>DefaultView X{v.useAiHighlighter}X</>; // here it is undefined
-  }
-
-  // Dev purposes
-  function devHeaderBar() {
-    return (
-      <>
-        {/* <div style={{ display: 'flex', gap: '8px' }}>
-          <Button onClick={() => setView({ view: 'stream' })}>stream</Button>
-          <Button onClick={() => setView({ view: 'clips', id: undefined })}>clips</Button>
-          <Button onClick={async () => HighlighterService.actions.toggleAiHighlighter()}>
-            AiHighlighter active: {v.useAiHighlighter.toString()}
-          </Button>
-        </div> */}
-      </>
-    );
+      return (
+        <>
+          {updaterModal}
+          <SettingsView
+            close={() => {
+              HighlighterService.actions.dismissTutorial();
+            }}
+            emitSetView={data => setViewFromEmit(data)}
+          />
+        </>
+      );
   }
 
   function setViewFromEmit(data: IViewState) {
-    if (data.view === 'clips') {
-      console.log('setViewInOverview:', data.id);
+    if (data.view === EHighlighterView.CLIPS) {
       setView({
         view: data.view,
         id: data.id,
@@ -123,7 +85,6 @@ export default function Highlighter(props: { params?: { view: string } }) {
     } else {
       setView({
         view: data.view,
-        id: undefined,
       });
     }
   }

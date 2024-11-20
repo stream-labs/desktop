@@ -1,5 +1,10 @@
 import React from 'react';
-import { IViewState, StreamInfoForAiHighlighter, TClip } from 'services/highlighter';
+import {
+  EHighlighterView,
+  IViewState,
+  StreamInfoForAiHighlighter,
+  TClip,
+} from 'services/highlighter';
 import styles from './StreamView.m.less';
 import { Button } from 'antd';
 import { Services } from 'components-react/service-provider';
@@ -170,7 +175,7 @@ export default function StreamCard({
               size="large"
               style={{ display: 'flex', gap: '8px', alignItems: 'center' }}
               onClick={e => {
-                emitSetView({ view: 'clips', id: stream!.id });
+                emitSetView({ view: EHighlighterView.CLIPS, id: stream!.id });
                 e.stopPropagation();
               }}
             >
@@ -220,7 +225,7 @@ export default function StreamCard({
 
   function showStreamClips() {
     if (stream?.state.type !== 'detection-in-progress') {
-      emitSetView({ view: 'clips', id: stream?.id });
+      emitSetView({ view: EHighlighterView.CLIPS, id: stream?.id });
     }
   }
   return (
