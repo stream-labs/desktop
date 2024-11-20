@@ -39,18 +39,27 @@ function censorEmail(str: string) {
  */
 class StreamSettingsModule {
   constructor() {
+    const showMessage = (msg: string, success: boolean) => {
+      message.config({
+        duration: 6,
+        maxCount: 1,
+      });
+
+      if (success) {
+        message.success(msg);
+      } else {
+        message.error(msg);
+      }
+    };
     Services.UserService.refreshedLinkedAccounts.subscribe(
       (res: { success: boolean; message: string }) => {
-        message.config({
-          duration: 6,
-          maxCount: 1,
-        });
-
-        if (res.success) {
-          message.success(res.message);
-        } else {
-          message.error(res.message);
-        }
+        const doShowMessage = () => showMessage(res.message, res.success);
+        /*
+         * Since the settings window pops out anyways (presumably because of
+         * using `message`make sure it is at least on the right page, as opposed
+         * to in an infinite loading blank window state.
+         */
+        doShowMessage();
       },
     );
   }
