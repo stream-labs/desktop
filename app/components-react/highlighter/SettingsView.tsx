@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { CheckCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
-import HotkeyBinding, { getBindingString } from 'components-react/shared/HotkeyBinding';
+import { InfoCircleOutlined } from '@ant-design/icons';
+import HotkeyBinding from 'components-react/shared/HotkeyBinding';
 import { IHotkey } from 'services/hotkeys';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
@@ -11,7 +11,6 @@ import Form from 'components-react/shared/inputs/Form';
 import Scrollable from 'components-react/shared/Scrollable';
 import styles from './SettingsView.m.less';
 import { $t } from 'services/i18n';
-import Translate from 'components-react/shared/Translate';
 import { EHighlighterView, IViewState } from 'services/highlighter';
 
 export default function SettingsView({
@@ -103,10 +102,6 @@ export default function SettingsView({
     HighlighterService.actions.toggleAiHighlighter();
   }
 
-  function toggleManualHighlighter() {
-    //TODO: add code to disable manual highlighter again
-  }
-
   function headerBarTag(text: string) {
     return (
       <div
@@ -139,8 +134,9 @@ export default function SettingsView({
           </p>
         </div>
         <div style={{ display: 'flex', gap: '16px' }}>
-          {/* <Button onClick={() => setShowModal('upload')}>Import</Button> */}
-          <Button onClick={() => emitSetView({ view: EHighlighterView.STREAM })}>Streams</Button>
+          <Button onClick={() => emitSetView({ view: EHighlighterView.STREAM })}>
+            Stream highlights
+          </Button>
           <Button onClick={() => emitSetView({ view: EHighlighterView.CLIPS, id: undefined })}>
             All clips
           </Button>
@@ -204,9 +200,16 @@ export default function SettingsView({
                 manually and edit them together afterwards.
               </p>
               <div style={{ display: 'flex', gap: '16px' }}>
-                {/* TODO: Check if it is fine to only show the step if it is not defined */}
-                {/* {!v.isStreaming && !correctlyConfigured && (
-                  <div className="section">
+                {!v.isStreaming && !correctlyConfigured && (
+                  <div
+                    className={styles.settingSection}
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                    }}
+                  >
                     {correctlyConfigured
                       ? completedStepHeading($t('Configure the replay buffer'))
                       : incompleteStepHeading($t('Configure the replay buffer'))}
@@ -216,7 +219,7 @@ export default function SettingsView({
                       <Button onClick={configure}>{$t('Configure')}</Button>
                     )}
                   </div>
-                )} */}
+                )}
                 {v.isStreaming && (
                   <div className={styles.settingSection} style={{ width: '100%' }}>
                     <p>End your stream to change the Hotkey or the replay duration.</p>
@@ -255,11 +258,6 @@ export default function SettingsView({
                 {!v.isStreaming && (
                   <div className={styles.settingSection} style={{ width: '100%' }}>
                     {completedStepHeading($t('Adjust replay duration'))}
-                    {/* <div>
-                      {$t(
-                        'Set the duration of captured replays. You can always trim them down later.',
-                      )}
-                    </div> */}
                     <Form layout="inline">
                       <SliderInput
                         style={{ width: 'calc(100% + 14px)', marginLeft: '-10px' }}
@@ -278,27 +276,7 @@ export default function SettingsView({
                     </Form>
                   </div>
                 )}
-                {/* <div className="section">
-                  {incompleteStepHeading($t('Capture a replay'))}
-                  {!!hotkey?.bindings.length && (
-                    <div>
-                      <Translate
-                        message={$t('highlighterHotkeyInstructions', {
-                          bindingStr: getBindingString(hotkey.bindings[0]),
-                        })}
-                      />
-                    </div>
-                  )}
-                  {!hotkey?.bindings.length && (
-                    <div>
-                      {$t(
-                        'Start streaming and capture a replay. Check back here after your stream.',
-                      )}
-                    </div>
-                  )}
-                </div> */}
               </div>
-              {/* <a onClick={close}>{$t('Or, import a clip from your computer')}</a> */}
             </div>
           </div>
 
