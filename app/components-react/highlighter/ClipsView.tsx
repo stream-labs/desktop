@@ -2,17 +2,15 @@ import React, { useEffect, useState } from 'react';
 import * as remote from '@electron/remote';
 import { Services } from 'components-react/service-provider';
 import styles from './ClipsView.m.less';
-import { EHighlighterView, IAiClip, IViewState } from 'services/highlighter';
+import { EHighlighterView, IAiClip, IViewState, TClip } from 'services/highlighter';
 import ClipPreview, { formatSecondsToHMS } from 'components-react/highlighter/ClipPreview';
 import { ReactSortable } from 'react-sortablejs';
 import Scrollable from 'components-react/shared/Scrollable';
 import { EditingControls } from './EditingControls';
 import {
   aiFilterClips,
-  createFinalSortedArray,
-  filterClips,
   getCombinedClipsDuration,
-  sortAndFilterClips,
+  sortClipsByOrder,
   useOptimizedHover,
 } from './utils';
 import ClipsViewModal from './ClipsViewModal';
@@ -39,23 +37,21 @@ export default function ClipsView({
   emitSetView: (data: IViewState) => void;
 }) {
   const { HighlighterService, UsageStatisticsService } = Services;
-
   const [clips, setClips] = useState<{
-    sorted: { id: string }[];
-    sortedFiltered: { id: string }[];
-  }>({ sorted: [], sortedFiltered: [] });
+    ordered: { id: string }[];
+    orderedFiltered: { id: string }[];
+  }>({ ordered: [], orderedFiltered: [] });
 
-  const [activeFilter, setActiveFilter] = useState('all');
+  const [activeFilter, setActiveFilter] = useState('all'); // Currently not using the setActiveFilter option
 
-  const [loaded, setLoaded] = useState<boolean>(false);
+  const [clipsLoaded, setClipsLoaded] = useState<boolean>(false);
   useEffect(() => {
     async function loadClips() {
       await HighlighterService.actions.return.loadClips(props.id);
-      setLoaded(true);
+      setClipsLoaded(true);
     }
-    console.log(props.id);
 
-    setLoaded(false);
+    setClipsLoaded(false);
     setClips(
       sortAndFilterClips(
         HighlighterService.getClips(HighlighterService.views.clips, props.id),
@@ -84,11 +80,9 @@ export default function ClipsView({
 
   function setClipOrder(listClips: { id: string }[], streamId: string | undefined) {
     const newOrderOfSomeItems = listClips.map(c => c.id);
-    const allItemArray = clips.sorted.map(c => c.id);
+    const allItemArray = clips.ordered.map(c => c.id);
     const newClipArray = createFinalSortedArray(newOrderOfSomeItems, allItemArray);
-    const oldClipArray = clips.sorted.map(c => c.id);
-
-    // const newClipArray = clips.map(c => c.id);
+    const oldClipArray = clips.ordered.map(c => c.id);
 
     if (JSON.stringify(newClipArray) === JSON.stringify(oldClipArray)) {
       return;
@@ -127,8 +121,8 @@ export default function ClipsView({
       );
 
       setClips({
-        sorted: newClipArray.map(c => ({ id: c })),
-        sortedFiltered: filterClips(updatedClips, activeFilter).map(c => ({ id: c.path })),
+        ordered: newClipArray.map(c => ({ id: c })),
+        orderedFiltered: filterClipsBySource(updatedClips, activeFilter).map(c => ({ id: c.path })),
       });
       return;
     }
@@ -158,7 +152,6 @@ export default function ClipsView({
 
   const containerRef = useOptimizedHover();
 
-  //TODO: Need performance updateb
   function getClipsView(
     streamId: string | undefined,
     sortedList: { id: string }[],
@@ -192,11 +185,12 @@ export default function ClipsView({
             </div>
           </div>
           {sortedList.length === 0 ? (
-            <> No clips found</>
+            <> No clips found</> // TODO M: Add empty state
           ) : (
             <>
-              {loaded ? (
+              {clipsLoaded ? (
                 <>
+                  {/* Disabled for now, will enable with the next version  */}
                   {/* <Scrollable
                     horizontal={true}
                     style={{
@@ -279,14 +273,14 @@ export default function ClipsView({
                           const filteredClips = aiFilterClips(clips, streamId, filterOptions);
                           const filteredClipPaths = new Set(filteredClips.map(c => c.path));
 
-                          clips.forEach(c => {
-                            const shouldBeEnabled = filteredClipPaths.has(c.path);
-                            const isEnabled = c.enabled;
+                          clips.forEach(clip => {
+                            const shouldBeEnabled = filteredClipPaths.has(clip.path);
+                            const isEnabled = clip.enabled;
 
                             if (shouldBeEnabled && !isEnabled) {
-                              HighlighterService.enableClip(c.path, true);
+                              HighlighterService.enableClip(clip.path, true);
                             } else if (!shouldBeEnabled && isEnabled) {
-                              HighlighterService.disableClip(c.path);
+                              HighlighterService.disableClip(clip.path);
                             }
                           });
                         }}
@@ -299,7 +293,8 @@ export default function ClipsView({
                       />
                     )}
                   </div>
-                  {/* <ClipsFilter activeFilter={activeFilter} onFilterChange={setActiveFilter} /> */}
+                  {/* Disabled for now, will enable with the next version
+                  <ClipsFilter activeFilter={activeFilter} onFilterChange={setActiveFilter} /> */}
                   <Scrollable style={{ flexGrow: 1, padding: '20px 20px 20px 20px' }}>
                     <ReactSortable
                       list={sortedFilteredList}
@@ -364,7 +359,7 @@ export default function ClipsView({
             setClips(
               sortAndFilterClips(
                 HighlighterService.getClips(HighlighterService.views.clips, props.id).filter(
-                  c => c.path !== clipId,
+                  clip => clip.path !== clipId,
                 ),
                 streamId,
                 'all',
@@ -378,11 +373,12 @@ export default function ClipsView({
 
   return getClipsView(
     props.id,
-    clips.sorted.map(c => ({ id: c.id })),
-    clips.sortedFiltered.map(c => ({ id: c.id })),
+    clips.ordered.map(clip => ({ id: clip.id })),
+    clips.orderedFiltered.map(clip => ({ id: clip.id })),
   );
 }
 
+// Temporary not used. Will be used in the next version
 function VideoDuration({ streamId }: { streamId: string | undefined }) {
   const { HighlighterService } = Services;
 
@@ -391,7 +387,7 @@ function VideoDuration({ streamId }: { streamId: string | undefined }) {
   );
 
   const totalDuration = clips
-    .filter(c => c.enabled)
+    .filter(clip => clip.enabled)
     .reduce((acc, clip) => acc + clip.duration! - clip.startTrim! - clip.endTrim!, 0);
 
   return <span>{formatSecondsToHMS(totalDuration)}</span>;
@@ -448,4 +444,55 @@ function ClipsLoadingView({ streamId }: { streamId: string | undefined }) {
       </p>
     </div>
   );
+}
+
+export function clipsToStringArray(clips: TClip[]): { id: string }[] {
+  return clips.map(c => ({ id: c.path }));
+}
+
+export function createFinalSortedArray(
+  newOrderOfSomeItems: string[],
+  allItemArray: string[],
+): string[] {
+  const finalArray: (string | null)[] = new Array(allItemArray.length).fill(null);
+  const itemsNotInNewOrder = allItemArray.filter(item => !newOrderOfSomeItems.includes(item));
+
+  itemsNotInNewOrder.forEach(item => {
+    const index = allItemArray.indexOf(item);
+    finalArray[index] = item;
+  });
+
+  let newOrderIndex = 0;
+  for (let i = 0; i < finalArray.length; i++) {
+    if (finalArray[i] === null) {
+      finalArray[i] = newOrderOfSomeItems[newOrderIndex];
+      newOrderIndex++;
+    }
+  }
+
+  return finalArray.filter((item): item is string => item !== null);
+}
+
+export function filterClipsBySource(clips: TClip[], filter: string) {
+  return clips.filter(clip => {
+    switch (filter) {
+      case 'ai':
+        return clip.source === 'AiClip';
+      case 'manual':
+        return clip.source === 'Manual' || clip.source === 'ReplayBuffer';
+      case 'all':
+      default:
+        return true;
+    }
+  });
+}
+export function sortAndFilterClips(clips: TClip[], streamId: string | undefined, filter: string) {
+  const orderedClips = sortClipsByOrder(clips, streamId);
+  const filteredClips = filterClipsBySource(orderedClips, filter);
+  const ordered = orderedClips.map(clip => ({ id: clip.path }));
+  const orderedFiltered = filteredClips.map(clip => ({
+    id: clip.path,
+  }));
+
+  return { ordered, orderedFiltered };
 }

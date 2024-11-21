@@ -5,7 +5,7 @@ import { EHighlighterInputTypes } from 'services/highlighter/ai-highlighter/ai-h
 import styles from './ClipsView.m.less';
 export const isAiClip = (clip: TClip): clip is IAiClip => clip.source === 'AiClip';
 
-export function sortClips(clips: TClip[], streamId: string | undefined): TClip[] {
+export function sortClipsByOrder(clips: TClip[], streamId: string | undefined): TClip[] {
   let sortedClips;
 
   if (streamId) {
@@ -32,57 +32,6 @@ export function sortClips(clips: TClip[], streamId: string | undefined): TClip[]
   }
 
   return sortedClips;
-}
-
-export function clipsToStringArray(clips: TClip[]): { id: string }[] {
-  return clips.map(c => ({ id: c.path }));
-}
-
-export function createFinalSortedArray(
-  newOrderOfSomeItems: string[],
-  allItemArray: string[],
-): string[] {
-  const finalArray: (string | null)[] = new Array(allItemArray.length).fill(null);
-  const itemsNotInNewOrder = allItemArray.filter(item => !newOrderOfSomeItems.includes(item));
-
-  itemsNotInNewOrder.forEach(item => {
-    const index = allItemArray.indexOf(item);
-    finalArray[index] = item;
-  });
-
-  let newOrderIndex = 0;
-  for (let i = 0; i < finalArray.length; i++) {
-    if (finalArray[i] === null) {
-      finalArray[i] = newOrderOfSomeItems[newOrderIndex];
-      newOrderIndex++;
-    }
-  }
-
-  return finalArray.filter((item): item is string => item !== null);
-}
-
-export function filterClips(clips: TClip[], filter: string) {
-  return clips.filter(clip => {
-    switch (filter) {
-      case 'ai':
-        return clip.source === 'AiClip';
-      case 'manual':
-        return clip.source === 'Manual' || clip.source === 'ReplayBuffer';
-      case 'all':
-      default:
-        return true;
-    }
-  });
-}
-export function sortAndFilterClips(clips: TClip[], streamId: string | undefined, filter: string) {
-  const sortedClips = sortClips(clips, streamId);
-  const filteredClips = filterClips(sortedClips, filter);
-  const sorted = sortedClips.map(clip => ({ id: clip.path }));
-  const sortedFiltered = filteredClips.map(clip => ({
-    id: clip.path,
-  }));
-
-  return { sorted, sortedFiltered };
 }
 
 export const useOptimizedHover = () => {
@@ -166,7 +115,7 @@ export function aiFilterClips(
   let clipsFromRounds: TClip[] = [];
 
   let totalDuration = 0;
-  for (var i = 0; i < sortedRounds.length; ++i) {
+  for (let i = 0; i < sortedRounds.length; ++i) {
     if (totalDuration > targetDuration) {
       // console.log(`Duration: ${totalDuration} more than target: ${targetDuration}`);
       break;
@@ -176,7 +125,7 @@ export function aiFilterClips(
       const roundIndex = sortedRounds[i];
       // console.log('include round ', roundIndex);
 
-      const roundClips = sortClips(getClipsOfRound(roundIndex, clips), streamId);
+      const roundClips = sortClipsByOrder(getClipsOfRound(roundIndex, clips), streamId);
       // console.log(
       //   'roundClips before adding:',
       //   roundClips.map(c => ({
@@ -218,7 +167,7 @@ export function aiFilterClips(
   // );
   // console.log('clipsFromRounds', clipsFromRounds);
 
-  let filteredClips: TClip[] = clipsFromRounds;
+  const filteredClips: TClip[] = clipsFromRounds;
   let currentDuration = getCombinedClipsDuration(filteredClips);
 
   // console.log('remove clipswise to get closer to target');
