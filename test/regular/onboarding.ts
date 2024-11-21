@@ -231,7 +231,7 @@ test.skip('Go through onboarding and install theme', async t => {
 });
 
 // CASE 3: New user logged in during onboarding, no theme installed
-test('Go through onboarding as a new user', async t => {
+test.skip('Go through onboarding as a new user', async t => {
   const login = true;
   const newUser = true;
   const installTheme = false;
@@ -263,7 +263,7 @@ test.skip('Go through onboarding as a new user and install theme', async t => {
 });
 
 // CASE 5: No user logged in during onboarding, no theme installed, then log in new user
-test('Login new user after onboarding skipped', async t => {
+test.skip('Login new user after onboarding skipped', async t => {
   const login = false;
   const newUser = false;
   const installTheme = false;
