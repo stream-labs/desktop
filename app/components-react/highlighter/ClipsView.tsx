@@ -325,10 +325,10 @@ export default function ClipsView({
                             >
                               <ClipPreview
                                 clipId={id}
-                                showTrim={() => {
+                                emitShowTrim={() => {
                                   setModal({ modal: 'trim', inspectedPathId: id });
                                 }}
-                                showRemove={() => {
+                                emitShowRemove={() => {
                                   setModal({ modal: 'remove', inspectedPathId: id });
                                 }}
                                 streamId={streamId}

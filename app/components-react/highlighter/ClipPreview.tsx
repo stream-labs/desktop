@@ -1,23 +1,20 @@
-import { IAiClip, TClip } from 'services/highlighter';
+import { TClip } from 'services/highlighter';
 import { SCRUB_HEIGHT, SCRUB_WIDTH, SCRUB_FRAMES } from 'services/highlighter/constants';
-import React, { useMemo, useState } from 'react';
-import path from 'path';
+import React, { useState } from 'react';
 import { Services } from 'components-react/service-provider';
 import { BoolButtonInput } from 'components-react/shared/inputs/BoolButtonInput';
 import styles from './ClipsView.m.less';
-import cx from 'classnames';
-import { Button, Tooltip } from 'antd';
+import { Button } from 'antd';
 import { $t } from 'services/i18n';
 import { isAiClip } from './utils';
-import { getInputTypeCount, InputEmojiSection } from './InputEmojiSection';
+import { InputEmojiSection } from './InputEmojiSection';
 
 import { useVuex } from 'components-react/hooks';
-import { EHighlighterInputTypes } from 'services/highlighter/ai-highlighter/ai-highlighter';
 export default function ClipPreview(props: {
   clipId: string;
   streamId: string | undefined;
-  showTrim: () => void;
-  showRemove: () => void;
+  emitShowTrim: () => void;
+  emitShowRemove: () => void;
 }) {
   const { HighlighterService } = Services;
   const v = useVuex(() => ({
@@ -26,20 +23,16 @@ export default function ClipPreview(props: {
 
   const [scrubFrame, setScrubFrame] = useState<number>(0);
 
-  // TODO: placeholder image + make sure to regenerate sprite if sprite doesnt exist
   const clipThumbnail = v.clip.scrubSprite || '';
 
-  const filename = useMemo(() => {
-    return path.basename(v.clip.path);
-  }, [v.clip.path]);
   // Deleted clips always show as disabled
   const enabled = v.clip.deleted ? false : v.clip.enabled;
+
   if (!v.clip) {
     return <div>deleted</div>;
   }
   function mouseMove(e: React.MouseEvent) {
     const frameIdx = Math.floor((e.nativeEvent.offsetX / SCRUB_WIDTH) * SCRUB_FRAMES);
-
     if (scrubFrame !== frameIdx) {
       setScrubFrame(frameIdx);
     }
@@ -53,7 +46,6 @@ export default function ClipPreview(props: {
     <div
       className={styles.previewClip}
       style={{
-        // padding: '16px',
         backgroundColor: '#2B383F',
         borderRadius: '16px',
         display: 'flex',
@@ -73,7 +65,7 @@ export default function ClipPreview(props: {
               borderRadius: '10px',
             }}
             onMouseMove={mouseMove}
-            onClick={props.showTrim}
+            onClick={props.emitShowTrim}
           ></img>
         )}
         {v.clip.deleted && (
@@ -136,6 +128,7 @@ export default function ClipPreview(props: {
             alignItems: 'center',
             flexDirection: 'column',
             gap: '8px',
+            pointerEvents: 'none',
           }}
         >
           <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
@@ -202,14 +195,14 @@ export default function ClipPreview(props: {
             <Button
               size="large"
               style={{ display: 'flex', gap: '8px', alignItems: 'center' }}
-              onClick={props.showRemove}
+              onClick={props.emitShowRemove}
             >
               <i className="icon-trash" />
             </Button>
             <Button
               size="large"
               style={{ display: 'flex', gap: '8px', alignItems: 'center' }}
-              onClick={props.showTrim}
+              onClick={props.emitShowTrim}
             >
               <i className="icon-trim" /> Trim
             </Button>
@@ -220,6 +213,7 @@ export default function ClipPreview(props: {
   );
 }
 
+// TODO M: Will be used in next version
 function formatSecondsToHHMMSS(seconds: number | undefined): string {
   if (seconds === undefined) {
     return '00:00:00';
