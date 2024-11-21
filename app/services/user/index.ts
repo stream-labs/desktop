@@ -532,10 +532,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.streamSettingsService.resetStreamSettings();
     await this.login(service, auth);
 
-    if (isNewUser) {
-      this.sceneCollectionsService.newUserFirstLogin = true;
-    }
-
     if (!isOnboardingTest) this.onboardingService.finish();
   }
 
