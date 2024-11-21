@@ -1,6 +1,7 @@
 import * as child from 'child_process';
 import EventEmitter from 'events';
 import { AiHighlighterUpdater } from './updater';
+import { duration } from 'moment';
 
 export enum EHighlighterInputTypes {
   KILL = 'kill',
@@ -84,11 +85,11 @@ class MessageBufferHandler {
         const completeMessage = this.buffer.substring(start, end + this.endToken.length);
         // Clear the buffer of the extracted message
         this.buffer = this.buffer.substring(end + this.endToken.length);
-
         messages.push(completeMessage);
+      } else {
+        // Message not complete
       }
     }
-    console.log('message not complete', this.buffer);
     return messages;
   }
 
@@ -132,12 +133,9 @@ export function getHighlightClips(
       for (const completeMessage of completeMessages) {
         // messageBuffer.clear();
         const aiHighlighterMessage = parseAiHighlighterMessage(completeMessage);
-        console.log('parsed aiHighlighterMessage', aiHighlighterMessage);
-
         if (typeof aiHighlighterMessage === 'string' || aiHighlighterMessage instanceof String) {
           console.log('message type of string', aiHighlighterMessage);
         } else if (aiHighlighterMessage) {
-          console.log('message NOT type of string', aiHighlighterMessage);
           switch (aiHighlighterMessage.type) {
             case 'progress':
               progressUpdate?.((aiHighlighterMessage.json as IHighlighterProgressMessage).progress);
@@ -163,7 +161,7 @@ export function getHighlightClips(
     });
 
     childProcess.stderr?.on('data', (data: Buffer) => {
-      console.log('Error logs:', data.toString());
+      console.log('Debug logs:', data.toString());
     });
 
     childProcess.on('error', error => {
@@ -184,10 +182,10 @@ function parseAiHighlighterMessage(messageString: string): IHighlighterMessage |
       const start = messageString.indexOf('>>>>');
       const end = messageString.indexOf('<<<<');
       const jsonString = messageString.substring(start, end).replace('>>>>', '');
-      console.log('Json string:', jsonString);
+      // console.log('Json string:', jsonString);
 
       const aiHighlighterMessage = JSON.parse(jsonString) as IHighlighterMessage;
-      console.log('Parsed ai highlighter message:', aiHighlighterMessage);
+      // console.log('Parsed ai highlighter message:', aiHighlighterMessage);
       return aiHighlighterMessage;
     } else {
       return messageString;
@@ -198,56 +196,60 @@ function parseAiHighlighterMessage(messageString: string): IHighlighterMessage |
   }
 }
 
-// Test function to simulate split messages from child process
-export function testSplitMessages() {
-  const messageBuffer = new MessageBufferHandler();
+export class ProgressTracker {
+  PRE_DURATION = 10;
+  POST_DURATION = 10;
+  progress = 0;
 
-  // Simulate receiving split messages
-  const message1 = 'Some logs>>>>{"type": "progress"';
-  const message2 = ', "json": {"progress": 0.5}}<<<<More logs';
+  onChangeCallback: (progress: number) => void;
 
-  console.log('Received first part:', message1);
-  messageBuffer.appendToBuffer(message1);
-  console.log('Message complete?', messageBuffer.isMessageComplete(message1));
-
-  console.log('Received second part:', message2);
-  messageBuffer.appendToBuffer(message2);
-  console.log('Message complete?', messageBuffer.isMessageComplete(message2));
-
-  const completeMessages = messageBuffer.extractCompleteMessages();
-  console.log('Extracted complete message:', completeMessages);
-
-  for (const completeMessage of completeMessages) {
-    const parsed = parseAiHighlighterMessage(completeMessage);
-    console.log('Parsed message:', parsed);
+  preInterval: NodeJS.Timeout;
+  postInterval: NodeJS.Timeout;
+  postStarted = false;
+  constructor(onChange = (progress: number) => {}) {
+    this.startPreTimer();
+    this.onChangeCallback = onChange;
   }
-}
 
-// Mock function to simulate child process and data input
-export async function simulateChildProcessData() {
-  const mockChildProcess = new EventEmitter() as child.ChildProcess;
-  mockChildProcess.stdout = new EventEmitter() as any;
-  const abortController = new AbortController();
+  startPreTimer() {
+    this.progress = 0;
+    this.preInterval = this.addOnePerSecond(this.PRE_DURATION);
+  }
 
-  getHighlightClips(
-    'test_video_uri',
-    highlights => {
-      console.log('Rendered highlights:', highlights);
-    },
-    abortController.signal,
-    progress => {
-      console.log('Progress update:', progress);
-    },
-    mockChildProcess,
-  );
+  startPostTimer() {
+    if (!this.postStarted) {
+      this.postInterval = this.addOnePerSecond(this.POST_DURATION);
+      this.postStarted = true;
+    }
+  }
+  destroy() {
+    this.preInterval && clearInterval(this.preInterval);
+    this.postInterval && clearInterval(this.postInterval);
+  }
 
-  // Simulate receiving split messages
-  const message1 = Buffer.from('>>>>{"type": "progress"');
-  const message2 = Buffer.from(', "json": {"progress": 0.5}}<<<<');
+  updateProgressFromHighlighter(highlighterProgress: number) {
+    this.preInterval && clearInterval(this.preInterval);
+    const adjustedProgress =
+      highlighterProgress * ((100 - this.PRE_DURATION - this.POST_DURATION) / 100) +
+      this.PRE_DURATION;
 
-  console.log('Simulating first part:', message1.toString());
-  mockChildProcess.stdout.emit('data', message1);
-  await new Promise(r => setTimeout(r, 4000));
-  console.log('Simulating second part:', message2.toString());
-  mockChildProcess.stdout.emit('data', message2);
+    this.progress = adjustedProgress;
+    this.onChangeCallback(this.progress);
+    if (highlighterProgress === 100) {
+      this.startPostTimer();
+    }
+  }
+
+  addOnePerSecond(duration: number) {
+    let passedSeconds = 0;
+    const interval = setInterval(() => {
+      passedSeconds += 1;
+      this.progress += 1;
+      this.onChangeCallback(this.progress);
+      if (passedSeconds >= duration) {
+        clearInterval(interval);
+      }
+    }, 1000);
+    return interval;
+  }
 }

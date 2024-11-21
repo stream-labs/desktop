@@ -51,6 +51,8 @@ import {
   EHighlighterInputTypes,
   getHighlightClips,
   IHighlight,
+  IHighlighterInput,
+  ProgressTracker,
 } from './ai-highlighter/ai-highlighter';
 import uuid from 'uuid';
 import { EMenuItemKey } from 'services/side-nav';
@@ -1776,30 +1778,11 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     };
 
     await this.addStream(setStreamInfo);
-    const videoDuration = await this.getVideoDuration(filePath);
-    const initialTime = 30; // length to boot up process
-    const variableProcessingTime = videoDuration / 2;
-    const estimatedDuration = initialTime + variableProcessingTime;
 
-    let intervalId: NodeJS.Timeout;
-
-    let intervalCount = 0;
-    // Start periodic progress updates
-    const startProgressUpdates = () => {
-      intervalId = setInterval(() => {
-        intervalCount++;
-        setStreamInfo.state.progress = Math.round(
-          intervalCount * (100 / estimatedDuration) + 100 / estimatedDuration,
-        );
-        this.updateStream(setStreamInfo);
-      }, 1000); // Update every second
-    };
-
-    // Stop progress updates
-    const stopProgressUpdates = () => {
-      clearInterval(intervalId);
-    };
-    startProgressUpdates();
+    const progressTracker = new ProgressTracker(progress => {
+      setStreamInfo.state.progress = progress;
+      this.updateStream(setStreamInfo);
+    });
 
     const renderHighlights = async (partialHighlights: IHighlight[]) => {
       console.log('🔄 cutHighlightClips');
@@ -1807,6 +1790,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       const clipData = await this.cutHighlightClips(filePath, partialHighlights, setStreamInfo);
       console.log('✅ cutHighlightClips');
       // 6. add highlight clips
+      progressTracker.destroy();
       setStreamInfo.state.type = 'detection-finished';
       this.updateStream(setStreamInfo);
 
@@ -1822,7 +1806,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
         renderHighlights,
         setStreamInfo.abortController.signal,
         (progress: number) => {
-          console.log('progress', progress);
+          progressTracker.updateProgressFromHighlighter(progress);
         },
       );
       console.log('✅ Final HighlighterData', highlighterResponse);
@@ -1836,7 +1820,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     } finally {
       setStreamInfo.abortController = undefined;
       this.updateStream(setStreamInfo);
-      stopProgressUpdates();
+      // stopProgressUpdates();
     }
 
     return;
