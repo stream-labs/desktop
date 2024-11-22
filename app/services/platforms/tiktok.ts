@@ -145,8 +145,20 @@ export class TikTokService
     return this.state.settings.liveScope === 'approved';
   }
 
+  get neverApplied(): boolean {
+    return this.state.settings.liveScope === 'never-applied';
+  }
+
   get denied(): boolean {
     return this.state.settings.liveScope === 'denied';
+  }
+
+  get legacy(): boolean {
+    return this.state.settings.liveScope === 'legacy';
+  }
+
+  get relog(): boolean {
+    return this.state.settings.liveScope === 'relog';
   }
 
   get defaultGame(): IGame {
@@ -431,11 +443,6 @@ export class TikTokService
           this.SET_DENIED_DATE(timestamp);
           return EPlatformCallResult.TikTokStreamScopeMissing;
         }
-
-        // show prompt to apply if user has never applied
-        if (applicationStatus === 'never-applied') {
-          return EPlatformCallResult.TikTokStreamScopeMissing;
-        }
       }
 
       if (status?.user) {
@@ -693,7 +700,9 @@ export class TikTokService
   }
 
   convertScope(scope: number, applicationStatus?: string): TTikTokLiveScopeTypes {
-    if (applicationStatus === 'never_applied') return 'never-applied';
+    if (applicationStatus === 'never_applied' && scope !== ETikTokLiveScopeReason.APPROVED_OBS) {
+      return 'never-applied';
+    }
 
     switch (scope) {
       case ETikTokLiveScopeReason.APPROVED: {

@@ -143,7 +143,9 @@ export class SceneItemsNode extends Node<ISchema, {}> {
     // but if the scene item already has a display assigned, skip it
     if (this.dualOutputService.views.hasNodeMap(context.scene.id)) {
       // nodes must be assigned to a context, so if it doesn't exist, establish it
-      this.videoSettingsService.validateVideoContext();
+      if (!this.videoSettingsService.contexts.vertical) {
+        this.videoSettingsService.establishVideoContext('vertical');
+      }
 
       const nodeMap = this.dualOutputService.views.sceneNodeMaps[context.scene.id];
 

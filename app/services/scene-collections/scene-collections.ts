@@ -123,11 +123,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   scenesServices: any;
 
   /**
-   * Used to handle actions for users on their first login
-   */
-  newUserFirstLogin = false;
-
-  /**
    * Does not use the standard init function so we can have asynchronous
    * initialization.
    */
@@ -671,12 +666,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
         });
       this.collectionErrorOpen = true;
     }
-
-    // Users who selected a theme during onboarding should have it loaded in dual output mode by default
-    if (this.newUserFirstLogin) {
-      this.dualOutputService.setDualOutputMode(true, true);
-      this.newUserFirstLogin = false;
-    }
   }
 
   async showUnsupportedSourcesDialog(e?: Error | unknown) {
@@ -980,17 +969,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
     const serverCollections = (await this.serverApi.fetchSceneCollections()).data;
 
-    // A user who has never logged in before and did not install a
-    // theme during onboarding will have no collections. To prevent
-    // special handling of the default theme for a user who installed
-    // a theme during onboarding. NOTE: this will be set to false after
-    // onboarding in the dual output service
-    if (!serverCollections || serverCollections.length === 0) {
-      this.newUserFirstLogin = true;
-    } else {
-      this.newUserFirstLogin = false;
-    }
-
     let failed = false;
 
     const collectionsToInsert = [];
@@ -1203,7 +1181,9 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
     if (!this.activeCollection) return;
 
-    this.stateService.initNodeMaps(sceneNodeMap);
+    if (!this.videoSettingsService.contexts.vertical) {
+      this.videoSettingsService.establishVideoContext('vertical');
+    }
   }
 
   /**
