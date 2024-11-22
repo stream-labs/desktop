@@ -317,40 +317,6 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
     );
   }
 
-  get createDefaultNewUserScene() {
-    // If the first login status was set in the scene collections service,
-    // determine if the user installed a theme during onboarding
-    if (this.sceneCollectionsService.newUserFirstLogin && !this.existingSceneCollections) {
-      return true;
-    }
-
-    // Skip checking creation date for accounts in when testing
-    if (Utils.isTestMode()) return false;
-
-    // If the user does not have a creation date, they are a new user so
-    // determine if the user installed a theme during onboarding
-    const creationDate = this.userService.state?.createdAt;
-    if (!creationDate) {
-      return this.existingSceneCollections === false;
-    }
-
-    // Otherwise, check if the user is within the first 6 hours of their
-    // account creation date/time. This is last resort very rough check to determine
-    // if the user is a new user. Not ideal but better than nothing.
-    const now = new Date().getTime();
-    const creationTime = new Date(creationDate).getTime();
-    const millisecondsInAnHour = 1000 * 60 * 60;
-
-    const isWithinCreationDateRange =
-      creationTime < now && creationTime - now < millisecondsInAnHour * 6;
-
-    return (
-      !isWithinCreationDateRange &&
-      this.sceneCollectionsService.newUserFirstLogin &&
-      !this.existingSceneCollections
-    );
-  }
-
   init() {
     this.setExistingCollections();
   }
@@ -392,22 +358,8 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
         streaming: { outputResolution },
       });
     }
-
-    // On their first login, users should have dual output mode enabled by default.
-    // If the user has not selected a scene collection during onboarding, add a few
-    // default sources to the default scene collection.
-    if (this.createDefaultNewUserScene) {
-      this.dualOutputService.setupDefaultSources();
-      this.sceneCollectionsService.newUserFirstLogin = false;
-    }
-
-    if (this.sceneCollectionsService.newUserFirstLogin && this.existingSceneCollections) {
-      this.dualOutputService.setDualOutputMode(true, true);
-      this.sceneCollectionsService.newUserFirstLogin = false;
-    }
-
-    this.onboardingCompleted.next();
     this.navigationService.navigate('Studio');
+    this.onboardingCompleted.next();
   }
 
   get isTwitchAuthed() {
