@@ -693,7 +693,9 @@ export class TikTokService
   }
 
   convertScope(scope: number, applicationStatus?: string): TTikTokLiveScopeTypes {
-    if (applicationStatus === 'never_applied') return 'never-applied';
+    if (applicationStatus === 'never_applied' && scope !== ETikTokLiveScopeReason.APPROVED_OBS) {
+      return 'never-applied';
+    }
 
     switch (scope) {
       case ETikTokLiveScopeReason.APPROVED: {
