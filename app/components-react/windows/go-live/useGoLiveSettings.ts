@@ -294,9 +294,16 @@ export class GoLiveSettingsModule {
    */
   async validate() {
     // tiktok live authorization error
-    if (this.state.isEnabled('tiktok') && !Services.TikTokService.liveStreamingEnabled) {
-      message.error($t('Streaming to TikTok not approved.'));
-      return false;
+    if (
+      this.state.isEnabled('tiktok') &&
+      (Services.TikTokService.neverApplied || Services.TikTokService.denied)
+    ) {
+      // TODO: this is a patch to allow users to attempt to go live with rtmp regardless of tiktok status
+      return message.info(
+        $t("Couldn't confirm TikTok Live Access. Apply for Live Permissions below"),
+        2,
+        () => true,
+      );
     }
 
     try {

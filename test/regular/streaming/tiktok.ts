@@ -52,13 +52,13 @@ test('Streaming to TikTok', withUser('twitch', { multistream: false, prime: fals
     title: 'Test stream',
     twitchGame: 'Fortnite',
   });
-  // await submit();
-  // await waitForDisplayed('span=Update settings for TikTok');
-  // await waitForStreamStart();
-  // await stopStream();
+  await submit();
+  await waitForDisplayed('span=Update settings for TikTok');
+  await waitForStreamStart();
+  await stopStream();
 
   // test all other tiktok statuses
-  // await testLiveScope(t, 'legacy');
+  await testLiveScope(t, 'legacy');
   await testLiveScope(t, 'denied');
   await testLiveScope(t, 'relog');
 
@@ -91,19 +91,25 @@ async function testLiveScope(t: TExecutionContext, scope: TTikTokLiveScopeTypes)
     await submit();
 
     t.true(
-      await isDisplayed('span=Streaming to TikTok not approved.'),
+      await isDisplayed(
+        "span=Couldn't confirm TikTok Live Access. Apply for Live Permissions below",
+        { timeout: 3000 },
+      ),
       'TikTok denied error shown',
     );
+
+    await waitForDisplayed('span=Update settings for TikTok');
+    await waitForStreamStart();
+    await stopStream();
 
     return;
   }
 
+  // test legacy scope
   await waitForSettingsWindowLoaded();
   await waitForDisplayed('div[data-name="tiktok-settings"]');
 
   const settings = {
-    title: 'Test stream',
-    twitchGame: 'Fortnite',
     serverUrl: user.serverUrl,
     streamKey: user.streamKey,
   };
