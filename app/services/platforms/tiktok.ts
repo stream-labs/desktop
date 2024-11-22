@@ -145,8 +145,20 @@ export class TikTokService
     return this.state.settings.liveScope === 'approved';
   }
 
+  get neverApplied(): boolean {
+    return this.state.settings.liveScope === 'never-applied';
+  }
+
   get denied(): boolean {
     return this.state.settings.liveScope === 'denied';
+  }
+
+  get legacy(): boolean {
+    return this.state.settings.liveScope === 'legacy';
+  }
+
+  get relog(): boolean {
+    return this.state.settings.liveScope === 'relog';
   }
 
   get defaultGame(): IGame {
@@ -429,11 +441,6 @@ export class TikTokService
         // show prompt to apply if user has never applied or was rejected 30+ days ago
         if (applicationStatus === 'rejected' && timestamp) {
           this.SET_DENIED_DATE(timestamp);
-          return EPlatformCallResult.TikTokStreamScopeMissing;
-        }
-
-        // show prompt to apply if user has never applied
-        if (applicationStatus === 'never-applied') {
           return EPlatformCallResult.TikTokStreamScopeMissing;
         }
       }
