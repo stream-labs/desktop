@@ -182,7 +182,23 @@ export default function ClipsView({
             </div>
           </div>
           {sortedList.length === 0 ? (
-            <> No clips found</> // TODO M: Add empty state
+            <>
+              {' '}
+              No clips found
+              <br />{' '}
+              <AddClip
+                streamId={props.id}
+                addedClips={() => {
+                  setClips(
+                    sortAndFilterClips(
+                      HighlighterService.getClips(HighlighterService.views.clips, props.id),
+                      props.id,
+                      activeFilter,
+                    ),
+                  );
+                }}
+              />
+            </> // TODO M: Add empty state
           ) : (
             <>
               {clipsLoaded ? (
