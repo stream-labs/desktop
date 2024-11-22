@@ -12,9 +12,14 @@ export default function Highlighter(props: { params?: { view: string } }) {
   const { HighlighterService } = Services;
   const v = useVuex(() => ({
     dismissedTutorial: HighlighterService.views.dismissedTutorial,
+    clips: HighlighterService.views.clips,
   }));
 
-  const [viewState, setViewState] = useState<IViewState>({ view: EHighlighterView.SETTINGS });
+  const [viewState, setViewState] = useState<IViewState>(
+    v.clips.length === 0
+      ? { view: EHighlighterView.SETTINGS }
+      : { view: EHighlighterView.CLIPS, id: undefined },
+  );
 
   switch (viewState.view) {
     case EHighlighterView.CLIPS:
