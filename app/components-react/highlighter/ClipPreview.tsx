@@ -194,14 +194,14 @@ export default function ClipPreview(props: {
           >
             <Button
               size="large"
-              style={{ display: 'flex', gap: '8px', alignItems: 'center' }}
+              style={{ display: 'flex', gap: '8px', alignItems: 'center', pointerEvents: 'auto' }}
               onClick={props.emitShowRemove}
             >
               <i className="icon-trash" />
             </Button>
             <Button
               size="large"
-              style={{ display: 'flex', gap: '8px', alignItems: 'center' }}
+              style={{ display: 'flex', gap: '8px', alignItems: 'center', pointerEvents: 'auto' }}
               onClick={props.emitShowTrim}
             >
               <i className="icon-trim" /> Trim
