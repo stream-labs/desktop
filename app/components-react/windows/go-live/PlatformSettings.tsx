@@ -80,7 +80,6 @@ export default function PlatformSettings() {
                 descriptionIsRequired={descriptionIsRequired}
                 value={commonFields}
                 onChange={updateCommonFields}
-                enabledPlatforms={enabledPlatforms}
               />
             </Section>
           )}

@@ -3,7 +3,6 @@ import { useVuex } from 'components-react/hooks';
 import React, { useState } from 'react';
 import { EHighlighterView, IViewState } from 'services/highlighter';
 import { Services } from 'components-react/service-provider';
-import StreamView from 'components-react/highlighter/StreamView';
 import ClipsView from 'components-react/highlighter/ClipsView';
 import UpdateModal from 'components-react/highlighter/UpdateModal';
 
@@ -13,42 +12,14 @@ export default function Highlighter(props: { params?: { view: string } }) {
   const { HighlighterService } = Services;
   const v = useVuex(() => ({
     dismissedTutorial: HighlighterService.views.dismissedTutorial,
-    useAiHighlighter: HighlighterService.views.useAiHighlighter,
-    isUpdaterRunning: HighlighterService.views.isUpdaterRunning,
-    highlighterVersion: HighlighterService.views.highlighterVersion,
-    progress: HighlighterService.views.updaterProgress,
   }));
 
-  const [viewState, setViewState] = useState<IViewState>(
-    openViewFromParams === EHighlighterView.STREAM || v.dismissedTutorial
-      ? { view: EHighlighterView.STREAM }
-      : { view: EHighlighterView.SETTINGS },
-  );
-
-  const updaterModal = (
-    <UpdateModal
-      version={v.highlighterVersion}
-      progress={v.progress}
-      isVisible={v.isUpdaterRunning}
-    />
-  );
+  const [viewState, setViewState] = useState<IViewState>({ view: EHighlighterView.SETTINGS });
 
   switch (viewState.view) {
-    case EHighlighterView.STREAM:
-      return (
-        <>
-          {updaterModal}
-          <StreamView
-            emitSetView={data => {
-              setViewFromEmit(data);
-            }}
-          />
-        </>
-      );
     case EHighlighterView.CLIPS:
       return (
         <>
-          {updaterModal}
           <ClipsView
             emitSetView={data => {
               setViewFromEmit(data);
@@ -65,7 +36,6 @@ export default function Highlighter(props: { params?: { view: string } }) {
     default:
       return (
         <>
-          {updaterModal}
           <SettingsView
             close={() => {
               HighlighterService.actions.dismissTutorial();

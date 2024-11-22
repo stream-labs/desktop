@@ -119,7 +119,6 @@ export type TClip = IAiClip | IReplayBufferClip | IManualClip;
 
 export enum EHighlighterView {
   CLIPS = 'clips',
-  STREAM = 'stream',
   SETTINGS = 'settings',
 }
 
@@ -127,15 +126,12 @@ interface TClipsViewState {
   view: EHighlighterView.CLIPS;
   id: string | undefined;
 }
-interface IStreamViewState {
-  view: EHighlighterView.STREAM;
-}
 
 interface ISettingsViewState {
   view: EHighlighterView.SETTINGS;
 }
 
-export type IViewState = TClipsViewState | IStreamViewState | ISettingsViewState;
+export type IViewState = TClipsViewState | ISettingsViewState;
 
 // TODO: Need to clean up all of this
 export interface StreamInfoForAiHighlighter {
@@ -244,11 +240,7 @@ interface IHighligherState {
   upload: IUploadInfo;
   dismissedTutorial: boolean;
   error: string;
-  useAiHighlighter: boolean;
   highlightedStreams: IHighlightedStream[];
-  updaterProgress: number;
-  isUpdaterRunning: boolean;
-  highlighterVersion: string;
 }
 
 // Capitalization is not consistent because it matches with the
@@ -378,16 +370,6 @@ class HighligherViews extends ViewHandler<IHighligherState> {
     return this.state.clips;
   }
 
-  /**
-   * Returns wether or not the AiHighlighter should be used
-   */
-  get useAiHighlighter() {
-    return this.state.useAiHighlighter;
-  }
-
-  /**
-   * Returns wether or not the AiHighlighter should be used
-   */
   get highlightedStreams() {
     return this.state.highlightedStreams;
   }
@@ -445,18 +427,6 @@ class HighligherViews extends ViewHandler<IHighligherState> {
     return this.state.error;
   }
 
-  get highlighterVersion() {
-    return this.state.highlighterVersion;
-  }
-
-  get isUpdaterRunning() {
-    return this.state.isUpdaterRunning;
-  }
-
-  get updaterProgress() {
-    return this.state.updaterProgress;
-  }
-
   /**
    * Takes a filepath to a video and returns a file:// url with a random
    * component to prevent the browser from caching it and missing changes.
@@ -508,11 +478,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     },
     dismissedTutorial: false,
     error: '',
-    useAiHighlighter: false,
     highlightedStreams: [],
-    updaterProgress: 0,
-    isUpdaterRunning: false,
-    highlighterVersion: '',
   };
 
   @Inject() streamingService: StreamingService;
@@ -523,8 +489,6 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   @Inject() jsonrpcService: JsonrpcService;
   @Inject() navigationService: NavigationService;
   @Inject() sharedStorageService: SharedStorageService;
-
-  aiHighlighterUpdater: AiHighlighterUpdater;
 
   /**
    * A dictionary of actual clip classes.
@@ -621,71 +585,12 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     this.state.error = error;
   }
 
-  @mutation()
-  SET_USE_AI_HIGHLIGHTER(useAiHighlighter: boolean) {
-    Vue.set(this.state, 'useAiHighlighter', useAiHighlighter);
-    this.state.useAiHighlighter = useAiHighlighter;
-  }
-
-  @mutation()
-  ADD_HIGHLIGHTED_STREAM(streamInfo: IHighlightedStream) {
-    // Vue.set(this.state, 'highlightedStreams', streamInfo);
-    this.state.highlightedStreams.push(streamInfo);
-  }
-
-  @mutation()
-  UPDATE_HIGHLIGHTED_STREAM(updatedStreamInfo: IHighlightedStream) {
-    const keepAsIs = this.state.highlightedStreams.filter(
-      stream => stream.id !== updatedStreamInfo.id,
-    );
-    this.state.highlightedStreams = [...keepAsIs, updatedStreamInfo];
-  }
-
-  @mutation()
-  REMOVE_HIGHLIGHTED_STREAM(id: string) {
-    this.state.highlightedStreams = this.state.highlightedStreams.filter(
-      stream => stream.id !== id,
-    );
-  }
-
-  @mutation()
-  SET_UPDATER_PROGRESS(progress: number) {
-    this.state.updaterProgress = progress;
-  }
-
-  @mutation()
-  SET_UPDATER_STATE(isRunning: boolean) {
-    this.state.isUpdaterRunning = isRunning;
-  }
-
-  @mutation()
-  SET_HIGHLIGHTER_VERSION(version: string) {
-    this.state.highlighterVersion = version;
-  }
-
   get views() {
     return new HighligherViews(this.state);
   }
 
   async init() {
     super.init();
-
-    if (!this.aiHighlighterUpdater) {
-      this.aiHighlighterUpdater = new AiHighlighterUpdater();
-    }
-
-    // check if ai highlighter is activated and we need to update it
-    if (this.views.useAiHighlighter && (await this.aiHighlighterUpdater.isNewVersionAvailable())) {
-      await this.startUpdater();
-    }
-
-    //
-    this.views.clips.forEach(clip => {
-      if (isAiClip(clip) && (clip.aiInfo as any).moments) {
-        clip.aiInfo.inputs = (clip.aiInfo as any).moments;
-        delete (clip.aiInfo as any).moments;
-      }
-    });
 
     //Check if files are existent, if not, delete
     this.views.clips.forEach(c => {
@@ -701,16 +606,6 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
         cancelRequested: false,
       });
     }
-
-    //Check if aiDetections were still running when the user closed desktop
-    this.views.highlightedStreams
-      .filter(stream => stream.state.type === 'detection-in-progress')
-      .forEach(stream => {
-        this.UPDATE_HIGHLIGHTED_STREAM({
-          ...stream,
-          state: { type: 'detection-canceled-by-user', progress: 0 },
-        });
-      });
 
     this.views.clips.forEach(c => {
       this.UPDATE_CLIP({
@@ -765,62 +660,16 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
         // path.join(CLIP_DIR, '2021-06-08 16-40-14.mp4'),
         // path.join(CLIP_DIR, '2021-05-25 08-56-03.mp4'),
       ];
-
-      //  await this.addStream({
-      //  id: 'demo123',
-      // game: 'Fortnite',
-      //title: 'Demo Stream',
-      //date: '1726234396290',
-      //state: { type: 'detection-finished', progress: 0 },
-      //});
-      //const newClips = [getSharedResource('replay123.mp4')].map(path => ({ path }));
-      //this.addClips(newClips, 'demo123', 'Manual');
     } else {
       let streamStarted = false;
-      let aiRecordingInProgress = false;
-      let aiRecordingStartTime = moment();
-      let streamInfo: StreamInfoForAiHighlighter;
 
       this.streamingService.replayBufferFileWrite.subscribe(async clipPath => {
-        const streamId = streamInfo?.id || undefined;
-        let endTime: number;
-
-        if (streamId) {
-          endTime = moment().diff(aiRecordingStartTime, 'seconds');
-        } else {
-          endTime = undefined;
-        }
-
-        const REPLAY_BUFFER_DURATION = 20; // TODO M: Replace with settingsservice
-        const startTime = Math.max(0, endTime ? endTime - REPLAY_BUFFER_DURATION : 0);
-
-        this.addClips([{ path: clipPath, startTime, endTime }], streamId, 'ReplayBuffer');
+        this.addClips([{ path: clipPath }], undefined, 'ReplayBuffer');
       });
 
       this.streamingService.streamingStatusChange.subscribe(async status => {
         if (status === EStreamingState.Live) {
-          streamStarted = true; // console.log('live', this.streamingService.views.settings.platforms.twitch.title);
-
-          if (this.views.useAiHighlighter === false) {
-            console.log('HighlighterService: Game:', this.streamingService.views.game);
-            // console.log('Highlighter not enabled or not Fortnite');
-            return;
-          }
-
-          // console.log('recording Alreadyt running?:', this.streamingService.views.isRecording);
-
-          if (this.streamingService.views.isRecording) {
-            // console.log('Recording is already running');
-          } else {
-            this.streamingService.toggleRecording();
-          }
-          streamInfo = {
-            id: 'fromStreamRecording' + uuid(),
-            title: this.streamingService.views.settings.platforms.twitch.title,
-            game: this.streamingService.views.game,
-          };
-          aiRecordingInProgress = true;
-          aiRecordingStartTime = moment();
+          streamStarted = true;
         }
 
         if (status === EStreamingState.Offline) {
@@ -848,30 +697,6 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
           streamStarted = false;
         }
-        if (status === EStreamingState.Ending) {
-          if (!aiRecordingInProgress) {
-            return;
-          }
-          this.streamingService.toggleRecording();
-
-          // Load potential replaybuffer clips
-          await this.loadClips(streamInfo.id);
-        }
-      });
-
-      this.streamingService.latestRecordingPath.subscribe(path => {
-        if (!aiRecordingInProgress) {
-          return;
-        }
-
-        aiRecordingInProgress = false;
-        this.flow(path, streamInfo);
-
-        this.navigationService.actions.navigate(
-          'Highlighter',
-          { view: 'stream' },
-          EMenuItemKey.Highlighter,
-        );
       });
     }
   }
@@ -953,62 +778,6 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     return;
   }
 
-  async addAiClips(newClips: INewClipData[], newStreamInfo: StreamInfoForAiHighlighter) {
-    const currentHighestOrderPosition = this.getClips(this.views.clips, newStreamInfo.id).length;
-    const getHighestGlobalOrderPosition = this.getClips(this.views.clips, undefined).length;
-
-    newClips.forEach((clip, index) => {
-      // Don't allow adding the same clip twice for ai clips
-      if (this.state.clips[clip.path]) return;
-
-      const streamInfo: { [key: string]: TStreamInfo } = {
-        [newStreamInfo.id]: {
-          orderPosition: index + currentHighestOrderPosition + 1,
-          initialStartTime: clip.startTime,
-          initialEndTime: clip.endTime,
-        },
-      };
-
-      this.ADD_CLIP({
-        path: clip.path,
-        loaded: false,
-        enabled: true,
-        startTrim: clip.startTrim,
-        endTrim: clip.endTrim,
-        deleted: false,
-        source: 'AiClip',
-        aiInfo: clip.aiClipInfo,
-        globalOrderPosition: index + getHighestGlobalOrderPosition + 1,
-        streamInfo,
-      });
-    });
-    this.sortStreamClipsByStartTime(this.views.clips, newStreamInfo);
-    await this.loadClips(newStreamInfo.id);
-  }
-
-  sortStreamClipsByStartTime(clips: TClip[], newStreamInfo: StreamInfoForAiHighlighter) {
-    const allClips = this.getClips(clips, newStreamInfo.id);
-
-    const sortedClips = allClips.sort(
-      (a, b) =>
-        a.streamInfo[newStreamInfo.id].initialStartTime -
-        b.streamInfo[newStreamInfo.id].initialStartTime,
-    );
-
-    // Update order positions based on the sorted order
-    sortedClips.forEach((clip, index) => {
-      this.UPDATE_CLIP({
-        path: clip.path,
-        streamInfo: {
-          [newStreamInfo.id]: {
-            ...clip.streamInfo[newStreamInfo.id],
-            orderPosition: index + 1,
-          },
-        },
-      });
-    });
-  }
-
   enableClip(path: string, enabled: boolean) {
     this.UPDATE_CLIP({
       path,
@@ -1042,43 +811,8 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       console.warn(`Clip not found for path: ${path}`);
       return;
     }
-    if (
-      this.fileExists(path) &&
-      streamId &&
-      clip.streamInfo &&
-      Object.keys(clip.streamInfo).length > 1
-    ) {
-      const updatedStreamInfo = { ...clip.streamInfo };
-      delete updatedStreamInfo[streamId];
-
-      this.UPDATE_CLIP({
-        path: clip.path,
-        streamInfo: updatedStreamInfo,
-      });
-    } else {
-      this.REMOVE_CLIP(path);
-      this.removeScrubFile(clip.scrubSprite);
-    }
-
-    if (clip.streamInfo !== undefined || streamId !== undefined) {
-      const ids: string[] = streamId ? [streamId] : Object.keys(clip.streamInfo);
-      const length = this.views.clips.length;
-
-      ids.forEach(id => {
-        let found = false;
-        if (length !== 0) {
-          for (let i = 0; i < length; i++) {
-            if (this.views.clips[i].streamInfo?.[id] !== undefined) {
-              found = true;
-              break;
-            }
-          }
-        }
-        if (!found) {
-          this.REMOVE_HIGHLIGHTED_STREAM(id);
-        }
-      });
-    }
+    this.REMOVE_CLIP(path);
+    this.removeScrubFile(clip.scrubSprite);
   }
 
   setTransition(transition: Partial<ITransitionInfo>) {
@@ -1123,47 +857,11 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     return fs.existsSync(file);
   }
 
-  // TODO M: Temp way to solve the issue
-  addStream(streamInfo: IHighlightedStream) {
-    return new Promise<void>(resolve => {
-      this.ADD_HIGHLIGHTED_STREAM(streamInfo);
-      setTimeout(() => {
-        resolve();
-      }, 2000);
-    });
-  }
-
-  updateStream(streamInfo: IHighlightedStream) {
-    this.UPDATE_HIGHLIGHTED_STREAM(streamInfo);
-  }
-
-  removeStream(streamId: string) {
-    this.REMOVE_HIGHLIGHTED_STREAM(streamId);
-
-    //Remove clips from stream
-    const clipsToRemove = this.getClips(this.views.clips, streamId);
-    clipsToRemove.forEach(clip => {
-      this.removeClip(clip.path, streamId);
-    });
-  }
-
   async removeScrubFile(clipPath: string) {
     try {
       await fs.remove(clipPath);
     } catch (error: unknown) {
       console.error('Error removing scrub file', error);
-    }
-  }
-
-  setAiHighlighter(state: boolean) {
-    this.SET_USE_AI_HIGHLIGHTER(state);
-  }
-
-  toggleAiHighlighter() {
-    if (this.state.useAiHighlighter) {
-      this.SET_USE_AI_HIGHLIGHTER(false);
-    } else {
-      this.SET_USE_AI_HIGHLIGHTER(true);
     }
   }
 
@@ -1674,329 +1372,6 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     this.CLEAR_UPLOAD();
   }
 
-  extractDateTimeFromPath(filePath: string): string | undefined {
-    try {
-      const parts = filePath.split(/[/\\]/);
-      const fileName = parts[parts.length - 1];
-      const dateTimePart = fileName.split('.')[0];
-      return dateTimePart;
-    } catch (error: unknown) {
-      return undefined;
-    }
-  }
-
-  restartAiDetection(filePath: string, streamInfo: IHighlightedStream) {
-    this.removeStream(streamInfo.id);
-    const streamInfoForHighlighter: StreamInfoForAiHighlighter = {
-      id: streamInfo.id,
-      title: streamInfo.title,
-      game: streamInfo.game,
-    };
-
-    this.flow(filePath, streamInfoForHighlighter);
-  }
-
-  async flow(filePath: string, streamInfo: StreamInfoForAiHighlighter): Promise<void> {
-    // if update is already in progress, need to wait until it's done
-    if (this.aiHighlighterUpdater.updateInProgress) {
-      await this.aiHighlighterUpdater.currentUpdate;
-    } else if (await this.aiHighlighterUpdater.isNewVersionAvailable()) {
-      await this.startUpdater();
-    }
-
-    const fallbackTitle = 'awesome-stream';
-    const sanitizedTitle = streamInfo.title
-      ? streamInfo.title.replace(/[\\/:"*?<>|]+/g, ' ')
-      : this.extractDateTimeFromPath(filePath) || fallbackTitle;
-
-    const setStreamInfo: IHighlightedStream = {
-      state: {
-        type: 'detection-in-progress',
-        progress: 0,
-      },
-      date: moment().toISOString(),
-      id: streamInfo.id || 'noId',
-      title: sanitizedTitle,
-      game: streamInfo.game || 'no title',
-      abortController: new AbortController(),
-      path: filePath,
-    };
-
-    await this.addStream(setStreamInfo);
-
-    const progressTracker = new ProgressTracker(progress => {
-      setStreamInfo.state.progress = progress;
-      this.updateStream(setStreamInfo);
-    });
-
-    const renderHighlights = async (partialHighlights: IHighlight[]) => {
-      console.log('🔄 cutHighlightClips');
-      this.updateStream({ state: 'Generating clips', ...setStreamInfo });
-      const clipData = await this.cutHighlightClips(filePath, partialHighlights, setStreamInfo);
-      console.log('✅ cutHighlightClips');
-      // 6. add highlight clips
-      progressTracker.destroy();
-      setStreamInfo.state.type = 'detection-finished';
-      this.updateStream(setStreamInfo);
-
-      console.log('🔄 addClips', clipData);
-      this.addAiClips(clipData, streamInfo);
-      console.log('✅ addClips');
-    };
-
-    console.log('🔄 HighlighterData');
-    try {
-      const highlighterResponse = await getHighlightClips(
-        filePath,
-        renderHighlights,
-        setStreamInfo.abortController.signal,
-        (progress: number) => {
-          progressTracker.updateProgressFromHighlighter(progress);
-        },
-      );
-      console.log('✅ Final HighlighterData', highlighterResponse);
-    } catch (error: unknown) {
-      if (error instanceof Error && error.message === 'Highlight generation canceled') {
-        setStreamInfo.state.type = 'detection-canceled-by-user';
-      } else {
-        console.error('Error in highlight generation:', error);
-        setStreamInfo.state.type = 'error';
-      }
-    } finally {
-      setStreamInfo.abortController = undefined;
-      this.updateStream(setStreamInfo);
-      // stopProgressUpdates();
-    }
-
-    return;
-  }
-
-  cancelHighlightGeneration(streamId: string): void {
-    const stream = this.views.highlightedStreams.find(s => s.id === streamId);
-    if (stream && stream.abortController) {
-      console.log('cancelHighlightGeneration', streamId);
-      stream.abortController.abort();
-    }
-  }
-
-  async getHighlightClipsRest(
-    type: string,
-    video_uri: string,
-    trim: { start_time: number; start_end: number } | undefined,
-  ) {
-    // Call highlighter code - replace with function
-    try {
-      const body = {
-        video_uri,
-        url,
-        trim,
-      };
-
-      const controller = new AbortController();
-      const signal = controller.signal;
-      const timeout = 1000 * 60 * 30; // 30 minutes
-      console.time('requestDuration');
-      const fetchTimeout = setTimeout(() => {
-        controller.abort();
-      }, timeout);
-
-      const response = await fetch(`http://127.0.0.1:8000${type}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-        },
-        body: JSON.stringify(body),
-        signal,
-      });
-
-      clearTimeout(fetchTimeout);
-      console.timeEnd('requestDuration');
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return data;
-    } catch (error: unknown) {
-      console.timeEnd('requestDuration');
-
-      if ((error as any).name === 'AbortError') {
-        console.error('Fetch request timed out');
-      } else {
-        console.error('Fetch error:', error);
-      }
-
-      throw new Error('Error while fetching');
-    }
-  }
-
-  async cutHighlightClips(
-    videoUri: string,
-    highlighterData: IHighlight[],
-    streamInfo: IHighlightedStream,
-  ): Promise<INewClipData[]> {
-    const id = streamInfo.id;
-    const fallbackTitle = 'awesome-stream';
-    const videoDir = path.dirname(videoUri);
-    const filename = path.basename(videoUri);
-    const sanitizedTitle = streamInfo.title
-      ? streamInfo.title.replace(/[\\/:"*?<>|]+/g, ' ')
-      : fallbackTitle;
-    const folderName = `${filename}-Clips-${sanitizedTitle}-${id.slice(id.length - 4, id.length)}`;
-    const outputDir = path.join(videoDir, folderName);
-
-    // Check if directory for clips exists, if not create it
-    try {
-      try {
-        await fs.readdir(outputDir);
-      } catch (error: unknown) {
-        await fs.mkdir(outputDir);
-      }
-    } catch (error: unknown) {
-      console.error('Error creating file directory');
-      return null;
-    }
-
-    const sortedHighlights = highlighterData.sort((a, b) => a.start_time - b.start_time);
-    const results: INewClipData[] = [];
-    const processedFiles = new Set<string>();
-
-    const duration = await this.getVideoDuration(videoUri);
-
-    // First check the codec
-    const probeArgs = [
-      '-v',
-      'error',
-      '-select_streams',
-      'v:0',
-      '-show_entries',
-      'stream=codec_name,format=duration',
-      '-of',
-      'default=nokey=1:noprint_wrappers=1',
-      videoUri,
-    ];
-    let codec = '';
-    try {
-      const codecResult = await execa(FFPROBE_EXE, probeArgs);
-      codec = codecResult.stdout.trim();
-      console.log(`Codec for ${videoUri}: ${codec}`);
-    } catch (error: unknown) {
-      console.error(`Error checking codec for ${videoUri}:`, error);
-    }
-    console.time('export');
-    const BATCH_SIZE = 1;
-    const DEFAULT_START_TRIM = 10;
-    const DEFAULT_END_TRIM = 10;
-
-    for (let i = 0; i < sortedHighlights.length; i += BATCH_SIZE) {
-      const highlightBatch = sortedHighlights.slice(i, i + BATCH_SIZE);
-      const batchTasks = highlightBatch.map((highlight: IHighlight) => {
-        return async () => {
-          const formattedStart = highlight.start_time.toString().padStart(6, '0');
-          const formattedEnd = highlight.end_time.toString().padStart(6, '0');
-          const outputFilename = `${folderName}-${formattedStart}-${formattedEnd}.mp4`;
-          const outputUri = path.join(outputDir, outputFilename);
-
-          if (processedFiles.has(outputUri)) {
-            console.log('File already exists');
-            return null;
-          }
-          processedFiles.add(outputUri);
-
-          // Check if the file with that name already exists and delete it if it does
-          try {
-            await fs.access(outputUri);
-            await fs.unlink(outputUri);
-          } catch (err: unknown) {
-            if ((err as any).code !== 'ENOENT') {
-              console.error(`Error checking existence of ${outputUri}:`, err);
-            }
-          }
-
-          // Calculate new start and end times + new clip duration
-          const newClipStartTime = Math.max(0, highlight.start_time - DEFAULT_START_TRIM);
-          const actualStartTrim = highlight.start_time - newClipStartTime;
-          const newClipEndTime = Math.min(duration, highlight.end_time + DEFAULT_END_TRIM);
-          const actualEndTrim = newClipEndTime - highlight.end_time;
-
-          const args = [
-            '-ss',
-            newClipStartTime.toString(),
-            '-to',
-            newClipEndTime.toString(),
-            '-i',
-            videoUri,
-            '-c:v',
-            codec === 'h264' ? 'copy' : 'libx264',
-            '-c:a',
-            'aac',
-            '-strict',
-            'experimental',
-            '-b:a',
-            '192k',
-            '-movflags',
-            'faststart',
-            outputUri,
-          ];
-
-          try {
-            const subprocess = execa(FFMPEG_EXE, args);
-            const timeoutDuration = 1000 * 60 * 5;
-            const timeoutId = setTimeout(() => {
-              console.warn(`FFMPEG process timed out for ${outputUri}`);
-              subprocess.kill('SIGTERM', { forceKillAfterTimeout: 2000 });
-            }, timeoutDuration);
-
-            try {
-              await subprocess;
-              console.log(`Created segment: ${outputUri}`);
-              const newClipData: INewClipData = {
-                path: outputUri,
-                aiClipInfo: {
-                  inputs: highlight.inputs,
-                  score: highlight.score,
-                  metadata: highlight.metadata,
-                },
-                startTime: highlight.start_time,
-                endTime: highlight.end_time,
-                startTrim: actualStartTrim,
-                endTrim: actualEndTrim,
-              };
-              return newClipData;
-            } catch (error: unknown) {
-              console.warn(`Error during FFMPEG execution for ${outputUri}:`, error);
-              return null;
-            } finally {
-              clearTimeout(timeoutId);
-            }
-          } catch (error: unknown) {
-            console.error(`Error creating segment: ${outputUri}`, error);
-            return null;
-          }
-        };
-      });
-
-      const batchResults = await Promise.allSettled(batchTasks.map(task => task()));
-      results.push(
-        ...batchResults
-          .filter((result): result is PromiseFulfilledResult<any> => result.status === 'fulfilled')
-          .map(result => result.value)
-          .filter(value => value !== null),
-      );
-
-      const failedResults = batchResults.filter(result => result.status === 'rejected');
-
-      if (failedResults.length > 0) {
-        console.error('Failed exports:', failedResults);
-      }
-    }
-
-    console.timeEnd('export');
-    return results;
-  }
-
   getClips(clips: TClip[], streamId?: string): TClip[] {
     const inputClips = clips.filter(clip => clip.path !== 'add');
     let wantedClips;
@@ -2016,78 +1391,5 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
         });
     }
     return outputClips;
-  }
-
-  getClipsLoaded(clips: TClip[], streamId?: string): boolean {
-    return this.getClips(clips, streamId).every(clip => clip.loaded);
-  }
-
-  getRoundDetails(clips: TClip[]): { round: number; inputs: IInput[] }[] {
-    const roundsMap: { [key: number]: IInput[] } = {};
-    clips.forEach(clip => {
-      const aiClip = isAiClip(clip) ? clip : undefined;
-      const round = aiClip?.aiInfo?.metadata?.round ?? undefined;
-      if (aiClip?.aiInfo?.inputs && round) {
-        if (!roundsMap[round]) {
-          roundsMap[round] = [];
-        }
-        roundsMap[round].push(...aiClip.aiInfo.inputs);
-      }
-    });
-
-    return Object.keys(roundsMap).map(round => ({
-      round: parseInt(round, 10),
-      inputs: roundsMap[parseInt(round, 10)],
-    }));
-  }
-
-  async getVideoDuration(filePath: string): Promise<number> {
-    const { stdout } = await execa(FFPROBE_EXE, [
-      '-v',
-      'error',
-      '-show_entries',
-      'format=duration',
-      '-of',
-      'default=noprint_wrappers=1:nokey=1',
-      filePath,
-    ]);
-    const duration = parseFloat(stdout);
-    return duration;
-  }
-
-  enableOnlySpecificClips(clips: TClip[], streamId?: string) {
-    clips.forEach(clip => {
-      this.UPDATE_CLIP({
-        path: clip.path,
-        enabled: false,
-      });
-    });
-
-    // Enable specific clips
-    const clipsToEnable = this.getClips(clips, streamId);
-    clipsToEnable.forEach(clip => {
-      this.UPDATE_CLIP({
-        path: clip.path,
-        enabled: true,
-      });
-    });
-  }
-
-  private updateProgress(progress: IDownloadProgress) {
-    // this is a lie and its not a percent, its float from 0 and 1
-    this.SET_UPDATER_PROGRESS(progress.percent * 100);
-  }
-
-  /**
-   * Start updater process
-   */
-  private async startUpdater() {
-    try {
-      this.SET_UPDATER_STATE(true);
-      this.SET_HIGHLIGHTER_VERSION(this.aiHighlighterUpdater.version || '');
-      await this.aiHighlighterUpdater.update(progress => this.updateProgress(progress));
-    } finally {
-      this.SET_UPDATER_STATE(false);
-    }
   }
 }

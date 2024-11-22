@@ -7,7 +7,6 @@ import styles from './ClipsView.m.less';
 import { Button } from 'antd';
 import { $t } from 'services/i18n';
 import { isAiClip } from './utils';
-import { InputEmojiSection } from './InputEmojiSection';
 
 import { useVuex } from 'components-react/hooks';
 export default function ClipPreview(props: {
@@ -92,11 +91,6 @@ export default function ClipPreview(props: {
             />
           </div>
         )}
-        <div style={{ position: 'absolute', top: '7px', right: '9px' }}>
-          {v.clip.source === 'AiClip' && (
-            <FlameHypeScore score={v.clip.aiInfo.score}></FlameHypeScore>
-          )}
-        </div>
         <span style={{ position: 'absolute', top: '10px', left: '10px' }}>
           <BoolButtonInput
             tooltip={enabled ? $t('Disable clip') : $t('Enable clip')}
@@ -158,34 +152,10 @@ export default function ClipPreview(props: {
                   transform: 'translateY(1px)',
                 }}
               >
-                {isAiClip(v.clip) ? (
-                  <>
-                    <InputEmojiSection
-                      clips={[v.clip]}
-                      includeRounds={false}
-                      includeDeploy={true}
-                      showCount={false}
-                      showDescription={false}
-                    />
-                  </>
-                ) : (
-                  <div style={{}}>
-                    <i className="icon-highlighter" />{' '}
-                  </div>
-                )}
-              </div>
-              {isAiClip(v.clip) && v.clip.aiInfo?.metadata?.round && (
-                <div
-                  style={{
-                    padding: '4px 6px',
-                    backgroundColor: '#00000070',
-                    borderRadius: '4px',
-                    color: 'white',
-                  }}
-                >
-                  {`Round: ${v.clip.aiInfo.metadata.round}`}
+                <div style={{}}>
+                  <i className="icon-highlighter" />{' '}
                 </div>
-              )}
+              </div>
             </div>
           </div>
           <div
@@ -240,25 +210,4 @@ export function formatSecondsToHMS(seconds: number): string {
   return `${hours !== 0 ? hours.toString() + 'h ' : ''} ${
     minutes !== 0 ? minutes.toString() + 'm ' : ''
   }${remainingSeconds !== 0 ? remainingSeconds.toString() + 's' : ''}`;
-}
-
-function FlameHypeScore({ score }: { score: number }) {
-  if (score === undefined) {
-    return <></>;
-  }
-  const normalizedScore = Math.min(1, Math.max(0, score));
-  const fullFlames = Math.ceil(normalizedScore * 5);
-
-  return (
-    <div className="flex items-center gap-1" style={{ fontSize: '19px' }}>
-      {[...Array(fullFlames)].map((_, index) => (
-        <React.Fragment key={'on' + index}>🔥</React.Fragment>
-      ))}
-      {[...Array(5 - fullFlames)].map((_, index) => (
-        <span key={'off' + index} style={{ opacity: '0.3' }}>
-          🔥
-        </span>
-      ))}
-    </div>
-  );
 }

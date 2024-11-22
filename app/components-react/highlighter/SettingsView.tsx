@@ -27,7 +27,6 @@ export default function SettingsView({
   const v = useVuex(() => ({
     settingsValues: SettingsService.views.values,
     isStreaming: StreamingService.isStreaming,
-    useAiHighlighter: HighlighterService.views.useAiHighlighter,
   }));
 
   const correctlyConfigured =
@@ -98,27 +97,6 @@ export default function SettingsView({
     SettingsService.actions.setSettingsPatch({ Output: { RecRBTime: time } });
   }
 
-  function toggleUseAiHighlighter() {
-    HighlighterService.actions.toggleAiHighlighter();
-  }
-
-  function headerBarTag(text: string) {
-    return (
-      <div
-        style={{
-          margin: 0,
-          marginLeft: '4px',
-          fontSize: '14px',
-          padding: '2px 6px',
-          borderRadius: '4px',
-          backgroundColor: '#2B383F',
-        }}
-      >
-        <p style={{ margin: 0 }}>{text}</p>
-      </div>
-    );
-  }
-
   return (
     <div
       className={styles.settingsViewRoot}
@@ -134,9 +112,6 @@ export default function SettingsView({
           </p>
         </div>
         <div style={{ display: 'flex', gap: '16px' }}>
-          <Button onClick={() => emitSetView({ view: EHighlighterView.STREAM })}>
-            Stream highlights
-          </Button>
           <Button onClick={() => emitSetView({ view: EHighlighterView.CLIPS, id: undefined })}>
             All clips
           </Button>
@@ -154,45 +129,10 @@ export default function SettingsView({
           }}
         >
           <div className={styles.cardWrapper}>
-            <div className={styles.highlighterCard}>
-              <div className={styles.cardHeaderbarWrapper}>
-                <div className={styles.cardHeaderbar}>
-                  <i style={{ margin: 0, fontSize: '20px' }} className="icon-highlighter"></i>
-                  <h3 style={{ margin: 0, fontSize: '20px' }}> Ai Highlighter</h3>
-                  {headerBarTag('For Fortnite streams (Beta)')}
-                </div>
-              </div>
-
-              <p style={{ margin: 0 }}>
-                The AI highlighter automatically detects highlights in your stream and creates a
-                highlight video for you after you finished your stream.
-              </p>
-
-              <SwitchInput
-                style={{ margin: 0, marginLeft: '-10px' }}
-                size="default"
-                value={v.useAiHighlighter}
-                onChange={toggleUseAiHighlighter}
-              />
-              <div
-                style={{
-                  position: 'absolute',
-                  right: 0,
-                  bottom: 0,
-                  borderRadius: '16px 0 9px 0',
-                  padding: '8px',
-                  paddingBottom: '5px',
-                  backgroundColor: '#2b5bd7',
-                  height: 'fit-content',
-                }}
-              >
-                Recommended
-              </div>
-            </div>
             <div className={styles.manualCard}>
               <div className={styles.cardHeaderbarWrapper}>
                 <div className={styles.cardHeaderbar}>
-                  <h3 style={{ margin: 0, fontSize: '20px' }}> Or use the manual highlighter</h3>
+                  <h3 style={{ margin: 0, fontSize: '20px' }}> Manual highlighter</h3>
                 </div>
               </div>
               <p>

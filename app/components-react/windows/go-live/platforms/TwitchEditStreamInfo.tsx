@@ -12,7 +12,6 @@ import Message from '../../../shared/Message';
 import { Row, Col, Select } from 'antd';
 import { IListOption } from 'components/shared/inputs';
 import TwitchContentClassificationInput from './TwitchContentClassificationInput';
-import AiHighlighterToggle from '../AiHighlighterToggle';
 
 export function TwitchEditStreamInfo(p: IPlatformComponentParams<'twitch'>) {
   const twSettings = p.value;
@@ -45,12 +44,7 @@ export function TwitchEditStreamInfo(p: IPlatformComponentParams<'twitch'>) {
             onChange={updateSettings}
           />
         }
-        requiredFields={
-          <React.Fragment key="required-fields">
-            <GameSelector key="required" platform={'twitch'} {...bind.game} />{' '}
-            <AiHighlighterToggle key="ai-toggle" game={bind.game?.value} cardIsExpanded={true} />
-          </React.Fragment>
-        }
+        requiredFields={<GameSelector key="required" platform={'twitch'} {...bind.game} />}
         optionalFields={optionalFields}
       />
     </Form>
