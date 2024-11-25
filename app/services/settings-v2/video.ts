@@ -461,8 +461,10 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
 
     fpsSettings.forEach((setting: keyof IVideoInfo) => {
       const hasSameVideoSetting =
-        this.contexts.horizontal.video[setting as string] === verticalVideoSetting;
+        this.contexts.horizontal.video[setting as keyof IVideoInfo] ===
+        verticalVideoSetting[setting as keyof IVideoInfo];
       let shouldUpdate = hasSameVideoSetting;
+
       // if the vertical context has been established, also compare legacy settings
       if (this.contexts.vertical) {
         const hasSameLegacySetting =

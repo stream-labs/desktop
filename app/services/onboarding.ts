@@ -294,7 +294,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
     return await Promise.all(Object.keys(this.themeMetadata).map(id => this.fetchThemeData(id)));
   }
 
-  get themeMetadata() {
+  get themeMetadata(): { [id: number]: string } {
     return this.userService.views.isPrime ? THEME_METADATA.PAID : THEME_METADATA.FREE;
   }
 
@@ -315,6 +315,33 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
       this.sceneCollectionsService.loadableCollections.length === 1 &&
       this.sceneCollectionsService.loadableCollections[0].auto
     );
+  }
+
+  get shouldAddDefaultSources() {
+    // Add default sources if the user did not install a theme during onboarding
+    if (!this.existingSceneCollections) return true;
+
+    // Skip checking creation date for accounts in when testing
+    if (Utils.isTestMode()) return false;
+
+    // If the user does not have a creation date, they are a new user. Check to see if this
+    // new user has installed a theme during onboarding
+    const creationDate = this.userService.state?.createdAt;
+    if (!creationDate && !this.existingSceneCollections) {
+      return true;
+    }
+
+    // Otherwise, check if the user is within the first 6 hours of their
+    // account creation date/time. This is last resort very rough check to determine
+    // if the user is a new user. Not ideal but better than nothing.
+    const now = new Date().getTime();
+    const creationTime = new Date(creationDate).getTime();
+    const millisecondsInAnHour = 1000 * 60 * 60;
+
+    const isWithinCreationDateRange =
+      creationTime < now && creationTime - now < millisecondsInAnHour * 6;
+
+    return isWithinCreationDateRange && !this.existingSceneCollections;
   }
 
   init() {
@@ -358,6 +385,13 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
         streaming: { outputResolution },
       });
     }
+
+    // On their first login, new users should have a few default sources if they did not
+    // select a scene collection during onboarding.
+    if (this.sceneCollectionsService.newUserFirstLogin) {
+      this.sceneCollectionsService.setupDefaultSources(this.shouldAddDefaultSources);
+    }
+
     this.navigationService.navigate('Studio');
     this.onboardingCompleted.next();
   }
