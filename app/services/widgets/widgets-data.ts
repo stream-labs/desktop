@@ -142,6 +142,7 @@ export const makeWidgetTesters = (host: string): IWidgetTester[] => {
   ] as IWidgetTester[];
 };
 
+// TODO: the type of this needs to match what's used on the UI with WidgetDisplayData
 export const WidgetDefinitions: { [x: number]: IWidget } = {
   [WidgetType.AlertBox]: {
     name: 'Alert Box',
@@ -491,6 +492,46 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
     y: 0.5,
 
     anchor: AnchorPoint.Center,
+  },
+  [WidgetType.ViewerCount]: {
+    name: 'Viewer Count',
+    humanType: 'viewer_count',
+    url(host, token) {
+      return `https://${host}/widgets/viewer-count?token=${token}`;
+    },
+
+    width: 600,
+    height: 200,
+    x: 0,
+    y: 1,
+    anchor: AnchorPoint.SouthWest,
+  },
+  // TODO: it seems we've half way transitioned to getWidgetsConfig but
+  // this list is still referenced
+  [WidgetType.GameWidget]: {
+    name: 'Game Widget',
+    humanType: 'game_widget',
+    width: 400,
+    height: 750,
+    x: 0.5,
+    y: 0,
+    anchor: AnchorPoint.North,
+
+    url(host, token) {
+      return `https://${host}/widgets/game-widget?token=${token}`;
+    },
+  },
+  [WidgetType.CustomWidget]: {
+    name: 'Custom Widget',
+    humanType: 'custom_widget',
+    width: 400,
+    height: 750,
+    x: 0.5,
+    y: 0,
+    anchor: AnchorPoint.North,
+    url(host, token) {
+      return `https://${host}/widgets/custom-widget?token=${token}`;
+    },
   },
 };
 

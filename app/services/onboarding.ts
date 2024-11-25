@@ -16,6 +16,7 @@ import { RecordingModeService } from './recording-mode';
 import { THEME_METADATA, IThemeMetadata } from './onboarding/theme-metadata';
 export type { IThemeMetadata } from './onboarding/theme-metadata';
 import { TwitchStudioImporterService } from './ts-importer';
+import { DualOutputService } from 'services/dual-output';
 
 enum EOnboardingSteps {
   MacPermissions = 'MacPermissions',
@@ -267,6 +268,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   @Inject() userService: UserService;
   @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() outputSettingsService: OutputSettingsService;
+  @Inject() dualOutputService: DualOutputService;
 
   @mutation()
   SET_OPTIONS(options: Partial<IOnboardingOptions>) {
@@ -356,7 +358,6 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
         streaming: { outputResolution },
       });
     }
-
     this.navigationService.navigate('Studio');
     this.onboardingCompleted.next();
   }
