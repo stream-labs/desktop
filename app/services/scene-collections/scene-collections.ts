@@ -1056,6 +1056,11 @@ export class SceneCollectionsService extends Service implements ISceneCollection
       this.scenesService.views.activeScene ??
       this.scenesService.createScene('Scene', { makeActive: true });
 
+    if (!scene) {
+      console.error('Default scene not found, failed to create default sources.');
+      return;
+    }
+
     // add game capture source
     scene.createAndAddSource('Game Capture', 'game_capture', {}, { display: 'horizontal' });
 
