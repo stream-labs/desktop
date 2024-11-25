@@ -213,14 +213,14 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
    * Returns the enabled platforms according to their assigned display
    */
   get activeDisplayPlatforms(): TDisplayPlatforms {
-    const platformDisplays = { horizontal: [] as TPlatform[], vertical: [] as TPlatform[] };
-
-    for (const platform in this.enabledPlatforms) {
-      const display = this.settings.platforms[platform as TPlatform]?.display ?? 'horizontal';
-      platformDisplays[display].push(platform as TPlatform);
-    }
-
-    return platformDisplays;
+    return this.enabledPlatforms.reduce(
+      (displayPlatforms: TDisplayPlatforms, platform: TPlatform) => {
+        const display = this.settings.platforms[platform]?.display ?? 'horizontal';
+        displayPlatforms[display].push(platform);
+        return displayPlatforms;
+      },
+      { horizontal: [], vertical: [] },
+    );
   }
 
   /**

@@ -53,6 +53,7 @@ class SourceSelectorController {
   private guestCamService = Services.GuestCamService;
   private dualOutputService = Services.DualOutputService;
   private userService = Services.UserService;
+  private tiktokService = Services.TikTokService;
 
   store = initStore({
     expandedFoldersIds: [] as string[],
@@ -676,6 +677,9 @@ class SourceSelectorController {
         Services.UsageStatisticsService.recordAnalyticsEvent('DualOutput', {
           type: 'ToggleOnDualOutput',
           source: 'SourceSelector',
+          isPrime: this.userService.isPrime,
+          platforms: this.streamingService.views.linkedPlatforms,
+          tiktokStatus: this.tiktokService.scope,
         });
 
         if (!this.dualOutputService.views.dualOutputMode && this.selectiveRecordingEnabled) {
