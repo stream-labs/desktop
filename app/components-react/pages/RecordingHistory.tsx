@@ -13,6 +13,8 @@ import { Services } from '../service-provider';
 import { initStore, useController } from '../hooks/zustand';
 import { useVuex } from '../hooks';
 import Translate from 'components-react/shared/Translate';
+import uuid from 'uuid/v4';
+import { EMenuItemKey } from 'services/side-nav';
 import { $i } from 'services/utils';
 import { IRecordingEntry } from 'services/recording-mode';
 
@@ -29,6 +31,8 @@ class RecordingHistoryController {
   private UserService = Services.UserService;
   private SharedStorageService = Services.SharedStorageService;
   private NotificationsService = Services.NotificationsService;
+  private HighlighterService = Services.HighlighterService;
+  private NavigationService = Services.NavigationService;
   store = initStore<IRecordingHistoryStore>({
     showSLIDModal: false,
     showEditModal: false,
@@ -113,6 +117,19 @@ class RecordingHistoryController {
       this.postError($t('Upload already in progress'));
       return;
     }
+    if (platform === 'highlighter') {
+      this.HighlighterService.actions.flow(recording.filename, {
+        game: 'forntnite',
+        id: 'rec_' + uuid(),
+      });
+      this.NavigationService.actions.navigate(
+        'Highlighter',
+        { view: 'stream' },
+        EMenuItemKey.Highlighter,
+      );
+      return;
+    }
+
     if (platform === 'youtube') return this.uploadToYoutube(recording.filename);
     if (platform === 'remove') return this.removeEntry(recording.timestamp);
     if (this.hasSLID) {
