@@ -529,6 +529,8 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
   aiHighlighterUpdater: AiHighlighterUpdater;
 
+  aiHighlighterEnabled = false;
+
   /**
    * A dictionary of actual clip classes.
    * These are not serializable so kept out of state.
@@ -672,13 +674,20 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
   async init() {
     super.init();
+    this.aiHighlighterEnabled = this.incrementalRolloutService.views.featureIsEnabled(
+      EAvailableFeatures.aiHighlighter,
+    );
 
-    if (!this.aiHighlighterUpdater) {
+    if (this.aiHighlighterEnabled && !this.aiHighlighterUpdater) {
       this.aiHighlighterUpdater = new AiHighlighterUpdater();
     }
 
     // check if ai highlighter is activated and we need to update it
-    if (this.views.useAiHighlighter && (await this.aiHighlighterUpdater.isNewVersionAvailable())) {
+    if (
+      this.aiHighlighterEnabled &&
+      this.views.useAiHighlighter &&
+      (await this.aiHighlighterUpdater.isNewVersionAvailable())
+    ) {
       await this.startUpdater();
     }
 
@@ -1700,7 +1709,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   }
 
   async flow(filePath: string, streamInfo: StreamInfoForAiHighlighter): Promise<void> {
-    if (!this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.aiHighlighter)) {
+    if (this.aiHighlighterEnabled === false) {
       console.log('HighlighterService: Not enabled');
       return;
     }
