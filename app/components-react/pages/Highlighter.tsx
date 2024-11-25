@@ -6,11 +6,15 @@ import { Services } from 'components-react/service-provider';
 import StreamView from 'components-react/highlighter/StreamView';
 import ClipsView from 'components-react/highlighter/ClipsView';
 import UpdateModal from 'components-react/highlighter/UpdateModal';
+import { EAvailableFeatures } from 'services/incremental-rollout';
 
 export default function Highlighter(props: { params?: { view: string } }) {
   const openViewFromParams = props?.params?.view || '';
 
-  const { HighlighterService } = Services;
+  const { HighlighterService, IncrementalRolloutService } = Services;
+  const aiHighlighterEnabled = IncrementalRolloutService.views.featureIsEnabled(
+    EAvailableFeatures.aiHighlighter,
+  );
   const v = useVuex(() => ({
     dismissedTutorial: HighlighterService.views.dismissedTutorial,
     useAiHighlighter: HighlighterService.views.useAiHighlighter,
@@ -19,12 +23,18 @@ export default function Highlighter(props: { params?: { view: string } }) {
     progress: HighlighterService.views.updaterProgress,
   }));
 
-  const [viewState, setViewState] = useState<IViewState>(
-    openViewFromParams === EHighlighterView.STREAM || v.dismissedTutorial
-      ? { view: EHighlighterView.STREAM }
-      : { view: EHighlighterView.SETTINGS },
-  );
+  let initialViewState: IViewState;
+  if (openViewFromParams === EHighlighterView.STREAM || v.dismissedTutorial) {
+    if (aiHighlighterEnabled) {
+      initialViewState = { view: EHighlighterView.STREAM };
+    } else {
+      initialViewState = { view: EHighlighterView.CLIPS, id: undefined };
+    }
+  } else {
+    initialViewState = { view: EHighlighterView.SETTINGS };
+  }
 
+  const [viewState, setViewState] = useState<IViewState>(initialViewState);
   const updaterModal = (
     <UpdateModal
       version={v.highlighterVersion}
@@ -37,7 +47,7 @@ export default function Highlighter(props: { params?: { view: string } }) {
     case EHighlighterView.STREAM:
       return (
         <>
-          {updaterModal}
+          {aiHighlighterEnabled && updaterModal}
           <StreamView
             emitSetView={data => {
               setViewFromEmit(data);
@@ -48,7 +58,7 @@ export default function Highlighter(props: { params?: { view: string } }) {
     case EHighlighterView.CLIPS:
       return (
         <>
-          {updaterModal}
+          {aiHighlighterEnabled && updaterModal}
           <ClipsView
             emitSetView={data => {
               setViewFromEmit(data);
@@ -65,7 +75,7 @@ export default function Highlighter(props: { params?: { view: string } }) {
     default:
       return (
         <>
-          {updaterModal}
+          {aiHighlighterEnabled && updaterModal}
           <SettingsView
             close={() => {
               HighlighterService.actions.dismissTutorial();

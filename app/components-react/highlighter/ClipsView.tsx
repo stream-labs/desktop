@@ -21,6 +21,7 @@ import { $t } from 'services/i18n';
 import path from 'path';
 import MiniClipPreview from './MiniClipPreview';
 import HighlightGeneratorUI from './HighlightGeneratorUI';
+import { EAvailableFeatures } from 'services/incremental-rollout';
 
 export type TModalClipsView = 'trim' | 'export' | 'preview' | 'remove';
 
@@ -36,7 +37,10 @@ export default function ClipsView({
   props: IClipsViewProps;
   emitSetView: (data: IViewState) => void;
 }) {
-  const { HighlighterService, UsageStatisticsService } = Services;
+  const { HighlighterService, UsageStatisticsService, IncrementalRolloutService } = Services;
+  const aiHighlighterEnabled = IncrementalRolloutService.views.featureIsEnabled(
+    EAvailableFeatures.aiHighlighter,
+  );
   const [clips, setClips] = useState<{
     ordered: { id: string }[];
     orderedFiltered: { id: string }[];
@@ -167,15 +171,27 @@ export default function ClipsView({
         <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: 'flex', padding: 20 }}>
             <div style={{ flexGrow: 1 }}>
-              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', cursor: 'pointer' }}>
                 <div
-                  style={{ cursor: 'pointer', paddingTop: '2px' }}
-                  onClick={() => emitSetView({ view: EHighlighterView.STREAM })}
+                  style={{ paddingTop: '2px' }}
+                  onClick={() =>
+                    emitSetView(
+                      streamId
+                        ? { view: EHighlighterView.STREAM }
+                        : { view: EHighlighterView.SETTINGS },
+                    )
+                  }
                 >
                   <i className="icon-back" />
                 </div>{' '}
                 <h1
-                  onClick={() => emitSetView({ view: EHighlighterView.STREAM })}
+                  onClick={() =>
+                    emitSetView(
+                      streamId
+                        ? { view: EHighlighterView.STREAM }
+                        : { view: EHighlighterView.SETTINGS },
+                    )
+                  }
                   style={{ margin: 0 }}
                 >
                   {' '}
@@ -279,37 +295,39 @@ export default function ClipsView({
                         );
                       }}
                     />
-                    {HighlighterService.getClips(HighlighterService.views.clips, props.id)
-                      .filter(clip => clip.source === 'AiClip')
-                      .every(clip => (clip as IAiClip).aiInfo.metadata?.round) && (
-                      <HighlightGeneratorUI
-                        emitSetFilter={filterOptions => {
-                          const clips = HighlighterService.getClips(
-                            HighlighterService.views.clips,
-                            props.id,
-                          );
-                          const filteredClips = aiFilterClips(clips, streamId, filterOptions);
-                          const filteredClipPaths = new Set(filteredClips.map(c => c.path));
+                    {streamId &&
+                      aiHighlighterEnabled &&
+                      HighlighterService.getClips(HighlighterService.views.clips, props.id)
+                        .filter(clip => clip.source === 'AiClip')
+                        .every(clip => (clip as IAiClip).aiInfo.metadata?.round) && (
+                        <HighlightGeneratorUI
+                          emitSetFilter={filterOptions => {
+                            const clips = HighlighterService.getClips(
+                              HighlighterService.views.clips,
+                              props.id,
+                            );
+                            const filteredClips = aiFilterClips(clips, streamId, filterOptions);
+                            const filteredClipPaths = new Set(filteredClips.map(c => c.path));
 
-                          clips.forEach(clip => {
-                            const shouldBeEnabled = filteredClipPaths.has(clip.path);
-                            const isEnabled = clip.enabled;
+                            clips.forEach(clip => {
+                              const shouldBeEnabled = filteredClipPaths.has(clip.path);
+                              const isEnabled = clip.enabled;
 
-                            if (shouldBeEnabled && !isEnabled) {
-                              HighlighterService.enableClip(clip.path, true);
-                            } else if (!shouldBeEnabled && isEnabled) {
-                              HighlighterService.disableClip(clip.path);
-                            }
-                          });
-                        }}
-                        combinedClipsDuration={getCombinedClipsDuration(
-                          HighlighterService.getClips(HighlighterService.views.clips, props.id),
-                        )}
-                        roundDetails={HighlighterService.getRoundDetails(
-                          HighlighterService.getClips(HighlighterService.views.clips, props.id),
-                        )}
-                      />
-                    )}
+                              if (shouldBeEnabled && !isEnabled) {
+                                HighlighterService.enableClip(clip.path, true);
+                              } else if (!shouldBeEnabled && isEnabled) {
+                                HighlighterService.disableClip(clip.path);
+                              }
+                            });
+                          }}
+                          combinedClipsDuration={getCombinedClipsDuration(
+                            HighlighterService.getClips(HighlighterService.views.clips, props.id),
+                          )}
+                          roundDetails={HighlighterService.getRoundDetails(
+                            HighlighterService.getClips(HighlighterService.views.clips, props.id),
+                          )}
+                        />
+                      )}
                   </div>
                   {/* Disabled for now, will enable with the next version
                   <ClipsFilter activeFilter={activeFilter} onFilterChange={setActiveFilter} /> */}

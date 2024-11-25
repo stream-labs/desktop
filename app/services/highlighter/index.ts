@@ -58,6 +58,8 @@ import uuid from 'uuid';
 import { EMenuItemKey } from 'services/side-nav';
 import { AiHighlighterUpdater } from './ai-highlighter/updater';
 import { IDownloadProgress } from 'util/requests';
+import { IncrementalRolloutService } from 'app-services';
+import { EAvailableFeatures } from 'services/incremental-rollout';
 export type TStreamInfo =
   | {
       orderPosition: number;
@@ -469,6 +471,16 @@ class HighligherViews extends ViewHandler<IHighligherState> {
 
 @InitAfter('StreamingService')
 export class HighlighterService extends PersistentStatefulService<IHighligherState> {
+  @Inject() streamingService: StreamingService;
+  @Inject() userService: UserService;
+  @Inject() usageStatisticsService: UsageStatisticsService;
+  @Inject() dismissablesService: DismissablesService;
+  @Inject() notificationsService: NotificationsService;
+  @Inject() jsonrpcService: JsonrpcService;
+  @Inject() navigationService: NavigationService;
+  @Inject() sharedStorageService: SharedStorageService;
+  @Inject() incrementalRolloutService: IncrementalRolloutService;
+
   static defaultState: IHighligherState = {
     clips: {},
     transition: {
@@ -514,15 +526,6 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     isUpdaterRunning: false,
     highlighterVersion: '',
   };
-
-  @Inject() streamingService: StreamingService;
-  @Inject() userService: UserService;
-  @Inject() usageStatisticsService: UsageStatisticsService;
-  @Inject() dismissablesService: DismissablesService;
-  @Inject() notificationsService: NotificationsService;
-  @Inject() jsonrpcService: JsonrpcService;
-  @Inject() navigationService: NavigationService;
-  @Inject() sharedStorageService: SharedStorageService;
 
   aiHighlighterUpdater: AiHighlighterUpdater;
 
@@ -1697,6 +1700,11 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   }
 
   async flow(filePath: string, streamInfo: StreamInfoForAiHighlighter): Promise<void> {
+    if (!this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.aiHighlighter)) {
+      console.log('HighlighterService: Not enabled');
+      return;
+    }
+
     // if update is already in progress, need to wait until it's done
     if (this.aiHighlighterUpdater.updateInProgress) {
       await this.aiHighlighterUpdater.currentUpdate;

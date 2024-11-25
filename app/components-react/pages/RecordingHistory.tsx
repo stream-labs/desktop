@@ -17,6 +17,8 @@ import uuid from 'uuid/v4';
 import { EMenuItemKey } from 'services/side-nav';
 import { $i } from 'services/utils';
 import { IRecordingEntry } from 'services/recording-mode';
+import { EHighlighterView } from 'services/highlighter';
+import { EAvailableFeatures } from 'services/incremental-rollout';
 
 interface IRecordingHistoryStore {
   showSLIDModal: boolean;
@@ -124,7 +126,7 @@ class RecordingHistoryController {
       });
       this.NavigationService.actions.navigate(
         'Highlighter',
-        { view: 'stream' },
+        { view: EHighlighterView.STREAM },
         EMenuItemKey.Highlighter,
       );
       return;
@@ -185,6 +187,9 @@ export default function RecordingHistoryPage() {
 export function RecordingHistory() {
   const controller = useController(RecordingHistoryCtx);
   const { formattedTimestamp, showFile, handleSelect, postError } = controller;
+  const aiHighlighterEnabled = Services.IncrementalRolloutService.views.featureIsEnabled(
+    EAvailableFeatures.aiHighlighter,
+  );
   const { uploadInfo, uploadOptions, recordings, hasSLID } = useVuex(() => ({
     recordings: controller.recordings,
     uploadOptions: controller.uploadOptions,
@@ -210,18 +215,25 @@ export function RecordingHistory() {
   function UploadActions(p: { recording: IRecordingEntry }) {
     return (
       <span className={styles.actionGroup}>
-        {uploadOptions.map(opt => (
-          <span
-            className={styles.action}
-            key={opt.value}
-            style={{ color: `var(--${opt.value === 'edit' ? 'teal' : 'title'})` }}
-            onClick={() => handleSelect(p.recording, opt.value)}
-          >
-            <i className={opt.icon} />
-            &nbsp;
-            <span>{opt.label}</span>
-          </span>
-        ))}
+        {uploadOptions
+          .map(option => {
+            if (option.value === 'highlighter' && !aiHighlighterEnabled) {
+              return null;
+            }
+            return (
+              <span
+                className={styles.action}
+                key={option.value}
+                style={{ color: `var(--${option.value === 'edit' ? 'teal' : 'title'})` }}
+                onClick={() => handleSelect(p.recording, option.value)}
+              >
+                <i className={option.icon} />
+                &nbsp;
+                <span>{option.label}</span>
+              </span>
+            );
+          })
+          .filter(Boolean)}
       </span>
     );
   }

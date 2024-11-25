@@ -13,10 +13,14 @@ import { Row, Col, Select } from 'antd';
 import { IListOption } from 'components/shared/inputs';
 import TwitchContentClassificationInput from './TwitchContentClassificationInput';
 import AiHighlighterToggle from '../AiHighlighterToggle';
+import { Services } from 'components-react/service-provider';
+import { EAvailableFeatures } from 'services/incremental-rollout';
 
 export function TwitchEditStreamInfo(p: IPlatformComponentParams<'twitch'>) {
   const twSettings = p.value;
-
+  const aiHighlighterEnabled = Services.IncrementalRolloutService.views.featureIsEnabled(
+    EAvailableFeatures.aiHighlighter,
+  );
   function updateSettings(patch: Partial<ITwitchStartStreamOptions>) {
     p.onChange({ ...twSettings, ...patch });
   }
@@ -48,7 +52,9 @@ export function TwitchEditStreamInfo(p: IPlatformComponentParams<'twitch'>) {
         requiredFields={
           <React.Fragment key="required-fields">
             <GameSelector key="required" platform={'twitch'} {...bind.game} />{' '}
-            <AiHighlighterToggle key="ai-toggle" game={bind.game?.value} cardIsExpanded={true} />
+            {aiHighlighterEnabled && (
+              <AiHighlighterToggle key="ai-toggle" game={bind.game?.value} cardIsExpanded={true} />
+            )}
           </React.Fragment>
         }
         optionalFields={optionalFields}
