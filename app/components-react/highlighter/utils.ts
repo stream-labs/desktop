@@ -1,8 +1,8 @@
 import moment from 'moment';
 import { IAiClip, TClip } from 'services/highlighter';
 import { useRef, useEffect, useCallback } from 'react';
-import styles from './ClipsView.m.less';
 import { EHighlighterInputTypes } from 'services/highlighter/ai-highlighter/ai-highlighter';
+import styles from './ClipsView.m.less';
 export const isAiClip = (clip: TClip): clip is IAiClip => clip.source === 'AiClip';
 
 export function sortClipsByOrder(clips: TClip[], streamId: string | undefined): TClip[] {

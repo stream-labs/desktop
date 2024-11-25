@@ -20,7 +20,14 @@ import {
 } from 'services/platforms/youtube/uploader';
 import { YoutubeService } from 'services/platforms/youtube';
 import os from 'os';
-import { CLIP_DIR, SCRUB_SPRITE_DIRECTORY, SUPPORTED_FILE_TYPES, TEST_MODE } from './constants';
+import {
+  CLIP_DIR,
+  FFMPEG_EXE,
+  SCRUB_SPRITE_DIRECTORY,
+  SUPPORTED_FILE_TYPES,
+  TEST_MODE,
+  FFPROBE_EXE,
+} from './constants';
 import { pmap } from 'util/pmap';
 import { Clip } from './clip';
 import { AudioCrossfader } from './audio-crossfader';
@@ -38,7 +45,19 @@ import { ENotificationType, NotificationsService } from 'services/notifications'
 import { JsonrpcService } from 'services/api/jsonrpc';
 import { NavigationService } from 'services/navigation';
 import { SharedStorageService } from 'services/integrations/shared-storage';
-import { EHighlighterInputTypes } from './ai-highlighter/ai-highlighter';
+import execa from 'execa';
+import moment from 'moment';
+import {
+  EHighlighterInputTypes,
+  getHighlightClips,
+  IHighlight,
+  IHighlighterInput,
+  ProgressTracker,
+} from './ai-highlighter/ai-highlighter';
+import uuid from 'uuid';
+import { EMenuItemKey } from 'services/side-nav';
+import { AiHighlighterUpdater } from './ai-highlighter/updater';
+import { IDownloadProgress } from 'util/requests';
 export type TStreamInfo =
   | {
       orderPosition: number;
