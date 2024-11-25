@@ -395,11 +395,13 @@ export class StreamingService
      * SET DUAL OUTPUT SETTINGS
      */
     if (this.views.isDualOutputMode) {
-      const horizontalStream: string[] = this.views.activeDisplayDestinations.horizontal;
-      horizontalStream.concat(this.views.activeDisplayPlatforms.horizontal as string[]);
+      const horizontalDestinations: string[] = this.views.activeDisplayDestinations.horizontal;
+      const horizontalPlatforms: TPlatform[] = this.views.activeDisplayPlatforms.horizontal;
+      const horizontalStream = horizontalDestinations.concat(horizontalPlatforms as string[]);
 
-      const verticalStream: string[] = this.views.activeDisplayDestinations.vertical;
-      verticalStream.concat(this.views.activeDisplayPlatforms.vertical as string[]);
+      const verticalDestinations: string[] = this.views.activeDisplayDestinations.vertical;
+      const verticalPlatforms: TPlatform[] = this.views.activeDisplayPlatforms.vertical;
+      const verticalStream = verticalDestinations.concat(verticalPlatforms as string[]);
 
       const allPlatforms = this.views.enabledPlatforms;
       const allDestinations = this.views.customDestinations

@@ -59,6 +59,7 @@ class VideoSettingsModule {
   userService = Services.UserService;
   dualOutputService = Services.DualOutputService;
   streamingService = Services.StreamingService;
+  tiktokService = Services.TikTokService;
 
   get display(): TDisplayType {
     return this.state.display;
@@ -504,6 +505,9 @@ class VideoSettingsModule {
       Services.UsageStatisticsService.recordAnalyticsEvent('DualOutput', {
         type: 'ToggleOnDualOutput',
         source: 'VideoSettings',
+        isPrime: this.userService.isPrime,
+        platforms: this.streamingService.views.linkedPlatforms,
+        tiktokStatus: this.tiktokService.scope,
       });
     }
   }
