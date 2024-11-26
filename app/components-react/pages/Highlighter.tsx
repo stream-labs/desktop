@@ -9,27 +9,25 @@ import UpdateModal from 'components-react/highlighter/UpdateModal';
 import { EAvailableFeatures } from 'services/incremental-rollout';
 
 export default function Highlighter(props: { params?: { view: string } }) {
-  const openViewFromParams = props?.params?.view || '';
-
   const { HighlighterService, IncrementalRolloutService } = Services;
   const aiHighlighterEnabled = IncrementalRolloutService.views.featureIsEnabled(
     EAvailableFeatures.aiHighlighter,
   );
   const v = useVuex(() => ({
-    dismissedTutorial: HighlighterService.views.dismissedTutorial,
     useAiHighlighter: HighlighterService.views.useAiHighlighter,
     isUpdaterRunning: HighlighterService.views.isUpdaterRunning,
     highlighterVersion: HighlighterService.views.highlighterVersion,
     progress: HighlighterService.views.updaterProgress,
+    clipsAmount: HighlighterService.views.clips.length,
+    streamAmount: HighlighterService.views.highlightedStreams.length,
   }));
 
   let initialViewState: IViewState;
-  if (openViewFromParams === EHighlighterView.STREAM || v.dismissedTutorial) {
-    if (aiHighlighterEnabled) {
-      initialViewState = { view: EHighlighterView.STREAM };
-    } else {
-      initialViewState = { view: EHighlighterView.CLIPS, id: undefined };
-    }
+
+  if (v.streamAmount > 0 && v.clipsAmount > 0 && aiHighlighterEnabled) {
+    initialViewState = { view: EHighlighterView.STREAM };
+  } else if (v.clipsAmount > 0) {
+    initialViewState = { view: EHighlighterView.CLIPS, id: undefined };
   } else {
     initialViewState = { view: EHighlighterView.SETTINGS };
   }
