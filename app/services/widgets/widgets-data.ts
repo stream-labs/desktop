@@ -371,7 +371,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
   [WidgetType.StreamBoss]: {
     name: 'Stream Boss',
-    humanType: 'stream_boss',
+    humanType: 'streamboss',
     url(host, token) {
       return `https://${host}/widgets/streamboss?token=${token}`;
     },
