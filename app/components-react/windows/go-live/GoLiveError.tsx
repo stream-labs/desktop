@@ -21,7 +21,6 @@ export default function GoLiveError() {
     NavigationService,
     WindowsService,
     MagicLinkService,
-    TikTokService,
   } = Services;
 
   // take an error from the global state

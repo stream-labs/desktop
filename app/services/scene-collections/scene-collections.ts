@@ -101,7 +101,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   collectionWillSwitch = new Subject<void>();
   collectionUpdated = new Subject<ISceneCollectionsManifestEntry>();
   collectionInitialized = new Subject<void>();
-  collectionActivated = new Subject<ISceneCollectionsManifestEntry>();
 
   /**
    * Whether a valid collection is currently loaded.
@@ -1032,13 +1031,13 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    */
 
   initNodeMaps(sceneNodeMap?: { [sceneId: string]: Dictionary<string> }) {
-    if (!this.videoSettingsService.contexts.vertical) {
-      this.videoSettingsService.establishVideoContext('vertical');
-    }
+    this.videoSettingsService.validateVideoContext();
 
     if (!this.activeCollection) return;
 
-    this.stateService.initNodeMaps(sceneNodeMap);
+    if (!this.videoSettingsService.contexts.vertical) {
+      this.videoSettingsService.establishVideoContext('vertical');
+    }
   }
 
   /**

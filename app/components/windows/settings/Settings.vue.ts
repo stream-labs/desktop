@@ -16,6 +16,7 @@ import VirtualWebcamSettings from './VirtualWebcamSettings';
 import { MagicLinkService } from 'services/magic-link';
 import { UserService } from 'services/user';
 import { DismissablesService, EDismissable } from 'services/dismissables';
+import { DualOutputService } from 'services/dual-output';
 import Scrollable from 'components/shared/Scrollable';
 import {
   ObsSettings,
@@ -57,6 +58,7 @@ export default class Settings extends Vue {
   @Inject() magicLinkService: MagicLinkService;
   @Inject() userService: UserService;
   @Inject() dismissablesService: DismissablesService;
+  @Inject() dualOutputService: DualOutputService;
 
   $refs: { settingsContainer: HTMLElement & SearchablePages };
 
@@ -173,10 +175,16 @@ export default class Settings extends Vue {
   }
 
   getInitialCategoryName() {
-    if (this.windowsService.state.child.queryParams) {
-      return this.windowsService.state.child.queryParams.categoryName || 'General';
-    }
-    return 'General';
+    /* Some sort of race condition, perhaps `WindowsService` creating
+     * the window, and *only* after updating its options, results in
+     * accessing state here to be empty for `state.child.queryParams`
+     * which is what this method used to use, unless the child window
+     * has already been displayed once?
+     *
+     * Switching to this method call seems to solve the issue, plus we
+     * shouldn't be accessing state directly regardless.
+     */
+    return this.windowsService.getChildWindowQueryParams()?.categoryName ?? 'General';
   }
 
   get categoryNames() {
@@ -273,6 +281,7 @@ export default class Settings extends Vue {
         })
         .then(({ response }) => {
           if (response === 0) {
+            this.dualOutputService.setDualOutputMode(false, true);
             this.userService.logOut();
           }
         });

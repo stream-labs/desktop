@@ -6,7 +6,6 @@ import { I18nService } from 'services/i18n';
 import Utils from 'services/utils';
 import Spinner from 'components-react/shared/Spinner';
 import { Services } from 'components-react/service-provider';
-import { useVuex } from 'components-react/hooks';
 import electron from 'electron';
 import { onUnload } from 'util/unload';
 
@@ -27,10 +26,8 @@ export default function BrowserView(p: BrowserViewProps) {
   const [loading, setLoading] = useState(true);
   const sizeContainer = useRef<HTMLDivElement>(null);
 
-  const { hideStyleBlockers, theme } = useVuex(() => ({
-    hideStyleBlockers: WindowsService.state[Utils.getWindowId()].hideStyleBlockers,
-    theme: CustomizationService.state.theme,
-  }));
+  const { hideStyleBlockers } = WindowsService.state[Utils.getWindowId()];
+  const { theme } = CustomizationService.state;
 
   let currentPosition: IVec2;
   let currentSize: IVec2;
