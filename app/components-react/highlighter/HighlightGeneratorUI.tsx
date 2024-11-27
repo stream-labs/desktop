@@ -119,14 +119,12 @@ export default function HighlightGeneratorUI({
         alignItems: 'center',
         gap: '8px',
         padding: '4px 16px',
-        backgroundColor: 'rgba(45, 45, 45, 0.9)',
+        backgroundColor: 'rgba(91, 246, 211, 0.7)',
         borderRadius: '24px',
         width: 'fit-content',
       }}
     >
-      <h3 style={{ color: '#FFFFFF', margin: 0, fontWeight: 400 }}>
-        🤖 Generate highlight video of
-      </h3>
+      <h3 style={{ color: '#FFFFFF', margin: 0, fontWeight: 400 }}>🤖 Create highlight video of</h3>
       <Select
         style={selectStyles}
         mode="multiple"

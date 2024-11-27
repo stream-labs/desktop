@@ -90,9 +90,9 @@ function getTypeWordingFromType(
 ): { emoji: string; description: string } {
   switch (type) {
     case EHighlighterInputTypes.KILL:
-      return { emoji: '💀', description: count > 1 ? 'eliminations' : 'elimination' };
+      return { emoji: '𖦏', description: count > 1 ? 'eliminations' : 'elimination' };
     case EHighlighterInputTypes.KNOCKED:
-      return { emoji: '🥊', description: count > 1 ? 'knockeds' : 'knocked' };
+      return { emoji: '🥊', description: count > 1 ? 'knocks' : 'knocked' };
     case EHighlighterInputTypes.DEATH:
       return { emoji: '🪦', description: count > 1 ? 'deaths' : 'death' };
     case EHighlighterInputTypes.VICTORY:
@@ -100,7 +100,7 @@ function getTypeWordingFromType(
     case EHighlighterInputTypes.DEPLOY:
       return { emoji: '🪂', description: count > 1 ? 'deploys' : 'deploy' };
     case EHighlighterInputTypes.PLAYER_KNOCKED:
-      return { emoji: '😵', description: count > 1 ? 'got knockeds' : 'got knocked' };
+      return { emoji: '😵', description: 'got knocked' };
     case 'BOT_KILL':
       return { emoji: '🤖', description: count > 1 ? 'bot eliminations' : 'bot elimination' };
     case 'rounds':

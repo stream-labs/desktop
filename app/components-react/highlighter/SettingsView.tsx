@@ -171,14 +171,14 @@ export default function SettingsView({
                 <div className={styles.cardHeaderbarWrapper}>
                   <div className={styles.cardHeaderbar}>
                     <i style={{ margin: 0, fontSize: '20px' }} className="icon-highlighter"></i>
-                    <h3 style={{ margin: 0, fontSize: '20px' }}> Ai Highlighter</h3>
+                    <h3 style={{ margin: 0, fontSize: '20px' }}> AI Highlighter</h3>
                     {headerBarTag('For Fortnite streams (Beta)')}
                   </div>
                 </div>
 
                 <p style={{ margin: 0 }}>
-                  The AI highlighter automatically detects highlights in your stream and creates a
-                  highlight video for you after you finished your stream.
+                  Automatically capture the best moments from your livestream and turn them into a
+                  highlight video.
                 </p>
 
                 <SwitchInput
@@ -213,8 +213,8 @@ export default function SettingsView({
                 </div>
               </div>
               <p>
-                The hotkey highlighter allows you to clip the best moments during your livestream
-                manually and edit them together afterwards.
+                Manually capture the best moments from your livestream with a hotkey command, and
+                automatically turn them into a highlight video.
               </p>
               <div style={{ display: 'flex', gap: '16px' }}>
                 {!v.isStreaming && !correctlyConfigured && (
