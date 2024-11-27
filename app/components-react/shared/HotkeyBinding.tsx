@@ -65,6 +65,7 @@ export default function HotkeyBinding(p: {
   hotkey: IHotkey;
   binding: IBinding | null;
   onBind: (binding: IBinding) => void;
+  style?: React.CSSProperties;
 }) {
   const { MarkersService, DualOutputService } = Services;
 
@@ -150,7 +151,7 @@ export default function HotkeyBinding(p: {
     <Form layout="inline">
       <TextInput
         name="binding"
-        style={{ width: 400 }}
+        style={{ width: 400, ...p.style }}
         label={showDualOutputLabel ? <DualOutputHotkeyLabel /> : <HotkeyLabel />}
         value={getHotkeyString(p.binding, focused)}
         onFocus={() => setFocused(true)}
