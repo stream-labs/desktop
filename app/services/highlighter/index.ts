@@ -29,7 +29,7 @@ import {
   FFPROBE_EXE,
 } from './constants';
 import { pmap } from 'util/pmap';
-import { Clip } from './clip';
+import { RenderingClip } from './clip';
 import { AudioCrossfader } from './audio-crossfader';
 import { FrameWriter } from './frame-writer';
 import { Transitioner } from './transitioner';
@@ -69,6 +69,15 @@ export type TStreamInfo =
   | undefined; // initialTimesInStream
 
 const isAiClip = (clip: TClip): clip is IAiClip => clip.source === 'AiClip';
+
+// types for highlighter video operations
+export type TOrientation = 'horizontal' | 'vertical';
+export interface ICoordinates {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+}
 
 interface IBaseClip {
   path: string;
@@ -114,7 +123,10 @@ export interface IInput {
 export interface IAiClipInfo {
   inputs: IInput[];
   score: number;
-  metadata: { round: number };
+  metadata: {
+    round: number;
+    webcam_coordinates: ICoordinates;
+  };
 }
 
 export type TClip = IAiClip | IReplayBufferClip | IManualClip;
@@ -367,6 +379,7 @@ export interface IExportOptions {
   width: number;
   height: number;
   preset: TPreset;
+  complexFilter?: string;
 }
 
 class HighligherViews extends ViewHandler<IHighligherState> {
@@ -535,7 +548,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
    * A dictionary of actual clip classes.
    * These are not serializable so kept out of state.
    */
-  clips: Dictionary<Clip> = {};
+  renderingClips: Dictionary<RenderingClip> = {};
 
   directoryCleared = false;
 
@@ -1181,7 +1194,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
   async loadClips(streamInfoId?: string | undefined) {
     const clipsToLoad: TClip[] = this.getClips(this.views.clips, streamInfoId);
-
+    this.resetRenderingClips();
     await this.ensureScrubDirectory();
 
     for (const clip of clipsToLoad) {
@@ -1199,13 +1212,14 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
         );
       }
 
-      this.clips[clip.path] = this.clips[clip.path] ?? new Clip(clip.path);
+      this.renderingClips[clip.path] =
+        this.renderingClips[clip.path] ?? new RenderingClip(clip.path);
     }
 
     //TODO M: tracking type not correct
     await pmap(
       clipsToLoad.filter(c => !c.loaded),
-      c => this.clips[c.path].init(),
+      c => this.renderingClips[c.path].init(),
       {
         concurrency: os.cpus().length,
         onProgress: completed => {
@@ -1216,14 +1230,18 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
           this.UPDATE_CLIP({
             path: completed.path,
             loaded: true,
-            scrubSprite: this.clips[completed.path].frameSource?.scrubJpg,
-            duration: this.clips[completed.path].duration,
-            deleted: this.clips[completed.path].deleted,
+            scrubSprite: this.renderingClips[completed.path].frameSource?.scrubJpg,
+            duration: this.renderingClips[completed.path].duration,
+            deleted: this.renderingClips[completed.path].deleted,
           });
         },
       },
     );
     return;
+  }
+
+  resetRenderingClips() {
+    this.renderingClips = {};
   }
 
   private async ensureScrubDirectory() {
@@ -1247,7 +1265,11 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
    * Exports the video using the currently configured settings
    * Return true if the video was exported, or false if not.
    */
-  async export(preview = false, streamId: string | undefined = undefined) {
+  async export(
+    preview = false,
+    streamId: string | undefined = undefined,
+    orientation: TOrientation = 'horizontal',
+  ) {
     await this.loadClips(streamId);
 
     if (
@@ -1277,9 +1299,9 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       return;
     }
 
-    let clips: Clip[] = [];
+    let renderingClips: RenderingClip[] = [];
     if (streamId) {
-      clips = this.getClips(this.views.clips, streamId)
+      renderingClips = this.getClips(this.views.clips, streamId)
         .filter(clip => clip.enabled)
         .filter(clip => {
           return clip.streamInfo && clip.streamInfo[streamId] !== undefined;
@@ -1289,7 +1311,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
             a.streamInfo[streamId].orderPosition - b.streamInfo[streamId].orderPosition,
         )
         .map(c => {
-          const clip = this.clips[c.path];
+          const clip = this.renderingClips[c.path];
 
           clip.startTrim = c.startTrim;
           clip.endTrim = c.endTrim;
@@ -1297,11 +1319,11 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
           return clip;
         });
     } else {
-      clips = this.views.clips
+      renderingClips = this.views.clips
         .filter(c => c.enabled)
         .sort((a: TClip, b: TClip) => a.globalOrderPosition - b.globalOrderPosition)
         .map(c => {
-          const clip = this.clips[c.path];
+          const clip = this.renderingClips[c.path];
 
           clip.startTrim = c.startTrim;
           clip.endTrim = c.endTrim;
@@ -1311,18 +1333,18 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     }
 
     if (this.views.video.intro.path) {
-      const intro: Clip = new Clip(this.views.video.intro.path);
+      const intro: RenderingClip = new RenderingClip(this.views.video.intro.path);
       await intro.init();
       intro.startTrim = 0;
       intro.endTrim = 0;
-      clips.unshift(intro);
+      renderingClips.unshift(intro);
     }
     if (this.views.video.outro.path) {
-      const outro = new Clip(this.views.video.outro.path);
+      const outro = new RenderingClip(this.views.video.outro.path);
       await outro.init();
       outro.startTrim = 0;
       outro.endTrim = 0;
-      clips.push(outro);
+      renderingClips.push(outro);
     }
 
     const exportOptions: IExportOptions = preview
@@ -1334,8 +1356,13 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
           preset: this.views.exportInfo.preset,
         };
 
+    if (orientation === 'vertical') {
+      // adds complex filter and flips width and height
+      this.addVerticalFilterToExportOptions(exportOptions);
+    }
+
     // Reset all clips
-    await pmap(clips, c => c.reset(exportOptions), {
+    await pmap(renderingClips, c => c.reset(exportOptions), {
       onProgress: c => {
         if (c.deleted) {
           this.UPDATE_CLIP({ path: c.sourcePath, deleted: true });
@@ -1345,18 +1372,18 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
     // TODO: For now, just remove deleted clips from the video
     // In the future, abort export and surface error to the user.
-    clips = clips.filter(c => !c.deleted);
+    renderingClips = renderingClips.filter(c => !c.deleted);
 
-    if (!clips.length) {
+    if (!renderingClips.length) {
       console.error('Highlighter: Export called without any clips!');
       return;
     }
 
     // Estimate the total number of frames to set up export info
-    const totalFrames = clips.reduce((count: number, clip) => {
+    const totalFrames = renderingClips.reduce((count: number, clip) => {
       return count + clip.frameSource.nFrames;
     }, 0);
-    const numTransitions = clips.length - 1;
+    const numTransitions = renderingClips.length - 1;
     const transitionFrames = this.views.transitionDuration * exportOptions.fps;
     const totalFramesAfterTransitions = totalFrames - numTransitions * transitionFrames;
 
@@ -1376,11 +1403,13 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       let currentFrame = 0;
 
       // Mix audio first
-      await Promise.all(clips.filter(c => c.hasAudio).map(clip => clip.audioSource.extract()));
+      await Promise.all(
+        renderingClips.filter(c => c.hasAudio).map(clip => clip.audioSource.extract()),
+      );
       const parsed = path.parse(this.views.exportInfo.file);
       const audioConcat = path.join(parsed.dir, `${parsed.name}-concat.flac`);
       let audioMix = path.join(parsed.dir, `${parsed.name}-mix.flac`);
-      fader = new AudioCrossfader(audioConcat, clips, this.views.transitionDuration);
+      fader = new AudioCrossfader(audioConcat, renderingClips, this.views.transitionDuration);
       await fader.export();
 
       if (this.views.audio.musicEnabled && this.views.audio.musicPath) {
@@ -1400,14 +1429,14 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
         audioMix = audioConcat;
       }
 
-      await Promise.all(clips.map(clip => clip.audioSource.cleanup()));
-      const nClips = clips.length;
+      await Promise.all(renderingClips.map(clip => clip.audioSource.cleanup()));
+      const nClips = renderingClips.length;
 
       this.SET_EXPORT_INFO({ step: EExportStep.FrameRender });
 
       // Cannot be null because we already checked there is at least 1 element in the array
-      let fromClip = clips.shift()!;
-      let toClip = clips.shift();
+      let fromClip = renderingClips.shift()!;
+      let toClip = renderingClips.shift();
 
       let transitioner: Transitioner | null = null;
       const exportPath = preview ? this.views.exportInfo.previewFile : this.views.exportInfo.file;
@@ -1491,7 +1520,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
           if (this.views.transition.type === 'Random') transitioner = null;
           fromClip.frameSource.end();
           fromClip = toClip!;
-          toClip = clips.shift();
+          toClip = renderingClips.shift();
         }
 
         if (!fromClip) {
@@ -1540,11 +1569,84 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
     if (fader) await fader.cleanup();
     if (mixer) await mixer.cleanup();
+    this.resetRenderingClips();
     this.SET_EXPORT_INFO({
       exporting: false,
       exported: !this.views.exportInfo.cancelRequested && !preview && !this.views.exportInfo.error,
     });
     this.SET_UPLOAD_INFO({ videoId: null });
+  }
+
+  /**
+   *
+   * @param exportOptions export options to be modified
+   * Take the existing export options, flips the resolution to vertical and adds complex filter to move webcam to top
+   */
+  private addVerticalFilterToExportOptions(exportOptions: IExportOptions) {
+    const webcamCoordinates = this.getWebcamPosition();
+    const newWidth = exportOptions.height;
+    const newHeight = exportOptions.width;
+    // exportOptions.height = exportOptions.width;
+    // exportOptions.width = newWidth;
+    exportOptions.complexFilter = this.getWebcamComplexFilterForFfmpeg(
+      webcamCoordinates,
+      newWidth,
+      newHeight,
+    );
+  }
+  /**
+   *
+   * @param
+   * @returns
+   * Gets the first webcam position from all of the clips
+   * should get webcam position for a specific clip soon
+   */
+  private getWebcamPosition() {
+    const clipWithWebcam = this.views.clips.find(
+      clip =>
+        isAiClip(clip) &&
+        !!clip.aiInfo.metadata.webcam_coordinates &&
+        this.renderingClips[clip.path],
+    ) as IAiClip;
+    return clipWithWebcam?.aiInfo?.metadata?.webcam_coordinates || undefined;
+  }
+  /**
+   *
+   * @param webcamCoordinates
+   * @param outputWidth
+   * @param outputHeight
+   * @returns properly formatted complex filter for ffmpeg to move webcam to top in vertical video
+   */
+  private getWebcamComplexFilterForFfmpeg(
+    webcamCoordinates: ICoordinates,
+    outputWidth: number,
+    outputHeight: number,
+  ) {
+    const webcam_x1 = webcamCoordinates.x1;
+    const webcam_y1 = webcamCoordinates.y1;
+    const webcamWidth = webcamCoordinates.x2 - webcamCoordinates.x1;
+    const webcamHeight = webcamCoordinates.y2 - webcamCoordinates.y1;
+
+    // const filter = `[0:v]split=2[webcam][vid];
+    // [webcam]crop=w=${webcamWidth}:h=${webcamHeight}:x=${webcam_x1}:y=${webcam_y1},scale=w=-1:h=${outputHeight}/5,pad=w=${outputWidth}:h=${outputHeight}:x=(ow-iw)/2:y=0:color=0x00000000[webcam_scaled];
+    // [vid]crop=ih*${outputWidth}/${outputHeight * (2 / 3)}:ih[vid_cropped]
+    // [vid_cropped]scale=${outputWidth}:-1[vid_scaled];
+    // [webcam_scaled][vid_scaled]vstack`;
+
+    const filter = `
+    [0:v]split=3[webcam][vid][blur];
+    [webcam]crop=w=${webcamWidth}:h=${webcamHeight}:x=${webcam_x1}:y=${webcam_y1},
+      scale=w='if(gte(iw/ih,iw/(ih/3)),${outputWidth},-1)':h='if(gte(iw/(ih/3),iw/ih),${outputHeight}/3,-1)',
+      pad=w=${outputHeight}:h=0:x=(ow-iw)/2:y=0:color=0x00000000[webcam_final];
+    [vid]crop=ih*${outputWidth}/${outputHeight * (2 / 3)}:ih[vid_cropped];
+    [vid_cropped]scale=${outputWidth}:-1[video_final];
+    [blur]crop=ih*${outputWidth}/${
+      outputHeight * (1 / 3)
+    }:ih,scale=${outputWidth}:-1,boxblur=luma_radius=min(h\\,w)/20:luma_power=1:chroma_radius=min(cw\\,ch)/20:chroma_power=1[blur_final];
+    [blur_final][webcam_final]overlay='(main_w-overlay_w)/2:(main_h-overlay_h)/2'[top];
+    [top][video_final]vstack[final];
+    `;
+    return filter;
   }
 
   // We throttle because this can go extremely fast, especially on previews

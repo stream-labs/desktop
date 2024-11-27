@@ -2,6 +2,7 @@ import * as child from 'child_process';
 import EventEmitter from 'events';
 import { AiHighlighterUpdater } from './updater';
 import { duration } from 'moment';
+import { ICoordinates } from '..';
 
 export enum EHighlighterInputTypes {
   KILL = 'kill',
@@ -17,7 +18,6 @@ export enum EHighlighterInputTypes {
   LOW_HEALTH = 'low_health',
   PLAYER_KNOCKED = 'player_knocked',
 }
-
 export type DeathMetadata = {
   place: number;
 };
@@ -34,7 +34,7 @@ export interface IHighlight {
   input_types: EHighlighterInputTypes[];
   inputs: IHighlighterInput[];
   score: number;
-  metadata: { round: number };
+  metadata: { round: number; webcam_coordinates: ICoordinates };
 }
 
 export type EHighlighterMessageTypes =

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { EExportStep, TFPS, TResolution, TPreset } from 'services/highlighter';
+import { EExportStep, TFPS, TResolution, TPreset, TOrientation } from 'services/highlighter';
 import { Services } from 'components-react/service-provider';
 import { FileInput, TextInput, ListInput } from 'components-react/shared/inputs';
 import Form from 'components-react/shared/inputs/Form';
@@ -44,8 +44,8 @@ class ExportController {
     this.service.actions.setExportFile(exportFile);
   }
 
-  exportCurrentFile(streamId: string | undefined) {
-    this.service.actions.export(false, streamId);
+  exportCurrentFile(streamId: string | undefined, orientation: TOrientation = 'horizontal') {
+    this.service.actions.export(false, streamId, orientation);
   }
 
   cancelExport() {
@@ -152,6 +152,28 @@ function ExportOptions({ close, streamId }: { close: () => void; streamId: strin
   function getVideoNameFromExportFile(exportFile: string) {
     return path.parse(exportFile).name;
   }
+
+  async function startExport(orientation: TOrientation) {
+    if (await fileExists(exportFile)) {
+      if (
+        !(await confirmAsync({
+          title: $t('Overwite File?'),
+          content: $t('%{filename} already exists. Would you like to overwrite it?', {
+            filename: path.basename(exportFile),
+          }),
+          okText: $t('Overwrite'),
+        }))
+      ) {
+        return;
+      }
+    }
+
+    UsageStatisticsService.actions.recordFeatureUsage('HighlighterExport');
+
+    setExport(exportFile);
+    exportCurrentFile(streamId, orientation);
+  }
+
   // Video name and export file are kept in sync
   const [exportFile, setExportFile] = useState<string>(getExportFileFromVideoName(videoName));
 
@@ -228,30 +250,12 @@ function ExportOptions({ close, streamId }: { close: () => void; streamId: strin
           <Button style={{ marginRight: 8 }} onClick={close}>
             {$t('Close')}
           </Button>
-          <Button
-            type="primary"
-            onClick={async () => {
-              if (await fileExists(exportFile)) {
-                if (
-                  !(await confirmAsync({
-                    title: $t('Overwite File?'),
-                    content: $t('%{filename} already exists. Would you like to overwrite it?', {
-                      filename: path.basename(exportFile),
-                    }),
-                    okText: $t('Overwrite'),
-                  }))
-                ) {
-                  return;
-                }
-              }
 
-              UsageStatisticsService.actions.recordFeatureUsage('HighlighterExport');
-
-              setExport(exportFile);
-              exportCurrentFile(streamId);
-            }}
-          >
-            {$t('Export')}
+          <Button style={{ marginRight: 8 }} type="primary" onClick={() => startExport('vertical')}>
+            {$t('Export vertical')}
+          </Button>
+          <Button type="primary" onClick={() => startExport('horizontal')}>
+            {$t('Export horizontal')}
           </Button>
         </div>
       </Form>
