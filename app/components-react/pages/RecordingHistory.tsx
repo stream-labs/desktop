@@ -41,19 +41,14 @@ class RecordingHistoryController {
   get uploadOptions() {
     const opts = [
       {
-        label: $t('Clip'),
-        value: 'crossclip',
-        icon: 'icon-editor-7',
-      },
-      {
-        label: $t('Subtitle'),
-        value: 'typestudio',
-        icon: 'icon-mic',
-      },
-      {
         label: $t('Edit'),
-        value: 'videoeditor',
-        icon: 'icon-play-round',
+        value: 'edit',
+        icon: 'icon-trim',
+      },
+      {
+        label: '',
+        value: 'remove',
+        icon: 'icon-trash',
       },
     ];
     if (this.hasYoutube) {

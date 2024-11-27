@@ -169,7 +169,8 @@ const GENERAL_ACTIONS: HotkeyGroup = {
   },
   SAVE_REPLAY: {
     name: 'SAVE_REPLAY',
-    description: () => $t('Save Replay'),
+    description: () => null,
+    // la
     down: () => getStreamingService().saveReplay(),
   },
   SPLIT_FILE: {

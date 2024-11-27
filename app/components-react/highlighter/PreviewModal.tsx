@@ -4,14 +4,20 @@ import { Services } from 'components-react/service-provider';
 import { Progress, Alert } from 'antd';
 import { $t } from 'services/i18n';
 
-export default function PreviewModal(p: { close: () => void }) {
+export default function PreviewModal({
+  close,
+  streamId,
+}: {
+  close: () => void;
+  streamId: string | undefined;
+}) {
   const { HighlighterService } = Services;
   const v = useVuex(() => ({
     exportInfo: HighlighterService.views.exportInfo,
   }));
 
   useEffect(() => {
-    HighlighterService.actions.export(true);
+    HighlighterService.actions.export(true, streamId);
 
     return () => HighlighterService.actions.cancelExport();
   }, []);
@@ -28,7 +34,7 @@ export default function PreviewModal(p: { close: () => void }) {
   useEffect(() => {
     // Close the window immediately if we stopped exporting due to cancel
     if (!v.exportInfo.exporting && v.exportInfo.cancelRequested && didStartExport.current) {
-      p.close();
+      close();
     }
   }, [v.exportInfo.exporting, v.exportInfo.cancelRequested]);
 
