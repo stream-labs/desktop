@@ -49,6 +49,7 @@ import execa from 'execa';
 import moment from 'moment';
 import {
   EHighlighterInputTypes,
+  getHighlightClips,
   IHighlight,
   IHighlighterInput,
 } from './ai-highlighter/ai-highlighter';
