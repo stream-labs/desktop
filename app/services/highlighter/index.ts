@@ -49,10 +49,8 @@ import execa from 'execa';
 import moment from 'moment';
 import {
   EHighlighterInputTypes,
-  getHighlightClips,
   IHighlight,
   IHighlighterInput,
-  ProgressTracker,
 } from './ai-highlighter/ai-highlighter';
 import uuid from 'uuid';
 import { EMenuItemKey } from 'services/side-nav';
@@ -2039,23 +2037,40 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     return this.getClips(clips, streamId).every(clip => clip.loaded);
   }
 
-  getRoundDetails(clips: TClip[]): { round: number; inputs: IInput[] }[] {
-    const roundsMap: { [key: number]: IInput[] } = {};
+  getRoundDetails(
+    clips: TClip[],
+  ): { round: number; inputs: IInput[]; duration: number; hypeScore: number }[] {
+    const roundsMap: {
+      [key: number]: { inputs: IInput[]; duration: number; hypeScore: number; count: number };
+    } = {};
     clips.forEach(clip => {
       const aiClip = isAiClip(clip) ? clip : undefined;
       const round = aiClip?.aiInfo?.metadata?.round ?? undefined;
       if (aiClip?.aiInfo?.inputs && round) {
         if (!roundsMap[round]) {
-          roundsMap[round] = [];
+          roundsMap[round] = { inputs: [], duration: 0, hypeScore: 0, count: 0 };
         }
-        roundsMap[round].push(...aiClip.aiInfo.inputs);
+        roundsMap[round].inputs.push(...aiClip.aiInfo.inputs);
+        roundsMap[round].duration += aiClip.duration
+          ? aiClip.duration - aiClip.startTrim - aiClip.endTrim
+          : 0;
+        roundsMap[round].hypeScore += aiClip.aiInfo.score;
+        roundsMap[round].count += 1;
       }
     });
 
-    return Object.keys(roundsMap).map(round => ({
-      round: parseInt(round, 10),
-      inputs: roundsMap[parseInt(round, 10)],
-    }));
+    return Object.keys(roundsMap).map(round => {
+      const averageScore =
+        roundsMap[parseInt(round, 10)].hypeScore / roundsMap[parseInt(round, 10)].count;
+      const hypeScore = Math.ceil(Math.min(1, Math.max(0, averageScore)) * 5);
+
+      return {
+        round: parseInt(round, 10),
+        inputs: roundsMap[parseInt(round, 10)].inputs,
+        duration: roundsMap[parseInt(round, 10)].duration,
+        hypeScore,
+      };
+    });
   }
 
   async getVideoDuration(filePath: string): Promise<number> {

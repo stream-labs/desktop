@@ -5,36 +5,22 @@ import { IFilterOptions } from './utils';
 import { IInput } from 'services/highlighter';
 import { getPlacementFromInputs, InputEmojiSection } from './InputEmojiSection';
 import { EHighlighterInputTypes } from 'services/highlighter/ai-highlighter/ai-highlighter';
-
+import styles from './HighlightGeneratorUI.m.less';
+import { formatSecondsToHMS } from './ClipPreview';
 const { Option } = Select;
 
 const selectStyles = {
-  width: '200px',
-  backgroundColor: '#2D2D2D',
-  border: '1px solid #3D3D3D',
+  width: '220px',
   borderRadius: '4px',
 };
 
 const dropdownStyles = {
-  backgroundColor: '#2D2D2D',
-  border: '1px solid #3D3D3D',
-  borderRadius: '4px',
-  padding: '8px 0',
-};
-
-const checkboxContainerStyles = {
-  padding: '8px 12px',
-  borderBottom: '1px solid #3D3D3D',
-  backgroundColor: '#2D2D2D',
+  borderRadius: '10px',
+  padding: '4px 4px',
 };
 
 const checkboxStyles = {
-  color: '#FFFFFF',
-};
-
-const optionStyles = {
-  padding: '8px 12px',
-  color: '#FFFFFF',
+  width: '100%',
 };
 
 export default function HighlightGeneratorUI({
@@ -46,6 +32,8 @@ export default function HighlightGeneratorUI({
   roundDetails: {
     round: number;
     inputs: IInput[];
+    duration: number;
+    hypeScore: number;
   }[];
   emitSetFilter: (filter: IFilterOptions) => void;
 }) {
@@ -89,7 +77,12 @@ export default function HighlightGeneratorUI({
     console.log('sth changed');
   }, [selectedRounds, filterType, targetDuration]);
 
-  function roundDropdownDetails(roundDetails: { round: number; inputs: IInput[] }) {
+  function roundDropdownDetails(roundDetails: {
+    round: number;
+    inputs: IInput[];
+    duration: number;
+    hypeScore: number;
+  }) {
     const combinedKillAndKnocked = roundDetails.inputs.reduce((count, input) => {
       if (
         input.type === EHighlighterInputTypes.KILL ||
@@ -105,25 +98,24 @@ export default function HighlightGeneratorUI({
       rank = getPlacementFromInputs(roundDetails.inputs);
     }
     return (
-      <>
-        Round {roundDetails.round} <br />
-        🔫: {combinedKillAndKnocked} | {won ? <>🏆 #1</> : <>🪦 {`${rank ? '#' + rank : ''}`}</>}
-      </>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <div style={{ fontWeight: 'bold' }}>Round {roundDetails.round} </div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+          <div className={styles.infoTag}>{combinedKillAndKnocked} 🔫</div>
+          {won ? (
+            <div className={styles.infoTag}>1st 🏆</div>
+          ) : (
+            <div className={styles.infoTag}>{`${rank ? '#' + rank : ''} 🪦`}</div>
+          )}
+          <div className={styles.infoTag}>{`${roundDetails.hypeScore} 🔥`}</div>
+          <div className={styles.infoTag}>{`${formatSecondsToHMS(roundDetails.duration)}`}</div>
+        </div>
+      </div>
     );
   }
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
-        padding: '4px 16px',
-        backgroundColor: 'rgba(91, 246, 211, 0.7)',
-        borderRadius: '24px',
-        width: 'fit-content',
-      }}
-    >
+    <div className={styles.wrapper}>
       <h3 style={{ color: '#FFFFFF', margin: 0, fontWeight: 400 }}>🤖 Create highlight video of</h3>
       <Select
         style={selectStyles}
@@ -133,23 +125,12 @@ export default function HighlightGeneratorUI({
         maxTagCount={2}
         suffixIcon={<DownOutlined style={{ color: '#FFFFFF', fontSize: '12px' }} />}
         tagRender={({ value }) => (
-          <span
-            style={{
-              padding: '3px 8px',
-              fontSize: '12px',
-              backgroundColor: '#3D3D3D',
-              borderRadius: '4px',
-              marginRight: '4px',
-              color: '#FFFFFF',
-            }}
-          >
-            {value === 0 ? 'All Rounds' : `Round ${value}`}
-          </span>
+          <span className={styles.tag}>{value === 0 ? 'All Rounds' : `Round ${value}`}</span>
         )}
         dropdownStyle={dropdownStyles}
         dropdownRender={menu => (
-          <div style={{ backgroundColor: '#2D2D2D' }}>
-            <div style={checkboxContainerStyles}>
+          <div>
+            <div className={styles.option}>
               <Checkbox
                 style={checkboxStyles}
                 checked={selectedRounds.includes(0)}
@@ -162,7 +143,7 @@ export default function HighlightGeneratorUI({
             </div>
             <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
               {roundDetails.map(roundDetails => (
-                <div key={roundDetails.round} style={checkboxContainerStyles}>
+                <div key={roundDetails.round} className={styles.option}>
                   <Checkbox
                     style={checkboxStyles}
                     checked={selectedRounds.includes(roundDetails.round)}
@@ -203,17 +184,17 @@ export default function HighlightGeneratorUI({
       </Select> */}
       {/* <h3 style={{ color: '#FFFFFF' }}>of</h3> */}
       <Select
-        style={{ ...selectStyles, width: '116px' }}
+        style={{ width: '116px' }}
         value={targetDuration}
         onChange={value => setTargetDuration(value)}
         dropdownStyle={dropdownStyles}
       >
         {filteredOptions.map(option => (
-          <Option key={option.value} value={option.value} style={optionStyles}>
+          <Option key={option.value} value={option.value} className={styles.option}>
             {option.label}
           </Option>
         ))}
-        <Option value={999} style={optionStyles}>
+        <Option value={999} className={styles.option}>
           unlimited
         </Option>
       </Select>
