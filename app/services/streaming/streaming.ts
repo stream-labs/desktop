@@ -1407,6 +1407,15 @@ export class StreamingService
     if (info.code) {
       if (this.outputErrorOpen) {
         console.warn('Not showing error message because existing window is open.', info);
+
+        const messages = formatUnknownErrorMessage(
+          info,
+          this.streamErrorUserMessage,
+          this.streamErrorReportMessage,
+        );
+
+        this.streamErrorCreated.next(messages.report);
+
         return;
       }
 
@@ -1454,13 +1463,6 @@ export class StreamingService
       } else {
         // -4 is used for generic unknown messages in OBS. Both -4 and any other code
         // we don't recognize should fall into this branch and show a generic error.
-        // if (!this.userService.isLoggedIn) {
-        //   const messages;
-        //   errorText = $t(
-        //     'You are currently logged out. Please log in or confirm your server url and stream key.',
-        //   );
-        //   diagReportMessage = 'User is logged out and has invalid server url or stream key.';
-        // } else
 
         if (!this.userService.isLoggedIn) {
           const messages = formatStreamErrorMessage('LOGGED_OUT_ERROR');
