@@ -15,12 +15,8 @@ import Utils from './utils';
 import { RecordingModeService } from './recording-mode';
 import { THEME_METADATA, IThemeMetadata } from './onboarding/theme-metadata';
 export type { IThemeMetadata } from './onboarding/theme-metadata';
-import {
-  StreamerKnowledgeMode,
-  isBeginnerOrIntermediateOrUnselected,
-} from './onboarding/knowledge-mode';
 import { TwitchStudioImporterService } from './ts-importer';
-export { StreamerKnowledgeMode } from './onboarding/knowledge-mode';
+import { DualOutputService } from 'services/dual-output';
 
 enum EOnboardingSteps {
   MacPermissions = 'MacPermissions',
@@ -34,7 +30,6 @@ enum EOnboardingSteps {
   // temporarily disable auto config until migrate to new api
   // Optimize = 'Optimize',
   Prime = 'Prime',
-  Tips = 'Tips',
 }
 
 const isMac = () => process.platform === OS.Mac;
@@ -123,16 +118,9 @@ export const ONBOARDING_STEPS = () => ({
     cond: ({ isUltra }: OnboardingStepContext) => !isUltra,
     isSkippable: true,
   },
-  [EOnboardingSteps.Tips]: {
-    component: 'Tips' as const,
-    hideButton: true,
-    cond: isBeginnerOrIntermediateOrUnselected,
-    isSkippable: false,
-  },
 });
 
 export interface OnboardingStepContext {
-  streamerKnowledgeMode: StreamerKnowledgeMode | null;
   isPartialSLAuth: boolean;
   existingSceneCollections: boolean;
   isObsInstalled: boolean;
@@ -156,8 +144,7 @@ export interface IOnboardingStep {
     | 'HardwareSetup'
     | 'ThemeSelector'
     | 'Optimize'
-    | 'Prime'
-    | 'Tips';
+    | 'Prime';
   hideButton?: boolean;
   label?: string;
   isPreboarding?: boolean;
@@ -178,7 +165,6 @@ interface IOnboardingServiceState {
   options: IOnboardingOptions;
   importedFrom: 'obs' | 'twitch';
   existingSceneCollections: boolean;
-  streamerKnowledgeMode: StreamerKnowledgeMode | null;
 }
 
 class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
@@ -204,13 +190,10 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
     ).isTwitchStudioInstalled();
     const recordingModeEnabled = this.getServiceViews(RecordingModeService).isRecordingModeEnabled;
 
-    const streamerKnowledgeMode = this.streamerKnowledgeMode;
-
     const { existingSceneCollections, importedFrom } = this.state;
     const { isLoggedIn, isPrime: isUltra } = userViews;
 
     const ctx: OnboardingStepContext = {
-      streamerKnowledgeMode,
       recordingModeEnabled,
       existingSceneCollections,
       importedFrom,
@@ -223,72 +206,27 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
         isLoggedIn && getPlatformService(userViews.platform?.type)?.hasCapability('themes'),
     };
 
-    return this.getStepsForMode(streamerKnowledgeMode)(ctx);
+    return this.makeSteps(ctx);
   }
 
   get totalSteps() {
     return this.steps.length;
   }
 
-  getStepsForMode(mode: StreamerKnowledgeMode) {
+  makeSteps(ctx: OnboardingStepContext) {
     const { getSteps } = this;
 
-    switch (mode) {
-      case StreamerKnowledgeMode.BEGINNER:
-        return getSteps([
-          EOnboardingSteps.MacPermissions,
-          EOnboardingSteps.StreamingOrRecording,
-          EOnboardingSteps.Connect,
-          EOnboardingSteps.PrimaryPlatformSelect,
-          EOnboardingSteps.FreshOrImport,
-          EOnboardingSteps.ObsImport,
-          EOnboardingSteps.HardwareSetup,
-          EOnboardingSteps.ThemeSelector,
-          EOnboardingSteps.Prime,
-          EOnboardingSteps.Tips,
-        ]);
-      case StreamerKnowledgeMode.INTERMEDIATE:
-        /*
-         * Yes, these are the same as beginner, only inner screens are supposed to differ,
-         * but the one screen that was provided is currently disabled (Optimizer).
-         * Nevertheless, this sets the foundation for future changes.
-         */
-        return getSteps([
-          EOnboardingSteps.MacPermissions,
-          EOnboardingSteps.StreamingOrRecording,
-          EOnboardingSteps.Connect,
-          EOnboardingSteps.PrimaryPlatformSelect,
-          EOnboardingSteps.FreshOrImport,
-          EOnboardingSteps.ObsImport,
-          EOnboardingSteps.HardwareSetup,
-          EOnboardingSteps.ThemeSelector,
-          EOnboardingSteps.Prime,
-          EOnboardingSteps.Tips,
-        ]);
-      case StreamerKnowledgeMode.ADVANCED:
-        return getSteps([
-          EOnboardingSteps.MacPermissions,
-          EOnboardingSteps.StreamingOrRecording,
-          EOnboardingSteps.Connect,
-          EOnboardingSteps.PrimaryPlatformSelect,
-          EOnboardingSteps.FreshOrImport,
-          EOnboardingSteps.ObsImport,
-          EOnboardingSteps.HardwareSetup,
-          EOnboardingSteps.Prime,
-        ]);
-      default:
-        return getSteps([
-          EOnboardingSteps.MacPermissions,
-          EOnboardingSteps.StreamingOrRecording,
-          EOnboardingSteps.Connect,
-          EOnboardingSteps.PrimaryPlatformSelect,
-          EOnboardingSteps.FreshOrImport,
-          EOnboardingSteps.ObsImport,
-          EOnboardingSteps.HardwareSetup,
-          EOnboardingSteps.ThemeSelector,
-          EOnboardingSteps.Prime,
-        ]);
-    }
+    return getSteps([
+      EOnboardingSteps.MacPermissions,
+      EOnboardingSteps.StreamingOrRecording,
+      EOnboardingSteps.Connect,
+      EOnboardingSteps.PrimaryPlatformSelect,
+      EOnboardingSteps.FreshOrImport,
+      EOnboardingSteps.ObsImport,
+      EOnboardingSteps.HardwareSetup,
+      EOnboardingSteps.ThemeSelector,
+      EOnboardingSteps.Prime,
+    ])(ctx);
   }
 
   getSteps(stepNames: EOnboardingSteps[]) {
@@ -308,10 +246,6 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
       }, [] as IOnboardingStep[]);
     };
   }
-
-  get streamerKnowledgeMode() {
-    return this.state.streamerKnowledgeMode;
-  }
 }
 
 export class OnboardingService extends StatefulService<IOnboardingServiceState> {
@@ -324,7 +258,6 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
     },
     importedFrom: null,
     existingSceneCollections: false,
-    streamerKnowledgeMode: null,
   };
 
   localStorageKey = 'UserHasBeenOnboarded';
@@ -335,6 +268,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   @Inject() userService: UserService;
   @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() outputSettingsService: OutputSettingsService;
+  @Inject() dualOutputService: DualOutputService;
 
   @mutation()
   SET_OPTIONS(options: Partial<IOnboardingOptions>) {
@@ -349,11 +283,6 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   @mutation()
   SET_EXISTING_COLLECTIONS(val: boolean) {
     this.state.existingSceneCollections = val;
-  }
-
-  @mutation()
-  SET_STREAMER_KNOWLEDGE_MODE(val: StreamerKnowledgeMode) {
-    this.state.streamerKnowledgeMode = val;
   }
 
   async fetchThemeData(id: string) {
@@ -400,10 +329,6 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
     this.SET_EXISTING_COLLECTIONS(this.existingSceneCollections);
   }
 
-  setStreamerKnowledgeMode(val: StreamerKnowledgeMode | null) {
-    this.SET_STREAMER_KNOWLEDGE_MODE(val);
-  }
-
   start(options: Partial<IOnboardingOptions> = {}) {
     const actualOptions: IOnboardingOptions = {
       isLogin: false,
@@ -433,7 +358,6 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
         streaming: { outputResolution },
       });
     }
-
     this.navigationService.navigate('Studio');
     this.onboardingCompleted.next();
   }

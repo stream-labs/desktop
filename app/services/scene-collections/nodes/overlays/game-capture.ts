@@ -50,12 +50,15 @@ export class GameCaptureNode extends Node<ISchema, IContext> {
 
   async load(context: IContext) {
     // A custom placeholder is not always provided
-    if (!this.data.placeholderFile) return;
+    if (!this.data.placeholderFile) {
+      return;
+    }
 
     const filePath = path.join(context.assetsPath, this.data.placeholderFile);
-    context.sceneItem
-      .getObsInput()
-      .update({ user_placeholder_image: filePath, user_placeholder_use: true });
+    context.sceneItem.getObsInput().update({
+      user_placeholder_image: filePath,
+      user_placeholder_use: true,
+    });
 
     // This is a bit of a hack to force us to immediately back up
     // the media upon overlay install.

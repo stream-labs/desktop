@@ -39,18 +39,27 @@ function censorEmail(str: string) {
  */
 class StreamSettingsModule {
   constructor() {
+    const showMessage = (msg: string, success: boolean) => {
+      message.config({
+        duration: 6,
+        maxCount: 1,
+      });
+
+      if (success) {
+        message.success(msg);
+      } else {
+        message.error(msg);
+      }
+    };
     Services.UserService.refreshedLinkedAccounts.subscribe(
       (res: { success: boolean; message: string }) => {
-        message.config({
-          duration: 6,
-          maxCount: 1,
-        });
-
-        if (res.success) {
-          message.success(res.message);
-        } else {
-          message.error(res.message);
-        }
+        const doShowMessage = () => showMessage(res.message, res.success);
+        /*
+         * Since the settings window pops out anyways (presumably because of
+         * using `message`make sure it is at least on the right page, as opposed
+         * to in an infinite loading blank window state.
+         */
+        doShowMessage();
       },
     );
   }
@@ -213,8 +222,8 @@ class StreamSettingsModule {
       : 'internal';
 
     await Services.UserService.actions.return.startAuth(platform, mode, true).then(res => {
+      Services.WindowsService.actions.setWindowOnTop('child');
       if (res === EPlatformCallResult.Error) {
-        Services.WindowsService.actions.setWindowOnTop();
         alertAsync(
           $t(
             'This account is already linked to another Streamlabs Account. Please use a different account.',
@@ -549,7 +558,7 @@ function CustomDestinationList() {
   const destinations = customDestinations;
   const isEditMode = editCustomDestMode !== false;
   const shouldShowAddForm = editCustomDestMode === true;
-  const canAddMoreDestinations = destinations.length < 2;
+  const canAddMoreDestinations = destinations.length < 5;
   const shouldShowPrimeLabel = !isPrime && destinations.length > 0;
 
   return (

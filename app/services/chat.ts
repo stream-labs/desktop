@@ -378,4 +378,19 @@ export class ChatService extends Service {
       this.refreshChat();
     }
   }
+
+  showMultistreamChatWindow() {
+    // We use a generated window Id to prevent someobody popping out the
+    // same winow multiple times.
+    this.windowsService.createOneOffWindow({
+      componentName: 'MultistreamChatInfo',
+      title: $t('Multistream Chat Platform Support'),
+      size: {
+        width: 748,
+        height: 635,
+        minWidth: 748,
+        minHeight: 635,
+      },
+    });
+  }
 }

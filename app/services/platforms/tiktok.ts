@@ -1,4 +1,4 @@
-import { InheritMutations, Inject, mutation } from '../core';
+import { InheritMutations, Inject, mutation, Service } from '../core';
 import { BasePlatformService } from './base-platform';
 import {
   EPlatformCallResult,
@@ -9,7 +9,12 @@ import {
   TPlatformCapability,
 } from './index';
 import { authorizedHeaders, jfetch } from '../../util/requests';
-import { throwStreamError } from '../streaming/stream-error';
+import {
+  throwStreamError,
+  StreamError,
+  errorTypes,
+  TStreamErrorType,
+} from '../streaming/stream-error';
 import { platformAuthorizedRequest } from './utils';
 import { getOS } from 'util/operating-systems';
 import { IGoLiveSettings } from '../streaming';
@@ -25,13 +30,17 @@ import {
   ITikTokStartStreamResponse,
   TTikTokLiveScopeTypes,
   ITikTokGamesData,
+  ITikTokAudienceControlsInfo,
 } from './tiktok/api';
-import { I18nService } from 'services/i18n';
+import { $t, I18nService } from 'services/i18n';
 import { getDefined } from 'util/properties-type-guards';
 import * as remote from '@electron/remote';
 import { WindowsService } from 'services/windows';
 import Utils from 'services/utils';
 import { UsageStatisticsService } from 'services/usage-statistics';
+import { DiagnosticsService } from 'services/diagnostics';
+import { ENotificationType, NotificationsService } from 'services/notifications';
+import { JsonrpcService } from '../api/jsonrpc';
 
 interface ITikTokServiceState extends IPlatformState {
   settings: ITikTokStartStreamSettings;
@@ -39,6 +48,8 @@ interface ITikTokServiceState extends IPlatformState {
   username: string;
   error?: string | null;
   gameName: string;
+  dateDenied?: string | null;
+  audienceControlsInfo: ITikTokAudienceControls;
 }
 
 interface ITikTokStartStreamSettings {
@@ -48,8 +59,15 @@ interface ITikTokStartStreamSettings {
   liveScope: TTikTokLiveScopeTypes;
   game: string;
   display: TDisplayType;
+  audienceType?: string;
   video?: IVideo;
   mode?: TOutputOrientation;
+}
+
+interface ITikTokAudienceControls {
+  disable: boolean;
+  audienceType: string;
+  types: { value: string; label: string }[];
 }
 
 export interface ITikTokStartStreamOptions {
@@ -58,7 +76,9 @@ export interface ITikTokStartStreamOptions {
   streamKey: string;
   display: TDisplayType;
   game: string;
+  audienceType?: string;
 }
+
 interface ITikTokRequestHeaders extends Dictionary<string> {
   Accept: string;
   'Content-Type': string;
@@ -74,7 +94,7 @@ export class TikTokService
     settings: {
       title: '',
       display: 'vertical',
-      liveScope: 'not-approved',
+      liveScope: 'denied',
       mode: 'portrait',
       serverUrl: '',
       streamKey: '',
@@ -83,10 +103,14 @@ export class TikTokService
     broadcastId: '',
     username: '',
     gameName: '',
+    audienceControlsInfo: { disable: true, audienceType: '0', types: [] },
   };
 
   @Inject() windowsService: WindowsService;
+  @Inject() diagnosticsService: DiagnosticsService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
+  @Inject() private notificationsService: NotificationsService;
+  @Inject() private jsonrpcService: JsonrpcService;
 
   readonly apiBase = 'https://open.tiktokapis.com/v2';
   readonly platform = 'tiktok';
@@ -113,13 +137,28 @@ export class TikTokService
   }
 
   get liveStreamingEnabled(): boolean {
-    const scope = this.state.settings?.liveScope ?? 'denied';
+    const scope = this.state.settings?.liveScope ?? 'relog';
     return ['approved', 'legacy'].includes(scope);
   }
 
-  // TODO: add logic to show rejected
-  get rejected(): boolean {
-    return false;
+  get approved(): boolean {
+    return this.state.settings.liveScope === 'approved';
+  }
+
+  get neverApplied(): boolean {
+    return this.state.settings.liveScope === 'never-applied';
+  }
+
+  get denied(): boolean {
+    return this.state.settings.liveScope === 'denied';
+  }
+
+  get legacy(): boolean {
+    return this.state.settings.liveScope === 'legacy';
+  }
+
+  get relog(): boolean {
+    return this.state.settings.liveScope === 'relog';
   }
 
   get defaultGame(): IGame {
@@ -147,32 +186,29 @@ export class TikTokService
     return 0;
   }
 
+  get audienceControls() {
+    return this.state.audienceControlsInfo;
+  }
+
   async beforeGoLive(goLiveSettings: IGoLiveSettings, display?: TDisplayType) {
+    // return an approved dummy account when testing
+    if (Utils.isTestMode() && this.getHasScope('approved')) {
+      await this.testBeforeGoLive(goLiveSettings);
+      return;
+    }
+
     const ttSettings = getDefined(goLiveSettings.platforms.tiktok);
     const context = display ?? ttSettings?.display;
 
     if (this.getHasScope('approved')) {
-      // skip generate stream keys for tests
-      if (Utils.isTestMode()) {
-        await this.putChannelInfo(ttSettings);
-        this.setPlatformContext('tiktok');
-        return;
-      }
-
       // update server url and stream key if handling streaming via API
       // streaming with server url and stream key is default
-      let streamInfo = {} as ITikTokStartStreamResponse;
+      const streamInfo = await this.startStream(ttSettings);
 
-      try {
-        streamInfo = await this.startStream(ttSettings);
-        if (!streamInfo?.id) {
-          await this.handleOpenLiveManager();
-          throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED');
-        }
-      } catch (error: unknown) {
-        this.SET_LIVE_SCOPE('denied');
+      // if the stream did not start successfully, prevent going live
+      if (!streamInfo?.id) {
         await this.handleOpenLiveManager();
-        throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED', error as any);
+        throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED');
       }
 
       ttSettings.serverUrl = streamInfo.rtmp;
@@ -208,6 +244,7 @@ export class TikTokService
   async afterStopStream(): Promise<void> {
     if (this.state.broadcastId) {
       await this.endStream(this.state.broadcastId);
+      this.showReplaysNotification();
     }
 
     // clear server url and stream key
@@ -296,7 +333,7 @@ export class TikTokService
         : 'Connection failed';
 
       if (notApproved) {
-        this.SET_LIVE_SCOPE('denied');
+        this.SET_LIVE_SCOPE('relog');
       } else if (hasStream) {
         // show error stream exists
         throwStreamError('TIKTOK_STREAM_ACTIVE', e as any, details);
@@ -314,10 +351,11 @@ export class TikTokService
    * of Streamlabs attempts to go live to TikTok, the first stream will be ended
    * and Desktop will enter a reconnecting state, which eventually times out.
    */
-  async startStream(opts: ITikTokStartStreamOptions) {
+  async startStream(opts: ITikTokStartStreamOptions): Promise<ITikTokStartStreamResponse> {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/tiktok/stream/start`;
     const headers = authorizedHeaders(this.userService.apiToken!);
+
     const body = new FormData();
     body.append('title', opts.title);
     body.append('device_platform', getOS());
@@ -326,9 +364,20 @@ export class TikTokService
     const game = opts.game === this.defaultGame.id ? '' : opts.game;
     body.append('category', game);
 
+    if (opts?.audienceType) {
+      body.append('audience_type', opts.audienceType);
+    }
+
     const request = new Request(url, { headers, method: 'POST', body });
 
-    return jfetch<ITikTokStartStreamResponse>(request);
+    return jfetch<ITikTokStartStreamResponse>(request).catch((e: unknown) => {
+      if (e instanceof StreamError) {
+        throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED', e as any);
+      }
+
+      const error = this.handleStartStreamError((e as ITikTokError)?.status);
+      throwStreamError(error.type, { status: error.status });
+    });
   }
 
   async endStream(id: string) {
@@ -365,9 +414,9 @@ export class TikTokService
           return EPlatformCallResult.Success;
         case 'legacy':
           return EPlatformCallResult.Success;
-        case 'denied':
+        case 'relog':
           return EPlatformCallResult.TikTokScopeOutdated;
-        case 'not-approved':
+        case 'denied':
           return EPlatformCallResult.TikTokStreamScopeMissing;
         default:
           return EPlatformCallResult.TikTokStreamScopeMissing;
@@ -376,26 +425,41 @@ export class TikTokService
 
     try {
       const response = await this.fetchLiveAccessStatus();
+
       const status = response as ITikTokLiveScopeResponse;
+      const scope = this.convertScope(status.reason, status.application_status?.status);
+      this.SET_LIVE_SCOPE(scope);
+
+      if (status?.audience_controls_info) {
+        this.setAudienceControls(status.audience_controls_info);
+      }
+
+      if (status?.application_status) {
+        const applicationStatus = status.application_status?.status;
+        const timestamp = status.application_status?.timestamp;
+
+        // show prompt to apply if user has never applied or was rejected 30+ days ago
+        if (applicationStatus === 'rejected' && timestamp) {
+          this.SET_DENIED_DATE(timestamp);
+          return EPlatformCallResult.TikTokStreamScopeMissing;
+        }
+      }
 
       if (status?.user) {
-        const scope = this.convertScope(status.reason);
         this.SET_USERNAME(status.user.username);
-        this.SET_LIVE_SCOPE(scope);
 
-        // Note on the 'denied' response: A user who needs to reauthenticate with TikTok
+        // Note on the 'relog' response: A user who needs to reauthenticate with TikTok
         // due a change in the scope for our api, needs to be told to unlink and remerge their account.
-        if (scope === 'denied') {
+        if (scope === 'relog') {
           return EPlatformCallResult.TikTokScopeOutdated;
         }
       } else if (
         status?.info &&
-        (!status?.reason || status?.reason === ETikTokLiveScopeReason.DENIED)
+        (!status?.reason || status?.reason === ETikTokLiveScopeReason.RELOG)
       ) {
-        this.SET_LIVE_SCOPE('denied');
+        this.SET_LIVE_SCOPE('relog');
         return EPlatformCallResult.TikTokScopeOutdated;
       } else {
-        this.SET_LIVE_SCOPE('not-approved');
         return EPlatformCallResult.TikTokStreamScopeMissing;
       }
 
@@ -413,7 +477,7 @@ export class TikTokService
         : EPlatformCallResult.TikTokStreamScopeMissing;
     } catch (e: unknown) {
       console.warn(this.getErrorMessage(e));
-      this.SET_LIVE_SCOPE('denied');
+      this.SET_LIVE_SCOPE('relog');
       return EPlatformCallResult.TikTokScopeOutdated;
     }
   }
@@ -443,8 +507,8 @@ export class TikTokService
         }
         return res;
       })
-      .catch(() => {
-        console.warn('Error fetching TikTok Live Access status.');
+      .catch(e => {
+        console.warn('Error fetching TikTok Live Access status: ', e);
       });
   }
 
@@ -469,11 +533,7 @@ export class TikTokService
         return games;
       })
       .catch(e => {
-        // return dummy game if running a test
-        if (Utils.isTestMode()) {
-          return [{ id: 'game1', name: 'test1' }, this.defaultGame];
-        }
-        console.error('Error fetching TikTok games: ', e);
+        console.error('Error fetching TikTok categories: ', e);
         return [];
       });
   }
@@ -523,6 +583,22 @@ export class TikTokService
     }
   }
 
+  /**
+   * Open link for replays in browser
+   * @remark This is a temporary solution until we can show replays in the app
+   */
+  showReplaysNotification() {
+    this.notificationsService.actions.push({
+      type: ENotificationType.SUCCESS,
+      message: $t('Click to view TikTok Replay in your browser.'),
+      action: this.jsonrpcService.createRequest(Service.getResourceId(this), 'openReplaysLink'),
+    });
+  }
+
+  openReplaysLink() {
+    remote.shell.openExternal(this.replaysUrl);
+  }
+
   get liveDockEnabled(): boolean {
     return true;
   }
@@ -569,6 +645,10 @@ export class TikTokService
     return 'https://www.tiktok.com/falcon/live_g/live_access_pc_apply/result/index.html?id=GL6399433079641606942';
   }
 
+  get replaysUrl(): string {
+    return 'https://livecenter.tiktok.com/replay';
+  }
+
   get locale(): string {
     return I18nService.instance.state.locale;
   }
@@ -578,19 +658,64 @@ export class TikTokService
     return 'GL6399433079641606942';
   }
 
-  convertScope(scope: number) {
+  get promptApply(): boolean {
+    // never show for approved/legacy users or logged out users
+    if (
+      !this.getHasScope('never-applied') ||
+      !this.userService.state?.createdAt ||
+      !this.userService.isLoggedIn
+    ) {
+      return false;
+    }
+
+    // prompt users that have had desktop for 30+ days
+    // and have streamed at least once in the past 30 days
+    const createdAt = new Date(this.userService.state.createdAt);
+    const today = new Date(Date.now());
+    const dateDiff = (createdAt.getTime() - today.getTime()) / (1000 * 3600 * 24);
+    const isOldAccount = dateDiff >= 30;
+    const hasRecentlyStreamed = this.diagnosticsService.hasRecentlyStreamed;
+
+    if (isOldAccount && hasRecentlyStreamed) return true;
+
+    // prompt users that have had desktop for 30+ days
+    // are not logged in to TikTok and are frequent users
+    const isTikTokLinked = !!this.userService.views.auth?.platforms?.tiktok;
+    const isFrequentUser = this.diagnosticsService.isFrequentUser;
+    if (isOldAccount && !isTikTokLinked && isFrequentUser) return true;
+
+    return false;
+  }
+
+  get promptReapply(): boolean {
+    // prompt a user to reapply if they were rejected 30+ days ago
+    if (!this.getHasScope('denied') || !this.state.dateDenied) return false;
+
+    const today = new Date(Date.now());
+    const deniedDate = new Date(this.state.dateDenied);
+    const deniedDateDiff = (deniedDate.getTime() - today.getTime()) / (1000 * 3600 * 24);
+    if (this.denied && deniedDateDiff >= 30) return true;
+
+    return false;
+  }
+
+  convertScope(scope: number, applicationStatus?: string): TTikTokLiveScopeTypes {
+    if (applicationStatus === 'never_applied' && scope !== ETikTokLiveScopeReason.APPROVED_OBS) {
+      return 'never-applied';
+    }
+
     switch (scope) {
       case ETikTokLiveScopeReason.APPROVED: {
         return 'approved';
       }
       case ETikTokLiveScopeReason.NOT_APPROVED: {
-        return 'not-approved';
+        return 'denied';
       }
       case ETikTokLiveScopeReason.APPROVED_OBS: {
         return 'legacy';
       }
-      case ETikTokLiveScopeReason.DENIED: {
-        return 'denied';
+      case ETikTokLiveScopeReason.RELOG: {
+        return 'relog';
       }
       default:
         return 'denied';
@@ -623,12 +748,79 @@ export class TikTokService
     }, 1000);
   }
 
+  async handleOpenProducer() {
+    remote.shell.openExternal(this.legacyDashboardUrl);
+  }
+
+  handleStartStreamError(status?: number) {
+    const title = $t('TikTok Stream Error');
+    const type: TStreamErrorType =
+      status === 422 ? 'TIKTOK_USER_BANNED' : 'TIKTOK_GENERATE_CREDENTIALS_FAILED';
+    const message = errorTypes[type].message;
+
+    const buttonText = status === 422 ? $t('Open TikTok Producer') : $t('Open TikTok Live Manager');
+    const url = status === 422 ? this.legacyDashboardUrl : this.dashboardUrl;
+
+    if (type !== 'TIKTOK_USER_BANNED') {
+      this.SET_LIVE_SCOPE('relog');
+      this.handleOpenLiveManager();
+    } else {
+      this.SET_LIVE_SCOPE('denied');
+    }
+
+    remote.dialog
+      .showMessageBox(Utils.getMainWindow(), {
+        title,
+        type: 'error',
+        message,
+        buttons: [buttonText, $t('Close')],
+      })
+      .then(({ response }) => {
+        if (response === 0) {
+          remote.shell.openExternal(url);
+        }
+      });
+
+    this.windowsService.actions.closeChildWindow();
+
+    return { type, status };
+  }
+
+  /**
+   * Test going live with approved status for TikTok
+   * @param goLiveSettings - all goLiveSettings
+   * @returns - Promise<void>
+   */
+  async testBeforeGoLive(goLiveSettings: IGoLiveSettings) {
+    const ttSettings = getDefined(goLiveSettings.platforms.tiktok);
+
+    // skip generate stream keys for tests
+    await this.putChannelInfo(ttSettings);
+    this.setPlatformContext('tiktok');
+  }
+
   setLiveScope(scope: TTikTokLiveScopeTypes) {
     this.SET_LIVE_SCOPE(scope);
   }
 
   setGameName(gameName: string) {
     this.SET_GAME_NAME(gameName);
+  }
+
+  setAudienceControls(audienceControlsInfo: ITikTokAudienceControlsInfo) {
+    // convert audience types to match the ListInput component options
+    const types = audienceControlsInfo.types.map(type => ({
+      value: type.key.toString(),
+      // TODO: revisit as to why cast is needed here, `string|null` on type def
+      label: type.label as string,
+    }));
+    const audienceType = audienceControlsInfo.info_type.toString();
+
+    this.SET_AUDIENCE_CONTROLS({
+      ...audienceControlsInfo,
+      audienceType,
+      types,
+    });
   }
 
   @mutation()
@@ -649,5 +841,15 @@ export class TikTokService
   @mutation()
   protected SET_GAME_NAME(gameName: string = '') {
     this.state.gameName = gameName;
+  }
+
+  @mutation()
+  protected SET_DENIED_DATE(date?: string) {
+    this.state.dateDenied = date ?? null;
+  }
+
+  @mutation()
+  protected SET_AUDIENCE_CONTROLS(audienceControlsInfo: ITikTokAudienceControls) {
+    this.state.audienceControlsInfo = audienceControlsInfo;
   }
 }

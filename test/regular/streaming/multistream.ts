@@ -13,12 +13,16 @@ import { logIn } from '../../helpers/modules/user';
 import { releaseUserInPool, reserveUserFromPool, withUser } from '../../helpers/webdriver/user';
 import { showSettingsWindow } from '../../helpers/modules/settings/settings';
 import { test, useWebdriver } from '../../helpers/webdriver';
+import { sleep } from '../../helpers/sleep';
 
+// not a react hook
+// eslint-disable-next-line react-hooks/rules-of-hooks
 useWebdriver();
 
 async function enableAllPlatforms() {
   for (const platform of ['twitch', 'youtube', 'trovo']) {
     await fillForm({ [platform]: true });
+    await sleep(500);
     await waitForSettingsWindowLoaded();
   }
 }
@@ -116,7 +120,6 @@ test('Custom stream destinations', async t => {
 
     t.true(await isDisplayed('span=MyCustomDestUpdated'), 'Destination should be updated');
 
-    // add one more destination
     await click('span=Add Destination');
     await fillForm({
       name: 'MyCustomDest',
@@ -125,7 +128,18 @@ test('Custom stream destinations', async t => {
     });
     await clickButton('Save');
 
-    t.false(await isDisplayed('span=Add Destination'), 'Do not allow more than 2 custom dest');
+    // add 3 more destinations (up to 5)
+    for (let i = 0; i < 3; i++) {
+      await click('span=Add Destination');
+      await fillForm({
+        name: `MyCustomDest${i}`,
+        url: 'rtmp://live.twitch.tv/app/',
+        streamKey: user.streamKey,
+      });
+      await clickButton('Save');
+    }
+
+    t.false(await isDisplayed('span=Add Destination'), 'Do not allow more than 5 custom dest');
 
     // open the GoLiveWindow and check destinations
     await prepareToGoLive();
@@ -148,8 +162,9 @@ test('Custom stream destinations', async t => {
 
     // delete existing destinations
     await showSettingsWindow('Stream');
-    await click('i.fa-trash');
-    await click('i.fa-trash');
+    for (let i = 0; i < 5; i++) {
+      await click('i.fa-trash');
+    }
     t.false(await isDisplayed('i.fa-trash'), 'Destinations should be removed');
   } finally {
     await releaseUserInPool(user);

@@ -40,6 +40,7 @@ import * as remote from '@electron/remote';
 import { TikTokService } from 'services/platforms/tiktok';
 import { TTikTokLiveScopeTypes } from 'services/platforms/tiktok/api';
 import { UsageStatisticsService } from 'app-services';
+import { debounce } from 'lodash-decorators';
 
 export enum EAuthProcessState {
   Idle = 'idle',
@@ -252,11 +253,8 @@ class UserViews extends ViewHandler<IUserServiceState> {
     return this.state.auth;
   }
 
-  appStoreUrl(params?: { appId?: string | undefined; type?: string | undefined }) {
-    const host = this.hostsService.platform;
-    const token = this.auth.apiToken;
-    const nightMode = this.customizationService.isDarkTheme ? 'night' : 'day';
-    let url = `https://${host}/slobs-store`;
+  async appStoreUrl(params?: { appId?: string | undefined; type?: string | undefined }) {
+    let url = `https://${this.hostsService.streamlabs}/library/app-store`;
 
     if (params?.appId) {
       url = `${url}/app/${params?.appId}`;
@@ -265,7 +263,9 @@ class UserViews extends ViewHandler<IUserServiceState> {
       url = `${url}/${params?.type}`;
     }
 
-    return `${url}?token=${token}&mode=${nightMode}`;
+    const magicUrl = await this.magicLinkService.actions.return.getMagicSessionUrl(url);
+
+    return magicUrl;
   }
 
   setPrimaryPlatform(platform: TPlatform) {
@@ -409,6 +409,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   userLogin = new Subject<IUserAuth>();
   userLogout = new Subject();
+  scopeAdded = new Subject();
 
   /**
    * Will fire on every login, similar to userLogin, but will
@@ -463,19 +464,52 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
             ? $t('Successfully merged account')
             : $t('Successfully unlinked account');
 
-        this.windowsService.actions.setWindowOnTop();
+        await this.showStreamSettingsIfNeeded();
+
+        this.windowsService.actions.setWindowOnTop('all');
         this.refreshedLinkedAccounts.next({ success: true, message });
       }
 
       if (event.type === 'account_merge_error') {
-        this.windowsService.actions.setWindowOnTop();
+        await this.showStreamSettingsIfNeeded();
+        this.windowsService.actions.setWindowOnTop('all');
         this.refreshedLinkedAccounts.next({ success: false, message: $t('Account merge error') });
       }
 
       if (event.type === 'streamlabs_prime_subscribe') {
         this.websocketService.ultraSubscription.next(true);
       }
+
+      if (event.type === 'account_permissions_required') {
+        const platform = event.message[0].platform.split('_')[0];
+        await this.startChatAuth(platform as TPlatform);
+      }
     });
+  }
+
+  /*
+   * Since we're displaying the child window in all cases, it might've
+   * been closed when we get this event, so no component was rendered into
+   * it and instead shows an empty blank window with a loading spinner.
+   * It could also never been created (or a component rendered into it
+   * at least), both cases resulted in that invalid state.
+   *
+   * If the child window is closed, and we get one of these user events,
+   * (refer to callers), show Settings -> Stream which in our case should
+   * displays user accounts.
+   */
+  async showStreamSettingsIfNeeded() {
+    if (this.windowsService.state.child && !this.windowsService.state.child.isShown) {
+      this.settingsService.showSettings('Stream');
+      /* TODO: added a sleep here so on first child window create
+       * we still get to see messages (i.e Stream settings).
+       * Otherwise subscriber is called late, since this is a normal
+       * subject.
+       * TODO: should we convert to `BehaviorSubject` or whatever was
+       * it the one that replays events for new subscribers?
+       */
+      await Utils.sleep(500);
+    }
   }
 
   get views() {
@@ -487,10 +521,17 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    * to do this because Twitch adds a captcha when we try to
    * actually log in from integration tests.
    */
-  async testingFakeAuth(auth: IUserAuth, isOnboardingTest: boolean) {
+  async testingFakeAuth(
+    auth: IUserAuth,
+    isOnboardingTest: boolean = false,
+    isNewUser: boolean = false,
+  ) {
+    if (!Utils.isTestMode()) return;
+
     const service = getPlatformService(auth.primaryPlatform);
     this.streamSettingsService.resetStreamSettings();
     await this.login(service, auth);
+
     if (!isOnboardingTest) this.onboardingService.finish();
   }
 
@@ -925,7 +966,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   async overlaysUrl(
-    type?: 'overlay' | 'widget-themes' | 'site-themes',
+    type?: 'overlay' | 'widget-themes' | 'site-themes' | 'collectibles',
     id?: string,
     install?: string,
   ) {
@@ -1183,6 +1224,27 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   /**
+   * Wrapper to add debounce to auth for adding chat scope for multistream chat
+   * @remark For now, only used for Twitch
+   */
+  @debounce(200)
+  async startChatAuth(platform: TPlatform = 'twitch') {
+    await this.startAuth(platform, 'external', false, true)
+      .then(res => {
+        this.windowsService.actions.setWindowOnTop('main');
+        if (res === EPlatformCallResult.Error) {
+          alert($t('Error granting chat permissions.'));
+          return;
+        }
+        this.scopeAdded.next();
+      })
+      .catch(e => {
+        this.windowsService.actions.setWindowOnTop('main');
+        alert($t('Error granting chat permissions.'));
+      });
+  }
+
+  /**
    * Starts the authentication process.  Multiple callbacks
    * can be passed for various events.
    */
@@ -1190,6 +1252,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     platform: TPlatform,
     mode: 'internal' | 'external',
     merge = false,
+    scope = false,
   ): Promise<EPlatformCallResult> {
     const service = getPlatformService(platform);
     const authUrl = merge ? service.mergeUrl : service.authUrl;
@@ -1241,7 +1304,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     let result: EPlatformCallResult;
 
-    if (!merge) {
+    if (!merge && !scope) {
       // Ensure we are starting with fresh stream settings
       this.streamSettingsService.resetStreamSettings();
 

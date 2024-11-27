@@ -132,7 +132,7 @@ export function Connect() {
                     loading={loading}
                     onClick={() => authPlatform(platform, afterLogin)}
                     key={platform}
-                    logoSize={['twitter', 'tiktok'].includes(platform) ? 15 : undefined}
+                    logoSize={['twitter', 'tiktok', 'youtube'].includes(platform) ? 15 : undefined}
                   >
                     <Translate
                       message={$t('Log in with <span>%{platform}</span>', {
@@ -147,6 +147,7 @@ export function Connect() {
               <div className={styles.extraPlatformsContainer}>
                 {shouldAddTrovo && (
                   <PlatformIconButton
+                    name={EPlatform.Trovo}
                     platform={EPlatform.Trovo}
                     disabled={loading || authInProgress}
                     loading={loading}
@@ -158,6 +159,7 @@ export function Connect() {
                 )}
                 {extraPlatforms.map(platform => (
                   <PlatformIconButton
+                    name={platform.value}
                     key={platform.value}
                     logo={platform.image}
                     disabled={loading || authInProgress}

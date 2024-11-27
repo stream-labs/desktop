@@ -23,6 +23,7 @@ test('Streaming to X', withUser('twitch', { multistream: true }), async t => {
     twitter: true,
   });
   await waitForSettingsWindowLoaded();
+  await waitForDisplayed('div[data-name="twitter-settings"]');
 
   await fillForm({
     title: 'Test stream',

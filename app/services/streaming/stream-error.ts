@@ -77,13 +77,12 @@ export const errorTypes = {
     get message() {
       return $t('Failed to authenticate with TikTok, re-login or re-merge TikTok account');
     },
-    get action() {
-      return $t('re-login or re-merge TikTok account');
-    },
   },
   TIKTOK_SCOPE_OUTDATED: {
     get message() {
-      return $t('Failed to update TikTok account');
+      return $t(
+        'Failed to update TikTok account. Please unlink and reconnect your TikTok account.',
+      );
     },
     get action() {
       return $t('unlink and re-merge TikTok account, then restart Desktop');
@@ -107,10 +106,22 @@ export const errorTypes = {
   },
   TIKTOK_GENERATE_CREDENTIALS_FAILED: {
     get message() {
-      return $t('Error generating TikTok stream credentials');
+      return $t('Failed to generate TikTok stream credentials. Confirm Live Access with TikTok.');
+    },
+  },
+  TIKTOK_USER_BANNED: {
+    get message() {
+      return $t('Failed to generate TikTok stream credentials. Confirm Live Access with TikTok.');
     },
     get action() {
-      return $t('confirm streaming approval status with TikTok');
+      return $t(
+        'user might be blocked from streaming to TikTok but do not say they are. Refer them to TikTok',
+      );
+    },
+  },
+  X_PREMIUM_ACCOUNT_REQUIRED: {
+    get message() {
+      return $t('You need X premium account to go live on X.');
     },
   },
   PRIME_REQUIRED: {
@@ -292,12 +303,11 @@ export function formatStreamErrorMessage(
       messages.user.push(details);
     }
 
-    // show all available info in diag report
-    const errorMessage = (error as any)?.action
-      ? `${error.message}, ${(error as any).action}`
-      : error.message;
+    message = error.message.replace(/\s*\.$/, '');
+    // trim trailing periods so that the message joins correctly
+    const errorMessage = (error as any)?.action ? `${message}, ${(error as any).action}` : message;
+
     messages.report.push(errorMessage);
-    if (errorTypeOrError?.message) messages.report.push(message);
     if (details) messages.report.push(details);
     if (code) messages.report.push($t('Error Code: %{code}', { code }));
   } else {
@@ -370,8 +380,42 @@ export function formatUnknownErrorMessage(
   } else if (typeof info === 'object') {
     if (info?.error) {
       try {
-        const error = typeof info.error === 'object' ? info.error : JSON.parse(info.error);
-        const platform = capitalize(error?.platform);
+        // TODO: we wanna refactor this, at least extract, and we should definitely fix types in the future
+        // ref: IOBSOutputSignalInfo
+        let error;
+        let platform;
+
+        if (typeof info.error === 'string') {
+          /*
+           * Try to parse error as JSON as originally done, however, if it's just a string
+           * (such as in the case of invalid path and many other unknown -4 errors we've
+           * swallowed, use that message instead.
+           * We intentionally skip all the logic below this point
+           */
+          try {
+            error = JSON.parse(info.error) as {
+              code: string;
+              message: string;
+              platform: string;
+              details: string;
+            };
+            platform = error.platform ? capitalize(error?.platform) : undefined;
+          } catch {
+            return obsStringErrorAsMessages(info);
+          }
+        } else {
+          error = (info.error as any) as {
+            code: string;
+            message: string;
+            platform: string;
+            details: string;
+          };
+          platform = capitalize(error.platform);
+        }
+
+        /* All of the below deals with correct JSON, which is what we were doing before and where the platform
+         * errors are?
+         */
         const unknownError = errorTypes['UNKNOWN_STREAMING_ERROR_WITH_MESSAGE'];
 
         const userMessage = platform
@@ -424,5 +468,30 @@ export function formatUnknownErrorMessage(
     user: messages.user.join('. '),
     report: messages.user.join('. '),
     details,
+  };
+}
+
+function obsStringErrorAsMessages(info: { error: string; code: number }) {
+  const error = { message: info.error, code: info.code };
+
+  const diagText = `${error.code} Error: ${error.message}`;
+  let userText;
+
+  // TODO: This doesn't work across locales, I know we want this custom text but it's complicating stuff
+  const invalidPath = /Unable to write to (.+). Make sure you're using a recording path which your user account is allowed to write to/;
+  if (invalidPath.test(error.message)) {
+    userText = `${error.message}\n\n${$t(
+      'Go to Settings -> Output -> Recording -> Recording Path if you need to change this location.',
+    )}`;
+  } else {
+    // Forward all errors without parsed `details` field (not sure where OBS sends JSON as info.error)
+    userText = `${$t(
+      'An error occurred with the output. Please check your streaming and recording settings.',
+    )}\n\n${error.message}`;
+  }
+
+  return {
+    user: userText,
+    report: diagText,
   };
 }

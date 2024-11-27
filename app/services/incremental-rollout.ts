@@ -26,7 +26,8 @@ export enum EAvailableFeatures {
    * availability at launch.
    */
   guestCamBeta = 'slobs--guest-join',
-  guestCaProduction = 'slobs--guest-join-prod',
+  guestCamProduction = 'slobs--guest-join-prod',
+  newChatBox = 'core--widgets-v2--chat-box',
 }
 
 interface IIncrementalRolloutServiceState {

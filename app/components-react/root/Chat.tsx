@@ -4,8 +4,6 @@ import { Services } from '../service-provider';
 import styles from './Chat.m.less';
 import { OS, getOS } from '../../util/operating-systems';
 import { onUnload } from 'util/unload';
-import { Button } from 'antd';
-import { $t } from 'services/i18n';
 
 export default function Chat(props: {
   restream: boolean;

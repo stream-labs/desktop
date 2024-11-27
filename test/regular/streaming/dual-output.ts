@@ -9,15 +9,23 @@ import {
   focusChild,
   focusMain,
   isDisplayed,
+  selectAsyncAlert,
   waitForDisplayed,
 } from '../../helpers/modules/core';
 import { logIn } from '../../helpers/modules/user';
 import { toggleDisplay, toggleDualOutputMode } from '../../helpers/modules/dual-output';
-import { test, TExecutionContext, useWebdriver } from '../../helpers/webdriver';
-import { releaseUserInPool, withPoolUser, withUser } from '../../helpers/webdriver/user';
+import {
+  skipCheckingErrorsInLog,
+  test,
+  TExecutionContext,
+  useWebdriver,
+} from '../../helpers/webdriver';
+import { withUser } from '../../helpers/webdriver/user';
 import { SceneBuilder } from '../../helpers/scene-builder';
 import { getApiClient } from '../../helpers/api-client';
 
+// not a react hook
+// eslint-disable-next-line react-hooks/rules-of-hooks
 useWebdriver();
 
 /**
@@ -56,14 +64,32 @@ test(
   async (t: TExecutionContext) => {
     const { app } = t.context;
 
-    await toggleDualOutputMode();
-    await focusMain();
+    t.false(await isDisplayed('div#vertical-display'));
     await (await app.client.$('[data-name=sourcesControls] .icon-smart-record')).click();
 
     // Check that selective recording icon is active
     await (await app.client.$('.icon-smart-record.active')).waitForExist();
 
+    await toggleDualOutputMode();
+
+    // dual output is active but the vertical display is not shown
+    await focusMain();
+    await (await app.client.$('.icon-dual-output.active')).waitForExist();
     t.false(await isDisplayed('div#vertical-display'));
+
+    // toggling selective recording off should show the vertical display
+    await (await app.client.$('.icon-smart-record.active')).click();
+    t.true(await isDisplayed('div#vertical-display'));
+
+    // toggling selective recording back on should hide the vertical display
+    await (await app.client.$('.icon-smart-record')).click();
+    t.false(await isDisplayed('div#vertical-display'));
+
+    // toggling selective recording on while in dual output mode opens a message box warning
+    // notifying the user that the vertical canvas is no longer accessible
+    // skip checking the log for this error
+    skipCheckingErrorsInLog();
+    t.pass();
   },
 );
 
@@ -85,8 +111,12 @@ test(
 
     // cannot use dual output mode with only one platform linked
     await submit();
-    await waitForDisplayed(
-      'div=To use Dual Output you must stream to at least one horizontal and one vertical platform.',
+
+    t.true(
+      await (
+        await selectAsyncAlert('Confirm Horizontal and Vertical Platforms')
+      ).waitForDisplayed(),
+      'Alert is open',
     );
 
     t.pass();
@@ -107,8 +137,11 @@ test(
 
     // cannot use dual output mode with all platforms assigned to one display
     await submit();
-    await waitForDisplayed(
-      'div=To use Dual Output you must stream to at least one horizontal and one vertical platform.',
+    t.true(
+      await (
+        await selectAsyncAlert('Confirm Horizontal and Vertical Platforms')
+      ).waitForDisplayed(),
+      'Alert is open',
     );
 
     t.pass();
@@ -165,8 +198,6 @@ test('Dual output duplicates item and folder hierarchy', async (t: TExecutionCon
 
   // toggle dual output on and convert dual output scene collection
   await toggleDualOutputMode();
-  await focusMain();
-  t.true(await isDisplayed('div#vertical-display'));
   t.true(
     sceneBuilder.isEqualTo(
       `

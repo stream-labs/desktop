@@ -42,6 +42,7 @@ import {
   TStreamErrorType,
   formatUnknownErrorMessage,
   formatStreamErrorMessage,
+  throwStreamError,
 } from './stream-error';
 import { authorizedHeaders } from 'util/requests';
 import { HostsService } from '../hosts';
@@ -54,7 +55,6 @@ import { MarkersService } from 'services/markers';
 import { byOS, OS } from 'util/operating-systems';
 import { DualOutputService } from 'services/dual-output';
 import { capitalize } from 'lodash';
-import { tiktokErrorMessages } from 'services/platforms/tiktok/api';
 import { TikTokService } from 'services/platforms/tiktok';
 
 enum EOBSOutputType {
@@ -274,8 +274,8 @@ export class StreamingService
         !assignContext && platform === 'twitch' && unattendedMode ? undefined : settings;
 
       if (assignContext) {
-        const context = this.views.getPlatformDisplay(platform);
-        await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform, context));
+        const display = settings.platforms[platform]?.display;
+        await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform, display));
       } else {
         await this.runCheck(platform, () =>
           service.beforeGoLive(settingsForPlatform, 'horizontal'),
@@ -313,22 +313,21 @@ export class StreamingService
     /**
      * Set custom destination stream settings
      */
-    if (this.views.isDualOutputMode) {
-      // set custom destination mode and video context before setting settings
-      settings.customDestinations.forEach(destination => {
-        // only update enabled custom destinations
-        if (!destination.enabled) return;
+    settings.customDestinations.forEach(destination => {
+      // only update enabled custom destinations
+      if (!destination.enabled) return;
 
-        if (!destination.display) {
-          // set display to horizontal by default if it does not exist
-          destination.display = 'horizontal';
-        }
+      if (!destination.display) {
+        // set display to horizontal by default if it does not exist
+        destination.display = 'horizontal';
+      }
 
-        const display = destination.display;
-        destination.video = this.videoSettingsService.contexts[display];
-        destination.mode = this.views.getDisplayContextName(display);
-      });
-    }
+      // preserve user's dual output display setting but correctly go live to custom destinations in single output mode
+      const display = this.views.isDualOutputMode ? destination.display : 'horizontal';
+
+      destination.video = this.videoSettingsService.contexts[display];
+      destination.mode = this.views.getDisplayContextName(display);
+    });
 
     // save enabled platforms to reuse setting with the next app start
     this.streamSettingsService.setSettings({ goLiveSettings: settings });
@@ -396,11 +395,13 @@ export class StreamingService
      * SET DUAL OUTPUT SETTINGS
      */
     if (this.views.isDualOutputMode) {
-      const horizontalStream: string[] = this.views.activeDisplayDestinations.horizontal;
-      horizontalStream.concat(this.views.activeDisplayPlatforms.horizontal as string[]);
+      const horizontalDestinations: string[] = this.views.activeDisplayDestinations.horizontal;
+      const horizontalPlatforms: TPlatform[] = this.views.activeDisplayPlatforms.horizontal;
+      const horizontalStream = horizontalDestinations.concat(horizontalPlatforms as string[]);
 
-      const verticalStream: string[] = this.views.activeDisplayDestinations.vertical;
-      verticalStream.concat(this.views.activeDisplayPlatforms.vertical as string[]);
+      const verticalDestinations: string[] = this.views.activeDisplayDestinations.vertical;
+      const verticalPlatforms: TPlatform[] = this.views.activeDisplayPlatforms.vertical;
+      const verticalStream = verticalDestinations.concat(verticalPlatforms as string[]);
 
       const allPlatforms = this.views.enabledPlatforms;
       const allDestinations = this.views.customDestinations
@@ -417,7 +418,7 @@ export class StreamingService
       });
 
       // if needed, set up multistreaming for dual output
-      const shouldMultistreamDisplay = this.views.shouldMultistreamDisplay;
+      const shouldMultistreamDisplay = this.views.getShouldMultistreamDisplay(settings);
 
       const destinationDisplays = this.views.activeDisplayDestinations;
 
@@ -553,8 +554,8 @@ export class StreamingService
 
     // in dual output mode, assign context by settings
     // in single output mode, assign context to 'horizontal' by default
-    const context = this.views.isDualOutputMode
-      ? this.views.getPlatformDisplay(platform)
+    const display = this.views.isDualOutputMode
+      ? settings.platforms[platform]?.display
       : 'horizontal';
 
     try {
@@ -564,34 +565,17 @@ export class StreamingService
           ? undefined
           : settings;
 
-      await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform, context));
+      await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform, display));
     } catch (e: unknown) {
       this.handleSetupPlatformError(e, platform);
 
-      if (platform === 'tiktok') {
-        const error = e as StreamError;
-        const title = $t('TikTok Stream Error');
-        const message = tiktokErrorMessages(error.type) ?? title;
-        this.outputErrorOpen = true;
-
-        remote.dialog
-          .showMessageBox(Utils.getMainWindow(), {
-            title,
-            type: 'error',
-            message,
-            buttons: [$t('Open TikTok Live Center'), $t('Close')],
-          })
-          .then(({ response }) => {
-            if (response === 0) {
-              this.tikTokService.handleOpenLiveManager(true);
-            }
-            this.outputErrorOpen = false;
-          })
-          .catch(() => {
-            this.outputErrorOpen = false;
-          });
-
-        this.windowsService.actions.closeChildWindow();
+      // if TikTok is the only platform going live and the user is banned, prevent the stream from attempting to start
+      if (
+        e instanceof StreamError &&
+        e.type === 'TIKTOK_USER_BANNED' &&
+        this.views.enabledPlatforms.length === 1
+      ) {
+        throwStreamError('TIKTOK_USER_BANNED', e);
       }
     }
   }
@@ -889,7 +873,10 @@ export class StreamingService
     // Dual output cannot be toggled while live
     if (this.state.streamingStatus !== EStreamingState.Offline) return;
 
-    if (enabled) this.usageStatisticsService.recordFeatureUsage('DualOutput');
+    if (enabled) {
+      this.dualOutputService.actions.setDualOutputMode(true, true);
+      this.usageStatisticsService.recordFeatureUsage('DualOutput');
+    }
 
     this.SET_DUAL_OUTPUT_MODE(enabled);
   }
@@ -998,7 +985,7 @@ export class StreamingService
   }
 
   async toggleStreaming(options?: TStartStreamOptions, force = false) {
-    if (this.views.isDualOutputMode && !this.dualOutputService.views.getCanStreamDualOutput()) {
+    if (this.views.isDualOutputMode && !this.views.getCanStreamDualOutput() && this.isIdle) {
       this.notificationsService.actions.push({
         message: $t('Set up Go Live Settings for Dual Output Mode in the Go Live window.'),
         type: ENotificationType.WARNING,
@@ -1314,6 +1301,17 @@ export class StreamingService
         eventMetadata.streamType = streamSettings.streamType;
         eventMetadata.platform = streamSettings.platform;
         eventMetadata.server = streamSettings.server;
+        eventMetadata.outputMode = this.views.isDualOutputMode ? 'dual' : 'single';
+        eventMetadata.platforms = this.views.protectedModeEnabled
+          ? [
+              ...this.views.enabledPlatforms,
+              /*
+               * This is to be consistent with `stream_end`, unsure what multiple `custom_rtmp`'s
+               * provide on their own without URL, but it could be a privacy or payload size issue.
+               */
+              ...this.views.customDestinations.filter(d => d.enabled).map(_ => 'custom_rtmp'),
+            ]
+          : ['custom_rtmp'];
 
         this.usageStatisticsService.recordEvent('stream_start', eventMetadata);
         this.usageStatisticsService.recordAnalyticsEvent('StreamingStatus', {
@@ -1409,6 +1407,15 @@ export class StreamingService
     if (info.code) {
       if (this.outputErrorOpen) {
         console.warn('Not showing error message because existing window is open.', info);
+
+        const messages = formatUnknownErrorMessage(
+          info,
+          this.streamErrorUserMessage,
+          this.streamErrorReportMessage,
+        );
+
+        this.streamErrorCreated.next(messages.report);
+
         return;
       }
 
@@ -1456,13 +1463,6 @@ export class StreamingService
       } else {
         // -4 is used for generic unknown messages in OBS. Both -4 and any other code
         // we don't recognize should fall into this branch and show a generic error.
-        // if (!this.userService.isLoggedIn) {
-        //   const messages;
-        //   errorText = $t(
-        //     'You are currently logged out. Please log in or confirm your server url and stream key.',
-        //   );
-        //   diagReportMessage = 'User is logged out and has invalid server url or stream key.';
-        // } else
 
         if (!this.userService.isLoggedIn) {
           const messages = formatStreamErrorMessage('LOGGED_OUT_ERROR');
@@ -1559,6 +1559,8 @@ export class StreamingService
     const data: Dictionary<any> = {};
     data.viewerCounts = {};
     data.duration = Math.round(moment().diff(moment(this.state.streamingStatusTime)) / 1000);
+    data.game = this.views.game;
+    data.outputMode = this.views.isDualOutputMode ? 'dual' : 'single';
 
     if (this.views.protectedModeEnabled) {
       data.platforms = this.views.enabledPlatforms;

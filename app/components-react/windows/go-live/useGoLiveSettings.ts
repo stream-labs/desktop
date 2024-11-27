@@ -1,5 +1,5 @@
 import { IGoLiveSettings, StreamInfoView } from '../../../services/streaming';
-import { TPlatform, getPlatformService } from '../../../services/platforms';
+import { TPlatform } from '../../../services/platforms';
 import { TDisplayDestinations } from 'services/dual-output';
 import { ICustomStreamDestination } from 'services/settings/streaming';
 import { Services } from '../../service-provider';
@@ -286,45 +286,24 @@ export class GoLiveSettingsModule {
    * Determine if all dual output go live requirements are fulfilled
    */
   getCanStreamDualOutput() {
-    const platformDisplays = Services.StreamingService.views.activeDisplayPlatforms;
-
-    // determine which enabled custom destinations use which displays
-    const destinationDisplays = this.state.customDestinations.reduce(
-      (displays: TDisplayDestinations, destination: ICustomStreamDestination, index: number) => {
-        if (destination.enabled && destination?.display) {
-          displays[destination.display].push(destination.name);
-        }
-        return displays;
-      },
-      { horizontal: [], vertical: [] },
-    );
-    // determine if both displays are selected for active platforms
-    const horizontalHasDestinations =
-      platformDisplays.horizontal.length > 0 || destinationDisplays.horizontal.length > 0;
-    const verticalHasDestinations =
-      platformDisplays.vertical.length > 0 || destinationDisplays.vertical.length > 0;
-
-    return horizontalHasDestinations && verticalHasDestinations;
+    return this.state.getCanStreamDualOutput(this.state);
   }
 
   /**
    * Validate the form and show an error message
    */
   async validate() {
-    // TODO: comment authorization error back in after resolving legacy approval flow
     // tiktok live authorization error
-    // if (this.state.isEnabled('tiktok') && !Services.TikTokService.liveStreamingEnabled) {
-    //   message.error($t('Streaming to TikTok not approved.'));
-    //   return false;
-    // }
-
-    if (Services.DualOutputService.views.dualOutputMode && !this.getCanStreamDualOutput()) {
-      message.error(
-        $t(
-          'To use Dual Output you must stream to at least one horizontal and one vertical platform.',
-        ),
+    if (
+      this.state.isEnabled('tiktok') &&
+      (Services.TikTokService.neverApplied || Services.TikTokService.denied)
+    ) {
+      // TODO: this is a patch to allow users to attempt to go live with rtmp regardless of tiktok status
+      return message.info(
+        $t("Couldn't confirm TikTok Live Access. Apply for Live Permissions below"),
+        2,
+        () => true,
       );
-      return false;
     }
 
     try {
@@ -338,6 +317,7 @@ export class GoLiveSettingsModule {
 
   /**
    * Validate the form and start streaming
+   * @remark Returning false from this function signifies that
    */
   async goLive() {
     if (await this.validate()) {
@@ -369,6 +349,10 @@ export class GoLiveSettingsModule {
 
   get isRestreamEnabled() {
     return Services.RestreamService.views.canEnableRestream;
+  }
+
+  get recommendedColorSpaceWarnings() {
+    return Services.SettingsService.views.recommendedColorSpaceWarnings;
   }
 }
 

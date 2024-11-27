@@ -18,6 +18,8 @@ import { IDummyTestUser, tikTokUsers } from '../../data/dummy-accounts';
 import { TTikTokLiveScopeTypes } from 'services/platforms/tiktok/api';
 import { isDisplayed, waitForDisplayed } from '../../helpers/modules/core';
 
+// not a react hook
+// eslint-disable-next-line react-hooks/rules-of-hooks
 useWebdriver();
 
 test('Streaming to TikTok', withUser('twitch', { multistream: false, prime: false }), async t => {
@@ -35,6 +37,8 @@ test('Streaming to TikTok', withUser('twitch', { multistream: false, prime: fals
     tiktok: true,
   });
   await waitForSettingsWindowLoaded();
+  await waitForDisplayed('div[data-name="tiktok-settings"]');
+
   const fields = await readFields();
 
   // tiktok always shows regardless of ultra status
@@ -47,7 +51,6 @@ test('Streaming to TikTok', withUser('twitch', { multistream: false, prime: fals
   await fillForm({
     title: 'Test stream',
     twitchGame: 'Fortnite',
-    tiktokGame: 'test1',
   });
   await submit();
   await waitForDisplayed('span=Update settings for TikTok');
@@ -55,9 +58,9 @@ test('Streaming to TikTok', withUser('twitch', { multistream: false, prime: fals
   await stopStream();
 
   // test all other tiktok statuses
-  await testLiveScope(t, 'not-approved');
   await testLiveScope(t, 'legacy');
   await testLiveScope(t, 'denied');
+  await testLiveScope(t, 'relog');
 
   t.pass();
 });
@@ -73,22 +76,40 @@ async function testLiveScope(t: TExecutionContext, scope: TTikTokLiveScopeTypes)
   await clickGoLive();
 
   // denied scope should show prompt to remerge TikTok account
-  if (scope === 'denied') {
+  if (scope === 'relog') {
     skipCheckingErrorsInLog();
-    t.true(await isDisplayed('div=Failed to update TikTok account', { timeout: 1000 }));
+
+    t.true(
+      await isDisplayed('div=Failed to update TikTok account', { timeout: 3000 }),
+      'TikTok remerge error shown',
+    );
     return;
   }
 
-  await waitForSettingsWindowLoaded();
+  if (scope === 'denied') {
+    await waitForSettingsWindowLoaded();
+    await submit();
 
-  await fillForm({
-    tiktok: true,
-  });
+    t.true(
+      await isDisplayed(
+        "span=Couldn't confirm TikTok Live Access. Apply for Live Permissions below",
+        { timeout: 3000 },
+      ),
+      'TikTok denied error shown',
+    );
+
+    await waitForDisplayed('span=Update settings for TikTok');
+    await waitForStreamStart();
+    await stopStream();
+
+    return;
+  }
+
+  // test legacy scope
   await waitForSettingsWindowLoaded();
+  await waitForDisplayed('div[data-name="tiktok-settings"]');
 
   const settings = {
-    title: 'Test stream',
-    twitchGame: 'Fortnite',
     serverUrl: user.serverUrl,
     streamKey: user.streamKey,
   };

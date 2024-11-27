@@ -31,7 +31,7 @@ import * as remote from '@electron/remote';
 import { AppService } from 'services/app';
 import fs from 'fs';
 import path from 'path';
-import { TPlatform } from './platforms';
+import { platformList, TPlatform } from './platforms';
 import { TDisplayType } from './settings-v2';
 
 interface IStreamDiagnosticInfo {
@@ -162,6 +162,28 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
 
   get cacheDir() {
     return this.appService.appDataDirectory;
+  }
+
+  get hasRecentlyStreamed(): boolean {
+    return this.state.streams.length > 0;
+  }
+
+  get isFrequentUser(): boolean {
+    // At least 5 streams in the last 30 days
+    const numStreams = this.state.streams.reduce((num: number, stream: IStreamDiagnosticInfo) => {
+      const streamDate = new Date(stream.endTime);
+      const today = new Date(Date.now());
+      const numDaysSinceStream = Math.floor(
+        (today.getTime() - streamDate.getTime()) / (1000 * 3600 * 24),
+      );
+
+      if (numDaysSinceStream >= 30) {
+        num = num + 1;
+        return num;
+      }
+    }, 0);
+
+    return numStreams > 4;
   }
 
   static defaultState: IDiagnosticsServiceState = {
@@ -307,9 +329,34 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
     this.problems.push(problem);
   }
 
-  private formatTargets(arr: TPlatform[] | string[], platforms?: boolean) {
+  private formatTargets(arr: TPlatform[] | string[]) {
     if (!arr.length) return 'None';
     return JSON.stringify(arr).slice(1, -1);
+  }
+
+  /**
+   * Confirm the platforms array contains the names of the platforms
+   * @remark If the item in a platforms array is a number, it's the index of the platform name
+   * when the platforms object is made iterable. Convert the index to the platform name
+   * for readability.
+   * @param platforms The platforms array to validate
+   * @returns Array of platform names
+   */
+  private validatePlatforms(platforms: string) {
+    const platformNames = platforms.replace(/"/g, '').split(',');
+    if (!platformNames.length) {
+      return 'None';
+    }
+
+    const names = platformNames.map(platform => {
+      if (/^\d+$/.test(platform)) {
+        const index = parseInt(platform, 10);
+        return platformList[index];
+      }
+      return platform;
+    });
+
+    return JSON.stringify(names).slice(1, -1);
   }
 
   private formatSimpleOutputInfo() {
@@ -436,7 +483,8 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
 
     const platformList = targets.platforms.horizontal.concat(targets.platforms.vertical);
     const destinationList = targets.destinations.horizontal.concat(targets.destinations.vertical);
-    const platforms = this.formatTargets(platformList, true);
+
+    const platforms = this.formatTargets(platformList);
     const destinations = this.formatTargets(destinationList);
 
     const info = {
@@ -964,6 +1012,18 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
     return new Section(
       'Streams',
       this.state.streams.map(s => {
+        const platforms = this.validatePlatforms(s?.platforms);
+
+        if (
+          s?.type === 'Single Output' &&
+          platforms.includes('tiktok') &&
+          s?.error.split(' ').at(-1) === '422'
+        ) {
+          this.logProblem(
+            'TikTok user might be blocked from streaming. Refer them to TikTok producer page or support to confirm live access status',
+          );
+        }
+
         return {
           'Start Time': new Date(s.startTime).toString(),
           'End Time': s.endTime ? new Date(s.endTime).toString() : 'Stream did not end cleanly',
@@ -973,7 +1033,7 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
           'Average CPU': `${s.avgCpu?.toFixed(2)}%`,
           'Average FPS': s.avgFps?.toFixed(2),
           'Stream Error': s?.error ?? 'None',
-          Platforms: s?.platforms,
+          Platforms: platforms,
           Destinations: s?.destinations,
           'Stream Type': s?.type,
         };
@@ -1005,8 +1065,8 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
         'Number Vertical Sources': numVertical,
       },
       Targets: {
-        'Horizontal Platforms': this.formatTargets(platforms.horizontal, true),
-        'Vertical Platforms': this.formatTargets(platforms.vertical, true),
+        'Horizontal Platforms': this.formatTargets(platforms.horizontal),
+        'Vertical Platforms': this.formatTargets(platforms.vertical),
         'Horizontal Custom Destinations': this.formatTargets(destinations.horizontal),
         'Vertical Custom Destinations': this.formatTargets(destinations.vertical),
       },
