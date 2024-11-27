@@ -164,7 +164,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
               gap: '8px',
             }}
           >
-            <h1 style={{ margin: 0 }}>Import stream</h1>
+            <h1 style={{ margin: 0 }}>Import Fortnite stream</h1>
             <input
               style={{ width: '100%', color: 'black' }}
               type="text"
@@ -250,7 +250,8 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
               }}
               onClick={() => !aiDetectionInProgress && setShowModal({ type: 'upload' })}
             >
-              <i className="icon-upload-image" /> Drag or click to browse your file{' '}
+              <FortniteIcon />
+              Drop your Fornite recording
               <Button disabled={aiDetectionInProgress === true}>Import</Button>
             </div>
             <Button onClick={() => emitSetView({ view: EHighlighterView.SETTINGS })}>
@@ -403,4 +404,37 @@ export function groupStreamsByTimePeriod(streams: { id: string; date: string }[]
   });
 
   return { ...groups, ...monthGroups };
+}
+
+function FortniteIcon(): JSX.Element {
+  return (
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <g clipPath="url(#clip0_2722_18907)">
+        <rect width="28" height="28" rx="2" fill="white" />
+        <rect width="28" height="28" fill="url(#paint0_linear_2722_18907)" />
+        <path
+          d="M10.3438 13.9981C10.3438 18.9588 10.3561 23.0156 10.3725 23.0156C10.3971 23.0156 13.7399 22.3981 14.15 22.3163L14.3633 22.2754V18.9628V15.6544H15.6348H16.9063V15.0491C16.9063 14.7178 16.9186 13.8549 16.935 13.127L16.9596 11.8102H15.6635H14.3633V10.3583V8.90654H15.8604C16.6848 8.90654 17.3574 8.89836 17.3574 8.88609C17.3574 8.84111 17.6856 5.3486 17.7061 5.17275L17.7307 4.98054H14.0352H10.3438V13.9981Z"
+          fill="white"
+        />
+      </g>
+      <defs>
+        <linearGradient
+          id="paint0_linear_2722_18907"
+          x1="2.94562e-08"
+          y1="-0.52973"
+          x2="15.0944"
+          y2="34.3755"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="#168FD8" />
+          <stop offset="0.205" stopColor="#3CA2E4" />
+          <stop offset="0.500584" stopColor="#75CDF1" />
+          <stop offset="1" stopColor="#6AE1FB" />
+        </linearGradient>
+        <clipPath id="clip0_2722_18907">
+          <rect width="28" height="28" rx="2" fill="white" />
+        </clipPath>
+      </defs>
+    </svg>
+  );
 }
