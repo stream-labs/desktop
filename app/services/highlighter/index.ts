@@ -52,6 +52,7 @@ import {
   getHighlightClips,
   IHighlight,
   IHighlighterInput,
+  ProgressTracker,
 } from './ai-highlighter/ai-highlighter';
 import uuid from 'uuid';
 import { EMenuItemKey } from 'services/side-nav';
