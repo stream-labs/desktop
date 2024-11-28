@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import * as remote from '@electron/remote';
 import { Services } from 'components-react/service-provider';
 import styles from './ClipsView.m.less';
@@ -49,12 +49,12 @@ export default function ClipsView({
   const [activeFilter, setActiveFilter] = useState('all'); // Currently not using the setActiveFilter option
 
   const [clipsLoaded, setClipsLoaded] = useState<boolean>(false);
-  useEffect(() => {
-    async function loadClips() {
-      await HighlighterService.actions.return.loadClips(props.id);
-      setClipsLoaded(true);
-    }
+  const loadClips = useCallback(async (id: string | undefined) => {
+    await HighlighterService.actions.return.loadClips(id);
+    setClipsLoaded(true);
+  }, []);
 
+  useEffect(() => {
     setClipsLoaded(false);
     setClips(
       sortAndFilterClips(
@@ -63,7 +63,7 @@ export default function ClipsView({
         activeFilter,
       ),
     );
-    loadClips();
+    loadClips(props.id);
   }, [props.id]);
 
   useEffect(() => {
