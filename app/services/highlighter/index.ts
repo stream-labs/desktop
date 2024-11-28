@@ -1287,23 +1287,14 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
     if (
       !this.views.clips
-        .filter(c => c.enabled)
         .filter(c => {
+          if (!c.enabled) return false;
           if (!streamId) return true;
           return c.streamInfo && c.streamInfo[streamId] !== undefined;
         })
         .every(clip => clip.loaded)
     ) {
-      console.error(
-        'Highlighter: Export called while clips are not fully loaded!: ',
-        this.views.clips
-          .filter(c => c.enabled)
-          .filter(clip => !clip.loaded)
-          .filter(c => {
-            if (!streamId) return true;
-            return c.streamInfo && c.streamInfo[streamId] !== undefined;
-          }),
-      );
+      console.error('Highlighter: Export called while clips are not fully loaded!: ');
       return;
     }
 
@@ -1315,10 +1306,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     let renderingClips: RenderingClip[] = [];
     if (streamId) {
       renderingClips = this.getClips(this.views.clips, streamId)
-        .filter(clip => clip.enabled)
-        .filter(clip => {
-          return clip.streamInfo && clip.streamInfo[streamId] !== undefined;
-        })
+        .filter(clip => clip.enabled && clip.streamInfo && clip.streamInfo[streamId] !== undefined)
         .sort(
           (a: TClip, b: TClip) =>
             a.streamInfo[streamId].orderPosition - b.streamInfo[streamId].orderPosition,
