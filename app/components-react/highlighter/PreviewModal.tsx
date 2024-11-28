@@ -76,10 +76,7 @@ export default function PreviewModal({
           videoPlayer.current!.src = playlist[currentClipIndex].src;
           videoPlayer.current!.load();
 
-          if (newIndex === 0) {
-            audio.current!.currentTime = 0;
-            audio.current!.play().catch(e => console.error('Error playing audio:', e));
-          }
+          playAudio(newIndex, newIndex === prevIndex + 1);
 
           return newIndex;
         });
@@ -109,6 +106,11 @@ export default function PreviewModal({
       setIsPlaying(true);
     };
 
+    const handleAudioEnd = () => {
+      audio.current!.currentTime = 0;
+      audio.current!.play().catch(e => console.error('Error playing audio:', e));
+    };
+
     videoPlayer.current?.addEventListener('ended', handleEnded);
     videoPlayer.current?.addEventListener('play', handlePlay);
     videoPlayer.current?.addEventListener('pause', handlePause);
@@ -117,6 +119,7 @@ export default function PreviewModal({
       audio.current = new Audio(audioSettings.musicPath);
       audio.current.volume = audioSettings.musicVolume / 100;
       audio.current.autoplay = true;
+      audio.current.addEventListener('ended', handleAudioEnd);
     }
 
     return () => {
@@ -125,6 +128,7 @@ export default function PreviewModal({
       videoPlayer.current?.removeEventListener('pause', handlePause);
       if (audio.current) {
         audio.current.pause();
+        audio.current.removeEventListener('ended', handleAudioEnd);
         audio.current = null;
       }
     };
@@ -179,6 +183,16 @@ export default function PreviewModal({
     videoPlayer.current!.src = clip.src;
     videoPlayer.current!.load();
 
+    playAudio(index);
+  }
+
+  function playAudio(index: number, continuation = false) {
+    // if its a continuation of a previous segment, no need to seek
+    // and introduce playback lag
+    if (continuation) {
+      return;
+    }
+
     // clips don't have absolute timestamps, we need to calculate the start time
     // in relation to previous clips
     const startTime = playlist
@@ -187,13 +201,12 @@ export default function PreviewModal({
 
     if (startTime < audio.current!.duration) {
       audio.current!.currentTime = startTime;
-      audio.current!.play().catch(e => console.error('Error playing audio:', e));
     } else {
-      // when we jump to clip and background music ends, we need to pause it
-      // to prevent it from being played from 0
-      audio.current!.currentTime = 0;
-      audio.current?.pause();
+      const start = startTime % audio.current!.duration;
+      audio.current!.currentTime = start;
+      // audio.current?.pause();
     }
+    audio.current!.play().catch(e => console.error('Error playing audio:', e));
   }
 
   const handleScroll = (event: { deltaY: any }) => {
