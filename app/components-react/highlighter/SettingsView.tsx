@@ -131,9 +131,7 @@ export default function SettingsView({
           <div className={styles.cardWrapper}>
             <div className={styles.manualCard}>
               <div className={styles.cardHeaderbarWrapper}>
-                <div className={styles.cardHeaderbar}>
-                  <h3 style={{ margin: 0, fontSize: '20px' }}> Manual highlighter</h3>
-                </div>
+                <h3 style={{ margin: 0, fontSize: '20px' }}> Manual highlighter</h3>
               </div>
               <p>
                 The hotkey highlighter allows you to clip the best moments during your livestream
@@ -180,9 +178,9 @@ export default function SettingsView({
                       ? completedStepHeading($t('Set a hotkey to capture replays'))
                       : incompleteStepHeading($t('Set a hotkey to capture replays'))}
                     {hotkey && (
-                      //TODO: if now label is added, remove the min width of the label div and remove the -16 margin left here
                       <HotkeyBinding
-                        style={{ width: 'calc(100% + 14px)', marginLeft: '-10px' }}
+                        style={{ width: 'calc(100% + 10px)', marginLeft: '-10px' }}
+                        showLabel={false}
                         hotkey={hotkey}
                         binding={hotkey.bindings[0] ?? null}
                         onBind={binding => {
