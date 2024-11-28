@@ -177,7 +177,8 @@ export default function ClipsView({
             </h1>
           </header>
           {sortedList.length === 0 ? (
-            <>
+            /** Better empty state will come with ai PR */
+            <div style={{ padding: '20px' }}>
               No clips found
               <br />
               <div>
@@ -194,7 +195,7 @@ export default function ClipsView({
                   }}
                 />
               </div>
-            </>
+            </div>
           ) : (
             <>
               {clipsLoaded ? (
