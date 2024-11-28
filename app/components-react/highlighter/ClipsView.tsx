@@ -34,6 +34,7 @@ export default function ClipsView({
   emitSetView: (data: IViewState) => void;
 }) {
   const { HighlighterService, UsageStatisticsService } = Services;
+  const clipsAmount = useVuex(() => HighlighterService.views.clips.length);
   const [clips, setClips] = useState<{
     ordered: { id: string }[];
     orderedFiltered: { id: string }[];
@@ -57,7 +58,7 @@ export default function ClipsView({
       ),
     );
     loadClips(props.id);
-  }, [props.id]);
+  }, [props.id, clipsAmount]);
 
   useEffect(() => {
     setClips(
