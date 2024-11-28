@@ -1,13 +1,13 @@
 import { useVuex } from 'components-react/hooks';
 import { Services } from 'components-react/service-provider';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { TModalClipsView } from './ClipsView';
 import { TClip } from 'services/highlighter';
 import styles from './ClipsView.m.less';
 import ClipTrimmer from 'components-react/highlighter/ClipTrimmer';
 import { Modal, Alert, Button } from 'antd';
 import ExportModal from 'components-react/highlighter/ExportModal';
-import React from 'react';
+
 import { $t } from 'services/i18n';
 import PreviewModal from './PreviewModal';
 

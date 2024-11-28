@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { EHighlighterView, IViewState } from 'services/highlighter';
 import { Services } from 'components-react/service-provider';
 import ClipsView from 'components-react/highlighter/ClipsView';
-import UpdateModal from 'components-react/highlighter/UpdateModal';
 
 export default function Highlighter(props: { params?: { view: string } }) {
   const openViewFromParams = props?.params?.view || '';
