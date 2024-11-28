@@ -130,10 +130,7 @@ export default function SettingsView({
   }
 
   return (
-    <div
-      className={styles.settingsViewRoot}
-      style={{ width: '100%', display: 'flex', flexDirection: 'column' }}
-    >
+    <div className={styles.settingsViewRoot}>
       <div style={{ display: 'flex', padding: 20 }}>
         <div style={{ flexGrow: 1 }}>
           <h1 style={{ margin: 0 }}>{$t('Highlighter')}</h1>
@@ -149,6 +146,7 @@ export default function SettingsView({
               Stream highlights
             </Button>
           )}
+          {/* New button coming with next PR */}
           <Button onClick={() => emitSetView({ view: EHighlighterView.CLIPS, id: undefined })}>
             All clips
           </Button>
@@ -156,15 +154,7 @@ export default function SettingsView({
       </div>
 
       <Scrollable style={{ flexGrow: 1, padding: '20px 20px 20px 20px', width: '100%' }}>
-        <div
-          style={{
-            display: 'flex',
-            backgroundColor: '#09161D',
-            padding: '56px',
-            borderRadius: '24px',
-            gap: '24px',
-          }}
-        >
+        <div className={styles.innerScrollWrapper}>
           <div className={styles.cardWrapper}>
             {aiHighlighterEnabled && (
               <div className={styles.highlighterCard}>
@@ -204,26 +194,17 @@ export default function SettingsView({
               </div>
             )}
             <div className={styles.manualCard}>
-              <div className={styles.cardHeaderbarWrapper}>
-                <h3 style={{ margin: 0, fontSize: '20px' }}>
-                  {aiHighlighterEnabled ? 'Or use the manual highlighter ' : 'Manual highlighter'}
-                </h3>
-              </div>
+              <h3 className={styles.cardHeaderTitle}>
+                {' '}
+                {aiHighlighterEnabled ? 'Or use the manual highlighter ' : 'Manual highlighter'}
+              </h3>
               <p>
                 Manually capture the best moments from your livestream with a hotkey command, and
                 automatically turn them into a highlight video.
               </p>
               <div style={{ display: 'flex', gap: '16px' }}>
                 {!v.isStreaming && !correctlyConfigured && (
-                  <div
-                    className={styles.settingSection}
-                    style={{
-                      width: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'space-between',
-                    }}
-                  >
+                  <div className={styles.settingSection}>
                     {correctlyConfigured
                       ? completedStepHeading($t('Configure the replay buffer'))
                       : incompleteStepHeading($t('Configure the replay buffer'))}
@@ -241,15 +222,7 @@ export default function SettingsView({
                 )}
 
                 {!v.isStreaming && (
-                  <div
-                    className={styles.settingSection}
-                    style={{
-                      width: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'space-between',
-                    }}
-                  >
+                  <div className={styles.settingSection}>
                     {hotkey?.bindings.length
                       ? completedStepHeading($t('Set a hotkey to capture replays'))
                       : incompleteStepHeading($t('Set a hotkey to capture replays'))}
@@ -294,18 +267,7 @@ export default function SettingsView({
             </div>
           </div>
 
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              paddingLeft: 24,
-              width: '100%',
-              backgroundImage: 'url(https://slobs-cdn.streamlabs.com/media/highlighter-image.png)',
-              backgroundPosition: 'center',
-              backgroundSize: 'contain',
-              backgroundRepeat: 'no-repeat',
-            }}
-          ></div>
+          <div className={styles.image}></div>
         </div>
       </Scrollable>
     </div>
