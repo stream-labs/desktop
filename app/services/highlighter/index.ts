@@ -1089,6 +1089,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     } else {
       this.REMOVE_CLIP(path);
       this.removeScrubFile(clip.scrubSprite);
+      delete this.renderingClips[path];
     }
 
     if (clip.streamInfo !== undefined || streamId !== undefined) {
@@ -1209,12 +1210,12 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
     for (const clip of clipsToLoad) {
       if (!this.fileExists(clip.path)) {
-        this.REMOVE_CLIP(clip.path);
+        this.removeClip(clip.path, streamInfoId);
         return;
       }
 
       if (!SUPPORTED_FILE_TYPES.map(e => `.${e}`).includes(path.parse(clip.path).ext)) {
-        this.REMOVE_CLIP(clip.path);
+        this.removeClip(clip.path, streamInfoId);
         this.SET_ERROR(
           $t(
             'One or more clips could not be imported because they were not recorded in a supported file format.',
