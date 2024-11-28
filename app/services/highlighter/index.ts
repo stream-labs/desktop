@@ -1607,6 +1607,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
    */
   private addVerticalFilterToExportOptions(exportOptions: IExportOptions) {
     const webcamCoordinates = this.getWebcamPosition();
+    if (!webcamCoordinates) return;
     const newWidth = exportOptions.height;
     const newHeight = exportOptions.width;
     // exportOptions.height = exportOptions.width;
@@ -1628,7 +1629,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     const clipWithWebcam = this.views.clips.find(
       clip =>
         isAiClip(clip) &&
-        !!clip.aiInfo.metadata.webcam_coordinates &&
+        !!clip?.aiInfo?.metadata?.webcam_coordinates &&
         this.renderingClips[clip.path],
     ) as IAiClip;
     return clipWithWebcam?.aiInfo?.metadata?.webcam_coordinates || undefined;
@@ -1649,26 +1650,26 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     const webcam_y1 = webcamCoordinates.y1;
     const webcamWidth = webcamCoordinates.x2 - webcamCoordinates.x1;
     const webcamHeight = webcamCoordinates.y2 - webcamCoordinates.y1;
-
-    // const filter = `[0:v]split=2[webcam][vid];
-    // [webcam]crop=w=${webcamWidth}:h=${webcamHeight}:x=${webcam_x1}:y=${webcam_y1},scale=w=-1:h=${outputHeight}/5,pad=w=${outputWidth}:h=${outputHeight}:x=(ow-iw)/2:y=0:color=0x00000000[webcam_scaled];
-    // [vid]crop=ih*${outputWidth}/${outputHeight * (2 / 3)}:ih[vid_cropped]
-    // [vid_cropped]scale=${outputWidth}:-1[vid_scaled];
-    // [webcam_scaled][vid_scaled]vstack`;
-
+    // if (!webcamCoordinates) {
     const filter = `
-    [0:v]split=3[webcam][vid][blur];
-    [webcam]crop=w=${webcamWidth}:h=${webcamHeight}:x=${webcam_x1}:y=${webcam_y1},
-      scale=w='if(gte(iw/ih,iw/(ih/3)),${outputWidth},-1)':h='if(gte(iw/(ih/3),iw/ih),${outputHeight}/3,-1)',
-      pad=w=${outputHeight}:h=0:x=(ow-iw)/2:y=0:color=0x00000000[webcam_final];
-    [vid]crop=ih*${outputWidth}/${outputHeight * (2 / 3)}:ih[vid_cropped];
-    [vid_cropped]scale=${outputWidth}:-1[video_final];
-    [blur]crop=ih*${outputWidth}/${
-      outputHeight * (1 / 3)
-    }:ih,scale=${outputWidth}:-1,boxblur=luma_radius=min(h\\,w)/20:luma_power=1:chroma_radius=min(cw\\,ch)/20:chroma_power=1[blur_final];
-    [blur_final][webcam_final]overlay='(main_w-overlay_w)/2:(main_h-overlay_h)/2'[top];
-    [top][video_final]vstack[final];
-    `;
+      [0:v]crop=ih*${outputWidth}/${outputHeight}:ih,scale=${outputWidth}:-1:force_original_aspect_ratio=increase[final];
+      `;
+    // }
+    // else{
+
+    // const filter = `
+    // [0:v]split=3[webcam][vid][blur];
+    // [webcam]crop=w=${webcamWidth}:h=${webcamHeight}:x=${webcam_x1}:y=${webcam_y1},
+    //   scale=w='if(gte(iw/ih,iw/(ih/3)),${outputWidth},-1)':h='if(gte(iw/(ih/3),iw/ih),${outputHeight}/3,-1)',
+    //   pad=w=${outputHeight}:h=0:x=(ow-iw)/2:y=0:color=0x00000000[webcam_final];
+    // [vid]crop=ih*${outputWidth}/${outputHeight * (2 / 3)}:ih[vid_cropped];
+    // [vid_cropped]scale=${outputWidth}:-1[video_final];
+    // [blur]crop=ih*${outputWidth}/${outputHeight * (1 / 3)}:ih,scale=${outputWidth}:-1[blur_final];
+    // [blur_final][webcam_final]overlay='(main_w-overlay_w)/2:(main_h-overlay_h)/2'[top];
+    // [top][video_final]vstack[final];
+    // `;
+
+    // }
     return filter;
   }
 
