@@ -164,47 +164,40 @@ export default function ClipsView({
     return (
       <div
         ref={containerRef}
-        style={{ width: '100%', display: 'flex' }}
         className={styles.clipsViewRoot}
         onDrop={event => onDrop(event, streamId)}
       >
-        <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
-          <div style={{ display: 'flex', padding: 20 }}>
-            <div style={{ flexGrow: 1 }}>
-              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', cursor: 'pointer' }}>
-                <div
-                  style={{ paddingTop: '2px' }}
-                  onClick={() =>
-                    emitSetView(
-                      streamId
-                        ? { view: EHighlighterView.STREAM }
-                        : { view: EHighlighterView.SETTINGS },
-                    )
-                  }
-                >
-                  <i className="icon-back" />
-                </div>{' '}
-                <h1
-                  onClick={() =>
-                    emitSetView(
-                      streamId
-                        ? { view: EHighlighterView.STREAM }
-                        : { view: EHighlighterView.SETTINGS },
-                    )
-                  }
-                  style={{ margin: 0 }}
-                >
-                  {' '}
-                  {props.streamTitle ?? 'All highlight clips'}
-                </h1>
-              </div>
-            </div>
-          </div>
+        <div className={styles.container}>
+          <header className={styles.header}>
+            <button
+              className={styles.backButton}
+              onClick={() =>
+                emitSetView(
+                  streamId
+                    ? { view: EHighlighterView.STREAM }
+                    : { view: EHighlighterView.SETTINGS },
+                )
+              }
+            >
+              <i className="icon-back" />
+            </button>
+            <h1
+              className={styles.title}
+              onClick={() =>
+                emitSetView(
+                  streamId
+                    ? { view: EHighlighterView.STREAM }
+                    : { view: EHighlighterView.SETTINGS },
+                )
+              }
+            >
+              {props.streamTitle ?? 'All highlight clips'}
+            </h1>
+          </header>
           {sortedList.length === 0 ? (
             <>
-              {' '}
               No clips found
-              <br />{' '}
+              <br />
               <div>
                 <AddClip
                   streamId={props.id}
@@ -219,70 +212,12 @@ export default function ClipsView({
                   }}
                 />
               </div>
-            </> // TODO M: Add empty state
+            </>
           ) : (
             <>
               {clipsLoaded ? (
                 <>
-                  {/* Disabled for now, will enable with the next version  */}
-                  {/* <Scrollable
-                    horizontal={true}
-                    style={{
-                      width: '100%',
-                      paddingLeft: '8px',
-                      paddingRight: '8px',
-                      height: '42px',
-                    }}
-                  >
-                    <ReactSortable
-                      style={{
-                        width: 'max-content',
-                        minWidth: '100%',
-                        display: 'flex',
-                        gap: '4px',
-                        justifyContent: 'center',
-                      }}
-                      list={sortedList}
-                      setList={clips => setClipOrder(clips, props.id)} //
-                      animation={200}
-                      filter=".sortable-ignore"
-                      // onEnd={() => setOnMove(false)}
-                      onMove={e => {
-                        // setOnMove(true);
-                        return e.related.className.indexOf('sortable-ignore') === -1;
-                      }}
-                    >
-                      {sortedList.map(({ id }) => {
-                        return (
-                          <div key={'mini' + id} data-clip-id={id} style={{ borderRadius: '6px' }}>
-                            <MiniClipPreview clipId={id}></MiniClipPreview>
-                          </div>
-                        );
-                      })}
-                    </ReactSortable>
-                  </Scrollable>{' '}
-                  <div
-                    style={{
-                      width: '100%',
-                      display: 'flex',
-                      padding: '0px 24px',
-                      justifyContent: 'space-between',
-                    }}
-                  >
-                    <span>0m 0s</span>
-                    <VideoDuration streamId={streamId} />
-                  </div> */}
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      width: '100%',
-                      padding: '0 20px',
-                      paddingTop: '16px',
-                      paddingBottom: '2px',
-                    }}
-                  >
+                  <div className={styles.clipsControls}>
                     <AddClip
                       streamId={props.id}
                       addedClips={() => {
@@ -329,12 +264,10 @@ export default function ClipsView({
                         />
                       )}
                   </div>
-                  {/* Disabled for now, will enable with the next version
-                  <ClipsFilter activeFilter={activeFilter} onFilterChange={setActiveFilter} /> */}
-                  <Scrollable style={{ flexGrow: 1, padding: '20px 20px 20px 20px' }}>
+                  <Scrollable className={styles.clipsContainer}>
                     <ReactSortable
                       list={sortedFilteredList}
-                      setList={clips => setClipOrder(clips, props.id)} //
+                      setList={clips => setClipOrder(clips, props.id)}
                       animation={200}
                       filter=".sortable-ignore"
                       onMove={e => {
@@ -344,32 +277,17 @@ export default function ClipsView({
                       {sortedFilteredList.map(({ id }) => {
                         const clip = HighlighterService.views.clipsDictionary[id];
                         return (
-                          <div
-                            key={clip.path}
-                            data-clip-id={id}
-                            style={{
-                              borderRadius: '18px',
-                              margin: '10px 20px 10px 0',
-                              display: 'inline-block',
-                            }}
-                          >
-                            <div
-                              style={{
-                                backgroundColor: '#111111',
-                                borderRadius: '16px',
+                          <div key={clip.path} data-clip-id={id} className={styles.clipItem}>
+                            <ClipPreview
+                              clipId={id}
+                              emitShowTrim={() => {
+                                setModal({ modal: 'trim', inspectedPathId: id });
                               }}
-                            >
-                              <ClipPreview
-                                clipId={id}
-                                emitShowTrim={() => {
-                                  setModal({ modal: 'trim', inspectedPathId: id });
-                                }}
-                                emitShowRemove={() => {
-                                  setModal({ modal: 'remove', inspectedPathId: id });
-                                }}
-                                streamId={streamId}
-                              />
-                            </div>
+                              emitShowRemove={() => {
+                                setModal({ modal: 'remove', inspectedPathId: id });
+                              }}
+                              streamId={streamId}
+                            />
                           </div>
                         );
                       })}
@@ -473,7 +391,7 @@ function ClipsLoadingView({ streamId }: { streamId: string | undefined }) {
   );
 
   return (
-    <div className={styles.clipLoader} style={{ display: 'grid', placeContent: 'center' }}>
+    <div className={styles.clipLoadingIndicator}>
       <h2>Loading</h2>
       <p>
         {clips.filter(clip => clip.loaded).length}/{clips.length} Clips
