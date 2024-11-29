@@ -7,6 +7,7 @@ import { pipeline } from 'stream/promises';
 import { importExtractZip } from 'util/slow-imports';
 import { spawn } from 'child_process';
 import { FFMPEG_EXE } from '../constants';
+import Utils from '../../utils';
 
 interface IAIHighlighterManifest {
   version: string;
@@ -130,6 +131,10 @@ export class AiHighlighterUpdater {
    * Update highlighter to the latest version
    */
   public async update(progressCallback?: (progress: IDownloadProgress) => void): Promise<void> {
+    if (Utils.isDevMode) {
+      console.log('skipping update in dev mode');
+      return;
+    }
     try {
       this.isCurrentlyUpdating = true;
       this.currentUpdate = this.performUpdate(progressCallback);
