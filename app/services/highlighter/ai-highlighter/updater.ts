@@ -52,7 +52,7 @@ export class AiHighlighterUpdater {
         [
           'run',
           'python',
-          `${rootPath}/highlighter-api/cli.py`,
+          `${rootPath}/highlighter_api/cli.py`,
           videoUri,
           '--ffmpeg_path',
           FFMPEG_EXE,
