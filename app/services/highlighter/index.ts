@@ -1596,7 +1596,6 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
    */
   private addVerticalFilterToExportOptions(exportOptions: IExportOptions) {
     const webcamCoordinates = this.getWebcamPosition();
-    if (!webcamCoordinates) return;
     const newWidth = exportOptions.height;
     const newHeight = exportOptions.width;
     // exportOptions.height = exportOptions.width;
@@ -1631,35 +1630,34 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
    * @returns properly formatted complex filter for ffmpeg to move webcam to top in vertical video
    */
   private getWebcamComplexFilterForFfmpeg(
-    webcamCoordinates: ICoordinates,
+    webcamCoordinates: ICoordinates | null,
     outputWidth: number,
     outputHeight: number,
   ) {
-    const webcam_x1 = webcamCoordinates.x1;
-    const webcam_y1 = webcamCoordinates.y1;
-    const webcamWidth = webcamCoordinates.x2 - webcamCoordinates.x1;
-    const webcamHeight = webcamCoordinates.y2 - webcamCoordinates.y1;
-    // if (!webcamCoordinates) {
-    const filter = `
+    if (!webcamCoordinates) {
+      return `
       [0:v]crop=ih*${outputWidth}/${outputHeight}:ih,scale=${outputWidth}:-1:force_original_aspect_ratio=increase[final];
       `;
-    // }
-    // else{
+    }
 
-    // const filter = `
-    // [0:v]split=3[webcam][vid][blur];
-    // [webcam]crop=w=${webcamWidth}:h=${webcamHeight}:x=${webcam_x1}:y=${webcam_y1},
-    //   scale=w='if(gte(iw/ih,iw/(ih/3)),${outputWidth},-1)':h='if(gte(iw/(ih/3),iw/ih),${outputHeight}/3,-1)',
-    //   pad=w=${outputHeight}:h=0:x=(ow-iw)/2:y=0:color=0x00000000[webcam_final];
-    // [vid]crop=ih*${outputWidth}/${outputHeight * (2 / 3)}:ih[vid_cropped];
-    // [vid_cropped]scale=${outputWidth}:-1[video_final];
-    // [blur]crop=ih*${outputWidth}/${outputHeight * (1 / 3)}:ih,scale=${outputWidth}:-1[blur_final];
-    // [blur_final][webcam_final]overlay='(main_w-overlay_w)/2:(main_h-overlay_h)/2'[top];
-    // [top][video_final]vstack[final];
-    // `;
+    const webcamTopX = webcamCoordinates?.x1;
+    const webcamTopY = webcamCoordinates?.y1;
+    const webcamWidth = webcamCoordinates?.x2 - webcamCoordinates?.x1;
+    const webcamHeight = webcamCoordinates?.y2 - webcamCoordinates?.y1;
 
-    // }
-    return filter;
+    const oneThirdHeight = outputHeight / 3;
+    const twoThirdsHeight = (outputHeight * 2) / 3;
+
+    return `
+    [0:v]split=3[webcam][vid][blur_source];
+    color=c=black:s=${outputWidth}x${outputHeight}:d=1[base];
+    [webcam]crop=w=${webcamWidth}:h=${webcamHeight}:x=${webcamTopX}:y=${webcamTopY},scale=-1:${oneThirdHeight}[webcam_final];
+    [vid]crop=ih*${outputWidth}/${twoThirdsHeight}:ih,scale=${outputWidth}:${twoThirdsHeight}[vid_cropped];
+    [blur_source]crop=ih*${outputWidth}/${twoThirdsHeight}:ih,scale=${outputWidth}:${oneThirdHeight},gblur=sigma=50[blur];
+    [base][blur]overlay=x=0:y=0[blur_base];
+    [blur_base][webcam_final]overlay='(${outputWidth}-overlay_w)/2:(${oneThirdHeight}-overlay_h)/2'[base_webcam];
+    [base_webcam][vid_cropped]overlay=x=0:y=${oneThirdHeight}[final];
+    `;
   }
 
   // We throttle because this can go extremely fast, especially on previews
