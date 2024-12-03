@@ -43,9 +43,7 @@ export class AiHighlighterUpdater {
    * Spawn the AI Highlighter process that would process the video
    */
   static startHighlighterProcess(videoUri: string) {
-    const isDev = process.env.NODE_ENV === 'development';
-
-    if (isDev) {
+    if (Utils.isDevMode()) {
       const rootPath = '../highlighter-api/';
       return spawn(
         'poetry',
@@ -131,7 +129,7 @@ export class AiHighlighterUpdater {
    * Update highlighter to the latest version
    */
   public async update(progressCallback?: (progress: IDownloadProgress) => void): Promise<void> {
-    if (Utils.isDevMode) {
+    if (Utils.isDevMode()) {
       console.log('skipping update in dev mode');
       return;
     }
