@@ -2140,26 +2140,21 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     console.timeEnd('export');
     return results;
   }
-
   getClips(clips: TClip[], streamId?: string): TClip[] {
-    const inputClips = clips.filter(clip => clip.path !== 'add');
-    let wantedClips;
-
-    if (streamId) {
-      wantedClips = inputClips.filter(clip => clip.streamInfo?.[streamId]);
-    } else {
-      wantedClips = inputClips;
-    }
-
-    const outputClips = wantedClips.filter(c => this.fileExists(c.path));
-    if (outputClips.length !== wantedClips.length) {
-      wantedClips
-        .filter(c => !this.fileExists(c.path))
-        .forEach(clip => {
-          this.removeClip(clip.path, streamId);
-        });
-    }
-    return outputClips;
+    return clips.filter(clip => {
+      if (clip.path === 'add') {
+        return false;
+      }
+      const exists = this.fileExists(clip.path);
+      if (!exists) {
+        this.removeClip(clip.path, streamId);
+        return false;
+      }
+      if (streamId) {
+        return clip.streamInfo?.[streamId];
+      }
+      return true;
+    });
   }
 
   getClipsLoaded(clips: TClip[], streamId?: string): boolean {

@@ -55,26 +55,18 @@ export default function ClipsView({
     setClipsLoaded(true);
   }, []);
 
+  const getClips = useCallback(() => {
+    return HighlighterService.getClips(HighlighterService.views.clips, props.id);
+  }, [props.id]);
+
   useEffect(() => {
     setClipsLoaded(false);
-    setClips(
-      sortAndFilterClips(
-        HighlighterService.getClips(HighlighterService.views.clips, props.id),
-        props.id,
-        activeFilter,
-      ),
-    );
+    setClips(sortAndFilterClips(getClips(), props.id, activeFilter));
     loadClips(props.id);
   }, [props.id, clipsAmount]);
 
   useEffect(() => {
-    setClips(
-      sortAndFilterClips(
-        HighlighterService.getClips(HighlighterService.views.clips, props.id),
-        props.id,
-        activeFilter,
-      ),
-    );
+    setClips(sortAndFilterClips(getClips(), props.id, activeFilter));
   }, [activeFilter]);
 
   useEffect(() => UsageStatisticsService.actions.recordFeatureUsage('Highlighter'), []);
@@ -126,8 +118,10 @@ export default function ClipsView({
       );
 
       setClips({
-        ordered: newClipArray.map(c => ({ id: c })),
-        orderedFiltered: filterClipsBySource(updatedClips, activeFilter).map(c => ({ id: c.path })),
+        ordered: newClipArray.map(clipPath => ({ id: clipPath })),
+        orderedFiltered: filterClipsBySource(updatedClips, activeFilter).map(clip => ({
+          id: clip.path,
+        })),
       });
       return;
     }
@@ -204,13 +198,7 @@ export default function ClipsView({
                 <AddClip
                   streamId={props.id}
                   addedClips={() => {
-                    setClips(
-                      sortAndFilterClips(
-                        HighlighterService.getClips(HighlighterService.views.clips, props.id),
-                        props.id,
-                        activeFilter,
-                      ),
-                    );
+                    setClips(sortAndFilterClips(getClips(), props.id, activeFilter));
                   }}
                 />
               </div>
@@ -223,13 +211,7 @@ export default function ClipsView({
                     <AddClip
                       streamId={props.id}
                       addedClips={() => {
-                        setClips(
-                          sortAndFilterClips(
-                            HighlighterService.getClips(HighlighterService.views.clips, props.id),
-                            props.id,
-                            activeFilter,
-                          ),
-                        );
+                        setClips(sortAndFilterClips(getClips(), props.id, activeFilter));
                       }}
                     />
                     {streamId &&
@@ -257,12 +239,8 @@ export default function ClipsView({
                               }
                             });
                           }}
-                          combinedClipsDuration={getCombinedClipsDuration(
-                            HighlighterService.getClips(HighlighterService.views.clips, props.id),
-                          )}
-                          roundDetails={HighlighterService.getRoundDetails(
-                            HighlighterService.getClips(HighlighterService.views.clips, props.id),
-                          )}
+                          combinedClipsDuration={getCombinedClipsDuration(getClips())}
+                          roundDetails={HighlighterService.getRoundDetails(getClips())}
                         />
                       )}
                   </div>
