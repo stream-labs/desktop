@@ -1205,7 +1205,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
   async loadClips(streamInfoId?: string | undefined) {
     const clipsToLoad: TClip[] = this.getClips(this.views.clips, streamInfoId);
-    this.resetRenderingClips();
+    // this.resetRenderingClips();
     await this.ensureScrubDirectory();
 
     for (const clip of clipsToLoad) {
@@ -1581,7 +1581,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
     if (fader) await fader.cleanup();
     if (mixer) await mixer.cleanup();
-    this.resetRenderingClips();
+    // this.resetRenderingClips();
     this.SET_EXPORT_INFO({
       exporting: false,
       exported: !this.views.exportInfo.cancelRequested && !preview && !this.views.exportInfo.error,
