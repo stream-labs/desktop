@@ -1334,14 +1334,14 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
         });
     }
 
-    if (this.views.video.intro.path) {
+    if (this.views.video.intro.path && orientation !== 'vertical') {
       const intro: RenderingClip = new RenderingClip(this.views.video.intro.path);
       await intro.init();
       intro.startTrim = 0;
       intro.endTrim = 0;
       renderingClips.unshift(intro);
     }
-    if (this.views.video.outro.path) {
+    if (this.views.video.outro.path && orientation !== 'vertical') {
       const outro = new RenderingClip(this.views.video.outro.path);
       await outro.init();
       outro.startTrim = 0;
