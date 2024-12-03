@@ -8,7 +8,6 @@ import { Button } from 'antd';
 import { $t } from 'services/i18n';
 import { isAiClip } from './utils';
 import { InputEmojiSection } from './InputEmojiSection';
-
 import { useVuex } from 'components-react/hooks';
 
 export default function ClipPreview(props: {
@@ -27,7 +26,7 @@ export default function ClipPreview(props: {
   const enabled = v.clip.deleted ? false : v.clip.enabled;
 
   if (!v.clip) {
-    return <div>deleted</div>;
+    return <>deleted</>;
   }
 
   function mouseMove(e: React.MouseEvent) {
@@ -69,10 +68,8 @@ export default function ClipPreview(props: {
             <i className={`icon-trash ${styles.deletedIcon}`} />
           </div>
         )}
-        <div style={{ position: 'absolute', top: '7px', right: '9px' }}>
-          {v.clip.source === 'AiClip' && (
-            <FlameHypeScore score={v.clip.aiInfo.score}></FlameHypeScore>
-          )}
+        <div className={styles.flameHypescoreWrapper}>
+          {isAiClip(v.clip) && <FlameHypeScore score={v.clip.aiInfo.score}></FlameHypeScore>}
         </div>
         <span className={styles.enableButton}>
           <BoolButtonInput
@@ -92,6 +89,7 @@ export default function ClipPreview(props: {
         </span>
         <div className={styles.previewClipMoving}>
           <div className={styles.controlsContainer}>
+            {/* left */}
             <div className={styles.durationInfo}>
               <span className={styles.durationLabel}>
                 {formatSecondsToHMS(v.clip.duration! - (v.clip.startTrim + v.clip.endTrim) || 0)}
@@ -106,15 +104,13 @@ export default function ClipPreview(props: {
                 }}
               >
                 {isAiClip(v.clip) ? (
-                  <>
-                    <InputEmojiSection
-                      clips={[v.clip]}
-                      includeRounds={false}
-                      includeDeploy={true}
-                      showCount={false}
-                      showDescription={false}
-                    />
-                  </>
+                  <InputEmojiSection
+                    clips={[v.clip]}
+                    includeRounds={false}
+                    includeDeploy={true}
+                    showCount={false}
+                    showDescription={false}
+                  />
                 ) : (
                   <div className={styles.highlighterIcon}>
                     <i className="icon-highlighter" />{' '}
@@ -122,16 +118,7 @@ export default function ClipPreview(props: {
                 )}
               </div>
               {isAiClip(v.clip) && v.clip.aiInfo?.metadata?.round && (
-                <div
-                  style={{
-                    padding: '4px 6px',
-                    backgroundColor: '#00000070',
-                    borderRadius: '4px',
-                    color: 'white',
-                  }}
-                >
-                  {`Round: ${v.clip.aiInfo.metadata.round}`}
-                </div>
+                <div className={styles.roundTag}>{`Round: ${v.clip.aiInfo.metadata.round}`}</div>
               )}
             </div>
           </div>
