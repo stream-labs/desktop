@@ -113,7 +113,7 @@ class IncrementalRolloutView extends ViewHandler<IIncrementalRolloutServiceState
   }
 
   featureIsEnabled(feature: EAvailableFeatures): boolean {
-    if (Utils.isDevMode()) return true; // always show for dev mode
+    if (Utils.isDevMode() || feature === EAvailableFeatures.aiHighlighter) return true; // always show for dev mode
 
     return this.availableFeatures.indexOf(feature) > -1;
   }
