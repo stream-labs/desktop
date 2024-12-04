@@ -111,5 +111,13 @@
   "Trim": "Trim",
   "Intro": "Intro",
   "Outro": "Outro",
-  "All clips": "All clips"
+  "All clips": "All clips",
+  "Export highlight reel": "Export highlight reel",
+  "Restart ai-detection": "Restart ai-detection",
+  "Add clips": "Add clips",
+  "Edit clips": "Edit clips",
+  "Searching for highlights...": "Searching for highlights...",
+  "Not enough highlights found": "Not enough highlights found",
+  "Ai-detection cancelled": "Ai-detection cancelled",
+  "Ai-detection failed": "Ai-detection failed"
 }
