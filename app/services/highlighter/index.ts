@@ -462,6 +462,16 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     highlightedStreams: [],
   };
 
+  static filter(state: IHighligherState) {
+    return {
+      ...this.defaultState,
+      clips: state.clips,
+      highlightedStreams: state.highlightedStreams,
+      video: state.video,
+      audio: state.audio,
+      transition: state.transition,
+    };
+  }
   @Inject() streamingService: StreamingService;
   @Inject() userService: UserService;
   @Inject() usageStatisticsService: UsageStatisticsService;
