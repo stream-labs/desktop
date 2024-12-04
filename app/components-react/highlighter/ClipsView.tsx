@@ -173,13 +173,13 @@ export default function ClipsView({
               className={styles.title}
               onClick={() => emitSetView({ view: EHighlighterView.SETTINGS })}
             >
-              {props.streamTitle ?? 'All highlight clips'}
+              {props.streamTitle ?? $t('All highlight clips')}
             </h1>
           </header>
           {sortedList.length === 0 ? (
             /** Better empty state will come with ai PR */
             <div style={{ padding: '20px' }}>
-              No clips found
+              {$t('No clips found')}
               <br />
               <div>
                 <AddClip
@@ -327,7 +327,7 @@ function ClipsLoadingView({ streamId }: { streamId: string | undefined }) {
 
   return (
     <div className={styles.clipLoadingIndicator}>
-      <h2>Loading</h2>
+      <h2>{$t('Loading')}</h2>
       <p>
         {clips.filter(clip => clip.loaded).length}/{clips.length} Clips
       </p>

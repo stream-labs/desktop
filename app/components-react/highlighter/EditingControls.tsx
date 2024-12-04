@@ -89,7 +89,7 @@ export function EditingControls({
         <div style={{ display: 'flex', alignItems: 'flex-end' }}>
           <FileInput
             style={{ width: '100%' }}
-            label={'Intro'}
+            label={$t('Intro')}
             value={v.video.intro.path}
             filters={[{ name: 'Video file', extensions: videoExtensions }]}
             onChange={e => {
@@ -109,7 +109,7 @@ export function EditingControls({
         <div style={{ display: 'flex', alignItems: 'flex-end' }}>
           <FileInput
             style={{ width: '100%' }}
-            label={'Outro'}
+            label={$t('Outro')}
             value={v.video.outro.path}
             filters={[{ name: 'Video file', extensions: videoExtensions }]}
             onChange={e => {
