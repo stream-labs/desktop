@@ -90,7 +90,7 @@ function getTypeWordingFromType(
 ): { emoji: string; description: string } {
   switch (type) {
     case EHighlighterInputTypes.KILL:
-      return { emoji: '𖦏', description: count > 1 ? 'eliminations' : 'elimination' };
+      return { emoji: '🔫', description: count > 1 ? 'eliminations' : 'elimination' };
     case EHighlighterInputTypes.KNOCKED:
       return { emoji: '🥊', description: count > 1 ? 'knocks' : 'knocked' };
     case EHighlighterInputTypes.DEATH:
