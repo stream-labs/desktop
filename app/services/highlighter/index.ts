@@ -705,58 +705,13 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     streamId: string | undefined,
     source: 'Manual' | 'ReplayBuffer',
   ) {
+    // streamId is used for ai highlighter
+
     newClips.forEach((clipData, index) => {
-      const currentClips = this.getClips(this.views.clips, streamId);
       const getHighestGlobalOrderPosition = this.getClips(this.views.clips, undefined).length;
 
-      let newStreamInfo: { [key: string]: TStreamInfo } = {};
-      if (streamId) {
-        if (source === 'Manual') {
-          // To Prepend the clip, change all other clips order + 1
-          currentClips.forEach(clip => {
-            const updatedStreamInfo = {
-              ...(clip.streamInfo ? clip.streamInfo : {}),
-              [streamId]: {
-                ...(clip.streamInfo?.[streamId] ?? {}),
-                orderPosition: clip.streamInfo?.[streamId]
-                  ? clip.streamInfo[streamId].orderPosition + 1
-                  : 0,
-              },
-            };
-            this.UPDATE_CLIP({
-              path: clip.path,
-              streamInfo: updatedStreamInfo,
-            });
-          });
-
-          newStreamInfo = {
-            [streamId]: {
-              orderPosition: 0,
-            },
-          };
-        } else {
-          // replaybuffer is appended
-          newStreamInfo = {
-            [streamId]: {
-              orderPosition: index + currentClips.length + 1,
-              initialStartTime: clipData.startTime,
-              initialEndTime: clipData.endTime,
-            },
-          };
-        }
-      }
-
-      //check if the clip already exists. If yess, only add to the specific stream
       if (this.state.clips[clipData.path]) {
-        const updatedStreamInfo = {
-          ...this.state.clips[clipData.path].streamInfo,
-          ...newStreamInfo,
-        };
-
-        this.UPDATE_CLIP({
-          path: clipData.path,
-          streamInfo: updatedStreamInfo,
-        });
+        // Clip exists already
         return;
       } else {
         this.ADD_CLIP({
@@ -768,7 +723,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
           deleted: false,
           source,
           globalOrderPosition: index + getHighestGlobalOrderPosition + 1,
-          streamInfo: streamId !== undefined ? newStreamInfo : undefined,
+          streamInfo: undefined,
         });
       }
     });
