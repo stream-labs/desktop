@@ -133,7 +133,7 @@ export default function PreviewModal({
         audio.current = null;
       }
     };
-  }, [playlist.length]);
+  }, [playlist.length, currentClipIndex]);
 
   useEffect(() => {
     if (videoPlayer.current === null || playlist.length === 0) {
@@ -178,8 +178,8 @@ export default function PreviewModal({
     if (currentClipIndex === index) {
       return;
     }
-
     setCurrentClipIndex(index);
+
     const clip = playlist[index];
     videoPlayer.current!.src = clip.src;
     videoPlayer.current!.load();
