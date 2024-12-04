@@ -249,7 +249,7 @@ export interface IVideoInfo {
   outro: IOutroInfo;
 }
 
-interface IHighligherState {
+interface IHighlighterState {
   clips: Dictionary<TClip>;
   transition: ITransitionInfo;
   video: IVideoInfo;
@@ -382,7 +382,7 @@ export interface IExportOptions {
   complexFilter?: string;
 }
 
-class HighligherViews extends ViewHandler<IHighligherState> {
+class HighlighterViews extends ViewHandler<IHighlighterState> {
   /**
    * Returns an array of clips
    */
@@ -483,7 +483,7 @@ class HighligherViews extends ViewHandler<IHighligherState> {
 }
 
 @InitAfter('StreamingService')
-export class HighlighterService extends PersistentStatefulService<IHighligherState> {
+export class HighlighterService extends PersistentStatefulService<IHighlighterState> {
   @Inject() streamingService: StreamingService;
   @Inject() userService: UserService;
   @Inject() usageStatisticsService: UsageStatisticsService;
@@ -494,7 +494,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   @Inject() sharedStorageService: SharedStorageService;
   @Inject() incrementalRolloutService: IncrementalRolloutService;
 
-  static defaultState: IHighligherState = {
+  static defaultState: IHighlighterState = {
     clips: {},
     transition: {
       type: 'fade',
@@ -543,7 +543,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   aiHighlighterUpdater: AiHighlighterUpdater;
   aiHighlighterEnabled = false;
 
-  static filter(state: IHighligherState) {
+  static filter(state: IHighlighterState) {
     return {
       ...this.defaultState,
       clips: state.clips,
@@ -692,7 +692,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   }
 
   get views() {
-    return new HighligherViews(this.state);
+    return new HighlighterViews(this.state);
   }
 
   async init() {
