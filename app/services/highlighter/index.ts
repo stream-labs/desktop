@@ -715,7 +715,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
           // To Prepend the clip, change all other clips order + 1
           currentClips.forEach(clip => {
             const updatedStreamInfo = {
-              ...clip.streamInfo,
+              ...(clip.streamInfo ? clip.streamInfo : {}),
               [streamId]: {
                 ...(clip.streamInfo?.[streamId] ?? {}),
                 orderPosition: clip.streamInfo?.[streamId]
