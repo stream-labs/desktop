@@ -131,7 +131,7 @@ export default function SettingsView({
           )}
           {/* New button coming with next PR */}
           <Button onClick={() => emitSetView({ view: EHighlighterView.CLIPS, id: undefined })}>
-            All clips
+            {$t('All clips')}
           </Button>
         </div>
       </div>
@@ -169,8 +169,9 @@ export default function SettingsView({
                 {aiHighlighterEnabled ? 'Or use the manual highlighter ' : 'Manual highlighter'}
               </h3>
               <p>
-                Manually capture the best moments from your livestream with a hotkey command, and
-                automatically turn them into a highlight video.
+                {$t(
+                  'Manually capture the best moments from your livestream with a hotkey command, and automatically turn them into a highlight video.',
+                )}
               </p>
               <div style={{ display: 'flex', gap: '16px' }}>
                 {!v.isStreaming && !correctlyConfigured && (
@@ -187,7 +188,7 @@ export default function SettingsView({
                 )}
                 {v.isStreaming && (
                   <div className={styles.settingSection} style={{ width: '100%' }}>
-                    <p>End your stream to change the Hotkey or the replay duration.</p>
+                    <p>{$t('End your stream to change the Hotkey or the replay duration.')}</p>
                   </div>
                 )}
 

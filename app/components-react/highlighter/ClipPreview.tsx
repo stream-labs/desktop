@@ -127,7 +127,7 @@ export default function ClipPreview(props: {
               <i className="icon-trash" />
             </Button>
             <Button size="large" className={styles.actionButton} onClick={props.emitShowTrim}>
-              <i className="icon-trim" /> Trim
+              <i className="icon-trim" /> {$t('Trim')}
             </Button>
           </div>
         </div>
