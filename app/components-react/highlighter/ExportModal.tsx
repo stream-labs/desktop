@@ -27,6 +27,9 @@ class ExportController {
   dismissError() {
     return this.service.actions.dismissError();
   }
+  resetExportedState() {
+    return this.service.actions.resetExportedState();
+  }
 
   setResolution(value: string) {
     this.service.actions.setResolution(parseInt(value, 10) as TResolution);
@@ -79,10 +82,14 @@ export default function ExportModalProvider({
 }
 
 function ExportModal({ close, streamId }: { close: () => void; streamId: string | undefined }) {
-  const { exportInfo, dismissError } = useController(ExportModalCtx);
+  const { exportInfo, dismissError, resetExportedState } = useController(ExportModalCtx);
 
+  const unmount = () => {
+    dismissError();
+    resetExportedState();
+  };
   // Clear all errors when this component unmounts
-  useEffect(dismissError, []);
+  useEffect(unmount, []);
 
   if (exportInfo.exporting) return <ExportProgress />;
   if (!exportInfo.exported) return <ExportOptions close={close} streamId={streamId} />;

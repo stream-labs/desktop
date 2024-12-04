@@ -1135,6 +1135,9 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     this.SET_VIDEO_INFO(video);
   }
 
+  resetExportedState() {
+    this.SET_EXPORT_INFO({ exported: false });
+  }
   setExportFile(file: string) {
     this.SET_EXPORT_INFO({ file });
   }
