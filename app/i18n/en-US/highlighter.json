@@ -126,5 +126,11 @@
   "Settings": "Settings",
   "Delete highlighted stream?": "Delete highlighted stream?",
   "Are you sure you want to delete this stream and all its associated clips? This action cannot be undone.": "Are you sure you want to delete this stream and all its associated clips? This action cannot be undone.",
-  "Set a title for your stream": "Set a title for your stream"
+  "Set a title for your stream": "Set a title for your stream",
+  "Create highlight video of": "Create highlight video of",
+  "All rounds": "All rounds",
+  "unlimited": "unlimited",
+  "minutes": "minutes",
+  "minute": "minute",
+  "with a duration of": "with a duration of"
 }

@@ -20,7 +20,7 @@ import { SUPPORTED_FILE_TYPES } from 'services/highlighter/constants';
 import { $t } from 'services/i18n';
 import path from 'path';
 import MiniClipPreview from './MiniClipPreview';
-import HighlightGeneratorUI from './HighlightGeneratorUI';
+import HighlightGenerator from './HighlightGenerator';
 import { EAvailableFeatures } from 'services/incremental-rollout';
 
 export type TModalClipsView = 'trim' | 'export' | 'preview' | 'remove';
@@ -219,7 +219,7 @@ export default function ClipsView({
                       HighlighterService.getClips(HighlighterService.views.clips, props.id)
                         .filter(clip => clip.source === 'AiClip')
                         .every(clip => (clip as IAiClip).aiInfo.metadata?.round) && (
-                        <HighlightGeneratorUI
+                        <HighlightGenerator
                           emitSetFilter={filterOptions => {
                             const clips = HighlighterService.getClips(
                               HighlighterService.views.clips,
