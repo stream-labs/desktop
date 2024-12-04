@@ -709,15 +709,18 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       const currentClips = this.getClips(this.views.clips, streamId);
       const getHighestGlobalOrderPosition = this.getClips(this.views.clips, undefined).length;
 
-      let newStreamInfo: { [key: string]: TStreamInfo };
-      if (source === 'Manual') {
-        if (streamId) {
+      let newStreamInfo: { [key: string]: TStreamInfo } = {};
+      if (streamId) {
+        if (source === 'Manual') {
+          // To Prepend the clip, change all other clips order + 1
           currentClips.forEach(clip => {
             const updatedStreamInfo = {
               ...clip.streamInfo,
               [streamId]: {
-                ...clip.streamInfo[streamId],
-                orderPosition: clip.streamInfo[streamId].orderPosition + 1,
+                ...(clip.streamInfo?.[streamId] ?? {}),
+                orderPosition: clip.streamInfo?.[streamId]
+                  ? clip.streamInfo[streamId].orderPosition + 1
+                  : 0,
               },
             };
             this.UPDATE_CLIP({
@@ -725,22 +728,25 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
               streamInfo: updatedStreamInfo,
             });
           });
+
+          newStreamInfo = {
+            [streamId]: {
+              orderPosition: 0,
+            },
+          };
+        } else {
+          // replaybuffer is appended
+          newStreamInfo = {
+            [streamId]: {
+              orderPosition: index + currentClips.length + 1,
+              initialStartTime: clipData.startTime,
+              initialEndTime: clipData.endTime,
+            },
+          };
         }
-        newStreamInfo = {
-          [streamId]: {
-            orderPosition: 0,
-          },
-        };
-      } else {
-        newStreamInfo = {
-          [streamId]: {
-            orderPosition: index + currentClips.length + 1,
-            initialStartTime: clipData.startTime,
-            initialEndTime: clipData.endTime,
-          },
-        };
       }
 
+      //check if the clip already exists. If yess, only add to the specific stream
       if (this.state.clips[clipData.path]) {
         const updatedStreamInfo = {
           ...this.state.clips[clipData.path].streamInfo,
@@ -849,7 +855,11 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     return fs.existsSync(file);
   }
 
-  async removeScrubFile(clipPath: string) {
+  async removeScrubFile(clipPath: string | undefined) {
+    if (!clipPath) {
+      console.warn('No scrub file path provided');
+      return;
+    }
     try {
       await fs.remove(clipPath);
     } catch (error: unknown) {
@@ -952,7 +962,8 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
         .filter(clip => clip.enabled && clip.streamInfo && clip.streamInfo[streamId] !== undefined)
         .sort(
           (a: TClip, b: TClip) =>
-            a.streamInfo[streamId].orderPosition - b.streamInfo[streamId].orderPosition,
+            (a.streamInfo?.[streamId]?.orderPosition ?? 0) -
+            (b.streamInfo?.[streamId]?.orderPosition ?? 0),
         )
         .map(c => {
           const clip = this.clips[c.path];
