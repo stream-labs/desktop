@@ -541,8 +541,18 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   };
 
   aiHighlighterUpdater: AiHighlighterUpdater;
-
   aiHighlighterEnabled = false;
+
+  static filter(state: IHighligherState) {
+    return {
+      ...this.defaultState,
+      clips: state.clips,
+      highlightedStreams: state.highlightedStreams,
+      video: state.video,
+      audio: state.audio,
+      transition: state.transition,
+    };
+  }
 
   /**
    * A dictionary of actual clip classes.
