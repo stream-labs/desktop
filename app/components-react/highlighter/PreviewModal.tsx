@@ -190,7 +190,7 @@ export default function PreviewModal({
   function playAudio(index: number, continuation = false) {
     // if its a continuation of a previous segment, no need to seek
     // and introduce playback lag
-    if (continuation) {
+    if (continuation || !audio.current) {
       return;
     }
 
