@@ -166,18 +166,22 @@ export interface INewClipData {
   startTrim: number;
   endTrim: number;
 }
+
+export enum EAiDetectionState {
+  INITIALIZED = 'initialized',
+  IN_PROGRESS = 'detection-in-progress',
+  ERROR = 'error',
+  FINISHED = 'detection-finished',
+  CANCELED_BY_USER = 'detection-canceled-by-user',
+}
+
 export interface IHighlightedStream {
   id: string;
   game: string;
   title: string;
   date: string;
   state: {
-    type:
-      | 'initialized'
-      | 'detection-in-progress'
-      | 'error'
-      | 'detection-finished'
-      | 'detection-canceled-by-user';
+    type: EAiDetectionState;
     progress: number;
   };
   abortController?: AbortController;
@@ -743,7 +747,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       .forEach(stream => {
         this.UPDATE_HIGHLIGHTED_STREAM({
           ...stream,
-          state: { type: 'detection-canceled-by-user', progress: 0 },
+          state: { type: EAiDetectionState.CANCELED_BY_USER, progress: 0 },
         });
       });
 
@@ -1857,7 +1861,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
     const setStreamInfo: IHighlightedStream = {
       state: {
-        type: 'detection-in-progress',
+        type: EAiDetectionState.IN_PROGRESS,
         progress: 0,
       },
       date: moment().toISOString(),
@@ -1882,7 +1886,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       console.log('✅ cutHighlightClips');
       // 6. add highlight clips
       progressTracker.destroy();
-      setStreamInfo.state.type = 'detection-finished';
+      setStreamInfo.state.type = EAiDetectionState.FINISHED;
       this.updateStream(setStreamInfo);
 
       console.log('🔄 addClips', clipData);
@@ -1909,10 +1913,10 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       console.log('✅ Final HighlighterData', highlighterResponse);
     } catch (error: unknown) {
       if (error instanceof Error && error.message === 'Highlight generation canceled') {
-        setStreamInfo.state.type = 'detection-canceled-by-user';
+        setStreamInfo.state.type = EAiDetectionState.CANCELED_BY_USER;
       } else {
         console.error('Error in highlight generation:', error);
-        setStreamInfo.state.type = 'error';
+        setStreamInfo.state.type = EAiDetectionState.ERROR;
       }
     } finally {
       setStreamInfo.abortController = undefined;
