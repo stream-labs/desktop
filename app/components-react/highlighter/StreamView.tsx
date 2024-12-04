@@ -123,7 +123,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
       setInputValue(event.target.value);
     }
 
-    async function aiDetectionForManualUpload(title: string) {
+    async function startAiDetection(title: string) {
       const streamInfo: StreamInfoForAiHighlighter = {
         id: 'manual_' + uuid(),
         title,
@@ -147,39 +147,24 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
 
     return (
       <>
-        <div
-          style={{
-            width: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '16px',
-            padding: '8px',
-          }}
-        >
-          <div
-            style={{
-              width: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '8px',
-            }}
-          >
-            <h1 style={{ margin: 0 }}>Import Fortnite stream</h1>
+        <div className={styles.manualUploadWrapper}>
+          <div className={styles.titleInputWrapper}>
+            <h1 style={{ margin: 0 }}> {$t('Import Fortnite stream')}</h1>
             <input
               style={{ width: '100%', color: 'black' }}
               type="text"
               name="name"
-              placeholder="Set a title for your stream"
+              placeholder={$t('Set a title for your stream')}
               onChange={handleInputChange}
             />
           </div>
           <div style={{ display: 'flex', gap: '8px', justifyContent: 'space-between' }}>
             {' '}
             <Button type="default" onClick={() => close()}>
-              Cancel
+              {$t('Cancel')}
             </Button>
-            <Button type="primary" onClick={() => aiDetectionForManualUpload(inputValue)}>
-              Select video to start import
+            <Button type="primary" onClick={() => startAiDetection(inputValue)}>
+              {$t('Select video to start import')}
             </Button>
           </div>
         </div>
@@ -230,111 +215,88 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
     e.stopPropagation();
   }
 
-  function getStreamView() {
-    return (
-      <div
-        style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}
-        className={styles.streamViewRoot}
-        onDrop={event => onDrop(event)}
-      >
-        <div style={{ display: 'flex', padding: 20 }}>
-          <div style={{ flexGrow: 1 }}>
-            <h1 style={{ margin: 0 }}>My stream highlights</h1>
-          </div>
-          <div style={{ display: 'flex', gap: '16px' }}>
-            <div
-              className={styles.uploadWrapper}
-              style={{
-                opacity: aiDetectionInProgress ? '0.7' : '1',
-                cursor: aiDetectionInProgress ? 'not-allowed' : 'pointer',
-              }}
-              onClick={() => !aiDetectionInProgress && setShowModal({ type: 'upload' })}
-            >
-              <FortniteIcon />
-              Drop your Fornite recording
-              <Button disabled={aiDetectionInProgress === true}>Import</Button>
-            </div>
-            <Button onClick={() => emitSetView({ view: EHighlighterView.SETTINGS })}>
-              Settings
-            </Button>
-          </div>
+  return (
+    <div
+      style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}
+      className={styles.streamViewRoot}
+      onDrop={event => onDrop(event)}
+    >
+      <div style={{ display: 'flex', padding: 20 }}>
+        <div style={{ flexGrow: 1 }}>
+          <h1 style={{ margin: 0 }}>My stream highlights</h1>
         </div>
-
-        <Scrollable style={{ flexGrow: 1, padding: '20px 0 20px 20px' }}>
-          {highlightedStreams.length === 0 ? (
-            <>No highlight clips created from streams</> // TODO: Add empty state
-          ) : (
-            Object.entries(groupStreamsByTimePeriod(highlightedStreams)).map(
-              ([period, streams]) =>
-                streams.length > 0 && (
-                  <React.Fragment key={period}>
-                    <div
-                      style={{
-                        borderBottom: '1px solid var(--border)',
-                        margin: '20px 0',
-                        paddingBottom: '10px',
-                        fontSize: '18px',
-                        fontWeight: 'bold',
-                      }}
-                    >
-                      {period}
-                    </div>
-                    <div
-                      style={{
-                        width: '100%',
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        gap: '8px',
-                      }}
-                    >
-                      {streams.map(stream => (
-                        <StreamCard
-                          key={stream.id}
-                          streamId={stream.id}
-                          emitSetView={data => emitSetView(data)}
-                          emitGeneratePreview={() => previewVideo(stream.id)}
-                          emitExportVideo={() => exportVideo(stream.id)}
-                          emitRemoveStream={() => setShowModal({ type: 'remove', id: stream.id })}
-                          clipsOfStreamAreLoading={clipsOfStreamAreLoading}
-                          emitCancelHighlightGeneration={() => {
-                            HighlighterService.actions.cancelHighlightGeneration(stream.id);
-                          }}
-                        />
-                      ))}
-                    </div>
-                  </React.Fragment>
-                ),
-            )
-          )}
-        </Scrollable>
-
-        <Modal
-          getContainer={`.${styles.streamViewRoot}`}
-          onCancel={closeModal}
-          footer={null}
-          width={modalWidth}
-          closable={false}
-          visible={!!showModal}
-          destroyOnClose={true}
-          keyboard={false}
-        >
-          {!!v.error && <Alert message={v.error} type="error" showIcon />}
-          {showModal?.type === 'upload' && <ImportStreamModal close={closeModal} />}
-          {showModal?.type === 'export' && (
-            <ExportModal close={closeModal} streamId={showModal.id} />
-          )}
-          {showModal?.type === 'preview' && (
-            <PreviewModal close={closeModal} streamId={showModal.id} />
-          )}
-          {showModal?.type === 'remove' && (
-            <RemoveStream close={closeModal} streamId={showModal.id} />
-          )}
-        </Modal>
+        <div style={{ display: 'flex', gap: '16px' }}>
+          <div
+            className={styles.uploadWrapper}
+            style={{
+              opacity: aiDetectionInProgress ? '0.7' : '1',
+              cursor: aiDetectionInProgress ? 'not-allowed' : 'pointer',
+            }}
+            onClick={() => !aiDetectionInProgress && setShowModal({ type: 'upload' })}
+          >
+            <FortniteIcon />
+            {$t('Drop your Fornite recording')}
+            <Button disabled={aiDetectionInProgress === true}>Import</Button>
+          </div>
+          <Button onClick={() => emitSetView({ view: EHighlighterView.SETTINGS })}>
+            {$t('Settings')}
+          </Button>
+        </div>
       </div>
-    );
-  }
 
-  return getStreamView();
+      <Scrollable style={{ flexGrow: 1, padding: '20px 0 20px 20px' }}>
+        {highlightedStreams.length === 0 ? (
+          <>No highlight clips created from streams</> // TODO: Add empty state
+        ) : (
+          Object.entries(groupStreamsByTimePeriod(highlightedStreams)).map(
+            ([period, streams]) =>
+              streams.length > 0 && (
+                <React.Fragment key={period}>
+                  <div className={styles.periodDivider}>{period}</div>
+                  <div className={styles.streamcardsWrapper}>
+                    {streams.map(stream => (
+                      <StreamCard
+                        key={stream.id}
+                        streamId={stream.id}
+                        emitSetView={data => emitSetView(data)}
+                        emitGeneratePreview={() => previewVideo(stream.id)}
+                        emitExportVideo={() => exportVideo(stream.id)}
+                        emitRemoveStream={() => setShowModal({ type: 'remove', id: stream.id })}
+                        clipsOfStreamAreLoading={clipsOfStreamAreLoading}
+                        emitCancelHighlightGeneration={() => {
+                          HighlighterService.actions.cancelHighlightGeneration(stream.id);
+                        }}
+                      />
+                    ))}
+                  </div>
+                </React.Fragment>
+              ),
+          )
+        )}
+      </Scrollable>
+
+      <Modal
+        getContainer={`.${styles.streamViewRoot}`}
+        onCancel={closeModal}
+        footer={null}
+        width={modalWidth}
+        closable={false}
+        visible={!!showModal}
+        destroyOnClose={true}
+        keyboard={false}
+      >
+        {!!v.error && <Alert message={v.error} type="error" showIcon />}
+        {showModal?.type === 'upload' && <ImportStreamModal close={closeModal} />}
+        {showModal?.type === 'export' && <ExportModal close={closeModal} streamId={showModal.id} />}
+        {showModal?.type === 'preview' && (
+          <PreviewModal close={closeModal} streamId={showModal.id} />
+        )}
+        {showModal?.type === 'remove' && (
+          <RemoveStream close={closeModal} streamId={showModal.id} />
+        )}
+      </Modal>
+    </div>
+  );
 }
 
 function RemoveStream(p: { streamId: string | undefined; close: () => void }) {
@@ -342,10 +304,11 @@ function RemoveStream(p: { streamId: string | undefined; close: () => void }) {
 
   return (
     <div style={{ textAlign: 'center' }}>
-      <h2>Delete highlighted Stream?</h2>
+      <h2>{$t('Delete highlighted stream?')} </h2>
       <p>
-        Are you sure you want to delete this stream and all its associated clips? This action cannot
-        be undone.
+        {$t(
+          'Are you sure you want to delete this stream and all its associated clips? This action cannot be undone.',
+        )}
       </p>
       <Button style={{ marginRight: 8 }} onClick={p.close}>
         {$t('Cancel')}
