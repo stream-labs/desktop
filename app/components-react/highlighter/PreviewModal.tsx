@@ -73,6 +73,7 @@ export default function PreviewModal({
 
         setCurrentClipIndex(prevIndex => {
           const newIndex = (prevIndex + 1) % playlist.length;
+          console.log('set new index to ', newIndex);
 
           videoPlayer.current!.src = playlist[currentClipIndex].src;
           videoPlayer.current!.load();
@@ -97,6 +98,8 @@ export default function PreviewModal({
       // and check if we are at the end of the clip
       const currentTime = videoPlayer.current!.currentTime;
       const endTime = playlist[currentClipIndex].end;
+      console.log('🚀 ~ currentClipIndex:', currentClipIndex);
+      console.log(`${currentTime} - ${endTime}`);
 
       if (currentTime >= endTime || isRoughlyEqual(currentTime, endTime)) {
         nextClip();
@@ -133,7 +136,7 @@ export default function PreviewModal({
         audio.current = null;
       }
     };
-  }, [playlist.length]);
+  }, [playlist.length, currentClipIndex]);
 
   useEffect(() => {
     if (videoPlayer.current === null || playlist.length === 0) {
@@ -178,8 +181,10 @@ export default function PreviewModal({
     if (currentClipIndex === index) {
       return;
     }
-
+    console.log('set new index to ', index);
     setCurrentClipIndex(index);
+    console.log('new current clip index', currentClipIndex);
+
     const clip = playlist[index];
     videoPlayer.current!.src = clip.src;
     videoPlayer.current!.load();
@@ -190,6 +195,8 @@ export default function PreviewModal({
   function playAudio(index: number, continuation = false) {
     // if its a continuation of a previous segment, no need to seek
     // and introduce playback lag
+    console.log('play audio', index, continuation);
+
     if (continuation || !audio.current) {
       return;
     }
