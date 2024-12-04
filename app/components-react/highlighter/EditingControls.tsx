@@ -81,11 +81,7 @@ export function EditingControls({
           tooltipPlacement="top"
           tipFormatter={v => `${v}s`}
         />
-        <SwitchInput
-          label={$t('Background Music')}
-          value={v.audio.musicEnabled}
-          onChange={setMusicEnabled}
-        />
+
         <div style={{ display: 'flex', alignItems: 'flex-end' }}>
           <FileInput
             style={{ width: '100%' }}
@@ -126,6 +122,11 @@ export function EditingControls({
             </div>
           )}
         </div>
+        <SwitchInput
+          label={$t('Background Music')}
+          value={v.audio.musicEnabled}
+          onChange={setMusicEnabled}
+        />
         <Animate transitionName="ant-slide-up">
           {v.audio.musicEnabled && (
             <div>
