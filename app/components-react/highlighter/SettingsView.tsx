@@ -112,23 +112,6 @@ export default function SettingsView({
     HighlighterService.actions.toggleAiHighlighter();
   }
 
-  function headerBarTag(text: string) {
-    return (
-      <div
-        style={{
-          margin: 0,
-          marginLeft: '4px',
-          fontSize: '14px',
-          padding: '2px 6px',
-          borderRadius: '4px',
-          backgroundColor: '#2B383F',
-        }}
-      >
-        <p style={{ margin: 0 }}>{text}</p>
-      </div>
-    );
-  }
-
   return (
     <div className={styles.settingsViewRoot}>
       <div style={{ display: 'flex', padding: 20 }}>
@@ -148,7 +131,7 @@ export default function SettingsView({
           )}
           {/* New button coming with next PR */}
           <Button onClick={() => emitSetView({ view: EHighlighterView.CLIPS, id: undefined })}>
-            All clips
+            {$t('All clips')}
           </Button>
         </div>
       </div>
@@ -162,7 +145,7 @@ export default function SettingsView({
                   <div className={styles.cardHeaderbar}>
                     <i style={{ margin: 0, fontSize: '20px' }} className="icon-highlighter"></i>
                     <h3 style={{ margin: 0, fontSize: '20px' }}> AI Highlighter</h3>
-                    {headerBarTag('For Fortnite streams (Beta)')}
+                    <p className={styles.headerbarTag}>For Fortnite streams (Beta)</p>
                   </div>
                 </div>
 
@@ -177,20 +160,7 @@ export default function SettingsView({
                   value={v.useAiHighlighter}
                   onChange={toggleUseAiHighlighter}
                 />
-                <div
-                  style={{
-                    position: 'absolute',
-                    right: 0,
-                    bottom: 0,
-                    borderRadius: '16px 0 9px 0',
-                    padding: '8px',
-                    paddingBottom: '5px',
-                    backgroundColor: '#2b5bd7',
-                    height: 'fit-content',
-                  }}
-                >
-                  Recommended
-                </div>
+                <div className={styles.recommendedCorner}>Recommended</div>
               </div>
             )}
             <div className={styles.manualCard}>
@@ -199,8 +169,9 @@ export default function SettingsView({
                 {aiHighlighterEnabled ? 'Or use the manual highlighter ' : 'Manual highlighter'}
               </h3>
               <p>
-                Manually capture the best moments from your livestream with a hotkey command, and
-                automatically turn them into a highlight video.
+                {$t(
+                  'Manually capture the best moments from your livestream with a hotkey command, and automatically turn them into a highlight video.',
+                )}
               </p>
               <div style={{ display: 'flex', gap: '16px' }}>
                 {!v.isStreaming && !correctlyConfigured && (
@@ -217,7 +188,7 @@ export default function SettingsView({
                 )}
                 {v.isStreaming && (
                   <div className={styles.settingSection} style={{ width: '100%' }}>
-                    <p>End your stream to change the Hotkey or the replay duration.</p>
+                    <p>{$t('End your stream to change the Hotkey or the replay duration.')}</p>
                   </div>
                 )}
 

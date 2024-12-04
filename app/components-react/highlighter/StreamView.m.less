@@ -14,82 +14,11 @@
   }
 }
 
-.stream-card {
-  overflow: hidden;
-  background: var(--border);
-  display: flex;
-  flex-direction: column;
-  border-radius: 10px;
-  gap: 16px;
-  height: fit-content;
-  width: 422px;
-  cursor: pointer;
-}
-
-.thumbnail-wrapper {
-  position: relative;
-
-  --thumbWith: 192px;
-  --thumbHeight: 108px;
-  overflow-x: clip;
-
-  width: calc(var(--thumbWith) * 2.2);
-  height: calc(var(--thumbHeight) * 2.2);
-  background: var(--Day-Colors-Dark-4, #4f5e65);
-}
-
-.thumbnail-wrapper-small {
-  position: absolute;
-  --thumbWith: 192px;
-  --thumbHeight: 108px;
-  overflow-x: clip;
-  border-radius: 4px;
-
-  width: calc(var(--thumbWith) * 0.35); // Destroys the aspect ratio but is nicer in the ui
-  height: calc(var(--thumbHeight) * 0.4);
-  border: 2px #22292d solid;
-}
-
-.loader {
-  border: 2px solid #f3f3f3; /* Light grey */
-  border-top: 2px solid #3e3e3e; /* Blue */
-  border-radius: 50%;
-  width: 16px;
-  height: 16px;
-  animation: spin 2s linear infinite;
-}
-
-.centered-overlay-item {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: white;
-  /* Adjust text color as needed */
-  text-align: center;
-  font-size: 14px;
-  /* Adjust font size as needed */
-
-  z-index: 99;
-}
-
 .streams-wrapper {
   display: grid;
   grid-template-columns: auto auto auto;
 
   gap: 16px;
-}
-.delete-button {
-  display: flex;
-  top: 8px;
-  left: 8px;
-  gap: 8px;
-  align-items: center;
-  opacity: 0;
-  backdrop-filter: blur(6px);
-}
-.stream-card:hover .delete-button {
-  opacity: 1;
 }
 
 .stream-view-root {
@@ -106,23 +35,6 @@
   }
 }
 
-.progressbar-background {
-  display: flex;
-  position: relative;
-  justify-content: space-between;
-  width: 100%;
-  height: 40px;
-
-  border-radius: 4px;
-  background: var(--Day-Colors-Dark-4, #4f5e65);
-}
-
-.progressbar-progress {
-  height: 100%;
-  border-radius: 4px;
-  background: var(--Night-Colors-Light-2, #f5f8fa);
-}
-
 .upload-wrapper {
   display: flex;
   padding: 16px;
@@ -134,11 +46,31 @@
   border: 1px dashed var(--Day-Colors-Dark-4, #4f5e65);
 }
 
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+.manual-upload-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 8px;
+}
+.title-input-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.streamcards-wrapper {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.period-divider {
+  border-bottom: 1px solid var(--border);
+  margin: 20px 0;
+  padding-bottom: 10px;
+  font-size: 18px;
+  font-weight: bold;
 }

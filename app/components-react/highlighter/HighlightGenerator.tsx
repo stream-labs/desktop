@@ -5,8 +5,9 @@ import { IFilterOptions } from './utils';
 import { IInput } from 'services/highlighter';
 import { getPlacementFromInputs, InputEmojiSection } from './InputEmojiSection';
 import { EHighlighterInputTypes } from 'services/highlighter/ai-highlighter/ai-highlighter';
-import styles from './HighlightGeneratorUI.m.less';
+import styles from './HighlightGenerator.m.less';
 import { formatSecondsToHMS } from './ClipPreview';
+import { $t } from 'services/i18n';
 const { Option } = Select;
 
 const selectStyles = {
@@ -23,12 +24,12 @@ const checkboxStyles = {
   width: '100%',
 };
 
-export default function HighlightGeneratorUI({
+export default function HighlightGenerator({
   combinedClipsDuration,
   roundDetails,
   emitSetFilter,
 }: {
-  combinedClipsDuration: number; // Maximum duration the highligh reel can be long - only used to restrict the targetDuration options
+  combinedClipsDuration: number; // Maximum duration the highlight reel can be long - only used to restrict the targetDuration options
   roundDetails: {
     round: number;
     inputs: IInput[];
@@ -41,16 +42,16 @@ export default function HighlightGeneratorUI({
 
   const [selectedRounds, setSelectedRounds] = useState<number[]>([0]);
   const [filterType, setFilterType] = useState<'duration' | 'hypescore'>('duration');
-  const [targetDuration, setTargetDuration] = useState(999);
+  const [targetDuration, setTargetDuration] = useState(combinedClipsDuration + 100);
   const options = [
-    { value: 1, label: '1 minute' },
-    { value: 2, label: '2 minutes' },
-    { value: 5, label: '5 minutes' },
-    { value: 10, label: '10 minutes' },
-    { value: 12, label: '12 minutes' },
-    { value: 15, label: '15 minutes' },
-    { value: 20, label: '20 minutes' },
-    { value: 30, label: '30 minutes' },
+    { value: 1, label: `1 ${$t('minute')}` },
+    { value: 2, label: `2 ${$t('minutes')}` },
+    { value: 5, label: `5 ${$t('minutes')}` },
+    { value: 10, label: `10 ${$t('minutes')}` },
+    { value: 12, label: `12 ${$t('minutes')}` },
+    { value: 15, label: `15 ${$t('minutes')}` },
+    { value: 20, label: `20 ${$t('minutes')}` },
+    { value: 30, label: `30 ${$t('minutes')}` },
   ];
   const filteredOptions = options.filter(option => option.value * 60 <= combinedClipsDuration);
   const handleRoundSelect = (value: number[]) => {
@@ -64,6 +65,7 @@ export default function HighlightGeneratorUI({
   };
   const isFirstRender = useRef(true);
   useEffect(() => {
+    // To not emit on first render
     if (isFirstRender.current) {
       isFirstRender.current = false;
       return;
@@ -74,7 +76,6 @@ export default function HighlightGeneratorUI({
       targetDuration: filterType === 'duration' ? targetDuration * 60 : 9999,
       includeAllEvents: true,
     });
-    console.log('sth changed');
   }, [selectedRounds, filterType, targetDuration]);
 
   function roundDropdownDetails(roundDetails: {
@@ -116,7 +117,9 @@ export default function HighlightGeneratorUI({
 
   return (
     <div className={styles.wrapper}>
-      <h3 style={{ color: '#FFFFFF', margin: 0, fontWeight: 400 }}>🤖 Create highlight video of</h3>
+      <h3 style={{ color: '#FFFFFF', margin: 0, fontWeight: 400 }}>
+        🤖 {$t('Create highlight video of')}
+      </h3>
       <Select
         style={selectStyles}
         mode="multiple"
@@ -138,7 +141,7 @@ export default function HighlightGeneratorUI({
                   setSelectedRounds(e.target.checked ? [0] : []);
                 }}
               >
-                All Rounds
+                {$t('All rounds')}
               </Checkbox>
             </div>
             <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
@@ -168,21 +171,7 @@ export default function HighlightGeneratorUI({
           </div>
         )}
       />
-      <h3 style={{ color: '#FFFFFF', margin: 0, fontWeight: 400 }}>with a duration of</h3>
-      {/* <Select
-        style={selectStyles}
-        value={filterType}
-        onChange={(value: 'duration' | 'hypescore') => setFilterType(value)}
-        dropdownStyle={dropdownStyles}
-      >
-        <Option value="duration" style={optionStyles}>
-          Duration
-        </Option>
-        <Option value="hypescore" style={optionStyles}>
-          Hype Score
-        </Option>
-      </Select> */}
-      {/* <h3 style={{ color: '#FFFFFF' }}>of</h3> */}
+      <h3 style={{ color: '#FFFFFF', margin: 0, fontWeight: 400 }}> {$t('with a duration of')}</h3>
       <Select
         style={{ width: '116px' }}
         value={targetDuration}
@@ -194,8 +183,8 @@ export default function HighlightGeneratorUI({
             {option.label}
           </Option>
         ))}
-        <Option value={999} className={styles.option}>
-          unlimited
+        <Option value={combinedClipsDuration + 100} className={styles.option}>
+          {$t('unlimited')}
         </Option>
       </Select>
       <Button
@@ -203,7 +192,7 @@ export default function HighlightGeneratorUI({
         onClick={() => {
           setSelectedRounds([0]);
           setFilterType('duration');
-          setTargetDuration(999);
+          setTargetDuration(combinedClipsDuration + 100);
         }}
         icon={<span style={{ color: '#666666', fontSize: '20px' }}>&times;</span>}
         style={{

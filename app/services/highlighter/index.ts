@@ -166,18 +166,22 @@ export interface INewClipData {
   startTrim: number;
   endTrim: number;
 }
+
+export enum EAiDetectionState {
+  INITIALIZED = 'initialized',
+  IN_PROGRESS = 'detection-in-progress',
+  ERROR = 'error',
+  FINISHED = 'detection-finished',
+  CANCELED_BY_USER = 'detection-canceled-by-user',
+}
+
 export interface IHighlightedStream {
   id: string;
   game: string;
   title: string;
   date: string;
   state: {
-    type:
-      | 'initialized'
-      | 'detection-in-progress'
-      | 'error'
-      | 'detection-finished'
-      | 'detection-canceled-by-user';
+    type: EAiDetectionState;
     progress: number;
   };
   abortController?: AbortController;
@@ -249,7 +253,7 @@ export interface IVideoInfo {
   outro: IOutroInfo;
 }
 
-interface IHighligherState {
+interface IHighlighterState {
   clips: Dictionary<TClip>;
   transition: ITransitionInfo;
   video: IVideoInfo;
@@ -382,7 +386,7 @@ export interface IExportOptions {
   complexFilter?: string;
 }
 
-class HighligherViews extends ViewHandler<IHighligherState> {
+class HighlighterViews extends ViewHandler<IHighlighterState> {
   /**
    * Returns an array of clips
    */
@@ -483,7 +487,7 @@ class HighligherViews extends ViewHandler<IHighligherState> {
 }
 
 @InitAfter('StreamingService')
-export class HighlighterService extends PersistentStatefulService<IHighligherState> {
+export class HighlighterService extends PersistentStatefulService<IHighlighterState> {
   @Inject() streamingService: StreamingService;
   @Inject() userService: UserService;
   @Inject() usageStatisticsService: UsageStatisticsService;
@@ -494,7 +498,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   @Inject() sharedStorageService: SharedStorageService;
   @Inject() incrementalRolloutService: IncrementalRolloutService;
 
-  static defaultState: IHighligherState = {
+  static defaultState: IHighlighterState = {
     clips: {},
     transition: {
       type: 'fade',
@@ -541,8 +545,18 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   };
 
   aiHighlighterUpdater: AiHighlighterUpdater;
-
   aiHighlighterEnabled = false;
+
+  static filter(state: IHighlighterState) {
+    return {
+      ...this.defaultState,
+      clips: state.clips,
+      highlightedStreams: state.highlightedStreams,
+      video: state.video,
+      audio: state.audio,
+      transition: state.transition,
+    };
+  }
 
   /**
    * A dictionary of actual clip classes.
@@ -682,7 +696,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
   }
 
   get views() {
-    return new HighligherViews(this.state);
+    return new HighlighterViews(this.state);
   }
 
   async init() {
@@ -733,7 +747,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       .forEach(stream => {
         this.UPDATE_HIGHLIGHTED_STREAM({
           ...stream,
-          state: { type: 'detection-canceled-by-user', progress: 0 },
+          state: { type: EAiDetectionState.CANCELED_BY_USER, progress: 0 },
         });
       });
 
@@ -1125,6 +1139,9 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
     this.SET_VIDEO_INFO(video);
   }
 
+  resetExportedState() {
+    this.SET_EXPORT_INFO({ exported: false });
+  }
   setExportFile(file: string) {
     this.SET_EXPORT_INFO({ file });
   }
@@ -1847,7 +1864,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
 
     const setStreamInfo: IHighlightedStream = {
       state: {
-        type: 'detection-in-progress',
+        type: EAiDetectionState.IN_PROGRESS,
         progress: 0,
       },
       date: moment().toISOString(),
@@ -1872,7 +1889,7 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       console.log('✅ cutHighlightClips');
       // 6. add highlight clips
       progressTracker.destroy();
-      setStreamInfo.state.type = 'detection-finished';
+      setStreamInfo.state.type = EAiDetectionState.FINISHED;
       this.updateStream(setStreamInfo);
 
       console.log('🔄 addClips', clipData);
@@ -1899,10 +1916,10 @@ export class HighlighterService extends PersistentStatefulService<IHighligherSta
       console.log('✅ Final HighlighterData', highlighterResponse);
     } catch (error: unknown) {
       if (error instanceof Error && error.message === 'Highlight generation canceled') {
-        setStreamInfo.state.type = 'detection-canceled-by-user';
+        setStreamInfo.state.type = EAiDetectionState.CANCELED_BY_USER;
       } else {
         console.error('Error in highlight generation:', error);
-        setStreamInfo.state.type = 'error';
+        setStreamInfo.state.type = EAiDetectionState.ERROR;
       }
     } finally {
       setStreamInfo.abortController = undefined;

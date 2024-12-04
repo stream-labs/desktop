@@ -1,16 +1,19 @@
 import React from 'react';
 import {
+  EAiDetectionState,
   EHighlighterView,
+  IHighlightedStream,
   IViewState,
   StreamInfoForAiHighlighter,
   TClip,
 } from 'services/highlighter';
-import styles from './StreamView.m.less';
+import styles from './StreamCard.m.less';
 import { Button } from 'antd';
 import { Services } from 'components-react/service-provider';
 import { isAiClip } from './utils';
 import { useVuex } from 'components-react/hooks';
 import { InputEmojiSection } from './InputEmojiSection';
+import { $t } from 'services/i18n';
 
 export default function StreamCard({
   streamId,
@@ -47,187 +50,12 @@ export default function StreamCard({
     return <>error</>;
   }
 
-  function getFailedText(): string {
-    if (stream?.state.type === 'error') {
-      return 'Ai detection failed';
-    }
-    if (stream?.state.type === 'detection-canceled-by-user') {
-      return 'Ai-detection cancelled';
-    }
-    return '';
-  }
-
-  function getActionRow(): JSX.Element {
-    if (stream?.state.type === 'detection-in-progress') {
-      return (
-        <div className={styles.progressbarBackground}>
-          <div
-            style={{
-              height: '40px',
-              display: 'flex',
-              alignItems: 'center',
-              paddingLeft: '16px',
-              position: 'absolute',
-              color: 'black',
-              fontSize: '16px',
-            }}
-          >
-            Creating AI highlights...
-          </div>
-          <div
-            className={styles.progressbarProgress}
-            style={{
-              width: `${stream.state.progress}%`,
-              transition: 'width 1s',
-            }}
-          ></div>
-
-          <Button
-            size="large"
-            style={{
-              border: 'none',
-              backgroundColor: 'transparent',
-              color: 'black',
-              display: 'flex',
-              position: 'absolute',
-              right: '0',
-              alignItems: 'center',
-            }}
-            onClick={e => {
-              e.stopPropagation();
-              emitCancelHighlightGeneration();
-            }}
-          >
-            <i className="icon-close" />
-          </Button>
-        </div>
-      );
-    }
-
-    if (stream && clips.length > 0) {
-      return (
-        <div
-          style={{
-            display: 'flex',
-            gap: '4px',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Button
-            size="large"
-            style={{ display: 'flex', gap: '8px', alignItems: 'center' }}
-            onClick={() => {
-              showStreamClips();
-            }}
-          >
-            <i className="icon-edit" /> Edit clips
-          </Button>
-
-          {/* TODO: What clips should be included when user clicks this button + bring normal export modal in here */}
-          <Button
-            size="large"
-            style={{
-              display: 'flex',
-              gap: '8px',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '100%',
-            }}
-            type="primary"
-            onClick={e => {
-              emitExportVideo();
-              e.stopPropagation();
-            }}
-          >
-            {clipsOfStreamAreLoading === stream.id ? (
-              //  TODO: replace with correct loader
-              <div className={styles.loader}></div>
-            ) : (
-              <>
-                <i className="icon-download" /> {'Export highlight reel'}
-              </>
-            )}
-          </Button>
-        </div>
-      );
-    }
-
-    //if failed
-    return (
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
-          {getFailedText()}
-        </div>
-        <div style={{ display: 'flex', gap: '4px' }}>
-          {stream?.state.type === 'detection-canceled-by-user' ? (
-            <Button
-              size="large"
-              style={{ display: 'flex', gap: '8px', alignItems: 'center' }}
-              onClick={e => {
-                HighlighterService.actions.restartAiDetection(stream.path, stream);
-                e.stopPropagation();
-              }}
-            >
-              Restart ai-detection
-            </Button>
-          ) : (
-            <Button
-              size="large"
-              style={{ display: 'flex', gap: '8px', alignItems: 'center' }}
-              onClick={e => {
-                emitSetView({ view: EHighlighterView.CLIPS, id: stream!.id });
-                e.stopPropagation();
-              }}
-            >
-              Add clips
-            </Button>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  function getThumbnailText(): JSX.Element | string {
-    if (clipsOfStreamAreLoading === stream?.id) {
-      return (
-        <>
-          <div className={styles.loader}></div>
-        </>
-      );
-    }
-
-    if (clips.length > 0) {
-      return <PlayButton />;
-    }
-
-    if (stream?.state.type === 'detection-in-progress') {
-      return 'Searching for highlights...';
-    }
-
-    if (stream?.state.type === 'detection-finished') {
-      if (clips.length === 0) {
-        return 'Not enough highlights found';
-      }
-
-      return <PlayButton />;
-    }
-
-    if (stream?.state.type === 'detection-canceled-by-user') {
-      return 'Ai-detection cancelled';
-    }
-
-    if (stream?.state.type === 'error') {
-      return 'Ai-detection cancelled';
-    }
-
-    return '';
-  }
-
   function showStreamClips() {
-    if (stream?.state.type !== 'detection-in-progress') {
+    if (stream?.state.type !== EAiDetectionState.IN_PROGRESS) {
       emitSetView({ view: EHighlighterView.CLIPS, id: stream?.id });
     }
   }
+
   return (
     <div
       className={styles.streamCard}
@@ -235,151 +63,286 @@ export default function StreamCard({
         showStreamClips();
       }}
     >
-      <div className={`${styles.thumbnailWrapper} `}>
-        {' '}
+      <Thumbnail
+        clips={clips}
+        clipsOfStreamAreLoading={clipsOfStreamAreLoading}
+        stream={stream}
+        emitGeneratePreview={emitGeneratePreview}
+        emitCancelHighlightGeneration={emitCancelHighlightGeneration}
+        emitRemoveStream={emitRemoveStream}
+      />
+      <div className={styles.streaminfoWrapper}>
+        <div className={styles.titleRotatedClipsWrapper}>
+          <div className={styles.titleDateWrapper}>
+            <h2 className={styles.streamcardTitle}>{stream.title}</h2>
+            <p style={{ margin: 0, fontSize: '12px' }}>{new Date(stream.date).toDateString()}</p>
+          </div>
+          <RotatedClips clips={clips} />
+        </div>
+        <h3 className={styles.emojiWrapper}>
+          {stream.state.type === EAiDetectionState.FINISHED ? (
+            <InputEmojiSection clips={clips} includeRounds={true} includeDeploy={false} />
+          ) : (
+            <div style={{ height: '22px' }}> </div>
+          )}
+        </h3>
+        <ActionBar
+          stream={stream}
+          clips={clips}
+          emitCancelHighlightGeneration={emitCancelHighlightGeneration}
+          emitExportVideo={emitExportVideo}
+          emitShowStreamClips={showStreamClips}
+          clipsOfStreamAreLoading={clipsOfStreamAreLoading}
+          emitRestartAiDetection={() => {
+            HighlighterService.actions.restartAiDetection(stream.path, stream);
+          }}
+          emitSetView={emitSetView}
+        />
+      </div>
+    </div>
+  );
+}
+
+function ActionBar({
+  stream,
+  clips,
+  clipsOfStreamAreLoading,
+  emitCancelHighlightGeneration,
+  emitExportVideo,
+  emitShowStreamClips,
+  emitRestartAiDetection,
+  emitSetView,
+}: {
+  stream: IHighlightedStream;
+  clips: TClip[];
+  clipsOfStreamAreLoading: string | null;
+  emitCancelHighlightGeneration: () => void;
+  emitExportVideo: () => void;
+  emitShowStreamClips: () => void;
+  emitRestartAiDetection: () => void;
+  emitSetView: (data: IViewState) => void;
+}): JSX.Element {
+  function getFailedText(state: EAiDetectionState): string {
+    switch (state) {
+      case EAiDetectionState.ERROR:
+        return $t('Ai detection failed');
+      case EAiDetectionState.CANCELED_BY_USER:
+        return $t('Ai-detection cancelled');
+      default:
+        return '';
+    }
+  }
+
+  // In Progress
+  if (stream?.state.type === EAiDetectionState.IN_PROGRESS) {
+    return (
+      <div className={styles.progressbarBackground}>
+        <div className={styles.progressbarText}>{$t('Searching for highlights...')}</div>
+        <div
+          className={styles.progressbarProgress}
+          style={{
+            width: `${stream.state.progress}%`,
+            transition: 'width 1s',
+          }}
+        ></div>
+
         <Button
           size="large"
-          className={styles.deleteButton}
+          className={styles.cancelButton}
           onClick={e => {
-            if (stream.state.type === 'detection-in-progress') {
-              emitCancelHighlightGeneration();
-            }
-            emitRemoveStream();
+            e.stopPropagation();
+            emitCancelHighlightGeneration();
+          }}
+        >
+          <i className="icon-close" />
+        </Button>
+      </div>
+    );
+  }
+
+  // If finished
+  if (stream && clips.length > 0) {
+    return (
+      <div className={styles.buttonBarWrapper}>
+        <Button
+          icon={<i className="icon-edit" style={{ marginRight: '4px' }} />}
+          size="large"
+          onClick={emitShowStreamClips}
+        >
+          {$t('Edit clips')}
+        </Button>
+
+        {/* TODO: What clips should be included when user clicks this button + bring normal export modal in here */}
+        <Button
+          size="large"
+          type="primary"
+          icon={
+            clipsOfStreamAreLoading !== stream.id ? (
+              <i className="icon-download" style={{ marginRight: '4px' }} />
+            ) : undefined
+          }
+          onClick={e => {
+            emitExportVideo();
             e.stopPropagation();
           }}
-          style={{ backgroundColor: '#00000040', border: 'none', position: 'absolute' }}
         >
-          <i className="icon-trash" />
+          {clipsOfStreamAreLoading === stream.id ? (
+            <div className={styles.loader}></div>
+          ) : (
+            <> {$t('Export highlight reel')}</>
+          )}
         </Button>
-        <img
+      </div>
+    );
+  }
+
+  //if failed or no clips
+  return (
+    <div className={styles.buttonBarWrapper}>
+      <div style={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
+        {getFailedText(stream.state.type)}
+      </div>
+      <div style={{ display: 'flex', gap: '4px' }}>
+        {stream?.state.type === EAiDetectionState.CANCELED_BY_USER ? (
+          <Button
+            size="large"
+            onClick={e => {
+              emitRestartAiDetection();
+              e.stopPropagation();
+            }}
+          >
+            {$t('Restart ai-detection')}
+          </Button>
+        ) : (
+          <Button
+            size="large"
+            onClick={e => {
+              emitSetView({ view: EHighlighterView.CLIPS, id: stream!.id });
+              e.stopPropagation();
+            }}
+          >
+            {$t('Add clips')}
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export function Thumbnail({
+  clips,
+  clipsOfStreamAreLoading,
+  stream,
+  emitGeneratePreview,
+  emitCancelHighlightGeneration,
+  emitRemoveStream,
+}: {
+  clips: TClip[];
+  clipsOfStreamAreLoading: string | null;
+  stream: IHighlightedStream;
+  emitGeneratePreview: () => void;
+  emitCancelHighlightGeneration: () => void;
+  emitRemoveStream: () => void;
+}) {
+  function getThumbnailText(state: EAiDetectionState): JSX.Element | string {
+    if (clipsOfStreamAreLoading === stream?.id) {
+      return <div className={styles.loader}></div>;
+    }
+
+    if (clips.length > 0) {
+      return <PlayButton />;
+    }
+    switch (state) {
+      case EAiDetectionState.IN_PROGRESS:
+        return $t('Searching for highlights...');
+      case EAiDetectionState.FINISHED:
+        if (clips.length === 0) {
+          return $t('Not enough highlights found');
+        }
+        return <PlayButton />;
+      case EAiDetectionState.CANCELED_BY_USER:
+        return $t('Ai-detection cancelled');
+      case EAiDetectionState.ERROR:
+        return $t('Ai-detection cancelled');
+      default:
+        return '';
+    }
+  }
+
+  return (
+    <div className={`${styles.thumbnailWrapper} `}>
+      <Button
+        size="large"
+        className={styles.deleteButton}
+        onClick={e => {
+          if (stream.state.type === EAiDetectionState.IN_PROGRESS) {
+            emitCancelHighlightGeneration();
+          }
+          emitRemoveStream();
+          e.stopPropagation();
+        }}
+        style={{ backgroundColor: '#00000040', border: 'none', position: 'absolute' }}
+      >
+        <i className="icon-trash" />
+      </Button>
+      <img
+        onClick={e => {
+          if (stream.state.type !== EAiDetectionState.IN_PROGRESS) {
+            emitGeneratePreview();
+            e.stopPropagation();
+          }
+        }}
+        style={{ height: '100%' }}
+        src={
+          clips.find(clip => clip?.streamInfo?.[stream.id]?.orderPosition === 0)?.scrubSprite ||
+          clips.find(clip => clip.scrubSprite)?.scrubSprite
+        }
+        alt=""
+      />
+      <div className={styles.centeredOverlayItem}>
+        {' '}
+        <div
           onClick={e => {
-            if (stream.state.type !== 'detection-in-progress') {
+            if (stream.state.type !== EAiDetectionState.IN_PROGRESS) {
               emitGeneratePreview();
               e.stopPropagation();
             }
           }}
-          style={{ height: '100%' }}
-          src={
-            clips.find(clip => clip?.streamInfo?.[streamId]?.orderPosition === 0)?.scrubSprite ||
-            clips.find(clip => clip.scrubSprite)?.scrubSprite
-          }
-          alt=""
-        />
-        <div className={styles.centeredOverlayItem}>
-          {' '}
-          <div
-            onClick={e => {
-              if (stream.state.type !== 'detection-in-progress') {
-                emitGeneratePreview();
-                e.stopPropagation();
-              }
-            }}
-          >
-            {getThumbnailText()}
-          </div>
-        </div>
-      </div>
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '8px',
-          padding: '20px',
-          paddingTop: '0px',
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            gap: '8px',
-            height: 'fit-content',
-          }}
         >
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '4px',
-              height: 'fit-content',
-            }}
-          >
-            <h2
-              style={{
-                margin: 0,
-                width: '275px',
-                textOverflow: 'ellipsis',
-                overflow: 'hidden',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {stream.title}
-            </h2>
-            <p style={{ margin: 0, fontSize: '12px' }}>{new Date(stream.date).toDateString()}</p>
-          </div>
-          <div style={{ width: '74px', position: 'relative' }}>
-            {clips.length > 0 ? (
-              <div style={{ transform: 'translateX(-10px)' }}>
-                <div
-                  className={styles.centeredOverlayItem}
-                  style={{
-                    display: 'flex',
-                    gap: '3px',
-                    paddingRight: '3px',
-                    textShadow: '0px 0px 6px black',
-                    transform: 'translate(-24px, 17px)',
-                  }}
-                >
-                  <span>{clips.length}</span>
-                  <span>clips</span>
-                </div>
-                {clips.slice(0, 3).map((clip, index) => (
-                  <div
-                    className={styles.thumbnailWrapperSmall}
-                    style={{
-                      rotate: `${(index - 1) * 6}deg`,
-                      scale: '1.2',
-                      transform: `translate(${(index - 1) * 9}px, ${
-                        index === 1 ? 0 + 4 : 2 + 4
-                      }px)`,
-                      zIndex: index === 1 ? 10 : 0,
-                    }}
-                    key={index}
-                  >
-                    <img
-                      style={{ height: '100%' }}
-                      src={
-                        clip.scrubSprite ||
-                        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACHBAMAAAB+jn0OAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAIVBMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABt0UjBAAAACnRSTlMAECAwQFBgcJC/CGe/dwAAAFtJREFUaN7twTEBAAAAwqD1T20IX4hAYcCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQN+GyZoAAHBUKQAAAAASUVORK5CYII='
-                      }
-                      alt={`Clip ${index + 1}`}
-                    />
-                  </div>
-                ))}{' '}
-              </div>
-            ) : (
-              ''
-            )}
-          </div>
+          {getThumbnailText(stream.state.type)}
         </div>
-        <div style={{ paddingTop: '6px', paddingBottom: '6px' }}>
-          <h3
-            style={{
-              margin: 0,
-              display: 'flex',
-              gap: '8px',
-              justifyContent: 'start',
-            }}
-          >
-            {stream.state.type === 'detection-finished' ? (
-              <InputEmojiSection clips={clips} includeRounds={true} includeDeploy={false} />
-            ) : (
-              <div style={{ height: '22px' }}> </div>
-            )}
-          </h3>
-        </div>
-        {getActionRow()}
       </div>
+    </div>
+  );
+}
+
+export function RotatedClips({ clips }: { clips: TClip[] }) {
+  return (
+    <div style={{ width: '74px', position: 'relative' }}>
+      {clips.length > 0 ? (
+        <div style={{ transform: 'translateX(-10px)' }}>
+          <div className={styles.clipsAmount}>
+            <span>{clips.length}</span>
+            <span>clips</span>
+          </div>
+          {clips.slice(0, 3).map((clip, index) => (
+            <div
+              className={styles.thumbnailWrapperSmall}
+              style={{
+                rotate: `${(index - 1) * 6}deg`,
+                scale: '1.2',
+                transform: `translate(${(index - 1) * 9}px, ${index === 1 ? 0 + 4 : 2 + 4}px)`,
+                zIndex: index === 1 ? 10 : 0,
+              }}
+              key={index}
+            >
+              <img style={{ height: '100%' }} src={clip.scrubSprite || ''} />
+            </div>
+          ))}{' '}
+        </div>
+      ) : (
+        ''
+      )}
     </div>
   );
 }
