@@ -95,7 +95,7 @@ export class RenderingClip {
         } else {
           await this.frameSource.exportScrubbingSprite(scrubPath);
         }
-      } catch (error) {
+      } catch (error: unknown) {
         console.log('err', error);
       }
     } else {
