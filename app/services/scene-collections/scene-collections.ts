@@ -673,6 +673,11 @@ export class SceneCollectionsService extends Service implements ISceneCollection
         });
       this.collectionErrorOpen = true;
     }
+
+    // Users who selected a theme during onboarding should skip adding default sources
+    if (this.newUserFirstLogin) {
+      this.newUserFirstLogin = false;
+    }
   }
 
   async showUnsupportedSourcesDialog(e?: Error | unknown) {
@@ -687,10 +692,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
       })
       .then(() => (this.collectionErrorOpen = false));
     this.collectionErrorOpen = true;
-    // Users who selected a theme during onboarding should skip adding default sources
-    if (this.newUserFirstLogin) {
-      this.newUserFirstLogin = false;
-    }
   }
 
   /**
