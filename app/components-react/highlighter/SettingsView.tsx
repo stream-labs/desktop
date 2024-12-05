@@ -125,8 +125,8 @@ export default function SettingsView({
         </div>
         <div style={{ display: 'flex', gap: '16px' }}>
           {aiHighlighterEnabled && (
-            <Button onClick={() => emitSetView({ view: EHighlighterView.STREAM })}>
-              Stream highlights
+            <Button type="primary" onClick={() => emitSetView({ view: EHighlighterView.STREAM })}>
+              {$t('Stream highlights')}
             </Button>
           )}
           {/* New button coming with next PR */}
@@ -144,14 +144,15 @@ export default function SettingsView({
                 <div className={styles.cardHeaderbarWrapper}>
                   <div className={styles.cardHeaderbar}>
                     <i style={{ margin: 0, fontSize: '20px' }} className="icon-highlighter"></i>
-                    <h3 style={{ margin: 0, fontSize: '20px' }}> AI Highlighter</h3>
-                    <p className={styles.headerbarTag}>For Fortnite streams (Beta)</p>
+                    <h3 style={{ margin: 0, fontSize: '20px' }}> {$t('AI Highlighter')}</h3>
+                    <p className={styles.headerbarTag}>{$t('For Fortnite streams (Beta)')}</p>
                   </div>
                 </div>
 
                 <p style={{ margin: 0 }}>
-                  Automatically capture the best moments from your livestream and turn them into a
-                  highlight video.
+                  {$t(
+                    'Automatically capture the best moments from your livestream and turn them into a highlight video.',
+                  )}
                 </p>
 
                 <SwitchInput
@@ -160,7 +161,7 @@ export default function SettingsView({
                   value={v.useAiHighlighter}
                   onChange={toggleUseAiHighlighter}
                 />
-                <div className={styles.recommendedCorner}>Recommended</div>
+                <div className={styles.recommendedCorner}>{$t('Recommended')}</div>
               </div>
             )}
             <div className={styles.manualCard}>
