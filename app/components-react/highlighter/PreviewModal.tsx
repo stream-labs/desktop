@@ -22,6 +22,7 @@ export default function PreviewModal({
   const { intro, outro } = HighlighterService.views.video;
   const audioSettings = HighlighterService.views.audio;
   const [currentClipIndex, setCurrentClipIndex] = useState(0);
+  const currentClipIndexRef = useRef(0);
   const sortedClips = [...sortClipsByOrder(clips, streamId).filter(c => c.enabled)];
 
   const playlist = [
@@ -96,7 +97,7 @@ export default function PreviewModal({
       // sometimes player fires paused event before ended, in this case we need to compare timestamps
       // and check if we are at the end of the clip
       const currentTime = videoPlayer.current!.currentTime;
-      const endTime = playlist[currentClipIndex].end;
+      const endTime = playlist[currentClipIndexRef.current].end;
 
       if (currentTime >= endTime || isRoughlyEqual(currentTime, endTime)) {
         nextClip();
@@ -133,9 +134,10 @@ export default function PreviewModal({
         audio.current = null;
       }
     };
-  }, [playlist.length, currentClipIndex]);
+  }, [playlist.length]);
 
   useEffect(() => {
+    currentClipIndexRef.current = currentClipIndex;
     if (videoPlayer.current === null || playlist.length === 0) {
       return;
     }
@@ -156,7 +158,7 @@ export default function PreviewModal({
     const currentPlayer = videoPlayer.current;
     if (currentPlayer?.paused) {
       currentPlayer.play().catch(e => console.error('Error playing video:', e));
-      if (audio.current!.currentTime > 0) {
+      if (audio.current && audio.current.currentTime > 0) {
         audio.current?.play().catch(e => console.error('Error playing audio:', e));
       }
     } else {

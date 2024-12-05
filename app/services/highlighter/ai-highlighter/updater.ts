@@ -43,7 +43,7 @@ export class AiHighlighterUpdater {
    * Spawn the AI Highlighter process that would process the video
    */
   static startHighlighterProcess(videoUri: string) {
-    const isDev = false; //Utils.isDevMode()
+    const isDev = Utils.isDevMode();
     if (isDev) {
       const rootPath = '../highlighter-api/';
       return spawn(
