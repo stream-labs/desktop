@@ -943,7 +943,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
       if (source === 'Manual') {
         if (streamId) {
           currentClips.forEach(clip => {
-            if (clip.streamInfo?.[streamId] === undefined) {
+            if (clip?.streamInfo?.[streamId] === undefined) {
               return;
             }
 
@@ -951,7 +951,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
               ...clip.streamInfo,
               [streamId]: {
                 ...clip.streamInfo[streamId],
-                orderPosition: clip.streamInfo[streamId].orderPosition + 1,
+                orderPosition: clip.streamInfo[streamId]!.orderPosition + 1,
               },
             };
             // update streaminfo position
