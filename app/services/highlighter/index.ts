@@ -822,7 +822,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
 
       this.streamingService.replayBufferFileWrite.subscribe(async clipPath => {
         const streamId = streamInfo?.id || undefined;
-        let endTime: number;
+        let endTime: number | undefined;
 
         if (streamId) {
           endTime = moment().diff(aiRecordingStartTime, 'seconds');
@@ -855,7 +855,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
           }
           streamInfo = {
             id: 'fromStreamRecording' + uuid(),
-            title: this.streamingService.views.settings.platforms.twitch.title,
+            title: this.streamingService.views.settings.platforms.twitch?.title,
             game: this.streamingService.views.game,
           };
           aiRecordingInProgress = true;
@@ -936,12 +936,17 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
   ) {
     newClips.forEach((clipData, index) => {
       const currentClips = this.getClips(this.views.clips, streamId);
-      const getHighestGlobalOrderPosition = this.getClips(this.views.clips, undefined).length;
+      const allClips = this.getClips(this.views.clips, undefined);
+      const getHighestGlobalOrderPosition = allClips.length;
 
-      let newStreamInfo: { [key: string]: TStreamInfo };
+      let newStreamInfo: { [key: string]: TStreamInfo } = {};
       if (source === 'Manual') {
         if (streamId) {
           currentClips.forEach(clip => {
+            if (clip.streamInfo?.[streamId] === undefined) {
+              return;
+            }
+
             const updatedStreamInfo = {
               ...clip.streamInfo,
               [streamId]: {
@@ -949,18 +954,39 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
                 orderPosition: clip.streamInfo[streamId].orderPosition + 1,
               },
             };
+            // update streaminfo position
             this.UPDATE_CLIP({
               path: clip.path,
               streamInfo: updatedStreamInfo,
             });
           });
+
+          // Update globalOrderPosition of all other items as well
+          allClips.forEach(clip => {
+            this.UPDATE_CLIP({
+              path: clip.path,
+              globalOrderPosition: clip.globalOrderPosition + 1,
+            });
+          });
+
+          newStreamInfo = {
+            [streamId]: {
+              orderPosition: 0 + index,
+            },
+          };
+        } else {
+          // If no streamId currentCLips = allClips
+          currentClips.forEach(clip => {
+            this.UPDATE_CLIP({
+              path: clip.path,
+              globalOrderPosition: clip.globalOrderPosition + 1,
+            });
+          });
         }
-        newStreamInfo = {
-          [streamId]: {
-            orderPosition: 0,
-          },
-        };
       } else {
+        if (!streamId) {
+          return;
+        }
         newStreamInfo = {
           [streamId]: {
             orderPosition: index + currentClips.length + 1,
@@ -971,6 +997,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
       }
 
       if (this.state.clips[clipData.path]) {
+        //Add new newStreamInfo, wont be added if no streamId is available
         const updatedStreamInfo = {
           ...this.state.clips[clipData.path].streamInfo,
           ...newStreamInfo,
@@ -990,7 +1017,11 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
           endTrim: 0,
           deleted: false,
           source,
-          globalOrderPosition: index + getHighestGlobalOrderPosition + 1,
+
+          // Manual clips always get prepended to be visible after adding them
+          // ReplayBuffers will appended to have them in the correct order.
+          globalOrderPosition:
+            source === 'Manual' ? 0 + index : index + getHighestGlobalOrderPosition + 1,
           streamInfo: streamId !== undefined ? newStreamInfo : undefined,
         });
       }
@@ -1008,7 +1039,9 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
 
       const streamInfo: { [key: string]: TStreamInfo } = {
         [newStreamInfo.id]: {
-          orderPosition: index + currentHighestOrderPosition + 1,
+          // Orderposition will get overwritten by sortStreamClipsByStartTime after creation
+          orderPosition:
+            index + currentHighestOrderPosition + (currentHighestOrderPosition === 0 ? 0 : 1),
           initialStartTime: clip.startTime,
           initialEndTime: clip.endTime,
         },
@@ -1023,7 +1056,8 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
         deleted: false,
         source: 'AiClip',
         aiInfo: clip.aiClipInfo,
-        globalOrderPosition: index + getHighestGlobalOrderPosition + 1,
+        globalOrderPosition:
+          index + getHighestGlobalOrderPosition + (getHighestGlobalOrderPosition === 0 ? 0 : 1),
         streamInfo,
       });
     });
@@ -1031,13 +1065,15 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     await this.loadClips(newStreamInfo.id);
   }
 
+  // This sorts all clips (replayBuffer and aiClips) by initialStartTime
+  // That will assure that replayBuffer clips are also sorted in correctly in the stream
   sortStreamClipsByStartTime(clips: TClip[], newStreamInfo: StreamInfoForAiHighlighter) {
     const allClips = this.getClips(clips, newStreamInfo.id);
 
     const sortedClips = allClips.sort(
       (a, b) =>
-        a.streamInfo[newStreamInfo.id].initialStartTime -
-        b.streamInfo[newStreamInfo.id].initialStartTime,
+        (a.streamInfo?.[newStreamInfo.id]?.initialStartTime || 0) -
+        (b.streamInfo?.[newStreamInfo.id]?.initialStartTime || 0),
     );
 
     // Update order positions based on the sorted order
@@ -1046,8 +1082,8 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
         path: clip.path,
         streamInfo: {
           [newStreamInfo.id]: {
-            ...clip.streamInfo[newStreamInfo.id],
-            orderPosition: index + 1,
+            ...(clip.streamInfo?.[newStreamInfo.id] ?? {}),
+            orderPosition: index,
           },
         },
       });
@@ -1107,7 +1143,9 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     }
 
     if (clip.streamInfo !== undefined || streamId !== undefined) {
-      const ids: string[] = streamId ? [streamId] : Object.keys(clip.streamInfo);
+      // if we are passing a streamId, only check if we need to remove the specific streamIds stream
+      // If we are not passing a streamId, check if we need to remove the streams the clip was part of
+      const ids: string[] = streamId ? [streamId] : Object.keys(clip.streamInfo ?? {});
       const length = this.views.clips.length;
 
       ids.forEach(id => {
@@ -1196,7 +1234,11 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     });
   }
 
-  async removeScrubFile(clipPath: string) {
+  async removeScrubFile(clipPath: string | undefined) {
+    if (!clipPath) {
+      console.warn('No scrub file path provided');
+      return;
+    }
     try {
       await fs.remove(clipPath);
     } catch (error: unknown) {
@@ -1324,10 +1366,14 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     let renderingClips: RenderingClip[] = [];
     if (streamId) {
       renderingClips = this.getClips(this.views.clips, streamId)
-        .filter(clip => clip.enabled && clip.streamInfo && clip.streamInfo[streamId] !== undefined)
+        .filter(
+          clip =>
+            !!clip && clip.enabled && clip.streamInfo && clip.streamInfo[streamId] !== undefined,
+        )
         .sort(
           (a: TClip, b: TClip) =>
-            a.streamInfo[streamId].orderPosition - b.streamInfo[streamId].orderPosition,
+            (a.streamInfo?.[streamId]?.orderPosition ?? 0) -
+            (b.streamInfo?.[streamId]?.orderPosition ?? 0),
         )
         .map(c => {
           const clip = this.renderingClips[c.path];
@@ -1884,7 +1930,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
 
     const renderHighlights = async (partialHighlights: IHighlight[]) => {
       console.log('🔄 cutHighlightClips');
-      this.updateStream({ state: 'Generating clips', ...setStreamInfo });
+      this.updateStream(setStreamInfo);
       const clipData = await this.cutHighlightClips(filePath, partialHighlights, setStreamInfo);
       console.log('✅ cutHighlightClips');
       // 6. add highlight clips
@@ -1902,7 +1948,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
       const highlighterResponse = await getHighlightClips(
         filePath,
         renderHighlights,
-        setStreamInfo.abortController.signal,
+        setStreamInfo.abortController!.signal,
         (progress: number) => {
           progressTracker.updateProgressFromHighlighter(progress);
         },
@@ -2015,7 +2061,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
       }
     } catch (error: unknown) {
       console.error('Error creating file directory');
-      return null;
+      return [];
     }
 
     const sortedHighlights = highlighterData.sort((a, b) => a.start_time - b.start_time);
