@@ -984,16 +984,15 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
           });
         }
       } else {
-        if (!streamId) {
-          return;
+        if (streamId) {
+          newStreamInfo = {
+            [streamId]: {
+              orderPosition: index + currentClips.length + 1,
+              initialStartTime: clipData.startTime,
+              initialEndTime: clipData.endTime,
+            },
+          };
         }
-        newStreamInfo = {
-          [streamId]: {
-            orderPosition: index + currentClips.length + 1,
-            initialStartTime: clipData.startTime,
-            initialEndTime: clipData.endTime,
-          },
-        };
       }
 
       if (this.state.clips[clipData.path]) {
