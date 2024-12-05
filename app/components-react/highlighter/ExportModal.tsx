@@ -44,8 +44,8 @@ class ExportController {
     this.service.actions.setExportFile(exportFile);
   }
 
-  exportCurrentFile() {
-    this.service.actions.export();
+  exportCurrentFile(streamId: string | undefined) {
+    this.service.actions.export(false, streamId);
   }
 
   cancelExport() {
@@ -63,24 +63,30 @@ class ExportController {
 
 export const ExportModalCtx = React.createContext<ExportController | null>(null);
 
-export default function ExportModalProvider(p: { close: () => void }) {
+export default function ExportModalProvider({
+  close,
+  streamId,
+}: {
+  close: () => void;
+  streamId: string | undefined;
+}) {
   const controller = useMemo(() => new ExportController(), []);
   return (
     <ExportModalCtx.Provider value={controller}>
-      <ExportModal close={p.close} />
+      <ExportModal close={close} streamId={streamId} />
     </ExportModalCtx.Provider>
   );
 }
 
-function ExportModal(p: { close: () => void }) {
+function ExportModal({ close, streamId }: { close: () => void; streamId: string | undefined }) {
   const { exportInfo, dismissError } = useController(ExportModalCtx);
 
   // Clear all errors when this component unmounts
   useEffect(dismissError, []);
 
   if (exportInfo.exporting) return <ExportProgress />;
-  if (!exportInfo.exported) return <ExportOptions close={p.close} />;
-  return <PlatformSelect onClose={p.close} />;
+  if (!exportInfo.exported) return <ExportOptions close={close} streamId={streamId} />;
+  return <PlatformSelect onClose={close} />;
 }
 
 function ExportProgress() {
@@ -122,7 +128,7 @@ function ExportProgress() {
   );
 }
 
-function ExportOptions(p: { close: () => void }) {
+function ExportOptions({ close, streamId }: { close: () => void; streamId: string | undefined }) {
   const { UsageStatisticsService } = Services;
   const {
     exportInfo,
@@ -219,7 +225,7 @@ function ExportOptions(p: { close: () => void }) {
           />
         )}
         <div style={{ textAlign: 'right' }}>
-          <Button style={{ marginRight: 8 }} onClick={p.close}>
+          <Button style={{ marginRight: 8 }} onClick={close}>
             {$t('Close')}
           </Button>
           <Button
@@ -242,7 +248,7 @@ function ExportOptions(p: { close: () => void }) {
               UsageStatisticsService.actions.recordFeatureUsage('HighlighterExport');
 
               setExport(exportFile);
-              exportCurrentFile();
+              exportCurrentFile(streamId);
             }}
           >
             {$t('Export')}
