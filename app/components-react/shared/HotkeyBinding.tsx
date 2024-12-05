@@ -65,12 +65,15 @@ export default function HotkeyBinding(p: {
   hotkey: IHotkey;
   binding: IBinding | null;
   onBind: (binding: IBinding) => void;
+  style?: React.CSSProperties;
+  showLabel?: boolean;
 }) {
   const { MarkersService, DualOutputService } = Services;
 
   const [focused, setFocused] = useState(false);
   const inputRef = useRef<Input>(null);
 
+  const hotKeyLabel = p.showLabel !== false ? <HotkeyLabel /> : <></>;
   const showDualOutputLabel =
     DualOutputService.views.dualOutputMode &&
     p?.hotkey.actionName !== 'SWITCH_TO_SCENE' &&
@@ -150,8 +153,8 @@ export default function HotkeyBinding(p: {
     <Form layout="inline">
       <TextInput
         name="binding"
-        style={{ width: 400 }}
-        label={showDualOutputLabel ? <DualOutputHotkeyLabel /> : <HotkeyLabel />}
+        style={{ width: 400, ...p.style }}
+        label={showDualOutputLabel ? <DualOutputHotkeyLabel /> : hotKeyLabel}
         value={getHotkeyString(p.binding, focused)}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}

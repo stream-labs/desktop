@@ -33,6 +33,7 @@ test('Highlighter save and export', async t => {
   await stopStream();
 
   await focusMain();
+  await clickButton('All clips');
   await clickButton('Export');
   const fileName = 'MyTestVideo.mp4';
   const exportLocation = path.resolve(recordingDir, fileName);
