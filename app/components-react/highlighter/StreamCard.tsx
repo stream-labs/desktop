@@ -125,7 +125,7 @@ function ActionBar({
   function getFailedText(state: EAiDetectionState): string {
     switch (state) {
       case EAiDetectionState.ERROR:
-        return $t('Ai detection failed');
+        return $t('Ai-detection failed');
       case EAiDetectionState.CANCELED_BY_USER:
         return $t('Ai-detection cancelled');
       default:
