@@ -555,6 +555,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
       video: state.video,
       audio: state.audio,
       transition: state.transition,
+      useAiHighlighter: state.useAiHighlighter,
     };
   }
 
