@@ -23,6 +23,12 @@ class ExportController {
   get exportInfo() {
     return this.service.views.exportInfo;
   }
+  getStreamTitle(streamId?: string) {
+    return (
+      this.service.views.highlightedStreams.find(stream => stream.id === streamId)?.title ||
+      'My Video'
+    );
+  }
 
   dismissError() {
     return this.service.actions.dismissError();
@@ -82,7 +88,11 @@ export default function ExportModalProvider({
 }
 
 function ExportModal({ close, streamId }: { close: () => void; streamId: string | undefined }) {
-  const { exportInfo, dismissError, resetExportedState } = useController(ExportModalCtx);
+  const { exportInfo, dismissError, resetExportedState, getStreamTitle } = useController(
+    ExportModalCtx,
+  );
+
+  const [videoName, setVideoName] = useState<string>(getStreamTitle(streamId));
 
   const unmount = () => {
     dismissError();
@@ -92,8 +102,17 @@ function ExportModal({ close, streamId }: { close: () => void; streamId: string 
   useEffect(unmount, []);
 
   if (exportInfo.exporting) return <ExportProgress />;
-  if (!exportInfo.exported) return <ExportOptions close={close} streamId={streamId} />;
-  return <PlatformSelect onClose={close} />;
+  if (!exportInfo.exported) {
+    return (
+      <ExportOptions
+        close={close}
+        streamId={streamId}
+        videoName={videoName}
+        onVideoNameChange={setVideoName}
+      />
+    );
+  }
+  return <PlatformSelect onClose={close} videoName={videoName} />;
 }
 
 function ExportProgress() {
@@ -135,7 +154,17 @@ function ExportProgress() {
   );
 }
 
-function ExportOptions({ close, streamId }: { close: () => void; streamId: string | undefined }) {
+function ExportOptions({
+  close,
+  streamId,
+  videoName,
+  onVideoNameChange,
+}: {
+  close: () => void;
+  streamId: string | undefined;
+  videoName: string;
+  onVideoNameChange: (name: string) => void;
+}) {
   const { UsageStatisticsService } = Services;
   const {
     exportInfo,
@@ -146,10 +175,12 @@ function ExportOptions({ close, streamId }: { close: () => void; streamId: strin
     fileExists,
     setExport,
     exportCurrentFile,
-    store,
+    getStreamTitle,
   } = useController(ExportModalCtx);
 
-  const videoName = store.useState(s => s.videoName);
+  // Video name and export file are kept in sync
+  const [exportFile, setExportFile] = useState<string>(getExportFileFromVideoName(videoName));
+
   function getExportFileFromVideoName(videoName: string) {
     const parsed = path.parse(exportInfo.file);
     const sanitized = videoName.replace(/[/\\?%*:|"<>\.,;=#]/g, '');
@@ -181,9 +212,6 @@ function ExportOptions({ close, streamId }: { close: () => void; streamId: strin
     exportCurrentFile(streamId, orientation);
   }
 
-  // Video name and export file are kept in sync
-  const [exportFile, setExportFile] = useState<string>(getExportFileFromVideoName(videoName));
-
   return (
     <div>
       <h2>Export Video</h2>
@@ -192,9 +220,7 @@ function ExportOptions({ close, streamId }: { close: () => void; streamId: strin
           label={$t('Video Name')}
           value={videoName}
           onInput={name => {
-            store.setState(s => {
-              s.videoName = name;
-            });
+            onVideoNameChange(name);
             setExportFile(getExportFileFromVideoName(name));
           }}
           uncontrolled={false}
@@ -207,9 +233,7 @@ function ExportOptions({ close, streamId }: { close: () => void; streamId: strin
           value={exportFile}
           onChange={file => {
             setExportFile(file);
-            store.setState(s => {
-              s.videoName = getVideoNameFromExportFile(file);
-            });
+            onVideoNameChange(getVideoNameFromExportFile(file));
           }}
         />
         <RadioInput
@@ -270,9 +294,8 @@ function ExportOptions({ close, streamId }: { close: () => void; streamId: strin
   );
 }
 
-function PlatformSelect(p: { onClose: () => void }) {
-  const { store, clearUpload } = useController(ExportModalCtx);
-  const videoName = store.useState(s => s.videoName);
+function PlatformSelect({ onClose, videoName }: { onClose: () => void; videoName: string }) {
+  const { store, clearUpload, getStreamTitle } = useController(ExportModalCtx);
   const { UserService } = Services;
   const { isYoutubeLinked } = useVuex(() => ({
     isYoutubeLinked: !!UserService.state.auth?.platforms.youtube,
@@ -302,8 +325,8 @@ function PlatformSelect(p: { onClose: () => void }) {
         nowrap
         options={platformOptions}
       />
-      {platform === 'youtube' && <YoutubeUpload defaultTitle={videoName} close={p.onClose} />}
-      {platform !== 'youtube' && <StorageUpload onClose={p.onClose} platform={platform} />}
+      {platform === 'youtube' && <YoutubeUpload defaultTitle={videoName} close={onClose} />}
+      {platform !== 'youtube' && <StorageUpload onClose={onClose} platform={platform} />}
     </Form>
   );
 }
