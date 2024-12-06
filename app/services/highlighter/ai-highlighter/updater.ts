@@ -100,7 +100,7 @@ export class AiHighlighterUpdater {
    * Get the path to the highlighter binary
    */
   private getManifestUrl(): string {
-    if (Utils.shouldUseHighlighterStaging()) {
+    if (Utils.isDevMode() || Utils.isPreview()) {
       return 'https://cdn-highlighter-builds.streamlabs.com/staging/manifest_win_x86_64.json';
     } else {
       return 'https://cdn-highlighter-builds.streamlabs.com/manifest_win_x86_64.json';
