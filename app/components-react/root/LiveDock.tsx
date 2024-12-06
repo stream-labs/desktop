@@ -18,6 +18,7 @@ import { useVuex } from 'components-react/hooks';
 import { useRealmObject } from 'components-react/hooks/realm';
 import { $i } from 'services/utils';
 import { TikTokChatInfo } from './TiktokChatInfo';
+import { ShareStreamLink } from './ShareStreamLink';
 
 const LiveDockCtx = React.createContext<LiveDockController | null>(null);
 
@@ -427,6 +428,7 @@ function LiveDock(p: { onLeft: boolean }) {
                     <i onClick={() => ctrl.openPlatformStream()} className="icon-studio" />
                   </Tooltip>
                 )}
+                {isStreaming && <ShareStreamLink />}
                 {isPlatform(['youtube', 'facebook', 'tiktok']) && isStreaming && (
                   <Tooltip
                     title={$t('Go to Live Dashboard')}
