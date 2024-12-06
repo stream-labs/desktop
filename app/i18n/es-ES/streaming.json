@@ -275,5 +275,9 @@
   "Detect CPU usage in Dual Output mode": "Detect CPU usage in Dual Output mode",
   "High CPU Usage: %{percentage}% used": "High CPU Usage: %{percentage}% used",
   "High CPU Usage: Detected": "High CPU Usage: Detected",
-  "TikTok Audience": "Audiencia de TikTok"
+  "TikTok Audience": "Audiencia de TikTok",
+  "Share stream link": "Share stream link",
+  "Copy stream link": "Copy stream link",
+  "Copy %{platform} link": "Copy %{platform} link",
+  "Copied to clipboard": "Copied to clipboard"
 }
