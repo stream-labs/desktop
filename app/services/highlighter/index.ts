@@ -1088,6 +1088,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
         },
       });
     });
+    return;
   }
 
   enableClip(path: string, enabled: boolean) {
