@@ -38,7 +38,7 @@ export const ShareStreamLink = () => {
     });
 
     return (
-      <Tooltip key={platform} placement="right" title={tooltip}>
+      <Tooltip key={platform} placement="right" title={tooltip} autoAdjustOverflow={false}>
         <Button
           type="text"
           title={tooltip}
