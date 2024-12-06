@@ -42,7 +42,7 @@ export const ShareStreamLink = () => {
       <Tooltip key={platform} placement="right" title={tooltip} autoAdjustOverflow={false}>
         <Button
           type="text"
-          title={tooltip}
+          aria-label={tooltip}
           onClick={() => copyToClipboard(streamPageUrl)}
           icon={<PlatformLogo platform={platform} />}
         />
@@ -59,7 +59,7 @@ export const ShareStreamLink = () => {
           <Button
             type="text"
             icon={<ShareAltOutlined />}
-            title={$t('Copy stream link')}
+            aria-label={$t('Copy stream link')}
             onClick={() =>
               copyToClipboard(
                 getPlatformService(StreamingService.views.enabledPlatforms[0]).streamPageUrl,
@@ -73,7 +73,7 @@ export const ShareStreamLink = () => {
             <Button
               type="text"
               icon={expanded ? <CloseOutlined /> : <ShareAltOutlined />}
-              title={$t('Share stream link')}
+              aria-label={$t('Share stream link')}
               onClick={() => toggleExpanded()}
             />
           </Tooltip>
