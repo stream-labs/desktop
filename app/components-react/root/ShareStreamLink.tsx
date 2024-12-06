@@ -7,6 +7,7 @@ import { Button, message } from 'antd';
 import { CloseOutlined, ShareAltOutlined } from '@ant-design/icons';
 import PlatformLogo from 'components-react/shared/PlatformLogo';
 import Tooltip from 'components-react/shared/Tooltip';
+import styles from './ShareStreamLink.m.less';
 
 /*
  * There's a weird issue on the Live Dock where components placed above
@@ -52,7 +53,7 @@ export const ShareStreamLink = () => {
   const single = items.length < 2;
 
   return (
-    <div style={{ marginTop: -5, display: 'flex' }}>
+    <div className={styles.shareStreamLinksContainer}>
       {single ? (
         <Tooltip placement="right" title={$t('Copy stream link')}>
           <Button
