@@ -291,9 +291,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   @Inject() private selectionService: SelectionService;
   @Inject() private streamingService: StreamingService;
   @Inject() private settingsService: SettingsService;
-  @Inject() private sourcesService: SourcesService;
-  @Inject() private widgetsService: WidgetsService;
-  @Inject() private defaultHardwareService: DefaultHardwareService;
 
   static defaultState: IDualOutputServiceState = {
     dualOutputMode: false,

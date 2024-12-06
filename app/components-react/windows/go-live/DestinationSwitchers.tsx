@@ -87,6 +87,7 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
            * If we had two platforms, none of which were tiktok, we still need to limit
            * that to 1 platform without restreaming.
            * This could happen when coming from having dual output enabled to off.
+           *  TODO: this might not be needed after #5244, keeping here for a while for extra care
            */
           enabledPlatformsRef.current = enabledPlatformsRef.current.slice(0, 1);
         } else {
