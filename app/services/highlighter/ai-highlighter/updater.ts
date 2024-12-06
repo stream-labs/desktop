@@ -42,26 +42,29 @@ export class AiHighlighterUpdater {
   /**
    * Spawn the AI Highlighter process that would process the video
    */
-  static startHighlighterProcess(videoUri: string) {
+  static startHighlighterProcess(videoUri: string, milestonesPath?: string) {
     const isDev = Utils.isDevMode();
     if (isDev) {
       const rootPath = '../highlighter-api/';
-      return spawn(
-        'poetry',
-        [
-          'run',
-          'python',
-          `${rootPath}/highlighter_api/cli.py`,
-          videoUri,
-          '--ffmpeg_path',
-          FFMPEG_EXE,
-          '--loglevel',
-          'debug',
-        ],
-        {
-          cwd: rootPath,
-        },
-      );
+      const command = [
+        'run',
+        'python',
+        `${rootPath}/highlighter_api/cli.py`,
+        videoUri,
+        '--ffmpeg_path',
+        FFMPEG_EXE,
+        '--loglevel',
+        'debug',
+      ];
+
+      if (milestonesPath) {
+        command.push('--milestones_file');
+        command.push(milestonesPath);
+      }
+
+      return spawn('poetry', command, {
+        cwd: rootPath,
+      });
     }
 
     const highlighterBinaryPath = path.resolve(
@@ -70,7 +73,13 @@ export class AiHighlighterUpdater {
       'app.exe',
     );
 
-    return spawn(highlighterBinaryPath, [videoUri, '--ffmpeg_path', FFMPEG_EXE]);
+    const command = [videoUri, '--ffmpeg_path', FFMPEG_EXE];
+    if (milestonesPath) {
+      command.push('--milestones_file');
+      command.push(milestonesPath);
+    }
+
+    return spawn(highlighterBinaryPath, command);
   }
 
   /**

@@ -52,6 +52,7 @@ import {
   getHighlightClips,
   IHighlight,
   IHighlighterInput,
+  IHighlighterMilestone,
   ProgressTracker,
 } from './ai-highlighter/ai-highlighter';
 import uuid from 'uuid';
@@ -60,6 +61,7 @@ import { AiHighlighterUpdater } from './ai-highlighter/updater';
 import { IDownloadProgress } from 'util/requests';
 import { IncrementalRolloutService } from 'app-services';
 import { EAvailableFeatures } from 'services/incremental-rollout';
+import { getSharedResource } from 'util/get-shared-resource';
 export type TStreamInfo =
   | {
       orderPosition: number;
@@ -151,11 +153,17 @@ interface ISettingsViewState {
 
 export type IViewState = TClipsViewState | IStreamViewState | ISettingsViewState;
 
+export interface StreamMilestones {
+  streamId: string;
+  milestones: IHighlighterMilestone[];
+}
+
 // TODO: Need to clean up all of this
 export interface StreamInfoForAiHighlighter {
   id: string;
   game: string;
   title?: string;
+  milestonesPath?: string;
 }
 
 export interface INewClipData {
@@ -546,6 +554,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
 
   aiHighlighterUpdater: AiHighlighterUpdater;
   aiHighlighterEnabled = false;
+  streamMilestones: StreamMilestones | null = null;
 
   static filter(state: IHighlighterState) {
     return {
@@ -1880,12 +1889,16 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     }
   }
 
-  restartAiDetection(filePath: string, streamInfo: IHighlightedStream) {
+  async restartAiDetection(filePath: string, streamInfo: IHighlightedStream) {
     this.removeStream(streamInfo.id);
+
+    const milestonesPath = await this.prepareMilestonesFile(streamInfo.id);
+
     const streamInfoForHighlighter: StreamInfoForAiHighlighter = {
       id: streamInfo.id,
       title: streamInfo.title,
       game: streamInfo.game,
+      milestonesPath,
     };
 
     this.flow(filePath, streamInfoForHighlighter);
@@ -1922,6 +1935,11 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
       path: filePath,
     };
 
+    this.streamMilestones = {
+      streamId: setStreamInfo.id,
+      milestones: [],
+    };
+
     await this.addStream(setStreamInfo);
 
     const progressTracker = new ProgressTracker(progress => {
@@ -1952,6 +1970,11 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
         setStreamInfo.abortController!.signal,
         (progress: number) => {
           progressTracker.updateProgressFromHighlighter(progress);
+        },
+        null,
+        streamInfo.milestonesPath,
+        (milestone: IHighlighterMilestone) => {
+          this.streamMilestones?.milestones?.push(milestone);
         },
       );
 
@@ -2307,5 +2330,26 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     } finally {
       this.SET_UPDATER_STATE(false);
     }
+  }
+
+  /**
+   * Create milestones file if ids match and return path
+   */
+  private async prepareMilestonesFile(streamId: string): Promise<string> {
+    if (
+      !this.streamMilestones ||
+      this.streamMilestones.streamId !== streamId ||
+      this.streamMilestones.milestones.length === 0
+    ) {
+      return null;
+    }
+
+    const basepath = getSharedResource('ai-highlighter');
+    const milestonesPath = path.join(basepath, 'milestones', 'milestones.json');
+
+    const milestonesData = JSON.stringify(this.streamMilestones.milestones);
+    await fs.outputFile(milestonesPath, milestonesData);
+
+    return milestonesPath;
   }
 }

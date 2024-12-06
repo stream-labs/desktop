@@ -3,6 +3,7 @@ import EventEmitter from 'events';
 import { AiHighlighterUpdater } from './updater';
 import { duration } from 'moment';
 import { ICoordinates } from '..';
+import kill from 'tree-kill';
 
 export enum EHighlighterInputTypes {
   KILL = 'kill',
@@ -42,7 +43,7 @@ export type EHighlighterMessageTypes =
   | 'inputs'
   | 'inputs_partial'
   | 'highlights'
-  | 'highlights_partial';
+  | 'milestone';
 
 export interface IHighlighterMessage {
   type: EHighlighterMessageTypes;
@@ -50,6 +51,12 @@ export interface IHighlighterMessage {
 }
 interface IHighlighterProgressMessage {
   progress: number;
+}
+
+export interface IHighlighterMilestone {
+  name: string;
+  weight: number;
+  data: IHighlighterMessage[] | null;
 }
 
 // Buffer management class to handle split messages
@@ -104,6 +111,8 @@ export function getHighlightClips(
   cancelSignal: AbortSignal,
   progressUpdate?: (progress: number) => void,
   mockChildProcess?: child.ChildProcess,
+  milestonesPath?: string,
+  milestoneUpdate?: (milestone: IHighlighterMilestone) => void,
 ): Promise<IHighlight[]> {
   return new Promise((resolve, reject) => {
     console.log(`Get highlight clips for ${videoUri}`);
@@ -112,13 +121,14 @@ export function getHighlightClips(
     console.log('Start Ai analysis');
 
     const childProcess: child.ChildProcess =
-      mockChildProcess || AiHighlighterUpdater.startHighlighterProcess(videoUri);
+      mockChildProcess || AiHighlighterUpdater.startHighlighterProcess(videoUri, milestonesPath);
     const messageBuffer = new MessageBufferHandler();
 
     if (cancelSignal) {
       cancelSignal.addEventListener('abort', () => {
-        childProcess.kill();
+        console.log('ending highlighter process');
         messageBuffer.clear();
+        kill(childProcess.pid, 'SIGINT');
         reject(new Error('Highlight generation canceled'));
       });
     }
@@ -147,8 +157,8 @@ export function getHighlightClips(
               }
               resolve(aiHighlighterMessage.json as IHighlight[]);
               break;
-            case 'highlights_partial':
-              // Handle partial highlights if needed
+            case 'milestone':
+              milestoneUpdate?.(aiHighlighterMessage.json as IHighlighterMilestone);
               break;
             default:
               console.log('\n\n');
