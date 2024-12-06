@@ -87,6 +87,16 @@ export class AiHighlighterUpdater {
     return this.manifest?.version || null;
   }
 
+  /*
+   * Get the path to the highlighter binary
+   */
+  private getManifestUrl(): string {
+    if (Utils.isDevMode() || Utils.isPreview()) {
+      return 'https://cdn-highlighter-builds.streamlabs.com/staging/manifest_win_x86_64.json';
+    } else {
+      return 'https://cdn-highlighter-builds.streamlabs.com/manifest_win_x86_64.json';
+    }
+  }
   /**
    * Check if AI Highlighter requires an update
    */
@@ -98,10 +108,9 @@ export class AiHighlighterUpdater {
 
     this.versionChecked = true;
     console.log('checking for highlighter updates...');
+    const manifestUrl = this.getManifestUrl();
     // fetch the latest version of the manifest for win x86_64 target
-    const newManifest = await jfetch<IAIHighlighterManifest>(
-      new Request('https://cdn-highlighter-builds.streamlabs.com/manifest_win_x86_64.json'),
-    );
+    const newManifest = await jfetch<IAIHighlighterManifest>(new Request(manifestUrl));
     this.manifest = newManifest;
 
     // if manifest.json does not exist, an initial download is required
