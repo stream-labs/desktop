@@ -35,6 +35,7 @@ class RecordingHistoryController {
   private NotificationsService = Services.NotificationsService;
   private HighlighterService = Services.HighlighterService;
   private NavigationService = Services.NavigationService;
+  private IncrementalRolloutService = Services.IncrementalRolloutService;
   store = initStore<IRecordingHistoryStore>({
     showSLIDModal: false,
     showEditModal: false,
@@ -59,6 +60,11 @@ class RecordingHistoryController {
 
   get uploadOptions() {
     const opts = [
+      {
+        label: `${$t('AI Highlighter')} ${$t('For Fortnite streams (Beta)')}`,
+        value: 'highlighter',
+        icon: 'icon-highlighter',
+      },
       {
         label: $t('Edit'),
         value: 'edit',
