@@ -101,5 +101,15 @@
   "Clip": "クリップ",
   "Subtitle": "サブタイトル",
   "Record your screen with Streamlabs Desktop. Once recording is complete, it will be displayed here. Access your files or edit further with Streamlabs tools.": "Streamlabs Desktop を使って画面を録画。録画が完了すると、ここに表示されます。ファイルにアクセス、または Streamlabs ツールを使ってさらに編集。",
-  "Recordings": "録画"
+  "Recordings": "録画",
+  "Manual Highlighter": "Manual Highlighter",
+  "The hotkey highlighter allows you to clip the best moments during your livestream manually and edit them together afterwards.": "The hotkey highlighter allows you to clip the best moments during your livestream manually and edit them together afterwards.",
+  "End your stream to change the Hotkey or the replay duration.": "End your stream to change the Hotkey or the replay duration.",
+  "No clips found": "No clips found",
+  "All highlight clips": "All highlight clips",
+  "Loading": "Loading",
+  "Trim": "Trim",
+  "Intro": "Intro",
+  "Outro": "Outro",
+  "All clips": "All clips"
 }

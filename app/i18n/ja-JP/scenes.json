@@ -3,7 +3,7 @@
   "The scene name is required": "シーン名は必須です",
   "Please enter the name of the scene": "シーンの名前を入力してください",
   "Manage Scene Collections": "シーンコレクションの管理",
-  "Create Scene Collection": "Create Scene Collection",
+  "Create Scene Collection": "シーンコレクションを作成",
   "There needs to be at least one scene.": "少なくとも 1 つのシーンが必要です。",
   "Projector:": "プロジェクター：",
   "Projector: Output": "プロジェクター：出力",
@@ -63,7 +63,7 @@
   "Loading scene...": "シーンをロード中...",
   "Import from OBS": "OBS からインポート",
   "Import from Twitch": "Twitchからインポート",
-  "Import from Twitch Studio": "Import from Twitch Studio",
+  "Import from Twitch Studio": "Twitch Studioからインポート",
   "Load existing scenes from Twitch Studio": "Twitch Studioから既存のシーンを読み込む",
-  "Start Fresh": "Start Fresh"
+  "Start Fresh": "やり直す"
 }
