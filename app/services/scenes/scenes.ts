@@ -5,6 +5,7 @@ import { filter, take, takeUntil, tap } from 'rxjs/operators';
 import { mutation, StatefulService } from 'services/core/stateful-service';
 import { TransitionsService } from 'services/transitions';
 import { WindowsService } from 'services/windows';
+import { SelectionService } from 'services/selection';
 import { Scene, SceneItem, TSceneNode, EScaleType, EBlendingMode, EBlendingMethod } from './index';
 import { ISource, SourcesService, ISourceAddOptions, TSourceType } from 'services/sources';
 import { Inject } from 'services/core/injector';
@@ -295,6 +296,7 @@ export class ScenesService extends StatefulService<IScenesState> {
   @Inject() private windowsService: WindowsService;
   @Inject() private sourcesService: SourcesService;
   @Inject() private transitionsService: TransitionsService;
+  @Inject() private selectionService: SelectionService;
 
   @mutation()
   private ADD_SCENE(id: string, name: string) {
@@ -458,7 +460,13 @@ export class ScenesService extends StatefulService<IScenesState> {
 
     const sceneItem = scene.createAndAddSource(sourceName, sourceType, settings);
 
-    const createVerticalNode = () => this.dualOutputService.createPartnerNode(sceneItem);
+    const createVerticalNode = () => {
+      this.dualOutputService.createPartnerNode(sceneItem);
+      /* For some reason dragging items after enabling dual output makes them
+       * duplicate, associate selection on switch to mitigate this issue
+       */
+      this.selectionService.associateSelectionWithDisplay('vertical');
+    };
 
     if (this.dualOutputService.state.dualOutputMode) {
       createVerticalNode();
