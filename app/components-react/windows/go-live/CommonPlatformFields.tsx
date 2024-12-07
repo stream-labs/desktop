@@ -7,6 +7,8 @@ import InputWrapper from '../../shared/inputs/InputWrapper';
 import Animate from 'rc-animate';
 import { TLayoutMode } from './platforms/PlatformSettingsLayout';
 import { Services } from '../../service-provider';
+import AiHighlighterToggle from './AiHighlighterToggle';
+import { EAvailableFeatures } from 'services/incremental-rollout';
 
 interface ICommonPlatformSettings {
   title: string;
@@ -22,6 +24,7 @@ interface IProps {
   layoutMode?: TLayoutMode;
   value: ICommonPlatformSettings;
   descriptionIsRequired?: boolean;
+  enabledPlatforms?: TPlatform[];
   onChange: (newValue: ICommonPlatformSettings) => unknown;
 }
 
@@ -55,6 +58,9 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
   }
 
   const view = Services.StreamingService.views;
+  const aiHighlighterEnabled = Services.IncrementalRolloutService.views.featureIsEnabled(
+    EAvailableFeatures.aiHighlighter,
+  );
   const hasCustomCheckbox = p.layoutMode === 'multiplatformAdvanced';
   const fieldsAreVisible = !hasCustomCheckbox || p.value.useCustomFields;
   const descriptionIsRequired =
@@ -124,6 +130,10 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
                 label={$t('Description')}
                 required={descriptionIsRequired}
               />
+            )}
+
+            {aiHighlighterEnabled && enabledPlatforms && !enabledPlatforms.includes('twitch') && (
+              <AiHighlighterToggle game={undefined} cardIsExpanded={false} />
             )}
           </div>
         )}

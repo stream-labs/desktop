@@ -151,14 +151,17 @@ export default function ClipTrimmer(props: { clip: TClip }) {
   function stopDragging() {
     if (isDragging.current === 'start') {
       HighlighterService.actions.setStartTrim(props.clip.path, localStartTrim);
-      UsageStatisticsService.actions.recordAnalyticsEvent('Highlighter', { type: 'Trim' });
     } else if (isDragging.current === 'end') {
       HighlighterService.actions.setEndTrim(props.clip.path, localEndTrim);
-      UsageStatisticsService.actions.recordAnalyticsEvent('Highlighter', { type: 'Trim' });
     }
 
     isDragging.current = null;
     playAt(localStartTrim);
+
+    UsageStatisticsService.actions.recordAnalyticsEvent(
+      HighlighterService.state.useAiHighlighter ? 'AIHighlighter' : 'Highlighter',
+      { type: 'Trim' },
+    );
   }
 
   const scrubHeight = 100;

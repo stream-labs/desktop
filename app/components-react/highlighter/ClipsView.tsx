@@ -3,6 +3,7 @@ import * as remote from '@electron/remote';
 import { Services } from 'components-react/service-provider';
 import styles from './ClipsView.m.less';
 import { EHighlighterView, IAiClip, IViewState, TClip } from 'services/highlighter';
+import ClipPreview, { formatSecondsToHMS } from 'components-react/highlighter/ClipPreview';
 import { ReactSortable } from 'react-sortablejs';
 import Scrollable from 'components-react/shared/Scrollable';
 import { EditingControls } from './EditingControls';
@@ -18,7 +19,10 @@ import { Button } from 'antd';
 import { SUPPORTED_FILE_TYPES } from 'services/highlighter/constants';
 import { $t } from 'services/i18n';
 import path from 'path';
-import ClipPreview from './ClipPreview';
+import MiniClipPreview from './MiniClipPreview';
+import HighlightGenerator from './HighlightGenerator';
+import { EAvailableFeatures } from 'services/incremental-rollout';
+
 export type TModalClipsView = 'trim' | 'export' | 'preview' | 'remove';
 
 interface IClipsViewProps {
@@ -33,7 +37,10 @@ export default function ClipsView({
   props: IClipsViewProps;
   emitSetView: (data: IViewState) => void;
 }) {
-  const { HighlighterService, UsageStatisticsService } = Services;
+  const { HighlighterService, UsageStatisticsService, IncrementalRolloutService } = Services;
+  const aiHighlighterEnabled = IncrementalRolloutService.views.featureIsEnabled(
+    EAvailableFeatures.aiHighlighter,
+  );
   const clipsAmount = useVuex(() => HighlighterService.views.clips.length);
   const [clips, setClips] = useState<{
     ordered: { id: string }[];
@@ -48,26 +55,18 @@ export default function ClipsView({
     setClipsLoaded(true);
   }, []);
 
+  const getClips = useCallback(() => {
+    return HighlighterService.getClips(HighlighterService.views.clips, props.id);
+  }, [props.id]);
+
   useEffect(() => {
     setClipsLoaded(false);
-    setClips(
-      sortAndFilterClips(
-        HighlighterService.getClips(HighlighterService.views.clips, props.id),
-        props.id,
-        activeFilter,
-      ),
-    );
+    setClips(sortAndFilterClips(getClips(), props.id, activeFilter));
     loadClips(props.id);
   }, [props.id, clipsAmount]);
 
   useEffect(() => {
-    setClips(
-      sortAndFilterClips(
-        HighlighterService.getClips(HighlighterService.views.clips, props.id),
-        props.id,
-        activeFilter,
-      ),
-    );
+    setClips(sortAndFilterClips(getClips(), props.id, activeFilter));
   }, [activeFilter]);
 
   useEffect(() => UsageStatisticsService.actions.recordFeatureUsage('Highlighter'), []);
@@ -119,8 +118,10 @@ export default function ClipsView({
       );
 
       setClips({
-        ordered: newClipArray.map(c => ({ id: c })),
-        orderedFiltered: filterClipsBySource(updatedClips, activeFilter).map(c => ({ id: c.path })),
+        ordered: newClipArray.map(clipPath => ({ id: clipPath })),
+        orderedFiltered: filterClipsBySource(updatedClips, activeFilter).map(clip => ({
+          id: clip.path,
+        })),
       });
       return;
     }
@@ -165,13 +166,25 @@ export default function ClipsView({
           <header className={styles.header}>
             <button
               className={styles.backButton}
-              onClick={() => emitSetView({ view: EHighlighterView.SETTINGS })}
+              onClick={() =>
+                emitSetView(
+                  streamId
+                    ? { view: EHighlighterView.STREAM }
+                    : { view: EHighlighterView.SETTINGS },
+                )
+              }
             >
               <i className="icon-back" />
             </button>
             <h1
               className={styles.title}
-              onClick={() => emitSetView({ view: EHighlighterView.SETTINGS })}
+              onClick={() =>
+                emitSetView(
+                  streamId
+                    ? { view: EHighlighterView.STREAM }
+                    : { view: EHighlighterView.SETTINGS },
+                )
+              }
             >
               {props.streamTitle ?? $t('All highlight clips')}
             </h1>
@@ -185,13 +198,7 @@ export default function ClipsView({
                 <AddClip
                   streamId={props.id}
                   addedClips={() => {
-                    setClips(
-                      sortAndFilterClips(
-                        HighlighterService.getClips(HighlighterService.views.clips, props.id),
-                        props.id,
-                        activeFilter,
-                      ),
-                    );
+                    setClips(sortAndFilterClips(getClips(), props.id, activeFilter));
                   }}
                 />
               </div>
@@ -204,15 +211,38 @@ export default function ClipsView({
                     <AddClip
                       streamId={props.id}
                       addedClips={() => {
-                        setClips(
-                          sortAndFilterClips(
-                            HighlighterService.getClips(HighlighterService.views.clips, props.id),
-                            props.id,
-                            activeFilter,
-                          ),
-                        );
+                        setClips(sortAndFilterClips(getClips(), props.id, activeFilter));
                       }}
                     />
+                    {streamId &&
+                      aiHighlighterEnabled &&
+                      HighlighterService.getClips(HighlighterService.views.clips, props.id)
+                        .filter(clip => clip.source === 'AiClip')
+                        .every(clip => (clip as IAiClip).aiInfo.metadata?.round) && (
+                        <HighlightGenerator
+                          emitSetFilter={filterOptions => {
+                            const clips = HighlighterService.getClips(
+                              HighlighterService.views.clips,
+                              props.id,
+                            );
+                            const filteredClips = aiFilterClips(clips, streamId, filterOptions);
+                            const filteredClipPaths = new Set(filteredClips.map(c => c.path));
+
+                            clips.forEach(clip => {
+                              const shouldBeEnabled = filteredClipPaths.has(clip.path);
+                              const isEnabled = clip.enabled;
+
+                              if (shouldBeEnabled && !isEnabled) {
+                                HighlighterService.enableClip(clip.path, true);
+                              } else if (!shouldBeEnabled && isEnabled) {
+                                HighlighterService.disableClip(clip.path);
+                              }
+                            });
+                          }}
+                          combinedClipsDuration={getCombinedClipsDuration(getClips())}
+                          roundDetails={HighlighterService.getRoundDetails(getClips())}
+                        />
+                      )}
                   </div>
                   <Scrollable className={styles.clipsContainer}>
                     <ReactSortable
@@ -280,6 +310,21 @@ export default function ClipsView({
     clips.ordered.map(clip => ({ id: clip.id })),
     clips.orderedFiltered.map(clip => ({ id: clip.id })),
   );
+}
+
+// Temporary not used. Will be used in the next version
+function VideoDuration({ streamId }: { streamId: string | undefined }) {
+  const { HighlighterService } = Services;
+
+  const clips = useVuex(() =>
+    HighlighterService.getClips(HighlighterService.views.clips, streamId),
+  );
+
+  const totalDuration = clips
+    .filter(clip => clip.enabled)
+    .reduce((acc, clip) => acc + clip.duration! - clip.startTrim! - clip.endTrim!, 0);
+
+  return <span>{formatSecondsToHMS(totalDuration)}</span>;
 }
 
 function AddClip({
