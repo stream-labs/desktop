@@ -37,7 +37,7 @@ export function getBindingString(binding: IBinding) {
 function getHotkeyString(binding: IBinding | null, focused = false) {
   if (focused) return 'Press any key combination...';
 
-  if (binding) {
+  if (binding?.key) {
     return `${getBindingString(binding)} (Click to re-bind)`;
   } else {
     return 'Click to bind';
