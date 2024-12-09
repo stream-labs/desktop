@@ -108,6 +108,7 @@ export class StreamingService
   replayBufferFileWrite = new Subject<string>();
   streamInfoChanged = new Subject<StreamInfoView<any>>();
   signalInfoChanged = new Subject<IOBSOutputSignalInfo>();
+  latestRecordingPath = new Subject<string>();
   streamErrorCreated = new Subject<string>();
 
   // Dummy subscription for stream deck
@@ -1374,6 +1375,7 @@ export class StreamingService
         this.recordingModeService.actions.addRecordingEntry(parsedFilename);
         this.markersService.actions.exportCsv(parsedFilename);
         this.recordingModeService.addRecordingEntry(parsedFilename);
+        this.latestRecordingPath.next(filename);
         // Wrote signals come after Offline, so we return early here
         // to not falsely set our state out of Offline
         return;

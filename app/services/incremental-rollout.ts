@@ -15,6 +15,7 @@ export enum EAvailableFeatures {
   restream = 'slobs--restream',
   tiktok = 'slobs--tiktok',
   highlighter = 'slobs--highlighter',
+  aiHighlighter = 'slobs--ai-highlighter',
   growTab = 'slobs--grow-tab',
   themeAudit = 'slobs--theme-audit',
   reactWidgets = 'slobs--react-widgets',

@@ -6,7 +6,7 @@ import fs from 'fs';
 import { IExportOptions } from '.';
 import path from 'path';
 
-export class Clip {
+export class RenderingClip {
   frameSource: FrameSource;
   audioSource: AudioSource;
 

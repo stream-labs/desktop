@@ -35,6 +35,7 @@ type TAnalyticsEvent =
   | 'Shown'
   | 'AppStart'
   | 'Highlighter'
+  | 'AIHighlighter'
   | 'Hardware'
   | 'WebcamUse'
   | 'MicrophoneUse'
