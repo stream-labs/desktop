@@ -754,7 +754,7 @@ export class TikTokService
       status === 422 ? 'TIKTOK_USER_BANNED' : 'TIKTOK_GENERATE_CREDENTIALS_FAILED';
     const message = errorTypes[type].message;
 
-    const buttonText = status === 422 ? $t('Open TikTok Producer') : $t('Open TikTok Live Manager');
+    const buttonText = $t('Open TikTok Live Manager');
 
     if (type !== 'TIKTOK_USER_BANNED') {
       this.SET_LIVE_SCOPE('relog');
