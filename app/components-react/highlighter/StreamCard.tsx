@@ -125,9 +125,9 @@ function ActionBar({
   function getFailedText(state: EAiDetectionState): string {
     switch (state) {
       case EAiDetectionState.ERROR:
-        return $t('Ai-detection failed');
+        return $t('Highlights failed');
       case EAiDetectionState.CANCELED_BY_USER:
-        return $t('Ai-detection cancelled');
+        return $t('Highlights cancelled');
       default:
         return '';
     }
@@ -211,7 +211,7 @@ function ActionBar({
               e.stopPropagation();
             }}
           >
-            {$t('Restart ai-detection')}
+            {$t('Restart')}
           </Button>
         ) : (
           <Button
@@ -261,9 +261,9 @@ export function Thumbnail({
         }
         return <PlayButton />;
       case EAiDetectionState.CANCELED_BY_USER:
-        return $t('Ai-detection cancelled');
+        return $t('Highlights cancelled');
       case EAiDetectionState.ERROR:
-        return $t('Ai-detection cancelled');
+        return $t('Highlights cancelled');
       default:
         return '';
     }
