@@ -141,8 +141,10 @@ function ActionBar({
         <div
           className={styles.progressbarProgress}
           style={{
-            width: `${stream.state.progress}%`,
-            transition: 'width 1s',
+            opacity: stream.state.progress < 1 ? 0 : 1,
+            transform: `scaleX(${stream.state.progress / 100})`,
+            transformOrigin: 'left',
+            transition: 'transform 100ms',
           }}
         ></div>
 
