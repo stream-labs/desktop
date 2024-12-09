@@ -93,6 +93,10 @@ export default class Utils {
     );
   }
 
+  static get isProduction() {
+    return Utils.env.NODE_ENV === 'production';
+  }
+
   static isDevMode() {
     return Utils.env.NODE_ENV !== 'production';
   }
