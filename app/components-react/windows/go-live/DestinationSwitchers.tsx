@@ -200,23 +200,28 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
   function onClickHandler(ev: MouseEvent) {
     if (p.promptConnectTikTok) {
       alertAsync({
+        bodyStyle: { padding: '24px' },
+        className: styles.tiktokModal,
         type: 'confirm',
-        title: $t('Connect TikTok Account'),
+        title: $t('Connect your TikTok Account'),
         closable: true,
-        content: (
-          <span>
-            {$t(
-              'Connect your TikTok account to stream to TikTok and one additional platform for free.',
-            )}
-          </span>
+        content: $t(
+          'Connect your TikTok account to stream to TikTok and one additional platform for free.',
         ),
+        icon: <PlatformLogo platform="tiktok" className={styles.tiktokModalLogo} />,
         okText: $t('Connect'),
+        okButtonProps: { type: 'primary' },
         onOk: () => {
           Services.NavigationService.actions.navigate('PlatformMerge', { platform: 'tiktok' });
           Services.WindowsService.actions.closeChildWindow();
         },
+        cancelText: $t('Skip'),
+        cancelButtonProps: { style: { display: 'unset', color: 'var(--link)' } },
+        onCancel: () => {
+          Services.WindowsService.actions.closeChildWindow();
+        },
+        width: 600,
       });
-      return;
     }
 
     // If we're disabling the switch we shouldn't be emitting anything past below

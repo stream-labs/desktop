@@ -1,4 +1,5 @@
 @import '../../../styles/index.less';
+@import '../../../styles/mixins.less';
 
 .destination-logo {
   font-size: 38px;
@@ -73,4 +74,44 @@
 
 .column-padding {
   padding: 0px 15px;
+}
+
+.tiktok-modal-logo {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  margin-right: 5px;
+  vertical-align: super;
+}
+
+.tiktok-modal {
+  // &:global(.ant-modal.ant-modal-confirm.ant-modal-confirm-confirm) {
+  //   width: 600px;
+  // }
+
+  &:global(.ant-modal-confirm .ant-modal-body) {
+    padding: 0px;
+  }
+
+  :global(.ant-modal-confirm-body .ant-modal-confirm-title) {
+    display: inline-block;
+    font-size: 19px;
+    line-height: unset;
+  }
+
+  :global(.ant-modal-confirm-btns) {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    background-color: var(--modal-footer);
+    margin-top: 0px;
+    padding: 16px 32px;
+    border-radius: 0px 0px 4px 4px;
+  }
+}
+
+.tiktok-modal-title {
+  display: inline-block;
+  line-height: unset;
+  font-size: 18px;
 }
