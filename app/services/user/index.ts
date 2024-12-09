@@ -976,7 +976,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   ) {
     const uiTheme = this.customizationService.isDarkTheme ? 'night' : 'day';
 
-    let url = `https://${this.hostsService.streamlabs}/library`;
+    let url = 'https://beta.streamlabs.com/library';
 
     if (type && !id) {
       url += `/${type}`;
