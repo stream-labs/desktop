@@ -6,6 +6,7 @@ import { HostsService } from './hosts';
 import Utils from 'services/utils';
 import { InitAfter } from './core';
 import { AppService } from './app';
+import { getOS, OS } from 'util/operating-systems';
 
 export enum EAvailableFeatures {
   platform = 'slobs--platform',
@@ -114,6 +115,10 @@ class IncrementalRolloutView extends ViewHandler<IIncrementalRolloutServiceState
 
   featureIsEnabled(feature: EAvailableFeatures): boolean {
     if (Utils.isDevMode()) return true; // always show for dev mode
+
+    if (feature === EAvailableFeatures.aiHighlighter && getOS() !== OS.Windows) {
+      return false;
+    }
 
     return this.availableFeatures.indexOf(feature) > -1;
   }
