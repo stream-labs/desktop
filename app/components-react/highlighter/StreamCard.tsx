@@ -211,7 +211,7 @@ function ActionBar({
               e.stopPropagation();
             }}
           >
-            {$t('Resume')}
+            {$t('Restart')}
           </Button>
         ) : (
           <Button
