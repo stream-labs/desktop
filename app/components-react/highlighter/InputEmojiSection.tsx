@@ -4,6 +4,104 @@ import { isAiClip } from './utils';
 import { EHighlighterInputTypes } from 'services/highlighter/ai-highlighter/ai-highlighter';
 import styles from './InputEmojiSection.m.less';
 
+interface TypeWording {
+  emoji: string;
+  description: string;
+}
+const TYPE_WORDING_MAP: Record<string, (count: number) => TypeWording> = {
+  [EHighlighterInputTypes.KILL]: count => ({
+    emoji: '🔫',
+    description: count > 1 ? 'eliminations' : 'elimination',
+  }),
+  [EHighlighterInputTypes.KNOCKED]: count => ({
+    emoji: '🥊',
+    description: count > 1 ? 'knocks' : 'knocked',
+  }),
+  [EHighlighterInputTypes.DEATH]: count => ({
+    emoji: '🪦',
+    description: count > 1 ? 'deaths' : 'death',
+  }),
+  [EHighlighterInputTypes.VICTORY]: count => ({
+    emoji: '🏆',
+    description: count > 1 ? 'wins' : 'win',
+  }),
+  [EHighlighterInputTypes.DEPLOY]: count => ({
+    emoji: '🪂',
+    description: count > 1 ? 'deploys' : 'deploy',
+  }),
+  [EHighlighterInputTypes.PLAYER_KNOCKED]: () => ({
+    emoji: '😵',
+    description: 'got knocked',
+  }),
+  BOT_KILL: count => ({
+    emoji: '🤖',
+    description: count > 1 ? 'bot eliminations' : 'bot elimination',
+  }),
+  rounds: count => ({
+    emoji: '🏁',
+    description: count === 0 || count > 1 ? `rounds ${count === 0 ? 'detected' : ''}` : 'round',
+  }),
+};
+
+function getTypeWordingFromType(
+  type: string,
+  count: number,
+): { emoji: string; description: string } {
+  return TYPE_WORDING_MAP[type]?.(count) ?? { emoji: '', description: '?' };
+}
+
+function getInputTypeCount(clips: TClip[]): { [type: string]: number } {
+  const typeCounts: { [type: string]: number } = {};
+  if (clips.length === 0) {
+    return typeCounts;
+  }
+  clips.forEach(clip => {
+    if (isAiClip(clip)) {
+      clip.aiInfo.inputs?.forEach(input => {
+        const type = input.type;
+        if (type === EHighlighterInputTypes.KILL) {
+          if ((input?.metadata as IKillMetadata)?.bot_kill === true) {
+            const currentCount = typeCounts['BOT_KILL'];
+            typeCounts['BOT_KILL'] = currentCount ? currentCount + 1 : 1;
+            return;
+          }
+        }
+        if (typeCounts[type]) {
+          typeCounts[type] += 1;
+        } else {
+          typeCounts[type] = 1;
+        }
+      });
+    }
+  });
+  return typeCounts;
+}
+function isDeath(type: string): boolean {
+  return type === EHighlighterInputTypes.DEATH;
+}
+
+function getGamePlacement(clips: TClip[]): number | null {
+  const deathClip = clips.find(
+    clip =>
+      isAiClip(clip) &&
+      clip.aiInfo.inputs.some(input => input.type === EHighlighterInputTypes.DEATH),
+  ) as IAiClip;
+
+  return getPlacementFromInputs(deathClip.aiInfo.inputs);
+}
+function getAmountOfRounds(clips: TClip[]): number {
+  const rounds: number[] = [];
+  clips.filter(isAiClip).forEach(clip => {
+    rounds.push(clip.aiInfo.metadata?.round || 1);
+  });
+  return Math.max(0, ...rounds);
+}
+
+export function getPlacementFromInputs(inputs: IInput[]): number | null {
+  const deathInput = inputs.find(input => input.type === EHighlighterInputTypes.DEATH);
+  return (deathInput?.metadata as IDeathMetadata)?.place || null;
+}
+
 export function InputEmojiSection({
   clips,
   includeRounds,
@@ -114,102 +212,4 @@ export function ManualClipTag({ clips }: { clips: TClip[] }): JSX.Element {
       }`}</span>
     </div>
   );
-}
-
-interface TypeWording {
-  emoji: string;
-  description: string;
-}
-const TYPE_WORDING_MAP: Record<string, (count: number) => TypeWording> = {
-  [EHighlighterInputTypes.KILL]: count => ({
-    emoji: '🔫',
-    description: count > 1 ? 'eliminations' : 'elimination',
-  }),
-  [EHighlighterInputTypes.KNOCKED]: count => ({
-    emoji: '🥊',
-    description: count > 1 ? 'knocks' : 'knocked',
-  }),
-  [EHighlighterInputTypes.DEATH]: count => ({
-    emoji: '🪦',
-    description: count > 1 ? 'deaths' : 'death',
-  }),
-  [EHighlighterInputTypes.VICTORY]: count => ({
-    emoji: '🏆',
-    description: count > 1 ? 'wins' : 'win',
-  }),
-  [EHighlighterInputTypes.DEPLOY]: count => ({
-    emoji: '🪂',
-    description: count > 1 ? 'deploys' : 'deploy',
-  }),
-  [EHighlighterInputTypes.PLAYER_KNOCKED]: () => ({
-    emoji: '😵',
-    description: 'got knocked',
-  }),
-  BOT_KILL: count => ({
-    emoji: '🤖',
-    description: count > 1 ? 'bot eliminations' : 'bot elimination',
-  }),
-  rounds: count => ({
-    emoji: '🏁',
-    description: count === 0 || count > 1 ? `rounds ${count === 0 ? 'detected' : ''}` : 'round',
-  }),
-};
-
-function getTypeWordingFromType(
-  type: string,
-  count: number,
-): { emoji: string; description: string } {
-  return TYPE_WORDING_MAP[type]?.(count) ?? { emoji: '', description: '?' };
-}
-
-function getInputTypeCount(clips: TClip[]): { [type: string]: number } {
-  const typeCounts: { [type: string]: number } = {};
-  if (clips.length === 0) {
-    return typeCounts;
-  }
-  clips.forEach(clip => {
-    if (isAiClip(clip)) {
-      clip.aiInfo.inputs?.forEach(input => {
-        const type = input.type;
-        if (type === EHighlighterInputTypes.KILL) {
-          if ((input?.metadata as IKillMetadata)?.bot_kill === true) {
-            const currentCount = typeCounts['BOT_KILL'];
-            typeCounts['BOT_KILL'] = currentCount ? currentCount + 1 : 1;
-            return;
-          }
-        }
-        if (typeCounts[type]) {
-          typeCounts[type] += 1;
-        } else {
-          typeCounts[type] = 1;
-        }
-      });
-    }
-  });
-  return typeCounts;
-}
-function isDeath(type: string): boolean {
-  return type === EHighlighterInputTypes.DEATH;
-}
-
-function getGamePlacement(clips: TClip[]): number | null {
-  const deathClip = clips.find(
-    clip =>
-      isAiClip(clip) &&
-      clip.aiInfo.inputs.some(input => input.type === EHighlighterInputTypes.DEATH),
-  ) as IAiClip;
-
-  return getPlacementFromInputs(deathClip.aiInfo.inputs);
-}
-function getAmountOfRounds(clips: TClip[]): number {
-  const rounds: number[] = [];
-  clips.filter(isAiClip).forEach(clip => {
-    rounds.push(clip.aiInfo.metadata?.round || 1);
-  });
-  return Math.max(0, ...rounds);
-}
-
-export function getPlacementFromInputs(inputs: IInput[]): number | null {
-  const deathInput = inputs.find(input => input.type === EHighlighterInputTypes.DEATH);
-  return (deathInput?.metadata as IDeathMetadata)?.place || null;
 }
