@@ -771,50 +771,8 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     }
 
     if (TEST_MODE) {
-      const clipsToLoad = [
-        // Aero 15 test clips
-        // path.join(CLIP_DIR, '2021-05-12 12-59-28.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-20.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-29.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-41.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-49.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-58.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-14-03.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-14-06.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-30-53.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-32-34.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-34-33.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-34-48.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-03.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-23.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-51.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-18.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-30.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-44.mp4'),
-
-        // Spoken Audio
-        path.join(CLIP_DIR, '2021-06-24 13-59-58.mp4'),
-        // path.join(CLIP_DIR, '2021-06-24 14-00-26.mp4'),
-        // path.join(CLIP_DIR, '2021-06-24 14-00-52.mp4'),
-
-        // 60 FPS
-        path.join(CLIP_DIR, '2021-07-06 15-14-22.mp4'),
-
-        // Razer blade test clips
-        // path.join(CLIP_DIR, '2021-05-25 08-55-13.mp4'),
-        // path.join(CLIP_DIR, '2021-06-08 16-40-14.mp4'),
-        // path.join(CLIP_DIR, '2021-05-25 08-56-03.mp4'),
-      ];
-
-      //  await this.addStream({
-      //  id: 'demo123',
-      // game: 'Fortnite',
-      //title: 'Demo Stream',
-      //date: '1726234396290',
-      //state: { type: 'detection-finished', progress: 0 },
-      //});
-      //const newClips = [getSharedResource('replay123.mp4')].map(path => ({ path }));
-      //this.addClips(newClips, 'demo123', 'Manual');
+      // Need to be adjusted by person running the test
+      const clipsToLoad = [path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-20.mp4')];
     } else {
       let streamStarted = false;
       let aiRecordingInProgress = false;
