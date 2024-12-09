@@ -17,9 +17,20 @@ export default function AiHighlighterToggle({
   //TODO M: Probably good way to integrate the highlighter in to GoLiveSettings
   const { HighlighterService } = Services;
   const useHighlighter = useVuex(() => HighlighterService.views.useAiHighlighter);
-  const [isExpanded, setIsExpanded] = useState(
-    game === 'Fortnite' ? true : useHighlighter ? true : cardIsExpanded,
-  );
+
+  function getInitialExpandedState() {
+    if (game === 'Fortnite') {
+      return true;
+    } else {
+      if (useHighlighter) {
+        return true;
+      } else {
+        return cardIsExpanded;
+      }
+    }
+  }
+  const initialExpandedState = getInitialExpandedState();
+  const [isExpanded, setIsExpanded] = useState(initialExpandedState);
 
   useEffect(() => {
     if (game === 'Fortnite') {
@@ -46,16 +57,7 @@ export default function AiHighlighterToggle({
           <div style={{ flexGrow: 0, backgroundColor: 'red' }}></div>
 
           <div className={styles.aiHighlighterBox}>
-            <div
-              style={{
-                cursor: 'pointer',
-                display: 'flex',
-                justifyContent: 'space-between',
-                width: '100%',
-                alignItems: 'center',
-              }}
-              onClick={() => setIsExpanded(isExpanded ? false : true)}
-            >
+            <div className={styles.headlineWrapper} onClick={() => setIsExpanded(!isExpanded)}>
               <h3 style={{ margin: 0, fontSize: '14px', fontWeight: 300, color: '#BDC2C4' }}>
                 Streaming <span style={{ fontWeight: 700 }}>Fortnite</span>? Try AI Highlighter!
               </h3>
@@ -67,68 +69,24 @@ export default function AiHighlighterToggle({
             </div>
             {isExpanded ? (
               <>
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    gap: '16px',
-                    marginTop: '16px',
-                    width: '100%',
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexGrow: 1,
-                        flexDirection: 'column',
-                        justifyContent: 'space-between',
-                      }}
-                    >
-                      <div>
-                        {' '}
-                        <h2 style={{ fontSize: '16px', fontWeight: 600 }}>
-                          Auto-create
-                          <br /> highlights
-                        </h2>
-                        <div
-                          style={{
-                            padding: '4px',
-                            borderRadius: '4px',
-                            paddingTop: '1px',
-                            paddingBottom: '1px',
-                            paddingLeft: '6px',
-                            paddingRight: '6px',
-                            width: 'fit-content',
-                            marginBottom: '8px',
-                            backgroundColor: '#2B5BD7',
-                          }}
-                        >
-                          Beta
-                        </div>
-                      </div>
-                      <SwitchInput
-                        style={{ padding: 0, margin: 0, marginLeft: '-40px', width: '100%' }}
-                        value={useHighlighter}
-                        label=""
-                        onChange={() => HighlighterService.actions.toggleAiHighlighter()}
-                      />
+                <div className={styles.expandedWrapper}>
+                  <div className={styles.toggleTextWrapper}>
+                    <div>
+                      {' '}
+                      <h2 style={{ fontSize: '16px', fontWeight: 600 }}>
+                        Auto-create
+                        <br /> highlights
+                      </h2>
+                      <div className={styles.betaTag}>Beta</div>
                     </div>
-                    <div
-                      style={{
-                        width: '182px',
-                        height: '187px',
-                        display: 'grid',
-                        placeContent: 'center',
-                        backgroundImage:
-                          'url(https://slobs-cdn.streamlabs.com/media/highlighter-image.png)',
-                        backgroundPosition: 'center',
-                        backgroundSize: 'contain',
-                        backgroundRepeat: 'no-repeat',
-                      }}
-                    ></div>
+                    <SwitchInput
+                      style={{ padding: 0, margin: 0, marginLeft: '-40px', width: '100%' }}
+                      value={useHighlighter}
+                      label=""
+                      onChange={() => HighlighterService.actions.toggleAiHighlighter()}
+                    />
                   </div>
+                  <div className={styles.image}></div>
                 </div>
               </>
             ) : (
