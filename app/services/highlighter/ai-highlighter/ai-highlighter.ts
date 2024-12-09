@@ -53,28 +53,31 @@ interface IHighlighterProgressMessage {
   progress: number;
 }
 
+
 export interface IHighlighterMilestone {
   name: string;
   weight: number;
   data: IHighlighterMessage[] | null;
 }
 
+
+const START_TOKEN = '>>>>';
+const END_TOKEN = '<<<<';
+
 // Buffer management class to handle split messages
 class MessageBufferHandler {
   private buffer: string = '';
-  private readonly startToken: string = '>>>>';
-  private readonly endToken: string = '<<<<';
 
   hasCompleteMessage(): boolean {
-    const hasStart = this.buffer.includes(this.startToken);
-    const hasEnd = this.buffer.includes(this.endToken);
+    const hasStart = this.buffer.includes(START_TOKEN);
+    const hasEnd = this.buffer.includes(END_TOKEN);
     return hasStart && hasEnd;
   }
 
   isMessageComplete(message: string): boolean {
     const combined = this.buffer + message;
-    const hasStart = combined.includes(this.startToken);
-    const hasEnd = combined.includes(this.endToken);
+    const hasStart = combined.includes(START_TOKEN);
+    const hasEnd = combined.includes(END_TOKEN);
     return hasStart && hasEnd;
   }
 
@@ -85,13 +88,13 @@ class MessageBufferHandler {
   extractCompleteMessages(): string[] {
     const messages = [];
     while (this.hasCompleteMessage()) {
-      const start = this.buffer.indexOf(this.startToken);
-      const end = this.buffer.indexOf(this.endToken);
+      const start = this.buffer.indexOf(START_TOKEN);
+      const end = this.buffer.indexOf(END_TOKEN);
 
       if (start !== -1 && end !== -1 && start < end) {
-        const completeMessage = this.buffer.substring(start, end + this.endToken.length);
+        const completeMessage = this.buffer.substring(start, end + END_TOKEN.length);
         // Clear the buffer of the extracted message
-        this.buffer = this.buffer.substring(end + this.endToken.length);
+        this.buffer = this.buffer.substring(end + END_TOKEN.length);
         messages.push(completeMessage);
       } else {
         // Message not complete
@@ -161,9 +164,9 @@ export function getHighlightClips(
               milestoneUpdate?.(aiHighlighterMessage.json as IHighlighterMilestone);
               break;
             default:
-              console.log('\n\n');
-              console.log('Unrecognized message type:', aiHighlighterMessage);
-              console.log('\n\n');
+              // console.log('\n\n');
+              // console.log('Unrecognized message type:', aiHighlighterMessage);
+              // console.log('\n\n');
               break;
           }
         }
@@ -188,10 +191,10 @@ export function getHighlightClips(
 
 function parseAiHighlighterMessage(messageString: string): IHighlighterMessage | string | null {
   try {
-    if (messageString.includes('>>>>') && messageString.includes('<<<<')) {
-      const start = messageString.indexOf('>>>>');
-      const end = messageString.indexOf('<<<<');
-      const jsonString = messageString.substring(start, end).replace('>>>>', '');
+    if (messageString.includes(START_TOKEN) && messageString.includes(END_TOKEN)) {
+      const start = messageString.indexOf(START_TOKEN);
+      const end = messageString.indexOf(END_TOKEN);
+      const jsonString = messageString.substring(start, end).replace(START_TOKEN, '');
       // console.log('Json string:', jsonString);
 
       const aiHighlighterMessage = JSON.parse(jsonString) as IHighlighterMessage;

@@ -69,7 +69,7 @@ export default function ClipPreview(props: {
           </div>
         )}
         <div className={styles.flameHypescoreWrapper}>
-          {isAiClip(v.clip) && <FlameHypeScore score={v.clip.aiInfo.score}></FlameHypeScore>}
+          {isAiClip(v.clip) && <FlameHypeScore score={v.clip.aiInfo.score} />}
         </div>
         <span className={styles.enableButton}>
           <BoolButtonInput
@@ -100,7 +100,6 @@ export default function ClipPreview(props: {
               <div
                 style={{
                   fontSize: '19px',
-                  transform: 'translateY(1px)',
                 }}
               >
                 {isAiClip(v.clip) ? (
@@ -159,10 +158,11 @@ function FlameHypeScore({ score }: { score: number }) {
 
   return (
     <div className="flex items-center gap-1" style={{ fontSize: '19px' }}>
-      {[...Array(fullFlames)].map((_, index) => (
+      {Array.from({ length: fullFlames }).map((_, index) => (
         <React.Fragment key={'on' + index}>🔥</React.Fragment>
       ))}
-      {[...Array(5 - fullFlames)].map((_, index) => (
+
+      {Array.from({ length: 5 - fullFlames }).map((_, index) => (
         <span key={'off' + index} style={{ opacity: '0.3' }}>
           🔥
         </span>

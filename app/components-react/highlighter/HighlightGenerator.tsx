@@ -44,14 +44,14 @@ export default function HighlightGenerator({
   const [filterType, setFilterType] = useState<'duration' | 'hypescore'>('duration');
   const [targetDuration, setTargetDuration] = useState(combinedClipsDuration + 100);
   const options = [
-    { value: 1, label: `1 ${$t('minute')}` },
-    { value: 2, label: `2 ${$t('minutes')}` },
-    { value: 5, label: `5 ${$t('minutes')}` },
-    { value: 10, label: `10 ${$t('minutes')}` },
-    { value: 12, label: `12 ${$t('minutes')}` },
-    { value: 15, label: `15 ${$t('minutes')}` },
-    { value: 20, label: `20 ${$t('minutes')}` },
-    { value: 30, label: `30 ${$t('minutes')}` },
+    {
+      value: 1,
+      label: $t('%{duration} minute', { duration: 1 }),
+    },
+    ...[2, 5, 10, 12, 15, 20, 30].map(value => ({
+      value,
+      label: $t('%{duration} minutes', { duration: value }),
+    })),
   ];
   const filteredOptions = options.filter(option => option.value * 60 <= combinedClipsDuration);
   const handleRoundSelect = (value: number[]) => {
@@ -195,15 +195,7 @@ export default function HighlightGenerator({
           setTargetDuration(combinedClipsDuration + 100);
         }}
         icon={<span style={{ color: '#666666', fontSize: '20px' }}>&times;</span>}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: '32px',
-          height: '32px',
-          borderRadius: '16px',
-          padding: 0,
-        }}
+        className={styles.resetButton}
       />
     </div>
   );

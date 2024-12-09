@@ -99,7 +99,7 @@ function ExportModal({ close, streamId }: { close: () => void; streamId: string 
     resetExportedState();
   };
   // Clear all errors when this component unmounts
-  useEffect(unmount, []);
+  useEffect(() => unmount, []);
 
   if (exportInfo.exporting) return <ExportProgress />;
   if (!exportInfo.exported) {

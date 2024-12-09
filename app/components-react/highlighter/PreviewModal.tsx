@@ -5,7 +5,7 @@ import { TClip } from 'services/highlighter';
 import { sortClipsByOrder } from './utils';
 import MiniClipPreview from './MiniClipPreview';
 import { PauseButton, PlayButton } from './StreamCard';
-
+import styles from './PreviewModal.m.less';
 export default function PreviewModal({
   close,
   streamId,
@@ -225,41 +225,14 @@ export default function PreviewModal({
         This is just a preview of your highlight reel. Loading times between clips are possible.
       </p>
       <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9' }}>
-        <video
-          onClick={togglePlay}
-          ref={videoPlayer}
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-          }}
-        />
+        <video onClick={togglePlay} ref={videoPlayer} className={styles.videoPlayer} />
       </div>
       <div style={{ display: 'flex', marginTop: '16px' }}>
         <div style={{ cursor: 'pointer' }} onClick={() => togglePlay()}>
           {playPauseButton()}
         </div>
-        <div
-          ref={containerRef}
-          onWheel={handleScroll}
-          style={{
-            width: '100%',
-            paddingLeft: '8px',
-            paddingRight: '8px',
-            display: 'flex',
-            overflowX: 'auto',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              gap: '4px',
-              paddingBottom: '8px',
-              justifyContent: 'center',
-            }}
-          >
+        <div ref={containerRef} onWheel={handleScroll} className={styles.timeline}>
+          <div className={styles.timelineItemWrapper}>
             {playlist.map(({ path }, index) => {
               let content;
               if (path === intro.path || path === outro.path) {
@@ -284,12 +257,7 @@ export default function PreviewModal({
                 <div
                   key={'preview-mini' + index}
                   id={'preview-' + index}
-                  style={{
-                    cursor: 'pointer',
-                    borderRadius: '6px',
-                    width: 'fit-content',
-                    border: `solid 2px ${currentClipIndex === index ? 'white' : 'transparent'}`,
-                  }}
+                  className={styles.timelineItem}
                   onClick={() => {
                     jumpToClip(index);
                   }}
