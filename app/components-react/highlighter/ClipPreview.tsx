@@ -100,7 +100,6 @@ export default function ClipPreview(props: {
               <div
                 style={{
                   fontSize: '19px',
-                  transform: 'translateY(1px)',
                 }}
               >
                 {isAiClip(v.clip) ? (
