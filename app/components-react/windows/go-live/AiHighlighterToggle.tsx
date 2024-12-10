@@ -72,7 +72,6 @@ export default function AiHighlighterToggle({
                 <div className={styles.expandedWrapper}>
                   <div className={styles.toggleTextWrapper}>
                     <div>
-                      {' '}
                       <h2 style={{ fontSize: '16px', fontWeight: 600 }}>
                         Auto-create
                         <br /> highlights

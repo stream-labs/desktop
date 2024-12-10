@@ -171,7 +171,7 @@ function ActionBar({
           size="large"
           onClick={emitShowStreamClips}
         >
-          {$t('Edit clips')}
+          {$t('Edit Clips')}
         </Button>
 
         {/* TODO: What clips should be included when user clicks this button + bring normal export modal in here */}
@@ -223,7 +223,7 @@ function ActionBar({
               e.stopPropagation();
             }}
           >
-            {$t('Add clips')}
+            {$t('Add Clips')}
           </Button>
         )}
       </div>
@@ -302,7 +302,6 @@ export function Thumbnail({
         alt=""
       />
       <div className={styles.centeredOverlayItem}>
-        {' '}
         <div
           onClick={e => {
             if (stream.state.type !== EAiDetectionState.IN_PROGRESS) {
@@ -340,7 +339,7 @@ export function RotatedClips({ clips }: { clips: TClip[] }) {
             >
               <img style={{ height: '100%' }} src={clip.scrubSprite || ''} />
             </div>
-          ))}{' '}
+          ))}
         </div>
       ) : (
         ''

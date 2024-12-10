@@ -283,10 +283,10 @@ function ExportOptions({
           </Button>
 
           <Button style={{ marginRight: 8 }} type="primary" onClick={() => startExport('vertical')}>
-            {$t('Export vertical')}
+            {$t('Export Vertical')}
           </Button>
           <Button type="primary" onClick={() => startExport('horizontal')}>
-            {$t('Export horizontal')}
+            {$t('Export Horizontal')}
           </Button>
         </div>
       </Form>
