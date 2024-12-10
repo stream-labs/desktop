@@ -60,7 +60,7 @@ export async function addSource(
   await clickAddSource();
   await focusChild();
 
-  await waitForDisplayed('span=Essential Sources');
+  await waitForDisplayed('[data-testid=essential-sources]');
   await click(`[data-name="${type}"]`);
 
   await clickButton('Add Source');
