@@ -111,7 +111,6 @@ export function getHighlightClips(
   renderHighlights: (highlightClips: IHighlight[]) => void,
   cancelSignal: AbortSignal,
   progressUpdate?: (progress: number) => void,
-  mockChildProcess?: child.ChildProcess,
   milestonesPath?: string,
   milestoneUpdate?: (milestone: IHighlighterMilestone) => void,
 ): Promise<IHighlight[]> {
@@ -121,15 +120,17 @@ export function getHighlightClips(
     const partialInputsRendered = false;
     console.log('Start Ai analysis');
 
-    const childProcess: child.ChildProcess =
-      mockChildProcess || AiHighlighterUpdater.startHighlighterProcess(videoUri, milestonesPath);
+    const childProcess: child.ChildProcess = AiHighlighterUpdater.startHighlighterProcess(
+      videoUri,
+      milestonesPath,
+    );
     const messageBuffer = new MessageBufferHandler();
 
     if (cancelSignal) {
       cancelSignal.addEventListener('abort', () => {
         console.log('ending highlighter process');
         messageBuffer.clear();
-        kill(childProcess.pid, 'SIGINT');
+        kill(childProcess.pid!, 'SIGINT');
         reject(new Error('Highlight generation canceled'));
       });
     }

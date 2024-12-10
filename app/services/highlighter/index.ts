@@ -1929,7 +1929,6 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
         (progress: number) => {
           progressTracker.updateProgressFromHighlighter(progress);
         },
-        null,
         streamInfo.milestonesPath,
         (milestone: IHighlighterMilestone) => {
           this.streamMilestones?.milestones?.push(milestone);
@@ -2293,13 +2292,13 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
   /**
    * Create milestones file if ids match and return path
    */
-  private async prepareMilestonesFile(streamId: string): Promise<string> {
+  private async prepareMilestonesFile(streamId: string): Promise<string | undefined> {
     if (
       !this.streamMilestones ||
       this.streamMilestones.streamId !== streamId ||
       this.streamMilestones.milestones.length === 0
     ) {
-      return null;
+      return;
     }
 
     const basepath = getSharedResource('ai-highlighter');

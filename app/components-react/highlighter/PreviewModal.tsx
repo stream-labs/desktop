@@ -67,6 +67,9 @@ export default function PreviewModal({
   }
 
   useEffect(() => {
+    if (!videoPlayer.current) {
+      return;
+    }
     //Pause gets also triggered when the video ends. We dont want to change the clip in that case
     const nextClip = () => {
       if (!isChangingClip.current) {
@@ -113,9 +116,9 @@ export default function PreviewModal({
       audio.current!.play().catch(e => console.error('Error playing audio:', e));
     };
 
-    videoPlayer.current?.addEventListener('ended', handleEnded);
-    videoPlayer.current?.addEventListener('play', handlePlay);
-    videoPlayer.current?.addEventListener('pause', handlePause);
+    videoPlayer.current.addEventListener('ended', handleEnded);
+    videoPlayer.current.addEventListener('play', handlePlay);
+    videoPlayer.current.addEventListener('pause', handlePause);
 
     if (audioSettings.musicEnabled && audioSettings.musicPath) {
       audio.current = new Audio(audioSettings.musicPath);
@@ -134,7 +137,7 @@ export default function PreviewModal({
         audio.current = null;
       }
     };
-  }, [playlist.length]);
+  }, [playlist.length, videoPlayer.current]);
 
   useEffect(() => {
     currentClipIndexRef.current = currentClipIndex;
