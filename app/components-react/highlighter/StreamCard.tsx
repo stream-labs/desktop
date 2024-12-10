@@ -47,7 +47,7 @@ export default function StreamCard({
     HighlighterService.views.highlightedStreams.find(s => s.id === streamId),
   );
   if (!stream) {
-    return <>error</>;
+    return <></>;
   }
 
   function showStreamClips() {
