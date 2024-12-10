@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { Empty, Row, Col, PageHeader, Button } from 'antd';
+import React, { useMemo, useState } from 'react';
+import { Empty, Row, Col, PageHeader, Button, Collapse } from 'antd';
 import Scrollable from 'components-react/shared/Scrollable';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
@@ -14,6 +14,7 @@ import SourceTag from './SourceTag';
 import { useSourceShowcaseSettings } from './useSourceShowcase';
 import { EAvailableFeatures } from 'services/incremental-rollout';
 import { useRealmObject } from 'components-react/hooks/realm';
+import styles from './SourceGrid.m.less';
 
 export default function SourceGrid(p: { activeTab: string }) {
   const {
@@ -24,6 +25,14 @@ export default function SourceGrid(p: { activeTab: string }) {
     CustomizationService,
     IncrementalRolloutService,
   } = Services;
+
+  // TODO: persistence
+  const [expandedSections, setExpandedSections] = useState([
+    'essentialSources',
+    'generalSources',
+    'widgets',
+    'apps',
+  ]);
 
   const { isLoggedIn, linkedPlatforms, primaryPlatform } = useVuex(() => ({
     isLoggedIn: UserService.views.isLoggedIn,
@@ -106,7 +115,7 @@ export default function SourceGrid(p: { activeTab: string }) {
   }, []);
 
   function showContent(key: string) {
-    const correctKey = ['all', key].includes(p.activeTab);
+    const correctKey = key === p.activeTab;
     if (key === 'apps') {
       return correctKey && availableAppSources.length > 0;
     }
@@ -126,110 +135,180 @@ export default function SourceGrid(p: { activeTab: string }) {
     return !essentialSources.essentialDefaults.find(s => s.value === source.value);
   }
 
-  return (
-    <Scrollable style={{ height: 'calc(100% - 64px)' }}>
-      <Row
-        gutter={[8, 8]}
-        style={{ marginLeft: '24px', marginRight: '24px', paddingBottom: '24px' }}
-      >
-        {showContent('all') && (
+  const { Panel } = Collapse;
+
+  const essentialSourcesList = useMemo(
+    () => (
+      <>
+        {essentialSources.essentialDefaults.map(source => (
+          <SourceTag key={source.value} type={source.value} essential excludeWrap={excludeWrap} />
+        ))}
+
+        {isLoggedIn &&
+          essentialSources.essentialWidgets.map(widgetType => (
+            <SourceTag key={widgetType} type={widgetType} essential excludeWrap={excludeWrap} />
+          ))}
+        {isLoggedIn && (
+          <SourceTag
+            key="streamlabel"
+            name={$t('Stream Label')}
+            type="streamlabel"
+            essential
+            excludeWrap={excludeWrap}
+          />
+        )}
+      </>
+    ),
+    [essentialSources, isLoggedIn, excludeWrap],
+  );
+
+  const generalSourcesList = useMemo(() => {
+    return (
+      <>
+        {availableSources.filter(filterEssential).map(source => (
+          <SourceTag key={source.value} type={source.value} excludeWrap={excludeWrap} />
+        ))}
+        <SourceTag
+          key="replay"
+          name={$t('Instant Replay')}
+          type="replay"
+          excludeWrap={excludeWrap}
+        />
+        {designerMode && (
+          <SourceTag
+            key="icon_library"
+            name={$t('Custom Icon')}
+            type={'icon_library'}
+            excludeWrap={excludeWrap}
+          />
+        )}
+      </>
+    );
+  }, [availableSources, p.activeTab, designerMode, excludeWrap]);
+
+  const appsList = useMemo(
+    () => (
+      <>
+        {availableAppSources.map(app => (
+          <SourceTag
+            key={`${app.appId}${app.source.id}`}
+            name={app.source.name}
+            type="app_source"
+            appId={app.appId}
+            appSourceId={app.source.id}
+            excludeWrap={excludeWrap}
+          />
+        ))}
+      </>
+    ),
+    [availableAppSources, excludeWrap],
+  );
+
+  const widgetList = useMemo(
+    () => (
+      <>
+        {!isLoggedIn ? (
+          <Empty
+            description={$t('You must be logged in to use Widgets')}
+            image={$i(`images/sleeping-kevin-${demoMode}.png`)}
+          >
+            <Button onClick={handleAuth}>{$t('Click here to log in')}</Button>
+          </Empty>
+        ) : (
           <>
-            <Col span={24}>
-              <PageHeader style={{ paddingLeft: 0 }} title={$t('Essential Sources')} />
-            </Col>
-            {essentialSources.essentialDefaults.map(source => (
-              <SourceTag
-                key={source.value}
-                type={source.value}
-                essential
-                excludeWrap={excludeWrap}
-              />
+            {iterableWidgetTypes.filter(filterEssential).map(widgetType => (
+              <SourceTag key={widgetType} type={widgetType} excludeWrap={excludeWrap} />
             ))}
-            {isLoggedIn &&
-              essentialSources.essentialWidgets.map(widgetType => (
-                <SourceTag key={widgetType} type={widgetType} essential excludeWrap={excludeWrap} />
-              ))}
-            {isLoggedIn && (
+            {p.activeTab !== 'all' && (
               <SourceTag
                 key="streamlabel"
                 name={$t('Stream Label')}
                 type="streamlabel"
-                essential
                 excludeWrap={excludeWrap}
               />
             )}
           </>
         )}
-        {showContent('general') && (
-          <>
-            <Col span={24}>
-              <PageHeader style={{ paddingLeft: 0 }} title={$t('General Sources')} />
-            </Col>
-            {availableSources.filter(filterEssential).map(source => (
-              <SourceTag key={source.value} type={source.value} excludeWrap={excludeWrap} />
-            ))}
-            <SourceTag
-              key="replay"
-              name={$t('Instant Replay')}
-              type="replay"
-              excludeWrap={excludeWrap}
-            />
-            {designerMode && (
-              <SourceTag
-                key="icon_library"
-                name={$t('Custom Icon')}
-                type={'icon_library'}
-                excludeWrap={excludeWrap}
-              />
-            )}
-          </>
-        )}
+      </>
+    ),
+    [isLoggedIn, iterableWidgetTypes, p.activeTab, excludeWrap],
+  );
 
-        {showContent('widgets') && (
+  const individualTab = useMemo(() => {
+    if (showContent('general')) {
+      return (
+        <>
+          <Col span={24}>
+            <PageHeader style={{ paddingLeft: 0 }} title={$t('General Sources')} />
+          </Col>
+          {generalSourcesList}
+        </>
+      );
+    } else if (showContent('widgets')) {
+      return (
+        <>
+          <Col span={24}>
+            <PageHeader style={{ paddingLeft: 0 }} title={$t('Widgets')} />
+          </Col>
+          {widgetList}
+        </>
+      );
+    } else if (showContent('apps')) {
+      return (
+        <>
+          <Col span={24}>
+            <PageHeader style={{ paddingLeft: 0 }} title={$t('Apps')} />
+          </Col>
+          {appsList}
+        </>
+      );
+    }
+  }, [p.activeTab, availableAppSources, appsList, widgetList]);
+
+  return (
+    <Scrollable style={{ height: 'calc(100% - 64px)' }} className={styles.sourceGrid}>
+      <Row
+        gutter={[8, 8]}
+        style={{ marginLeft: '24px', marginRight: '24px', paddingBottom: '24px' }}
+      >
+        {p.activeTab === 'all' ? (
           <>
             <Col span={24}>
-              <PageHeader style={{ paddingLeft: 0 }} title={$t('Widgets')} />
-            </Col>
-            {!isLoggedIn ? (
-              <Empty
-                description={$t('You must be logged in to use Widgets')}
-                image={$i(`images/sleeping-kevin-${demoMode}.png`)}
+              <Collapse
+                ghost
+                activeKey={expandedSections}
+                onChange={xs => setExpandedSections(xs as string[])}
               >
-                <Button onClick={handleAuth}>{$t('Click here to log in')}</Button>
-              </Empty>
-            ) : (
-              <>
-                {iterableWidgetTypes.filter(filterEssential).map(widgetType => (
-                  <SourceTag key={widgetType} type={widgetType} excludeWrap={excludeWrap} />
-                ))}
-                {p.activeTab !== 'all' && (
-                  <SourceTag
-                    key="streamlabel"
-                    name={$t('Stream Label')}
-                    type="streamlabel"
-                    excludeWrap={excludeWrap}
-                  />
-                )}
-              </>
-            )}
-          </>
-        )}
-        {showContent('apps') && (
-          <>
-            <Col span={24}>
-              <PageHeader style={{ paddingLeft: 0 }} title={$t('Apps')} />
+                <Panel
+                  header={$t('Essential Sources')}
+                  key="essentialSources"
+                  collapsible="disabled"
+                  showArrow={false}
+                >
+                  <div className="collapse-section" data-testid="essential-sources">
+                    {essentialSourcesList}
+                  </div>
+                </Panel>
+                <Panel header={$t('General Sources')} key="generalSources">
+                  <div className="collapse-section" data-testid="general-sources">
+                    {generalSourcesList}
+                  </div>
+                </Panel>
+                <Panel header={$t('Widgets')} key="widgets">
+                  <div className="collapse-section" data-testid="widget-sources">
+                    {widgetList}
+                  </div>
+                </Panel>
+                <Panel header={$t('Apps')} key="apps">
+                  <div className="collapse-section" data-testid="app-sources">
+                    {appsList}
+                  </div>
+                </Panel>
+              </Collapse>
             </Col>
-            {availableAppSources.map(app => (
-              <SourceTag
-                key={`${app.appId}${app.source.id}`}
-                name={app.source.name}
-                type="app_source"
-                appId={app.appId}
-                appSourceId={app.source.id}
-                excludeWrap={excludeWrap}
-              />
-            ))}
           </>
+        ) : (
+          individualTab
         )}
       </Row>
     </Scrollable>
