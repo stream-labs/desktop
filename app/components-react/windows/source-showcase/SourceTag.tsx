@@ -39,7 +39,7 @@ export default function SourceTag(p: {
   return (
     <Col span={8}>
       <div
-        className={cx(styles.sourceTag, {
+        className={cx('source-tag', styles.sourceTag, {
           [styles.active]: active(),
           [styles.essential]: p.essential,
           [styles.excludeWrap]: p.excludeWrap,
