@@ -171,7 +171,7 @@ function ActionBar({
           size="large"
           onClick={emitShowStreamClips}
         >
-          {$t('Edit clips')}
+          {$t('Edit Clips')}
         </Button>
 
         {/* TODO: What clips should be included when user clicks this button + bring normal export modal in here */}
@@ -223,7 +223,7 @@ function ActionBar({
               e.stopPropagation();
             }}
           >
-            {$t('Add clips')}
+            {$t('Add Clips')}
           </Button>
         )}
       </div>

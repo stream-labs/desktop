@@ -126,12 +126,12 @@ export default function SettingsView({
         <div style={{ display: 'flex', gap: '16px' }}>
           {aiHighlighterEnabled && (
             <Button type="primary" onClick={() => emitSetView({ view: EHighlighterView.STREAM })}>
-              {$t('Stream highlights')}
+              {$t('Stream Highlights')}
             </Button>
           )}
           {/* New button coming with next PR */}
           <Button onClick={() => emitSetView({ view: EHighlighterView.CLIPS, id: undefined })}>
-            {$t('All clips')}
+            {$t('All Clips')}
           </Button>
         </div>
       </div>
