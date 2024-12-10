@@ -117,7 +117,7 @@ export default function PreviewModal({
     videoPlayer.current?.addEventListener('play', handlePlay);
     videoPlayer.current?.addEventListener('pause', handlePause);
 
-    if (audioSettings.musicEnabled && audioSettings.musicPath) {
+    if (audioSettings.musicEnabled && audioSettings.musicPath && playlist.length > 0) {
       audio.current = new Audio(audioSettings.musicPath);
       audio.current.volume = audioSettings.musicVolume / 100;
       audio.current.autoplay = true;
@@ -217,6 +217,15 @@ export default function PreviewModal({
       containerRef.current.scrollLeft += event.deltaY;
     }
   };
+
+  if (playlist.length === 0) {
+    return (
+      <div>
+        <h2>{$t('Preview')}</h2>
+        <p>Select at least one clip to preview your video</p>
+      </div>
+    );
+  }
 
   return (
     <div>

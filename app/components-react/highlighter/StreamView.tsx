@@ -235,7 +235,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
             onClick={() => !aiDetectionInProgress && setShowModal({ type: 'upload' })}
           >
             <FortniteIcon />
-            {$t('Drop your Fornite recording')}
+            {$t('Select your Fornite recording')}
             <Button disabled={aiDetectionInProgress === true}>Import</Button>
           </div>
           <Button onClick={() => emitSetView({ view: EHighlighterView.SETTINGS })}>
