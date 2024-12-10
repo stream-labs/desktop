@@ -53,13 +53,11 @@ interface IHighlighterProgressMessage {
   progress: number;
 }
 
-
 export interface IHighlighterMilestone {
   name: string;
   weight: number;
   data: IHighlighterMessage[] | null;
 }
-
 
 const START_TOKEN = '>>>>';
 const END_TOKEN = '<<<<';
