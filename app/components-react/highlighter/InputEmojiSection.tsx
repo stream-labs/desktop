@@ -157,7 +157,7 @@ export function RoundTag({ clips }: { clips: TClip[] }): JSX.Element {
   const { emoji, description } = getTypeWordingFromType('rounds', rounds);
   return (
     <div key={'rounds'} style={{ display: 'flex', gap: '4px' }}>
-      <span key={'rounds-emoji'}> {emoji} </span>
+      <span key={'rounds-emoji'}> {emoji} </span>{' '}
       <span className={styles.description} key={'rounds-description'}>
         {rounds} {description}
       </span>

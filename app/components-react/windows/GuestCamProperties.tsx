@@ -395,7 +395,7 @@ function GuestCamPropertiesModal() {
             {joinAsGuest ? (
               <div style={{ height: 32, margin: '10px 0 10px' }}>
                 <div>
-                  <b>{$t('Connected To Host:')}</b>
+                  <b>{$t('Connected To Host:')}</b>{' '}
                   <span style={{ color: 'var(--title)' }}>{hostName}</span>
                   <Tooltip
                     title={$t(

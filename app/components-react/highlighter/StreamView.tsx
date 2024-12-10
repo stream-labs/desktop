@@ -159,6 +159,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
             />
           </div>
           <div style={{ display: 'flex', gap: '8px', justifyContent: 'space-between' }}>
+            {' '}
             <Button type="default" onClick={() => close()}>
               {$t('Cancel')}
             </Button>

@@ -50,7 +50,8 @@ export default function InstalledApps() {
           {installedApps.map(app => (
             <tr key={app.id}>
               <td>
-                <img src={app.icon} alt="-" width="50" />
+                {' '}
+                <img src={app.icon} alt="-" width="50" />{' '}
               </td>
               <td> {app.manifest.name} </td>
               <td> {app.manifest.version} </td>

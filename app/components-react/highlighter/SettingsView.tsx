@@ -166,6 +166,7 @@ export default function SettingsView({
             )}
             <div className={styles.manualCard}>
               <h3 className={styles.cardHeaderTitle}>
+                {' '}
                 {aiHighlighterEnabled ? 'Or use the manual highlighter ' : 'Manual highlighter'}
               </h3>
               <p>
