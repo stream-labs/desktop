@@ -12,7 +12,7 @@ const { Option } = Select;
 
 const selectStyles = {
   width: '220px',
-  borderRadius: '4px',
+  borderRadius: '8px',
 };
 
 const dropdownStyles = {
@@ -21,6 +21,7 @@ const dropdownStyles = {
 };
 
 const checkboxStyles = {
+  borderRadius: '8px',
   width: '100%',
 };
 
@@ -54,15 +55,6 @@ export default function HighlightGenerator({
     })),
   ];
   const filteredOptions = options.filter(option => option.value * 60 <= combinedClipsDuration);
-  const handleRoundSelect = (value: number[]) => {
-    if (value.includes(0)) {
-      setSelectedRounds([0]);
-    } else if (value.length === 0) {
-      setSelectedRounds([0]);
-    } else {
-      setSelectedRounds(value.filter(item => item !== 0));
-    }
-  };
   const isFirstRender = useRef(true);
   useEffect(() => {
     // To not emit on first render
@@ -124,53 +116,44 @@ export default function HighlightGenerator({
         style={selectStyles}
         mode="multiple"
         value={selectedRounds}
-        onChange={handleRoundSelect}
         maxTagCount={2}
         suffixIcon={<DownOutlined style={{ color: '#FFFFFF', fontSize: '12px' }} />}
         tagRender={({ value }) => (
           <span className={styles.tag}>{value === 0 ? 'All Rounds' : `Round ${value}`}</span>
         )}
         dropdownStyle={dropdownStyles}
-        dropdownRender={menu => (
-          <div>
-            <div className={styles.option}>
-              <Checkbox
-                style={checkboxStyles}
-                checked={selectedRounds.includes(0)}
-                onChange={e => {
-                  setSelectedRounds(e.target.checked ? [0] : []);
-                }}
-              >
-                {$t('All rounds')}
-              </Checkbox>
-            </div>
-            <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
-              {roundDetails.map(roundDetails => (
-                <div key={roundDetails.round} className={styles.option}>
-                  <Checkbox
-                    style={checkboxStyles}
-                    checked={selectedRounds.includes(roundDetails.round)}
-                    onChange={e => {
-                      if (e.target.checked) {
-                        const newSelection = [
-                          ...selectedRounds.filter(r => r !== 0),
-                          roundDetails.round,
-                        ];
-                        setSelectedRounds(newSelection);
-                      } else {
-                        const newSelection = selectedRounds.filter(r => r !== roundDetails.round);
-                        setSelectedRounds(newSelection.length === 0 ? [0] : newSelection);
-                      }
-                    }}
-                  >
-                    {roundDropdownDetails(roundDetails)}
-                  </Checkbox>
-                </div>
-              ))}
-            </div>
+      >
+        <div key="all-rounds" className={styles.option}>
+          <Checkbox
+            style={checkboxStyles}
+            checked={selectedRounds.includes(0)}
+            onChange={e => {
+              setSelectedRounds(e.target.checked ? [0] : []);
+            }}
+          >
+            {$t('All rounds')}
+          </Checkbox>
+        </div>
+        {roundDetails.map(roundDetails => (
+          <div key={'in-wrapper-round' + roundDetails.round} className={styles.option}>
+            <Checkbox
+              style={checkboxStyles}
+              checked={selectedRounds.includes(roundDetails.round)}
+              onChange={e => {
+                if (e.target.checked) {
+                  const newSelection = [...selectedRounds.filter(r => r !== 0), roundDetails.round];
+                  setSelectedRounds(newSelection);
+                } else {
+                  const newSelection = selectedRounds.filter(r => r !== roundDetails.round);
+                  setSelectedRounds(newSelection.length === 0 ? [0] : newSelection);
+                }
+              }}
+            >
+              {roundDropdownDetails(roundDetails)}
+            </Checkbox>
           </div>
-        )}
-      />
+        ))}
+      </Select>
       <h3 style={{ color: '#FFFFFF', margin: 0, fontWeight: 400 }}> {$t('with a duration of')}</h3>
       <Select
         style={{ width: '116px' }}
