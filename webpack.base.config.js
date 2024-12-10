@@ -23,6 +23,10 @@ if (process.env.SLD_COMPILE_FOR_BETA) {
   console.log('Compiling build with forced beta SL host.');
   envDef['process.env.SLD_COMPILE_FOR_BETA'] = JSON.stringify(true);
 }
+if (process.env.HIGHLIGHTER_STAGING) {
+  console.log('Compiling build with staging highlighter version.');
+  envDef['process.env.HIGHLIGHTER_STAGING'] = JSON.stringify(true);
+}
 
 plugins.push(new webpack.DefinePlugin(envDef));
 

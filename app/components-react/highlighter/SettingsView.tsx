@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import HotkeyBinding from 'components-react/shared/HotkeyBinding';
 import { IHotkey } from 'services/hotkeys';
@@ -13,6 +13,7 @@ import styles from './SettingsView.m.less';
 import { $t } from 'services/i18n';
 import { EHighlighterView, IViewState } from 'services/highlighter';
 import { EAvailableFeatures } from 'services/incremental-rollout';
+import Utils from 'services/utils';
 
 export default function SettingsView({
   emitSetView,
@@ -34,6 +35,7 @@ export default function SettingsView({
   const [hotkey, setHotkey] = useState<IHotkey | null>(null);
   const hotkeyRef = useRef<IHotkey | null>(null);
 
+  const shouldUseStagingHighlighter = useMemo(Utils.shouldUseHighlighterStaging, []);
   const v = useVuex(() => ({
     settingsValues: SettingsService.views.values,
     isStreaming: StreamingService.isStreaming,
@@ -116,7 +118,13 @@ export default function SettingsView({
     <div className={styles.settingsViewRoot}>
       <div style={{ display: 'flex', padding: 20 }}>
         <div style={{ flexGrow: 1 }}>
-          <h1 style={{ margin: 0 }}>{$t('Highlighter')}</h1>
+          <h1 style={{ margin: 0 }}>
+            {$t('Highlighter')}
+            {shouldUseStagingHighlighter && (
+              <span>highlighter: {shouldUseStagingHighlighter ? 'staging' : 'production'}</span>
+            )}
+          </h1>
+
           <p>
             {$t(
               'The highlighter allows you to clip the best moments from your livestream and edit them together into an exciting highlight video you can upload directly to YouTube.',
