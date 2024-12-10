@@ -24,6 +24,7 @@ export interface IEnv {
   // Allows joining as a guest instead of a host for guest cam
   SLD_GUEST_CAM_HASH: string;
   CI: boolean;
+  HIGHLIGHTER_STAGING: boolean;
 }
 
 export default class Utils {
@@ -99,6 +100,9 @@ export default class Utils {
 
   static isDevMode() {
     return Utils.env.NODE_ENV !== 'production';
+  }
+  static shouldUseHighlighterStaging() {
+    return process.env.HIGHLIGHTER_STAGING;
   }
 
   static isTestMode() {
