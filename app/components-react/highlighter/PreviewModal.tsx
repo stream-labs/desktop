@@ -270,7 +270,7 @@ export default function PreviewModal({
               );
             })}
           </div>
-        </div>{' '}
+        </div>
       </div>
     </div>
   );
