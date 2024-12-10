@@ -121,7 +121,7 @@ export default function ThemeAudit() {
 
     return (
       <span style={{ color, marginRight: 8 }}>
-        {['WARN', 'CRITICAL'].includes(type) && <ExclamationCircleOutlined style={{ color }} />}{' '}
+        {['WARN', 'CRITICAL'].includes(type) && <ExclamationCircleOutlined style={{ color }} />}
         <b>{label}:</b> {displayValue}
       </span>
     );

@@ -112,7 +112,7 @@ export default function ClipPreview(props: {
                   />
                 ) : (
                   <div className={styles.highlighterIcon}>
-                    <i className="icon-highlighter" />{' '}
+                    <i className="icon-highlighter" />
                   </div>
                 )}
               </div>

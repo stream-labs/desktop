@@ -335,7 +335,7 @@ function StudioModeControls(p: { stacked: boolean }) {
         className="button button--default"
         onClick={() => TransitionsService.actions.executeStudioModeTransition()}
       >
-        {$t('Transition')}{' '}
+        {$t('Transition')}
         {p.stacked ? (
           <i className="fa fa-arrow-down" v-if="stacked" />
         ) : (

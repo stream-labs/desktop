@@ -51,7 +51,7 @@ export function TwitchEditStreamInfo(p: IPlatformComponentParams<'twitch'>) {
         }
         requiredFields={
           <React.Fragment key="required-fields">
-            <GameSelector key="required" platform={'twitch'} {...bind.game} />{' '}
+            <GameSelector key="required" platform={'twitch'} {...bind.game} />
             {aiHighlighterEnabled && (
               <AiHighlighterToggle key="ai-toggle" game={bind.game?.value} cardIsExpanded={true} />
             )}

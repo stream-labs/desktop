@@ -302,7 +302,6 @@ export function Thumbnail({
         alt=""
       />
       <div className={styles.centeredOverlayItem}>
-        {' '}
         <div
           onClick={e => {
             if (stream.state.type !== EAiDetectionState.IN_PROGRESS) {
@@ -340,7 +339,7 @@ export function RotatedClips({ clips }: { clips: TClip[] }) {
             >
               <img style={{ height: '100%' }} src={clip.scrubSprite || ''} />
             </div>
-          ))}{' '}
+          ))}
         </div>
       ) : (
         ''
