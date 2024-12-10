@@ -7,10 +7,11 @@ import { ICustomStreamDestination } from '../../../services/settings/streaming';
 import { Services } from '../../service-provider';
 import { SwitchInput } from '../../shared/inputs';
 import PlatformLogo from '../../shared/PlatformLogo';
-import { assertIsDefined } from '../../../util/properties-type-guards';
 import { useDebounce } from '../../hooks';
 import { useGoLiveSettings } from './useGoLiveSettings';
 import { alertAsync } from '../../modals';
+import { ModalLayout } from 'components-react/shared/ModalLayout';
+import { Button, Form, Modal } from 'antd';
 
 /**
  * Allows enabling/disabling platforms and custom destinations for the stream
@@ -204,22 +205,15 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
         className: styles.tiktokModal,
         type: 'confirm',
         title: $t('Connect your TikTok Account'),
-        closable: true,
         content: $t(
           'Connect your TikTok account to stream to TikTok and one additional platform for free.',
         ),
         icon: <PlatformLogo platform="tiktok" className={styles.tiktokModalLogo} />,
-        okText: $t('Connect'),
-        okButtonProps: { type: 'primary' },
-        onOk: () => {
-          Services.NavigationService.actions.navigate('PlatformMerge', { platform: 'tiktok' });
-          Services.WindowsService.actions.closeChildWindow();
-        },
-        cancelText: $t('Skip'),
-        cancelButtonProps: { style: { display: 'unset', color: 'var(--link)' } },
-        onCancel: () => {
-          Services.WindowsService.actions.closeChildWindow();
-        },
+        closable: true,
+        maskClosable: true,
+        cancelButtonProps: { style: { display: 'none' } },
+        okButtonProps: { style: { display: 'none' } },
+        modalRender: node => <ModalLayout footer={<ModalFooter />}>{node}</ModalLayout>,
         width: 600,
       });
     }
@@ -336,3 +330,20 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
     </div>
   );
 });
+
+function ModalFooter() {
+  function connect() {
+    Modal.destroyAll();
+    Services.NavigationService.actions.navigate('PlatformMerge', { platform: 'tiktok' });
+    Services.WindowsService.actions.closeChildWindow();
+  }
+
+  return (
+    <Form layout={'inline'} className={styles.tiktokModalFooter}>
+      <Button onClick={Modal.destroyAll}>{$t('Skip')}</Button>
+      <Button type="primary" onClick={connect}>
+        {$t('Connect')}
+      </Button>
+    </Form>
+  );
+}

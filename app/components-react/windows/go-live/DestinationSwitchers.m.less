@@ -85,12 +85,12 @@
 }
 
 .tiktok-modal {
-  // &:global(.ant-modal.ant-modal-confirm.ant-modal-confirm-confirm) {
-  //   width: 600px;
-  // }
-
   &:global(.ant-modal-confirm .ant-modal-body) {
     padding: 0px;
+  }
+
+  :global(div.ant-modal-content) {
+    box-shadow: none;
   }
 
   :global(.ant-modal-confirm-body .ant-modal-confirm-title) {
@@ -100,18 +100,11 @@
   }
 
   :global(.ant-modal-confirm-btns) {
-    display: flex;
-    justify-content: flex-end;
-    width: 100%;
-    background-color: var(--modal-footer);
-    margin-top: 0px;
-    padding: 16px 32px;
-    border-radius: 0px 0px 4px 4px;
+    display: none;
   }
 }
 
-.tiktok-modal-title {
-  display: inline-block;
-  line-height: unset;
-  font-size: 18px;
+.tiktok-modal-footer {
+  display: flex;
+  justify-content: flex-end;
 }
