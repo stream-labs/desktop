@@ -15,6 +15,7 @@ import StreamCard from './StreamCard';
 import path from 'path';
 import PreviewModal from './PreviewModal';
 import moment from 'moment';
+import { TextInput } from 'components-react/shared/inputs';
 
 type TModalStreamView =
   | { type: 'export'; id: string | undefined }
@@ -119,11 +120,20 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
     const { HighlighterService } = Services;
     const [inputValue, setInputValue] = useState<string>('');
 
-    function handleInputChange(event: any) {
-      setInputValue(event.target.value);
+    function handleInputChange(value: string) {
+      setInputValue(value);
+    }
+
+    function specialCharacterValidator(rule: unknown, value: string, callback: Function) {
+      if (/[\\/:"*?<>|]+/g.test(value)) {
+        callback($t('You cannot use special characters in this field'));
+      } else {
+        callback();
+      }
     }
 
     async function startAiDetection(title: string) {
+      if (/[\\/:"*?<>|]+/g.test(title)) return;
       const streamInfo: StreamInfoForAiHighlighter = {
         id: 'manual_' + uuid(),
         title,
@@ -149,13 +159,15 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
       <>
         <div className={styles.manualUploadWrapper}>
           <div className={styles.titleInputWrapper}>
-            <h1 style={{ margin: 0 }}> {$t('Import Fortnite stream')}</h1>
-            <input
-              style={{ width: '100%', color: 'black' }}
-              type="text"
+            <h1 style={{ margin: 0 }}> {$t('Import Fortnite Stream')}</h1>
+            <TextInput
+              value={inputValue}
               name="name"
               placeholder={$t('Set a title for your stream')}
               onChange={handleInputChange}
+              style={{ width: '100%', color: 'black' }}
+              rules={[{ validator: specialCharacterValidator }]}
+              nowrap
             />
           </div>
           <div style={{ display: 'flex', gap: '8px', justifyContent: 'space-between' }}>
@@ -222,7 +234,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
     >
       <div style={{ display: 'flex', padding: 20 }}>
         <div style={{ flexGrow: 1 }}>
-          <h1 style={{ margin: 0 }}>My stream highlights</h1>
+          <h1 style={{ margin: 0 }}>{$t('My Stream Highlights')}</h1>
         </div>
         <div style={{ display: 'flex', gap: '16px' }}>
           <div
@@ -234,8 +246,8 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
             onClick={() => !aiDetectionInProgress && setShowModal({ type: 'upload' })}
           >
             <FortniteIcon />
-            {$t('Select your Fornite recording')}
-            <Button disabled={aiDetectionInProgress === true}>Import</Button>
+            {$t('Select your Fortnite recording')}
+            <Button disabled={aiDetectionInProgress === true}>{$t('Import')}</Button>
           </div>
           <Button onClick={() => emitSetView({ view: EHighlighterView.SETTINGS })}>
             {$t('Settings')}
