@@ -264,9 +264,9 @@ test('Create/Remove Game Capture and view Source Properties', async t => {
 });
 
 test('Create/Remove Video Capture Device and view Source Properties', async t => {
-  const sourceName = 'Video Capture Device';
+  const sourceName = 'Camera / Capture Card';
 
-  await addSource('Video Capture Device', sourceName);
+  await addSource('Camera / Capture Card', sourceName);
   await focusMain();
 
   await selectSource(sourceName);
