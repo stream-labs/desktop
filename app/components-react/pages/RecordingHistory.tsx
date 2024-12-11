@@ -13,8 +13,12 @@ import { Services } from '../service-provider';
 import { initStore, useController } from '../hooks/zustand';
 import { useVuex } from '../hooks';
 import Translate from 'components-react/shared/Translate';
+import uuid from 'uuid/v4';
+import { EMenuItemKey } from 'services/side-nav';
 import { $i } from 'services/utils';
 import { IRecordingEntry } from 'services/recording-mode';
+import { EAiDetectionState, EHighlighterView } from 'services/highlighter';
+import { EAvailableFeatures } from 'services/incremental-rollout';
 
 interface IRecordingHistoryStore {
   showSLIDModal: boolean;
@@ -29,6 +33,9 @@ class RecordingHistoryController {
   private UserService = Services.UserService;
   private SharedStorageService = Services.SharedStorageService;
   private NotificationsService = Services.NotificationsService;
+  private HighlighterService = Services.HighlighterService;
+  private NavigationService = Services.NavigationService;
+  private IncrementalRolloutService = Services.IncrementalRolloutService;
   store = initStore<IRecordingHistoryStore>({
     showSLIDModal: false,
     showEditModal: false,
@@ -51,8 +58,19 @@ class RecordingHistoryController {
     return this.RecordingModeService.state.uploadInfo;
   }
 
+  get aiDetectionInProgress() {
+    return this.HighlighterService.views.highlightedStreams.some(
+      stream => stream.state.type === EAiDetectionState.IN_PROGRESS,
+    );
+  }
+
   get uploadOptions() {
     const opts = [
+      {
+        label: `${$t('Get highlights (Fortnite only))')}`,
+        value: 'highlighter',
+        icon: 'icon-highlighter',
+      },
       {
         label: $t('Edit'),
         value: 'edit',
@@ -113,6 +131,20 @@ class RecordingHistoryController {
       this.postError($t('Upload already in progress'));
       return;
     }
+    if (platform === 'highlighter') {
+      if (this.aiDetectionInProgress) return;
+      this.HighlighterService.actions.flow(recording.filename, {
+        game: 'forntnite',
+        id: 'rec_' + uuid(),
+      });
+      this.NavigationService.actions.navigate(
+        'Highlighter',
+        { view: EHighlighterView.STREAM },
+        EMenuItemKey.Highlighter,
+      );
+      return;
+    }
+
     if (platform === 'youtube') return this.uploadToYoutube(recording.filename);
     if (platform === 'remove') return this.removeEntry(recording.timestamp);
     if (this.hasSLID) {
@@ -168,8 +200,12 @@ export default function RecordingHistoryPage() {
 export function RecordingHistory() {
   const controller = useController(RecordingHistoryCtx);
   const { formattedTimestamp, showFile, handleSelect, postError } = controller;
-  const { uploadInfo, uploadOptions, recordings, hasSLID } = useVuex(() => ({
+  const aiHighlighterEnabled = Services.IncrementalRolloutService.views.featureIsEnabled(
+    EAvailableFeatures.aiHighlighter,
+  );
+  const { uploadInfo, uploadOptions, recordings, hasSLID, aiDetectionInProgress } = useVuex(() => ({
     recordings: controller.recordings,
+    aiDetectionInProgress: controller.aiDetectionInProgress,
     uploadOptions: controller.uploadOptions,
     uploadInfo: controller.uploadInfo,
     hasSLID: controller.hasSLID,
@@ -193,18 +229,32 @@ export function RecordingHistory() {
   function UploadActions(p: { recording: IRecordingEntry }) {
     return (
       <span className={styles.actionGroup}>
-        {uploadOptions.map(opt => (
-          <span
-            className={styles.action}
-            key={opt.value}
-            style={{ color: `var(--${opt.value === 'edit' ? 'teal' : 'title'})` }}
-            onClick={() => handleSelect(p.recording, opt.value)}
-          >
-            <i className={opt.icon} />
-            &nbsp;
-            <span>{opt.label}</span>
-          </span>
-        ))}
+        {uploadOptions
+          .map(option => {
+            if (option.value === 'highlighter' && !aiHighlighterEnabled) {
+              return null;
+            }
+            return (
+              <span
+                className={styles.action}
+                key={option.value}
+                style={{
+                  color: `var(--${option.value === 'edit' ? 'teal' : 'title'})`,
+                  opacity: option.value === 'highlighter' && aiDetectionInProgress ? 0.3 : 1,
+                  cursor:
+                    option.value === 'highlighter' && aiDetectionInProgress
+                      ? 'not-allowed'
+                      : 'pointer',
+                }}
+                onClick={() => handleSelect(p.recording, option.value)}
+              >
+                <i className={option.icon} />
+                &nbsp;
+                <span>{option.label}</span>
+              </span>
+            );
+          })
+          .filter(Boolean)}
       </span>
     );
   }
