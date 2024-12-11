@@ -100,16 +100,25 @@ export default function SourceGrid(p: { activeTab: string }) {
     });
   }, []);
 
+  const essentialSourcesOrder = ['game_capture', 'dshow_input', 'ffmpeg_source'];
+
   const essentialSources = useMemo(() => {
-    const essentialDefaults = availableSources.filter(source =>
-      [
-        'dshow_input',
-        'ffmpeg_source',
-        byOS({ [OS.Windows]: 'screen_capture', [OS.Mac]: 'window_capture' }),
-      ].includes(source.value),
-    );
+    const essentialDefaults = availableSources
+      .filter(source =>
+        [
+          'dshow_input',
+          'ffmpeg_source',
+          'game_capture',
+          //byOS({ [OS.Windows]: 'screen_capture', [OS.Mac]: 'window_capture' }),
+        ].includes(source.value),
+      )
+      .sort(
+        (s1, s2) =>
+          essentialSourcesOrder.indexOf(s1.value) - essentialSourcesOrder.indexOf(s2.value),
+      );
+
     const essentialWidgets = iterableWidgetTypes.filter(type =>
-      [WidgetType.AlertBox, WidgetType.EventList].includes(WidgetType[type]),
+      [WidgetType.AlertBox, WidgetType.ChatBox].includes(WidgetType[type]),
     );
     return { essentialDefaults, essentialWidgets };
   }, []);
@@ -267,10 +276,7 @@ export default function SourceGrid(p: { activeTab: string }) {
 
   return (
     <Scrollable style={{ height: 'calc(100% - 64px)' }} className={styles.sourceGrid}>
-      <Row
-        gutter={[8, 8]}
-        style={{ marginLeft: '24px', marginRight: '24px', paddingBottom: '24px' }}
-      >
+      <Row gutter={[8, 8]} style={{ marginLeft: '8px', marginRight: '8px', paddingBottom: '24px' }}>
         {p.activeTab === 'all' ? (
           <>
             <Col span={24}>
@@ -280,7 +286,7 @@ export default function SourceGrid(p: { activeTab: string }) {
                 onChange={xs => setExpandedSections(xs as string[])}
               >
                 <Panel
-                  header={$t('Essential Sources')}
+                  header={$t('Essentials')}
                   key="essentialSources"
                   collapsible="disabled"
                   showArrow={false}
