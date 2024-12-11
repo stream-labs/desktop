@@ -92,7 +92,7 @@ function ExportModal({ close, streamId }: { close: () => void; streamId: string 
     ExportModalCtx,
   );
 
-  const [videoName, setVideoName] = useState<string>(getStreamTitle(streamId));
+  const [videoName, setVideoName] = useState<string>(getStreamTitle(streamId) + ' - highlights');
 
   const unmount = () => {
     dismissError();
