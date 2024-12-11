@@ -17,7 +17,7 @@ import uuid from 'uuid/v4';
 import { EMenuItemKey } from 'services/side-nav';
 import { $i } from 'services/utils';
 import { IRecordingEntry } from 'services/recording-mode';
-import { EHighlighterView } from 'services/highlighter';
+import { EAiDetectionState, EHighlighterView } from 'services/highlighter';
 import { EAvailableFeatures } from 'services/incremental-rollout';
 
 interface IRecordingHistoryStore {
@@ -55,6 +55,12 @@ class RecordingHistoryController {
 
   get uploadInfo() {
     return this.RecordingModeService.state.uploadInfo;
+  }
+
+  get aiDetectionInProgress() {
+    return this.HighlighterService.views.highlightedStreams.some(
+      stream => stream.state.type === EAiDetectionState.IN_PROGRESS,
+    );
   }
 
   get uploadOptions() {
@@ -120,6 +126,7 @@ class RecordingHistoryController {
       return;
     }
     if (platform === 'highlighter') {
+      if (this.aiDetectionInProgress) return;
       this.HighlighterService.actions.flow(recording.filename, {
         game: 'forntnite',
         id: 'rec_' + uuid(),
@@ -190,8 +197,9 @@ export function RecordingHistory() {
   const aiHighlighterEnabled = Services.IncrementalRolloutService.views.featureIsEnabled(
     EAvailableFeatures.aiHighlighter,
   );
-  const { uploadInfo, uploadOptions, recordings, hasSLID } = useVuex(() => ({
+  const { uploadInfo, uploadOptions, recordings, hasSLID, aiDetectionInProgress } = useVuex(() => ({
     recordings: controller.recordings,
+    aiDetectionInProgress: controller.aiDetectionInProgress,
     uploadOptions: controller.uploadOptions,
     uploadInfo: controller.uploadInfo,
     hasSLID: controller.hasSLID,
@@ -224,7 +232,14 @@ export function RecordingHistory() {
               <span
                 className={styles.action}
                 key={option.value}
-                style={{ color: `var(--${option.value === 'edit' ? 'teal' : 'title'})` }}
+                style={{
+                  color: `var(--${option.value === 'edit' ? 'teal' : 'title'})`,
+                  opacity: option.value === 'highlighter' && aiDetectionInProgress ? 0.3 : 1,
+                  cursor:
+                    option.value === 'highlighter' && aiDetectionInProgress
+                      ? 'not-allowed'
+                      : 'pointer',
+                }}
                 onClick={() => handleSelect(p.recording, option.value)}
               >
                 <i className={option.icon} />
