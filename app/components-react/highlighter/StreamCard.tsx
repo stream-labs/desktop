@@ -144,7 +144,7 @@ function ActionBar({
             opacity: stream.state.progress < 1 ? 0 : 1,
             transform: `scaleX(${stream.state.progress / 100})`,
             transformOrigin: 'left',
-            transition: 'transform 100ms',
+            transition: 'transform 1000ms',
           }}
         ></div>
 
