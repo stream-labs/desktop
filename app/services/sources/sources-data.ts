@@ -82,12 +82,14 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
   game_capture: {
     name: $t('Game Capture'),
     description: $t("Capture a game you're playing on your computer."),
+    shortDesc: $t('Capture your game'),
     demoFilename: 'game-capture.png',
     supportList: [$t('Built in works with most modern computer games')],
     icon: 'fas fa-gamepad',
   },
   dshow_input: {
-    name: $t('Video Capture Device'),
+    name: $t('Camera / Capture Card'),
+    shortDesc: $t('Display device video'),
     description: $t('Display video from webcams, capture cards, and other devices.'),
     demoFilename: 'video-capture.png',
     supportList: [
@@ -96,7 +98,6 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
       $t('Capture cards (Elgato, Avermedia, BlackMagic)'),
     ],
     icon: 'icon-webcam',
-    shortDesc: $t('Your webcam device'),
   },
   ndi_source: {
     name: $t('NDI source'),
@@ -202,7 +203,8 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     icon: 'icon-audio',
   },
   av_capture_input: {
-    name: $t('Video Capture Device'),
+    name: $t('Camera / Capture Card'),
+    shortDesc: $t('Display device video'),
     description: $t('Display video from webcams, capture cards, and other devices.'),
     demoFilename: 'video-capture.png',
     supportList: [
@@ -278,12 +280,14 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     icon: 'icon-team-2',
   },
   wasapi_process_output_capture: {
-    name: $t('Application Audio Capture (BETA)'),
+    name: $t('Application Audio'),
+    shortDesc: $t('Beta'),
     description: $t('Capture the audio coming from a specific application.'),
     icon: 'fas fa-user',
   },
   spout_capture: {
-    name: $t('Spout2 capture (Vtube support)'),
+    name: $t('Spout2 capture'),
+    shortDesc: $t('Vtube support'),
     description: $t(
       'Virtual avatar capture source. Enables high resolution, zero-compression and zero-latency video capture from VTube third-party software.',
     ),

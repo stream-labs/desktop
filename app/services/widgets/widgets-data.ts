@@ -543,7 +543,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     demoFilename: 'source-alertbox.png',
     supportList: [$t('Donations'), $t('Subscriptions'), $t('Follows'), $t('Bits')],
     icon: 'icon-alert-box',
-    shortDesc: $t('Dynamic, live alerts'),
+    shortDesc: $t('Dynamic live alerts'),
   },
   [WidgetType.DonationGoal]: {
     name: $t('Tip Goal'),
@@ -631,6 +631,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
   [WidgetType.ChatBox]: {
     name: $t('Chat Box'),
     description: $t("Include your channel's chat into your stream."),
+    shortDesc: $t('Display chatters on screen'),
     demoVideo: false,
     demoFilename: 'source-chatbox.png',
     supportList: [$t('Twitch chat'), $t('YouTube chat'), $t('Facebook chat'), $t('Trovo chat')],
