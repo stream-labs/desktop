@@ -5,7 +5,7 @@ import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
 import { IObsListOption } from 'components/obs/inputs/ObsInput';
 import { WidgetDisplayData, WidgetType } from 'services/widgets';
-import { TSourceType } from 'services/sources';
+import { TSourceType, SourceDisplayData } from 'services/sources';
 import { getPlatformService } from 'services/platforms';
 import { $i } from 'services/utils';
 import { byOS, getOS, OS } from 'util/operating-systems';
@@ -29,7 +29,9 @@ export default function SourceGrid(p: { activeTab: string }) {
   // TODO: persistence
   const [expandedSections, setExpandedSections] = useState([
     'essentialSources',
-    'generalSources',
+    'captureSources',
+    'avSources',
+    'mediaSources',
     'widgets',
     'apps',
   ]);
@@ -146,6 +148,10 @@ export default function SourceGrid(p: { activeTab: string }) {
 
   const { Panel } = Collapse;
 
+  const toSourceEl = (source: IObsListOption<TSourceType>) => (
+    <SourceTag key={source.value} type={source.value} essential excludeWrap={excludeWrap} />
+  );
+
   const essentialSourcesList = useMemo(
     () => (
       <>
@@ -171,12 +177,31 @@ export default function SourceGrid(p: { activeTab: string }) {
     [essentialSources, isLoggedIn, excludeWrap],
   );
 
-  const generalSourcesList = useMemo(() => {
-    return (
+  const sourceDisplayData = useMemo(() => SourceDisplayData(), []);
+
+  const byGroup = (group: 'capture' | 'av' | 'media') => (source: IObsListOption<TSourceType>) => {
+    const displayData = sourceDisplayData[source.value];
+    if (!displayData) {
+      return true;
+    }
+
+    return displayData.group === group;
+  };
+
+  const captureSourcesList = useMemo(
+    () => availableSources.filter(byGroup('capture')).map(toSourceEl),
+    [availableSources, excludeWrap],
+  );
+
+  const avSourcesList = useMemo(() => availableSources.filter(byGroup('av')).map(toSourceEl), [
+    availableSources,
+    excludeWrap,
+  ]);
+
+  const mediaSourcesList = useMemo(
+    () => (
       <>
-        {availableSources.filter(filterEssential).map(source => (
-          <SourceTag key={source.value} type={source.value} excludeWrap={excludeWrap} />
-        ))}
+        {availableSources.filter(byGroup('media')).map(toSourceEl)}
         <SourceTag
           key="replay"
           name={$t('Instant Replay')}
@@ -192,25 +217,8 @@ export default function SourceGrid(p: { activeTab: string }) {
           />
         )}
       </>
-    );
-  }, [availableSources, p.activeTab, designerMode, excludeWrap]);
-
-  const appsList = useMemo(
-    () => (
-      <>
-        {availableAppSources.map(app => (
-          <SourceTag
-            key={`${app.appId}${app.source.id}`}
-            name={app.source.name}
-            type="app_source"
-            appId={app.appId}
-            appSourceId={app.source.id}
-            excludeWrap={excludeWrap}
-          />
-        ))}
-      </>
     ),
-    [availableAppSources, excludeWrap],
+    [availableSources, excludeWrap, designerMode],
   );
 
   const widgetList = useMemo(
@@ -243,14 +251,58 @@ export default function SourceGrid(p: { activeTab: string }) {
     [isLoggedIn, iterableWidgetTypes, p.activeTab, excludeWrap],
   );
 
+  const appsList = useMemo(
+    () => (
+      <>
+        {availableAppSources.map(app => (
+          <SourceTag
+            key={`${app.appId}${app.source.id}`}
+            name={app.source.name}
+            type="app_source"
+            appId={app.appId}
+            appSourceId={app.source.id}
+            excludeWrap={excludeWrap}
+          />
+        ))}
+      </>
+    ),
+    [availableAppSources, excludeWrap],
+  );
+
+  const groupedSources = useMemo(
+    () => (
+      <>
+        <Panel header={$t('Capture Sources')} key="captureSources">
+          <div className="collapse-section">{captureSourcesList}</div>
+        </Panel>
+        <Panel header={$t('Video and Audio')} key="avSources">
+          <div className="collapse-section">{avSourcesList}</div>
+        </Panel>
+        <Panel header={$t('Media')} key="mediaSources">
+          <div className="collapse-section">{mediaSourcesList}</div>
+        </Panel>
+      </>
+    ),
+    [captureSourcesList, avSourcesList, mediaSourcesList],
+  );
+
   const individualTab = useMemo(() => {
+    /*
+     * TODO: general is called media now, should probably rename in code.
+     * It is the same as the All Sources tab except for widgets and apps.
+     */
     if (showContent('general')) {
       return (
         <>
           <Col span={24}>
-            <PageHeader style={{ paddingLeft: 0 }} title={$t('General Sources')} />
+            <Collapse
+              ghost
+              activeKey={expandedSections}
+              onChange={xs => setExpandedSections(xs as string[])}
+            >
+              {groupedSources}
+            </Collapse>
           </Col>
-          {generalSourcesList}
         </>
       );
     } else if (showContent('widgets')) {
@@ -295,11 +347,7 @@ export default function SourceGrid(p: { activeTab: string }) {
                     {essentialSourcesList}
                   </div>
                 </Panel>
-                <Panel header={$t('General Sources')} key="generalSources">
-                  <div className="collapse-section" data-testid="general-sources">
-                    {generalSourcesList}
-                  </div>
-                </Panel>
+                {groupedSources}
                 <Panel header={$t('Widgets')} key="widgets">
                   <div className="collapse-section" data-testid="widget-sources">
                     {widgetList}
