@@ -141,6 +141,11 @@ export class TikTokService
     return ['approved', 'legacy'].includes(scope);
   }
 
+  get missingLiveAccess(): boolean {
+    const scope = this.state.settings?.liveScope ?? 'never-applied';
+    return ['legacy', 'never-applied'].includes(scope);
+  }
+
   get approved(): boolean {
     return this.state.settings.liveScope === 'approved';
   }

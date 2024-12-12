@@ -2,15 +2,18 @@ import React, { useRef, MouseEvent } from 'react';
 import { getPlatformService, TPlatform } from '../../../services/platforms';
 import cx from 'classnames';
 import { $t } from '../../../services/i18n';
+import * as remote from '@electron/remote';
 import styles from './DestinationSwitchers.m.less';
 import { ICustomStreamDestination } from '../../../services/settings/streaming';
 import { Services } from '../../service-provider';
 import { SwitchInput } from '../../shared/inputs';
 import PlatformLogo from '../../shared/PlatformLogo';
-import { assertIsDefined } from '../../../util/properties-type-guards';
 import { useDebounce } from '../../hooks';
 import { useGoLiveSettings } from './useGoLiveSettings';
 import { alertAsync } from '../../modals';
+import { ModalLayout } from 'components-react/shared/ModalLayout';
+import { Button, Form, Modal } from 'antd';
+import Translate from 'components-react/shared/Translate';
 
 /**
  * Allows enabling/disabling platforms and custom destinations for the stream
@@ -188,9 +191,11 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
   const switchInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const platform = typeof p.destination === 'string' ? (p.destination as TPlatform) : null;
-  const { RestreamService, MagicLinkService, StreamingService } = Services;
+  const { RestreamService, TikTokService, StreamingService } = Services;
   const canEnableRestream = RestreamService.views.canEnableRestream;
   const cannotDisableDestination = p.isPrimary && !canEnableRestream;
+  const showTikTokModal =
+    p.promptConnectTikTok || (platform === 'tiktok' && TikTokService.missingLiveAccess);
 
   // Preserving old TikTok functionality, so they can't enable the toggle if TikTok is not
   // connected.
@@ -199,25 +204,8 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
     platform === 'tiktok' && !StreamingService.views.isPlatformLinked('tiktok');
 
   function onClickHandler(ev: MouseEvent) {
-    if (p.promptConnectTikTok) {
-      alertAsync({
-        type: 'confirm',
-        title: $t('Connect TikTok Account'),
-        closable: true,
-        content: (
-          <span>
-            {$t(
-              'Connect your TikTok account to stream to TikTok and one additional platform for free.',
-            )}
-          </span>
-        ),
-        okText: $t('Connect'),
-        onOk: () => {
-          Services.NavigationService.actions.navigate('PlatformMerge', { platform: 'tiktok' });
-          Services.WindowsService.actions.closeChildWindow();
-        },
-      });
-      return;
+    if (showTikTokModal) {
+      renderTikTokModal(p.promptConnectTikTok);
     }
 
     // If we're disabling the switch we shouldn't be emitting anything past below
@@ -332,3 +320,54 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
     </div>
   );
 });
+
+export function renderTikTokModal(promptConnectTikTok?: boolean) {
+  const { TikTokService } = Services;
+
+  const message = promptConnectTikTok
+    ? $t('Connect your TikTok account to stream to TikTok and one additional platform for free.')
+    : $t(
+        "Connect your TikTok account to stream to TikTok and one other platform for free. Haven't applied to stream on TikTok Live yet? <link>Start the process here</link>.",
+        { link: <a href={TikTokService.applicationUrl} /> },
+      );
+
+  function openApplicationInfoPage() {
+    remote.shell.openExternal(Services.TikTokService.applicationUrl);
+  }
+
+  alertAsync({
+    bodyStyle: { padding: '24px' },
+    className: styles.tiktokModal,
+    type: 'confirm',
+    title: $t('Connect your TikTok Account'),
+    content: (
+      <Translate message={message}>
+        <a slot="link" onClick={openApplicationInfoPage} style={{ textDecoration: 'underline' }} />
+      </Translate>
+    ),
+    icon: <PlatformLogo platform="tiktok" className={styles.tiktokModalLogo} />,
+    closable: true,
+    maskClosable: true,
+    cancelButtonProps: { style: { display: 'none' } },
+    okButtonProps: { style: { display: 'none' } },
+    modalRender: node => <ModalLayout footer={<TikTokModalFooter />}>{node}</ModalLayout>,
+    width: 600,
+  });
+}
+
+function TikTokModalFooter() {
+  function connect() {
+    Modal.destroyAll();
+    Services.NavigationService.actions.navigate('PlatformMerge', { platform: 'tiktok' });
+    Services.WindowsService.actions.closeChildWindow();
+  }
+
+  return (
+    <Form layout={'inline'} className={styles.tiktokModalFooter}>
+      <Button onClick={Modal.destroyAll}>{$t('Skip')}</Button>
+      <Button type="primary" onClick={connect}>
+        {$t('Connect TikTok Account')}
+      </Button>
+    </Form>
+  );
+}

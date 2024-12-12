@@ -1,4 +1,4 @@
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useMemo } from 'react';
 import { getPlatformService, TPlatform } from 'services/platforms';
 import cx from 'classnames';
 import { $t } from 'services/i18n';
@@ -14,6 +14,7 @@ import Translate from 'components-react/shared/Translate';
 import DualOutputPlatformSelector from './DualOutputPlatformSelector';
 import { useDebounce } from 'components-react/hooks';
 import DualOutputToggle from '../../../shared/DualOutputToggle';
+import { renderTikTokModal } from '../DestinationSwitchers';
 
 interface INonUltraDestinationSwitchers {
   showSelector?: boolean;
@@ -34,6 +35,11 @@ export function NonUltraDestinationSwitchers(p: INonUltraDestinationSwitchers) {
   enabledPlatformsRef.current = enabledPlatforms;
   const destinationSwitcherRef = useRef({ addClass: () => undefined });
   const promptConnectTikTok = !isPlatformLinked('tiktok');
+
+  const platforms = useMemo(
+    () => (promptConnectTikTok ? enabledPlatforms.concat('tiktok') : enabledPlatforms),
+    [enabledPlatforms, promptConnectTikTok],
+  );
 
   const emitSwitch = useDebounce(500, () => {
     switchPlatforms(enabledPlatformsRef.current);
@@ -69,7 +75,7 @@ export function NonUltraDestinationSwitchers(p: INonUltraDestinationSwitchers) {
           style={{ marginBottom: '15px' }}
         />
       )}
-      {enabledPlatforms.map((platform: TPlatform, index: number) => (
+      {platforms.map((platform: TPlatform, index: number) => (
         <DestinationSwitcher
           key={platform}
           destination={platform}
@@ -138,7 +144,10 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
       };
     });
     const containerRef = useRef<HTMLDivElement>(null);
+    const { TikTokService } = Services;
     const platform = typeof p.destination === 'string' ? (p.destination as TPlatform) : null;
+    const showTikTokModal =
+      p.promptConnectTikTok || (platform === 'tiktok' && TikTokService.missingLiveAccess);
 
     function addClass() {
       containerRef.current?.classList.remove(styles.platformDisabled);
@@ -156,26 +165,6 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
 
       p.onChange(false);
       containerRef.current?.classList.add(styles.platformDisabled);
-    }
-
-    function showTikTokConnectModal() {
-      alertAsync({
-        type: 'confirm',
-        title: $t('Connect TikTok Account'),
-        closable: true,
-        content: (
-          <span>
-            {$t(
-              'Connect your TikTok account to stream to TikTok and one additional platform for free.',
-            )}
-          </span>
-        ),
-        okText: $t('Connect'),
-        onOk: () => {
-          Services.NavigationService.actions.navigate('PlatformMerge', { platform: 'tiktok' });
-          Services.WindowsService.actions.closeChildWindow();
-        },
-      });
     }
 
     const { title, description, CloseIcon, Logo } = (() => {
@@ -220,15 +209,18 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
       }
     })();
     return (
-      <div data-test="non-ultra-switcher" className={styles.platformSwitcher}>
+      <div
+        data-test="non-ultra-switcher"
+        className={cx(styles.platformSwitcher, {
+          [styles.platformDisabled]: !p.enabled || p.promptConnectTikTok,
+        })}
+      >
         <div
           ref={containerRef}
-          className={cx(styles.switcherHeader, {
-            [styles.platformDisabled]: !p.enabled || p.promptConnectTikTok,
-          })}
+          className={styles.switcherHeader}
           onClick={() => {
-            if (p.promptConnectTikTok) {
-              showTikTokConnectModal();
+            if (showTikTokModal) {
+              renderTikTokModal(p.promptConnectTikTok);
             }
           }}
         >
@@ -241,7 +233,7 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
               <span className={styles.platformUsername}>{description}</span>
             </div>
             {/* CLOSE */}
-            {!p.isPrimary && <CloseIcon />}
+            {(!p.isPrimary || !p.promptConnectTikTok) && <CloseIcon />}
           </div>
         </div>
         <div className={styles.platformDisplay}>
