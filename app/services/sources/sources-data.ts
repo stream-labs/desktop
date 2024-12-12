@@ -25,6 +25,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     demoFilename: 'image.png',
     supportList: imageSupport,
     icon: 'icon-image',
+    group: 'media',
   },
   color_source: {
     name: $t('Color Block'),
@@ -41,6 +42,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     demoFilename: 'browser-source.png',
     supportList: [$t('Websites'), $t('Third party widgets'), 'HTML'],
     icon: 'fas fa-globe',
+    group: 'capture',
   },
   ffmpeg_source: {
     name: $t('Media File'),
@@ -49,6 +51,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     supportList: mediaSupport,
     icon: 'far fa-file-video',
     shortDesc: $t('Add media'),
+    group: 'media',
   },
   slideshow: {
     name: $t('Image Slide Show'),
@@ -56,6 +59,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     demoFilename: 'image-slide-show.png',
     supportList: imageSupport,
     icon: 'icon-image',
+    group: 'media',
   },
   text_gdiplus: {
     name: $t('Text (GDI+)'),
@@ -70,6 +74,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     demoFilename: 'display-capture.png',
     supportList: [$t('Primary monitor'), $t('Secondary monitor')],
     icon: 'fas fa-desktop',
+    group: 'capture',
   },
   window_capture: {
     name: $t('Window Capture'),
@@ -78,6 +83,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     supportList: [$t('Compatible with most modern browsers and programs')],
     icon: 'icon-editor-9',
     shortDesc: $t('Capture an application window'),
+    group: 'capture',
   },
   game_capture: {
     name: $t('Game Capture'),
@@ -86,6 +92,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     demoFilename: 'game-capture.png',
     supportList: [$t('Built in works with most modern computer games')],
     icon: 'fas fa-gamepad',
+    group: 'capture',
   },
   dshow_input: {
     name: $t('Camera / Capture Card'),
@@ -98,11 +105,13 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
       $t('Capture cards (Elgato, Avermedia, BlackMagic)'),
     ],
     icon: 'icon-webcam',
+    group: 'av',
   },
   ndi_source: {
     name: $t('NDI source'),
     description: $t('Allow you to capture NDI output streams.'),
     icon: 'fas fa-file',
+    group: 'capture',
   },
   'decklink-input': {
     name: $t('Blackmagic Device'),
@@ -117,6 +126,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     demoFilename: 'vr-capture.png',
     supportList: ['OpenVR', 'SteamVR'],
     icon: 'fab fa-simplybuilt fa-rotate-180',
+    group: 'capture',
   },
   screen_capture: {
     name: $t('Screen Capture'),
@@ -125,6 +135,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     supportList: [$t('Most games, apps, displays')],
     icon: 'icon-group',
     shortDesc: $t('Capture games and apps'),
+    group: 'capture',
   },
   mac_screen_capture: {
     name: $t('macOS Screen Capture'),
@@ -133,6 +144,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     supportList: [$t('Most games, apps, displays')],
     icon: 'icon-group',
     shortDesc: $t('Capture games and apps'),
+    group: 'capture',
   },
   liv_capture: {
     name: $t('LIV Client Capture'),
@@ -142,6 +154,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     demoFilename: 'vr-capture.png',
     supportList: ['LIV'],
     icon: 'fab fa-simplybuilt fa-rotate-180',
+    group: 'capture',
   },
   wasapi_input_capture: {
     name: $t('Audio Input Capture'),
@@ -151,6 +164,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     demoFilename: 'audio-input.png',
     supportList: [$t('Built in microphones'), $t('USB microphones'), $t('Other USB devices')],
     icon: 'icon-mic',
+    group: 'av',
   },
   wasapi_output_capture: {
     name: $t('Audio Output Capture'),
@@ -160,6 +174,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     demoFilename: 'audio-output.png',
     supportList: [$t('Desktop audio')],
     icon: 'icon-audio',
+    group: 'av',
   },
   scene: {
     name: $t('Scene'),
@@ -183,6 +198,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     name: $t('VLC Source'),
     description: $t('Add playlists of videos to your scene.'),
     icon: 'fas fa-play',
+    group: 'media',
   },
   coreaudio_input_capture: {
     name: $t('Audio Input Capture'),
@@ -192,6 +208,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     demoFilename: 'audio-input.png',
     supportList: [$t('Built in microphones'), $t('USB microphones'), $t('Other USB devices')],
     icon: 'icon-mic',
+    group: 'av',
   },
   coreaudio_output_capture: {
     name: $t('Audio Output Capture'),
@@ -201,6 +218,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     demoFilename: 'audio-output.png',
     supportList: [$t('Desktop audio')],
     icon: 'icon-audio',
+    group: 'av',
   },
   av_capture_input: {
     name: $t('Camera / Capture Card'),
@@ -213,6 +231,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
       $t('Capture cards (Elgato, Avermedia, BlackMagic)'),
     ],
     icon: 'icon-webcam',
+    group: 'av',
   },
   display_capture: {
     name: $t('Display Capture'),
@@ -220,6 +239,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     demoFilename: 'display-capture.png',
     supportList: [$t('Primary monitor'), $t('Secondary monitor')],
     icon: 'fas fa-desktop',
+    group: 'capture',
   },
   'syphon-input': {
     name: $t('Game Capture'),
@@ -227,11 +247,13 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     demoFilename: 'game-capture.png',
     supportList: [$t('Built in works with most modern computer games')],
     icon: 'fas fa-gamepad',
+    group: 'capture',
   },
   audio_line: {
     name: $t('JACK Input Client'),
     description: $t(''),
     icon: 'fas fa-file',
+    group: 'av',
   },
   soundtrack_source: {
     name: $t('Twitch Soundtrack'),
@@ -278,12 +300,14 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     ),
     demoFilename: 'source-collab-cam.png',
     icon: 'icon-team-2',
+    group: 'av',
   },
   wasapi_process_output_capture: {
     name: $t('Application Audio'),
     shortDesc: $t('Beta'),
     description: $t('Capture the audio coming from a specific application.'),
     icon: 'fas fa-user',
+    group: 'av',
   },
   spout_capture: {
     name: $t('Spout2 capture'),
@@ -296,5 +320,6 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     icon: 'icon-face-masks-3',
     link: 'https://streamlabs.com/content-hub/post/vtuber-support-on-streamlabs-desktop',
     linkText: $t('Learn how to set it up'),
+    group: 'capture',
   },
 });
