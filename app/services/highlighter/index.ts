@@ -808,6 +808,10 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
         if (status === EStreamingState.Live) {
           streamStarted = true; // console.log('live', this.streamingService.views.settings.platforms.twitch.title);
 
+          if (!this.aiHighlighterEnabled) {
+            return;
+          }
+
           if (this.views.useAiHighlighter === false) {
             console.log('HighlighterService: Game:', this.streamingService.views.game);
             // console.log('Highlighter not enabled or not Fortnite');
@@ -819,7 +823,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
           if (this.streamingService.views.isRecording) {
             // console.log('Recording is already running');
           } else {
-            this.streamingService.toggleRecording();
+            this.streamingService.actions.toggleRecording();
           }
           streamInfo = {
             id: 'fromStreamRecording' + uuid(),
@@ -862,7 +866,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
           if (!aiRecordingInProgress) {
             return;
           }
-          this.streamingService.toggleRecording();
+          this.streamingService.actions.toggleRecording();
 
           // Load potential replaybuffer clips
           await this.loadClips(streamInfo.id);
