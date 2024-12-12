@@ -711,22 +711,25 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
 
   async init() {
     super.init();
-    this.aiHighlighterEnabled = this.incrementalRolloutService.views.featureIsEnabled(
-      EAvailableFeatures.aiHighlighter,
-    );
 
-    if (this.aiHighlighterEnabled && !this.aiHighlighterUpdater) {
-      this.aiHighlighterUpdater = new AiHighlighterUpdater();
-    }
+    this.incrementalRolloutService.featuresReady.then(async () => {
+      this.aiHighlighterEnabled = this.incrementalRolloutService.views.featureIsEnabled(
+        EAvailableFeatures.aiHighlighter,
+      );
 
-    // check if ai highlighter is activated and we need to update it
-    if (
-      this.aiHighlighterEnabled &&
-      this.views.useAiHighlighter &&
-      (await this.aiHighlighterUpdater.isNewVersionAvailable())
-    ) {
-      await this.startUpdater();
-    }
+      if (this.aiHighlighterEnabled && !this.aiHighlighterUpdater) {
+        this.aiHighlighterUpdater = new AiHighlighterUpdater();
+      }
+
+      // check if ai highlighter is activated and we need to update it
+      if (
+        this.aiHighlighterEnabled &&
+        this.views.useAiHighlighter &&
+        (await this.aiHighlighterUpdater.isNewVersionAvailable())
+      ) {
+        await this.startUpdater();
+      }
+    });
 
     //
     this.views.clips.forEach(clip => {
