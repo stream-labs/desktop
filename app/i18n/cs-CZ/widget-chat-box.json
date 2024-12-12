@@ -27,6 +27,6 @@
   "Hide Characters": "Skrýt znaky",
   "Hide Common Chat Bots": "Skrýt běžné chatovací boty",
   "Hide commands starting with `!`": "Skrýt příkazy začínající `!`",
-  "Chat Notifications": "Chat Notifications",
-  "Trigger a sound to notify you when there is new chat activity": "Trigger a sound to notify you when there is new chat activity"
+  "Chat Notifications": "Oznámení chatu",
+  "Trigger a sound to notify you when there is new chat activity": "Spuštění zvuku, který vás upozorní na novou aktivitu v chatu."
 }

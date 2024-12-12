@@ -27,6 +27,6 @@
   "Hide Characters": "Karakterleri Gizle",
   "Hide Common Chat Bots": "Genel sohbet robotlarını gizleyin",
   "Hide commands starting with `!`": "'!' ile başlayan komutlarını gizle",
-  "Chat Notifications": "Chat Notifications",
-  "Trigger a sound to notify you when there is new chat activity": "Trigger a sound to notify you when there is new chat activity"
+  "Chat Notifications": "Sohbet Bildirimleri Gönder",
+  "Trigger a sound to notify you when there is new chat activity": "Yeni bir sohbet etkinliği olduğunda sizi uyarması için bir sesli bildirim ayarlayın."
 }

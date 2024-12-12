@@ -3,7 +3,7 @@
   "The scene name is required": "Der Szenenname ist erforderlich",
   "Please enter the name of the scene": "Bitte Szenennamen eingeben",
   "Manage Scene Collections": "Szenen-Sammlungen verwalten",
-  "Create Scene Collection": "Create Scene Collection",
+  "Create Scene Collection": "Szenensammlung erstellen",
   "There needs to be at least one scene.": "Es muss mindestens eine Szene vorhanden sein.",
   "Projector:": "Projektor:",
   "Projector: Output": "Projektor: Ausgabe",
@@ -63,7 +63,7 @@
   "Loading scene...": "Szene laden ...",
   "Import from OBS": "Von OBS importieren",
   "Import from Twitch": "Von Twitch importieren",
-  "Import from Twitch Studio": "Import from Twitch Studio",
+  "Import from Twitch Studio": "Aus Twitch Studio importieren",
   "Load existing scenes from Twitch Studio": "Vorhandene Szenen aus Twitch Studio laden",
-  "Start Fresh": "Start Fresh"
+  "Start Fresh": "Ohne Import starten"
 }

@@ -101,5 +101,15 @@
   "Clip": "Klip",
   "Subtitle": "Undertitel",
   "Record your screen with Streamlabs Desktop. Once recording is complete, it will be displayed here. Access your files or edit further with Streamlabs tools.": "Optag din skærm med Streamlabs Desktop. Når optagelsen er færdig, vises den her. Få adgang til dine filer, eller rediger videre med Streamlabs-værktøjer.",
-  "Recordings": "Optagelser"
+  "Recordings": "Optagelser",
+  "Manual Highlighter": "Manual Highlighter",
+  "The hotkey highlighter allows you to clip the best moments during your livestream manually and edit them together afterwards.": "The hotkey highlighter allows you to clip the best moments during your livestream manually and edit them together afterwards.",
+  "End your stream to change the Hotkey or the replay duration.": "End your stream to change the Hotkey or the replay duration.",
+  "No clips found": "No clips found",
+  "All highlight clips": "All highlight clips",
+  "Loading": "Loading",
+  "Trim": "Trim",
+  "Intro": "Intro",
+  "Outro": "Outro",
+  "All clips": "All clips"
 }
