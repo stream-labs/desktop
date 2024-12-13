@@ -107,7 +107,6 @@ export class AiHighlighterUpdater {
    * Get the path to the highlighter binary
    */
   private getManifestUrl(): string {
-    console.log('Utils.getHighlighterEnvironment()', Utils.getHighlighterEnvironment());
     if (Utils.getHighlighterEnvironment() === 'staging') {
       return 'https://cdn-highlighter-builds.streamlabs.com/staging/manifest_win_x86_64.json';
     } else {
