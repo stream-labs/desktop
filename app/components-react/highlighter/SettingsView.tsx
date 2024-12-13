@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import HotkeyBinding from 'components-react/shared/HotkeyBinding';
 import { IHotkey } from 'services/hotkeys';
@@ -13,7 +13,6 @@ import styles from './SettingsView.m.less';
 import { $t } from 'services/i18n';
 import { EHighlighterView, IViewState } from 'services/highlighter';
 import { EAvailableFeatures } from 'services/incremental-rollout';
-import Utils from 'services/utils';
 
 export default function SettingsView({
   emitSetView,
@@ -118,7 +117,6 @@ export default function SettingsView({
       <div style={{ display: 'flex', padding: 20 }}>
         <div style={{ flexGrow: 1 }}>
           <h1 style={{ margin: 0 }}>{$t('Highlighter')}</h1>
-
           <p>
             {$t(
               'The highlighter allows you to clip the best moments from your livestream and edit them together into an exciting highlight video you can upload directly to YouTube.',
