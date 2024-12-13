@@ -19,12 +19,20 @@
 
 .inner-scroll-wrapper {
   display: flex;
-  background-color: #09161d;
+  background-color: var(--section);
   padding: 56px;
   border-radius: 24px;
   gap: 24px;
 }
 
+.headerbar-tag {
+  margin: 0;
+  margin-left: 4px;
+  font-size: 14px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background-color: var(--section);
+}
 .card-wrapper {
   display: flex;
   flex-direction: column;
@@ -39,10 +47,22 @@
   flex-direction: column;
   gap: 24px;
   position: relative;
-  background-color: #17242d;
+  background-color: var(--border);
   padding: 40px;
   border-radius: 16px;
   border: solid 2px #2b5bd7;
+}
+
+.recommended-corner {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  border-radius: 16px 0 9px 0;
+  padding: 8px;
+  padding-bottom: 5px;
+  background-color: #2b5bd7;
+  color: white;
+  height: fit-content;
 }
 
 .manual-card {
@@ -61,9 +81,8 @@
 }
 
 .setting-section {
-  background-color: #17242d;
+  background-color: var(--border);
   h3 {
-    color: #bdc2c4;
   }
 
   padding: 24px;
@@ -82,4 +101,10 @@
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
+}
+
+.card-headerbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }

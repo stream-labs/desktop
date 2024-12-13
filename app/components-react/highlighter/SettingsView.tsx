@@ -12,6 +12,7 @@ import Scrollable from 'components-react/shared/Scrollable';
 import styles from './SettingsView.m.less';
 import { $t } from 'services/i18n';
 import { EHighlighterView, IViewState } from 'services/highlighter';
+import { EAvailableFeatures } from 'services/incremental-rollout';
 
 export default function SettingsView({
   emitSetView,
@@ -20,13 +21,23 @@ export default function SettingsView({
   emitSetView: (data: IViewState) => void;
   close: () => void;
 }) {
-  const { HotkeysService, SettingsService, StreamingService, HighlighterService } = Services;
+  const {
+    HotkeysService,
+    SettingsService,
+    StreamingService,
+    HighlighterService,
+    IncrementalRolloutService,
+  } = Services;
+  const aiHighlighterEnabled = IncrementalRolloutService.views.featureIsEnabled(
+    EAvailableFeatures.aiHighlighter,
+  );
   const [hotkey, setHotkey] = useState<IHotkey | null>(null);
   const hotkeyRef = useRef<IHotkey | null>(null);
 
   const v = useVuex(() => ({
     settingsValues: SettingsService.views.values,
     isStreaming: StreamingService.isStreaming,
+    useAiHighlighter: HighlighterService.views.useAiHighlighter,
   }));
 
   const correctlyConfigured =
@@ -97,6 +108,10 @@ export default function SettingsView({
     SettingsService.actions.setSettingsPatch({ Output: { RecRBTime: time } });
   }
 
+  function toggleUseAiHighlighter() {
+    HighlighterService.actions.toggleAiHighlighter();
+  }
+
   return (
     <div className={styles.settingsViewRoot}>
       <div style={{ display: 'flex', padding: 20 }}>
@@ -109,9 +124,14 @@ export default function SettingsView({
           </p>
         </div>
         <div style={{ display: 'flex', gap: '16px' }}>
+          {aiHighlighterEnabled && (
+            <Button type="primary" onClick={() => emitSetView({ view: EHighlighterView.STREAM })}>
+              {$t('Stream Highlights')}
+            </Button>
+          )}
           {/* New button coming with next PR */}
           <Button onClick={() => emitSetView({ view: EHighlighterView.CLIPS, id: undefined })}>
-            {$t('All clips')}
+            {$t('All Clips')}
           </Button>
         </div>
       </div>
@@ -119,11 +139,38 @@ export default function SettingsView({
       <Scrollable style={{ flexGrow: 1, padding: '20px 20px 20px 20px', width: '100%' }}>
         <div className={styles.innerScrollWrapper}>
           <div className={styles.cardWrapper}>
+            {aiHighlighterEnabled && (
+              <div className={styles.highlighterCard}>
+                <div className={styles.cardHeaderbarWrapper}>
+                  <div className={styles.cardHeaderbar}>
+                    <i style={{ margin: 0, fontSize: '20px' }} className="icon-highlighter"></i>
+                    <h3 style={{ margin: 0, fontSize: '20px' }}> {$t('AI Highlighter')}</h3>
+                    <p className={styles.headerbarTag}>{$t('For Fortnite streams (Beta)')}</p>
+                  </div>
+                </div>
+
+                <p style={{ margin: 0 }}>
+                  {$t(
+                    'Automatically capture the best moments from your livestream and turn them into a highlight video.',
+                  )}
+                </p>
+
+                <SwitchInput
+                  style={{ margin: 0, marginLeft: '-10px' }}
+                  size="default"
+                  value={v.useAiHighlighter}
+                  onChange={toggleUseAiHighlighter}
+                />
+                <div className={styles.recommendedCorner}>{$t('Recommended')}</div>
+              </div>
+            )}
             <div className={styles.manualCard}>
-              <h3 className={styles.cardHeaderTitle}> {$t('Manual Highlighter')}</h3>
+              <h3 className={styles.cardHeaderTitle}>
+                {aiHighlighterEnabled ? 'Or use the manual highlighter ' : 'Manual highlighter'}
+              </h3>
               <p>
                 {$t(
-                  'The hotkey highlighter allows you to clip the best moments during your livestream manually and edit them together afterwards.',
+                  'Manually capture the best moments from your livestream with a hotkey command, and automatically turn them into a highlight video.',
                 )}
               </p>
               <div style={{ display: 'flex', gap: '16px' }}>

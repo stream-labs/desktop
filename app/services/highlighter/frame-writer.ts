@@ -19,39 +19,65 @@ export class FrameWriter {
     /* eslint-disable */
     const args = [
       // Video Input
-      '-f', 'rawvideo',
-      '-vcodec', 'rawvideo',
-      '-pix_fmt', 'rgba',
-      '-s', `${this.options.width}x${this.options.height}`,
-      '-r', `${this.options.fps}`,
-      '-i', '-',
+      '-f',
+      'rawvideo',
+      '-vcodec',
+      'rawvideo',
+      '-pix_fmt',
+      'rgba',
+      '-s',
+      `${this.options.width}x${this.options.height}`,
+      '-r',
+      `${this.options.fps}`,
+      '-i',
+      '-',
 
       // Audio Input
-      '-i', this.audioInput,
+      '-i',
+      this.audioInput,
 
       // Input Mapping
-      '-map', '0:v:0',
-      '-map', '1:a:0',
+      '-map',
+      '0:v:0',
+      '-map',
+      '1:a:0',
 
       // Filters
-      '-af', `afade=type=out:duration=${FADE_OUT_DURATION}:start_time=${Math.max(this.duration - (FADE_OUT_DURATION + 0.2), 0)}`,
-      '-vf', `format=yuv420p,fade=type=out:duration=${FADE_OUT_DURATION}:start_time=${Math.max(this.duration - (FADE_OUT_DURATION + 0.2), 0)}`,
-
-      // Video Output
-      '-vcodec', 'libx264',
-      '-profile:v', 'high',
-      '-preset:v', this.options.preset,
-      '-crf', '18',
-      '-movflags', 'faststart',
-
-      // Audio Output
-      '-acodec', 'aac',
-      '-b:a', '128k',
-
-      '-y', this.outputPath,
+      '-af',
+      `afade=type=out:duration=${FADE_OUT_DURATION}:start_time=${Math.max(
+        this.duration - (FADE_OUT_DURATION + 0.2),
+        0,
+      )}`,
     ];
-    /* eslint-enable */
 
+    this.addVideoFilters(args);
+
+    args.push(
+      ...[
+        // Video Output
+        '-vcodec',
+        'libx264',
+        '-profile:v',
+        'high',
+        '-preset:v',
+        this.options.preset,
+        '-crf',
+        '18',
+        '-movflags',
+        'faststart',
+
+        // Audio Output
+        '-acodec',
+        'aac',
+        '-b:a',
+        '128k',
+
+        '-y',
+        this.outputPath,
+      ],
+    );
+
+    /* eslint-enable */
     this.ffmpeg = execa(FFMPEG_EXE, args, {
       encoding: null,
       buffer: false,
@@ -74,6 +100,18 @@ export class FrameWriter {
     this.ffmpeg.stderr?.on('data', (data: Buffer) => {
       console.log('ffmpeg:', data.toString());
     });
+  }
+
+  private addVideoFilters(args: string[]) {
+    const fadeFilter = `format=yuv420p,fade=type=out:duration=${FADE_OUT_DURATION}:start_time=${Math.max(
+      this.duration - (FADE_OUT_DURATION + 0.2),
+      0,
+    )}`;
+    if (this.options.complexFilter) {
+      args.push('-vf', this.options.complexFilter + `[final]${fadeFilter}`);
+    } else {
+      args.push('-vf', fadeFilter);
+    }
   }
 
   async writeNextFrame(frameBuffer: Buffer) {

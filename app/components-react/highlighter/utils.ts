@@ -200,7 +200,10 @@ export function aiFilterClips(
 }
 
 export function getCombinedClipsDuration(clips: TClip[]): number {
-  return clips.reduce((sum, clip) => sum + (clip.duration || 0), 0);
+  return clips.reduce(
+    (sum, clip) => sum + (clip.duration ? clip.duration - (clip.startTrim + clip.endTrim) : 0),
+    0,
+  );
 }
 
 function getClipsOfRound(round: number, clips: TClip[]): TClip[] {

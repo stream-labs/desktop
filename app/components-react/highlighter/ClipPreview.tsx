@@ -6,6 +6,8 @@ import { BoolButtonInput } from 'components-react/shared/inputs/BoolButtonInput'
 import styles from './ClipPreview.m.less';
 import { Button } from 'antd';
 import { $t } from 'services/i18n';
+import { isAiClip } from './utils';
+import { InputEmojiSection } from './InputEmojiSection';
 import { useVuex } from 'components-react/hooks';
 
 export default function ClipPreview(props: {
@@ -24,7 +26,7 @@ export default function ClipPreview(props: {
   const enabled = v.clip.deleted ? false : v.clip.enabled;
 
   if (!v.clip) {
-    return <div>deleted</div>;
+    return <>deleted</>;
   }
 
   function mouseMove(e: React.MouseEvent) {
@@ -66,6 +68,9 @@ export default function ClipPreview(props: {
             <i className={`icon-trash ${styles.deletedIcon}`} />
           </div>
         )}
+        <div className={styles.flameHypescoreWrapper}>
+          {isAiClip(v.clip) && <FlameHypeScore score={v.clip.aiInfo.score} />}
+        </div>
         <span className={styles.enableButton}>
           <BoolButtonInput
             tooltip={enabled ? $t('Disable clip') : $t('Enable clip')}
@@ -84,13 +89,36 @@ export default function ClipPreview(props: {
         </span>
         <div className={styles.previewClipMoving}>
           <div className={styles.controlsContainer}>
+            {/* left */}
             <div className={styles.durationInfo}>
               <span className={styles.durationLabel}>
                 {formatSecondsToHMS(v.clip.duration! - (v.clip.startTrim + v.clip.endTrim) || 0)}
               </span>
             </div>
-            <div className={styles.highlighterIcon}>
-              <i className="icon-highlighter" />
+            {/* right */}
+            <div style={{ display: 'flex', gap: '4px' }}>
+              <div
+                style={{
+                  fontSize: '19px',
+                }}
+              >
+                {isAiClip(v.clip) ? (
+                  <InputEmojiSection
+                    clips={[v.clip]}
+                    includeRounds={false}
+                    includeDeploy={true}
+                    showCount={false}
+                    showDescription={false}
+                  />
+                ) : (
+                  <div className={styles.highlighterIcon}>
+                    <i className="icon-highlighter" />
+                  </div>
+                )}
+              </div>
+              {isAiClip(v.clip) && v.clip.aiInfo?.metadata?.round && (
+                <div className={styles.roundTag}>{`Round: ${v.clip.aiInfo.metadata.round}`}</div>
+              )}
             </div>
           </div>
           <div className={styles.previewClipBottomBar}>
@@ -119,4 +147,26 @@ export function formatSecondsToHMS(seconds: number): string {
   return `${hours !== 0 ? hours.toString() + 'h ' : ''} ${
     minutes !== 0 ? minutes.toString() + 'm ' : ''
   }${remainingSeconds !== 0 ? remainingSeconds.toString() + 's' : ''}`;
+}
+
+function FlameHypeScore({ score }: { score: number }) {
+  if (score === undefined) {
+    return <></>;
+  }
+  const normalizedScore = Math.min(1, Math.max(0, score));
+  const fullFlames = Math.ceil(normalizedScore * 5);
+
+  return (
+    <div className="flex items-center gap-1" style={{ fontSize: '19px' }}>
+      {Array.from({ length: fullFlames }).map((_, index) => (
+        <React.Fragment key={'on' + index}>🔥</React.Fragment>
+      ))}
+
+      {Array.from({ length: 5 - fullFlames }).map((_, index) => (
+        <span key={'off' + index} style={{ opacity: '0.3' }}>
+          🔥
+        </span>
+      ))}
+    </div>
+  );
 }
