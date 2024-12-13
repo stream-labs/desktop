@@ -20,6 +20,7 @@ import MenuItem from 'components-react/shared/MenuItem';
 import AppsNav from './AppsNav';
 import EditorTabs from './EditorTabs';
 import cx from 'classnames';
+import Utils from 'services/utils';
 
 export default function FeaturesNav() {
   function toggleStudioMode() {
@@ -298,6 +299,7 @@ function FeaturesNavItem(p: {
       className: styles.toggleError,
     });
   }
+  const highlighterEnvironment = useMemo(Utils.getHighlighterEnvironment, []);
 
   return (
     <MenuItem
@@ -324,7 +326,9 @@ function FeaturesNavItem(p: {
         {title}
         {menuItem.key === EMenuItemKey.Highlighter && aiHighlighterEnabled && (
           <div className={styles.betaTag}>
-            <p style={{ margin: 0 }}>beta</p>
+            <p style={{ margin: 0 }}>
+              {highlighterEnvironment === 'production' ? 'beta' : highlighterEnvironment}
+            </p>
           </div>
         )}
       </div>

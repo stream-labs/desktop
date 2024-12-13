@@ -35,7 +35,6 @@ export default function SettingsView({
   const [hotkey, setHotkey] = useState<IHotkey | null>(null);
   const hotkeyRef = useRef<IHotkey | null>(null);
 
-  const shouldUseStagingHighlighter = useMemo(Utils.shouldUseHighlighterStaging, []);
   const v = useVuex(() => ({
     settingsValues: SettingsService.views.values,
     isStreaming: StreamingService.isStreaming,
@@ -118,12 +117,7 @@ export default function SettingsView({
     <div className={styles.settingsViewRoot}>
       <div style={{ display: 'flex', padding: 20 }}>
         <div style={{ flexGrow: 1 }}>
-          <h1 style={{ margin: 0 }}>
-            {$t('Highlighter')}
-            {shouldUseStagingHighlighter && (
-              <span>highlighter: {shouldUseStagingHighlighter ? 'staging' : 'production'}</span>
-            )}
-          </h1>
+          <h1 style={{ margin: 0 }}>{$t('Highlighter')}</h1>
 
           <p>
             {$t(
