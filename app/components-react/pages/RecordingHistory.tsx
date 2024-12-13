@@ -67,7 +67,7 @@ class RecordingHistoryController {
   get uploadOptions() {
     const opts = [
       {
-        label: `${$t('Get highlights (Fortnite only))')}`,
+        label: `${$t('Get highlights (Fortnite only)')}`,
         value: 'highlighter',
         icon: 'icon-highlighter',
       },
