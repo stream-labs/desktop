@@ -33,7 +33,7 @@ const DISPLAY_TYPE_MAP: Record<string, (count: number) => TypeWording> = {
   [EHighlighterInputTypes.DEPLOY]: count => ({
     emoji: '🪂',
     description: count > 1 ? 'deploys' : 'deploy',
-    orderPriority: 7,
+    orderPriority: 8,
   }),
   [EHighlighterInputTypes.PLAYER_KNOCKED]: () => ({
     emoji: '😵',
