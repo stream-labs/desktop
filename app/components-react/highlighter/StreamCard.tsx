@@ -81,7 +81,14 @@ export default function StreamCard({
         </div>
         <h3 className={styles.emojiWrapper}>
           {stream.state.type === EAiDetectionState.FINISHED ? (
-            <InputEmojiSection clips={clips} includeRounds={true} includeDeploy={false} />
+            <InputEmojiSection
+              clips={clips}
+              includeRounds={true}
+              includeDeploy={false}
+              showCount={true}
+              showDescription={true}
+              showDeathPlacement={false}
+            />
           ) : (
             <div style={{ height: '22px' }}> </div>
           )}
