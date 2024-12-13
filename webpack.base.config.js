@@ -26,7 +26,6 @@ if (process.env.SLD_COMPILE_FOR_BETA) {
 if (process.env.HIGHLIGHTER_ENV) {
   console.log('Compiling build with ' + process.env.HIGHLIGHTER_ENV + ' highlighter version.');
   envDef['process.env.HIGHLIGHTER_ENV'] = JSON.stringify(process.env.HIGHLIGHTER_ENV ?? '');
-  console.log(envDef['process.env.HIGHLIGHTER_ENV']);
 }
 
 plugins.push(new webpack.DefinePlugin(envDef));
