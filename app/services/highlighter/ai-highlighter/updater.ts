@@ -43,28 +43,12 @@ export class AiHighlighterUpdater {
    * Spawn the AI Highlighter process that would process the video
    */
   static startHighlighterProcess(videoUri: string, milestonesPath?: string) {
-    const isDev = Utils.isDevMode();
-    if (isDev) {
-      const rootPath = '../highlighter-api/';
-      const command = [
-        'run',
-        'python',
-        `${rootPath}/highlighter_api/cli.py`,
-        videoUri,
-        '--ffmpeg_path',
-        FFMPEG_EXE,
-        '--loglevel',
-        'debug',
-      ];
+    const runHighlighterFromRepository = Utils.getHighlighterEnvironment() === 'local';
 
-      if (milestonesPath) {
-        command.push('--milestones_file');
-        command.push(milestonesPath);
-      }
-
-      return spawn('poetry', command, {
-        cwd: rootPath,
-      });
+    if (runHighlighterFromRepository) {
+      // this is for highlighter development
+      // to run this you have to install the highlighter repository next to desktop
+      return AiHighlighterUpdater.startHighlighterFromRepository(videoUri, milestonesPath);
     }
 
     const highlighterBinaryPath = path.resolve(
@@ -82,6 +66,29 @@ export class AiHighlighterUpdater {
     return spawn(highlighterBinaryPath, command);
   }
 
+  private static startHighlighterFromRepository(videoUri: string, milestonesPath: string) {
+    const rootPath = '../highlighter-api/';
+    const command = [
+      'run',
+      'python',
+      `${rootPath}/highlighter_api/cli.py`,
+      videoUri,
+      '--ffmpeg_path',
+      FFMPEG_EXE,
+      '--loglevel',
+      'debug',
+    ];
+
+    if (milestonesPath) {
+      command.push('--milestones_file');
+      command.push(milestonesPath);
+    }
+
+    return spawn('poetry', command, {
+      cwd: rootPath,
+    });
+  }
+
   /**
    * Check if an update is currently in progress
    */
@@ -96,6 +103,16 @@ export class AiHighlighterUpdater {
     return this.manifest?.version || null;
   }
 
+  /*
+   * Get the path to the highlighter binary
+   */
+  private getManifestUrl(): string {
+    if (Utils.getHighlighterEnvironment() === 'staging') {
+      return 'https://cdn-highlighter-builds.streamlabs.com/staging/manifest_win_x86_64.json';
+    } else {
+      return 'https://cdn-highlighter-builds.streamlabs.com/manifest_win_x86_64.json';
+    }
+  }
   /**
    * Check if AI Highlighter requires an update
    */
@@ -107,10 +124,9 @@ export class AiHighlighterUpdater {
 
     this.versionChecked = true;
     console.log('checking for highlighter updates...');
+    const manifestUrl = this.getManifestUrl();
     // fetch the latest version of the manifest for win x86_64 target
-    const newManifest = await jfetch<IAIHighlighterManifest>(
-      new Request('https://cdn-highlighter-builds.streamlabs.com/manifest_win_x86_64.json'),
-    );
+    const newManifest = await jfetch<IAIHighlighterManifest>(new Request(manifestUrl));
     this.manifest = newManifest;
 
     // if manifest.json does not exist, an initial download is required
