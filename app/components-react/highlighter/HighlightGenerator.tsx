@@ -3,7 +3,7 @@ import { Button, Select, Checkbox, Typography } from 'antd';
 import { DownOutlined, RobotOutlined } from '@ant-design/icons';
 import { IFilterOptions } from './utils';
 import { IInput } from 'services/highlighter';
-import { getPlacementFromInputs, InputEmojiSection } from './InputEmojiSection';
+import { getPlacementFromInputs } from './InputEmojiSection';
 import { EHighlighterInputTypes } from 'services/highlighter/ai-highlighter/ai-highlighter';
 import styles from './HighlightGenerator.m.less';
 import { formatSecondsToHMS } from './ClipPreview';
