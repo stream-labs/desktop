@@ -1318,6 +1318,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     streamId: string | undefined = undefined,
     orientation: TOrientation = 'horizontal',
   ) {
+    this.resetRenderingClips();
     await this.loadClips(streamId);
 
     if (
