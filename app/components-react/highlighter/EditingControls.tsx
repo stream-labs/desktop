@@ -11,7 +11,7 @@ import { TModalClipsView } from './ClipsView';
 import { useVuex } from 'components-react/hooks';
 import { Services } from 'components-react/service-provider';
 import { SUPPORTED_FILE_TYPES } from 'services/highlighter/constants';
-import { Clip } from 'services/highlighter/clip';
+import { RenderingClip } from 'services/highlighter/clip';
 
 export function EditingControls({
   emitSetShowModal,
@@ -45,7 +45,7 @@ export function EditingControls({
 
   async function setVideoFile(file: string, type: 'intro' | 'outro') {
     if (!videoExtensions.map(e => `.${e}`).includes(path.parse(file).ext)) return;
-    const tempClip = new Clip(file);
+    const tempClip = new RenderingClip(file);
     await tempClip.init();
     HighlighterService.actions.setVideo({ [type]: { path: file, duration: tempClip.duration } });
   }
