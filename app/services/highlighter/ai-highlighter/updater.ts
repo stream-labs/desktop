@@ -8,6 +8,7 @@ import { importExtractZip } from 'util/slow-imports';
 import { spawn } from 'child_process';
 import { FFMPEG_EXE } from '../constants';
 import Utils from '../../utils';
+import * as remote from '@electron/remote';
 
 interface IAIHighlighterManifest {
   version: string;
@@ -35,7 +36,7 @@ export class AiHighlighterUpdater {
   public currentUpdate: Promise<void> | null = null;
 
   constructor() {
-    this.basepath = getSharedResource('ai-highlighter');
+    this.basepath = path.join(remote.app.getPath('userData'), 'ai-highlighter');
     this.manifestPath = path.resolve(this.basepath, 'manifest.json');
   }
 
@@ -52,7 +53,7 @@ export class AiHighlighterUpdater {
     }
 
     const highlighterBinaryPath = path.resolve(
-      getSharedResource('ai-highlighter'),
+      path.join(remote.app.getPath('userData'), 'ai-highlighter'),
       'bin',
       'app.exe',
     );
