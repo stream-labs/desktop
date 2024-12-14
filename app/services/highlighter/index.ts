@@ -61,7 +61,6 @@ import { AiHighlighterUpdater } from './ai-highlighter/updater';
 import { IDownloadProgress } from 'util/requests';
 import { IncrementalRolloutService } from 'app-services';
 import { EAvailableFeatures } from 'services/incremental-rollout';
-import { getSharedResource } from 'util/get-shared-resource';
 export type TStreamInfo =
   | {
       orderPosition: number;
@@ -2309,7 +2308,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
       return;
     }
 
-    const basepath = getSharedResource('ai-highlighter');
+    const basepath = path.join(remote.app.getPath('userData'), 'ai-highlighter');
     const milestonesPath = path.join(basepath, 'milestones', 'milestones.json');
 
     const milestonesData = JSON.stringify(this.streamMilestones.milestones);
