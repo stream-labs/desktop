@@ -1,4 +1,4 @@
-import React, { useRef, MouseEvent, useCallback } from 'react';
+import React, { useRef, MouseEvent, useCallback, useMemo } from 'react';
 import { getPlatformService, TPlatform } from 'services/platforms';
 import cx from 'classnames';
 import { $t } from 'services/i18n';
@@ -14,6 +14,7 @@ import { alertAsync } from 'components-react/modals';
 import Translate from 'components-react/shared/Translate';
 import { useDebounce } from 'components-react/hooks';
 import DualOutputToggle from '../../../shared/DualOutputToggle';
+import { renderTikTokModal } from '../DestinationSwitchers';
 
 interface IUltraDestinationSwitchers {
   type?: 'default' | 'ultra';
@@ -37,6 +38,11 @@ export function UltraDestinationSwitchers(p: IUltraDestinationSwitchers) {
   const enabledPlatformsRef = useRef(enabledPlatforms);
   enabledPlatformsRef.current = enabledPlatforms;
   const promptConnectTikTok = !isPlatformLinked('tiktok');
+
+  const platforms = useMemo(
+    () => (promptConnectTikTok ? linkedPlatforms.concat('tiktok') : linkedPlatforms),
+    [linkedPlatforms, promptConnectTikTok],
+  );
 
   const emitSwitch = useDebounce(500, () => {
     switchPlatforms(enabledPlatformsRef.current);
@@ -77,7 +83,7 @@ export function UltraDestinationSwitchers(p: IUltraDestinationSwitchers) {
           style={{ marginBottom: '15px' }}
         />
       )}
-      {linkedPlatforms.map((platform: TPlatform, index: number) => (
+      {platforms.map((platform: TPlatform, index: number) => (
         <DestinationSwitcher
           key={platform}
           destination={platform}
@@ -120,28 +126,10 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const platform = typeof p.destination === 'string' ? (p.destination as TPlatform) : null;
   const enable = !p.enabled ?? (p.promptConnectTikTok && p.promptConnectTikTok === true);
-  const { RestreamService, MagicLinkService } = Services;
+  const { RestreamService, MagicLinkService, TikTokService } = Services;
   const canDisablePrimary = p.canDisablePrimary;
-
-  function showTikTokConnectModal() {
-    alertAsync({
-      type: 'confirm',
-      title: $t('Connect TikTok Account'),
-      closable: true,
-      content: (
-        <span>
-          {$t(
-            'Connect your TikTok account to stream to TikTok and one additional platform for free.',
-          )}
-        </span>
-      ),
-      okText: $t('Connect'),
-      onOk: () => {
-        Services.NavigationService.actions.navigate('PlatformMerge', { platform: 'tiktok' });
-        Services.WindowsService.actions.closeChildWindow();
-      },
-    });
-  }
+  const showTikTokModal =
+    p.promptConnectTikTok || (platform === 'tiktok' && TikTokService.missingLiveAccess);
 
   function onClickHandler(ev: MouseEvent) {
     // TODO: do we need this check if we're on an Ultra DestinationSwitcher
@@ -229,10 +217,12 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
     <div
       ref={containerRef}
       data-test="ultra-switcher"
-      className={cx(styles.platformSwitcher, { [styles.platformDisabled]: !p.enabled })}
+      className={cx(styles.platformSwitcher, {
+        [styles.platformDisabled]: !p.enabled || p.promptConnectTikTok,
+      })}
       onClick={() => {
-        if (p.promptConnectTikTok) {
-          showTikTokConnectModal();
+        if (showTikTokModal) {
+          renderTikTokModal(p.promptConnectTikTok);
         }
       }}
     >
@@ -249,8 +239,8 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
         {/* SWITCH */}
         <div
           onClick={e => {
-            if (p.promptConnectTikTok) {
-              showTikTokConnectModal();
+            if (showTikTokModal) {
+              renderTikTokModal(p.promptConnectTikTok);
               e.stopPropagation();
               return;
             } else {
