@@ -1,6 +1,6 @@
 import SettingsView from 'components-react/highlighter/SettingsView';
 import { useVuex } from 'components-react/hooks';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { EHighlighterView, IViewState } from 'services/highlighter';
 import { Services } from 'components-react/service-provider';
 import StreamView from 'components-react/highlighter/StreamView';
@@ -31,6 +31,19 @@ export default function Highlighter(props: { params?: { view: string } }) {
   } else {
     initialViewState = { view: EHighlighterView.SETTINGS };
   }
+
+  useEffect(() => {
+    // check if ai highlighter is activated and we need to update it
+    async function shouldUpdate() {
+      if (!HighlighterService.aiHighlighterUpdater) return false;
+      const versionAvailable = await HighlighterService.aiHighlighterUpdater.isNewVersionAvailable();
+      return versionAvailable && aiHighlighterEnabled && v.useAiHighlighter;
+    }
+
+    shouldUpdate().then(shouldUpdate => {
+      if (shouldUpdate) HighlighterService.actions.startUpdater();
+    });
+  }, []);
 
   const [viewState, setViewState] = useState<IViewState>(initialViewState);
   const updaterModal = (
