@@ -209,20 +209,31 @@ export class KickService
 
     const request = new Request(url, { headers, method: 'POST', body });
 
-    return jfetch<IKickStartStreamResponse>(request).catch((e: unknown) => {
+    return jfetch<IKickStartStreamResponse>(request).catch((e: IKickError | unknown) => {
       console.error('Error starting Kick stream: ', e);
 
-      // check if the error is an IKickError
-      if (e.hasOwnProperty('success')) {
-        const error = e as IKickError;
+      const defaultError = {
+        status: 403,
+        statusText: 'Unable to start Kick stream.',
+      };
 
-        throwStreamError('PLATFORM_REQUEST_FAILED', {
-          status: 403,
-          statusText: `Unable to start Kick stream. ${error.message}`,
-        });
+      if (!e) throwStreamError('PLATFORM_REQUEST_FAILED', defaultError);
+
+      // check if the error is an IKickError
+      if (typeof e === 'object' && e.hasOwnProperty('success')) {
+        const error = e as IKickError;
+        throwStreamError(
+          'PLATFORM_REQUEST_FAILED',
+          {
+            ...error,
+            status: 403,
+            statusText: error.message,
+          },
+          defaultError.statusText,
+        );
       }
 
-      throwStreamError('PLATFORM_REQUEST_FAILED', e);
+      throwStreamError('PLATFORM_REQUEST_FAILED', e as any, defaultError.statusText);
     });
   }
 
