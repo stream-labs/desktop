@@ -10,6 +10,7 @@ import { WidgetType } from '../widgets';
 import { ITrovoStartStreamOptions, TrovoService } from './trovo';
 import { TDisplayType } from 'services/settings-v2';
 import { $t } from 'services/i18n';
+import { KickService, IKickStartStreamOptions } from './kick';
 
 export type Tag = string;
 export interface IGame {
@@ -151,7 +152,8 @@ export type TStartStreamOptions =
   | Partial<IFacebookStartStreamOptions>
   | Partial<ITikTokStartStreamOptions>
   | Partial<ITrovoStartStreamOptions>
-  | Partial<IInstagramStartStreamOptions>;
+  | Partial<IInstagramStartStreamOptions>
+  | Partial<IKickStartStreamOptions>;
 
 // state applicable for all platforms
 export interface IPlatformState {
@@ -242,6 +244,7 @@ export enum EPlatform {
   Trovo = 'trovo',
   Twitter = 'twitter',
   Instagram = 'instagram',
+  Kick = 'kick',
 }
 
 export type TPlatform =
@@ -251,7 +254,8 @@ export type TPlatform =
   | 'tiktok'
   | 'trovo'
   | 'twitter'
-  | 'instagram';
+  | 'instagram'
+  | 'kick';
 
 export const platformList = [
   EPlatform.Facebook,
@@ -261,6 +265,7 @@ export const platformList = [
   EPlatform.YouTube,
   EPlatform.Twitter,
   EPlatform.Instagram,
+  EPlatform.Kick,
 ];
 
 export const platformLabels = (platform: TPlatform | string) =>
@@ -273,6 +278,7 @@ export const platformLabels = (platform: TPlatform | string) =>
     // TODO: translate
     [EPlatform.Twitter]: 'Twitter',
     [EPlatform.Instagram]: $t('Instagram'),
+    [EPlatform.Kick]: $t('Kick'),
   }[platform]);
 
 export function getPlatformService(platform: TPlatform): IPlatformService {
@@ -282,6 +288,7 @@ export function getPlatformService(platform: TPlatform): IPlatformService {
     facebook: FacebookService.instance,
     tiktok: TikTokService.instance,
     trovo: TrovoService.instance,
+    kick: KickService.instance,
     twitter: TwitterPlatformService.instance,
     instagram: InstagramService.instance,
   }[platform];
