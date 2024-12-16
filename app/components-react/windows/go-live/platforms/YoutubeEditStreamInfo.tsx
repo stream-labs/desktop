@@ -6,7 +6,7 @@ import {
   InputComponent,
   ListInput,
 } from '../../../shared/inputs';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Services } from '../../../service-provider';
 import { $t } from '../../../../services/i18n';
 import BroadcastInput from './BroadcastInput';
@@ -39,8 +39,6 @@ export const YoutubeEditStreamInfo = InputComponent((p: IPlatformComponentParams
     newYtSettings => updateSettings(newYtSettings),
     fieldName => ({ disabled: fieldIsDisabled(fieldName as keyof IYoutubeStartStreamOptions) }),
   );
-
-  const monetizationElligible = true;
 
   const { broadcastsQuery } = useModule(() => {
     const youtube = inject(YoutubeService);
@@ -209,7 +207,7 @@ export const YoutubeEditStreamInfo = InputComponent((p: IPlatformComponentParams
                   )}
                 </p>
               )}
-              {monetizationElligible && (
+              {ytSettings.elligibleForMonetization && (
                 <CheckboxInput label={$t('Enable Monetization')} {...bind.monetizationEnabled} />
               )}
             </>

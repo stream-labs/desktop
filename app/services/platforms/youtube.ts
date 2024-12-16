@@ -43,6 +43,7 @@ export interface IYoutubeStartStreamOptions extends IExtraBroadcastSettings {
   scheduledStartTime?: number;
   mode?: TOutputOrientation;
   monetizationEnabled?: boolean;
+  elligibleForMonetization?: boolean;
 }
 
 /**
@@ -103,6 +104,7 @@ export interface IYoutubeLiveBroadcast {
       scheduleStrategy?: string;
       repeatIntervalSecs?: number;
     };
+    elligibleForAdsMonetization?: boolean;
   };
 }
 
@@ -221,6 +223,7 @@ export class YoutubeService
       thumbnail: '',
       video: undefined,
       mode: undefined,
+      monetizationEnabled: false,
     },
   };
 
@@ -805,6 +808,8 @@ export class YoutubeService
       latencyPreference,
       categoryId: video.snippet.categoryId,
       thumbnail: broadcast.snippet.thumbnails.default.url,
+      monetizationEnabled: broadcast.monetizationDetails?.cuepointSchedule?.enabled,
+      elligibleForMonetization: broadcast.monetizationDetails?.elligibleForAdsMonetization,
     };
   }
 
