@@ -50,6 +50,7 @@ import MultistreamChatInfo from './windows/MultistreamChatInfo';
 import Blank from './windows/Blank';
 import PlatformMerge from './pages/PlatformMerge';
 import AlertboxLibrary from './pages/AlertboxLibrary';
+import AlertBoxPropertiesEmbed from './widgets/AlertBoxPropertiesEmbed';
 import PlatformAppStore from './pages/PlatformAppStore';
 import BrowseOverlays from './pages/BrowseOverlays';
 import PlatformAppMainPage from './pages/PlatformAppMainPage';
@@ -103,6 +104,7 @@ export const components = {
   ThemeAudit,
   StudioEditor,
   WidgetWindow: createRoot(WidgetWindow),
+  AlertBoxPropertiesEmbed: createRoot(AlertBoxPropertiesEmbed),
   CustomCodeWindow: createRoot(CustomCodeWindow),
   SafeMode,
   AdvancedAudio: createRoot(AdvancedAudio),
