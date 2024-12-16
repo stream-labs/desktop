@@ -719,15 +719,6 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
       if (this.aiHighlighterEnabled && !this.aiHighlighterUpdater) {
         this.aiHighlighterUpdater = new AiHighlighterUpdater();
       }
-
-      // check if ai highlighter is activated and we need to update it
-      if (
-        this.aiHighlighterEnabled &&
-        this.views.useAiHighlighter &&
-        (await this.aiHighlighterUpdater.isNewVersionAvailable())
-      ) {
-        await this.startUpdater();
-      }
     });
 
     //
@@ -2286,7 +2277,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
   /**
    * Start updater process
    */
-  private async startUpdater() {
+  async startUpdater() {
     try {
       this.SET_UPDATER_STATE(true);
       this.SET_HIGHLIGHTER_VERSION(this.aiHighlighterUpdater.version || '');
