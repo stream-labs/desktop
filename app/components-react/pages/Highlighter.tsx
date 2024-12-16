@@ -35,6 +35,7 @@ export default function Highlighter(props: { params?: { view: string } }) {
   useEffect(() => {
     // check if ai highlighter is activated and we need to update it
     async function shouldUpdate() {
+      if (!HighlighterService.aiHighlighterUpdater) return false;
       const versionAvailable = await HighlighterService.aiHighlighterUpdater.isNewVersionAvailable();
       return versionAvailable && aiHighlighterEnabled && v.useAiHighlighter;
     }
