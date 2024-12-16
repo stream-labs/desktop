@@ -27,6 +27,6 @@
   "Hide Characters": "Tekens verbergen",
   "Hide Common Chat Bots": "Veelgebruikte chatbots verbergen",
   "Hide commands starting with `!`": "Opdrachten verbergen die starten met '!'",
-  "Chat Notifications": "Chat Notifications",
-  "Trigger a sound to notify you when there is new chat activity": "Trigger a sound to notify you when there is new chat activity"
+  "Chat Notifications": "Chatmeldingen",
+  "Trigger a sound to notify you when there is new chat activity": "Laat een geluid horen als er nieuwe chatactiviteit is"
 }
