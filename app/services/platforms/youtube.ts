@@ -764,7 +764,7 @@ export class YoutubeService
 
   async fetchBroadcast(
     id: string,
-    fields = ['snippet', 'contentDetails', 'status'],
+    fields = ['snippet', 'contentDetails', 'status', 'monetizationDetails'],
   ): Promise<IYoutubeLiveBroadcast> {
     const filter = `&id=${id}`;
     const query = `part=${fields.join(',')}${filter}&maxResults=1`;
