@@ -794,6 +794,10 @@ export class YoutubeService
       this.fetchBroadcast(broadcastId),
       this.fetchVideo(broadcastId),
     ]);
+    console.log('BROADCAST');
+    console.log(broadcast);
+    console.log('VIDEO');
+    console.log(video);
     const { title, description } = broadcast.snippet;
     const { privacyStatus, selfDeclaredMadeForKids } = broadcast.status;
     const { enableDvr, projection, latencyPreference } = broadcast.contentDetails;
