@@ -185,21 +185,29 @@ function ActionBar({
         <Button
           size="large"
           type="primary"
-          icon={
-            clipsOfStreamAreLoading !== stream.id ? (
-              <i className="icon-download" style={{ marginRight: '4px' }} />
-            ) : undefined
-          }
           onClick={e => {
             emitExportVideo();
             e.stopPropagation();
           }}
+          style={{ display: 'grid', gridTemplateAreas: 'stack' }}
         >
-          {clipsOfStreamAreLoading === stream.id ? (
-            <div className={styles.loader}></div>
-          ) : (
-            <> {$t('Export highlight reel')}</>
-          )}
+          <div
+            style={{
+              visibility: clipsOfStreamAreLoading === stream.id ? 'visible' : 'hidden',
+              gridArea: 'stack',
+            }}
+          >
+            <i className="fa fa-spinner fa-pulse" />
+          </div>
+          <span
+            style={{
+              visibility: clipsOfStreamAreLoading !== stream.id ? 'visible' : 'hidden',
+              gridArea: 'stack',
+            }}
+          >
+            <i className="icon-download" style={{ marginRight: '4px' }} />
+            {$t('Export highlight reel')}
+          </span>
         </Button>
       </div>
     );
@@ -255,7 +263,7 @@ export function Thumbnail({
 }) {
   function getThumbnailText(state: EAiDetectionState): JSX.Element | string {
     if (clipsOfStreamAreLoading === stream?.id) {
-      return <div className={styles.loader}></div>;
+      return <i className="fa fa-spinner fa-pulse" style={{ marginLeft: 8 }} />;
     }
 
     if (clips.length > 0) {
