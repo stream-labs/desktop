@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { EExportStep, TFPS, TResolution, TPreset } from 'services/highlighter';
+import { EExportStep, TFPS, TResolution, TPreset, TOrientation } from 'services/highlighter';
 import { Services } from 'components-react/service-provider';
 import { FileInput, TextInput, ListInput } from 'components-react/shared/inputs';
 import Form from 'components-react/shared/inputs/Form';
@@ -23,9 +23,18 @@ class ExportController {
   get exportInfo() {
     return this.service.views.exportInfo;
   }
+  getStreamTitle(streamId?: string) {
+    return (
+      this.service.views.highlightedStreams.find(stream => stream.id === streamId)?.title ||
+      'My Video'
+    );
+  }
 
   dismissError() {
     return this.service.actions.dismissError();
+  }
+  resetExportedState() {
+    return this.service.actions.resetExportedState();
   }
 
   setResolution(value: string) {
@@ -44,8 +53,8 @@ class ExportController {
     this.service.actions.setExportFile(exportFile);
   }
 
-  exportCurrentFile() {
-    this.service.actions.export();
+  exportCurrentFile(streamId: string | undefined, orientation: TOrientation = 'horizontal') {
+    this.service.actions.export(false, streamId, orientation);
   }
 
   cancelExport() {
@@ -63,24 +72,47 @@ class ExportController {
 
 export const ExportModalCtx = React.createContext<ExportController | null>(null);
 
-export default function ExportModalProvider(p: { close: () => void }) {
+export default function ExportModalProvider({
+  close,
+  streamId,
+}: {
+  close: () => void;
+  streamId: string | undefined;
+}) {
   const controller = useMemo(() => new ExportController(), []);
   return (
     <ExportModalCtx.Provider value={controller}>
-      <ExportModal close={p.close} />
+      <ExportModal close={close} streamId={streamId} />
     </ExportModalCtx.Provider>
   );
 }
 
-function ExportModal(p: { close: () => void }) {
-  const { exportInfo, dismissError } = useController(ExportModalCtx);
+function ExportModal({ close, streamId }: { close: () => void; streamId: string | undefined }) {
+  const { exportInfo, dismissError, resetExportedState, getStreamTitle } = useController(
+    ExportModalCtx,
+  );
 
+  const [videoName, setVideoName] = useState<string>(getStreamTitle(streamId) + ' - highlights');
+
+  const unmount = () => {
+    dismissError();
+    resetExportedState();
+  };
   // Clear all errors when this component unmounts
-  useEffect(dismissError, []);
+  useEffect(() => unmount, []);
 
   if (exportInfo.exporting) return <ExportProgress />;
-  if (!exportInfo.exported) return <ExportOptions close={p.close} />;
-  return <PlatformSelect onClose={p.close} />;
+  if (!exportInfo.exported) {
+    return (
+      <ExportOptions
+        close={close}
+        streamId={streamId}
+        videoName={videoName}
+        onVideoNameChange={setVideoName}
+      />
+    );
+  }
+  return <PlatformSelect onClose={close} videoName={videoName} />;
 }
 
 function ExportProgress() {
@@ -122,7 +154,17 @@ function ExportProgress() {
   );
 }
 
-function ExportOptions(p: { close: () => void }) {
+function ExportOptions({
+  close,
+  streamId,
+  videoName,
+  onVideoNameChange,
+}: {
+  close: () => void;
+  streamId: string | undefined;
+  videoName: string;
+  onVideoNameChange: (name: string) => void;
+}) {
   const { UsageStatisticsService } = Services;
   const {
     exportInfo,
@@ -133,10 +175,12 @@ function ExportOptions(p: { close: () => void }) {
     fileExists,
     setExport,
     exportCurrentFile,
-    store,
+    getStreamTitle,
   } = useController(ExportModalCtx);
 
-  const videoName = store.useState(s => s.videoName);
+  // Video name and export file are kept in sync
+  const [exportFile, setExportFile] = useState<string>(getExportFileFromVideoName(videoName));
+
   function getExportFileFromVideoName(videoName: string) {
     const parsed = path.parse(exportInfo.file);
     const sanitized = videoName.replace(/[/\\?%*:|"<>\.,;=#]/g, '');
@@ -146,8 +190,27 @@ function ExportOptions(p: { close: () => void }) {
   function getVideoNameFromExportFile(exportFile: string) {
     return path.parse(exportFile).name;
   }
-  // Video name and export file are kept in sync
-  const [exportFile, setExportFile] = useState<string>(getExportFileFromVideoName(videoName));
+
+  async function startExport(orientation: TOrientation) {
+    if (await fileExists(exportFile)) {
+      if (
+        !(await confirmAsync({
+          title: $t('Overwite File?'),
+          content: $t('%{filename} already exists. Would you like to overwrite it?', {
+            filename: path.basename(exportFile),
+          }),
+          okText: $t('Overwrite'),
+        }))
+      ) {
+        return;
+      }
+    }
+
+    UsageStatisticsService.actions.recordFeatureUsage('HighlighterExport');
+
+    setExport(exportFile);
+    exportCurrentFile(streamId, orientation);
+  }
 
   return (
     <div>
@@ -157,9 +220,7 @@ function ExportOptions(p: { close: () => void }) {
           label={$t('Video Name')}
           value={videoName}
           onInput={name => {
-            store.setState(s => {
-              s.videoName = name;
-            });
+            onVideoNameChange(name);
             setExportFile(getExportFileFromVideoName(name));
           }}
           uncontrolled={false}
@@ -172,9 +233,7 @@ function ExportOptions(p: { close: () => void }) {
           value={exportFile}
           onChange={file => {
             setExportFile(file);
-            store.setState(s => {
-              s.videoName = getVideoNameFromExportFile(file);
-            });
+            onVideoNameChange(getVideoNameFromExportFile(file));
           }}
         />
         <RadioInput
@@ -219,33 +278,15 @@ function ExportOptions(p: { close: () => void }) {
           />
         )}
         <div style={{ textAlign: 'right' }}>
-          <Button style={{ marginRight: 8 }} onClick={p.close}>
+          <Button style={{ marginRight: 8 }} onClick={close}>
             {$t('Close')}
           </Button>
-          <Button
-            type="primary"
-            onClick={async () => {
-              if (await fileExists(exportFile)) {
-                if (
-                  !(await confirmAsync({
-                    title: $t('Overwite File?'),
-                    content: $t('%{filename} already exists. Would you like to overwrite it?', {
-                      filename: path.basename(exportFile),
-                    }),
-                    okText: $t('Overwrite'),
-                  }))
-                ) {
-                  return;
-                }
-              }
 
-              UsageStatisticsService.actions.recordFeatureUsage('HighlighterExport');
-
-              setExport(exportFile);
-              exportCurrentFile();
-            }}
-          >
-            {$t('Export')}
+          <Button style={{ marginRight: 8 }} type="primary" onClick={() => startExport('vertical')}>
+            {$t('Export Vertical')}
+          </Button>
+          <Button type="primary" onClick={() => startExport('horizontal')}>
+            {$t('Export Horizontal')}
           </Button>
         </div>
       </Form>
@@ -253,9 +294,8 @@ function ExportOptions(p: { close: () => void }) {
   );
 }
 
-function PlatformSelect(p: { onClose: () => void }) {
-  const { store, clearUpload } = useController(ExportModalCtx);
-  const videoName = store.useState(s => s.videoName);
+function PlatformSelect({ onClose, videoName }: { onClose: () => void; videoName: string }) {
+  const { store, clearUpload, getStreamTitle } = useController(ExportModalCtx);
   const { UserService } = Services;
   const { isYoutubeLinked } = useVuex(() => ({
     isYoutubeLinked: !!UserService.state.auth?.platforms.youtube,
@@ -285,8 +325,8 @@ function PlatformSelect(p: { onClose: () => void }) {
         nowrap
         options={platformOptions}
       />
-      {platform === 'youtube' && <YoutubeUpload defaultTitle={videoName} close={p.onClose} />}
-      {platform !== 'youtube' && <StorageUpload onClose={p.onClose} platform={platform} />}
+      {platform === 'youtube' && <YoutubeUpload defaultTitle={videoName} close={onClose} />}
+      {platform !== 'youtube' && <StorageUpload onClose={onClose} platform={platform} />}
     </Form>
   );
 }

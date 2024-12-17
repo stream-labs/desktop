@@ -142,9 +142,11 @@ export const makeWidgetTesters = (host: string): IWidgetTester[] => {
   ] as IWidgetTester[];
 };
 
+// TODO: the type of this needs to match what's used on the UI with WidgetDisplayData
 export const WidgetDefinitions: { [x: number]: IWidget } = {
   [WidgetType.AlertBox]: {
     name: 'Alert Box',
+    humanType: 'alert_box',
     url(host, token) {
       return `https://${host}/alert-box/v3/${token}`;
     },
@@ -160,6 +162,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
   [WidgetType.DonationGoal]: {
     name: 'Tip Goal',
+    humanType: 'donation_goal',
     url(host, token) {
       return `https://${host}/widgets/donation-goal?token=${token}`;
     },
@@ -175,6 +178,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
   [WidgetType.FollowerGoal]: {
     name: 'Follower Goal',
+    humanType: 'follower_goal',
     url(host, token) {
       return `https://${host}/widgets/follower-goal?token=${token}`;
     },
@@ -188,8 +192,10 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
     anchor: AnchorPoint.SouthWest,
   },
 
+  // TODO: what is this widget and why does it point to follower goal?
   [WidgetType.SubscriberGoal]: {
     name: 'Subscriber Goal',
+    humanType: 'follower_goal',
     url(host, token) {
       return `https://${host}/widgets/follower-goal?token=${token}`;
     },
@@ -205,6 +211,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
   [WidgetType.SubGoal]: {
     name: 'Sub Goal',
+    humanType: 'sub_goal',
     url(host, token) {
       return `https://${host}/widgets/sub-goal?token=${token}`;
     },
@@ -220,6 +227,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
   [WidgetType.BitGoal]: {
     name: 'Bit Goal',
+    humanType: 'bit_goal',
     url(host, token) {
       return `https://${host}/widgets/bit-goal?token=${token}`;
     },
@@ -235,6 +243,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
   [WidgetType.StarsGoal]: {
     name: 'Stars Goal',
+    humanType: 'stars_goal',
     url(host, token) {
       return `https://${host}/widgets/stars-goal?token=${token}`;
     },
@@ -250,6 +259,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
   [WidgetType.SupporterGoal]: {
     name: 'Supporter Goal',
+    humanType: 'supporter_goal',
     url(host, token) {
       return `https://${host}/widgets/supporter-goal?token=${token}`;
     },
@@ -265,6 +275,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
   [WidgetType.SuperchatGoal]: {
     name: 'Superchat Goal',
+    humanType: 'super_chat_goal',
     url(host, token) {
       return `https://${host}/widgets/super-chat-goal?token=${token}`;
     },
@@ -280,6 +291,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
   [WidgetType.CharityGoal]: {
     name: 'Streamlabs Charity Goal',
+    humanType: 'streamlabs_charity_donation_goal',
     url(host, token) {
       return `https://${host}/widgets/streamlabs-charity-donation-goal?token=${token}`;
     },
@@ -295,6 +307,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
   [WidgetType.DonationTicker]: {
     name: 'Donation Ticker',
+    humanType: 'donation_ticker',
     url(host, token) {
       return `https://${host}/widgets/donation-ticker?token=${token}`;
     },
@@ -310,6 +323,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
   [WidgetType.ChatBox]: {
     name: 'Chat Box',
+    humanType: 'chat_box',
     url(host, token) {
       return `https://${host}/widgets/chat-box/v1/${token}`;
     },
@@ -325,6 +339,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
   [WidgetType.EventList]: {
     name: 'Event List',
+    humanType: 'event_list',
     url(host, token) {
       return `https://${host}/widgets/event-list/v1/${token}`;
     },
@@ -340,6 +355,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
   [WidgetType.TipJar]: {
     name: 'The Jar',
+    humanType: 'tip_jar',
     url(host, token) {
       return `https://${host}/widgets/tip-jar/v1/${token}`;
     },
@@ -355,6 +371,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
   [WidgetType.StreamBoss]: {
     name: 'Stream Boss',
+    humanType: 'streamboss',
     url(host, token) {
       return `https://${host}/widgets/streamboss?token=${token}`;
     },
@@ -370,6 +387,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
   [WidgetType.Credits]: {
     name: 'Credits',
+    humanType: 'end_credits',
     url(host, token) {
       return `https://${host}/widgets/end-credits?token=${token}`;
     },
@@ -385,6 +403,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
   [WidgetType.SponsorBanner]: {
     name: 'Sponsor Banner',
+    humanType: 'sponsor_banner',
     url(host, token) {
       return `https://${host}/widgets/sponsor-banner?token=${token}`;
     },
@@ -399,6 +418,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
   },
 
   [WidgetType.SpinWheel]: {
+    humanType: 'wheel',
     name: 'Spin Wheel',
     url(host, token) {
       return `https://${host}/widgets/wheel?token=${token}`;
@@ -415,6 +435,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
   [WidgetType.MediaShare]: {
     name: 'Media Share',
+    humanType: 'media-sharing',
     url(host, token) {
       return `https://${host}/widgets/media/v1/${token}`;
     },
@@ -429,6 +450,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
   },
   [WidgetType.Poll]: {
     name: 'Poll',
+    humanType: 'poll',
     url(host, token) {
       return `https://${host}/widgets/poll/${token}`;
     },
@@ -443,6 +465,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
   },
   [WidgetType.EmoteWall]: {
     name: 'Emote Wall',
+    humanType: 'emote-wall',
     url(host, token) {
       return `https://${host}/widgets/emote-wall?token=${token}`;
     },
@@ -457,6 +480,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
   },
   [WidgetType.ChatHighlight]: {
     name: 'Chat Highlight',
+    humanType: 'chat_highlight',
     url(host, token) {
       return `https://${host}/widgets/chat-highlight?token=${token}`;
     },
@@ -468,6 +492,46 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
     y: 0.5,
 
     anchor: AnchorPoint.Center,
+  },
+  [WidgetType.ViewerCount]: {
+    name: 'Viewer Count',
+    humanType: 'viewer_count',
+    url(host, token) {
+      return `https://${host}/widgets/viewer-count?token=${token}`;
+    },
+
+    width: 600,
+    height: 200,
+    x: 0,
+    y: 1,
+    anchor: AnchorPoint.SouthWest,
+  },
+  // TODO: it seems we've half way transitioned to getWidgetsConfig but
+  // this list is still referenced
+  [WidgetType.GameWidget]: {
+    name: 'Game Widget',
+    humanType: 'game_widget',
+    width: 400,
+    height: 750,
+    x: 0.5,
+    y: 0,
+    anchor: AnchorPoint.North,
+
+    url(host, token) {
+      return `https://${host}/widgets/game-widget?token=${token}`;
+    },
+  },
+  [WidgetType.CustomWidget]: {
+    name: 'Custom Widget',
+    humanType: 'custom_widget',
+    width: 400,
+    height: 750,
+    x: 0.5,
+    y: 0,
+    anchor: AnchorPoint.North,
+    url(host, token) {
+      return `https://${host}/widgets/custom-widget?token=${token}`;
+    },
   },
 };
 

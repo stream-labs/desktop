@@ -26,6 +26,8 @@ import { getWidgetsConfig } from './widgets-config';
 import { WidgetDisplayData } from '.';
 import { DualOutputService } from 'services/dual-output';
 import { TDisplayType, VideoSettingsService } from 'services/settings-v2';
+import { IncrementalRolloutService } from 'app-services';
+import { EAvailableFeatures } from 'services/incremental-rollout';
 
 export interface IWidgetSourcesState {
   widgetSources: Dictionary<IWidgetSource>;
@@ -83,6 +85,7 @@ export class WidgetsService
   @Inject() editorCommandsService: EditorCommandsService;
   @Inject() dualOutputService: DualOutputService;
   @Inject() videoSettingsService: VideoSettingsService;
+  @Inject() incrementalRolloutService: IncrementalRolloutService;
 
   widgetDisplayData = WidgetDisplayData(); // cache widget display data
 
@@ -251,6 +254,14 @@ export class WidgetsService
   }
 
   stopSyncPreviewSource(previewSourceId: string) {
+    if (!this.previewSourceWatchers[previewSourceId]) {
+      console.warn(
+        'Trying to destroy preview source',
+        previewSourceId,
+        'which is not on the watcher list, perhaps called twice?',
+      );
+      return;
+    }
     this.previewSourceWatchers[previewSourceId].unsubscribe();
     delete this.previewSourceWatchers[previewSourceId];
   }
@@ -448,7 +459,19 @@ export class WidgetsService
   }
 
   get widgetsConfig() {
-    return getWidgetsConfig(this.hostsService.streamlabs, this.userService.widgetToken);
+    // Widgets that have been ported to the new backend API at /api/v5/widgets/desktop
+    const widgetsWithNewAPI: WidgetType[] = [];
+
+    // The new chatbox requires the new widget API, add it here if the user is under incremental
+    if (this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.newChatBox)) {
+      widgetsWithNewAPI.push(WidgetType.ChatBox);
+    }
+
+    return getWidgetsConfig(
+      this.hostsService.streamlabs,
+      this.userService.widgetToken,
+      widgetsWithNewAPI,
+    );
   }
 
   get alertsConfig() {

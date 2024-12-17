@@ -18,6 +18,7 @@ import { useVuex } from 'components-react/hooks';
 import { useRealmObject } from 'components-react/hooks/realm';
 import { $i } from 'services/utils';
 import { TikTokChatInfo } from './TiktokChatInfo';
+import { ShareStreamLink } from './ShareStreamLink';
 
 const LiveDockCtx = React.createContext<LiveDockController | null>(null);
 
@@ -395,13 +396,12 @@ function LiveDock(p: { onLeft: boolean }) {
                 <span className={styles.liveDockText}>{liveText}</span>
                 <span className={styles.liveDockTimer}>{elapsedStreamTime}</span>
               </div>
-              <div className={styles.liveDockViewerCount}>
+              <div className={styles.liveDockViewerCount} onClick={() => ctrl.toggleViewerCount()}>
                 <i
                   className={cx({
                     ['icon-view']: !hideViewerCount,
                     ['icon-hide']: hideViewerCount,
                   })}
-                  onClick={() => ctrl.toggleViewerCount()}
                 />
                 <span className={styles.liveDockViewerCountCount}>{viewerCount}</span>
                 {Number(viewerCount) >= 0 && <span>{$t('viewers')}</span>}
@@ -428,6 +428,7 @@ function LiveDock(p: { onLeft: boolean }) {
                     <i onClick={() => ctrl.openPlatformStream()} className="icon-studio" />
                   </Tooltip>
                 )}
+                {isStreaming && <ShareStreamLink />}
                 {isPlatform(['youtube', 'facebook', 'tiktok']) && isStreaming && (
                   <Tooltip
                     title={$t('Go to Live Dashboard')}

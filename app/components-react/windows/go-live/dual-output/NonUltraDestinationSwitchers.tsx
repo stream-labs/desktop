@@ -1,19 +1,20 @@
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useMemo } from 'react';
 import { getPlatformService, TPlatform } from 'services/platforms';
 import cx from 'classnames';
 import { $t } from 'services/i18n';
-import styles from './DualOutputGoLive.m.less';
+import styles from '../GoLive.m.less';
 import { ICustomStreamDestination } from 'services/settings/streaming';
 import { Services } from 'components-react/service-provider';
 import PlatformLogo from 'components-react/shared/PlatformLogo';
 import InfoBadge from 'components-react/shared/InfoBadge';
 import DisplaySelector from 'components-react/shared/DisplaySelector';
-import { assertIsDefined } from 'util/properties-type-guards';
 import { useGoLiveSettings } from '../useGoLiveSettings';
 import { alertAsync } from 'components-react/modals';
 import Translate from 'components-react/shared/Translate';
 import DualOutputPlatformSelector from './DualOutputPlatformSelector';
 import { useDebounce } from 'components-react/hooks';
+import DualOutputToggle from '../../../shared/DualOutputToggle';
+import { renderTikTokModal } from '../DestinationSwitchers';
 
 interface INonUltraDestinationSwitchers {
   showSelector?: boolean;
@@ -35,6 +36,11 @@ export function NonUltraDestinationSwitchers(p: INonUltraDestinationSwitchers) {
   const destinationSwitcherRef = useRef({ addClass: () => undefined });
   const promptConnectTikTok = !isPlatformLinked('tiktok');
 
+  const platforms = useMemo(
+    () => (promptConnectTikTok ? enabledPlatforms.concat('tiktok') : enabledPlatforms),
+    [enabledPlatforms, promptConnectTikTok],
+  );
+
   const emitSwitch = useDebounce(500, () => {
     switchPlatforms(enabledPlatformsRef.current);
   });
@@ -55,18 +61,21 @@ export function NonUltraDestinationSwitchers(p: INonUltraDestinationSwitchers) {
   }
 
   return (
-    <div className={styles.switchWrapper}>
+    <div className={cx(styles.switchWrapper, styles.columnPadding)}>
       {isDualOutputMode && (
         <InfoBadge
           content={
-            <Translate message="<dualoutput>Dual Output</dualoutput> is enabled - you must stream to one horizontal and one vertical platform.">
-              <u slot="dualoutput" />
-            </Translate>
+            <>
+              <DualOutputToggle type="dual" lightShadow />
+              <Translate message="<dualoutput>Dual Output</dualoutput> is enabled - you must stream to one horizontal and one vertical platform.">
+                <u slot="dualoutput" />
+              </Translate>
+            </>
           }
           style={{ marginBottom: '15px' }}
         />
       )}
-      {enabledPlatforms.map((platform: TPlatform, index: number) => (
+      {platforms.map((platform: TPlatform, index: number) => (
         <DestinationSwitcher
           key={platform}
           destination={platform}
@@ -135,7 +144,10 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
       };
     });
     const containerRef = useRef<HTMLDivElement>(null);
+    const { TikTokService } = Services;
     const platform = typeof p.destination === 'string' ? (p.destination as TPlatform) : null;
+    const showTikTokModal =
+      p.promptConnectTikTok || (platform === 'tiktok' && TikTokService.missingLiveAccess);
 
     function addClass() {
       containerRef.current?.classList.remove(styles.platformDisabled);
@@ -155,26 +167,6 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
       containerRef.current?.classList.add(styles.platformDisabled);
     }
 
-    function showTikTokConnectModal() {
-      alertAsync({
-        type: 'confirm',
-        title: $t('Connect TikTok Account'),
-        closable: true,
-        content: (
-          <span>
-            {$t(
-              'Connect your TikTok account to stream to TikTok and one additional platform for free.',
-            )}
-          </span>
-        ),
-        okText: $t('Connect'),
-        onOk: () => {
-          Services.NavigationService.actions.navigate('PlatformMerge', { platform: 'tiktok' });
-          Services.WindowsService.actions.closeChildWindow();
-        },
-      });
-    }
-
     const { title, description, CloseIcon, Logo } = (() => {
       if (platform) {
         const { UserService } = Services;
@@ -191,7 +183,7 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
           Logo: () => (
             <PlatformLogo
               platform={platform}
-              className={cx(styles.logo, styles[`platform-logo-${platform}`])}
+              className={cx(styles.platformLogo, styles[`platform-logo-${platform}`])}
               size={36}
             />
           ),
@@ -217,15 +209,18 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
       }
     })();
     return (
-      <div data-test="non-ultra-switcher" className={styles.platformSwitcher}>
+      <div
+        data-test="non-ultra-switcher"
+        className={cx(styles.platformSwitcher, {
+          [styles.platformDisabled]: !p.enabled || p.promptConnectTikTok,
+        })}
+      >
         <div
           ref={containerRef}
-          className={cx(styles.switcherHeader, {
-            [styles.platformDisabled]: !p.enabled || p.promptConnectTikTok,
-          })}
+          className={styles.switcherHeader}
           onClick={() => {
-            if (p.promptConnectTikTok) {
-              showTikTokConnectModal();
+            if (showTikTokModal) {
+              renderTikTokModal(p.promptConnectTikTok);
             }
           }}
         >
@@ -238,7 +233,7 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
               <span className={styles.platformUsername}>{description}</span>
             </div>
             {/* CLOSE */}
-            {!p.isPrimary && <CloseIcon />}
+            {(!p.isPrimary || !p.promptConnectTikTok) && <CloseIcon />}
           </div>
         </div>
         <div className={styles.platformDisplay}>
