@@ -452,12 +452,7 @@ export default function SourceGrid(p: { activeTab: string }) {
                 activeKey={expandedSections}
                 onChange={xs => setExpandedSections(xs as string[])}
               >
-                <Panel
-                  header={$t('Essentials')}
-                  key="essentialSources"
-                  collapsible="disabled"
-                  showArrow={false}
-                >
+                <Panel header={$t('Essentials')} key="essentialSources">
                   <div className="collapse-section" data-testid="essential-sources">
                     {essentialSourcesList}
                   </div>
