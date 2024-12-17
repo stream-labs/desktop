@@ -208,6 +208,7 @@ import { InstagramService } from 'services/platforms/instagram';
 import { TwitchStudioImporterService } from 'services/ts-importer';
 import { RemoteControlService } from 'services/api/remote-control-api';
 import { UrlService } from 'services/hosts';
+import { VirtualWebcamService } from 'services/virtual-webcam';
 
 export const AppServices = {
   AppService,
@@ -288,4 +289,5 @@ export const AppServices = {
   RealmService,
   RemoteControlService,
   UrlService,
+  VirtualWebcamService,
 };
