@@ -15,6 +15,7 @@ export default function SourceTag(p: {
   appSourceId?: string;
   essential?: boolean;
   excludeWrap?: boolean;
+  hideShortDescription?: boolean;
 }) {
   const { inspectSource, selectInspectedSource, store } = useSourceShowcaseSettings();
 
@@ -54,7 +55,7 @@ export default function SourceTag(p: {
           </div>
           <div className={styles.displayName}>{displayData?.name || p.name}</div>
         </div>
-        {displayData?.shortDesc && (
+        {displayData?.shortDesc && !p.hideShortDescription && (
           <div
             style={{
               opacity: '0.5',

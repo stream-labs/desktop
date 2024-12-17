@@ -15,7 +15,11 @@ export interface IWidgetDisplayData {
   shortDesc?: string;
   link?: string;
   linkText?: string;
+  group: TWidgetGroup;
 }
+
+export type TWidgetGroup = 'essential' | 'interactive' | 'goals' | 'flair' | 'charity';
+
 // Do not alter the order of this enum, it is coupled to the user's local config
 export enum WidgetType {
   AlertBox = 0,
@@ -552,6 +556,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     ],
     icon: 'icon-alert-box',
     shortDesc: $t('Dynamic live alerts'),
+    group: 'essential',
   },
   [WidgetType.DonationGoal]: {
     name: $t('Tip Goal'),
@@ -560,6 +565,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     demoFilename: 'source-donation-goal.gif',
     supportList: [$t('Tips')],
     icon: 'fas fa-calendar',
+    group: 'goals',
   },
   [WidgetType.FollowerGoal]: {
     name: platform === 'youtube' ? $t('Subscription Goal') : $t('Follower Goal'),
@@ -574,6 +580,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
       $t('Trovo Followers'),
     ],
     icon: 'fas fa-calendar',
+    group: 'goals',
   },
   [WidgetType.SubGoal]: {
     name: platform === 'youtube' ? $t('Member Goal') : $t('Subscription Goal'),
@@ -588,6 +595,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     ],
     platforms: new Set(['twitch', 'youtube']),
     icon: 'fas fa-calendar',
+    group: 'goals',
   },
   [WidgetType.BitGoal]: {
     name: $t('Bit Goal'),
@@ -597,6 +605,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     supportList: [$t('Twitch Bits')],
     platforms: new Set(['twitch']),
     icon: 'fas fa-calendar',
+    group: 'goals',
   },
   [WidgetType.StarsGoal]: {
     name: $t('Stars Goal'),
@@ -606,6 +615,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     supportList: [$t('Facebook Stars')],
     platforms: new Set(['facebook']),
     icon: 'fas fa-calendar',
+    group: 'goals',
   },
   [WidgetType.SupporterGoal]: {
     name: $t('Supporter Goal'),
@@ -615,6 +625,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     supportList: [$t('Facebook Supporters')],
     platforms: new Set(['facebook']),
     icon: 'fas fa-calendar',
+    group: 'goals',
   },
   [WidgetType.CharityGoal]: {
     name: $t('Streamlabs Charity Donation Goal'),
@@ -623,6 +634,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     demoFilename: 'source-charity-goal.gif',
     supportList: [$t('Streamlabs Charity Donations')],
     icon: 'fas fa-calendar',
+    group: 'goals',
   },
   [WidgetType.SuperchatGoal]: {
     name: $t('Superchat Goal'),
@@ -632,6 +644,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     supportList: [$t('YouTube Superchats')],
     platforms: new Set(['youtube']),
     icon: 'fas fa-calendar',
+    group: 'goals',
   },
   [WidgetType.DonationTicker]: {
     name: $t('Tip Ticker'),
@@ -641,6 +654,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     demoFilename: 'source-tip-ticker.png',
     supportList: [$t('Tips')],
     icon: 'fas fa-ellipsis-h',
+    group: 'flair',
   },
   [WidgetType.ChatBox]: {
     name: $t('Chat Box'),
@@ -650,6 +664,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     demoFilename: 'source-chatbox.png',
     supportList: [$t('Twitch chat'), $t('YouTube chat'), $t('Facebook chat'), $t('Trovo chat')],
     icon: 'fas fa-comments',
+    group: 'essential',
   },
   [WidgetType.EventList]: {
     name: $t('Event List'),
@@ -668,6 +683,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     ],
     icon: 'fas fa-th-list',
     shortDesc: $t('Display recent events'),
+    group: 'essential',
   },
   [WidgetType.TipJar]: {
     name: $t('The Jar'),
@@ -682,6 +698,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
       $t('Platform support: Twitch, YouTube, Facebook, Trovo'),
     ],
     icon: 'fas fa-beer',
+    group: 'interactive',
   },
   [WidgetType.ViewerCount]: {
     name: $t('Viewer Count'),
@@ -690,6 +707,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     demoFilename: 'source-viewer-count.png',
     supportList: ['YouTube', 'Twitch', 'Facebook', 'Trovo'],
     icon: 'fas fa-eye',
+    group: 'essential',
   },
   [WidgetType.StreamBoss]: {
     name: $t('Stream Boss'),
@@ -700,6 +718,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     demoFilename: 'source-streamboss.png',
     supportList: [$t('Twitch Bits'), $t('Platform support: Twitch, YouTube, Facebook, Trovo')],
     icon: 'fas fa-gavel',
+    group: 'interactive',
   },
   [WidgetType.Credits]: {
     name: $t('Credits'),
@@ -717,6 +736,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     ],
     platforms: new Set(['twitch', 'youtube']),
     icon: 'fas fa-align-center',
+    group: 'flair',
   },
   [WidgetType.SponsorBanner]: {
     name: $t('Sponsor Banner'),
@@ -727,6 +747,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     demoFilename: 'source-sponsor-banner.png',
     supportList: [$t('The streamer manually adds images of sponsors.')],
     icon: 'fas fa-heart',
+    group: 'flair',
   },
   [WidgetType.SpinWheel]: {
     name: $t('Spin Wheel'),
@@ -735,6 +756,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     demoFilename: 'source-wheel.png',
     supportList: [$t('The streamer manually triggers a spin anytime while they are live.')],
     icon: 'fas fa-chart-pie',
+    group: 'interactive',
   },
   [WidgetType.MediaShare]: {
     name: $t('Media Share'),
@@ -743,6 +765,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     demoFilename: 'media.png',
     supportList: [],
     icon: 'icon-share',
+    group: 'interactive',
   },
   [WidgetType.Poll]: {
     name: $t('Poll'),
@@ -751,6 +774,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     demoFilename: 'poll.png',
     supportList: [$t('Twitch'), $t('YouTube')],
     icon: 'icon-text-align-left',
+    group: 'interactive',
   },
   [WidgetType.EmoteWall]: {
     name: $t('Emote Wall'),
@@ -760,6 +784,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     supportList: [],
     platforms: new Set(['twitch']),
     icon: 'icon-smile',
+    group: 'interactive',
   },
   [WidgetType.ChatHighlight]: {
     name: $t('Chat Highlight'),
@@ -769,6 +794,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     supportList: [],
     platforms: new Set(['twitch']),
     icon: 'icon-community',
+    group: 'interactive',
   },
   [WidgetType.GameWidget]: {
     name: $t('Game Widget'),
@@ -778,6 +804,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     supportList: [],
     platforms: new Set(['twitch', 'youtube']),
     icon: 'icon-face-masks',
+    group: 'interactive',
   },
   [WidgetType.CustomWidget]: {
     name: $t('Custom Widget'),
@@ -786,5 +813,6 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     demoFilename: '', // do not show an image
     supportList: [],
     icon: 'icon-developer',
+    group: 'flair',
   },
 });

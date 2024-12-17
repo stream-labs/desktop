@@ -36,6 +36,13 @@ export default function SourceGrid(p: { activeTab: string }) {
     'apps',
   ]);
 
+  const [widgetSections, setWidgetExpandedSections] = useState([
+    'essentialWidgets',
+    'interactive',
+    'goals',
+    'flair',
+  ]);
+
   const { isLoggedIn, linkedPlatforms, primaryPlatform } = useVuex(() => ({
     isLoggedIn: UserService.views.isLoggedIn,
     linkedPlatforms: UserService.views.linkedPlatforms,
@@ -103,6 +110,18 @@ export default function SourceGrid(p: { activeTab: string }) {
   }, []);
 
   const essentialSourcesOrder = ['game_capture', 'dshow_input', 'ffmpeg_source'];
+  // Stream Label is last, we don't have a widget type for it
+  const essentialWidgetsOrder = [
+    WidgetType.AlertBox,
+    WidgetType.ChatBox,
+    WidgetType.EventList,
+    WidgetType.ViewerCount,
+  ];
+
+  function customOrder<T, U>(orderArray: T[], getter: (a: U) => T) {
+    return (s1: U, s2: U): number =>
+      orderArray.indexOf(getter(s1)) - orderArray.indexOf(getter(s2));
+  }
 
   const essentialSources = useMemo(() => {
     const essentialDefaults = availableSources
@@ -114,10 +133,7 @@ export default function SourceGrid(p: { activeTab: string }) {
           //byOS({ [OS.Windows]: 'screen_capture', [OS.Mac]: 'window_capture' }),
         ].includes(source.value),
       )
-      .sort(
-        (s1, s2) =>
-          essentialSourcesOrder.indexOf(s1.value) - essentialSourcesOrder.indexOf(s2.value),
-      );
+      .sort(customOrder(essentialSourcesOrder, s => s.value));
 
     const essentialWidgets = iterableWidgetTypes.filter(type =>
       [WidgetType.AlertBox, WidgetType.ChatBox].includes(WidgetType[type]),
@@ -152,6 +168,12 @@ export default function SourceGrid(p: { activeTab: string }) {
     <SourceTag key={source.value} type={source.value} essential excludeWrap={excludeWrap} />
   );
 
+  // TODO: restrict type
+  // Hide widget descriptions on non-general tab
+  const toWidgetEl = (widget: string) => (
+    <SourceTag key={widget} type={widget} excludeWrap={excludeWrap} hideShortDescription />
+  );
+
   const essentialSourcesList = useMemo(
     () => (
       <>
@@ -178,9 +200,19 @@ export default function SourceGrid(p: { activeTab: string }) {
   );
 
   const sourceDisplayData = useMemo(() => SourceDisplayData(), []);
+  const widgetDisplayData = useMemo(() => WidgetDisplayData(), []);
 
   const byGroup = (group: 'capture' | 'av' | 'media') => (source: IObsListOption<TSourceType>) => {
     const displayData = sourceDisplayData[source.value];
+    if (!displayData) {
+      return true;
+    }
+
+    return displayData.group === group;
+  };
+
+  const byWidgetGroup = (group: string) => (widget: string) => {
+    const displayData = widgetDisplayData[WidgetType[widget]];
     if (!displayData) {
       return true;
     }
@@ -234,7 +266,12 @@ export default function SourceGrid(p: { activeTab: string }) {
         ) : (
           <>
             {iterableWidgetTypes.filter(filterEssential).map(widgetType => (
-              <SourceTag key={widgetType} type={widgetType} excludeWrap={excludeWrap} />
+              <SourceTag
+                key={widgetType}
+                type={widgetType}
+                excludeWrap={excludeWrap}
+                hideShortDescription
+              />
             ))}
             {p.activeTab !== 'all' && (
               <SourceTag
@@ -250,6 +287,87 @@ export default function SourceGrid(p: { activeTab: string }) {
     ),
     [isLoggedIn, iterableWidgetTypes, p.activeTab, excludeWrap],
   );
+
+  const widgetGroupedList = useMemo(() => {
+    // TODO: restrict types
+    const widgetsInGroup = (group: string, sorter?: (s1: string, s2: string) => number) => {
+      const widgets = iterableWidgetTypes
+        .filter(byWidgetGroup(group))
+        // Sort lexographically by default, if sorter is not provided
+        .sort(sorter);
+
+      return widgets.map(toWidgetEl);
+    };
+
+    // Using essentials as a group for widgets since we wanna display more
+    const essentialWidgets = (
+      <>
+        {widgetsInGroup(
+          'essential',
+          customOrder(essentialWidgetsOrder, x => WidgetType[x]),
+        )}
+        <SourceTag
+          key="streamlabel"
+          name={$t('Stream Label')}
+          type="streamlabel"
+          excludeWrap={excludeWrap}
+          hideShortDescription
+        />
+      </>
+    );
+
+    const interactiveWidgets = widgetsInGroup('interactive');
+    const goalWidgets = widgetsInGroup('goals');
+    const flairWidgets = <>{widgetsInGroup('flair')}</>;
+    const charityWidgets = widgetsInGroup('charity');
+
+    return (
+      <>
+        {!isLoggedIn ? (
+          <Empty
+            description={$t('You must be logged in to use Widgets')}
+            image={$i(`images/sleeping-kevin-${demoMode}.png`)}
+          >
+            <Button onClick={handleAuth}>{$t('Click here to log in')}</Button>
+          </Empty>
+        ) : (
+          <Collapse
+            ghost
+            activeKey={widgetSections}
+            onChange={xs => setWidgetExpandedSections(xs as string[])}
+          >
+            <Panel header={$t('Essentials')} key="essentialWidgets">
+              <div className="collapse-section" data-testid="essential-widgets">
+                {essentialWidgets}
+              </div>
+            </Panel>
+            <Panel header={$t('Interactive')} key="interactive">
+              <div className="collapse-section" data-testid="interactive-widgets">
+                {interactiveWidgets}
+              </div>
+            </Panel>
+            <Panel header={$t('Goals')} key="goals">
+              <div className="collapse-section" data-testid="goal-widgets">
+                {goalWidgets}
+              </div>
+            </Panel>
+            <Panel header={$t('Flair')} key="flair">
+              <div className="collapse-section" data-testid="flair-widgets">
+                {flairWidgets}
+              </div>
+            </Panel>
+            {/* TODO: we don't have any charity widgets on Desktop
+            <Panel header={$t('Charity')} key="charity">
+              <div className="collapse-section" data-testid="charity-widgets">
+                {charityWidgets}
+              </div>
+            </Panel>
+            */}
+          </Collapse>
+        )}
+      </>
+    );
+  }, [widgetSections, isLoggedIn, iterableWidgetTypes, excludeWrap]);
 
   const appsList = useMemo(
     () => (
@@ -308,10 +426,7 @@ export default function SourceGrid(p: { activeTab: string }) {
     } else if (showContent('widgets')) {
       return (
         <>
-          <Col span={24}>
-            <PageHeader style={{ paddingLeft: 0 }} title={$t('Widgets')} />
-          </Col>
-          {widgetList}
+          <Col span={24}>{widgetGroupedList}</Col>
         </>
       );
     } else if (showContent('apps')) {
@@ -337,12 +452,7 @@ export default function SourceGrid(p: { activeTab: string }) {
                 activeKey={expandedSections}
                 onChange={xs => setExpandedSections(xs as string[])}
               >
-                <Panel
-                  header={$t('Essentials')}
-                  key="essentialSources"
-                  collapsible="disabled"
-                  showArrow={false}
-                >
+                <Panel header={$t('Essentials')} key="essentialSources">
                   <div className="collapse-section" data-testid="essential-sources">
                     {essentialSourcesList}
                   </div>
