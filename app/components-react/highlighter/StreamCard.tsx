@@ -263,7 +263,7 @@ export function Thumbnail({
 }) {
   function getThumbnailText(state: EAiDetectionState): JSX.Element | string {
     if (clipsOfStreamAreLoading === stream?.id) {
-      return <i className="fa fa-spinner fa-pulse" style={{ marginLeft: 8 }} />;
+      return <i className="fa fa-spinner fa-pulse" />;
     }
 
     if (clips.length > 0) {
