@@ -41,7 +41,6 @@ export default function SourceGrid(p: { activeTab: string }) {
     'interactive',
     'goals',
     'flair',
-    'charity',
   ]);
 
   const { isLoggedIn, linkedPlatforms, primaryPlatform } = useVuex(() => ({
@@ -337,38 +336,28 @@ export default function SourceGrid(p: { activeTab: string }) {
             activeKey={widgetSections}
             onChange={xs => setWidgetExpandedSections(xs as string[])}
           >
-            <Panel
-              header={$t('Essentials')}
-              key="essentialWidgets"
-              collapsible="disabled"
-              showArrow={false}
-            >
+            <Panel header={$t('Essentials')} key="essentialWidgets">
               <div className="collapse-section" data-testid="essential-widgets">
                 {essentialWidgets}
               </div>
             </Panel>
-            <Panel
-              header={$t('Interactive')}
-              key="interactive"
-              collapsible="disabled"
-              showArrow={false}
-            >
+            <Panel header={$t('Interactive')} key="interactive">
               <div className="collapse-section" data-testid="interactive-widgets">
                 {interactiveWidgets}
               </div>
             </Panel>
-            <Panel header={$t('Goals')} key="goals" collapsible="disabled" showArrow={false}>
+            <Panel header={$t('Goals')} key="goals">
               <div className="collapse-section" data-testid="goal-widgets">
                 {goalWidgets}
               </div>
             </Panel>
-            <Panel header={$t('Flair')} key="flair" collapsible="disabled" showArrow={false}>
+            <Panel header={$t('Flair')} key="flair">
               <div className="collapse-section" data-testid="flair-widgets">
                 {flairWidgets}
               </div>
             </Panel>
             {/* TODO: we don't have any charity widgets on Desktop
-            <Panel header={$t('Charity')} key="charity" collapsible="disabled" showArrow={false}>
+            <Panel header={$t('Charity')} key="charity">
               <div className="collapse-section" data-testid="charity-widgets">
                 {charityWidgets}
               </div>
@@ -378,7 +367,7 @@ export default function SourceGrid(p: { activeTab: string }) {
         )}
       </>
     );
-  }, [isLoggedIn, iterableWidgetTypes, excludeWrap]);
+  }, [widgetSections, isLoggedIn, iterableWidgetTypes, excludeWrap]);
 
   const appsList = useMemo(
     () => (
