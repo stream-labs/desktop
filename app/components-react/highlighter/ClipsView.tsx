@@ -15,7 +15,7 @@ import {
 } from './utils';
 import ClipsViewModal from './ClipsViewModal';
 import { useVuex } from 'components-react/hooks';
-import { Button } from 'antd';
+import { Button, Tooltip } from 'antd';
 import { SUPPORTED_FILE_TYPES } from 'services/highlighter/constants';
 import { $t } from 'services/i18n';
 import path from 'path';
@@ -58,6 +58,8 @@ export default function ClipsView({
   const getClips = useCallback(() => {
     return HighlighterService.getClips(HighlighterService.views.clips, props.id);
   }, [props.id]);
+
+  const noClipsToExport = getClips().some(clip => clip.enabled) === false;
 
   useEffect(() => {
     setClipsLoaded(false);
@@ -196,13 +198,36 @@ export default function ClipsView({
                 {props.streamTitle ?? $t('All highlight clips')}
               </h1>
             </header>
-            <div style={{ padding: '20px' }}>
+            <div style={{ padding: '20px', display: 'flex', gap: '8px' }}>
               <Button
+                type="text"
                 icon={<i className="icon-community" style={{ marginRight: 8 }} />}
                 onClick={shareFeedback}
               >
-                Share Feedback
+                {$t('Share feedback')}
               </Button>
+              <Tooltip
+                title={
+                  noClipsToExport ? $t('Select at least one clip to preview your video') : null
+                }
+                placement="bottom"
+              >
+                <Button disabled={noClipsToExport} onClick={() => setModal({ modal: 'preview' })}>
+                  {$t('Preview')}
+                </Button>
+              </Tooltip>
+              <Tooltip
+                title={noClipsToExport ? $t('Select at least one clip to export your video') : null}
+                placement="bottom"
+              >
+                <Button
+                  disabled={noClipsToExport}
+                  type="primary"
+                  onClick={() => setModal({ modal: 'export' })}
+                >
+                  {$t('Export')}
+                </Button>
+              </Tooltip>
             </div>
           </div>
           {sortedList.length === 0 ? (
