@@ -4,7 +4,6 @@ import { AiHighlighterUpdater } from './updater';
 import { duration } from 'moment';
 import { ICoordinates } from '..';
 import kill from 'tree-kill';
-import { getOS, OS } from 'util/operating-systems';
 
 export enum EHighlighterInputTypes {
   KILL = 'kill',
@@ -131,13 +130,7 @@ export function getHighlightClips(
       cancelSignal.addEventListener('abort', () => {
         console.log('ending highlighter process');
         messageBuffer.clear();
-
-        // windows doesn't support signals and we have to use the custom graceful shutdown
-        if (getOS() === OS.Windows) {
-          childProcess.stdin?.write('quit\n');
-        } else {
-          kill(childProcess.pid!, 'SIGINT');
-        }
+        kill(childProcess.pid!, 'SIGINT');
         reject(new Error('Highlight generation canceled'));
       });
     }
