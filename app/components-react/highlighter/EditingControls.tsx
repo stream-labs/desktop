@@ -152,19 +152,6 @@ export function EditingControls({
           )}
         </Animate>
       </Form>
-      <Button
-        style={{ marginTop: '16px', marginRight: '8px' }}
-        onClick={() => emitSetShowModal('preview')}
-      >
-        {$t('Preview')}
-      </Button>
-      <Button
-        type="primary"
-        style={{ marginTop: '16px' }}
-        onClick={() => emitSetShowModal('export')}
-      >
-        {$t('Export')}
-      </Button>
     </Scrollable>
   );
 }
