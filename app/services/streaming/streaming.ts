@@ -348,6 +348,14 @@ export class StreamingService
 
     for (const platform of platforms) {
       await this.setPlatformSettings(platform, settings, unattendedMode);
+
+      if (platform === 'youtube') {
+        const yt = settings.customDestinations[settings.customDestinations.length - 1];
+
+        if (yt) {
+          yt.video = this.videoSettingsService.contexts[yt.display];
+        }
+      }
     }
 
     /**
@@ -921,8 +929,12 @@ export class StreamingService
     this.powerSaveId = remote.powerSaveBlocker.start('prevent-display-sleep');
 
     // start streaming
-    if (this.views.isDualOutputMode) {
+    if (this.views.isDualOutputMode || this.views.enabledPlatforms.includes('youtube')) {
       // start dual output
+      console.log(
+        'start streaming this.views.settings',
+        JSON.stringify(this.views.settings, null, 2),
+      );
 
       const horizontalContext = this.videoSettingsService.contexts.horizontal;
       const verticalContext = this.videoSettingsService.contexts.vertical;
@@ -938,11 +950,15 @@ export class StreamingService
           }
 
           if (signalInfo.signal === EOBSOutputSignal.Start) {
+            console.log('starting vertical');
+
             NodeObs.OBS_service_startStreaming('vertical');
             signalChanged.unsubscribe();
           }
         }
       });
+
+      console.log('starting horizontal');
 
       NodeObs.OBS_service_startStreaming('horizontal');
       // sleep for 1 second to allow the first stream to start
@@ -1034,9 +1050,11 @@ export class StreamingService
         remote.powerSaveBlocker.stop(this.powerSaveId);
       }
 
-      if (this.views.isDualOutputMode) {
+      if (this.views.isDualOutputMode || this.views.enabledPlatforms.includes('youtube')) {
         const signalChanged = this.signalInfoChanged.subscribe(
           (signalInfo: IOBSOutputSignalInfo) => {
+            console.log('stopping vertical');
+
             if (
               signalInfo.service === 'default' &&
               signalInfo.signal === EOBSOutputSignal.Deactivate
@@ -1046,6 +1064,7 @@ export class StreamingService
             }
           },
         );
+        console.log('stopping horizontal');
 
         NodeObs.OBS_service_stopStreaming(false, 'horizontal');
         // sleep for 1 second to allow the first stream to stop
@@ -1074,7 +1093,7 @@ export class StreamingService
     }
 
     if (this.state.streamingStatus === EStreamingState.Ending) {
-      if (this.views.isDualOutputMode) {
+      if (this.views.isDualOutputMode || this.views.enabledPlatforms.includes('youtube')) {
         NodeObs.OBS_service_stopStreaming(true, 'horizontal');
         NodeObs.OBS_service_stopStreaming(true, 'vertical');
       } else {
