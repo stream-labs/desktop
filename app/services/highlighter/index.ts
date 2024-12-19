@@ -1328,7 +1328,13 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
       console.error('Highlighter: Cannot export until current export operation is finished');
       return;
     }
-
+    this.SET_EXPORT_INFO({
+      exporting: true,
+      currentFrame: 0,
+      step: EExportStep.AudioMix,
+      cancelRequested: false,
+      error: null,
+    });
     let renderingClips: RenderingClip[] = [];
     if (streamId) {
       renderingClips = this.getClips(this.views.clips, streamId)
@@ -1407,6 +1413,11 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
 
     if (!renderingClips.length) {
       console.error('Highlighter: Export called without any clips!');
+      this.SET_EXPORT_INFO({
+        exporting: false,
+        exported: false,
+        error: $t('Please select at least one clip to export a video'),
+      });
       return;
     }
 
@@ -1419,12 +1430,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     const totalFramesAfterTransitions = totalFrames - numTransitions * transitionFrames;
 
     this.SET_EXPORT_INFO({
-      exporting: true,
-      currentFrame: 0,
       totalFrames: totalFramesAfterTransitions,
-      step: EExportStep.AudioMix,
-      cancelRequested: false,
-      error: null,
     });
 
     let fader: AudioCrossfader | null = null;

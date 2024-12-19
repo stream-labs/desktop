@@ -142,5 +142,6 @@
   "Export Horizontal": "Export Horizontal",
   "Get highlights (Fortnite only)": "Get highlights (Fortnite only)",
   "My Stream Highlights": "My Stream Highlights",
-  "You cannot use special characters in this field": "You cannot use special characters in this field"
+  "You cannot use special characters in this field": "You cannot use special characters in this field",
+  "Please select at least one clip to export a video": "Please select at least one clip to export a video"
 }
