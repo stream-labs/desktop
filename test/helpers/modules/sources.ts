@@ -61,6 +61,8 @@ export async function addSource(
   await focusChild();
 
   await waitForDisplayed('[data-testid=essential-sources]');
+  // to ensure async rendering of panels don't cause issues
+  await waitForDisplayed('[data-testid=widget-sources]');
   await click(`[data-name="${type}"]`);
 
   await clickButton('Add Source');
