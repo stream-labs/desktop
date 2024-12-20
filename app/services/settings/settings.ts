@@ -124,10 +124,6 @@ export interface ISettingsValues {
     NewSocketLoopEnable: boolean;
     LowLatencyEnable: boolean;
   };
-  'Virtual Webcam': {
-    OutputType: number;
-    OutputSelection: string;
-  };
 }
 export interface ISettingsSubCategory {
   nameSubCategory: string;
