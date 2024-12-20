@@ -539,6 +539,7 @@ export class YoutubeService
     };
 
     if (params.monetizationEnabled) {
+      fields.push('monetizationDetails');
       data.monetizationDetails = {
         cuepointSchedule: {
           enabled: params.monetizationEnabled,
