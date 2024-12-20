@@ -56,6 +56,7 @@ import { byOS, OS } from 'util/operating-systems';
 import { DualOutputService } from 'services/dual-output';
 import { capitalize } from 'lodash';
 import { TikTokService } from 'services/platforms/tiktok';
+import { YoutubeService } from 'services/platforms/youtube';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -101,6 +102,7 @@ export class StreamingService
   @Inject() private markersService: MarkersService;
   @Inject() private dualOutputService: DualOutputService;
   @Inject() private tikTokService: TikTokService;
+  @Inject() private youtubeService: YoutubeService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
@@ -331,6 +333,18 @@ export class StreamingService
       destination.mode = this.views.getDisplayContextName(display);
     });
 
+    // setup youtube vertical
+    if (this.views.enabledPlatforms.includes('youtube')) {
+      const ytvert = await this.youtubeService.createVertical(settings);
+
+      this.videoSettingsService.validateVideoContext('vertical');
+
+      ytvert.video = this.videoSettingsService.contexts.vertical;
+      console.log('ytvert.video', JSON.stringify(ytvert.video, null, 2));
+
+      settings.customDestinations.push(ytvert);
+    }
+
     // save enabled platforms to reuse setting with the next app start
     this.streamSettingsService.setSettings({ goLiveSettings: settings });
 
@@ -350,13 +364,13 @@ export class StreamingService
     for (const platform of platforms) {
       await this.setPlatformSettings(platform, settings, unattendedMode);
 
-      if (platform === 'youtube') {
-        const yt = settings.customDestinations[settings.customDestinations.length - 1];
+      // if (platform === 'youtube') {
+      //   const yt = settings.customDestinations[settings.customDestinations.length - 1];
 
-        if (yt) {
-          yt.video = this.videoSettingsService.contexts[yt.display];
-        }
-      }
+      //   if (yt) {
+      //     yt.video = this.videoSettingsService.contexts[yt.display];
+      //   }
+      // }
     }
 
     /**
@@ -493,6 +507,7 @@ export class StreamingService
                   },
                   display as TDisplayType,
                 );
+                console.log('set up custom destination', destination);
               } else {
                 console.error('Custom destination not found');
               }
@@ -955,6 +970,8 @@ export class StreamingService
 
             NodeObs.OBS_service_startStreaming('vertical');
             signalChanged.unsubscribe();
+
+            this.youtubeService.logStreams();
           }
         }
       });
