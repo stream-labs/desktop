@@ -813,6 +813,10 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
 
           // console.log('recording Alreadyt running?:', this.streamingService.views.isRecording);
 
+          this.usageStatisticsService.recordAnalyticsEvent('AIHighlighter', {
+            type: 'AiRecordingStarted',
+          });
+
           if (this.streamingService.views.isRecording) {
             // console.log('Recording is already running');
           } else {
