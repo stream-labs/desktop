@@ -7,15 +7,50 @@ import cx from 'classnames';
 import { $t } from 'services/i18n';
 import Translate from 'components/shared/translate';
 import { getOS, OS } from 'util/operating-systems';
+import { Services } from 'components-react/service-provider';
+import { Multiselect } from 'vue-multiselect';
+import { VCamOutputType } from 'obs-studio-node';
 
-@Component({})
-export default class AppearanceSettings extends Vue {
+@Component({
+  components: {
+    Multiselect
+  },
+})
+export default class VirtualCamSettings extends Vue {
   @Inject() virtualWebcamService: VirtualWebcamService;
 
   installStatus: EVirtualWebcamPluginInstallStatus = null;
+  outputTypeOptions = [
+    {name: $t('Program (default)'), id: VCamOutputType.ProgramView},
+    // {name: $t('Preview'), id: VCamOutputType.PreviewOutput}, // VCam for studio mode, is not implemented right now
+    {name: $t('Scene'), id: VCamOutputType.SceneOutput},
+    {name: $t('Source'), id: VCamOutputType.SourceOutput}
+  ];
+  outputTypeValue: {name: string, id: VCamOutputType} = this.outputTypeOptions[0];
+
+  outputSelectionOptions = [{name: "None", id: ""}];
+  outputSelectionValue: {name: string, id: string} = this.outputSelectionOptions[0];
+
+  scenesService = Services.ScenesService;
+  sourcesService = Services.SourcesService;
 
   created() {
     this.checkInstalled();
+
+    // TODO: reimplement with settings in RealmDB
+    /*
+    const outputType: VCamOutputType = this.settingsService.findSettingValue(this.settingsService.views.virtualWebcamSettings, 'OutputType', 'OutputType');
+    const outputTypeIndex = this.outputTypeOptions.findIndex(val => val.id === outputType);
+
+    if (outputTypeIndex !== -1) {
+      this.outputTypeValue = this.outputTypeOptions[outputTypeIndex];
+    } else {
+      this.outputTypeValue = this.outputTypeOptions[0];
+      this.settingsService.setSettingValue('Virtual Webcam', 'OutputType', VCamOutputType.ProgramView);
+    }
+
+    this.onOutputTypeChange(this.outputTypeValue);
+    */
   }
 
   install() {
@@ -154,18 +189,113 @@ export default class AppearanceSettings extends Vue {
     }
   }
 
+  onOutputTypeChange(value: {name: string, id: number}) {
+    this.outputTypeValue = value;
+
+    // TODO: RealmDB settings
+
+    //this.settingsService.setSettingValue('Virtual Webcam', 'OutputType', value.id);
+    //const settingsOutputSelection: string = this.settingsService.findSettingValue(this.settingsService.views.virtualWebcamSettings, 'OutputSelection', 'OutputSelection');
+
+    if (value.id == VCamOutputType.SceneOutput) {
+      const scenes = this.scenesService.views.scenes.map((scene) => ({
+        name: scene.name,
+        id: scene.id,
+      }));
+
+      this.outputSelectionOptions = scenes;
+      const outputSelectionIndex = this.outputSelectionOptions.findIndex(val => val.id === "" /*settingsOutputSelection*/);
+      if (outputSelectionIndex !== -1) {
+        this.outputSelectionValue = scenes[outputSelectionIndex];
+      } else {
+        this.outputSelectionValue = scenes[0];
+      }
+
+      //this.settingsService.setSettingValue('Virtual Webcam', 'OutputSelection', this.outputSelectionValue.id);
+      this.virtualWebcamService.update(VCamOutputType.SceneOutput, this.outputSelectionValue.id);
+    } else if (value.id == VCamOutputType.SourceOutput) {
+      const sources = this.virtualWebcamService.getVideoSources().map(source => ({name: source.name, id: source.sourceId}));
+
+      this.outputSelectionOptions = sources;
+      const outputSelectionIndex = this.outputSelectionOptions.findIndex(val => val.id === "" /*settingsOutputSelection*/);
+      if (outputSelectionIndex !== -1) {
+        this.outputSelectionValue = sources[outputSelectionIndex];
+      } else {
+        this.outputSelectionValue = sources[0];
+      }
+
+      //this.settingsService.setSettingValue('Virtual Webcam', 'OutputSelection', this.outputSelectionValue.id);
+      this.virtualWebcamService.update(VCamOutputType.SourceOutput, this.outputSelectionValue.id);
+    } else {
+      //this.settingsService.setSettingValue('Virtual Webcam', 'OutputSelection', "");
+      this.virtualWebcamService.update(value.id, "");
+    }
+  }
+
+  onOutputSelectionChange(value: {name: string, id: string}) {
+    this.outputSelectionValue = value;
+
+    // TODO: RealmDB settings
+    //this.settingsService.setSettingValue('Virtual Webcam', 'OutputSelection', this.outputSelectionValue.id);
+    this.virtualWebcamService.update(this.outputTypeValue.id, this.outputSelectionValue.id);
+  }
+
   render() {
     return (
       <div>
         <div class="section">
           <div class="section-content">
-            <b>{$t('This is an experimental feature.')}</b>
             <p>
               {$t(
                 'Virtual Webcam allows you to display your scenes from Streamlabs Desktop in video conferencing software. Streamlabs Desktop will appear as a Webcam that can be selected in most video conferencing apps.',
               )}
             </p>
           </div>
+        </div>
+
+        {/* -- TODO: prettify me!!!! -- */}
+
+        <div class="section">
+          <div class="section-content">
+          <p>{$t('Output type')}</p>
+            <Multiselect
+              value={this.outputTypeValue}
+              options={this.outputTypeOptions}
+              trackBy="id"
+              label="name"
+              onSelect={this.onOutputTypeChange}
+              singleSelect={true}
+              allowEmpty={false}
+              selectLabel={""}
+              selectedLabel={""}
+              deselectLabel={""}
+              showLabels={false}
+              searchable={false}
+              internalSearch={false}
+              showPointer={true}
+            />
+          </div>
+
+          {(this.outputTypeValue.id === VCamOutputType.SceneOutput || this.outputTypeValue.id === VCamOutputType.SourceOutput) &&
+          <div>
+            <p style={{ marginTop: '30px' }}>{$t('Output selection')}</p>
+            <Multiselect
+              value={this.outputSelectionValue}
+              options={this.outputSelectionOptions}
+              trackBy="id"
+              label="name"
+              onSelect={this.onOutputSelectionChange}
+              singleSelect={true}
+              allowEmpty={false}
+              selectLabel={""}
+              selectedLabel={""}
+              deselectLabel={""}
+              showLabels={false}
+              searchable={false}
+              internalSearch={false}
+              showPointer={true}
+            />
+          </div>}
         </div>
         {this.installStatus && this.getSection(this.installStatus)}
         {this.installStatus &&

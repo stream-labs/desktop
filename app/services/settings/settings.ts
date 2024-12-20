@@ -131,8 +131,6 @@ export interface ISettingsSubCategory {
   parameters: TObsFormData;
 }
 
-declare type TSettingsFormData = Dictionary<ISettingsSubCategory[]>;
-
 export enum ESettingsCategoryType {
   Untabbed = 0,
   Tabbed = 1,
@@ -241,6 +239,10 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
     }
 
     return null;
+  }
+
+  get virtualWebcamSettings() {
+    return this.state['Virtual Webcam'].formData;
   }
 }
 
@@ -397,6 +399,8 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
     let categories: string[] = obs.NodeObs.OBS_settings_getListCategories();
     // insert 'Multistreaming' after 'General'
     categories.splice(1, 0, 'Multistreaming');
+    // Deleting 'Virtual Webcam' category to add it below to position properly
+    categories = categories.filter(category => category !== 'Virtual Webcam');
     categories = categories.concat([
       'Scene Collections',
       'Notifications',

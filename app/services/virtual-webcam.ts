@@ -6,9 +6,10 @@ import path from 'path';
 import { getChecksum } from 'util/requests';
 import { byOS, OS } from 'util/operating-systems';
 import { Inject } from 'services/core/injector';
-import { UsageStatisticsService } from 'services/usage-statistics';
+import { UsageStatisticsService, SourcesService } from 'app-services';
 import * as remote from '@electron/remote';
 import { Subject } from 'rxjs';
+import { ESourceOutputFlags, VCamOutputType } from 'obs-studio-node';
 
 const PLUGIN_PLIST_PATH =
   '/Library/CoreMediaIO/Plug-Ins/DAL/vcam-plugin.plugin/Contents/Info.plist';
@@ -28,6 +29,7 @@ interface IVirtualWebcamServiceState {
 
 export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceState> {
   @Inject() usageStatisticsService: UsageStatisticsService;
+  @Inject() sourcesService: SourcesService;
 
   static initialState: IVirtualWebcamServiceState = { running: false };
 
@@ -88,8 +90,8 @@ export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceS
   start() {
     if (this.state.running) return;
 
-    obs.NodeObs.OBS_service_createVirtualWebcam('Streamlabs Desktop Virtual Webcam');
-    obs.NodeObs.OBS_service_startVirtualWebcam();
+    //obs.NodeObs.OBS_service_createVirtualWebcam('Streamlabs Desktop Virtual Webcam');
+    obs.NodeObs.OBS_service_startVirtualCam();
 
     this.SET_RUNNING(true);
     this.runningChanged.next(true);
@@ -100,8 +102,8 @@ export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceS
   stop() {
     if (!this.state.running) return;
 
-    obs.NodeObs.OBS_service_stopVirtualWebcam();
-    obs.NodeObs.OBS_service_removeVirtualWebcam();
+    obs.NodeObs.OBS_service_stopVirtualCam();
+    //obs.NodeObs.OBS_service_removeVirtualWebcam();
 
     this.SET_RUNNING(false);
     this.runningChanged.next(false);
@@ -110,6 +112,17 @@ export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceS
   private getCurrentChecksum() {
     const internalPlistPath = path.join(remote.app.getAppPath(), INTERNAL_PLIST_PATH);
     return getChecksum(internalPlistPath);
+  }
+
+  update(type: VCamOutputType, name: string) {
+    obs.NodeObs.OBS_service_updateVirtualCam(type, name);
+  }
+
+  getVideoSources() {
+    return this.sourcesService.views.sources.filter(
+      source =>
+        source.type !== 'scene' && source.getObsInput().outputFlags & ESourceOutputFlags.Video,
+    );
   }
 
   @mutation()
