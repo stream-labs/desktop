@@ -22,5 +22,9 @@
   "TikTok Live Access not granted. Click here to learn more.": "未授予 TikTok 直播權限。按一下此處以瞭解更多資訊。",
   "Only 32 characters of your title will display on TikTok": "您的標題中只有 32 個字元將顯示在 TikTok 上",
   "You may be eligible for TikTok Live Access. <apply>Apply here.</apply>": "您可能符合 TikTok 直播權限的資格。<apply>在這裡申請。</apply>",
-  "Click to view TikTok Replay in your browser.": "按一下以在瀏覽器中檢視 TikTok 重播。"
+  "Click to view TikTok Replay in your browser.": "按一下以在瀏覽器中檢視 TikTok 重播。",
+  "TikTok Stream Error": "TikTok 串流錯誤",
+  "Couldn't confirm TikTok Live Access. Apply for Live Permissions below": "無法確認 TikTok 直播權限。在下方申請直播權限",
+  "Connect your TikTok account": "Connect your TikTok account",
+  "Connect your TikTok account to stream to TikTok and one other platform for free. Haven't applied to stream on TikTok Live yet? <link>Start the process here</link>.": "Connect your TikTok account to stream to TikTok and one other platform for free. Haven't applied to stream on TikTok Live yet? <link>Start the process here</link>."
 }
