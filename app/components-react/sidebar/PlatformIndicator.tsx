@@ -46,7 +46,9 @@ export default function PlatformIndicator({ platform }: IPlatformIndicatorProps)
 }
 
 const SinglePlatformIndicator = ({ platform }: Pick<IPlatformIndicatorProps, 'platform'>) => {
-  const username = platform?.type === 'instagram' ? undefined : platform?.username;
+  const username = !['instagram', 'kick'].includes(platform?.type ?? '')
+    ? undefined
+    : platform?.username;
 
   return (
     <>

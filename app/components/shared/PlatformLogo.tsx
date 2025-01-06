@@ -23,6 +23,7 @@ export default class PlatformLogo extends TsxComponent<LogoProps> {
       trovo: 'trovo',
       twitter: 'twitter',
       instagram: 'instagram',
+      kick: 'kick',
     }[this.props.platform];
   }
 

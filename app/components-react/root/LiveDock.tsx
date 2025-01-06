@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import * as remote from '@electron/remote';
 import cx from 'classnames';
 import Animation from 'rc-animate';
-import { Menu } from 'antd';
+import { Button, Menu } from 'antd';
 import pick from 'lodash/pick';
 import { initStore, useController } from 'components-react/hooks/zustand';
 import { EStreamingState } from 'services/streaming';
@@ -354,6 +354,32 @@ function LiveDock(p: { onLeft: boolean }) {
     if (showInstagramInfo) {
       // FIXME: empty tab
       return <></>;
+    }
+
+    const showKickInfo = primaryChat === 'kick';
+    if (showKickInfo) {
+      return (
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            marginTop: '30px',
+          }}
+        >
+          <div style={{ marginBottom: '5px' }}>
+            {$t('Access chat for Kick in the Stream Dashboard.')}
+          </div>
+          <Button
+            style={{
+              width: '200px',
+              marginBottom: '10px',
+            }}
+            onClick={() => remote.shell.openExternal(Services.KickService.chatUrl)}
+          >
+            {$t('Open Kick Chat')}
+          </Button>
+        </div>
+      );
     }
 
     return (
