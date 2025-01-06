@@ -118,7 +118,7 @@ export class KickService
   }
 
   get liveDockEnabled(): boolean {
-    return this.streamingService.views.isMultiplatformMode;
+    return true;
   }
 
   get chatUrl(): string {

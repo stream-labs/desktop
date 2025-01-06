@@ -356,7 +356,8 @@ function LiveDock(p: { onLeft: boolean }) {
       return <></>;
     }
 
-    const showKickInfo = primaryChat === 'kick';
+    const showKickInfo =
+      visibleChat === 'kick' || (visibleChat === 'default' && primaryChat === 'kick');
     if (showKickInfo) {
       return (
         <div
@@ -475,7 +476,8 @@ function LiveDock(p: { onLeft: boolean }) {
             </div>
             {!hideStyleBlockers &&
               (isPlatform(['twitch', 'trovo']) ||
-                (isStreaming && isPlatform(['youtube', 'facebook', 'twitter', 'tiktok']))) && (
+                (isStreaming &&
+                  isPlatform(['youtube', 'facebook', 'twitter', 'tiktok', 'kick']))) && (
                 <div className={styles.liveDockChat}>
                   {hasChatTabs && <ChatTabs visibleChat={visibleChat} setChat={setChat} />}
 
@@ -491,7 +493,8 @@ function LiveDock(p: { onLeft: boolean }) {
                 </div>
               )}
             {(!ctrl.platform ||
-              (isPlatform(['youtube', 'facebook', 'twitter', 'tiktok']) && !isStreaming)) && (
+              (isPlatform(['youtube', 'facebook', 'twitter', 'tiktok', 'kick']) &&
+                !isStreaming)) && (
               <div className={cx('flex flex--center flex--column', styles.liveDockChatOffline)}>
                 <img className={styles.liveDockChatImgOffline} src={ctrl.offlineImageSrc} />
                 {!hideStyleBlockers && <span>{$t('Your chat is currently offline')}</span>}
