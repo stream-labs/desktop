@@ -262,7 +262,15 @@ export default function PreviewModal({
                   </div>
                 );
               } else {
-                content = <MiniClipPreview clipId={path}></MiniClipPreview>;
+                content = (
+                  <MiniClipPreview
+                    clipId={path}
+                    toggleAble={true}
+                    clipStateChanged={function (clipId: string, newState: boolean): void {
+                      throw new Error('Function not implemented.');
+                    }}
+                  ></MiniClipPreview>
+                );
               }
 
               return (
