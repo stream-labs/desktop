@@ -929,6 +929,8 @@ export class StreamingService
     if (this.views.isDualOutputMode) {
       // start dual output
 
+      // TODO: This automatically forces YouTube to go live with both contexts in dual output mode.
+      // We need something in the UI so the user can choose if they want this behavior.
       if (this.views.enabledPlatforms.includes('youtube')) {
         // On YouTube mobile, it only recognizes the default stream as a live stream.
         // Because the horizontal video context is technically the default context, in

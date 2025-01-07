@@ -101,6 +101,7 @@ function ModalFooter() {
     lifecycle === 'runChecklist' && error && checklist.startVideoTransmission !== 'done';
 
   function handleGoLive() {
+    // TODO: comment in once the UI is created to allow users to select whether or not they want YouTube dual output to go live with both displays
     // if (isDualOutputMode && !getCanStreamDualOutput()) {
     //   handleConfirmGoLive();
     //   return;
