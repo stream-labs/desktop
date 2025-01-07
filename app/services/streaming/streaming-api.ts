@@ -10,6 +10,7 @@ import { ITrovoStartStreamOptions } from '../platforms/trovo';
 import { IVideo } from 'obs-studio-node';
 import { ITwitterStartStreamOptions } from 'services/platforms/twitter';
 import { IInstagramStartStreamOptions } from 'services/platforms/instagram';
+import { IKickStartStreamOptions } from 'services/platforms/kick';
 import { TDisplayType } from 'services/settings-v2';
 
 export enum EStreamingState {
@@ -51,6 +52,7 @@ export interface IStreamInfo {
     youtube: TGoLiveChecklistItemState;
     facebook: TGoLiveChecklistItemState;
     tiktok: TGoLiveChecklistItemState;
+    kick: TGoLiveChecklistItemState;
     trovo: TGoLiveChecklistItemState;
     twitter: TGoLiveChecklistItemState;
     instagram: TGoLiveChecklistItemState;
@@ -71,6 +73,7 @@ export interface IStreamSettings {
     trovo?: IPlatformFlags & ITrovoStartStreamOptions;
     twitter?: IPlatformFlags & ITwitterStartStreamOptions;
     instagram?: IPlatformFlags & IInstagramStartStreamOptions;
+    kick?: IPlatformFlags & IKickStartStreamOptions;
   };
   customDestinations: ICustomStreamDestination[];
   advancedMode: boolean;
