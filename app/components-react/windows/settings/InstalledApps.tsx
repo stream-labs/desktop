@@ -89,6 +89,24 @@ export default function InstalledApps() {
               </td>
             </tr>
           ))}
+          <tr key={'Ai Highlighter'}>
+            <td>
+              {' '}
+              Beta
+              {/* <img src={} alt="-" width="50" />{' '} */}
+            </td>
+            <td> {'AI Highlighter'} </td>
+            <td> {'0.0.30'} </td>
+            <td className={cx(styles.buttonContainer, 'button-container--right')}>
+              <button
+                className={cx('button', {
+                  'button--soft-warning': true,
+                })}
+              >
+                Uninstall
+              </button>
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>

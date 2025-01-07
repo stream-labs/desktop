@@ -24,7 +24,11 @@ export default function Highlighter(props: { params?: { view: string } }) {
 
   let initialViewState: IViewState;
 
-  if (v.streamAmount > 0 && v.clipsAmount > 0 && aiHighlighterEnabled) {
+  if (props.params?.view) {
+    const view =
+      props.params?.view === 'settings' ? EHighlighterView.SETTINGS : EHighlighterView.STREAM;
+    initialViewState = { view };
+  } else if (v.streamAmount > 0 && v.clipsAmount > 0 && aiHighlighterEnabled) {
     initialViewState = { view: EHighlighterView.STREAM };
   } else if (v.clipsAmount > 0) {
     initialViewState = { view: EHighlighterView.CLIPS, id: undefined };

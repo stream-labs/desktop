@@ -20,6 +20,10 @@ export default function PlatformAppStore(p: { params: { appId?: string; type?: s
     getPlatformAppsUrl();
   }, [p.params]);
 
+  useEffect(() => {
+    console.log('loooooool', platformAppsUrl);
+  }, [platformAppsUrl]);
+
   function onBrowserViewReady(view: Electron.BrowserView) {
     new GuestApiHandler().exposeApi(view.webContents.id, {
       reloadProductionApps,
@@ -64,16 +68,24 @@ export default function PlatformAppStore(p: { params: { appId?: string; type?: s
   }
 
   async function navigateToApp(appId: string) {
+    console.log('looooool', appId);
+
     NavigationService.actions.navigate('PlatformAppMainPage', { appId });
   }
 
   if (!platformAppsUrl) return <></>;
   return (
-    <BrowserView
-      style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}
-      src={platformAppsUrl}
-      onReady={onBrowserViewReady}
-      enableGuestApi
-    />
+    <>
+      <BrowserView
+        style={{ position: 'absolute', top: 0, right: 0, left: 0, height: 'calc(100% - 40px)' }}
+        src={platformAppsUrl}
+        onReady={onBrowserViewReady}
+        enableGuestApi
+      />
+      <button style={{ position: 'absolute', bottom: 0, width: '40px', height: '40px' }}>
+        {' '}
+        helloo
+      </button>
+    </>
   );
 }
