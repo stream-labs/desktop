@@ -101,10 +101,10 @@ function ModalFooter() {
     lifecycle === 'runChecklist' && error && checklist.startVideoTransmission !== 'done';
 
   function handleGoLive() {
-    if (isDualOutputMode && !getCanStreamDualOutput()) {
-      handleConfirmGoLive();
-      return;
-    }
+    // if (isDualOutputMode && !getCanStreamDualOutput()) {
+    //   handleConfirmGoLive();
+    //   return;
+    // }
 
     goLive();
   }

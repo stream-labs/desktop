@@ -929,25 +929,60 @@ export class StreamingService
     if (this.views.isDualOutputMode) {
       // start dual output
 
-      const horizontalContext = this.videoSettingsService.contexts.horizontal;
-      const verticalContext = this.videoSettingsService.contexts.vertical;
+      if (this.views.enabledPlatforms.includes('youtube')) {
+        // On YouTube mobile, it only recognizes the default stream as a live stream.
+        // Because the horizontal video context is technically the default context, in
+        // order to show the vertical stream as live on YouTube mobile, we need to assign
+        // the vertical context as the default context and the horizontal context as the
+        // secondary context.
+        const horizontalContext = this.videoSettingsService.contexts.horizontal;
+        const verticalContext = this.videoSettingsService.contexts.vertical;
 
-      NodeObs.OBS_service_setVideoInfo(horizontalContext, 'horizontal');
-      NodeObs.OBS_service_setVideoInfo(verticalContext, 'vertical');
+        NodeObs.OBS_service_setVideoInfo(horizontalContext, 'horizontal');
+        NodeObs.OBS_service_setVideoInfo(verticalContext, 'vertical');
 
-      const signalChanged = this.signalInfoChanged.subscribe((signalInfo: IOBSOutputSignalInfo) => {
-        if (signalInfo.service === 'default') {
-          if (signalInfo.code !== 0) {
-            NodeObs.OBS_service_stopStreaming(true, 'horizontal');
-            NodeObs.OBS_service_stopStreaming(true, 'vertical');
-          }
+        const signalChanged = this.signalInfoChanged.subscribe(
+          (signalInfo: IOBSOutputSignalInfo) => {
+            if (signalInfo.service === 'default') {
+              if (signalInfo.code !== 0) {
+                NodeObs.OBS_service_stopStreaming(true, 'vertical');
+                NodeObs.OBS_service_stopStreaming(true, 'horizontal');
+              }
 
-          if (signalInfo.signal === EOBSOutputSignal.Start) {
-            NodeObs.OBS_service_startStreaming('vertical');
-            signalChanged.unsubscribe();
-          }
-        }
-      });
+              if (signalInfo.signal === EOBSOutputSignal.Start) {
+                NodeObs.OBS_service_startStreaming('horizontal');
+                signalChanged.unsubscribe();
+              }
+            }
+          },
+        );
+
+        NodeObs.OBS_service_startStreaming('vertical');
+        // sleep for 1 second to allow the first stream to start
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } else {
+        const horizontalContext = this.videoSettingsService.contexts.horizontal;
+        const verticalContext = this.videoSettingsService.contexts.vertical;
+
+        NodeObs.OBS_service_setVideoInfo(horizontalContext, 'horizontal');
+        NodeObs.OBS_service_setVideoInfo(verticalContext, 'vertical');
+
+        const signalChanged = this.signalInfoChanged.subscribe(
+          (signalInfo: IOBSOutputSignalInfo) => {
+            if (signalInfo.service === 'default') {
+              if (signalInfo.code !== 0) {
+                NodeObs.OBS_service_stopStreaming(true, 'horizontal');
+                NodeObs.OBS_service_stopStreaming(true, 'vertical');
+              }
+
+              if (signalInfo.signal === EOBSOutputSignal.Start) {
+                NodeObs.OBS_service_startStreaming('vertical');
+                signalChanged.unsubscribe();
+              }
+            }
+          },
+        );
+      }
 
       NodeObs.OBS_service_startStreaming('horizontal');
       // sleep for 1 second to allow the first stream to start
