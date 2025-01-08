@@ -12,7 +12,6 @@ import { StreamingService } from './streaming';
 import { FacebookService } from './platforms/facebook';
 import { TikTokService } from './platforms/tiktok';
 import { TrovoService } from './platforms/trovo';
-import { KickService } from './platforms/kick';
 import * as remote from '@electron/remote';
 import { VideoSettingsService, TDisplayType } from './settings-v2/video';
 import { DualOutputService } from './dual-output';
@@ -57,7 +56,6 @@ export class RestreamService extends StatefulService<IRestreamState> {
   @Inject('TikTokService') tiktokService: TikTokService;
   @Inject() trovoService: TrovoService;
   @Inject() instagramService: InstagramService;
-  @Inject() kickService: KickService;
   @Inject() videoSettingsService: VideoSettingsService;
   @Inject() dualOutputService: DualOutputService;
   @Inject('TwitterPlatformService') twitterService: TwitterPlatformService;
@@ -311,20 +309,10 @@ export class RestreamService extends StatefulService<IRestreamState> {
     // treat instagram as a custom destination
     const instagramTarget = newTargets.find(t => t.platform === 'instagram');
     if (instagramTarget) {
-      instagramTarget.platform = 'relay' as 'relay';
+      instagramTarget.platform = 'relay';
       instagramTarget.streamKey = `${this.instagramService.state.settings.streamUrl}${this.instagramService.state.streamKey}`;
       instagramTarget.mode = isDualOutputMode
         ? this.dualOutputService.views.getPlatformMode('instagram')
-        : 'landscape';
-    }
-
-    // treat kick as a custom destination
-    const kickTarget = newTargets.find(t => t.platform === 'kick');
-    if (kickTarget) {
-      kickTarget.platform = 'relay';
-      kickTarget.streamKey = `${this.kickService.state.settings.streamUrl}/${this.kickService.state.settings.streamKey}`;
-      kickTarget.mode = isDualOutputMode
-        ? this.dualOutputService.views.getPlatformMode('kick')
         : 'landscape';
     }
 

@@ -13,7 +13,6 @@ import { getDefined } from '../../../util/properties-type-guards';
 import { TrovoEditStreamInfo } from './platforms/TrovoEditStreamInfo';
 import { TwitterEditStreamInfo } from './platforms/TwitterEditStreamInfo';
 import { InstagramEditStreamInfo } from './platforms/InstagramEditStreamInfo';
-import { KickEditStreamInfo } from './platforms/KickEditStreamInfo';
 import AdvancedSettingsSwitch from './AdvancedSettingsSwitch';
 
 export default function PlatformSettings() {
@@ -105,7 +104,6 @@ export default function PlatformSettings() {
               {platform === 'tiktok' && isTikTokConnected && (
                 <TikTokEditStreamInfo {...createPlatformBinding('tiktok')} />
               )}
-              {platform === 'kick' && <KickEditStreamInfo {...createPlatformBinding('kick')} />}
               {platform === 'trovo' && <TrovoEditStreamInfo {...createPlatformBinding('trovo')} />}
               {platform === 'twitter' && (
                 <TwitterEditStreamInfo {...createPlatformBinding('twitter')} />

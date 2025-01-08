@@ -19,8 +19,6 @@ import Translate from 'components-react/shared/Translate';
 import * as remote from '@electron/remote';
 import { InstagramEditStreamInfo } from '../go-live/platforms/InstagramEditStreamInfo';
 import { IInstagramStartStreamOptions } from 'services/platforms/instagram';
-import { KickEditStreamInfo } from '../go-live/platforms/KickEditStreamInfo';
-import { IKickStartStreamOptions } from 'services/platforms/kick';
 import { metadata } from 'components-react/shared/inputs/metadata';
 import FormFactory, { TInputValue } from 'components-react/shared/inputs/FormFactory';
 import { alertAsync } from '../../modals';
@@ -413,14 +411,13 @@ function SLIDBlock() {
  */
 function Platform(p: { platform: TPlatform }) {
   const platform = p.platform;
-  const { UserService, StreamingService, InstagramService, KickService } = Services;
+  const { UserService, StreamingService, InstagramService } = Services;
   const { canEditSettings, platformMergeInline, platformUnlink } = useStreamSettings();
 
-  const { isLoading, authInProgress, instagramSettings, kickSettings } = useVuex(() => ({
+  const { isLoading, authInProgress, instagramSettings } = useVuex(() => ({
     isLoading: UserService.state.authProcessState === EAuthProcessState.Loading,
     authInProgress: UserService.state.authProcessState === EAuthProcessState.InProgress,
     instagramSettings: InstagramService.state.settings,
-    kickSettings: KickService.state.settings,
   }));
 
   const isMerged = StreamingService.views.isPlatformLinked(platform);
@@ -439,11 +436,7 @@ function Platform(p: { platform: TPlatform }) {
    */
   const isInstagram = platform === 'instagram';
   const [showInstagramFields, setShowInstagramFields] = useState(isInstagram && isMerged);
-
-  const isKick = platform === 'kick';
-  const [showKickFields, setShowKickFields] = useState(isKick && isMerged);
-
-  const shouldShowUsername = !isInstagram && !isKick;
+  const shouldShowUsername = !isInstagram;
 
   const usernameOrBlank = shouldShowUsername ? (
     <>
@@ -473,13 +466,13 @@ function Platform(p: { platform: TPlatform }) {
   const ConnectButton = () => (
     <span>
       <Button
-        onClick={handleConnect}
+        onClick={isInstagram ? instagramConnect : () => platformMergeInline(platform)}
         className={cx({ [css.tiktokConnectBtn]: platform === 'tiktok' })}
         disabled={isLoading || authInProgress}
         style={{
           backgroundColor: `var(--${platform})`,
           borderColor: 'transparent',
-          color: ['trovo', 'instagram', 'kick'].includes(platform) ? 'black' : 'inherit',
+          color: ['trovo', 'instagram'].includes(platform) ? 'black' : 'inherit',
         }}
       >
         {$t('Connect')}
@@ -489,45 +482,6 @@ function Platform(p: { platform: TPlatform }) {
 
   const updateInstagramSettings = (newSettings: IInstagramStartStreamOptions) => {
     InstagramService.actions.updateSettings(newSettings);
-  };
-
-  const updateKickSettings = (newSettings: IKickStartStreamOptions) => {
-    KickService.actions.updateSettings(newSettings);
-  };
-
-  const kickConnect = async () => {
-    const success = await UserService.actions.return.startAuth(platform, 'internal', true);
-    if (!success) return;
-    setShowKickFields(true);
-  };
-
-  const kickUnlink = () => {
-    // 1. reset stream key and url after unlinking if the user chooses to re-link immediately
-    updateKickSettings({ title: '', streamKey: '', streamUrl: '' });
-    // 2. hide extra fields
-    setShowKickFields(false);
-    // 3. unlink platform
-    platformUnlink(platform);
-  };
-
-  const handleConnect = () => {
-    if (isInstagram) {
-      instagramConnect();
-    } else if (isKick) {
-      kickConnect();
-    } else {
-      platformMergeInline(platform);
-    }
-  };
-
-  const handleUnlink = () => {
-    if (isInstagram) {
-      instagramUnlink();
-    } else if (isKick) {
-      kickUnlink();
-    } else {
-      platformMergeInline(platform);
-    }
   };
 
   const ExtraFieldsSection = () => {
@@ -543,20 +497,6 @@ function Platform(p: { platform: TPlatform }) {
         </div>
       );
     }
-
-    if (isKick && showKickFields) {
-      return (
-        <div className={cx(css.extraFieldsSection)}>
-          <KickEditStreamInfo
-            onChange={updateKickSettings}
-            value={kickSettings}
-            layoutMode="singlePlatform"
-            isStreamSettingsWindow
-          />
-        </div>
-      );
-    }
-
     return null;
   };
 
@@ -583,7 +523,10 @@ function Platform(p: { platform: TPlatform }) {
         <div style={{ marginLeft: 'auto' }}>
           {shouldShowConnectBtn && <ConnectButton />}
           {shouldShowUnlinkBtn && (
-            <Button danger onClick={handleUnlink}>
+            <Button
+              danger
+              onClick={() => (isInstagram ? instagramUnlink() : platformUnlink(platform))}
+            >
               {$t('Unlink')}
             </Button>
           )}

@@ -3,7 +3,6 @@ import { IYoutubeStartStreamOptions, YoutubeService } from './youtube';
 import { FacebookService, IFacebookStartStreamOptions } from './facebook';
 import { ITikTokStartStreamOptions, TikTokService } from './tiktok';
 import { InstagramService, IInstagramStartStreamOptions } from './instagram';
-import { KickService, IKickStartStreamOptions } from './kick';
 import { TwitterPlatformService } from './twitter';
 import { TTwitchOAuthScope } from './twitch/index';
 import { IGoLiveSettings } from 'services/streaming';
@@ -152,8 +151,7 @@ export type TStartStreamOptions =
   | Partial<IFacebookStartStreamOptions>
   | Partial<ITikTokStartStreamOptions>
   | Partial<ITrovoStartStreamOptions>
-  | Partial<IInstagramStartStreamOptions>
-  | Partial<IKickStartStreamOptions>;
+  | Partial<IInstagramStartStreamOptions>;
 
 // state applicable for all platforms
 export interface IPlatformState {
@@ -244,7 +242,6 @@ export enum EPlatform {
   Trovo = 'trovo',
   Twitter = 'twitter',
   Instagram = 'instagram',
-  Kick = 'kick',
 }
 
 export type TPlatform =
@@ -254,8 +251,7 @@ export type TPlatform =
   | 'tiktok'
   | 'trovo'
   | 'twitter'
-  | 'instagram'
-  | 'kick';
+  | 'instagram';
 
 export const platformList = [
   EPlatform.Facebook,
@@ -265,7 +261,6 @@ export const platformList = [
   EPlatform.YouTube,
   EPlatform.Twitter,
   EPlatform.Instagram,
-  EPlatform.Kick,
 ];
 
 export const platformLabels = (platform: TPlatform | string) =>
@@ -278,7 +273,6 @@ export const platformLabels = (platform: TPlatform | string) =>
     // TODO: translate
     [EPlatform.Twitter]: 'Twitter',
     [EPlatform.Instagram]: $t('Instagram'),
-    [EPlatform.Kick]: $t('Kick'),
   }[platform]);
 
 export function getPlatformService(platform: TPlatform): IPlatformService {
@@ -290,7 +284,6 @@ export function getPlatformService(platform: TPlatform): IPlatformService {
     trovo: TrovoService.instance,
     twitter: TwitterPlatformService.instance,
     instagram: InstagramService.instance,
-    kick: KickService.instance,
   }[platform];
 }
 

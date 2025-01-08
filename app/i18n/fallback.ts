@@ -65,7 +65,6 @@ const fallbackDictionary = {
   ...require('./en-US/widget-game.json'),
   ...require('./en-US/loader.json'),
   ...require('./en-US/guest-cam.json'),
-  ...require('./en-US/kick.json'),
 };
 
 export default fallbackDictionary;
