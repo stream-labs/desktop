@@ -10,6 +10,8 @@ import { UsageStatisticsService, SourcesService } from 'app-services';
 import * as remote from '@electron/remote';
 import { Subject } from 'rxjs';
 import { ESourceOutputFlags, VCamOutputType } from 'obs-studio-node';
+import { RealmObject } from './realm';
+import { ObjectSchema } from 'realm';
 
 const PLUGIN_PLIST_PATH =
   '/Library/CoreMediaIO/Plug-Ins/DAL/vcam-plugin.plugin/Contents/Info.plist';
@@ -27,9 +29,26 @@ interface IVirtualWebcamServiceState {
   running: boolean;
 }
 
+class VirtualCamServicePersistentState extends RealmObject {
+  // Naming of these fields is taken from OBS for reference
+  outputType: VCamOutputType;
+  outputSelection: string;
+
+  static schema: ObjectSchema = {
+    name: 'VirtualCamServicePersistentState',
+    properties: {
+      outputType: { type: 'int', default: VCamOutputType.ProgramView },
+      outputSelection: { type: 'string', default: '' },
+    },
+  };
+}
+
+VirtualCamServicePersistentState.register({ persist: true });
+
 export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceState> {
   @Inject() usageStatisticsService: UsageStatisticsService;
   @Inject() sourcesService: SourcesService;
+  virtualCamSettings = VirtualCamServicePersistentState.inject();
 
   static initialState: IVirtualWebcamServiceState = { running: false };
 
@@ -115,7 +134,21 @@ export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceS
   }
 
   update(type: VCamOutputType, name: string) {
+    this.virtualCamSettings.db.write(() => {
+      this.virtualCamSettings.deepPatch({
+        outputType: type,
+        outputSelection: name,
+      });
+    });
     obs.NodeObs.OBS_service_updateVirtualCam(type, name);
+  }
+
+  outputType(): VCamOutputType {
+    return this.virtualCamSettings.outputType;
+  }
+
+  outputSelection(): string {
+    return this.virtualCamSettings.outputSelection;
   }
 
   getVideoSources() {

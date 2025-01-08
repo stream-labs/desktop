@@ -37,20 +37,18 @@ export default class VirtualCamSettings extends Vue {
   created() {
     this.checkInstalled();
 
-    // TODO: reimplement with settings in RealmDB
-    /*
-    const outputType: VCamOutputType = this.settingsService.findSettingValue(this.settingsService.views.virtualWebcamSettings, 'OutputType', 'OutputType');
+    console.info("!!!", this.virtualWebcamService.outputType(), this.virtualWebcamService.outputSelection());
+
+    const outputType: VCamOutputType = this.virtualWebcamService.outputType();
     const outputTypeIndex = this.outputTypeOptions.findIndex(val => val.id === outputType);
 
     if (outputTypeIndex !== -1) {
       this.outputTypeValue = this.outputTypeOptions[outputTypeIndex];
     } else {
       this.outputTypeValue = this.outputTypeOptions[0];
-      this.settingsService.setSettingValue('Virtual Webcam', 'OutputType', VCamOutputType.ProgramView);
     }
 
     this.onOutputTypeChange(this.outputTypeValue);
-    */
   }
 
   install() {
@@ -192,11 +190,6 @@ export default class VirtualCamSettings extends Vue {
   onOutputTypeChange(value: {name: string, id: number}) {
     this.outputTypeValue = value;
 
-    // TODO: RealmDB settings
-
-    //this.settingsService.setSettingValue('Virtual Webcam', 'OutputType', value.id);
-    //const settingsOutputSelection: string = this.settingsService.findSettingValue(this.settingsService.views.virtualWebcamSettings, 'OutputSelection', 'OutputSelection');
-
     if (value.id == VCamOutputType.SceneOutput) {
       const scenes = this.scenesService.views.scenes.map((scene) => ({
         name: scene.name,
@@ -204,39 +197,33 @@ export default class VirtualCamSettings extends Vue {
       }));
 
       this.outputSelectionOptions = scenes;
-      const outputSelectionIndex = this.outputSelectionOptions.findIndex(val => val.id === "" /*settingsOutputSelection*/);
+      const outputSelectionIndex = this.outputSelectionOptions.findIndex(val => val.id === this.virtualWebcamService.outputSelection());
       if (outputSelectionIndex !== -1) {
         this.outputSelectionValue = scenes[outputSelectionIndex];
       } else {
         this.outputSelectionValue = scenes[0];
       }
 
-      //this.settingsService.setSettingValue('Virtual Webcam', 'OutputSelection', this.outputSelectionValue.id);
       this.virtualWebcamService.update(VCamOutputType.SceneOutput, this.outputSelectionValue.id);
     } else if (value.id == VCamOutputType.SourceOutput) {
       const sources = this.virtualWebcamService.getVideoSources().map(source => ({name: source.name, id: source.sourceId}));
 
       this.outputSelectionOptions = sources;
-      const outputSelectionIndex = this.outputSelectionOptions.findIndex(val => val.id === "" /*settingsOutputSelection*/);
+      const outputSelectionIndex = this.outputSelectionOptions.findIndex(val => val.id === this.virtualWebcamService.outputSelection());
       if (outputSelectionIndex !== -1) {
         this.outputSelectionValue = sources[outputSelectionIndex];
       } else {
         this.outputSelectionValue = sources[0];
       }
 
-      //this.settingsService.setSettingValue('Virtual Webcam', 'OutputSelection', this.outputSelectionValue.id);
       this.virtualWebcamService.update(VCamOutputType.SourceOutput, this.outputSelectionValue.id);
     } else {
-      //this.settingsService.setSettingValue('Virtual Webcam', 'OutputSelection', "");
       this.virtualWebcamService.update(value.id, "");
     }
   }
 
   onOutputSelectionChange(value: {name: string, id: string}) {
     this.outputSelectionValue = value;
-
-    // TODO: RealmDB settings
-    //this.settingsService.setSettingValue('Virtual Webcam', 'OutputSelection', this.outputSelectionValue.id);
     this.virtualWebcamService.update(this.outputTypeValue.id, this.outputSelectionValue.id);
   }
 
@@ -275,6 +262,9 @@ export default class VirtualCamSettings extends Vue {
               showPointer={true}
             />
           </div>
+
+          {(this.outputTypeValue.id === VCamOutputType.ProgramView) &&
+          <div style={{ marginBottom: '30px' }}></div>}
 
           {(this.outputTypeValue.id === VCamOutputType.SceneOutput || this.outputTypeValue.id === VCamOutputType.SourceOutput) &&
           <div>
