@@ -17,8 +17,6 @@ const fs = require('fs');
 useWebdriver();
 
 test('Highlighter save and export', async t => {
-  console.log('Starting test');
-
   await logIn();
   const recordingDir = await setTemporaryRecordingPath();
 
