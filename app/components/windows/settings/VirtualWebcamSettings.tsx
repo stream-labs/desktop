@@ -37,8 +37,6 @@ export default class VirtualCamSettings extends Vue {
   created() {
     this.checkInstalled();
 
-    console.info("!!!", this.virtualWebcamService.outputType(), this.virtualWebcamService.outputSelection());
-
     const outputType: VCamOutputType = this.virtualWebcamService.outputType();
     const outputTypeIndex = this.outputTypeOptions.findIndex(val => val.id === outputType);
 
