@@ -103,8 +103,8 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     group: 'capture',
   },
   dshow_input: {
-    name: $t('Camera / Capture Card'),
-    shortDesc: $t('Display device video'),
+    name: $t('Video Capture'),
+    shortDesc: $t('Camera / Capture Card'),
     description: $t('Display video from webcams, capture cards, and other devices.'),
     demoFilename: 'video-capture.png',
     supportList: [
@@ -240,8 +240,8 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     group: 'av',
   },
   av_capture_input: {
-    name: $t('Camera / Capture Card'),
-    shortDesc: $t('Display device video'),
+    name: $t('Video Capture'),
+    shortDesc: $t('Camera / Capture Card'),
     description: $t('Display video from webcams, capture cards, and other devices.'),
     demoFilename: 'video-capture.png',
     supportList: [
@@ -300,18 +300,18 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
   streamlabel: {
     name: $t('Stream Label'),
     description: $t(
-      'Include text into your stream, such as follower count, last donation, and many others.',
+      'Include text into your stream, such as follower count, latest tip, last sub and more.',
     ),
     demoFilename: 'source-stream-labels.png',
     supportList: [
       $t('New Followers'),
       $t('New Subscribers'),
       $t('New Cheers'),
-      $t('New Donations'),
-      $t('All-Time Top Donator'),
-      $t('Weekly Top Donator'),
+      $t('New Tips'),
+      $t('All-Time Top Tipper'),
+      $t('Weekly Top Tipper'),
       $t('Monthly Follows'),
-      $t('Many more'),
+      $t('And more'),
     ],
     icon: 'fas fa-file',
     shortDesc: $t('Stream stats and events'),
