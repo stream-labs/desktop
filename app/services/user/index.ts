@@ -1287,6 +1287,29 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       return EPlatformCallResult.Success;
     }
 
+    if (platform === 'kick') {
+      const auth = {
+        widgetToken: '',
+        apiToken: '',
+        primaryPlatform: 'kick' as TPlatform,
+        platforms: {
+          kick: {
+            type: 'kick' as TPlatform,
+            // HACK: faking kick username
+            username: 'linked',
+            token: '',
+            id: 'kick',
+          },
+        },
+        hasRelogged: true,
+      };
+
+      this.UPDATE_PLATFORM(
+        (auth.platforms as Record<TPlatform, IPlatformAuth>)[auth.primaryPlatform],
+      );
+      return EPlatformCallResult.Success;
+    }
+
     this.SET_AUTH_STATE(EAuthProcessState.Loading);
     const onWindowShow = () =>
       this.SET_AUTH_STATE(
