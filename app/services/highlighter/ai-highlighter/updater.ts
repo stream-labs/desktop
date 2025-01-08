@@ -109,9 +109,10 @@ export class AiHighlighterUpdater {
    */
   private getManifestUrl(): string {
     if (Utils.getHighlighterEnvironment() === 'staging') {
-      return 'https://cdn-highlighter-builds.streamlabs.com/staging/manifest_win_x86_64.json';
+      const cacheBuster = Math.floor(Date.now() / 1000);
+      return `https://cdn-highlighter-builds.streamlabs.com/staging/manifest_win_x86_64.json?t=${cacheBuster}`;
     } else {
-      return 'https://cdn-highlighter-builds.streamlabs.com/manifest_win_x86_64.json';
+      return 'https://cdn-highlighter-builds.streamlabs.com/production/manifest_win_x86_64.json';
     }
   }
   /**
@@ -141,7 +142,10 @@ export class AiHighlighterUpdater {
       await fs.readFile(this.manifestPath, 'utf-8'),
     ) as IAIHighlighterManifest;
 
-    if (newManifest.version !== currentManifest.version) {
+    if (
+      newManifest.version !== currentManifest.version ||
+      newManifest.timestamp > currentManifest.timestamp
+    ) {
       console.log(
         `new highlighter version available. ${currentManifest.version} -> ${newManifest.version}`,
       );

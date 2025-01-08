@@ -101,7 +101,12 @@ export default class Utils {
   static isDevMode() {
     return Utils.env.NODE_ENV !== 'production';
   }
+
   static getHighlighterEnvironment(): 'production' | 'staging' | 'local' {
+    if (process.argv.includes('--bundle-qa')) {
+      return 'staging';
+    }
+
     if (process.env.HIGHLIGHTER_ENV !== 'staging' && process.env.HIGHLIGHTER_ENV !== 'local') {
       return 'production';
     }
