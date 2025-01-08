@@ -103,7 +103,9 @@ export default class Utils {
   }
 
   static getHighlighterEnvironment(): 'production' | 'staging' | 'local' {
-    if (process.argv.includes('--bundle-qa')) {
+    // need to use this remote thing because main process is being spawned as
+    // subprocess of updater process in the release build
+    if (remote.process.argv.includes('--bundle-qa')) {
       return 'staging';
     }
 
