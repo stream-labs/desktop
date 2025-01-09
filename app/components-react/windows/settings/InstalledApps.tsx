@@ -8,10 +8,11 @@ import styles from './InstalledApps.m.less';
 import { useVuex } from 'components-react/hooks';
 
 export default function InstalledApps() {
-  const { PlatformAppsService } = Services;
+  const { PlatformAppsService, HighlighterService } = Services;
 
-  const { installedApps } = useVuex(() => ({
+  const { installedApps, highlighterVersion } = useVuex(() => ({
     installedApps: PlatformAppsService.views.productionApps,
+    highlighterVersion: HighlighterService.views.highlighterVersion,
   }));
   const enabledInstalledAppIds = installedApps.filter(app => app.enabled).map(app => app.id);
 
@@ -89,24 +90,28 @@ export default function InstalledApps() {
               </td>
             </tr>
           ))}
-          <tr key={'Ai Highlighter'}>
-            <td>
-              {' '}
-              Beta
-              {/* <img src={} alt="-" width="50" />{' '} */}
-            </td>
-            <td> {'AI Highlighter'} </td>
-            <td> {'0.0.30'} </td>
-            <td className={cx(styles.buttonContainer, 'button-container--right')}>
-              <button
-                className={cx('button', {
-                  'button--soft-warning': true,
-                })}
-              >
-                Uninstall
-              </button>
-            </td>
-          </tr>
+          {highlighterVersion !== '' && (
+            <tr key={'Ai Highlighter'}>
+              <td>
+                <img
+                  src={'https://slobs-cdn.streamlabs.com/media/highlighter-image.png'}
+                  alt="-"
+                  width="50"
+                />{' '}
+              </td>
+              <td> {'AI Highlighter'} </td>
+              <td> {highlighterVersion} </td>
+              <td className={cx(styles.buttonContainer, 'button-container--right')}>
+                <button
+                  className={cx('button', {
+                    'button--soft-warning': true,
+                  })}
+                >
+                  Uninstall
+                </button>
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>

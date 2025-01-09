@@ -564,6 +564,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
       audio: state.audio,
       transition: state.transition,
       useAiHighlighter: state.useAiHighlighter,
+      highlighterVersion: state.highlighterVersion,
     };
   }
 
@@ -702,6 +703,12 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
   @mutation()
   SET_HIGHLIGHTER_VERSION(version: string) {
     this.state.highlighterVersion = version;
+  }
+
+  @mutation()
+  UNINSTALL_HIGHLIGHTER() {
+    // TODO: Actually deinstall highlighter, then set
+    this.state.highlighterVersion = '';
   }
 
   get views() {
