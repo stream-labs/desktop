@@ -104,6 +104,7 @@ export interface IYoutubeLiveBroadcast {
       scheduleStrategy?: string;
       repeatIntervalSecs?: number;
     };
+    adsMonetizationStatus?: 'on' | 'off';
     eligibleForAdsMonetization?: boolean;
   };
 }
@@ -541,6 +542,7 @@ export class YoutubeService
     if (params.monetizationEnabled) {
       fields.push('monetizationDetails');
       data.monetizationDetails = {
+        adsMonetizationStatus: this.getMonetizationStatus(params.monetizationEnabled),
         cuepointSchedule: {
           enabled: params.monetizationEnabled,
         },
@@ -616,6 +618,9 @@ export class YoutubeService
 
       const moneyInfo = broadcast.monetizationDetails.cuepointSchedule;
       monetizationDetails = {
+        adsMonetizationStatus: this.getMonetizationStatus(
+          isMidStreamMode ? moneyInfo?.enabled : params.monetizationEnabled,
+        ),
         cuepointSchedule: {
           enabled: isMidStreamMode ? moneyInfo?.enabled : params.monetizationEnabled,
           pauseAdsUntil: moneyInfo?.pauseAdsUntil,
@@ -777,6 +782,10 @@ export class YoutubeService
     ).items[0];
   }
 
+  getMonetizationStatus(val: boolean) {
+    return val ? 'on' : 'off';
+  }
+
   get chatUrl() {
     const broadcastId = this.state.settings.broadcastId;
     if (!broadcastId) return '';
@@ -813,7 +822,7 @@ export class YoutubeService
       latencyPreference,
       categoryId: video.snippet.categoryId,
       thumbnail: broadcast.snippet.thumbnails.default.url,
-      monetizationEnabled: broadcast.monetizationDetails?.cuepointSchedule?.enabled,
+      monetizationEnabled: broadcast.monetizationDetails?.adsMonetizationStatus === 'on',
       eligibleForMonetization: broadcast.monetizationDetails?.eligibleForAdsMonetization,
     };
   }
