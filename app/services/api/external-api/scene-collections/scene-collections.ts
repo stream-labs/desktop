@@ -67,6 +67,12 @@ export class SceneCollectionsService {
     };
   }
 
+  /**
+   * Gets whether or not this is a new user's first login. This is set
+   * on load when the app attempts to sync scene collections with the
+   * cloud for the first time and signifies that no scene collections
+   * were found.
+   */
   get newUserFirstLogin(): boolean {
     return this.sceneCollectionsService.newUserFirstLogin;
   }

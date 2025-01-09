@@ -291,9 +291,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   @Inject() private selectionService: SelectionService;
   @Inject() private streamingService: StreamingService;
   @Inject() private settingsService: SettingsService;
-  @Inject() private sourcesService: SourcesService;
-  @Inject() private widgetsService: WidgetsService;
-  @Inject() private defaultHardwareService: DefaultHardwareService;
 
   static defaultState: IDualOutputServiceState = {
     dualOutputMode: false,
@@ -795,59 +792,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         this.streamSettingsService.setGoLiveSettings({ customDestinations: updatedDestinations });
       }
     });
-  }
-
-  /**
-   * Creates default sources for new users
-   * @remark New users should have dual output toggled and a few default sources.
-   * Create all the sources before toggling dual output for a better user experience.
-   */
-  setupDefaultSources() {
-    this.setIsLoading(true);
-
-    this.videoSettingsService.validateVideoContext();
-
-    const scene =
-      this.scenesService.views.activeScene ??
-      this.scenesService.createScene('Scene', { makeActive: true });
-
-    // add game capture source
-    const gameCapture = scene.createAndAddSource(
-      'Game Capture',
-      'game_capture',
-      {},
-      { display: 'horizontal' },
-    );
-    this.createPartnerNode(gameCapture);
-
-    // add webcam source
-    const type = byOS({
-      [OS.Windows]: 'dshow_input',
-      [OS.Mac]: 'av_capture_input',
-    }) as TSourceType;
-
-    const defaultSource = this.defaultHardwareService.state.defaultVideoDevice;
-
-    const webCam = defaultSource
-      ? this.sourcesService.views.getSource(defaultSource)
-      : this.sourcesService.views.sources.find(s => s?.type === type);
-
-    if (!webCam) {
-      const cam = scene.createAndAddSource('Webcam', type, { display: 'horizontal' });
-      this.createPartnerNode(cam);
-    } else {
-      const cam = scene.addSource(webCam.sourceId, { display: 'horizontal' });
-      this.createPartnerNode(cam);
-    }
-
-    // add alert box widget
-    this.widgetsService.createWidget(WidgetType.AlertBox, 'Alert Box');
-
-    // toggle dual output mode and vertical display
-    this.toggleDisplay(true, 'vertical');
-    this.toggleDualOutputMode(true);
-
-    this.collectionHandled.next();
   }
 
   /**

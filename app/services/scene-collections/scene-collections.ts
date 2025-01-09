@@ -14,7 +14,7 @@ import { SceneFiltersNode } from './nodes/scene-filters';
 import path from 'path';
 import { parse } from './parse';
 import { ScenesService, TSceneNode } from 'services/scenes';
-import { SourcesService } from 'services/sources';
+import { SourcesService, TSourceType } from 'services/sources';
 import { E_AUDIO_CHANNELS } from 'services/audio';
 import { AppService } from 'services/app';
 import { RunInLoadingMode } from 'services/app/app-decorators';
@@ -44,6 +44,7 @@ import { GuestCamNode } from './nodes/guest-cam';
 import { DualOutputService } from 'services/dual-output';
 import { NodeMapNode } from './nodes/node-map';
 import { VideoSettingsService } from 'services/settings-v2';
+import { WidgetsService, WidgetType } from 'services/widgets';
 
 const uuid = window['require']('uuid/v4');
 
@@ -94,6 +95,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   @Inject() dualOutputService: DualOutputService;
   @Inject() videoSettingsService: VideoSettingsService;
   @Inject() private defaultHardwareService: DefaultHardwareService;
+  @Inject() private widgetsService: WidgetsService;
 
   collectionAdded = new Subject<ISceneCollectionsManifestEntry>();
   collectionRemoved = new Subject<ISceneCollectionsManifestEntry>();
@@ -607,9 +609,8 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     await root.load();
     this.hotkeysService.bindHotkeys();
 
-    // Users who selected a theme during onboarding should have it loaded in dual output mode by default
+    // Users who selected a theme during onboarding should skip adding default sources
     if (this.newUserFirstLogin) {
-      this.dualOutputService.setDualOutputMode(true, true);
       this.newUserFirstLogin = false;
     }
   }
@@ -1039,6 +1040,52 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
   canSync(): boolean {
     return this.userService.isLoggedIn && !this.appService.state.argv.includes('--nosync');
+  }
+
+  /**
+   * Creates default sources for new users
+   * @remark New users should be in single output mode and have a few default sources.
+   */
+  setupDefaultSources(shouldAddDefaultSources: boolean) {
+    if (!shouldAddDefaultSources) {
+      this.newUserFirstLogin = false;
+      return;
+    }
+
+    const scene =
+      this.scenesService.views.activeScene ??
+      this.scenesService.createScene('Scene', { makeActive: true });
+
+    if (!scene) {
+      console.error('Default scene not found, failed to create default sources.');
+      return;
+    }
+
+    // add game capture source
+    scene.createAndAddSource('Game Capture', 'game_capture', {}, { display: 'horizontal' });
+
+    // add webcam source
+    const type = byOS({
+      [OS.Windows]: 'dshow_input',
+      [OS.Mac]: 'av_capture_input',
+    }) as TSourceType;
+
+    const defaultSource = this.defaultHardwareService.state.defaultVideoDevice;
+
+    const webCam = defaultSource
+      ? this.sourcesService.views.getSource(defaultSource)
+      : this.sourcesService.views.sources.find(s => s?.type === type);
+
+    if (!webCam) {
+      scene.createAndAddSource('Webcam', type, { display: 'horizontal' });
+    } else {
+      scene.addSource(webCam.sourceId, { display: 'horizontal' });
+    }
+
+    // add alert box widget
+    this.widgetsService.createWidget(WidgetType.AlertBox, 'Alert Box');
+
+    this.newUserFirstLogin = false;
   }
 
   /**

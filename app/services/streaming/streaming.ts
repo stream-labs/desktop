@@ -108,6 +108,7 @@ export class StreamingService
   replayBufferFileWrite = new Subject<string>();
   streamInfoChanged = new Subject<StreamInfoView<any>>();
   signalInfoChanged = new Subject<IOBSOutputSignalInfo>();
+  latestRecordingPath = new Subject<string>();
   streamErrorCreated = new Subject<string>();
 
   // Dummy subscription for stream deck
@@ -138,6 +139,7 @@ export class StreamingService
         youtube: 'not-started',
         facebook: 'not-started',
         tiktok: 'not-started',
+        kick: 'not-started',
         trovo: 'not-started',
         twitter: 'not-started',
         instagram: 'not-started',
@@ -395,11 +397,13 @@ export class StreamingService
      * SET DUAL OUTPUT SETTINGS
      */
     if (this.views.isDualOutputMode) {
-      const horizontalStream: string[] = this.views.activeDisplayDestinations.horizontal;
-      horizontalStream.concat(this.views.activeDisplayPlatforms.horizontal as string[]);
+      const horizontalDestinations: string[] = this.views.activeDisplayDestinations.horizontal;
+      const horizontalPlatforms: TPlatform[] = this.views.activeDisplayPlatforms.horizontal;
+      const horizontalStream = horizontalDestinations.concat(horizontalPlatforms as string[]);
 
-      const verticalStream: string[] = this.views.activeDisplayDestinations.vertical;
-      verticalStream.concat(this.views.activeDisplayPlatforms.vertical as string[]);
+      const verticalDestinations: string[] = this.views.activeDisplayDestinations.vertical;
+      const verticalPlatforms: TPlatform[] = this.views.activeDisplayPlatforms.vertical;
+      const verticalStream = verticalDestinations.concat(verticalPlatforms as string[]);
 
       const allPlatforms = this.views.enabledPlatforms;
       const allDestinations = this.views.customDestinations
@@ -636,6 +640,10 @@ export class StreamingService
 
     if (settings.platforms.instagram?.enabled) {
       this.usageStatisticsService.recordFeatureUsage('StreamToInstagram');
+    }
+
+    if (settings.platforms.kick?.enabled) {
+      this.usageStatisticsService.recordFeatureUsage('StreamToKick');
     }
   }
 
@@ -1372,6 +1380,7 @@ export class StreamingService
         this.recordingModeService.actions.addRecordingEntry(parsedFilename);
         this.markersService.actions.exportCsv(parsedFilename);
         this.recordingModeService.addRecordingEntry(parsedFilename);
+        this.latestRecordingPath.next(filename);
         // Wrote signals come after Offline, so we return early here
         // to not falsely set our state out of Offline
         return;
@@ -1405,6 +1414,15 @@ export class StreamingService
     if (info.code) {
       if (this.outputErrorOpen) {
         console.warn('Not showing error message because existing window is open.', info);
+
+        const messages = formatUnknownErrorMessage(
+          info,
+          this.streamErrorUserMessage,
+          this.streamErrorReportMessage,
+        );
+
+        this.streamErrorCreated.next(messages.report);
+
         return;
       }
 
@@ -1452,13 +1470,6 @@ export class StreamingService
       } else {
         // -4 is used for generic unknown messages in OBS. Both -4 and any other code
         // we don't recognize should fall into this branch and show a generic error.
-        // if (!this.userService.isLoggedIn) {
-        //   const messages;
-        //   errorText = $t(
-        //     'You are currently logged out. Please log in or confirm your server url and stream key.',
-        //   );
-        //   diagReportMessage = 'User is logged out and has invalid server url or stream key.';
-        // } else
 
         if (!this.userService.isLoggedIn) {
           const messages = formatStreamErrorMessage('LOGGED_OUT_ERROR');

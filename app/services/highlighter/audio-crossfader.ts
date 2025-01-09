@@ -1,13 +1,13 @@
 import execa from 'execa';
 import fs from 'fs';
 import { FFMPEG_EXE } from './constants';
-import { Clip } from './clip';
+import { RenderingClip } from './clip';
 import { AudioMixError } from './errors';
 
 export class AudioCrossfader {
   constructor(
     public readonly outputPath: string,
-    public readonly clips: Clip[],
+    public readonly clips: RenderingClip[],
     public readonly transitionDuration: number,
   ) {}
 

@@ -1,4 +1,5 @@
 @import '../../../styles/index.less';
+@import '../../../styles/mixins.less';
 
 .destination-logo {
   font-size: 38px;
@@ -73,4 +74,37 @@
 
 .column-padding {
   padding: 0px 15px;
+}
+
+.tiktok-modal-logo {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  margin-right: 5px;
+  vertical-align: super;
+}
+
+.tiktok-modal {
+  &:global(.ant-modal-confirm .ant-modal-body) {
+    padding: 0px;
+  }
+
+  :global(div.ant-modal-content) {
+    box-shadow: none;
+  }
+
+  :global(.ant-modal-confirm-body .ant-modal-confirm-title) {
+    display: inline-block;
+    font-size: 19px;
+    line-height: unset;
+  }
+
+  :global(.ant-modal-confirm-btns) {
+    display: none;
+  }
+}
+
+.tiktok-modal-footer {
+  display: flex;
+  justify-content: flex-end;
 }

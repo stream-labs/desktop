@@ -141,12 +141,29 @@ export class TikTokService
     return ['approved', 'legacy'].includes(scope);
   }
 
+  get missingLiveAccess(): boolean {
+    const scope = this.state.settings?.liveScope ?? 'never-applied';
+    return ['legacy', 'never-applied'].includes(scope);
+  }
+
   get approved(): boolean {
     return this.state.settings.liveScope === 'approved';
   }
 
+  get neverApplied(): boolean {
+    return this.state.settings.liveScope === 'never-applied';
+  }
+
   get denied(): boolean {
     return this.state.settings.liveScope === 'denied';
+  }
+
+  get legacy(): boolean {
+    return this.state.settings.liveScope === 'legacy';
+  }
+
+  get relog(): boolean {
+    return this.state.settings.liveScope === 'relog';
   }
 
   get defaultGame(): IGame {
@@ -431,11 +448,6 @@ export class TikTokService
           this.SET_DENIED_DATE(timestamp);
           return EPlatformCallResult.TikTokStreamScopeMissing;
         }
-
-        // show prompt to apply if user has never applied
-        if (applicationStatus === 'never-applied') {
-          return EPlatformCallResult.TikTokStreamScopeMissing;
-        }
       }
 
       if (status?.user) {
@@ -693,7 +705,9 @@ export class TikTokService
   }
 
   convertScope(scope: number, applicationStatus?: string): TTikTokLiveScopeTypes {
-    if (applicationStatus === 'never_applied') return 'never-applied';
+    if (applicationStatus === 'never_applied' && scope !== ETikTokLiveScopeReason.APPROVED_OBS) {
+      return 'never-applied';
+    }
 
     switch (scope) {
       case ETikTokLiveScopeReason.APPROVED: {
@@ -739,18 +753,13 @@ export class TikTokService
     }, 1000);
   }
 
-  async handleOpenProducer() {
-    remote.shell.openExternal(this.legacyDashboardUrl);
-  }
-
   handleStartStreamError(status?: number) {
     const title = $t('TikTok Stream Error');
     const type: TStreamErrorType =
       status === 422 ? 'TIKTOK_USER_BANNED' : 'TIKTOK_GENERATE_CREDENTIALS_FAILED';
     const message = errorTypes[type].message;
 
-    const buttonText = status === 422 ? $t('Open TikTok Producer') : $t('Open TikTok Live Manager');
-    const url = status === 422 ? this.legacyDashboardUrl : this.dashboardUrl;
+    const buttonText = $t('Open TikTok Live Manager');
 
     if (type !== 'TIKTOK_USER_BANNED') {
       this.SET_LIVE_SCOPE('relog');
@@ -768,7 +777,7 @@ export class TikTokService
       })
       .then(({ response }) => {
         if (response === 0) {
-          remote.shell.openExternal(url);
+          remote.shell.openExternal(this.dashboardUrl);
         }
       });
 

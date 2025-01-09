@@ -294,7 +294,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
     return await Promise.all(Object.keys(this.themeMetadata).map(id => this.fetchThemeData(id)));
   }
 
-  get themeMetadata() {
+  get themeMetadata(): { [id: number]: string } {
     return this.userService.views.isPrime ? THEME_METADATA.PAID : THEME_METADATA.FREE;
   }
 
@@ -317,21 +317,18 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
     );
   }
 
-  get createDefaultNewUserScene() {
-    // If the first login status was set in the scene collections service,
-    // determine if the user installed a theme during onboarding
-    if (this.sceneCollectionsService.newUserFirstLogin && !this.existingSceneCollections) {
-      return true;
-    }
+  get shouldAddDefaultSources() {
+    // Add default sources if the user did not install a theme during onboarding
+    if (!this.existingSceneCollections) return true;
 
     // Skip checking creation date for accounts in when testing
     if (Utils.isTestMode()) return false;
 
-    // If the user does not have a creation date, they are a new user so
-    // determine if the user installed a theme during onboarding
+    // If the user does not have a creation date, they are a new user. Check to see if this
+    // new user has installed a theme during onboarding
     const creationDate = this.userService.state?.createdAt;
-    if (!creationDate) {
-      return this.existingSceneCollections === false;
+    if (!creationDate && !this.existingSceneCollections) {
+      return true;
     }
 
     // Otherwise, check if the user is within the first 6 hours of their
@@ -344,11 +341,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
     const isWithinCreationDateRange =
       creationTime < now && creationTime - now < millisecondsInAnHour * 6;
 
-    return (
-      !isWithinCreationDateRange &&
-      this.sceneCollectionsService.newUserFirstLogin &&
-      !this.existingSceneCollections
-    );
+    return isWithinCreationDateRange && !this.existingSceneCollections;
   }
 
   init() {
@@ -393,21 +386,14 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
       });
     }
 
-    // On their first login, users should have dual output mode enabled by default.
-    // If the user has not selected a scene collection during onboarding, add a few
-    // default sources to the default scene collection.
-    if (this.createDefaultNewUserScene) {
-      this.dualOutputService.setupDefaultSources();
-      this.sceneCollectionsService.newUserFirstLogin = false;
+    // On their first login, new users should have a few default sources if they did not
+    // select a scene collection during onboarding.
+    if (this.sceneCollectionsService.newUserFirstLogin) {
+      this.sceneCollectionsService.setupDefaultSources(this.shouldAddDefaultSources);
     }
 
-    if (this.sceneCollectionsService.newUserFirstLogin && this.existingSceneCollections) {
-      this.dualOutputService.setDualOutputMode(true, true);
-      this.sceneCollectionsService.newUserFirstLogin = false;
-    }
-
-    this.onboardingCompleted.next();
     this.navigationService.navigate('Studio');
+    this.onboardingCompleted.next();
   }
 
   get isTwitchAuthed() {

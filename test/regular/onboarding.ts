@@ -51,9 +51,11 @@ async function confirmDefaultSources(t: TExecutionContext, hasDefaultSources = t
     }, {} as { [sourceId: string]: number });
 
   if (hasDefaultSources) {
-    // dual output scene collections should have 2 scene items that share a single source
+    // confirm this is a single output scene collection by confirming that each source
+    // is only used by a single scene item. This is because dual output scene collection
+    // scene items share a single source.
     for (const [sourceId, count] of Object.entries(numSceneItems)) {
-      t.is(count, 2, `Scene has dual output source ${sourceId}`);
+      t.is(count, 1, `Scene has only once scene item with source ${sourceId}`);
     }
 
     t.is(Object.keys(numSceneItems).length, numDefaultSources, 'Scene has correct default sources');
@@ -213,7 +215,7 @@ test.skip('Go through onboarding and install theme', async t => {
   await goThroughOnboarding(t, login, newUser, installTheme, async () => {
     // Confirm sources and dual output status
     t.not(await getNumElements('div[data-role=source]'), 0, 'Theme installed before login');
-    t.true(await isDisplayed('i[data-testid=dual-output-inactive]'), 'Dual output not enabled');
+    t.true(await isDisplayed('i[data-testid=dual-output-inactive]'), 'Single output enabled');
 
     // login new user after onboarding
     await clickIfDisplayed('li[data-testid=nav-auth]');
@@ -224,7 +226,7 @@ test.skip('Go through onboarding and install theme', async t => {
 
     // Confirm switched to scene with default sources and dual output status
     await confirmDefaultSources(t);
-    t.true(await isDisplayed('i[data-testid=dual-output-active]'), 'Dual output enabled.');
+    t.true(await isDisplayed('i[data-testid=dual-output-inactive]'), 'Single output enabled.');
   });
 
   t.pass();
@@ -239,7 +241,7 @@ test('Go through onboarding as a new user', async t => {
   await goThroughOnboarding(t, login, newUser, installTheme, async () => {
     // Confirm sources and dual output status
     await confirmDefaultSources(t);
-    t.true(await isDisplayed('i[data-testid=dual-output-active]'), 'Dual output enabled.');
+    t.true(await isDisplayed('i[data-testid=dual-output-inactive]'), 'Single output enabled.');
   });
 
   t.pass();
@@ -256,7 +258,7 @@ test.skip('Go through onboarding as a new user and install theme', async t => {
   await goThroughOnboarding(t, login, newUser, installTheme, async () => {
     // Confirm sources and dual output status
     await confirmDefaultSources(t, hasDefaultSources);
-    t.false(await isDisplayed('i[data-testid=dual-output-inactive]'), 'Dual output enabled.');
+    t.true(await isDisplayed('i[data-testid=dual-output-inactive]'), 'Single output enabled.');
   });
 
   t.pass();
@@ -278,7 +280,7 @@ test('Login new user after onboarding skipped', async t => {
 
     // Confirm switched to scene with default sources and dual output status
     await confirmDefaultSources(t);
-    t.true(await isDisplayed('i[data-testid=dual-output-active]'), 'Dual output enabled.');
+    t.true(await isDisplayed('i[data-testid=dual-output-inactive]'), 'Dual output not enabled.');
   });
 
   t.pass();

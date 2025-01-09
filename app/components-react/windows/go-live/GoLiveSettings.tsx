@@ -37,7 +37,6 @@ export default function DualOutputGoLiveSettings() {
     isLoading,
     isPrime,
     isDualOutputMode,
-    isRestreamEnabled,
     canAddDestinations,
     canUseOptimizedProfile,
     showSelector,
@@ -89,9 +88,8 @@ export default function DualOutputGoLiveSettings() {
   const shouldShowLeftCol = isDualOutputMode ? true : protectedModeEnabled;
   const shouldShowAddDestButton = canAddDestinations && isPrime;
 
-  const shouldShowPrimaryChatSwitcher = isDualOutputMode
-    ? isRestreamEnabled && hasMultiplePlatforms
-    : hasMultiplePlatforms;
+  const shouldShowPrimaryChatSwitcher = hasMultiplePlatforms;
+
   // TODO: make sure this doesn't jank the UI
   const leftPaneHeight = shouldShowPrimaryChatSwitcher ? '81%' : '100%';
 

@@ -19,6 +19,8 @@ import Translate from 'components-react/shared/Translate';
 import * as remote from '@electron/remote';
 import { InstagramEditStreamInfo } from '../go-live/platforms/InstagramEditStreamInfo';
 import { IInstagramStartStreamOptions } from 'services/platforms/instagram';
+import { KickEditStreamInfo } from '../go-live/platforms/KickEditStreamInfo';
+import { IKickStartStreamOptions } from 'services/platforms/kick';
 import { metadata } from 'components-react/shared/inputs/metadata';
 import FormFactory, { TInputValue } from 'components-react/shared/inputs/FormFactory';
 import { alertAsync } from '../../modals';
@@ -39,18 +41,27 @@ function censorEmail(str: string) {
  */
 class StreamSettingsModule {
   constructor() {
+    const showMessage = (msg: string, success: boolean) => {
+      message.config({
+        duration: 6,
+        maxCount: 1,
+      });
+
+      if (success) {
+        message.success(msg);
+      } else {
+        message.error(msg);
+      }
+    };
     Services.UserService.refreshedLinkedAccounts.subscribe(
       (res: { success: boolean; message: string }) => {
-        message.config({
-          duration: 6,
-          maxCount: 1,
-        });
-
-        if (res.success) {
-          message.success(res.message);
-        } else {
-          message.error(res.message);
-        }
+        const doShowMessage = () => showMessage(res.message, res.success);
+        /*
+         * Since the settings window pops out anyways (presumably because of
+         * using `message`make sure it is at least on the right page, as opposed
+         * to in an infinite loading blank window state.
+         */
+        doShowMessage();
       },
     );
   }
@@ -402,13 +413,14 @@ function SLIDBlock() {
  */
 function Platform(p: { platform: TPlatform }) {
   const platform = p.platform;
-  const { UserService, StreamingService, InstagramService } = Services;
+  const { UserService, StreamingService, InstagramService, KickService } = Services;
   const { canEditSettings, platformMergeInline, platformUnlink } = useStreamSettings();
 
-  const { isLoading, authInProgress, instagramSettings } = useVuex(() => ({
+  const { isLoading, authInProgress, instagramSettings, kickSettings } = useVuex(() => ({
     isLoading: UserService.state.authProcessState === EAuthProcessState.Loading,
     authInProgress: UserService.state.authProcessState === EAuthProcessState.InProgress,
     instagramSettings: InstagramService.state.settings,
+    kickSettings: KickService.state.settings,
   }));
 
   const isMerged = StreamingService.views.isPlatformLinked(platform);
@@ -427,7 +439,11 @@ function Platform(p: { platform: TPlatform }) {
    */
   const isInstagram = platform === 'instagram';
   const [showInstagramFields, setShowInstagramFields] = useState(isInstagram && isMerged);
-  const shouldShowUsername = !isInstagram;
+
+  const isKick = platform === 'kick';
+  const [showKickFields, setShowKickFields] = useState(isKick && isMerged);
+
+  const shouldShowUsername = !isInstagram && !isKick;
 
   const usernameOrBlank = shouldShowUsername ? (
     <>
@@ -457,13 +473,13 @@ function Platform(p: { platform: TPlatform }) {
   const ConnectButton = () => (
     <span>
       <Button
-        onClick={isInstagram ? instagramConnect : () => platformMergeInline(platform)}
+        onClick={handleConnect}
         className={cx({ [css.tiktokConnectBtn]: platform === 'tiktok' })}
         disabled={isLoading || authInProgress}
         style={{
           backgroundColor: `var(--${platform})`,
           borderColor: 'transparent',
-          color: ['trovo', 'instagram'].includes(platform) ? 'black' : 'inherit',
+          color: ['trovo', 'instagram', 'kick'].includes(platform) ? 'black' : 'inherit',
         }}
       >
         {$t('Connect')}
@@ -473,6 +489,45 @@ function Platform(p: { platform: TPlatform }) {
 
   const updateInstagramSettings = (newSettings: IInstagramStartStreamOptions) => {
     InstagramService.actions.updateSettings(newSettings);
+  };
+
+  const updateKickSettings = (newSettings: IKickStartStreamOptions) => {
+    KickService.actions.updateSettings(newSettings);
+  };
+
+  const kickConnect = async () => {
+    const success = await UserService.actions.return.startAuth(platform, 'internal', true);
+    if (!success) return;
+    setShowKickFields(true);
+  };
+
+  const kickUnlink = () => {
+    // 1. reset stream key and url after unlinking if the user chooses to re-link immediately
+    updateKickSettings({ title: '', streamKey: '', streamUrl: '' });
+    // 2. hide extra fields
+    setShowKickFields(false);
+    // 3. unlink platform
+    platformUnlink(platform);
+  };
+
+  const handleConnect = () => {
+    if (isInstagram) {
+      instagramConnect();
+    } else if (isKick) {
+      kickConnect();
+    } else {
+      platformMergeInline(platform);
+    }
+  };
+
+  const handleUnlink = () => {
+    if (isInstagram) {
+      instagramUnlink();
+    } else if (isKick) {
+      kickUnlink();
+    } else {
+      platformMergeInline(platform);
+    }
   };
 
   const ExtraFieldsSection = () => {
@@ -488,6 +543,20 @@ function Platform(p: { platform: TPlatform }) {
         </div>
       );
     }
+
+    if (isKick && showKickFields) {
+      return (
+        <div className={cx(css.extraFieldsSection)}>
+          <KickEditStreamInfo
+            onChange={updateKickSettings}
+            value={kickSettings}
+            layoutMode="singlePlatform"
+            isStreamSettingsWindow
+          />
+        </div>
+      );
+    }
+
     return null;
   };
 
@@ -514,10 +583,7 @@ function Platform(p: { platform: TPlatform }) {
         <div style={{ marginLeft: 'auto' }}>
           {shouldShowConnectBtn && <ConnectButton />}
           {shouldShowUnlinkBtn && (
-            <Button
-              danger
-              onClick={() => (isInstagram ? instagramUnlink() : platformUnlink(platform))}
-            >
+            <Button danger onClick={handleUnlink}>
               {$t('Unlink')}
             </Button>
           )}

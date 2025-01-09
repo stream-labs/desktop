@@ -1,11 +1,12 @@
 import execa from 'execa';
 import { FrameSource } from './frame-source';
 import { AudioSource } from './audio-source';
-import { FFPROBE_EXE } from './constants';
+import { FFPROBE_EXE, SCRUB_SPRITE_DIRECTORY } from './constants';
 import fs from 'fs';
 import { IExportOptions } from '.';
+import path from 'path';
 
-export class Clip {
+export class RenderingClip {
   frameSource: FrameSource;
   audioSource: AudioSource;
 
@@ -44,7 +45,7 @@ export class Clip {
    * to start reading from the file again.
    */
   async reset(options: IExportOptions) {
-    this.deleted = !(await this.fileExists());
+    this.deleted = !(await this.fileExists(this.sourcePath));
     if (this.deleted) return;
 
     if (!this.duration) await this.readDuration();
@@ -68,9 +69,9 @@ export class Clip {
   /**
    * Checks if the underlying file exists and is readable
    */
-  private async fileExists() {
+  private async fileExists(file: string) {
     return new Promise(resolve => {
-      fs.access(this.sourcePath, fs.constants.R_OK, e => {
+      fs.access(file, fs.constants.R_OK, e => {
         if (e) {
           resolve(false);
         } else {
@@ -83,7 +84,23 @@ export class Clip {
   private async doInit() {
     await this.reset({ fps: 30, width: 1280, height: 720, preset: 'ultrafast' });
     if (this.deleted) return;
-    await this.frameSource.exportScrubbingSprite();
+    if (this.frameSource) {
+      try {
+        const parsed = path.parse(this.sourcePath);
+        const scrubPath = path.join(SCRUB_SPRITE_DIRECTORY, `${parsed.name}-scrub.jpg`);
+
+        const scrubFileExists = await this.fileExists(scrubPath);
+        if (scrubFileExists) {
+          this.frameSource.scrubJpg = scrubPath;
+        } else {
+          await this.frameSource.exportScrubbingSprite(scrubPath);
+        }
+      } catch (error: unknown) {
+        console.log('err', error);
+      }
+    } else {
+      console.log('No Framesource');
+    }
   }
 
   private async readDuration() {

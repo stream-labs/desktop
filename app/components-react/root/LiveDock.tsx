@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import * as remote from '@electron/remote';
 import cx from 'classnames';
 import Animation from 'rc-animate';
-import { Menu } from 'antd';
+import { Button, Menu } from 'antd';
 import pick from 'lodash/pick';
 import { initStore, useController } from 'components-react/hooks/zustand';
 import { EStreamingState } from 'services/streaming';
@@ -18,6 +18,7 @@ import { useVuex } from 'components-react/hooks';
 import { useRealmObject } from 'components-react/hooks/realm';
 import { $i } from 'services/utils';
 import { TikTokChatInfo } from './TiktokChatInfo';
+import { ShareStreamLink } from './ShareStreamLink';
 
 const LiveDockCtx = React.createContext<LiveDockController | null>(null);
 
@@ -355,6 +356,33 @@ function LiveDock(p: { onLeft: boolean }) {
       return <></>;
     }
 
+    const showKickInfo =
+      visibleChat === 'kick' || (visibleChat === 'default' && primaryChat === 'kick');
+    if (showKickInfo) {
+      return (
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            marginTop: '30px',
+          }}
+        >
+          <div style={{ marginBottom: '5px' }}>
+            {$t('Access chat for Kick in the Stream Dashboard.')}
+          </div>
+          <Button
+            style={{
+              width: '200px',
+              marginBottom: '10px',
+            }}
+            onClick={() => remote.shell.openExternal(Services.KickService.chatUrl)}
+          >
+            {$t('Open Kick Chat')}
+          </Button>
+        </div>
+      );
+    }
+
     return (
       <Chat
         restream={isRestreaming && visibleChat === 'restream'}
@@ -395,13 +423,12 @@ function LiveDock(p: { onLeft: boolean }) {
                 <span className={styles.liveDockText}>{liveText}</span>
                 <span className={styles.liveDockTimer}>{elapsedStreamTime}</span>
               </div>
-              <div className={styles.liveDockViewerCount}>
+              <div className={styles.liveDockViewerCount} onClick={() => ctrl.toggleViewerCount()}>
                 <i
                   className={cx({
                     ['icon-view']: !hideViewerCount,
                     ['icon-hide']: hideViewerCount,
                   })}
-                  onClick={() => ctrl.toggleViewerCount()}
                 />
                 <span className={styles.liveDockViewerCountCount}>{viewerCount}</span>
                 {Number(viewerCount) >= 0 && <span>{$t('viewers')}</span>}
@@ -428,6 +455,7 @@ function LiveDock(p: { onLeft: boolean }) {
                     <i onClick={() => ctrl.openPlatformStream()} className="icon-studio" />
                   </Tooltip>
                 )}
+                {isStreaming && <ShareStreamLink />}
                 {isPlatform(['youtube', 'facebook', 'tiktok']) && isStreaming && (
                   <Tooltip
                     title={$t('Go to Live Dashboard')}
@@ -448,7 +476,8 @@ function LiveDock(p: { onLeft: boolean }) {
             </div>
             {!hideStyleBlockers &&
               (isPlatform(['twitch', 'trovo']) ||
-                (isStreaming && isPlatform(['youtube', 'facebook', 'twitter', 'tiktok']))) && (
+                (isStreaming &&
+                  isPlatform(['youtube', 'facebook', 'twitter', 'tiktok', 'kick']))) && (
                 <div className={styles.liveDockChat}>
                   {hasChatTabs && <ChatTabs visibleChat={visibleChat} setChat={setChat} />}
 
@@ -464,7 +493,8 @@ function LiveDock(p: { onLeft: boolean }) {
                 </div>
               )}
             {(!ctrl.platform ||
-              (isPlatform(['youtube', 'facebook', 'twitter', 'tiktok']) && !isStreaming)) && (
+              (isPlatform(['youtube', 'facebook', 'twitter', 'tiktok', 'kick']) &&
+                !isStreaming)) && (
               <div className={cx('flex flex--center flex--column', styles.liveDockChatOffline)}>
                 <img className={styles.liveDockChatImgOffline} src={ctrl.offlineImageSrc} />
                 {!hideStyleBlockers && <span>{$t('Your chat is currently offline')}</span>}

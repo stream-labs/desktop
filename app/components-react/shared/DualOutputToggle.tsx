@@ -25,12 +25,15 @@ export default function DualOutputToggle(p: IDualOutputToggleProps) {
     DualOutputService,
     StreamingService,
     UsageStatisticsService,
+    UserService,
+    TikTokService,
   } = Services;
 
   const v = useVuex(() => ({
     dualOutputMode: DualOutputService.views.dualOutputMode,
     studioMode: TransitionsService.views.studioMode,
     selectiveRecording: StreamingService.state.selectiveRecording,
+    isPrime: UserService.state.isPrime,
   }));
 
   const label = v.dualOutputMode ? $t('Disable Dual Output') : $t('Enable Dual Output');
@@ -61,6 +64,9 @@ export default function DualOutputToggle(p: IDualOutputToggleProps) {
       UsageStatisticsService.recordAnalyticsEvent('DualOutput', {
         type: 'ToggleOnDualOutput',
         source: 'GoLiveWindow',
+        isPrime: v.isPrime,
+        platforms: StreamingService.views.linkedPlatforms,
+        tiktokStatus: TikTokService.scope,
       });
     }
   }

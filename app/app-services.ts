@@ -78,6 +78,7 @@ export { RestreamService } from 'services/restream';
 export { TwitterService } from 'services/integrations/twitter';
 export { TwitterPlatformService } from 'services/platforms/twitter';
 export { InstagramService } from 'services/platforms/instagram';
+export { KickService } from 'services/platforms/kick';
 export { UsageStatisticsService } from './services/usage-statistics';
 export { GameOverlayService } from 'services/game-overlay';
 export { SharedStorageService } from 'services/integrations/shared-storage';
@@ -205,6 +206,7 @@ import { MarkersService } from 'services/markers';
 import { SharedStorageService } from 'services/integrations/shared-storage';
 import { RealmService } from 'services/realm';
 import { InstagramService } from 'services/platforms/instagram';
+import { KickService } from 'services/platforms/kick';
 import { TwitchStudioImporterService } from 'services/ts-importer';
 import { RemoteControlService } from 'services/api/remote-control-api';
 import { UrlService } from 'services/hosts';
@@ -241,6 +243,7 @@ export const AppServices = {
   TwitchContentClassificationService,
   TrovoService,
   InstagramService,
+  KickService,
   DismissablesService,
   HighlighterService,
   GrowService,

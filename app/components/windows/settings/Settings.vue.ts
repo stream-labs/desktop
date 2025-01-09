@@ -175,10 +175,16 @@ export default class Settings extends Vue {
   }
 
   getInitialCategoryName() {
-    if (this.windowsService.state.child.queryParams) {
-      return this.windowsService.state.child.queryParams.categoryName || 'General';
-    }
-    return 'General';
+    /* Some sort of race condition, perhaps `WindowsService` creating
+     * the window, and *only* after updating its options, results in
+     * accessing state here to be empty for `state.child.queryParams`
+     * which is what this method used to use, unless the child window
+     * has already been displayed once?
+     *
+     * Switching to this method call seems to solve the issue, plus we
+     * shouldn't be accessing state directly regardless.
+     */
+    return this.windowsService.getChildWindowQueryParams()?.categoryName ?? 'General';
   }
 
   get categoryNames() {

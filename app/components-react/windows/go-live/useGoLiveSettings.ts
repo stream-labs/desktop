@@ -163,7 +163,7 @@ export class GoLiveSettingsModule {
    * Fetch settings for each platform
    */
   async prepopulate() {
-    const { StreamingService } = Services;
+    const { StreamingService, RestreamService, DualOutputService } = Services;
     const { isMultiplatformMode } = StreamingService.views;
 
     this.state.setNeedPrepopulate(true);
@@ -198,6 +198,27 @@ export class GoLiveSettingsModule {
     }
 
     this.state.updateSettings(settings);
+
+    /* If the user was in dual output before but doesn't have restream
+     * we should disable one of the platforms if they have 2
+     * ref: https://app.asana.com/0/1207748235152481/1208813184366087/f
+     */
+    const { dualOutputMode } = DualOutputService.state;
+    const { canEnableRestream } = RestreamService.views;
+
+    // Tiktok can stay active
+    const enabledPlatforms = this.state.enabledPlatforms.filter(platform => platform !== 'tiktok');
+
+    if (!dualOutputMode && !canEnableRestream && enabledPlatforms.length > 1) {
+      /* Find the platform that was set as primary chat to remain enabled,
+       * if for some reason we fail to find it default to the last selected platform
+       */
+      const platform =
+        enabledPlatforms.find(platform => platform === this.primaryChat) ||
+        enabledPlatforms[enabledPlatforms.length - 1];
+
+      this.switchPlatforms([platform]);
+    }
   }
 
   get isPrime() {
@@ -294,9 +315,16 @@ export class GoLiveSettingsModule {
    */
   async validate() {
     // tiktok live authorization error
-    if (this.state.isEnabled('tiktok') && !Services.TikTokService.liveStreamingEnabled) {
-      message.error($t('Streaming to TikTok not approved.'));
-      return false;
+    if (
+      this.state.isEnabled('tiktok') &&
+      (Services.TikTokService.neverApplied || Services.TikTokService.denied)
+    ) {
+      // TODO: this is a patch to allow users to attempt to go live with rtmp regardless of tiktok status
+      return message.info(
+        $t("Couldn't confirm TikTok Live Access. Apply for Live Permissions below"),
+        2,
+        () => true,
+      );
     }
 
     try {
