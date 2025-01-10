@@ -618,13 +618,15 @@ export class YoutubeService
 
       const moneyInfo = broadcast.monetizationDetails;
       monetizationDetails = {
-        adsMonetizationStatus: isMidStreamMode ? moneyInfo?.adsMonetizationStatus : this.getMonetizationStatus(params.monetizationEnabled),,
+        adsMonetizationStatus: isMidStreamMode
+          ? moneyInfo?.adsMonetizationStatus
+          : this.getMonetizationStatus(params.monetizationEnabled),
       };
       if (!isMidStreamMode && params.monetizationEnabled) {
         monetizationDetails.cuepointSchedule = {
           ...moneyInfo.cuepointSchedule,
           enabled: params.monetizationEnabled,
-        }
+        };
       }
     }
 
