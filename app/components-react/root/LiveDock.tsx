@@ -193,6 +193,7 @@ class LiveDockController {
     if (this.platform === 'youtube') url = this.youtubeService.dashboardUrl;
     if (this.platform === 'facebook') url = this.facebookService.streamDashboardUrl;
     if (this.platform === 'tiktok') url = this.tiktokService.dashboardUrl;
+    if (this.platform === 'kick') url = this.kickService.dashboardUrl;
     remote.shell.openExternal(url);
   }
 

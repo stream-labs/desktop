@@ -269,19 +269,6 @@ export class KickService
     };
   }
 
-  getErrorMessage(error?: any) {
-    switch (error) {
-      case error?.message:
-        return error?.message;
-      case error?.error_description:
-        return error?.error_description;
-      case error?.http_status_code:
-        return error?.http_status_code;
-      default:
-        return 'Error processing Kick request.';
-    }
-  }
-
   get authUrl() {
     const host = this.hostsService.streamlabs;
     const query = `_=${Date.now()}&skip_splash=true&external=electron&kick&force_verify&origin=slobs`;
@@ -299,6 +286,10 @@ export class KickService
 
   get chatUrl(): string {
     return this.state.chatUrl;
+  }
+
+  get dashboardUrl(): string {
+    return `https://dashboard.${this.domain.split('//')[1]}/stream`;
   }
 
   get streamPageUrl(): string {
