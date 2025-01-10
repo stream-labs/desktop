@@ -104,7 +104,7 @@ export default function InstalledApps() {
               <td className={cx(styles.buttonContainer, 'button-container--right')}>
                 <button
                   onClick={() => {
-                    HighlighterService.UNINSTALL_HIGHLIGHTER();
+                    HighlighterService.uninstallAiHighlighter();
                   }}
                   className={cx('button', {
                     'button--soft-warning': true,

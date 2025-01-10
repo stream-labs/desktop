@@ -143,7 +143,11 @@ export default function AppsNav(p: IAppsNav) {
               title={app.manifest?.name}
               onClick={() => {
                 if (app.id === 'AiHighlighter') {
-                  NavigationService.navigate('Highlighter', {}, EMenuItemKey.Highlighter);
+                  NavigationService.navigate(
+                    'Highlighter',
+                    { view: 'settings' },
+                    EMenuItemKey.Highlighter,
+                  );
                 } else {
                   app?.id && navigateApp(app?.id, `sub-${app?.id}`);
                 }

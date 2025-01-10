@@ -156,12 +156,24 @@ export default function SettingsView({
                   )}
                 </p>
 
-                <SwitchInput
-                  style={{ margin: 0, marginLeft: '-10px' }}
-                  size="default"
-                  value={v.useAiHighlighter}
-                  onChange={toggleUseAiHighlighter}
-                />
+                {v.highlighterVersion !== '' ? (
+                  <SwitchInput
+                    style={{ margin: 0, marginLeft: '-10px' }}
+                    size="default"
+                    value={v.useAiHighlighter}
+                    onChange={toggleUseAiHighlighter}
+                  />
+                ) : (
+                  <Button
+                    style={{ width: 'fit-content' }}
+                    type="primary"
+                    onClick={() => {
+                      HighlighterService.installAiHighlighter(true);
+                    }}
+                  >
+                    Install AI Highlighter
+                  </Button>
+                )}
                 <div className={styles.recommendedCorner}>{$t('Recommended')}</div>
               </div>
             )}

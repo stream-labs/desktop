@@ -17,6 +17,9 @@ export default function PlatformAppStore(p: { params: { appId?: string; type?: s
     NavigationService,
     HighlighterService,
   } = Services;
+  const [highlighterInstalled, setHighlighterInstalled] = useState<boolean>(
+    HighlighterService.views.highlighterVersion !== '',
+  );
   const [platformAppsUrl, setPlatformAppsUrl] = useState('');
   const [currentUrl, setCurrentUrl] = useState<string>('');
   const browser = useRef<any>(null);
@@ -86,7 +89,12 @@ export default function PlatformAppStore(p: { params: { appId?: string; type?: s
           top: 0,
           right: 0,
           left: 0,
-          height: `calc(100% - ${currentUrl.includes('installed-apps') ? '72' : '0'}px)`,
+          height: `calc(100% - ${
+            currentUrl.includes('installed-apps') &&
+            HighlighterService.views.highlighterVersion !== ''
+              ? '72'
+              : '0'
+          }px)`,
         }}
         src={platformAppsUrl}
         onReady={onBrowserViewReady}
@@ -95,7 +103,7 @@ export default function PlatformAppStore(p: { params: { appId?: string; type?: s
           setCurrentUrl(url);
         }}
       />
-      {currentUrl.includes('installed-apps') && (
+      {currentUrl.includes('installed-apps') && highlighterInstalled && (
         <div
           style={{
             display: 'flex',
@@ -129,7 +137,8 @@ export default function PlatformAppStore(p: { params: { appId?: string; type?: s
                 size="middle"
                 type="default"
                 onClick={() => {
-                  HighlighterService.UNINSTALL_HIGHLIGHTER();
+                  setHighlighterInstalled(false);
+                  HighlighterService.uninstallAiHighlighter();
                 }}
               >
                 {$t('Uninstall')}

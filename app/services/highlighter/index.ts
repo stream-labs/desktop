@@ -1234,6 +1234,22 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     }
   }
 
+  async installAiHighlighter(downloadNow: boolean = false) {
+    this.setAiHighlighter(true);
+    if (downloadNow) {
+      await this.aiHighlighterUpdater.isNewVersionAvailable();
+      this.startUpdater();
+    } else {
+      // Only for go live view to immediately show the toggle. For other flow updater will set the version
+      this.SET_HIGHLIGHTER_VERSION('0.0.0');
+    }
+  }
+
+  uninstallAiHighlighter() {
+    this.setAiHighlighter(false);
+    this.UNINSTALL_HIGHLIGHTER();
+  }
+
   async loadClips(streamInfoId?: string | undefined) {
     const clipsToLoad: TClip[] = this.getClips(this.views.clips, streamInfoId);
     // this.resetRenderingClips();
