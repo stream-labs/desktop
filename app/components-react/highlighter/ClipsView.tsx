@@ -38,7 +38,7 @@ export default function ClipsView({
   emitSetView: (data: IViewState) => void;
 }) {
   const { HighlighterService, UsageStatisticsService, IncrementalRolloutService } = Services;
-  const aiHighlighterEnabled = IncrementalRolloutService.views.featureIsEnabled(
+  const aiHighlighterFeatureEnabled = IncrementalRolloutService.views.featureIsEnabled(
     EAvailableFeatures.aiHighlighter,
   );
   const clipsAmount = useVuex(() => HighlighterService.views.clips.length);
@@ -215,7 +215,7 @@ export default function ClipsView({
                       }}
                     />
                     {streamId &&
-                      aiHighlighterEnabled &&
+                      aiHighlighterFeatureEnabled &&
                       HighlighterService.getClips(HighlighterService.views.clips, props.id)
                         .filter(clip => clip.source === 'AiClip')
                         .every(clip => (clip as IAiClip).aiInfo.metadata?.round) && (

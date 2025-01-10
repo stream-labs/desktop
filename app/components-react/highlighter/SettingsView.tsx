@@ -28,7 +28,7 @@ export default function SettingsView({
     HighlighterService,
     IncrementalRolloutService,
   } = Services;
-  const aiHighlighterEnabled = IncrementalRolloutService.views.featureIsEnabled(
+  const aiHighlighterFeatureEnabled = IncrementalRolloutService.views.featureIsEnabled(
     EAvailableFeatures.aiHighlighter,
   );
   const [hotkey, setHotkey] = useState<IHotkey | null>(null);
@@ -38,6 +38,7 @@ export default function SettingsView({
     settingsValues: SettingsService.views.values,
     isStreaming: StreamingService.isStreaming,
     useAiHighlighter: HighlighterService.views.useAiHighlighter,
+    highlighterVersion: HighlighterService.views.highlighterVersion,
   }));
 
   const correctlyConfigured =
@@ -124,7 +125,7 @@ export default function SettingsView({
           </p>
         </div>
         <div style={{ display: 'flex', gap: '16px' }}>
-          {aiHighlighterEnabled && (
+          {aiHighlighterFeatureEnabled && (
             <Button type="primary" onClick={() => emitSetView({ view: EHighlighterView.STREAM })}>
               {$t('Stream Highlights')}
             </Button>
@@ -139,7 +140,7 @@ export default function SettingsView({
       <Scrollable style={{ flexGrow: 1, padding: '20px 20px 20px 20px', width: '100%' }}>
         <div className={styles.innerScrollWrapper}>
           <div className={styles.cardWrapper}>
-            {aiHighlighterEnabled && (
+            {aiHighlighterFeatureEnabled && (
               <div className={styles.highlighterCard}>
                 <div className={styles.cardHeaderbarWrapper}>
                   <div className={styles.cardHeaderbar}>
@@ -166,7 +167,9 @@ export default function SettingsView({
             )}
             <div className={styles.manualCard}>
               <h3 className={styles.cardHeaderTitle}>
-                {aiHighlighterEnabled ? 'Or use the manual highlighter ' : 'Manual highlighter'}
+                {aiHighlighterFeatureEnabled
+                  ? 'Or use the manual highlighter '
+                  : 'Manual highlighter'}
               </h3>
               <p>
                 {$t(

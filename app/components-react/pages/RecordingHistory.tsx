@@ -200,7 +200,7 @@ export default function RecordingHistoryPage() {
 export function RecordingHistory() {
   const controller = useController(RecordingHistoryCtx);
   const { formattedTimestamp, showFile, handleSelect, postError } = controller;
-  const aiHighlighterEnabled = Services.IncrementalRolloutService.views.featureIsEnabled(
+  const aiHighlighterFeatureEnabled = Services.IncrementalRolloutService.views.featureIsEnabled(
     EAvailableFeatures.aiHighlighter,
   );
   const { uploadInfo, uploadOptions, recordings, hasSLID, aiDetectionInProgress } = useVuex(() => ({
@@ -231,7 +231,7 @@ export function RecordingHistory() {
       <span className={styles.actionGroup}>
         {uploadOptions
           .map(option => {
-            if (option.value === 'highlighter' && !aiHighlighterEnabled) {
+            if (option.value === 'highlighter' && !aiHighlighterFeatureEnabled) {
               return null;
             }
             return (

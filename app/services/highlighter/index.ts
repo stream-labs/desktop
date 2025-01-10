@@ -552,7 +552,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
   };
 
   aiHighlighterUpdater: AiHighlighterUpdater;
-  aiHighlighterEnabled = false;
+  aiHighlighterFeatureEnabled = false;
   streamMilestones: StreamMilestones | null = null;
 
   static filter(state: IHighlighterState) {
@@ -719,11 +719,11 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     super.init();
 
     this.incrementalRolloutService.featuresReady.then(async () => {
-      this.aiHighlighterEnabled = this.incrementalRolloutService.views.featureIsEnabled(
+      this.aiHighlighterFeatureEnabled = this.incrementalRolloutService.views.featureIsEnabled(
         EAvailableFeatures.aiHighlighter,
       );
 
-      if (this.aiHighlighterEnabled && !this.aiHighlighterUpdater) {
+      if (this.aiHighlighterFeatureEnabled && !this.aiHighlighterUpdater) {
         this.aiHighlighterUpdater = new AiHighlighterUpdater();
       }
     });
@@ -808,7 +808,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
         if (status === EStreamingState.Live) {
           streamStarted = true; // console.log('live', this.streamingService.views.settings.platforms.twitch.title);
 
-          if (!this.aiHighlighterEnabled) {
+          if (!this.aiHighlighterFeatureEnabled) {
             return;
           }
 
@@ -1868,7 +1868,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
   }
 
   async flow(filePath: string, streamInfo: StreamInfoForAiHighlighter): Promise<void> {
-    if (this.aiHighlighterEnabled === false) {
+    if (this.aiHighlighterFeatureEnabled === false) {
       console.log('HighlighterService: Not enabled');
       return;
     }
