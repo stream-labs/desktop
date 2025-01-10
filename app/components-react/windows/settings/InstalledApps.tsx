@@ -103,11 +103,14 @@ export default function InstalledApps() {
               <td> {highlighterVersion} </td>
               <td className={cx(styles.buttonContainer, 'button-container--right')}>
                 <button
+                  onClick={() => {
+                    HighlighterService.UNINSTALL_HIGHLIGHTER();
+                  }}
                   className={cx('button', {
                     'button--soft-warning': true,
                   })}
                 >
-                  Uninstall
+                  {$t('Uninstall')}
                 </button>
               </td>
             </tr>
