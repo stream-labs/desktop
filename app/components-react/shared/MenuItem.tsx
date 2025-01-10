@@ -15,7 +15,6 @@ export default function Menutem(p: IMenuProps) {
 
   return (
     <>
-      {/* type: {type} */}
       <div title={title} className={styles.menuitemWrapper} style={style}>
         <Menu.Item
           {...p}
