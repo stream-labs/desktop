@@ -18,7 +18,7 @@ interface IKickStartStreamResponse {
   key: string;
   rtmp: string;
   chat_url: string;
-  broadcast_id?: string;
+  broadcast_id?: string | null;
   channel_name: string;
   platform_id: string;
   region?: string;
@@ -36,7 +36,6 @@ interface IKickError {
 }
 interface IKickServiceState extends IPlatformState {
   settings: IKickStartStreamSettings;
-  broadcastId: string;
   ingest: string;
   chatUrl: string;
   channelName: string;
@@ -71,7 +70,6 @@ export class KickService
       display: 'horizontal',
       mode: 'landscape',
     },
-    broadcastId: '',
     ingest: '',
     chatUrl: '',
     channelName: '',
@@ -84,7 +82,7 @@ export class KickService
   readonly domain = 'https://kick.com';
   readonly platform = 'kick';
   readonly displayName = 'Kick';
-  readonly capabilities = new Set<TPlatformCapability>(['title', 'viewerCount']);
+  readonly capabilities = new Set<TPlatformCapability>(['chat']);
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions = {
     width: 600,
@@ -93,14 +91,6 @@ export class KickService
 
   private get oauthToken() {
     return this.userService.views.state.auth?.platforms?.kick?.token;
-  }
-
-  /**
-   * Kick's API currently does not provide viewer count.
-   * To prevent errors, return 0 for now;
-   */
-  get viewersCount(): number {
-    return 0;
   }
 
   async beforeGoLive(goLiveSettings: IGoLiveSettings, display?: TDisplayType) {
@@ -112,14 +102,6 @@ export class KickService
         goLiveSettings.platforms.kick ?? this.state.settings,
       );
 
-      if (!streamInfo.broadcast_id) {
-        throwStreamError('PLATFORM_REQUEST_FAILED', {
-          status: 403,
-          statusText: 'Kick Error: no broadcast ID returned, unable to start stream.',
-        });
-      }
-
-      this.SET_BROADCAST_ID(streamInfo.broadcast_id);
       this.SET_INGEST(streamInfo.rtmp);
       this.SET_STREAM_KEY(streamInfo.key);
       this.SET_CHAT_URL(streamInfo.chat_url);
@@ -145,10 +127,6 @@ export class KickService
   }
 
   async afterStopStream(): Promise<void> {
-    if (this.state.broadcastId) {
-      await this.endStream(this.state.broadcastId);
-    }
-
     // clear server url and stream key
     this.SET_INGEST('');
     this.SET_STREAM_KEY('');
@@ -246,10 +224,6 @@ export class KickService
     return jfetch<IKickEndStreamResponse>(request);
   }
 
-  async fetchViewerCount(): Promise<number> {
-    return 0;
-  }
-
   /**
    * prepopulate channel info and save it to the store
    */
@@ -301,12 +275,6 @@ export class KickService
 
   get locale(): string {
     return I18nService.instance.state.locale;
-  }
-
-  @mutation()
-  SET_BROADCAST_ID(broadcastId?: string) {
-    if (!broadcastId) return;
-    this.state.broadcastId = broadcastId;
   }
 
   @mutation()
