@@ -101,8 +101,8 @@ export interface IYoutubeLiveBroadcast {
     cuepointSchedule: {
       enabled?: boolean;
       pauseAdsUntil?: string;
-      scheduleStrategy?: string;
-      repeatIntervalSecs?: number;
+      creatorCuepointConfig?: any;
+      ytOptimizedCuepointConfig?: 'CONSERVATIVE' | 'BALANCED' | 'AGGRESSIVE';
     };
     adsMonetizationStatus?: 'on' | 'off';
     eligibleForAdsMonetization?: boolean;
@@ -545,6 +545,7 @@ export class YoutubeService
         adsMonetizationStatus: this.getMonetizationStatus(params.monetizationEnabled),
         cuepointSchedule: {
           enabled: params.monetizationEnabled,
+          ytOptimizedCuepointConfig: 'BALANCED',
         },
       };
     }
@@ -626,6 +627,8 @@ export class YoutubeService
         monetizationDetails.cuepointSchedule = {
           ...moneyInfo.cuepointSchedule,
           enabled: params.monetizationEnabled,
+          ytOptimizedCuepointConfig: 'BALANCED',
+          creatorCuepointConfig: undefined,
         };
       }
     }
