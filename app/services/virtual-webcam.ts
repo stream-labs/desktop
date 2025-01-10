@@ -1,4 +1,4 @@
-import { StatefulService, mutation } from 'services/core';
+import { Service, mutation } from 'services/core';
 import * as obs from '../../obs-api';
 import fs from 'fs';
 import util from 'util';
@@ -25,9 +25,18 @@ export enum EVirtualWebcamPluginInstallStatus {
   Outdated = 'outdated',
 }
 
-interface IVirtualWebcamServiceState {
-  running: boolean;
+class VirtualCamServiceEphemeralState extends RealmObject {
+  isRunning: boolean;
+
+  static schema: ObjectSchema = {
+    name: 'VirtualCamServiceEphemeralState',
+    properties: {
+      isRunning: { type: 'bool', default: false },
+    },
+  };
 }
+
+VirtualCamServiceEphemeralState.register();
 
 class VirtualCamServicePersistentState extends RealmObject {
   // Naming of these fields is taken from OBS for reference
@@ -45,12 +54,11 @@ class VirtualCamServicePersistentState extends RealmObject {
 
 VirtualCamServicePersistentState.register({ persist: true });
 
-export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceState> {
+export class VirtualWebcamService extends Service {
   @Inject() usageStatisticsService: UsageStatisticsService;
   @Inject() sourcesService: SourcesService;
-  virtualCamSettings = VirtualCamServicePersistentState.inject();
-
-  static initialState: IVirtualWebcamServiceState = { running: false };
+  state = VirtualCamServicePersistentState.inject();
+  ephemeralState = VirtualCamServiceEphemeralState.inject();
 
   runningChanged = new Subject<boolean>();
 
@@ -107,24 +115,22 @@ export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceS
   }
 
   start() {
-    if (this.state.running) return;
+    if (this.ephemeralState.isRunning) return;
 
-    //obs.NodeObs.OBS_service_createVirtualWebcam('Streamlabs Desktop Virtual Webcam');
     obs.NodeObs.OBS_service_startVirtualCam();
 
-    this.SET_RUNNING(true);
+    this.setRunning(true);
     this.runningChanged.next(true);
 
     this.usageStatisticsService.recordFeatureUsage('VirtualWebcam');
   }
 
   stop() {
-    if (!this.state.running) return;
+    if (!this.ephemeralState.isRunning) return;
 
     obs.NodeObs.OBS_service_stopVirtualCam();
-    //obs.NodeObs.OBS_service_removeVirtualWebcam();
 
-    this.SET_RUNNING(false);
+    this.setRunning(false);
     this.runningChanged.next(false);
   }
 
@@ -134,8 +140,8 @@ export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceS
   }
 
   update(type: VCamOutputType, name: string) {
-    this.virtualCamSettings.db.write(() => {
-      this.virtualCamSettings.deepPatch({
+    this.state.db.write(() => {
+      this.state.deepPatch({
         outputType: type,
         outputSelection: name,
       });
@@ -143,12 +149,16 @@ export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceS
     obs.NodeObs.OBS_service_updateVirtualCam(type, name);
   }
 
-  outputType(): VCamOutputType {
-    return this.virtualCamSettings.outputType;
+  get outputType(): VCamOutputType {
+    return this.state.outputType;
   }
 
-  outputSelection(): string {
-    return this.virtualCamSettings.outputSelection;
+  get outputSelection(): string {
+    return this.state.outputSelection;
+  }
+
+  get isRunning(): boolean {
+    return this.ephemeralState.isRunning;
   }
 
   getVideoSources() {
@@ -158,8 +168,9 @@ export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceS
     );
   }
 
-  @mutation()
-  private SET_RUNNING(running: boolean) {
-    this.state.running = running;
+  private setRunning(running: boolean) {
+    this.ephemeralState.db.write(() => {
+      this.ephemeralState.isRunning = running;
+    });
   }
 }
