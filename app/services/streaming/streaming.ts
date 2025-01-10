@@ -349,6 +349,9 @@ export class StreamingService
 
     // setup youtube vertical
     if (this.views.enabledPlatforms.includes('youtube')) {
+      // TODO: this needs to fail gracefully, failing to create stream
+      // (for example due to rate limits), leaves streaming window in
+      // infinite load and other streams won't start.
       const ytvert = await this.youtubeService.createVertical(settings);
       //console.log('ytvert', ytvert);
 
@@ -1003,7 +1006,7 @@ export class StreamingService
             use_auth: false,
             streamType: 'rtmp_custom',
           });
-          NodeObs.OBS_service_setVideoInfo(context, service.name);
+          // NodeObs.OBS_service_setVideoInfo(context, service.name);
           stream.service = service;
 
           output.stream = stream;
@@ -1020,10 +1023,14 @@ export class StreamingService
             NodeObs.OBS_service_stopStreaming(true, 'horizontal');
             NodeObs.OBS_service_stopStreaming(true, 'vertical');
 
-            extraOutputs.forEach(output => {
-              console.log('destroying stream for ', output.name);
-              output.stream?.stop();
-            });
+            try {
+              extraOutputs.forEach(output => {
+                console.log('destroying stream for ', output.name);
+                output.stream?.stop();
+              });
+            } catch (e: unknown) {
+              console.error(e);
+            }
 
             this.extraOutputs = [];
           }
@@ -1147,6 +1154,11 @@ export class StreamingService
               signalInfo.signal === EOBSOutputSignal.Deactivate
             ) {
               NodeObs.OBS_service_stopStreaming(false, 'vertical');
+              console.log('stopping extra outputs');
+              this.extraOutputs.forEach(output => {
+                console.log('stopping stream for ', output.name);
+                output.stream?.stop();
+              });
               signalChanged.unsubscribe();
             }
           },
@@ -1183,6 +1195,11 @@ export class StreamingService
       if (this.views.isDualOutputMode || this.views.enabledPlatforms.includes('youtube')) {
         NodeObs.OBS_service_stopStreaming(true, 'horizontal');
         NodeObs.OBS_service_stopStreaming(true, 'vertical');
+
+        this.extraOutputs.forEach(output => {
+          console.log('stopping stream for ', output.name);
+          output.stream?.stop();
+        });
       } else {
         NodeObs.OBS_service_stopStreaming(true);
       }
