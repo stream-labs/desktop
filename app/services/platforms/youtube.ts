@@ -616,18 +616,16 @@ export class YoutubeService
     if (broadcast.monetizationDetails) {
       fields.push('monetizationDetails');
 
-      const moneyInfo = broadcast.monetizationDetails.cuepointSchedule;
+      const moneyInfo = broadcast.monetizationDetails;
       monetizationDetails = {
-        adsMonetizationStatus: this.getMonetizationStatus(
-          isMidStreamMode ? moneyInfo?.enabled : params.monetizationEnabled,
-        ),
-        cuepointSchedule: {
-          enabled: isMidStreamMode ? moneyInfo?.enabled : params.monetizationEnabled,
-          pauseAdsUntil: moneyInfo?.pauseAdsUntil,
-          scheduleStrategy: moneyInfo?.scheduleStrategy,
-          repeatIntervalSecs: moneyInfo?.repeatIntervalSecs,
-        },
+        adsMonetizationStatus: isMidStreamMode ? moneyInfo?.adsMonetizationStatus : this.getMonetizationStatus(params.monetizationEnabled),,
       };
+      if (!isMidStreamMode && params.monetizationEnabled) {
+        monetizationDetails.cuepointSchedule = {
+          ...moneyInfo.cuepointSchedule,
+          enabled: params.monetizationEnabled,
+        }
+      }
     }
 
     const endpoint = `liveBroadcasts?part=${fields.join(',')}&id=${id}`;
