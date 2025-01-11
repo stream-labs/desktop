@@ -786,7 +786,12 @@ export class SourcesService extends StatefulService<ISourcesState> {
     const isReactComponent =
       this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.reactWidgets) &&
       reactWidgets.includes(componentName);
-    const windowComponentName = isReactComponent ? 'WidgetWindow' : componentName;
+
+    // We're embedding alertbox properties from dashboard, change component if so
+    const reactComponentName =
+      componentName === 'AlertBox' ? 'AlertBoxPropertiesEmbed' : 'WidgetWindow';
+
+    const windowComponentName = isReactComponent ? reactComponentName : componentName;
 
     const defaultVueWindowSize = { width: 920, height: 1024 };
     const defaultReactWindowSize = { width: 600, height: 800 };

@@ -33,6 +33,14 @@ export class AdvancedStatistics extends ReactComponent {}
 })
 export class AlertboxLibrary extends ReactComponent {}
 
+@Component({
+  props: {
+    name: { default: 'AlertBoxPropertiesEmbed' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class AlertBoxPropertiesEmbed extends ReactComponent {}
+
 @Component({ props: { name: { default: 'Blank' } } })
 export class Blank extends ReactComponent {}
 
