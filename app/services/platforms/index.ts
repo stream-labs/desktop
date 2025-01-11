@@ -3,7 +3,6 @@ import { IYoutubeStartStreamOptions, YoutubeService } from './youtube';
 import { FacebookService, IFacebookStartStreamOptions } from './facebook';
 import { ITikTokStartStreamOptions, TikTokService } from './tiktok';
 import { InstagramService, IInstagramStartStreamOptions } from './instagram';
-import { KickService, IKickStartStreamOptions } from './kick';
 import { TwitterPlatformService } from './twitter';
 import { TTwitchOAuthScope } from './twitch/index';
 import { IGoLiveSettings } from 'services/streaming';
@@ -11,6 +10,7 @@ import { WidgetType } from '../widgets';
 import { ITrovoStartStreamOptions, TrovoService } from './trovo';
 import { TDisplayType } from 'services/settings-v2';
 import { $t } from 'services/i18n';
+import { KickService, IKickStartStreamOptions } from './kick';
 
 export type Tag = string;
 export interface IGame {
@@ -288,9 +288,9 @@ export function getPlatformService(platform: TPlatform): IPlatformService {
     facebook: FacebookService.instance,
     tiktok: TikTokService.instance,
     trovo: TrovoService.instance,
+    kick: KickService.instance,
     twitter: TwitterPlatformService.instance,
     instagram: InstagramService.instance,
-    kick: KickService.instance,
   }[platform];
 }
 
