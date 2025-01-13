@@ -115,7 +115,7 @@ export default function PlatformAppStore(p: { params: { appId?: string; type?: s
             padding: '8px',
           }}
         >
-          <div>Other installed apps: </div>
+          <div>{$t('Other installed apps:')}</div>
           <div
             style={{
               borderRadius: 8,

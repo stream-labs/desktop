@@ -93,13 +93,23 @@ export default function InstalledApps() {
           {highlighterVersion !== '' && (
             <tr key={'Ai Highlighter'}>
               <td>
-                <img
-                  src={'https://slobs-cdn.streamlabs.com/media/highlighter-image.png'}
-                  alt="-"
-                  width="50"
-                />{' '}
+                <div
+                  style={{
+                    width: '50px',
+                    height: '32px',
+                    display: 'grid',
+                    placeContent: 'center',
+                    background:
+                      'linear-gradient(60deg, #2DE8B0 25.56%, #CBE953 60.27%, #FFAB48 79.52%, #FF5151 96.69%), #FFF',
+                  }}
+                >
+                  <i
+                    style={{ margin: 0, fontSize: '20px', color: 'black' }}
+                    className="icon-highlighter"
+                  ></i>
+                </div>
               </td>
-              <td> {'AI Highlighter'} </td>
+              <td> {'Streamlabs AI Highlighter'} </td>
               <td> {highlighterVersion} </td>
               <td className={cx(styles.buttonContainer, 'button-container--right')}>
                 <button
