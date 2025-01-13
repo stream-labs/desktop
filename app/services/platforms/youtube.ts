@@ -516,7 +516,6 @@ export class YoutubeService
     params: IYoutubeStartStreamOptions & { scheduledStartTime?: number },
   ): Promise<IYoutubeLiveBroadcast> {
     const fields = ['snippet', 'contentDetails', 'status'];
-    const endpoint = `liveBroadcasts?part=${fields.join(',')}`;
     const scheduledStartTime = params.scheduledStartTime
       ? new Date(params.scheduledStartTime)
       : new Date();
@@ -550,6 +549,7 @@ export class YoutubeService
       };
     }
 
+    const endpoint = `liveBroadcasts?part=${fields.join(',')}`;
     const broadcast = await this.requestYoutube<IYoutubeLiveBroadcast>({
       body: JSON.stringify(data),
       method: 'POST',
