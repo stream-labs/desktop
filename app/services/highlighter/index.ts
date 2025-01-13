@@ -1245,9 +1245,11 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     }
   }
 
-  uninstallAiHighlighter() {
+  async uninstallAiHighlighter() {
     this.setAiHighlighter(false);
     this.UNINSTALL_HIGHLIGHTER();
+
+    await this.aiHighlighterUpdater?.uninstall();
   }
 
   async loadClips(streamInfoId?: string | undefined) {
@@ -2322,8 +2324,11 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
       return;
     }
 
-    const basepath = path.join(remote.app.getPath('userData'), 'ai-highlighter');
-    const milestonesPath = path.join(basepath, 'milestones', 'milestones.json');
+    const milestonesPath = path.join(
+      AiHighlighterUpdater.basepath,
+      'milestones',
+      'milestones.json',
+    );
 
     const milestonesData = JSON.stringify(this.streamMilestones.milestones);
     await fs.outputFile(milestonesPath, milestonesData);
