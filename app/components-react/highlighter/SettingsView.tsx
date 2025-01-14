@@ -153,6 +153,13 @@ export default function SettingsView({
                 <p style={{ margin: 0 }}>
                   {$t(
                     'Automatically capture the best moments from your livestream and turn them into a highlight video.',
+                  )}{' '}
+                  {v.highlighterVersion !== '' && (
+                    <span>
+                      {$t(
+                        'The AI Highlighter App can be managed in the Apps Manager tab or in Settings > Installed apps.',
+                      )}
+                    </span>
                   )}
                 </p>
 
@@ -171,7 +178,7 @@ export default function SettingsView({
                       HighlighterService.installAiHighlighter(true);
                     }}
                   >
-                    Install AI Highlighter
+                    {$t('Install AI Highlighter App')}
                   </Button>
                 )}
                 <div className={styles.recommendedCorner}>{$t('Recommended')}</div>
@@ -180,8 +187,8 @@ export default function SettingsView({
             <div className={styles.manualCard}>
               <h3 className={styles.cardHeaderTitle}>
                 {aiHighlighterFeatureEnabled
-                  ? 'Or use the manual highlighter '
-                  : 'Manual highlighter'}
+                  ? $t('Or, use the built-in manual highlighter')
+                  : $t('Built-in manual highlighter')}
               </h3>
               <p>
                 {$t(
