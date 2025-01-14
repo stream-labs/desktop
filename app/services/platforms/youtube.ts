@@ -306,6 +306,11 @@ export class YoutubeService
     let broadcast: IYoutubeLiveBroadcast;
     if (!streamToScheduledBroadcast) {
       broadcast = await this.createBroadcast(ytSettings);
+
+      // Current YT api doesn't let us POST with monetization settings so need to patch it in after creation
+      if (ytSettings.monetizationEnabled) {
+        await this.updateBroadcast(broadcast.id, ytSettings);
+      }
     } else {
       assertIsDefined(ytSettings.broadcastId);
       await this.updateBroadcast(ytSettings.broadcastId, ytSettings);
@@ -516,6 +521,7 @@ export class YoutubeService
     params: IYoutubeStartStreamOptions & { scheduledStartTime?: number },
   ): Promise<IYoutubeLiveBroadcast> {
     const fields = ['snippet', 'contentDetails', 'status'];
+    const endpoint = `liveBroadcasts?part=${fields.join(',')}`;
     const scheduledStartTime = params.scheduledStartTime
       ? new Date(params.scheduledStartTime)
       : new Date();
@@ -538,18 +544,6 @@ export class YoutubeService
       },
     };
 
-    if (params.monetizationEnabled) {
-      fields.push('monetizationDetails');
-      data.monetizationDetails = {
-        adsMonetizationStatus: this.getMonetizationStatus(params.monetizationEnabled),
-        cuepointSchedule: {
-          enabled: params.monetizationEnabled,
-          ytOptimizedCuepointConfig: 'BALANCED',
-        },
-      };
-    }
-
-    const endpoint = `liveBroadcasts?part=${fields.join(',')}`;
     const broadcast = await this.requestYoutube<IYoutubeLiveBroadcast>({
       body: JSON.stringify(data),
       method: 'POST',

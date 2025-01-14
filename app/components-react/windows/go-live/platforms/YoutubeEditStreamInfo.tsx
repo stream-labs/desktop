@@ -207,7 +207,7 @@ export const YoutubeEditStreamInfo = InputComponent((p: IPlatformComponentParams
                   )}
                 </p>
               )}
-              {ytSettings.eligibleForMonetization && (
+              {!isScheduleMode && ytSettings.eligibleForMonetization && (
                 <CheckboxInput label={$t('Enable Monetization')} {...bind.monetizationEnabled} />
               )}
             </>
