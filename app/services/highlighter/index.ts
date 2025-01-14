@@ -705,12 +705,6 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     this.state.highlighterVersion = version;
   }
 
-  @mutation()
-  UNINSTALL_HIGHLIGHTER() {
-    // TODO: Actually deinstall highlighter, then set
-    this.state.highlighterVersion = '';
-  }
-
   get views() {
     return new HighlighterViews(this.state);
   }
@@ -1240,14 +1234,14 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
       await this.aiHighlighterUpdater.isNewVersionAvailable();
       this.startUpdater();
     } else {
-      // Only for go live view to immediately show the toggle. For other flow updater will set the version
+      // Only for go live view to immediately show the toggle. For other flows, the updater will set the version
       this.SET_HIGHLIGHTER_VERSION('0.0.0');
     }
   }
 
   async uninstallAiHighlighter() {
     this.setAiHighlighter(false);
-    this.UNINSTALL_HIGHLIGHTER();
+    this.SET_HIGHLIGHTER_VERSION('');
 
     await this.aiHighlighterUpdater?.uninstall();
   }

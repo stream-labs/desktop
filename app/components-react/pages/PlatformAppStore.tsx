@@ -8,6 +8,7 @@ import { Services } from 'components-react/service-provider';
 import { Button } from 'antd';
 import { EMenuItemKey } from 'services/side-nav';
 import { $t } from 'services/i18n';
+import styles from './PlatformAppStore.m.less';
 
 export default function PlatformAppStore(p: { params: { appId?: string; type?: string } }) {
   const {
@@ -22,7 +23,7 @@ export default function PlatformAppStore(p: { params: { appId?: string; type?: s
   );
   const [platformAppsUrl, setPlatformAppsUrl] = useState('');
   const [currentUrl, setCurrentUrl] = useState<string>('');
-  const browser = useRef<any>(null);
+
   useEffect(() => {
     async function getPlatformAppsUrl() {
       const url = await UserService.views.appStoreUrl(p.params);
@@ -84,11 +85,8 @@ export default function PlatformAppStore(p: { params: { appId?: string; type?: s
   return (
     <>
       <BrowserView
+        className={styles.browserView}
         style={{
-          position: 'absolute',
-          top: 0,
-          right: 0,
-          left: 0,
           height: `calc(100% - ${
             currentUrl.includes('installed-apps') &&
             HighlighterService.views.highlighterVersion !== ''
@@ -104,31 +102,10 @@ export default function PlatformAppStore(p: { params: { appId?: string; type?: s
         }}
       />
       {currentUrl.includes('installed-apps') && highlighterInstalled && (
-        <div
-          style={{
-            display: 'flex',
-            gap: '16px',
-            position: 'absolute',
-            bottom: 0,
-            height: '72px',
-            alignItems: 'center',
-            padding: '8px',
-          }}
-        >
+        <div className={styles.otherInstalledAppsWrapper}>
           <div>{$t('Other installed apps:')}</div>
-          <div
-            style={{
-              borderRadius: 8,
-              border: '1px solid #30383D',
-              display: 'flex',
-              gap: '16px',
-              padding: '8px',
-              paddingLeft: '16px',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <div className={styles.otherAppWrapper}>
+            <div className={styles.textWrapper}>
               <h3 style={{ margin: 0 }}>AI Highlighter</h3>
               <p style={{ opacity: 0.3, margin: 0 }}>by Streamlabs</p>
             </div>

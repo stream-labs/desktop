@@ -184,10 +184,9 @@ export default function BrowserView(p: BrowserViewProps) {
 
   function getCurrentUrl() {
     if (!browserView.current) {
-      console.log('BrowserView: browserView.current is null');
       return '';
     }
-    return browserView.current!.webContents.getURL();
+    return browserView.current.webContents.getURL();
   }
 
   return (

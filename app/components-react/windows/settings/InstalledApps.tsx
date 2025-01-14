@@ -93,16 +93,7 @@ export default function InstalledApps() {
           {highlighterVersion !== '' && (
             <tr key={'Ai Highlighter'}>
               <td>
-                <div
-                  style={{
-                    width: '50px',
-                    height: '32px',
-                    display: 'grid',
-                    placeContent: 'center',
-                    background:
-                      'linear-gradient(60deg, #2DE8B0 25.56%, #CBE953 60.27%, #FFAB48 79.52%, #FF5151 96.69%), #FFF',
-                  }}
-                >
+                <div className={styles.aiHighlighterThumbnail}>
                   <i
                     style={{ margin: 0, fontSize: '20px', color: 'black' }}
                     className="icon-highlighter"
