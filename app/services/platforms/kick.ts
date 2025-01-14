@@ -270,7 +270,7 @@ export class KickService
     const username = this.userService.state.auth?.platforms?.kick?.username;
     if (!username) return '';
 
-    return `${this.domain}/${username}`;
+    return `${this.domain}/${username.toLowerCase().replace(/\_/g, '-')}`;
   }
 
   get locale(): string {
