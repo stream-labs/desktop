@@ -19,6 +19,7 @@ import { useVuex } from 'components-react/hooks';
 import { useRealmObject } from 'components-react/hooks/realm';
 import { $i } from 'services/utils';
 import { TikTokChatInfo } from './TiktokChatInfo';
+import { ShareStreamLink } from './ShareStreamLink';
 
 const LiveDockCtx = React.createContext<LiveDockController | null>(null);
 
@@ -27,6 +28,7 @@ class LiveDockController {
   private youtubeService = Services.YoutubeService;
   private facebookService = Services.FacebookService;
   private trovoService = Services.TrovoService;
+  private kickService = Services.KickService;
   private tiktokService = Services.TikTokService;
   private userService = Services.UserService;
   private customizationService = Services.CustomizationService;
@@ -159,6 +161,7 @@ class LiveDockController {
     // Twitter & Tiktok don't support editing title after going live
     if (this.isPlatform('twitter') && !this.isRestreaming) return false;
     if (this.isPlatform('tiktok') && !this.isRestreaming) return false;
+    if (this.isPlatform('kick') && !this.isRestreaming) return false;
 
     return (
       this.streamingService.views.isMidStreamMode ||
@@ -181,6 +184,7 @@ class LiveDockController {
     if (this.platform === 'youtube') url = this.youtubeService.streamPageUrl;
     if (this.platform === 'facebook') url = this.facebookService.streamPageUrl;
     if (this.platform === 'trovo') url = this.trovoService.streamPageUrl;
+    if (this.platform === 'kick') url = this.kickService.streamPageUrl;
     if (this.platform === 'tiktok') url = this.tiktokService.streamPageUrl;
     remote.shell.openExternal(url);
   }
@@ -190,6 +194,7 @@ class LiveDockController {
     if (this.platform === 'youtube') url = this.youtubeService.dashboardUrl;
     if (this.platform === 'facebook') url = this.facebookService.streamDashboardUrl;
     if (this.platform === 'tiktok') url = this.tiktokService.dashboardUrl;
+    if (this.platform === 'kick') url = this.kickService.dashboardUrl;
     remote.shell.openExternal(url);
   }
 
@@ -439,7 +444,7 @@ function LiveDock(p: ILiveDockProps) {
                         <i onClick={() => ctrl.showEditStreamInfo()} className="icon-edit" />
                       </Tooltip>
                     )}
-                    {isPlatform(['youtube', 'facebook', 'trovo', 'tiktok']) && isStreaming && (
+                    {isPlatform(['youtube', 'facebook', 'trovo', 'tiktok', 'kick']) && isStreaming && (
                       <Tooltip
                         title={$t('View your live stream in a web browser')}
                         placement="right"
@@ -459,7 +464,7 @@ function LiveDock(p: ILiveDockProps) {
                     )}
                   </div>
                   <div className="flex">
-                    {(isPlatform(['twitch', 'trovo', 'facebook']) ||
+                    {(isPlatform(['twitch', 'trovo', 'facebook', 'kick']) ||
                       (isPlatform(['youtube', 'twitter']) && isStreaming) ||
                       (isPlatform(['tiktok']) && isRestreaming)) && (
                       <a onClick={() => ctrl.refreshChat()}>{$t('Refresh Chat')}</a>
@@ -468,7 +473,8 @@ function LiveDock(p: ILiveDockProps) {
                 </div>
                 {!hideStyleBlockers &&
                   (isPlatform(['twitch', 'trovo']) ||
-                    (isStreaming && isPlatform(['youtube', 'facebook', 'twitter', 'tiktok']))) && (
+                    (isStreaming &&
+                      isPlatform(['youtube', 'facebook', 'twitter', 'tiktok', 'kick']))) && (
                     <div className={styles.liveDockChat}>
                       {hasChatTabs && (
                         <div className="flex">
@@ -515,7 +521,8 @@ function LiveDock(p: ILiveDockProps) {
               </div>
               {!hideStyleBlockers &&
                 (isPlatform(['twitch', 'trovo']) ||
-                  (isStreaming && isPlatform(['youtube', 'facebook', 'twitter', 'tiktok']))) && (
+                  (isStreaming &&
+                    isPlatform(['youtube', 'facebook', 'twitter', 'tiktok', 'kick']))) && (
                   <div className={styles.liveDockChat}>
                     {hasChatTabs && <ChatTabs visibleChat={visibleChat} setChat={setChat} />}
                     {!applicationLoading && !collapsed && chat}
@@ -530,7 +537,8 @@ function LiveDock(p: ILiveDockProps) {
                   </div>
                 )}
               {(!ctrl.platform ||
-                (isPlatform(['youtube', 'facebook', 'twitter', 'tiktok']) && !isStreaming)) && (
+                (isPlatform(['youtube', 'facebook', 'twitter', 'tiktok', 'kick']) &&
+                  !isStreaming)) && (
                 <div className={cx('flex flex--center flex--column', styles.liveDockChatOffline)}>
                   <img className={styles.liveDockChatImgOffline} src={ctrl.offlineImageSrc} />
                   {!hideStyleBlockers && <span>{$t('Your chat is currently offline')}</span>}

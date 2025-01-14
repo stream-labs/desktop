@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Utils from 'services/utils';
+import urlLib from 'url';
 import BrowserView from 'components-react/shared/BrowserView';
 import { GuestApiHandler } from 'util/guest-api-handler';
 import * as remote from '@electron/remote';
@@ -28,6 +29,16 @@ export default function PlatformAppStore(p: {
       openLinkInBrowser,
       onPaypalAuthSuccess,
       navigateToApp,
+    });
+
+    view.webContents.setWindowOpenHandler(details => {
+      const protocol = urlLib.parse(details.url).protocol;
+
+      if (protocol === 'http:' || protocol === 'https:') {
+        remote.shell.openExternal(details.url);
+      }
+
+      return { action: 'deny' };
     });
 
     view.webContents.on('did-finish-load', () => {

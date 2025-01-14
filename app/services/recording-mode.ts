@@ -19,7 +19,7 @@ import { getPlatformService } from 'services/platforms';
 import { IYoutubeUploadResponse } from 'services/platforms/youtube/uploader';
 import { YoutubeService } from 'services/platforms/youtube';
 
-interface IRecordingEntry {
+export interface IRecordingEntry {
   timestamp: string;
   filename: string;
 }
@@ -193,10 +193,14 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
     });
   }
 
+  removeRecordingEntry(timestamp: string) {
+    this.REMOVE_RECORDING_ENTRY(timestamp);
+  }
+
   pruneRecordingEntries() {
     if (Object.keys(this.state.recordingHistory).length < 30) return;
     const oneMonthAgo = moment().subtract(30, 'days');
-    const prunedEntries = {};
+    const prunedEntries: Dictionary<IRecordingEntry> = {};
     Object.keys(this.state.recordingHistory).forEach(timestamp => {
       if (moment(timestamp).isAfter(oneMonthAgo)) {
         prunedEntries[timestamp] = this.state.recordingHistory[timestamp];
@@ -337,6 +341,11 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
   @mutation()
   private ADD_RECORDING_ENTRY(timestamp: string, filename: string) {
     Vue.set(this.state.recordingHistory, timestamp, { timestamp, filename });
+  }
+
+  @mutation()
+  private REMOVE_RECORDING_ENTRY(timestamp: string) {
+    Vue.delete(this.state.recordingHistory, timestamp);
   }
 
   @mutation()

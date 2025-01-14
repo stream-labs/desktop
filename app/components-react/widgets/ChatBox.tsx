@@ -1,5 +1,5 @@
 import React from 'react';
-import { IWidgetCommonState, useWidget, WidgetModule } from './common/useWidget';
+import { IWidgetCommonState, useWidget, WidgetModule, settingsToGlobal } from './common/useWidget';
 import { WidgetLayout } from './common/WidgetLayout';
 import { $t } from '../../services/i18n';
 import { metadata } from '../shared/inputs/metadata';
@@ -45,7 +45,7 @@ export function ChatBox() {
 
 export class ChatBoxModule extends WidgetModule<IChatBoxState> {
   get meta() {
-    return {
+    const result = {
       theme: metadata.list({
         label: $t('Theme'),
         options: [
@@ -111,15 +111,35 @@ export class ChatBoxModule extends WidgetModule<IChatBoxState> {
       },
       muted_chatters: metadata.textarea({ label: $t('Muted Chatters') }),
     };
+
+    // TODO: this shouldn't trigger since we do check loading state but somehow
+    // `this.config` is undefined on first render
+    if (this.config?.useNewWidgetAPI) {
+      return {
+        ...result,
+        alert_enabled: metadata.switch({
+          label: $t('Chat Notifications'),
+          tooltip: $t('Trigger a sound to notify you when there is new chat activity'),
+        }),
+      };
+    }
+
+    return result;
   }
 
   // The server sends and recieves these duration fields at different precision
   protected patchBeforeSend(settings: IChatBoxState['data']['settings']) {
-    return {
+    const obj = {
       ...settings,
       message_hide_delay: Math.floor(settings.message_hide_delay / 1000),
       message_show_delay: Math.floor(settings.message_show_delay / 1000),
     };
+
+    if (this.config.useNewWidgetAPI) {
+      return settingsToGlobal(obj);
+    }
+
+    return obj;
   }
 }
 

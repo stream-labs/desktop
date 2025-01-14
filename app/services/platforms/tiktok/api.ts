@@ -1,4 +1,3 @@
-import { $t } from 'services/i18n';
 import { TPlatform } from '..';
 
 export type TTikTokScope =
@@ -25,7 +24,13 @@ export enum ETikTokLiveScopeReason {
   APPROVED_OBS = 2,
 }
 
-export type TTikTokLiveScopeTypes = 'approved' | 'denied' | 'legacy' | 'relog';
+export enum ETikTokAudienceType {
+  ALL = 0,
+  MATURE = 1,
+}
+
+export type TTikTokLiveScopeTypes = 'approved' | 'denied' | 'legacy' | 'relog' | 'never-applied';
+export type TTikTokApplicationStatus = 'approved' | 'rejected' | 'never_applied';
 
 export interface ITikTokLiveScopeResponse {
   platform: TPlatform | string;
@@ -33,6 +38,8 @@ export interface ITikTokLiveScopeResponse {
   can_be_live?: boolean;
   user?: ITikTokUserData;
   info?: any[] | null[] | undefined[] | ITikTokGame[] | ITikTokGamesData | any;
+  audience_controls_info: ITikTokAudienceControlsInfo;
+  application_status?: ITikTokApplicationStatus;
 }
 
 export interface ITikTokGamesData extends ITikTokLiveScopeResponse {
@@ -47,6 +54,22 @@ export interface ITikTokGamesData extends ITikTokLiveScopeResponse {
 interface ITikTokGame {
   full_name: string;
   game_mask_id: string;
+}
+
+export interface ITikTokAudienceControlsInfo {
+  disable: boolean;
+  info_type: ETikTokAudienceType;
+  types: ITikTokAudienceControlType[];
+}
+
+export interface ITikTokAudienceControlType {
+  key: ETikTokAudienceType;
+  label: string | null;
+}
+
+export interface ITikTokApplicationStatus {
+  status: string;
+  timestamp: string | null;
 }
 
 export interface ITikTokUserData {
@@ -64,10 +87,14 @@ export interface ITikTokUserData {
 }
 
 export interface ITikTokError {
-  code: string;
-  message: string;
-  log_id: string;
-  http_status_code: number;
+  status?: number;
+  error?: boolean;
+  success?: boolean;
+  message?: string;
+  data?: {
+    message: string;
+    code: ETikTokErrorTypes;
+  };
 }
 
 export enum ETikTokErrorTypes {
@@ -92,17 +119,3 @@ export interface ITikTokStartStreamResponse {
 export interface ITikTokEndStreamResponse {
   success: boolean;
 }
-
-export const tiktokErrorMessages = (error: string) => {
-  return {
-    TIKTOK_OAUTH_EXPIRED: $t('tiktokReAuthError'),
-    TIKTOK_GENERATE_CREDENTIALS_FAILED: $t(
-      'Failed to generate TikTok stream credentials. Confirm Live Access with TikTok.',
-    ),
-    TIKTOK_STREAM_SCOPE_MISSING: $t('Your TikTok account is not enabled for live streaming.'),
-    TIKTOK_SCOPE_OUTDATED: $t(
-      'Failed to update TikTok account. Please unlink and reconnect your TikTok account.',
-    ),
-    TIKTOK_STREAM_ACTIVE: $t('You are already live on a another device'),
-  }[error];
-};

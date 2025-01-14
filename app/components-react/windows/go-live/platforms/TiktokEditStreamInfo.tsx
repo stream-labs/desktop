@@ -8,7 +8,7 @@ import PlatformSettingsLayout, { IPlatformComponentParams } from './PlatformSett
 import * as remote from '@electron/remote';
 import { CommonPlatformFields } from '../CommonPlatformFields';
 import { ITikTokStartStreamOptions } from 'services/platforms/tiktok';
-import { TextInput, createBinding } from 'components-react/shared/inputs';
+import { RadioInput, TextInput, createBinding } from 'components-react/shared/inputs';
 import InfoBanner from 'components-react/shared/InfoBanner';
 import GameSelector from '../GameSelector';
 import { EDismissable } from 'services/dismissables';
@@ -20,7 +20,8 @@ export function TikTokEditStreamInfo(p: IPlatformComponentParams<'tiktok'>) {
   const { TikTokService } = Services;
   const ttSettings = p.value;
   const approved = TikTokService.scope === 'approved';
-  const denied = TikTokService.scope === 'denied' && !TikTokService.promptReapply;
+  const denied = TikTokService.scope === 'denied';
+  const controls = TikTokService.audienceControls;
 
   function updateSettings(patch: Partial<ITikTokStartStreamOptions>) {
     p.onChange({ ...ttSettings, ...patch });
@@ -44,6 +45,18 @@ export function TikTokEditStreamInfo(p: IPlatformComponentParams<'tiktok'>) {
         requiredFields={<div key="empty-tiktok" />}
       />
       {approved && <GameSelector key="optional" platform={'tiktok'} {...bind.game} />}
+      {approved && !controls.disable && (
+        <RadioInput
+          key="audience-ctrl"
+          options={controls.types}
+          defaultValue={controls.audienceType}
+          value={controls.audienceType}
+          label={$t('TikTok Audience')}
+          direction="horizontal"
+          colon
+          {...bind.audienceType}
+        />
+      )}
       {!approved && <TikTokEnterCredentialsFormInfo {...p} denied={denied} />}
     </Form>
   );
@@ -126,8 +139,8 @@ function TikTokInfo() {
 
 function TikTokButtons(p: { denied: boolean }) {
   const status = Services.TikTokService.promptApply ? 'prompted' : 'not-prompted';
-  const component = p.denied ? 'ReapplyButton' : 'ApplyButton';
-  const text = p.denied
+  const component = Services.TikTokService.promptReapply ? 'ReapplyButton' : 'ApplyButton';
+  const text = Services.TikTokService.promptReapply
     ? $t('Reapply for TikTok Live Permission')
     : $t('Apply for TikTok Live Permission');
 
@@ -138,11 +151,14 @@ function TikTokButtons(p: { denied: boolean }) {
 
   return (
     <>
-      {!p.denied && (
-        <Button id="tiktok-locate-key" onClick={openProducer} style={{ marginBottom: '10px' }}>
-          {$t('Locate my Stream Key')}
-        </Button>
-      )}
+      <Button
+        id="tiktok-locate-key"
+        onClick={openProducer}
+        style={{ marginBottom: '10px', width: '100%' }}
+      >
+        {$t('Locate my Stream Key')}
+      </Button>
+
       <Button
         id="tiktok-application"
         onClick={() => {

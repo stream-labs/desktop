@@ -63,7 +63,7 @@ export function Connect() {
   // streamlabs and trovo are added separarely on markup below
   const platforms = RecordingModeService.views.isRecordingModeEnabled
     ? ['youtube']
-    : ['twitch', 'youtube', 'facebook', 'twitter', 'tiktok'];
+    : ['twitch', 'youtube', 'tiktok', 'kick', 'facebook', 'twitter'];
 
   const shouldAddTrovo = !RecordingModeService.views.isRecordingModeEnabled;
 
@@ -132,7 +132,9 @@ export function Connect() {
                     loading={loading}
                     onClick={() => authPlatform(platform, afterLogin)}
                     key={platform}
-                    logoSize={['twitter', 'tiktok', 'youtube'].includes(platform) ? 15 : undefined}
+                    logoSize={
+                      ['twitter', 'tiktok', 'youtube', 'kick'].includes(platform) ? 15 : undefined
+                    }
                   >
                     <Translate
                       message={$t('Log in with <span>%{platform}</span>', {
@@ -147,6 +149,7 @@ export function Connect() {
               <div className={styles.extraPlatformsContainer}>
                 {shouldAddTrovo && (
                   <PlatformIconButton
+                    name={EPlatform.Trovo}
                     platform={EPlatform.Trovo}
                     disabled={loading || authInProgress}
                     loading={loading}
@@ -158,6 +161,7 @@ export function Connect() {
                 )}
                 {extraPlatforms.map(platform => (
                   <PlatformIconButton
+                    name={platform.value}
                     key={platform.value}
                     logo={platform.image}
                     disabled={loading || authInProgress}
@@ -261,7 +265,9 @@ export class LoginModule {
 
     const result = await this.UserService.startAuth(
       platform,
-      ['youtube', 'twitch', 'twitter', 'tiktok'].includes(platform) ? 'external' : 'internal',
+      ['youtube', 'twitch', 'twitter', 'tiktok', 'kick'].includes(platform)
+        ? 'external'
+        : 'internal',
       merge,
     );
 

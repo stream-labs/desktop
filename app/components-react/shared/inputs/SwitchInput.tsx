@@ -10,7 +10,12 @@ import cx from 'classnames';
 const ANT_SWITCH_FEATURES = ['checkedChildren', 'unCheckedChildren'] as const;
 
 export type TSwitchInputProps = TSlobsInputProps<
-  { inputRef?: React.Ref<HTMLInputElement>; style?: React.CSSProperties; name?: string },
+  {
+    inputRef?: React.Ref<HTMLInputElement>;
+    style?: React.CSSProperties;
+    name?: string;
+    size?: 'small' | 'default';
+  },
   boolean,
   SwitchProps,
   ValuesOf<typeof ANT_SWITCH_FEATURES>
@@ -18,6 +23,7 @@ export type TSwitchInputProps = TSlobsInputProps<
 
 export const SwitchInput = InputComponent((p: TSwitchInputProps) => {
   const { wrapperAttrs, inputAttrs } = useInput('switch', p, ANT_SWITCH_FEATURES);
+  const { size = 'small' } = p;
 
   /*
    * The horizontal styling shifts the label to follow the switch.
@@ -27,7 +33,7 @@ export const SwitchInput = InputComponent((p: TSwitchInputProps) => {
       <Form.Item colon={false} aria-label={p.label} style={p.style}>
         <Switch
           checked={inputAttrs.value}
-          size="small"
+          size={size}
           {...inputAttrs}
           ref={p.inputRef}
           className={cx(styles.horizontal, styles.horizontalItem)}
@@ -38,7 +44,7 @@ export const SwitchInput = InputComponent((p: TSwitchInputProps) => {
     </InputWrapper>
   ) : (
     <InputWrapper {...wrapperAttrs}>
-      <Switch checked={inputAttrs.value} size="small" {...inputAttrs} ref={p.inputRef} />
+      <Switch checked={inputAttrs.value} size={size} {...inputAttrs} ref={p.inputRef} />
     </InputWrapper>
   );
 });

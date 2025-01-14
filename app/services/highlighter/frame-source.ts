@@ -42,15 +42,19 @@ export class FrameSource {
     public readonly options: IExportOptions,
   ) {}
 
-  async exportScrubbingSprite() {
-    const parsed = path.parse(this.sourcePath);
-    this.scrubJpg = path.join(SCRUB_SPRITE_DIRECTORY, `${parsed.name}-scrub.jpg`);
+  async exportScrubbingSprite(path: string) {
+    this.scrubJpg = path;
 
     /* eslint-disable */
     const args = [
-      '-i', this.sourcePath,
-      '-vf', `scale=${SCRUB_WIDTH}:${SCRUB_HEIGHT},fps=${SCRUB_FRAMES / this.duration},tile=${SCRUB_FRAMES}x1`,
-      '-frames:v', '1',
+      '-i',
+      this.sourcePath,
+      '-vf',
+      `scale=${SCRUB_WIDTH}:${SCRUB_HEIGHT},fps=${
+        SCRUB_FRAMES / this.duration
+      },tile=${SCRUB_FRAMES}x1`,
+      '-frames:v',
+      '1',
       '-y',
       this.scrubJpg,
     ];
@@ -62,15 +66,23 @@ export class FrameSource {
   private startFfmpeg() {
     /* eslint-disable */
     const args = [
-      '-ss', this.startTrim.toString(),
-      '-i', this.sourcePath,
-      '-t', (this.duration - this.startTrim - this.endTrim).toString(),
-      '-vf', `fps=${this.options.fps},scale=${this.options.width}:${this.options.height}`,
-      '-map', 'v:0',
-      '-vcodec', 'rawvideo',
-      '-pix_fmt', 'rgba',
-      '-f', 'image2pipe',
-      '-'
+      '-ss',
+      this.startTrim.toString(),
+      '-i',
+      this.sourcePath,
+      '-t',
+      (this.duration - this.startTrim - this.endTrim).toString(),
+      '-vf',
+      `fps=${this.options.fps},scale=${this.options.width}:${this.options.height}`,
+      '-map',
+      'v:0',
+      '-vcodec',
+      'rawvideo',
+      '-pix_fmt',
+      'rgba',
+      '-f',
+      'image2pipe',
+      '-',
     ];
     /* eslint-enable */
 

@@ -1,12 +1,14 @@
 import { TPlatform } from '../../../services/platforms';
 import { $t } from '../../../services/i18n';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { CheckboxInput, InputComponent, TextAreaInput, TextInput } from '../../shared/inputs';
 import { assertIsDefined } from '../../../util/properties-type-guards';
 import InputWrapper from '../../shared/inputs/InputWrapper';
 import Animate from 'rc-animate';
 import { TLayoutMode } from './platforms/PlatformSettingsLayout';
 import { Services } from '../../service-provider';
+import AiHighlighterToggle from './AiHighlighterToggle';
+import { EAvailableFeatures } from 'services/incremental-rollout';
 
 interface ICommonPlatformSettings {
   title: string;
@@ -22,6 +24,7 @@ interface IProps {
   layoutMode?: TLayoutMode;
   value: ICommonPlatformSettings;
   descriptionIsRequired?: boolean;
+  enabledPlatforms?: TPlatform[];
   onChange: (newValue: ICommonPlatformSettings) => unknown;
 }
 
@@ -55,6 +58,9 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
   }
 
   const view = Services.StreamingService.views;
+  const aiHighlighterEnabled = Services.IncrementalRolloutService.views.featureIsEnabled(
+    EAvailableFeatures.aiHighlighter,
+  );
   const hasCustomCheckbox = p.layoutMode === 'multiplatformAdvanced';
   const fieldsAreVisible = !hasCustomCheckbox || p.value.useCustomFields;
   const descriptionIsRequired =
@@ -84,6 +90,18 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
     maxCharacters = 140;
   }
 
+  const titleTooltip = useMemo(() => {
+    if (enabledPlatforms.includes('tiktok')) {
+      return $t('Only 32 characters of your title will display on TikTok');
+    }
+
+    if (enabledPlatforms.length === 1 && p?.platform === 'kick') {
+      return $t('Edit your stream title on Kick after going live.');
+    }
+
+    return undefined;
+  }, [enabledPlatforms]);
+
   return (
     <div>
       {/* USE CUSTOM CHECKBOX */}
@@ -109,10 +127,7 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
               label={$t('Title')}
               required={true}
               max={maxCharacters}
-              tooltip={
-                enabledPlatforms.includes('tiktok') &&
-                $t('Only 32 characters of your title will display on TikTok')
-              }
+              tooltip={titleTooltip}
             />
 
             {/*DESCRIPTION*/}
@@ -124,6 +139,10 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
                 label={$t('Description')}
                 required={descriptionIsRequired}
               />
+            )}
+
+            {aiHighlighterEnabled && enabledPlatforms && !enabledPlatforms.includes('twitch') && (
+              <AiHighlighterToggle game={undefined} cardIsExpanded={false} />
             )}
           </div>
         )}

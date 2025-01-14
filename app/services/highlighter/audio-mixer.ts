@@ -19,13 +19,11 @@ export class AudioMixer {
 
     const args = [...inputArgs];
 
-    const filterGraph = `amix=inputs=${this.inputs.length}:duration=first:weights=${this.inputs
-      .map(i => i.volume)
-      .join(' ')}`;
+    const inputMap = this.inputs.map((_, index) => `[${index}:a]`).join('');
 
-    this.inputs.forEach((input, index) => {
-      args.push('-map', `${index}:a`);
-    });
+    const filterGraph = `${inputMap}amix=inputs=${
+      this.inputs.length
+    }:duration=first:weights=${this.inputs.map(i => i.volume).join(' ')}`;
 
     args.push('-filter_complex', filterGraph);
 

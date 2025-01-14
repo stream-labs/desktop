@@ -14,7 +14,7 @@ import { SceneFiltersNode } from './nodes/scene-filters';
 import path from 'path';
 import { parse } from './parse';
 import { ScenesService, TSceneNode } from 'services/scenes';
-import { SourcesService } from 'services/sources';
+import { SourcesService, TSourceType } from 'services/sources';
 import { E_AUDIO_CHANNELS } from 'services/audio';
 import { AppService } from 'services/app';
 import { RunInLoadingMode } from 'services/app/app-decorators';
@@ -44,6 +44,7 @@ import { GuestCamNode } from './nodes/guest-cam';
 import { DualOutputService } from 'services/dual-output';
 import { NodeMapNode } from './nodes/node-map';
 import { VideoSettingsService } from 'services/settings-v2';
+import { WidgetsService, WidgetType } from 'services/widgets';
 
 const uuid = window['require']('uuid/v4');
 
@@ -94,6 +95,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   @Inject() dualOutputService: DualOutputService;
   @Inject() videoSettingsService: VideoSettingsService;
   @Inject() private defaultHardwareService: DefaultHardwareService;
+  @Inject() private widgetsService: WidgetsService;
 
   collectionAdded = new Subject<ISceneCollectionsManifestEntry>();
   collectionRemoved = new Subject<ISceneCollectionsManifestEntry>();
@@ -101,7 +103,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   collectionWillSwitch = new Subject<void>();
   collectionUpdated = new Subject<ISceneCollectionsManifestEntry>();
   collectionInitialized = new Subject<void>();
-  collectionActivated = new Subject<ISceneCollectionsManifestEntry>();
 
   /**
    * Whether a valid collection is currently loaded.
@@ -113,6 +114,11 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * true if the scene-collections sync in progress
    */
   private syncPending = false;
+
+  /**
+   * Used to handle actions for users on their first login
+   */
+  newUserFirstLogin = false;
 
   /**
    * Does not use the standard init function so we can have asynchronous
@@ -391,6 +397,16 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    */
   @RunInLoadingMode()
   async loadOverlay(filePath: string, name: string) {
+    // Save the current audio devices for Desktop Audio and Mic so when we
+    // install a new overlay they're preserved.
+    // TODO: this only works if the user sources have the default names
+
+    // We always pass a desktop audio device in, since we might've found a bug that
+    // when installing a new overlay the device is not set and while it seems
+    // to behave correctly, it is blank on device properties.
+    const desktopAudioDevice = this.getDeviceIdFor('Desktop Audio') || 'default';
+    const micDevice = this.getDeviceIdFor('Mic/Aux');
+
     await this.deloadCurrentApplicationState();
 
     const id: string = uuid();
@@ -399,7 +415,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
     try {
       await this.overlaysPersistenceService.loadOverlay(filePath);
-      this.setupDefaultAudio();
+      this.setupDefaultAudio(desktopAudioDevice, micDevice);
     } catch (e: unknown) {
       // We tried really really hard :(
       console.error('Overlay installation failed', e);
@@ -409,6 +425,10 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
     this.collectionLoaded = true;
     await this.save();
+  }
+
+  private getDeviceIdFor(sourceName: 'Desktop Audio' | 'Mic/Aux'): string | undefined {
+    return this.sourcesService.views.getSourcesByName(sourceName)[0]?.getSettings()?.device_id;
   }
 
   /**
@@ -588,6 +608,11 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
     await root.load();
     this.hotkeysService.bindHotkeys();
+
+    // Users who selected a theme during onboarding should skip adding default sources
+    if (this.newUserFirstLogin) {
+      this.newUserFirstLogin = false;
+    }
   }
 
   /**
@@ -685,14 +710,14 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   /**
    * Creates the default audio sources
    */
-  private setupDefaultAudio() {
+  private setupDefaultAudio(desktopAudioDevice?: string, micDevice?: string) {
     // On macOS, most users will not have an audio capture device, so
     // we do not create it automatically.
     if (getOS() === OS.Windows) {
       this.sourcesService.createSource(
         'Desktop Audio',
         byOS({ [OS.Windows]: 'wasapi_output_capture', [OS.Mac]: 'coreaudio_output_capture' }),
-        {},
+        { device_id: desktopAudioDevice },
         { channel: E_AUDIO_CHANNELS.OUTPUT_1 },
       );
     }
@@ -703,7 +728,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     this.sourcesService.createSource(
       'Mic/Aux',
       byOS({ [OS.Windows]: 'wasapi_input_capture', [OS.Mac]: 'coreaudio_input_capture' }),
-      { device_id: defaultId },
+      { device_id: micDevice || defaultId },
       { channel: E_AUDIO_CHANNELS.INPUT_1 },
     );
   }
@@ -809,6 +834,17 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     if (!this.canSync()) return;
 
     const serverCollections = (await this.serverApi.fetchSceneCollections()).data;
+
+    // A user who has never logged in before and did not install a
+    // theme during onboarding will have no collections. To prevent
+    // special handling of the default theme for a user who installed
+    // a theme during onboarding. NOTE: this will be set to false after
+    // onboarding in the dual output service
+    if (!serverCollections || serverCollections.length === 0) {
+      this.newUserFirstLogin = true;
+    } else {
+      this.newUserFirstLogin = false;
+    }
 
     let failed = false;
 
@@ -1007,6 +1043,52 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   }
 
   /**
+   * Creates default sources for new users
+   * @remark New users should be in single output mode and have a few default sources.
+   */
+  setupDefaultSources(shouldAddDefaultSources: boolean) {
+    if (!shouldAddDefaultSources) {
+      this.newUserFirstLogin = false;
+      return;
+    }
+
+    const scene =
+      this.scenesService.views.activeScene ??
+      this.scenesService.createScene('Scene', { makeActive: true });
+
+    if (!scene) {
+      console.error('Default scene not found, failed to create default sources.');
+      return;
+    }
+
+    // add game capture source
+    scene.createAndAddSource('Game Capture', 'game_capture', {}, { display: 'horizontal' });
+
+    // add webcam source
+    const type = byOS({
+      [OS.Windows]: 'dshow_input',
+      [OS.Mac]: 'av_capture_input',
+    }) as TSourceType;
+
+    const defaultSource = this.defaultHardwareService.state.defaultVideoDevice;
+
+    const webCam = defaultSource
+      ? this.sourcesService.views.getSource(defaultSource)
+      : this.sourcesService.views.sources.find(s => s?.type === type);
+
+    if (!webCam) {
+      scene.createAndAddSource('Webcam', type, { display: 'horizontal' });
+    } else {
+      scene.addSource(webCam.sourceId, { display: 'horizontal' });
+    }
+
+    // add alert box widget
+    this.widgetsService.createWidget(WidgetType.AlertBox, 'Alert Box');
+
+    this.newUserFirstLogin = false;
+  }
+
+  /**
    * Add a scene node map
    *
    * @remarks
@@ -1018,9 +1100,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    */
 
   initNodeMaps(sceneNodeMap?: { [sceneId: string]: Dictionary<string> }) {
-    if (!this.videoSettingsService.contexts.vertical) {
-      this.videoSettingsService.establishVideoContext('vertical');
-    }
+    this.videoSettingsService.validateVideoContext();
 
     if (!this.activeCollection) return;
 
