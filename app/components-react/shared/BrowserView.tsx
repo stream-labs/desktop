@@ -189,17 +189,5 @@ export default function BrowserView(p: BrowserViewProps) {
     return browserView.current.webContents.getURL();
   }
 
-  return (
-    <>
-      <Button
-        style={{ position: 'absolute', top: 0, left: 0, zIndex: 1000 }}
-        onClick={() => {
-          console.log('getCurrentUrl', getCurrentUrl());
-        }}
-      >
-        teeest
-      </Button>
-      <div style={{ height: '100%', ...p.style }} ref={sizeContainer} className={p.className} />
-    </>
-  );
+  return <div style={{ height: '100%', ...p.style }} ref={sizeContainer} className={p.className} />;
 }
