@@ -225,7 +225,7 @@ export default function PreviewModal({
     return (
       <div>
         <h2>{$t('Preview')}</h2>
-        <p>Select at least one clip to preview your video</p>
+        <p>{$t('Select at least one clip to preview your video')}</p>
       </div>
     );
   }
