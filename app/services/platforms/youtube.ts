@@ -406,8 +406,7 @@ export class YoutubeService
           streamType: 'rtmp_custom',
           server: 'rtmp://a.rtmp.youtube.com/live2',
         },
-        'horizontal',
-        // context,
+        context,
       );
 
       // console.log('creating vertical');
