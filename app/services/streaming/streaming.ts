@@ -1031,9 +1031,9 @@ export class StreamingService
               });
             } catch (e: unknown) {
               console.error(e);
+            } finally {
+              this.extraOutputs = [];
             }
-
-            this.extraOutputs = [];
           }
 
           if (signalInfo.signal === EOBSOutputSignal.Start) {
@@ -1158,6 +1158,7 @@ export class StreamingService
                 console.log('stopping stream for ', output.name);
                 output.stream?.stop();
               });
+              this.extraOutputs = [];
               signalChanged.unsubscribe();
             }
           },
@@ -1195,10 +1196,13 @@ export class StreamingService
         NodeObs.OBS_service_stopStreaming(true, 'horizontal');
         NodeObs.OBS_service_stopStreaming(true, 'vertical');
 
+        // TODO: these are probably too much but DO does it this way on
+        // several signal states, so we follow suit
         this.extraOutputs.forEach(output => {
           console.log('stopping stream for ', output.name);
           output.stream?.stop();
         });
+        this.extraOutputs = [];
       } else {
         NodeObs.OBS_service_stopStreaming(true);
       }
