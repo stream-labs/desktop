@@ -10,7 +10,7 @@ import { EAvailableFeatures } from 'services/incremental-rollout';
 
 export default function Highlighter(props: { params?: { view: string } }) {
   const { HighlighterService, IncrementalRolloutService } = Services;
-  const aiHighlighterEnabled = IncrementalRolloutService.views.featureIsEnabled(
+  const aiHighlighterFeatureEnabled = IncrementalRolloutService.views.featureIsEnabled(
     EAvailableFeatures.aiHighlighter,
   );
   const v = useVuex(() => ({
@@ -24,7 +24,11 @@ export default function Highlighter(props: { params?: { view: string } }) {
 
   let initialViewState: IViewState;
 
-  if (v.streamAmount > 0 && v.clipsAmount > 0 && aiHighlighterEnabled) {
+  if (props.params?.view) {
+    const view =
+      props.params?.view === 'settings' ? EHighlighterView.SETTINGS : EHighlighterView.STREAM;
+    initialViewState = { view };
+  } else if (v.streamAmount > 0 && v.clipsAmount > 0 && aiHighlighterFeatureEnabled) {
     initialViewState = { view: EHighlighterView.STREAM };
   } else if (v.clipsAmount > 0) {
     initialViewState = { view: EHighlighterView.CLIPS, id: undefined };
@@ -37,7 +41,7 @@ export default function Highlighter(props: { params?: { view: string } }) {
     async function shouldUpdate() {
       if (!HighlighterService.aiHighlighterUpdater) return false;
       const versionAvailable = await HighlighterService.aiHighlighterUpdater.isNewVersionAvailable();
-      return versionAvailable && aiHighlighterEnabled && v.useAiHighlighter;
+      return versionAvailable && aiHighlighterFeatureEnabled && v.useAiHighlighter;
     }
 
     shouldUpdate().then(shouldUpdate => {
@@ -58,7 +62,7 @@ export default function Highlighter(props: { params?: { view: string } }) {
     case EHighlighterView.STREAM:
       return (
         <>
-          {aiHighlighterEnabled && updaterModal}
+          {aiHighlighterFeatureEnabled && updaterModal}
           <StreamView
             emitSetView={data => {
               setViewFromEmit(data);
@@ -69,7 +73,7 @@ export default function Highlighter(props: { params?: { view: string } }) {
     case EHighlighterView.CLIPS:
       return (
         <>
-          {aiHighlighterEnabled && updaterModal}
+          {aiHighlighterFeatureEnabled && updaterModal}
           <ClipsView
             emitSetView={data => {
               setViewFromEmit(data);
@@ -86,7 +90,7 @@ export default function Highlighter(props: { params?: { view: string } }) {
     default:
       return (
         <>
-          {aiHighlighterEnabled && updaterModal}
+          {aiHighlighterFeatureEnabled && updaterModal}
           <SettingsView
             close={() => {
               HighlighterService.actions.dismissTutorial();

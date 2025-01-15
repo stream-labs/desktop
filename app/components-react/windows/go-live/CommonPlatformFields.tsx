@@ -58,7 +58,7 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
   }
 
   const view = Services.StreamingService.views;
-  const aiHighlighterEnabled = Services.IncrementalRolloutService.views.featureIsEnabled(
+  const aiHighlighterFeatureEnabled = Services.IncrementalRolloutService.views.featureIsEnabled(
     EAvailableFeatures.aiHighlighter,
   );
   const hasCustomCheckbox = p.layoutMode === 'multiplatformAdvanced';
@@ -141,9 +141,11 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
               />
             )}
 
-            {aiHighlighterEnabled && enabledPlatforms && !enabledPlatforms.includes('twitch') && (
-              <AiHighlighterToggle game={undefined} cardIsExpanded={false} />
-            )}
+            {aiHighlighterFeatureEnabled &&
+              enabledPlatforms &&
+              !enabledPlatforms.includes('twitch') && (
+                <AiHighlighterToggle game={undefined} cardIsExpanded={false} />
+              )}
           </div>
         )}
       </Animate>
