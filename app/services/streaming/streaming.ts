@@ -1024,16 +1024,12 @@ export class StreamingService
             NodeObs.OBS_service_stopStreaming(true, 'horizontal');
             NodeObs.OBS_service_stopStreaming(true, 'vertical');
 
-            try {
-              extraOutputs.forEach(output => {
-                console.log('destroying stream for ', output.name);
-                output.stream?.stop();
-              });
-            } catch (e: unknown) {
-              console.error(e);
-            } finally {
-              this.extraOutputs = [];
-            }
+            extraOutputs.forEach(output => {
+              console.log('destroying stream for ', output.name);
+              output.stream?.stop();
+            });
+
+            this.extraOutputs = [];
           }
 
           if (signalInfo.signal === EOBSOutputSignal.Start) {
@@ -1152,13 +1148,14 @@ export class StreamingService
               signalInfo.service === 'default' &&
               signalInfo.signal === EOBSOutputSignal.Deactivate
             ) {
-              NodeObs.OBS_service_stopStreaming(false, 'vertical');
-              console.log('stopping extra outputs');
+              // TODO: these are probably too much but DO does it this way on
+              // several signal states, so we follow suit
               this.extraOutputs.forEach(output => {
                 console.log('stopping stream for ', output.name);
                 output.stream?.stop();
               });
               this.extraOutputs = [];
+              NodeObs.OBS_service_stopStreaming(false, 'vertical');
               signalChanged.unsubscribe();
             }
           },
@@ -1195,14 +1192,6 @@ export class StreamingService
       if (this.views.isDualOutputMode) {
         NodeObs.OBS_service_stopStreaming(true, 'horizontal');
         NodeObs.OBS_service_stopStreaming(true, 'vertical');
-
-        // TODO: these are probably too much but DO does it this way on
-        // several signal states, so we follow suit
-        this.extraOutputs.forEach(output => {
-          console.log('stopping stream for ', output.name);
-          output.stream?.stop();
-        });
-        this.extraOutputs = [];
       } else {
         NodeObs.OBS_service_stopStreaming(true);
       }
