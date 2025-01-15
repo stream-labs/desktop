@@ -151,6 +151,12 @@ export default function ClipsView({
 
   const containerRef = useOptimizedHover();
 
+  function shareFeedback() {
+    remote.shell.openExternal(
+      'https://support.streamlabs.com/hc/en-us/requests/new?ticket_form_id=31967205905051',
+    );
+  }
+
   function getClipsView(
     streamId: string | undefined,
     sortedList: { id: string }[],
@@ -163,34 +169,43 @@ export default function ClipsView({
         onDrop={event => onDrop(event, streamId)}
       >
         <div className={styles.container}>
-          <header className={styles.header}>
-            <button
-              className={styles.backButton}
-              onClick={() =>
-                emitSetView(
-                  streamId
-                    ? { view: EHighlighterView.STREAM }
-                    : { view: EHighlighterView.SETTINGS },
-                )
-              }
-            >
-              <i className="icon-back" />
-            </button>
-            <h1
-              className={styles.title}
-              onClick={() =>
-                emitSetView(
-                  streamId
-                    ? { view: EHighlighterView.STREAM }
-                    : { view: EHighlighterView.SETTINGS },
-                )
-              }
-            >
-              {props.streamTitle ?? $t('All highlight clips')}
-            </h1>
-          </header>
+          <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
+            <header className={styles.header}>
+              <button
+                className={styles.backButton}
+                onClick={() =>
+                  emitSetView(
+                    streamId
+                      ? { view: EHighlighterView.STREAM }
+                      : { view: EHighlighterView.SETTINGS },
+                  )
+                }
+              >
+                <i className="icon-back" />
+              </button>
+              <h1
+                className={styles.title}
+                onClick={() =>
+                  emitSetView(
+                    streamId
+                      ? { view: EHighlighterView.STREAM }
+                      : { view: EHighlighterView.SETTINGS },
+                  )
+                }
+              >
+                {props.streamTitle ?? $t('All highlight clips')}
+              </h1>
+            </header>
+            <div style={{ padding: '20px' }}>
+              <Button
+                icon={<i className="icon-community" style={{ marginRight: 8 }} />}
+                onClick={shareFeedback}
+              >
+                Share Feedback
+              </Button>
+            </div>
+          </div>
           {sortedList.length === 0 ? (
-            /** Better empty state will come with ai PR */
             <div style={{ padding: '20px' }}>
               {$t('No clips found')}
               <br />
