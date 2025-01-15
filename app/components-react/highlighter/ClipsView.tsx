@@ -231,7 +231,6 @@ export default function ClipsView({
             </div>
           </div>
           {sortedList.length === 0 ? (
-            /** Better empty state will come with ai PR */
             <div style={{ padding: '20px' }}>
               {$t('No clips found')}
               <br />

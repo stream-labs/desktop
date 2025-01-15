@@ -279,5 +279,6 @@
   "Share stream link": "Share stream link",
   "Copy stream link": "Copy stream link",
   "Copy %{platform} link": "Copy %{platform} link",
-  "Copied to clipboard": "Copied to clipboard"
+  "Copied to clipboard": "Copied to clipboard",
+  "Twitch Followers": "Twitch Followers"
 }

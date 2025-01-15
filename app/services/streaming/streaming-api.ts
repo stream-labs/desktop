@@ -7,10 +7,10 @@ import { IStreamError } from './stream-error';
 import { ICustomStreamDestination } from '../settings/streaming';
 import { ITikTokStartStreamOptions } from '../platforms/tiktok';
 import { ITrovoStartStreamOptions } from '../platforms/trovo';
-import { IVideo } from 'obs-studio-node';
+import { IKickStartStreamOptions } from 'services/platforms/kick';
 import { ITwitterStartStreamOptions } from 'services/platforms/twitter';
 import { IInstagramStartStreamOptions } from 'services/platforms/instagram';
-import { IKickStartStreamOptions } from 'services/platforms/kick';
+import { IVideo } from 'obs-studio-node';
 import { TDisplayType } from 'services/settings-v2';
 
 export enum EStreamingState {
@@ -52,8 +52,8 @@ export interface IStreamInfo {
     youtube: TGoLiveChecklistItemState;
     facebook: TGoLiveChecklistItemState;
     tiktok: TGoLiveChecklistItemState;
-    kick: TGoLiveChecklistItemState;
     trovo: TGoLiveChecklistItemState;
+    kick: TGoLiveChecklistItemState;
     twitter: TGoLiveChecklistItemState;
     instagram: TGoLiveChecklistItemState;
     setupMultistream: TGoLiveChecklistItemState;
@@ -71,9 +71,9 @@ export interface IStreamSettings {
     facebook?: IPlatformFlags & IFacebookStartStreamOptions;
     tiktok?: IPlatformFlags & ITikTokStartStreamOptions;
     trovo?: IPlatformFlags & ITrovoStartStreamOptions;
+    kick?: IPlatformFlags & IKickStartStreamOptions;
     twitter?: IPlatformFlags & ITwitterStartStreamOptions;
     instagram?: IPlatformFlags & IInstagramStartStreamOptions;
-    kick?: IPlatformFlags & IKickStartStreamOptions;
   };
   customDestinations: ICustomStreamDestination[];
   advancedMode: boolean;

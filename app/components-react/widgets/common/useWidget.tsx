@@ -451,9 +451,7 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
   }
 
   private setStaticConfig(resp: unknown) {
-    this.state.mutate(state => {
-      state.staticConfig = resp;
-    });
+    this.state.setStaticConfig(resp);
   }
 }
 

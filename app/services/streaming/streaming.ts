@@ -139,8 +139,8 @@ export class StreamingService
         youtube: 'not-started',
         facebook: 'not-started',
         tiktok: 'not-started',
-        kick: 'not-started',
         trovo: 'not-started',
+        kick: 'not-started',
         twitter: 'not-started',
         instagram: 'not-started',
         setupMultistream: 'not-started',
@@ -640,10 +640,6 @@ export class StreamingService
 
     if (settings.platforms.instagram?.enabled) {
       this.usageStatisticsService.recordFeatureUsage('StreamToInstagram');
-    }
-
-    if (settings.platforms.kick?.enabled) {
-      this.usageStatisticsService.recordFeatureUsage('StreamToKick');
     }
   }
 
