@@ -64,6 +64,10 @@ class RecordingHistoryController {
     );
   }
 
+  get highlighterVersion() {
+    return this.HighlighterService.views.highlighterVersion;
+  }
+
   get uploadOptions() {
     const opts = [
       {
@@ -200,15 +204,23 @@ export default function RecordingHistoryPage() {
 export function RecordingHistory() {
   const controller = useController(RecordingHistoryCtx);
   const { formattedTimestamp, showFile, handleSelect, postError } = controller;
-  const aiHighlighterEnabled = Services.IncrementalRolloutService.views.featureIsEnabled(
+  const aiHighlighterFeatureEnabled = Services.IncrementalRolloutService.views.featureIsEnabled(
     EAvailableFeatures.aiHighlighter,
   );
-  const { uploadInfo, uploadOptions, recordings, hasSLID, aiDetectionInProgress } = useVuex(() => ({
+  const {
+    uploadInfo,
+    uploadOptions,
+    recordings,
+    hasSLID,
+    aiDetectionInProgress,
+    highlighterVersion,
+  } = useVuex(() => ({
     recordings: controller.recordings,
     aiDetectionInProgress: controller.aiDetectionInProgress,
     uploadOptions: controller.uploadOptions,
     uploadInfo: controller.uploadInfo,
     hasSLID: controller.hasSLID,
+    highlighterVersion: controller.highlighterVersion,
   }));
 
   useEffect(() => {
@@ -231,7 +243,10 @@ export function RecordingHistory() {
       <span className={styles.actionGroup}>
         {uploadOptions
           .map(option => {
-            if (option.value === 'highlighter' && !aiHighlighterEnabled) {
+            if (
+              option.value === 'highlighter' &&
+              (!aiHighlighterFeatureEnabled || highlighterVersion === '')
+            ) {
               return null;
             }
             return (
