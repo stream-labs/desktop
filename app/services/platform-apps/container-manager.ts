@@ -202,11 +202,7 @@ export class PlatformContainerManager {
       },
     };
 
-    // TODO: Not for production
-    if ([
-      'b472396e49', // Prod / Ava
-      '04f85c93be' // Cale Dev
-      ].includes(app.id)) {
+    if (app.highlyPrivileged) {
       opts.webPreferences.nodeIntegration = true;
       opts.webPreferences.contextIsolation = false;
     }

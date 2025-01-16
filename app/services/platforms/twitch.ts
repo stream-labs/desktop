@@ -66,6 +66,7 @@ interface ITwitchOAuthValidateResponse {
 interface ITwitchServiceState extends IPlatformState {
   hasUpdateTagsPermission: boolean;
   hasPollsPermission: boolean;
+  hasChatWritePermission: boolean;
   settings: ITwitchStartStreamOptions;
 }
 
@@ -86,6 +87,7 @@ export class TwitchService
     ...BasePlatformService.initialState,
     hasUpdateTagsPermission: false,
     hasPollsPermission: false,
+    hasChatWritePermission: false,
     settings: {
       title: '',
       game: '',
@@ -134,6 +136,8 @@ export class TwitchService
         this.validatePollsScope();
         // Check for updated tags scopes
         this.validateTagsScope();
+        // Check for chat write scope
+        this.validateChatWriteScope();
       }
     });
   }
@@ -145,6 +149,7 @@ export class TwitchService
       'channel_editor',
       'user:edit:broadcast',
       'channel:manage:broadcast',
+      'user:write:chat'
     ];
 
     const query =
@@ -466,6 +471,23 @@ export class TwitchService
     this.SET_HAS_POLLS_PERMISSION(hasPollsPermission);
   }
 
+  async validateChatWriteScope() {
+    const hasChatWritePermission = await this.hasScope('user:write:chat');
+    this.SET_HAS_CHAT_WRITE_PERMISSION(hasChatWritePermission);
+  }
+
+  async sendChatMessage(msg: string) {
+    this.requestTwitch({
+      url: `${this.apiBase}/helix/chat/messages`,
+      method: 'POST',
+      body: JSON.stringify({
+        broadcaster_id: this.twitchId,
+        sender_id: this.twitchId,
+        message: msg,
+      }),
+    });
+  }
+
   hasScope(scope: TTwitchOAuthScope): Promise<boolean> {
     // prettier-ignore
     return platformAuthorizedRequest('twitch', 'https://id.twitch.tv/oauth2/validate').then(
@@ -497,5 +519,10 @@ export class TwitchService
   @mutation()
   private SET_HAS_TAGS_PERMISSION(hasUpdateTagsPermission: boolean) {
     this.state.hasUpdateTagsPermission = hasUpdateTagsPermission;
+  }
+
+  @mutation()
+  private SET_HAS_CHAT_WRITE_PERMISSION(hasChatWritePermission: boolean) {
+    this.state.hasChatWritePermission = hasChatWritePermission;
   }
 }
