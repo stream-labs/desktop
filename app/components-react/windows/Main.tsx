@@ -337,7 +337,7 @@ function Main() {
   if (!uiReady) return <div className={cx(styles.main, theme)} />;
 
   const Component: React.FunctionComponent<{
-    className: string;
+    className?: string;
     params: any;
     onTotalWidth: (width: number) => void;
   }> = (appPages as Dictionary<React.FunctionComponent>)[page];
@@ -383,9 +383,11 @@ function Main() {
           ref={mainMiddleEl}
         >
           {!showLoadingSpinner && (
-            <div className={styles.mainPageContainer} style={{ gridRow: '1 / span 1' }}>
+            <div
+              className={styles.mainPageContainer}
+              style={{ gridRow: '1 / span 1', minWidth: 0 }}
+            >
               <Component
-                className={''}
                 params={ctrl.params}
                 onTotalWidth={(width: number) => ctrl.handleEditorWidth(width)}
               />
