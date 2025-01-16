@@ -167,6 +167,10 @@ class StreamSettingsModule {
 
   get platforms() {
     return this.streamingView.allPlatforms.filter(platform => {
+      if (platform === 'tiktok' && !this.streamingView.isPlatformLinked('tiktok')) {
+        return false;
+      }
+
       return true;
     });
   }
@@ -426,8 +430,15 @@ function Platform(p: { platform: TPlatform }) {
   const platformName = useMemo(() => getPlatformService(platform).displayName, []);
   const isPrimary = StreamingService.views.isPrimaryPlatform(platform);
   const shouldShowPrimaryBtn = isPrimary;
-  const shouldShowConnectBtn = !isMerged && canEditSettings;
+  const shouldShowConnectBtn = !isMerged && canEditSettings && platform !== 'tiktok';
   const shouldShowUnlinkBtn = !isPrimary && isMerged && canEditSettings;
+
+  const primaryBtnTooltip =
+    isPrimary && platform === 'tiktok'
+      ? $t('To unlink TikTok, please sign in with a different platform and try again.')
+      : $t(
+          'You cannot unlink the platform you used to sign in to Streamlabs Desktop. If you want to unlink this platform, please sign in with a different platform.',
+        );
 
   /*
    * TODO: don't really see much value in having Instagram text boxes here, since
@@ -531,11 +542,7 @@ function Platform(p: { platform: TPlatform }) {
             </Button>
           )}
           {shouldShowPrimaryBtn && (
-            <Tooltip
-              title={$t(
-                'You cannot unlink the platform you used to sign in to Streamlabs Desktop. If you want to unlink this platform, please sign in with a different platform.',
-              )}
-            >
+            <Tooltip title={primaryBtnTooltip}>
               <Button disabled={true} type="primary">
                 {$t('Logged in')}
               </Button>

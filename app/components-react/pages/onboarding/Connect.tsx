@@ -63,7 +63,7 @@ export function Connect() {
   // streamlabs and trovo are added separarely on markup below
   const platforms = RecordingModeService.views.isRecordingModeEnabled
     ? ['youtube']
-    : ['twitch', 'youtube', 'tiktok', 'kick', 'facebook', 'twitter'];
+    : ['twitch', 'youtube', 'kick', 'facebook', 'twitter'];
 
   const shouldAddTrovo = !RecordingModeService.views.isRecordingModeEnabled;
 
@@ -132,9 +132,7 @@ export function Connect() {
                     loading={loading}
                     onClick={() => authPlatform(platform, afterLogin)}
                     key={platform}
-                    logoSize={
-                      ['twitter', 'tiktok', 'youtube', 'kick'].includes(platform) ? 15 : undefined
-                    }
+                    logoSize={['twitter', 'youtube', 'kick'].includes(platform) ? 15 : undefined}
                   >
                     <Translate
                       message={$t('Log in with <span>%{platform}</span>', {
@@ -265,9 +263,7 @@ export class LoginModule {
 
     const result = await this.UserService.startAuth(
       platform,
-      ['youtube', 'twitch', 'twitter', 'tiktok', 'kick'].includes(platform)
-        ? 'external'
-        : 'internal',
+      ['youtube', 'twitch', 'twitter', 'kick'].includes(platform) ? 'external' : 'internal',
       merge,
     );
 

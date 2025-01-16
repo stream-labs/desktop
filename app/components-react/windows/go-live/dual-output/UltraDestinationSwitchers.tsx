@@ -37,21 +37,13 @@ export function UltraDestinationSwitchers(p: IUltraDestinationSwitchers) {
   } = useGoLiveSettings();
   const enabledPlatformsRef = useRef(enabledPlatforms);
   enabledPlatformsRef.current = enabledPlatforms;
-  const promptConnectTikTok = !isPlatformLinked('tiktok');
 
-  const platforms = useMemo(
-    () => (promptConnectTikTok ? linkedPlatforms.concat('tiktok') : linkedPlatforms),
-    [linkedPlatforms, promptConnectTikTok],
-  );
+  const platforms = linkedPlatforms.filter((platform: TPlatform) => platform !== 'tiktok');
 
   const emitSwitch = useDebounce(500, () => {
     switchPlatforms(enabledPlatformsRef.current);
   });
   const isEnabled = useCallback((target: TPlatform) => {
-    if (target === 'tiktok' && promptConnectTikTok) {
-      return false;
-    }
-
     return enabledPlatformsRef.current.includes(target);
   }, []);
 
@@ -83,6 +75,7 @@ export function UltraDestinationSwitchers(p: IUltraDestinationSwitchers) {
           style={{ marginBottom: '15px' }}
         />
       )}
+
       {platforms.map((platform: TPlatform, index: number) => (
         <DestinationSwitcher
           key={platform}
@@ -90,11 +83,25 @@ export function UltraDestinationSwitchers(p: IUltraDestinationSwitchers) {
           enabled={isEnabled(platform)}
           onChange={enabled => togglePlatform(platform, enabled)}
           isPrimary={isPrimaryPlatform(platform)}
-          promptConnectTikTok={platform === 'tiktok' && promptConnectTikTok}
+          promptConnectTikTok={false}
           canDisablePrimary={isRestreamEnabled}
           index={index}
         />
       ))}
+
+      {isPlatformLinked('tiktok') && (
+        <DestinationSwitcher
+          key={'tiktok'}
+          destination={'tiktok'}
+          enabled={false}
+          onChange={() => {}}
+          isPrimary={isPrimaryPlatform('tiktok')}
+          promptConnectTikTok={true}
+          canDisablePrimary={isRestreamEnabled}
+          index={platforms.length}
+        />
+      )}
+
       {customDestinations?.map((destination: ICustomStreamDestination, index: number) => (
         <DestinationSwitcher
           key={index}
@@ -125,13 +132,16 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
   const switchInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const platform = typeof p.destination === 'string' ? (p.destination as TPlatform) : null;
-  const enable = !p.enabled ?? (p.promptConnectTikTok && p.promptConnectTikTok === true);
+  const enable = !p.enabled;
   const { RestreamService, MagicLinkService, TikTokService } = Services;
   const canDisablePrimary = p.canDisablePrimary;
-  const showTikTokModal =
-    p.promptConnectTikTok || (platform === 'tiktok' && TikTokService.missingLiveAccess);
 
   function onClickHandler(ev: MouseEvent) {
+    if (p.promptConnectTikTok) {
+      renderTikTokModal(p.isPrimary);
+      return;
+    }
+
     // TODO: do we need this check if we're on an Ultra DestinationSwitcher
     if (p.isPrimary && p.canDisablePrimary !== true) {
       alertAsync(
@@ -181,11 +191,7 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
             inputRef={switchInputRef}
             value={p.enabled}
             name={platform}
-            disabled={
-              canDisablePrimary
-                ? false
-                : p?.isPrimary || (p.promptConnectTikTok && platform === 'tiktok')
-            }
+            disabled={p.promptConnectTikTok ?? (canDisablePrimary ? false : p?.isPrimary)}
             uncontrolled
             className={styles.platformSwitch}
             checkedChildren={<i className="icon-check-mark" />}
@@ -220,9 +226,10 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
       className={cx(styles.platformSwitcher, {
         [styles.platformDisabled]: !p.enabled || p.promptConnectTikTok,
       })}
-      onClick={() => {
-        if (showTikTokModal) {
-          renderTikTokModal(p.promptConnectTikTok);
+      onClick={e => {
+        if (p.promptConnectTikTok) {
+          renderTikTokModal(p.isPrimary);
+          e.stopPropagation();
         }
       }}
     >
@@ -239,8 +246,8 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
         {/* SWITCH */}
         <div
           onClick={e => {
-            if (showTikTokModal) {
-              renderTikTokModal(p.promptConnectTikTok);
+            if (p.promptConnectTikTok) {
+              renderTikTokModal(p.isPrimary);
               e.stopPropagation();
               return;
             } else {

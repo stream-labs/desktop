@@ -138,7 +138,6 @@ export class StreamingService
         twitch: 'not-started',
         youtube: 'not-started',
         facebook: 'not-started',
-        tiktok: 'not-started',
         trovo: 'not-started',
         kick: 'not-started',
         twitter: 'not-started',
@@ -269,6 +268,8 @@ export class StreamingService
     unattendedMode: boolean,
     assignContext: boolean = false,
   ) {
+    if (platform === 'tiktok') return;
+
     const service = getPlatformService(platform);
     try {
       // don't update settings for twitch in unattendedMode
@@ -552,6 +553,8 @@ export class StreamingService
     settings: IGoLiveSettings,
     unattendedMode: boolean,
   ) {
+    if (platform === 'tiktok') return;
+
     const service = getPlatformService(platform);
 
     // in dual output mode, assign context by settings
@@ -665,6 +668,8 @@ export class StreamingService
     });
 
     for (const platform of platforms) {
+      if (platform === 'tiktok') return;
+
       const service = getPlatformService(platform);
       const newSettings = getDefined(settings.platforms[platform]);
       try {

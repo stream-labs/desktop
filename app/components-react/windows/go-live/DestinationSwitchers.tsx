@@ -37,9 +37,7 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
   const enabledDestRef = useRef(enabledDestinations);
   enabledDestRef.current = enabledDestinations;
 
-  // special handling for TikTok for non-ultra users
-  // to disable/enable platforms and open ultra link
-  const promptConnectTikTok = !isPlatformLinked('tiktok');
+  const platforms = linkedPlatforms.filter((platform: TPlatform) => platform !== 'tiktok');
 
   const shouldDisableCustomDestinationSwitchers = () => {
     // Multistream users can always add destinations
@@ -66,7 +64,7 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
     if (typeof target === 'number') {
       return enabledDestRef.current.includes(target);
     } else {
-      if (target === 'tiktok' && promptConnectTikTok) {
+      if (target === 'tiktok') {
         return false;
       }
 
@@ -132,30 +130,26 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
     emitSwitch(ind, enabled);
   }
 
-  // TODO: find a cleaner way to do this
-  const isPrimary = (platform: TPlatform) =>
-    isPrimaryPlatform(platform) || linkedPlatforms.length === 1;
-
   return (
     <div className={cx(styles.switchWrapper, styles.columnPadding)}>
-      {linkedPlatforms.map(platform => (
+      {platforms.map(platform => (
         <DestinationSwitcher
           key={platform}
           destination={platform}
           enabled={isEnabled(platform)}
           onChange={enabled => togglePlatform(platform, enabled)}
-          promptConnectTikTok={platform === 'tiktok' && promptConnectTikTok}
+          promptConnectTikTok={false}
           isPrimary={isPrimaryPlatform(platform)}
         />
       ))}
 
-      {!linkedPlatforms.includes('tiktok') && (
+      {isPlatformLinked('tiktok') && (
         <DestinationSwitcher
           destination={'tiktok'}
-          enabled={isEnabled('tiktok')}
-          onChange={enabled => togglePlatform('tiktok', enabled)}
+          enabled={false}
+          onChange={() => {}}
           isPrimary={isPrimaryPlatform('tiktok')}
-          promptConnectTikTok={promptConnectTikTok}
+          promptConnectTikTok={true}
         />
       )}
 
@@ -194,18 +188,11 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
   const { RestreamService, TikTokService, StreamingService } = Services;
   const canEnableRestream = RestreamService.views.canEnableRestream;
   const cannotDisableDestination = p.isPrimary && !canEnableRestream;
-  const showTikTokModal =
-    p.promptConnectTikTok || (platform === 'tiktok' && TikTokService.missingLiveAccess);
-
-  // Preserving old TikTok functionality, so they can't enable the toggle if TikTok is not
-  // connected.
-  // TODO: this kind of logic should belong on caller, but ideally we would refactor all this
-  const tiktokDisabled =
-    platform === 'tiktok' && !StreamingService.views.isPlatformLinked('tiktok');
 
   function onClickHandler(ev: MouseEvent) {
-    if (showTikTokModal) {
-      renderTikTokModal(p.promptConnectTikTok);
+    if (p.promptConnectTikTok) {
+      renderTikTokModal(p.isPrimary);
+      return;
     }
 
     // If we're disabling the switch we shouldn't be emitting anything past below
@@ -270,7 +257,7 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
             inputRef={switchInputRef}
             value={p.enabled}
             name={platform}
-            disabled={tiktokDisabled}
+            disabled={platform === 'tiktok'}
             uncontrolled
           />
         ),
@@ -321,28 +308,29 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
   );
 });
 
-export function renderTikTokModal(promptConnectTikTok?: boolean) {
+export function renderTikTokModal(isPrimary?: boolean) {
   const { TikTokService } = Services;
 
-  const message = promptConnectTikTok
-    ? $t('Connect your TikTok account to stream to TikTok and one additional platform for free.')
+  const message = isPrimary
+    ? $t(
+        'As of January 19, 2025, streaming to TikTok is no longer supported. Please link another platform to start streaming.',
+      )
     : $t(
-        "Connect your TikTok account to stream to TikTok and one other platform for free. Haven't applied to stream on TikTok Live yet? <link>Start the process here</link>.",
-        { link: <a href={TikTokService.applicationUrl} /> },
+        'As of January 19, 2025, streaming to TikTok is no longer supported. <link>Click here</link> to explore other streaming options.',
       );
 
-  function openApplicationInfoPage() {
-    remote.shell.openExternal(Services.TikTokService.applicationUrl);
+  function openInfoPage() {
+    remote.shell.openExternal('http://streamlabs.com');
   }
 
   alertAsync({
     bodyStyle: { padding: '24px' },
     className: styles.tiktokModal,
     type: 'confirm',
-    title: $t('Connect your TikTok Account'),
+    title: $t('TikTok No Longer Supported'),
     content: (
       <Translate message={message}>
-        <a slot="link" onClick={openApplicationInfoPage} style={{ textDecoration: 'underline' }} />
+        <a slot="link" onClick={openInfoPage} style={{ textDecoration: 'underline' }} />
       </Translate>
     ),
     icon: <PlatformLogo platform="tiktok" className={styles.tiktokModalLogo} />,
@@ -353,20 +341,48 @@ export function renderTikTokModal(promptConnectTikTok?: boolean) {
     modalRender: node => <ModalLayout footer={<TikTokModalFooter />}>{node}</ModalLayout>,
     width: 600,
   });
+
+  // const message = promptConnectTikTok
+  //   ? $t('Connect your TikTok account to stream to TikTok and one additional platform for free.')
+  //   : $t(
+  //       "Connect your TikTok account to stream to TikTok and one other platform for free. Haven't applied to stream on TikTok Live yet? <link>Start the process here</link>.",
+  //       { link: <a href={TikTokService.applicationUrl} /> },
+  //     );
+
+  // function openApplicationInfoPage() {
+  //   remote.shell.openExternal(Services.TikTokService.applicationUrl);
+  // }
+
+  // alertAsync({
+  //   bodyStyle: { padding: '24px' },
+  //   className: styles.tiktokModal,
+  //   type: 'confirm',
+  //   title: $t('Connect your TikTok Account'),
+  //   content: (
+  //     <Translate message={message}>
+  //       <a slot="link" onClick={openApplicationInfoPage} style={{ textDecoration: 'underline' }} />
+  //     </Translate>
+  //   ),
+  //   icon: <PlatformLogo platform="tiktok" className={styles.tiktokModalLogo} />,
+  //   closable: true,
+  //   maskClosable: true,
+  //   cancelButtonProps: { style: { display: 'none' } },
+  //   okButtonProps: { style: { display: 'none' } },
+  //   modalRender: node => <ModalLayout footer={<TikTokModalFooter />}>{node}</ModalLayout>,
+  //   width: 600,
+  // });
 }
 
 function TikTokModalFooter() {
-  function connect() {
-    Modal.destroyAll();
-    Services.NavigationService.actions.navigate('PlatformMerge', { platform: 'tiktok' });
-    Services.WindowsService.actions.closeChildWindow();
+  function openInfoPage() {
+    remote.shell.openExternal('http://streamlabs.com');
   }
 
   return (
     <Form layout={'inline'} className={styles.tiktokModalFooter}>
-      <Button onClick={Modal.destroyAll}>{$t('Skip')}</Button>
-      <Button type="primary" onClick={connect}>
-        {$t('Connect TikTok Account')}
+      <Button onClick={Modal.destroyAll}>{$t('Close')}</Button>
+      <Button type="primary" onClick={openInfoPage}>
+        {$t('Explore')}
       </Button>
     </Form>
   );

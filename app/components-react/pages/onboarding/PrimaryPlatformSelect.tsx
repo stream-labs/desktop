@@ -12,7 +12,7 @@ import Form from 'components-react/shared/inputs/Form';
 import { ListInput } from 'components-react/shared/inputs';
 import { Button } from 'antd';
 import { Services } from 'components-react/service-provider';
-import { useVuex, useWatchVuex } from 'components-react/hooks';
+import { useVuex } from 'components-react/hooks';
 
 export function PrimaryPlatformSelect() {
   const { UserService, OnboardingService } = Services;
@@ -48,11 +48,6 @@ export function PrimaryPlatformSelect() {
       value: 'twitter',
       label: 'X (Twitter)',
       image: <PlatformLogo platform="twitter" size={14} />,
-    },
-    {
-      value: 'tiktok',
-      label: 'TikTok',
-      image: <PlatformLogo platform="tiktok" size={14} />,
     },
     {
       value: 'kick',

@@ -196,68 +196,71 @@ export class TikTokService
   }
 
   async beforeGoLive(goLiveSettings: IGoLiveSettings, display?: TDisplayType) {
+    return;
     // return an approved dummy account when testing
-    if (Utils.isTestMode() && this.getHasScope('approved')) {
-      await this.testBeforeGoLive(goLiveSettings);
-      return;
-    }
+    // if (Utils.isTestMode() && this.getHasScope('approved')) {
+    //   await this.testBeforeGoLive(goLiveSettings);
+    //   return;
+    // }
 
-    const ttSettings = getDefined(goLiveSettings.platforms.tiktok);
-    const context = display ?? ttSettings?.display;
+    // const ttSettings = getDefined(goLiveSettings.platforms.tiktok);
+    // const context = display ?? ttSettings?.display;
 
-    if (this.getHasScope('approved')) {
-      // update server url and stream key if handling streaming via API
-      // streaming with server url and stream key is default
-      const streamInfo = await this.startStream(ttSettings);
+    // if (this.getHasScope('approved')) {
+    //   // update server url and stream key if handling streaming via API
+    //   // streaming with server url and stream key is default
+    //   const streamInfo = await this.startStream(ttSettings);
 
-      // if the stream did not start successfully, prevent going live
-      if (!streamInfo?.id) {
-        await this.handleOpenLiveManager();
-        throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED');
-      }
+    //   // if the stream did not start successfully, prevent going live
+    //   if (!streamInfo?.id) {
+    //     await this.handleOpenLiveManager();
+    //     throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED');
+    //   }
 
-      ttSettings.serverUrl = streamInfo.rtmp;
-      ttSettings.streamKey = streamInfo.key;
+    //   ttSettings.serverUrl = streamInfo.rtmp;
+    //   ttSettings.streamKey = streamInfo.key;
 
-      this.SET_BROADCAST_ID(streamInfo.id);
-    }
+    //   this.SET_BROADCAST_ID(streamInfo.id);
+    // }
 
-    if (!this.streamingService.views.isMultiplatformMode) {
-      this.streamSettingsService.setSettings(
-        {
-          streamType: 'rtmp_custom',
-          key: ttSettings.streamKey,
-          server: ttSettings.serverUrl,
-        },
-        context,
-      );
-    }
+    // if (!this.streamingService.views.isMultiplatformMode) {
+    //   this.streamSettingsService.setSettings(
+    //     {
+    //       streamType: 'rtmp_custom',
+    //       key: ttSettings.streamKey,
+    //       server: ttSettings.serverUrl,
+    //     },
+    //     context,
+    //   );
+    // }
 
-    await this.putChannelInfo(ttSettings);
-    this.setPlatformContext('tiktok');
+    // await this.putChannelInfo(ttSettings);
+    // this.setPlatformContext('tiktok');
   }
 
   async afterGoLive(): Promise<void> {
-    super.afterGoLive();
+    return;
+    // super.afterGoLive();
 
-    // open url if stream successfully started
-    if (this.scope === 'approved') {
-      await this.handleOpenLiveManager();
-    }
+    // // open url if stream successfully started
+    // if (this.scope === 'approved') {
+    //   await this.handleOpenLiveManager();
+    // }
   }
 
   async afterStopStream(): Promise<void> {
-    if (this.state.broadcastId) {
-      await this.endStream(this.state.broadcastId);
-      this.showReplaysNotification();
-    }
+    return;
+    // if (this.state.broadcastId) {
+    //   await this.endStream(this.state.broadcastId);
+    //   this.showReplaysNotification();
+    // }
 
-    // clear server url and stream key
-    await this.putChannelInfo({
-      ...this.state.settings,
-      serverUrl: '',
-      streamKey: '',
-    });
+    // // clear server url and stream key
+    // await this.putChannelInfo({
+    //   ...this.state.settings,
+    //   serverUrl: '',
+    //   streamKey: '',
+    // });
   }
 
   // Note, this needs to be here but should never be called, because we
@@ -272,7 +275,7 @@ export class TikTokService
       .then(response => {
         return this.userService.updatePlatformToken('tiktok', response.access_token);
       })
-      .catch(e => {
+      .catch((e: unknown) => {
         console.error('Error fetching new token.');
         return Promise.reject(e);
       });
@@ -408,83 +411,85 @@ export class TikTokService
    * @returns fulfilled promise with platform call result
    */
   async validatePlatform(): Promise<EPlatformCallResult> {
-    if (!this.userService.views.auth?.platforms['tiktok']) {
-      return EPlatformCallResult.TikTokStreamScopeMissing;
-    }
+    return EPlatformCallResult.TikTokStreamScopeMissing;
 
-    // for test to show correct components for each scope
-    if (Utils.isTestMode()) {
-      switch (this.state.settings.liveScope) {
-        case 'approved':
-          return EPlatformCallResult.Success;
-        case 'legacy':
-          return EPlatformCallResult.Success;
-        case 'relog':
-          return EPlatformCallResult.TikTokScopeOutdated;
-        case 'denied':
-          return EPlatformCallResult.TikTokStreamScopeMissing;
-        default:
-          return EPlatformCallResult.TikTokStreamScopeMissing;
-      }
-    }
+    // if (!this.userService.views.auth?.platforms['tiktok']) {
+    //   return EPlatformCallResult.TikTokStreamScopeMissing;
+    // }
 
-    try {
-      const response = await this.fetchLiveAccessStatus();
+    // // for test to show correct components for each scope
+    // if (Utils.isTestMode()) {
+    //   switch (this.state.settings.liveScope) {
+    //     case 'approved':
+    //       return EPlatformCallResult.Success;
+    //     case 'legacy':
+    //       return EPlatformCallResult.Success;
+    //     case 'relog':
+    //       return EPlatformCallResult.TikTokScopeOutdated;
+    //     case 'denied':
+    //       return EPlatformCallResult.TikTokStreamScopeMissing;
+    //     default:
+    //       return EPlatformCallResult.TikTokStreamScopeMissing;
+    //   }
+    // }
 
-      const status = response as ITikTokLiveScopeResponse;
-      const scope = this.convertScope(status.reason, status.application_status?.status);
-      this.SET_LIVE_SCOPE(scope);
+    // try {
+    //   const response = await this.fetchLiveAccessStatus();
 
-      if (status?.audience_controls_info) {
-        this.setAudienceControls(status.audience_controls_info);
-      }
+    //   const status = response as ITikTokLiveScopeResponse;
+    //   const scope = this.convertScope(status.reason, status.application_status?.status);
+    //   this.SET_LIVE_SCOPE(scope);
 
-      if (status?.application_status) {
-        const applicationStatus = status.application_status?.status;
-        const timestamp = status.application_status?.timestamp;
+    //   if (status?.audience_controls_info) {
+    //     this.setAudienceControls(status.audience_controls_info);
+    //   }
 
-        // show prompt to apply if user has never applied or was rejected 30+ days ago
-        if (applicationStatus === 'rejected' && timestamp) {
-          this.SET_DENIED_DATE(timestamp);
-          return EPlatformCallResult.TikTokStreamScopeMissing;
-        }
-      }
+    //   if (status?.application_status) {
+    //     const applicationStatus = status.application_status?.status;
+    //     const timestamp = status.application_status?.timestamp;
 
-      if (status?.user) {
-        this.SET_USERNAME(status.user.username);
+    //     // show prompt to apply if user has never applied or was rejected 30+ days ago
+    //     if (applicationStatus === 'rejected' && timestamp) {
+    //       this.SET_DENIED_DATE(timestamp);
+    //       return EPlatformCallResult.TikTokStreamScopeMissing;
+    //     }
+    //   }
 
-        // Note on the 'relog' response: A user who needs to reauthenticate with TikTok
-        // due a change in the scope for our api, needs to be told to unlink and remerge their account.
-        if (scope === 'relog') {
-          return EPlatformCallResult.TikTokScopeOutdated;
-        }
-      } else if (
-        status?.info &&
-        (!status?.reason || status?.reason === ETikTokLiveScopeReason.RELOG)
-      ) {
-        this.SET_LIVE_SCOPE('relog');
-        return EPlatformCallResult.TikTokScopeOutdated;
-      } else {
-        return EPlatformCallResult.TikTokStreamScopeMissing;
-      }
+    //   if (status?.user) {
+    //     this.SET_USERNAME(status.user.username);
 
-      // clear any leftover server url or stream key
-      if (this.state.settings?.serverUrl || this.state.settings?.streamKey) {
-        await this.putChannelInfo({
-          ...this.state.settings,
-          serverUrl: '',
-          streamKey: '',
-        });
-      }
+    //     // Note on the 'relog' response: A user who needs to reauthenticate with TikTok
+    //     // due a change in the scope for our api, needs to be told to unlink and remerge their account.
+    //     if (scope === 'relog') {
+    //       return EPlatformCallResult.TikTokScopeOutdated;
+    //     }
+    //   } else if (
+    //     status?.info &&
+    //     (!status?.reason || status?.reason === ETikTokLiveScopeReason.RELOG)
+    //   ) {
+    //     this.SET_LIVE_SCOPE('relog');
+    //     return EPlatformCallResult.TikTokScopeOutdated;
+    //   } else {
+    //     return EPlatformCallResult.TikTokStreamScopeMissing;
+    //   }
 
-      return this.liveStreamingEnabled
-        ? EPlatformCallResult.Success
-        : EPlatformCallResult.TikTokStreamScopeMissing;
-    } catch (e: unknown) {
-      console.warn(this.getErrorMessage(e));
-      this.SET_LIVE_SCOPE('relog');
-      return EPlatformCallResult.TikTokScopeOutdated;
-    }
+    //   // clear any leftover server url or stream key
+    //   if (this.state.settings?.serverUrl || this.state.settings?.streamKey) {
+    //     await this.putChannelInfo({
+    //       ...this.state.settings,
+    //       serverUrl: '',
+    //       streamKey: '',
+    //     });
+    //   }
+
+    //   return this.liveStreamingEnabled
+    //     ? EPlatformCallResult.Success
+    //     : EPlatformCallResult.TikTokStreamScopeMissing;
+    // } catch (e: unknown) {
+    //   console.warn(this.getErrorMessage(e));
+    //   this.SET_LIVE_SCOPE('relog');
+    //   return EPlatformCallResult.TikTokScopeOutdated;
+    // }
   }
 
   /**
@@ -537,9 +542,9 @@ export class TikTokService
         games.push(this.defaultGame);
         return games;
       })
-      .catch(e => {
+      .catch((e: unknown) => {
         console.error('Error fetching TikTok categories: ', e);
-        return [];
+        return [] as IGame[];
       });
   }
 
@@ -792,11 +797,12 @@ export class TikTokService
    * @returns - Promise<void>
    */
   async testBeforeGoLive(goLiveSettings: IGoLiveSettings) {
-    const ttSettings = getDefined(goLiveSettings.platforms.tiktok);
+    return;
+    // const ttSettings = getDefined(goLiveSettings.platforms.tiktok);
 
-    // skip generate stream keys for tests
-    await this.putChannelInfo(ttSettings);
-    this.setPlatformContext('tiktok');
+    // // skip generate stream keys for tests
+    // await this.putChannelInfo(ttSettings);
+    // this.setPlatformContext('tiktok');
   }
 
   setLiveScope(scope: TTikTokLiveScopeTypes) {
