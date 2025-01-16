@@ -51,6 +51,7 @@ export interface IStreamInfo {
     twitch: TGoLiveChecklistItemState;
     youtube: TGoLiveChecklistItemState;
     facebook: TGoLiveChecklistItemState;
+    tiktok: TGoLiveChecklistItemState;
     trovo: TGoLiveChecklistItemState;
     kick: TGoLiveChecklistItemState;
     twitter: TGoLiveChecklistItemState;

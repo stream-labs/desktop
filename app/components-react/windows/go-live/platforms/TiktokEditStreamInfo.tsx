@@ -12,7 +12,6 @@ import { RadioInput, TextInput, createBinding } from 'components-react/shared/in
 import InfoBanner from 'components-react/shared/InfoBanner';
 import GameSelector from '../GameSelector';
 import { EDismissable } from 'services/dismissables';
-import MessageLayout from '../MessageLayout';
 
 /**
  * @remark The filename for this component is intentionally not consistent with capitalization to preserve the commit history
@@ -31,42 +30,36 @@ export function TikTokEditStreamInfo(p: IPlatformComponentParams<'tiktok'>) {
   const bind = createBinding(ttSettings, updatedSettings => updateSettings(updatedSettings));
 
   return (
-    <MessageLayout message={$t('Unable to load settings')}>
-      {$t('Please enable a platform to start streaming.')}
-    </MessageLayout>
+    <Form name="tiktok-settings">
+      <PlatformSettingsLayout
+        layoutMode={p.layoutMode}
+        commonFields={
+          <CommonPlatformFields
+            key="common"
+            platform="tiktok"
+            layoutMode={p.layoutMode}
+            value={ttSettings}
+            onChange={updateSettings}
+          />
+        }
+        requiredFields={<div key="empty-tiktok" />}
+      />
+      {approved && <GameSelector key="optional" platform={'tiktok'} {...bind.game} />}
+      {approved && !controls.disable && (
+        <RadioInput
+          key="audience-ctrl"
+          options={controls.types}
+          defaultValue={controls.audienceType}
+          value={controls.audienceType}
+          label={$t('TikTok Audience')}
+          direction="horizontal"
+          colon
+          {...bind.audienceType}
+        />
+      )}
+      {!approved && <TikTokEnterCredentialsFormInfo {...p} denied={denied} />}
+    </Form>
   );
-
-  // return (
-  //   <Form name="tiktok-settings">
-  //     <PlatformSettingsLayout
-  //       layoutMode={p.layoutMode}
-  //       commonFields={
-  //         <CommonPlatformFields
-  //           key="common"
-  //           platform="tiktok"
-  //           layoutMode={p.layoutMode}
-  //           value={ttSettings}
-  //           onChange={updateSettings}
-  //         />
-  //       }
-  //       requiredFields={<div key="empty-tiktok" />}
-  //     />
-  //     {approved && <GameSelector key="optional" platform={'tiktok'} {...bind.game} />}
-  //     {approved && !controls.disable && (
-  //       <RadioInput
-  //         key="audience-ctrl"
-  //         options={controls.types}
-  //         defaultValue={controls.audienceType}
-  //         value={controls.audienceType}
-  //         label={$t('TikTok Audience')}
-  //         direction="horizontal"
-  //         colon
-  //         {...bind.audienceType}
-  //       />
-  //     )}
-  //     {!approved && <TikTokEnterCredentialsFormInfo {...p} denied={denied} />}
-  //   </Form>
-  // );
 }
 
 export function TikTokEnterCredentialsFormInfo(

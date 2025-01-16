@@ -34,8 +34,12 @@ export function NonUltraDestinationSwitchers(p: INonUltraDestinationSwitchers) {
   const enabledPlatformsRef = useRef(enabledPlatforms);
   enabledPlatformsRef.current = enabledPlatforms;
   const destinationSwitcherRef = useRef({ addClass: () => undefined });
+  const promptConnectTikTok = !isPlatformLinked('tiktok');
 
-  const platforms = enabledPlatforms.filter((platform: TPlatform) => platform !== 'tiktok');
+  const platforms = useMemo(
+    () => (promptConnectTikTok ? enabledPlatforms.concat('tiktok') : enabledPlatforms),
+    [enabledPlatforms, promptConnectTikTok],
+  );
 
   const emitSwitch = useDebounce(500, () => {
     switchPlatforms(enabledPlatformsRef.current);
@@ -49,6 +53,10 @@ export function NonUltraDestinationSwitchers(p: INonUltraDestinationSwitchers) {
   }, []);
 
   function isEnabled(target: TPlatform) {
+    if (target === 'tiktok' && promptConnectTikTok) {
+      return false;
+    }
+
     return enabledPlatforms.includes(target);
   }
 
@@ -67,7 +75,6 @@ export function NonUltraDestinationSwitchers(p: INonUltraDestinationSwitchers) {
           style={{ marginBottom: '15px' }}
         />
       )}
-
       {platforms.map((platform: TPlatform, index: number) => (
         <DestinationSwitcher
           key={platform}
@@ -75,25 +82,11 @@ export function NonUltraDestinationSwitchers(p: INonUltraDestinationSwitchers) {
           enabled={isEnabled(platform)}
           onChange={enabled => togglePlatform(platform, enabled)}
           isPrimary={isPrimaryPlatform(platform)}
-          promptConnectTikTok={false}
+          promptConnectTikTok={platform === 'tiktok' && promptConnectTikTok}
           canDisablePrimary={isRestreamEnabled}
           index={index}
         />
       ))}
-
-      {isPlatformLinked('tiktok') && (
-        <DestinationSwitcher
-          key={'tiktok'}
-          destination={'tiktok'}
-          enabled={false}
-          onChange={() => {}}
-          isPrimary={isPrimaryPlatform('tiktok')}
-          promptConnectTikTok={true}
-          canDisablePrimary={isRestreamEnabled}
-          index={platforms.length}
-        />
-      )}
-
       {customDestinations
         .map((destination: ICustomStreamDestination, index: number) => ({ ...destination, index }))
         .filter(destination => destination.enabled)
@@ -151,7 +144,10 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
       };
     });
     const containerRef = useRef<HTMLDivElement>(null);
+    const { TikTokService } = Services;
     const platform = typeof p.destination === 'string' ? (p.destination as TPlatform) : null;
+    const showTikTokModal =
+      p.promptConnectTikTok || (platform === 'tiktok' && TikTokService.missingLiveAccess);
 
     function addClass() {
       containerRef.current?.classList.remove(styles.platformDisabled);
@@ -223,12 +219,11 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
           ref={containerRef}
           className={styles.switcherHeader}
           onClick={() => {
-            if (p.promptConnectTikTok) {
-              renderTikTokModal(p.isPrimary);
+            if (showTikTokModal) {
+              renderTikTokModal(p.promptConnectTikTok);
             }
           }}
         >
-          {' '}
           <div className={styles.platformInfoWrapper}>
             {/* LOGO */}
             <Logo />
