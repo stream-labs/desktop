@@ -9,6 +9,9 @@ import { TLayoutMode } from './platforms/PlatformSettingsLayout';
 import { Services } from '../../service-provider';
 import AiHighlighterToggle from './AiHighlighterToggle';
 import { EAvailableFeatures } from 'services/incremental-rollout';
+import * as remote from '@electron/remote';
+import InfoBanner from 'components-react/shared/InfoBanner';
+import { EDismissable } from 'services/dismissables';
 
 interface ICommonPlatformSettings {
   title: string;
@@ -68,8 +71,6 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
       ? p.descriptionIsRequired
       : p.platform === 'facebook';
 
-  const user = Services.UserService.views;
-
   const hasDescription = p.platform
     ? view.supports('description', [p.platform as TPlatform])
     : view.supports('description');
@@ -91,16 +92,14 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
   }
 
   const titleTooltip = useMemo(() => {
-    if (enabledPlatforms.includes('tiktok')) {
-      return $t('Only 32 characters of your title will display on TikTok');
-    }
-
     if (enabledPlatforms.length === 1 && p?.platform === 'kick') {
       return $t('Edit your stream title on Kick after going live.');
     }
 
     return undefined;
   }, [enabledPlatforms]);
+
+  const showTikTokWarningBanner = Services.TikTokService.shouldHideTikTok;
 
   return (
     <div>
@@ -144,9 +143,28 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
             {aiHighlighterEnabled && enabledPlatforms && !enabledPlatforms.includes('twitch') && (
               <AiHighlighterToggle game={undefined} cardIsExpanded={false} />
             )}
+
+            {showTikTokWarningBanner && <TikTokNoty />}
           </div>
         )}
       </Animate>
     </div>
   );
 });
+
+function TikTokNoty() {
+  return (
+    <InfoBanner
+      id="tiktok-noty"
+      message={$t('Streaming to TikTok may not work due to ban in effect. Learn more here.')}
+      type="warning"
+      onClick={openConfirmation}
+      style={{ marginBottom: '15px', marginLeft: '20%', width: '80%' }}
+      dismissableKey={EDismissable.TikTokRejected}
+    />
+  );
+}
+
+function openConfirmation() {
+  remote.shell.openExternal(Services.TikTokService.notificationUrl);
+}

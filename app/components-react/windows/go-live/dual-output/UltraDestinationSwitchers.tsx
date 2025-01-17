@@ -1,4 +1,4 @@
-import React, { useRef, MouseEvent, useCallback, useMemo } from 'react';
+import React, { useRef, MouseEvent, useCallback } from 'react';
 import { getPlatformService, TPlatform } from 'services/platforms';
 import cx from 'classnames';
 import { $t } from 'services/i18n';
@@ -14,7 +14,6 @@ import { alertAsync } from 'components-react/modals';
 import Translate from 'components-react/shared/Translate';
 import { useDebounce } from 'components-react/hooks';
 import DualOutputToggle from '../../../shared/DualOutputToggle';
-import { renderTikTokModal } from '../DestinationSwitchers';
 
 interface IUltraDestinationSwitchers {
   type?: 'default' | 'ultra';
@@ -30,28 +29,22 @@ export function UltraDestinationSwitchers(p: IUltraDestinationSwitchers) {
     customDestinations,
     isDualOutputMode,
     isPrimaryPlatform,
-    isPlatformLinked,
     switchPlatforms,
     switchCustomDestination,
     isRestreamEnabled,
   } = useGoLiveSettings();
   const enabledPlatformsRef = useRef(enabledPlatforms);
   enabledPlatformsRef.current = enabledPlatforms;
-  const promptConnectTikTok = !isPlatformLinked('tiktok');
 
-  const platforms = useMemo(
-    () => (promptConnectTikTok ? linkedPlatforms.concat('tiktok') : linkedPlatforms),
-    [linkedPlatforms, promptConnectTikTok],
-  );
+  const platforms = Services.TikTokService.shouldHideTikTok
+    ? linkedPlatforms.filter(platform => platform !== 'tiktok')
+    : linkedPlatforms;
 
   const emitSwitch = useDebounce(500, () => {
     switchPlatforms(enabledPlatformsRef.current);
   });
-  const isEnabled = useCallback((target: TPlatform) => {
-    if (target === 'tiktok' && promptConnectTikTok) {
-      return false;
-    }
 
+  const isEnabled = useCallback((target: TPlatform) => {
     return enabledPlatformsRef.current.includes(target);
   }, []);
 
@@ -90,7 +83,6 @@ export function UltraDestinationSwitchers(p: IUltraDestinationSwitchers) {
           enabled={isEnabled(platform)}
           onChange={enabled => togglePlatform(platform, enabled)}
           isPrimary={isPrimaryPlatform(platform)}
-          promptConnectTikTok={platform === 'tiktok' && promptConnectTikTok}
           canDisablePrimary={isRestreamEnabled}
           index={index}
         />
@@ -113,7 +105,6 @@ interface IDestinationSwitcherProps {
   enabled: boolean;
   onChange: (enabled: boolean) => unknown;
   isPrimary?: boolean;
-  promptConnectTikTok?: boolean;
   canDisablePrimary?: boolean;
   index: number;
 }
@@ -125,11 +116,9 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
   const switchInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const platform = typeof p.destination === 'string' ? (p.destination as TPlatform) : null;
-  const enable = !p.enabled ?? (p.promptConnectTikTok && p.promptConnectTikTok === true);
-  const { RestreamService, MagicLinkService, TikTokService } = Services;
+  const enable = !p.enabled;
+  const { RestreamService, MagicLinkService } = Services;
   const canDisablePrimary = p.canDisablePrimary;
-  const showTikTokModal =
-    p.promptConnectTikTok || (platform === 'tiktok' && TikTokService.missingLiveAccess);
 
   function onClickHandler(ev: MouseEvent) {
     // TODO: do we need this check if we're on an Ultra DestinationSwitcher
@@ -142,7 +131,7 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
       return;
     }
 
-    if (RestreamService.views.canEnableRestream && !p.promptConnectTikTok) {
+    if (RestreamService.views.canEnableRestream) {
       p.onChange(enable);
       // always proxy the click to the SwitchInput
       // so it can play a transition animation
@@ -181,11 +170,7 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
             inputRef={switchInputRef}
             value={p.enabled}
             name={platform}
-            disabled={
-              canDisablePrimary
-                ? false
-                : p?.isPrimary || (p.promptConnectTikTok && platform === 'tiktok')
-            }
+            disabled={canDisablePrimary ? false : p?.isPrimary}
             uncontrolled
             className={styles.platformSwitch}
             checkedChildren={<i className="icon-check-mark" />}
@@ -218,13 +203,8 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
       ref={containerRef}
       data-test="ultra-switcher"
       className={cx(styles.platformSwitcher, {
-        [styles.platformDisabled]: !p.enabled || p.promptConnectTikTok,
+        [styles.platformDisabled]: !p.enabled,
       })}
-      onClick={() => {
-        if (showTikTokModal) {
-          renderTikTokModal(p.promptConnectTikTok);
-        }
-      }}
     >
       <div className={styles.switcherHeader}>
         <div className={styles.platformInfoWrapper}>
@@ -237,17 +217,7 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
           </div>
         </div>
         {/* SWITCH */}
-        <div
-          onClick={e => {
-            if (showTikTokModal) {
-              renderTikTokModal(p.promptConnectTikTok);
-              e.stopPropagation();
-              return;
-            } else {
-              onClickHandler(e);
-            }
-          }}
-        >
+        <div onClick={onClickHandler}>
           <Switch />
         </div>
       </div>

@@ -660,6 +660,10 @@ export class TikTokService
     return 'https://livecenter.tiktok.com/replay';
   }
 
+  get notificationUrl(): string {
+    return 'https://streamlabs.com/content-hub/post/is-tiktok-banned';
+  }
+
   get locale(): string {
     return I18nService.instance.state.locale;
   }
@@ -708,6 +712,10 @@ export class TikTokService
     if (this.denied && deniedDateDiff >= 30) return true;
 
     return false;
+  }
+
+  get shouldHideTikTok() {
+    return this.locale === 'en-US' && this.streamingService.views.isPlatformLinked('tiktok');
   }
 
   convertScope(scope: number, applicationStatus?: string): TTikTokLiveScopeTypes {
