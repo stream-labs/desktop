@@ -22,6 +22,7 @@ export function TikTokEditStreamInfo(p: IPlatformComponentParams<'tiktok'>) {
   const approved = TikTokService.scope === 'approved';
   const denied = TikTokService.scope === 'denied';
   const controls = TikTokService.audienceControls;
+  const showNoty = TikTokService.locale === 'en-US';
 
   function updateSettings(patch: Partial<ITikTokStartStreamOptions>) {
     p.onChange({ ...ttSettings, ...patch });
@@ -34,13 +35,16 @@ export function TikTokEditStreamInfo(p: IPlatformComponentParams<'tiktok'>) {
       <PlatformSettingsLayout
         layoutMode={p.layoutMode}
         commonFields={
-          <CommonPlatformFields
-            key="common"
-            platform="tiktok"
-            layoutMode={p.layoutMode}
-            value={ttSettings}
-            onChange={updateSettings}
-          />
+          <>
+            <CommonPlatformFields
+              key="common"
+              platform="tiktok"
+              layoutMode={p.layoutMode}
+              value={ttSettings}
+              onChange={updateSettings}
+            />
+            {showNoty && <TikTokNoty />}
+          </>
         }
         requiredFields={<div key="empty-tiktok" />}
       />
@@ -134,6 +138,18 @@ function TikTokInfo() {
         style={{ marginTop: '5px', marginBottom: '5px' }}
       />
     </>
+  );
+}
+
+function TikTokNoty() {
+  return (
+    <InfoBanner
+      id="tiktok-noty"
+      message={$t('Streaming to TikTok may not work due to ban in effect. Learn more here.')}
+      type="warning"
+      onClick={openConfirmation}
+      style={{ marginBottom: '15px', marginLeft: '23%', width: '78%' }}
+    />
   );
 }
 

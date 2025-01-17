@@ -213,7 +213,7 @@ export class TikTokService
       // if the stream did not start successfully, prevent going live
       if (!streamInfo?.id) {
         await this.handleOpenLiveManager();
-        throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED');
+        throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED', {}, `User locale is ${this.locale}`);
       }
 
       ttSettings.serverUrl = streamInfo.rtmp;
@@ -273,7 +273,7 @@ export class TikTokService
         return this.userService.updatePlatformToken('tiktok', response.access_token);
       })
       .catch(e => {
-        console.error('Error fetching new token.');
+        console.error('Error fetching new token. User locale is ', this.locale);
         return Promise.reject(e);
       });
   }
@@ -334,8 +334,10 @@ export class TikTokService
       );
 
       const details = (e as any).result?.error
-        ? `${(e as any).result.error.type} ${(e as any).result.error.message}`
-        : 'Connection failed';
+        ? `${(e as any).result.error.type} ${(e as any).result.error.message} User locale is ${
+            this.locale
+          }`
+        : `Connection failed. User locale is ${this.locale}`;
 
       if (notApproved) {
         this.SET_LIVE_SCOPE('relog');
@@ -377,11 +379,15 @@ export class TikTokService
 
     return jfetch<ITikTokStartStreamResponse>(request).catch((e: unknown) => {
       if (e instanceof StreamError) {
-        throwStreamError('TIKTOK_GENERATE_CREDENTIALS_FAILED', e as any);
+        throwStreamError(
+          'TIKTOK_GENERATE_CREDENTIALS_FAILED',
+          e as any,
+          `User locale is ${this.locale}`,
+        );
       }
 
       const error = this.handleStartStreamError((e as ITikTokError)?.status);
-      throwStreamError(error.type, { status: error.status });
+      throwStreamError(error.type, { status: error.status }, `User locale is ${this.locale}`);
     });
   }
 
@@ -537,9 +543,9 @@ export class TikTokService
         games.push(this.defaultGame);
         return games;
       })
-      .catch(e => {
+      .catch((e: unknown) => {
         console.error('Error fetching TikTok categories: ', e);
-        return [];
+        return [] as IGame[];
       });
   }
 
@@ -557,7 +563,7 @@ export class TikTokService
     console.debug('TikTok stream status: ', status);
 
     if (status === EPlatformCallResult.TikTokScopeOutdated) {
-      throwStreamError('TIKTOK_SCOPE_OUTDATED');
+      throwStreamError('TIKTOK_SCOPE_OUTDATED', {}, `User locale is ${this.locale}`);
     }
 
     this.SET_PREPOPULATED(true);
