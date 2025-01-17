@@ -1,6 +1,12 @@
 import { InheritMutations, Inject, mutation } from '../core';
 import { BasePlatformService } from './base-platform';
-import { IPlatformRequest, IPlatformService, IPlatformState, TPlatformCapability } from './index';
+import {
+  IGame,
+  IPlatformRequest,
+  IPlatformService,
+  IPlatformState,
+  TPlatformCapability,
+} from './index';
 import { authorizedHeaders, jfetch } from '../../util/requests';
 import { throwStreamError } from '../streaming/stream-error';
 import { platformAuthorizedRequest } from './utils';
@@ -12,11 +18,10 @@ import { I18nService } from 'services/i18n';
 import { getDefined } from 'util/properties-type-guards';
 import { WindowsService } from 'services/windows';
 import { DiagnosticsService } from 'services/diagnostics';
-
 interface IKickStartStreamResponse {
   id?: string;
-  key: string;
   rtmp: string;
+  key: string;
   chat_url: string;
   broadcast_id?: string | null;
   channel_name: string;
@@ -42,15 +47,31 @@ interface IKickServiceState extends IPlatformState {
   platformId?: string;
 }
 
+interface IKickStreamInfoResponse {
+  platform: string;
+  info: unknown[];
+  categories: unknown[];
+  channel: {
+    title: string;
+    category: {
+      id: number;
+      name: string;
+      thumbnail: string;
+    };
+  };
+}
+
 interface IKickStartStreamSettings {
   title: string;
   display: TDisplayType;
+  game: string;
   video?: IVideo;
   mode?: TOutputOrientation;
 }
 
 export interface IKickStartStreamOptions {
   title: string;
+  game: string;
 }
 
 interface IKickRequestHeaders extends Dictionary<string> {
@@ -69,6 +90,7 @@ export class KickService
       title: '',
       display: 'horizontal',
       mode: 'landscape',
+      game: '',
     },
     ingest: '',
     chatUrl: '',
@@ -185,6 +207,14 @@ export class KickService
     const body = new FormData();
     body.append('title', opts.title);
 
+    console.log('opts.game', opts.game);
+    // pass an empty string for the 'Other' game option
+    const game = opts.game;
+    // body.append('category', game);
+    body.append('category', '403');
+
+    console.log('body ', body.get('title'), body.get('category'));
+
     const request = new Request(url, { headers, method: 'POST', body });
 
     return jfetch<IKickStartStreamResponse>(request).catch((e: IKickError | unknown) => {
@@ -225,9 +255,83 @@ export class KickService
   }
 
   /**
+   * Get if user is approved by TikTok to stream to TikTok
+   * @remark Only users approved by TikTok are allowed to generate
+   * stream keys. It is possible that users have received approval
+   * since the last time that they logged in using TikTok, so get this
+   * status every time the user sets the go live settings.
+   */
+  async fetchStreamInfo(): Promise<IKickStreamInfoResponse | IKickError | void> {
+    const host = this.hostsService.streamlabs;
+    const url = `https://${host}/api/v5/slobs/kick/info`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const request = new Request(url, { headers });
+    return jfetch<IKickStreamInfoResponse | IKickError>(request)
+      .then(async res => {
+        const data = res as IKickStreamInfoResponse;
+        console.log('data', data);
+        return res;
+      })
+      .catch(e => {
+        console.warn('Error fetching Kick info: ', e);
+      });
+  }
+
+  /**
+   * Search for games
+   * @remark While this is the same endpoint for if a user can go live,
+   * the category parameter will only show category results, and will not
+   * show live approval status.
+   */
+  async searchGames(searchString: string): Promise<IGame[]> {
+    const host = this.hostsService.streamlabs;
+    const url = `https://${host}/api/v5/slobs/kick/info?${searchString}`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const request = new Request(url, { headers });
+    return jfetch<IKickStreamInfoResponse | IGame[]>(request)
+      .then(async res => {
+        //     const games = await Promise.all(
+        //       res?.categories.map(g => ({ id: g.game_mask_id, name: g.full_name })),
+        //     );
+        //     games.push(this.defaultGame);
+        //     return games;
+
+        console.log('res', res);
+        return (res as IKickStreamInfoResponse).channel.category;
+      })
+      .then(async category => {
+        console.log('categort', category);
+
+        return [
+          {
+            id: category.id.toString(),
+            name: category.name,
+            image: category.thumbnail,
+          },
+        ];
+      })
+      .catch(e => {
+        console.warn('Error fetching Kick info: ', e);
+        return [
+          {
+            id: '400',
+            name: this.state.settings.game,
+          },
+        ] as IGame[];
+      });
+  }
+
+  /**
    * prepopulate channel info and save it to the store
    */
   async prepopulateInfo(): Promise<void> {
+    const response = await this.fetchStreamInfo();
+    const info = response as IKickStreamInfoResponse;
+
+    if (info.channel) {
+      this.SET_CHANNEL_NAME(info.channel.title);
+      this.UPDATE_STREAM_SETTINGS({ title: info.channel.title, game: info.channel.category.name });
+    }
     this.SET_PREPOPULATED(true);
   }
 
@@ -267,10 +371,7 @@ export class KickService
   }
 
   get streamPageUrl(): string {
-    const username = this.userService.state.auth?.platforms?.kick?.username;
-    if (!username) return '';
-
-    return `${this.domain}/${username}`;
+    return `${this.domain}/${this.state.channelName}`;
   }
 
   get locale(): string {
@@ -290,5 +391,10 @@ export class KickService
   @mutation()
   SET_PLATFORM_ID(platformId: string) {
     this.state.platformId = platformId;
+  }
+
+  @mutation()
+  SET_CHANNEL_NAME(channelName: string) {
+    this.state.channelName = channelName;
   }
 }
