@@ -714,7 +714,7 @@ export class TikTokService
     return false;
   }
 
-  get shouldHideTikTok() {
+  get shouldShowTikTokWarning() {
     return this.locale === 'en-US' && this.streamingService.views.isPlatformLinked('tiktok');
   }
 

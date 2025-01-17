@@ -33,10 +33,6 @@ export function NonUltraDestinationSwitchers(p: INonUltraDestinationSwitchers) {
   enabledPlatformsRef.current = enabledPlatforms;
   const destinationSwitcherRef = useRef({ addClass: () => undefined });
 
-  const platforms = Services.TikTokService.shouldHideTikTok
-    ? enabledPlatforms.filter(platform => platform !== 'tiktok')
-    : enabledPlatforms;
-
   const emitSwitch = useDebounce(500, () => {
     switchPlatforms(enabledPlatformsRef.current);
   });
@@ -67,7 +63,7 @@ export function NonUltraDestinationSwitchers(p: INonUltraDestinationSwitchers) {
           style={{ marginBottom: '15px' }}
         />
       )}
-      {platforms.map((platform: TPlatform, index: number) => (
+      {enabledPlatforms.map((platform: TPlatform, index: number) => (
         <DestinationSwitcher
           key={platform}
           destination={platform}

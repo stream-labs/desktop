@@ -27,10 +27,7 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
   // use these references to apply debounce
   // for error handling and switch animation
   const enabledPlatformsRef = useRef(enabledPlatforms);
-  const platforms = Services.TikTokService.shouldHideTikTok
-    ? enabledPlatforms.filter(platform => platform !== 'tiktok')
-    : enabledPlatforms;
-  enabledPlatformsRef.current = platforms;
+  enabledPlatformsRef.current = enabledPlatforms;
 
   const enabledDestRef = useRef(enabledDestinations);
   enabledDestRef.current = enabledDestinations;
@@ -42,7 +39,7 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
     }
 
     // Otherwise, only a single platform and no custom destinations
-    return platforms.length > 0;
+    return enabledPlatforms.length > 0;
   };
 
   const disableCustomDestinationSwitchers = shouldDisableCustomDestinationSwitchers();
@@ -88,17 +85,15 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
 
   return (
     <div className={cx(styles.switchWrapper, styles.columnPadding)}>
-      {linkedPlatforms
-        .filter(p => p !== 'tiktok')
-        .map(platform => (
-          <DestinationSwitcher
-            key={platform}
-            destination={platform}
-            enabled={isEnabled(platform)}
-            onChange={enabled => togglePlatform(platform, enabled)}
-            isPrimary={isPrimaryPlatform(platform)}
-          />
-        ))}
+      {linkedPlatforms.map(platform => (
+        <DestinationSwitcher
+          key={platform}
+          destination={platform}
+          enabled={isEnabled(platform)}
+          onChange={enabled => togglePlatform(platform, enabled)}
+          isPrimary={isPrimaryPlatform(platform)}
+        />
+      ))}
 
       {customDestinations?.map((dest, ind) => (
         <DestinationSwitcher

@@ -99,7 +99,7 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
     return undefined;
   }, [enabledPlatforms]);
 
-  const showTikTokWarningBanner = Services.TikTokService.shouldHideTikTok;
+  const shouldShowTikTokWarning = Services.TikTokService.shouldShowTikTokWarning;
 
   return (
     <div>
@@ -144,7 +144,7 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
               <AiHighlighterToggle game={undefined} cardIsExpanded={false} />
             )}
 
-            {showTikTokWarningBanner && <TikTokNoty />}
+            {shouldShowTikTokWarning && <TikTokNoty />}
           </div>
         )}
       </Animate>
@@ -160,7 +160,7 @@ function TikTokNoty() {
       type="warning"
       onClick={openConfirmation}
       style={{ marginBottom: '15px', marginLeft: '20%', width: '80%' }}
-      dismissableKey={EDismissable.TikTokRejected}
+      dismissableKey={EDismissable.TikTokBanned}
     />
   );
 }
