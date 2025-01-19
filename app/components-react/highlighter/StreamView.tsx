@@ -30,6 +30,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
     exportInfo: HighlighterService.views.exportInfo,
     error: HighlighterService.views.error,
     uploadInfo: HighlighterService.views.uploadInfo,
+    highlighterVersion: HighlighterService.views.highlighterVersion,
   }));
 
   // Below is only used because useVueX doesnt work as expected
@@ -205,6 +206,8 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
   }
 
   function onDrop(e: React.DragEvent<HTMLDivElement>) {
+    if (v.highlighterVersion === '') return;
+
     const extensions = SUPPORTED_FILE_TYPES.map(e => `.${e}`);
     const files: string[] = [];
     let fi = e.dataTransfer.files.length;
@@ -237,18 +240,20 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
           <h1 style={{ margin: 0 }}>{$t('My Stream Highlights')}</h1>
         </div>
         <div style={{ display: 'flex', gap: '16px' }}>
-          <div
-            className={styles.uploadWrapper}
-            style={{
-              opacity: aiDetectionInProgress ? '0.7' : '1',
-              cursor: aiDetectionInProgress ? 'not-allowed' : 'pointer',
-            }}
-            onClick={() => !aiDetectionInProgress && setShowModal({ type: 'upload' })}
-          >
-            <FortniteIcon />
-            {$t('Select your Fortnite recording')}
-            <Button disabled={aiDetectionInProgress === true}>{$t('Import')}</Button>
-          </div>
+          {v.highlighterVersion !== '' && (
+            <div
+              className={styles.uploadWrapper}
+              style={{
+                opacity: aiDetectionInProgress ? '0.7' : '1',
+                cursor: aiDetectionInProgress ? 'not-allowed' : 'pointer',
+              }}
+              onClick={() => !aiDetectionInProgress && setShowModal({ type: 'upload' })}
+            >
+              <FortniteIcon />
+              {$t('Select your Fortnite recording')}
+              <Button disabled={aiDetectionInProgress === true}>{$t('Import')}</Button>
+            </div>
+          )}
           <Button onClick={() => emitSetView({ view: EHighlighterView.SETTINGS })}>
             {$t('Settings')}
           </Button>
@@ -297,7 +302,9 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
         keyboard={false}
       >
         {!!v.error && <Alert message={v.error} type="error" showIcon />}
-        {showModal?.type === 'upload' && <ImportStreamModal close={closeModal} />}
+        {showModal?.type === 'upload' && v.highlighterVersion !== '' && (
+          <ImportStreamModal close={closeModal} />
+        )}
         {showModal?.type === 'export' && <ExportModal close={closeModal} streamId={showModal.id} />}
         {showModal?.type === 'preview' && (
           <PreviewModal close={closeModal} streamId={showModal.id} />

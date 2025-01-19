@@ -18,7 +18,7 @@ import { EAvailableFeatures } from 'services/incremental-rollout';
 
 export function TwitchEditStreamInfo(p: IPlatformComponentParams<'twitch'>) {
   const twSettings = p.value;
-  const aiHighlighterEnabled = Services.IncrementalRolloutService.views.featureIsEnabled(
+  const aiHighlighterFeatureEnabled = Services.IncrementalRolloutService.views.featureIsEnabled(
     EAvailableFeatures.aiHighlighter,
   );
   function updateSettings(patch: Partial<ITwitchStartStreamOptions>) {
@@ -52,7 +52,7 @@ export function TwitchEditStreamInfo(p: IPlatformComponentParams<'twitch'>) {
         requiredFields={
           <React.Fragment key="required-fields">
             <GameSelector key="required" platform={'twitch'} {...bind.game} />
-            {aiHighlighterEnabled && (
+            {aiHighlighterFeatureEnabled && (
               <AiHighlighterToggle key="ai-toggle" game={bind.game?.value} cardIsExpanded={true} />
             )}
           </React.Fragment>

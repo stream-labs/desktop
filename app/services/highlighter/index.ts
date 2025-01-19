@@ -552,7 +552,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
   };
 
   aiHighlighterUpdater: AiHighlighterUpdater;
-  aiHighlighterEnabled = false;
+  aiHighlighterFeatureEnabled = false;
   streamMilestones: StreamMilestones | null = null;
 
   static filter(state: IHighlighterState) {
@@ -564,6 +564,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
       audio: state.audio,
       transition: state.transition,
       useAiHighlighter: state.useAiHighlighter,
+      highlighterVersion: state.highlighterVersion,
     };
   }
 
@@ -712,11 +713,11 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     super.init();
 
     this.incrementalRolloutService.featuresReady.then(async () => {
-      this.aiHighlighterEnabled = this.incrementalRolloutService.views.featureIsEnabled(
+      this.aiHighlighterFeatureEnabled = this.incrementalRolloutService.views.featureIsEnabled(
         EAvailableFeatures.aiHighlighter,
       );
 
-      if (this.aiHighlighterEnabled && !this.aiHighlighterUpdater) {
+      if (this.aiHighlighterFeatureEnabled && !this.aiHighlighterUpdater) {
         this.aiHighlighterUpdater = new AiHighlighterUpdater();
       }
     });
@@ -801,7 +802,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
         if (status === EStreamingState.Live) {
           streamStarted = true; // console.log('live', this.streamingService.views.settings.platforms.twitch.title);
 
-          if (!this.aiHighlighterEnabled) {
+          if (!this.aiHighlighterFeatureEnabled) {
             return;
           }
 
@@ -1231,6 +1232,24 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     }
   }
 
+  async installAiHighlighter(downloadNow: boolean = false) {
+    this.setAiHighlighter(true);
+    if (downloadNow) {
+      await this.aiHighlighterUpdater.isNewVersionAvailable();
+      this.startUpdater();
+    } else {
+      // Only for go live view to immediately show the toggle. For other flows, the updater will set the version
+      this.SET_HIGHLIGHTER_VERSION('0.0.0');
+    }
+  }
+
+  async uninstallAiHighlighter() {
+    this.setAiHighlighter(false);
+    this.SET_HIGHLIGHTER_VERSION('');
+
+    await this.aiHighlighterUpdater?.uninstall();
+  }
+
   async loadClips(streamInfoId?: string | undefined) {
     const clipsToLoad: TClip[] = this.getClips(this.views.clips, streamInfoId);
     // this.resetRenderingClips();
@@ -1332,7 +1351,13 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
       console.error('Highlighter: Cannot export until current export operation is finished');
       return;
     }
-
+    this.SET_EXPORT_INFO({
+      exporting: true,
+      currentFrame: 0,
+      step: EExportStep.AudioMix,
+      cancelRequested: false,
+      error: null,
+    });
     let renderingClips: RenderingClip[] = [];
     if (streamId) {
       renderingClips = this.getClips(this.views.clips, streamId)
@@ -1411,6 +1436,11 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
 
     if (!renderingClips.length) {
       console.error('Highlighter: Export called without any clips!');
+      this.SET_EXPORT_INFO({
+        exporting: false,
+        exported: false,
+        error: $t('Please select at least one clip to export a video'),
+      });
       return;
     }
 
@@ -1423,12 +1453,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     const totalFramesAfterTransitions = totalFrames - numTransitions * transitionFrames;
 
     this.SET_EXPORT_INFO({
-      exporting: true,
-      currentFrame: 0,
       totalFrames: totalFramesAfterTransitions,
-      step: EExportStep.AudioMix,
-      cancelRequested: false,
-      error: null,
     });
 
     let fader: AudioCrossfader | null = null;
@@ -1865,7 +1890,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
   }
 
   async flow(filePath: string, streamInfo: StreamInfoForAiHighlighter): Promise<void> {
-    if (this.aiHighlighterEnabled === false) {
+    if (this.aiHighlighterFeatureEnabled === false) {
       console.log('HighlighterService: Not enabled');
       return;
     }
@@ -2303,8 +2328,11 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
       return;
     }
 
-    const basepath = path.join(remote.app.getPath('userData'), 'ai-highlighter');
-    const milestonesPath = path.join(basepath, 'milestones', 'milestones.json');
+    const milestonesPath = path.join(
+      AiHighlighterUpdater.basepath,
+      'milestones',
+      'milestones.json',
+    );
 
     const milestonesData = JSON.stringify(this.streamMilestones.milestones);
     await fs.outputFile(milestonesPath, milestonesData);

@@ -6,6 +6,7 @@ import { Services } from 'components-react/service-provider';
 import Highlighter from 'components-react/pages/Highlighter';
 import { useVuex } from 'components-react/hooks';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
+import { Button } from 'antd';
 
 export default function AiHighlighterToggle({
   game,
@@ -16,7 +17,12 @@ export default function AiHighlighterToggle({
 }) {
   //TODO M: Probably good way to integrate the highlighter in to GoLiveSettings
   const { HighlighterService } = Services;
-  const useHighlighter = useVuex(() => HighlighterService.views.useAiHighlighter);
+  const { useHighlighter, highlighterVersion } = useVuex(() => {
+    return {
+      useHighlighter: HighlighterService.views.useAiHighlighter,
+      highlighterVersion: HighlighterService.views.highlighterVersion,
+    };
+  });
 
   function getInitialExpandedState() {
     if (game === 'Fortnite') {
@@ -78,12 +84,25 @@ export default function AiHighlighterToggle({
                       </h2>
                       <div className={styles.betaTag}>Beta</div>
                     </div>
-                    <SwitchInput
-                      style={{ padding: 0, margin: 0, marginLeft: '-40px', width: '100%' }}
-                      value={useHighlighter}
-                      label=""
-                      onChange={() => HighlighterService.actions.toggleAiHighlighter()}
-                    />
+                    {highlighterVersion !== '' ? (
+                      <SwitchInput
+                        style={{ padding: 0, margin: 0, marginLeft: '-40px', width: '100%' }}
+                        value={useHighlighter}
+                        label=""
+                        onChange={() => HighlighterService.actions.toggleAiHighlighter()}
+                      />
+                    ) : (
+                      <Button
+                        style={{ width: 'fit-content' }}
+                        size="small"
+                        type="primary"
+                        onClick={() => {
+                          HighlighterService.installAiHighlighter();
+                        }}
+                      >
+                        Install AI Highlighter
+                      </Button>
+                    )}
                   </div>
                   <div className={styles.image}></div>
                 </div>
