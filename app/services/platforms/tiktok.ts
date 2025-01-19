@@ -715,7 +715,7 @@ export class TikTokService
   }
 
   get shouldShowTikTokWarning() {
-    return this.locale === 'en-US' && this.streamingService.views.isPlatformLinked('tiktok');
+    return this.streamingService.views.isPlatformLinked('tiktok');
   }
 
   convertScope(scope: number, applicationStatus?: string): TTikTokLiveScopeTypes {

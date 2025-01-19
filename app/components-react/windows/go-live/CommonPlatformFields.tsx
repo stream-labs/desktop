@@ -145,9 +145,8 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
               !enabledPlatforms.includes('twitch') && (
                 <AiHighlighterToggle game={undefined} cardIsExpanded={false} />
               )}
-        
-            {shouldShowTikTokWarning && <TikTokNoty />}
 
+            {shouldShowTikTokWarning && <TikTokNoty />}
           </div>
         )}
       </Animate>
