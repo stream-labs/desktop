@@ -197,8 +197,8 @@ export class AppService extends StatefulService<IAppState> {
       await this.sceneCollectionsService.deinitialize();
       this.performanceService.stop();
       this.transitionsService.shutdown();
-      this.videoService.shutdown();
       await this.gameOverlayService.destroy();
+      this.videoService.shutdown();
       await this.fileManagerService.flushAll();
       obs.NodeObs.RemoveSourceCallback();
       obs.NodeObs.OBS_service_removeCallback();

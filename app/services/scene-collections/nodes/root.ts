@@ -95,49 +95,24 @@ export class RootNode extends Node<ISchema, {}> {
    * This if/else prevents an error by guaranteeing a video context exists.
    */
   async load(): Promise<void> {
-    if (!this.videoService.contexts.horizontal) {
-      const establishedContext = this.videoService.establishedContext.subscribe(async () => {
-        this.videoService.setBaseResolution(this.data.baseResolutions);
-        this.streamingService.setSelectiveRecording(!!this.data.selectiveRecording);
-        this.streamingService.setDualOutputMode(this.data.dualOutputMode);
+    this.videoService.setBaseResolution(this.data.baseResolutions);
+    this.streamingService.setSelectiveRecording(!!this.data.selectiveRecording);
+    this.streamingService.setDualOutputMode(this.data.dualOutputMode);
 
-        await this.data.transitions.load();
-        await this.data.sources.load({});
-        await this.data.scenes.load({});
+    if (this.data.nodeMap) {
+      await this.data.nodeMap.load();
+    }
 
-        if (this.data.nodeMap) {
-          await this.data.nodeMap.load();
-        }
+    await this.data.transitions.load();
+    await this.data.sources.load({});
+    await this.data.scenes.load({});
 
-        if (this.data.hotkeys) {
-          await this.data.hotkeys.load({});
-        }
+    if (this.data.hotkeys) {
+      await this.data.hotkeys.load({});
+    }
 
-        if (this.data.guestCam) {
-          await this.data.guestCam.load();
-        }
-        establishedContext.unsubscribe();
-      });
-    } else {
-      this.videoService.setBaseResolution(this.data.baseResolutions);
-      this.streamingService.setSelectiveRecording(!!this.data.selectiveRecording);
-      this.streamingService.setDualOutputMode(this.data.dualOutputMode);
-
-      if (this.data.nodeMap) {
-        await this.data.nodeMap.load();
-      }
-
-      await this.data.transitions.load();
-      await this.data.sources.load({});
-      await this.data.scenes.load({});
-
-      if (this.data.hotkeys) {
-        await this.data.hotkeys.load({});
-      }
-
-      if (this.data.guestCam) {
-        await this.data.guestCam.load();
-      }
+    if (this.data.guestCam) {
+      await this.data.guestCam.load();
     }
   }
 

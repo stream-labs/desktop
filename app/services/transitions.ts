@@ -167,11 +167,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
       this.disableStudioMode();
     });
 
-    // a video context must be initialized before loading the scene transition
-    const establishedContext = this.videoService.establishedContext.subscribe(() => {
-      if (!this.studioModeTransition) this.createStudioModeTransition();
-      establishedContext.unsubscribe();
-    });
+    if (!this.studioModeTransition) this.createStudioModeTransition();
   }
 
   enableStudioMode() {
