@@ -52,6 +52,7 @@ interface IKickServiceState extends IPlatformState {
   ingest: string;
   chatUrl: string;
   channelName: string;
+  gameId: string;
   platformId?: string;
 }
 
@@ -103,6 +104,7 @@ export class KickService
     ingest: '',
     chatUrl: '',
     channelName: '',
+    gameId: '',
   };
 
   @Inject() windowsService: WindowsService;
@@ -215,8 +217,7 @@ export class KickService
     const body = new FormData();
     body.append('title', opts.title);
 
-    // pass an empty string for the 'Other' game option
-    const game = opts.game;
+    const game = this.state.gameId;
     body.append('category', game);
 
     const request = new Request(url, { headers, method: 'POST', body });
@@ -327,7 +328,12 @@ export class KickService
 
     if (info.channel) {
       this.SET_CHANNEL_NAME(info.channel.title);
-      this.UPDATE_STREAM_SETTINGS({ title: info.channel.title, game: info.channel.category.name });
+      this.UPDATE_STREAM_SETTINGS({
+        title: info.channel.title,
+        game: info.channel.category.name,
+      });
+
+      this.SET_GAME_ID(info.channel.category.id.toString());
     }
     this.SET_PREPOPULATED(true);
   }
@@ -342,6 +348,10 @@ export class KickService
       'Content-Type': 'application/json',
       Authorization: `Bearer ${this.oauthToken}`,
     };
+  }
+
+  setGameId(gameId: string) {
+    this.SET_GAME_ID(gameId);
   }
 
   get authUrl() {
@@ -393,5 +403,10 @@ export class KickService
   @mutation()
   SET_CHANNEL_NAME(channelName: string) {
     this.state.channelName = channelName;
+  }
+
+  @mutation()
+  SET_GAME_ID(gameId: string) {
+    this.state.gameId = gameId;
   }
 }

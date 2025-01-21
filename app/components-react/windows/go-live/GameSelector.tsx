@@ -62,7 +62,7 @@ export default function GameSelector(p: TProps) {
 
   async function loadImageForSelectedGame() {
     // game images available for Twitch and Trovo only
-    if (!['twitch', 'trovo'].includes(platform)) return;
+    if (!['twitch', 'trovo', 'kick'].includes(platform)) return;
     if (!selectedGameName) return;
     const game = await platformService.fetchGame(selectedGameName);
     if (!game || game.name !== selectedGameName) return;
@@ -94,6 +94,10 @@ export default function GameSelector(p: TProps) {
 
     if (isTikTok) {
       Services.TikTokService.actions.setGameName(searchString);
+    }
+
+    if (isKick && game) {
+      Services.KickService.actions.setGameId(game.value);
     }
 
     if (!game) return;
