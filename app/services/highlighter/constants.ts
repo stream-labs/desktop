@@ -16,9 +16,6 @@ export const FFPROBE_EXE = path.join(
   getOS() === OS.Mac ? path.join('Frameworks', 'ffprobe') : 'ffprobe.exe',
 );
 
-// TODO: Used for test mode only
-export const CLIP_DIR = path.resolve('C:/', 'Users', 'acree', 'Videos');
-
 /**
  * Enable to use predefined clips instead of pulling from
  * the replay buffer.

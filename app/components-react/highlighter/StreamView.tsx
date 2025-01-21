@@ -2,7 +2,11 @@ import { useVuex } from 'components-react/hooks';
 import React, { useRef, useState } from 'react';
 import { Services } from 'components-react/service-provider';
 import styles from './StreamView.m.less';
-import { EHighlighterView, IViewState, StreamInfoForAiHighlighter } from 'services/highlighter';
+import {
+  EHighlighterView,
+  IStreamInfoForAiHighlighter,
+  IViewState,
+} from 'services/highlighter/models/highlighter.models';
 import isEqual from 'lodash/isEqual';
 import { Modal, Button, Alert } from 'antd';
 import ExportModal from 'components-react/highlighter/ExportModal';
@@ -135,7 +139,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
 
     async function startAiDetection(title: string) {
       if (/[\\/:"*?<>|]+/g.test(title)) return;
-      const streamInfo: StreamInfoForAiHighlighter = {
+      const streamInfo: IStreamInfoForAiHighlighter = {
         id: 'manual_' + uuid(),
         title,
         game: 'Fortnite',
@@ -218,7 +222,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
 
     const filtered = files.filter(f => extensions.includes(path.parse(f).ext));
     if (filtered.length) {
-      const StreamInfoForAiHighlighter: StreamInfoForAiHighlighter = {
+      const StreamInfoForAiHighlighter: IStreamInfoForAiHighlighter = {
         id: 'manual_' + uuid(),
         game: 'Fortnite',
       };
