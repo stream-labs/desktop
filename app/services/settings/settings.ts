@@ -138,7 +138,7 @@ export enum ESettingsCategoryType {
   Tabbed = 1,
 }
 
-interface ISettingsCategory {
+export interface ISettingsCategory {
   type: ESettingsCategoryType;
   formData: ISettingsSubCategory[];
 }

@@ -1,5 +1,5 @@
 import { Service } from 'services';
-import Realm, { PropertyTypeName } from 'realm';
+import Realm, { PropertiesTypes, PropertyTypeName } from 'realm';
 import path from 'path';
 import * as remote from '@electron/remote';
 import { ExecuteInCurrentWindow } from './core';
@@ -129,10 +129,12 @@ export class RealmObject {
     });
   }
 
-  toObject() {
+  toObject(filterId: boolean = false) {
     const obj = {};
 
-    Object.keys(this.schema.properties).forEach(key => {
+    Object.keys(this.schema.properties).forEach((key: keyof Realm.PropertiesTypes) => {
+      if (filterId && key === '_id') return;
+
       const val = this[key];
 
       if (val instanceof RealmObject) {
