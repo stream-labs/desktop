@@ -22,6 +22,7 @@ export default function GameSelector(p: TProps) {
   const isTwitch = platform === 'twitch';
   const isTrovo = platform === 'trovo';
   const isTikTok = platform === 'tiktok';
+  const isKick = platform === 'kick';
 
   if (isTrovo) {
     selectedGameName = Services.TrovoService.state.channelInfo.gameName;
@@ -74,7 +75,7 @@ export default function GameSelector(p: TProps) {
     if (searchString.length < 2 && platform !== 'tiktok') return;
     const games =
       (await fetchGames(searchString))?.map(g => ({
-        value: ['trovo', 'tiktok'].includes(platform) ? g.id : g.name,
+        value: ['trovo', 'tiktok', 'kick'].includes(platform) ? g.id : g.name,
         label: g.name,
         image: g?.image,
       })) ?? [];
@@ -104,6 +105,7 @@ export default function GameSelector(p: TProps) {
     facebook: $t('Facebook Game'),
     trovo: $t('Trovo Category'),
     tiktok: $t('TikTok Category'),
+    kick: $t('Kick Category'),
   }[platform as string];
 
   const filterOption = (input: string, option?: { label: string; value: string }) => {
@@ -134,7 +136,7 @@ export default function GameSelector(p: TProps) {
       filterOption={filterOption}
       debounce={500}
       required={isTwitch || isTrovo}
-      hasImage={isTwitch || isTrovo}
+      hasImage={isTwitch || isTrovo || isKick}
       onBeforeSearch={onBeforeSearchHandler}
       imageSize={platformService.gameImageSize}
       loading={isSearching}

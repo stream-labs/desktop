@@ -18,6 +18,13 @@ import { I18nService } from 'services/i18n';
 import { getDefined } from 'util/properties-type-guards';
 import { WindowsService } from 'services/windows';
 import { DiagnosticsService } from 'services/diagnostics';
+
+interface IKickGame {
+  id: number;
+  name: string;
+  thumbnail: string;
+}
+
 interface IKickStartStreamResponse {
   id?: string;
   rtmp: string;
@@ -39,6 +46,7 @@ interface IKickError {
   message: string;
   data: any[];
 }
+
 interface IKickServiceState extends IPlatformState {
   settings: IKickStartStreamSettings;
   ingest: string;
@@ -50,7 +58,7 @@ interface IKickServiceState extends IPlatformState {
 interface IKickStreamInfoResponse {
   platform: string;
   info: unknown[];
-  categories: unknown[];
+  categories?: IKickGame[];
   channel: {
     title: string;
     category: {
@@ -207,13 +215,9 @@ export class KickService
     const body = new FormData();
     body.append('title', opts.title);
 
-    console.log('opts.game', opts.game);
     // pass an empty string for the 'Other' game option
     const game = opts.game;
-    // body.append('category', game);
-    body.append('category', '403');
-
-    console.log('body ', body.get('title'), body.get('category'));
+    body.append('category', game);
 
     const request = new Request(url, { headers, method: 'POST', body });
 
@@ -268,8 +272,6 @@ export class KickService
     const request = new Request(url, { headers });
     return jfetch<IKickStreamInfoResponse | IKickError>(request)
       .then(async res => {
-        const data = res as IKickStreamInfoResponse;
-        console.log('data', data);
         return res;
       })
       .catch(e => {
@@ -290,34 +292,29 @@ export class KickService
     const request = new Request(url, { headers });
     return jfetch<IKickStreamInfoResponse | IGame[]>(request)
       .then(async res => {
-        //     const games = await Promise.all(
-        //       res?.categories.map(g => ({ id: g.game_mask_id, name: g.full_name })),
-        //     );
-        //     games.push(this.defaultGame);
-        //     return games;
-
-        console.log('res', res);
-        return (res as IKickStreamInfoResponse).channel.category;
-      })
-      .then(async category => {
-        console.log('categort', category);
-
+        const data = res as IKickStreamInfoResponse;
         return [
           {
-            id: category.id.toString(),
-            name: category.name,
-            image: category.thumbnail,
+            id: data.channel.category.id.toString(),
+            name: data.channel.category.name,
+            image: data.channel.category.thumbnail,
           },
         ];
+
+        // TODO: comment in for array returning more than one game
+        // const games = await Promise.all(
+        //   (res as IKickStreamInfoResponse)?.categories.map((g: IKickGame) => ({
+        //     id: g.id.toString(),
+        //     name: g.name,
+        //     image: g.thumbnail,
+        //   })),
+        // );
+
+        // return games;
       })
-      .catch(e => {
+      .catch((e: unknown) => {
         console.warn('Error fetching Kick info: ', e);
-        return [
-          {
-            id: '400',
-            name: this.state.settings.game,
-          },
-        ] as IGame[];
+        return [] as IGame[];
       });
   }
 
