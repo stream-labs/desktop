@@ -1,6 +1,6 @@
 import { ArrayNode } from '../array-node';
 import { SceneItem, Scene, TSceneNode, ScenesService } from 'services/scenes';
-import { VideoService } from 'services/video';
+import { VideoService, TDisplayType } from 'services/video';
 import { SourcesService, TSourceType } from 'services/sources';
 import { SourceFiltersService, TSourceFilterType } from 'services/source-filters';
 import { Inject } from 'services/core/injector';
@@ -18,7 +18,6 @@ import { WidgetType } from '../../../widgets';
 import { byOS, OS, getOS } from 'util/operating-systems';
 import { GameCaptureNode } from './game-capture';
 import { Node } from '../node';
-import { TDisplayType } from 'services/video';
 
 type TContent =
   | ImageNode
