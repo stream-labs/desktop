@@ -75,7 +75,7 @@ export class AiHighlighterUpdater {
     return spawn(highlighterBinaryPath, command);
   }
 
-  private static startHighlighterFromRepository(videoUri: string, milestonesPath: string) {
+  private static startHighlighterFromRepository(videoUri: string, milestonesPath?: string) {
     const rootPath = '../highlighter-api/';
     const command = [
       'run',
@@ -167,7 +167,7 @@ export class AiHighlighterUpdater {
   /**
    * Update highlighter to the latest version
    */
-  public async update(progressCallback?: (progress: IDownloadProgress) => void): Promise<void> {
+  public async update(progressCallback: (progress: IDownloadProgress) => void): Promise<void> {
     // if (Utils.isDevMode()) {
     //   console.log('skipping update in dev mode');
     //   return;

@@ -827,7 +827,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     return this.getClips(clips, streamId).every(clip => clip.loaded);
   }
 
-  private hasUnloadedClips(streamId: string) {
+  private hasUnloadedClips(streamId?: string) {
     return !this.views.clips
       .filter(c => {
         if (!c.enabled) return false;
@@ -1021,7 +1021,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     return exportOptions;
   }
 
-  private async generateRenderingClips(streamId: string, orientation: string) {
+  private async generateRenderingClips(streamId?: string, orientation?: string) {
     let renderingClips: RenderingClip[] = [];
 
     if (streamId) {
