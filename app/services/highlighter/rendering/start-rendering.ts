@@ -47,8 +47,6 @@ export async function startRendering(
   let fader: AudioCrossfader | null = null;
   let mixer: AudioMixer | null = null;
   try {
-    console.log('rendering started');
-
     // Estimate the total number of frames to set up export info
     const totalFrames = renderingClips.reduce((count: number, clip) => {
       return count + clip.frameSource.nFrames;

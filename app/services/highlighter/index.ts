@@ -38,6 +38,7 @@ import {
   IHighlightedStream,
   IHighlighterState,
   INewClipData,
+  isAiClip,
   IStreamInfoForAiHighlighter,
   IStreamMilestones,
   IUploadInfo,
@@ -67,8 +68,9 @@ import {
 import { HighlighterViews } from './highlighter-views';
 import { startRendering } from './rendering/start-rendering';
 import { cutHighlightClips } from './cut-highlight-clips';
-
-const isAiClip = (clip: TClip): clip is IAiClip => clip.source === 'AiClip';
+import { reduce } from 'lodash';
+import { extractDateTimeFromPath, fileExists } from './file-utils';
+import { addVerticalFilterToExportOptions } from './vertical-export';
 
 @InitAfter('StreamingService')
 export class HighlighterService extends PersistentStatefulService<IHighlighterState> {
@@ -150,7 +152,6 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
    * These are not serializable so kept out of state.
    */
   renderingClips: Dictionary<RenderingClip> = {};
-
   directoryCleared = false;
 
   @mutation()
@@ -309,7 +310,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
 
     //Check if files are existent, if not, delete
     this.views.clips.forEach(c => {
-      if (!this.fileExists(c.path)) {
+      if (!fileExists(c.path)) {
         this.removeClip(c.path, undefined);
       }
     });
@@ -474,6 +475,50 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     );
   }
 
+  setTransition(transition: Partial<ITransitionInfo>) {
+    this.SET_TRANSITION_INFO(transition);
+  }
+
+  setAudio(audio: Partial<IAudioInfo>) {
+    this.SET_AUDIO_INFO(audio);
+  }
+
+  setVideo(video: Partial<IVideoInfo>) {
+    this.SET_VIDEO_INFO(video);
+  }
+
+  resetExportedState() {
+    this.SET_EXPORT_INFO({ exported: false });
+  }
+  setExportFile(file: string) {
+    this.SET_EXPORT_INFO({ file });
+  }
+
+  setFps(fps: TFPS) {
+    this.SET_EXPORT_INFO({ fps });
+  }
+
+  setResolution(resolution: TResolution) {
+    this.SET_EXPORT_INFO({ resolution });
+  }
+
+  setPreset(preset: TPreset) {
+    this.SET_EXPORT_INFO({ preset });
+  }
+
+  dismissError() {
+    if (this.state.export.error) this.SET_EXPORT_INFO({ error: null });
+    if (this.state.upload.error) this.SET_UPLOAD_INFO({ error: false });
+    if (this.state.error) this.SET_ERROR('');
+  }
+
+  dismissTutorial() {
+    this.DISMISS_TUTORIAL();
+  }
+
+  // =================================================================================================
+  // CLIPS logic
+  // =================================================================================================
   addClips(
     newClips: { path: string; startTime?: number; endTime?: number }[],
     streamId: string | undefined,
@@ -669,7 +714,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
       return;
     }
     if (
-      this.fileExists(path) &&
+      fileExists(path) &&
       streamId &&
       clip.streamInfo &&
       Object.keys(clip.streamInfo).length > 1
@@ -710,116 +755,13 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     }
   }
 
-  setTransition(transition: Partial<ITransitionInfo>) {
-    this.SET_TRANSITION_INFO(transition);
-  }
-
-  setAudio(audio: Partial<IAudioInfo>) {
-    this.SET_AUDIO_INFO(audio);
-  }
-
-  setVideo(video: Partial<IVideoInfo>) {
-    this.SET_VIDEO_INFO(video);
-  }
-
-  resetExportedState() {
-    this.SET_EXPORT_INFO({ exported: false });
-  }
-  setExportFile(file: string) {
-    this.SET_EXPORT_INFO({ file });
-  }
-
-  setFps(fps: TFPS) {
-    this.SET_EXPORT_INFO({ fps });
-  }
-
-  setResolution(resolution: TResolution) {
-    this.SET_EXPORT_INFO({ resolution });
-  }
-
-  setPreset(preset: TPreset) {
-    this.SET_EXPORT_INFO({ preset });
-  }
-
-  dismissError() {
-    if (this.state.export.error) this.SET_EXPORT_INFO({ error: null });
-    if (this.state.upload.error) this.SET_UPLOAD_INFO({ error: false });
-    if (this.state.error) this.SET_ERROR('');
-  }
-
-  dismissTutorial() {
-    this.DISMISS_TUTORIAL();
-  }
-
-  fileExists(file: string): boolean {
-    return fs.existsSync(file);
-  }
-
-  // TODO M: Temp way to solve the issue
-  addStream(streamInfo: IHighlightedStream) {
-    return new Promise<void>(resolve => {
-      this.ADD_HIGHLIGHTED_STREAM(streamInfo);
-      setTimeout(() => {
-        resolve();
-      }, 2000);
-    });
-  }
-
-  updateStream(streamInfo: IHighlightedStream) {
-    this.UPDATE_HIGHLIGHTED_STREAM(streamInfo);
-  }
-
-  removeStream(streamId: string) {
-    this.REMOVE_HIGHLIGHTED_STREAM(streamId);
-
-    //Remove clips from stream
-    const clipsToRemove = this.getClips(this.views.clips, streamId);
-    clipsToRemove.forEach(clip => {
-      this.removeClip(clip.path, streamId);
-    });
-  }
-
-  setAiHighlighter(state: boolean) {
-    this.SET_USE_AI_HIGHLIGHTER(state);
-    this.usageStatisticsService.recordAnalyticsEvent('AIHighlighter', {
-      type: 'Toggled',
-      value: state,
-    });
-  }
-
-  toggleAiHighlighter() {
-    if (this.state.useAiHighlighter) {
-      this.SET_USE_AI_HIGHLIGHTER(false);
-    } else {
-      this.SET_USE_AI_HIGHLIGHTER(true);
-    }
-  }
-
-  async installAiHighlighter(downloadNow: boolean = false) {
-    this.setAiHighlighter(true);
-    if (downloadNow) {
-      await this.aiHighlighterUpdater.isNewVersionAvailable();
-      this.startUpdater();
-    } else {
-      // Only for go live view to immediately show the toggle. For other flows, the updater will set the version
-      this.SET_HIGHLIGHTER_VERSION('0.0.0');
-    }
-  }
-
-  async uninstallAiHighlighter() {
-    this.setAiHighlighter(false);
-    this.SET_HIGHLIGHTER_VERSION('');
-
-    await this.aiHighlighterUpdater?.uninstall();
-  }
-
   async loadClips(streamInfoId?: string | undefined) {
     const clipsToLoad: TClip[] = this.getClips(this.views.clips, streamInfoId);
     // this.resetRenderingClips();
     await this.ensureScrubDirectory();
 
     for (const clip of clipsToLoad) {
-      if (!this.fileExists(clip.path)) {
+      if (!fileExists(clip.path)) {
         this.removeClip(clip.path, streamInfoId);
         return;
       }
@@ -864,14 +806,85 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     return;
   }
 
-  cancelExport() {
-    this.SET_EXPORT_INFO({ cancelRequested: true });
+  getClips(clips: TClip[], streamId?: string): TClip[] {
+    return clips.filter(clip => {
+      if (clip.path === 'add') {
+        return false;
+      }
+      const exists = fileExists(clip.path);
+      if (!exists) {
+        this.removeClip(clip.path, streamId);
+        return false;
+      }
+      if (streamId) {
+        return clip.streamInfo?.[streamId];
+      }
+      return true;
+    });
   }
 
-  resetRenderingClips() {
-    this.renderingClips = {};
+  getClipsLoaded(clips: TClip[], streamId?: string): boolean {
+    return this.getClips(clips, streamId).every(clip => clip.loaded);
   }
 
+  private hasUnloadedClips(streamId: string) {
+    return !this.views.clips
+      .filter(c => {
+        if (!c.enabled) return false;
+        if (!streamId) return true;
+        return c.streamInfo && c.streamInfo[streamId] !== undefined;
+      })
+      .every(clip => clip.loaded);
+  }
+
+  enableOnlySpecificClips(clips: TClip[], streamId?: string) {
+    clips.forEach(clip => {
+      this.UPDATE_CLIP({
+        path: clip.path,
+        enabled: false,
+      });
+    });
+
+    // Enable specific clips
+    const clipsToEnable = this.getClips(clips, streamId);
+    clipsToEnable.forEach(clip => {
+      this.UPDATE_CLIP({
+        path: clip.path,
+        enabled: true,
+      });
+    });
+  }
+
+  // =================================================================================================
+  // STREAM logic
+  // =================================================================================================
+  // TODO M: Temp way to solve the issue
+  addStream(streamInfo: IHighlightedStream) {
+    return new Promise<void>(resolve => {
+      this.ADD_HIGHLIGHTED_STREAM(streamInfo);
+      setTimeout(() => {
+        resolve();
+      }, 2000);
+    });
+  }
+
+  updateStream(streamInfo: IHighlightedStream) {
+    this.UPDATE_HIGHLIGHTED_STREAM(streamInfo);
+  }
+
+  removeStream(streamId: string) {
+    this.REMOVE_HIGHLIGHTED_STREAM(streamId);
+
+    //Remove clips from stream
+    const clipsToRemove = this.getClips(this.views.clips, streamId);
+    clipsToRemove.forEach(clip => {
+      this.removeClip(clip.path, streamId);
+    });
+  }
+
+  // =================================================================================================
+  // SCRUB logic
+  // =================================================================================================
   private async ensureScrubDirectory() {
     try {
       try {
@@ -896,6 +909,9 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     }
   }
 
+  // =================================================================================================
+  // EXPORT logic
+  // =================================================================================================
   /**
    * Exports the video using the currently configured settings
    * Return true if the video was exported, or false if not.
@@ -926,7 +942,11 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     });
 
     let renderingClips: RenderingClip[] = await this.generateRenderingClips(streamId, orientation);
-    const exportOptions: IExportOptions = this.generateExportOptions(preview, orientation);
+    const exportOptions: IExportOptions = this.generateExportOptions(
+      renderingClips,
+      preview,
+      orientation,
+    );
 
     // Reset all clips
     await pmap(renderingClips, c => c.reset(exportOptions), {
@@ -980,7 +1000,11 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     this.SET_UPLOAD_INFO({ videoId: null });
   }
 
-  private generateExportOptions(preview: boolean, orientation: string) {
+  private generateExportOptions(
+    renderingClips: RenderingClip[],
+    preview: boolean,
+    orientation: string,
+  ) {
     const exportOptions: IExportOptions = preview
       ? { width: 1280 / 4, height: 720 / 4, fps: 30, preset: 'ultrafast' }
       : {
@@ -992,19 +1016,9 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
 
     if (orientation === 'vertical') {
       // adds complex filter and flips width and height
-      this.addVerticalFilterToExportOptions(exportOptions);
+      addVerticalFilterToExportOptions(this.views.clips, renderingClips, exportOptions);
     }
     return exportOptions;
-  }
-
-  private hasUnloadedClips(streamId: string) {
-    return !this.views.clips
-      .filter(c => {
-        if (!c.enabled) return false;
-        if (!streamId) return true;
-        return c.streamInfo && c.streamInfo[streamId] !== undefined;
-      })
-      .every(clip => clip.loaded);
   }
 
   private async generateRenderingClips(streamId: string, orientation: string) {
@@ -1060,78 +1074,6 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     return renderingClips;
   }
 
-  /**
-   *
-   * @param exportOptions export options to be modified
-   * Take the existing export options, flips the resolution to vertical and adds complex filter to move webcam to top
-   */
-  private addVerticalFilterToExportOptions(exportOptions: IExportOptions) {
-    const webcamCoordinates = this.getWebcamPosition();
-    const newWidth = exportOptions.height;
-    const newHeight = exportOptions.width;
-    // exportOptions.height = exportOptions.width;
-    // exportOptions.width = newWidth;
-    exportOptions.complexFilter = this.getWebcamComplexFilterForFfmpeg(
-      webcamCoordinates,
-      newWidth,
-      newHeight,
-    );
-  }
-  /**
-   *
-   * @param
-   * @returns
-   * Gets the first webcam position from all of the clips
-   * should get webcam position for a specific clip soon
-   */
-  private getWebcamPosition() {
-    const clipWithWebcam = this.views.clips.find(
-      clip =>
-        isAiClip(clip) &&
-        !!clip?.aiInfo?.metadata?.webcam_coordinates &&
-        this.renderingClips[clip.path],
-    ) as IAiClip;
-    return clipWithWebcam?.aiInfo?.metadata?.webcam_coordinates || undefined;
-  }
-
-  /**
-   *
-   * @param webcamCoordinates
-   * @param outputWidth
-   * @param outputHeight
-   * @returns properly formatted complex filter for ffmpeg to move webcam to top in vertical video
-   */
-  private getWebcamComplexFilterForFfmpeg(
-    webcamCoordinates: ICoordinates | null,
-    outputWidth: number,
-    outputHeight: number,
-  ) {
-    if (!webcamCoordinates) {
-      return `
-      [0:v]crop=ih*${outputWidth}/${outputHeight}:ih,scale=${outputWidth}:-1:force_original_aspect_ratio=increase[final];
-      `;
-    }
-
-    const webcamTopX = webcamCoordinates?.x1;
-    const webcamTopY = webcamCoordinates?.y1;
-    const webcamWidth = webcamCoordinates?.x2 - webcamCoordinates?.x1;
-    const webcamHeight = webcamCoordinates?.y2 - webcamCoordinates?.y1;
-
-    const oneThirdHeight = outputHeight / 3;
-    const twoThirdsHeight = (outputHeight * 2) / 3;
-
-    return `
-    [0:v]split=3[webcam][vid][blur_source];
-    color=c=black:s=${outputWidth}x${outputHeight}:d=1[base];
-    [webcam]crop=w=${webcamWidth}:h=${webcamHeight}:x=${webcamTopX}:y=${webcamTopY},scale=-1:${oneThirdHeight}[webcam_final];
-    [vid]crop=ih*${outputWidth}/${twoThirdsHeight}:ih,scale=${outputWidth}:${twoThirdsHeight}[vid_cropped];
-    [blur_source]crop=ih*${outputWidth}/${twoThirdsHeight}:ih,scale=${outputWidth}:${oneThirdHeight},gblur=sigma=50[blur];
-    [base][blur]overlay=x=0:y=0[blur_base];
-    [blur_base][webcam_final]overlay='(${outputWidth}-overlay_w)/2:(${oneThirdHeight}-overlay_h)/2'[base_webcam];
-    [base_webcam][vid_cropped]overlay=x=0:y=${oneThirdHeight}[final];
-    `;
-  }
-
   // We throttle because this can go extremely fast, especially on previews
   @throttle(100)
   private setCurrentFrame(frame: number) {
@@ -1140,30 +1082,74 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     this.SET_EXPORT_INFO({ currentFrame: frame });
   }
 
-  cancelFunction: (() => void) | null = null;
+  cancelExport() {
+    this.SET_EXPORT_INFO({ cancelRequested: true });
+  }
 
-  /**
-   * Will cancel the currently in progress upload
-   */
-  cancelUpload() {
-    if (this.cancelFunction && this.views.uploadInfo.uploading) {
-      this.SET_UPLOAD_INFO({ cancelRequested: true });
-      this.cancelFunction();
+  resetRenderingClips() {
+    this.renderingClips = {};
+  }
+
+  // =================================================================================================
+  // AI-HIGHLIGHTER logic
+  // =================================================================================================
+
+  setAiHighlighter(state: boolean) {
+    this.SET_USE_AI_HIGHLIGHTER(state);
+    this.usageStatisticsService.recordAnalyticsEvent('AIHighlighter', {
+      type: 'Toggled',
+      value: state,
+    });
+  }
+
+  toggleAiHighlighter() {
+    if (this.state.useAiHighlighter) {
+      this.SET_USE_AI_HIGHLIGHTER(false);
+    } else {
+      this.SET_USE_AI_HIGHLIGHTER(true);
     }
   }
 
-  clearUpload() {
-    this.CLEAR_UPLOAD();
+  async installAiHighlighter(downloadNow: boolean = false) {
+    this.setAiHighlighter(true);
+    if (downloadNow) {
+      await this.aiHighlighterUpdater.isNewVersionAvailable();
+      this.startUpdater();
+    } else {
+      // Only for go live view to immediately show the toggle. For other flows, the updater will set the version
+      this.SET_HIGHLIGHTER_VERSION('0.0.0');
+    }
   }
 
-  extractDateTimeFromPath(filePath: string): string | undefined {
+  async uninstallAiHighlighter() {
+    this.setAiHighlighter(false);
+    this.SET_HIGHLIGHTER_VERSION('');
+
+    await this.aiHighlighterUpdater?.uninstall();
+  }
+
+  /**
+   * Start updater process
+   */
+  async startUpdater() {
     try {
-      const parts = filePath.split(/[/\\]/);
-      const fileName = parts[parts.length - 1];
-      const dateTimePart = fileName.split('.')[0];
-      return dateTimePart;
-    } catch (error: unknown) {
-      return undefined;
+      this.SET_UPDATER_STATE(true);
+      this.SET_HIGHLIGHTER_VERSION(this.aiHighlighterUpdater.version || '');
+      await this.aiHighlighterUpdater.update(progress => this.updateProgress(progress));
+    } finally {
+      this.SET_UPDATER_STATE(false);
+    }
+  }
+  private updateProgress(progress: IDownloadProgress) {
+    // this is a lie and its not a percent, its float from 0 and 1
+    this.SET_UPDATER_PROGRESS(progress.percent * 100);
+  }
+
+  cancelHighlightGeneration(streamId: string): void {
+    const stream = this.views.highlightedStreams.find(s => s.id === streamId);
+    if (stream && stream.abortController) {
+      console.log('cancelHighlightGeneration', streamId);
+      stream.abortController.abort();
     }
   }
 
@@ -1201,7 +1187,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     const fallbackTitle = 'awesome-stream';
     const sanitizedTitle = streamInfo.title
       ? streamInfo.title.replace(/[\\/:"*?<>|]+/g, ' ')
-      : this.extractDateTimeFromPath(filePath) || fallbackTitle;
+      : extractDateTimeFromPath(filePath) || fallbackTitle;
 
     const setStreamInfo: IHighlightedStream = {
       state: {
@@ -1279,36 +1265,6 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
 
     return;
   }
-
-  cancelHighlightGeneration(streamId: string): void {
-    const stream = this.views.highlightedStreams.find(s => s.id === streamId);
-    if (stream && stream.abortController) {
-      console.log('cancelHighlightGeneration', streamId);
-      stream.abortController.abort();
-    }
-  }
-
-  getClips(clips: TClip[], streamId?: string): TClip[] {
-    return clips.filter(clip => {
-      if (clip.path === 'add') {
-        return false;
-      }
-      const exists = this.fileExists(clip.path);
-      if (!exists) {
-        this.removeClip(clip.path, streamId);
-        return false;
-      }
-      if (streamId) {
-        return clip.streamInfo?.[streamId];
-      }
-      return true;
-    });
-  }
-
-  getClipsLoaded(clips: TClip[], streamId?: string): boolean {
-    return this.getClips(clips, streamId).every(clip => clip.loaded);
-  }
-
   getRoundDetails(
     clips: TClip[],
   ): { round: number; inputs: IInput[]; duration: number; hypeScore: number }[] {
@@ -1345,42 +1301,6 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     });
   }
 
-  enableOnlySpecificClips(clips: TClip[], streamId?: string) {
-    clips.forEach(clip => {
-      this.UPDATE_CLIP({
-        path: clip.path,
-        enabled: false,
-      });
-    });
-
-    // Enable specific clips
-    const clipsToEnable = this.getClips(clips, streamId);
-    clipsToEnable.forEach(clip => {
-      this.UPDATE_CLIP({
-        path: clip.path,
-        enabled: true,
-      });
-    });
-  }
-
-  private updateProgress(progress: IDownloadProgress) {
-    // this is a lie and its not a percent, its float from 0 and 1
-    this.SET_UPDATER_PROGRESS(progress.percent * 100);
-  }
-
-  /**
-   * Start updater process
-   */
-  async startUpdater() {
-    try {
-      this.SET_UPDATER_STATE(true);
-      this.SET_HIGHLIGHTER_VERSION(this.aiHighlighterUpdater.version || '');
-      await this.aiHighlighterUpdater.update(progress => this.updateProgress(progress));
-    } finally {
-      this.SET_UPDATER_STATE(false);
-    }
-  }
-
   /**
    * Create milestones file if ids match and return path
    */
@@ -1404,7 +1324,24 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
 
     return milestonesPath;
   }
-  // UPLOAD
+  // =================================================================================================
+  // UPLOAD logic
+  // =================================================================================================
+
+  cancelFunction: (() => void) | null = null;
+  /**
+   * Will cancel the currently in progress upload
+   */
+  cancelUpload() {
+    if (this.cancelFunction && this.views.uploadInfo.uploading) {
+      this.SET_UPLOAD_INFO({ cancelRequested: true });
+      this.cancelFunction();
+    }
+  }
+
+  clearUpload() {
+    this.CLEAR_UPLOAD();
+  }
 
   async uploadYoutube(options: IYoutubeVideoUploadOptions) {
     if (!this.userService.state.auth?.platforms.youtube) {

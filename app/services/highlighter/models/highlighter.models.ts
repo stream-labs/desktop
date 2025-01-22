@@ -3,6 +3,8 @@ import { ITransitionInfo, IAudioInfo, IExportInfo, IVideoInfo } from './renderin
 
 export type TClip = IAiClip | IReplayBufferClip | IManualClip;
 
+export const isAiClip = (clip: TClip): clip is IAiClip => clip.source === 'AiClip';
+
 export interface IHighlighterState {
   clips: Dictionary<TClip>;
   transition: ITransitionInfo;

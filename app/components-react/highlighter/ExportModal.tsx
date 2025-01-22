@@ -18,6 +18,7 @@ import StorageUpload from './StorageUpload';
 import { useVuex } from 'components-react/hooks';
 import { initStore, useController } from '../hooks/zustand';
 import { TOrientation } from 'services/highlighter/models/ai-highlighter.models';
+import { fileExists } from 'services/highlighter/file-utils';
 
 class ExportController {
   get service() {
@@ -72,7 +73,7 @@ class ExportController {
   }
 
   async fileExists(exportFile: string) {
-    return await this.service.actions.return.fileExists(exportFile);
+    return await fileExists(exportFile);
   }
 }
 
