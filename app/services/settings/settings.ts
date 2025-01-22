@@ -21,11 +21,10 @@ import { VideoEncodingOptimizationService } from 'services/video-encoding-optimi
 import { PlatformAppsService } from 'services/platform-apps';
 import { EDeviceType, HardwareService } from 'services/hardware';
 import { StreamingService } from 'services/streaming';
-import { byOS, getOS, OS } from 'util/operating-systems';
+import { byOS, OS } from 'util/operating-systems';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { Subject } from 'rxjs';
-import * as remote from '@electron/remote';
 import fs from 'fs';
 import path from 'path';
 
@@ -267,10 +266,6 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
   }
 
   init() {
-    this.loadSettingsIntoStore();
-    this.ensureValidEncoder();
-    this.sceneCollectionsService.collectionSwitched.subscribe(() => this.refreshAudioSettings());
-
     // TODO: Remove in a week
     try {
       if (fs.existsSync(path.join(this.appService.appDataDirectory, 'HADisable'))) {
@@ -336,19 +331,6 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
       type: settingsMetadata.type,
       formData: settings,
     };
-  }
-
-  /**
-   * Can be called externally to ensure that you have the absolute latest settings
-   * fetched from OBS directly.
-   */
-  loadSettingsIntoStore() {
-    // load configuration from nodeObs to state
-    const settingsFormData = {};
-    this.getCategories().forEach(categoryName => {
-      settingsFormData[categoryName] = this.fetchSettingsFromObs(categoryName);
-    });
-    this.SET_SETTINGS(settingsFormData);
   }
 
   /**
@@ -461,7 +443,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
     return option ? option.value : options[0].value;
   }
 
-  private patchSetting(
+  patchSetting(
     settingsFormData: ISettingsSubCategory[],
     name: string,
     patch: Partial<IObsInput<TObsValue>>,
@@ -654,35 +636,6 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
         source.setName(displayName);
       }
     });
-  }
-
-  private ensureValidEncoder() {
-    if (getOS() === OS.Mac) return;
-
-    const encoderSetting: IObsListInput<string> =
-      this.findSetting(this.state.Output.formData, 'Streaming', 'Encoder') ??
-      this.findSetting(this.state.Output.formData, 'Streaming', 'StreamEncoder');
-    const encoderIsValid = !!encoderSetting.options.find(opt => opt.value === encoderSetting.value);
-
-    // The backend incorrectly defaults to obs_x264 in Simple mode rather x264.
-    // In this case we shouldn't do anything here.
-    if (encoderSetting.value === 'obs_x264') return;
-
-    if (!encoderIsValid) {
-      const mode: string = this.findSettingValue(this.state.Output.formData, 'Untitled', 'Mode');
-
-      if (mode === 'Advanced') {
-        this.setSettingValue('Output', 'Encoder', 'obs_x264');
-      } else {
-        this.setSettingValue('Output', 'StreamEncoder', 'x264');
-      }
-
-      remote.dialog.showMessageBox(this.windowsService.windows.main, {
-        type: 'error',
-        message:
-          'Your stream encoder has been reset to Software (x264). This can be caused by out of date graphics drivers. Please update your graphics drivers to continue using hardware encoding.',
-      });
-    }
   }
 
   @mutation()

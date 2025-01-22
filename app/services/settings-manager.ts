@@ -1,4 +1,4 @@
-import { Service } from 'services/core';
+import { InitAfter, Service } from 'services/core';
 import { RealmObject } from './realm';
 import { ObjectSchema } from 'realm';
 import {
@@ -9,13 +9,18 @@ import {
   TObsType,
   TObsValue,
   IObsListOption,
+  IObsListInput,
 } from 'components/obs/inputs/ObsInput';
-import { ISettingsCategory, ISettingsSubCategory } from './settings/settings';
+import { SettingsService, ISettingsCategory, ISettingsSubCategory } from 'services/settings';
 import * as obs from '../../obs-api';
 import { Inject } from '../services/core/injector';
 import { SourcesService } from 'services/sources';
 import { AudioService, E_AUDIO_CHANNELS } from 'services/audio';
-import { byOS, OS } from 'util/operating-systems';
+import { byOS, getOS, OS } from 'util/operating-systems';
+import { SceneCollectionsService } from 'services/scene-collections';
+import { WindowsService } from 'services/windows';
+import * as remote from '@electron/remote';
+import { TDisplayType } from './settings-v2';
 
 /**
  * TODO: Remove when we are sure that the string conversion method works
@@ -67,6 +72,8 @@ import { byOS, OS } from 'util/operating-systems';
  * SettingListValue.register({ persist: true });
  *
  */
+
+type TSettingsProfile = 'General' | 'Stream' | 'StreamSecond' | 'Output' | 'Advanced';
 
 class SettingListOption extends RealmObject implements IObsListOption<TObsValue> {
   description: string;
@@ -205,7 +212,7 @@ export class SettingsProfile extends RealmObject {
         default: {} as SettingsCategory,
       },
       Output: { type: 'object', objectType: 'SettingsCategory', default: {} as SettingsCategory },
-      Video: { type: 'object', objectType: 'SettingsCategory', default: {} as SettingsCategory },
+      // Video: { type: 'object', objectType: 'SettingsCategory', default: {} as SettingsCategory },
       // Audio: <== from audio settings service
       Advanced: {
         type: 'object',
@@ -281,12 +288,49 @@ export class SettingsProfile extends RealmObject {
     }
     return categories;
   }
+}
+
+SettingsProfile.register({ persist: true });
+
+export class SettingsManagerState extends RealmObject {
+  horizontal: SettingsProfile;
+  vertical: SettingsProfile;
+
+  static schema: ObjectSchema = {
+    name: 'SettingsManagerState',
+    properties: {
+      horizontal: {
+        type: 'object',
+        objectType: 'SettingsProfile',
+        default: {},
+      },
+      vertical: {
+        type: 'object',
+        objectType: 'SettingsProfile',
+        default: {},
+      },
+    },
+  };
+
+  get categories() {
+    return Object.keys(this.horizontal.categories);
+  }
+
+  get displays() {
+    return this.toObject(true);
+  }
+
+  get default() {
+    return this.horizontal;
+  }
 
   protected onCreated(): void {
     const settingsFormData = this.formatObsSettings();
 
     this.db.write(() => {
-      Object.assign(this, settingsFormData);
+      for (const display in this.displays) {
+        this.deepPatch(Object.assign(this, { [display]: { ...settingsFormData } }));
+      }
     });
   }
 
@@ -384,31 +428,6 @@ export class SettingsProfile extends RealmObject {
       formData: settings,
     };
   }
-}
-
-SettingsProfile.register({ persist: true });
-
-export class SettingsManagerState extends RealmObject {
-  horizontal: SettingsProfile;
-  vertical: SettingsProfile;
-
-  static schema: ObjectSchema = {
-    name: 'SettingsManagerState',
-    properties: {
-      horizontal: {
-        type: 'object',
-        objectType: 'SettingsProfile',
-        default: {},
-      },
-      vertical: {
-        type: 'object',
-        objectType: 'SettingsProfile',
-        default: {},
-      },
-    },
-  };
-
-  protected onCreated(): void {}
 
   get values() {
     return {
@@ -420,13 +439,37 @@ export class SettingsManagerState extends RealmObject {
 
 SettingsManagerState.register({ persist: true });
 
+@InitAfter('SettingsService')
 export class SettingsManagerService extends Service {
   @Inject() private sourcesService: SourcesService;
   @Inject() private audioService: AudioService;
-  state = SettingsProfile.inject();
+  @Inject() private sceneCollectionsService: SceneCollectionsService;
+  @Inject() private settingsService: SettingsService;
+  @Inject() private windowsService: WindowsService;
+
+  state = SettingsManagerState.inject();
 
   init() {
-    // fetch most recent backend options
+    // this.loadSettingsIntoStore();
+    this.ensureValidEncoder('horizontal');
+    this.ensureValidEncoder('vertical');
+
+    this.sceneCollectionsService.collectionSwitched.subscribe(() =>
+      this.settingsService.refreshAudioSettings(),
+    );
+  }
+
+  /**
+   * Load latest settings from obs into the realms
+   */
+  loadSettingsIntoStore() {
+    // load configuration from nodeObs to state
+    Object.keys(this.state.displays).forEach((display: TDisplayType) => {
+      this.state.categories.forEach((categoryName: TSettingsProfile) => {
+        const settings = this.state.fetchSettingsFromObs(categoryName);
+        this.setSettings({ [categoryName]: settings }, display);
+      });
+    });
   }
 
   formatObsSettings() {
@@ -471,8 +514,73 @@ export class SettingsManagerService extends Service {
     });
   }
 
-  updateSettingsOptions(category: string, subCategory: string, parameter: string, patch: any) {
-    const settings = this.state.values;
+  /**
+   * Ensure that the output encoder is valid
+   * @remark Copied from the settings service because it needs to reference the settings profile realm
+   */
+  private ensureValidEncoder(display: TDisplayType) {
+    if (getOS() === OS.Mac) return;
+
+    const encoderSetting: IObsListInput<string> =
+      this.settingsService.findSetting(
+        this.state[display].Output.formData,
+        'Streaming',
+        'Encoder',
+      ) ??
+      this.settingsService.findSetting(
+        this.state[display].Output.formData,
+        'Streaming',
+        'StreamEncoder',
+      );
+    const encoderIsValid = !!encoderSetting.options.find(opt => opt.value === encoderSetting.value);
+
+    // The backend incorrectly defaults to obs_x264 in Simple mode rather x264.
+    // In this case we shouldn't do anything here.
+    if (encoderSetting.value === 'obs_x264') return;
+
+    if (!encoderIsValid) {
+      const mode: string = this.settingsService.findSettingValue(
+        this.state[display].Output.formData,
+        'Untitled',
+        'Mode',
+      );
+
+      if (mode === 'Advanced') {
+        this.setSettingValue('Output', 'Encoder', 'obs_x264', display);
+      } else {
+        this.setSettingValue('Output', 'StreamEncoder', 'x264', display);
+      }
+
+      remote.dialog.showMessageBox(this.windowsService.windows.main, {
+        type: 'error',
+        message:
+          'Your stream encoder has been reset to Software (x264). This can be caused by out of date graphics drivers. Please update your graphics drivers to continue using hardware encoding.',
+      });
+    }
+  }
+
+  /**
+   * Set an individual setting value
+   */
+  setSettingValue(category: string, name: string, value: TObsValue, display: TDisplayType) {
+    const formData = this.settingsService.patchSetting(
+      this.state.fetchSettingsFromObs(category).formData,
+      name,
+      {
+        value,
+      },
+    );
+    this.setSettings(category, formData, display);
+  }
+
+  updateSettingsOptions(
+    category: keyof SettingsProfile,
+    subCategory: string,
+    parameter: string,
+    patch: any,
+    display: TDisplayType,
+  ) {
+    const settings = this.state[display].values;
     const updatedSettings = settings[category].formData.map((subCat: ISettingsSubCategory) => {
       if (subCat.nameSubCategory === subCategory) {
         const updatedParameters = subCat.parameters.map((param: any) => {
@@ -554,10 +662,40 @@ export class SettingsManagerService extends Service {
     // this.setSettings({ categoryName: { formData: dataToSave } });
   }
 
-  setSettings(settingsPatch: DeepPartial<SettingsProfile>) {
+  setSettings(
+    categoryName: keyof SettingsProfile,
+    settingsPatch: DeepPartial<SettingsCategory>, // ISettingsSubCategory
+    display: TDisplayType,
+  ) {
+    if (categoryName === 'Audio') this.setAudioSettings([settingsData.pop()]);
+    if (categoryName === 'Video' && forceApplyCategory && forceApplyCategory !== 'Video') return;
+
+    const dataToSave = [];
+
+    for (const subGroup of settingsData) {
+      dataToSave.push({
+        ...subGroup,
+        parameters: inputValuesToObsValues(subGroup.parameters, {
+          valueToCurrentValue: true,
+        }),
+      });
+
+      if (
+        categoryName === 'Output' &&
+        subGroup.nameSubCategory === 'Untitled' &&
+        subGroup.parameters[0].value === 'Simple'
+      ) {
+        this.audioService.setSimpleTracks();
+      }
+    }
+
+    const newSettings = { [categoryName]: settingsPatch };
+
     this.state.db.write(() => {
-      this.state.deepPatch(settingsPatch);
+      this.state.deepPatch({ [display]: settingsPatch });
     });
+
+    obs.NodeObs.OBS_settings_saveSettings(categoryName, newSettings);
   }
 
   private setAudioSettings(settingsData: ISettingsSubCategory[]) {
