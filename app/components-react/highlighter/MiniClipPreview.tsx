@@ -29,7 +29,6 @@ export default function MiniClipPreview({
       className={styles.miniClipCheckbox}
       key={clip.path}
       style={{
-        position: 'relative',
         display: showDisabled || clip.enabled ? 'inline-block' : 'none',
       }}
     >
@@ -46,7 +45,7 @@ export default function MiniClipPreview({
       <img
         onClick={emitPlayClip}
         src={clip.scrubSprite}
-        className={styles.thumbnailClips}
+        className={styles.thumbnailSpecs}
         style={{
           opacity: !clip.enabled ? '0.3' : '1',
           width: `${SCRUB_WIDTH / 6}px`,
