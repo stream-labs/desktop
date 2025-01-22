@@ -16,12 +16,6 @@ export const FFPROBE_EXE = path.join(
   getOS() === OS.Mac ? path.join('Frameworks', 'ffprobe') : 'ffprobe.exe',
 );
 
-/**
- * Enable to use predefined clips instead of pulling from
- * the replay buffer.
- */
-export const TEST_MODE = false;
-
 export const SCRUB_WIDTH = 320;
 export const SCRUB_HEIGHT = 180;
 export const SCRUB_FRAMES = 20;
@@ -30,3 +24,9 @@ export const SCRUB_SPRITE_DIRECTORY = path.join(remote.app.getPath('userData'), 
 export const FADE_OUT_DURATION = 1;
 
 export const SUPPORTED_FILE_TYPES = ['mp4', 'mov', 'mkv'];
+
+export const AI_HIGHLIGHTER_BUILDS_URL_STAGING =
+  'https://cdn-highlighter-builds.streamlabs.com/staging/manifest_win_x86_64.json';
+
+export const AI_HIGHLIGHTER_BUILDS_URL_PRODUCTION =
+  'https://cdn-highlighter-builds.streamlabs.com/production/manifest_win_x86_64.json';

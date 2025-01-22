@@ -150,7 +150,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
       try {
         filePath = await importStreamFromDevice();
         if (filePath && filePath.length > 0) {
-          HighlighterService.actions.flow(filePath[0], streamInfo);
+          HighlighterService.actions.detectAndClipAiHighlights(filePath[0], streamInfo);
           close();
         } else {
           // No file selected
@@ -226,7 +226,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
         id: 'manual_' + uuid(),
         game: 'Fortnite',
       };
-      HighlighterService.actions.flow(filtered[0], StreamInfoForAiHighlighter);
+      HighlighterService.actions.detectAndClipAiHighlights(filtered[0], StreamInfoForAiHighlighter);
     }
 
     e.preventDefault();

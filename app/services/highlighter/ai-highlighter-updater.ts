@@ -6,8 +6,12 @@ import crypto from 'crypto';
 import { pipeline } from 'stream/promises';
 import { importExtractZip } from 'util/slow-imports';
 import { spawn } from 'child_process';
-import { FFMPEG_EXE } from '../constants';
-import Utils from '../../utils';
+import {
+  AI_HIGHLIGHTER_BUILDS_URL_PRODUCTION,
+  AI_HIGHLIGHTER_BUILDS_URL_STAGING,
+  FFMPEG_EXE,
+} from './constants';
+import Utils from '../utils';
 import * as remote from '@electron/remote';
 
 interface IAIHighlighterManifest {
@@ -114,9 +118,9 @@ export class AiHighlighterUpdater {
   private getManifestUrl(): string {
     if (Utils.getHighlighterEnvironment() === 'staging') {
       const cacheBuster = Math.floor(Date.now() / 1000);
-      return `https://cdn-highlighter-builds.streamlabs.com/staging/manifest_win_x86_64.json?t=${cacheBuster}`;
+      return `${AI_HIGHLIGHTER_BUILDS_URL_STAGING}?t=${cacheBuster}`;
     } else {
-      return 'https://cdn-highlighter-builds.streamlabs.com/production/manifest_win_x86_64.json';
+      return AI_HIGHLIGHTER_BUILDS_URL_PRODUCTION;
     }
   }
   /**

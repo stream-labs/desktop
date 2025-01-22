@@ -1,6 +1,6 @@
 import * as child from 'child_process';
 import EventEmitter from 'events';
-import { AiHighlighterUpdater } from './updater';
+import { AiHighlighterUpdater } from './ai-highlighter-updater';
 import { duration } from 'moment';
 import kill from 'tree-kill';
 import {
@@ -8,7 +8,7 @@ import {
   IHighlighterMessage,
   IHighlighterMilestone,
   IHighlighterProgressMessage,
-} from '../models/ai-highlighter.models';
+} from './models/ai-highlighter.models';
 
 const START_TOKEN = '>>>>';
 const END_TOKEN = '<<<<';

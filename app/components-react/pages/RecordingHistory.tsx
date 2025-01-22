@@ -138,7 +138,7 @@ class RecordingHistoryController {
     }
     if (platform === 'highlighter') {
       if (this.aiDetectionInProgress) return;
-      this.HighlighterService.actions.flow(recording.filename, {
+      this.HighlighterService.actions.detectAndClipAiHighlights(recording.filename, {
         game: 'forntnite',
         id: 'rec_' + uuid(),
       });
