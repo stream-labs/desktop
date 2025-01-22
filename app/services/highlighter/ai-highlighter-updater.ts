@@ -71,6 +71,7 @@ export class AiHighlighterUpdater {
       command.push('--milestones_file');
       command.push(milestonesPath);
     }
+    command.push('--use_sentry');
 
     return spawn(highlighterBinaryPath, command);
   }
