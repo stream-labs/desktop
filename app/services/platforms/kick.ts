@@ -222,32 +222,39 @@ export class KickService
 
     const request = new Request(url, { headers, method: 'POST', body });
 
-    return jfetch<IKickStartStreamResponse>(request).catch((e: IKickError | unknown) => {
-      console.error('Error starting Kick stream: ', e);
+    return jfetch<IKickStartStreamResponse>(request)
+      .then(resp => {
+        if (resp.channel_name) {
+          this.SET_CHANNEL_NAME(resp.channel_name);
+        }
+        return resp;
+      })
+      .catch((e: IKickError | unknown) => {
+        console.error('Error starting Kick stream: ', e);
 
-      const defaultError = {
-        status: 403,
-        statusText: 'Unable to start Kick stream.',
-      };
+        const defaultError = {
+          status: 403,
+          statusText: 'Unable to start Kick stream.',
+        };
 
-      if (!e) throwStreamError('PLATFORM_REQUEST_FAILED', defaultError);
+        if (!e) throwStreamError('PLATFORM_REQUEST_FAILED', defaultError);
 
-      // check if the error is an IKickError
-      if (typeof e === 'object' && e.hasOwnProperty('success')) {
-        const error = e as IKickError;
-        throwStreamError(
-          'PLATFORM_REQUEST_FAILED',
-          {
-            ...error,
-            status: 403,
-            statusText: error.message,
-          },
-          defaultError.statusText,
-        );
-      }
+        // check if the error is an IKickError
+        if (typeof e === 'object' && e.hasOwnProperty('success')) {
+          const error = e as IKickError;
+          throwStreamError(
+            'PLATFORM_REQUEST_FAILED',
+            {
+              ...error,
+              status: 403,
+              statusText: error.message,
+            },
+            defaultError.statusText,
+          );
+        }
 
-      throwStreamError('PLATFORM_REQUEST_FAILED', e as any, defaultError.statusText);
-    });
+        throwStreamError('PLATFORM_REQUEST_FAILED', e as any, defaultError.statusText);
+      });
   }
 
   async endStream(id: string) {
@@ -320,7 +327,6 @@ export class KickService
     const info = response as IKickStreamInfoResponse;
 
     if (info.channel) {
-      this.SET_CHANNEL_NAME(info.channel.title);
       this.UPDATE_STREAM_SETTINGS({
         title: info.channel.title,
         game: info.channel.category.name,
