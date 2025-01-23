@@ -259,13 +259,6 @@ export class KickService
     return jfetch<IKickEndStreamResponse>(request);
   }
 
-  /**
-   * Get if user is approved by TikTok to stream to TikTok
-   * @remark Only users approved by TikTok are allowed to generate
-   * stream keys. It is possible that users have received approval
-   * since the last time that they logged in using TikTok, so get this
-   * status every time the user sets the go live settings.
-   */
   async fetchStreamInfo(): Promise<IKickStreamInfoResponse | IKickError | void> {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/kick/info`;
@@ -339,7 +332,24 @@ export class KickService
   }
 
   async putChannelInfo(settings: IKickStartStreamOptions): Promise<void> {
-    this.SET_STREAM_SETTINGS(settings);
+    const host = this.hostsService.streamlabs;
+    const url = `https://${host}/api/v5/slobs/kick/info`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const body = new FormData();
+    body.append('title', settings.title);
+
+    const game = this.state.gameId;
+    body.append('category', game);
+
+    const request = new Request(url, { headers, method: 'PUT', body });
+    try {
+      await jfetch(request);
+      this.SET_STREAM_SETTINGS(settings);
+      return Promise.resolve();
+    } catch (e: unknown) {
+      console.warn('Error updating Kick channel info', e);
+      return Promise.reject();
+    }
   }
 
   getHeaders(req: IPlatformRequest, useToken?: string | boolean): IKickRequestHeaders {
