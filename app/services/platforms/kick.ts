@@ -150,7 +150,7 @@ export class KickService
         );
       }
 
-      await this.putChannelInfo(kickSettings);
+      this.SET_STREAM_SETTINGS(kickSettings);
       this.setPlatformContext('kick');
     } catch (e: unknown) {
       console.error('Error starting stream: ', e);
