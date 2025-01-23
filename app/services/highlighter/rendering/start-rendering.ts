@@ -227,9 +227,6 @@ export async function startRendering(
       });
     }
   } finally {
-    console.log('finally');
-    // this.resetRenderingClips();
-
     setExportInfo({
       exporting: false,
       exported: !exportInfo.cancelRequested && !isPreview && !exportInfo.error,
