@@ -319,6 +319,10 @@ export class KickService
       });
   }
 
+  async fetchGame(name: string): Promise<IGame> {
+    return (await this.searchGames(name))[0];
+  }
+
   /**
    * prepopulate channel info and save it to the store
    */
