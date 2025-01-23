@@ -74,6 +74,10 @@ export interface IOutroInfo {
   path: string;
   duration: number | null;
 }
+export interface ISingleVideoInfo {
+  path: string;
+  duration: number | null;
+}
 export interface IVideoInfo {
   intro: IIntroInfo;
   outro: IOutroInfo;

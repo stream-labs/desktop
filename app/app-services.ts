@@ -55,6 +55,7 @@ export { MacPermissionsService } from 'services/mac-permissions';
 export { VirtualWebcamService } from 'services/virtual-webcam';
 export { MetricsService } from 'services/metrics';
 export { HighlighterService } from 'services/highlighter';
+export { RHighlighterService } from 'services/highlighter/highligher-service-realm';
 export { DiagnosticsService } from 'services/diagnostics';
 export { RecordingModeService } from 'services/recording-mode';
 export { SideNavService } from 'services/side-nav';
@@ -163,6 +164,7 @@ import { PatchNotesService } from './services/patch-notes';
 import { VideoService } from './services/video';
 import { ChatService } from './services/chat';
 import { HighlighterService } from './services/highlighter';
+import { RHighlighterService } from './services/highlighter/highligher-service-realm';
 import { GrowService } from './services/grow/grow';
 import { TransitionsService } from './services/transitions';
 import { TcpServerService } from './services/api/tcp-server';
@@ -246,6 +248,7 @@ export const AppServices = {
   InstagramService,
   DismissablesService,
   HighlighterService,
+  RHighlighterService,
   GrowService,
   TransitionsService,
   TcpServerService,

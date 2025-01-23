@@ -13,6 +13,7 @@ import styles from './SettingsView.m.less';
 import { $t } from 'services/i18n';
 import { EHighlighterView, IViewState } from 'services/highlighter/models/highlighter.models';
 import { EAvailableFeatures } from 'services/incremental-rollout';
+import { useRealmObject } from '../hooks/realm';
 
 export default function SettingsView({
   emitSetView,
@@ -25,7 +26,7 @@ export default function SettingsView({
     HotkeysService,
     SettingsService,
     StreamingService,
-    HighlighterService,
+    RHighlighterService,
     IncrementalRolloutService,
   } = Services;
   const aiHighlighterFeatureEnabled = IncrementalRolloutService.views.featureIsEnabled(
@@ -37,9 +38,13 @@ export default function SettingsView({
   const v = useVuex(() => ({
     settingsValues: SettingsService.views.values,
     isStreaming: StreamingService.isStreaming,
-    useAiHighlighter: HighlighterService.views.useAiHighlighter,
-    highlighterVersion: HighlighterService.views.highlighterVersion,
   }));
+  const highlighterState = useRealmObject(RHighlighterService.state);
+  console.log('highlighterState', highlighterState);
+  console.log('highlighterState', highlighterState.currentHighlighterVersion);
+
+  // useAiHighlighter: RHighlighterService.views.useAiHighlighter,
+  // highlighterVersion: RHighlighterService.views.highlighterVersion,
 
   const correctlyConfigured =
     v.settingsValues.Output.RecRB &&
@@ -110,7 +115,7 @@ export default function SettingsView({
   }
 
   function toggleUseAiHighlighter() {
-    HighlighterService.actions.toggleAiHighlighter();
+    RHighlighterService.actions.toggleAiHighlighter();
   }
 
   return (
@@ -154,7 +159,7 @@ export default function SettingsView({
                   {$t(
                     'Automatically capture the best moments from your livestream and turn them into a highlight video.',
                   )}{' '}
-                  {v.highlighterVersion !== '' && (
+                  {highlighterState.currentHighlighterVersion !== '' && (
                     <span>
                       {$t(
                         'The AI Highlighter App can be managed in the Apps Manager tab or in Settings > Installed apps.',
@@ -163,11 +168,11 @@ export default function SettingsView({
                   )}
                 </p>
 
-                {v.highlighterVersion !== '' ? (
+                {highlighterState.currentHighlighterVersion !== '' ? (
                   <SwitchInput
                     style={{ margin: 0, marginLeft: '-10px' }}
                     size="default"
-                    value={v.useAiHighlighter}
+                    value={highlighterState.useAiHighlighter}
                     onChange={toggleUseAiHighlighter}
                   />
                 ) : (
@@ -175,7 +180,7 @@ export default function SettingsView({
                     style={{ width: 'fit-content' }}
                     type="primary"
                     onClick={() => {
-                      HighlighterService.actions.installAiHighlighter(true);
+                      RHighlighterService.actions.installAiHighlighter(true);
                     }}
                   >
                     {$t('Install AI Highlighter App')}
