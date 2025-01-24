@@ -41,10 +41,18 @@ interface IKickEndStreamResponse {
 }
 
 interface IKickError {
-  success: boolean;
-  error: boolean;
-  message: string;
-  data: any[];
+  status?: number;
+  statusText?: string;
+  url: string;
+  result: {
+    success: boolean;
+    error: boolean;
+    message: string;
+    data: {
+      code: number;
+      message: string;
+    };
+  };
 }
 
 interface IKickServiceState extends IPlatformState {
@@ -52,14 +60,14 @@ interface IKickServiceState extends IPlatformState {
   ingest: string;
   chatUrl: string;
   channelName: string;
-  gameId: string;
+  gameName: string;
   platformId?: string;
 }
 
 interface IKickStreamInfoResponse {
   platform: string;
-  info: unknown[];
-  categories?: IKickGame[];
+  info: any[];
+  categories?: any[];
   channel: {
     title: string;
     category: {
@@ -68,6 +76,10 @@ interface IKickStreamInfoResponse {
       thumbnail: string;
     };
   };
+}
+
+interface IKickUpdateStreamResponse {
+  success: boolean;
 }
 
 interface IKickStartStreamSettings {
@@ -104,7 +116,7 @@ export class KickService
     ingest: '',
     chatUrl: '',
     channelName: '',
-    gameId: '',
+    gameName: '',
   };
 
   @Inject() windowsService: WindowsService;
@@ -217,8 +229,9 @@ export class KickService
     const body = new FormData();
     body.append('title', opts.title);
 
-    const game = this.state.gameId;
-    body.append('category', game);
+    if (opts.game) {
+      body.append('category', opts.game);
+    }
 
     const request = new Request(url, { headers, method: 'POST', body });
 
@@ -246,8 +259,8 @@ export class KickService
             'PLATFORM_REQUEST_FAILED',
             {
               ...error,
-              status: 403,
-              statusText: error.message,
+              status: error.status,
+              statusText: error.result.data.message,
             },
             defaultError.statusText,
           );
@@ -277,6 +290,22 @@ export class KickService
       })
       .catch(e => {
         console.warn('Error fetching Kick info: ', e);
+
+        if (e.hasOwnProperty('result')) {
+          if (e.result.data.code === 401) {
+            const message = e.statusText !== '' ? e.statusText : e.result.data.message;
+            throwStreamError(
+              'KICK_SCOPE_OUTDATED',
+              {
+                status: e.status,
+                statusText: message,
+              },
+              e.result.data.message,
+            );
+          }
+
+          throwStreamError('PLATFORM_REQUEST_FAILED', e);
+        }
       });
   }
 
@@ -288,30 +317,20 @@ export class KickService
    */
   async searchGames(searchString: string): Promise<IGame[]> {
     const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/kick/info?${searchString}`;
+    const url = `https://${host}/api/v5/slobs/kick/info?category=${searchString}`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
     return jfetch<IKickStreamInfoResponse | IGame[]>(request)
       .then(async res => {
-        const data = res as IKickStreamInfoResponse;
-        return [
-          {
-            id: data.channel.category.id.toString(),
-            name: data.channel.category.name,
-            image: data.channel.category.thumbnail,
-          },
-        ];
+        const games = await Promise.all(
+          (res as IKickStreamInfoResponse)?.categories.map((g: any) => ({
+            id: g.id.toString(),
+            name: g.name,
+            image: g.thumbnail,
+          })),
+        );
 
-        // TODO: comment in for array returning more than one game
-        // const games = await Promise.all(
-        //   (res as IKickStreamInfoResponse)?.categories.map((g: IKickGame) => ({
-        //     id: g.id.toString(),
-        //     name: g.name,
-        //     image: g.thumbnail,
-        //   })),
-        // );
-
-        // return games;
+        return games;
       })
       .catch((e: unknown) => {
         console.warn('Error fetching Kick info: ', e);
@@ -333,33 +352,41 @@ export class KickService
     if (info.channel) {
       this.UPDATE_STREAM_SETTINGS({
         title: info.channel.title,
-        game: info.channel.category.name,
+        game: info.channel.category.id.toString(),
       });
-
-      this.SET_GAME_ID(info.channel.category.id.toString());
+      this.SET_GAME_NAME(info.channel.category.name);
     }
     this.SET_PREPOPULATED(true);
   }
 
   async putChannelInfo(settings: IKickStartStreamOptions): Promise<void> {
+    console.log('putChannel settings to PUT', settings);
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/kick/info`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const body = new FormData();
-    body.append('title', settings.title);
 
-    const game = this.state.gameId;
-    body.append('category', game);
+    body.append('title', settings.title);
+    if (settings.game) {
+      body.append('category', settings.game);
+    }
 
     const request = new Request(url, { headers, method: 'PUT', body });
-    try {
-      await jfetch(request);
-      this.SET_STREAM_SETTINGS(settings);
-      return Promise.resolve();
-    } catch (e: unknown) {
-      console.warn('Error updating Kick channel info', e);
-      return Promise.reject();
-    }
+
+    return jfetch<IKickUpdateStreamResponse | void>(request)
+      .then(async res => {
+        if ((res as IKickUpdateStreamResponse).success) {
+          this.SET_STREAM_SETTINGS(settings);
+        } else {
+          throwStreamError('PLATFORM_REQUEST_FAILED', {
+            status: 400,
+            statusText: 'Failed to update Kick channel info',
+          });
+        }
+      })
+      .catch((e: unknown) => {
+        console.warn('Error updating Kick channel info', e);
+      });
   }
 
   getHeaders(req: IPlatformRequest, useToken?: string | boolean): IKickRequestHeaders {
@@ -368,10 +395,6 @@ export class KickService
       'Content-Type': 'application/json',
       Authorization: `Bearer ${this.oauthToken}`,
     };
-  }
-
-  setGameId(gameId: string) {
-    this.SET_GAME_ID(gameId);
   }
 
   get authUrl() {
@@ -426,7 +449,7 @@ export class KickService
   }
 
   @mutation()
-  SET_GAME_ID(gameId: string) {
-    this.state.gameId = gameId;
+  SET_GAME_NAME(gameName: string) {
+    this.state.gameName = gameName;
   }
 }

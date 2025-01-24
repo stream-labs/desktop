@@ -32,6 +32,10 @@ export default function GameSelector(p: TProps) {
     selectedGameName = Services.TikTokService.state.gameName;
   }
 
+  if (isKick) {
+    selectedGameName = Services.KickService.state.gameName;
+  }
+
   const { isSearching, setIsSearching, games, setGames } = useModule(() => {
     const selectedGameOptions =
       isTikTok && selectedGameId.toLowerCase() !== Services.TikTokService.defaultGame.id
@@ -61,7 +65,7 @@ export default function GameSelector(p: TProps) {
   }, []);
 
   async function loadImageForSelectedGame() {
-    // game images available for Twitch and Trovo only
+    // game images available for Twitch, Trovo, and Kick only
     if (!['twitch', 'trovo', 'kick'].includes(platform)) return;
     if (!selectedGameName) return;
     const game = await platformService.fetchGame(selectedGameName);
@@ -94,10 +98,6 @@ export default function GameSelector(p: TProps) {
 
     if (isTikTok) {
       Services.TikTokService.actions.setGameName(searchString);
-    }
-
-    if (isKick && game) {
-      Services.KickService.actions.setGameId(game.value);
     }
 
     if (!game) return;
