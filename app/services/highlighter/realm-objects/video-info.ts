@@ -10,7 +10,7 @@ export class RSingleVideoInfo extends RealmObject {
     embedded: true,
     properties: {
       path: { type: 'string', default: '' },
-      duration: { type: 'int', default: null },
+      duration: { type: 'int', optional: true, default: null },
     },
   };
 

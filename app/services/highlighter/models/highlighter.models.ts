@@ -89,8 +89,8 @@ export interface IHighlightedStream {
     type: EAiDetectionState;
     progress: number;
   };
-  abortController?: AbortController;
   path: string;
+  abortController?: AbortController;
 }
 
 // VIEW

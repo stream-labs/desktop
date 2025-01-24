@@ -737,7 +737,9 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
       });
     } else {
       this.REMOVE_CLIP(path);
-      removeScrubFile(clip.scrubSprite);
+      if (clip.scrubSprite) {
+        removeScrubFile(clip.scrubSprite);
+      }
       delete this.renderingClips[path];
     }
 
@@ -836,7 +838,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     return this.getClips(clips, streamId).every(clip => clip.loaded);
   }
 
-  private hasUnloadedClips(streamId: string) {
+  private hasUnloadedClips(streamId?: string) {
     return !this.views.clips
       .filter(c => {
         if (!c.enabled) return false;
@@ -898,11 +900,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
    * Exports the video using the currently configured settings
    * Return true if the video was exported, or false if not.
    */
-  async export(
-    preview = false,
-    streamId: string | undefined = undefined,
-    orientation: TOrientation = 'horizontal',
-  ) {
+  async export(preview = false, streamId?: string, orientation: TOrientation = 'horizontal') {
     this.resetRenderingClips();
     await this.loadClips(streamId);
 
@@ -1003,7 +1001,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     return exportOptions;
   }
 
-  private async generateRenderingClips(streamId: string, orientation: string) {
+  private async generateRenderingClips(streamId?: string, orientation?: string) {
     let renderingClips: RenderingClip[] = [];
 
     if (streamId) {

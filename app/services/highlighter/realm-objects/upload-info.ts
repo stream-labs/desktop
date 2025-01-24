@@ -7,7 +7,7 @@ export class RUploadInfo extends RealmObject {
   uploadedBytes: number;
   totalBytes: number;
   cancelRequested: boolean;
-  videoId: string | null;
+  videoId?: string;
   error: boolean;
 
   static schema: ObjectSchema = {
@@ -18,7 +18,7 @@ export class RUploadInfo extends RealmObject {
       uploadedBytes: { type: 'int', default: 0 },
       totalBytes: { type: 'int', default: 0 },
       cancelRequested: { type: 'bool', default: false },
-      videoId: { type: 'mixed', default: null },
+      videoId: { type: 'string', optional: true, default: null },
       error: { type: 'bool', default: false },
     },
   };

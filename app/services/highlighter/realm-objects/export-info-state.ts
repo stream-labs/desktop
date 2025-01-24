@@ -10,7 +10,7 @@ export class RExportInfo extends RealmObject {
   file: string;
   previewFile: string;
   exported: boolean;
-  error: string | null;
+  error?: string;
   fps: number;
   resolution: number;
   preset: string;
@@ -27,7 +27,7 @@ export class RExportInfo extends RealmObject {
       file: { type: 'string', default: '' },
       previewFile: { type: 'string', default: '' },
       exported: { type: 'bool', default: false },
-      error: { type: 'mixed', default: null },
+      error: { type: 'string', optional: true, default: null },
       fps: { type: 'int', default: 30 },
       resolution: { type: 'int', default: 720 },
       preset: { type: 'string', default: 'ultrafast' },

@@ -6,7 +6,7 @@ import path from 'path';
 import fs from 'fs-extra';
 import * as Sentry from '@sentry/browser';
 
-import { Inject } from 'vue-property-decorator';
+import { Inject } from 'services/core/injector';
 import { throttle } from 'lodash-decorators';
 
 import { InitAfter, Service } from '../core';
@@ -65,7 +65,9 @@ import { cutHighlightClips } from './cut-highlight-clips';
 import { IYoutubeUploadResponse, IYoutubeVideoUploadOptions } from '../platforms/youtube/uploader';
 import { getPlatformService } from '../platforms';
 import { YoutubeService } from '../platforms/youtube';
+import { RHighlighterClip } from './realm-objects/clip-state';
 
+@InitAfter('StreamingService')
 export class RHighlighterService extends Service {
   @Inject() streamingService: StreamingService;
   @Inject() userService: UserService;
@@ -81,7 +83,7 @@ export class RHighlighterService extends Service {
 
   aiHighlighterUpdater: AiHighlighterUpdater;
   aiHighlighterFeatureEnabled = false;
-  streamMilestones?: IStreamMilestones = null;
+  streamMilestones?: IStreamMilestones = undefined;
 
   /**
    * A dictionary of actual clip classes.
@@ -97,7 +99,6 @@ export class RHighlighterService extends Service {
   async init() {
     try {
       console.log('RealmHighlighterService: init');
-      console.log(this.incrementalRolloutService);
 
       this.initRolloutService();
       this.initClips();
@@ -539,7 +540,10 @@ export class RHighlighterService extends Service {
       });
     } else {
       this.state.removeClip(path);
-      removeScrubFile(clip.scrubSprite);
+      if (clip.scrubSprite) {
+        removeScrubFile(clip.scrubSprite);
+      }
+
       delete this.renderingClips[path];
     }
 
@@ -587,7 +591,7 @@ export class RHighlighterService extends Service {
     return this.getClips(clips, streamId).every(clip => clip.loaded);
   }
 
-  hasUnloadedClips(streamId: string) {
+  hasUnloadedClips(streamId?: string) {
     return !this.state.clipsArray
       .filter(clip => {
         if (!clip.enabled) return false;
@@ -672,11 +676,7 @@ export class RHighlighterService extends Service {
    * Exports the video using the currently configured settings
    * Return true if the video was exported, or false if not.
    */
-  async export(
-    preview = false,
-    streamId: string | undefined = undefined,
-    orientation: TOrientation = 'horizontal',
-  ) {
+  async export(preview = false, streamId?: string, orientation: TOrientation = 'horizontal') {
     this.resetRenderingClips();
     await this.loadClips(streamId);
 
@@ -777,7 +777,7 @@ export class RHighlighterService extends Service {
     return exportOptions;
   }
 
-  private async generateRenderingClips(streamId: string, orientation: string) {
+  private async generateRenderingClips(streamId?: string, orientation?: string) {
     let renderingClips: RenderingClip[] = [];
 
     if (streamId) {
@@ -901,11 +901,11 @@ export class RHighlighterService extends Service {
   }
 
   cancelHighlightGeneration(streamId: string): void {
-    const stream = this.state.highlightedStreams.find(s => s.id === streamId);
-    if (stream && stream.abortController) {
-      console.log('cancelHighlightGeneration', streamId);
-      stream.abortController.abort();
-    }
+    // const stream = this.state.highlightedStreams.find(s => s.id === streamId);
+    // if (stream && stream.abortController) {
+    //   console.log('cancelHighlightGeneration', streamId);
+    //   stream.abortController.abort();
+    // }
   }
 
   async restartAiDetection(filePath: string, streamInfo: IHighlightedStream) {

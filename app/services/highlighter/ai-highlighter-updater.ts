@@ -75,7 +75,7 @@ export class AiHighlighterUpdater {
     return spawn(highlighterBinaryPath, command);
   }
 
-  private static startHighlighterFromRepository(videoUri: string, milestonesPath: string) {
+  private static startHighlighterFromRepository(videoUri: string, milestonesPath?: string) {
     const rootPath = '../highlighter-api/';
     const command = [
       'run',
@@ -191,7 +191,7 @@ export class AiHighlighterUpdater {
     }
   }
 
-  private async performUpdate(progressCallback: (progress: IDownloadProgress) => void) {
+  private async performUpdate(progressCallback?: (progress: IDownloadProgress) => void) {
     if (!this.manifest) {
       throw new Error('Manifest not found, cannot update');
     }

@@ -40,8 +40,6 @@ export default function SettingsView({
     isStreaming: StreamingService.isStreaming,
   }));
   const highlighterState = useRealmObject(RHighlighterService.state);
-  console.log('highlighterState', highlighterState);
-  console.log('highlighterState', highlighterState.currentHighlighterVersion);
 
   // useAiHighlighter: RHighlighterService.views.useAiHighlighter,
   // highlighterVersion: RHighlighterService.views.highlighterVersion,
