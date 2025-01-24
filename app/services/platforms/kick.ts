@@ -229,7 +229,7 @@ export class KickService
     const body = new FormData();
     body.append('title', opts.title);
 
-    if (opts.game) {
+    if (opts.game !== '') {
       body.append('category', opts.game);
     }
 
@@ -240,6 +240,7 @@ export class KickService
         if (resp.channel_name) {
           this.SET_CHANNEL_NAME(resp.channel_name);
         }
+        this.SET_STREAM_SETTINGS(opts);
         return resp;
       })
       .catch((e: IKickError | unknown) => {
@@ -360,23 +361,25 @@ export class KickService
   }
 
   async putChannelInfo(settings: IKickStartStreamOptions): Promise<void> {
-    console.log('putChannel settings to PUT', settings);
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/kick/info`;
-    const headers = authorizedHeaders(this.userService.apiToken);
-    const body = new FormData();
+    const headers = authorizedHeaders(this.userService.apiToken!);
+    headers.append('Content-Type', 'application/x-www-form-urlencoded');
 
-    body.append('title', settings.title);
-    if (settings.game) {
-      body.append('category', settings.game);
+    const params = new URLSearchParams();
+    params.append('title', settings.title);
+    if (settings.game !== '') {
+      params.append('category', settings.game);
     }
 
-    const request = new Request(url, { headers, method: 'PUT', body });
+    const request = new Request(url, { headers, method: 'PUT', body: params.toString() });
 
     return jfetch<IKickUpdateStreamResponse | void>(request)
       .then(async res => {
         if ((res as IKickUpdateStreamResponse).success) {
+          const info = await this.fetchStreamInfo();
           this.SET_STREAM_SETTINGS(settings);
+          this.SET_GAME_NAME((info as IKickStreamInfoResponse).channel.category.name);
         } else {
           throwStreamError('PLATFORM_REQUEST_FAILED', {
             status: 400,
