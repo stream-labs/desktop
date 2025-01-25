@@ -24,6 +24,7 @@ import * as remote from '@electron/remote';
 import { IVideo } from 'obs-studio-node';
 import pick from 'lodash/pick';
 import { TOutputOrientation } from 'services/restream';
+import { UsageStatisticsService } from 'services/usage-statistics';
 
 interface IYoutubeServiceState extends IPlatformState {
   liveStreamingEnabled: boolean;
@@ -190,6 +191,7 @@ export class YoutubeService
   @Inject() private customizationService: CustomizationService;
   @Inject() private windowsService: WindowsService;
   @Inject() private i18nService: I18nService;
+  @Inject() private usageStatisticsService: UsageStatisticsService;
 
   @lazyModule(YoutubeUploader) uploader: YoutubeUploader;
 
@@ -610,6 +612,7 @@ export class YoutubeService
     let monetizationDetails: Partial<IYoutubeLiveBroadcast['monetizationDetails']>;
     if (broadcast.monetizationDetails) {
       fields.push('monetizationDetails');
+      this.usageStatisticsService.actions.recordFeatureUsage('YouTubeMonetization');
 
       const moneyInfo = broadcast.monetizationDetails;
       monetizationDetails = {
