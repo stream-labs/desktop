@@ -126,7 +126,7 @@ export class KickService
   readonly domain = 'https://kick.com';
   readonly platform = 'kick';
   readonly displayName = 'Kick';
-  readonly capabilities = new Set<TPlatformCapability>(['chat']);
+  readonly capabilities = new Set<TPlatformCapability>(['title', 'chat', 'game']);
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions = {
     width: 600,
