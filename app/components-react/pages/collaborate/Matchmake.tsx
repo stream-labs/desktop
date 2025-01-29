@@ -48,7 +48,7 @@ export default function Matchmake() {
   }
 
   return (
-    <div>
+    <div className={styles.matchmakeFormContainer}>
         <TagsInput label="I Like to Stream..." options={contentTags} onChange={selectContent} required />
         <TagsInput label="My Streams are all about...." options={vibeTags} onChange={selectVibes} required />
         <TextAreaInput label="Bio" placeholder="Anything else you want to add about yourself" onChange={setBio} value={bio} />
