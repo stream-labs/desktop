@@ -25,7 +25,7 @@ export default function Chat(p: { currentChat: string }) {
       messagesRef.current.scrollTop = bottom;
     }
 
-    window.addEventListener('keydown', (ev: KeyboardEvent) => {
+    document.addEventListener('keydown', (ev: KeyboardEvent) => {
       if (ev.key === 'enter') {
         handleEnter();
       }
@@ -65,7 +65,7 @@ export default function Chat(p: { currentChat: string }) {
         <TextAreaInput
           value={currentMessage}
           onChange={setMessage}
-          placeholder="Message []"
+          placeholder="Message Comfy Card Dads"
         />
         <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
           <i className="fas fa-smile" style={{ fontSize: '20px' }} />

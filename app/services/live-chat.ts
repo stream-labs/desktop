@@ -90,7 +90,7 @@ export class LiveChatService extends StatefulService<ILiveChatState> {
     this.messageSocketConnection = pusher.subscribe(PUSHER_MESSAGE_CHANNEL);
     this.messageSocketConnection.bind(PUSHER_MESSAGE_EVENT, (data: IMessageData) => {
       this.recieveMessage({
-        room: 'chat',
+        room: 'Comfy Card Dads',
         message: data.message,
       }, {
         id: 1,
@@ -125,14 +125,24 @@ export class LiveChatService extends StatefulService<ILiveChatState> {
   }
 
   sendMessage(message: string) {
+    this.ADD_MESSAGE('Comfy Card Dads', {
+      user_id: 0,
+      display_name: 'toasthammer',
+      room: 'Comfy Card Dads',
+      message,
+      avatar: '',
+      date_posted: Date.now().toLocaleString(),
+    });
     if (this.messageSocketConnection) {
-      this.messageSocketConnection.trigger(PUSHER_MESSAGE_EVENT, {
-        id: uuid(),
-        message,
-        author: 'gettin_toasty',
-        timestamp: Date.now(),
-        flagged: false,
-      });
+      // this.messageSocketConnection.trigger(`client-${PUSHER_MESSAGE_EVENT}`, {
+      //   id: uuid(),
+      //   message,
+      //   author: 'toasthammer',
+      //   timestamp: Date.now(),
+      //   flagged: false,
+      // });
+
+
     }
   }
 }

@@ -11,9 +11,9 @@ import { Services } from 'components-react/service-provider';
 export default function Matchmake(p: { setPage: (val: string) => void }) {
   const { CollaborateService } = Services;
 
-  const [streamContent, setStreamContent] = useState<string[]>(['Card Games']);
+  const [streamContent, setStreamContent] = useState<string[]>(['tag6']);
   const [streamVibes, setStreamVibes] = useState<string[]>([]);
-  const [languages, setLanguages] = useState<string[]>(['en-US']);
+  const [languages, setLanguages] = useState<string[]>(['English']);
   const [bio, setBio] = useState('');
   const [discord, setDiscord] = useState('');
 
@@ -51,7 +51,7 @@ export default function Matchmake(p: { setPage: (val: string) => void }) {
     { value: 'tag13', label: 'Silly Guys' },
   ];
 
-  const languageOptions = Object.values(LANG_CODE_MAP).map(opt => ({ value: opt.locale, label: opt.lang }))
+  const languageOptions = Object.values(LANG_CODE_MAP).map(opt => ({ value: opt.lang, label: opt.lang }))
 
   function selectContent(vals: string[]) {
     setStreamContent(vals);
@@ -72,8 +72,8 @@ export default function Matchmake(p: { setPage: (val: string) => void }) {
 
   return (
     <div className={styles.matchmakeFormContainer}>
-        <TagsInput label="I Like to Stream..." options={contentTags} onChange={selectContent} />
-        <TagsInput label="My Streams are all about...." options={vibeTags} onChange={selectVibes} />
+        <TagsInput label="I Like to Stream..." options={contentTags} onChange={selectContent} value={streamContent} />
+        <TagsInput label="My Streams are all about...." options={vibeTags} onChange={selectVibes} value={streamVibes} />
         <TextAreaInput label="Bio" placeholder="Anything else you want to add about yourself" onChange={setBio} value={bio} />
         <TagsInput label="Languages" options={languageOptions} onChange={selectLanguages} value={languages} />
         <TextInput label="Discord Username" onChange={setDiscord} value={discord} />
