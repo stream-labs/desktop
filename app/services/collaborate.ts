@@ -159,9 +159,9 @@ export class CollaborateService extends StatefulService<ICommunityHubState> {
   }
 
   async fetchUserData() {
-    // await this.getFriends();
+    await this.getFriends();
     // await this.getFriendRequests();
-    // await this.getChatrooms();
+    await this.getChatrooms();
     // Promise.all(this.state.chatrooms.map(room => this.getChatMembers(room.name)));
   }
 
@@ -182,25 +182,58 @@ export class CollaborateService extends StatefulService<ICommunityHubState> {
     return await fetch(request).then(handleResponse);
   }
 
-//   async getFriends() {
-//     const resp = await this.getResponse('friends');
-//     const mappedFriends = resp.data.map((friend: IFriend) => ({
-//       ...friend,
-//       chat_names: [] as Array<string>,
-//       is_friend: true,
-//     }));
-//     this.updateUsers(mappedFriends);
-//   }
+  async getFriends(): Promise<IFriend[]> {
+    return [];
+  }
 
-//   async getChatMembers(chatroomName: string) {
-//     const resp = await this.getResponse(`dm/members?dmName=${chatroomName}`);
-//     if (resp.data) {
-//       const notSelf = resp.data.filter((user: IFriend) => user.id !== this.self.id);
-//       this.updateUsers(notSelf.map((user: IFriend) => ({ ...user, chat_names: [chatroomName] })));
-//     }
-//   }
+  getChatMembers(chatroomName: string) {
+    return [
+      {
+        id: 1,
+        name: 'nate',
+        user_id: 1,
+        status: 'online',
+        is_friend: false,
+      },
+      {
+        id: 2,
+        name: 'dylan',
+        user_id: 2,
+        status: 'online',
+        is_friend: false,
+      },
+      {
+        id: 3,
+        name: 'PirateSoftware',
+        user_id: 3,
+        status: 'offline',
+        is_friend: false,
+      },
+      {
+        id: 4,
+        name: 'amber',
+        user_id: 4,
+        status: 'online',
+        is_friend: false,
+      },
+      {
+        id: 5,
+        name: 'Ludwig',
+        user_id: 5,
+        status: 'offline',
+        is_friend: false,
+      },
+      {
+        id: 6,
+        name: 'anna',
+        user_id: 6,
+        status: 'online',
+        is_friend: false,
+      },
+    ];
+  }
 
-  async sendFriendRequest(friendId: number) {
+  async sendFriendRnequest(friendId: number) {
     this.postResponse('friend/request', { friendId });
   }
 
@@ -239,10 +272,9 @@ export class CollaborateService extends StatefulService<ICommunityHubState> {
     this.updateUsers([{ ...friend, is_friend: false }]);
   }
 
-//   async getChatrooms() {
-//     const resp = await this.getResponse('dms');
-//     resp?.forEach((chatroom: IChatRoom) => this.addChat(chatroom, false));
-//   }
+  async getChatrooms() {
+    [].forEach((chatroom: IChatRoom) => this.addChat(chatroom, false));
+  }
 
   async leaveChatroom(groupId: string) {
     this.postResponse('group/leave', { groupId });
@@ -264,13 +296,15 @@ export class CollaborateService extends StatefulService<ICommunityHubState> {
     this.SET_CURRENT_PAGE(page);
   }
 
-//   async createChat(title: string, members: Array<IFriend>) {
-//     const queryMembers = members.map(member => `friends[]=${member.id}`).join('&');
-//     const resp = await this.getResponse(`dm?${queryMembers}&title=${title}`);
-//     this.chatWebsocketService.joinRoom(resp);
-//     this.updateUsers(members.map(member => ({ ...member, chat_names: [resp.name] })));
-//     this.addChat(resp);
-//   }
+  async createChat(title: string, members: Array<IFriend>) {
+    const membos = this.getChatMembers('');
+    this.updateUsers(membos.map(member => ({ ...member, chat_names: ['Comfy Card Dads'] })));
+    this.addChat({
+      name: 'Comfy Card Dads',
+      title: 'Comfy Card Dads',
+      avatar: null,
+    });
+  }
 
   addChat(chatroom: IChatRoom, navigate = true) {
     const imageOrCode = chatroom.avatar || chatBgColor();

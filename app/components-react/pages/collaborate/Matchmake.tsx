@@ -5,9 +5,12 @@ import cx from 'classnames';
 import styles from './CommunityHub.m.less';
 import { LANG_CODE_MAP } from 'services/i18n';
 import { TagsInput, TextAreaInput, TextInput } from 'components-react/shared/inputs';
+import { Services } from 'components-react/service-provider';
 
 
-export default function Matchmake() {
+export default function Matchmake(p: { setPage: (val: string) => void }) {
+  const { CollaborateService } = Services;
+
   const [streamContent, setStreamContent] = useState<string[]>(['Card Games']);
   const [streamVibes, setStreamVibes] = useState<string[]>([]);
   const [languages, setLanguages] = useState<string[]>(['en-US']);
@@ -62,6 +65,11 @@ export default function Matchmake() {
     setLanguages(vals);
   }
 
+  function match() {
+    CollaborateService.actions.createChat('', []);
+    p.setPage('Comfy Card Dads');
+  }
+
   return (
     <div className={styles.matchmakeFormContainer}>
         <TagsInput label="I Like to Stream..." options={contentTags} onChange={selectContent} />
@@ -69,7 +77,7 @@ export default function Matchmake() {
         <TextAreaInput label="Bio" placeholder="Anything else you want to add about yourself" onChange={setBio} value={bio} />
         <TagsInput label="Languages" options={languageOptions} onChange={selectLanguages} value={languages} />
         <TextInput label="Discord Username" onChange={setDiscord} value={discord} />
-        <Button>Find Friends</Button>
+        <Button onClick={match}>Find Friends</Button>
     </div>
   );
 }

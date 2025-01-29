@@ -7,11 +7,12 @@ import AddFriendModal from './AddFriendModal';
 import styles from './Collaborate.m.less';
 import { $t } from 'services/i18n';
 import Matchmake from './Matchmake';
+import Chat from './Chat';
 
 const components: Dictionary<React.ReactNode> = {
   matchmake: Matchmake,
   friends: <></>,
-  chat: <></>,
+  chat: Chat,
 };
 
 export default function Collaborate() {
@@ -33,6 +34,7 @@ export default function Collaborate() {
 
   const titleMap: Dictionary<string> = {
     matchmake: 'Matchmaking',
+    friendsPage: 'Friends',
   };
 
   function Title() {
@@ -76,15 +78,16 @@ export default function Collaborate() {
   }
 
   const PageComponent = components[currentTab];
+  const title = titleMap[currentTab];
   return (
       <div style={{ width: '100%', height: "100%" }}>
         <div style={{ width: '100%', height: '100%', display: "flex" }}>
-            <SideBar onShowAddChatModal={() => setAddChatModalVisible(true)} currentTab={currentTab.value} setPage={setPage} />
+            <SideBar onShowAddChatModal={() => setAddChatModalVisible(true)} currentTab={currentTab} setPage={setPage} />
             <div className={styles.pageContainer}>
               <Header />
-              <PageComponent />
+              <PageComponent setPage={setPage} />
             </div>
-            {!currentTab.title && chatInfoVisible && (
+            {!title && chatInfoVisible && (
               <ChatInfo onHideChat={() => setChatInfoVisible(false)} />
             )}
         </div>
