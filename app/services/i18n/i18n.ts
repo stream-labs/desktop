@@ -56,7 +56,7 @@ export function $translateIfExistWithCheck(key: string, ...args: any[]) {
  * Do some mapping in LANG_CODE_MAP based on docs:
  * @see https://electronjs.org/docs/api/locales
  */
-const LANG_CODE_MAP: Dictionary<{ lang: string; locale: string }> = {
+export const LANG_CODE_MAP: Dictionary<{ lang: string; locale: string }> = {
   cs: { lang: 'Czech', locale: 'cs-CZ' },
   de: { lang: 'German', locale: 'de-DE' },
   'en-US': { lang: 'English', locale: 'en-US' },
