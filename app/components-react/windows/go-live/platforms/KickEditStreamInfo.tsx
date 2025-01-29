@@ -4,6 +4,7 @@ import Form from '../../../shared/inputs/Form';
 import { createBinding, InputComponent } from '../../../shared/inputs';
 import PlatformSettingsLayout, { IPlatformComponentParams } from './PlatformSettingsLayout';
 import { IKickStartStreamOptions } from '../../../../services/platforms/kick';
+import GameSelector from '../GameSelector';
 
 /***
  * Stream Settings for Kick
@@ -30,6 +31,7 @@ export const KickEditStreamInfo = InputComponent((p: IPlatformComponentParams<'k
           />
         }
         requiredFields={<div key={'empty-kick'} />}
+        optionalFields={<GameSelector key="optional" platform={'kick'} {...bind.game} />}
       />
     </Form>
   );
