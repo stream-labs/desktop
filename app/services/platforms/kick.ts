@@ -321,22 +321,25 @@ export class KickService
     const url = `https://${host}/api/v5/slobs/kick/info?category=${searchString}`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
-    return jfetch<IKickStreamInfoResponse | IGame[]>(request)
+
+    return jfetch<IKickStreamInfoResponse>(request)
       .then(async res => {
-        if (!res) {
+        const data = res as IKickStreamInfoResponse;
+
+        if (data.categories && data.categories.length > 0) {
+          const games = await Promise.all(
+            data.categories.map((g: any) => ({
+              id: g.id.toString(),
+              name: g.name,
+              image: g.thumbnail,
+            })),
+          );
+
+          return games;
+        } else {
           console.error('Failed to fetch Kick categories info.');
           return [] as IGame[];
         }
-
-        const games = await Promise.all(
-          (res as IKickStreamInfoResponse)?.categories.map((g: any) => ({
-            id: g.id.toString(),
-            name: g.name,
-            image: g.thumbnail,
-          })),
-        );
-
-        return games;
       })
       .catch((e: unknown) => {
         console.error('Error fetching Kick info: ', e);
