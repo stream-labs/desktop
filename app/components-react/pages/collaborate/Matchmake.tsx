@@ -10,7 +10,7 @@ import { TagsInput, TextAreaInput, TextInput } from 'components-react/shared/inp
 export default function Matchmake() {
   const [streamContent, setStreamContent] = useState<string[]>([]);
   const [streamVibes, setStreamVibes] = useState<string[]>([]);
-  const [languages, setLanguages] = useState<string[]>([]);
+  const [languages, setLanguages] = useState<string[]>(['en-US']);
   const [bio, setBio] = useState('');
   const [discord, setDiscord] = useState('');
 
@@ -20,6 +20,8 @@ export default function Matchmake() {
     { value: 'tag3', label: 'FPS' },
     { value: 'tag4', label: 'Arts and Crafts' },
     { value: 'tag5', label: 'RPGs' },
+    { value: 'tag6', label: 'Card Games' },
+
   ];
 
   const vibeTags = [

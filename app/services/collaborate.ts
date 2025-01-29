@@ -16,7 +16,7 @@ export interface IFriend {
   avatar: string;
   is_prime?: boolean;
   user_id?: number;
-  status?: string;
+  status: string;
   is_friend?: boolean;
   chat_names?: Array<string>;
   game_streamed?: string;
@@ -42,7 +42,8 @@ const chatBgColor = () =>
 
 
 class CommunityHubViews extends ViewHandler<ICommunityHubState> {
-  usersInRoom(roomName: string) {
+  usersInRoom(roomName?: string) {
+    if (!roomName) return [];
     return Object.values(this.state.connectedUsers).filter(
       user => user.chat_names.includes(roomName) && user.id !== this.state.self.id,
     );
@@ -94,7 +95,7 @@ class CommunityHubViews extends ViewHandler<ICommunityHubState> {
 }
 
 @InitAfter('UserService')
-export class CommunityHubService extends StatefulService<ICommunityHubState> {
+export class CollaborateService extends StatefulService<ICommunityHubState> {
   @Inject() private hostsService: HostsService;
   @Inject() private userService: UserService;
 

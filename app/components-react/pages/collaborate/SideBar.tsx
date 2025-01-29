@@ -8,11 +8,11 @@ export default function SideBar(p: { onShowAddChatModal: (val: boolean) => void;
   const { CollaborateService } = Services;
 
   function setPage(page: string) {
-    this.communityHubService.setPage(page);
+    CollaborateService.actions.setPage(page);
   }
 
   function GroupChatRows() {
-    const groupChats = this.communityHubService.views.groupChats;
+    const groupChats = CollaborateService.views.groupChats;
     return (
       <div>
         <span className={styles.chatHeader}>
@@ -44,7 +44,7 @@ export default function SideBar(p: { onShowAddChatModal: (val: boolean) => void;
   }
 
   function DirectMessageRows() {
-    const directMessages = this.communityHubService.views.directMessages;
+    const directMessages = CollaborateService.views.directMessages;
     return (
       <div>
         <span className={styles.chatHeader}>
@@ -52,7 +52,7 @@ export default function SideBar(p: { onShowAddChatModal: (val: boolean) => void;
           <i className="icon-add-circle" onClick={() => p.onShowAddChatModal(true)} />
         </span>
         {directMessages.map(chat => {
-          const friend = this.communityHubService.views.usersInRoom(chat.name)[0];
+          const friend = CollaborateService.views.usersInRoom(chat.name)[0];
           return (
             <div
               className={cx(styles.chatRow, { [styles.active]: p.currentTab === chat.name })}
@@ -84,7 +84,7 @@ export default function SideBar(p: { onShowAddChatModal: (val: boolean) => void;
       >
         <i className="icon-team-2" />
         {$t('Friends (%{friendCount} Online)', {
-          friendCount: this.communityHubService.views.onlineFriendCount,
+          friendCount: CollaborateService.views.onlineFriendCount,
         })}
       </span>
       <GroupChatRows />

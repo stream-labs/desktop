@@ -103,6 +103,7 @@ export { MagicLinkService } from 'services/magic-link';
 export { GrowService } from 'services/grow/grow';
 export { GuestCamService } from 'services/guest-cam';
 export { DualOutputService } from 'services/dual-output';
+export { CollaborateService } from 'services/collaborate';
 
 // WIDGETS
 export { WidgetSource, WidgetsService } from './services/widgets';
@@ -205,6 +206,7 @@ import { SharedStorageService } from 'services/integrations/shared-storage';
 import { RealmService } from 'services/realm';
 import { InstagramService } from 'services/platforms/instagram';
 import { TwitchStudioImporterService } from 'services/ts-importer';
+import { CollaborateService } from 'services/collaborate';
 
 export const AppServices = {
   AppService,
@@ -283,4 +285,5 @@ export const AppServices = {
   MarkersService,
   SharedStorageService,
   RealmService,
+  CollaborateService,
 };

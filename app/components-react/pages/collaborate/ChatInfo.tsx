@@ -12,7 +12,7 @@ export default function ChatPage(p: { onHideChat: () => void }) {
   const { chatroom, friends, members } = useVuex(() => ({
     chatroom: CollaborateService.views.currentChat,
     friends: CollaborateService.views.sortedFriends,
-    members: CollaborateService.views.usersInRoom(CollaborateService.views.currentChat.name),
+    members: CollaborateService.views.usersInRoom(CollaborateService.views.currentChat?.name),
   }));
 
   function ContextButton(p: { chatter: IFriend }) {
