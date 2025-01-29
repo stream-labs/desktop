@@ -6,7 +6,6 @@ import { HostsService } from 'services/hosts';
 import { Inject } from 'services/core/injector';
 import { $t } from 'services/i18n';
 import { InitAfter } from 'services/core';
-import * as pages from 'components-react/pages/collaborate/pages';
 import { handleResponse, authorizedHeaders } from 'util/requests';
 import Utils from 'services/utils';
 

@@ -6,7 +6,7 @@ import { IFriend } from 'services/collaborate';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
 
-export default function ChatPage(p: { onHideChat: () => void }) {
+export default function ChatInfo(p: { onHideChat: () => void }) {
   const { CollaborateService } = Services;
 
   const { chatroom, friends, members } = useVuex(() => ({

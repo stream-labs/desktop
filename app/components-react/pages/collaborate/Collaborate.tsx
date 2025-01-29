@@ -19,11 +19,24 @@ export default function Collaborate() {
   const [addChatModalVisible, setAddChatModalVisible] = useState(false);
   const [addFriendModalVisible, setAddFriendModalVisible] = useState(false);
 
-  const [currentTab, setCurrentTab] = useState({ value: 'matchmake', title: 'Matchmake'});
-  const [currentChat, setCurrentChat] = useState({ name: '', avatar: '' });
+  const [currentTab, setCurrentTab] = useState('matchmake');
+  const [currentChat, setCurrentChat] = useState('');
+
+  function setPage(value: string) {
+    if (['matchmake', 'friendsPage'].includes(value)) {
+      setCurrentTab(value);
+    } else {
+      setCurrentTab('chat');
+      setCurrentChat(value);
+    }
+  }
+
+  const titleMap: Dictionary<string> = {
+    matchmake: 'Matchmaking',
+  };
 
   function Title() {
-    if (currentTab.title) return <>{currentTab.title}</>;
+    if (currentTab) return <>{titleMap[currentTab]}</>;
     const chatroom = currentChat;
     const members: any[] = [];
     const noImg = true;
@@ -33,13 +46,12 @@ export default function Collaborate() {
         {noImg && (
           <div
             className={cx(styles.avatar, styles.sidebarAvatar, styles.noImgAvatar)}
-            style={{ background: `${chatroom.avatar}` }}
           >
-            {chatroom.name[0]}
+            {chatroom[0]}
           </div>
         )}
         <div style={{ marginLeft: "16px" }}>
-          {members.length === 1 ? members[0].name : chatroom.name}
+          {members.length === 1 ? members[0].name : chatroom}
         </div>
       </div>
     );
@@ -49,7 +61,7 @@ export default function Collaborate() {
     return (
       <div className={styles.mainHeader}>
         <Title />
-        {currentTab.value === 'friendsPage' && (
+        {currentTab === 'friendsPage' && (
           <button
             className="button button--trans"
             style={{ marginLeft: 'auto' }}
@@ -63,11 +75,11 @@ export default function Collaborate() {
     );
   }
 
-  const PageComponent = components[currentTab.value];
+  const PageComponent = components[currentTab];
   return (
       <div style={{ width: '100%', height: "100%" }}>
         <div style={{ width: '100%', height: '100%', display: "flex" }}>
-            <SideBar onShowAddChatModal={() => setAddChatModalVisible(true)} />
+            <SideBar onShowAddChatModal={() => setAddChatModalVisible(true)} currentTab={currentTab.value} setPage={setPage} />
             <div className={styles.pageContainer}>
               <Header />
               <PageComponent />

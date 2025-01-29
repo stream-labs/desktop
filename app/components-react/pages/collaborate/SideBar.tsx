@@ -4,11 +4,11 @@ import styles from './CommunityHub.m.less';
 import { $t } from 'services/i18n';
 import { Services } from 'components-react/service-provider';
 
-export default function SideBar(p: { onShowAddChatModal: (val: boolean) => void; currentTab: string }) {
+export default function SideBar(p: { onShowAddChatModal: (val: boolean) => void; currentTab: string; setPage: (val: string) => void; }) {
   const { CollaborateService } = Services;
 
   function setPage(page: string) {
-    CollaborateService.actions.setPage(page);
+    p.setPage(page);
   }
 
   function GroupChatRows() {
