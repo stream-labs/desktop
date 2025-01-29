@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from 'antd';
 import FormFactory from 'components-react/shared/inputs/FormFactory';
 import cx from 'classnames';
-import styles from './CommunityHub.m.less';
+import styles from './Collaborate.m.less';
 import { LANG_CODE_MAP } from 'services/i18n';
 import { TagsInput, TextAreaInput, TextInput } from 'components-react/shared/inputs';
 import { Services } from 'components-react/service-provider';

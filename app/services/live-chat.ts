@@ -1,10 +1,12 @@
 import Vue from 'vue';
 import { Subscription } from 'rxjs';
+import Pusher, { Channel } from 'pusher-js';
 import { StatefulService, mutation, ViewHandler } from 'services/core/stateful-service';
 import { Inject } from 'services/core/injector';
 import { InitAfter } from 'services/core';
 import { CollaborateService, IFriend, IChatRoom } from './collaborate';
 import { UserService, LoginLifecycle } from 'services/user';
+import uuid from 'uuid';
 
 export interface IMessage {
   user_id: number;
@@ -15,9 +17,22 @@ export interface IMessage {
   date_posted?: string;
 }
 
+interface IMessageData {
+  id: string;
+  timestamp: number;
+  author: string;
+  message: string;
+  flagged: boolean;
+}
+
 interface ILiveChatState {
   messages: Dictionary<Array<IMessage>>;
 }
+
+const PUSHER_APP_KEY = '8d2ee88ba341ba678124';
+const PUSHER_APP_CLUSTER = 'us2';
+const PUSHER_MESSAGE_CHANNEL = 'messages';
+const PUSHER_MESSAGE_EVENT = 'new-message';
 
 class LiveChatViews extends ViewHandler<ILiveChatState> {
   messages(chatId: string) {
@@ -64,29 +79,32 @@ export class LiveChatService extends StatefulService<ILiveChatState> {
   }
 
   lifecycle: LoginLifecycle;
-  messageSocketConnection: Subscription = null;
+  messageSocketConnection: Channel = null;
   internalEventSocketConnection: Subscription = null;
   roomUpdateSocketConnection: Subscription = null;
 
   async subscribeToSocketConnections() {
-    // this.messageSocketConnection = this.chatWebsocketService.chatMessageEvent.subscribe(ev =>
-    //   this.recieveMessage(ev.data, ev.user),
-    // );
-    // this.internalEventSocketConnection = this.chatWebsocketService.internalEvent.subscribe(ev => {
-    //   this.handleInternalEvent(ev);
-    // });
-    // this.roomUpdateSocketConnection = this.chatWebsocketService.roomUpdateEvent.subscribe(ev => {
-    //   if (ev.action === 'new_member') {
-    //     this.chatWebsocketService.sendStatusUpdate('online', null, ev.room.name);
-    //     this.communityHubService.getChatMembers(ev.room.name);
-    //   }
-    // });
+    const pusher = new Pusher(PUSHER_APP_KEY, {
+      cluster: PUSHER_APP_CLUSTER,
+    })
+    this.messageSocketConnection = pusher.subscribe(PUSHER_MESSAGE_CHANNEL);
+    this.messageSocketConnection.bind(PUSHER_MESSAGE_EVENT, (data: IMessageData) => {
+      this.recieveMessage({
+        room: 'chat',
+        message: data.message,
+      }, {
+        id: 1,
+        name: 'dylan',
+        status: 'online',
+        avatar: '',
+      });
+    });
   }
 
   async unsubscribeFromSocketConnections() {
     if (this.messageSocketConnection) this.messageSocketConnection.unsubscribe();
-    if (this.internalEventSocketConnection) this.internalEventSocketConnection.unsubscribe();
-    if (this.roomUpdateSocketConnection) this.roomUpdateSocketConnection.unsubscribe();
+    // if (this.internalEventSocketConnection) this.internalEventSocketConnection.unsubscribe();
+    // if (this.roomUpdateSocketConnection) this.roomUpdateSocketConnection.unsubscribe();
   }
 
   updateStatus(user: IFriend, status: string) {
@@ -107,5 +125,14 @@ export class LiveChatService extends StatefulService<ILiveChatState> {
   }
 
   sendMessage(message: string) {
+    if (this.messageSocketConnection) {
+      this.messageSocketConnection.trigger(PUSHER_MESSAGE_EVENT, {
+        id: uuid(),
+        message,
+        author: 'gettin_toasty',
+        timestamp: Date.now(),
+        flagged: false,
+      });
+    }
   }
 }

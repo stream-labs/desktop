@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import cx from 'classnames';
 import SideBar from './SideBar';
 import ChatInfo from './ChatInfo';
-import AddChatModal from './AddChatModal';
-import AddFriendModal from './AddFriendModal';
+// import AddChatModal from './AddChatModal';
+// import AddFriendModal from './AddFriendModal';
 import styles from './Collaborate.m.less';
 import { $t } from 'services/i18n';
 import Matchmake from './Matchmake';
 import Chat from './Chat';
 
-const components: Dictionary<React.ReactNode> = {
+const components: Dictionary<any> = {
   matchmake: Matchmake,
   friends: <></>,
   chat: Chat,
@@ -91,12 +91,12 @@ export default function Collaborate() {
               <ChatInfo onHideChat={() => setChatInfoVisible(false)} />
             )}
         </div>
-        {addChatModalVisible && (
+        {/* {addChatModalVisible && (
             <AddChatModal onCloseAddChatModal={() => setAddChatModalVisible(false)} />
         )}
         {addFriendModalVisible && (
             <AddFriendModal onCloseAddFriendModal={() => setAddFriendModalVisible(false)} />
-        )}
+        )} */}
       </div>
   );
 }

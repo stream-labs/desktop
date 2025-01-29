@@ -1,6 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
-import styles from './CommunityHub.m.less';
+import styles from './Collaborate.m.less';
 import { $t } from 'services/i18n';
 import { Services } from 'components-react/service-provider';
 

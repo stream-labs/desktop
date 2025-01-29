@@ -20,6 +20,7 @@ import {
   RecordingHistory,
   Studio,
   LiveDock,
+  Collaborate,
 } from 'components/shared/ReactComponentList';
 import { ScenesService } from 'services/scenes';
 import { PlatformAppsService } from 'services/platform-apps';
@@ -65,6 +66,7 @@ import antdThemes from 'styles/antd/index';
     Highlighter,
     Grow,
     ThemeAudit,
+    Collaborate,
   },
 })
 export default class Main extends Vue {

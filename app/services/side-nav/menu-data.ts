@@ -25,6 +25,7 @@ export enum EMenuItemKey {
   GetHelp = 'get-help',
   Settings = 'settings',
   Login = 'login',
+  Collaborate= 'collaborate',
 }
 
 /**
@@ -124,6 +125,7 @@ export const compactMenuItemKeys: EMenuItemKey[] = [
   EMenuItemKey.AppStore,
   EMenuItemKey.Highlighter,
   EMenuItemKey.RecordingHistory,
+  EMenuItemKey.Collaborate,
 ];
 
 /**
@@ -206,6 +208,14 @@ export const SideNavMenuItems = (): TMenuItems => ({
     target: 'Studio',
     trackingTarget: 'editor',
     icon: 'icon-studio',
+    isActive: true,
+    isExpanded: false,
+  },
+  [EMenuItemKey.Collaborate]: {
+    key: EMenuItemKey.Collaborate,
+    target: 'Collaborate',
+    icon: 'icon-user',
+    trackingTarget: 'collaborate',
     isActive: true,
     isExpanded: false,
   },

@@ -63,6 +63,7 @@ import InstalledApps from './windows/settings/InstalledApps';
 import Hotkeys from './windows/settings/Hotkeys';
 import Studio from './pages/Studio';
 import LiveDock from './root/LiveDock';
+import Collaborate from './pages/collaborate/Collaborate';
 
 // list of React components to be used inside Vue components
 export const components = {
@@ -130,4 +131,5 @@ export const components = {
   Hotkeys,
   LiveDock: createRoot(LiveDock),
   Studio: createRoot(Studio),
+  Collaborate: createRoot(Collaborate),
 };

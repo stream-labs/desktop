@@ -18,7 +18,8 @@ export type TAppPage =
   | 'Highlighter'
   | 'Grow'
   | 'ThemeAudit'
-  | 'RecordingHistory';
+  | 'RecordingHistory'
+  | 'Collaborate';
 
 interface INavigationState {
   currentPage: TAppPage;

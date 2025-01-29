@@ -536,3 +536,11 @@ export class Hotkeys extends ReactComponent<{
   },
 })
 export class GLVolmeters extends ReactComponent {}
+
+@Component({
+  props: {
+    name: { default: 'Collaborate' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  }
+})
+export class Collaborate extends ReactComponent {}

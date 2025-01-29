@@ -1,6 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
-import styles from './CommunityHub.m.less';
+import styles from './Collaborate.m.less';
 import { $t } from 'services/i18n';
 import { IFriend } from 'services/collaborate';
 import { Services } from 'components-react/service-provider';
@@ -44,7 +44,7 @@ export default function ChatInfo(p: { onHideChat: () => void }) {
       <div className={styles.chatHeader}>
         {$t('Members (%{numberOfMembers})', { numberOfMembers: members.length })}
       </div>
-      {members.map(chatter => <FriendRow friend={chatter} />}
+      {members.map(chatter => <FriendRow friend={chatter} />)}
     </div>
   );
 }

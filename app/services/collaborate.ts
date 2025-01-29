@@ -194,6 +194,7 @@ export class CollaborateService extends StatefulService<ICommunityHubState> {
         user_id: 1,
         status: 'online',
         is_friend: false,
+        avatar: '',
       },
       {
         id: 2,
@@ -201,6 +202,7 @@ export class CollaborateService extends StatefulService<ICommunityHubState> {
         user_id: 2,
         status: 'online',
         is_friend: false,
+        avatar: '',
       },
       {
         id: 3,
@@ -208,6 +210,7 @@ export class CollaborateService extends StatefulService<ICommunityHubState> {
         user_id: 3,
         status: 'offline',
         is_friend: false,
+        avatar: '',
       },
       {
         id: 4,
@@ -215,6 +218,7 @@ export class CollaborateService extends StatefulService<ICommunityHubState> {
         user_id: 4,
         status: 'online',
         is_friend: false,
+        avatar: '',
       },
       {
         id: 5,
@@ -222,6 +226,7 @@ export class CollaborateService extends StatefulService<ICommunityHubState> {
         user_id: 5,
         status: 'offline',
         is_friend: false,
+        avatar: '',
       },
       {
         id: 6,
@@ -229,6 +234,7 @@ export class CollaborateService extends StatefulService<ICommunityHubState> {
         user_id: 6,
         status: 'online',
         is_friend: false,
+        avatar: '',
       },
     ];
   }

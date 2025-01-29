@@ -11438,6 +11438,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"pusher-js@npm:^8.4.0-rc2":
+  version: 8.4.0-rc2
+  resolution: "pusher-js@npm:8.4.0-rc2"
+  dependencies:
+    tweetnacl: ^1.0.3
+  checksum: 38058d1f9d62d4d21241507aa4fb958479f176e20f4db6313a90f4bc632e15aea343934d2c68c11610f67a9e0a69b355be8e50e496207511d5251c0f5db06330
+  languageName: node
+  linkType: hard
+
 "qr.js@npm:0.0.0":
   version: 0.0.0
   resolution: "qr.js@npm:0.0.0"
@@ -13230,6 +13239,7 @@ __metadata:
     prettier-eslint: 12.0.0
     pretty-bytes: 5.6.0
     progress: 2.0.0
+    pusher-js: ^8.4.0-rc2
     qrcode.react: 1.0.1
     raven: ^2.6.4
     raw-loader: 2.0.0
@@ -14357,6 +14367,13 @@ __metadata:
   dependencies:
     safe-buffer: ^5.0.1
   checksum: 05f6510358f8afc62a057b8b692f05d70c1782b70db86d6a1e0d5e28a32389e52fa6e7707b6c5ecccacc031462e4bc35af85ecfe4bbc341767917b7cf6965711
+  languageName: node
+  linkType: hard
+
+"tweetnacl@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "tweetnacl@npm:1.0.3"
+  checksum: e4a57cac188f0c53f24c7a33279e223618a2bfb5fea426231991652a13247bea06b081fd745d71291fcae0f4428d29beba1b984b1f1ce6f66b06a6d1ab90645c
   languageName: node
   linkType: hard
 
