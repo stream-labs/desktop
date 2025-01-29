@@ -104,6 +104,7 @@ export { GrowService } from 'services/grow/grow';
 export { GuestCamService } from 'services/guest-cam';
 export { DualOutputService } from 'services/dual-output';
 export { CollaborateService } from 'services/collaborate';
+export { LiveChatService } from 'services/live-chat';
 
 // WIDGETS
 export { WidgetSource, WidgetsService } from './services/widgets';
@@ -207,6 +208,7 @@ import { RealmService } from 'services/realm';
 import { InstagramService } from 'services/platforms/instagram';
 import { TwitchStudioImporterService } from 'services/ts-importer';
 import { CollaborateService } from 'services/collaborate';
+import { LiveChatService } from 'services/live-chat';
 
 export const AppServices = {
   AppService,
@@ -286,4 +288,5 @@ export const AppServices = {
   SharedStorageService,
   RealmService,
   CollaborateService,
+  LiveChatService,
 };

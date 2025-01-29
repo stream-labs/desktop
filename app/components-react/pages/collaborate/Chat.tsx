@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import cx from 'classnames';
 import styles from './Collaborate.m.less';
 import { $t } from 'services/i18n';
-import { Inject } from 'services';
 import { IMessage } from 'services/live-chat';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
