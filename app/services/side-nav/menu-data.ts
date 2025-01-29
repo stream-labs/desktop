@@ -160,6 +160,7 @@ export const menuTitles = (item: EMenuItemKey | ESubMenuItemKey | string) => {
     [ESubMenuItemKey.Widgets]: $t('Widgets'),
     [ESubMenuItemKey.TipSettings]: $t('Tip Settings'),
     [ESubMenuItemKey.Multistream]: $t('Multistream'),
+    [EMenuItemKey.Collaborate]: 'Stream Friends',
   }[item];
 };
 
@@ -170,6 +171,7 @@ export const SideBarTopNavData = (): IMenu => ({
   name: ENavName.TopNav,
   menuItems: [
     SideNavMenuItems()[EMenuItemKey.Editor],
+    SideNavMenuItems()[EMenuItemKey.Collaborate],
     SideNavMenuItems()[EMenuItemKey.LayoutEditor],
     SideNavMenuItems()[EMenuItemKey.StudioMode],
     SideNavMenuItems()[EMenuItemKey.Themes],
@@ -214,8 +216,8 @@ export const SideNavMenuItems = (): TMenuItems => ({
   [EMenuItemKey.Collaborate]: {
     key: EMenuItemKey.Collaborate,
     target: 'Collaborate',
-    icon: 'icon-user',
     trackingTarget: 'collaborate',
+    icon: 'icon-user',
     isActive: true,
     isExpanded: false,
   },

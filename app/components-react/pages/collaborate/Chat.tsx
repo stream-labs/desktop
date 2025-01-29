@@ -10,7 +10,7 @@ import { TextAreaInput } from 'components-react/shared/inputs';
 export default function Chat(p: { currentChat: string }) {
   const { CollaborateService, LiveChatService } = Services
 
-  const messagesRef = useRef<HTMLElement | null>(null);
+  const messagesRef = useRef<HTMLDivElement | null>(null);
 
   const [currentMessage, setMessage] = useState('');
 
@@ -58,7 +58,7 @@ export default function Chat(p: { currentChat: string }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: `calc(100% - 30px)` }}>
-      <div className={styles.chatContainer} ref="messages">
+      <div className={styles.chatContainer} ref={messagesRef}>
         {messages.map(message => <ChatMessage message={message} />)}
       </div>
       <div className={styles.chatInput}>
