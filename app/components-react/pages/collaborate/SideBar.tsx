@@ -20,14 +20,13 @@ export default function SideBar(p: { onShowAddChatModal: (val: boolean) => void;
           <i className="icon-add-circle" onClick={() => p.onShowAddChatModal(true)} />
         </span>
         {groupChats.map(chat => {
-          const noImg = /^#/.test(chat.avatar) || !chat.avatar;
+          const noImg = true;
           return (
             <div
               className={cx(styles.chatRow, { [styles.active]: p.currentTab === chat.name })}
               onClick={() => setPage(chat.name)}
               key={chat.name}
             >
-              {!noImg && <img className={cx(styles.avatar, styles.sidebarAvatar)} src={chat.avatar} />}
               {noImg && (
                 <div
                   className={cx(styles.avatar, styles.sidebarAvatar, styles.noImgAvatar)}
