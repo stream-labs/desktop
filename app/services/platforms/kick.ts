@@ -323,6 +323,13 @@ export class KickService
     const request = new Request(url, { headers });
     return jfetch<IKickStreamInfoResponse | IGame[]>(request)
       .then(async res => {
+        if (!res) {
+          throwStreamError('PLATFORM_REQUEST_FAILED', {
+            status: 422,
+            statusText: 'Failed to fetch Kick categories info.',
+          });
+        }
+
         const games = await Promise.all(
           (res as IKickStreamInfoResponse)?.categories.map((g: any) => ({
             id: g.id.toString(),
@@ -334,7 +341,7 @@ export class KickService
         return games;
       })
       .catch((e: unknown) => {
-        console.warn('Error fetching Kick info: ', e);
+        console.error('Error fetching Kick info: ', e);
         return [] as IGame[];
       });
   }
