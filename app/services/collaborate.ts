@@ -242,7 +242,7 @@ export class CollaborateService extends StatefulService<ICommunityHubState> {
         user_id: 6,
         status: 'online',
         is_friend: false,
-        avatar: 'https://framecloud-public.s3.amazonaws.com/hackathon-avatars/hackathon_avatar_3.jpg',
+        avatar: 'https://framecloud-public.s3.us-east-1.amazonaws.com/hackathon-avatars/kevin_quick.png',
       },
     ];
   }
