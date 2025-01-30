@@ -5,9 +5,10 @@ import { $t } from 'services/i18n';
 import { IFriend } from 'services/collaborate';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
+import Tooltip from 'components-react/shared/Tooltip';
 
 export default function ChatInfo(p: { onHideChat: () => void }) {
-  const { CollaborateService } = Services;
+  const { CollaborateService, SourcesService, NavigationService } = Services;
 
   const { chatroom, friends, members } = useVuex(() => ({
     chatroom: CollaborateService.views.currentChat,
@@ -21,6 +22,12 @@ export default function ChatInfo(p: { onHideChat: () => void }) {
     return <></>
   }
 
+  function openCollab() {
+    const source = SourcesService.views.getSourcesByType('mediasoupconnector')[0];
+    SourcesService.actions.showSourceProperties(source.sourceId);
+    NavigationService.actions.navigate('Studio');
+  }
+
   function FriendRow(p: { friend: IFriend }) {
     return (
       <div className={styles.friend}>
@@ -28,6 +35,9 @@ export default function ChatInfo(p: { onHideChat: () => void }) {
           <img className={styles.avatar} src={p.friend.avatar} />
           <div className={cx(styles.status, styles[p.friend.status])} />
           <div className={styles.chatName}>{p.friend.name}</div>
+          <Tooltip title="Collaborate">
+            <i className="icon-team-2" style={{ color: 'var(--teal)', marginLeft: 16 }} onClick={openCollab} />
+          </Tooltip>
         </div>
         <div style={{ marginLeft: "auto" }} ><ContextButton chatter={p.friend} /></div>
       </div>

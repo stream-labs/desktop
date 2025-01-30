@@ -38,22 +38,17 @@ export default function Collaborate() {
   };
 
   function Title() {
-    if (currentTab) return <>{titleMap[currentTab]}</>;
+    if (['matchmake', 'friendsPage'].includes(currentTab)) return <>{titleMap[currentTab]}</>;
     const chatroom = currentChat;
-    const members: any[] = [];
-    const noImg = true;
     return (
       <div style={{display: 'flex', alignItems: 'center'}}>
-        {!noImg && <img className={styles.avatar} src={members[0].avatar} />}
-        {noImg && (
           <div
             className={cx(styles.avatar, styles.sidebarAvatar, styles.noImgAvatar)}
           >
             {chatroom[0]}
           </div>
-        )}
         <div style={{ marginLeft: "16px" }}>
-          {members.length === 1 ? members[0].name : chatroom}
+          {chatroom}
         </div>
       </div>
     );

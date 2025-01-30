@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import { ipcRenderer } from 'electron';
 import { Subscription } from 'rxjs';
 import Pusher, { Channel } from 'pusher-js';
 import { StatefulService, mutation, ViewHandler } from 'services/core/stateful-service';
@@ -89,14 +90,15 @@ export class LiveChatService extends StatefulService<ILiveChatState> {
     })
     this.messageSocketConnection = pusher.subscribe(PUSHER_MESSAGE_CHANNEL);
     this.messageSocketConnection.bind(PUSHER_MESSAGE_EVENT, (data: IMessageData) => {
+      const user = this.collaborateService.getChatMembers('').find(member => member.name === data.author);
       this.recieveMessage({
         room: 'Comfy Card Dads',
         message: data.message,
       }, {
         id: 2,
-        name: 'dylan',
+        name: data.author,
         status: 'online',
-        avatar: '',
+        avatar: user ? user.avatar : '',
       });
     });
   }
@@ -130,19 +132,8 @@ export class LiveChatService extends StatefulService<ILiveChatState> {
       display_name: 'toasthammer',
       room: 'Comfy Card Dads',
       message,
-      avatar: '',
+      avatar: 'https://framecloud-public.s3.amazonaws.com/hackathon-avatars/channels4_profile.jpg',
       date_posted: Date.now().toLocaleString(),
     });
-    if (this.messageSocketConnection) {
-      // this.messageSocketConnection.trigger(`client-${PUSHER_MESSAGE_EVENT}`, {
-      //   id: uuid(),
-      //   message,
-      //   author: 'toasthammer',
-      //   timestamp: Date.now(),
-      //   flagged: false,
-      // });
-
-
-    }
   }
 }

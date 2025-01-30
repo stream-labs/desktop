@@ -36,7 +36,7 @@ interface ICommunityHubState {
   self: IFriend;
 }
 
-const chatBgColor = () =>
+export const chatBgColor = () =>
   sample(['#2B5BD7', '#C22571', '#5E3BEC', '#758D14', '#36ADE0', '#EB7777', '#C57BFF', '#D5FF7B']);
 
 
@@ -168,7 +168,7 @@ export class CollaborateService extends StatefulService<ICommunityHubState> {
       user_id: 0,
       status: 'online',
       is_friend: false,
-      avatar: '',
+      avatar: 'https://framecloud-public.s3.amazonaws.com/hackathon-avatars/channels4_profile.jpg',
     });
     // Promise.all(this.state.chatrooms.map(room => this.getChatMembers(room.name)));
   }
@@ -202,31 +202,23 @@ export class CollaborateService extends StatefulService<ICommunityHubState> {
         user_id: 0,
         status: 'online',
         is_friend: false,
-        avatar: '',
+        avatar: 'https://framecloud-public.s3.amazonaws.com/hackathon-avatars/channels4_profile.jpg',
       },
       {
         id: 1,
-        name: 'nate',
+        name: 'un4tunatetoast',
         user_id: 1,
         status: 'online',
         is_friend: false,
-        avatar: '',
+        avatar: 'https://framecloud-public.s3.amazonaws.com/hackathon-avatars/hackathon_avatar_3.jpg',
       },
       {
         id: 2,
-        name: 'dylan',
+        name: 'ekso',
         user_id: 2,
         status: 'online',
         is_friend: false,
-        avatar: '',
-      },
-      {
-        id: 3,
-        name: 'PirateSoftware',
-        user_id: 3,
-        status: 'offline',
-        is_friend: false,
-        avatar: '',
+        avatar: 'https://framecloud-public.s3.amazonaws.com/hackathon-avatars/hackathon_avatar_2.jpg',
       },
       {
         id: 4,
@@ -234,7 +226,7 @@ export class CollaborateService extends StatefulService<ICommunityHubState> {
         user_id: 4,
         status: 'online',
         is_friend: false,
-        avatar: '',
+        avatar: 'https://framecloud-public.s3.amazonaws.com/hackathon-avatars/hackathon_avatar_1.jpg',
       },
       {
         id: 5,
@@ -242,15 +234,15 @@ export class CollaborateService extends StatefulService<ICommunityHubState> {
         user_id: 5,
         status: 'offline',
         is_friend: false,
-        avatar: '',
+        avatar: 'https://framecloud-public.s3.amazonaws.com/hackathon-avatars/ludwig_profile.png',
       },
       {
         id: 6,
-        name: 'anna',
+        name: 'StreamlabsKevin',
         user_id: 6,
         status: 'online',
         is_friend: false,
-        avatar: '',
+        avatar: 'https://framecloud-public.s3.amazonaws.com/hackathon-avatars/hackathon_avatar_3.jpg',
       },
     ];
   }

@@ -29,10 +29,11 @@ export default function Chat(p: { currentChat: string }) {
   function ChatMessage(p: { message: IMessage }) {
     const chatter =
       members.find(chatter => p.message.user_id === chatter.id) || CollaborateService.self;
-    const isSelf = chatter.id === CollaborateService.self.id;
+    const isSelf = p.message.user_id === CollaborateService.self.id;
     return (
       <div className={cx(styles.messageContainer, { [styles.self]: isSelf })}>
-        <img className={styles.avatar} src={p.message.avatar} />
+        {p.message.avatar !== '' && <img className={styles.avatar} src={p.message.avatar} />}
+        {p.message.avatar === '' && <div className={cx(styles.avatar, styles.sidebarAvatar, styles.noImgAvatar)}>{p.message.display_name[0]}</div>}
         <div className={cx(styles.status, styles[chatter.status])} />
         <div className={styles.nameAndBubble}>
           <span style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
