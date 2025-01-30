@@ -856,3 +856,25 @@ ipcMain.on('request-message-channel-in', (e, id) => {
 ipcMain.on('request-message-channel-out', (e, id) => {
   e.senderFrame.postMessage(`port-${id}`, null, [channels[id].port2]);
 });
+
+// Pusher broadcaster
+const Pusher = require('pusher');
+
+const PUSHER_APP_ID = 'PUSHER_APP_ID';
+const PUSHER_APP_KEY = 'PUSHER_APP_KEY';
+const PUSHER_SECRET = 'PUSHER_SECRET';
+const PUSHER_CLUSTER = 'PUSHER_CLUSTER';
+const PUSHER_CHANNEL = 'messages';
+const PUSHER_EVENT = 'new-message';
+
+const pusher = new Pusher({
+  appId: PUSHER_APP_ID,
+  key: PUSHER_APP_KEY,
+  secret: PUSHER_SECRET,
+  cluster: PUSHER_CLUSTER,
+  useTLS: true,
+});
+
+ipcMain.on('send-pusher-message', (event, message) => {
+  pusher.trigger(PUSHER_CHANNEL, PUSHER_EVENT, message);
+});

@@ -85,6 +85,7 @@
     "node-window-rendering": "https://slobs-node-window-rendering.s3-us-west-2.amazonaws.com/node-window-rendering-0.0.0.tar.gz",
     "obs-studio-node": "https://s3-us-west-2.amazonaws.com/obsstudionodes3.streamlabs.com/osn-0.0.0-release.tar.gz",
     "overlayscrollbars-react": "^0.2.2",
+    "pusher": "^5.2.0",
     "raven": "^2.6.4",
     "react-colorful": "^5.5.0",
     "react-devtools-electron": "^4.7.0",
