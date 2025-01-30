@@ -162,6 +162,14 @@ export class CollaborateService extends StatefulService<ICommunityHubState> {
     await this.getFriends();
     // await this.getFriendRequests();
     await this.getChatrooms();
+    this.SET_SELF({
+      id: 0,
+      name: 'toasthammer',
+      user_id: 0,
+      status: 'online',
+      is_friend: false,
+      avatar: '',
+    });
     // Promise.all(this.state.chatrooms.map(room => this.getChatMembers(room.name)));
   }
 
@@ -188,6 +196,14 @@ export class CollaborateService extends StatefulService<ICommunityHubState> {
 
   getChatMembers(chatroomName: string) {
     return [
+      {
+        id: 0,
+        name: 'toasthammer',
+        user_id: 0,
+        status: 'online',
+        is_friend: false,
+        avatar: '',
+      },
       {
         id: 1,
         name: 'nate',

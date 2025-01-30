@@ -42,7 +42,7 @@ export default function ChatInfo(p: { onHideChat: () => void }) {
         <i className="icon-close" style={{ marginLeft: "20px"}} onClick={() => p.onHideChat()} />
       </div>
       <div className={styles.chatHeader}>
-        {$t('Members (%{numberOfMembers})', { numberOfMembers: members.length })}
+        {$t('Members (6)', { numberOfMembers: members.length })}
       </div>
       {members.map(chatter => <FriendRow friend={chatter} />)}
     </div>

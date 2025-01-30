@@ -93,7 +93,7 @@ export class LiveChatService extends StatefulService<ILiveChatState> {
         room: 'Comfy Card Dads',
         message: data.message,
       }, {
-        id: 1,
+        id: 2,
         name: 'dylan',
         status: 'online',
         avatar: '',

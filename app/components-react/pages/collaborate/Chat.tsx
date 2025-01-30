@@ -12,10 +12,10 @@ export default function Chat(p: { currentChat: string }) {
 
   const messagesRef = useRef<HTMLDivElement | null>(null);
 
-  const [currentMessage, setMessage] = useState('');
+  const [currentMessage, setCurrentMessage] = useState('');
 
   const { messages, members } = useVuex(() => ({
-    messages: LiveChatService.views.messages(p.currentChat),
+    messages: LiveChatService.views.messages('Comfy Card Dads'),
     members: CollaborateService.views.usersInRoom(p.currentChat),
   }));
 
@@ -24,12 +24,6 @@ export default function Chat(p: { currentChat: string }) {
       const bottom = messagesRef.current.scrollHeight;
       messagesRef.current.scrollTop = bottom;
     }
-
-    document.addEventListener('keydown', (ev: KeyboardEvent) => {
-      if (ev.key === 'enter') {
-        handleEnter();
-      }
-    });
   }, [messages.length, messagesRef.current])
 
   function ChatMessage(p: { message: IMessage }) {
@@ -50,10 +44,17 @@ export default function Chat(p: { currentChat: string }) {
     );
   }
 
-  function handleEnter() {
+  function handleEnter(ev: React.KeyboardEvent) {
+    if (ev.key === 'Enter') {
+      ev.preventDefault();
+      sendMessage();
+    }
+  }
+
+  function sendMessage() {
     if (!currentMessage) return;
     LiveChatService.actions.sendMessage(currentMessage);
-    setMessage('');
+    setCurrentMessage('');
   }
 
   return (
@@ -64,12 +65,14 @@ export default function Chat(p: { currentChat: string }) {
       <div className={styles.chatInput}>
         <TextAreaInput
           value={currentMessage}
-          onChange={setMessage}
+          onChange={setCurrentMessage}
+          onKeyDown={handleEnter}
           placeholder="Message Comfy Card Dads"
+          uncontrolled={false}
         />
         <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
           <i className="fas fa-smile" style={{ fontSize: '20px' }} />
-          <button className="button button--default" style={{ marginLeft: '16px' }} onClick={handleEnter}>
+          <button className="button button--default" style={{ marginLeft: '16px' }} onClick={sendMessage}>
             {'Send'}
           </button>
         </div>

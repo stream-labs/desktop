@@ -7,7 +7,9 @@ import { TextAreaProps } from 'antd/lib/input';
 const ANT_TEXTAREA_FEATURES = ['showCount', 'autoSize', 'maxLength', 'rows'] as const;
 
 export type TTextAreaInputProps = TSlobsInputProps<
-  {},
+  {
+    onKeyDown?: React.KeyboardEventHandler<HTMLTextAreaElement>;
+  },
   string,
   TextAreaProps,
   ValuesOf<typeof ANT_TEXTAREA_FEATURES>
@@ -15,9 +17,15 @@ export type TTextAreaInputProps = TSlobsInputProps<
 
 export const TextAreaInput = InputComponent((p: TTextAreaInputProps) => {
   const { inputAttrs, wrapperAttrs } = useTextInput('textarea', p, ANT_TEXTAREA_FEATURES);
+
+  const textInputAttrs = {
+    ...inputAttrs,
+    onKeyDown: p.onKeyDown,
+  };
+
   return (
     <InputWrapper {...wrapperAttrs}>
-      <Input.TextArea {...inputAttrs} />
+      <Input.TextArea {...textInputAttrs} />
     </InputWrapper>
   );
 });

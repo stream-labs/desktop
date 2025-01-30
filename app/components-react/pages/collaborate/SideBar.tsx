@@ -83,7 +83,7 @@ export default function SideBar(p: { onShowAddChatModal: (val: boolean) => void;
         onClick={() => setPage('friendsPage')}
       >
         <i className="icon-team-2" />
-        {$t('Friends (%{friendCount} Online)', {
+        {$t('Friends (0 Online)', {
           friendCount: CollaborateService.views.onlineFriendCount,
         })}
       </span>
