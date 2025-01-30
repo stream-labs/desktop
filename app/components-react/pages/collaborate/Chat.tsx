@@ -5,7 +5,7 @@ import { $t } from 'services/i18n';
 import { IMessage } from 'services/live-chat';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
-import { TextAreaInput } from 'components-react/shared/inputs';
+import { TextInput } from 'components-react/shared/inputs';
 
 export default function Chat(p: { currentChat: string }) {
   const { CollaborateService, LiveChatService } = Services
@@ -64,7 +64,7 @@ export default function Chat(p: { currentChat: string }) {
         {messages.map(message => <ChatMessage message={message} />)}
       </div>
       <div className={styles.chatInput}>
-        <TextAreaInput
+        <TextInput
           value={currentMessage}
           onChange={setCurrentMessage}
           onKeyDown={handleEnter}
