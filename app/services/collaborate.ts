@@ -312,10 +312,10 @@ export class CollaborateService extends StatefulService<ICommunityHubState> {
 
   async createChat(title: string, members: Array<IFriend>) {
     const membos = this.getChatMembers('');
-    this.updateUsers(membos.map(member => ({ ...member, chat_names: ['Comfy Card Dads'] })));
+    this.updateUsers(membos.map(member => ({ ...member, chat_names: ['brainrotters unite'] })));
     this.addChat({
-      name: 'Comfy Card Dads',
-      title: 'Comfy Card Dads',
+      name: 'brainrotters unite',
+      title: 'brainrotters unite',
       avatar: null,
     });
   }

@@ -3,16 +3,20 @@ import cx from 'classnames';
 import styles from './Collaborate.m.less';
 import { $t } from 'services/i18n';
 import { Services } from 'components-react/service-provider';
+import { useVuex } from 'components-react/hooks';
 
 export default function SideBar(p: { onShowAddChatModal: (val: boolean) => void; currentTab: string; setPage: (val: string) => void; }) {
   const { CollaborateService } = Services;
+
+  const { groupChats } = useVuex(() => ({
+    groupChats: CollaborateService.views.groupChats,
+  }));
 
   function setPage(page: string) {
     p.setPage(page);
   }
 
   function GroupChatRows() {
-    const groupChats = CollaborateService.views.groupChats;
     return (
       <div>
         <span className={styles.chatHeader}>

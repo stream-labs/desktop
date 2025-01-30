@@ -67,7 +67,7 @@ export default function Matchmake(p: { setPage: (val: string) => void }) {
 
   function match() {
     CollaborateService.actions.createChat('', []);
-    p.setPage('Comfy Card Dads');
+    p.setPage('brainrotters unite');
   }
 
   return (

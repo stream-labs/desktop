@@ -92,7 +92,7 @@ export class LiveChatService extends StatefulService<ILiveChatState> {
     this.messageSocketConnection.bind(PUSHER_MESSAGE_EVENT, (data: IMessageData) => {
       const user = this.collaborateService.getChatMembers('').find(member => member.name === data.author);
       this.recieveMessage({
-        room: 'Comfy Card Dads',
+        room: 'brainrotters unite',
         message: data.message,
       }, {
         id: 2,
@@ -127,10 +127,10 @@ export class LiveChatService extends StatefulService<ILiveChatState> {
   }
 
   sendMessage(message: string) {
-    this.ADD_MESSAGE('Comfy Card Dads', {
+    this.ADD_MESSAGE('brainrotters unite', {
       user_id: 0,
       display_name: 'toasthammer',
-      room: 'Comfy Card Dads',
+      room: 'brainrotters unite',
       message,
       avatar: 'https://framecloud-public.s3.amazonaws.com/hackathon-avatars/channels4_profile.jpg',
       date_posted: Date.now().toLocaleString(),

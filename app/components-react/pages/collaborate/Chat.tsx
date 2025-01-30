@@ -15,7 +15,7 @@ export default function Chat(p: { currentChat: string }) {
   const [currentMessage, setCurrentMessage] = useState('');
 
   const { messages, members } = useVuex(() => ({
-    messages: LiveChatService.views.messages('Comfy Card Dads'),
+    messages: LiveChatService.views.messages('brainrotters unite'),
     members: CollaborateService.views.usersInRoom(p.currentChat),
   }));
 
@@ -68,7 +68,7 @@ export default function Chat(p: { currentChat: string }) {
           value={currentMessage}
           onChange={setCurrentMessage}
           onKeyDown={handleEnter}
-          placeholder="Message Comfy Card Dads"
+          placeholder="Message brainrotters unite"
           uncontrolled={false}
         />
         <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
