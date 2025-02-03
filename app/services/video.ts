@@ -16,7 +16,7 @@ import { ISelectionState, SelectionService } from 'services/selection';
 import { SourcesService } from 'services/sources';
 import { ScenesService } from 'services/scenes';
 import { debounce } from 'lodash-decorators';
-import { Subscription } from 'rxjs';
+import { Subscription, Subject } from 'rxjs';
 
 /**
  * Display Types
@@ -49,6 +49,23 @@ export interface IVideoSettingFormatted {
   fpsNum: number;
   fpsDen: number;
   fpsInt: number;
+}
+
+// to migrate from the V1 to V2 API, we need to map the old enum to the new API enum
+enum EFPSType {
+  'Common FPS Value' = 0,
+  'Integer FPS Value' = 1,
+  'Fractional FPS Value' = 2,
+}
+
+// to migrate from the V1 to V2 API, we need to map the old enum to the new API enum
+enum EScaleType {
+  // Disable,
+  // Point,
+  'bicubic' = 2,
+  'bilinear' = 3,
+  'lanczos' = 4,
+  // Area,
 }
 
 export enum ESettingsVideoProperties {
@@ -271,24 +288,44 @@ export class VideoSettingsState extends RealmObject {
       fpsType: obs.EFPSType.Integer,
     };
 
-    const videoSettings = obs.NodeObs.OBS_settings_getSettings('Video')?.data;
+    const videoSettings = obs.NodeObs.OBS_settings_getSettings('Video')?.data[0]?.parameters;
 
     if (!videoSettings) return defaultSettings;
 
-    const [baseWidth, baseHeight] = videoSettings.data.Base.split('x');
-    const [outputWidth, outputHeight] = videoSettings.data.Output.split('x');
+    videoSettings.forEach((setting: any) => {
+      switch (setting.name) {
+        case 'Base': {
+          const [baseWidth, baseHeight] = setting.currentValue.split('x');
+          defaultSettings.baseWidth = Number(baseWidth);
+          defaultSettings.baseHeight = Number(baseHeight);
+          break;
+        }
+        case 'Output': {
+          const [outputWidth, outputHeight] = setting.currentValue.split('x');
+          defaultSettings.outputWidth = Number(outputWidth);
+          defaultSettings.outputHeight = Number(outputHeight);
+          break;
+        }
+        case 'ScaleType':
+          defaultSettings.scaleType = (EScaleType[
+            setting.currentValue
+          ] as unknown) as obs.EScaleType;
+          break;
+        case 'FPSType':
+          defaultSettings.fpsType = (EFPSType[setting.currentValue] as unknown) as obs.EFPSType;
+          break;
+        case 'FPSNum':
+          defaultSettings.fpsNum = setting.currentValue;
+          break;
+        case 'FPSDen':
+          defaultSettings.fpsDen = setting.currentValue;
+          break;
+        default:
+          break;
+      }
+    });
 
-    return {
-      ...defaultSettings,
-      baseWidth: Number(baseWidth) ?? defaultSettings.baseWidth,
-      baseHeight: Number(baseHeight) ?? defaultSettings.baseHeight,
-      outputWidth: Number(outputWidth) ?? defaultSettings.outputWidth,
-      outputHeight: Number(outputHeight) ?? defaultSettings.outputHeight,
-      scaleType: (videoSettings.data.ScaleType as obs.EScaleType) ?? defaultSettings.scaleType,
-      fpsType: (videoSettings.data.FPSType as obs.EFPSType) ?? defaultSettings.fpsType,
-      fpsNum: (videoSettings.data.FPSNum as number) ?? defaultSettings.fpsNum,
-      fpsDen: (videoSettings.data.FPSDen as number) ?? defaultSettings.fpsDen,
-    };
+    return defaultSettings;
   }
 
   protected onCreated(): void {
@@ -322,7 +359,7 @@ export class VideoSettingsState extends RealmObject {
       // update active display settings
       if (parsed.videoSettings?.activeDisplays) {
         this.db.write(() => {
-          this.horizontal.isActive = parsed.videoSettings.activeDisplays.horizontal;
+          this.horizontal.isActive = parsed.videoSettings.activeDisplays?.horizontal ?? true;
           this.vertical.isActive = parsed.videoSettings.activeDisplays.vertical;
         });
       }
@@ -736,6 +773,8 @@ export class VideoService extends Service {
 
   state = VideoSettingsState.inject();
 
+  establishedContexts = new Subject();
+
   init() {
     this.settingsService.loadSettingsIntoStore();
 
@@ -744,6 +783,8 @@ export class VideoService extends Service {
     if (this.state.vertical?.isActive && !this.contexts.vertical) {
       this.establishVideoContext('vertical');
     }
+
+    this.establishedContexts.next();
   }
 
   contexts = {
