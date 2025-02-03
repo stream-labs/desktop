@@ -167,10 +167,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
       this.disableStudioMode();
     });
 
-    const establishedContexts = this.videoService.establishedContexts.subscribe(() => {
-      if (!this.studioModeTransition) this.createStudioModeTransition();
-      establishedContexts.unsubscribe();
-    });
+    if (!this.studioModeTransition) this.createStudioModeTransition();
   }
 
   enableStudioMode() {

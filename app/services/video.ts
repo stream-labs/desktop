@@ -16,7 +16,7 @@ import { ISelectionState, SelectionService } from 'services/selection';
 import { SourcesService } from 'services/sources';
 import { ScenesService } from 'services/scenes';
 import { debounce } from 'lodash-decorators';
-import { Subscription, Subject } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 /**
  * Display Types
@@ -773,8 +773,6 @@ export class VideoService extends Service {
 
   state = VideoSettingsState.inject();
 
-  establishedContexts = new Subject();
-
   init() {
     this.settingsService.loadSettingsIntoStore();
 
@@ -783,8 +781,6 @@ export class VideoService extends Service {
     if (this.state.vertical?.isActive && !this.contexts.vertical) {
       this.establishVideoContext('vertical');
     }
-
-    this.establishedContexts.next();
   }
 
   contexts = {
