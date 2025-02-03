@@ -13,6 +13,7 @@ import Utils from 'services/utils';
 import DualOutputToggle from '../../shared/DualOutputToggle';
 import { ObsSettingsSection } from './ObsSettings';
 import { useRealmObject } from 'components-react/hooks/realm';
+import uniq from 'lodash/uniq';
 
 const CANVAS_RES_OPTIONS = [
   { label: '1920x1080', value: '1920x1080' },
@@ -126,22 +127,28 @@ export function VideoSettings() {
   }, []);
 
   const baseResOptions = useMemo(() => {
-    return display === 'vertical'
-      ? VERTICAL_CANVAS_OPTIONS
-      : CANVAS_RES_OPTIONS.concat(monitorResolutions)
-          .concat(VERTICAL_CANVAS_OPTIONS)
-          .concat([{ label: $t('Custom'), value: 'custom' }]);
+    const options =
+      display === 'vertical'
+        ? VERTICAL_CANVAS_OPTIONS
+        : CANVAS_RES_OPTIONS.concat(monitorResolutions)
+            .concat(VERTICAL_CANVAS_OPTIONS)
+            .concat([{ label: $t('Custom'), value: 'custom' }]);
+
+    return uniq(options);
   }, [display, monitorResolutions]);
 
   const outputResOptions = useMemo(() => {
     const baseRes = `${videoSettings.horizontal.baseWidth}x${videoSettings.horizontal.baseHeight}`;
 
-    return display === 'vertical'
-      ? VERTICAL_OUTPUT_RES_OPTIONS
-      : [{ label: baseRes, value: baseRes }]
-          .concat(OUTPUT_RES_OPTIONS)
-          .concat(VERTICAL_OUTPUT_RES_OPTIONS)
-          .concat([{ label: $t('Custom'), value: 'custom' }]);
+    const options =
+      display === 'vertical'
+        ? VERTICAL_OUTPUT_RES_OPTIONS
+        : [{ label: baseRes, value: baseRes }]
+            .concat(OUTPUT_RES_OPTIONS)
+            .concat(VERTICAL_OUTPUT_RES_OPTIONS)
+            .concat([{ label: $t('Custom'), value: 'custom' }]);
+
+    return uniq(options);
   }, [display, videoSettings]);
 
   function updateSettings(key: string, val: string | number | EFPSType | EScaleType) {
