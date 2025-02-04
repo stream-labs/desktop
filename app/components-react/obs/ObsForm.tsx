@@ -9,6 +9,7 @@ import {
   IObsSliderInputValue,
   IObsTextInputValue,
   IObsNumberInputValue,
+  IObsBitmaskInput,
 } from '../../components/obs/inputs/ObsInput';
 import Form, { useFormContext } from '../shared/inputs/Form';
 import {
@@ -119,13 +120,13 @@ function ObsInput(p: IObsInputProps) {
       if (textVal.multiline) {
         return <TextAreaInput {...inputProps} debounce={300} />;
       } else if (textVal.infoField) {
-        let style = { };
+        let style = {};
         if (textVal.infoType == obs.ETextInfoType.Warning) {
           Object.assign(style, { color: 'var(--info)' });
         } else if (textVal.infoType == obs.ETextInfoType.Error) {
           Object.assign(style, { color: 'var(--warning)' });
         }
-        return <InputWrapper style={ style }>{textVal.description}</InputWrapper>;
+        return <InputWrapper style={style}>{textVal.description}</InputWrapper>;
       } else {
         return <TextInput {...inputProps} isPassword={inputProps.masked} />;
       }
@@ -193,6 +194,40 @@ function ObsInput(p: IObsInputProps) {
           tooltipPlacement="right"
         />
       );
+
+    case 'OBS_PROPERTY_BITMASK':
+      // eslint-disable-next-line no-case-declarations
+      const flags = Utils.numberToBinnaryArray(
+        (p.value as IObsBitmaskInput).value,
+        (p.value as IObsBitmaskInput).size,
+      ).reverse();
+
+      return (
+        <div>
+          {flags.map((flag, index) => (
+            <Button
+              key={`flag-${index}`}
+              onChange={(v: any) =>
+                inputProps.onChange(Utils.binnaryArrayToNumber(flags.reverse()))
+              }
+              color={flag === 1 ? 'primary' : 'default'}
+              style={{
+                marginRight: '5px',
+                backgroundColor: flag === 1 ? 'var(--primary)' : 'var(--dark-background)',
+                // color: flag === 1 ? 'var(--dark-background)' : 'var(--section)',
+                // borderColor: flag === 1 ? 'var(--dark-background)' : 'var(--section)',
+                padding: '5px',
+                lineHeight: 0.75,
+              }}
+            >
+              {index}
+            </Button>
+          ))}
+        </div>
+      );
+
+    case 'OBS_PROPERTY_PATH':
+      return <FileInput {...inputProps} directory={true} />;
 
     default:
       return <span style={{ color: 'red' }}>Unknown input type {type}</span>;
