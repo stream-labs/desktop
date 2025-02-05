@@ -8,7 +8,6 @@ interface ITab {
 }
 
 interface ITabs {
-  value?: string;
   tabs?: string[];
   onChange?: (param?: any) => void;
   style?: CSSProperties;

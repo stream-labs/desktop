@@ -313,42 +313,52 @@ interface IObsTabbedFormGroupProps {
 }
 
 export function ObsTabbedFormGroup(p: IObsTabbedFormGroupProps) {
-  const [header, sections] = partition(
-    p.sections,
-    section => section.nameSubCategory === 'Untitled',
-  );
-  const tabs = sections.map(section => section.nameSubCategory);
+  const tabs = useMemo(() => {
+    // combine all audio tracks into one tab
+    const filtered = p.sections
+      .filter(sectionProps => sectionProps.nameSubCategory !== 'Untitled')
+      .filter(sectionProps => !sectionProps.nameSubCategory.startsWith('Audio - Track'))
+      .map(sectionProps => sectionProps.nameSubCategory);
+
+    filtered.splice(2, 0, 'Audio');
+    return filtered;
+  }, [p.sections]);
 
   const [currentTab, setCurrentTab] = useState(p.sections[1].nameSubCategory);
-  const currentTabData = useMemo(() => {
-    const section = p.sections.find(section => section.nameSubCategory === currentTab);
-    return {
-      formData: section,
-      index: p.sections.findIndex(section => section.nameSubCategory === currentTab),
-    };
-  }, [currentTab]);
 
   return (
-    <div className="section">
-      <ObsForm value={header[0].parameters} onChange={formData => p.onChange(formData, 0)} />
-
-      <Tabs tabs={tabs} onChange={setCurrentTab} value={currentTab} />
-      {currentTabData.formData && (
-        <div
-          className="section"
-          key={`${currentTabData.formData.nameSubCategory}${currentTabData.index}`}
-        >
-          <h2 className="section-title">{$t(currentTabData.formData.nameSubCategory)}</h2>
-          {currentTab === currentTabData.formData.nameSubCategory && (
-            <div className="section-content">
+    <div className="section" key="tabbed-section">
+      {p.sections.map((sectionProps, ind) => (
+        <>
+          {sectionProps.nameSubCategory === 'Untitled' && (
+            <div className="section-content" key={`${sectionProps.nameSubCategory}${ind}`}>
               <ObsForm
-                value={currentTabData.formData.parameters}
-                onChange={formData => p.onChange(formData, currentTabData.index)}
+                value={sectionProps.parameters}
+                onChange={formData => p.onChange(formData, ind)}
+              />
+              <Tabs tabs={tabs} onChange={setCurrentTab} style={{ marginBottom: '24px' }} />
+            </div>
+          )}
+
+          {sectionProps.nameSubCategory === currentTab && (
+            <div className="section-content" key={`${sectionProps.nameSubCategory}${ind}`}>
+              <ObsForm
+                value={sectionProps.parameters}
+                onChange={formData => p.onChange(formData, ind)}
               />
             </div>
           )}
-        </div>
-      )}
+
+          {currentTab === 'Audio' && sectionProps.nameSubCategory.startsWith('Audio - Track') && (
+            <div className="section-content" key={`${sectionProps.nameSubCategory}${ind}`}>
+              <ObsForm
+                value={sectionProps.parameters}
+                onChange={formData => p.onChange(formData, ind)}
+              />
+            </div>
+          )}
+        </>
+      ))}
     </div>
   );
 }
