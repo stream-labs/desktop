@@ -6,6 +6,8 @@ import Form from '../../shared/inputs/Form';
 import css from './ObsSettings.m.less';
 import Tabs from 'components-react/shared/Tabs';
 
+export type IObsFormType = 'default' | 'tabs' | 'collapsible';
+
 /**
  * Renders a settings page
  */
@@ -26,10 +28,14 @@ export function ObsSettings(p: { page: string }) {
 /**
  * Renders generic inputs from OBS
  */
-export function ObsGenericSettingsForm() {
+export function ObsGenericSettingsForm(p: { type?: IObsFormType }) {
   const { settingsFormData, saveSettings } = useObsSettings();
   return (
-    <ObsFormGroup value={settingsFormData} onChange={newSettings => saveSettings(newSettings)} />
+    <ObsFormGroup
+      value={settingsFormData}
+      onChange={newSettings => saveSettings(newSettings)}
+      type={p?.type}
+    />
   );
 }
 

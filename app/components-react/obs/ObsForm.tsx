@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { ISettingsSubCategory } from '../../services/settings';
 import {
   IObsInput,
@@ -23,13 +23,16 @@ import {
   TextInput,
   TInputLayout,
 } from '../shared/inputs';
+import { IObsFormType } from '../windows/settings/ObsSettings';
 import cloneDeep from 'lodash/cloneDeep';
-import { Button } from 'antd';
+import { Button, Collapse } from 'antd';
 import InputWrapper from '../shared/inputs/InputWrapper';
 import { $t, $translateIfExist, $translateIfExistWithCheck } from '../../services/i18n';
 import Utils from 'services/utils';
-
+import cx from 'classnames';
 import * as obs from '../../../obs-api';
+import Tabs from 'components-react/shared/Tabs';
+import partition from 'lodash/partition';
 
 interface IExtraInputProps {
   debounce?: number;
@@ -238,6 +241,7 @@ interface IObsFormGroupProps {
   categoryName?: string;
   value: ISettingsSubCategory[];
   onChange: (newValue: ISettingsSubCategory[]) => unknown;
+  type?: IObsFormType;
 }
 
 /**
@@ -251,21 +255,137 @@ export function ObsFormGroup(p: IObsFormGroupProps) {
   }
   const sections = p.value.filter(section => section.parameters.filter(p => p.visible).length);
 
+  const type = p.type || 'default';
+
   return (
     <div className="form-groups">
-      {sections.map((sectionProps, ind) => (
-        <div className="section" key={`${sectionProps.nameSubCategory}${ind}`}>
-          {sectionProps.nameSubCategory !== 'Untitled' && (
-            <h2 className="section-title">{$t(sectionProps.nameSubCategory)}</h2>
-          )}
-          <div className="section-content">
-            <ObsForm
-              value={sectionProps.parameters}
-              onChange={formData => onChangeHandler(formData, ind)}
-            />
+      {type === 'default' &&
+        sections.map((sectionProps, ind) => (
+          <div className="section" key={`${sectionProps.nameSubCategory}${ind}`}>
+            {sectionProps.nameSubCategory !== 'Untitled' && (
+              <h2 className="section-title">{$t(sectionProps.nameSubCategory)}</h2>
+            )}
+            <div className="section-content">
+              <ObsForm
+                value={sectionProps.parameters}
+                onChange={formData => onChangeHandler(formData, ind)}
+              />
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+
+      {type === 'tabs' && <ObsTabbedFormGroup sections={sections} onChange={onChangeHandler} />}
+
+      {type === 'collapsible' &&
+        sections.map((sectionProps, ind) => (
+          <>
+            {sectionProps.nameSubCategory === 'Untitled' ? (
+              <div className="section" key={`${sectionProps.nameSubCategory}${ind}`}>
+                <div className="section-content">
+                  <ObsForm
+                    value={sectionProps.parameters}
+                    onChange={formData => onChangeHandler(formData, ind)}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div
+                className="section"
+                key={`${sectionProps.nameSubCategory}${ind}`}
+                style={{ padding: '4px' }}
+              >
+                <ObsCollapsibleFormItem
+                  key={`${sectionProps.nameSubCategory}${ind}`}
+                  section={sectionProps}
+                  onChange={formData => onChangeHandler(formData, ind)}
+                />
+              </div>
+            )}
+          </>
+        ))}
     </div>
+  );
+}
+
+interface IObsTabbedFormGroupProps {
+  sections: ISettingsSubCategory[];
+  onChange: (formData: TObsFormData, ind: number) => unknown;
+}
+
+export function ObsTabbedFormGroup(p: IObsTabbedFormGroupProps) {
+  const [header, sections] = partition(
+    p.sections,
+    section => section.nameSubCategory === 'Untitled',
+  );
+  const tabs = sections.map(section => section.nameSubCategory);
+
+  const [currentTab, setCurrentTab] = useState(p.sections[1].nameSubCategory);
+  const currentTabData = useMemo(() => {
+    const section = p.sections.find(section => section.nameSubCategory === currentTab);
+    return {
+      formData: section,
+      index: p.sections.findIndex(section => section.nameSubCategory === currentTab),
+    };
+  }, [currentTab]);
+
+  return (
+    <div className="section">
+      <ObsForm value={header[0].parameters} onChange={formData => p.onChange(formData, 0)} />
+
+      <Tabs tabs={tabs} onChange={setCurrentTab} value={currentTab} />
+      {currentTabData.formData && (
+        <div
+          className="section"
+          key={`${currentTabData.formData.nameSubCategory}${currentTabData.index}`}
+        >
+          <h2 className="section-title">{$t(currentTabData.formData.nameSubCategory)}</h2>
+          {currentTab === currentTabData.formData.nameSubCategory && (
+            <div className="section-content">
+              <ObsForm
+                value={currentTabData.formData.parameters}
+                onChange={formData => p.onChange(formData, currentTabData.index)}
+              />
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+interface IObsCollapsibleFormGroupProps {
+  key: string;
+  section: ISettingsSubCategory;
+  onChange: (formData: TObsFormData, ind: number) => unknown;
+}
+
+const { Panel } = Collapse;
+
+export function ObsCollapsibleFormItem(p: IObsCollapsibleFormGroupProps) {
+  const [expanded, setExpanded] = useState(true);
+
+  return (
+    <Collapse
+      key={p.key}
+      className={cx('section-content', 'section-content--collapse')}
+      onChange={() => setExpanded(!expanded)}
+      expandIcon={({ isActive }) => (
+        <i
+          className={cx('fa', 'section-title-icon', {
+            'fa-minus': isActive,
+            'fa-plus': !isActive,
+          })}
+        />
+      )}
+      bordered={false}
+    >
+      <Panel
+        className="section-content--panel"
+        header={p.section.nameSubCategory}
+        key={`${p.section.nameSubCategory}`}
+      >
+        <ObsForm value={p.section.parameters} onChange={p.onChange} />
+      </Panel>
+    </Collapse>
   );
 }

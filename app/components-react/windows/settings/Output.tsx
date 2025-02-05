@@ -1,8 +1,13 @@
 import React from 'react';
-import { ObsGenericSettingsForm } from './ObsSettings';
+import { IObsFormType, ObsGenericSettingsForm } from './ObsSettings';
+import { useObsSettings } from './useObsSettings';
 
 export function OutputSettings() {
-  return <ObsGenericSettingsForm />;
+  const { settingsFormData } = useObsSettings();
+
+  const type = settingsFormData[0].parameters[0].currentValue === 'Simple' ? 'collapsible' : 'tabs';
+
+  return <ObsGenericSettingsForm type={type as IObsFormType} />;
 }
 
 OutputSettings.page = 'Output';
