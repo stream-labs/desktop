@@ -17,6 +17,8 @@ import { SourcesService } from 'services/sources';
 import { ScenesService } from 'services/scenes';
 import { debounce } from 'lodash-decorators';
 import { Subscription } from 'rxjs';
+import path from 'path';
+import fs from 'fs';
 
 /**
  * Display Types
@@ -277,10 +279,10 @@ export class VideoSettingsState extends RealmObject {
     const defaultSettings = {
       fpsNum: 30,
       fpsDen: 1,
-      baseWidth: 720,
-      baseHeight: 1280,
-      outputWidth: 720,
-      outputHeight: 1280,
+      baseWidth: 1920,
+      baseHeight: 1080,
+      outputWidth: 1920,
+      outputHeight: 1080,
       outputFormat: obs.EVideoFormat.I420,
       colorspace: obs.EColorSpace.CS709,
       range: obs.ERangeType.Full,
@@ -289,19 +291,23 @@ export class VideoSettingsState extends RealmObject {
     };
 
     const videoSettings = obs.NodeObs.OBS_settings_getSettings('Video')?.data[0]?.parameters;
+    console.log('videoSettings', videoSettings);
 
     if (!videoSettings) return defaultSettings;
 
     videoSettings.forEach((setting: any) => {
+      if (!setting.currentValue) return;
       switch (setting.name) {
         case 'Base': {
           const [baseWidth, baseHeight] = setting.currentValue.split('x');
+          if (baseWidth === '0' || baseHeight === '0') break;
           defaultSettings.baseWidth = Number(baseWidth);
           defaultSettings.baseHeight = Number(baseHeight);
           break;
         }
         case 'Output': {
           const [outputWidth, outputHeight] = setting.currentValue.split('x');
+          if (outputWidth === '0' || outputHeight === '0') break;
           defaultSettings.outputWidth = Number(outputWidth);
           defaultSettings.outputHeight = Number(outputHeight);
           break;
@@ -325,12 +331,71 @@ export class VideoSettingsState extends RealmObject {
       }
     });
 
+    console.log('defaultSettings', defaultSettings);
+
     return defaultSettings;
+  }
+
+  /**
+   * Validate horizontal video settings
+   * @remark Primarily used to confirm horizontal resolutions when creating the realm
+   */
+  validateHorizontalSettings(settings: obs.IVideoInfo) {
+    const filePath = path.join(remote.app.getPath('userData'), 'basic.ini');
+    const truePath = path.resolve(filePath);
+
+    const horizontalSettings = settings;
+
+    try {
+      const data = fs.readFileSync(truePath).toString();
+
+      const propertiesToValidate = ['BaseCX', 'BaseCY', 'OutputCX', 'OutputCY'];
+
+      propertiesToValidate.forEach(property => {
+        const regex = new RegExp(`${property}=(.*?)(\r?\n|$)`);
+        const match = data.match(regex);
+
+        if (match && match[1].trim() !== '0') {
+          console.log('match', match);
+          const value = Number(match[1].trim());
+          console.log('isNaN(value)', isNaN(value));
+          if (isNaN(value)) return;
+
+          switch (property) {
+            case 'BaseCX':
+              horizontalSettings.baseWidth = Number(match[1].trim());
+              break;
+            case 'BaseCY':
+              horizontalSettings.baseHeight = Number(match[1].trim());
+              break;
+            case 'OutputCX':
+              horizontalSettings.outputWidth = Number(match[1].trim());
+              break;
+            case 'OutputCY':
+              horizontalSettings.outputHeight = Number(match[1].trim());
+              break;
+            default:
+              break;
+          }
+        }
+      });
+    } catch (e: unknown) {
+      console.warn('Error reading basic.ini', e);
+    }
+
+    console.log('horizontalSettings', horizontalSettings);
+
+    return horizontalSettings;
   }
 
   protected onCreated(): void {
     // fetch horizontal video settings (also is the legacy settings)
-    const horizontalSettings = this.fetchLegacySettings();
+
+    console.log('obs.Video.legacySettings', obs.Video.legacySettings);
+    console.log('obs.Video.legacySettings', obs.Video.video);
+    const settings = this.fetchLegacySettings();
+
+    const horizontalSettings = this.validateHorizontalSettings(settings);
 
     // migrate horizontal settings to realm
     this.db.write(() => {
@@ -339,16 +404,21 @@ export class VideoSettingsState extends RealmObject {
 
     // migrate vertical video settings
     const verticalSettings = {
-      ...horizontalSettings,
+      ...settings,
       baseWidth: 720,
       baseHeight: 1280,
       outputWidth: 720,
       outputHeight: 1280,
     };
 
+    // migrate vertical settings to realm
     this.db.write(() => {
       this.vertical.video.deepPatch(verticalSettings);
     });
+
+    console.log('verticalSettings', verticalSettings);
+    console.log('==> horizontalSettings', JSON.stringify(horizontalSettings, null, 2));
+    console.log('==> verticalSettings', JSON.stringify(verticalSettings, null, 2));
 
     // load persisted horizontal settings from service
     const data = localStorage.getItem('PersistentStatefulService-DualOutputService');
@@ -364,11 +434,6 @@ export class VideoSettingsState extends RealmObject {
         });
       }
     }
-
-    // migrate vertical settings to realm
-    this.db.write(() => {
-      this.vertical.video.deepPatch(verticalSettings);
-    });
   }
 
   /**
@@ -947,6 +1012,8 @@ export class VideoService extends Service {
   establishVideoContext(display: TDisplayType = 'horizontal') {
     if (this.contexts[display]) return;
     this.contexts[display] = obs.VideoFactory.create();
+
+    console.log('this.videoInfo', display, JSON.stringify(this.videoInfo, null, 2));
 
     this.contexts[display].video = this.videoInfo[display];
     this.contexts[display].legacySettings = this.videoInfo[display];
