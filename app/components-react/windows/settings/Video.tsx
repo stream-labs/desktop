@@ -473,6 +473,7 @@ export function VideoSettings() {
       {dualOutputMode && <Tabs onChange={setDisplay} />}
       <ObsSettingsSection>
         <FormFactory
+          name="video-settings"
           values={values}
           metadata={metadata}
           onChange={onChange}
