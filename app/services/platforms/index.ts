@@ -144,6 +144,11 @@ export enum EPlatformCallResult {
    * The user needs to re-merge their to update Live Access status.
    */
   TikTokScopeOutdated,
+
+  /**
+   * The user needs to re-login to update Kick scope.
+   */
+  KickScopeOutdated,
 }
 
 export type TStartStreamOptions =

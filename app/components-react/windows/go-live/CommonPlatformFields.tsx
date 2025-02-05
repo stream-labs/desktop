@@ -95,10 +95,6 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
       return $t('Only 32 characters of your title will display on TikTok');
     }
 
-    if (enabledPlatforms.length === 1 && p?.platform === 'kick') {
-      return $t('Edit your stream title on Kick after going live.');
-    }
-
     return undefined;
   }, [enabledPlatforms]);
 

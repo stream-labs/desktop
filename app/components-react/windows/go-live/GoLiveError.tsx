@@ -57,6 +57,8 @@ export default function GoLiveError() {
         return renderTikTokScopeOutdatedError(error);
       case 'FACEBOOK_STREAMING_DISABLED':
         return renderFacebookNotEligibleForStreamingError();
+      case 'KICK_SCOPE_OUTDATED':
+        return renderRemergeError(error);
       case 'MACHINE_LOCKED':
         return renderMachineLockedError(error);
       default:

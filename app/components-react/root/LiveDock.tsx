@@ -160,7 +160,6 @@ class LiveDockController {
     // Twitter & Tiktok don't support editing title after going live
     if (this.isPlatform('twitter') && !this.isRestreaming) return false;
     if (this.isPlatform('tiktok') && !this.isRestreaming) return false;
-    if (this.isPlatform('kick') && !this.isRestreaming) return false;
 
     return (
       this.streamingService.views.isMidStreamMode ||
