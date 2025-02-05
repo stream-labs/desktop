@@ -13,6 +13,10 @@ export default function PreviewModal({
   close: () => void;
   streamId: string | undefined;
 }) {
+  if (streamId === undefined) {
+    close();
+    console.error('streamId is required');
+  }
   const { HighlighterService } = Services;
   const clips = HighlighterService.getClips(HighlighterService.views.clips, streamId);
   const { intro, outro } = HighlighterService.views.video;
