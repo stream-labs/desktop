@@ -276,7 +276,8 @@ export class VideoSettingsState extends RealmObject {
    * @returns Legacy video settings
    */
   fetchLegacySettings() {
-    const defaultSettings = {
+    // default video settings
+    let videoSettings = {
       fpsNum: 30,
       fpsDen: 1,
       baseWidth: 1920,
@@ -290,63 +291,76 @@ export class VideoSettingsState extends RealmObject {
       fpsType: obs.EFPSType.Integer,
     };
 
-    const videoSettings = obs.NodeObs.OBS_settings_getSettings('Video')?.data[0]?.parameters;
-    console.log('videoSettings', videoSettings);
-
-    if (!videoSettings) return defaultSettings;
-
-    videoSettings.forEach((setting: any) => {
-      if (!setting.currentValue) return;
-      switch (setting.name) {
-        case 'Base': {
-          const [baseWidth, baseHeight] = setting.currentValue.split('x');
-          if (baseWidth === '0' || baseHeight === '0') break;
-          defaultSettings.baseWidth = Number(baseWidth);
-          defaultSettings.baseHeight = Number(baseHeight);
-          break;
-        }
-        case 'Output': {
-          const [outputWidth, outputHeight] = setting.currentValue.split('x');
-          if (outputWidth === '0' || outputHeight === '0') break;
-          defaultSettings.outputWidth = Number(outputWidth);
-          defaultSettings.outputHeight = Number(outputHeight);
-          break;
-        }
-        case 'ScaleType':
-          defaultSettings.scaleType = (EScaleType[
-            setting.currentValue
-          ] as unknown) as obs.EScaleType;
-          break;
-        case 'FPSType':
-          defaultSettings.fpsType = (EFPSType[setting.currentValue] as unknown) as obs.EFPSType;
-          break;
-        case 'FPSNum':
-          defaultSettings.fpsNum = setting.currentValue;
-          break;
-        case 'FPSDen':
-          defaultSettings.fpsDen = setting.currentValue;
-          break;
-        default:
-          break;
-      }
-    });
-
-    console.log('defaultSettings', defaultSettings);
-
-    return defaultSettings;
-  }
-
-  /**
-   * Validate horizontal video settings
-   * @remark Primarily used to confirm horizontal resolutions when creating the realm
-   */
-  validateHorizontalSettings(settings: obs.IVideoInfo) {
-    const filePath = path.join(remote.app.getPath('userData'), 'basic.ini');
-    const truePath = path.resolve(filePath);
-
-    const horizontalSettings = settings;
-
+    // try to fetch video settings from video factory
     try {
+      const temporaryVideoContext = obs.VideoFactory.create();
+      const videoFactoryVideoSettings = { ...temporaryVideoContext.video };
+      const videoFactoryLegacySettings = { ...temporaryVideoContext.legacySettings };
+      temporaryVideoContext.destroy();
+
+      if (videoFactoryVideoSettings) {
+        videoSettings = videoFactoryVideoSettings;
+      } else if (videoFactoryLegacySettings) {
+        videoSettings = videoFactoryLegacySettings;
+      }
+
+      return videoSettings;
+    } catch (e: unknown) {
+      console.warn('Error fetching video settings from video factory', e);
+    }
+
+    // as a fallback, try to fetch video settings from the old API
+    try {
+      const oldAPISettings = obs.NodeObs.OBS_settings_getSettings('Video')?.data[0]?.parameters;
+
+      if (oldAPISettings) {
+        oldAPISettings.forEach((setting: any) => {
+          if (!setting.currentValue) return;
+          switch (setting.name) {
+            case 'Base': {
+              const [baseWidth, baseHeight] = setting.currentValue.split('x');
+              if (baseWidth === '0' || baseHeight === '0') break;
+              videoSettings.baseWidth = Number(baseWidth);
+              videoSettings.baseHeight = Number(baseHeight);
+              break;
+            }
+            case 'Output': {
+              const [outputWidth, outputHeight] = setting.currentValue.split('x');
+              if (outputWidth === '0' || outputHeight === '0') break;
+              videoSettings.outputWidth = Number(outputWidth);
+              videoSettings.outputHeight = Number(outputHeight);
+              break;
+            }
+            case 'ScaleType':
+              videoSettings.scaleType = (EScaleType[
+                setting.currentValue
+              ] as unknown) as obs.EScaleType;
+              break;
+            case 'FPSType':
+              videoSettings.fpsType = (EFPSType[setting.currentValue] as unknown) as obs.EFPSType;
+              break;
+            case 'FPSNum':
+              videoSettings.fpsNum = setting.currentValue;
+              break;
+            case 'FPSDen':
+              videoSettings.fpsDen = setting.currentValue;
+              break;
+            default:
+              break;
+          }
+        });
+      }
+
+      return videoSettings;
+    } catch (e: unknown) {
+      console.warn('Error fetching video settings from video factory', e);
+    }
+
+    // as a last resort, fetch settings from the local settings file
+    try {
+      const filePath = path.join(remote.app.getPath('userData'), 'basic.ini');
+      const truePath = path.resolve(filePath);
+
       const data = fs.readFileSync(truePath).toString();
 
       const propertiesToValidate = ['BaseCX', 'BaseCY', 'OutputCX', 'OutputCY'];
@@ -356,23 +370,21 @@ export class VideoSettingsState extends RealmObject {
         const match = data.match(regex);
 
         if (match && match[1].trim() !== '0') {
-          console.log('match', match);
           const value = Number(match[1].trim());
-          console.log('isNaN(value)', isNaN(value));
           if (isNaN(value)) return;
 
           switch (property) {
             case 'BaseCX':
-              horizontalSettings.baseWidth = Number(match[1].trim());
+              videoSettings.baseWidth = Number(match[1].trim());
               break;
             case 'BaseCY':
-              horizontalSettings.baseHeight = Number(match[1].trim());
+              videoSettings.baseHeight = Number(match[1].trim());
               break;
             case 'OutputCX':
-              horizontalSettings.outputWidth = Number(match[1].trim());
+              videoSettings.outputWidth = Number(match[1].trim());
               break;
             case 'OutputCY':
-              horizontalSettings.outputHeight = Number(match[1].trim());
+              videoSettings.outputHeight = Number(match[1].trim());
               break;
             default:
               break;
@@ -383,19 +395,13 @@ export class VideoSettingsState extends RealmObject {
       console.warn('Error reading basic.ini', e);
     }
 
-    console.log('horizontalSettings', horizontalSettings);
-
-    return horizontalSettings;
+    // if everything fails, return the default video settings
+    return videoSettings;
   }
 
   protected onCreated(): void {
     // fetch horizontal video settings (also is the legacy settings)
-
-    console.log('obs.Video.legacySettings', obs.Video.legacySettings);
-    console.log('obs.Video.legacySettings', obs.Video.video);
-    const settings = this.fetchLegacySettings();
-
-    const horizontalSettings = this.validateHorizontalSettings(settings);
+    const horizontalSettings = this.fetchLegacySettings();
 
     // migrate horizontal settings to realm
     this.db.write(() => {
@@ -404,7 +410,7 @@ export class VideoSettingsState extends RealmObject {
 
     // migrate vertical video settings
     const verticalSettings = {
-      ...settings,
+      ...horizontalSettings,
       baseWidth: 720,
       baseHeight: 1280,
       outputWidth: 720,
@@ -415,10 +421,6 @@ export class VideoSettingsState extends RealmObject {
     this.db.write(() => {
       this.vertical.video.deepPatch(verticalSettings);
     });
-
-    console.log('verticalSettings', verticalSettings);
-    console.log('==> horizontalSettings', JSON.stringify(horizontalSettings, null, 2));
-    console.log('==> verticalSettings', JSON.stringify(verticalSettings, null, 2));
 
     // load persisted horizontal settings from service
     const data = localStorage.getItem('PersistentStatefulService-DualOutputService');
@@ -1012,8 +1014,6 @@ export class VideoService extends Service {
   establishVideoContext(display: TDisplayType = 'horizontal') {
     if (this.contexts[display]) return;
     this.contexts[display] = obs.VideoFactory.create();
-
-    console.log('this.videoInfo', display, JSON.stringify(this.videoInfo, null, 2));
 
     this.contexts[display].video = this.videoInfo[display];
     this.contexts[display].legacySettings = this.videoInfo[display];
