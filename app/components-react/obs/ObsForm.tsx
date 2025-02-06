@@ -446,23 +446,36 @@ function ObsInputResolutionField(p: IObsInputResolutionFieldProps) {
 
   const [custom, setCustom] = useState(false);
 
-  const buttonText = custom ? $t('Custom') : $t('Apply Primary');
+  const buttonText = custom ? $t('Apply Primary') : $t('Custom');
 
   return (
-    <InputWrapper
-      style={{ marginBottom: '8px', display: 'flex', flexDirection: 'row', alignItems: 'center' }}
-      layout="inline"
-      nowrap={true}
+    <div
+      className="section-input"
+      style={{
+        marginBottom: '8px',
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        // justifyContent: 'space-between',
+      }}
     >
       {custom ? (
-        <>
+        <InputWrapper layout="horizontal" nowrap={true}>
           <TextInput style={{ width: '30%', marginRight: '8px' }} />
           <TextInput style={{ width: '30%' }} />
-        </>
+        </InputWrapper>
       ) : (
-        <ListInput {...p.inputProps} allowClear={false} options={p.options} />
+        <InputWrapper layout="horizontal" nowrap={true}>
+          <ListInput {...p.inputProps} allowClear={false} options={p.options} />
+        </InputWrapper>
       )}
-      <Button onClick={() => setCustom(!custom)}>{buttonText}</Button>
-    </InputWrapper>
+      <Button
+        type={custom ? 'primary' : 'default'}
+        style={{ width: '30%' }}
+        onClick={() => setCustom(!custom)}
+      >
+        {buttonText}
+      </Button>
+    </div>
   );
 }
