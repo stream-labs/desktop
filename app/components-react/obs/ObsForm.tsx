@@ -10,6 +10,7 @@ import {
   IObsTextInputValue,
   IObsNumberInputValue,
   IObsBitmaskInput,
+  IObsListOption,
 } from '../../components/obs/inputs/ObsInput';
 import Form, { useFormContext } from '../shared/inputs/Form';
 import {
@@ -151,7 +152,10 @@ function ObsInput(p: IObsInputProps) {
 
     case 'OBS_INPUT_RESOLUTION_LIST':
       // eslint-disable-next-line no-case-declarations
-      const resolutions = (p.value as IObsListInput<unknown>).options.map(opt => {
+      const resolutions: Omit<
+        IObsListOption<unknown>,
+        'description'
+      >[] = (p.value as IObsListInput<number>).options.map(opt => {
         // treat 0 as an non-selected option if the description is empty
         if (opt.value === 0 && opt.description === '') {
           return { label: $t('Select Option'), value: 0 };
@@ -159,21 +163,16 @@ function ObsInput(p: IObsInputProps) {
 
         return {
           value: opt.value,
-          label: $translateIfExistWithCheck(opt.description),
-          originalLabel: opt.description,
+          label: $translateIfExistWithCheck(opt?.description),
+          originalLabel: opt?.description,
         };
       });
 
-      const resolutionData = {
-        disabled: (p.value as any).enabled === false,
-        options: resolutions,
-        allowEmpty: false,
-        placeholder: $t('Select Option'),
-        name: (p.value as any).name,
-        allowCustom: true,
-      };
-
-      return <ObsInputResolutionField inputProps={inputProps} {...resolutionData} />;
+      return (
+        <InputWrapper>
+          <ObsInputResolutionField inputProps={inputProps} options={resolutions} />
+        </InputWrapper>
+      );
 
     case 'OBS_PROPERTY_BUTTON':
       return (
@@ -304,30 +303,22 @@ export function ObsFormGroup(p: IObsFormGroupProps) {
 
       {type === 'collapsible' &&
         sections.map((sectionProps, ind) => (
-          <>
+          <div className="section" key={`${sectionProps.nameSubCategory}${ind}`}>
             {sectionProps.nameSubCategory === 'Untitled' ? (
-              <div className="section" key={`${sectionProps.nameSubCategory}${ind}`}>
-                <div className="section-content">
-                  <ObsForm
-                    value={sectionProps.parameters}
-                    onChange={formData => onChangeHandler(formData, ind)}
-                  />
-                </div>
-              </div>
-            ) : (
-              <div
-                className="section"
-                key={`${sectionProps.nameSubCategory}${ind}`}
-                style={{ padding: '4px' }}
-              >
-                <ObsCollapsibleFormItem
-                  key={`${sectionProps.nameSubCategory}${ind}`}
-                  section={sectionProps}
+              <div className="section-content">
+                <ObsForm
+                  value={sectionProps.parameters}
                   onChange={formData => onChangeHandler(formData, ind)}
                 />
               </div>
+            ) : (
+              <ObsCollapsibleFormItem
+                key={`${sectionProps.nameSubCategory}${ind}`}
+                section={sectionProps}
+                onChange={formData => onChangeHandler(formData, ind)}
+              />
             )}
-          </>
+          </div>
         ))}
     </div>
   );
@@ -355,42 +346,37 @@ export function ObsTabbedFormGroup(p: IObsTabbedFormGroupProps) {
   return (
     <div className="section" key="tabbed-section">
       {p.sections.map((sectionProps, ind) => (
-        <>
+        <div className="section-content" key={`${sectionProps.nameSubCategory}${ind}`}>
           {sectionProps.nameSubCategory === 'Untitled' && (
-            <div className="section-content" key={`${sectionProps.nameSubCategory}${ind}`}>
+            <>
               <ObsForm
                 value={sectionProps.parameters}
                 onChange={formData => p.onChange(formData, ind)}
               />
               <Tabs tabs={tabs} onChange={setCurrentTab} style={{ marginBottom: '24px' }} />
-            </div>
+            </>
           )}
 
           {sectionProps.nameSubCategory === currentTab && (
-            <div className="section-content" key={`${sectionProps.nameSubCategory}${ind}`}>
-              <ObsForm
-                value={sectionProps.parameters}
-                onChange={formData => p.onChange(formData, ind)}
-              />
-            </div>
+            <ObsForm
+              value={sectionProps.parameters}
+              onChange={formData => p.onChange(formData, ind)}
+            />
           )}
 
           {currentTab === 'Audio' && sectionProps.nameSubCategory.startsWith('Audio - Track') && (
-            <div className="section-content" key={`${sectionProps.nameSubCategory}${ind}`}>
-              <ObsForm
-                value={sectionProps.parameters}
-                onChange={formData => p.onChange(formData, ind)}
-              />
-            </div>
+            <ObsForm
+              value={sectionProps.parameters}
+              onChange={formData => p.onChange(formData, ind)}
+            />
           )}
-        </>
+        </div>
       ))}
     </div>
   );
 }
 
 interface IObsCollapsibleFormGroupProps {
-  key: string;
   section: ISettingsSubCategory;
   onChange: (formData: TObsFormData, ind: number) => unknown;
 }
@@ -402,7 +388,6 @@ export function ObsCollapsibleFormItem(p: IObsCollapsibleFormGroupProps) {
 
   return (
     <Collapse
-      key={p.key}
       className={cx('section-content', 'section-content--collapse')}
       onChange={() => setExpanded(!expanded)}
       expandIcon={({ isActive }) => (
@@ -428,54 +413,58 @@ export function ObsCollapsibleFormItem(p: IObsCollapsibleFormGroupProps) {
 
 interface IObsInputResolutionFieldProps {
   inputProps: any;
-  disabled: boolean;
-  options: unknown[];
-  allowEmpty: boolean;
-  placeholder: string;
-  name: string;
-  allowCustom: boolean;
+  options?: Omit<IObsListOption<unknown>, 'description'>[];
 }
 
 function ObsInputResolutionField(p: IObsInputResolutionFieldProps) {
-  // disabled: (p.value as any).enabled === false,
-  // options: resolutions,
-  // allowEmpty: false,
-  // placeholder: $t('Select Option'),
-  // name: (p.value as any).name,
-  // allowCustom: true,
-
   const [custom, setCustom] = useState(false);
+  const [customResolution, setCustomResolution] = useState(p.inputProps.value);
 
-  const buttonText = custom ? $t('Apply Primary') : $t('Custom');
+  const validator = /^[0-9]+x[0-9]+$/.test(customResolution);
+
+  function resolutionValidator(rule: unknown, values: string[], callback: Function) {
+    if (!validator) {
+      callback($t('The resolution must be in the format [width]x[height] (i.e. 1920x1080)'));
+    } else {
+      callback();
+    }
+  }
+
+  function onClick() {
+    if (custom && !validator) return;
+
+    if (custom && validator) {
+      p.inputProps.onChange(customResolution);
+    }
+
+    setCustom(!custom);
+  }
 
   return (
-    <div
-      className="section-input"
-      style={{
-        marginBottom: '8px',
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        // justifyContent: 'space-between',
-      }}
-    >
+    <>
       {custom ? (
-        <InputWrapper layout="horizontal" nowrap={true}>
-          <TextInput style={{ width: '30%', marginRight: '8px' }} />
-          <TextInput style={{ width: '30%' }} />
-        </InputWrapper>
+        <TextInput
+          value={customResolution}
+          onChange={val => setCustomResolution(val)}
+          label={p.inputProps.label}
+          rules={[{ validator: resolutionValidator }]}
+        />
       ) : (
-        <InputWrapper layout="horizontal" nowrap={true}>
-          <ListInput {...p.inputProps} allowClear={false} options={p.options} />
-        </InputWrapper>
+        <ListInput
+          {...p.inputProps}
+          allowClear={false}
+          options={p.options}
+          placeholder={$t('Select Option')}
+        />
       )}
       <Button
+        // {...p.inputProps}
         type={custom ? 'primary' : 'default'}
-        style={{ width: '30%' }}
-        onClick={() => setCustom(!custom)}
+        onClick={onClick}
+        // rules={[{ validator: resolutionValidator }]}
       >
-        {buttonText}
+        {custom ? $t('Apply Primary') : $t('Custom')}
       </Button>
-    </div>
+    </>
   );
 }
