@@ -149,6 +149,32 @@ function ObsInput(p: IObsInputProps) {
       });
       return <ListInput {...inputProps} options={options} allowClear={false} />;
 
+    case 'OBS_INPUT_RESOLUTION_LIST':
+      // eslint-disable-next-line no-case-declarations
+      const resolutions = (p.value as IObsListInput<unknown>).options.map(opt => {
+        // treat 0 as an non-selected option if the description is empty
+        if (opt.value === 0 && opt.description === '') {
+          return { label: $t('Select Option'), value: 0 };
+        }
+
+        return {
+          value: opt.value,
+          label: $translateIfExistWithCheck(opt.description),
+          originalLabel: opt.description,
+        };
+      });
+
+      const resolutionData = {
+        disabled: (p.value as any).enabled === false,
+        options: resolutions,
+        allowEmpty: false,
+        placeholder: $t('Select Option'),
+        name: (p.value as any).name,
+        allowCustom: true,
+      };
+
+      return <ObsInputResolutionField inputProps={inputProps} {...resolutionData} />;
+
     case 'OBS_PROPERTY_BUTTON':
       return (
         <InputWrapper>
@@ -397,5 +423,46 @@ export function ObsCollapsibleFormItem(p: IObsCollapsibleFormGroupProps) {
         <ObsForm value={p.section.parameters} onChange={p.onChange} />
       </Panel>
     </Collapse>
+  );
+}
+
+interface IObsInputResolutionFieldProps {
+  inputProps: any;
+  disabled: boolean;
+  options: unknown[];
+  allowEmpty: boolean;
+  placeholder: string;
+  name: string;
+  allowCustom: boolean;
+}
+
+function ObsInputResolutionField(p: IObsInputResolutionFieldProps) {
+  // disabled: (p.value as any).enabled === false,
+  // options: resolutions,
+  // allowEmpty: false,
+  // placeholder: $t('Select Option'),
+  // name: (p.value as any).name,
+  // allowCustom: true,
+
+  const [custom, setCustom] = useState(false);
+
+  const buttonText = custom ? $t('Custom') : $t('Apply Primary');
+
+  return (
+    <InputWrapper
+      style={{ marginBottom: '8px', display: 'flex', flexDirection: 'row', alignItems: 'center' }}
+      layout="inline"
+      nowrap={true}
+    >
+      {custom ? (
+        <>
+          <TextInput style={{ width: '30%', marginRight: '8px' }} />
+          <TextInput style={{ width: '30%' }} />
+        </>
+      ) : (
+        <ListInput {...p.inputProps} allowClear={false} options={p.options} />
+      )}
+      <Button onClick={() => setCustom(!custom)}>{buttonText}</Button>
+    </InputWrapper>
   );
 }
