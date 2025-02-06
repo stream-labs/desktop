@@ -229,9 +229,8 @@ export class KickService
     const body = new FormData();
     body.append('title', opts.title);
 
-    if (opts.game !== '') {
-      body.append('category', opts.game);
-    }
+    const game = opts.game === '' ? '15' : opts.game;
+    body.append('category', game);
 
     const request = new Request(url, { headers, method: 'POST', body });
 
@@ -325,6 +324,7 @@ export class KickService
     return jfetch<IKickStreamInfoResponse>(request)
       .then(async res => {
         const data = res as IKickStreamInfoResponse;
+        console.log('data', JSON.stringify(data, null, 2));
 
         if (data.categories && data.categories.length > 0) {
           const games = await Promise.all(
@@ -376,9 +376,7 @@ export class KickService
 
     const params = new URLSearchParams();
     params.append('title', settings.title);
-    if (settings.game !== '') {
-      params.append('category', settings.game);
-    }
+    params.append('category', settings.game);
 
     const request = new Request(url, { headers, method: 'PUT', body: params.toString() });
 
