@@ -613,7 +613,7 @@ export class TikTokService
   }
 
   get chatUrl(): string {
-    return '';
+    return `https://livecenter.tiktok.com/common_live_chat?apply_mode=8?lang=${this.locale}`;
   }
 
   // url for the live monitor
