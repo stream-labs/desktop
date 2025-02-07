@@ -252,8 +252,12 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
         </div>
       </div>
       <div className={styles.platformDisplay}>
-        <span className={styles.label}>{`${$t('Output')}:`}</span>
-        <DisplaySelector title={title} platform={platform} index={p.index} nolabel nomargin />
+        <DisplaySelector
+          title={title}
+          platform={platform}
+          index={p.index}
+          label={`${$t('Output')}:`}
+        />
       </div>
     </div>
   );
