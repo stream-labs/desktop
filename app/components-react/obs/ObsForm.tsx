@@ -122,13 +122,19 @@ function ObsInput(p: IObsInputProps) {
       if (textVal.multiline) {
         return <TextAreaInput {...inputProps} debounce={300} />;
       } else if (textVal.infoField) {
-        let style = {};
-        if (textVal.infoType == obs.ETextInfoType.Warning) {
-          Object.assign(style, { color: 'var(--info)' });
-        } else if (textVal.infoType == obs.ETextInfoType.Error) {
-          Object.assign(style, { color: 'var(--warning)' });
+        const infoField = (textVal.infoField as unknown) as obs.ETextInfoType;
+        switch (textVal.infoField) {
+          case infoField === obs.ETextInfoType.Warning:
+            return (
+              <InputWrapper style={{ color: 'var(--info)' }}>{textVal.description}</InputWrapper>
+            );
+          case infoField === obs.ETextInfoType.Error:
+            return (
+              <InputWrapper style={{ color: 'var(--warning)' }}>{textVal.description}</InputWrapper>
+            );
+          default:
+            return <InputWrapper>{textVal.description}</InputWrapper>;
         }
-        return <InputWrapper style={style}>{textVal.description}</InputWrapper>;
       } else {
         return <TextInput {...inputProps} isPassword={inputProps.masked} />;
       }
@@ -376,10 +382,13 @@ export function ObsTabbedFormGroup(p: IObsTabbedFormGroupProps) {
           )}
 
           {currentTab === 'Audio' && sectionProps.nameSubCategory.startsWith('Audio - Track') && (
-            <ObsForm
-              value={sectionProps.parameters}
-              onChange={formData => p.onChange(formData, ind)}
-            />
+            <div style={{ backgroundColor: 'var(--checkbox)', padding: '8px' }}>
+              <h2 className="section-title">{$t(sectionProps.nameSubCategory)}</h2>
+              <ObsForm
+                value={sectionProps.parameters}
+                onChange={formData => p.onChange(formData, ind)}
+              />
+            </div>
           )}
         </div>
       ))}
@@ -432,8 +441,10 @@ function ObsInputResolutionField(p: IObsInputResolutionFieldProps) {
   const [customResolution, setCustomResolution] = useState(p.inputProps.value);
 
   // const form = useForm();
+  const formContext = useFormContext();
 
   function onChange(val: string) {
+    formContext?.antForm.validateFields();
     // form.validateFields();
     setCustomResolution(val);
 
@@ -443,6 +454,7 @@ function ObsInputResolutionField(p: IObsInputResolutionFieldProps) {
   }
 
   function onClick() {
+    formContext?.antForm.validateFields();
     // form.validateFields();
     const isValid = /^[0-9]+x[0-9]+$/.test(customResolution);
     if (custom && !isValid) return;
@@ -478,6 +490,12 @@ function ObsInputResolutionField(p: IObsInputResolutionFieldProps) {
           {...p.inputProps}
           allowClear={false}
           options={p.options}
+          rules={[
+            {
+              message: $t('The resolution must be in the format [width]x[height] (i.e. 1920x1080)'),
+              pattern: /^[0-9]+x[0-9]+$/,
+            },
+          ]}
           placeholder={$t('Select Option')}
         />
       )}
