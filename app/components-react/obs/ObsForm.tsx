@@ -12,7 +12,7 @@ import {
   IObsBitmaskInput,
   IObsListOption,
 } from '../../components/obs/inputs/ObsInput';
-import Form, { useFormContext } from '../shared/inputs/Form';
+import Form, { useForm, useFormContext } from '../shared/inputs/Form';
 import {
   CheckboxInput,
   ColorInput,
@@ -33,8 +33,6 @@ import Utils from 'services/utils';
 import cx from 'classnames';
 import * as obs from '../../../obs-api';
 import Tabs from 'components-react/shared/Tabs';
-import partition from 'lodash/partition';
-
 interface IExtraInputProps {
   debounce?: number;
 }
@@ -168,11 +166,7 @@ function ObsInput(p: IObsInputProps) {
         };
       });
 
-      return (
-        <InputWrapper>
-          <ObsInputResolutionField inputProps={inputProps} options={resolutions} />
-        </InputWrapper>
-      );
+      return <ObsInputResolutionField inputProps={inputProps} options={resolutions} />;
 
     case 'OBS_PROPERTY_BUTTON':
       return (
@@ -343,8 +337,25 @@ export function ObsTabbedFormGroup(p: IObsTabbedFormGroupProps) {
 
   const [currentTab, setCurrentTab] = useState(p.sections[1].nameSubCategory);
 
+  const [customResolution, setCustomResolution] = useState('');
   return (
     <div className="section" key="tabbed-section">
+      <Form layout="vertical" style={{ marginBottom: '24px' }}>
+        <TextInput
+          value={customResolution}
+          onChange={val => setCustomResolution(val)}
+          label="testing"
+          rules={[
+            {
+              message: $t('The resolution must be in the format [width]x[height] (i.e. 1920x1080)'),
+              pattern: /^[0-9]+x[0-9]+$/,
+            },
+          ]}
+          uncontrolled={false}
+          name="testing"
+        />
+      </Form>
+
       {p.sections.map((sectionProps, ind) => (
         <div className="section-content" key={`${sectionProps.nameSubCategory}${ind}`}>
           {sectionProps.nameSubCategory === 'Untitled' && (
@@ -420,21 +431,25 @@ function ObsInputResolutionField(p: IObsInputResolutionFieldProps) {
   const [custom, setCustom] = useState(false);
   const [customResolution, setCustomResolution] = useState(p.inputProps.value);
 
-  const validator = /^[0-9]+x[0-9]+$/.test(customResolution);
+  // const form = useForm();
 
-  function resolutionValidator(rule: unknown, values: string[], callback: Function) {
-    if (!validator) {
-      callback($t('The resolution must be in the format [width]x[height] (i.e. 1920x1080)'));
-    } else {
-      callback();
+  function onChange(val: string) {
+    // form.validateFields();
+    setCustomResolution(val);
+
+    if (custom && /^[0-9]+x[0-9]+$/.test(customResolution)) {
+      p.inputProps.onChange(customResolution);
     }
   }
 
   function onClick() {
-    if (custom && !validator) return;
+    // form.validateFields();
+    const isValid = /^[0-9]+x[0-9]+$/.test(customResolution);
+    if (custom && !isValid) return;
 
-    if (custom && validator) {
+    if (custom && isValid) {
       p.inputProps.onChange(customResolution);
+      setCustomResolution('');
     }
 
     setCustom(!custom);
@@ -444,10 +459,19 @@ function ObsInputResolutionField(p: IObsInputResolutionFieldProps) {
     <>
       {custom ? (
         <TextInput
+          {...p.inputProps}
           value={customResolution}
-          onChange={val => setCustomResolution(val)}
+          onChange={val => onChange(val)}
           label={p.inputProps.label}
-          rules={[{ validator: resolutionValidator }]}
+          validateTrigger="onBlur"
+          rules={[
+            {
+              message: $t('The resolution must be in the format [width]x[height] (i.e. 1920x1080)'),
+              pattern: /^[0-9]+x[0-9]+$/,
+            },
+          ]}
+          uncontrolled={false}
+          name={p.inputProps.name}
         />
       ) : (
         <ListInput
@@ -457,12 +481,8 @@ function ObsInputResolutionField(p: IObsInputResolutionFieldProps) {
           placeholder={$t('Select Option')}
         />
       )}
-      <Button
-        // {...p.inputProps}
-        type={custom ? 'primary' : 'default'}
-        onClick={onClick}
-        // rules={[{ validator: resolutionValidator }]}
-      >
+
+      <Button type={custom ? 'primary' : 'default'} onClick={onClick}>
         {custom ? $t('Apply Primary') : $t('Custom')}
       </Button>
     </>
