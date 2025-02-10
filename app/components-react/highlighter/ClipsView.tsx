@@ -2,7 +2,12 @@ import React, { useCallback, useEffect, useState } from 'react';
 import * as remote from '@electron/remote';
 import { Services } from 'components-react/service-provider';
 import styles from './ClipsView.m.less';
-import { EHighlighterView, IAiClip, IViewState, TClip } from 'services/highlighter';
+import {
+  EHighlighterView,
+  IAiClip,
+  IViewState,
+  TClip,
+} from 'services/highlighter/models/highlighter.models';
 import ClipPreview, { formatSecondsToHMS } from 'components-react/highlighter/ClipPreview';
 import { ReactSortable } from 'react-sortablejs';
 import Scrollable from 'components-react/shared/Scrollable';
