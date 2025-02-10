@@ -225,37 +225,43 @@ function ObsInput(p: IObsInputProps) {
 
     case 'OBS_PROPERTY_BITMASK':
       // eslint-disable-next-line no-case-declarations
-      const flags = Utils.numberToBinnaryArray(
-        (p.value as IObsBitmaskInput).value,
-        (p.value as IObsBitmaskInput).size,
-      ).reverse();
+      const flagsVal = p.value as IObsBitmaskInput;
+      const flags = Utils.numberToBinnaryArray(flagsVal.value, flagsVal.size).reverse();
 
       return (
-        <div>
+        <InputWrapper label={flagsVal.description}>
           {flags.map((flag, index) => (
             <Button
               key={`flag-${index}`}
-              onChange={(v: any) =>
-                inputProps.onChange(Utils.binnaryArrayToNumber(flags.reverse()))
-              }
-              color={flag === 1 ? 'primary' : 'default'}
+              onClick={() => {
+                const newFlags = Array(flagsVal.size).fill(0);
+                newFlags.splice(index, 1, 1);
+                inputProps.onChange(Utils.binnaryArrayToNumber(newFlags.reverse()));
+              }}
               style={{
                 marginRight: '5px',
                 backgroundColor: flag === 1 ? 'var(--primary)' : 'var(--dark-background)',
-                // color: flag === 1 ? 'var(--dark-background)' : 'var(--section)',
-                // borderColor: flag === 1 ? 'var(--dark-background)' : 'var(--section)',
-                padding: '5px',
+                color: flag === 1 ? 'var(--action-button-text)' : 'var(--icon)',
+                borderColor: flag === 1 ? 'var(--primary)' : 'var(--icon)',
+                padding: '10px',
                 lineHeight: 0.75,
               }}
             >
               {index}
             </Button>
           ))}
-        </div>
+        </InputWrapper>
       );
 
     case 'OBS_PROPERTY_PATH':
       return <FileInput {...inputProps} directory={true} />;
+
+    case 'OBS_PROPERTY_UINT':
+      return (
+        <InputWrapper style={{ marginBottom: '8px' }} nowrap={layout === 'vertical'}>
+          <CheckboxInput {...inputProps} />
+        </InputWrapper>
+      );
 
     default:
       return <span style={{ color: 'red' }}>Unknown input type {type}</span>;
@@ -357,7 +363,6 @@ export function ObsTabbedFormGroup(p: IObsTabbedFormGroupProps) {
               pattern: /^[0-9]+x[0-9]+$/,
             },
           ]}
-          uncontrolled={false}
           name="testing"
         />
       </Form>
@@ -382,7 +387,14 @@ export function ObsTabbedFormGroup(p: IObsTabbedFormGroupProps) {
           )}
 
           {currentTab === 'Audio' && sectionProps.nameSubCategory.startsWith('Audio - Track') && (
-            <div style={{ backgroundColor: 'var(--checkbox)', padding: '8px' }}>
+            <div
+              style={{
+                backgroundColor: 'var(--section-wrapper)',
+                padding: '15px',
+                marginBottom: '30px',
+                borderRadius: '5px',
+              }}
+            >
               <h2 className="section-title">{$t(sectionProps.nameSubCategory)}</h2>
               <ObsForm
                 value={sectionProps.parameters}
