@@ -21,12 +21,14 @@ import { VideoEncodingOptimizationService } from 'services/video-encoding-optimi
 import { PlatformAppsService } from 'services/platform-apps';
 import { EDeviceType, HardwareService } from 'services/hardware';
 import { StreamingService } from 'services/streaming';
-import { byOS, OS } from 'util/operating-systems';
+import { byOS, getOS, OS } from 'util/operating-systems';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { Subject } from 'rxjs';
+import * as remote from '@electron/remote';
 import fs from 'fs';
 import path from 'path';
+import { SettingsManagerService, SettingsProfile } from 'services/settings-manager';
 
 export interface ISettingsValues {
   General: {
@@ -241,6 +243,10 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
 
     return null;
   }
+
+  get virtualWebcamSettings() {
+    return this.state['Virtual Webcam'].formData;
+  }
 }
 
 export class SettingsService extends StatefulService<ISettingsServiceState> {
@@ -255,17 +261,23 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
   @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject() private sceneCollectionsService: SceneCollectionsService;
   @Inject() private hardwareService: HardwareService;
+  @Inject() private settingsManagerService: SettingsManagerService;
 
   @Inject()
   private videoEncodingOptimizationService: VideoEncodingOptimizationService;
 
   audioRefreshed = new Subject();
+  settingsUpdated = new Subject<Partial<SettingsProfile>>();
 
   get views() {
     return new SettingsViews(this.state);
   }
 
   init() {
+    this.loadSettingsIntoStore();
+    this.ensureValidEncoder();
+    this.sceneCollectionsService.collectionSwitched.subscribe(() => this.refreshAudioSettings());
+
     // TODO: Remove in a week
     try {
       if (fs.existsSync(path.join(this.appService.appDataDirectory, 'HADisable'))) {
@@ -334,6 +346,19 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
   }
 
   /**
+   * Can be called externally to ensure that you have the absolute latest settings
+   * fetched from OBS directly.
+   */
+  loadSettingsIntoStore() {
+    // load configuration from nodeObs to state
+    const settingsFormData = {};
+    this.getCategories().forEach(categoryName => {
+      settingsFormData[categoryName] = this.fetchSettingsFromObs(categoryName);
+    });
+    this.SET_SETTINGS(settingsFormData);
+  }
+
+  /**
    * Audio settings are a special case where switching scene collections will
    * cause them to become invalid. Calling this function will ensure that the
    * audio settings are in sync with the currently loaded scene collection.
@@ -379,6 +404,8 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
     let categories: string[] = obs.NodeObs.OBS_settings_getListCategories();
     // insert 'Multistreaming' after 'General'
     categories.splice(1, 0, 'Multistreaming');
+    // Deleting 'Virtual Webcam' category to add it below to position properly
+    categories = categories.filter(category => category !== 'Virtual Webcam');
     categories = categories.concat([
       'Scene Collections',
       'Notifications',
@@ -577,6 +604,12 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
 
     obs.NodeObs.OBS_settings_saveSettings(categoryName, dataToSave);
     this.loadSettingsIntoStore();
+
+    // update the settings manager realm
+    // TODO: Refactor when the settings manager is fully integrated
+    const category = categoryName as keyof SettingsProfile;
+
+    this.settingsUpdated.next({ [category]: settingsData });
   }
 
   setSettingsPatch(patch: DeepPartial<ISettingsValues>) {
@@ -636,6 +669,35 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
         source.setName(displayName);
       }
     });
+  }
+
+  private ensureValidEncoder() {
+    if (getOS() === OS.Mac) return;
+
+    const encoderSetting: IObsListInput<string> =
+      this.findSetting(this.state.Output.formData, 'Streaming', 'Encoder') ??
+      this.findSetting(this.state.Output.formData, 'Streaming', 'StreamEncoder');
+    const encoderIsValid = !!encoderSetting.options.find(opt => opt.value === encoderSetting.value);
+
+    // The backend incorrectly defaults to obs_x264 in Simple mode rather x264.
+    // In this case we shouldn't do anything here.
+    if (encoderSetting.value === 'obs_x264') return;
+
+    if (!encoderIsValid) {
+      const mode: string = this.findSettingValue(this.state.Output.formData, 'Untitled', 'Mode');
+
+      if (mode === 'Advanced') {
+        this.setSettingValue('Output', 'Encoder', 'obs_x264');
+      } else {
+        this.setSettingValue('Output', 'StreamEncoder', 'x264');
+      }
+
+      remote.dialog.showMessageBox(this.windowsService.windows.main, {
+        type: 'error',
+        message:
+          'Your stream encoder has been reset to Software (x264). This can be caused by out of date graphics drivers. Please update your graphics drivers to continue using hardware encoding.',
+      });
+    }
   }
 
   @mutation()
