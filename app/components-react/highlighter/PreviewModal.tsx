@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Services } from 'components-react/service-provider';
 import { $t } from 'services/i18n';
-import { TClip } from 'services/highlighter';
+import { TClip } from 'services/highlighter/models/highlighter.models';
 import { sortClipsByOrder } from './utils';
 import MiniClipPreview from './MiniClipPreview';
 import { PauseButton, PlayButton } from './StreamCard';

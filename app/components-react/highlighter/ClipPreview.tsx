@@ -1,4 +1,4 @@
-import { TClip } from 'services/highlighter';
+import { TClip } from 'services/highlighter/models/highlighter.models';
 import { SCRUB_HEIGHT, SCRUB_WIDTH, SCRUB_FRAMES } from 'services/highlighter/constants';
 import React, { useState } from 'react';
 import { Services } from 'components-react/service-provider';

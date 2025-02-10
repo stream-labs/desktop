@@ -1,5 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { EExportStep, TFPS, TResolution, TPreset, TOrientation } from 'services/highlighter';
+import {
+  EExportStep,
+  TFPS,
+  TResolution,
+  TPreset,
+} from 'services/highlighter/models/rendering.models';
 import { Services } from 'components-react/service-provider';
 import { FileInput, TextInput, ListInput } from 'components-react/shared/inputs';
 import Form from 'components-react/shared/inputs/Form';
@@ -12,6 +17,8 @@ import { $t } from 'services/i18n';
 import StorageUpload from './StorageUpload';
 import { useVuex } from 'components-react/hooks';
 import { initStore, useController } from '../hooks/zustand';
+import { TOrientation } from 'services/highlighter/models/ai-highlighter.models';
+import { fileExists } from 'services/highlighter/file-utils';
 
 class ExportController {
   get service() {
@@ -66,7 +73,7 @@ class ExportController {
   }
 
   async fileExists(exportFile: string) {
-    return await this.service.actions.return.fileExists(exportFile);
+    return await fileExists(exportFile);
   }
 }
 
