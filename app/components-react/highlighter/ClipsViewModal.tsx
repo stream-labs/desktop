@@ -2,7 +2,7 @@ import { useVuex } from 'components-react/hooks';
 import { Services } from 'components-react/service-provider';
 import React, { useEffect, useState } from 'react';
 import { TModalClipsView } from './ClipsView';
-import { TClip } from 'services/highlighter';
+import { TClip } from 'services/highlighter/models/highlighter.models';
 import styles from './ClipsView.m.less';
 import ClipTrimmer from 'components-react/highlighter/ClipTrimmer';
 import { Modal, Alert, Button } from 'antd';

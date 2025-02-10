@@ -1,8 +1,8 @@
 import { useVuex } from 'components-react/hooks';
 import { Services } from 'components-react/service-provider';
 import React from 'react';
-import { TClip } from 'services/highlighter';
 import { SCRUB_HEIGHT, SCRUB_WIDTH } from 'services/highlighter/constants';
+import { TClip } from 'services/highlighter/models/highlighter.models';
 
 export default function MiniClipPreview({ clipId }: { clipId: string }) {
   const { HighlighterService } = Services;

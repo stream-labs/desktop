@@ -1,7 +1,7 @@
 import SettingsView from 'components-react/highlighter/SettingsView';
 import { useVuex } from 'components-react/hooks';
 import React, { useEffect, useState } from 'react';
-import { EHighlighterView, IViewState } from 'services/highlighter';
+import { EHighlighterView, IViewState } from 'services/highlighter/models/highlighter.models';
 import { Services } from 'components-react/service-provider';
 import StreamView from 'components-react/highlighter/StreamView';
 import ClipsView from 'components-react/highlighter/ClipsView';

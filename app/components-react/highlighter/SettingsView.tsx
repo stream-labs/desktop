@@ -11,7 +11,7 @@ import Form from 'components-react/shared/inputs/Form';
 import Scrollable from 'components-react/shared/Scrollable';
 import styles from './SettingsView.m.less';
 import { $t } from 'services/i18n';
-import { EHighlighterView, IViewState } from 'services/highlighter';
+import { EHighlighterView, IViewState } from 'services/highlighter/models/highlighter.models';
 import { EAvailableFeatures } from 'services/incremental-rollout';
 
 export default function SettingsView({
