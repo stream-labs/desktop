@@ -1,6 +1,12 @@
 import { InheritMutations, Inject, mutation } from '../core';
 import { BasePlatformService } from './base-platform';
-import { IPlatformRequest, IPlatformService, IPlatformState, TPlatformCapability } from './index';
+import {
+  IGame,
+  IPlatformRequest,
+  IPlatformService,
+  IPlatformState,
+  TPlatformCapability,
+} from './index';
 import { authorizedHeaders, jfetch } from '../../util/requests';
 import { throwStreamError } from '../streaming/stream-error';
 import { platformAuthorizedRequest } from './utils';
@@ -13,10 +19,16 @@ import { getDefined } from 'util/properties-type-guards';
 import { WindowsService } from 'services/windows';
 import { DiagnosticsService } from 'services/diagnostics';
 
+interface IKickGame {
+  id: number;
+  name: string;
+  thumbnail: string;
+}
+
 interface IKickStartStreamResponse {
   id?: string;
-  key: string;
   rtmp: string;
+  key: string;
   chat_url: string;
   broadcast_id?: string | null;
   channel_name: string;
@@ -29,28 +41,58 @@ interface IKickEndStreamResponse {
 }
 
 interface IKickError {
-  success: boolean;
-  error: boolean;
-  message: string;
-  data: any[];
+  status?: number;
+  statusText?: string;
+  url: string;
+  result: {
+    success: boolean;
+    error: boolean;
+    message: string;
+    data: {
+      code: number;
+      message: string;
+    };
+  };
 }
+
 interface IKickServiceState extends IPlatformState {
   settings: IKickStartStreamSettings;
   ingest: string;
   chatUrl: string;
   channelName: string;
+  gameName: string;
   platformId?: string;
+}
+
+interface IKickStreamInfoResponse {
+  platform: string;
+  info: any[];
+  categories?: any[];
+  channel: {
+    title: string;
+    category: {
+      id: number;
+      name: string;
+      thumbnail: string;
+    };
+  };
+}
+
+interface IKickUpdateStreamResponse {
+  success: boolean;
 }
 
 interface IKickStartStreamSettings {
   title: string;
   display: TDisplayType;
+  game: string;
   video?: IVideo;
   mode?: TOutputOrientation;
 }
 
 export interface IKickStartStreamOptions {
   title: string;
+  game: string;
 }
 
 interface IKickRequestHeaders extends Dictionary<string> {
@@ -69,10 +111,12 @@ export class KickService
       title: '',
       display: 'horizontal',
       mode: 'landscape',
+      game: '',
     },
     ingest: '',
     chatUrl: '',
     channelName: '',
+    gameName: '',
   };
 
   @Inject() windowsService: WindowsService;
@@ -82,7 +126,7 @@ export class KickService
   readonly domain = 'https://kick.com';
   readonly platform = 'kick';
   readonly displayName = 'Kick';
-  readonly capabilities = new Set<TPlatformCapability>(['chat']);
+  readonly capabilities = new Set<TPlatformCapability>(['title', 'chat', 'game']);
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions = {
     width: 600,
@@ -118,7 +162,7 @@ export class KickService
         );
       }
 
-      await this.putChannelInfo(kickSettings);
+      this.SET_STREAM_SETTINGS(kickSettings);
       this.setPlatformContext('kick');
     } catch (e: unknown) {
       console.error('Error starting stream: ', e);
@@ -185,34 +229,45 @@ export class KickService
     const body = new FormData();
     body.append('title', opts.title);
 
+    const game = opts.game === '' ? '15' : opts.game;
+    body.append('category', game);
+
     const request = new Request(url, { headers, method: 'POST', body });
 
-    return jfetch<IKickStartStreamResponse>(request).catch((e: IKickError | unknown) => {
-      console.error('Error starting Kick stream: ', e);
+    return jfetch<IKickStartStreamResponse>(request)
+      .then(resp => {
+        if (resp.channel_name) {
+          this.SET_CHANNEL_NAME(resp.channel_name);
+        }
+        this.SET_STREAM_SETTINGS(opts);
+        return resp;
+      })
+      .catch((e: IKickError | unknown) => {
+        console.error('Error starting Kick stream: ', e);
 
-      const defaultError = {
-        status: 403,
-        statusText: 'Unable to start Kick stream.',
-      };
+        const defaultError = {
+          status: 403,
+          statusText: 'Unable to start Kick stream.',
+        };
 
-      if (!e) throwStreamError('PLATFORM_REQUEST_FAILED', defaultError);
+        if (!e) throwStreamError('PLATFORM_REQUEST_FAILED', defaultError);
 
-      // check if the error is an IKickError
-      if (typeof e === 'object' && e.hasOwnProperty('success')) {
-        const error = e as IKickError;
-        throwStreamError(
-          'PLATFORM_REQUEST_FAILED',
-          {
-            ...error,
-            status: 403,
-            statusText: error.message,
-          },
-          defaultError.statusText,
-        );
-      }
+        // check if the error is an IKickError
+        if (typeof e === 'object' && e.hasOwnProperty('success')) {
+          const error = e as IKickError;
+          throwStreamError(
+            'PLATFORM_REQUEST_FAILED',
+            {
+              ...error,
+              status: error.status,
+              statusText: error.result.data.message,
+            },
+            defaultError.statusText,
+          );
+        }
 
-      throwStreamError('PLATFORM_REQUEST_FAILED', e as any, defaultError.statusText);
-    });
+        throwStreamError('PLATFORM_REQUEST_FAILED', e as any, defaultError.statusText);
+      });
   }
 
   async endStream(id: string) {
@@ -224,15 +279,123 @@ export class KickService
     return jfetch<IKickEndStreamResponse>(request);
   }
 
+  async fetchStreamInfo(): Promise<IKickStreamInfoResponse | IKickError | void> {
+    const host = this.hostsService.streamlabs;
+    const url = `https://${host}/api/v5/slobs/kick/info`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const request = new Request(url, { headers });
+    return jfetch<IKickStreamInfoResponse | IKickError>(request)
+      .then(async res => {
+        return res;
+      })
+      .catch(e => {
+        console.warn('Error fetching Kick info: ', e);
+
+        if (e.hasOwnProperty('result')) {
+          if (e.result.data.code === 401) {
+            const message = e.statusText !== '' ? e.statusText : e.result.data.message;
+            throwStreamError(
+              'KICK_SCOPE_OUTDATED',
+              {
+                status: e.status,
+                statusText: message,
+              },
+              e.result.data.message,
+            );
+          }
+
+          throwStreamError('PLATFORM_REQUEST_FAILED', e);
+        }
+      });
+  }
+
+  /**
+   * Search for games
+   * @remark While this is the same endpoint for if a user can go live,
+   * the category parameter will only show category results, and will not
+   * show live approval status.
+   */
+  async searchGames(searchString: string): Promise<IGame[]> {
+    const host = this.hostsService.streamlabs;
+    const url = `https://${host}/api/v5/slobs/kick/info?category=${searchString}`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const request = new Request(url, { headers });
+
+    return jfetch<IKickStreamInfoResponse>(request)
+      .then(async res => {
+        const data = res as IKickStreamInfoResponse;
+        console.log('data', JSON.stringify(data, null, 2));
+
+        if (data.categories && data.categories.length > 0) {
+          const games = await Promise.all(
+            data.categories.map((g: any) => ({
+              id: g.id.toString(),
+              name: g.name,
+              image: g.thumbnail,
+            })),
+          );
+
+          return games;
+        } else {
+          console.error('Failed to fetch Kick categories info.');
+          return [] as IGame[];
+        }
+      })
+      .catch((e: unknown) => {
+        console.error('Error fetching Kick info: ', e);
+        return [] as IGame[];
+      });
+  }
+
+  async fetchGame(name: string): Promise<IGame> {
+    return (await this.searchGames(name))[0];
+  }
+
   /**
    * prepopulate channel info and save it to the store
    */
   async prepopulateInfo(): Promise<void> {
+    const response = await this.fetchStreamInfo();
+    const info = response as IKickStreamInfoResponse;
+
+    if (info.channel) {
+      this.UPDATE_STREAM_SETTINGS({
+        title: info.channel.title,
+        game: info.channel.category.id.toString(),
+      });
+      this.SET_GAME_NAME(info.channel.category.name);
+    }
     this.SET_PREPOPULATED(true);
   }
 
   async putChannelInfo(settings: IKickStartStreamOptions): Promise<void> {
-    this.SET_STREAM_SETTINGS(settings);
+    const host = this.hostsService.streamlabs;
+    const url = `https://${host}/api/v5/slobs/kick/info`;
+    const headers = authorizedHeaders(this.userService.apiToken!);
+    headers.append('Content-Type', 'application/x-www-form-urlencoded');
+
+    const params = new URLSearchParams();
+    params.append('title', settings.title);
+    params.append('category', settings.game);
+
+    const request = new Request(url, { headers, method: 'PUT', body: params.toString() });
+
+    return jfetch<IKickUpdateStreamResponse | void>(request)
+      .then(async res => {
+        if ((res as IKickUpdateStreamResponse).success) {
+          const info = await this.fetchStreamInfo();
+          this.SET_STREAM_SETTINGS(settings);
+          this.SET_GAME_NAME((info as IKickStreamInfoResponse).channel.category.name);
+        } else {
+          throwStreamError('PLATFORM_REQUEST_FAILED', {
+            status: 400,
+            statusText: 'Failed to update Kick channel info',
+          });
+        }
+      })
+      .catch((e: unknown) => {
+        console.warn('Error updating Kick channel info', e);
+      });
   }
 
   getHeaders(req: IPlatformRequest, useToken?: string | boolean): IKickRequestHeaders {
@@ -267,10 +430,7 @@ export class KickService
   }
 
   get streamPageUrl(): string {
-    const username = this.userService.state.auth?.platforms?.kick?.username;
-    if (!username) return '';
-
-    return `${this.domain}/${username}`;
+    return `${this.domain}/${this.state.channelName}`;
   }
 
   get locale(): string {
@@ -290,5 +450,15 @@ export class KickService
   @mutation()
   SET_PLATFORM_ID(platformId: string) {
     this.state.platformId = platformId;
+  }
+
+  @mutation()
+  SET_CHANNEL_NAME(channelName: string) {
+    this.state.channelName = channelName;
+  }
+
+  @mutation()
+  SET_GAME_NAME(gameName: string) {
+    this.state.gameName = gameName;
   }
 }
