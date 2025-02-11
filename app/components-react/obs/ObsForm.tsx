@@ -1,4 +1,4 @@
-import React, { LegacyRef, useMemo, useRef, useState } from 'react';
+import React, { LegacyRef, RefObject, forwardRef, useMemo, useRef, useState } from 'react';
 import { ISettingsSubCategory } from '../../services/settings';
 import {
   IObsInput,
@@ -20,7 +20,6 @@ import {
   ListInput,
   SliderInput,
   TextAreaInput,
-  TextInput,
   TInputLayout,
   useTextInput,
 } from '../shared/inputs';
@@ -86,7 +85,7 @@ interface IObsInputProps {
 /**
  * Renders a single OBS input
  */
-const ObsInput = React.forwardRef<{}, IObsInputProps>((p, ref) => {
+const ObsInput = forwardRef<{}, IObsInputProps>((p, ref) => {
   const formContext = useFormContext();
   const layout = formContext?.layout;
   if (!p.value.visible) return <></>;
@@ -113,13 +112,13 @@ const ObsInput = React.forwardRef<{}, IObsInputProps>((p, ref) => {
 
   switch (type) {
     case 'OBS_PROPERTY_DOUBLE':
-      return <ObsInputNumberField {...inputProps} ref={ref} />;
+      return <ObsNumberInput {...inputProps} ref={ref} />;
     case 'OBS_PROPERTY_INT':
       // eslint-disable-next-line no-case-declarations
       const intVal = p.value as IObsNumberInputValue;
 
       return (
-        <ObsInputNumberField
+        <ObsNumberInput
           {...inputProps}
           step={1}
           min={intVal.minVal}
@@ -149,7 +148,7 @@ const ObsInput = React.forwardRef<{}, IObsInputProps>((p, ref) => {
             return <InputWrapper>{textVal.description}</InputWrapper>;
         }
       } else {
-        return <ObsInputTextField {...inputProps} isPassword={inputProps.masked} ref={ref} />;
+        return <ObsTextInput {...inputProps} isPassword={inputProps.masked} ref={ref} />;
       }
     case 'OBS_PROPERTY_LIST':
       // eslint-disable-next-line no-case-declarations
@@ -165,7 +164,18 @@ const ObsInput = React.forwardRef<{}, IObsInputProps>((p, ref) => {
           originalLabel: opt.description,
         };
       });
-      return <ListInput {...inputProps} options={options} allowClear={false} />;
+
+      return (
+        <ListInput
+          {...inputProps}
+          options={options}
+          allowClear={false}
+          nolabel={p.value.description === ''}
+          style={{
+            marginBottom: (p.value as IObsListInput<unknown>)?.subType === '' ? '8px' : '24px',
+          }}
+        />
+      );
 
     case 'OBS_INPUT_RESOLUTION_LIST':
       // eslint-disable-next-line no-case-declarations
@@ -185,7 +195,7 @@ const ObsInput = React.forwardRef<{}, IObsInputProps>((p, ref) => {
         };
       });
 
-      return <ObsInputResolutionField inputProps={inputProps} options={resolutions} />;
+      return <ObsInputListCustomInput inputProps={inputProps} options={resolutions} />;
 
     case 'OBS_PROPERTY_BUTTON':
       return (
@@ -267,13 +277,20 @@ const ObsInput = React.forwardRef<{}, IObsInputProps>((p, ref) => {
       );
 
     case 'OBS_PROPERTY_PATH':
-      return <FileInput {...inputProps} directory={true} />;
+      return <FileInput {...inputProps} directory={true} style={{ marginBottom: '8px' }} />;
 
     case 'OBS_PROPERTY_UINT':
+      // eslint-disable-next-line no-case-declarations
+      const uintVal = p.value as IObsNumberInputValue;
+
       return (
-        <InputWrapper style={{ marginBottom: '8px' }} nowrap={layout === 'vertical'}>
-          <CheckboxInput {...inputProps} />
-        </InputWrapper>
+        <ObsNumberInput
+          {...inputProps}
+          step={1}
+          min={uintVal.minVal}
+          max={uintVal.maxVal}
+          ref={ref}
+        />
       );
 
     default:
@@ -362,24 +379,8 @@ export function ObsTabbedFormGroup(p: IObsTabbedFormGroupProps) {
 
   const [currentTab, setCurrentTab] = useState(p.sections[1].nameSubCategory);
 
-  const [customResolution, setCustomResolution] = useState('');
   return (
-    <div className="section" key="tabbed-section">
-      <Form layout="vertical" style={{ marginBottom: '24px' }}>
-        <TextInput
-          value={customResolution}
-          onChange={val => setCustomResolution(val)}
-          label="testing"
-          rules={[
-            {
-              message: $t('The resolution must be in the format [width]x[height] (i.e. 1920x1080)'),
-              pattern: /^[0-9]+x[0-9]+$/,
-            },
-          ]}
-          name="testing"
-        />
-      </Form>
-
+    <div className="section" key="tabbed-section" style={{ marginBottom: '24px' }}>
       {p.sections.map((sectionProps, ind) => (
         <div className="section-content" key={`${sectionProps.nameSubCategory}${ind}`}>
           {sectionProps.nameSubCategory === 'Untitled' && (
@@ -456,12 +457,12 @@ export function ObsCollapsibleFormItem(p: IObsCollapsibleFormGroupProps) {
   );
 }
 
-interface IObsInputResolutionFieldProps {
+interface IObsInputListCustomInputProps {
   inputProps: any;
   options?: Omit<IObsListOption<unknown>, 'description'>[];
 }
 
-const ObsInputResolutionField = React.forwardRef<{}, IObsInputResolutionFieldProps>((p, ref) => {
+const ObsInputListCustomInput = forwardRef<{}, IObsInputListCustomInputProps>((p, ref) => {
   const [custom, setCustom] = useState(false);
   const [customResolution, setCustomResolution] = useState(p.inputProps.value);
 
@@ -495,7 +496,7 @@ const ObsInputResolutionField = React.forwardRef<{}, IObsInputResolutionFieldPro
   return (
     <>
       {custom ? (
-        <ObsInputTextField
+        <ObsTextInput
           {...p.inputProps}
           value={customResolution}
           onChange={val => onChange(val)}
@@ -512,22 +513,15 @@ const ObsInputResolutionField = React.forwardRef<{}, IObsInputResolutionFieldPro
           ref={ref}
         />
       ) : (
-        <ListInput
-          {...p.inputProps}
-          allowClear={false}
-          options={p.options}
-          rules={[
-            {
-              message: $t('The resolution must be in the format [width]x[height] (i.e. 1920x1080)'),
-              pattern: /^[0-9]+x[0-9]+$/,
-            },
-          ]}
-          placeholder={$t('Select Option')}
-        />
+        <ListInput {...p.inputProps} allowClear={false} options={p.options} />
       )}
 
-      <Button type={custom ? 'primary' : 'default'} onClick={onClick}>
-        {custom ? $t('Apply Primary') : $t('Custom')}
+      <Button
+        type={custom ? 'primary' : 'default'}
+        onClick={onClick}
+        style={{ marginBottom: '24px' }}
+      >
+        {custom ? $t('Apply Primary') : $t('Use Custom')}
       </Button>
     </>
   );
@@ -537,7 +531,7 @@ const ObsInputResolutionField = React.forwardRef<{}, IObsInputResolutionFieldPro
  * @remark Note: The following is a copy of the shared component `NumberInput` but with the reference forwarded.
  * This is to allow form validation to work correctly.
  */
-const ObsInputNumberField = React.forwardRef((p: TNumberInputProps) => {
+const ObsNumberInput = forwardRef((p: TNumberInputProps, ref) => {
   const { inputAttrs, wrapperAttrs, originalOnChange } = useTextInput<typeof p, number>(
     'number',
     p,
@@ -555,8 +549,18 @@ const ObsInputNumberField = React.forwardRef((p: TNumberInputProps) => {
   const rules = p.rules ? p.rules[0] : {};
 
   return (
-    <InputWrapper {...wrapperAttrs} rules={[{ ...rules, type: 'number' }]}>
-      <InputNumber {...inputAttrs} onChange={onChangeHandler} defaultValue={p.defaultValue} />
+    <InputWrapper
+      {...wrapperAttrs}
+      rules={[{ ...rules, type: 'number' }]}
+      style={{ width: '100%' }}
+    >
+      <InputNumber
+        {...inputAttrs}
+        onChange={onChangeHandler}
+        defaultValue={p.defaultValue}
+        ref={ref as RefObject<HTMLInputElement>}
+        style={{ width: '100%' }}
+      />
     </InputWrapper>
   );
 });
@@ -565,7 +569,7 @@ const ObsInputNumberField = React.forwardRef((p: TNumberInputProps) => {
  * @remark Note: The following is a copy of the shared component `TextInput` but with the reference forwarded.
  * This is to allow form validation to work correctly.
  */
-const ObsInputTextField = React.forwardRef<{}, TTextInputProps>((p, ref) => {
+const ObsTextInput = forwardRef<{}, TTextInputProps>((p, ref) => {
   const { inputAttrs, wrapperAttrs } = useTextInput('text', p, ANT_INPUT_FEATURES);
   const textInputAttrs = {
     ...inputAttrs,
@@ -576,7 +580,7 @@ const ObsInputTextField = React.forwardRef<{}, TTextInputProps>((p, ref) => {
     prefix: p.prefix,
   };
   return (
-    <InputWrapper {...wrapperAttrs}>
+    <InputWrapper {...wrapperAttrs} style={{ width: '100%' }}>
       <Input {...textInputAttrs} ref={ref as LegacyRef<Input>} />
     </InputWrapper>
   );

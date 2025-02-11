@@ -52,6 +52,7 @@ export interface IObsInput<TValueType> {
   visible?: boolean;
   masked?: boolean;
   type: TObsType;
+  subType?: TObsType | string;
 }
 
 export declare type TObsFormData = (IObsInput<TObsValue> | IObsListInput<TObsValue>)[];
@@ -450,7 +451,7 @@ export function setPropertiesFormData(
 
     if (property.type === 'OBS_PROPERTY_FONT') {
       settings['custom_font'] = (property.value as IObsFont).path;
-      delete settings[property.name]['path'];
+      delete (settings[property.name] as IObsFont).path;
     }
   });
 
