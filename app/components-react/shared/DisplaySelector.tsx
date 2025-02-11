@@ -1,7 +1,7 @@
 import React, { CSSProperties } from 'react';
 import { $t } from 'services/i18n';
 import { RadioInput } from './inputs';
-import { TDisplayType } from 'services/settings-v2';
+import { TDisplayType } from 'services/video';
 import { platformLabels, TPlatform } from 'services/platforms';
 import { useGoLiveSettings } from 'components-react/windows/go-live/useGoLiveSettings';
 import { ICustomStreamDestination } from 'services/settings/streaming';
