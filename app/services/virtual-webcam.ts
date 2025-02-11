@@ -72,6 +72,22 @@ export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceS
     }
   }
 
+  /**
+   * Set the virtual camera install status
+   * @remark This method wraps getting the install status in a try/catch block
+   * to prevent infinite loading from errors
+   */
+  @ExecuteInWorkerProcess()
+  setInstallStatus() {
+    try {
+      const installStatus = this.getInstallStatus();
+      this.SET_INSTALL_STATUS(installStatus);
+    } catch (error: unknown) {
+      console.error('Error resolving install status:', error);
+      this.SET_INSTALL_STATUS(EVirtualWebcamPluginInstallStatus.NotPresent);
+    }
+  }
+
   @ExecuteInWorkerProcess()
   getInstallStatus(): EVirtualWebcamPluginInstallStatus {
     return byOS({
@@ -112,6 +128,8 @@ export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceS
   @ExecuteInWorkerProcess()
   install() {
     obs.NodeObs.OBS_service_installVirtualCamPlugin();
+
+    this.setInstallStatus();
   }
 
   @ExecuteInWorkerProcess()
@@ -125,6 +143,7 @@ export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceS
     this.settingsService.setSettingValue('Virtual Webcam', 'OutputSelection', '');
   }
 
+  @ExecuteInWorkerProcess()
   start() {
     if (this.state.running) return;
 
