@@ -114,7 +114,10 @@ export default function GoLiveSettings() {
       )}
 
       {/*RIGHT COLUMN*/}
-      <Col span={shouldShowLeftCol ? 16 : 24} className={styles.rightColumn}>
+      <Col
+        span={shouldShowLeftCol ? 16 : 24}
+        className={cx(styles.rightColumn, !shouldShowLeftCol && styles.destinationMode)}
+      >
         <Spinner visible={isLoading} relative />
         <GoLiveError />
         {shouldShowSettings && (

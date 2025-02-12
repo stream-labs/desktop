@@ -65,7 +65,16 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
   }
 
   function togglePlatform(platform: TPlatform, enabled: boolean) {
-    enabledPlatformsRef.current = enabledPlatformsRef.current.filter(p => p !== platform);
+    // On non multistream mode, switch the platform that was just selected while disabling all the others,
+    if (!isRestreamEnabled) {
+      /*
+       * Clearing this list ensures that when a new platform is selected, instead of enabling 2 platforms
+       * we switch to 1 enabled platforms that was just toggled.
+       */
+      enabledPlatformsRef.current = [];
+    } else {
+      enabledPlatformsRef.current = enabledPlatformsRef.current.filter(p => p !== platform);
+    }
 
     if (enabled) {
       enabledPlatformsRef.current.push(platform);
@@ -77,6 +86,16 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
     }
 
     emitSwitch();
+  }
+
+  function toggleDestination(index: number, enabled: boolean) {
+    enabledDestRef.current = enabledDestRef.current.filter((dest, i) => i !== index);
+
+    if (enabled) {
+      enabledDestRef.current.push(index);
+    }
+
+    emitSwitch(index, enabled);
   }
 
   // TODO: find a cleaner way to do this
@@ -102,7 +121,7 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
           key={ind}
           destination={dest}
           enabled={customDestinations[ind].enabled && !disableCustomDestinationSwitchers}
-          onChange={enabled => switchCustomDestination(ind, enabled)}
+          onChange={enabled => toggleDestination(ind, enabled)}
           disabled={disableCustomDestinationSwitchers}
           isDualOutputMode={isDualOutputMode}
           index={ind}
@@ -116,7 +135,7 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
           }}
           showSwitcher={destinationSwitcherRef.current.addClass}
           switchDestination={index => {
-            switchCustomDestination(index, true);
+            toggleDestination(index, true);
             destinationSwitcherRef.current.addClass();
           }}
         />
@@ -148,16 +167,6 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
   const { RestreamService, StreamingService, MagicLinkService } = Services;
 
   function dualOutputClickHandler(ev: MouseEvent) {
-    // TODO: do we need this check if we're on an Ultra DestinationSwitcher
-    if (p.isPrimary && StreamingService.views.isMultiplatformMode !== true) {
-      alertAsync(
-        $t(
-          'You cannot disable the platform you used to sign in to Streamlabs Desktop. Please sign in with a different platform to disable streaming to this destination.',
-        ),
-      );
-      return;
-    }
-
     if (RestreamService.views.canEnableRestream) {
       p.onChange(!p.enabled);
       // always proxy the click to the SwitchInput
