@@ -9,14 +9,14 @@ import { SwitchInput } from '../../shared/inputs';
 import PlatformLogo from '../../shared/PlatformLogo';
 import { useDebounce } from '../../hooks';
 import { useGoLiveSettings } from './useGoLiveSettings';
-import { alertAsync } from '../../modals';
 import DisplaySelector from 'components-react/shared/DisplaySelector';
 import DualOutputPlatformSelector from './dual-output/DualOutputPlatformSelector';
+import AddDestinationButton from 'components-react/shared/AddDestinationButton';
 
 /**
  * Allows enabling/disabling platforms and custom destinations for the stream
  */
-export function DestinationSwitchers(p: { showSelector?: boolean }) {
+export function DestinationSwitchers() {
   const {
     linkedPlatforms,
     enabledPlatforms,
@@ -27,6 +27,7 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
     isPrimaryPlatform,
     isRestreamEnabled,
     isDualOutputMode,
+    isPrime,
   } = useGoLiveSettings();
   // use these references to apply debounce
   // for error handling and switch animation
@@ -35,6 +36,11 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
   const enabledDestRef = useRef(enabledDestinations);
   enabledDestRef.current = enabledDestinations;
   const destinationSwitcherRef = useRef({ addClass: () => undefined });
+
+  const platforms = isDualOutputMode && !isPrime ? enabledPlatforms : linkedPlatforms;
+  const showSelector =
+    enabledPlatforms.length < 2 && customDestinations.map(d => d.enabled).length < 1;
+  const showAddDestButton = isDualOutputMode && !isPrime && !showSelector;
 
   const shouldDisableCustomDestinationSwitchers = () => {
     // Multistream users can always add destinations
@@ -65,7 +71,17 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
   }
 
   function togglePlatform(platform: TPlatform, enabled: boolean) {
-    // On non multistream mode, switch the platform that was just selected while disabling all the others,
+    // In dual output mode, only allow non-ultra users to have 2 platforms, or 1 platform and 1 custom destination enabled
+    if (isDualOutputMode && !isPrime) {
+      if (enabledPlatformsRef.current.length < 2 && enabledDestRef.current.length < 1) {
+        enabledPlatformsRef.current.push(platform);
+      } else {
+        enabledPlatformsRef.current = enabledPlatformsRef.current.filter(p => p !== platform);
+      }
+      emitSwitch();
+      return;
+    }
+
     if (!isRestreamEnabled) {
       /*
        * Clearing this list ensures that when a new platform is selected, instead of enabling 2 platforms
@@ -104,7 +120,7 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
 
   return (
     <div className={cx(styles.switchWrapper, styles.columnPadding)}>
-      {linkedPlatforms.map((platform, ind) => (
+      {platforms.map((platform, ind) => (
         <DestinationSwitcher
           key={platform}
           destination={platform}
@@ -113,6 +129,7 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
           isPrimary={isPrimary(platform)}
           isDualOutputMode={isDualOutputMode}
           index={ind}
+          hideController={showSelector}
         />
       ))}
 
@@ -127,7 +144,7 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
           index={ind}
         />
       ))}
-      {p.showSelector && (
+      {showSelector && (
         <DualOutputPlatformSelector
           togglePlatform={platform => {
             togglePlatform(platform, true);
@@ -140,6 +157,7 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
           }}
         />
       )}
+      {showAddDestButton && <AddDestinationButton />}
     </div>
   );
 }
@@ -152,6 +170,7 @@ interface IDestinationSwitcherProps {
   disabled?: boolean;
   index: number;
   isDualOutputMode: boolean;
+  hideController?: boolean;
 }
 
 /**
@@ -164,7 +183,7 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
   const switchInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const platform = typeof p.destination === 'string' ? (p.destination as TPlatform) : null;
-  const { RestreamService, StreamingService, MagicLinkService } = Services;
+  const { RestreamService, MagicLinkService } = Services;
 
   function dualOutputClickHandler(ev: MouseEvent) {
     if (RestreamService.views.canEnableRestream) {
@@ -196,10 +215,6 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
     switchInputRef.current?.click();
   }
 
-  function addClass() {
-    containerRef.current?.classList.remove(styles.platformDisabled);
-  }
-
   function removeClass() {
     p.onChange(false);
     containerRef.current?.classList.add(styles.platformDisabled);
@@ -229,7 +244,13 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
         ),
         Controller: () =>
           showCloseIcon ? (
-            <CloseIcon removeClass={removeClass} isPrimary={p?.isPrimary} />
+            <i
+              className={cx('icon-close', styles.close)}
+              onClick={e => {
+                p.onChange(!p.enabled);
+                e.stopPropagation();
+              }}
+            />
           ) : (
             <SwitchInput
               inputRef={switchInputRef}
@@ -252,7 +273,13 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
         Logo: () => <i className={cx(styles.destinationLogo, 'fa fa-globe')} />,
         Controller: () =>
           showCloseIcon ? (
-            <CloseIcon removeClass={removeClass} isPrimary={p?.isPrimary} />
+            <i
+              className={cx('icon-close', styles.close)}
+              onClick={e => {
+                p.onChange(!p.enabled);
+                e.stopPropagation();
+              }}
+            />
           ) : (
             <SwitchInput
               inputRef={switchInputRef}
@@ -279,16 +306,22 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
         })}
       >
         <div className={styles.dualOutputPlatformInfo}>
-          {/* LOGO */}
+          {/* PLATFORM LOGO */}
           <Logo />
-          {/* INFO */}
+          {/* PLATFORM TITLE AND ACCOUNT/URL */}
           <div className={styles.dualOutputColAccount}>
             <div className={styles.dualOutputPlatformName}>{title}</div>
             <div className={styles.dualOutputPlatformUsername}>{description}</div>
           </div>
           {/* SWITCH */}
-          <div className={cx(styles.dualOutputColInput)} onClick={dualOutputClickHandler}>
-            <Controller />
+          <div
+            className={cx(styles.dualOutputColInput)}
+            onClick={e => {
+              if (p.hideController) return;
+              dualOutputClickHandler(e);
+            }}
+          >
+            {!p.hideController && <Controller />}
           </div>
         </div>
 
@@ -311,6 +344,7 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
       })}
       onClick={onClickHandler}
     >
+      {/* SWITCH */}
       <div className={cx(styles.colInput)}>
         <Controller />
       </div>
@@ -328,244 +362,3 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
     </div>
   );
 });
-
-interface IDestinationSwitcherProps {
-  destination: TPlatform | ICustomStreamDestination;
-  enabled: boolean;
-  onChange: (enabled: boolean) => unknown;
-  isPrimary?: boolean;
-  promptConnectTikTok?: boolean;
-  index: number;
-  canDisablePrimary?: boolean;
-}
-
-/**
- * Render a single switcher card
- */
-
-// disable `func-call-spacing` and `no-spaced-func` rules
-// to pass back reference to addClass function
-// eslint-disable-next-line
-const DualOutputDestinationSwitcher = React.forwardRef<
-  // eslint-disable-next-line
-  { addClass: () => void },
-  IDestinationSwitcherProps
->((p, ref) => {
-  React.useImperativeHandle(ref, () => {
-    return {
-      addClass() {
-        addClass();
-      },
-    };
-  });
-  const switchInputRef = useRef<HTMLInputElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const { RestreamService, MagicLinkService, UserService } = Services;
-
-  const platform = typeof p.destination === 'string' ? (p.destination as TPlatform) : null;
-  const enable = !p.enabled;
-  const canDisable = p.canDisablePrimary;
-  const isPrime = Services.UserService.views.isPrime;
-
-  function addClass() {
-    containerRef.current?.classList.remove(styles.platformDisabled);
-  }
-
-  function removeClass() {
-    if (canDisable) {
-      alertAsync(
-        $t(
-          'You cannot disable the platform you used to sign in to Streamlabs Desktop. Please sign in with a different platform to disable streaming to this destination.',
-        ),
-      );
-      return;
-    }
-
-    p.onChange(false);
-    containerRef.current?.classList.add(styles.platformDisabled);
-  }
-
-  function showTikTokConnectModal() {
-    alertAsync({
-      type: 'confirm',
-      title: $t('Connect TikTok Account'),
-      closable: true,
-      content: (
-        <span>
-          {$t(
-            'Connect your TikTok account to stream to TikTok and one additional platform for free.',
-          )}
-        </span>
-      ),
-      okText: $t('Connect'),
-      onOk: () => {
-        Services.NavigationService.actions.navigate('PlatformMerge', { platform: 'tiktok' });
-        Services.WindowsService.actions.closeChildWindow();
-      },
-    });
-  }
-
-  function onClickHandler() {
-    // TODO: do we need this check if we're on an Ultra DestinationSwitcher
-    if (p.isPrimary && p.canDisablePrimary !== true) {
-      alertAsync(
-        $t(
-          'You cannot disable the platform you used to sign in to Streamlabs Desktop. Please sign in with a different platform to disable streaming to this destination.',
-        ),
-      );
-      return;
-    }
-
-    if (RestreamService.views.canEnableRestream && !p.promptConnectTikTok) {
-      p.onChange(enable);
-      // always proxy the click to the SwitchInput
-      // so it can play a transition animation
-      switchInputRef.current?.click();
-      // switch the container class without re-rendering to not stop the animation
-      if (enable) {
-        containerRef.current?.classList.remove(styles.platformDisabled);
-      } else {
-        containerRef.current?.classList.add(styles.platformDisabled);
-      }
-    } else {
-      MagicLinkService.actions.linkToPrime('slobs-multistream');
-    }
-  }
-
-  const { title, description, Controller, Logo } = (() => {
-    if (platform) {
-      const { UserService } = Services;
-      // define slots for a platform switcher
-      const service = getPlatformService(platform);
-      const platformAuthData = UserService.state.auth?.platforms[platform] ?? {
-        username: '',
-      };
-      const username = platformAuthData?.username ?? '';
-
-      return {
-        title: service.displayName,
-        description: username,
-        Logo: () => (
-          <PlatformLogo
-            platform={platform}
-            className={cx(styles.logo, styles[`platform-logo-${platform}`])}
-            size={36}
-          />
-        ),
-        Controller: () =>
-          isPrime ? (
-            <Switch
-              inputRef={switchInputRef}
-              value={p.enabled}
-              name={platform}
-              disabled={
-                p.canDisablePrimary
-                  ? false
-                  : p?.isPrimary || (p.promptConnectTikTok && platform === 'tiktok')
-              }
-            />
-          ) : (
-            <CloseIcon removeClass={removeClass} isPrimary={p?.isPrimary} />
-          ),
-      };
-    } else {
-      // define slots for a custom destination switcher
-      const destination = p.destination as ICustomStreamDestination;
-      return {
-        title: destination.name,
-        description: destination.url,
-        Logo: () => <i className={cx(styles.destinationLogo, 'fa fa-globe')} />,
-        Controller: () =>
-          isPrime ? (
-            <Switch
-              inputRef={switchInputRef}
-              value={destination?.enabled}
-              name={`destination_${destination?.name}`}
-            />
-          ) : (
-            <CloseIcon removeClass={removeClass} isPrimary={p?.isPrimary} />
-          ),
-      };
-    }
-  })();
-
-  return (
-    <div
-      ref={containerRef}
-      data-test={platform ? `${platform}-dual-output` : 'destination-dual-output'}
-      className={cx(styles.dualOutputPlatformSwitcher, {
-        [styles.platformDisabled]: !p.enabled || p.promptConnectTikTok,
-      })}
-      onClick={() => {
-        if (p.promptConnectTikTok) {
-          showTikTokConnectModal();
-        }
-      }}
-    >
-      <div className={styles.dualOutputPlatformInfo}>
-        {/* LOGO */}
-        <Logo />
-        {/* INFO */}
-        <div className={styles.colAccount}>
-          <span className={styles.platformName}>{title}</span>
-          <span className={styles.platformUsername}>{description}</span>
-        </div>
-        {/* SWITCH */}
-        <div
-          className={cx(styles.colInput)}
-          onClick={e => {
-            if (!UserService.views.isPrime) return;
-
-            if (p.promptConnectTikTok) {
-              showTikTokConnectModal();
-              e.stopPropagation();
-              return;
-            } else {
-              onClickHandler();
-            }
-          }}
-        >
-          <Controller />
-        </div>
-      </div>
-
-      <DisplaySelector
-        title={title}
-        className={styles.dualOutputDisplaySelector}
-        platform={platform}
-        label={$t('Output')}
-        index={p.index}
-      />
-    </div>
-  );
-});
-
-function CloseIcon(p: { removeClass: () => void; isPrimary?: boolean }) {
-  return p?.isPrimary ? (
-    <></>
-  ) : (
-    <i
-      className={cx('icon-close', styles.close)}
-      onClick={e => {
-        e.stopPropagation();
-        p.removeClass();
-      }}
-    />
-  );
-}
-
-function Switch(p: { inputRef: any; name: string; value: boolean; disabled?: boolean }) {
-  return (
-    <SwitchInput
-      inputRef={p.inputRef}
-      value={p.value}
-      name={p.name}
-      uncontrolled
-      nolabel
-      className={styles.dualOutputPlatformSwitch}
-      checkedChildren={<i className="icon-check-mark" />}
-      disabled={p.disabled}
-    />
-  );
-}

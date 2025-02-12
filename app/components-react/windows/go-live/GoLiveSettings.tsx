@@ -50,10 +50,7 @@ export default function GoLiveSettings() {
         return linkedPlatforms.length + customDestinations.length < 8;
       },
 
-      showSelector:
-        !UserService.views.isPrime &&
-        module.isDualOutputMode &&
-        module.state.enabledPlatforms.length < 3,
+      showSelector: !UserService.views.isPrime && module.isDualOutputMode,
 
       isPrime: UserService.views.isPrime,
 
@@ -96,7 +93,7 @@ export default function GoLiveSettings() {
               lightShadow
             />
             {/*DESTINATION SWITCHERS*/}
-            <DestinationSwitchers showSelector={showSelector} />
+            <DestinationSwitchers />
 
             {/*ADD DESTINATION BUTTON*/}
             {shouldShowAddDestButton && !showSelector && <AddDestinationButton />}
