@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Services } from 'components-react/service-provider';
 import { $t } from 'services/i18n';
-import { TClip } from 'services/highlighter';
-import { getCombinedClipsDuration, sortClipsByOrder } from './utils';
+import { TClip } from 'services/highlighter/models/highlighter.models';
+import { sortClipsByOrder, getCombinedClipsDuration } from './utils';
 import MiniClipPreview from './MiniClipPreview';
 import { PauseButton, PlayButton } from './StreamCard';
 import styles from './PreviewModal.m.less';
@@ -258,7 +258,7 @@ export default function PreviewModal({
     return (
       <div>
         <h2>{$t('Preview')}</h2>
-        <p>Select at least one clip to preview your video</p>
+        <p>{$t('Select at least one clip to preview your video')}</p>
       </div>
     );
   }

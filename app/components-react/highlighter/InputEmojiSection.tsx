@@ -1,8 +1,13 @@
 import React from 'react';
-import { IAiClip, IDeathMetadata, IInput, IKillMetadata, TClip } from 'services/highlighter';
+import { IAiClip, TClip } from 'services/highlighter/models/highlighter.models';
 import { isAiClip } from './utils';
-import { EHighlighterInputTypes } from 'services/highlighter/ai-highlighter/ai-highlighter';
 import styles from './InputEmojiSection.m.less';
+import {
+  EHighlighterInputTypes,
+  IDeathMetadata,
+  IInput,
+  IKillMetadata,
+} from 'services/highlighter/models/ai-highlighter.models';
 
 interface TypeWording {
   emoji: string;

@@ -22,7 +22,7 @@ interface IUsageApiData {
   data: string;
 }
 
-type TAnalyticsEvent =
+export type TAnalyticsEvent =
   | 'PlatformLogin'
   | 'SocialShare'
   | 'Heartbeat'

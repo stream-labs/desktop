@@ -5,10 +5,9 @@ import { Services } from 'components-react/service-provider';
 import { BoolButtonInput, CheckboxInput } from 'components-react/shared/inputs';
 import { SwitchInput } from 'components-react/shared/inputs/SwitchInput';
 import React from 'react';
-import styles from './MiniClipPreview.m.less';
-import { TClip } from 'services/highlighter';
 import { SCRUB_HEIGHT, SCRUB_WIDTH } from 'services/highlighter/constants';
-import { $t } from 'services/i18n';
+import { TClip } from 'services/highlighter/models/highlighter.models';
+import styles from './MiniClipPreview.m.less';
 
 export default function MiniClipPreview({
   clipId,

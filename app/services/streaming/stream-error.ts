@@ -124,6 +124,14 @@ export const errorTypes = {
       return $t('You need X premium account to go live on X.');
     },
   },
+  KICK_SCOPE_OUTDATED: {
+    get message() {
+      return $t('Failed to update Kick account. Please unlink and reconnect your Kick account.');
+    },
+    get action() {
+      return $t('unlink and re-merge Kick account, then restart Desktop');
+    },
+  },
   PRIME_REQUIRED: {
     get message() {
       return $t('This feature is for Ultra members only');

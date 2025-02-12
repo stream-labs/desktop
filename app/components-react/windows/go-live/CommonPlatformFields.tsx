@@ -1,6 +1,6 @@
 import { TPlatform } from '../../../services/platforms';
 import { $t } from '../../../services/i18n';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { CheckboxInput, InputComponent, TextAreaInput, TextInput } from '../../shared/inputs';
 import { assertIsDefined } from '../../../util/properties-type-guards';
 import InputWrapper from '../../shared/inputs/InputWrapper';
@@ -58,7 +58,7 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
   }
 
   const view = Services.StreamingService.views;
-  const aiHighlighterEnabled = Services.IncrementalRolloutService.views.featureIsEnabled(
+  const aiHighlighterFeatureEnabled = Services.IncrementalRolloutService.views.featureIsEnabled(
     EAvailableFeatures.aiHighlighter,
   );
   const hasCustomCheckbox = p.layoutMode === 'multiplatformAdvanced';
@@ -90,6 +90,14 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
     maxCharacters = 140;
   }
 
+  const titleTooltip = useMemo(() => {
+    if (enabledPlatforms.includes('tiktok')) {
+      return $t('Only 32 characters of your title will display on TikTok');
+    }
+
+    return undefined;
+  }, [enabledPlatforms]);
+
   return (
     <div>
       {/* USE CUSTOM CHECKBOX */}
@@ -115,10 +123,7 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
               label={$t('Title')}
               required={true}
               max={maxCharacters}
-              tooltip={
-                enabledPlatforms.includes('tiktok') &&
-                $t('Only 32 characters of your title will display on TikTok')
-              }
+              tooltip={titleTooltip}
             />
 
             {/*DESCRIPTION*/}
@@ -132,9 +137,11 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
               />
             )}
 
-            {aiHighlighterEnabled && enabledPlatforms && !enabledPlatforms.includes('twitch') && (
-              <AiHighlighterToggle game={undefined} cardIsExpanded={false} />
-            )}
+            {aiHighlighterFeatureEnabled &&
+              enabledPlatforms &&
+              !enabledPlatforms.includes('twitch') && (
+                <AiHighlighterToggle game={undefined} cardIsExpanded={false} />
+              )}
           </div>
         )}
       </Animate>

@@ -56,6 +56,7 @@ import { byOS, OS } from 'util/operating-systems';
 import { DualOutputService } from 'services/dual-output';
 import { capitalize } from 'lodash';
 import { TikTokService } from 'services/platforms/tiktok';
+import { YoutubeService } from 'app-services';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -101,6 +102,7 @@ export class StreamingService
   @Inject() private markersService: MarkersService;
   @Inject() private dualOutputService: DualOutputService;
   @Inject() private tikTokService: TikTokService;
+  @Inject() private youtubeService: YoutubeService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
@@ -140,6 +142,7 @@ export class StreamingService
         facebook: 'not-started',
         tiktok: 'not-started',
         trovo: 'not-started',
+        kick: 'not-started',
         twitter: 'not-started',
         instagram: 'not-started',
         setupMultistream: 'not-started',
@@ -1314,6 +1317,11 @@ export class StreamingService
             ]
           : ['custom_rtmp'];
 
+        if (eventMetadata.platforms.includes('youtube')) {
+          eventMetadata.streamId = this.youtubeService.state.streamId;
+          eventMetadata.broadcastId = this.youtubeService.state.settings?.broadcastId;
+        }
+
         this.usageStatisticsService.recordEvent('stream_start', eventMetadata);
         this.usageStatisticsService.recordAnalyticsEvent('StreamingStatus', {
           code: info.code,
@@ -1583,6 +1591,11 @@ export class StreamingService
       });
     } else {
       data.platforms = ['custom_rtmp'];
+    }
+
+    if (data.platforms.includes('youtube')) {
+      data.streamId = this.youtubeService.state.streamId;
+      data.broadcastId = this.youtubeService.state.settings?.broadcastId;
     }
 
     this.recordGoals(data.duration);

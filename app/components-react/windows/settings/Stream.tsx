@@ -217,7 +217,7 @@ class StreamSettingsModule {
   }
 
   async platformMergeInline(platform: TPlatform) {
-    const mode = ['youtube', 'twitch', 'twitter', 'tiktok'].includes(platform)
+    const mode = ['youtube', 'twitch', 'twitter', 'tiktok', 'kick'].includes(platform)
       ? 'external'
       : 'internal';
 
@@ -472,7 +472,7 @@ function Platform(p: { platform: TPlatform }) {
         style={{
           backgroundColor: `var(--${platform})`,
           borderColor: 'transparent',
-          color: ['trovo', 'instagram'].includes(platform) ? 'black' : 'inherit',
+          color: ['trovo', 'instagram', 'kick'].includes(platform) ? 'black' : 'inherit',
         }}
       >
         {$t('Connect')}
