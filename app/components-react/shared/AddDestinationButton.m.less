@@ -27,6 +27,7 @@ button.add-destination-btn {
   text-align: center;
   position: relative;
   margin: auto;
+  margin-bottom: 15px;
   background-color: var(--background);
 
   &:hover {
@@ -54,7 +55,9 @@ button.add-destination-btn {
   border: 1px dashed var(--border) !important;
   min-height: 58px;
   transition: border 0.3s, box-shadow 0.3s !important;
-  margin-bottom: 15px;
+  margin: 0px 15px 15px 15px !important;
+  width: calc(100% - 30px) !important;
+  background-color: var(--dark-background) !important;
 
   &:hover {
     border: 1px solid var(--button) !important;
@@ -67,6 +70,8 @@ button.add-destination-btn {
   transition: box-shadow 0.3s !important;
   border: unset !important;
   background-color: var(--dropdown-bg) !important;
+  margin: 0px 15px !important;
+  width: calc(100% - 30px) !important;
 }
 
 .ultra-btn:extend(button.add-destination-btn) {

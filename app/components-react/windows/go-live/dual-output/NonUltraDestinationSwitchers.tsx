@@ -14,7 +14,6 @@ import Translate from 'components-react/shared/Translate';
 import DualOutputPlatformSelector from './DualOutputPlatformSelector';
 import { useDebounce } from 'components-react/hooks';
 import DualOutputToggle from '../../../shared/DualOutputToggle';
-import { renderTikTokModal } from '../DestinationSwitchers';
 
 interface INonUltraDestinationSwitchers {
   showSelector?: boolean;
@@ -215,15 +214,7 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
           [styles.platformDisabled]: !p.enabled || p.promptConnectTikTok,
         })}
       >
-        <div
-          ref={containerRef}
-          className={styles.switcherHeader}
-          onClick={() => {
-            if (showTikTokModal) {
-              renderTikTokModal(p.promptConnectTikTok);
-            }
-          }}
-        >
+        <div ref={containerRef} className={styles.switcherHeader}>
           <div className={styles.platformInfoWrapper}>
             {/* LOGO */}
             <Logo />

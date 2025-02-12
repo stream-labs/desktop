@@ -2,7 +2,6 @@ import React, { useRef, MouseEvent } from 'react';
 import { getPlatformService, TPlatform } from '../../../services/platforms';
 import cx from 'classnames';
 import { $t } from '../../../services/i18n';
-import * as remote from '@electron/remote';
 import styles from './DestinationSwitchers.m.less';
 import { ICustomStreamDestination } from '../../../services/settings/streaming';
 import { Services } from '../../service-provider';
@@ -11,9 +10,8 @@ import PlatformLogo from '../../shared/PlatformLogo';
 import { useDebounce } from '../../hooks';
 import { useGoLiveSettings } from './useGoLiveSettings';
 import { alertAsync } from '../../modals';
-import { ModalLayout } from 'components-react/shared/ModalLayout';
-import { Button, Form, Modal } from 'antd';
-import Translate from 'components-react/shared/Translate';
+import DisplaySelector from 'components-react/shared/DisplaySelector';
+import DualOutputPlatformSelector from './dual-output/DualOutputPlatformSelector';
 
 /**
  * Allows enabling/disabling platforms and custom destinations for the stream
@@ -27,8 +25,8 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
     switchPlatforms,
     switchCustomDestination,
     isPrimaryPlatform,
-    isPlatformLinked,
     isRestreamEnabled,
+    isDualOutputMode,
   } = useGoLiveSettings();
   // use these references to apply debounce
   // for error handling and switch animation
@@ -36,10 +34,7 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
   enabledPlatformsRef.current = enabledPlatforms;
   const enabledDestRef = useRef(enabledDestinations);
   enabledDestRef.current = enabledDestinations;
-
-  // special handling for TikTok for non-ultra users
-  // to disable/enable platforms and open ultra link
-  const promptConnectTikTok = !isPlatformLinked('tiktok');
+  const destinationSwitcherRef = useRef({ addClass: () => undefined });
 
   const shouldDisableCustomDestinationSwitchers = () => {
     // Multistream users can always add destinations
@@ -47,8 +42,7 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
       return false;
     }
 
-    // Otherwise, only a single platform and no custom destinations,
-    // TikTok should be handled by platform switching
+    // Otherwise, only a single platform and no custom destinations
     return enabledPlatforms.length > 0;
   };
 
@@ -66,51 +60,12 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
     if (typeof target === 'number') {
       return enabledDestRef.current.includes(target);
     } else {
-      if (target === 'tiktok' && promptConnectTikTok) {
-        return false;
-      }
-
       return enabledPlatformsRef.current.includes(target);
     }
   }
 
   function togglePlatform(platform: TPlatform, enabled: boolean) {
-    // On non multistream mode, switch the platform that was just selected while disabling all the others,
-    // allow TikTok to be added as an extra platform
-    if (!isRestreamEnabled) {
-      /*
-       * If TikTok is the platform being toggled:
-       * - Preserve the currently active platform so TikTok can be added to this list at the bottom of this function,
-       *   we will have 2 active platforms and a Primary Chat switcher.
-       * - Remove TikTok from the list without removing the other active platform if we're disabling TikTok itself.
-       */
-      if (platform === 'tiktok') {
-        if (enabled) {
-          /*
-           * If we had two platforms, none of which were tiktok, we still need to limit
-           * that to 1 platform without restreaming.
-           * This could happen when coming from having dual output enabled to off.
-           *  TODO: this might not be needed after #5244, keeping here for a while for extra care
-           */
-          enabledPlatformsRef.current = enabledPlatformsRef.current.slice(0, 1);
-        } else {
-          enabledPlatformsRef.current = enabledPlatformsRef.current.filter(
-            platform => platform !== 'tiktok',
-          );
-        }
-      } else {
-        /*
-         * Clearing this list ensures that when a new platform is selected, instead of enabling 2 platforms
-         * we switch to 1 enabled platforms that was just toggled.
-         * We will also preserve TikTok as an active platform if it was before.
-         */
-        enabledPlatformsRef.current = enabledPlatformsRef.current.includes('tiktok')
-          ? ['tiktok']
-          : [];
-      }
-    } else {
-      enabledPlatformsRef.current = enabledPlatformsRef.current.filter(p => p !== platform);
-    }
+    enabledPlatformsRef.current = enabledPlatformsRef.current.filter(p => p !== platform);
 
     if (enabled) {
       enabledPlatformsRef.current.push(platform);
@@ -124,40 +79,23 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
     emitSwitch();
   }
 
-  function toggleDest(ind: number, enabled: boolean) {
-    enabledDestRef.current = enabledDestRef.current.filter(index => index !== ind);
-    if (enabled) {
-      enabledDestRef.current.push(ind);
-    }
-    emitSwitch(ind, enabled);
-  }
-
   // TODO: find a cleaner way to do this
   const isPrimary = (platform: TPlatform) =>
     isPrimaryPlatform(platform) || linkedPlatforms.length === 1;
 
   return (
     <div className={cx(styles.switchWrapper, styles.columnPadding)}>
-      {linkedPlatforms.map(platform => (
+      {linkedPlatforms.map((platform, ind) => (
         <DestinationSwitcher
           key={platform}
           destination={platform}
           enabled={isEnabled(platform)}
           onChange={enabled => togglePlatform(platform, enabled)}
-          promptConnectTikTok={platform === 'tiktok' && promptConnectTikTok}
-          isPrimary={isPrimaryPlatform(platform)}
+          isPrimary={isPrimary(platform)}
+          isDualOutputMode={isDualOutputMode}
+          index={ind}
         />
       ))}
-
-      {!linkedPlatforms.includes('tiktok') && (
-        <DestinationSwitcher
-          destination={'tiktok'}
-          enabled={isEnabled('tiktok')}
-          onChange={enabled => togglePlatform('tiktok', enabled)}
-          isPrimary={isPrimaryPlatform('tiktok')}
-          promptConnectTikTok={promptConnectTikTok}
-        />
-      )}
 
       {customDestinations?.map((dest, ind) => (
         <DestinationSwitcher
@@ -166,8 +104,23 @@ export function DestinationSwitchers(p: { showSelector?: boolean }) {
           enabled={customDestinations[ind].enabled && !disableCustomDestinationSwitchers}
           onChange={enabled => switchCustomDestination(ind, enabled)}
           disabled={disableCustomDestinationSwitchers}
+          isDualOutputMode={isDualOutputMode}
+          index={ind}
         />
       ))}
+      {p.showSelector && (
+        <DualOutputPlatformSelector
+          togglePlatform={platform => {
+            togglePlatform(platform, true);
+            destinationSwitcherRef.current.addClass();
+          }}
+          showSwitcher={destinationSwitcherRef.current.addClass}
+          switchDestination={index => {
+            switchCustomDestination(index, true);
+            destinationSwitcherRef.current.addClass();
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -177,8 +130,9 @@ interface IDestinationSwitcherProps {
   enabled: boolean;
   onChange: (enabled: boolean) => unknown;
   isPrimary?: boolean;
-  promptConnectTikTok?: boolean;
   disabled?: boolean;
+  index: number;
+  isDualOutputMode: boolean;
 }
 
 /**
@@ -191,23 +145,36 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
   const switchInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const platform = typeof p.destination === 'string' ? (p.destination as TPlatform) : null;
-  const { RestreamService, TikTokService, StreamingService } = Services;
-  const canEnableRestream = RestreamService.views.canEnableRestream;
-  const cannotDisableDestination = p.isPrimary && !canEnableRestream;
-  const showTikTokModal =
-    p.promptConnectTikTok || (platform === 'tiktok' && TikTokService.missingLiveAccess);
+  const { RestreamService, StreamingService, MagicLinkService } = Services;
 
-  // Preserving old TikTok functionality, so they can't enable the toggle if TikTok is not
-  // connected.
-  // TODO: this kind of logic should belong on caller, but ideally we would refactor all this
-  const tiktokDisabled =
-    platform === 'tiktok' && !StreamingService.views.isPlatformLinked('tiktok');
-
-  function onClickHandler(ev: MouseEvent) {
-    if (showTikTokModal) {
-      renderTikTokModal(p.promptConnectTikTok);
+  function dualOutputClickHandler(ev: MouseEvent) {
+    // TODO: do we need this check if we're on an Ultra DestinationSwitcher
+    if (p.isPrimary && StreamingService.views.isMultiplatformMode !== true) {
+      alertAsync(
+        $t(
+          'You cannot disable the platform you used to sign in to Streamlabs Desktop. Please sign in with a different platform to disable streaming to this destination.',
+        ),
+      );
+      return;
     }
 
+    if (RestreamService.views.canEnableRestream) {
+      p.onChange(!p.enabled);
+      // always proxy the click to the SwitchInput
+      // so it can play a transition animation
+      switchInputRef.current?.click();
+      // switch the container class without re-rendering to not stop the animation
+      if (!p.enabled) {
+        containerRef.current?.classList.remove(styles.platformDisabled);
+      } else {
+        containerRef.current?.classList.add(styles.platformDisabled);
+      }
+    } else {
+      MagicLinkService.actions.linkToPrime('slobs-multistream');
+    }
+  }
+
+  function onClickHandler(ev: MouseEvent) {
     // If we're disabling the switch we shouldn't be emitting anything past below
     if (p.disabled) {
       return;
@@ -218,20 +185,6 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
     // always proxy the click to the SwitchInput
     // so it can play a transition animation
     switchInputRef.current?.click();
-
-    /*
-     * TODO:
-     *   this causes inconsistent state when disabling primary platform
-     *   after is being re-enabled. Not sure which animation is referring to.
-     */
-    // switch the container class without re-rendering to not stop the animation
-    /*
-    if (enable) {
-      containerRef.current?.classList.remove(styles.platformDisabled);
-    } else {
-      containerRef.current?.classList.add(styles.platformDisabled);
-    }
-    */
   }
 
   function addClass() {
@@ -239,22 +192,16 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
   }
 
   function removeClass() {
-    if (p.isPrimary) {
-      alertAsync(
-        $t(
-          'You cannot disable the platform you used to sign in to Streamlabs Desktop. Please sign in with a different platform to disable streaming to this destination.',
-        ),
-      );
-      return;
-    }
     p.onChange(false);
     containerRef.current?.classList.add(styles.platformDisabled);
   }
 
-  const { title, description, Switch, Logo } = (() => {
+  const { title, description, Controller, Logo } = (() => {
+    const { UserService } = Services;
+    const showCloseIcon = p.isDualOutputMode && !UserService.views.isPrime;
+
     if (platform) {
       // define slots for a platform switcher
-      const { UserService, StreamingService } = Services;
       const service = getPlatformService(platform);
       const platformAuthData = UserService.state.auth?.platforms[platform];
       const username = platformAuthData?.username ?? '';
@@ -263,17 +210,29 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
         title: $t('Stream to %{platformName}', { platformName: service.displayName }),
         description: username,
         Logo: () => (
-          <PlatformLogo platform={platform} className={styles[`platform-logo-${platform}`]} />
-        ),
-        Switch: () => (
-          <SwitchInput
-            inputRef={switchInputRef}
-            value={p.enabled}
-            name={platform}
-            disabled={tiktokDisabled}
-            uncontrolled
+          <PlatformLogo
+            platform={platform}
+            className={cx(
+              styles[`platform-logo-${platform}`],
+              p.isDualOutputMode ? styles.dualOutputLogo : styles.singleOutputLogo,
+            )}
           />
         ),
+        Controller: () =>
+          showCloseIcon ? (
+            <CloseIcon removeClass={removeClass} isPrimary={p?.isPrimary} />
+          ) : (
+            <SwitchInput
+              inputRef={switchInputRef}
+              value={p.enabled}
+              name={platform}
+              disabled={p.disabled}
+              uncontrolled
+              nolabel
+              className={p.isDualOutputMode && styles.dualOutputPlatformSwitch}
+              checkedChildren={p.isDualOutputMode && <i className="icon-check-mark" />}
+            />
+          ),
       };
     } else {
       // define slots for a custom destination switcher
@@ -282,29 +241,69 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
         title: destination.name,
         description: destination.url,
         Logo: () => <i className={cx(styles.destinationLogo, 'fa fa-globe')} />,
-        Switch: () => (
-          <SwitchInput
-            inputRef={switchInputRef}
-            value={p.enabled}
-            name={`destination_${destination.name}`}
-            disabled={p.disabled}
-            uncontrolled
-          />
-        ),
+        Controller: () =>
+          showCloseIcon ? (
+            <CloseIcon removeClass={removeClass} isPrimary={p?.isPrimary} />
+          ) : (
+            <SwitchInput
+              inputRef={switchInputRef}
+              value={p.enabled}
+              name={`destination_${destination.name}`}
+              disabled={p.disabled}
+              uncontrolled
+              nolabel
+              className={p.isDualOutputMode && styles.dualOutputPlatformSwitch}
+              checkedChildren={p.isDualOutputMode && <i className="icon-check-mark" />}
+            />
+          ),
       };
     }
   })();
+
+  if (p.isDualOutputMode) {
+    return (
+      <div
+        ref={containerRef}
+        data-test={platform ? `${platform}-dual-output` : 'destination-dual-output'}
+        className={cx(styles.dualOutputPlatformSwitcher, {
+          [styles.platformDisabled]: !p.enabled,
+        })}
+      >
+        <div className={styles.dualOutputPlatformInfo}>
+          {/* LOGO */}
+          <Logo />
+          {/* INFO */}
+          <div className={styles.dualOutputColAccount}>
+            <div className={styles.dualOutputPlatformName}>{title}</div>
+            <div className={styles.dualOutputPlatformUsername}>{description}</div>
+          </div>
+          {/* SWITCH */}
+          <div className={cx(styles.colInput)} onClick={dualOutputClickHandler}>
+            <Controller />
+          </div>
+        </div>
+
+        <DisplaySelector
+          title={title}
+          className={styles.dualOutputDisplaySelector}
+          platform={platform}
+          label={$t('Output')}
+          index={p.index}
+        />
+      </div>
+    );
+  }
 
   return (
     <div
       ref={containerRef}
       className={cx(styles.platformSwitcher, {
-        [styles.platformDisabled]: !p.enabled || p.promptConnectTikTok,
+        [styles.platformDisabled]: !p.enabled,
       })}
       onClick={onClickHandler}
     >
       <div className={cx(styles.colInput)}>
-        <Switch />
+        <Controller />
       </div>
 
       {/* PLATFORM LOGO */}
@@ -321,53 +320,243 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
   );
 });
 
-export function renderTikTokModal(promptConnectTikTok?: boolean) {
-  const { TikTokService } = Services;
-
-  const message = promptConnectTikTok
-    ? $t('Connect your TikTok account to stream to TikTok and one additional platform for free.')
-    : $t(
-        "Connect your TikTok account to stream to TikTok and one other platform for free. Haven't applied to stream on TikTok Live yet? <link>Start the process here</link>.",
-        { link: <a href={TikTokService.applicationUrl} /> },
-      );
-
-  function openApplicationInfoPage() {
-    remote.shell.openExternal(Services.TikTokService.applicationUrl);
-  }
-
-  alertAsync({
-    bodyStyle: { padding: '24px' },
-    className: styles.tiktokModal,
-    type: 'confirm',
-    title: $t('Connect your TikTok Account'),
-    content: (
-      <Translate message={message}>
-        <a slot="link" onClick={openApplicationInfoPage} style={{ textDecoration: 'underline' }} />
-      </Translate>
-    ),
-    icon: <PlatformLogo platform="tiktok" className={styles.tiktokModalLogo} />,
-    closable: true,
-    maskClosable: true,
-    cancelButtonProps: { style: { display: 'none' } },
-    okButtonProps: { style: { display: 'none' } },
-    modalRender: node => <ModalLayout footer={<TikTokModalFooter />}>{node}</ModalLayout>,
-    width: 600,
-  });
+interface IDestinationSwitcherProps {
+  destination: TPlatform | ICustomStreamDestination;
+  enabled: boolean;
+  onChange: (enabled: boolean) => unknown;
+  isPrimary?: boolean;
+  promptConnectTikTok?: boolean;
+  index: number;
+  canDisablePrimary?: boolean;
 }
 
-function TikTokModalFooter() {
-  function connect() {
-    Modal.destroyAll();
-    Services.NavigationService.actions.navigate('PlatformMerge', { platform: 'tiktok' });
-    Services.WindowsService.actions.closeChildWindow();
+/**
+ * Render a single switcher card
+ */
+
+// disable `func-call-spacing` and `no-spaced-func` rules
+// to pass back reference to addClass function
+// eslint-disable-next-line
+const DualOutputDestinationSwitcher = React.forwardRef<
+  // eslint-disable-next-line
+  { addClass: () => void },
+  IDestinationSwitcherProps
+>((p, ref) => {
+  React.useImperativeHandle(ref, () => {
+    return {
+      addClass() {
+        addClass();
+      },
+    };
+  });
+  const switchInputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const { RestreamService, MagicLinkService, UserService } = Services;
+
+  const platform = typeof p.destination === 'string' ? (p.destination as TPlatform) : null;
+  const enable = !p.enabled;
+  const canDisable = p.canDisablePrimary;
+  const isPrime = Services.UserService.views.isPrime;
+
+  function addClass() {
+    containerRef.current?.classList.remove(styles.platformDisabled);
   }
 
+  function removeClass() {
+    if (canDisable) {
+      alertAsync(
+        $t(
+          'You cannot disable the platform you used to sign in to Streamlabs Desktop. Please sign in with a different platform to disable streaming to this destination.',
+        ),
+      );
+      return;
+    }
+
+    p.onChange(false);
+    containerRef.current?.classList.add(styles.platformDisabled);
+  }
+
+  function showTikTokConnectModal() {
+    alertAsync({
+      type: 'confirm',
+      title: $t('Connect TikTok Account'),
+      closable: true,
+      content: (
+        <span>
+          {$t(
+            'Connect your TikTok account to stream to TikTok and one additional platform for free.',
+          )}
+        </span>
+      ),
+      okText: $t('Connect'),
+      onOk: () => {
+        Services.NavigationService.actions.navigate('PlatformMerge', { platform: 'tiktok' });
+        Services.WindowsService.actions.closeChildWindow();
+      },
+    });
+  }
+
+  function onClickHandler() {
+    // TODO: do we need this check if we're on an Ultra DestinationSwitcher
+    if (p.isPrimary && p.canDisablePrimary !== true) {
+      alertAsync(
+        $t(
+          'You cannot disable the platform you used to sign in to Streamlabs Desktop. Please sign in with a different platform to disable streaming to this destination.',
+        ),
+      );
+      return;
+    }
+
+    if (RestreamService.views.canEnableRestream && !p.promptConnectTikTok) {
+      p.onChange(enable);
+      // always proxy the click to the SwitchInput
+      // so it can play a transition animation
+      switchInputRef.current?.click();
+      // switch the container class without re-rendering to not stop the animation
+      if (enable) {
+        containerRef.current?.classList.remove(styles.platformDisabled);
+      } else {
+        containerRef.current?.classList.add(styles.platformDisabled);
+      }
+    } else {
+      MagicLinkService.actions.linkToPrime('slobs-multistream');
+    }
+  }
+
+  const { title, description, Controller, Logo } = (() => {
+    if (platform) {
+      const { UserService } = Services;
+      // define slots for a platform switcher
+      const service = getPlatformService(platform);
+      const platformAuthData = UserService.state.auth?.platforms[platform] ?? {
+        username: '',
+      };
+      const username = platformAuthData?.username ?? '';
+
+      return {
+        title: service.displayName,
+        description: username,
+        Logo: () => (
+          <PlatformLogo
+            platform={platform}
+            className={cx(styles.logo, styles[`platform-logo-${platform}`])}
+            size={36}
+          />
+        ),
+        Controller: () =>
+          isPrime ? (
+            <Switch
+              inputRef={switchInputRef}
+              value={p.enabled}
+              name={platform}
+              disabled={
+                p.canDisablePrimary
+                  ? false
+                  : p?.isPrimary || (p.promptConnectTikTok && platform === 'tiktok')
+              }
+            />
+          ) : (
+            <CloseIcon removeClass={removeClass} isPrimary={p?.isPrimary} />
+          ),
+      };
+    } else {
+      // define slots for a custom destination switcher
+      const destination = p.destination as ICustomStreamDestination;
+      return {
+        title: destination.name,
+        description: destination.url,
+        Logo: () => <i className={cx(styles.destinationLogo, 'fa fa-globe')} />,
+        Controller: () =>
+          isPrime ? (
+            <Switch
+              inputRef={switchInputRef}
+              value={destination?.enabled}
+              name={`destination_${destination?.name}`}
+            />
+          ) : (
+            <CloseIcon removeClass={removeClass} isPrimary={p?.isPrimary} />
+          ),
+      };
+    }
+  })();
+
   return (
-    <Form layout={'inline'} className={styles.tiktokModalFooter}>
-      <Button onClick={Modal.destroyAll}>{$t('Skip')}</Button>
-      <Button type="primary" onClick={connect}>
-        {$t('Connect TikTok Account')}
-      </Button>
-    </Form>
+    <div
+      ref={containerRef}
+      data-test={platform ? `${platform}-dual-output` : 'destination-dual-output'}
+      className={cx(styles.dualOutputPlatformSwitcher, {
+        [styles.platformDisabled]: !p.enabled || p.promptConnectTikTok,
+      })}
+      onClick={() => {
+        if (p.promptConnectTikTok) {
+          showTikTokConnectModal();
+        }
+      }}
+    >
+      <div className={styles.dualOutputPlatformInfo}>
+        {/* LOGO */}
+        <Logo />
+        {/* INFO */}
+        <div className={styles.colAccount}>
+          <span className={styles.platformName}>{title}</span>
+          <span className={styles.platformUsername}>{description}</span>
+        </div>
+        {/* SWITCH */}
+        <div
+          className={cx(styles.colInput)}
+          onClick={e => {
+            if (!UserService.views.isPrime) return;
+
+            if (p.promptConnectTikTok) {
+              showTikTokConnectModal();
+              e.stopPropagation();
+              return;
+            } else {
+              onClickHandler();
+            }
+          }}
+        >
+          <Controller />
+        </div>
+      </div>
+
+      <DisplaySelector
+        title={title}
+        className={styles.dualOutputDisplaySelector}
+        platform={platform}
+        label={$t('Output')}
+        index={p.index}
+      />
+    </div>
+  );
+});
+
+function CloseIcon(p: { removeClass: () => void; isPrimary?: boolean }) {
+  return p?.isPrimary ? (
+    <></>
+  ) : (
+    <i
+      className={cx('icon-close', styles.close)}
+      onClick={e => {
+        e.stopPropagation();
+        p.removeClass();
+      }}
+    />
+  );
+}
+
+function Switch(p: { inputRef: any; name: string; value: boolean; disabled?: boolean }) {
+  return (
+    <SwitchInput
+      inputRef={p.inputRef}
+      value={p.value}
+      name={p.name}
+      uncontrolled
+      nolabel
+      className={styles.dualOutputPlatformSwitch}
+      checkedChildren={<i className="icon-check-mark" />}
+      disabled={p.disabled}
+    />
   );
 }
