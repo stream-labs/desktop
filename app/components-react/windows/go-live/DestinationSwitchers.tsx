@@ -10,7 +10,7 @@ import PlatformLogo from '../../shared/PlatformLogo';
 import { useDebounce } from '../../hooks';
 import { useGoLiveSettings } from './useGoLiveSettings';
 import DisplaySelector from 'components-react/shared/DisplaySelector';
-import DualOutputPlatformSelector from './dual-output/DualOutputPlatformSelector';
+import DestinationSelector from './DestinationSelector';
 import AddDestinationButton from 'components-react/shared/AddDestinationButton';
 
 /**
@@ -147,7 +147,7 @@ export function DestinationSwitchers() {
         />
       ))}
       {showSelector && (
-        <DualOutputPlatformSelector
+        <DestinationSelector
           togglePlatform={platform => {
             togglePlatform(platform, true);
             destinationSwitcherRef.current.addClass();
