@@ -89,7 +89,7 @@ export default function GoLiveSettings() {
           span={8}
           className={cx(styles.leftColumn, { [styles.columnPadding]: !isDualOutputMode })}
         >
-          <Scrollable style={{ height: '81%' }} snapToWindowEdge>
+          <Scrollable style={{ height: '81%' }}>
             <DualOutputToggle
               className={cx(styles.dualOutputToggle, styles.columnPadding)}
               type="single"

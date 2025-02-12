@@ -278,7 +278,7 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
             <div className={styles.dualOutputPlatformUsername}>{description}</div>
           </div>
           {/* SWITCH */}
-          <div className={cx(styles.colInput)} onClick={dualOutputClickHandler}>
+          <div className={cx(styles.dualOutputColInput)} onClick={dualOutputClickHandler}>
             <Controller />
           </div>
         </div>
