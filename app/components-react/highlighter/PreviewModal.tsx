@@ -35,10 +35,17 @@ export default function PreviewModal({
   const clips = HighlighterService.getClips(HighlighterService.views.clips, streamId);
   const { intro, outro } = HighlighterService.views.video;
   const audioSettings = HighlighterService.views.audio;
-  const [currentClipIndex, setCurrentClipIndex] = useState(0);
-  const currentClipIndexRef = useRef(0);
   const sortedClips = [...sortClipsByOrder(clips, streamId)];
+  const initialIndex = getInitialIndex(intro.duration, sortedClips);
+  const [currentClipIndex, setCurrentClipIndex] = useState(initialIndex);
+  const currentClipIndexRef = useRef(initialIndex);
   const [showDisabled, setShowDisabled] = useState(true);
+
+  function getInitialIndex(introDuration: number | null, sortedClips: TClip[]): number {
+    if (introDuration) return 0;
+    const firstEnabledIndex = sortedClips.findIndex(clip => clip.enabled);
+    return firstEnabledIndex === -1 ? 0 : firstEnabledIndex;
+  }
 
   const playlist: IPlaylist[] = [
     ...(intro.duration
