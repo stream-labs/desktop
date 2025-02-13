@@ -117,7 +117,11 @@ export function aiFilterClips(
   let totalDuration = 0;
   for (let i = 0; i < sortedRounds.length; ++i) {
     if (totalDuration > targetDuration) {
-      // console.log(`Duration: ${totalDuration} more than target: ${targetDuration}`);
+      // console.log(
+      // `Duration: ${totalDuration} more than target: ${targetDuration}, ${JSON.stringify(
+      // clipsFromRounds.map(c => c.duration! - (c.startTrim + c.endTrim)),
+      // )} clips`,
+      //);
       break;
     } else {
       // console.log(`Duration: ${totalDuration} less than target: ${targetDuration}`);
@@ -151,10 +155,16 @@ export function aiFilterClips(
     EHighlighterInputTypes.DEATH,
     EHighlighterInputTypes.VICTORY,
   ];
-  const clipsSortedByScore = clipsFromRounds
-    .filter(
-      clips => !(clips as IAiClip).aiInfo.inputs.some(input => contextTypes.includes(input.type)),
-    )
+  // always include the start and end of the round > context type
+
+  const clipsSortedByScore: TClip[] = clipsFromRounds
+    .map(clip => {
+      if ((clip as IAiClip).aiInfo.inputs.some(input => contextTypes.includes(input.type))) {
+        return { ...clip, aiInfo: { score: 999 } } as TClip;
+      } else {
+        return clip as TClip;
+      }
+    })
     .sort((a, b) => (a as IAiClip).aiInfo.score - (b as IAiClip).aiInfo.score);
   // console.log(
   //   'clipsSortedByScore',
@@ -170,33 +180,26 @@ export function aiFilterClips(
   const filteredClips: TClip[] = clipsFromRounds;
   let currentDuration = getCombinedClipsDuration(filteredClips);
 
-  // console.log('remove clipswise to get closer to target');
+  const BUFFER_SEC = 10;
 
-  const BUFFER_SEC = 0;
   while (currentDuration > targetDuration + BUFFER_SEC) {
     // console.log('ruuun currentDuration', currentDuration);
     if (clipsSortedByScore === undefined || clipsSortedByScore.length === 0) {
       break;
     }
-
-    const clipToRemove = clipsSortedByScore[0];
     clipsSortedByScore.splice(0, 1); // remove from our sorted array
 
-    const index = filteredClips.findIndex(clip => clip.path === clipToRemove.path);
+    currentDuration = getCombinedClipsDuration(clipsSortedByScore);
 
-    if (index > -1) {
-      filteredClips.splice(index, 1); // 2nd parameter means remove one item only
-      currentDuration = getCombinedClipsDuration(filteredClips);
-      // console.log(
-      //   'removed, new currentDuration:',
-      //   currentDuration,
-      //   'target:',
-      //   targetDuration + BUFFER_SEC,
-      // );
-    }
+    // console.log(
+    // 'removed, new currentDuration:',
+    // currentDuration,
+    // 'target:',
+    // targetDuration + BUFFER_SEC,
+    // );
   }
 
-  return filteredClips;
+  return clipsSortedByScore;
 }
 
 export function getCombinedClipsDuration(clips: TClip[]): number {
