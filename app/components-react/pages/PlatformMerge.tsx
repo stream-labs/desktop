@@ -13,6 +13,7 @@ interface IPlatformMergeProps {
     overlayName?: string;
     highlighter?: boolean;
   };
+  className?: string;
 }
 
 export default function PlatformMerge(p: IPlatformMergeProps) {
@@ -124,7 +125,10 @@ export default function PlatformMerge(p: IPlatformMergeProps) {
   }
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+    <div
+      className={p.className}
+      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}
+    >
       <div style={{ width: '400px' }}>
         <h1>{$t('Connect %{platformName}', { platformName })}</h1>
         {showOverlay ? <OverlayStep /> : <LoginStep />}
