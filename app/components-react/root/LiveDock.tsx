@@ -394,8 +394,8 @@ function LiveDock(p: ILiveDockProps) {
       <Animation transitionName={p.onLeft ? 'ant-slide-right' : 'ant-slide'}>
         {!collapsed && (
           <ResizeBar
-            className={cx(styles.liveDockResizeBar, styles.liveDockResizeBarLeft)}
-            position="right"
+            className={cx(styles.liveDockResizeBar)}
+            position={p.onLeft ? 'left' : 'right'}
             onInput={(val: number) => onResize(val)}
             max={p.maxDockWidth}
             min={p.minDockWidth}

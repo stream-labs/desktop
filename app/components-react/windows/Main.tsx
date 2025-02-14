@@ -376,10 +376,7 @@ function Main() {
           ref={mainMiddleEl}
         >
           {!showLoadingSpinner && (
-            <div
-              className={styles.mainPageContainer}
-              style={{ gridRow: '1 / span 1', minWidth: 0, minHeight: 0 }}
-            >
+            <div className={styles.mainPageContainer}>
               <Component
                 params={ctrl.params}
                 onTotalWidth={(width: number) => ctrl.handleEditorWidth(width)}
