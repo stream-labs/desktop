@@ -1,12 +1,10 @@
 import React from 'react';
 import {
-  EAiDetectionState,
   EHighlighterView,
   IHighlightedStream,
   IViewState,
-  StreamInfoForAiHighlighter,
   TClip,
-} from 'services/highlighter';
+} from 'services/highlighter/models/highlighter.models';
 import styles from './StreamCard.m.less';
 import { Button } from 'antd';
 import { Services } from 'components-react/service-provider';
@@ -14,6 +12,7 @@ import { isAiClip } from './utils';
 import { useVuex } from 'components-react/hooks';
 import { InputEmojiSection } from './InputEmojiSection';
 import { $t } from 'services/i18n';
+import { EAiDetectionState } from 'services/highlighter/models/ai-highlighter.models';
 
 export default function StreamCard({
   streamId,
@@ -185,21 +184,29 @@ function ActionBar({
         <Button
           size="large"
           type="primary"
-          icon={
-            clipsOfStreamAreLoading !== stream.id ? (
-              <i className="icon-download" style={{ marginRight: '4px' }} />
-            ) : undefined
-          }
           onClick={e => {
             emitExportVideo();
             e.stopPropagation();
           }}
+          style={{ display: 'grid', gridTemplateAreas: 'stack' }}
         >
-          {clipsOfStreamAreLoading === stream.id ? (
-            <div className={styles.loader}></div>
-          ) : (
-            <> {$t('Export highlight reel')}</>
-          )}
+          <div
+            style={{
+              visibility: clipsOfStreamAreLoading === stream.id ? 'visible' : 'hidden',
+              gridArea: 'stack',
+            }}
+          >
+            <i className="fa fa-spinner fa-pulse" />
+          </div>
+          <span
+            style={{
+              visibility: clipsOfStreamAreLoading !== stream.id ? 'visible' : 'hidden',
+              gridArea: 'stack',
+            }}
+          >
+            <i className="icon-download" style={{ marginRight: '4px' }} />
+            {$t('Export highlight reel')}
+          </span>
         </Button>
       </div>
     );
@@ -255,7 +262,7 @@ export function Thumbnail({
 }) {
   function getThumbnailText(state: EAiDetectionState): JSX.Element | string {
     if (clipsOfStreamAreLoading === stream?.id) {
-      return <div className={styles.loader}></div>;
+      return <i className="fa fa-spinner fa-pulse" />;
     }
 
     if (clips.length > 0) {

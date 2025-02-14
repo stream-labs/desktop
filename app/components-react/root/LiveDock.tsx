@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import * as remote from '@electron/remote';
 import cx from 'classnames';
 import Animation from 'rc-animate';
-import { Menu } from 'antd';
+import { Button, Menu } from 'antd';
 import pick from 'lodash/pick';
 import { initStore, useController } from 'components-react/hooks/zustand';
 import { EStreamingState } from 'services/streaming';
@@ -161,7 +161,6 @@ class LiveDockController {
     // Twitter & Tiktok don't support editing title after going live
     if (this.isPlatform('twitter') && !this.isRestreaming) return false;
     if (this.isPlatform('tiktok') && !this.isRestreaming) return false;
-    if (this.isPlatform('kick') && !this.isRestreaming) return false;
 
     return (
       this.streamingService.views.isMidStreamMode ||
@@ -358,12 +357,6 @@ function LiveDock(p: ILiveDockProps) {
 
   const chat = useMemo(() => {
     const primaryChat = Services.UserService.state.auth!.primaryPlatform;
-    const showTiktokInfo =
-      visibleChat === 'tiktok' || (visibleChat === 'default' && primaryChat === 'tiktok');
-
-    if (showTiktokInfo) {
-      return <TikTokChatInfo />;
-    }
 
     const showInstagramInfo = primaryChat === 'instagram';
     if (showInstagramInfo) {

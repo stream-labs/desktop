@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Services } from 'components-react/service-provider';
 import { $t } from 'services/i18n';
-import { TClip } from 'services/highlighter';
+import { TClip } from 'services/highlighter/models/highlighter.models';
 import { sortClipsByOrder } from './utils';
 import MiniClipPreview from './MiniClipPreview';
 import { PauseButton, PlayButton } from './StreamCard';
@@ -13,10 +13,6 @@ export default function PreviewModal({
   close: () => void;
   streamId: string | undefined;
 }) {
-  if (streamId === undefined) {
-    close();
-    console.error('streamId is required');
-  }
   const { HighlighterService } = Services;
   const clips = HighlighterService.getClips(HighlighterService.views.clips, streamId);
   const { intro, outro } = HighlighterService.views.video;
@@ -225,7 +221,7 @@ export default function PreviewModal({
     return (
       <div>
         <h2>{$t('Preview')}</h2>
-        <p>Select at least one clip to preview your video</p>
+        <p>{$t('Select at least one clip to preview your video')}</p>
       </div>
     );
   }

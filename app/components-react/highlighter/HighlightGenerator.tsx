@@ -2,12 +2,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Button, Select, Checkbox, Typography } from 'antd';
 import { DownOutlined, RobotOutlined } from '@ant-design/icons';
 import { IFilterOptions } from './utils';
-import { IInput } from 'services/highlighter';
 import { getPlacementFromInputs } from './InputEmojiSection';
-import { EHighlighterInputTypes } from 'services/highlighter/ai-highlighter/ai-highlighter';
 import styles from './HighlightGenerator.m.less';
 import { formatSecondsToHMS } from './ClipPreview';
 import { $t } from 'services/i18n';
+import { EHighlighterInputTypes, IInput } from 'services/highlighter/models/ai-highlighter.models';
 const { Option } = Select;
 
 const selectStyles = {

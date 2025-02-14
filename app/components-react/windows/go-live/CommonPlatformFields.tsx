@@ -58,7 +58,7 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
   }
 
   const view = Services.StreamingService.views;
-  const aiHighlighterEnabled = Services.IncrementalRolloutService.views.featureIsEnabled(
+  const aiHighlighterFeatureEnabled = Services.IncrementalRolloutService.views.featureIsEnabled(
     EAvailableFeatures.aiHighlighter,
   );
   const hasCustomCheckbox = p.layoutMode === 'multiplatformAdvanced';
@@ -93,10 +93,6 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
   const titleTooltip = useMemo(() => {
     if (enabledPlatforms.includes('tiktok')) {
       return $t('Only 32 characters of your title will display on TikTok');
-    }
-
-    if (enabledPlatforms.length === 1 && p?.platform === 'kick') {
-      return $t('Edit your stream title on Kick after going live.');
     }
 
     return undefined;
@@ -141,9 +137,11 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
               />
             )}
 
-            {aiHighlighterEnabled && enabledPlatforms && !enabledPlatforms.includes('twitch') && (
-              <AiHighlighterToggle game={undefined} cardIsExpanded={false} />
-            )}
+            {aiHighlighterFeatureEnabled &&
+              enabledPlatforms &&
+              !enabledPlatforms.includes('twitch') && (
+                <AiHighlighterToggle game={undefined} cardIsExpanded={false} />
+              )}
           </div>
         )}
       </Animate>
