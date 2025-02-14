@@ -358,14 +358,7 @@ function Main() {
         })}
       >
         {page !== 'Onboarding' && !showLoadingSpinner && (
-          <div
-            style={{
-              minHeight: '100%',
-              height: '100%',
-              display: 'flex',
-              flexGrow: 1,
-            }}
-          >
+          <div className={styles.sideNavContainer}>
             <SideNav />
           </div>
         )}
@@ -385,7 +378,7 @@ function Main() {
           {!showLoadingSpinner && (
             <div
               className={styles.mainPageContainer}
-              style={{ gridRow: '1 / span 1', minWidth: 0 }}
+              style={{ gridRow: '1 / span 1', minWidth: 0, minHeight: 0 }}
             >
               <Component
                 params={ctrl.params}

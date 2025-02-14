@@ -55,6 +55,17 @@
   }
 }
 
+.side-nav-container {
+  height: 100%;
+  display: flex;
+  flex-grow: 1;
+
+  // Scrollable does some weird things to the sidebar here
+  :global(.os-content-glue) {
+    height: 100% !important;
+  }
+}
+
 .main-page-container {
   /* Page always takes up remaining space */
   flex-grow: 1;
