@@ -1,6 +1,17 @@
 import Vue from 'vue';
 import { mutation, StatefulService } from 'services/core/stateful-service';
-import { EOutputCode, Global, NodeObs } from '../../../obs-api';
+import {
+  EOutputCode,
+  Global,
+  NodeObs,
+  SimpleStreamingFactory,
+  ServiceFactory,
+  VideoEncoderFactory,
+  AudioEncoderFactory,
+  DelayFactory,
+  ReconnectFactory,
+  NetworkFactory,
+} from '../../../obs-api';
 import { Inject } from 'services/core/injector';
 import moment from 'moment';
 import padStart from 'lodash/padStart';
@@ -117,6 +128,9 @@ export class StreamingService
   streamingStateChange = new Subject<void>();
 
   powerSaveId: number;
+
+  // TODO
+  extraOutputs: any[] = [];
 
   private resolveStartStreaming: Function = () => {};
   private rejectStartStreaming: Function = () => {};
@@ -332,7 +346,6 @@ export class StreamingService
       destination.video = this.videoSettingsService.contexts[display];
       destination.mode = this.views.getDisplayContextName(display);
     });
-
     // save enabled platforms to reuse setting with the next app start
     this.streamSettingsService.setSettings({ goLiveSettings: settings });
 
@@ -351,6 +364,14 @@ export class StreamingService
 
     for (const platform of platforms) {
       await this.setPlatformSettings(platform, settings, unattendedMode);
+
+      // if (platform === 'youtube') {
+      //   const yt = settings.customDestinations[settings.customDestinations.length - 1];
+
+      //   if (yt) {
+      //     yt.video = this.videoSettingsService.contexts[yt.display];
+      //   }
+      // }
     }
 
     /**
@@ -426,6 +447,30 @@ export class StreamingService
 
       const destinationDisplays = this.views.activeDisplayDestinations;
 
+      // setup youtube vertical
+      if (
+        this.views.isDualOutputMode &&
+        this.views.enabledPlatforms.includes('youtube') &&
+        this.views.getPlatformSettings('youtube').hasExtraOutputs &&
+        /*
+         * Super safe so we don't ever bypass validation due to the toggles
+         * or `hasExtraOutputs` not being reset.
+         * TODO: might not cover free TikTok, but probably by design
+         */
+        (this.userService.views.isPrime || this.views.enabledPlatforms.length === 1)
+      ) {
+        // This really belongs as a YT check
+        await this.runCheck('setupDualOutput', async () => {
+          // TODO: this needs to fail gracefully, failing to create stream
+          // (for example due to rate limits), leaves streaming window in
+          // infinite load and other streams won't start.
+          const ytVertical = await this.youtubeService.createVertical(settings);
+
+          this.videoSettingsService.validateVideoContext('vertical');
+          this.extraOutputs.push(ytVertical);
+        });
+      }
+
       for (const display in shouldMultistreamDisplay) {
         const key = display as keyof typeof shouldMultistreamDisplay;
         // set up restream service to multistream display
@@ -487,6 +532,7 @@ export class StreamingService
                   },
                   display as TDisplayType,
                 );
+                console.log('set up custom destination', destination);
               } else {
                 console.error('Custom destination not found');
               }
@@ -933,21 +979,100 @@ export class StreamingService
       NodeObs.OBS_service_setVideoInfo(horizontalContext, 'horizontal');
       NodeObs.OBS_service_setVideoInfo(verticalContext, 'vertical');
 
+      const { extraOutputs } = this;
+      extraOutputs.forEach(output => {
+        console.log('creating extra output for ', output.name);
+        try {
+          const stream = SimpleStreamingFactory.create();
+          console.log('created simple factory');
+          stream.enforceServiceBitrate = false;
+          stream.enableTwitchVOD = false;
+
+          const context = this.videoSettingsService.contexts[output.display];
+          console.log('setting context to ', context);
+          stream.video = context;
+
+          // TODO: how to fetch encoders from the other streams
+          stream.videoEncoder = VideoEncoderFactory.create('obs_x264', 'video-encoder');
+          stream.audioEncoder = AudioEncoderFactory.create();
+
+          const service = ServiceFactory.create('rtmp_common', output.name, {
+            key: output.streamKey,
+            server: output.url,
+            username: '',
+            password: '',
+            use_auth: false,
+            streamType: 'rtmp_custom',
+          });
+
+          stream.service = service;
+
+          // TODO: are all this necessary
+          stream.delay = DelayFactory.create();
+          stream.reconnect = ReconnectFactory.create();
+          stream.network = NetworkFactory.create();
+
+          stream.signalHandler = this.handleOBSOutputSignal;
+          output.stream = stream;
+
+          // TODO: are we handling signals, or do we need to
+        } catch (e: unknown) {
+          console.error(e);
+          throw e;
+        }
+      });
+
+      // Do not start vertical stream if YT is the only platform and
+      // is assigned to "both" outputs. We create vertical broadcast
+      // separately.
+      const shouldStartVertical = this.views.enabledPlatforms.length > 1;
+
       const signalChanged = this.signalInfoChanged.subscribe((signalInfo: IOBSOutputSignalInfo) => {
+        console.log('on signal changed', signalInfo.service, signalInfo.code);
+
         if (signalInfo.service === 'default') {
           if (signalInfo.code !== 0) {
             NodeObs.OBS_service_stopStreaming(true, 'horizontal');
             NodeObs.OBS_service_stopStreaming(true, 'vertical');
+
+            extraOutputs.forEach(output => {
+              console.log('destroying stream for ', output.name);
+              output.stream?.stop();
+
+              SimpleStreamingFactory.destroy(output.stream);
+            });
+
+            this.extraOutputs = [];
           }
 
           if (signalInfo.signal === EOBSOutputSignal.Start) {
-            NodeObs.OBS_service_startStreaming('vertical');
+            if (shouldStartVertical) {
+              console.log('starting vertical');
+
+              NodeObs.OBS_service_startStreaming('vertical');
+            }
+
+            extraOutputs.forEach(output => {
+              console.log('starting stream for ', output.name);
+              output.stream?.start();
+            });
+
             signalChanged.unsubscribe();
           }
         }
       });
 
-      NodeObs.OBS_service_startStreaming('horizontal');
+      if (shouldStartVertical) {
+        // Confusing as we're indeed starting the horizontal stream here, but
+        // "start video transmission" does not ever resolve presumably because
+        // it assumes the vertical stream was starting too.
+        console.log('starting horizontal');
+
+        NodeObs.OBS_service_startStreaming('horizontal');
+      } else {
+        console.log('skipped creating vertical stream (done separately)');
+        NodeObs.OBS_service_startStreaming();
+      }
       // sleep for 1 second to allow the first stream to start
       await new Promise(resolve => setTimeout(resolve, 1000));
     } else {
@@ -1040,15 +1165,27 @@ export class StreamingService
       if (this.views.isDualOutputMode) {
         const signalChanged = this.signalInfoChanged.subscribe(
           (signalInfo: IOBSOutputSignalInfo) => {
+            console.log('stopping vertical');
+            console.log('on signal changed 2', signalInfo.service, signalInfo.signal);
+
             if (
               signalInfo.service === 'default' &&
               signalInfo.signal === EOBSOutputSignal.Deactivate
             ) {
+              // TODO: these are probably too much but DO does it this way on
+              // several signal states, so we follow suit
+              this.extraOutputs.forEach(output => {
+                console.log('stopping stream for ', output.name);
+                output.stream?.stop();
+                SimpleStreamingFactory.destroy(output.stream);
+              });
+              this.extraOutputs = [];
               NodeObs.OBS_service_stopStreaming(false, 'vertical');
               signalChanged.unsubscribe();
             }
           },
         );
+        console.log('stopping horizontal');
 
         NodeObs.OBS_service_stopStreaming(false, 'horizontal');
         // sleep for 1 second to allow the first stream to stop
@@ -1077,6 +1214,7 @@ export class StreamingService
     }
 
     if (this.state.streamingStatus === EStreamingState.Ending) {
+      console.log('on streamingStatus ending');
       if (this.views.isDualOutputMode) {
         NodeObs.OBS_service_stopStreaming(true, 'horizontal');
         NodeObs.OBS_service_stopStreaming(true, 'vertical');
@@ -1270,8 +1408,13 @@ export class StreamingService
   private handleOBSOutputSignal(info: IOBSOutputSignalInfo) {
     console.debug('OBS Output signal: ', info);
 
+    const singlePlatformUsingDualOutput =
+      this.views.isDualOutputMode && this.views.enabledPlatforms.length === 1;
+
     const shouldResolve =
-      !this.views.isDualOutputMode || (this.views.isDualOutputMode && info.service === 'vertical');
+      !this.views.isDualOutputMode ||
+      (this.views.isDualOutputMode &&
+        (info.service === 'vertical' || singlePlatformUsingDualOutput));
 
     const time = new Date().toISOString();
 
