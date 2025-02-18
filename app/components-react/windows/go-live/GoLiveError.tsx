@@ -9,6 +9,7 @@ import { $t } from '../../../services/i18n';
 import Translate from '../../shared/Translate';
 import css from './GoLiveError.m.less';
 import * as remote from '@electron/remote';
+import { ENotificationType } from 'services/notifications';
 
 /**
  * Shows an error and troubleshooting suggestions
@@ -198,11 +199,39 @@ export default function GoLiveError() {
   }
 
   function renderRestreamError(error: IStreamError) {
+    Services.NotificationsService.actions.push({
+      message: `${$t('Multistream Error')}: ${error.details}`,
+      type: ENotificationType.WARNING,
+      lifeTime: 5000,
+    });
+
+    function skipSettingsUpdateAndGoLive() {
+      StreamingService.actions.finishStartStreaming();
+      WindowsService.actions.closeChildWindow();
+    }
+
     return (
-      <MessageLayout error={error}>
-        {$t(
-          'Please try again. If the issue persists, you can stream directly to a single platform instead.',
+      <MessageLayout
+        error={error}
+        hasButton={true}
+        message={$t(
+          'Please try again. If the issue persists, you can stream directly to a single platform instead or click the button below to bypass and go live.',
         )}
+      >
+        {`${$t('Issues')}:`}
+        <ul>
+          {error.details?.split('\n').map(detail => (
+            <li>{detail}</li>
+          ))}
+        </ul>
+        <br />
+        <button
+          className="button button--warn"
+          style={{ marginTop: '8px' }}
+          onClick={() => skipSettingsUpdateAndGoLive()}
+        >
+          {$t('Bypass and Go Live')}
+        </button>
       </MessageLayout>
     );
   }

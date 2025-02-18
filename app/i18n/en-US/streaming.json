@@ -280,5 +280,9 @@
   "Copy stream link": "Copy stream link",
   "Copy %{platform} link": "Copy %{platform} link",
   "Copied to clipboard": "Copied to clipboard",
-  "Twitch Followers": "Twitch Followers"
+  "Twitch Followers": "Twitch Followers",
+  "Bypass and Go Live": "Bypass and Go Live",
+  "Please try again. If the issue persists, you can stream directly to a single platform instead or click the button below to bypass and go live.": "Please try again. If the issue persists, you can stream directly to a single platform instead or click the button below to bypass and go live.",
+  "Issues": "Issues",
+  "Multistream Error": "Multistream Error"
 }
