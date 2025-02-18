@@ -110,18 +110,11 @@ export default function PreviewModal({
     if (!isChangingClip.current) {
       isChangingClip.current = true;
 
-      const handleLoaded = () => {
-        isChangingClip.current = false;
-        videoPlayer.current?.removeEventListener('loadeddata', handleLoaded);
-      };
-
       setCurrentClipIndex(prevIndex => {
         const newIndex = findNextEnabledClipIndex(prevIndex);
-        videoPlayer.current!.addEventListener('loadeddata', handleLoaded);
-        videoPlayer.current!.src = playlist[newIndex].src;
-        videoPlayer.current!.load();
 
-        playAudio(newIndex, newIndex === prevIndex + 1);
+        playAudio(newIndex, true);
+        isChangingClip.current = false;
 
         return newIndex;
       });
@@ -225,10 +218,6 @@ export default function PreviewModal({
       return;
     }
     setCurrentClipIndex(index);
-
-    const clip = playlist[index];
-    videoPlayer.current!.src = clip.src;
-    videoPlayer.current!.load();
 
     playAudio(index);
   }
