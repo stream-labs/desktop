@@ -48,16 +48,16 @@ export default function PreviewModal({
   }
 
   const playlist: IPlaylist[] = [
-    ...(intro.duration
+    ...(intro.duration && intro.path
       ? [
           {
             src: intro.path,
             path: intro.path,
             start: 0,
-            end: intro.duration!,
+            end: intro.duration,
             type: 'video/mp4',
             enabled: true,
-            duration: intro.duration!,
+            duration: intro.duration,
           },
         ]
       : []),
@@ -76,10 +76,10 @@ export default function PreviewModal({
             src: outro.path,
             path: outro.path,
             start: 0,
-            end: outro.duration!,
+            end: outro.duration,
             type: 'video/mp4',
             enabled: true,
-            duration: intro.duration!,
+            duration: outro.duration,
           },
         ]
       : []),
@@ -110,9 +110,14 @@ export default function PreviewModal({
     if (!isChangingClip.current) {
       isChangingClip.current = true;
 
+      const handleLoaded = () => {
+        isChangingClip.current = false;
+        videoPlayer.current?.removeEventListener('loadeddata', handleLoaded);
+      };
+
       setCurrentClipIndex(prevIndex => {
         const newIndex = findNextEnabledClipIndex(prevIndex);
-
+        videoPlayer.current!.addEventListener('loadeddata', handleLoaded);
         videoPlayer.current!.src = playlist[newIndex].src;
         videoPlayer.current!.load();
 
@@ -120,10 +125,6 @@ export default function PreviewModal({
 
         return newIndex;
       });
-
-      setTimeout(() => {
-        isChangingClip.current = false;
-      }, 500);
     }
   };
 
