@@ -114,7 +114,6 @@ export default function PreviewModal({
         const newIndex = findNextEnabledClipIndex(prevIndex);
 
         playAudio(newIndex, true);
-        isChangingClip.current = false;
 
         return newIndex;
       });
@@ -181,7 +180,7 @@ export default function PreviewModal({
     videoPlayer.current!.src = playlist[currentClipIndex].src;
     videoPlayer.current!.load();
     videoPlayer.current!.play().catch(e => console.error('Error playing video:', e));
-
+    isChangingClip.current = false;
     // currently its done by querying DOM, don't want to store a giant array of refs
     // that wont be used otherwise
     document.getElementById('preview-' + currentClipIndex)?.scrollIntoView({
