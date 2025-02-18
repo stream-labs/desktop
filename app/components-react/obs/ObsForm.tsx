@@ -112,7 +112,7 @@ const ObsInput = forwardRef<{}, IObsInputProps>((p, ref) => {
 
   switch (type) {
     case 'OBS_PROPERTY_DOUBLE':
-      return <ObsNumberInput {...inputProps} ref={ref} />;
+      return <ObsNumberInput {...inputProps} ref={ref} data-name={p.value.name} />;
     case 'OBS_PROPERTY_INT':
       // eslint-disable-next-line no-case-declarations
       const intVal = p.value as IObsNumberInputValue;
@@ -124,6 +124,7 @@ const ObsInput = forwardRef<{}, IObsInputProps>((p, ref) => {
           min={intVal.minVal}
           max={intVal.maxVal}
           ref={ref}
+          data-name={p.value.name}
         />
       );
     case 'OBS_PROPERTY_EDIT_TEXT':
@@ -132,23 +133,34 @@ const ObsInput = forwardRef<{}, IObsInputProps>((p, ref) => {
       const textVal = p.value as IObsTextInputValue;
 
       if (textVal.multiline) {
-        return <TextAreaInput {...inputProps} debounce={300} />;
+        return <TextAreaInput {...inputProps} debounce={300} data-name={p.value.name} />;
       } else if (textVal.infoField) {
         const infoField = (textVal.infoField as unknown) as obs.ETextInfoType;
         switch (textVal.infoField) {
           case infoField === obs.ETextInfoType.Warning:
             return (
-              <InputWrapper style={{ color: 'var(--info)' }}>{textVal.description}</InputWrapper>
+              <InputWrapper style={{ color: 'var(--info)' }} data-name={p.value.name}>
+                {textVal.description}
+              </InputWrapper>
             );
           case infoField === obs.ETextInfoType.Error:
             return (
-              <InputWrapper style={{ color: 'var(--warning)' }}>{textVal.description}</InputWrapper>
+              <InputWrapper style={{ color: 'var(--warning)' }} data-name={p.value.name}>
+                {textVal.description}
+              </InputWrapper>
             );
           default:
-            return <InputWrapper>{textVal.description}</InputWrapper>;
+            return <InputWrapper data-name={p.value.name}>{textVal.description}</InputWrapper>;
         }
       } else {
-        return <ObsTextInput {...inputProps} isPassword={inputProps.masked} ref={ref} />;
+        return (
+          <ObsTextInput
+            {...inputProps}
+            isPassword={inputProps.masked}
+            ref={ref}
+            data-name={p.value.name}
+          />
+        );
       }
     case 'OBS_PROPERTY_LIST':
       // eslint-disable-next-line no-case-declarations
@@ -174,6 +186,7 @@ const ObsInput = forwardRef<{}, IObsInputProps>((p, ref) => {
           style={{
             marginBottom: (p.value as IObsListInput<unknown>)?.subType === '' ? '8px' : '24px',
           }}
+          data-name={p.value.name}
         />
       );
 
@@ -195,24 +208,38 @@ const ObsInput = forwardRef<{}, IObsInputProps>((p, ref) => {
         };
       });
 
-      return <ObsInputListCustomInput inputProps={inputProps} options={resolutions} />;
+      return (
+        <ObsInputListCustomInput
+          inputProps={inputProps}
+          options={resolutions}
+          data-name={p.value.name}
+        />
+      );
 
     case 'OBS_PROPERTY_BUTTON':
       return (
         <InputWrapper>
-          <Button onClick={() => inputProps.onChange(true)}>{inputProps.label}</Button>
+          <Button onClick={() => inputProps.onChange(true)} data-name={p.value.name}>
+            {inputProps.label}
+          </Button>
         </InputWrapper>
       );
 
     case 'OBS_PROPERTY_BOOL':
       return (
         <InputWrapper style={{ marginBottom: '8px' }} nowrap={layout === 'vertical'}>
-          <CheckboxInput {...inputProps} />
+          <CheckboxInput {...inputProps} data-name={p.value.name} />
         </InputWrapper>
       );
 
     case 'OBS_PROPERTY_FILE':
-      return <FileInput {...inputProps} filters={(p.value as IObsPathInputValue).filters} />;
+      return (
+        <FileInput
+          {...inputProps}
+          filters={(p.value as IObsPathInputValue).filters}
+          data-name={p.value.name}
+        />
+      );
 
     case 'OBS_PROPERTY_COLOR':
       // eslint-disable-next-line no-case-declarations
@@ -226,6 +253,7 @@ const ObsInput = forwardRef<{}, IObsInputProps>((p, ref) => {
           onChange={(v: any) => {
             inputProps.onChange(Utils.rgbaToInt(v.r, v.g, v.b, Math.round(v.a * 255)));
           }}
+          data-name={p.value.name}
         />
       );
 
@@ -243,6 +271,7 @@ const ObsInput = forwardRef<{}, IObsInputProps>((p, ref) => {
           hasNumberInput={true}
           debounce={500}
           tooltipPlacement="right"
+          data-name={p.value.name}
         />
       );
 
@@ -252,7 +281,7 @@ const ObsInput = forwardRef<{}, IObsInputProps>((p, ref) => {
       const flags = Utils.numberToBinnaryArray(flagsVal.value, flagsVal.size).reverse();
 
       return (
-        <InputWrapper label={flagsVal.description}>
+        <InputWrapper label={flagsVal.description} data-name={p.value.name}>
           {flags.map((flag, index) => (
             <Button
               key={`flag-${index}`}
@@ -277,7 +306,14 @@ const ObsInput = forwardRef<{}, IObsInputProps>((p, ref) => {
       );
 
     case 'OBS_PROPERTY_PATH':
-      return <FileInput {...inputProps} directory={true} style={{ marginBottom: '8px' }} />;
+      return (
+        <FileInput
+          {...inputProps}
+          directory={true}
+          style={{ marginBottom: '8px' }}
+          data-name={p.value.name}
+        />
+      );
 
     case 'OBS_PROPERTY_UINT':
       // eslint-disable-next-line no-case-declarations
@@ -290,6 +326,7 @@ const ObsInput = forwardRef<{}, IObsInputProps>((p, ref) => {
           min={uintVal.minVal}
           max={uintVal.maxVal}
           ref={ref}
+          data-name={p.value.name}
         />
       );
 
