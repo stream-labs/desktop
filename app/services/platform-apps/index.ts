@@ -177,7 +177,8 @@ class PlatformAppsViews extends ViewHandler<IPlatformAppServiceState> {
     // WARNING: Only internal Streamlabs apps should have these permissions
     return [
       'b472396e49', // Avatar - Prod / Ava
-      '04f85c93be' // Avatar - Cale Dev
+      '04f85c93be', // Avatar - Cale Dev
+      '875cf5de20' // Coach - Ava
     ].includes(appId);
   }
 }

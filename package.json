@@ -88,6 +88,7 @@
     "node-screenshots": "^0.2.1",
     "node-window-rendering": "https://slobs-node-window-rendering.s3-us-west-2.amazonaws.com/node-window-rendering-0.0.0.tar.gz",
     "obs-studio-node": "https://s3-us-west-2.amazonaws.com/obsstudionodes3.streamlabs.com/osn-0.0.0-release.tar.gz",
+    "openai": "^4.80.1",
     "overlayscrollbars-react": "^0.2.2",
     "raven": "^2.6.4",
     "react-colorful": "^5.5.0",
