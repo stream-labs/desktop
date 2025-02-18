@@ -24,7 +24,6 @@ export function DestinationSwitchers() {
     enabledDestinations,
     switchPlatforms,
     switchCustomDestination,
-    isPrimaryPlatform,
     isRestreamEnabled,
     isDualOutputMode,
     isPrime,
@@ -41,7 +40,12 @@ export function DestinationSwitchers() {
   const destinations =
     isDualOutputMode && !isPrime ? customDestinations.filter(d => d.enabled) : customDestinations;
   const showSelector =
-    enabledPlatforms.length < 2 && customDestinations.filter(d => d.enabled).length < 1;
+    isDualOutputMode &&
+    !isPrime &&
+    enabledPlatforms.length < 2 &&
+    customDestinations.filter(d => d.enabled).length < 1;
+  const hidePlatformController =
+    isDualOutputMode && platforms.length === 1 && destinations.length === 1;
   const showAddDestButton = isDualOutputMode && !isPrime && !showSelector;
 
   const shouldDisableCustomDestinationSwitchers = () => {
@@ -116,10 +120,6 @@ export function DestinationSwitchers() {
     emitSwitch(index, enabled);
   }
 
-  // TODO: find a cleaner way to do this
-  const isPrimary = (platform: TPlatform) =>
-    isPrimaryPlatform(platform) || linkedPlatforms.length === 1;
-
   return (
     <div className={cx(styles.switchWrapper, styles.columnPadding)}>
       {platforms.map((platform, ind) => (
@@ -128,10 +128,9 @@ export function DestinationSwitchers() {
           destination={platform}
           enabled={isEnabled(platform)}
           onChange={enabled => togglePlatform(platform, enabled)}
-          isPrimary={isPrimary(platform)}
           isDualOutputMode={isDualOutputMode}
           index={ind}
-          hideController={showSelector}
+          hideController={showSelector || hidePlatformController}
         />
       ))}
 
@@ -168,7 +167,6 @@ interface IDestinationSwitcherProps {
   destination: TPlatform | ICustomStreamDestination;
   enabled: boolean;
   onChange: (enabled: boolean) => unknown;
-  isPrimary?: boolean;
   disabled?: boolean;
   index: number;
   isDualOutputMode: boolean;
