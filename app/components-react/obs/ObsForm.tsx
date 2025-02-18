@@ -278,6 +278,7 @@ const ObsInput = forwardRef<{}, IObsInputProps>((p, ref) => {
     case 'OBS_PROPERTY_BITMASK':
       // eslint-disable-next-line no-case-declarations
       const flagsVal = p.value as IObsBitmaskInput;
+      // eslint-disable-next-line no-case-declarations
       const flags = Utils.numberToBinnaryArray(flagsVal.value, flagsVal.size).reverse();
 
       return (
@@ -356,7 +357,7 @@ export function ObsFormGroup(p: IObsFormGroupProps) {
   const type = p.type || 'default';
 
   return (
-    <div className="form-groups">
+    <div className="form-groups" style={{ paddingBottom: '12px' }}>
       {type === 'default' &&
         sections.map((sectionProps, ind) => (
           <div className="section" key={`${sectionProps.nameSubCategory}${ind}`}>
@@ -376,7 +377,11 @@ export function ObsFormGroup(p: IObsFormGroupProps) {
 
       {type === 'collapsible' &&
         sections.map((sectionProps, ind) => (
-          <div className="section" key={`${sectionProps.nameSubCategory}${ind}`}>
+          <div
+            className="section"
+            key={`${sectionProps.nameSubCategory}${ind}`}
+            style={{ padding: sectionProps.nameSubCategory !== 'Untitled' ? '4px' : '16px' }}
+          >
             {sectionProps.nameSubCategory === 'Untitled' ? (
               <div className="section-content">
                 <ObsForm
@@ -473,9 +478,10 @@ export function ObsCollapsibleFormItem(p: IObsCollapsibleFormGroupProps) {
     <Collapse
       className={cx('section-content', 'section-content--collapse')}
       onChange={() => setExpanded(!expanded)}
+      defaultActiveKey={[`${p.section.nameSubCategory}`]}
       expandIcon={({ isActive }) => (
         <i
-          className={cx('fa', 'section-title-icon', {
+          className={cx('fa', 'section-title__icon', {
             'fa-minus': isActive,
             'fa-plus': !isActive,
           })}
