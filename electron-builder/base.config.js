@@ -1,4 +1,7 @@
 const signtool = require('signtool');
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
 
 const base = {
   appId: 'com.streamlabs.slobs',
@@ -41,6 +44,7 @@ const base = {
     rfc3161TimeStampServer: 'http://timestamp.digicert.com',
     timeStampServer: 'http://timestamp.digicert.com',
     signDlls: true,
+    signingHashAlgorithms: ['sha256'],
     async sign(config) {
       if (process.env.SLOBS_NO_SIGN) return;
 
@@ -52,14 +56,23 @@ const base = {
       }
 
       console.log(`Signing ${config.hash} ${config.path}`);
-      await signtool.sign(config.path, {
-        subject: 'Streamlabs (General Workings, Inc.)',
-        rfcTimestamp: 'http://timestamp.digicert.com',
-        algorithm: config.hash,
-        append: config.isNest,
-        description: config.name,
-        url: config.site,
-      });
+
+      const signingPath = path.join(os.tmpdir(), 'sldesktopsigning');
+
+      if (fs.existsSync(signingPath)) {
+        fs.appendFileSync(signingPath, `${config.path}\n`);
+      } else {
+        console.log('WOULD HAVE SIGNED FILE DIRECTLY', config.path);
+      }
+
+      // await signtool.sign(config.path, {
+      //   subject: 'Streamlabs (General Workings, Inc.)',
+      //   rfcTimestamp: 'http://timestamp.digicert.com',
+      //   algorithm: config.hash,
+      //   append: config.isNest,
+      //   description: config.name,
+      //   url: config.site,
+      // });
     },
   },
   mac: {
