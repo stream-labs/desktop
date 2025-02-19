@@ -215,11 +215,6 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
     switchInputRef.current?.click();
   }
 
-  function removeClass() {
-    p.onChange(false);
-    containerRef.current?.classList.add(styles.platformDisabled);
-  }
-
   const { title, description, Controller, Logo } = (() => {
     const { UserService } = Services;
     const showCloseIcon = p.isDualOutputMode && !UserService.views.isPrime;
@@ -245,7 +240,7 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
         Controller: () =>
           showCloseIcon ? (
             <i
-              className={cx('icon-close', styles.close)}
+              className={cx('icon-close', 'platform-close', styles.close)}
               onClick={e => {
                 p.onChange(false);
                 e.stopPropagation();
@@ -259,7 +254,9 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
               disabled={p.disabled}
               uncontrolled
               nolabel
-              className={p.isDualOutputMode && styles.dualOutputPlatformSwitch}
+              className={cx('platform-switch', {
+                [styles.dualOutputPlatformSwitch]: p.isDualOutputMode,
+              })}
               checkedChildren={p.isDualOutputMode && <i className="icon-check-mark" />}
             />
           ),
@@ -274,7 +271,7 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
         Controller: () =>
           showCloseIcon ? (
             <i
-              className={cx('icon-close', styles.close)}
+              className={cx('icon-close', 'destination-close', styles.close)}
               onClick={e => {
                 p.onChange(false);
                 e.stopPropagation();
@@ -288,7 +285,9 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
               disabled={p.disabled}
               uncontrolled
               nolabel
-              className={p.isDualOutputMode && styles.dualOutputPlatformSwitch}
+              className={cx('destination-switch', {
+                [styles.dualOutputPlatformSwitch]: p.isDualOutputMode,
+              })}
               checkedChildren={p.isDualOutputMode && <i className="icon-check-mark" />}
             />
           ),
@@ -302,7 +301,7 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
       {!p.isDualOutputMode && (
         <div
           ref={containerRef}
-          className={cx(styles.platformSwitcher, {
+          className={cx('single-output-card', styles.platformSwitcher, {
             [styles.platformDisabled]: !p.enabled,
           })}
           onClick={onClickHandler}
@@ -330,7 +329,7 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
         <div
           ref={containerRef}
           data-test={platform ? `${platform}-dual-output` : 'destination-dual-output'}
-          className={cx(styles.dualOutputPlatformSwitcher, {
+          className={cx('dual-output-card', styles.dualOutputPlatformSwitcher, {
             [styles.platformDisabled]: !p.enabled,
           })}
         >

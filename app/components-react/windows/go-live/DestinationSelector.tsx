@@ -87,7 +87,7 @@ export default function DestinationSelector(p: IDestinationSelectorProps) {
 
   return (
     <Select
-      data-test="do-platform-selector"
+      data-test="destination-selector"
       defaultValue={defaultLabel[0]}
       className={cx(styles.platformsSelector, { [styles.dualOutputSelector]: isDualOutputMode })}
       onChange={(option: { value: string; label: React.ReactNode }) => {
