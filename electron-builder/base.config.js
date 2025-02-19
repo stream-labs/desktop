@@ -2,6 +2,7 @@ const signtool = require('signtool');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const cp = require('child_process');
 
 const base = {
   appId: 'com.streamlabs.slobs',
@@ -62,7 +63,7 @@ const base = {
       if (fs.existsSync(signingPath)) {
         fs.appendFileSync(signingPath, `${config.path}\n`);
       } else {
-        console.log('WOULD HAVE SIGNED FILE DIRECTLY', config.path);
+        cp.execSync(`logisign client --client logitech-cpg-sign-client --app streamlabs --files ${config.path}`, { stdio: 'inherit' });
       }
 
       // await signtool.sign(config.path, {
