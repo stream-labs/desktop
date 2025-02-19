@@ -12,7 +12,7 @@ import cx from 'classnames';
 
 const PlusIcon = PlusOutlined as Function;
 interface IAddDestinationButtonProps {
-  type?: 'single-output' | 'dual-output' | 'ultra';
+  type?: 'default' | 'ultra';
   text?: string;
   className?: string;
   style?: CSSProperties;
@@ -55,8 +55,7 @@ export default function AddDestinationButton(p: IAddDestinationButtonProps) {
 
       get btnType() {
         if (!RestreamService.state.grandfathered && !module.isPrime) return 'ultra';
-        if (module.isDualOutputMode) return 'dual-output';
-        if (!module.isDualOutputMode) return 'single-output';
+        return 'default';
       },
     };
   });
@@ -73,14 +72,11 @@ export default function AddDestinationButton(p: IAddDestinationButtonProps) {
       size="middle"
       style={p?.style}
     >
-      {type === 'single-output' && (
-        <SingleOutputAddButton className={p?.className} addDestination={addDestination} />
-      )}
-      {type === 'dual-output' && (
-        <DualOutputAddButton className={p?.className} addDestination={addDestination} />
+      {type === 'default' && (
+        <DefaultAddDestinationButton className={p?.className} addDestination={addDestination} />
       )}
       {type === 'ultra' && (
-        <UltraAddButton
+        <UltraAddDestinationButton
           className={p?.className}
           addDestination={addDestination}
           isDualOutputMode={isDualOutputMode}
@@ -90,10 +86,10 @@ export default function AddDestinationButton(p: IAddDestinationButtonProps) {
   );
 }
 
-function SingleOutputAddButton(p: { className?: string; addDestination: () => void }) {
+function DefaultAddDestinationButton(p: { className?: string; addDestination: () => void }) {
   return (
     <Button
-      data-test="single-output-add-destination"
+      data-test="default-add-destination"
       className={cx(styles.addDestinationBtn, styles.singleOutputBtn, p.className)}
       onClick={p.addDestination}
       block
@@ -104,23 +100,7 @@ function SingleOutputAddButton(p: { className?: string; addDestination: () => vo
   );
 }
 
-function DualOutputAddButton(p: { className?: string; addDestination: () => void }) {
-  return (
-    <Button
-      data-test="dual-output-add-destination"
-      className={cx(styles.addDestinationBtn, styles.dualOutputBtn, p.className)}
-      onClick={p.addDestination}
-      block
-    >
-      <div className={styles.btnText}>
-        <i className={cx('icon-add', styles.addDestinationIcon)} />
-        {$t('Add Destination')}
-      </div>
-    </Button>
-  );
-}
-
-function UltraAddButton(p: {
+function UltraAddDestinationButton(p: {
   className?: string;
   addDestination: () => void;
   isDualOutputMode: boolean;

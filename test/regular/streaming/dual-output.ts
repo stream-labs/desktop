@@ -151,8 +151,8 @@ test(
     const numSoDestinations = await getNumElements('.destination-switch');
     t.true(numSoDestinations > 1, 'Custom destination switches exist');
     t.true(
-      await isDisplayed('[data-test=single-output-add-destination]'),
-      'Single output add destination button exists',
+      await isDisplayed('[data-test=default-add-destination]'),
+      'Default add destination button exists',
     );
     t.false(
       await isDisplayed('[data-test=destination-selector]'),
@@ -179,8 +179,8 @@ test(
       'Same number of destination switches exist for both single and dual output modes.',
     );
     t.true(
-      await isDisplayed('[data-test=dual-output-add-destination]'),
-      'Add destination button exists',
+      await isDisplayed('[data-test=default-add-destination]'),
+      'Default add destination button exists',
     );
     t.false(
       await isDisplayed('[data-test=destination-selector]'),

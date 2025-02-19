@@ -51,27 +51,18 @@ button.add-destination-btn {
   }
 }
 
-.single-output-btn:extend(button.add-destination-btn) {
+.default-output-btn:extend(button.add-destination-btn) {
   border: 1px dashed var(--border) !important;
   min-height: 58px;
   transition: border 0.3s, box-shadow 0.3s !important;
   margin: 0px 15px 15px 15px !important;
   width: calc(100% - 30px) !important;
   background-color: var(--dark-background) !important;
+  font-weight: 500;
 
   &:hover {
     border: 1px solid var(--button) !important;
   }
-}
-
-.dual-output-btn:extend(button.add-destination-btn) {
-  min-height: 58px;
-  justify-content: center !important;
-  transition: box-shadow 0.3s !important;
-  border: unset !important;
-  background-color: var(--dropdown-bg) !important;
-  margin: 0px 15px !important;
-  width: calc(100% - 30px) !important;
 }
 
 .ultra-btn:extend(button.add-destination-btn) {
