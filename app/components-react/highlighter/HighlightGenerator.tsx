@@ -108,15 +108,21 @@ export default function HighlightGenerator({
   }
 
   return (
-    <div className={styles.wrapper}>
-      <h3 style={{ color: '#FFFFFF', margin: 0, fontWeight: 400 }}>
-        🤖{' '}
-        <Translate
-          message={$t(
-            'Create highlight video of <roundSelect></roundSelect> with a duration of <minutesSelect></minutesSelect>',
-          )}
-        >
-          <div slot="roundSelect">
+    <h3
+      className={styles.wrapper}
+      style={{
+        color: '#FFFFFF',
+        margin: 0,
+        fontWeight: 400,
+      }}
+    >
+      🤖{' '}
+      <Translate
+        message={$t(
+          'Create highlight video of <roundSelect></roundSelect> with a duration of <minutesSelect></minutesSelect>',
+        )}
+        renderSlots={{
+          roundSelect: () => (
             <Select
               style={selectStyles}
               mode="multiple"
@@ -166,8 +172,8 @@ export default function HighlightGenerator({
                 </div>
               ))}
             </Select>
-          </div>
-          <div slot="minutesSelect">
+          ),
+          minutesSelect: () => (
             <Select
               style={{ width: '116px' }}
               value={targetDuration}
@@ -183,9 +189,9 @@ export default function HighlightGenerator({
                 {$t('unlimited')}
               </Option>
             </Select>
-          </div>
-        </Translate>
-      </h3>
+          ),
+        }}
+      ></Translate>
       <Button
         type="text"
         onClick={() => {
@@ -196,6 +202,6 @@ export default function HighlightGenerator({
         icon={<span style={{ color: '#666666', fontSize: '20px' }}>&times;</span>}
         className={styles.resetButton}
       />
-    </div>
+    </h3>
   );
 }
