@@ -991,6 +991,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
         transitionDuration: this.views.transitionDuration,
         transition: this.views.transition,
         useAiHighlighter: this.views.useAiHighlighter,
+        streamId,
       },
       handleFrame,
       setExportInfo,
@@ -1110,7 +1111,15 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     }
   }
 
-  async installAiHighlighter(downloadNow: boolean = false) {
+  async installAiHighlighter(
+    downloadNow: boolean = false,
+    location: 'Highlighter-tab' | 'Go-live-flow',
+  ) {
+    this.usageStatisticsService.recordAnalyticsEvent('AIHighlighter', {
+      type: 'Installation',
+      location,
+    });
+
     this.setAiHighlighter(true);
     if (downloadNow) {
       await this.aiHighlighterUpdater.isNewVersionAvailable();
@@ -1248,6 +1257,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
         type: 'Detection',
         clips: highlighterResponse.length,
         game: 'Fortnite', // hardcode for now
+        streamId: this.streamMilestones?.streamId,
       });
       console.log('✅ Final HighlighterData', highlighterResponse);
     } catch (error: unknown) {
@@ -1343,7 +1353,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     this.CLEAR_UPLOAD();
   }
 
-  async uploadYoutube(options: IYoutubeVideoUploadOptions) {
+  async uploadYoutube(options: IYoutubeVideoUploadOptions, streamId: string | undefined) {
     if (!this.userService.state.auth?.platforms.youtube) {
       throw new Error('Cannot upload without YT linked');
     }
@@ -1407,6 +1417,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
         this.views.useAiHighlighter ? 'AIHighlighter' : 'Highlighter',
         {
           type: 'UploadYouTubeSuccess',
+          streamId,
           privacy: options.privacyStatus,
           videoLink:
             options.privacyStatus === 'public'

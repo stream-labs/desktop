@@ -13,13 +13,20 @@ export default function PreviewModal({
   close: () => void;
   streamId: string | undefined;
 }) {
-  const { HighlighterService } = Services;
+  const { HighlighterService, UsageStatisticsService } = Services;
   const clips = HighlighterService.getClips(HighlighterService.views.clips, streamId);
   const { intro, outro } = HighlighterService.views.video;
   const audioSettings = HighlighterService.views.audio;
   const [currentClipIndex, setCurrentClipIndex] = useState(0);
   const currentClipIndexRef = useRef(0);
   const sortedClips = [...sortClipsByOrder(clips, streamId).filter(c => c.enabled)];
+
+  useEffect(() => {
+    UsageStatisticsService.recordAnalyticsEvent('AIHighlighter', {
+      type: 'PreviewViewed',
+      streamId,
+    });
+  }, []);
 
   const playlist = [
     ...(intro.duration

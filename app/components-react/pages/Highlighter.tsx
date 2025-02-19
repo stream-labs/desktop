@@ -9,7 +9,7 @@ import UpdateModal from 'components-react/highlighter/UpdateModal';
 import { EAvailableFeatures } from 'services/incremental-rollout';
 
 export default function Highlighter(props: { params?: { view: string } }) {
-  const { HighlighterService, IncrementalRolloutService } = Services;
+  const { HighlighterService, IncrementalRolloutService, UsageStatisticsService } = Services;
   const aiHighlighterFeatureEnabled = IncrementalRolloutService.views.featureIsEnabled(
     EAvailableFeatures.aiHighlighter,
   );
@@ -50,6 +50,14 @@ export default function Highlighter(props: { params?: { view: string } }) {
   }, []);
 
   const [viewState, setViewState] = useState<IViewState>(initialViewState);
+
+  useEffect(() => {
+    UsageStatisticsService.recordAnalyticsEvent('Highlighter', {
+      type: 'HighlighterTabViewed',
+      view: viewState,
+    });
+  }, [viewState]);
+
   const updaterModal = (
     <UpdateModal
       version={v.highlighterVersion}

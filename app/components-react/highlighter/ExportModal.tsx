@@ -301,7 +301,15 @@ function ExportOptions({
   );
 }
 
-function PlatformSelect({ onClose, videoName }: { onClose: () => void; videoName: string }) {
+function PlatformSelect({
+  onClose,
+  videoName,
+  streamId,
+}: {
+  onClose: () => void;
+  videoName: string;
+  streamId: string | undefined;
+}) {
   const { store, clearUpload, getStreamTitle } = useController(ExportModalCtx);
   const { UserService } = Services;
   const { isYoutubeLinked } = useVuex(() => ({
@@ -332,7 +340,9 @@ function PlatformSelect({ onClose, videoName }: { onClose: () => void; videoName
         nowrap
         options={platformOptions}
       />
-      {platform === 'youtube' && <YoutubeUpload defaultTitle={videoName} close={onClose} />}
+      {platform === 'youtube' && (
+        <YoutubeUpload defaultTitle={videoName} close={onClose} streamId={streamId} />
+      )}
       {platform !== 'youtube' && <StorageUpload onClose={onClose} platform={platform} />}
     </Form>
   );
