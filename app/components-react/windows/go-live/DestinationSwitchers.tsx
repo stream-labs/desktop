@@ -88,7 +88,8 @@ export function DestinationSwitchers() {
       return;
     }
 
-    if (!isRestreamEnabled) {
+    // user can always stream to tiktok
+    if (!isRestreamEnabled && platform !== 'tiktok') {
       /*
        * Clearing this list ensures that when a new platform is selected, instead of enabling 2 platforms
        * we switch to 1 enabled platforms that was just toggled.
