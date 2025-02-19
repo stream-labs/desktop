@@ -224,7 +224,6 @@ export default function GoLiveError() {
             <li>{detail}</li>
           ))}
         </ul>
-        <br />
         <button
           className="button button--warn"
           style={{ marginTop: '8px' }}
