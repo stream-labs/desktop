@@ -38,7 +38,7 @@ export default function PlatformMerge(p: IPlatformMergeProps) {
 
   async function mergePlatform() {
     if (!platform) return;
-    const mode = ['youtube', 'twitch', 'twitter', 'tiktok'].includes(platform)
+    const mode = ['youtube', 'twitch', 'twitter', 'tiktok', 'kick'].includes(platform)
       ? 'external'
       : 'internal';
     await UserService.actions.return

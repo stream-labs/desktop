@@ -701,16 +701,22 @@ export class StreamingService
   }
 
   handleTypedStreamError(
-    e: unknown,
+    e: StreamError | unknown,
     type: TStreamErrorType,
     message: string,
   ): StreamError | TStreamErrorType {
-    console.error(message, e as any);
-
     // restream errors returns an object with key value pairs for error details
-    if (e instanceof StreamError && type.split('_').includes('RESTREAM')) {
+    const defaultMessage =
+      this.state.info.error?.message ??
+      $t(
+        'One of destinations might have incomplete permissions. Reconnect the destinations in settings and try again.',
+      );
+
+    if (e && typeof e === 'object' && type.split('_').includes('RESTREAM')) {
       const messages: string[] = [];
       const details: string[] = [];
+
+      details.push(defaultMessage);
 
       Object.entries(e).forEach(([key, value]: [string, string]) => {
         const name = capitalize(key.replace(/([A-Z])/g, ' $1'));
@@ -722,8 +728,7 @@ export class StreamingService
         }
       });
 
-      e.message = messages.join('. ');
-      e.details = details.join('.');
+      return createStreamError(type, { status: 400, statusText: message }, details.join('\n'));
     }
 
     return e instanceof StreamError ? { ...e, type } : type;
