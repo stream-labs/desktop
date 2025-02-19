@@ -63,7 +63,7 @@ const base = {
       if (fs.existsSync(signingPath)) {
         fs.appendFileSync(signingPath, `${config.path}\n`);
       } else {
-        cp.execSync(`logisign client --client logitech-cpg-sign-client --app streamlabs --files ${config.path}`, { stdio: 'inherit' });
+        cp.execSync(`logisign client --client logitech-cpg-sign-client --app streamlabs --files "${config.path}"`, { stdio: 'inherit' });
       }
 
       // await signtool.sign(config.path, {
