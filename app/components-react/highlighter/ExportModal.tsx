@@ -119,7 +119,7 @@ function ExportModal({ close, streamId }: { close: () => void; streamId: string 
       />
     );
   }
-  return <PlatformSelect onClose={close} videoName={videoName} />;
+  return <PlatformSelect onClose={close} videoName={videoName} streamId={streamId} />;
 }
 
 function ExportProgress() {
