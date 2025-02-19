@@ -284,5 +284,6 @@
   "Bypass and Go Live": "Bypass and Go Live",
   "Please try again. If the issue persists, you can stream directly to a single platform instead or click the button below to bypass and go live.": "Please try again. If the issue persists, you can stream directly to a single platform instead or click the button below to bypass and go live.",
   "Issues": "Issues",
-  "Multistream Error": "Multistream Error"
+  "Multistream Error": "Multistream Error",
+  "One of destinations might have incomplete permissions. Reconnect the destinations in settings and try again.": "One of destinations might have incomplete permissions. Reconnect the destinations in settings and try again."
 }

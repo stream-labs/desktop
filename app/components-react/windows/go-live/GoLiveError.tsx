@@ -210,6 +210,15 @@ export default function GoLiveError() {
       WindowsService.actions.closeChildWindow();
     }
 
+    const details =
+      !error.details || error.details === ''
+        ? [
+            $t(
+              'One of destinations might have incomplete permissions. Reconnect the destinations in settings and try again.',
+            ),
+          ]
+        : error.details.split('\n');
+
     return (
       <MessageLayout
         error={error}
@@ -220,8 +229,8 @@ export default function GoLiveError() {
       >
         {`${$t('Issues')}:`}
         <ul>
-          {error.details?.split('\n').map(detail => (
-            <li>{detail}</li>
+          {details.map((detail: string, index: number) => (
+            <li key={`detail-${index}`}>{detail}</li>
           ))}
         </ul>
         <button

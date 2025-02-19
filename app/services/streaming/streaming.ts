@@ -706,12 +706,17 @@ export class StreamingService
     message: string,
   ): StreamError | TStreamErrorType {
     // restream errors returns an object with key value pairs for error details
-    if (typeof e === 'object' && type.split('_').includes('RESTREAM')) {
+    const defaultMessage =
+      this.state.info.error?.message ??
+      $t(
+        'One of destinations might have incomplete permissions. Reconnect the destinations in settings and try again.',
+      );
+
+    if (e && typeof e === 'object' && type.split('_').includes('RESTREAM')) {
       const messages: string[] = [];
       const details: string[] = [];
-      if (this.state.info.error?.message) {
-        details.push(this.state.info.error?.message);
-      }
+
+      details.push(defaultMessage);
 
       Object.entries(e).forEach(([key, value]: [string, string]) => {
         const name = capitalize(key.replace(/([A-Z])/g, ' $1'));
