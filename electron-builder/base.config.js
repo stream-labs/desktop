@@ -130,7 +130,7 @@ const base = {
   },
   beforePack: './electron-builder/beforePack.js',
   afterPack: './electron-builder/afterPack.js',
-  afterSign: './electron-builder/notarize.js',
+  afterSign: './electron-builder/afterSign.js',
 };
 
 module.exports = base;

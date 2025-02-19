@@ -1,11 +1,10 @@
+const { notarize } = require('@electron/notarize');
 const fs = require('fs');
 const cp = require('child_process');
 const path = require('path');
 const os = require('os');
 
 async function notarizeMac() {
-  const { notarize } = require('@electron/notarize');
-
   if (process.env.SLOBS_NO_NOTARIZE) return;
   if (process.platform !== 'darwin') return;
 
