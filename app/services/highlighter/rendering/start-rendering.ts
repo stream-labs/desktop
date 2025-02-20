@@ -28,6 +28,7 @@ export interface IRenderingConfig {
   transitionDuration: number;
   transition: ITransitionInfo;
   useAiHighlighter: boolean;
+  streamId: string | undefined;
 }
 export async function startRendering(
   renderingConfig: IRenderingConfig,
@@ -43,6 +44,7 @@ export async function startRendering(
   const transitionDuration = renderingConfig.transitionDuration;
   const transition = renderingConfig.transition;
   const useAiHighlighter = renderingConfig.useAiHighlighter;
+  const streamId = renderingConfig.streamId;
 
   let fader: AudioCrossfader | null = null;
   let mixer: AudioMixer | null = null;
@@ -200,6 +202,7 @@ export async function startRendering(
           preset: exportInfo.preset,
           duration: totalFramesAfterTransitions / exportOptions.fps,
           isPreview,
+          streamId,
         });
         break;
       }
