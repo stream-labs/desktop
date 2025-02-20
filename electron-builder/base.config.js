@@ -65,15 +65,6 @@ const base = {
       } else {
         cp.execSync(`logisign client --client logitech-cpg-sign-client --app streamlabs --files "${config.path}"`, { stdio: 'inherit' });
       }
-
-      // await signtool.sign(config.path, {
-      //   subject: 'Streamlabs (General Workings, Inc.)',
-      //   rfcTimestamp: 'http://timestamp.digicert.com',
-      //   algorithm: config.hash,
-      //   append: config.isNest,
-      //   description: config.name,
-      //   url: config.site,
-      // });
     },
   },
   mac: {
