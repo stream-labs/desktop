@@ -22,10 +22,7 @@ export default function PreviewModal({
   const sortedClips = [...sortClipsByOrder(clips, streamId).filter(c => c.enabled)];
 
   useEffect(() => {
-    UsageStatisticsService.recordAnalyticsEvent('AIHighlighter', {
-      type: 'PreviewViewed',
-      streamId,
-    });
+    UsageStatisticsService.recordShown('ClipsPreview', streamId);
   }, []);
 
   const playlist = [

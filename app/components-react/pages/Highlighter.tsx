@@ -52,10 +52,7 @@ export default function Highlighter(props: { params?: { view: string } }) {
   const [viewState, setViewState] = useState<IViewState>(initialViewState);
 
   useEffect(() => {
-    UsageStatisticsService.recordAnalyticsEvent('Highlighter', {
-      type: 'HighlighterTabViewed',
-      view: viewState,
-    });
+    UsageStatisticsService.recordShown('HighlighterTab', viewState.view);
   }, [viewState]);
 
   const updaterModal = (
