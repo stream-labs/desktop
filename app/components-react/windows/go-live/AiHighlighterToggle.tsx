@@ -6,7 +6,23 @@ import { Services } from 'components-react/service-provider';
 import Highlighter from 'components-react/pages/Highlighter';
 import { useVuex } from 'components-react/hooks';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
-import { Button } from 'antd';
+import { Button, Carousel } from 'antd';
+
+// Add carousel styles
+const carouselStyle: React.CSSProperties = {
+  width: '100%',
+  height: '100%',
+  backgroundColor: 'red',
+};
+
+const contentStyle: React.CSSProperties = {
+  margin: 0,
+  height: '160px',
+  color: '#fff',
+  lineHeight: '160px',
+  textAlign: 'center',
+  background: '#364d79',
+};
 
 export default function AiHighlighterToggle({
   game,
@@ -76,7 +92,7 @@ export default function AiHighlighterToggle({
             {isExpanded ? (
               <>
                 <div className={styles.expandedWrapper}>
-                  <div className={styles.toggleTextWrapper}>
+                  {!useHighlighter ? (
                     <div>
                       <h2 style={{ fontSize: '16px', fontWeight: 600 }}>
                         Auto-create
@@ -84,28 +100,42 @@ export default function AiHighlighterToggle({
                       </h2>
                       <div className={styles.betaTag}>Beta</div>
                     </div>
-                    {highlighterVersion !== '' ? (
-                      <SwitchInput
-                        style={{ padding: 0, margin: 0, marginLeft: '-40px', width: '100%' }}
-                        value={useHighlighter}
-                        label=""
-                        onChange={() => HighlighterService.actions.toggleAiHighlighter()}
-                      />
-                    ) : (
-                      <Button
-                        style={{ width: 'fit-content' }}
-                        size="small"
-                        type="primary"
-                        onClick={() => {
-                          HighlighterService.installAiHighlighter();
-                        }}
-                      >
-                        Install AI Highlighter
-                      </Button>
-                    )}
-                  </div>
-                  <div className={styles.image}></div>
+                  ) : (
+                    <Carousel arrows={true} dots={true}>
+                      <div>
+                        <h3 style={contentStyle}>Feature 1</h3>
+                      </div>
+                      <div>
+                        <h3 style={contentStyle}>Feature 2</h3>
+                      </div>
+                      <div>
+                        <h3 style={contentStyle}>Feature 3</h3>
+                      </div>
+                    </Carousel>
+                  )}
+
+                  {highlighterVersion !== '' ? (
+                    <SwitchInput
+                      style={{ padding: 0, margin: 0, marginLeft: '-40px', width: '100%' }}
+                      value={useHighlighter}
+                      label=""
+                      onChange={() => HighlighterService.actions.toggleAiHighlighter()}
+                    />
+                  ) : (
+                    <Button
+                      style={{ width: 'fit-content' }}
+                      size="small"
+                      type="primary"
+                      onClick={() => {
+                        HighlighterService.installAiHighlighter();
+                      }}
+                    >
+                      Install AI Highlighter
+                    </Button>
+                  )}
                 </div>
+
+                {!useHighlighter && <div className={styles.image}></div>}
               </>
             ) : (
               <></>
