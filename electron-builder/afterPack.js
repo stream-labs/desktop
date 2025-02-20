@@ -82,8 +82,6 @@ function afterPackWin() {
 }
 
 exports.default = async function(context) {
-  console.log('AFTER PACK HOOK');
-
   if (process.platform === 'darwin') {
     afterPackMac();
   }

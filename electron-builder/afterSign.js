@@ -44,8 +44,6 @@ async function afterPackWin() {
 }
 
 exports.default = async function afterSign(context) {
-  console.log('AFTER SIGN HOOK');
-
   if (process.platform === 'darwin') {
     await notarizeMac();
   }
