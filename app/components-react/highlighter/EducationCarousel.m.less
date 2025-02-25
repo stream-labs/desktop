@@ -1,4 +1,4 @@
-@paddingLeft: 24px;
+@paddingLeft: 24px; // was 24
 @paddingTop: 20px;
 @paddingRight: 24px;
 @paddingBottom: 20px;
@@ -15,9 +15,6 @@
       height: 100%;
     }
     .slick-slider {
-      padding-left: @paddingLeft;
-      padding-right: @paddingRight;
-
       .slick-arrow {
         position: absolute !important;
         display: block !important;
@@ -35,19 +32,19 @@
         &.slick-prev {
           left: 0px;
           &::before {
-            content: '<';
+            content: '❰';
           }
         }
 
         &.slick-next {
           right: 0px;
           &::before {
-            content: '>';
+            content: '❱';
           }
         }
 
         &::before {
-          color: red;
+          color: white;
           font-size: 20px;
           opacity: 1;
           line-height: 1;
@@ -59,19 +56,23 @@
       }
       .slick-dots {
         li {
-          background-color: green;
           button {
-            background: red;
+            background: rgb(255, 255, 255);
             opacity: 0.3;
           }
           &.slick-active button {
             opacity: 1;
-            background: yellow;
+            background: var(--teal);
           }
         }
       }
     }
   }
+}
+
+.slide-wrapper {
+  padding-left: @paddingLeft;
+  padding-right: @paddingRight;
 }
 
 .content-wrapper {
@@ -82,6 +83,7 @@
 }
 
 .language-difference {
+  position: relative;
   font-family: 'Luckiest Guy', serif;
   font-size: 24px;
   border-radius: 5px;
@@ -94,11 +96,59 @@
 }
 
 .language-correct {
-  border: 1px solid #128079;
+  border: 1px solid;
+  border-color: #128079;
   background: rgba(155, 255, 160, 0.06);
 }
 
 .language-false {
-  border: 1px solid #b14334;
+  border: 1px solid;
+  border-color: #b14334;
   background: rgba(234, 50, 35, 0.06);
+}
+
+.game-mode-image-wrapper {
+  position: relative;
+  flex: 1;
+  height: 60px;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.game-mode-image-wrapper::before {
+  content: '';
+  border-style: solid;
+  border-width: 2px;
+  border-color: #ffffff29;
+  border-radius: 3px;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.game-mode-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.overlay-rule-image-wrapper {
+  height: 82px;
+  position: relative;
+  border-width: 2px;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.issue-text {
+  position: absolute;
+  font-size: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #b14334;
+  background-color: #b143347e;
+  border-radius: 3px;
+  color: white;
+  padding: 0 4px;
 }
