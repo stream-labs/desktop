@@ -24,6 +24,7 @@ import {
   useTextInput,
 } from '../shared/inputs';
 import { IObsFormType } from '../windows/settings/ObsSettings';
+import { showFileDialog } from '../shared/inputs/FileInput';
 import cloneDeep from 'lodash/cloneDeep';
 import { Button, Collapse, Input, InputNumber } from 'antd';
 import InputWrapper from '../shared/inputs/InputWrapper';
@@ -301,16 +302,15 @@ const ObsInput = forwardRef<{}, IObsInputProps>((p, ref) => {
       );
 
     case 'OBS_PROPERTY_PATH':
-      console.log('OBS_PROPERTY_PATH p.value', p.value);
-      console.log('inputProps', inputProps);
       return (
-        <FileInput
+        <ObsTextInput
           {...inputProps}
-          directory={true}
           style={{ marginBottom: '8px' }}
-          onKeyDown={v => {
-            inputProps.onChange(v);
-          }}
+          addonAfter={
+            <Button onClick={() => showFileDialog({ ...inputProps, directory: true })}>
+              {$t('Browse')}
+            </Button>
+          }
         />
       );
 
@@ -495,12 +495,10 @@ const ObsInputListCustomResolutionInput = forwardRef<{}, IObsInputListCustomReso
     const [custom, setCustom] = useState(false);
     const [customResolution, setCustomResolution] = useState(p.inputProps.value);
 
-    // const form = useForm();
     const formContext = useFormContext();
 
     function onChange(val: string) {
       formContext?.antForm.validateFields();
-      // form.validateFields();
       setCustomResolution(val);
 
       if (custom && /^[0-9]+x[0-9]+$/.test(customResolution)) {
@@ -510,7 +508,6 @@ const ObsInputListCustomResolutionInput = forwardRef<{}, IObsInputListCustomReso
 
     function onClick() {
       formContext?.antForm.validateFields();
-      // form.validateFields();
       const isValid = /^[0-9]+x[0-9]+$/.test(customResolution);
       if (custom && !isValid) return;
 
