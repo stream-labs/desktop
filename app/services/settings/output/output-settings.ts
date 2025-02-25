@@ -154,7 +154,7 @@ export const encoderFieldsMap = {
   [EEncoderFamily.amd]: { preset: 'QualityPreset' },
 };
 
-function simpleEncoderToAdvancedEncoder(encoder: EEncoderFamily) {
+export function simpleEncoderToAdvancedEncoder(encoder: EEncoderFamily) {
   return simpleEncoderToAnvancedEncoderMap[encoder];
 }
 
