@@ -90,7 +90,7 @@ function DefaultAddDestinationButton(p: { className?: string; addDestination: ()
   return (
     <Button
       data-test="default-add-destination"
-      className={cx(styles.addDestinationBtn, styles.singleOutputBtn, p.className)}
+      className={cx(styles.addDestinationBtn, styles.defaultOutputBtn, p.className)}
       onClick={p.addDestination}
       block
     >
