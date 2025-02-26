@@ -103,52 +103,24 @@ export function aiFilterClips(
         ]
       : rounds;
 
-  // console.log('selectedRounds', selectedRounds);
-
   // Sort rounds by score (descending)
   const sortedRounds = selectedRounds.sort(
     (a, b) => getRoundScore(b, clips) - getRoundScore(a, clips),
   );
-
-  // console.log('sortedRounds by rooundScore', sortedRounds);
 
   let clipsFromRounds: TClip[] = [];
 
   let totalDuration = 0;
   for (let i = 0; i < sortedRounds.length; ++i) {
     if (totalDuration > targetDuration) {
-      // console.log(
-      // `Duration: ${totalDuration} more than target: ${targetDuration}, ${JSON.stringify(
-      // clipsFromRounds.map(c => c.duration! - (c.startTrim + c.endTrim)),
-      // )} clips`,
-      //);
       break;
     } else {
-      // console.log(`Duration: ${totalDuration} less than target: ${targetDuration}`);
       //Todo M: how do sort? Per round or all together and then the rounds are in the stream order again?
       const roundIndex = sortedRounds[i];
-      // console.log('include round ', roundIndex);
-
       const roundClips = sortClipsByOrder(getClipsOfRound(roundIndex, clips), streamId);
-      // console.log(
-      //   'roundClips before adding:',
-      //   roundClips.map(c => ({
-      //     duration: c.duration,
-      //   })),
-      // );
-
       clipsFromRounds = [...clipsFromRounds, ...roundClips];
-
-      // console.log(
-      //   'clipsFromRounds after adding:',
-      //   clipsFromRounds.map(c => ({
-      //     duration: c.duration,
-      //   })),
-      // );
       totalDuration = getCombinedClipsDuration(clipsFromRounds);
-      // console.log('new totalDuration:', totalDuration);
     }
-    // console.log('clipsFromRounds', clipsFromRounds);
   }
   const contextTypes = [
     EHighlighterInputTypes.DEPLOY,
@@ -166,16 +138,6 @@ export function aiFilterClips(
       }
     })
     .sort((a, b) => (a as IAiClip).aiInfo.score - (b as IAiClip).aiInfo.score);
-  // console.log(
-  //   'clipsSortedByScore',
-  //   clipsSortedByScore.map(clip => {
-  //     return {
-  //       score: (clip as IAiClip).aiInfo.score,
-  //       inputs: JSON.stringify((clip as IAiClip).aiInfo.inputs),
-  //     };
-  //   }),
-  // );
-  // console.log('clipsFromRounds', clipsFromRounds);
 
   const filteredClips: TClip[] = clipsFromRounds;
   let currentDuration = getCombinedClipsDuration(filteredClips);
@@ -183,20 +145,12 @@ export function aiFilterClips(
   const BUFFER_SEC = 10;
 
   while (currentDuration > targetDuration + BUFFER_SEC) {
-    // console.log('ruuun currentDuration', currentDuration);
     if (clipsSortedByScore === undefined || clipsSortedByScore.length === 0) {
       break;
     }
     clipsSortedByScore.splice(0, 1); // remove from our sorted array
 
     currentDuration = getCombinedClipsDuration(clipsSortedByScore);
-
-    // console.log(
-    // 'removed, new currentDuration:',
-    // currentDuration,
-    // 'target:',
-    // targetDuration + BUFFER_SEC,
-    // );
   }
 
   return clipsSortedByScore;
