@@ -17,21 +17,15 @@ export default function EducationCarousel() {
               alignItems: 'start',
             }}
           >
-            <div
-              style={{
-                width: '100%',
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                paddingLeft: '6px',
-              }}
-            >
-              <h3 style={{ fontSize: '16px' }}> Game language must be English</h3>
-              <p style={{ fontSize: '12px' }}>
-                Ai Highlighter only works, if the game language is set to english. How to change the
-                game language?
-              </p>
-            </div>
+            <SlideTitle
+              headline={'Game language must be English'}
+              subHeadline={'Ai Highlighter only works, if the game language is set to english.'}
+              custom={
+                <a href="https://www.epicgames.com/help/en-US/c-Category_Fortnite/c-Fortnite_Gameplay/how-do-i-change-my-language-in-fortnite-a000084860">
+                  How to change the game language?
+                </a>
+              }
+            />
             <div style={{ display: 'flex', width: '100%', gap: '8px' }}>
               <div className={`${styles.languageDifference} ${styles.languageCorrect}`}>
                 English
@@ -63,46 +57,35 @@ export default function EducationCarousel() {
               alignItems: 'start',
             }}
           >
-            <div
-              style={{
-                width: '100%',
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                paddingLeft: '6px',
-              }}
-            >
-              <h3 style={{ fontSize: '16px' }}> Supported game modes</h3>
-              <p style={{ fontSize: '12px' }}>
-                Right now we are only supporting the following game modes: Battle Royale, Zero
-                build, OG, Reload
-              </p>
-            </div>
+            <SlideTitle
+              headline={'Supported game modes'}
+              subHeadline={'Right now we only support the following game modes: Battle Royale'}
+            />
             <div style={{ display: 'flex', width: '100%', gap: '8px' }}>
               <div className={styles.gameModeImageWrapper}>
                 <img
-                  src="https://cdn2.unrealengine.com/fnbr-34-00-c6s2-discover-playlist-tiles-keyart-480x270-480x270-8e098cc63e70.jpg"
+                  src="https://cdn.streamlabs.com/static/imgs/carousel-images/battle-royale.png"
                   alt=""
                   className={styles.gameModeImage}
                 />
               </div>
               <div className={styles.gameModeImageWrapper}>
                 <img
-                  src="https://cdn2.unrealengine.com/en-fnbr-34-00-c6s2-discover-playlist-tiles-lineup-zb-480x270-480x270-48438900e15d.jpg"
+                  src="https://cdn.streamlabs.com/static/imgs/carousel-images/zero-build.png"
                   alt=""
                   className={styles.gameModeImage}
                 />
               </div>
               <div className={styles.gameModeImageWrapper}>
                 <img
-                  src="https://cdn2.unrealengine.com/en-fn33-00-c1s1-discover-playlist-tiles-og-480x270-480x270-a40f03430d45.jpg"
+                  src="https://cdn.streamlabs.com/static/imgs/carousel-images/reload.png"
                   alt=""
                   className={styles.gameModeImage}
                 />
               </div>
               <div className={styles.gameModeImageWrapper}>
                 <img
-                  src="https://cdn2.unrealengine.com/de-fnbr-32-00-reload-discoverytile-1920x1080-1920x1080-fdefe179ef23.jpg?resize=1&w=2560"
+                  src="https://cdn.streamlabs.com/static/imgs/carousel-images/og.png"
                   alt=""
                   className={styles.gameModeImage}
                 />
@@ -123,18 +106,10 @@ export default function EducationCarousel() {
               alignItems: 'start',
             }}
           >
-            <div
-              style={{
-                width: '100%',
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                paddingLeft: '6px',
-              }}
-            >
-              <h3 style={{ fontSize: '16px' }}>Game & map visibility</h3>
-              <p style={{ fontSize: '12px', margin: 0 }}>Map: Fully visible, Game: Fullscreen</p>
-            </div>
+            <SlideTitle
+              headline={'Game and map visibility'}
+              subHeadline={'Map: Fully visible | Game: Fullscreen'}
+            />
             <div
               style={{
                 display: 'flex',
@@ -148,7 +123,7 @@ export default function EducationCarousel() {
                   <CorrectThumb />
                 </div>
                 <img
-                  src="https://media.cleanshot.cloud/media/14014/H0eg7miTPGXRgGnC4rQlfIQhkxrWwMSdIDxKjwN2.jpeg?Expires=1740507652&Signature=pmSrOcBzg9XOTfZna9Zd-I7b1l6elC3fYNXmt5P0baOQcnE0dRle1Kcjn5-QwDa0gkMXGgJv1uwx1BwA3wLbPlUoMDNJe9KFGKjO~AiV~sq1v2jKBHXXq6WK~iXZnDFZjGPyO~ruSjOxU9M89NNjlz3W9kMz~CrgwAG3awK52c1~drTxvZTxI~ER3a1wNaXn5MRTduiOx-4jJ4TEOX~SMZ3okAfVsq9Kn5UImzjXwceEjjd9FdtcPWSMI7l1Lt0Irf3agAd6bqttLT23~JGWngJFdmhupnsDWDIKFEXMM8ei~CFzaOdLiB2IXKQMkYd044d9PuKM8Ookg6p~yTWjJg__&Key-Pair-Id=K269JMAT9ZF4GZ"
+                  src="https://cdn.streamlabs.com/static/imgs/carousel-images/correct.png"
                   alt=""
                   className={styles.gameModeImage}
                 />
@@ -161,7 +136,7 @@ export default function EducationCarousel() {
                       <FalseThumb />
                     </div>
                     <img
-                      src="https://media.cleanshot.cloud/media/14014/H0eg7miTPGXRgGnC4rQlfIQhkxrWwMSdIDxKjwN2.jpeg?Expires=1740507753&Signature=FX-pnffSAH-MrQXl7B6Dx-j1DDq8wmlripQr~zhWy1DFWMb1th3Atr-gKQwoGSguQswGNMQAd36bo7WBXDaUx1zukUGOPkKzS8qXnvYI1GmntFAvN4qrIJNM0vQglyk7FJ1kVjg3Y6m3xtaYmcgP6xl1tlBZh-k82QCuQn8ec6B~NqkYDE0nJcWYKFkG9hSjzts3T-6ltcnvPXc64Csf9qiCL-utvSzt5EToPwtT9rnkuV4RMJHfyYG7wg-QtKzt6RLklE7~wh1N0JMQDPclpsiGEAIk6Tgm7EwDpsdGK6-I~XAkwqQh6g02oDKYYHkO9reUQWwH9TvvcYMW8AYL9g__&Key-Pair-Id=K269JMAT9ZF4GZ"
+                      src="https://cdn.streamlabs.com/static/imgs/carousel-images/false-map.png"
                       alt=""
                       className={styles.gameModeImage}
                     />
@@ -175,7 +150,7 @@ export default function EducationCarousel() {
                       <FalseThumb />
                     </div>
                     <img
-                      src="https://media.cleanshot.cloud/media/14014/RUjyil8xXMJYeeIhtw9VS1VQKvhn4RafXb9Dpm5O.jpeg?Expires=1740507733&Signature=pJMnZEGnBI4P7GwOngQBbPVmVyaSYXDe4pdyGwkdQVgd3t9bqtUj9Ddqech-ECSvSso5S~8x5auBmgob8sZR0cq8KAhfhYWG4KzAIsWGqsgWdpQn6p81J5EuBAeaEzPs3fYDQOovmDMoNFNRy-VOBof1a1K74quct6mWwixdcCa~DD-BiXNolS44ei92RI~5bxs1CT1iQThWk~t9MZB-nQAKWq6k7VeGxChkjPVKK1FPwgR~YjahI9rMYBj91s1R3sk5QqM1cbg1qE70xVofqm1EY6YxoIt6I4CT~8jQwAP6JjPMbwqHIAjXTrl5t0vwQNMvN05OsA2HrcgtPWK81A__&Key-Pair-Id=K269JMAT9ZF4GZ"
+                      src="https://cdn.streamlabs.com/static/imgs/carousel-images/false-overlay.png"
                       alt=""
                       className={styles.gameModeImage}
                     />
@@ -213,5 +188,24 @@ const FalseThumb = () => (
 const IssueText = ({ text, style }: { text: string; style?: React.CSSProperties }) => (
   <div className={styles.issueText} style={style}>
     <p style={{ margin: 0 }}>{text}</p>
+  </div>
+);
+
+const SlideTitle = ({
+  headline,
+  subHeadline,
+  custom,
+}: {
+  headline: string;
+  subHeadline?: string;
+  custom?: React.ReactNode;
+}) => (
+  <div className={styles.slideTitleWrapper}>
+    <h3 style={{ fontSize: '16px' }}>{headline}</h3>
+    {subHeadline && (
+      <p style={{ fontSize: '12px', margin: 0 }}>
+        {subHeadline} {custom}
+      </p>
+    )}
   </div>
 );
