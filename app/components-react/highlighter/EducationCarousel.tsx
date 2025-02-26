@@ -2,6 +2,7 @@ import { Carousel } from 'antd';
 import React from 'react';
 import styles from './EducationCarousel.m.less';
 import { I18nService } from 'services/i18n';
+import * as remote from '@electron/remote';
 
 export default function EducationCarousel() {
   const i18nService = I18nService.instance as I18nService;
@@ -67,37 +68,40 @@ const SlideTitle = ({
   </div>
 );
 
-const Language = ({ falseLanguage = 'German' }: { falseLanguage?: string }) => (
-  <div className={styles.slideWrapper}>
-    <div className={styles.contentWrapper}>
-      <SlideTitle
-        headline={'Game language must be English'}
-        subHeadline={'Ai Highlighter only works, if the game language is set to english.'}
-        custom={
-          <a href="https://www.epicgames.com/help/en-US/c-Category_Fortnite/c-Fortnite_Gameplay/how-do-i-change-my-language-in-fortnite-a000084860">
-            How to change the game language?
-          </a>
-        }
-      />
-      <div style={{ display: 'flex', width: '100%', gap: '8px' }}>
-        <div className={`${styles.languageDifference} ${styles.languageCorrect}`}>
-          English
-          <div style={{ position: 'absolute', bottom: '-8px', left: '3px' }}>
-            <CorrectThumb />
+const Language = ({ falseLanguage = 'German' }: { falseLanguage?: string }) => {
+  function openHowToChangeLanguage() {
+    remote.shell.openExternal(
+      'https://www.epicgames.com/help/en-US/c-Category_Fortnite/c-Fortnite_Gameplay/how-do-i-change-my-language-in-fortnite-a000084860',
+    );
+  }
+  return (
+    <div className={styles.slideWrapper}>
+      <div className={styles.contentWrapper}>
+        <SlideTitle
+          headline={'Game language must be English'}
+          subHeadline={'Ai Highlighter only works, if the game language is set to english.'}
+          custom={<a onClick={openHowToChangeLanguage}>How to change the game language?</a>}
+        />
+        <div style={{ display: 'flex', width: '100%', gap: '8px' }}>
+          <div className={`${styles.languageDifference} ${styles.languageCorrect}`}>
+            English
+            <div style={{ position: 'absolute', bottom: '-8px', left: '3px' }}>
+              <CorrectThumb />
+            </div>
           </div>
-        </div>
 
-        <div className={`${styles.languageDifference} ${styles.languageFalse}`}>
-          {' '}
-          <div style={{ position: 'absolute', top: '-7px', right: '4px' }}>
-            <FalseThumb />
+          <div className={`${styles.languageDifference} ${styles.languageFalse}`}>
+            {' '}
+            <div style={{ position: 'absolute', top: '-7px', right: '4px' }}>
+              <FalseThumb />
+            </div>
+            {falseLanguage}
           </div>
-          {falseLanguage}
         </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const SupportedGameModes = () => (
   <div className={styles.slideWrapper}>
