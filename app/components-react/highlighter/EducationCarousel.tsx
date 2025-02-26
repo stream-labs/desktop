@@ -1,7 +1,7 @@
 import { Carousel } from 'antd';
 import React from 'react';
 import styles from './EducationCarousel.m.less';
-import { I18nService } from 'services/i18n';
+import { $t, I18nService } from 'services/i18n';
 import * as remote from '@electron/remote';
 
 export default function EducationCarousel() {
@@ -12,7 +12,6 @@ export default function EducationCarousel() {
     currentLocale !== 'en-US'
       ? localeOptions.find(locale => locale.value === currentLocale)?.label || 'German'
       : 'German';
-  console.log(i18nService.state, localeOptions, currentLocale);
 
   return (
     <Carousel arrows={true} dots={true} autoplay={false} autoplaySpeed={3000}>
@@ -78,13 +77,15 @@ const Language = ({ falseLanguage = 'German' }: { falseLanguage?: string }) => {
     <div className={styles.slideWrapper}>
       <div className={styles.contentWrapper}>
         <SlideTitle
-          headline={'Game language must be English'}
-          subHeadline={'Ai Highlighter only works, if the game language is set to english.'}
-          custom={<a onClick={openHowToChangeLanguage}>How to change the game language?</a>}
+          headline={$t('Game language must be English')}
+          subHeadline={$t('Ai Highlighter only works, if the game language is set to english.')}
+          custom={
+            <a onClick={openHowToChangeLanguage}> {$t('How to change the game language?')}</a>
+          }
         />
         <div style={{ display: 'flex', width: '100%', gap: '8px' }}>
           <div className={`${styles.languageDifference} ${styles.languageCorrect}`}>
-            English
+            {$t('English')}
             <div style={{ position: 'absolute', bottom: '-8px', left: '3px' }}>
               <CorrectThumb />
             </div>
@@ -107,10 +108,10 @@ const SupportedGameModes = () => (
   <div className={styles.slideWrapper}>
     <div className={styles.contentWrapper}>
       <SlideTitle
-        headline={'Supported game modes'}
-        subHeadline={
-          'Right now we only support the following game modes: Battle Royale, Zero Build, Reload, OG'
-        }
+        headline={$t('Supported game modes')}
+        subHeadline={$t(
+          'Right now we only support the following game modes: Battle Royale, Zero Build, Reload, OG',
+        )}
       />
       <div style={{ display: 'flex', width: '100%', gap: '8px' }}>
         <div className={styles.gameModeImageWrapper}>
@@ -150,8 +151,8 @@ const Overlay = () => (
   <div className={styles.slideWrapper}>
     <div className={styles.contentWrapper}>
       <SlideTitle
-        headline={'Game and map visibility'}
-        subHeadline={'Map: Fully visible | Game: Fullscreen'}
+        headline={$t('Game and map visibility')}
+        subHeadline={$t('Map must be visible and game must be fullscreen')}
       />
       <div className={styles.overlayRules}>
         <div className={`${styles.overlayRuleImageWrapper} ${styles.languageCorrect}`}>
@@ -167,7 +168,7 @@ const Overlay = () => (
         <div style={{ width: '140px' }}>
           <Carousel autoplay={true} arrows={false} autoplaySpeed={3000} dots={false}>
             <div className={`${styles.overlayRuleImageWrapper} ${styles.languageFalse}`}>
-              <IssueText text={'Map not visible'} style={{ right: '2px', bottom: '2px' }} />
+              <IssueText text={$t('Map not visible')} style={{ right: '2px', bottom: '2px' }} />
               <div style={{ position: 'absolute', top: '20px', right: '20px' }}>
                 <FalseThumb />
               </div>
@@ -178,7 +179,7 @@ const Overlay = () => (
               />
             </div>{' '}
             <div className={`${styles.overlayRuleImageWrapper} ${styles.languageFalse}`}>
-              <IssueText text={'Game not fullscreen'} style={{ bottom: '2px', left: '2px' }} />
+              <IssueText text={$t('Game not fullscreen')} style={{ bottom: '2px', left: '2px' }} />
               <div style={{ position: 'absolute', top: '0px', left: '0px' }}>
                 <FalseThumb />
               </div>

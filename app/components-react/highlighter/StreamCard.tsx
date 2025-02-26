@@ -81,19 +81,23 @@ export default function StreamCard({
         </Button>
         <div className={styles.requirements}>
           <div style={{ display: 'flex', flexDirection: 'column', width: '280px' }}>
-            <h2>No clips found</h2>
-            <p style={{ marginBottom: '8px' }}>Please make sure all the requirements are met:</p>
-            <p>• Game is supported (Currently Fortnite only)</p>
-            <p>• Game language is English</p>
-            <p>• Map and Stats area is fully visible</p>
-            <p>• Game in fullscreen in your stream</p>
-            <p>• Game mode is supported (Battle Royale, Reload, Zero Build, OG)</p>
+            <h2>{$t('No clips found')}</h2>
+            <p style={{ marginBottom: '8px' }}>
+              {$t('Please make sure all the requirements are met:')}
+            </p>
+            <p>{$t('• Game is supported (Currently Fortnite only)')}</p>
+            <p>{$t('• Game language is English')}</p>
+            <p>{$t('• Map and Stats area is fully visible')}</p>
+            <p>{$t('• Game in fullscreen in your stream')}</p>
+            <p>{$t('• Game mode is supported (Battle Royale, Reload, Zero Build, OG)')}</p>
             <a onClick={emitShowRequirements} style={{ marginBottom: '14px' }}>
-              Show details
+              {$t('Show details')}
             </a>
-            <p>All requirements met but no luck?</p>
+            <p>{$t('All requirements met but no luck?')}</p>
 
-            <a onClick={shareFeedback}>Take a screenshot of your stream and share it here</a>
+            <a onClick={shareFeedback}>
+              {$t('Take a screenshot of your stream and share it here')}
+            </a>
           </div>
         </div>
         <div className={styles.streaminfoWrapper}>
@@ -111,7 +115,7 @@ export default function StreamCard({
               onClick={shareFeedback}
               icon={<i className="icon-community" style={{ marginRight: '8px' }} />}
             >
-              Share feedback
+              {$t('Share feedback')}
             </Button>
           </div>
         </div>
