@@ -311,7 +311,15 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
         )}
         {showModal?.type === 'export' && <ExportModal close={closeModal} streamId={showModal.id} />}
         {showModal?.type === 'preview' && (
-          <PreviewModal close={closeModal} streamId={showModal.id} />
+          <PreviewModal
+            close={closeModal}
+            streamId={showModal.id}
+            emitSetShowModal={modal => {
+              if (modal === 'export') {
+                rawSetShowModal({ type: 'export', id: showModal.id });
+              }
+            }}
+          />
         )}
         {showModal?.type === 'remove' && (
           <RemoveStream close={closeModal} streamId={showModal.id} />
