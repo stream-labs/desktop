@@ -1,166 +1,23 @@
 import { Carousel } from 'antd';
 import React from 'react';
 import styles from './EducationCarousel.m.less';
+import { I18nService } from 'services/i18n';
 
 export default function EducationCarousel() {
-  return (
-    <Carousel arrows={true} dots={true}>
-      <div className={styles.slideWrapper}>
-        <div className={styles.contentWrapper}>
-          <div
-            style={{
-              height: '100%',
-              padding: '8px',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              alignItems: 'start',
-            }}
-          >
-            <SlideTitle
-              headline={'Game language must be English'}
-              subHeadline={'Ai Highlighter only works, if the game language is set to english.'}
-              custom={
-                <a href="https://www.epicgames.com/help/en-US/c-Category_Fortnite/c-Fortnite_Gameplay/how-do-i-change-my-language-in-fortnite-a000084860">
-                  How to change the game language?
-                </a>
-              }
-            />
-            <div style={{ display: 'flex', width: '100%', gap: '8px' }}>
-              <div className={`${styles.languageDifference} ${styles.languageCorrect}`}>
-                English
-                <div style={{ position: 'absolute', top: '-16px', left: '0px' }}>
-                  <CorrectThumb />
-                </div>
-              </div>
+  const i18nService = I18nService.instance as I18nService;
+  const localeOptions = i18nService.state.localeList;
+  const currentLocale = i18nService.state.locale;
+  const falseLanguage =
+    currentLocale !== 'en-US'
+      ? localeOptions.find(locale => locale.value !== currentLocale)?.label || 'German'
+      : 'German';
+  console.log(i18nService.state, localeOptions, currentLocale);
 
-              <div className={`${styles.languageDifference} ${styles.languageFalse}`}>
-                {' '}
-                <div style={{ position: 'absolute', top: '-16px', left: '0px' }}>
-                  <FalseThumb />
-                </div>
-                Spanish
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className={styles.slideWrapper}>
-        <div className={styles.contentWrapper}>
-          <div
-            style={{
-              height: '100%',
-              padding: '8px',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              alignItems: 'start',
-            }}
-          >
-            <SlideTitle
-              headline={'Supported game modes'}
-              subHeadline={'Right now we only support the following game modes: Battle Royale'}
-            />
-            <div style={{ display: 'flex', width: '100%', gap: '8px' }}>
-              <div className={styles.gameModeImageWrapper}>
-                <img
-                  src="https://cdn.streamlabs.com/static/imgs/carousel-images/battle-royale.png"
-                  alt=""
-                  className={styles.gameModeImage}
-                />
-              </div>
-              <div className={styles.gameModeImageWrapper}>
-                <img
-                  src="https://cdn.streamlabs.com/static/imgs/carousel-images/zero-build.png"
-                  alt=""
-                  className={styles.gameModeImage}
-                />
-              </div>
-              <div className={styles.gameModeImageWrapper}>
-                <img
-                  src="https://cdn.streamlabs.com/static/imgs/carousel-images/reload.png"
-                  alt=""
-                  className={styles.gameModeImage}
-                />
-              </div>
-              <div className={styles.gameModeImageWrapper}>
-                <img
-                  src="https://cdn.streamlabs.com/static/imgs/carousel-images/og.png"
-                  alt=""
-                  className={styles.gameModeImage}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className={styles.slideWrapper}>
-        <div className={styles.contentWrapper}>
-          <div
-            style={{
-              height: '100%',
-              padding: '8px',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              alignItems: 'start',
-            }}
-          >
-            <SlideTitle
-              headline={'Game and map visibility'}
-              subHeadline={'Map: Fully visible | Game: Fullscreen'}
-            />
-            <div
-              style={{
-                display: 'flex',
-                width: '100%',
-                gap: '8px',
-                justifyContent: 'space-between',
-              }}
-            >
-              <div className={`${styles.overlayRuleImageWrapper} ${styles.languageCorrect}`}>
-                <div style={{ position: 'absolute', top: '0', left: '0' }}>
-                  <CorrectThumb />
-                </div>
-                <img
-                  src="https://cdn.streamlabs.com/static/imgs/carousel-images/correct.png"
-                  alt=""
-                  className={styles.gameModeImage}
-                />
-              </div>
-              <div style={{ width: '140px' }}>
-                <Carousel autoplay={true} arrows={false} autoplaySpeed={3000} dots={false}>
-                  <div className={`${styles.overlayRuleImageWrapper} ${styles.languageFalse}`}>
-                    <IssueText text={'Map not visible'} style={{ right: '2px', bottom: '2px' }} />
-                    <div style={{ position: 'absolute', top: '20px', right: '20px' }}>
-                      <FalseThumb />
-                    </div>
-                    <img
-                      src="https://cdn.streamlabs.com/static/imgs/carousel-images/false-map.png"
-                      alt=""
-                      className={styles.gameModeImage}
-                    />
-                  </div>{' '}
-                  <div className={`${styles.overlayRuleImageWrapper} ${styles.languageFalse}`}>
-                    <IssueText
-                      text={'Game not fullscreen'}
-                      style={{ bottom: '2px', left: '2px' }}
-                    />
-                    <div style={{ position: 'absolute', top: '0px', left: '0px' }}>
-                      <FalseThumb />
-                    </div>
-                    <img
-                      src="https://cdn.streamlabs.com/static/imgs/carousel-images/false-overlay.png"
-                      alt=""
-                      className={styles.gameModeImage}
-                    />
-                  </div>
-                </Carousel>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+  return (
+    <Carousel arrows={true} dots={true} autoplay={false} autoplaySpeed={3000}>
+      <Overlay />
+      <SupportedGameModes />
+      {currentLocale !== 'en-US' && <Language falseLanguage={falseLanguage} />}
     </Carousel>
   );
 }
@@ -207,5 +64,127 @@ const SlideTitle = ({
         {subHeadline} {custom}
       </p>
     )}
+  </div>
+);
+
+const Language = ({ falseLanguage = 'German' }: { falseLanguage?: string }) => (
+  <div className={styles.slideWrapper}>
+    <div className={styles.contentWrapper}>
+      <SlideTitle
+        headline={'Game language must be English'}
+        subHeadline={'Ai Highlighter only works, if the game language is set to english.'}
+        custom={
+          <a href="https://www.epicgames.com/help/en-US/c-Category_Fortnite/c-Fortnite_Gameplay/how-do-i-change-my-language-in-fortnite-a000084860">
+            How to change the game language?
+          </a>
+        }
+      />
+      <div style={{ display: 'flex', width: '100%', gap: '8px' }}>
+        <div className={`${styles.languageDifference} ${styles.languageCorrect}`}>
+          English
+          <div style={{ position: 'absolute', bottom: '-8px', left: '3px' }}>
+            <CorrectThumb />
+          </div>
+        </div>
+
+        <div className={`${styles.languageDifference} ${styles.languageFalse}`}>
+          {' '}
+          <div style={{ position: 'absolute', top: '-7px', right: '4px' }}>
+            <FalseThumb />
+          </div>
+          {falseLanguage}
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+const SupportedGameModes = () => (
+  <div className={styles.slideWrapper}>
+    <div className={styles.contentWrapper}>
+      <SlideTitle
+        headline={'Supported game modes'}
+        subHeadline={'Right now we only support the following game modes: Battle Royale'}
+      />
+      <div style={{ display: 'flex', width: '100%', gap: '8px' }}>
+        <div className={styles.gameModeImageWrapper}>
+          <img
+            src="https://cdn.streamlabs.com/static/imgs/carousel-images/battle-royale.png"
+            alt=""
+            className={styles.gameModeImage}
+          />
+        </div>
+        <div className={styles.gameModeImageWrapper}>
+          <img
+            src="https://cdn.streamlabs.com/static/imgs/carousel-images/zero-build.png"
+            alt=""
+            className={styles.gameModeImage}
+          />
+        </div>
+        <div className={styles.gameModeImageWrapper}>
+          <img
+            src="https://cdn.streamlabs.com/static/imgs/carousel-images/reload.png"
+            alt=""
+            className={styles.gameModeImage}
+          />
+        </div>
+        <div className={styles.gameModeImageWrapper}>
+          <img
+            src="https://cdn.streamlabs.com/static/imgs/carousel-images/og.png"
+            alt=""
+            className={styles.gameModeImage}
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+const Overlay = () => (
+  <div className={styles.slideWrapper}>
+    <div className={styles.contentWrapper}>
+      <SlideTitle
+        headline={'Game and map visibility'}
+        subHeadline={'Map: Fully visible | Game: Fullscreen'}
+      />
+      <div className={styles.overlayRules}>
+        <div className={`${styles.overlayRuleImageWrapper} ${styles.languageCorrect}`}>
+          <div style={{ position: 'absolute', top: '0', left: '0' }}>
+            <CorrectThumb />
+          </div>
+          <img
+            src="https://cdn.streamlabs.com/static/imgs/carousel-images/correct.png"
+            alt=""
+            className={styles.gameModeImage}
+          />
+        </div>
+        <div style={{ width: '140px' }}>
+          <Carousel autoplay={true} arrows={false} autoplaySpeed={3000} dots={false}>
+            <div className={`${styles.overlayRuleImageWrapper} ${styles.languageFalse}`}>
+              <IssueText text={'Map not visible'} style={{ right: '2px', bottom: '2px' }} />
+              <div style={{ position: 'absolute', top: '20px', right: '20px' }}>
+                <FalseThumb />
+              </div>
+              <img
+                src="https://cdn.streamlabs.com/static/imgs/carousel-images/false-map.png"
+                alt=""
+                className={styles.gameModeImage}
+              />
+            </div>{' '}
+            <div className={`${styles.overlayRuleImageWrapper} ${styles.languageFalse}`}>
+              <IssueText text={'Game not fullscreen'} style={{ bottom: '2px', left: '2px' }} />
+              <div style={{ position: 'absolute', top: '0px', left: '0px' }}>
+                <FalseThumb />
+              </div>
+              <img
+                src="https://cdn.streamlabs.com/static/imgs/carousel-images/false-overlay.png"
+                alt=""
+                className={styles.gameModeImage}
+              />
+            </div>
+          </Carousel>
+        </div>
+      </div>
+    </div>
   </div>
 );
