@@ -288,7 +288,7 @@ export function StreamSettings() {
   } = useModule(StreamSettingsModule);
 
   return (
-    <div>
+    <div className={css.section}>
       {/* account info */}
       {protectedModeEnabled && (
         <div>
