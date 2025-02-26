@@ -9,7 +9,7 @@ export default function EducationCarousel() {
   const currentLocale = i18nService.state.locale;
   const falseLanguage =
     currentLocale !== 'en-US'
-      ? localeOptions.find(locale => locale.value !== currentLocale)?.label || 'German'
+      ? localeOptions.find(locale => locale.value === currentLocale)?.label || 'German'
       : 'German';
   console.log(i18nService.state, localeOptions, currentLocale);
 
@@ -104,7 +104,9 @@ const SupportedGameModes = () => (
     <div className={styles.contentWrapper}>
       <SlideTitle
         headline={'Supported game modes'}
-        subHeadline={'Right now we only support the following game modes: Battle Royale'}
+        subHeadline={
+          'Right now we only support the following game modes: Battle Royale, Zero Build, Reload, OG'
+        }
       />
       <div style={{ display: 'flex', width: '100%', gap: '8px' }}>
         <div className={styles.gameModeImageWrapper}>
