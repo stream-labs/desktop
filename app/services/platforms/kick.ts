@@ -324,7 +324,6 @@ export class KickService
     return jfetch<IKickStreamInfoResponse>(request)
       .then(async res => {
         const data = res as IKickStreamInfoResponse;
-        console.log('data', JSON.stringify(data, null, 2));
 
         if (data.categories && data.categories.length > 0) {
           const games = await Promise.all(
