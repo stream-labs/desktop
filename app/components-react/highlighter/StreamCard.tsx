@@ -13,6 +13,7 @@ import { useVuex } from 'components-react/hooks';
 import { InputEmojiSection } from './InputEmojiSection';
 import { $t } from 'services/i18n';
 import { EAiDetectionState } from 'services/highlighter/models/ai-highlighter.models';
+import * as remote from '@electron/remote';
 
 export default function StreamCard({
   streamId,
@@ -22,6 +23,7 @@ export default function StreamCard({
   emitExportVideo,
   emitRemoveStream,
   emitCancelHighlightGeneration,
+  emitShowRequirements,
 }: {
   streamId: string;
   clipsOfStreamAreLoading: string | null;
@@ -30,6 +32,7 @@ export default function StreamCard({
   emitExportVideo: () => void;
   emitRemoveStream: () => void;
   emitCancelHighlightGeneration: () => void;
+  emitShowRequirements: () => void;
 }) {
   const { HighlighterService } = Services;
   const clips = useVuex(() =>
@@ -49,10 +52,71 @@ export default function StreamCard({
     return <></>;
   }
 
+  function shareFeedback() {
+    remote.shell.openExternal(
+      'https://support.streamlabs.com/hc/en-us/requests/new?ticket_form_id=31967205905051',
+    );
+  }
+
   function showStreamClips() {
     if (stream?.state.type !== EAiDetectionState.IN_PROGRESS) {
       emitSetView({ view: EHighlighterView.CLIPS, id: stream?.id });
     }
+  }
+
+  if (stream.state.type === EAiDetectionState.FINISHED && clips.length === 0) {
+    return (
+      <div className={styles.streamCard}>
+        {' '}
+        <Button
+          size="large"
+          className={styles.deleteButton}
+          onClick={e => {
+            emitRemoveStream();
+            e.stopPropagation();
+          }}
+          style={{ backgroundColor: '#00000040', border: 'none', position: 'absolute' }}
+        >
+          <i className="icon-trash" />
+        </Button>
+        <div className={styles.requirements}>
+          <div style={{ display: 'flex', flexDirection: 'column', width: '280px' }}>
+            <h2>No clips found</h2>
+            <p style={{ marginBottom: '8px' }}>Please make sure all the requirements are met:</p>
+            <p>• Game is supported (Currently Fortnite only)</p>
+            <p>• Game language is English</p>
+            <p>• Map and Stats area is fully visible</p>
+            <p>• Game in fullscreen in your stream</p>
+            <p>• Game mode is supported (Battle Royale, Reload, Zero Build, OG)</p>
+            <a onClick={emitShowRequirements} style={{ marginBottom: '14px' }}>
+              Show details
+            </a>
+            <p>All requirements met but no luck?</p>
+
+            <a onClick={shareFeedback}>Take a screenshot of your stream and share it here</a>
+          </div>
+        </div>
+        <div className={styles.streaminfoWrapper}>
+          <div
+            className={styles.titleRotatedClipsWrapper}
+            style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
+          >
+            <div className={styles.titleDateWrapper}>
+              <h2 className={styles.streamcardTitle}>{stream.title}</h2>
+              <p style={{ margin: 0, fontSize: '12px' }}>{new Date(stream.date).toDateString()}</p>
+            </div>
+            <Button
+              size="large"
+              className={styles.cancelButton}
+              onClick={shareFeedback}
+              icon={<i className="icon-community" style={{ marginRight: '8px' }} />}
+            >
+              Share feedback
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
