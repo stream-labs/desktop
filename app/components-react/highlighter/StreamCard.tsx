@@ -85,7 +85,7 @@ export default function StreamCard({
             <p style={{ marginBottom: '8px' }}>
               {$t('Please make sure all the requirements are met:')}
             </p>
-            <ul>
+            <ul style={{ marginBottom: 0, marginLeft: '-28px' }}>
               <li>{$t('Game is supported (Currently Fortnite only)')}</li>
               <li>{$t('Game language is English')}</li>
               <li>{$t('Map and Stats area is fully visible')}</li>

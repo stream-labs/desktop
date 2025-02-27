@@ -14,11 +14,13 @@ export default function EducationCarousel() {
       : 'German';
 
   return (
-    <Carousel arrows={true} dots={true} autoplay={false} autoplaySpeed={3000}>
-      <Overlay />
-      <SupportedGameModes />
-      {currentLocale !== 'en-US' && <Language falseLanguage={falseLanguage} />}
-    </Carousel>
+    <div className={styles.carouselWrapper}>
+      <Carousel arrows={true} dots={true} autoplay={false} autoplaySpeed={3000}>
+        <Overlay />
+        <SupportedGameModes />
+        {currentLocale !== 'en-US' && <Language falseLanguage={falseLanguage} />}
+      </Carousel>
+    </div>
   );
 }
 

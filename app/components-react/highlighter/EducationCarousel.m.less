@@ -3,66 +3,68 @@
 @paddingRight: 24px;
 @paddingBottom: 20px;
 
-:global {
-  .ant-carousel {
-    width: 100%;
+.carousel-wrapper {
+  :global {
+    .ant-carousel {
+      width: 100%;
 
-    .slick-list {
-      height: 100%;
-    }
-
-    .slick-track {
-      height: 100%;
-    }
-    .slick-slider {
-      .slick-arrow {
-        position: absolute !important;
-        display: block !important;
-        //background: gray;
-        width: @paddingLeft;
-        top: 10px;
+      .slick-list {
         height: 100%;
-        z-index: 1000;
-        cursor: pointer;
-
-        //&:hover {
-        //background: rgba(0, 0, 0, 0.8);
-        // }
-
-        &.slick-prev {
-          left: 0px;
-          &::before {
-            content: '❰';
-          }
-        }
-
-        &.slick-next {
-          right: 0px;
-          &::before {
-            content: '❱';
-          }
-        }
-
-        &::before {
-          color: white;
-          font-size: 20px;
-          opacity: 1;
-          line-height: 1;
-        }
       }
 
-      .slick-dots-bottom {
-        bottom: -25px;
+      .slick-track {
+        height: 100%;
       }
-      .slick-dots {
-        li {
-          button {
-            background: rgb(255, 255, 255);
-            opacity: 0.3;
+      .slick-slider {
+        .slick-arrow {
+          position: absolute !important;
+          display: block !important;
+          //background: gray;
+          width: @paddingLeft;
+          top: 10px;
+          height: 100%;
+          z-index: 1000;
+          cursor: pointer;
+
+          //&:hover {
+          //background: rgba(0, 0, 0, 0.8);
+          // }
+
+          &.slick-prev {
+            left: 0px;
+            &::before {
+              content: '❰';
+            }
           }
-          &.slick-active button {
+
+          &.slick-next {
+            right: 0px;
+            &::before {
+              content: '❱';
+            }
+          }
+
+          &::before {
+            color: white;
+            font-size: 20px;
             opacity: 1;
-            background: var(--teal);
+            line-height: 1;
+          }
+        }
+
+        .slick-dots-bottom {
+          bottom: -25px;
+        }
+        .slick-dots {
+          li {
+            button {
+              background: rgb(255, 255, 255);
+              opacity: 0.3;
+            }
+            &.slick-active button {
+              opacity: 1;
+              background: var(--teal);
+            }
           }
         }
       }
