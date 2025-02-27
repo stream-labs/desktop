@@ -31,7 +31,7 @@ export default function PreviewModal({
   streamId: string | undefined;
   emitSetShowModal: (modal: TModalClipsView | null) => void;
 }) {
-  const { HighlighterService } = Services;
+  const { HighlighterService, UsageStatisticsService } = Services;
   const clips = HighlighterService.getClips(HighlighterService.views.clips, streamId);
   const { intro, outro } = HighlighterService.views.video;
   const audioSettings = HighlighterService.views.audio;
@@ -40,6 +40,10 @@ export default function PreviewModal({
   const [currentClipIndex, setCurrentClipIndex] = useState(initialIndex);
   const currentClipIndexRef = useRef(initialIndex);
   const [showDisabled, setShowDisabled] = useState(true);
+
+  useEffect(() => {
+    UsageStatisticsService.recordShown('ClipsPreview', streamId);
+  }, []);
 
   function getInitialIndex(introDuration: number | null, sortedClips: TClip[]): number {
     if (introDuration) return 0;
