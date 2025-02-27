@@ -1,12 +1,10 @@
 import React from 'react';
 import {
-  EAiDetectionState,
   EHighlighterView,
   IHighlightedStream,
   IViewState,
-  StreamInfoForAiHighlighter,
   TClip,
-} from 'services/highlighter';
+} from 'services/highlighter/models/highlighter.models';
 import styles from './StreamCard.m.less';
 import { Button } from 'antd';
 import { Services } from 'components-react/service-provider';
@@ -14,6 +12,7 @@ import { isAiClip } from './utils';
 import { useVuex } from 'components-react/hooks';
 import { InputEmojiSection } from './InputEmojiSection';
 import { $t } from 'services/i18n';
+import { EAiDetectionState } from 'services/highlighter/models/ai-highlighter.models';
 
 export default function StreamCard({
   streamId,

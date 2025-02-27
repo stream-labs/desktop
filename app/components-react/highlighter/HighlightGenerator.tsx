@@ -2,12 +2,12 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Button, Select, Checkbox, Typography } from 'antd';
 import { DownOutlined, RobotOutlined } from '@ant-design/icons';
 import { IFilterOptions } from './utils';
-import { IInput } from 'services/highlighter';
 import { getPlacementFromInputs } from './InputEmojiSection';
-import { EHighlighterInputTypes } from 'services/highlighter/ai-highlighter/ai-highlighter';
 import styles from './HighlightGenerator.m.less';
 import { formatSecondsToHMS } from './ClipPreview';
 import { $t } from 'services/i18n';
+import { EHighlighterInputTypes, IInput } from 'services/highlighter/models/ai-highlighter.models';
+import Translate from 'components-react/shared/Translate';
 const { Option } = Select;
 
 const selectStyles = {
@@ -108,68 +108,90 @@ export default function HighlightGenerator({
   }
 
   return (
-    <div className={styles.wrapper}>
-      <h3 style={{ color: '#FFFFFF', margin: 0, fontWeight: 400 }}>
-        🤖 {$t('Create highlight video of')}
-      </h3>
-      <Select
-        style={selectStyles}
-        mode="multiple"
-        value={selectedRounds}
-        maxTagCount={2}
-        suffixIcon={<DownOutlined style={{ color: '#FFFFFF', fontSize: '12px' }} />}
-        tagRender={({ value }) => (
-          <span className={styles.tag}>{value === 0 ? 'All Rounds' : `Round ${value}`}</span>
+    <h3
+      className={styles.wrapper}
+      style={{
+        color: '#FFFFFF',
+        margin: 0,
+        fontWeight: 400,
+      }}
+    >
+      🤖{' '}
+      <Translate
+        message={$t(
+          'Create highlight video of <roundSelect></roundSelect> with a duration of <minutesSelect></minutesSelect>',
         )}
-        dropdownStyle={dropdownStyles}
-      >
-        <div key="all-rounds" className={styles.option}>
-          <Checkbox
-            style={checkboxStyles}
-            checked={selectedRounds.includes(0)}
-            onChange={e => {
-              setSelectedRounds(e.target.checked ? [0] : []);
-            }}
-          >
-            {$t('All rounds')}
-          </Checkbox>
-        </div>
-        {roundDetails.map(roundDetails => (
-          <div key={'in-wrapper-round' + roundDetails.round} className={styles.option}>
-            <Checkbox
-              style={checkboxStyles}
-              checked={selectedRounds.includes(roundDetails.round)}
-              onChange={e => {
-                if (e.target.checked) {
-                  const newSelection = [...selectedRounds.filter(r => r !== 0), roundDetails.round];
-                  setSelectedRounds(newSelection);
-                } else {
-                  const newSelection = selectedRounds.filter(r => r !== roundDetails.round);
-                  setSelectedRounds(newSelection.length === 0 ? [0] : newSelection);
-                }
-              }}
+        renderSlots={{
+          roundSelect: () => (
+            <Select
+              style={selectStyles}
+              mode="multiple"
+              value={selectedRounds}
+              maxTagCount={2}
+              suffixIcon={<DownOutlined style={{ color: '#FFFFFF', fontSize: '12px' }} />}
+              tagRender={({ value }) => (
+                <span className={styles.tag}>
+                  {value === 0
+                    ? $t('All Rounds')
+                    : $t('Round %{roundNumber}', { roundNumber: value })}
+                </span>
+              )}
+              dropdownStyle={dropdownStyles}
             >
-              {roundDropdownDetails(roundDetails)}
-            </Checkbox>
-          </div>
-        ))}
-      </Select>
-      <h3 style={{ color: '#FFFFFF', margin: 0, fontWeight: 400 }}> {$t('with a duration of')}</h3>
-      <Select
-        style={{ width: '116px' }}
-        value={targetDuration}
-        onChange={value => setTargetDuration(value)}
-        dropdownStyle={dropdownStyles}
-      >
-        {filteredOptions.map(option => (
-          <Option key={option.value} value={option.value} className={styles.option}>
-            {option.label}
-          </Option>
-        ))}
-        <Option value={combinedClipsDuration + 100} className={styles.option}>
-          {$t('unlimited')}
-        </Option>
-      </Select>
+              <div key="all-rounds" className={styles.option}>
+                <Checkbox
+                  style={checkboxStyles}
+                  checked={selectedRounds.includes(0)}
+                  onChange={e => {
+                    setSelectedRounds(e.target.checked ? [0] : []);
+                  }}
+                >
+                  {$t('All Rounds')}
+                </Checkbox>
+              </div>
+              {roundDetails.map(roundDetails => (
+                <div key={'in-wrapper-round' + roundDetails.round} className={styles.option}>
+                  <Checkbox
+                    style={checkboxStyles}
+                    checked={selectedRounds.includes(roundDetails.round)}
+                    onChange={e => {
+                      if (e.target.checked) {
+                        const newSelection = [
+                          ...selectedRounds.filter(r => r !== 0),
+                          roundDetails.round,
+                        ];
+                        setSelectedRounds(newSelection);
+                      } else {
+                        const newSelection = selectedRounds.filter(r => r !== roundDetails.round);
+                        setSelectedRounds(newSelection.length === 0 ? [0] : newSelection);
+                      }
+                    }}
+                  >
+                    {roundDropdownDetails(roundDetails)}
+                  </Checkbox>
+                </div>
+              ))}
+            </Select>
+          ),
+          minutesSelect: () => (
+            <Select
+              style={{ width: '116px' }}
+              value={targetDuration}
+              onChange={value => setTargetDuration(value)}
+              dropdownStyle={dropdownStyles}
+            >
+              {filteredOptions.map(option => (
+                <Option key={option.value} value={option.value} className={styles.option}>
+                  {option.label}
+                </Option>
+              ))}
+              <Option value={combinedClipsDuration + 100} className={styles.option}>
+                {$t('unlimited')}
+              </Option>
+            </Select>
+          ),
+        }}
+      ></Translate>
       <Button
         type="text"
         onClick={() => {
@@ -180,6 +202,6 @@ export default function HighlightGenerator({
         icon={<span style={{ color: '#666666', fontSize: '20px' }}>&times;</span>}
         className={styles.resetButton}
       />
-    </div>
+    </h3>
   );
 }

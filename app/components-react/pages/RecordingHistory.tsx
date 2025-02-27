@@ -17,8 +17,9 @@ import uuid from 'uuid/v4';
 import { EMenuItemKey } from 'services/side-nav';
 import { $i } from 'services/utils';
 import { IRecordingEntry } from 'services/recording-mode';
-import { EAiDetectionState, EHighlighterView } from 'services/highlighter';
 import { EAvailableFeatures } from 'services/incremental-rollout';
+import { EAiDetectionState } from 'services/highlighter/models/ai-highlighter.models';
+import { EHighlighterView } from 'services/highlighter/models/highlighter.models';
 
 interface IRecordingHistoryStore {
   showSLIDModal: boolean;
@@ -137,7 +138,7 @@ class RecordingHistoryController {
     }
     if (platform === 'highlighter') {
       if (this.aiDetectionInProgress) return;
-      this.HighlighterService.actions.flow(recording.filename, {
+      this.HighlighterService.actions.detectAndClipAiHighlights(recording.filename, {
         game: 'forntnite',
         id: 'rec_' + uuid(),
       });
