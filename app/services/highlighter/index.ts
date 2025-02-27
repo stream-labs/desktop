@@ -1253,9 +1253,19 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     } catch (error: unknown) {
       if (error instanceof Error && error.message === 'Highlight generation canceled') {
         setStreamInfo.state.type = EAiDetectionState.CANCELED_BY_USER;
+        this.usageStatisticsService.recordAnalyticsEvent('AIHighlighter', {
+          type: 'DetectionCanceled',
+          reason: EAiDetectionState.CANCELED_BY_USER,
+          game: 'Fortnite',
+        });
       } else {
         console.error('Error in highlight generation:', error);
         setStreamInfo.state.type = EAiDetectionState.ERROR;
+        this.usageStatisticsService.recordAnalyticsEvent('AIHighlighter', {
+          type: 'DetectionFailed',
+          reason: EAiDetectionState.ERROR,
+          game: 'Fortnite',
+        });
       }
     } finally {
       setStreamInfo.abortController = undefined;
