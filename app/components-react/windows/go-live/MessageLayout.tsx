@@ -62,19 +62,17 @@ export default function MessageLayout(p: IMessageLayoutProps & HTMLAttributes<un
         <div>{p.children}</div>
         <div className={cx({ [styles.ctaBtn]: hasButton })}>
           {details && !isErrorDetailsShown && (
-            <p style={{ textAlign: 'right' }}>
-              <a className={styles.link} onClick={() => setDetailsShown(true)}>
-                {$t('Show details')}
-              </a>
-            </p>
+            <a className={styles.link} onClick={() => setDetailsShown(true)}>
+              {$t('Show details')}
+            </a>
           )}
           {details && isErrorDetailsShown && (
-            <p className={styles.details}>
+            <div className={styles.details}>
               {details}
               <br />
               <br />
               {error?.status} {error?.statusText} {error?.url}
-            </p>
+            </div>
           )}
         </div>
       </div>
