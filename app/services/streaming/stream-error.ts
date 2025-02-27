@@ -311,7 +311,7 @@ export function formatStreamErrorMessage(
       messages.user.push(details);
     }
 
-    message = error.message.replace(/\s*\.$/, '');
+    message = error.message.replace(/\.*$/, '');
     // trim trailing periods so that the message joins correctly
     const errorMessage = (error as any)?.action ? `${message}, ${(error as any).action}` : message;
 
