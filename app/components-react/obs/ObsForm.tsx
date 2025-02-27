@@ -45,6 +45,7 @@ export interface IObsFormProps {
   layout?: TInputLayout;
   style?: React.CSSProperties;
   extraProps?: Record<string, IExtraInputProps>;
+  name?: string;
 }
 
 /**
@@ -60,8 +61,10 @@ export function ObsForm(p: IObsFormProps) {
     p.onChange(newValue, index);
   }
 
+  const name = p?.name || p.value[0]?.name;
+
   return (
-    <Form layout={p.layout || 'vertical'} style={p.style}>
+    <Form layout={p.layout || 'vertical'} style={p.style} name={name}>
       {p.value.map((inputData, inputIndex) => (
         <ObsInput
           ref={inputRef}
@@ -404,6 +407,7 @@ export function ObsCollapsibleFormGroup(p: IObsSectionedFormGroupProps) {
           ) : (
             <ObsCollapsibleFormItem
               key={`${sectionProps.nameSubCategory}${ind}`}
+              name={sectionProps.nameSubCategory}
               section={sectionProps}
               onChange={formData => p.onChange(formData, ind)}
             />
@@ -439,6 +443,7 @@ export function ObsTabbedFormGroup(p: IObsSectionedFormGroupProps) {
 
           {sectionProps.nameSubCategory === currentTab && (
             <ObsForm
+              name={sectionProps.nameSubCategory}
               value={sectionProps.parameters}
               onChange={formData => p.onChange(formData, ind)}
             />
@@ -451,6 +456,7 @@ export function ObsTabbedFormGroup(p: IObsSectionedFormGroupProps) {
 
 interface IObsCollapsibleFormItemProps {
   section: ISettingsSubCategory;
+  name: string;
   onChange: (formData: TObsFormData, ind: number) => unknown;
 }
 
@@ -479,7 +485,7 @@ export function ObsCollapsibleFormItem(p: IObsCollapsibleFormItemProps) {
         header={p.section.nameSubCategory}
         key={`${p.section.nameSubCategory}`}
       >
-        <ObsForm value={p.section.parameters} onChange={p.onChange} />
+        <ObsForm name={p.name} value={p.section.parameters} onChange={p.onChange} />
       </Panel>
     </Collapse>
   );

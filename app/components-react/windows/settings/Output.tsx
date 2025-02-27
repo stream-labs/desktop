@@ -3,9 +3,7 @@ import { useObsSettings } from './useObsSettings';
 import {
   IObsSectionedFormGroupProps,
   ObsCollapsibleFormGroup,
-  ObsCollapsibleFormItem,
   ObsForm,
-  ObsTabbedFormGroup,
 } from 'components-react/obs/ObsForm';
 import Tabs from 'components-react/shared/Tabs';
 import { $t } from 'services/i18n';
@@ -67,6 +65,7 @@ export function ObsTabbedOutputFormGroup(p: IObsSectionedFormGroupProps) {
 
           {sectionProps.nameSubCategory === currentTab && (
             <ObsForm
+              name={sectionProps.nameSubCategory}
               value={sectionProps.parameters}
               onChange={formData => p.onChange(formData, ind)}
             />
