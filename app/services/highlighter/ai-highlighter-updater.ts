@@ -238,7 +238,11 @@ export class AiHighlighterUpdater {
     // backup the ouotdated version in case something goes bad
     if (outdateVersionPresent) {
       console.log('backing up outdated version...');
-      await fs.rename(binPath, path.resolve(AiHighlighterUpdater.basepath, 'bin.bkp'));
+      const backupPath = path.resolve(AiHighlighterUpdater.basepath, 'bin.bkp');
+      if (existsSync(backupPath)) {
+        await fs.rm(backupPath, { recursive: true });
+      }
+      await fs.rename(binPath, backupPath);
     }
     console.log('swapping new version...');
     await fs.rename(unzipPath, binPath);
