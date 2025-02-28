@@ -9,6 +9,7 @@ import { $t } from '../../../services/i18n';
 import Translate from '../../shared/Translate';
 import css from './GoLiveError.m.less';
 import * as remote from '@electron/remote';
+import { ENotificationType } from 'services/notifications';
 
 /**
  * Shows an error and troubleshooting suggestions
@@ -198,11 +199,47 @@ export default function GoLiveError() {
   }
 
   function renderRestreamError(error: IStreamError) {
+    Services.NotificationsService.actions.push({
+      message: `${$t('Multistream Error')}: ${error.details}`,
+      type: ENotificationType.WARNING,
+      lifeTime: 5000,
+    });
+
+    function skipSettingsUpdateAndGoLive() {
+      StreamingService.actions.finishStartStreaming();
+      WindowsService.actions.closeChildWindow();
+    }
+
+    const details =
+      !error.details || error.details === ''
+        ? [
+            $t(
+              'One of destinations might have incomplete permissions. Reconnect the destinations in settings and try again.',
+            ),
+          ]
+        : error.details.split('\n');
+
     return (
-      <MessageLayout error={error}>
-        {$t(
-          'Please try again. If the issue persists, you can stream directly to a single platform instead.',
+      <MessageLayout
+        error={error}
+        hasButton={true}
+        message={$t(
+          'Please try again. If the issue persists, you can stream directly to a single platform instead or click the button below to bypass and go live.',
         )}
+      >
+        {`${$t('Issues')}:`}
+        <ul>
+          {details.map((detail: string, index: number) => (
+            <li key={`detail-${index}`}>{detail}</li>
+          ))}
+        </ul>
+        <button
+          className="button button--warn"
+          style={{ marginTop: '8px' }}
+          onClick={() => skipSettingsUpdateAndGoLive()}
+        >
+          {$t('Bypass and Go Live')}
+        </button>
       </MessageLayout>
     );
   }
