@@ -1145,6 +1145,12 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
       this.SET_UPDATER_STATE(true);
       this.SET_HIGHLIGHTER_VERSION(this.aiHighlighterUpdater.version || '');
       await this.aiHighlighterUpdater.update(progress => this.updateProgress(progress));
+    } catch (e: unknown) {
+      console.error('Error updating AI Highlighter:', e);
+      this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
+        type: 'UpdateError',
+        new_version: this.aiHighlighterUpdater.version,
+      });
     } finally {
       this.SET_UPDATER_STATE(false);
     }

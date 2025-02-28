@@ -129,7 +129,7 @@ export class AiHighlighterUpdater {
    */
   public async isNewVersionAvailable(): Promise<boolean> {
     // check if updater checked version in current session already
-    if (this.versionChecked) {
+    if (this.versionChecked || Utils.getHighlighterEnvironment() === 'local') {
       return false;
     }
 
@@ -235,7 +235,7 @@ export class AiHighlighterUpdater {
     const binPath = path.resolve(AiHighlighterUpdater.basepath, 'bin');
     const outdateVersionPresent = existsSync(binPath);
 
-    // backup the ouotdated version in case something goes bad
+    // backup the outdated version in case something goes bad
     if (outdateVersionPresent) {
       console.log('backing up outdated version...');
       await fs.rename(binPath, path.resolve(AiHighlighterUpdater.basepath, 'bin.bkp'));
