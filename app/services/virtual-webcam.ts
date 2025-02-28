@@ -30,6 +30,7 @@ export type TVirtualWebcamPluginInstallStatus =
 interface IVirtualWebcamServiceState {
   running: boolean;
   outputType: VCamOutputType;
+  outputSelection: string;
   installStatus: EVirtualWebcamPluginInstallStatus;
 }
 
@@ -41,6 +42,7 @@ export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceS
   static initialState: IVirtualWebcamServiceState = {
     running: false,
     outputType: VCamOutputType.ProgramView,
+    outputSelection: '',
     installStatus: EVirtualWebcamPluginInstallStatus.NotPresent,
   };
 
@@ -48,7 +50,6 @@ export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceS
   installStatusChanged = new Subject<EVirtualWebcamPluginInstallStatus>();
 
   protected init(): void {
-    super.init();
     this.setInstallStatus();
   }
 
@@ -70,22 +71,8 @@ export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceS
       console.error('Error resolving install status:', error);
       this.SET_INSTALL_STATUS(EVirtualWebcamPluginInstallStatus.NotPresent);
     }
-  }
 
-  /**
-   * Set the virtual camera install status
-   * @remark This method wraps getting the install status in a try/catch block
-   * to prevent infinite loading from errors
-   */
-  @ExecuteInWorkerProcess()
-  setInstallStatus() {
-    try {
-      const installStatus = this.getInstallStatus();
-      this.SET_INSTALL_STATUS(installStatus);
-    } catch (error: unknown) {
-      console.error('Error resolving install status:', error);
-      this.SET_INSTALL_STATUS(EVirtualWebcamPluginInstallStatus.NotPresent);
-    }
+    this.installStatusChanged.next(this.state.installStatus);
   }
 
   @ExecuteInWorkerProcess()
@@ -156,11 +143,11 @@ export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceS
     this.usageStatisticsService.recordFeatureUsage('VirtualWebcam');
   }
 
+  @ExecuteInWorkerProcess()
   stop() {
     if (!this.state.running) return;
 
     obs.NodeObs.OBS_service_stopVirtualCam();
-    //obs.NodeObs.OBS_service_removeVirtualWebcam();
 
     this.SET_RUNNING(false);
     this.runningChanged.next(false);
@@ -175,16 +162,12 @@ export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceS
   update(type: VCamOutputType, name: string) {
     obs.NodeObs.OBS_service_updateVirtualCam(type, name);
 
+    const outputSelection = type === VCamOutputType.ProgramView ? '' : name;
+
     if (type !== this.state.outputType) {
       this.SET_OUTPUT_TYPE(type);
+      this.SET_OUTPUT_SELECTION(outputSelection);
     }
-  }
-
-  getVideoSources() {
-    return this.sourcesService.views.sources.filter(
-      source =>
-        source.type !== 'scene' && source.getObsInput().outputFlags & ESourceOutputFlags.Video,
-    );
   }
 
   @mutation()
@@ -195,6 +178,11 @@ export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceS
   @mutation()
   private SET_OUTPUT_TYPE(type: VCamOutputType) {
     this.state.outputType = type;
+  }
+
+  @mutation()
+  private SET_OUTPUT_SELECTION(selection: string) {
+    this.state.outputSelection = selection;
   }
 
   @mutation()
@@ -209,6 +197,10 @@ class VirtualWebcamViews extends ViewHandler<IVirtualWebcamServiceState> {
 
   get outputType() {
     return this.state.outputType.toString();
+  }
+
+  get outputSelection() {
+    return this.state.outputSelection;
   }
 
   get installStatus(): EVirtualWebcamPluginInstallStatus {

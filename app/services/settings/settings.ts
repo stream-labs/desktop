@@ -124,10 +124,6 @@ export interface ISettingsValues {
     NewSocketLoopEnable: boolean;
     LowLatencyEnable: boolean;
   };
-  'Virtual Webcam'?: {
-    OutputType: number;
-    OutputSelection: string;
-  };
 }
 export interface ISettingsSubCategory {
   nameSubCategory: string;
@@ -244,14 +240,6 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
 
     return null;
   }
-
-  get virtualWebcamSettings() {
-    return this.state['Virtual Webcam'].formData;
-  }
-
-  get virtualWebcamOutputSelection() {
-    return this.values['Virtual Webcam'].OutputSelection;
-  }
 }
 
 export class SettingsService extends StatefulService<ISettingsServiceState> {
@@ -358,8 +346,6 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
     this.getCategories().forEach((categoryName: keyof ISettingsServiceState) => {
       settingsFormData[categoryName] = this.fetchSettingsFromObs(categoryName);
     });
-    console.log('settingsFormData', settingsFormData);
-    console.log('settingsFormData', JSON.stringify(settingsFormData, null, 2));
 
     this.SET_SETTINGS(settingsFormData);
   }

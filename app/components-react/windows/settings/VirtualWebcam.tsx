@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { useVuex } from 'components-react/hooks';
 import { getOS, OS } from 'util/operating-systems';
 import { $t } from 'services/i18n';
@@ -14,16 +14,25 @@ import styles from './VirtualWebcam.m.less';
 import cx from 'classnames';
 
 export function VirtualWebcamSettings() {
-  const { VirtualWebcamService, ScenesService, SettingsService, SourcesService } = Services;
+  const { VirtualWebcamService, ScenesService, SourcesService } = Services;
+
+  useEffect(() => {
+    let mounted = true;
+    if (mounted) {
+      VirtualWebcamService.actions.setInstallStatus();
+    }
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const v = useVuex(() => ({
     running: VirtualWebcamService.views.running,
     outputType: VirtualWebcamService.views.outputType,
-    outputSelection: SettingsService.views.virtualWebcamOutputSelection,
+    outputSelection: VirtualWebcamService.views.outputSelection,
     installStatus: VirtualWebcamService.views.installStatus,
-    start: VirtualWebcamService.actions.start,
-    stop: VirtualWebcamService.actions.stop,
-    setOutputType: VirtualWebcamService.actions.update,
+    update: VirtualWebcamService.actions.update,
   }));
 
   const OUTPUT_TYPE_OPTIONS = [
@@ -54,13 +63,6 @@ export function VirtualWebcamSettings() {
         }));
     }
 
-    // set the default virtual webcam output (skip if using the default options because
-    // it was already set in the onSelect)
-    if (options.length) {
-      const selected = options[0].value;
-      SettingsService.setSettingValue('Virtual Webcam', 'OutputSelection', selected);
-    }
-
     return options;
   }, [v.outputType, v.outputSelection]);
 
@@ -70,53 +72,27 @@ export function VirtualWebcamSettings() {
     const outputSelection =
       outputSelectionOptions.find(o => o.value === v.outputSelection) ?? outputSelectionOptions[0];
 
-    SettingsService.setSettingValue('Virtual Webcam', 'OutputSelection', outputSelection.value);
-    VirtualWebcamService.update((v.outputType as unknown) as VCamOutputType, outputSelection.value);
-
     return outputSelection;
   }, [v.outputSelection, outputSelectionOptions]);
 
+  const isInstalled = v.installStatus === EVirtualWebcamPluginInstallStatus.Installed;
+
   const showOutputSelection =
-    v.outputType === VCamOutputType.SceneOutput.toString() ||
-    v.outputType === VCamOutputType.SourceOutput.toString();
+    isInstalled &&
+    (v.outputType === VCamOutputType.SceneOutput.toString() ||
+      v.outputType === VCamOutputType.SourceOutput.toString());
 
   const showOutputLabel =
     v.outputType === VCamOutputType.SceneOutput.toString()
       ? $t('Output Scene')
       : $t('Output Source');
 
-  const showInstall = useMemo(() => {
-    switch (v.installStatus) {
-      case EVirtualWebcamPluginInstallStatus.NotPresent:
-        return true;
-      case EVirtualWebcamPluginInstallStatus.Outdated:
-        return true;
-      case EVirtualWebcamPluginInstallStatus.Installed:
-        return false;
-      default:
-        return true;
-    }
-  }, [v.installStatus]);
-
-  const isInstalled = v.installStatus === EVirtualWebcamPluginInstallStatus.Installed;
-
   function onSelectType(value: string, label: string) {
-    const shouldResetDefault = [
-      VCamOutputType.SceneOutput.toString(),
-      VCamOutputType.SourceOutput.toString(),
-    ].includes(value);
-
-    // when switching to the default type, clear the output selection
-    if (shouldResetDefault) {
-      SettingsService.setSettingValue('Virtual Webcam', 'OutputSelection', '');
-    }
-
-    v.setOutputType((value as unknown) as VCamOutputType, label);
+    v.update((value as unknown) as VCamOutputType, label);
   }
 
   function onSelectSelection(value: string) {
-    SettingsService.setSettingValue('Virtual Webcam', 'OutputSelection', value);
-    VirtualWebcamService.update((v.outputType as unknown) as VCamOutputType, value);
+    v.update((v.outputType as unknown) as VCamOutputType, value);
   }
 
   return (
@@ -130,31 +106,16 @@ export function VirtualWebcamSettings() {
       </ObsSettingsSection>
 
       {/* MANAGE TARGET */}
-      <ObsSettingsSection key="vw-type">
-        <Form>
-          <ListInput
-            label={$t('Output Type')}
-            options={OUTPUT_TYPE_OPTIONS}
-            value={v.outputType}
-            defaultValue={OUTPUT_TYPE_OPTIONS[0].value}
-            onSelect={(val: string, opts) => {
-              onSelectType(val, opts.labelrender);
-            }}
-            allowClear={false}
-            style={{ width: '100%' }}
-          />
-        </Form>
-      </ObsSettingsSection>
-
-      {showOutputSelection && (
-        <ObsSettingsSection key="vw-selection">
+      {isInstalled && (
+        <ObsSettingsSection key="vw-type">
           <Form>
             <ListInput
-              label={showOutputLabel}
-              options={outputSelectionOptions}
-              value={outputSelectionValue.value}
-              onSelect={(val, opts) => {
-                onSelectSelection(val);
+              label={$t('Output Type')}
+              options={OUTPUT_TYPE_OPTIONS}
+              value={v.outputType}
+              defaultValue={OUTPUT_TYPE_OPTIONS[0].value}
+              onSelect={(val: string, opts) => {
+                onSelectType(val, opts.labelrender);
               }}
               allowClear={false}
               style={{ width: '100%' }}
@@ -163,32 +124,46 @@ export function VirtualWebcamSettings() {
         </ObsSettingsSection>
       )}
 
+      {showOutputSelection && (
+        <ObsSettingsSection key="vw-selection">
+          <Form>
+            <ListInput
+              label={showOutputLabel}
+              options={outputSelectionOptions}
+              value={outputSelectionValue.value}
+              onSelect={onSelectSelection}
+              allowClear={false}
+              style={{ width: '100%' }}
+            />
+          </Form>
+        </ObsSettingsSection>
+      )}
+
       {/* START/STOP */}
-      {isInstalled && <ManageVirtualWebcam />}
+      {isInstalled && <ManageVirtualWebcam isRunning={v.running} />}
 
       {/* MANAGE INSTALLATION */}
-      {showInstall && (
+      {!isInstalled && (
         <InstallVirtualWebcam
           isUpdate={v.installStatus === EVirtualWebcamPluginInstallStatus.Outdated}
           name={outputSelectionValue.value}
         />
       )}
-      {!showInstall && <UninstallVirtualWebcam />}
+      {isInstalled && <UninstallVirtualWebcam />}
     </div>
   );
 }
 
-function ManageVirtualWebcam() {
+function ManageVirtualWebcam(p: { isRunning: boolean }) {
   const { VirtualWebcamService } = Services;
-  const isRunning = VirtualWebcamService.views.running;
 
-  const buttonText = isRunning ? $t('Stop Virtual Webcam') : $t('Start Virtual Webcam');
-  const statusText = isRunning
+  const buttonText = p.isRunning ? $t('Stop Virtual Webcam') : $t('Start Virtual Webcam');
+  const statusText = p.isRunning
     ? $t('Virtual webcam is <status>Running</status>')
     : $t('Virtual webcam is <status>Offline</status>');
 
   function handleStartStop() {
-    if (isRunning) {
+    if (p.isRunning) {
       VirtualWebcamService.actions.stop();
     } else {
       VirtualWebcamService.actions.start();
@@ -204,7 +179,7 @@ function ManageVirtualWebcam() {
             renderSlots={{
               status: (text: string) => {
                 return (
-                  <span key="vw-running" className={cx({ [styles.running]: isRunning })}>
+                  <span key="vw-running" className={cx({ [styles.running]: p.isRunning })}>
                     <b>{text}</b>
                   </span>
                 );
@@ -213,9 +188,9 @@ function ManageVirtualWebcam() {
           />
         </p>
         <button
-          className={cx('button', { 'button--action': !isRunning, 'button--warn': isRunning })}
+          className={cx('button', { 'button--action': !p.isRunning, 'button--warn': p.isRunning })}
           style={{ marginBottom: '16px' }}
-          onClick={() => handleStartStop()}
+          onClick={handleStartStop}
         >
           {buttonText}
         </button>
