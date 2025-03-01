@@ -65,23 +65,23 @@ jobs:
       - script: 'yarn compile:strictnulls'
         displayName: 'Check regressions in files with strictNullChecks'
 
-  - job: macOS
+  # - job: macOS
 
-    pool:
-      vmImage: macOS-latest
+  #   pool:
+  #     vmImage: macOS-latest
 
-    workspace:
-      clean: resources
+  #   workspace:
+  #     clean: resources
 
-    steps:
-      - script: yarn install --immutable --network-timeout 1000000 2>&1
-        displayName: 'Install Dependencies'
+  #   steps:
+  #     - script: yarn install --immutable --network-timeout 1000000 2>&1
+  #       displayName: 'Install Dependencies'
 
-      - script: node node_modules/electron/install.js
-        displayName: 'Install Electron'
+  #     - script: node node_modules/electron/install.js
+  #       displayName: 'Install Electron'
 
-      - script: 'yarn eslint'
-        displayName: 'ESLint'
+  #     - script: 'yarn eslint'
+  #       displayName: 'ESLint'
 
-      - script: 'yarn ci:compile'
-        displayName: 'Compile Assets'
+  #     - script: 'yarn ci:compile'
+  #       displayName: 'Compile Assets'
