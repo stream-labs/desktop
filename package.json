@@ -108,7 +108,7 @@
     "@babel/preset-env": "7.22.10",
     "@electron/notarize": "^2.3.0",
     "@octokit/app": "14.0.0",
-    "@octokit/request": "8.1.1",
+    "@octokit/request": "8.4.1",
     "@octokit/rest": "20.0.1",
     "@sentry/browser": "5.21.4",
     "@sentry/integrations": "5.21.4",
