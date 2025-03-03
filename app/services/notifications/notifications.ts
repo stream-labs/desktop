@@ -65,6 +65,11 @@ class NotificationsViews extends ViewHandler<INotificationsState> {
       },
     ];
   }
+
+  getLastNotification(): INotification | null {
+    const numNotifications = this.getAll().length;
+    return numNotifications > 0 ? this.getAll()[numNotifications - 1] : null;
+  }
 }
 
 export class NotificationsService
