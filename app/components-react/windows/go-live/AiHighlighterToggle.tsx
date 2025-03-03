@@ -122,7 +122,7 @@ export default function AiHighlighterToggle({
                       size="small"
                       type="primary"
                       onClick={() => {
-                        HighlighterService.installAiHighlighter();
+                        HighlighterService.installAiHighlighter(false, 'Go-live-flow');
                       }}
                     >
                       Install AI Highlighter

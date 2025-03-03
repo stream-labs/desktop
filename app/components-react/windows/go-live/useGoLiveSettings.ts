@@ -34,6 +34,17 @@ class GoLiveSettingsState extends StreamInfoView<IGoLiveSettingsState> {
     return this.state;
   }
 
+  get alwaysEnabledPlatforms(): TPlatform[] {
+    return ['tiktok'];
+  }
+
+  /*
+   * Primary used to get all platforms that should always show the destination switcher in the Go Live window
+   */
+  get alwaysShownPlatforms(): TPlatform[] {
+    return ['kick'];
+  }
+
   /**
    * Update top level settings
    */
@@ -173,7 +184,7 @@ export class GoLiveSettingsModule {
 
     const prepopulateOptions = this.state.prepopulateOptions;
     const view = new StreamInfoView({});
-    const settings = {
+    const settings: IGoLiveSettingsState = {
       ...view.savedSettings, // copy saved stream settings
       tweetText: view.getTweetText(view.commonFields.title), // generate a default tweet text
       needPrepopulate: false,
@@ -208,8 +219,10 @@ export class GoLiveSettingsModule {
     const { dualOutputMode } = DualOutputService.state;
     const { canEnableRestream } = RestreamService.views;
 
-    // Tiktok can stay active
-    const enabledPlatforms = this.state.enabledPlatforms.filter(platform => platform !== 'tiktok');
+    // Tiktok and Kick can stay active
+    const enabledPlatforms = this.state.enabledPlatforms.filter(
+      platform => !this.state.alwaysEnabledPlatforms.includes(platform),
+    );
 
     if (!dualOutputMode && !canEnableRestream && enabledPlatforms.length > 1) {
       /* Find the platform that was set as primary chat to remain enabled,
