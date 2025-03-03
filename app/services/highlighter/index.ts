@@ -991,6 +991,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
         transitionDuration: this.views.transitionDuration,
         transition: this.views.transition,
         useAiHighlighter: this.views.useAiHighlighter,
+        streamId,
       },
       handleFrame,
       setExportInfo,
@@ -1110,7 +1111,15 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     }
   }
 
-  async installAiHighlighter(downloadNow: boolean = false) {
+  async installAiHighlighter(
+    downloadNow: boolean = false,
+    location: 'Highlighter-tab' | 'Go-live-flow',
+  ) {
+    this.usageStatisticsService.recordAnalyticsEvent('AIHighlighter', {
+      type: 'Installation',
+      location,
+    });
+
     this.setAiHighlighter(true);
     if (downloadNow) {
       await this.aiHighlighterUpdater.isNewVersionAvailable();
@@ -1136,6 +1145,12 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
       this.SET_UPDATER_STATE(true);
       this.SET_HIGHLIGHTER_VERSION(this.aiHighlighterUpdater.version || '');
       await this.aiHighlighterUpdater.update(progress => this.updateProgress(progress));
+    } catch (e: unknown) {
+      console.error('Error updating AI Highlighter:', e);
+      this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
+        type: 'UpdateError',
+        newVersion: this.aiHighlighterUpdater.version,
+      });
     } finally {
       this.SET_UPDATER_STATE(false);
     }
@@ -1248,14 +1263,25 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
         type: 'Detection',
         clips: highlighterResponse.length,
         game: 'Fortnite', // hardcode for now
+        streamId: this.streamMilestones?.streamId,
       });
       console.log('✅ Final HighlighterData', highlighterResponse);
     } catch (error: unknown) {
       if (error instanceof Error && error.message === 'Highlight generation canceled') {
         setStreamInfo.state.type = EAiDetectionState.CANCELED_BY_USER;
+        this.usageStatisticsService.recordAnalyticsEvent('AIHighlighter', {
+          type: 'DetectionCanceled',
+          reason: EAiDetectionState.CANCELED_BY_USER,
+          game: 'Fortnite',
+        });
       } else {
         console.error('Error in highlight generation:', error);
         setStreamInfo.state.type = EAiDetectionState.ERROR;
+        this.usageStatisticsService.recordAnalyticsEvent('AIHighlighter', {
+          type: 'DetectionFailed',
+          reason: EAiDetectionState.ERROR,
+          game: 'Fortnite',
+        });
       }
     } finally {
       setStreamInfo.abortController = undefined;
@@ -1343,7 +1369,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     this.CLEAR_UPLOAD();
   }
 
-  async uploadYoutube(options: IYoutubeVideoUploadOptions) {
+  async uploadYoutube(options: IYoutubeVideoUploadOptions, streamId: string | undefined) {
     if (!this.userService.state.auth?.platforms.youtube) {
       throw new Error('Cannot upload without YT linked');
     }
@@ -1407,6 +1433,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
         this.views.useAiHighlighter ? 'AIHighlighter' : 'Highlighter',
         {
           type: 'UploadYouTubeSuccess',
+          streamId,
           privacy: options.privacyStatus,
           videoLink:
             options.privacyStatus === 'public'
