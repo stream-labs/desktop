@@ -1,5 +1,5 @@
-import React, { useRef, MouseEvent } from 'react';
-import { getPlatformService, TPlatform } from '../../../services/platforms';
+import React, { useRef, useMemo, MouseEvent } from 'react';
+import { getPlatformService, platformLabels, TPlatform } from '../../../services/platforms';
 import cx from 'classnames';
 import { $t } from '../../../services/i18n';
 import styles from './DestinationSwitchers.m.less';
@@ -12,6 +12,7 @@ import { useGoLiveSettings } from './useGoLiveSettings';
 import DisplaySelector from 'components-react/shared/DisplaySelector';
 import DestinationSelector from './DestinationSelector';
 import AddDestinationButton from 'components-react/shared/AddDestinationButton';
+import { promptAction } from 'components-react/modals';
 
 /**
  * Allows enabling/disabling platforms and custom destinations for the stream
@@ -24,10 +25,14 @@ export function DestinationSwitchers() {
     enabledDestinations,
     switchPlatforms,
     switchCustomDestination,
+    isPlatformLinked,
     isRestreamEnabled,
     isDualOutputMode,
     isPrime,
+    alwaysEnabledPlatforms,
+    alwaysShownPlatforms,
   } = useGoLiveSettings();
+
   // use these references to apply debounce
   // for error handling and switch animation
   const enabledPlatformsRef = useRef(enabledPlatforms);
@@ -36,9 +41,24 @@ export function DestinationSwitchers() {
   enabledDestRef.current = enabledDestinations;
   const destinationSwitcherRef = useRef({ addClass: () => undefined });
 
-  const platforms = isDualOutputMode && !isPrime ? enabledPlatforms : linkedPlatforms;
+  // some platforms are always shown, even if not linked
+  // add them to the list of platforms to display
+  const platforms = useMemo(() => {
+    const displayedPlatforms = isDualOutputMode && !isPrime ? enabledPlatforms : linkedPlatforms;
+    const unlinkedAlwaysShownPlatforms = alwaysShownPlatforms.filter(
+      platform => !isPlatformLinked(platform),
+    );
+    return unlinkedAlwaysShownPlatforms.length
+      ? displayedPlatforms.concat(unlinkedAlwaysShownPlatforms)
+      : displayedPlatforms;
+  }, [linkedPlatforms, enabledPlatformsRef.current, isDualOutputMode, isPrime]);
+
+  // in dual output mode for non-ultra users, only one custom destination can be enabled
   const destinations =
     isDualOutputMode && !isPrime ? customDestinations.filter(d => d.enabled) : customDestinations;
+
+  // there are four different UIs for the switchers for each combination of output mode and ultra status.
+  // the below determines which elements to show
   const showSelector =
     isDualOutputMode &&
     !isPrime &&
@@ -88,8 +108,8 @@ export function DestinationSwitchers() {
       return;
     }
 
-    // user can always stream to tiktok
-    if (!isRestreamEnabled && platform !== 'tiktok') {
+    // user can always stream to tiktok and kick
+    if (!isRestreamEnabled && !alwaysEnabledPlatforms.includes(platform)) {
       /*
        * Clearing this list ensures that when a new platform is selected, instead of enabling 2 platforms
        * we switch to 1 enabled platforms that was just toggled.
@@ -132,6 +152,7 @@ export function DestinationSwitchers() {
           isDualOutputMode={isDualOutputMode}
           index={ind}
           hideController={showSelector || hidePlatformController}
+          showPrompt={alwaysShownPlatforms.includes(platform) && !isPlatformLinked(platform)}
         />
       ))}
 
@@ -141,7 +162,7 @@ export function DestinationSwitchers() {
           destination={dest}
           enabled={dest.enabled && !disableCustomDestinationSwitchers}
           onChange={enabled => toggleDestination(ind, enabled)}
-          disabled={disableCustomDestinationSwitchers}
+          switchDisabled={disableCustomDestinationSwitchers}
           isDualOutputMode={isDualOutputMode}
           index={ind}
         />
@@ -168,10 +189,11 @@ interface IDestinationSwitcherProps {
   destination: TPlatform | ICustomStreamDestination;
   enabled: boolean;
   onChange: (enabled: boolean) => unknown;
-  disabled?: boolean;
+  switchDisabled?: boolean;
   index: number;
   isDualOutputMode: boolean;
   hideController?: boolean;
+  showPrompt?: boolean;
 }
 
 /**
@@ -184,9 +206,16 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
   const switchInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const platform = typeof p.destination === 'string' ? (p.destination as TPlatform) : null;
-  const { RestreamService, MagicLinkService } = Services;
+  const disabled = p?.switchDisabled || p?.showPrompt;
+
+  const { RestreamService, MagicLinkService, NavigationService, WindowsService } = Services;
 
   function dualOutputClickHandler(ev: MouseEvent) {
+    if (p.showPrompt && platform) {
+      renderPrompt();
+      return;
+    }
+
     if (RestreamService.views.canEnableRestream) {
       p.onChange(!p.enabled);
       // always proxy the click to the SwitchInput
@@ -204,8 +233,13 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
   }
 
   function onClickHandler(ev: MouseEvent) {
+    if (p.showPrompt && platform) {
+      renderPrompt();
+      return;
+    }
+
     // If we're disabling the switch we shouldn't be emitting anything past below
-    if (p.disabled) {
+    if (disabled) {
       return;
     }
 
@@ -216,9 +250,37 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
     switchInputRef.current?.click();
   }
 
+  function renderPrompt() {
+    if (!platform) return;
+
+    const message = RestreamService.views.canEnableRestream
+      ? $t('Connect your %{platform} account to stream to %{platform}.', {
+          platform: platformLabels(platform),
+        })
+      : $t(
+          'Connect your %{platform} account to stream to %{platform}. Try streaming to %{platform} and another platform at the same time for free in dual output mode, or multistream with ultra.',
+          {
+            platform: platformLabels(platform),
+          },
+        );
+
+    promptAction({
+      title: $t('Connect your %{platform} account', { platform: platformLabels(platform) }),
+      icon: <PlatformLogo platform={platform} className={styles.actionModalLogo} />,
+      message,
+      btnText: $t('Connect'),
+      fn: () => {
+        NavigationService.actions.navigate('PlatformMerge', {
+          platform,
+        });
+        WindowsService.actions.closeChildWindow();
+      },
+    });
+  }
+
   const { title, description, Controller, Logo } = (() => {
     const { UserService } = Services;
-    const showCloseIcon = p.isDualOutputMode && !UserService.views.isPrime;
+    const showCloseIcon = p.isDualOutputMode && !UserService.views.isPrime && !p?.showPrompt;
 
     if (platform) {
       // define slots for a platform switcher
@@ -252,7 +314,7 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
               inputRef={switchInputRef}
               value={p.enabled}
               name={platform}
-              disabled={p.disabled}
+              disabled={disabled}
               uncontrolled
               nolabel
               className={cx('platform-switch', {
@@ -283,7 +345,7 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
               inputRef={switchInputRef}
               value={p.enabled}
               name={`destination_${destination.name}`}
-              disabled={p.disabled}
+              disabled={disabled}
               uncontrolled
               nolabel
               className={cx('destination-switch', {
@@ -333,6 +395,12 @@ const DestinationSwitcher = React.forwardRef<{}, IDestinationSwitcherProps>((p, 
           className={cx('dual-output-card', styles.dualOutputPlatformSwitcher, {
             [styles.platformDisabled]: !p.enabled,
           })}
+          onClick={e => {
+            if (p.showPrompt) {
+              renderPrompt();
+              e.preventDefault();
+            }
+          }}
         >
           <div className={styles.dualOutputPlatformInfo}>
             {/* PLATFORM LOGO */}
