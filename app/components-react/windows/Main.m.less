@@ -15,28 +15,11 @@
 }
 
 .main-contents {
-  display: grid;
-  grid-template-columns: auto 1fr;
+  display: flex;
   flex-grow: 1;
   height: 100%;
+  width: 100%;
   position: relative;
-  // overflow: auto;
-}
-
-.main-contents--right {
-  grid-template-columns: auto auto 1fr;
-}
-
-.main-contents--left {
-  grid-template-columns: auto 1fr auto;
-}
-
-.main-contents--onboarding {
-  grid-template-columns: 1fr;
-
-  .main-middle {
-    grid-template-rows: 1fr;
-  }
 }
 
 .main-middle {
@@ -44,7 +27,7 @@
   grid-template-rows: minmax(0, 1fr) 48px;
   position: relative;
   height: 100%;
-  width: auto;
+  flex-grow: 1;
   min-width: 0;
 }
 
@@ -112,14 +95,21 @@
   height: 100%;
 }
 
-.live-dock-resize-bar {
-  position: absolute;
-  height: calc(100% - 20px);
-  bottom: 0;
+.live-dock-container {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+  padding: 16px 8px;
+  width: 100%;
+  min-width: 0;
+  border-left: 1px solid var(--border);
 }
 
-.live-dock-resize-bar--left {
-  right: 0;
+.live-dock-container.left {
+  border-left: none;
+  border-right: 1px solid var(--border);
 }
 
 /deep/ .creator-sites-container .s-loader {

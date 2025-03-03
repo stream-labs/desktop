@@ -15,6 +15,7 @@ import SideNav from 'components-react/sidebar/SideNav';
 import LiveDock from 'components-react/root/LiveDock';
 import StudioFooter from 'components-react/root/StudioFooter';
 import Loader from 'components-react/pages/Loader';
+import ResizeBar from 'components-react/root/ResizeBar';
 import antdThemes from 'styles/antd/index';
 import { getPlatformService } from 'services/platforms';
 import { IModalOptions } from 'services/windows';
@@ -108,10 +109,6 @@ class MainController {
     );
   }
 
-  get liveDockSize() {
-    return this.customizationService.state.livedockSize;
-  }
-
   get isDockCollapsed() {
     return this.customizationService.state.livedockCollapsed;
   }
@@ -191,12 +188,14 @@ class MainController {
   }
 
   updateLiveDockWidth() {
-    if (this.liveDockSize !== this.validateWidth(this.liveDockSize)) {
-      this.setLiveDockWidth(this.liveDockSize);
+    const liveDockSize = this.customizationService.state.livedockSize;
+    if (liveDockSize !== this.validateWidth(liveDockSize)) {
+      this.setLiveDockWidth(liveDockSize);
     }
   }
 
   setLiveDockWidth(width: number) {
+    console.log(width, this.store.maxDockWidth);
     this.customizationService.actions.setSettings({
       livedockSize: this.validateWidth(width),
     });
@@ -266,15 +265,6 @@ function Main() {
 
   const dockWidth = useRealmObject(Services.CustomizationService.state).livedockSize;
 
-  useEffect(() => {
-    const unsubscribe = StatefulService.store.subscribe((_, state) => {
-      if (state.bulkLoadFinished) setBulkLoadFinished(true);
-      if (state.i18nReady) seti18nReady(true);
-    });
-
-    return unsubscribe;
-  }, []);
-
   function windowSizeHandler() {
     if (!hideStyleBlockers) {
       ctrl.updateStyleBlockers(true);
@@ -298,6 +288,17 @@ function Main() {
       ctrl.updateLiveDockWidth();
     }, 200);
   }
+
+  useEffect(() => {
+    const unsubscribe = StatefulService.store.subscribe((_, state) => {
+      if (state.bulkLoadFinished) setBulkLoadFinished(true);
+      if (state.i18nReady) seti18nReady(true);
+    });
+
+    windowSizeHandler();
+
+    return unsubscribe;
+  }, []);
 
   useEffect(() => {
     window.addEventListener('resize', windowSizeHandler);
@@ -363,12 +364,18 @@ function Main() {
           </div>
         )}
         {renderDock && leftDock && (
-          <LiveDock
-            onLeft
-            setLiveDockWidth={(width: number) => ctrl.setLiveDockWidth(width)}
-            minDockWidth={minDockWidth}
-            maxDockWidth={maxDockWidth}
-          />
+          <ResizeBar
+            position="left"
+            onInput={(val: number) => ctrl.setLiveDockWidth(val)}
+            max={maxDockWidth}
+            min={minDockWidth}
+            value={dockWidth}
+            transformScale={1}
+          >
+            <div className={styles.liveDockContainer} style={{ width: dockWidth }}>
+              <LiveDock />
+            </div>
+          </ResizeBar>
         )}
 
         <div
@@ -391,11 +398,18 @@ function Main() {
         </div>
 
         {renderDock && !leftDock && (
-          <LiveDock
-            setLiveDockWidth={(width: number) => ctrl.setLiveDockWidth(width)}
-            minDockWidth={minDockWidth}
-            maxDockWidth={maxDockWidth}
-          />
+          <ResizeBar
+            position="right"
+            onInput={(val: number) => ctrl.setLiveDockWidth(val)}
+            max={maxDockWidth}
+            min={minDockWidth}
+            value={dockWidth}
+            transformScale={1}
+          >
+            <div className={styles.liveDockContainer} style={{ width: dockWidth }}>
+              <LiveDock />
+            </div>
+          </ResizeBar>
         )}
       </div>
       <ModalWrapper renderFn={ctrl.modalOptions.renderFn} />

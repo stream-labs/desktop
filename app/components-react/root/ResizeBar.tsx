@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React from 'react';
 import { Resizable, ResizableProps } from 'react-resizable';
 import cx from 'classnames';
 import styles from './ResizeBar.m.less';
