@@ -34,6 +34,17 @@ class GoLiveSettingsState extends StreamInfoView<IGoLiveSettingsState> {
     return this.state;
   }
 
+  get alwaysEnabledPlatforms(): TPlatform[] {
+    return ['tiktok'];
+  }
+
+  /*
+   * Primary used to get all platforms that should always show the destination switcher in the Go Live window
+   */
+  get alwaysShownPlatforms(): TPlatform[] {
+    return ['kick'];
+  }
+
   /**
    * Update top level settings
    */
@@ -118,7 +129,7 @@ class GoLiveSettingsState extends StreamInfoView<IGoLiveSettingsState> {
       platforms.forEach(platform => {
         if (!view.supports(fieldName, [platform])) return;
         const platformSettings = getDefined(this.state.platforms[platform]);
-        platformSettings[fieldName] = value;
+        (platformSettings as Record<TCommonFieldName, string>)[fieldName] = value;
       });
     });
   }
@@ -173,7 +184,7 @@ export class GoLiveSettingsModule {
 
     const prepopulateOptions = this.state.prepopulateOptions;
     const view = new StreamInfoView({});
-    const settings = {
+    const settings: IGoLiveSettingsState = {
       ...view.savedSettings, // copy saved stream settings
       tweetText: view.getTweetText(view.commonFields.title), // generate a default tweet text
       needPrepopulate: false,
@@ -193,7 +204,10 @@ export class GoLiveSettingsModule {
     // prefill the form if `prepopulateOptions` provided
     if (prepopulateOptions) {
       Object.keys(prepopulateOptions).forEach(platform => {
-        Object.assign(settings.platforms[platform], prepopulateOptions[platform]);
+        Object.assign(
+          settings.platforms[platform as TPlatform] || {},
+          prepopulateOptions[platform as keyof typeof prepopulateOptions],
+        );
       });
     }
 
@@ -201,13 +215,14 @@ export class GoLiveSettingsModule {
 
     /* If the user was in dual output before but doesn't have restream
      * we should disable one of the platforms if they have 2
-     * ref: https://app.asana.com/0/1207748235152481/1208813184366087/f
      */
     const { dualOutputMode } = DualOutputService.state;
     const { canEnableRestream } = RestreamService.views;
 
-    // Tiktok can stay active
-    const enabledPlatforms = this.state.enabledPlatforms.filter(platform => platform !== 'tiktok');
+    // Tiktok and Kick can stay active
+    const enabledPlatforms = this.state.enabledPlatforms.filter(
+      platform => !this.state.alwaysEnabledPlatforms.includes(platform),
+    );
 
     if (!dualOutputMode && !canEnableRestream && enabledPlatforms.length > 1) {
       /* Find the platform that was set as primary chat to remain enabled,
