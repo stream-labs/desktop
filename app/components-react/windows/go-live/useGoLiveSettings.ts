@@ -118,7 +118,7 @@ class GoLiveSettingsState extends StreamInfoView<IGoLiveSettingsState> {
       platforms.forEach(platform => {
         if (!view.supports(fieldName, [platform])) return;
         const platformSettings = getDefined(this.state.platforms[platform]);
-        platformSettings[fieldName] = value;
+        (platformSettings as Record<TCommonFieldName, string>)[fieldName] = value;
       });
     });
   }
@@ -193,15 +193,17 @@ export class GoLiveSettingsModule {
     // prefill the form if `prepopulateOptions` provided
     if (prepopulateOptions) {
       Object.keys(prepopulateOptions).forEach(platform => {
-        Object.assign(settings.platforms[platform], prepopulateOptions[platform]);
+        Object.assign(
+          (settings.platforms as Record<string, any>)[platform],
+          prepopulateOptions[platform as keyof typeof prepopulateOptions],
+        );
       });
     }
 
     this.state.updateSettings(settings);
 
     /* If the user was in dual output before but doesn't have restream
-     * we should disable one of the platforms if they have 2
-     * ref: https://app.asana.com/0/1207748235152481/1208813184366087/f
+     * we should disable one of the platforms if they have two enabled
      */
     const { dualOutputMode } = DualOutputService.state;
     const { canEnableRestream } = RestreamService.views;
@@ -243,10 +245,13 @@ export class GoLiveSettingsModule {
    * Switch platforms on/off and save settings
    * If platform is enabled then prepopulate its settings
    */
-  switchPlatforms(enabledPlatforms: TPlatform[]) {
+  switchPlatforms(enabledPlatforms: TPlatform[], skipPrepopulate?: boolean) {
     this.state.linkedPlatforms.forEach(platform => {
       this.state.updatePlatform(platform, { enabled: enabledPlatforms.includes(platform) });
     });
+
+    if (skipPrepopulate) return;
+
     /*
      * If there's exactly one enabled platform, set primaryChat to it,
      * ensures there's a primary platform if the user has multiple selected and then
@@ -338,7 +343,6 @@ export class GoLiveSettingsModule {
 
   /**
    * Validate the form and start streaming
-   * @remark Returning false from this function signifies that
    */
   async goLive() {
     if (await this.validate()) {
