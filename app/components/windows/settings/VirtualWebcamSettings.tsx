@@ -10,6 +10,8 @@ import { getOS, OS } from 'util/operating-systems';
 import { Services } from 'components-react/service-provider';
 import { Multiselect } from 'vue-multiselect';
 import { VCamOutputType } from 'obs-studio-node';
+import { ObjectChangeSet } from 'realm';
+import { DefaultObject } from 'realm/dist/public-types/schema';
 
 @Component({
   components: {
@@ -34,23 +36,26 @@ export default class VirtualCamSettings extends Vue {
   scenesService = Services.ScenesService;
   sourcesService = Services.SourcesService;
 
+  isVCamRunning: boolean = false;
+
   created() {
     this.checkInstalled();
 
-    // TODO: reimplement with settings in RealmDB
-    /*
-    const outputType: VCamOutputType = this.settingsService.findSettingValue(this.settingsService.views.virtualWebcamSettings, 'OutputType', 'OutputType');
-    const outputTypeIndex = this.outputTypeOptions.findIndex(val => val.id === outputType);
+    const outputTypeIndex = this.outputTypeOptions.findIndex(val => val.id === this.virtualWebcamService.outputType);
 
     if (outputTypeIndex !== -1) {
       this.outputTypeValue = this.outputTypeOptions[outputTypeIndex];
     } else {
       this.outputTypeValue = this.outputTypeOptions[0];
-      this.settingsService.setSettingValue('Virtual Webcam', 'OutputType', VCamOutputType.ProgramView);
     }
 
     this.onOutputTypeChange(this.outputTypeValue);
-    */
+
+    // TODO: after migrating this component to React, the listener should be removed and useRealmObject used instead
+    const listener = (_o: DefaultObject, changes: ObjectChangeSet<DefaultObject>) => {
+      this.isVCamRunning = this.virtualWebcamService.isRunning;
+    };
+    this.virtualWebcamService.ephemeralState.realmModel.addListener(listener);
   }
 
   install() {
@@ -79,7 +84,7 @@ export default class VirtualCamSettings extends Vue {
   }
 
   get running() {
-    return this.virtualWebcamService.state.running;
+    return this.isVCamRunning;
   }
 
   needsInstallSection(isUpdate: boolean) {
@@ -114,8 +119,8 @@ export default class VirtualCamSettings extends Vue {
   }
 
   isInstalledSection() {
-    const buttonText = this.running ? $t('Stop Virtual Webcam') : $t('Start Virtual Webcam');
-    const statusText = this.running
+    const buttonText = this.isVCamRunning ? $t('Stop Virtual Webcam') : $t('Start Virtual Webcam');
+    const statusText = this.isVCamRunning
       ? $t('Virtual webcam is <status>Running</status>')
       : $t('Virtual webcam is <status>Offline</status>');
 
@@ -128,7 +133,7 @@ export default class VirtualCamSettings extends Vue {
               scopedSlots={{
                 status: (text: string) => {
                   return (
-                    <span class={cx({ [styles.running]: this.running })}>
+                    <span class={cx({ [styles.running]: this.isVCamRunning })}>
                       <b>{text}</b>
                     </span>
                   );
@@ -137,9 +142,9 @@ export default class VirtualCamSettings extends Vue {
             />
           </p>
           <button
-            class={cx('button', { 'button--action': !this.running, 'button--warn': this.running })}
+            class={cx('button', { 'button--action': !this.isVCamRunning, 'button--warn': this.isVCamRunning })}
             style={{ marginBottom: '16px' }}
-            onClick={this.running ? this.stop : this.start}
+            onClick={this.isVCamRunning ? this.stop : this.start}
           >
             {buttonText}
           </button>
@@ -167,7 +172,7 @@ export default class VirtualCamSettings extends Vue {
           <button
             class="button button--default"
             style={{ marginBottom: '16px' }}
-            disabled={this.running}
+            disabled={this.isVCamRunning}
             onClick={this.uninstall}
           >
             {$t('Uninstall Virtual Webcam')}
@@ -192,11 +197,6 @@ export default class VirtualCamSettings extends Vue {
   onOutputTypeChange(value: {name: string, id: number}) {
     this.outputTypeValue = value;
 
-    // TODO: RealmDB settings
-
-    //this.settingsService.setSettingValue('Virtual Webcam', 'OutputType', value.id);
-    //const settingsOutputSelection: string = this.settingsService.findSettingValue(this.settingsService.views.virtualWebcamSettings, 'OutputSelection', 'OutputSelection');
-
     if (value.id == VCamOutputType.SceneOutput) {
       const scenes = this.scenesService.views.scenes.map((scene) => ({
         name: scene.name,
@@ -204,39 +204,33 @@ export default class VirtualCamSettings extends Vue {
       }));
 
       this.outputSelectionOptions = scenes;
-      const outputSelectionIndex = this.outputSelectionOptions.findIndex(val => val.id === "" /*settingsOutputSelection*/);
+      const outputSelectionIndex = this.outputSelectionOptions.findIndex(val => val.id === this.virtualWebcamService.outputSelection);
       if (outputSelectionIndex !== -1) {
         this.outputSelectionValue = scenes[outputSelectionIndex];
       } else {
         this.outputSelectionValue = scenes[0];
       }
 
-      //this.settingsService.setSettingValue('Virtual Webcam', 'OutputSelection', this.outputSelectionValue.id);
       this.virtualWebcamService.update(VCamOutputType.SceneOutput, this.outputSelectionValue.id);
     } else if (value.id == VCamOutputType.SourceOutput) {
       const sources = this.virtualWebcamService.getVideoSources().map(source => ({name: source.name, id: source.sourceId}));
 
       this.outputSelectionOptions = sources;
-      const outputSelectionIndex = this.outputSelectionOptions.findIndex(val => val.id === "" /*settingsOutputSelection*/);
+      const outputSelectionIndex = this.outputSelectionOptions.findIndex(val => val.id === this.virtualWebcamService.outputSelection);
       if (outputSelectionIndex !== -1) {
         this.outputSelectionValue = sources[outputSelectionIndex];
       } else {
         this.outputSelectionValue = sources[0];
       }
 
-      //this.settingsService.setSettingValue('Virtual Webcam', 'OutputSelection', this.outputSelectionValue.id);
       this.virtualWebcamService.update(VCamOutputType.SourceOutput, this.outputSelectionValue.id);
     } else {
-      //this.settingsService.setSettingValue('Virtual Webcam', 'OutputSelection', "");
       this.virtualWebcamService.update(value.id, "");
     }
   }
 
   onOutputSelectionChange(value: {name: string, id: string}) {
     this.outputSelectionValue = value;
-
-    // TODO: RealmDB settings
-    //this.settingsService.setSettingValue('Virtual Webcam', 'OutputSelection', this.outputSelectionValue.id);
     this.virtualWebcamService.update(this.outputTypeValue.id, this.outputSelectionValue.id);
   }
 
@@ -275,6 +269,9 @@ export default class VirtualCamSettings extends Vue {
               showPointer={true}
             />
           </div>
+
+          {(this.outputTypeValue.id === VCamOutputType.ProgramView) &&
+          <div style={{ marginBottom: '30px' }}></div>}
 
           {(this.outputTypeValue.id === VCamOutputType.SceneOutput || this.outputTypeValue.id === VCamOutputType.SourceOutput) &&
           <div>
