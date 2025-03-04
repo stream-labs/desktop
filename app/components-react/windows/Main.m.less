@@ -112,6 +112,46 @@
   border-right: 1px solid var(--border);
 }
 
+.live-dock-collapsed {
+    width: 20px;
+    height: 100%;
+    padding: 0;
+    position: relative;
+    border-left: 1px solid var(--border);
+    box-sizing: border-box;
+
+    .live-dock-collapsed.left {
+      border-left: none;
+      border-right: 1px solid var(--border);
+    }
+
+    .live-dock-chevron {
+      .center();
+
+      border: none;
+    }
+}
+
+.live-dock-chevron {
+  width: 16px;
+  height: 20px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+
+  i {
+    .center();
+
+    font-size: 12px;
+
+    &:global(.icon-right) {
+      transform: translate(-50%, -50%) rotate(-90deg);
+    }
+  }
+}
+
 /deep/ .creator-sites-container .s-loader {
   .s-loader__bg {
     position: unset;

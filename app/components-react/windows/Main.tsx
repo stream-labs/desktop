@@ -19,6 +19,7 @@ import ResizeBar from 'components-react/root/ResizeBar';
 import antdThemes from 'styles/antd/index';
 import { getPlatformService } from 'services/platforms';
 import { IModalOptions } from 'services/windows';
+import { EStreamingState } from 'services/streaming';
 import { TApplicationTheme } from 'services/customization';
 import styles from './Main.m.less';
 import { StatefulService } from 'services';
@@ -43,6 +44,7 @@ class MainController {
   private platformAppsService = Services.PlatformAppsService;
   private editorCommandsService = Services.EditorCommandsService;
   private sideNavService = Services.SideNavService;
+  private streamingService = Services.StreamingService;
 
   modalOptions: IModalOptions = {
     renderFn: null,
@@ -60,6 +62,7 @@ class MainController {
     minDockWidth: 290,
     maxDockWidth: 290,
     minEditorWidth: 500,
+    canAnimate: false,
   });
 
   get title() {
@@ -80,6 +83,10 @@ class MainController {
 
   get sideNavCollapsed() {
     return this.sideNavService.state.compactView;
+  }
+
+  get streamingStatus() {
+    return this.streamingService.state.streamingStatus;
   }
 
   theme(bulkLoadFinished: boolean): TApplicationTheme {
@@ -112,10 +119,6 @@ class MainController {
       getPlatformService(this.userService.platform?.type)?.liveDockEnabled &&
       !this.showLoadingSpinner
     );
-  }
-
-  get isDockCollapsed() {
-    return this.customizationService.state.livedockCollapsed;
   }
 
   get leftDock() {
@@ -214,6 +217,20 @@ class MainController {
   updateStyleBlockers(val: boolean) {
     this.windowsService.actions.updateStyleBlockers('main', val);
   }
+
+  setCollapsed(livedockCollapsed: boolean) {
+    this.store.setState(s => {
+      s.canAnimate = true;
+    });
+    this.windowsService.actions.updateStyleBlockers('main', true);
+    this.customizationService.actions.setSettings({ livedockCollapsed });
+    setTimeout(() => {
+      this.store.setState(s => {
+        s.canAnimate = false;
+      });
+      this.windowsService.actions.updateStyleBlockers('main', false);
+    }, 300);
+  }
 }
 
 export default function MainWithContext(): ReactElement<{}> {
@@ -245,8 +262,6 @@ function Main() {
     leftDock,
     applicationLoading,
     page,
-    maxDockWidth,
-    minDockWidth,
     hideStyleBlockers,
     compactView,
     sideNavCollapsed,
@@ -260,8 +275,6 @@ function Main() {
       hasLiveDock: ctrl.store.hasLiveDock,
       applicationLoading: ctrl.applicationLoading,
       page: ctrl.page,
-      maxDockWidth: ctrl.store.maxDockWidth,
-      minDockWidth: ctrl.store.minDockWidth,
       hideStyleBlockers: ctrl.hideStyleBlockers,
       compactView: ctrl.store.compactView,
       sideNavCollapsed: ctrl.sideNavCollapsed,
@@ -270,6 +283,7 @@ function Main() {
   );
 
   const dockWidth = useRealmObject(Services.CustomizationService.state).livedockSize;
+  const isDockCollapsed = useRealmObject(Services.CustomizationService.state).livedockCollapsed;
 
   function windowSizeHandler() {
     if (!hideStyleBlockers) {
@@ -350,6 +364,7 @@ function Main() {
   }> = (appPages as Dictionary<React.FunctionComponent>)[page];
 
   const sideBarSize = sideNavCollapsed ? 70 : 220;
+  const liveDockSize = isDockCollapsed ? 20 : dockWidth;
 
   return (
     <div
@@ -371,24 +386,10 @@ function Main() {
             <SideNav />
           </div>
         )}
-        {renderDock && leftDock && (
-          <ResizeBar
-            position="left"
-            onInput={(val: number) => ctrl.setLiveDockWidth(val)}
-            max={maxDockWidth}
-            min={minDockWidth}
-            value={dockWidth}
-            transformScale={1}
-          >
-            <div className={styles.liveDockContainer} style={{ width: dockWidth }}>
-              <LiveDock />
-            </div>
-          </ResizeBar>
-        )}
-
+        {leftDock && <LiveDockContainer onLeft />}
         <div
           className={cx(styles.mainMiddle, { [styles.mainMiddleCompact]: compactView })}
-          style={{ width: `calc(100% - ${dockWidth + sideBarSize}px)` }}
+          style={{ width: `calc(100% - ${liveDockSize + sideBarSize}px)` }}
           ref={mainMiddleEl}
         >
           {!showLoadingSpinner && (
@@ -405,21 +406,7 @@ function Main() {
             </div>
           )}
         </div>
-
-        {renderDock && !leftDock && (
-          <ResizeBar
-            position="right"
-            onInput={(val: number) => ctrl.setLiveDockWidth(val)}
-            max={maxDockWidth}
-            min={minDockWidth}
-            value={dockWidth}
-            transformScale={1}
-          >
-            <div className={styles.liveDockContainer} style={{ width: `${dockWidth}px` }}>
-              <LiveDock />
-            </div>
-          </ResizeBar>
-        )}
+        {!leftDock && <LiveDockContainer />}
       </div>
       <ModalWrapper renderFn={ctrl.modalOptions.renderFn} />
       <Animation transitionName="ant-fade">
@@ -430,5 +417,69 @@ function Main() {
         )}
       </Animation>
     </div>
+  );
+}
+
+function LiveDockContainer(p: { onLeft?: boolean }) {
+  const ctrl = useController(MainCtx);
+
+  const { maxDockWidth, minDockWidth, renderDock, streamingStatus } = useVuex(
+    () => ({
+      maxDockWidth: ctrl.store.maxDockWidth,
+      minDockWidth: ctrl.store.minDockWidth,
+      renderDock: ctrl.renderDock,
+      streamingStatus: ctrl.streamingStatus,
+    }),
+    true,
+  );
+
+  useEffect(() => {
+    if (streamingStatus === EStreamingState.Starting && isDockCollapsed) {
+      ctrl.setCollapsed(false);
+    }
+  }, [streamingStatus]);
+
+  const dockWidth = useRealmObject(Services.CustomizationService.state).livedockSize;
+  const isDockCollapsed = useRealmObject(Services.CustomizationService.state).livedockCollapsed;
+
+  function Chevron() {
+    return (
+      <div className={styles.liveDockChevron} onClick={() => ctrl.setCollapsed(!isDockCollapsed)}>
+        <i
+          className={cx({
+            [styles.chevronCollapsed]: isDockCollapsed,
+            'icon-back': (!p.onLeft && isDockCollapsed) || (p.onLeft && !isDockCollapsed),
+            ['icon-down icon-right']:
+              (p.onLeft && isDockCollapsed) || (!p.onLeft && !isDockCollapsed),
+          })}
+        />
+      </div>
+    );
+  }
+
+  if (!renderDock) return <></>;
+
+  if (isDockCollapsed) {
+    return (
+      <div className={styles.liveDockCollapsed}>
+        <Chevron />
+      </div>
+    );
+  }
+
+  return (
+    <ResizeBar
+      position={p.onLeft ? 'left' : 'right'}
+      onInput={(val: number) => ctrl.setLiveDockWidth(val)}
+      max={maxDockWidth}
+      min={minDockWidth}
+      value={dockWidth}
+      transformScale={1}
+    >
+      <div className={styles.liveDockContainer} style={{ width: `${dockWidth}px` }}>
+        <LiveDock />
+        <Chevron />
+      </div>
+    </ResizeBar>
   );
 }

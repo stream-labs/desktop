@@ -212,20 +212,6 @@ class LiveDockController {
     });
   }
 
-  setCollapsed(livedockCollapsed: boolean) {
-    this.store.setState(s => {
-      s.canAnimate = true;
-    });
-    this.windowsService.actions.updateStyleBlockers('main', true);
-    this.customizationService.actions.setSettings({ livedockCollapsed });
-    setTimeout(() => {
-      this.store.setState(s => {
-        s.canAnimate = false;
-      });
-      this.windowsService.actions.updateStyleBlockers('main', false);
-    }, 300);
-  }
-
   toggleViewerCount() {
     this.customizationService.actions.setHiddenViewerCount(
       !this.customizationService.state.hideViewerCount,
@@ -288,16 +274,11 @@ function LiveDock() {
     ]),
   );
 
-  const liveDockSize = useRealmObject(Services.CustomizationService.state).livedockSize;
   const collapsed = useRealmObject(Services.CustomizationService.state).livedockCollapsed;
   const hideViewerCount = useRealmObject(Services.CustomizationService.state).hideViewerCount;
   const viewerCount = hideViewerCount ? $t('Viewers Hidden') : currentViewers;
 
   useEffect(() => {
-    if (streamingStatus === EStreamingState.Starting && collapsed) {
-      ctrl.setCollapsed(false);
-    }
-
     const elapsedInterval = window.setInterval(() => {
       if (streamingStatus === EStreamingState.Live) {
         setElapsedStreamTime(ctrl.getElapsedStreamTime());
@@ -320,10 +301,6 @@ function LiveDock() {
       return;
     }
   }, [visibleChat, isRestreaming, streamingStatus]);
-
-  function toggleCollapsed() {
-    collapsed ? ctrl.setCollapsed(false) : ctrl.setCollapsed(true);
-  }
 
   // Safe getter/setter prevents getting stuck on the chat
   // for an app that was unloaded.
