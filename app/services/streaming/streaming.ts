@@ -12,6 +12,10 @@ import {
   SimpleRecordingFactory,
   VideoEncoderFactory,
   EOutputSignal,
+  SimpleReplayBufferFactory,
+  ISimpleReplayBuffer,
+  AdvancedReplayBufferFactory,
+  IAdvancedReplayBuffer,
 } from '../../../obs-api';
 import { Inject } from 'services/core/injector';
 import moment from 'moment';
@@ -66,8 +70,9 @@ import { RecordingModeService } from 'services/recording-mode';
 import { MarkersService } from 'services/markers';
 import { byOS, OS } from 'util/operating-systems';
 import { DualOutputService } from 'services/dual-output';
-import { capitalize } from 'lodash';
+import { capitalize, isFunction } from 'lodash';
 import { YoutubeService } from 'app-services';
+import path from 'path';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -80,18 +85,29 @@ enum EOBSOutputSignal {
   Start = 'start',
   Stopping = 'stopping',
   Stop = 'stop',
+  Activate = 'activate',
   Deactivate = 'deactivate',
   Reconnect = 'reconnect',
   ReconnectSuccess = 'reconnect_success',
   Wrote = 'wrote',
+  Writing = 'writing',
   WriteError = 'writing_error',
 }
 
 enum EOutputSignalState {
+  Saving = 'saving',
+  Starting = 'starting',
   Start = 'start',
-  Stop = 'stop',
   Stopping = 'stopping',
+  Stop = 'stop',
+  Activate = 'activate',
+  Deactivate = 'deactivate',
+  Reconnect = 'reconnect',
+  ReconnectSuccess = 'reconnect_success',
+  Running = 'running',
   Wrote = 'wrote',
+  Writing = 'writing',
+  WriteError = 'writing_error',
 }
 export interface IOBSOutputSignalInfo {
   type: EOBSOutputType;
@@ -140,6 +156,9 @@ export class StreamingService
 
   private horizontalRecording: ISimpleRecording | IAdvancedRecording = null;
   private verticalRecording: ISimpleRecording | IAdvancedRecording = null;
+
+  private horizontalReplayBuffer: ISimpleReplayBuffer | IAdvancedReplayBuffer = null;
+  private verticalReplayBuffer: ISimpleReplayBuffer | IAdvancedReplayBuffer = null;
 
   static initialState: IStreamingServiceState = {
     streamingStatus: EStreamingState.Offline,
@@ -1134,7 +1153,7 @@ export class StreamingService
       this.state.recordingStatus === ERecordingState.Recording &&
       this.state.verticalRecordingStatus === ERecordingState.Recording
     ) {
-      // stop recroding both displays
+      // stop recording both displays
       let time = new Date().toISOString();
 
       if (this.verticalRecording !== null) {
@@ -1227,7 +1246,8 @@ export class StreamingService
 
     // set signal handler
     recording.signalHandler = async signal => {
-      await this.handleRecordingSignal(signal, display);
+      console.log('recording signal', signal);
+      await this.handleSignal(signal, display);
     };
 
     // handle unique properties (including audio)
@@ -1264,6 +1284,7 @@ export class StreamingService
       [EOutputSignalState.Stopping]: ERecordingState.Stopping,
       [EOutputSignalState.Wrote]: ERecordingState.Wrote,
     } as Dictionary<ERecordingState>)[info.signal];
+    console.log('handleRecordingSignal nextState', nextState, 'signal', info.signal);
 
     // We received a signal we didn't recognize
     if (!nextState) return;
@@ -1338,26 +1359,189 @@ export class StreamingService
     }
   }
 
-  startReplayBuffer() {
-    if (this.state.replayBufferStatus !== EReplayBufferState.Offline) return;
+  private async handleSignal(info: EOutputSignal, display: TDisplayType) {
+    if (info.type === EOBSOutputType.Recording) {
+      await this.handleRecordingSignal(info, display);
+      return;
+    }
 
-    this.usageStatisticsService.recordFeatureUsage('ReplayBuffer');
-    NodeObs.OBS_service_startReplayBuffer();
-  }
+    if (info.type === EOBSOutputType.ReplayBuffer) {
+      this.handleReplayBufferSignal(info, display);
+      return;
+    }
 
-  stopReplayBuffer() {
-    if (this.state.replayBufferStatus === EReplayBufferState.Running) {
-      NodeObs.OBS_service_stopReplayBuffer(false);
-    } else if (this.state.replayBufferStatus === EReplayBufferState.Stopping) {
-      NodeObs.OBS_service_stopReplayBuffer(true);
+    if (info.type === EOBSOutputType.Streaming) {
+      this.handleStreamingSignal(info, display);
+      return;
     }
   }
 
-  saveReplay() {
-    if (this.state.replayBufferStatus === EReplayBufferState.Running) {
-      this.SET_REPLAY_BUFFER_STATUS(EReplayBufferState.Saving);
-      this.replayBufferStatusChange.next(EReplayBufferState.Saving);
-      NodeObs.OBS_service_processReplayBufferHotkey();
+  private handleReplayBufferSignal(info: EOutputSignal, display: TDisplayType) {
+    // map signals to status
+    const nextState: EReplayBufferState = ({
+      [EOBSOutputSignal.Start]: EReplayBufferState.Running,
+      [EOBSOutputSignal.Writing]: EReplayBufferState.Saving,
+      [EOBSOutputSignal.Wrote]: EReplayBufferState.Running,
+      [EOBSOutputSignal.Stop]: EReplayBufferState.Offline,
+    } as Dictionary<EReplayBufferState>)[info.signal];
+    console.log('handleReplayBufferSignal nextState', nextState, 'signal', info.signal);
+
+    if (nextState) {
+      const time = new Date().toISOString();
+      this.SET_REPLAY_BUFFER_STATUS(nextState, time);
+      this.replayBufferStatusChange.next(nextState);
+    }
+
+    if (info.signal === EOBSOutputSignal.Wrote) {
+      this.usageStatisticsService.recordAnalyticsEvent('ReplayBufferStatus', {
+        status: 'wrote',
+        code: info.code,
+      });
+      this.replayBufferFileWrite.next(NodeObs.OBS_service_getLastReplay());
+    }
+  }
+
+  // TODO migrate streaming to new API
+  private handleStreamingSignal(info: EOutputSignal, display: TDisplayType) {
+    // map signals to status
+  }
+
+  startReplayBuffer(display: TDisplayType = 'horizontal') {
+    if (this.state.replayBufferStatus !== EReplayBufferState.Offline) return;
+
+    const mode = this.outputSettingsService.getSettings().mode;
+    if (!this.horizontalRecording) return;
+
+    if (this.state.replayBufferStatus !== EReplayBufferState.Offline) return;
+
+    if (this.horizontalReplayBuffer) {
+      if (mode === 'Advanced') {
+        AdvancedReplayBufferFactory.destroy(this.horizontalReplayBuffer as IAdvancedReplayBuffer);
+      } else {
+        SimpleReplayBufferFactory.destroy(this.horizontalReplayBuffer as ISimpleReplayBuffer);
+      }
+    }
+
+    if (mode === 'Advanced') {
+      this.horizontalReplayBuffer = AdvancedReplayBufferFactory.create();
+    } else {
+      const replayBuffer = SimpleReplayBufferFactory.create();
+      const recordingSettings = this.outputSettingsService.getSimpleRecordingSettings();
+
+      // const advancedSettings = this.outputSettingsService.getAdvancedRecordingSettings();
+      // console.log('recordingSettings', recordingSettings);
+      // console.log('advancedSettings', advancedSettings);
+      // recordingSettings {
+      //   path: 'C:\\Users\\miche\\Videos',
+      //   format: 'mp4',
+      //   quality: 1,
+      //   encoder: 'jim_nvenc',
+      //   lowCPU: false,
+      //   overwrite: false,
+      //   noSpace: false
+      // }
+      // advancedSettings {
+      //   path: undefined,
+      //   format: 'mp4',
+      //   encoder: 'jim_nvenc',
+      //   overwrite: false,
+      //   noSpace: undefined,
+      //   rescaling: undefined,
+      //   mixer: undefined,
+      //   useStreamEncoders: false
+      // }
+
+      replayBuffer.path = recordingSettings.path;
+      replayBuffer.format = recordingSettings.format;
+      replayBuffer.overwrite = recordingSettings.overwrite;
+      replayBuffer.noSpace = recordingSettings.noSpace;
+      replayBuffer.video = this.videoSettingsService.contexts[display]; // TODO: Add vertical context
+      replayBuffer.duration = 60;
+      replayBuffer.prefix = 'Prefix';
+      replayBuffer.suffix = 'Suffix';
+      replayBuffer.usesStream = true;
+      replayBuffer.recording = this.horizontalRecording as ISimpleRecording;
+      replayBuffer.signalHandler = async signal => {
+        console.log('replay buffer signal', signal);
+        await this.handleSignal(signal, 'horizontal');
+      };
+
+      this.horizontalReplayBuffer = replayBuffer;
+      this.horizontalReplayBuffer.start();
+      this.usageStatisticsService.recordFeatureUsage('ReplayBuffer');
+    }
+  }
+
+  stopReplayBuffer(display: TDisplayType = 'horizontal') {
+    if (this.state.replayBufferStatus === EReplayBufferState.Offline) return;
+    const forceStop = this.state.replayBufferStatus === EReplayBufferState.Stopping;
+    console.log('stopReplayBuffer mode', this.outputSettingsService.getSettings().mode);
+    console.log(
+      'stopReplayBuffer before destroy this.horizontalReplayBuffer',
+      this.horizontalReplayBuffer,
+    );
+    console.log(
+      'stopReplayBuffer before destroy this.verticalReplayBuffer',
+      this.verticalReplayBuffer,
+    );
+
+    if (this.outputSettingsService.getSettings().mode === 'Advanced') {
+      if (display === 'horizontal' && this.horizontalReplayBuffer) {
+        // TODO: save before stopping
+        // this.horizontalReplayBuffer.save();
+        this.horizontalReplayBuffer.stop(forceStop);
+        AdvancedReplayBufferFactory.destroy(this.horizontalReplayBuffer as IAdvancedReplayBuffer);
+        this.horizontalReplayBuffer = null;
+      }
+
+      if (display === 'vertical' && this.verticalReplayBuffer) {
+        // TODO: save before stopping
+        // this.verticalReplayBuffer.save();
+        this.verticalReplayBuffer.stop(forceStop);
+        AdvancedReplayBufferFactory.destroy(this.verticalReplayBuffer as IAdvancedReplayBuffer);
+        this.verticalReplayBuffer = null;
+      }
+    } else {
+      if (display === 'horizontal' && this.horizontalReplayBuffer) {
+        // TODO: save before stopping
+        // this.horizontalReplayBuffer.save();
+        this.horizontalReplayBuffer.stop(forceStop);
+        SimpleReplayBufferFactory.destroy(this.horizontalReplayBuffer as ISimpleReplayBuffer);
+        this.horizontalReplayBuffer = null;
+      }
+
+      if (display === 'vertical' && this.verticalReplayBuffer) {
+        // TODO: save before stopping
+        // this.horizontalReplayBuffer.save();
+        this.verticalReplayBuffer.stop(forceStop);
+        SimpleReplayBufferFactory.destroy(this.verticalReplayBuffer as ISimpleReplayBuffer);
+        this.verticalReplayBuffer = null;
+      }
+    }
+
+    console.log(
+      'stopReplayBuffer after destroy this.horizontalReplayBuffer',
+      this.horizontalReplayBuffer,
+    );
+    console.log(
+      'stopReplayBuffer after destroy this.verticalReplayBuffer',
+      this.verticalReplayBuffer,
+    );
+
+    // TODO: Determine why replay buffer stop signals are missing
+    // temporarily set replay buffer status to offline
+    this.SET_REPLAY_BUFFER_STATUS(EReplayBufferState.Offline);
+  }
+
+  saveReplay(display: TDisplayType = 'horizontal') {
+    if (display === 'horizontal' && this.horizontalReplayBuffer) {
+      this.horizontalReplayBuffer.save();
+      return;
+    }
+
+    if (display === 'vertical' && this.verticalReplayBuffer) {
+      this.verticalReplayBuffer.save();
+      return;
     }
   }
 

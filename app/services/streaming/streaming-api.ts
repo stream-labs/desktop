@@ -26,6 +26,7 @@ export enum ERecordingState {
   Starting = 'starting',
   Recording = 'recording',
   Stopping = 'stopping',
+  Start = 'start',
   Wrote = 'wrote',
 }
 
@@ -34,6 +35,7 @@ export enum EReplayBufferState {
   Stopping = 'stopping',
   Offline = 'offline',
   Saving = 'saving',
+  Wrote = 'wrote',
 }
 
 export interface IStreamInfo {
