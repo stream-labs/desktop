@@ -1,6 +1,18 @@
 import Vue from 'vue';
 import { mutation, StatefulService } from 'services/core/stateful-service';
-import { EOutputCode, Global, NodeObs } from '../../../obs-api';
+import {
+  AdvancedRecordingFactory,
+  AudioEncoderFactory,
+  AudioTrackFactory,
+  EOutputCode,
+  Global,
+  IAdvancedRecording,
+  ISimpleRecording,
+  NodeObs,
+  SimpleRecordingFactory,
+  VideoEncoderFactory,
+  EOutputSignal,
+} from '../../../obs-api';
 import { Inject } from 'services/core/injector';
 import moment from 'moment';
 import padStart from 'lodash/padStart';
@@ -55,7 +67,6 @@ import { MarkersService } from 'services/markers';
 import { byOS, OS } from 'util/operating-systems';
 import { DualOutputService } from 'services/dual-output';
 import { capitalize } from 'lodash';
-import { TikTokService } from 'services/platforms/tiktok';
 import { YoutubeService } from 'app-services';
 
 enum EOBSOutputType {
@@ -76,6 +87,12 @@ enum EOBSOutputSignal {
   WriteError = 'writing_error',
 }
 
+enum EOutputSignalState {
+  Start = 'start',
+  Stop = 'stop',
+  Stopping = 'stopping',
+  Wrote = 'wrote',
+}
 export interface IOBSOutputSignalInfo {
   type: EOBSOutputType;
   signal: EOBSOutputSignal;
@@ -101,7 +118,6 @@ export class StreamingService
   @Inject() private videoSettingsService: VideoSettingsService;
   @Inject() private markersService: MarkersService;
   @Inject() private dualOutputService: DualOutputService;
-  @Inject() private tikTokService: TikTokService;
   @Inject() private youtubeService: YoutubeService;
 
   streamingStatusChange = new Subject<EStreamingState>();
@@ -115,17 +131,25 @@ export class StreamingService
 
   // Dummy subscription for stream deck
   streamingStateChange = new Subject<void>();
+  private recordingStopped = new Subject();
 
   powerSaveId: number;
 
   private resolveStartStreaming: Function = () => {};
   private rejectStartStreaming: Function = () => {};
 
+  private horizontalRecording: ISimpleRecording | IAdvancedRecording = null;
+  private verticalRecording: ISimpleRecording | IAdvancedRecording = null;
+
   static initialState: IStreamingServiceState = {
     streamingStatus: EStreamingState.Offline,
+    verticalStreamingStatus: EStreamingState.Offline,
     streamingStatusTime: new Date().toISOString(),
+    verticalStreamingStatusTime: new Date().toISOString(),
     recordingStatus: ERecordingState.Offline,
+    verticalRecordingStatus: ERecordingState.Offline,
     recordingStatusTime: new Date().toISOString(),
+    verticalRecordingStatusTime: new Date().toString(),
     replayBufferStatus: EReplayBufferState.Offline,
     replayBufferStatusTime: new Date().toISOString(),
     selectiveRecording: false,
@@ -155,7 +179,7 @@ export class StreamingService
   init() {
     NodeObs.OBS_service_connectOutputSignals((info: IOBSOutputSignalInfo) => {
       this.signalInfoChanged.next(info);
-      this.handleOBSOutputSignal(info);
+      this.handleOBSV2OutputSignal(info);
     });
 
     // watch for StreamInfoView at emit `streamInfoChanged` event if something has been hanged there
@@ -214,12 +238,12 @@ export class StreamingService
         } catch (e: unknown) {
           // cast all PLATFORM_REQUEST_FAILED errors to PREPOPULATE_FAILED
           if (e instanceof StreamError) {
-            const type =
+            e.type =
               (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
                 ? 'PREPOPULATE_FAILED'
                 : e.type || 'UNKNOWN_ERROR';
-            const error = this.handleTypedStreamError(e, type, `Failed to prepopulate ${platform}`);
-            this.setError(error, platform);
+
+            this.setError(e, platform);
           } else {
             this.setError('PREPOPULATE_FAILED', platform);
           }
@@ -260,34 +284,6 @@ export class StreamingService
     }
 
     return false;
-  }
-
-  /**
-   * set platform stream settings
-   */
-  async handleSetupPlatform(
-    platform: TPlatform,
-    settings: IGoLiveSettings,
-    unattendedMode: boolean,
-    assignContext: boolean = false,
-  ) {
-    const service = getPlatformService(platform);
-    try {
-      // don't update settings for twitch in unattendedMode
-      const settingsForPlatform =
-        !assignContext && platform === 'twitch' && unattendedMode ? undefined : settings;
-
-      if (assignContext) {
-        const display = settings.platforms[platform]?.display;
-        await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform, display));
-      } else {
-        await this.runCheck(platform, () =>
-          service.beforeGoLive(settingsForPlatform, 'horizontal'),
-        );
-      }
-    } catch (e: unknown) {
-      this.handleSetupPlatformError(e, platform);
-    }
   }
 
   /**
@@ -928,10 +924,11 @@ export class StreamingService
 
     this.powerSaveId = remote.powerSaveBlocker.start('prevent-display-sleep');
 
-    // start streaming
+    // handle start streaming and recording
     if (this.views.isDualOutputMode) {
       // start dual output
 
+      // stream horizontal and stream vertical
       const horizontalContext = this.videoSettingsService.contexts.horizontal;
       const verticalContext = this.videoSettingsService.contexts.vertical;
 
@@ -943,10 +940,21 @@ export class StreamingService
           if (signalInfo.code !== 0) {
             NodeObs.OBS_service_stopStreaming(true, 'horizontal');
             NodeObs.OBS_service_stopStreaming(true, 'vertical');
+            // Refactor when move streaming to new API
+            if (this.state.verticalStreamingStatus !== EStreamingState.Offline) {
+              this.SET_VERTICAL_STREAMING_STATUS(EStreamingState.Offline);
+            }
           }
 
           if (signalInfo.signal === EOBSOutputSignal.Start) {
             NodeObs.OBS_service_startStreaming('vertical');
+
+            // Refactor when move streaming to new API
+            const time = new Date().toISOString();
+            if (this.state.verticalStreamingStatus === EStreamingState.Offline) {
+              this.SET_VERTICAL_STREAMING_STATUS(EStreamingState.Live, time);
+            }
+
             signalChanged.unsubscribe();
           }
         }
@@ -961,12 +969,12 @@ export class StreamingService
       NodeObs.OBS_service_setVideoInfo(horizontalContext, 'horizontal');
 
       NodeObs.OBS_service_startStreaming();
-    }
 
-    const recordWhenStreaming = this.streamSettingsService.settings.recordWhenStreaming;
+      const recordWhenStreaming = this.streamSettingsService.settings.recordWhenStreaming;
 
-    if (recordWhenStreaming && this.state.recordingStatus === ERecordingState.Offline) {
-      this.toggleRecording();
+      if (recordWhenStreaming && this.state.recordingStatus === ERecordingState.Offline) {
+        this.toggleRecording();
+      }
     }
 
     const replayWhenStreaming = this.streamSettingsService.settings.replayBufferWhileStreaming;
@@ -1050,6 +1058,10 @@ export class StreamingService
               signalInfo.signal === EOBSOutputSignal.Deactivate
             ) {
               NodeObs.OBS_service_stopStreaming(false, 'vertical');
+              // Refactor when move streaming to new API
+              if (this.state.verticalStreamingStatus !== EStreamingState.Offline) {
+                this.SET_VERTICAL_STREAMING_STATUS(EStreamingState.Offline);
+              }
               signalChanged.unsubscribe();
             }
           },
@@ -1063,7 +1075,10 @@ export class StreamingService
       }
 
       const keepRecording = this.streamSettingsService.settings.keepRecordingWhenStreamStops;
-      if (!keepRecording && this.state.recordingStatus === ERecordingState.Recording) {
+      const isRecording =
+        this.state.recordingStatus === ERecordingState.Recording ||
+        this.state.verticalRecordingStatus === ERecordingState.Recording;
+      if (!keepRecording && isRecording) {
         this.toggleRecording();
       }
 
@@ -1082,8 +1097,15 @@ export class StreamingService
     }
 
     if (this.state.streamingStatus === EStreamingState.Ending) {
-      if (this.views.isDualOutputMode) {
+      if (
+        this.views.isDualOutputMode &&
+        this.state.verticalRecordingStatus === ERecordingState.Offline
+      ) {
         NodeObs.OBS_service_stopStreaming(true, 'horizontal');
+        // Refactor when move streaming to new API
+        if (this.state.verticalStreamingStatus !== EStreamingState.Offline) {
+          this.SET_VERTICAL_STREAMING_STATUS(EStreamingState.Offline);
+        }
         NodeObs.OBS_service_stopStreaming(true, 'vertical');
       } else {
         NodeObs.OBS_service_stopStreaming(true);
@@ -1107,15 +1129,207 @@ export class StreamingService
   }
 
   toggleRecording() {
-    if (this.state.recordingStatus === ERecordingState.Recording) {
-      NodeObs.OBS_service_stopRecording();
+    // stop recording
+    if (
+      this.state.recordingStatus === ERecordingState.Recording &&
+      this.state.verticalRecordingStatus === ERecordingState.Recording
+    ) {
+      // stop recroding both displays
+      let time = new Date().toISOString();
+
+      if (this.verticalRecording !== null) {
+        const recordingStopped = this.recordingStopped.subscribe(async () => {
+          await new Promise(resolve =>
+            // sleep for 2 seconds to allow a different time stamp to be generated
+            // because the recording history uses the time stamp as keys
+            // if the same time stamp is used, the entry will be replaced in the recording history
+            setTimeout(() => {
+              time = new Date().toISOString();
+              this.SET_RECORDING_STATUS(ERecordingState.Stopping, time, 'horizontal');
+              if (this.horizontalRecording !== null) {
+                this.horizontalRecording.stop();
+              }
+            }, 2000),
+          );
+          recordingStopped.unsubscribe();
+        });
+
+        this.SET_RECORDING_STATUS(ERecordingState.Stopping, time, 'vertical');
+        this.verticalRecording.stop();
+        this.recordingStopped.next();
+      }
+
+      return;
+    } else if (
+      this.state.verticalRecordingStatus === ERecordingState.Recording &&
+      this.verticalRecording !== null
+    ) {
+      // stop recording vertical display
+      const time = new Date().toISOString();
+      this.SET_RECORDING_STATUS(ERecordingState.Stopping, time, 'vertical');
+      this.verticalRecording.stop();
+    } else if (
+      this.state.recordingStatus === ERecordingState.Recording &&
+      this.horizontalRecording !== null
+    ) {
+      const time = new Date().toISOString();
+      // stop recording horizontal display
+      this.SET_RECORDING_STATUS(ERecordingState.Stopping, time, 'horizontal');
+      this.horizontalRecording.stop();
+    }
+
+    // start recording
+    if (
+      this.state.recordingStatus === ERecordingState.Offline &&
+      this.state.verticalRecordingStatus === ERecordingState.Offline
+    ) {
+      if (this.views.isDualOutputMode) {
+        if (this.state.streamingStatus !== EStreamingState.Offline) {
+          // In dual output mode, if the streaming status is starting then this call to toggle recording came from the function to toggle streaming.
+          // In this case, only stream the horizontal display (don't record the horizontal display) and record the vertical display.
+          this.createRecording('vertical', 2);
+        } else {
+          // Otherwise, record both displays in dual output mode
+          this.createRecording('vertical', 2);
+          this.createRecording('horizontal', 1);
+        }
+      } else {
+        // In single output mode, recording only the horizontal display
+        this.createRecording('horizontal', 1);
+      }
+    }
+  }
+
+  private createRecording(display: TDisplayType, index: number) {
+    const mode = this.outputSettingsService.getSettings().mode;
+
+    const recording =
+      mode === 'Advanced'
+        ? (AdvancedRecordingFactory.create() as IAdvancedRecording)
+        : (SimpleRecordingFactory.create() as ISimpleRecording);
+
+    const settings =
+      mode === 'Advanced'
+        ? this.outputSettingsService.getAdvancedRecordingSettings()
+        : this.outputSettingsService.getSimpleRecordingSettings();
+
+    // assign settings
+    Object.keys(settings).forEach(key => {
+      if (key === 'encoder') {
+        recording.videoEncoder = VideoEncoderFactory.create(settings.encoder, 'video-encoder');
+      } else {
+        (recording as any)[key] = (settings as any)[key];
+      }
+    });
+
+    // assign context
+    recording.video = this.videoSettingsService.contexts[display];
+
+    // set signal handler
+    recording.signalHandler = async signal => {
+      await this.handleRecordingSignal(signal, display);
+    };
+
+    // handle unique properties (including audio)
+    if (mode === 'Advanced') {
+      (recording as IAdvancedRecording).outputWidth = this.dualOutputService.views.videoSettings[
+        display
+      ].outputWidth;
+      (recording as IAdvancedRecording).outputHeight = this.dualOutputService.views.videoSettings[
+        display
+      ].outputHeight;
+
+      const trackName = `track${index}`;
+      const track = AudioTrackFactory.create(160, trackName);
+      AudioTrackFactory.setAtIndex(track, index);
+    } else {
+      (recording as ISimpleRecording).audioEncoder = AudioEncoderFactory.create();
+    }
+
+    // save in state
+    if (display === 'vertical') {
+      this.verticalRecording = recording;
+      this.verticalRecording.start();
+    } else {
+      this.horizontalRecording = recording;
+      this.horizontalRecording.start();
+    }
+  }
+
+  private async handleRecordingSignal(info: EOutputSignal, display: TDisplayType) {
+    // map signals to status
+    const nextState: ERecordingState = ({
+      [EOutputSignalState.Start]: ERecordingState.Recording,
+      [EOutputSignalState.Stop]: ERecordingState.Offline,
+      [EOutputSignalState.Stopping]: ERecordingState.Stopping,
+      [EOutputSignalState.Wrote]: ERecordingState.Wrote,
+    } as Dictionary<ERecordingState>)[info.signal];
+
+    // We received a signal we didn't recognize
+    if (!nextState) return;
+
+    if (nextState === ERecordingState.Recording) {
+      const mode = this.views.isDualOutputMode ? 'dual' : 'single';
+      this.usageStatisticsService.recordFeatureUsage('Recording');
+      this.usageStatisticsService.recordAnalyticsEvent('RecordingStatus', {
+        status: ERecordingState.Recording,
+        code: info.code,
+        mode,
+        display,
+      });
+    }
+
+    if (nextState === ERecordingState.Wrote) {
+      const fileName =
+        display === 'vertical'
+          ? this.verticalRecording.lastFile()
+          : this.horizontalRecording.lastFile();
+
+      const parsedName = byOS({
+        [OS.Mac]: fileName,
+        [OS.Windows]: fileName.replace(/\//, '\\'),
+      });
+
+      // in dual output mode, each confirmation should be labelled for each display
+      if (this.views.isDualOutputMode) {
+        this.recordingModeService.addRecordingEntry(parsedName, display);
+      } else {
+        this.recordingModeService.addRecordingEntry(parsedName);
+      }
+      await this.markersService.exportCsv(parsedName);
+
+      // destroy recording factory instances
+      if (this.outputSettingsService.getSettings().mode === 'Advanced') {
+        if (display === 'horizontal' && this.horizontalRecording) {
+          AdvancedRecordingFactory.destroy(this.horizontalRecording as IAdvancedRecording);
+          this.horizontalRecording = null;
+        } else if (display === 'vertical' && this.verticalRecording) {
+          AdvancedRecordingFactory.destroy(this.verticalRecording as IAdvancedRecording);
+          this.verticalRecording = null;
+        }
+      } else {
+        if (display === 'horizontal' && this.horizontalRecording) {
+          SimpleRecordingFactory.destroy(this.horizontalRecording as ISimpleRecording);
+          this.horizontalRecording = null;
+        } else if (display === 'vertical' && this.verticalRecording) {
+          SimpleRecordingFactory.destroy(this.verticalRecording as ISimpleRecording);
+          this.verticalRecording = null;
+        }
+      }
+
+      const time = new Date().toISOString();
+      this.SET_RECORDING_STATUS(ERecordingState.Offline, time, display);
+      this.recordingStatusChange.next(ERecordingState.Offline);
+
+      this.handleV2OutputCode(info);
       return;
     }
 
-    if (this.state.recordingStatus === ERecordingState.Offline) {
-      NodeObs.OBS_service_startRecording();
-      return;
-    }
+    const time = new Date().toISOString();
+    this.SET_RECORDING_STATUS(nextState, time, display);
+    this.recordingStatusChange.next(nextState);
+
+    this.handleV2OutputCode(info);
   }
 
   splitFile() {
@@ -1225,6 +1439,13 @@ export class StreamingService
   }
 
   get formattedDurationInCurrentRecordingState() {
+    // in dual output mode, if using vertical recording as the second destination
+    // display the vertical recording status time
+    if (this.state.recordingStatus !== ERecordingState.Offline) {
+      this.formattedDurationSince(moment(this.state.recordingStatusTime));
+    } else if (this.state.verticalRecordingStatus !== ERecordingState.Offline) {
+      return this.formattedDurationSince(moment(this.state.verticalRecordingStatusTime));
+    }
     return this.formattedDurationSince(moment(this.state.recordingStatusTime));
   }
 
@@ -1271,6 +1492,223 @@ export class StreamingService
   private outputErrorOpen = false;
   private streamErrorUserMessage = '';
   private streamErrorReportMessage = '';
+
+  private handleOBSV2OutputSignal(info: IOBSOutputSignalInfo) {
+    console.debug('OBS Output signal: ', info);
+
+    /*
+     * Resolve when:
+     * - Single output mode: always resolve
+     * - Dual output mode: after vertical stream started
+     * - Dual output mode: when vertical display is second destination,
+     *   resolve after horizontal stream started
+     */
+    const isVerticalDisplayStartSignal =
+      info.service === 'vertical' && info.signal === EOBSOutputSignal.Start;
+
+    const shouldResolve =
+      !this.views.isDualOutputMode ||
+      (this.views.isDualOutputMode && isVerticalDisplayStartSignal) ||
+      (this.views.isDualOutputMode && info.signal === EOBSOutputSignal.Start);
+
+    const time = new Date().toISOString();
+
+    if (info.type === EOBSOutputType.Streaming) {
+      if (info.signal === EOBSOutputSignal.Start && shouldResolve) {
+        this.SET_STREAMING_STATUS(EStreamingState.Live, time);
+        this.resolveStartStreaming();
+        this.streamingStatusChange.next(EStreamingState.Live);
+
+        let streamEncoderInfo: Partial<IOutputSettings> = {};
+        let game: string = '';
+
+        try {
+          streamEncoderInfo = this.outputSettingsService.getSettings();
+          game = this.views.game;
+        } catch (e: unknown) {
+          console.error('Error fetching stream encoder info: ', e);
+        }
+
+        const eventMetadata: Dictionary<any> = {
+          ...streamEncoderInfo,
+          game,
+        };
+
+        if (this.videoEncodingOptimizationService.state.useOptimizedProfile) {
+          eventMetadata.useOptimizedProfile = true;
+        }
+
+        const streamSettings = this.streamSettingsService.settings;
+
+        eventMetadata.streamType = streamSettings.streamType;
+        eventMetadata.platform = streamSettings.platform;
+        eventMetadata.server = streamSettings.server;
+
+        this.usageStatisticsService.recordEvent('stream_start', eventMetadata);
+        this.usageStatisticsService.recordAnalyticsEvent('StreamingStatus', {
+          code: info.code,
+          status: EStreamingState.Live,
+          service: streamSettings.service,
+        });
+        this.usageStatisticsService.recordFeatureUsage('Streaming');
+      } else if (info.signal === EOBSOutputSignal.Starting && shouldResolve) {
+        this.SET_STREAMING_STATUS(EStreamingState.Starting, time);
+        this.streamingStatusChange.next(EStreamingState.Starting);
+      } else if (info.signal === EOBSOutputSignal.Stop) {
+        this.SET_STREAMING_STATUS(EStreamingState.Offline, time);
+        this.RESET_STREAM_INFO();
+        this.rejectStartStreaming();
+        this.streamingStatusChange.next(EStreamingState.Offline);
+        this.usageStatisticsService.recordAnalyticsEvent('StreamingStatus', {
+          code: info.code,
+          status: EStreamingState.Offline,
+        });
+      } else if (info.signal === EOBSOutputSignal.Stopping) {
+        this.sendStreamEndEvent();
+        this.SET_STREAMING_STATUS(EStreamingState.Ending, time);
+        this.streamingStatusChange.next(EStreamingState.Ending);
+      } else if (info.signal === EOBSOutputSignal.Reconnect) {
+        this.SET_STREAMING_STATUS(EStreamingState.Reconnecting);
+        this.streamingStatusChange.next(EStreamingState.Reconnecting);
+        this.sendReconnectingNotification();
+      } else if (info.signal === EOBSOutputSignal.ReconnectSuccess) {
+        this.SET_STREAMING_STATUS(EStreamingState.Live);
+        this.streamingStatusChange.next(EStreamingState.Live);
+        this.clearReconnectingNotification();
+      }
+    } else if (info.type === EOBSOutputType.ReplayBuffer) {
+      const nextState: EReplayBufferState = ({
+        [EOBSOutputSignal.Start]: EReplayBufferState.Running,
+        [EOBSOutputSignal.Stopping]: EReplayBufferState.Stopping,
+        [EOBSOutputSignal.Stop]: EReplayBufferState.Offline,
+        [EOBSOutputSignal.Wrote]: EReplayBufferState.Running,
+        [EOBSOutputSignal.WriteError]: EReplayBufferState.Running,
+      } as Dictionary<EReplayBufferState>)[info.signal];
+
+      if (nextState) {
+        this.SET_REPLAY_BUFFER_STATUS(nextState, time);
+        this.replayBufferStatusChange.next(nextState);
+      }
+
+      if (info.signal === EOBSOutputSignal.Wrote) {
+        this.usageStatisticsService.recordAnalyticsEvent('ReplayBufferStatus', {
+          status: 'wrote',
+          code: info.code,
+        });
+        this.replayBufferFileWrite.next(NodeObs.OBS_service_getLastReplay());
+      }
+    }
+    this.handleV2OutputCode(info);
+  }
+
+  private handleV2OutputCode(info: IOBSOutputSignalInfo | EOutputSignal) {
+    if (info.code) {
+      if (this.outputErrorOpen) {
+        console.warn('Not showing error message because existing window is open.', info);
+        return;
+      }
+
+      let errorText = '';
+      let extendedErrorText = '';
+      let linkToDriverInfo = false;
+      let showNativeErrorMessage = false;
+
+      if (info.code === EOutputCode.BadPath) {
+        errorText = $t(
+          'Invalid Path or Connection URL.  Please check your settings to confirm that they are valid.',
+        );
+      } else if (info.code === EOutputCode.ConnectFailed) {
+        errorText = $t(
+          'Failed to connect to the streaming server.  Please check your internet connection.',
+        );
+      } else if (info.code === EOutputCode.Disconnected) {
+        errorText = $t(
+          'Disconnected from the streaming server.  Please check your internet connection.',
+        );
+      } else if (info.code === EOutputCode.InvalidStream) {
+        errorText = $t(
+          'Could not access the specified channel or stream key. Please log out and back in to refresh your credentials. If the problem persists, there may be a problem connecting to the server.',
+        );
+      } else if (info.code === EOutputCode.NoSpace) {
+        errorText = $t('There is not sufficient disk space to continue recording.');
+      } else if (info.code === EOutputCode.Unsupported) {
+        errorText =
+          $t(
+            'The output format is either unsupported or does not support more than one audio track.  ',
+          ) + $t('Please check your settings and try again.');
+      } else if (info.code === EOutputCode.OutdatedDriver) {
+        linkToDriverInfo = true;
+        errorText = $t(
+          'An error occurred with the output. This is usually caused by out of date video drivers. Please ensure your Nvidia or AMD drivers are up to date and try again.',
+        );
+      } else {
+        // -4 is used for generic unknown messages in OBS. Both -4 and any other code
+        // we don't recognize should fall into this branch and show a generic error.
+        errorText = $t(
+          'An error occurred with the output. Please check your streaming and recording settings.',
+        );
+        if (info.error) {
+          showNativeErrorMessage = true;
+          extendedErrorText = errorText + '\n\n' + $t('System error message:') + info.error + '"';
+        }
+      }
+      const buttons = [$t('OK')];
+
+      const title = {
+        [EOBSOutputType.Streaming]: $t('Streaming Error'),
+        [EOBSOutputType.Recording]: $t('Recording Error'),
+        [EOBSOutputType.ReplayBuffer]: $t('Replay Buffer Error'),
+      }[info.type];
+
+      if (linkToDriverInfo) buttons.push($t('Learn More'));
+      if (showNativeErrorMessage) buttons.push($t('More'));
+
+      this.outputErrorOpen = true;
+      const errorType = 'error';
+      remote.dialog
+        .showMessageBox(Utils.getMainWindow(), {
+          buttons,
+          title,
+          type: errorType,
+          message: errorText,
+        })
+        .then(({ response }) => {
+          if (linkToDriverInfo && response === 1) {
+            this.outputErrorOpen = false;
+            remote.shell.openExternal(
+              'https://howto.streamlabs.com/streamlabs-obs-19/nvidia-graphics-driver-clean-install-tutorial-7000',
+            );
+          } else {
+            let expectedResponse = 1;
+            if (linkToDriverInfo) {
+              expectedResponse = 2;
+            }
+            if (showNativeErrorMessage && response === expectedResponse) {
+              const buttons = [$t('OK')];
+              remote.dialog
+                .showMessageBox({
+                  buttons,
+                  title,
+                  type: errorType,
+                  message: extendedErrorText,
+                })
+                .then(({ response }) => {
+                  this.outputErrorOpen = false;
+                })
+                .catch(() => {
+                  this.outputErrorOpen = false;
+                });
+            } else {
+              this.outputErrorOpen = false;
+            }
+          }
+        })
+        .catch(() => {
+          this.outputErrorOpen = false;
+        });
+      this.windowsService.actions.closeChildWindow();
+    }
+  }
 
   private handleOBSOutputSignal(info: IOBSOutputSignalInfo) {
     console.debug('OBS Output signal: ', info);
@@ -1643,9 +2081,24 @@ export class StreamingService
   }
 
   @mutation()
-  private SET_RECORDING_STATUS(status: ERecordingState, time: string) {
-    this.state.recordingStatus = status;
-    this.state.recordingStatusTime = time;
+  private SET_VERTICAL_STREAMING_STATUS(status: EStreamingState, time?: string) {
+    this.state.streamingStatus = status;
+    if (time) this.state.streamingStatusTime = time;
+  }
+
+  @mutation()
+  private SET_RECORDING_STATUS(
+    status: ERecordingState,
+    time: string,
+    display: TDisplayType = 'horizontal',
+  ) {
+    if (display === 'vertical') {
+      this.state.verticalRecordingStatus = status;
+      this.state.verticalRecordingStatusTime = time;
+    } else {
+      this.state.recordingStatus = status;
+      this.state.recordingStatusTime = time;
+    }
   }
 
   @mutation()
