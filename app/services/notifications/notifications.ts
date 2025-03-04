@@ -21,6 +21,10 @@ interface INotificationsState {
 }
 
 class NotificationsViews extends ViewHandler<INotificationsState> {
+  get lastNotification(): INotification | null {
+    return this.state.notifications ? this.state.notifications[0] : null;
+  }
+
   getNotification(id: number): INotification {
     return this.state.notifications.find(notify => notify.id === id);
   }
@@ -64,11 +68,6 @@ class NotificationsViews extends ViewHandler<INotificationsState> {
         enabled: settings.enabled,
       },
     ];
-  }
-
-  getLastNotification(): INotification | null {
-    const numNotifications = this.getAll().length;
-    return numNotifications > 0 ? this.getAll()[numNotifications - 1] : null;
   }
 }
 

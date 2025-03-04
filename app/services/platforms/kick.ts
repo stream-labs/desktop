@@ -8,7 +8,7 @@ import {
   TPlatformCapability,
 } from './index';
 import { authorizedHeaders, jfetch } from '../../util/requests';
-import { throwStreamError } from '../streaming/stream-error';
+import { StreamError, throwStreamError } from '../streaming/stream-error';
 import { platformAuthorizedRequest } from './utils';
 import { IGoLiveSettings } from '../streaming';
 import { TOutputOrientation } from 'services/restream';
@@ -223,13 +223,23 @@ export class KickService
 
     return jfetch<IKickStartStreamResponse>(request)
       .then(resp => {
+        if (!resp.broadcast_id || !resp.rtmp || !resp.key) {
+          throwStreamError(
+            'KICK_REQUEST_FAILED',
+            {
+              status: 403,
+            },
+            'Kick stream failed to start. One of the following is missing: broadcast id, rtmp url, or stream key.',
+          );
+        }
+
         if (resp.channel_name) {
           this.SET_CHANNEL_NAME(resp.channel_name);
         }
         this.SET_STREAM_SETTINGS(opts);
         return resp;
       })
-      .catch((e: IKickError | unknown) => {
+      .catch((e: IKickError | StreamError | string | unknown) => {
         console.error('Error starting Kick stream: ', e);
 
         const defaultError = {
@@ -264,6 +274,12 @@ export class KickService
             },
             defaultError.statusText,
           );
+        }
+
+        // check if the error is a stream error
+        if (typeof e === 'object' && e.hasOwnProperty('type')) {
+          const error = e as StreamError;
+          throwStreamError(error.type, error, error.message);
         }
 
         throwStreamError('PLATFORM_REQUEST_FAILED', e);

@@ -30,10 +30,17 @@ export default function GoLiveError() {
     NavigationService,
     WindowsService,
     MagicLinkService,
+    NotificationsService,
   } = Services;
 
   // take an error from the global state
-  const { error } = useVuex(() => ({ error: StreamingService.state.info.error }), false);
+  const { error, lastNotification } = useVuex(
+    () => ({
+      error: StreamingService.state.info.error,
+      lastNotification: NotificationsService.views.lastNotification,
+    }),
+    false,
+  );
   const { goLive, updatePlatform } = useGoLiveSettings();
 
   function render() {
@@ -209,9 +216,8 @@ export default function GoLiveError() {
 
   function renderRestreamError(error: IStreamError) {
     // a little janky, but this is to prevent duplicate notifications for the same error on rerender
-    const lastNotification = Services.NotificationsService.views.getLastNotification();
     if (!lastNotification || !lastNotification.message.startsWith($t('Multistream Error'))) {
-      Services.NotificationsService.actions.push({
+      NotificationsService.actions.push({
         message: `${$t('Multistream Error')}: ${error.details}`,
         type: ENotificationType.WARNING,
         lifeTime: 5000,
@@ -220,7 +226,7 @@ export default function GoLiveError() {
 
     async function skipSettingsUpdateAndGoLive() {
       // clear error
-      Services.StreamingService.actions.resetError();
+      StreamingService.actions.resetError();
 
       // disable failed platforms
       Object.entries(cloneDeep(StreamingService.views.checklist)).forEach(
@@ -229,7 +235,7 @@ export default function GoLiveError() {
             updatePlatform(key as TPlatform, { enabled: false });
 
             // notify the user that the platform has been toggled off
-            Services.NotificationsService.actions.push({
+            NotificationsService.actions.push({
               message: $t(
                 '%{platform} Setup Error: Toggling off %{platform} to bypass and go live.',
                 {
@@ -243,7 +249,7 @@ export default function GoLiveError() {
         },
       );
 
-      Services.StreamingService.actions.resetInfo();
+      StreamingService.actions.resetInfo();
 
       await goLive();
     }
