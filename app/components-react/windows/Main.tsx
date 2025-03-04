@@ -42,6 +42,7 @@ class MainController {
   private scenesService = Services.ScenesService;
   private platformAppsService = Services.PlatformAppsService;
   private editorCommandsService = Services.EditorCommandsService;
+  private sideNavService = Services.SideNavService;
 
   modalOptions: IModalOptions = {
     renderFn: null,
@@ -75,6 +76,10 @@ class MainController {
 
   get hideStyleBlockers() {
     return this.windowsService.state.main.hideStyleBlockers;
+  }
+
+  get sideNavCollapsed() {
+    return this.sideNavService.state.compactView;
   }
 
   theme(bulkLoadFinished: boolean): TApplicationTheme {
@@ -195,9 +200,8 @@ class MainController {
   }
 
   setLiveDockWidth(width: number) {
-    console.log(width, this.store.maxDockWidth);
     this.customizationService.actions.setSettings({
-      livedockSize: this.validateWidth(width),
+      livedockSize: width,
     });
   }
 
@@ -245,6 +249,7 @@ function Main() {
     minDockWidth,
     hideStyleBlockers,
     compactView,
+    sideNavCollapsed,
   } = useVuex(
     () => ({
       theme: ctrl.theme(bulkLoadFinished),
@@ -259,6 +264,7 @@ function Main() {
       minDockWidth: ctrl.store.minDockWidth,
       hideStyleBlockers: ctrl.hideStyleBlockers,
       compactView: ctrl.store.compactView,
+      sideNavCollapsed: ctrl.sideNavCollapsed,
     }),
     true,
   );
@@ -343,6 +349,8 @@ function Main() {
     onTotalWidth: (width: number) => void;
   }> = (appPages as Dictionary<React.FunctionComponent>)[page];
 
+  const sideBarSize = sideNavCollapsed ? 70 : 220;
+
   return (
     <div
       className={cx(styles.main, theme, 'react')}
@@ -380,6 +388,7 @@ function Main() {
 
         <div
           className={cx(styles.mainMiddle, { [styles.mainMiddleCompact]: compactView })}
+          style={{ width: `calc(100% - ${dockWidth + sideBarSize}px)` }}
           ref={mainMiddleEl}
         >
           {!showLoadingSpinner && (
@@ -406,7 +415,7 @@ function Main() {
             value={dockWidth}
             transformScale={1}
           >
-            <div className={styles.liveDockContainer} style={{ width: dockWidth }}>
+            <div className={styles.liveDockContainer} style={{ width: `${dockWidth}px` }}>
               <LiveDock />
             </div>
           </ResizeBar>
