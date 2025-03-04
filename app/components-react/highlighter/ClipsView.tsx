@@ -311,6 +311,9 @@ export default function ClipsView({
                               emitShowRemove={() => {
                                 setModal({ modal: 'remove', inspectedPathId: id });
                               }}
+                              emitOpenFileInLocation={() => {
+                                remote.shell.showItemInFolder(clip.path);
+                              }}
                               streamId={streamId}
                             />
                           </div>
