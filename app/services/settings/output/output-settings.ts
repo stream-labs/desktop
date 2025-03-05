@@ -317,7 +317,6 @@ export class OutputSettingsService extends Service {
     const advanced = this.settingsService.state.Advanced.formData;
 
     const path = this.settingsService.findSettingValue(output, 'Recording', 'RecFilePath');
-    const encoder = this.settingsService.findSettingValue(output, 'Recording', 'RecEncoder');
     const rescaling = this.settingsService.findSettingValue(output, 'Recording', 'RecRescale');
     const mixer = this.settingsService.findSettingValue(output, 'Recording', 'RecTracks');
     const prefix = this.settingsService.findSettingValue(output, 'Recording', 'RecRBPrefix');
@@ -325,6 +324,15 @@ export class OutputSettingsService extends Service {
     const duration = this.settingsService.findSettingValue(output, 'Stream Delay', 'DelaySec');
     const useStreamEncoders =
       this.settingsService.findSettingValue(output, 'Recording', 'RecEncoder') === 'none';
+
+    const convertedEncoderName:
+      | EObsSimpleEncoder.x264_lowcpu
+      | EObsAdvancedEncoder = this.convertEncoderToNewAPI(this.getSettings().recording.encoder);
+
+    const encoder: EObsAdvancedEncoder =
+      convertedEncoderName === EObsSimpleEncoder.x264_lowcpu
+        ? EObsAdvancedEncoder.obs_x264
+        : convertedEncoderName;
 
     const format = this.settingsService.findValidListValue(
       output,

@@ -97,7 +97,17 @@ export interface IPlatformFlags {
   video?: IVideo;
 }
 
+export interface IOutputStatus {
+  streaming: EStreamingState;
+  streamingTime: string;
+  recording: ERecordingState;
+  recordingTime: string;
+  replayBuffer: EReplayBufferState;
+  replayBufferTime: string;
+}
+
 export interface IStreamingServiceState {
+  status: { [display: string]: IOutputStatus };
   streamingStatus: EStreamingState;
   verticalStreamingStatus: EStreamingState;
   streamingStatusTime: string;
