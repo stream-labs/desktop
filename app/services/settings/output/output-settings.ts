@@ -282,6 +282,22 @@ export class OutputSettingsService extends Service {
       'FileNameWithoutSpace',
     );
 
+    const prefix: string = this.settingsService.findSettingValue(
+      output,
+      'Recording',
+      'RecRBPrefix',
+    );
+    const suffix: string = this.settingsService.findSettingValue(
+      output,
+      'Recording',
+      'RecRBSuffix',
+    );
+    const duration: number = this.settingsService.findSettingValue(
+      output,
+      'Stream Delay',
+      'DelaySec',
+    );
+
     return {
       path,
       format,
@@ -290,6 +306,9 @@ export class OutputSettingsService extends Service {
       lowCPU,
       overwrite,
       noSpace,
+      prefix,
+      suffix,
+      duration,
     };
   }
 
@@ -301,6 +320,9 @@ export class OutputSettingsService extends Service {
     const encoder = this.settingsService.findSettingValue(output, 'Recording', 'RecEncoder');
     const rescaling = this.settingsService.findSettingValue(output, 'Recording', 'RecRescale');
     const mixer = this.settingsService.findSettingValue(output, 'Recording', 'RecTracks');
+    const prefix = this.settingsService.findSettingValue(output, 'Recording', 'RecRBPrefix');
+    const suffix = this.settingsService.findSettingValue(output, 'Recording', 'RecRBSuffix');
+    const duration = this.settingsService.findSettingValue(output, 'Stream Delay', 'DelaySec');
     const useStreamEncoders =
       this.settingsService.findSettingValue(output, 'Recording', 'RecEncoder') === 'none';
 
@@ -330,6 +352,9 @@ export class OutputSettingsService extends Service {
       noSpace,
       rescaling,
       mixer,
+      prefix,
+      suffix,
+      duration,
       useStreamEncoders,
     };
   }

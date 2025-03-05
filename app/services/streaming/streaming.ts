@@ -1232,6 +1232,8 @@ export class StreamingService
         ? this.outputSettingsService.getAdvancedRecordingSettings()
         : this.outputSettingsService.getSimpleRecordingSettings();
 
+    console.log('createRecording advanced settings', settings);
+
     // assign settings
     Object.keys(settings).forEach(key => {
       if (key === 'encoder') {
@@ -1382,6 +1384,7 @@ export class StreamingService
       [EOBSOutputSignal.Start]: EReplayBufferState.Running,
       [EOBSOutputSignal.Writing]: EReplayBufferState.Saving,
       [EOBSOutputSignal.Wrote]: EReplayBufferState.Running,
+      [EOBSOutputSignal.Stopping]: EReplayBufferState.Stopping,
       [EOBSOutputSignal.Stop]: EReplayBufferState.Offline,
     } as Dictionary<EReplayBufferState>)[info.signal];
     console.log('handleReplayBufferSignal nextState', nextState, 'signal', info.signal);
@@ -1398,6 +1401,35 @@ export class StreamingService
         code: info.code,
       });
       this.replayBufferFileWrite.next(NodeObs.OBS_service_getLastReplay());
+    }
+
+    if (info.signal === EOBSOutputSignal.Stop) {
+      this.usageStatisticsService.recordAnalyticsEvent('ReplayBufferStatus', {
+        status: 'stop',
+        code: info.code,
+      });
+
+      if (this.outputSettingsService.getSettings().mode === 'Advanced') {
+        if (display === 'horizontal' && this.horizontalReplayBuffer) {
+          AdvancedReplayBufferFactory.destroy(this.horizontalReplayBuffer as IAdvancedReplayBuffer);
+          this.horizontalReplayBuffer = null;
+        }
+
+        if (display === 'vertical' && this.verticalReplayBuffer) {
+          AdvancedReplayBufferFactory.destroy(this.verticalReplayBuffer as IAdvancedReplayBuffer);
+          this.verticalReplayBuffer = null;
+        }
+      } else {
+        if (display === 'horizontal' && this.horizontalReplayBuffer) {
+          SimpleReplayBufferFactory.destroy(this.horizontalReplayBuffer as ISimpleReplayBuffer);
+          this.horizontalReplayBuffer = null;
+        }
+
+        if (display === 'vertical' && this.verticalReplayBuffer) {
+          SimpleReplayBufferFactory.destroy(this.verticalReplayBuffer as ISimpleReplayBuffer);
+          this.verticalReplayBuffer = null;
+        }
+      }
     }
   }
 
@@ -1424,41 +1456,38 @@ export class StreamingService
 
     if (mode === 'Advanced') {
       this.horizontalReplayBuffer = AdvancedReplayBufferFactory.create();
+      const recordingSettings = this.outputSettingsService.getAdvancedRecordingSettings();
+
+      this.horizontalReplayBuffer.path = recordingSettings.path;
+      this.horizontalReplayBuffer.format = recordingSettings.format;
+      this.horizontalReplayBuffer.overwrite = recordingSettings.overwrite;
+      this.horizontalReplayBuffer.noSpace = recordingSettings.noSpace;
+      this.horizontalReplayBuffer.duration = recordingSettings.duration;
+      this.horizontalReplayBuffer.video = this.videoSettingsService.contexts[display];
+      this.horizontalReplayBuffer.prefix = recordingSettings.prefix;
+      this.horizontalReplayBuffer.suffix = recordingSettings.suffix;
+      this.horizontalReplayBuffer.usesStream = recordingSettings.useStreamEncoders;
+      this.horizontalReplayBuffer.mixer = recordingSettings.mixer;
+      this.horizontalReplayBuffer.recording = this.horizontalRecording as IAdvancedRecording;
+      this.horizontalReplayBuffer.signalHandler = async signal => {
+        console.log('replay buffer signal', signal);
+        await this.handleSignal(signal, display);
+      };
+
+      this.horizontalReplayBuffer.start();
+      this.usageStatisticsService.recordFeatureUsage('ReplayBuffer');
     } else {
       const replayBuffer = SimpleReplayBufferFactory.create();
       const recordingSettings = this.outputSettingsService.getSimpleRecordingSettings();
-
-      // const advancedSettings = this.outputSettingsService.getAdvancedRecordingSettings();
-      // console.log('recordingSettings', recordingSettings);
-      // console.log('advancedSettings', advancedSettings);
-      // recordingSettings {
-      //   path: 'C:\\Users\\miche\\Videos',
-      //   format: 'mp4',
-      //   quality: 1,
-      //   encoder: 'jim_nvenc',
-      //   lowCPU: false,
-      //   overwrite: false,
-      //   noSpace: false
-      // }
-      // advancedSettings {
-      //   path: undefined,
-      //   format: 'mp4',
-      //   encoder: 'jim_nvenc',
-      //   overwrite: false,
-      //   noSpace: undefined,
-      //   rescaling: undefined,
-      //   mixer: undefined,
-      //   useStreamEncoders: false
-      // }
 
       replayBuffer.path = recordingSettings.path;
       replayBuffer.format = recordingSettings.format;
       replayBuffer.overwrite = recordingSettings.overwrite;
       replayBuffer.noSpace = recordingSettings.noSpace;
-      replayBuffer.video = this.videoSettingsService.contexts[display]; // TODO: Add vertical context
-      replayBuffer.duration = 60;
-      replayBuffer.prefix = 'Prefix';
-      replayBuffer.suffix = 'Suffix';
+      replayBuffer.video = this.videoSettingsService.contexts[display];
+      replayBuffer.duration = recordingSettings.duration;
+      replayBuffer.prefix = recordingSettings.prefix;
+      replayBuffer.suffix = recordingSettings.suffix;
       replayBuffer.usesStream = true;
       replayBuffer.recording = this.horizontalRecording as ISimpleRecording;
       replayBuffer.signalHandler = async signal => {
@@ -1487,35 +1516,19 @@ export class StreamingService
 
     if (this.outputSettingsService.getSettings().mode === 'Advanced') {
       if (display === 'horizontal' && this.horizontalReplayBuffer) {
-        // TODO: save before stopping
-        // this.horizontalReplayBuffer.save();
         this.horizontalReplayBuffer.stop(forceStop);
-        AdvancedReplayBufferFactory.destroy(this.horizontalReplayBuffer as IAdvancedReplayBuffer);
-        this.horizontalReplayBuffer = null;
       }
 
       if (display === 'vertical' && this.verticalReplayBuffer) {
-        // TODO: save before stopping
-        // this.verticalReplayBuffer.save();
         this.verticalReplayBuffer.stop(forceStop);
-        AdvancedReplayBufferFactory.destroy(this.verticalReplayBuffer as IAdvancedReplayBuffer);
-        this.verticalReplayBuffer = null;
       }
     } else {
       if (display === 'horizontal' && this.horizontalReplayBuffer) {
-        // TODO: save before stopping
-        // this.horizontalReplayBuffer.save();
         this.horizontalReplayBuffer.stop(forceStop);
-        SimpleReplayBufferFactory.destroy(this.horizontalReplayBuffer as ISimpleReplayBuffer);
-        this.horizontalReplayBuffer = null;
       }
 
       if (display === 'vertical' && this.verticalReplayBuffer) {
-        // TODO: save before stopping
-        // this.horizontalReplayBuffer.save();
         this.verticalReplayBuffer.stop(forceStop);
-        SimpleReplayBufferFactory.destroy(this.verticalReplayBuffer as ISimpleReplayBuffer);
-        this.verticalReplayBuffer = null;
       }
     }
 

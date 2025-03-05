@@ -46,7 +46,7 @@ export default function StudioFooterComponent() {
     replayBufferStopping: StreamingService.state.replayBufferStatus === EReplayBufferState.Stopping,
     replayBufferSaving: StreamingService.state.replayBufferStatus === EReplayBufferState.Saving,
     recordingModeEnabled: RecordingModeService.views.isRecordingModeEnabled,
-    replayBufferEnabled: SettingsService.views.values.Output.RecRB,
+    replayBufferEnabled: StreamingService.state.recordingStatus !== ERecordingState.Offline,
   }));
 
   function performanceIconClassName() {
