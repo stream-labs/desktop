@@ -20,12 +20,27 @@ const DISPLAY_TYPE_MAP: Record<string, (count: number) => TypeWording> = {
     description: count > 1 ? 'eliminations' : 'elimination',
     orderPriority: 4,
   }),
+  ['elimination']: count => ({
+    emoji: '🔫',
+    description: count > 1 ? 'eliminations' : 'elimination',
+    orderPriority: 4,
+  }),
   [EHighlighterInputTypes.KNOCKED]: count => ({
     emoji: '🥊',
     description: count > 1 ? 'knocks' : 'knocked',
     orderPriority: 5,
   }),
+  ['knockout']: count => ({
+    emoji: '🥊',
+    description: count > 1 ? 'knocks' : 'knocked',
+    orderPriority: 5,
+  }),
   [EHighlighterInputTypes.DEATH]: count => ({
+    emoji: '🪦',
+    description: count > 1 ? 'deaths' : 'death',
+    orderPriority: 3,
+  }),
+  ['defeat']: count => ({
     emoji: '🪦',
     description: count > 1 ? 'deaths' : 'death',
     orderPriority: 3,
