@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import { mutation, StatefulService } from 'services/core/stateful-service';
+import { Service } from 'services/core/service';
 import {
   AdvancedRecordingFactory,
   AudioEncoderFactory,
@@ -74,9 +75,10 @@ import { RecordingModeService } from 'services/recording-mode';
 import { MarkersService } from 'services/markers';
 import { byOS, OS } from 'util/operating-systems';
 import { DualOutputService } from 'services/dual-output';
-import { capitalize, isFunction } from 'lodash';
+import { capitalize } from 'lodash';
 import { YoutubeService } from 'app-services';
-import path from 'path';
+import { JsonrpcService } from '../api/jsonrpc';
+import { NavigationService } from 'services/navigation';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -145,6 +147,8 @@ export class StreamingService
   @Inject() private markersService: MarkersService;
   @Inject() private dualOutputService: DualOutputService;
   @Inject() private youtubeService: YoutubeService;
+  @Inject() private jsonrpcService: JsonrpcService;
+  @Inject() private navigationService: NavigationService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
@@ -1311,7 +1315,9 @@ export class StreamingService
       // streaming object
       // TODO: move to its own function
       const videoEncoder = recording.videoEncoder;
-      const stream = AdvancedStreamingFactory.create() as IAdvancedStreaming;
+      const stream =
+        (this.contexts[display].streaming as IAdvancedStreaming) ??
+        (AdvancedStreamingFactory.create() as IAdvancedStreaming);
       stream.enforceServiceBitrate = false;
       stream.enableTwitchVOD = false;
       stream.audioTrack = index;
@@ -1368,7 +1374,7 @@ export class StreamingService
         [OS.Windows]: fileName.replace(/\//, '\\'),
       });
 
-      // in dual output mode, each confirmation should be labelled for each display
+      // In dual output mode, each confirmation should be labelled for each display
       if (this.views.isDualOutputMode) {
         this.recordingModeService.addRecordingEntry(parsedName, display);
       } else {
@@ -1376,10 +1382,13 @@ export class StreamingService
       }
       await this.markersService.exportCsv(parsedName);
 
-      // destroy recording factory instances
+      // destroy recording instance
       this.destroyOutputContextIfExists(display, 'recording');
-      // TODO: is this necessary?
-      this.destroyOutputContextIfExists(display, 'streaming');
+      // Also destroy the streaming instance if it was only created for recording
+      // Note: this is only the case when recording without streaming in advanced mode
+      if (this.state.status[display].streaming === EStreamingState.Offline) {
+        this.destroyOutputContextIfExists(display, 'streaming');
+      }
 
       const time = new Date().toISOString();
       this.SET_RECORDING_STATUS(ERecordingState.Offline, display, time);
@@ -1441,6 +1450,19 @@ export class StreamingService
         status: 'wrote',
         code: info.code,
       });
+
+      const message = $t('A new Highlight has been saved. Click to edit in the Highlighter');
+
+      this.notificationsService.actions.push({
+        type: ENotificationType.SUCCESS,
+        message,
+        action: this.jsonrpcService.createRequest(Service.getResourceId(this), 'showHighlighter'),
+      });
+
+      console.log('NodeObs.OBS_service_getLastReplay()', NodeObs.OBS_service_getLastReplay());
+      console.log('this.contexts[display].replayBuffer', this.contexts[display].replayBuffer);
+      console.log('this.contexts[display].recording', this.contexts[display].recording);
+
       this.replayBufferFileWrite.next(NodeObs.OBS_service_getLastReplay());
     }
 
@@ -1454,6 +1476,10 @@ export class StreamingService
     }
   }
 
+  showHighlighter() {
+    this.navigationService.navigate('Highlighter');
+  }
+
   // TODO migrate streaming to new API
   private handleStreamingSignal(info: EOutputSignal, display: TDisplayType) {
     // map signals to status
@@ -1463,38 +1489,50 @@ export class StreamingService
     if (this.state.status[display].replayBuffer !== EReplayBufferState.Offline) return;
 
     const mode = this.outputSettingsService.getSettings().mode;
-    if (!this.contexts.horizontal.recording) return;
+    if (!this.contexts[display].recording) return;
 
     if (this.state.status[display].replayBuffer !== EReplayBufferState.Offline) return;
 
     this.destroyOutputContextIfExists(display, 'replayBuffer');
 
+    // the replay buffer must have a recording instance to reference
+    if (
+      this.state.streamingStatus !== EStreamingState.Offline &&
+      !this.contexts[display].recording
+    ) {
+      this.createRecording(display, 1);
+    }
+
     if (mode === 'Advanced') {
-      this.contexts.horizontal.replayBuffer = AdvancedReplayBufferFactory.create();
+      const replayBuffer = AdvancedReplayBufferFactory.create() as IAdvancedReplayBuffer;
       const recordingSettings = this.outputSettingsService.getRecordingSettings();
 
-      this.contexts.horizontal.replayBuffer.path = recordingSettings.path;
-      this.contexts.horizontal.replayBuffer.format = recordingSettings.format;
-      this.contexts.horizontal.replayBuffer.overwrite = recordingSettings.overwrite;
-      this.contexts.horizontal.replayBuffer.noSpace = recordingSettings.noSpace;
-      this.contexts.horizontal.replayBuffer.duration = recordingSettings.duration;
-      this.contexts.horizontal.replayBuffer.video = this.videoSettingsService.contexts[display];
-      this.contexts.horizontal.replayBuffer.prefix = recordingSettings.prefix;
-      this.contexts.horizontal.replayBuffer.suffix = recordingSettings.suffix;
-      this.contexts.horizontal.replayBuffer.usesStream = recordingSettings.useStreamEncoders;
-      this.contexts.horizontal.replayBuffer.mixer = recordingSettings.mixer;
-      this.contexts.horizontal.replayBuffer.recording = this.contexts.horizontal
-        .recording as IAdvancedRecording;
-      this.contexts.horizontal.replayBuffer.signalHandler = async signal => {
+      // console.log('Advanced recordingSettings', JSON.stringify(recordingSettings, null, 2));
+
+      replayBuffer.path = recordingSettings.path;
+      replayBuffer.format = recordingSettings.format;
+      replayBuffer.overwrite = recordingSettings.overwrite;
+      replayBuffer.noSpace = recordingSettings.noSpace;
+      replayBuffer.duration = recordingSettings.duration;
+      replayBuffer.video = this.videoSettingsService.contexts[display];
+      replayBuffer.prefix = recordingSettings.prefix;
+      replayBuffer.suffix = recordingSettings.suffix;
+      replayBuffer.usesStream = recordingSettings.useStreamEncoders;
+      replayBuffer.mixer = recordingSettings.mixer;
+      replayBuffer.recording = this.contexts[display].recording as IAdvancedRecording;
+      replayBuffer.signalHandler = async signal => {
         console.log('replay buffer signal', signal);
         await this.handleSignal(signal, display);
       };
 
-      this.contexts.horizontal.replayBuffer.start();
+      this.contexts[display].replayBuffer = replayBuffer;
+      this.contexts[display].replayBuffer.start();
       this.usageStatisticsService.recordFeatureUsage('ReplayBuffer');
     } else {
-      const replayBuffer = SimpleReplayBufferFactory.create();
+      const replayBuffer = SimpleReplayBufferFactory.create() as ISimpleReplayBuffer;
       const recordingSettings = this.outputSettingsService.getRecordingSettings();
+
+      // console.log('Simple recordingSettings', JSON.stringify(recordingSettings, null, 2));
 
       replayBuffer.path = recordingSettings.path;
       replayBuffer.format = recordingSettings.format;
@@ -1505,14 +1543,14 @@ export class StreamingService
       replayBuffer.prefix = recordingSettings.prefix;
       replayBuffer.suffix = recordingSettings.suffix;
       replayBuffer.usesStream = true;
-      replayBuffer.recording = this.contexts.horizontal.recording as ISimpleRecording;
+      replayBuffer.recording = this.contexts[display].recording as ISimpleRecording;
       replayBuffer.signalHandler = async signal => {
         console.log('replay buffer signal', signal);
-        await this.handleSignal(signal, 'horizontal');
+        await this.handleSignal(signal, display);
       };
 
-      this.contexts.horizontal.replayBuffer = replayBuffer;
-      this.contexts.horizontal.replayBuffer.start();
+      this.contexts[display].replayBuffer = replayBuffer;
+      this.contexts[display].replayBuffer.start();
       this.usageStatisticsService.recordFeatureUsage('ReplayBuffer');
     }
   }
@@ -1529,6 +1567,7 @@ export class StreamingService
   }
 
   saveReplay(display: TDisplayType = 'horizontal') {
+    console.log('this.contexts[display].replayBuffer', this.contexts[display].replayBuffer);
     if (!this.contexts[display].replayBuffer) return;
     this.contexts[display].replayBuffer.save();
   }
@@ -1748,28 +1787,29 @@ export class StreamingService
         this.streamingStatusChange.next(EStreamingState.Live);
         this.clearReconnectingNotification();
       }
-    } else if (info.type === EOBSOutputType.ReplayBuffer) {
-      const nextState: EReplayBufferState = ({
-        [EOBSOutputSignal.Start]: EReplayBufferState.Running,
-        [EOBSOutputSignal.Stopping]: EReplayBufferState.Stopping,
-        [EOBSOutputSignal.Stop]: EReplayBufferState.Offline,
-        [EOBSOutputSignal.Wrote]: EReplayBufferState.Running,
-        [EOBSOutputSignal.WriteError]: EReplayBufferState.Running,
-      } as Dictionary<EReplayBufferState>)[info.signal];
-
-      if (nextState) {
-        this.SET_REPLAY_BUFFER_STATUS(nextState, 'horizontal', time);
-        this.replayBufferStatusChange.next(nextState);
-      }
-
-      if (info.signal === EOBSOutputSignal.Wrote) {
-        this.usageStatisticsService.recordAnalyticsEvent('ReplayBufferStatus', {
-          status: 'wrote',
-          code: info.code,
-        });
-        this.replayBufferFileWrite.next(NodeObs.OBS_service_getLastReplay());
-      }
     }
+    // else if (info.type === EOBSOutputType.ReplayBuffer) {
+    //   const nextState: EReplayBufferState = ({
+    //     [EOBSOutputSignal.Start]: EReplayBufferState.Running,
+    //     [EOBSOutputSignal.Stopping]: EReplayBufferState.Stopping,
+    //     [EOBSOutputSignal.Stop]: EReplayBufferState.Offline,
+    //     [EOBSOutputSignal.Wrote]: EReplayBufferState.Running,
+    //     [EOBSOutputSignal.WriteError]: EReplayBufferState.Running,
+    //   } as Dictionary<EReplayBufferState>)[info.signal];
+
+    //   if (nextState) {
+    //     this.SET_REPLAY_BUFFER_STATUS(nextState, 'horizontal', time);
+    //     this.replayBufferStatusChange.next(nextState);
+    //   }
+
+    //   if (info.signal === EOBSOutputSignal.Wrote) {
+    //     this.usageStatisticsService.recordAnalyticsEvent('ReplayBufferStatus', {
+    //       status: 'wrote',
+    //       code: info.code,
+    //     });
+    //     this.replayBufferFileWrite.next(NodeObs.OBS_service_getLastReplay());
+    //   }
+    // }
     this.handleV2OutputCode(info);
   }
 
@@ -2006,28 +2046,29 @@ export class StreamingService
 
       this.SET_RECORDING_STATUS(nextState, 'horizontal', time);
       this.recordingStatusChange.next(nextState);
-    } else if (info.type === EOBSOutputType.ReplayBuffer) {
-      const nextState: EReplayBufferState = ({
-        [EOBSOutputSignal.Start]: EReplayBufferState.Running,
-        [EOBSOutputSignal.Stopping]: EReplayBufferState.Stopping,
-        [EOBSOutputSignal.Stop]: EReplayBufferState.Offline,
-        [EOBSOutputSignal.Wrote]: EReplayBufferState.Running,
-        [EOBSOutputSignal.WriteError]: EReplayBufferState.Running,
-      } as Dictionary<EReplayBufferState>)[info.signal];
-
-      if (nextState) {
-        this.SET_REPLAY_BUFFER_STATUS(nextState, 'horizontal', time);
-        this.replayBufferStatusChange.next(nextState);
-      }
-
-      if (info.signal === EOBSOutputSignal.Wrote) {
-        this.usageStatisticsService.recordAnalyticsEvent('ReplayBufferStatus', {
-          status: 'wrote',
-          code: info.code,
-        });
-        this.replayBufferFileWrite.next(NodeObs.OBS_service_getLastReplay());
-      }
     }
+    // else if (info.type === EOBSOutputType.ReplayBuffer) {
+    //   const nextState: EReplayBufferState = ({
+    //     [EOBSOutputSignal.Start]: EReplayBufferState.Running,
+    //     [EOBSOutputSignal.Stopping]: EReplayBufferState.Stopping,
+    //     [EOBSOutputSignal.Stop]: EReplayBufferState.Offline,
+    //     [EOBSOutputSignal.Wrote]: EReplayBufferState.Running,
+    //     [EOBSOutputSignal.WriteError]: EReplayBufferState.Running,
+    //   } as Dictionary<EReplayBufferState>)[info.signal];
+
+    //   if (nextState) {
+    //     this.SET_REPLAY_BUFFER_STATUS(nextState, 'horizontal', time);
+    //     this.replayBufferStatusChange.next(nextState);
+    //   }
+
+    //   if (info.signal === EOBSOutputSignal.Wrote) {
+    //     this.usageStatisticsService.recordAnalyticsEvent('ReplayBufferStatus', {
+    //       status: 'wrote',
+    //       code: info.code,
+    //     });
+    //     this.replayBufferFileWrite.next(NodeObs.OBS_service_getLastReplay());
+    //   }
+    // }
 
     if (info.code) {
       if (this.outputErrorOpen) {

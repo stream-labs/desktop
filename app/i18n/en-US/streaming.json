@@ -288,5 +288,6 @@
   "Please try again. If the issue persists, you can stream directly to a single platform instead or click the button below to bypass and go live.": "Please try again. If the issue persists, you can stream directly to a single platform instead or click the button below to bypass and go live.",
   "Issues": "Issues",
   "Multistream Error": "Multistream Error",
-  "One of destinations might have incomplete permissions. Reconnect the destinations in settings and try again.": "One of destinations might have incomplete permissions. Reconnect the destinations in settings and try again."
+  "One of destinations might have incomplete permissions. Reconnect the destinations in settings and try again.": "One of destinations might have incomplete permissions. Reconnect the destinations in settings and try again.",
+  "A new Highlight has been saved. Click to edit in the Highlighter": "A new Highlight has been saved. Click to edit in the Highlighter"
 }
