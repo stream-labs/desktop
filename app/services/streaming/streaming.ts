@@ -915,7 +915,7 @@ export class StreamingService
   }
 
   get isReplayBufferActive() {
-    return this.state.replayBufferStatus !== EReplayBufferState.Offline;
+    return this.state.status.horizontal.replayBuffer !== EReplayBufferState.Offline;
   }
 
   get isIdle(): boolean {
@@ -1037,7 +1037,10 @@ export class StreamingService
 
     const replayWhenStreaming = this.streamSettingsService.settings.replayBufferWhileStreaming;
 
-    if (replayWhenStreaming && this.state.replayBufferStatus === EReplayBufferState.Offline) {
+    if (
+      replayWhenStreaming &&
+      this.state.status.horizontal.replayBuffer === EReplayBufferState.Offline
+    ) {
       this.startReplayBuffer();
     }
 
@@ -1141,7 +1144,10 @@ export class StreamingService
       }
 
       const keepReplaying = this.streamSettingsService.settings.keepReplayBufferStreamStops;
-      if (!keepReplaying && this.state.replayBufferStatus === EReplayBufferState.Running) {
+      if (
+        !keepReplaying &&
+        this.state.status.horizontal.replayBuffer === EReplayBufferState.Running
+      ) {
         this.stopReplayBuffer();
       }
 
@@ -1203,7 +1209,7 @@ export class StreamingService
             // if the same time stamp is used, the entry will be replaced in the recording history
             setTimeout(() => {
               time = new Date().toISOString();
-              this.SET_RECORDING_STATUS(ERecordingState.Stopping, time, 'horizontal');
+              this.SET_RECORDING_STATUS(ERecordingState.Stopping, 'horizontal', time);
               if (this.contexts.horizontal.recording !== null) {
                 this.contexts.horizontal.recording.stop();
               }
@@ -1212,7 +1218,7 @@ export class StreamingService
           recordingStopped.unsubscribe();
         });
 
-        this.SET_RECORDING_STATUS(ERecordingState.Stopping, time, 'vertical');
+        this.SET_RECORDING_STATUS(ERecordingState.Stopping, 'vertical', time);
         this.contexts.vertical.recording.stop();
         this.recordingStopped.next();
       }
@@ -1224,7 +1230,7 @@ export class StreamingService
     ) {
       // stop recording vertical display
       const time = new Date().toISOString();
-      this.SET_RECORDING_STATUS(ERecordingState.Stopping, time, 'vertical');
+      this.SET_RECORDING_STATUS(ERecordingState.Stopping, 'vertical', time);
       this.contexts.vertical.recording.stop();
     } else if (
       this.state.recordingStatus === ERecordingState.Recording &&
@@ -1232,7 +1238,7 @@ export class StreamingService
     ) {
       const time = new Date().toISOString();
       // stop recording horizontal display
-      this.SET_RECORDING_STATUS(ERecordingState.Stopping, time, 'horizontal');
+      this.SET_RECORDING_STATUS(ERecordingState.Stopping, 'horizontal', time);
       this.contexts.horizontal.recording.stop();
     }
 
@@ -1270,11 +1276,8 @@ export class StreamingService
 
     const settings = this.outputSettingsService.getRecordingSettings();
 
-    console.log('createRecording advanced settings', settings);
-
     // assign settings
     Object.keys(settings).forEach(key => {
-      console.log('(settings as any)[key]', key, (settings as any)[key]);
       if ((settings as any)[key] === undefined) return;
 
       if (key === 'videoEncoder') {
@@ -1286,15 +1289,12 @@ export class StreamingService
 
     // assign context
     recording.video = this.videoSettingsService.contexts[display];
-    console.log('assigned context');
 
     // set signal handler
     recording.signalHandler = async signal => {
       console.log('recording signal', signal);
       await this.handleSignal(signal, display);
     };
-
-    console.log('assign signal handler');
 
     // handle unique properties (including audio)
     if (mode === 'Advanced') {
@@ -1308,9 +1308,8 @@ export class StreamingService
       const track = AudioTrackFactory.create(160, trackName);
       AudioTrackFactory.setAtIndex(track, index);
 
-      console.log('assigned audio track');
-
       // streaming object
+      // TODO: move to its own function
       const videoEncoder = recording.videoEncoder;
       const stream = AdvancedStreamingFactory.create() as IAdvancedStreaming;
       stream.enforceServiceBitrate = false;
@@ -1332,7 +1331,6 @@ export class StreamingService
 
     // save in state
     this.contexts[display].recording = recording;
-    console.log('this.contexts[display].recording', this.contexts[display].recording);
     this.contexts[display].recording.start();
   }
 
@@ -1344,7 +1342,6 @@ export class StreamingService
       [EOutputSignalState.Stopping]: ERecordingState.Stopping,
       [EOutputSignalState.Wrote]: ERecordingState.Wrote,
     } as Dictionary<ERecordingState>)[info.signal];
-    console.log('handleRecordingSignal nextState', nextState, 'signal', info.signal);
 
     // We received a signal we didn't recognize
     if (!nextState) return;
@@ -1381,11 +1378,11 @@ export class StreamingService
 
       // destroy recording factory instances
       this.destroyOutputContextIfExists(display, 'recording');
-      // TODO: remove
+      // TODO: is this necessary?
       this.destroyOutputContextIfExists(display, 'streaming');
 
       const time = new Date().toISOString();
-      this.SET_RECORDING_STATUS(ERecordingState.Offline, time, display);
+      this.SET_RECORDING_STATUS(ERecordingState.Offline, display, time);
       this.recordingStatusChange.next(ERecordingState.Offline);
 
       this.handleV2OutputCode(info);
@@ -1393,7 +1390,7 @@ export class StreamingService
     }
 
     const time = new Date().toISOString();
-    this.SET_RECORDING_STATUS(nextState, time, display);
+    this.SET_RECORDING_STATUS(nextState, display, time);
     this.recordingStatusChange.next(nextState);
 
     this.handleV2OutputCode(info);
@@ -1435,7 +1432,7 @@ export class StreamingService
 
     if (nextState) {
       const time = new Date().toISOString();
-      this.SET_REPLAY_BUFFER_STATUS(nextState, time);
+      this.SET_REPLAY_BUFFER_STATUS(nextState, display, time);
       this.replayBufferStatusChange.next(nextState);
     }
 
@@ -1463,18 +1460,18 @@ export class StreamingService
   }
 
   startReplayBuffer(display: TDisplayType = 'horizontal') {
-    if (this.state.replayBufferStatus !== EReplayBufferState.Offline) return;
+    if (this.state.status[display].replayBuffer !== EReplayBufferState.Offline) return;
 
     const mode = this.outputSettingsService.getSettings().mode;
     if (!this.contexts.horizontal.recording) return;
 
-    if (this.state.replayBufferStatus !== EReplayBufferState.Offline) return;
+    if (this.state.status[display].replayBuffer !== EReplayBufferState.Offline) return;
 
     this.destroyOutputContextIfExists(display, 'replayBuffer');
 
     if (mode === 'Advanced') {
       this.contexts.horizontal.replayBuffer = AdvancedReplayBufferFactory.create();
-      const recordingSettings = this.outputSettingsService.getAdvancedRecordingSettings();
+      const recordingSettings = this.outputSettingsService.getRecordingSettings();
 
       this.contexts.horizontal.replayBuffer.path = recordingSettings.path;
       this.contexts.horizontal.replayBuffer.format = recordingSettings.format;
@@ -1497,7 +1494,7 @@ export class StreamingService
       this.usageStatisticsService.recordFeatureUsage('ReplayBuffer');
     } else {
       const replayBuffer = SimpleReplayBufferFactory.create();
-      const recordingSettings = this.outputSettingsService.getSimpleRecordingSettings();
+      const recordingSettings = this.outputSettingsService.getRecordingSettings();
 
       replayBuffer.path = recordingSettings.path;
       replayBuffer.format = recordingSettings.format;
@@ -1521,60 +1518,19 @@ export class StreamingService
   }
 
   stopReplayBuffer(display: TDisplayType = 'horizontal') {
-    if (this.state.replayBufferStatus === EReplayBufferState.Offline) return;
-    const forceStop = this.state.replayBufferStatus === EReplayBufferState.Stopping;
-    console.log('stopReplayBuffer mode', this.outputSettingsService.getSettings().mode);
-    console.log(
-      'stopReplayBuffer before destroy this.contexts.horizontal.replayBuffer',
-      this.contexts.horizontal.replayBuffer,
-    );
-    console.log(
-      'stopReplayBuffer before destroy this.verticalReplayBuffer',
-      this.contexts.vertical.replayBuffer,
-    );
-
-    if (this.outputSettingsService.getSettings().mode === 'Advanced') {
-      if (display === 'horizontal' && this.contexts.horizontal.replayBuffer) {
-        this.contexts.horizontal.replayBuffer.stop(forceStop);
-      }
-
-      if (display === 'vertical' && this.contexts.vertical.replayBuffer) {
-        this.contexts.vertical.replayBuffer.stop(forceStop);
-      }
-    } else {
-      if (display === 'horizontal' && this.contexts.horizontal.replayBuffer) {
-        this.contexts.horizontal.replayBuffer.stop(forceStop);
-      }
-
-      if (display === 'vertical' && this.contexts.vertical.replayBuffer) {
-        this.contexts.vertical.replayBuffer.stop(forceStop);
-      }
+    if (
+      !this.contexts[display].replayBuffer ||
+      this.state.status[display].replayBuffer === EReplayBufferState.Offline
+    ) {
+      return;
     }
-
-    console.log(
-      'stopReplayBuffer after destroy this.contexts.horizontal.replayBuffer',
-      this.contexts.horizontal.replayBuffer,
-    );
-    console.log(
-      'stopReplayBuffer after destroy this.verticalReplayBuffer',
-      this.contexts.vertical.replayBuffer,
-    );
-
-    // TODO: Determine why replay buffer stop signals are missing
-    // temporarily set replay buffer status to offline
-    this.SET_REPLAY_BUFFER_STATUS(EReplayBufferState.Offline);
+    const forceStop = this.state.status[display].replayBuffer === EReplayBufferState.Stopping;
+    this.contexts[display].replayBuffer.stop(forceStop);
   }
 
   saveReplay(display: TDisplayType = 'horizontal') {
-    if (display === 'horizontal' && this.contexts.horizontal.replayBuffer) {
-      this.contexts.horizontal.replayBuffer.save();
-      return;
-    }
-
-    if (display === 'vertical' && this.contexts.vertical.replayBuffer) {
-      this.contexts.vertical.replayBuffer.save();
-      return;
-    }
+    if (!this.contexts[display].replayBuffer) return;
+    this.contexts[display].replayBuffer.save();
   }
 
   /**
@@ -1802,7 +1758,7 @@ export class StreamingService
       } as Dictionary<EReplayBufferState>)[info.signal];
 
       if (nextState) {
-        this.SET_REPLAY_BUFFER_STATUS(nextState, time);
+        this.SET_REPLAY_BUFFER_STATUS(nextState, 'horizontal', time);
         this.replayBufferStatusChange.next(nextState);
       }
 
@@ -2048,7 +2004,7 @@ export class StreamingService
         return;
       }
 
-      this.SET_RECORDING_STATUS(nextState, time);
+      this.SET_RECORDING_STATUS(nextState, 'horizontal', time);
       this.recordingStatusChange.next(nextState);
     } else if (info.type === EOBSOutputType.ReplayBuffer) {
       const nextState: EReplayBufferState = ({
@@ -2060,7 +2016,7 @@ export class StreamingService
       } as Dictionary<EReplayBufferState>)[info.signal];
 
       if (nextState) {
-        this.SET_REPLAY_BUFFER_STATUS(nextState, time);
+        this.SET_REPLAY_BUFFER_STATUS(nextState, 'horizontal', time);
         this.replayBufferStatusChange.next(nextState);
       }
 
@@ -2366,24 +2322,30 @@ export class StreamingService
   }
 
   @mutation()
-  private SET_RECORDING_STATUS(
-    status: ERecordingState,
-    time: string,
-    display: TDisplayType = 'horizontal',
-  ) {
-    if (display === 'vertical') {
-      this.state.status.vertical.recording = status;
-      this.state.status.vertical.recordingTime = time;
-    } else {
-      this.state.recordingStatus = status;
-      this.state.recordingStatusTime = time;
-    }
+  private SET_RECORDING_STATUS(status: ERecordingState, display: TDisplayType, time: string) {
+    // while recording and the replay buffer are in the v2 API and streaming is in the old API
+    // we need to duplicate tracking the replay buffer status
+    this.state.status[display].recording = status;
+    this.state.status[display].recordingTime = time;
+    this.state.recordingStatus = status;
+    this.state.recordingStatusTime = time;
   }
 
   @mutation()
-  private SET_REPLAY_BUFFER_STATUS(status: EReplayBufferState, time?: string) {
+  private SET_REPLAY_BUFFER_STATUS(
+    status: EReplayBufferState,
+    display: TDisplayType,
+    time?: string,
+  ) {
+    // while recording and the replay buffer are in the v2 API and streaming is in the old API
+    // we need to duplicate tracking the replay buffer status
+    this.state.status[display].replayBuffer = status;
     this.state.replayBufferStatus = status;
-    if (time) this.state.replayBufferStatusTime = time;
+
+    if (time) {
+      this.state.status[display].replayBufferTime = time;
+      this.state.replayBufferStatusTime = time;
+    }
   }
 
   @mutation()
