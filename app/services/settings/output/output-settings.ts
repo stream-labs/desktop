@@ -230,6 +230,128 @@ export class OutputSettingsService extends Service {
     };
   }
 
+  /**
+   * Get recording settings
+   * @remark Primarily used for setting up the recording output context,
+   * this function will automatically return either the simple or advanced
+   * settings based on the current mode.
+   * @returns settings for the recording
+   */
+  getRecordingSettings() {
+    const output = this.settingsService.state.Output.formData;
+    const advanced = this.settingsService.state.Advanced.formData;
+
+    console.log('output', JSON.stringify(output, null, 2));
+    console.log('advanced', JSON.stringify(advanced, null, 2));
+
+    const mode: TOutputSettingsMode = this.settingsService.findSettingValue(
+      output,
+      'Untitled',
+      'Mode',
+    );
+
+    const pathKey = mode === 'Advanced' ? 'RecFilePath' : 'FilePath';
+    const path: string = this.settingsService.findSettingValue(output, 'Recording', pathKey);
+
+    const format: ERecordingFormat = this.settingsService.findValidListValue(
+      output,
+      'Recording',
+      'RecFormat',
+    ) as ERecordingFormat;
+
+    const oldQualityName = this.settingsService.findSettingValue(output, 'Recording', 'RecQuality');
+    let quality: ERecordingQuality = ERecordingQuality.HigherQuality;
+    switch (oldQualityName) {
+      case 'Small':
+        quality = ERecordingQuality.HighQuality;
+        break;
+      case 'HQ':
+        quality = ERecordingQuality.HigherQuality;
+        break;
+      case 'Lossless':
+        quality = ERecordingQuality.Lossless;
+        break;
+      case 'Stream':
+        quality = ERecordingQuality.Stream;
+        break;
+    }
+
+    const convertedEncoderName:
+      | EObsSimpleEncoder.x264_lowcpu
+      | EObsAdvancedEncoder = this.convertEncoderToNewAPI(this.getSettings().recording.encoder);
+
+    const videoEncoder: EObsAdvancedEncoder =
+      convertedEncoderName === EObsSimpleEncoder.x264_lowcpu
+        ? EObsAdvancedEncoder.obs_x264
+        : convertedEncoderName;
+
+    const lowCPU: boolean = convertedEncoderName === EObsSimpleEncoder.x264_lowcpu;
+
+    const overwrite: boolean = this.settingsService.findSettingValue(
+      advanced,
+      'Recording',
+      'OverwriteIfExists',
+    );
+
+    const noSpace: boolean = this.settingsService.findSettingValue(
+      output,
+      'Recording',
+      'FileNameWithoutSpace',
+    );
+
+    const prefix: string = this.settingsService.findSettingValue(
+      output,
+      'Recording',
+      'RecRBPrefix',
+    );
+    const suffix: string = this.settingsService.findSettingValue(
+      output,
+      'Recording',
+      'RecRBSuffix',
+    );
+    const duration: number = this.settingsService.findSettingValue(
+      output,
+      'Stream Delay',
+      'DelaySec',
+    );
+
+    if (mode === 'Advanced') {
+      const mixer = this.settingsService.findSettingValue(output, 'Recording', 'RecTracks');
+      const rescaling = this.settingsService.findSettingValue(output, 'Recording', 'RecRescale');
+      const useStreamEncoders =
+        this.settingsService.findSettingValue(output, 'Recording', 'RecEncoder') === 'none';
+
+      // advanced settings
+      return {
+        path,
+        format,
+        overwrite,
+        noSpace,
+        mixer,
+        rescaling,
+        useStreamEncoders,
+        videoEncoder,
+        prefix,
+        suffix,
+        duration,
+      };
+    } else {
+      // simple settings
+      return {
+        path,
+        format,
+        quality,
+        videoEncoder,
+        lowCPU,
+        overwrite,
+        noSpace,
+        prefix,
+        suffix,
+        duration,
+      };
+    }
+  }
+
   getSimpleRecordingSettings() {
     const output = this.settingsService.state.Output.formData;
     const advanced = this.settingsService.state.Advanced.formData;
@@ -311,6 +433,31 @@ export class OutputSettingsService extends Service {
       duration,
     };
   }
+  // simple
+  // recording.path = path.join(path.normalize(__dirname), '..', 'osnData');
+  // recording.format = ERecordingFormat.MOV;
+  // recording.quality = ERecordingQuality.HighQuality;
+  // recording.video = obs.defaultVideoContext;
+  // recording.videoEncoder =
+  //     osn.VideoEncoderFactory.create('obs_x264', 'video-encoder');
+  // recording.lowCPU = true;
+  // recording.audioEncoder = osn.AudioEncoderFactory.create();
+  // recording.overwrite = true;
+  // recording.noSpace = false;
+
+  // advanced
+  // recording.path = path.join(path.normalize(__dirname), '..', 'osnData');
+  // recording.format = ERecordingFormat.MOV;
+  // recording.videoEncoder =
+  //     osn.VideoEncoderFactory.create('obs_x264', 'video-encoder');
+  // recording.overwrite = true;
+  // recording.noSpace = false;
+  // recording.video = obs.defaultVideoContext;
+  // recording.mixer = 7;
+  // recording.rescaling = true;
+  // recording.outputWidth = 1920;
+  // recording.outputHeight = 1080;
+  // recording.useStreamEncoders = false;
 
   getAdvancedRecordingSettings() {
     const output = this.settingsService.state.Output.formData;

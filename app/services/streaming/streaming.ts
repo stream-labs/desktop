@@ -1268,10 +1268,7 @@ export class StreamingService
         ? (AdvancedRecordingFactory.create() as IAdvancedRecording)
         : (SimpleRecordingFactory.create() as ISimpleRecording);
 
-    const settings =
-      mode === 'Advanced'
-        ? this.outputSettingsService.getAdvancedRecordingSettings()
-        : this.outputSettingsService.getSimpleRecordingSettings();
+    const settings = this.outputSettingsService.getRecordingSettings();
 
     console.log('createRecording advanced settings', settings);
 
@@ -1280,8 +1277,8 @@ export class StreamingService
       console.log('(settings as any)[key]', key, (settings as any)[key]);
       if ((settings as any)[key] === undefined) return;
 
-      if (key === 'encoder') {
-        recording.videoEncoder = VideoEncoderFactory.create(settings.encoder, 'video-encoder');
+      if (key === 'videoEncoder') {
+        recording.videoEncoder = VideoEncoderFactory.create(settings.videoEncoder, 'video-encoder');
       } else {
         (recording as any)[key] = (settings as any)[key];
       }
@@ -1301,23 +1298,32 @@ export class StreamingService
 
     // handle unique properties (including audio)
     if (mode === 'Advanced') {
-      (recording as IAdvancedRecording).outputWidth = this.dualOutputService.views.videoSettings[
-        display
-      ].outputWidth;
-      (recording as IAdvancedRecording).outputHeight = this.dualOutputService.views.videoSettings[
-        display
-      ].outputHeight;
+      // output resolutions
+      const resolution = this.videoSettingsService.outputResolutions[display];
+      (recording as IAdvancedRecording).outputWidth = resolution.outputWidth;
+      (recording as IAdvancedRecording).outputHeight = resolution.outputHeight;
 
+      // audio track
       const trackName = `track${index}`;
       const track = AudioTrackFactory.create(160, trackName);
       AudioTrackFactory.setAtIndex(track, index);
 
       console.log('assigned audio track');
 
+      // streaming object
       const videoEncoder = recording.videoEncoder;
       const stream = AdvancedStreamingFactory.create() as IAdvancedStreaming;
+      stream.enforceServiceBitrate = false;
+      stream.enableTwitchVOD = false;
+      stream.audioTrack = index;
+      // stream.twitchTrack = 3;
+      stream.rescaling = ((recording as unknown) as IAdvancedStreaming).rescaling;
+      stream.outputWidth = ((recording as unknown) as IAdvancedStreaming).outputWidth;
+      stream.outputHeight = ((recording as unknown) as IAdvancedStreaming).outputHeight;
       stream.video = this.videoSettingsService.contexts[display];
       stream.videoEncoder = videoEncoder;
+
+      this.contexts[display].streaming = stream;
       recording.videoEncoder = videoEncoder;
       recording.streaming = stream;
     } else {
@@ -1325,14 +1331,9 @@ export class StreamingService
     }
 
     // save in state
-    if (display === 'vertical') {
-      this.contexts.vertical.recording = recording;
-      this.contexts.vertical.recording.start();
-    } else {
-      this.contexts.horizontal.recording = recording;
-      console.log('this.contexts.horizontal.recording', this.contexts.horizontal.recording);
-      this.contexts.horizontal.recording.start();
-    }
+    this.contexts[display].recording = recording;
+    console.log('this.contexts[display].recording', this.contexts[display].recording);
+    this.contexts[display].recording.start();
   }
 
   private async handleRecordingSignal(info: EOutputSignal, display: TDisplayType) {
@@ -1380,6 +1381,8 @@ export class StreamingService
 
       // destroy recording factory instances
       this.destroyOutputContextIfExists(display, 'recording');
+      // TODO: remove
+      this.destroyOutputContextIfExists(display, 'streaming');
 
       const time = new Date().toISOString();
       this.SET_RECORDING_STATUS(ERecordingState.Offline, time, display);
