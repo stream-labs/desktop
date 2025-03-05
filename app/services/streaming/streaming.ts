@@ -1259,7 +1259,7 @@ export class StreamingService
   }
 
   private createRecording(display: TDisplayType, index: number) {
-    this.destroyRecordingContextIfExists(display);
+    this.destroyOutputContextIfExists(display, 'recording');
 
     const mode = this.outputSettingsService.getSettings().mode;
 
@@ -1379,7 +1379,7 @@ export class StreamingService
       await this.markersService.exportCsv(parsedName);
 
       // destroy recording factory instances
-      this.destroyRecordingContextIfExists(display);
+      this.destroyOutputContextIfExists(display, 'recording');
 
       const time = new Date().toISOString();
       this.SET_RECORDING_STATUS(ERecordingState.Offline, time, display);
@@ -1450,7 +1450,7 @@ export class StreamingService
         code: info.code,
       });
 
-      this.destroyReplayBufferContextIfExists(display);
+      this.destroyOutputContextIfExists(display, 'replayBuffer');
     }
   }
 
@@ -1467,7 +1467,7 @@ export class StreamingService
 
     if (this.state.replayBufferStatus !== EReplayBufferState.Offline) return;
 
-    this.destroyReplayBufferContextIfExists(display);
+    this.destroyOutputContextIfExists(display, 'replayBuffer');
 
     if (mode === 'Advanced') {
       this.contexts.horizontal.replayBuffer = AdvancedReplayBufferFactory.create();
@@ -2294,64 +2294,60 @@ export class StreamingService
    * on app shutdown to prevent errors.
    */
   shutdown() {
-    for (const display in this.contexts) {
-      this.destroyStreamingContextIfExists(display);
-      this.destroyRecordingContextIfExists(display);
-      this.destroyReplayBufferContextIfExists(display);
-    }
+    Object.keys(this.contexts).forEach(display => {
+      Object.keys(this.contexts[display]).forEach((contextType: keyof IOutputContext) => {
+        this.destroyOutputContextIfExists(display, contextType);
+      });
+    });
   }
 
   /**
-   * Destroy the streaming context for a given display
+   * Destroy the streaming context for a given display and output
    * @remark Will just return if the context is null
-   * @param display - The display to destroy the streaming context for
+   * @param display - The display to destroy the output context for
+   * @param contextType - The name of the output context to destroy
    */
-  private destroyStreamingContextIfExists(display: TDisplayType | string) {
-    if (!this.contexts[display] || !this.contexts[display].streaming) return;
+  private destroyOutputContextIfExists(
+    display: TDisplayType | string,
+    contextType: keyof IOutputContext,
+  ) {
+    if (!this.contexts[display] || !this.contexts[display][contextType]) return;
 
     if (this.outputSettingsService.getSettings().mode === 'Advanced') {
-      AdvancedStreamingFactory.destroy(this.contexts[display].streaming as IAdvancedStreaming);
+      switch (contextType) {
+        case 'streaming':
+          AdvancedStreamingFactory.destroy(
+            this.contexts[display][contextType] as IAdvancedStreaming,
+          );
+          break;
+        case 'recording':
+          AdvancedRecordingFactory.destroy(
+            this.contexts[display][contextType] as IAdvancedRecording,
+          );
+          break;
+        case 'replayBuffer':
+          AdvancedReplayBufferFactory.destroy(
+            this.contexts[display][contextType] as IAdvancedReplayBuffer,
+          );
+          break;
+      }
     } else {
-      SimpleStreamingFactory.destroy(this.contexts[display].streaming as ISimpleStreaming);
+      switch (contextType) {
+        case 'streaming':
+          SimpleStreamingFactory.destroy(this.contexts[display][contextType] as ISimpleStreaming);
+          break;
+        case 'recording':
+          SimpleRecordingFactory.destroy(this.contexts[display][contextType] as ISimpleRecording);
+          break;
+        case 'replayBuffer':
+          SimpleReplayBufferFactory.destroy(
+            this.contexts[display][contextType] as ISimpleReplayBuffer,
+          );
+          break;
+      }
     }
 
-    this.contexts[display].streaming = null;
-  }
-
-  /**
-   * Destroy the recording context for a given display
-   * @remark Will just return if the context is null
-   * @param display - The display to destroy the recording context for
-   */
-  private destroyRecordingContextIfExists(display: TDisplayType | string) {
-    if (!this.contexts[display] || !this.contexts[display].recording) return;
-
-    if (this.outputSettingsService.getSettings().mode === 'Advanced') {
-      AdvancedRecordingFactory.destroy(this.contexts[display].recording as IAdvancedRecording);
-    } else {
-      SimpleRecordingFactory.destroy(this.contexts[display].recording as ISimpleRecording);
-    }
-
-    this.contexts[display].recording = null;
-  }
-
-  /**
-   * Destroy the replay buffer context for a given display
-   * @remark Will just return if the context is null
-   * @param display - The display to destroy the replay buffer context for
-   */
-  private destroyReplayBufferContextIfExists(display: TDisplayType | string) {
-    if (!this.contexts[display] || !this.contexts[display].replayBuffer) return;
-
-    if (this.outputSettingsService.getSettings().mode === 'Advanced') {
-      AdvancedReplayBufferFactory.destroy(
-        this.contexts[display].replayBuffer as IAdvancedReplayBuffer,
-      );
-    } else {
-      SimpleReplayBufferFactory.destroy(this.contexts[display].replayBuffer as ISimpleReplayBuffer);
-    }
-
-    this.contexts[display].replayBuffer = null;
+    this.contexts[display][contextType] = null;
   }
 
   @mutation()
