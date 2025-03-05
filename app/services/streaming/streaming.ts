@@ -1352,6 +1352,14 @@ export class StreamingService
     // We received a signal we didn't recognize
     if (!nextState) return;
 
+    if (info.signal === EOBSOutputSignal.Start) {
+      this.usageStatisticsService.recordFeatureUsage('Recording');
+      this.usageStatisticsService.recordAnalyticsEvent('RecordingStatus', {
+        status: nextState,
+        code: info.code,
+      });
+    }
+
     if (nextState === ERecordingState.Recording) {
       const mode = this.views.isDualOutputMode ? 'dual' : 'single';
       this.usageStatisticsService.recordFeatureUsage('Recording');
@@ -1364,10 +1372,7 @@ export class StreamingService
     }
 
     if (nextState === ERecordingState.Wrote) {
-      const fileName =
-        display === 'vertical'
-          ? this.contexts.vertical.recording.lastFile()
-          : this.contexts.horizontal.recording.lastFile();
+      const fileName = this.contexts[display].recording.lastFile();
 
       const parsedName = byOS({
         [OS.Mac]: fileName,
@@ -1390,9 +1395,7 @@ export class StreamingService
         this.destroyOutputContextIfExists(display, 'streaming');
       }
 
-      const time = new Date().toISOString();
-      this.SET_RECORDING_STATUS(ERecordingState.Offline, display, time);
-      this.recordingStatusChange.next(ERecordingState.Offline);
+      this.latestRecordingPath.next(fileName);
 
       this.handleV2OutputCode(info);
       return;
@@ -1437,7 +1440,6 @@ export class StreamingService
       [EOBSOutputSignal.Stopping]: EReplayBufferState.Stopping,
       [EOBSOutputSignal.Stop]: EReplayBufferState.Offline,
     } as Dictionary<EReplayBufferState>)[info.signal];
-    console.log('handleReplayBufferSignal nextState', nextState, 'signal', info.signal);
 
     if (nextState) {
       const time = new Date().toISOString();
@@ -1459,11 +1461,7 @@ export class StreamingService
         action: this.jsonrpcService.createRequest(Service.getResourceId(this), 'showHighlighter'),
       });
 
-      console.log('NodeObs.OBS_service_getLastReplay()', NodeObs.OBS_service_getLastReplay());
-      console.log('this.contexts[display].replayBuffer', this.contexts[display].replayBuffer);
-      console.log('this.contexts[display].recording', this.contexts[display].recording);
-
-      this.replayBufferFileWrite.next(NodeObs.OBS_service_getLastReplay());
+      this.replayBufferFileWrite.next(this.contexts[display].replayBuffer.lastFile());
     }
 
     if (info.signal === EOBSOutputSignal.Stop) {
@@ -1488,13 +1486,6 @@ export class StreamingService
   startReplayBuffer(display: TDisplayType = 'horizontal') {
     if (this.state.status[display].replayBuffer !== EReplayBufferState.Offline) return;
 
-    const mode = this.outputSettingsService.getSettings().mode;
-    if (!this.contexts[display].recording) return;
-
-    if (this.state.status[display].replayBuffer !== EReplayBufferState.Offline) return;
-
-    this.destroyOutputContextIfExists(display, 'replayBuffer');
-
     // the replay buffer must have a recording instance to reference
     if (
       this.state.streamingStatus !== EStreamingState.Offline &&
@@ -1503,11 +1494,13 @@ export class StreamingService
       this.createRecording(display, 1);
     }
 
+    const mode = this.outputSettingsService.getSettings().mode;
+
+    this.destroyOutputContextIfExists(display, 'replayBuffer');
+
     if (mode === 'Advanced') {
       const replayBuffer = AdvancedReplayBufferFactory.create() as IAdvancedReplayBuffer;
       const recordingSettings = this.outputSettingsService.getRecordingSettings();
-
-      // console.log('Advanced recordingSettings', JSON.stringify(recordingSettings, null, 2));
 
       replayBuffer.path = recordingSettings.path;
       replayBuffer.format = recordingSettings.format;
@@ -1531,8 +1524,6 @@ export class StreamingService
     } else {
       const replayBuffer = SimpleReplayBufferFactory.create() as ISimpleReplayBuffer;
       const recordingSettings = this.outputSettingsService.getRecordingSettings();
-
-      // console.log('Simple recordingSettings', JSON.stringify(recordingSettings, null, 2));
 
       replayBuffer.path = recordingSettings.path;
       replayBuffer.format = recordingSettings.format;
@@ -1567,7 +1558,6 @@ export class StreamingService
   }
 
   saveReplay(display: TDisplayType = 'horizontal') {
-    console.log('this.contexts[display].replayBuffer', this.contexts[display].replayBuffer);
     if (!this.contexts[display].replayBuffer) return;
     this.contexts[display].replayBuffer.save();
   }
@@ -1788,28 +1778,7 @@ export class StreamingService
         this.clearReconnectingNotification();
       }
     }
-    // else if (info.type === EOBSOutputType.ReplayBuffer) {
-    //   const nextState: EReplayBufferState = ({
-    //     [EOBSOutputSignal.Start]: EReplayBufferState.Running,
-    //     [EOBSOutputSignal.Stopping]: EReplayBufferState.Stopping,
-    //     [EOBSOutputSignal.Stop]: EReplayBufferState.Offline,
-    //     [EOBSOutputSignal.Wrote]: EReplayBufferState.Running,
-    //     [EOBSOutputSignal.WriteError]: EReplayBufferState.Running,
-    //   } as Dictionary<EReplayBufferState>)[info.signal];
 
-    //   if (nextState) {
-    //     this.SET_REPLAY_BUFFER_STATUS(nextState, 'horizontal', time);
-    //     this.replayBufferStatusChange.next(nextState);
-    //   }
-
-    //   if (info.signal === EOBSOutputSignal.Wrote) {
-    //     this.usageStatisticsService.recordAnalyticsEvent('ReplayBufferStatus', {
-    //       status: 'wrote',
-    //       code: info.code,
-    //     });
-    //     this.replayBufferFileWrite.next(NodeObs.OBS_service_getLastReplay());
-    //   }
-    // }
     this.handleV2OutputCode(info);
   }
 
@@ -2009,66 +1978,7 @@ export class StreamingService
         this.streamingStatusChange.next(EStreamingState.Live);
         this.clearReconnectingNotification();
       }
-    } else if (info.type === EOBSOutputType.Recording) {
-      const nextState: ERecordingState = ({
-        [EOBSOutputSignal.Start]: ERecordingState.Recording,
-        [EOBSOutputSignal.Starting]: ERecordingState.Starting,
-        [EOBSOutputSignal.Stop]: ERecordingState.Offline,
-        [EOBSOutputSignal.Stopping]: ERecordingState.Stopping,
-        [EOBSOutputSignal.Wrote]: ERecordingState.Wrote,
-      } as Dictionary<ERecordingState>)[info.signal];
-
-      // We received a signal we didn't recognize
-      if (!nextState) return;
-
-      if (info.signal === EOBSOutputSignal.Start) {
-        this.usageStatisticsService.recordFeatureUsage('Recording');
-        this.usageStatisticsService.recordAnalyticsEvent('RecordingStatus', {
-          status: nextState,
-          code: info.code,
-        });
-      }
-
-      if (info.signal === EOBSOutputSignal.Wrote) {
-        const filename = NodeObs.OBS_service_getLastRecording();
-        const parsedFilename = byOS({
-          [OS.Mac]: filename,
-          [OS.Windows]: filename.replace(/\//, '\\'),
-        });
-        this.recordingModeService.actions.addRecordingEntry(parsedFilename);
-        this.markersService.actions.exportCsv(parsedFilename);
-        this.recordingModeService.addRecordingEntry(parsedFilename);
-        this.latestRecordingPath.next(filename);
-        // Wrote signals come after Offline, so we return early here
-        // to not falsely set our state out of Offline
-        return;
-      }
-
-      this.SET_RECORDING_STATUS(nextState, 'horizontal', time);
-      this.recordingStatusChange.next(nextState);
     }
-    // else if (info.type === EOBSOutputType.ReplayBuffer) {
-    //   const nextState: EReplayBufferState = ({
-    //     [EOBSOutputSignal.Start]: EReplayBufferState.Running,
-    //     [EOBSOutputSignal.Stopping]: EReplayBufferState.Stopping,
-    //     [EOBSOutputSignal.Stop]: EReplayBufferState.Offline,
-    //     [EOBSOutputSignal.Wrote]: EReplayBufferState.Running,
-    //     [EOBSOutputSignal.WriteError]: EReplayBufferState.Running,
-    //   } as Dictionary<EReplayBufferState>)[info.signal];
-
-    //   if (nextState) {
-    //     this.SET_REPLAY_BUFFER_STATUS(nextState, 'horizontal', time);
-    //     this.replayBufferStatusChange.next(nextState);
-    //   }
-
-    //   if (info.signal === EOBSOutputSignal.Wrote) {
-    //     this.usageStatisticsService.recordAnalyticsEvent('ReplayBufferStatus', {
-    //       status: 'wrote',
-    //       code: info.code,
-    //     });
-    //     this.replayBufferFileWrite.next(NodeObs.OBS_service_getLastReplay());
-    //   }
-    // }
 
     if (info.code) {
       if (this.outputErrorOpen) {
