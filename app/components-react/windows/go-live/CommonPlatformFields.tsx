@@ -39,6 +39,8 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
   const defaultProps = { layoutMode: 'singlePlatform' as TLayoutMode };
   const p: IProps = { ...defaultProps, ...rawProps };
 
+  const { HighlighterService } = Services;
+
   function updatePlatform(patch: Partial<ICommonPlatformSettings>) {
     const platformSettings = p.value;
     p.onChange({ ...platformSettings, ...patch });
@@ -88,6 +90,10 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
     maxCharacters = 100;
   } else if (enabledPlatforms.includes('twitch')) {
     maxCharacters = 140;
+  }
+
+  if (!enabledPlatforms.includes('twitch') && HighlighterService.views.useAiHighlighter) {
+    HighlighterService.actions.setAiHighlighter(false);
   }
 
   const titleTooltip = useMemo(() => {
