@@ -137,11 +137,11 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
               />
             )}
 
-            {aiHighlighterFeatureEnabled &&
+            {/* {aiHighlighterFeatureEnabled &&
               enabledPlatforms &&
               !enabledPlatforms.includes('twitch') && (
                 <AiHighlighterToggle game={undefined} cardIsExpanded={false} />
-              )}
+              )} */}
           </div>
         )}
       </Animate>
