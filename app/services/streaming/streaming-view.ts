@@ -545,11 +545,7 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
   }
 
   get isRecording() {
-    return this.streamingState.recordingStatus !== ERecordingState.Offline;
-  }
-
-  get isReplayBufferActive() {
-    return this.streamingState.replayBufferStatus !== EReplayBufferState.Offline;
+    return this.streamingState.status.horizontal.recording !== ERecordingState.Offline;
   }
 
   get isIdle(): boolean {
@@ -563,5 +559,9 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
 
   get selectiveRecording() {
     return this.streamingState.selectiveRecording;
+  }
+
+  get replayBufferStatus() {
+    return this.streamingState.status.horizontal.replayBuffer;
   }
 }

@@ -240,10 +240,6 @@ export class OutputSettingsService extends Service {
   getRecordingSettings() {
     const output = this.settingsService.state.Output.formData;
     const advanced = this.settingsService.state.Advanced.formData;
-
-    console.log('output', JSON.stringify(output, null, 2));
-    console.log('advanced', JSON.stringify(advanced, null, 2));
-
     const mode: TOutputSettingsMode = this.settingsService.findSettingValue(
       output,
       'Untitled',
@@ -348,6 +344,103 @@ export class OutputSettingsService extends Service {
         prefix,
         suffix,
         duration,
+      };
+    }
+  }
+
+  getReplayBufferSettings() {
+    const output = this.settingsService.state.Output.formData;
+    const advanced = this.settingsService.state.Advanced.formData;
+
+    const mode: TOutputSettingsMode = this.settingsService.findSettingValue(
+      output,
+      'Untitled',
+      'Mode',
+    );
+
+    const pathKey = mode === 'Advanced' ? 'RecFilePath' : 'FilePath';
+    const path: string = this.settingsService.findSettingValue(output, 'Recording', pathKey);
+
+    const format: ERecordingFormat = this.settingsService.findValidListValue(
+      output,
+      'Recording',
+      'RecFormat',
+    ) as ERecordingFormat;
+
+    const oldQualityName = this.settingsService.findSettingValue(output, 'Recording', 'RecQuality');
+    let quality: ERecordingQuality = ERecordingQuality.HigherQuality;
+    switch (oldQualityName) {
+      case 'Small':
+        quality = ERecordingQuality.HighQuality;
+        break;
+      case 'HQ':
+        quality = ERecordingQuality.HigherQuality;
+        break;
+      case 'Lossless':
+        quality = ERecordingQuality.Lossless;
+        break;
+      case 'Stream':
+        quality = ERecordingQuality.Stream;
+        break;
+    }
+
+    const overwrite: boolean = this.settingsService.findSettingValue(
+      advanced,
+      'Recording',
+      'OverwriteIfExists',
+    );
+
+    const noSpace: boolean = this.settingsService.findSettingValue(
+      output,
+      'Recording',
+      'FileNameWithoutSpace',
+    );
+
+    const prefix: string = this.settingsService.findSettingValue(
+      output,
+      'Recording',
+      'RecRBPrefix',
+    );
+    const suffix: string = this.settingsService.findSettingValue(
+      output,
+      'Recording',
+      'RecRBSuffix',
+    );
+    const duration: number = this.settingsService.findSettingValue(
+      output,
+      'Stream Delay',
+      'DelaySec',
+    );
+
+    const useStreamEncoders =
+      this.settingsService.findSettingValue(output, 'Recording', 'RecEncoder') === 'none';
+
+    if (mode === 'Advanced') {
+      const mixer = this.settingsService.findSettingValue(output, 'Recording', 'RecTracks');
+
+      // advanced settings
+      return {
+        path,
+        format,
+        overwrite,
+        noSpace,
+        mixer,
+        useStreamEncoders,
+        prefix,
+        suffix,
+        duration,
+      };
+    } else {
+      // simple settings
+      return {
+        path,
+        format,
+        overwrite,
+        noSpace,
+        prefix,
+        suffix,
+        duration,
+        useStreamEncoders,
       };
     }
   }
