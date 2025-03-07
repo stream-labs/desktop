@@ -1201,12 +1201,6 @@ export class StreamingService
   }
 
   toggleRecording() {
-    console.log('this.state.status.horizontal.recording', this.state.status.horizontal.recording);
-    console.log('this.contexts.horizontal.recording', this.contexts.horizontal.recording);
-    console.log(
-      'this.state.status.horizontal.recording',
-      this.state.status.horizontal.replayBuffer,
-    );
     // stop recording
     if (
       this.state.status.horizontal.recording === ERecordingState.Recording &&
@@ -1243,14 +1237,17 @@ export class StreamingService
       this.contexts.vertical.recording !== null
     ) {
       // stop recording vertical display
+      // change the recording status for the loading animation
+      this.SET_RECORDING_STATUS(ERecordingState.Stopping, 'vertical', new Date().toISOString());
       this.contexts.vertical.recording.stop();
-      return;
     } else if (
       this.state.status.horizontal.recording === ERecordingState.Recording &&
       this.contexts.horizontal.recording !== null
     ) {
+      // stop recording horizontal display
+      // change the recording status for the loading animation
+      this.SET_RECORDING_STATUS(ERecordingState.Stopping, 'horizontal', new Date().toISOString());
       this.contexts.horizontal.recording.stop(true);
-      return;
     }
 
     // start recording
@@ -1339,8 +1336,6 @@ export class StreamingService
     }
 
     // save in state
-    // this.contexts[display].recording =
-    //   mode === 'Advanced' ? (recording as IAdvancedRecording) : (recording as ISimpleRecording);
     this.contexts[display].recording = recording;
 
     // assign context
@@ -1408,13 +1403,11 @@ export class StreamingService
       await this.markersService.exportCsv(parsedName);
 
       // destroy recording instance
-      await this.destroyOutputContextIfExists(display, 'recording');
+      this.destroyOutputContextIfExists(display, 'recording');
       // Also destroy the streaming instance if it was only created for recording
       // Note: this is only the case when recording without streaming in advanced mode
       if (this.state.status[display].streaming === EStreamingState.Offline) {
-        console.log('destroying streaming instance');
-
-        await this.destroyOutputContextIfExists(display, 'streaming');
+        this.destroyOutputContextIfExists(display, 'streaming');
       }
 
       this.latestRecordingPath.next(fileName);
@@ -1486,7 +1479,7 @@ export class StreamingService
         code: info.code,
       });
 
-      await this.destroyOutputContextIfExists(display, 'replayBuffer');
+      this.destroyOutputContextIfExists(display, 'replayBuffer');
     }
 
     if (nextState) {
@@ -1494,6 +1487,8 @@ export class StreamingService
       this.SET_REPLAY_BUFFER_STATUS(nextState, display, time);
       this.replayBufferStatusChange.next(nextState);
     }
+
+    this.handleV2OutputCode(info);
   }
 
   showHighlighter() {
@@ -1566,7 +1561,7 @@ export class StreamingService
 
     this.contexts[display].replayBuffer.stop(forceStop);
     // change the replay buffer status for the loading animation
-    // this.SET_REPLAY_BUFFER_STATUS(EReplayBufferState.Stopping, display);
+    this.SET_REPLAY_BUFFER_STATUS(EReplayBufferState.Stopping, display, new Date().toISOString());
 
     // In the case that the user is streaming but not recording, a recording instance
     // was created for the replay buffer. If the replay buffer is stopped, the recording
@@ -1579,7 +1574,7 @@ export class StreamingService
   saveReplay(display: TDisplayType = 'horizontal') {
     if (!this.contexts[display].replayBuffer) return;
     // change the replay buffer status for the loading animation
-    // this.SET_REPLAY_BUFFER_STATUS(EReplayBufferState.Saving, display);
+    this.SET_REPLAY_BUFFER_STATUS(EReplayBufferState.Saving, display, new Date().toISOString());
     this.contexts[display].replayBuffer.save();
   }
 
@@ -2281,16 +2276,27 @@ export class StreamingService
    * @returns A promise that resolves to true if the context was destroyed, false
    * if the context did not exist
    */
-  private async destroyOutputContextIfExists(
+  private destroyOutputContextIfExists(
     display: TDisplayType | string,
     contextType: keyof IOutputContext,
   ) {
-    if (!this.contexts[display] || !this.contexts[display][contextType]) {
-      return Promise.resolve(false);
-    }
+    if (!this.contexts[display] || !this.contexts[display][contextType]) return;
 
     if (this.state.status[display][contextType].toString() !== 'offline') {
       this.contexts[display][contextType].stop();
+
+      // change the status to offline for the UI
+      switch (contextType) {
+        case 'streaming':
+          this.state.status[display][contextType] = EStreamingState.Offline;
+          break;
+        case 'recording':
+          this.state.status[display][contextType] = ERecordingState.Offline;
+          break;
+        case 'replayBuffer':
+          this.state.status[display][contextType] = EReplayBufferState.Offline;
+          break;
+      }
     }
 
     if (this.outputSettingsService.getSettings().mode === 'Advanced') {
@@ -2328,8 +2334,6 @@ export class StreamingService
     }
 
     this.contexts[display][contextType] = null;
-
-    return Promise.resolve(true);
   }
 
   @mutation()
