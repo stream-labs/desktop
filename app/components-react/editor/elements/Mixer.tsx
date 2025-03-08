@@ -13,7 +13,7 @@ import { useRealmObject } from 'components-react/hooks/realm';
 const mins = { x: 150, y: 120 };
 
 export function Mixer() {
-  const { EditorCommandsService, AudioService, CustomizationService } = Services;
+  const { EditorCommandsService, AudioService, CustomizationService, WindowsService } = Services;
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -26,10 +26,11 @@ export function Mixer() {
   }, []);
 
   const performanceMode = useRealmObject(CustomizationService.state).performanceMode;
-  const { audioSourceIds } = useVuex(() => ({
+  const { audioSourceIds, hideStyleBlockers } = useVuex(() => ({
     audioSourceIds: AudioService.views.sourcesForCurrentScene
       .filter(source => !source.mixerHidden && source.isControlledViaObs)
       .map(source => source.sourceId),
+    hideStyleBlockers: WindowsService.state.main.hideStyleBlockers,
   }));
 
   function showAdvancedSettings() {
@@ -68,7 +69,9 @@ export function Mixer() {
           style={{ height: 'calc(100% - 32px)' }}
         >
           <div style={{ position: 'relative' }} onContextMenu={handleRightClick}>
-            {audioSourceIds.length !== 0 && !performanceMode && <GLVolmeters />}
+            {audioSourceIds.length !== 0 && !performanceMode && !hideStyleBlockers && (
+              <GLVolmeters />
+            )}
             {audioSourceIds.map(sourceId => (
               <MixerItem
                 key={sourceId}
