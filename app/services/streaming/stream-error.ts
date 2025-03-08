@@ -132,6 +132,14 @@ export const errorTypes = {
       return $t('unlink and re-merge Kick account, then restart Desktop');
     },
   },
+  KICK_REQUEST_FAILED: {
+    get message() {
+      return $t('Request to Kick failed. Please check permissions with Kick and try again.');
+    },
+    get action() {
+      return $t('unlink and re-merge Kick account, then restart Desktop');
+    },
+  },
   PRIME_REQUIRED: {
     get message() {
       return $t('This feature is for Ultra members only');
