@@ -5,6 +5,8 @@ import { Display as OBSDisplay } from '../../services/video';
 import { TDisplayType } from 'services/settings-v2/video';
 import uuid from 'uuid/v4';
 import { useRealmObject } from 'components-react/hooks/realm';
+import { useUpdateEffect } from 'components-react/hooks';
+
 interface DisplayProps {
   id?: string;
   sourceId?: string;
@@ -43,7 +45,7 @@ export default function Display(props: DisplayProps) {
   const displayEl = useRef<HTMLDivElement>(null);
 
   useEffect(updateDisplay, [p.sourceId, paddingColor]);
-  useEffect(refreshOutputRegion, [v.baseResolution]);
+  useUpdateEffect(refreshOutputRegion, [v.baseResolution]);
 
   function refreshOutputRegion() {
     if (!obsDisplay.current) return;

@@ -100,6 +100,25 @@ export function useRenderInterval(callback: () => void, delay: number, condition
 }
 
 /**
+ * Sets up a useEffect scenario that will only fire after the first render
+ * instead of the normal case that fires during the first render in addition to after
+ * dependency changes.
+ * @param callback Function to handle the desired effect
+ * @param deps If present, effect will only activate if the values in the list change
+ */
+export function useUpdateEffect(callback: React.EffectCallback, deps?: React.DependencyList) {
+  const hasRendered = useRef(false);
+
+  useEffect(() => {
+    if (hasRendered.current) {
+      callback();
+    } else {
+      hasRendered.current = true;
+    }
+  }, deps);
+}
+
+/**
  * Useful for firing off an async request when the component mounts, but
  * the result will be automatically discarded if the component unmounts
  * before the request finishes. React throws a warning when doing state
