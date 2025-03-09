@@ -1,4 +1,4 @@
-import { StatefulService, mutation } from 'services/core';
+import { Service, mutation } from 'services/core';
 import * as obs from '../../obs-api';
 import fs from 'fs';
 import util from 'util';
@@ -10,6 +10,8 @@ import { UsageStatisticsService, SourcesService } from 'app-services';
 import * as remote from '@electron/remote';
 import { Subject } from 'rxjs';
 import { ESourceOutputFlags, VCamOutputType } from 'obs-studio-node';
+import { RealmObject } from './realm';
+import { ObjectSchema } from 'realm';
 
 const PLUGIN_PLIST_PATH =
   '/Library/CoreMediaIO/Plug-Ins/DAL/vcam-plugin.plugin/Contents/Info.plist';
@@ -23,15 +25,40 @@ export enum EVirtualWebcamPluginInstallStatus {
   Outdated = 'outdated',
 }
 
-interface IVirtualWebcamServiceState {
-  running: boolean;
+class VirtualCamServiceEphemeralState extends RealmObject {
+  isRunning: boolean;
+
+  static schema: ObjectSchema = {
+    name: 'VirtualCamServiceEphemeralState',
+    properties: {
+      isRunning: { type: 'bool', default: false },
+    },
+  };
 }
 
-export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceState> {
+VirtualCamServiceEphemeralState.register();
+
+class VirtualCamServicePersistentState extends RealmObject {
+  // Naming of these fields is taken from OBS for reference
+  outputType: VCamOutputType;
+  outputSelection: string;
+
+  static schema: ObjectSchema = {
+    name: 'VirtualCamServicePersistentState',
+    properties: {
+      outputType: { type: 'int', default: VCamOutputType.ProgramView },
+      outputSelection: { type: 'string', default: '' },
+    },
+  };
+}
+
+VirtualCamServicePersistentState.register({ persist: true });
+
+export class VirtualWebcamService extends Service {
   @Inject() usageStatisticsService: UsageStatisticsService;
   @Inject() sourcesService: SourcesService;
-
-  static initialState: IVirtualWebcamServiceState = { running: false };
+  state = VirtualCamServicePersistentState.inject();
+  ephemeralState = VirtualCamServiceEphemeralState.inject();
 
   runningChanged = new Subject<boolean>();
 
@@ -88,24 +115,22 @@ export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceS
   }
 
   start() {
-    if (this.state.running) return;
+    if (this.ephemeralState.isRunning) return;
 
-    //obs.NodeObs.OBS_service_createVirtualWebcam('Streamlabs Desktop Virtual Webcam');
     obs.NodeObs.OBS_service_startVirtualCam();
 
-    this.SET_RUNNING(true);
+    this.setRunning(true);
     this.runningChanged.next(true);
 
     this.usageStatisticsService.recordFeatureUsage('VirtualWebcam');
   }
 
   stop() {
-    if (!this.state.running) return;
+    if (!this.ephemeralState.isRunning) return;
 
     obs.NodeObs.OBS_service_stopVirtualCam();
-    //obs.NodeObs.OBS_service_removeVirtualWebcam();
 
-    this.SET_RUNNING(false);
+    this.setRunning(false);
     this.runningChanged.next(false);
   }
 
@@ -115,7 +140,25 @@ export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceS
   }
 
   update(type: VCamOutputType, name: string) {
+    this.state.db.write(() => {
+      this.state.deepPatch({
+        outputType: type,
+        outputSelection: name,
+      });
+    });
     obs.NodeObs.OBS_service_updateVirtualCam(type, name);
+  }
+
+  get outputType(): VCamOutputType {
+    return this.state.outputType;
+  }
+
+  get outputSelection(): string {
+    return this.state.outputSelection;
+  }
+
+  get isRunning(): boolean {
+    return this.ephemeralState.isRunning;
   }
 
   getVideoSources() {
@@ -125,8 +168,9 @@ export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceS
     );
   }
 
-  @mutation()
-  private SET_RUNNING(running: boolean) {
-    this.state.running = running;
+  private setRunning(running: boolean) {
+    this.ephemeralState.db.write(() => {
+      this.ephemeralState.isRunning = running;
+    });
   }
 }
