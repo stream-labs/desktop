@@ -203,13 +203,13 @@ const GENERAL_ACTIONS: HotkeyGroup = {
     name: 'TOGGLE_VIRTUAL_CAMERA_ON',
     description: () => $t('Start Virtual Camera'),
     down: () => getVirtualCameraService().start(),
-    isActive: () => getVirtualCameraService().state.running,
+    isActive: () => getVirtualCameraService().isRunning,
   },
   TOGGLE_VIRTUAL_CAMERA_OFF: {
     name: 'TOGGLE_VIRTUAL_CAMERA_OFF',
     description: () => $t('Stop Virtual Camera'),
     down: () => getVirtualCameraService().stop(),
-    isActive: () => !getVirtualCameraService().state.running,
+    isActive: () => !getVirtualCameraService().isRunning,
   },
 };
 
