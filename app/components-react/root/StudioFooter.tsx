@@ -43,8 +43,8 @@ export default function StudioFooterComponent() {
       !RecordingModeService.views.isRecordingModeEnabled,
     streamQuality: PerformanceService.views.streamQuality,
     replayBufferOffline: StreamingService.views.replayBufferStatus === EReplayBufferState.Offline,
-    replayBufferStopping: StreamingService.views.replayBufferStatus === EReplayBufferState.Stopping,
-    replayBufferSaving: StreamingService.views.replayBufferStatus === EReplayBufferState.Saving,
+    replayBufferStopping: StreamingService.state.replayBufferStatus === EReplayBufferState.Stopping,
+    replayBufferSaving: StreamingService.state.replayBufferStatus === EReplayBufferState.Saving,
     recordingModeEnabled: RecordingModeService.views.isRecordingModeEnabled,
     replayBufferEnabled: SettingsService.views.values.Output.RecRB,
   }));
@@ -83,7 +83,7 @@ export default function StudioFooterComponent() {
   }
 
   function toggleReplayBuffer() {
-    if (StreamingService.state.replayBufferStatus === EReplayBufferState.Offline) {
+    if (replayBufferOffline) {
       StreamingService.actions.startReplayBuffer();
     } else {
       StreamingService.actions.stopReplayBuffer();

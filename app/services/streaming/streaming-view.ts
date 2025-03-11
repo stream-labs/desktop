@@ -4,7 +4,6 @@ import {
   IStreamSettings,
   EStreamingState,
   ERecordingState,
-  EReplayBufferState,
 } from './streaming-api';
 import { StreamSettingsService, ICustomStreamDestination } from '../settings/streaming';
 import { UserService } from '../user';

@@ -289,5 +289,6 @@
   "Issues": "Issues",
   "Multistream Error": "Multistream Error",
   "One of destinations might have incomplete permissions. Reconnect the destinations in settings and try again.": "One of destinations might have incomplete permissions. Reconnect the destinations in settings and try again.",
-  "A new Highlight has been saved. Click to edit in the Highlighter": "A new Highlight has been saved. Click to edit in the Highlighter"
+  "A new Highlight has been saved. Click to edit in the Highlighter": "A new Highlight has been saved. Click to edit in the Highlighter",
+  "An unknown %{type} error occurred.": "An unknown %{type} error occurred."
 }

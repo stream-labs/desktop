@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import { mutation, StatefulService } from 'services/core/stateful-service';
-import { Service } from 'services/core/service';
 import {
   AdvancedRecordingFactory,
   AudioEncoderFactory,
@@ -21,8 +20,11 @@ import {
   IAdvancedStreaming,
   AdvancedStreamingFactory,
   SimpleStreamingFactory,
+  ServiceFactory,
+  DelayFactory,
+  ReconnectFactory,
+  NetworkFactory,
 } from '../../../obs-api';
-import * as obs from '../../../obs-api';
 import { Inject } from 'services/core/injector';
 import moment from 'moment';
 import padStart from 'lodash/padStart';
@@ -78,14 +80,19 @@ import { byOS, OS } from 'util/operating-systems';
 import { DualOutputService } from 'services/dual-output';
 import { capitalize } from 'lodash';
 import { YoutubeService } from 'app-services';
-import { JsonrpcService } from '../api/jsonrpc';
-import { NavigationService } from 'services/navigation';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
   Recording = 'recording',
   ReplayBuffer = 'replay-buffer',
 }
+
+const outputType = (type: EOBSOutputType) =>
+  ({
+    [EOBSOutputType.Streaming]: $t('Streaming'),
+    [EOBSOutputType.Recording]: $t('Recording'),
+    [EOBSOutputType.ReplayBuffer]: $t('Replay Buffer'),
+  }[type]);
 
 enum EOBSOutputSignal {
   Starting = 'starting',
@@ -148,8 +155,6 @@ export class StreamingService
   @Inject() private markersService: MarkersService;
   @Inject() private dualOutputService: DualOutputService;
   @Inject() private youtubeService: YoutubeService;
-  @Inject() private jsonrpcService: JsonrpcService;
-  @Inject() private navigationService: NavigationService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
@@ -242,7 +247,7 @@ export class StreamingService
   init() {
     NodeObs.OBS_service_connectOutputSignals((info: IOBSOutputSignalInfo) => {
       this.signalInfoChanged.next(info);
-      this.handleOBSV2OutputSignal(info);
+      this.handleOBSOutputSignal(info);
     });
 
     // watch for StreamInfoView at emit `streamInfoChanged` event if something has been hanged there
@@ -1272,6 +1277,12 @@ export class StreamingService
     }
   }
 
+  /**
+   * Create a recording instance for the given display
+   * @param display - The display to create the recording for
+   * @param index - The index of the audio track
+   * @param skipStart - Whether to skip starting the recording. This is used when creating a recording instance for the replay buffer
+   */
   private createRecording(display: TDisplayType, index: number, skipStart: boolean = false) {
     this.destroyOutputContextIfExists(display, 'recording');
 
@@ -1288,8 +1299,11 @@ export class StreamingService
     Object.keys(settings).forEach(key => {
       if ((settings as any)[key] === undefined) return;
 
+      // share the video encoder with the streaming instance if it exists
       if (key === 'videoEncoder') {
-        recording.videoEncoder = VideoEncoderFactory.create(settings.videoEncoder, 'video-encoder');
+        recording.videoEncoder =
+          this.contexts[display].streaming?.videoEncoder ??
+          VideoEncoderFactory.create(settings.videoEncoder, 'video-encoder');
       } else {
         (recording as any)[key] = (settings as any)[key];
       }
@@ -1303,34 +1317,12 @@ export class StreamingService
       (recording as IAdvancedRecording).outputHeight = resolution.outputHeight;
 
       // audio track
-      const trackName = `track${index}`;
-      const track = AudioTrackFactory.create(160, trackName);
-      AudioTrackFactory.setAtIndex(track, index);
+      this.createAudioTrack(index);
 
-      // streaming object
-      // TODO: move to its own function
-      const videoEncoder = recording.videoEncoder;
-
+      // streaming instance
       this.validateOrCreateOutputInstance(mode, display, 'streaming');
-
-      const stream = this.contexts[display].streaming as IAdvancedStreaming;
-      stream.enforceServiceBitrate = false;
-      stream.enableTwitchVOD = false;
-      stream.audioTrack = index;
-      // stream.twitchTrack = 3;
-      stream.rescaling = ((recording as unknown) as IAdvancedStreaming).rescaling;
-      stream.outputWidth = ((recording as unknown) as IAdvancedStreaming).outputWidth;
-      stream.outputHeight = ((recording as unknown) as IAdvancedStreaming).outputHeight;
-      stream.video = this.videoSettingsService.contexts[display];
-      stream.videoEncoder = videoEncoder;
-      stream.signalHandler = async signal => {
-        console.log('streaming signal', signal);
-        await this.handleSignal(signal, display);
-      };
-
-      this.contexts[display].streaming = stream;
-      recording.videoEncoder = videoEncoder;
-      recording.streaming = stream;
+      (recording as IAdvancedRecording).streaming = this.contexts[display]
+        .streaming as IAdvancedStreaming;
     } else {
       (recording as ISimpleRecording).audioEncoder = AudioEncoderFactory.create();
     }
@@ -1353,6 +1345,130 @@ export class StreamingService
 
     // start recording
     this.contexts[display].recording.start();
+  }
+
+  /**
+   * Create a streaming instance for the given display
+   * @param display - The display to create the streaming for
+   * @param index - The index of the audio track
+   * @param skipStart - Whether to skip starting the streaming. This is used when creating a streaming instance for advanced recording
+   */
+  private createStreaming(display: TDisplayType, index: number, skipStart: boolean = false) {
+    this.destroyOutputContextIfExists(display, 'streaming');
+
+    const mode = this.outputSettingsService.getSettings().mode;
+
+    const settings = this.outputSettingsService.getStreamingSettings();
+
+    console.log('createStreaming settings', settings);
+
+    const stream =
+      mode === 'Advanced'
+        ? (AdvancedStreamingFactory.create() as IAdvancedStreaming)
+        : (SimpleStreamingFactory.create() as ISimpleStreaming);
+
+    // assign settings
+    Object.keys(settings).forEach(key => {
+      if ((settings as any)[key] === undefined) return;
+
+      // share the video encoder with the recording instance if it exists
+      if (key === 'videoEncoder') {
+        stream.videoEncoder =
+          this.contexts[display].recording?.videoEncoder ??
+          VideoEncoderFactory.create(settings.videoEncoder, 'video-encoder');
+      } else {
+        (stream as any)[key] = (settings as any)[key];
+      }
+    });
+
+    if (this.isAdvancedStreaming(stream)) {
+      const resolution = this.videoSettingsService.outputResolutions[display];
+      stream.outputWidth = resolution.outputWidth;
+      stream.outputHeight = resolution.outputHeight;
+
+      // stream audio track
+      this.createAudioTrack(index);
+      stream.audioTrack = index;
+
+      // Twitch VOD audio track
+      if (stream.enableTwitchVOD && stream.twitchTrack) {
+        this.createAudioTrack(stream.twitchTrack);
+      } else if (stream.enableTwitchVOD) {
+        // do not use the same audio track for the VOD as the stream
+        stream.twitchTrack = index + 1;
+        this.createAudioTrack(stream.twitchTrack);
+      }
+    } else {
+      stream.audioEncoder =
+        (this.contexts[display].recording as ISimpleRecording)?.audioEncoder ??
+        AudioEncoderFactory.create();
+    }
+
+    stream.video = this.videoSettingsService.contexts[display];
+    stream.signalHandler = async signal => {
+      console.log('streaming signal', signal);
+      await this.handleSignal(signal, display);
+    };
+
+    this.contexts[display].streaming = stream;
+
+    if (skipStart) return;
+
+    // TODO: fully implement streaming
+    this.contexts[display].streaming.service = ServiceFactory.legacySettings;
+    this.contexts[display].streaming.delay = DelayFactory.create();
+    this.contexts[display].streaming.reconnect = ReconnectFactory.create();
+    this.contexts[display].streaming.network = NetworkFactory.create();
+
+    this.contexts[display].streaming.start();
+  }
+
+  /**
+   * Signal handler for the Factory API for streaming, recording, and replay buffer
+   * @param info - The signal info
+   * @param display - The context to handle the signal for
+   */
+  private async handleSignal(info: EOutputSignal, display: TDisplayType) {
+    if (info.code !== EOutputCode.Success) {
+      // handle errors before attempting anything else
+      console.error('Output Signal Error:', info);
+
+      if (!info.error || info.error === '') {
+        info.error = $t('An unknown %{type} error occurred.', {
+          type: outputType(info.type as EOBSOutputType),
+        });
+      }
+
+      this.handleFactoryOutputError(info, display);
+    } else if (info.type === EOBSOutputType.Streaming) {
+      this.handleStreamingSignal(info, display);
+    } else if (info.type === EOBSOutputType.Recording) {
+      await this.handleRecordingSignal(info, display);
+    } else if (info.type === EOBSOutputType.ReplayBuffer) {
+      await this.handleReplayBufferSignal(info, display);
+    } else {
+      console.debug('Unknown Output Signal or Error:', info);
+    }
+  }
+
+  private handleStreamingSignal(info: EOutputSignal, display: TDisplayType) {
+    // map signals to status
+    console.log('streaming signal info', info);
+
+    // const nextState: EStreamingState = ({
+    //   [EOBSOutputSignal.Start]: EStreamingState.Starting,
+    //   [EOBSOutputSignal.Stop]: EStreamingState.Offline,
+    //   [EOBSOutputSignal.Stopping]: EStreamingState.Ending,
+    //   [EOBSOutputSignal.Deactivate]: EStreamingState.Offline,
+    // } as Dictionary<EStreamingState>)[info.signal];
+
+    // EOBSOutputSignal.Starting;
+    // EOBSOutputSignal.Activate;
+    // EOBSOutputSignal.Start;
+    // EOBSOutputSignal.Stopping;
+    // EOBSOutputSignal.Stop;
+
+    this.handleFactoryOutputError(info, display);
   }
 
   private async handleRecordingSignal(info: EOutputSignal, display: TDisplayType) {
@@ -1416,34 +1532,6 @@ export class StreamingService
     const time = new Date().toISOString();
     this.SET_RECORDING_STATUS(nextState, display, time);
     this.recordingStatusChange.next(nextState);
-
-    this.handleV2OutputCode(info);
-  }
-
-  splitFile(display: TDisplayType = 'horizontal') {
-    if (
-      this.state.status.horizontal.recording === ERecordingState.Recording &&
-      this.contexts[display].recording
-    ) {
-      this.contexts[display].recording.splitFile();
-    }
-  }
-
-  private async handleSignal(info: EOutputSignal, display: TDisplayType) {
-    if (info.type === EOBSOutputType.Recording) {
-      await this.handleRecordingSignal(info, display);
-      return;
-    }
-
-    if (info.type === EOBSOutputType.ReplayBuffer) {
-      await this.handleReplayBufferSignal(info, display);
-      return;
-    }
-
-    if (info.type === EOBSOutputType.Streaming) {
-      this.handleStreamingSignal(info, display);
-      return;
-    }
   }
 
   private async handleReplayBufferSignal(info: EOutputSignal, display: TDisplayType) {
@@ -1456,18 +1544,17 @@ export class StreamingService
       [EOBSOutputSignal.Stop]: EReplayBufferState.Offline,
     } as Dictionary<EReplayBufferState>)[info.signal];
 
+    // We received a signal we didn't recognize
+    if (!nextState) return;
+
+    const time = new Date().toISOString();
+    this.SET_REPLAY_BUFFER_STATUS(nextState, display, time);
+    this.replayBufferStatusChange.next(nextState);
+
     if (info.signal === EOBSOutputSignal.Wrote) {
       this.usageStatisticsService.recordAnalyticsEvent('ReplayBufferStatus', {
         status: 'wrote',
         code: info.code,
-      });
-
-      const message = $t('A new Highlight has been saved. Click to edit in the Highlighter');
-
-      this.notificationsService.actions.push({
-        type: ENotificationType.SUCCESS,
-        message,
-        action: this.jsonrpcService.createRequest(Service.getResourceId(this), 'showHighlighter'),
       });
 
       this.replayBufferFileWrite.next(this.contexts[display].replayBuffer.lastFile());
@@ -1479,27 +1566,27 @@ export class StreamingService
         code: info.code,
       });
 
+      // In the case that the user is streaming but not recording, a recording instance
+      // was created for the replay buffer. If the replay buffer is stopped, the recording
+      // instance should be destroyed.
+      if (this.state.status.horizontal.recording === ERecordingState.Offline) {
+        this.destroyOutputContextIfExists(display, 'recording');
+      }
+
       this.destroyOutputContextIfExists(display, 'replayBuffer');
     }
-
-    if (nextState) {
-      const time = new Date().toISOString();
-      this.SET_REPLAY_BUFFER_STATUS(nextState, display, time);
-      this.replayBufferStatusChange.next(nextState);
-    }
-
-    this.handleV2OutputCode(info);
   }
 
-  showHighlighter() {
-    this.navigationService.navigate('Highlighter');
+  splitFile(display: TDisplayType = 'horizontal') {
+    if (
+      this.state.status.horizontal.recording === ERecordingState.Recording &&
+      this.contexts[display].recording
+    ) {
+      this.contexts[display].recording.splitFile();
+    }
   }
 
   // TODO migrate streaming to new API
-  private handleStreamingSignal(info: EOutputSignal, display: TDisplayType) {
-    // map signals to status
-    console.log('streaming signal info', info);
-  }
 
   startReplayBuffer(display: TDisplayType = 'horizontal') {
     if (this.state.status[display].replayBuffer !== EReplayBufferState.Offline) return;
@@ -1562,13 +1649,6 @@ export class StreamingService
     this.contexts[display].replayBuffer.stop(forceStop);
     // change the replay buffer status for the loading animation
     this.SET_REPLAY_BUFFER_STATUS(EReplayBufferState.Stopping, display, new Date().toISOString());
-
-    // In the case that the user is streaming but not recording, a recording instance
-    // was created for the replay buffer. If the replay buffer is stopped, the recording
-    // instance should be destroyed.
-    if (this.state.status.horizontal.recording === ERecordingState.Offline) {
-      this.destroyOutputContextIfExists(display, 'recording');
-    }
   }
 
   saveReplay(display: TDisplayType = 'horizontal') {
@@ -1596,19 +1676,26 @@ export class StreamingService
         (mode === 'Advanced' && !isAdvancedOutputInstance)
       ) {
         this.destroyOutputContextIfExists(display, type);
-      } else {
-        return;
       }
     }
 
     // Create new instance if it does not exist or was destroyed
     if (type === 'streaming') {
       // TODO: create streaming instance
-      this.contexts[display].streaming =
-        mode === 'Advanced' ? AdvancedStreamingFactory.create() : SimpleStreamingFactory.create();
+      this.createStreaming(display, 1, true);
     } else {
       this.createRecording(display, 1, true);
     }
+  }
+
+  /**
+   * Create an audio track
+   * @param index - index of the audio track to create
+   */
+  createAudioTrack(index: number) {
+    const trackName = `track${index}`;
+    const track = AudioTrackFactory.create(160, trackName);
+    AudioTrackFactory.setAtIndex(track, index);
   }
 
   isAdvancedStreaming(instance: any): instance is IAdvancedStreaming {
@@ -1617,6 +1704,18 @@ export class StreamingService
 
   isAdvancedRecording(instance: any): instance is IAdvancedRecording {
     return 'useStreamEncoders' in instance;
+  }
+
+  handleFactoryOutputError(info: EOutputSignal, display: TDisplayType) {
+    const legacyInfo = {
+      type: info.type as EOBSOutputType,
+      signal: info.signal as EOBSOutputSignal,
+      code: info.code as EOutputCode,
+      error: info.error,
+      service: display as string,
+    } as IOBSOutputSignalInfo;
+
+    this.handleOBSOutputError(legacyInfo);
   }
 
   /**
@@ -1751,7 +1850,7 @@ export class StreamingService
   private streamErrorUserMessage = '';
   private streamErrorReportMessage = '';
 
-  private handleOBSV2OutputSignal(info: IOBSOutputSignalInfo) {
+  private handleOBSOutputSignal(info: IOBSOutputSignalInfo) {
     console.debug('OBS Output signal: ', info);
 
     /*
@@ -1761,8 +1860,10 @@ export class StreamingService
      * - Dual output mode: when vertical display is second destination,
      *   resolve after horizontal stream started
      */
+    const display = this.convertSignalToDisplay(info.service);
+
     const isVerticalDisplayStartSignal =
-      info.service === 'vertical' && info.signal === EOBSOutputSignal.Start;
+      display === 'vertical' && info.signal === EOBSOutputSignal.Start;
 
     const shouldResolve =
       !this.views.isDualOutputMode ||
@@ -1773,7 +1874,7 @@ export class StreamingService
 
     if (info.type === EOBSOutputType.Streaming) {
       if (info.signal === EOBSOutputSignal.Start && shouldResolve) {
-        this.SET_STREAMING_STATUS(EStreamingState.Live, time);
+        this.SET_STREAMING_STATUS(EStreamingState.Live, display, time);
         this.resolveStartStreaming();
         this.streamingStatusChange.next(EStreamingState.Live);
 
@@ -1810,10 +1911,10 @@ export class StreamingService
         });
         this.usageStatisticsService.recordFeatureUsage('Streaming');
       } else if (info.signal === EOBSOutputSignal.Starting && shouldResolve) {
-        this.SET_STREAMING_STATUS(EStreamingState.Starting, time);
+        this.SET_STREAMING_STATUS(EStreamingState.Starting, display, time);
         this.streamingStatusChange.next(EStreamingState.Starting);
       } else if (info.signal === EOBSOutputSignal.Stop) {
-        this.SET_STREAMING_STATUS(EStreamingState.Offline, time);
+        this.SET_STREAMING_STATUS(EStreamingState.Offline, display, time);
         this.RESET_STREAM_INFO();
         this.rejectStartStreaming();
         this.streamingStatusChange.next(EStreamingState.Offline);
@@ -1823,223 +1924,125 @@ export class StreamingService
         });
       } else if (info.signal === EOBSOutputSignal.Stopping) {
         this.sendStreamEndEvent();
-        this.SET_STREAMING_STATUS(EStreamingState.Ending, time);
+        this.SET_STREAMING_STATUS(EStreamingState.Ending, display, time);
         this.streamingStatusChange.next(EStreamingState.Ending);
       } else if (info.signal === EOBSOutputSignal.Reconnect) {
-        this.SET_STREAMING_STATUS(EStreamingState.Reconnecting);
+        this.SET_STREAMING_STATUS(EStreamingState.Reconnecting, display);
         this.streamingStatusChange.next(EStreamingState.Reconnecting);
         this.sendReconnectingNotification();
       } else if (info.signal === EOBSOutputSignal.ReconnectSuccess) {
-        this.SET_STREAMING_STATUS(EStreamingState.Live);
+        this.SET_STREAMING_STATUS(EStreamingState.Live, display);
         this.streamingStatusChange.next(EStreamingState.Live);
         this.clearReconnectingNotification();
       }
     }
 
-    this.handleV2OutputCode(info);
+    if (info.code === EOutputCode.Success) return;
+    this.handleOBSOutputError(info);
   }
 
-  private handleV2OutputCode(info: IOBSOutputSignalInfo | EOutputSignal) {
-    if (info.code) {
-      if (this.outputErrorOpen) {
-        console.warn('Not showing error message because existing window is open.', info);
-        return;
-      }
-
-      let errorText = '';
-      let extendedErrorText = '';
-      let linkToDriverInfo = false;
-      let showNativeErrorMessage = false;
-
-      if (info.code === EOutputCode.BadPath) {
-        errorText = $t(
-          'Invalid Path or Connection URL.  Please check your settings to confirm that they are valid.',
-        );
-      } else if (info.code === EOutputCode.ConnectFailed) {
-        errorText = $t(
-          'Failed to connect to the streaming server.  Please check your internet connection.',
-        );
-      } else if (info.code === EOutputCode.Disconnected) {
-        errorText = $t(
-          'Disconnected from the streaming server.  Please check your internet connection.',
-        );
-      } else if (info.code === EOutputCode.InvalidStream) {
-        errorText = $t(
-          'Could not access the specified channel or stream key. Please log out and back in to refresh your credentials. If the problem persists, there may be a problem connecting to the server.',
-        );
-      } else if (info.code === EOutputCode.NoSpace) {
-        errorText = $t('There is not sufficient disk space to continue recording.');
-      } else if (info.code === EOutputCode.Unsupported) {
-        errorText =
-          $t(
-            'The output format is either unsupported or does not support more than one audio track.  ',
-          ) + $t('Please check your settings and try again.');
-      } else if (info.code === EOutputCode.OutdatedDriver) {
-        linkToDriverInfo = true;
-        errorText = $t(
-          'An error occurred with the output. This is usually caused by out of date video drivers. Please ensure your Nvidia or AMD drivers are up to date and try again.',
-        );
-      } else {
-        // -4 is used for generic unknown messages in OBS. Both -4 and any other code
-        // we don't recognize should fall into this branch and show a generic error.
-        errorText = $t(
-          'An error occurred with the output. Please check your streaming and recording settings.',
-        );
-        if (info.error) {
-          showNativeErrorMessage = true;
-          extendedErrorText = errorText + '\n\n' + $t('System error message:') + info.error + '"';
-        }
-      }
-      const buttons = [$t('OK')];
-
-      const title = {
-        [EOBSOutputType.Streaming]: $t('Streaming Error'),
-        [EOBSOutputType.Recording]: $t('Recording Error'),
-        [EOBSOutputType.ReplayBuffer]: $t('Replay Buffer Error'),
-      }[info.type];
-
-      if (linkToDriverInfo) buttons.push($t('Learn More'));
-      if (showNativeErrorMessage) buttons.push($t('More'));
-
-      this.outputErrorOpen = true;
-      const errorType = 'error';
-      remote.dialog
-        .showMessageBox(Utils.getMainWindow(), {
-          buttons,
-          title,
-          type: errorType,
-          message: errorText,
-        })
-        .then(({ response }) => {
-          if (linkToDriverInfo && response === 1) {
-            this.outputErrorOpen = false;
-            remote.shell.openExternal(
-              'https://howto.streamlabs.com/streamlabs-obs-19/nvidia-graphics-driver-clean-install-tutorial-7000',
-            );
-          } else {
-            let expectedResponse = 1;
-            if (linkToDriverInfo) {
-              expectedResponse = 2;
-            }
-            if (showNativeErrorMessage && response === expectedResponse) {
-              const buttons = [$t('OK')];
-              remote.dialog
-                .showMessageBox({
-                  buttons,
-                  title,
-                  type: errorType,
-                  message: extendedErrorText,
-                })
-                .then(({ response }) => {
-                  this.outputErrorOpen = false;
-                })
-                .catch(() => {
-                  this.outputErrorOpen = false;
-                });
-            } else {
-              this.outputErrorOpen = false;
-            }
-          }
-        })
-        .catch(() => {
-          this.outputErrorOpen = false;
-        });
-      this.windowsService.actions.closeChildWindow();
+  /**
+   * Convert the signal from IOBSOutputSignalInfo to the display type
+   * @remark This is required to facilitate special handling for each display in dual output mode
+   * @param service - String representing the name of the service returned from the API
+   * @returns - The display type
+   */
+  private convertSignalToDisplay(service: string): TDisplayType {
+    switch (service) {
+      case 'vertical':
+        return 'vertical';
+      case 'horizontal':
+        return 'horizontal';
+      case 'default':
+        return 'horizontal';
+      default:
+        return 'horizontal';
     }
   }
 
-  private handleOBSOutputSignal(info: IOBSOutputSignalInfo) {
+  private handleOBSOutputError(info: IOBSOutputSignalInfo) {
     console.debug('OBS Output signal: ', info);
 
-    const shouldResolve =
-      !this.views.isDualOutputMode || (this.views.isDualOutputMode && info.service === 'vertical');
+    if (!info.code) return;
+    if ((info.code as EOutputCode) === EOutputCode.Success) return;
 
-    const time = new Date().toISOString();
+    if (this.outputErrorOpen) {
+      console.warn('Not showing error message because existing window is open.', info);
 
-    if (info.type === EOBSOutputType.Streaming) {
-      if (info.signal === EOBSOutputSignal.Start && shouldResolve) {
-        this.SET_STREAMING_STATUS(EStreamingState.Live, time);
-        this.resolveStartStreaming();
-        this.streamingStatusChange.next(EStreamingState.Live);
+      const messages = formatUnknownErrorMessage(
+        info,
+        this.streamErrorUserMessage,
+        this.streamErrorReportMessage,
+      );
 
-        let streamEncoderInfo: Partial<IOutputSettings> = {};
-        let game: string = '';
+      this.streamErrorCreated.next(messages.report);
 
-        try {
-          streamEncoderInfo = this.outputSettingsService.getSettings();
-          game = this.views.game;
-        } catch (e: unknown) {
-          console.error('Error fetching stream encoder info: ', e);
-        }
-
-        const eventMetadata: Dictionary<any> = {
-          ...streamEncoderInfo,
-          game,
-        };
-
-        if (this.videoEncodingOptimizationService.state.useOptimizedProfile) {
-          eventMetadata.useOptimizedProfile = true;
-        }
-
-        const streamSettings = this.streamSettingsService.settings;
-
-        eventMetadata.streamType = streamSettings.streamType;
-        eventMetadata.platform = streamSettings.platform;
-        eventMetadata.server = streamSettings.server;
-        eventMetadata.outputMode = this.views.isDualOutputMode ? 'dual' : 'single';
-        eventMetadata.platforms = this.views.protectedModeEnabled
-          ? [
-              ...this.views.enabledPlatforms,
-              /*
-               * This is to be consistent with `stream_end`, unsure what multiple `custom_rtmp`'s
-               * provide on their own without URL, but it could be a privacy or payload size issue.
-               */
-              ...this.views.customDestinations.filter(d => d.enabled).map(_ => 'custom_rtmp'),
-            ]
-          : ['custom_rtmp'];
-
-        if (eventMetadata.platforms.includes('youtube')) {
-          eventMetadata.streamId = this.youtubeService.state.streamId;
-          eventMetadata.broadcastId = this.youtubeService.state.settings?.broadcastId;
-        }
-
-        this.usageStatisticsService.recordEvent('stream_start', eventMetadata);
-        this.usageStatisticsService.recordAnalyticsEvent('StreamingStatus', {
-          code: info.code,
-          status: EStreamingState.Live,
-          service: streamSettings.service,
-        });
-        this.usageStatisticsService.recordFeatureUsage('Streaming');
-      } else if (info.signal === EOBSOutputSignal.Starting && shouldResolve) {
-        this.SET_STREAMING_STATUS(EStreamingState.Starting, time);
-        this.streamingStatusChange.next(EStreamingState.Starting);
-      } else if (info.signal === EOBSOutputSignal.Stop) {
-        this.SET_STREAMING_STATUS(EStreamingState.Offline, time);
-        this.RESET_STREAM_INFO();
-        this.rejectStartStreaming();
-        this.streamingStatusChange.next(EStreamingState.Offline);
-        this.usageStatisticsService.recordAnalyticsEvent('StreamingStatus', {
-          code: info.code,
-          status: EStreamingState.Offline,
-        });
-      } else if (info.signal === EOBSOutputSignal.Stopping) {
-        this.sendStreamEndEvent();
-        this.SET_STREAMING_STATUS(EStreamingState.Ending, time);
-        this.streamingStatusChange.next(EStreamingState.Ending);
-      } else if (info.signal === EOBSOutputSignal.Reconnect) {
-        this.SET_STREAMING_STATUS(EStreamingState.Reconnecting);
-        this.streamingStatusChange.next(EStreamingState.Reconnecting);
-        this.sendReconnectingNotification();
-      } else if (info.signal === EOBSOutputSignal.ReconnectSuccess) {
-        this.SET_STREAMING_STATUS(EStreamingState.Live);
-        this.streamingStatusChange.next(EStreamingState.Live);
-        this.clearReconnectingNotification();
-      }
+      return;
     }
 
-    if (info.code) {
-      if (this.outputErrorOpen) {
-        console.warn('Not showing error message because existing window is open.', info);
+    let errorText = this.streamErrorUserMessage;
+    let details = '';
+    let linkToDriverInfo = false;
+    let showNativeErrorMessage = false;
+    let diagReportMessage = this.streamErrorUserMessage;
+
+    if (info.code === EOutputCode.BadPath) {
+      errorText = $t(
+        'Invalid Path or Connection URL.  Please check your settings to confirm that they are valid.',
+      );
+      diagReportMessage = diagReportMessage.concat(errorText);
+    } else if (info.code === EOutputCode.ConnectFailed) {
+      errorText = $t(
+        'Failed to connect to the streaming server.  Please check your internet connection.',
+      );
+      diagReportMessage = diagReportMessage.concat(errorText);
+    } else if (info.code === EOutputCode.Disconnected) {
+      errorText = $t(
+        'Disconnected from the streaming server.  Please check your internet connection.',
+      );
+      diagReportMessage = diagReportMessage.concat(errorText);
+    } else if (info.code === EOutputCode.InvalidStream) {
+      errorText = $t(
+        'Could not access the specified channel or stream key. Please log out and back in to refresh your credentials. If the problem persists, there may be a problem connecting to the server.',
+      );
+      diagReportMessage = diagReportMessage.concat(errorText);
+    } else if (info.code === EOutputCode.NoSpace) {
+      errorText = $t('There is not sufficient disk space to continue recording.');
+      diagReportMessage = diagReportMessage.concat(errorText);
+    } else if (info.code === EOutputCode.Unsupported) {
+      errorText =
+        $t(
+          'The output format is either unsupported or does not support more than one audio track.  ',
+        ) + $t('Please check your settings and try again.');
+      diagReportMessage = diagReportMessage.concat(errorText);
+    } else if (info.code === EOutputCode.OutdatedDriver) {
+      linkToDriverInfo = true;
+      errorText = $t(
+        'An error occurred with the output. This is usually caused by out of date video drivers. Please ensure your Nvidia or AMD drivers are up to date and try again.',
+      );
+      diagReportMessage = diagReportMessage.concat(errorText);
+    } else {
+      // -4 is used for generic unknown messages in OBS. Both -4 and any other code
+      // we don't recognize should fall into this branch and show a generic error.
+
+      if (!this.userService.isLoggedIn) {
+        const messages = formatStreamErrorMessage('LOGGED_OUT_ERROR');
+
+        errorText = messages.user;
+        diagReportMessage = messages.report;
+        if (messages.details) details = messages.details;
+
+        showNativeErrorMessage = details !== '';
+      } else {
+        if (
+          !info.error ||
+          (info.error && typeof info.error !== 'string') ||
+          (info.error && info.error === '')
+        ) {
+          info.error = $t('An unknown %{type} error occurred.', {
+            type: outputType(info.type),
+          });
+        }
 
         const messages = formatUnknownErrorMessage(
           info,
@@ -2047,144 +2050,78 @@ export class StreamingService
           this.streamErrorReportMessage,
         );
 
-        this.streamErrorCreated.next(messages.report);
+        errorText = messages.user;
+        diagReportMessage = messages.report;
+        if (messages.details) details = messages.details;
 
-        return;
+        showNativeErrorMessage = details !== '';
       }
+    }
 
-      let errorText = this.streamErrorUserMessage;
-      let details = '';
-      let linkToDriverInfo = false;
-      let showNativeErrorMessage = false;
-      let diagReportMessage = this.streamErrorUserMessage;
+    const buttons = [$t('OK')];
 
-      if (info.code === EOutputCode.BadPath) {
-        errorText = $t(
-          'Invalid Path or Connection URL.  Please check your settings to confirm that they are valid.',
-        );
-        diagReportMessage = diagReportMessage.concat(errorText);
-      } else if (info.code === EOutputCode.ConnectFailed) {
-        errorText = $t(
-          'Failed to connect to the streaming server.  Please check your internet connection.',
-        );
-        diagReportMessage = diagReportMessage.concat(errorText);
-      } else if (info.code === EOutputCode.Disconnected) {
-        errorText = $t(
-          'Disconnected from the streaming server.  Please check your internet connection.',
-        );
-        diagReportMessage = diagReportMessage.concat(errorText);
-      } else if (info.code === EOutputCode.InvalidStream) {
-        errorText = $t(
-          'Could not access the specified channel or stream key. Please log out and back in to refresh your credentials. If the problem persists, there may be a problem connecting to the server.',
-        );
-        diagReportMessage = diagReportMessage.concat(errorText);
-      } else if (info.code === EOutputCode.NoSpace) {
-        errorText = $t('There is not sufficient disk space to continue recording.');
-        diagReportMessage = diagReportMessage.concat(errorText);
-      } else if (info.code === EOutputCode.Unsupported) {
-        errorText =
-          $t(
-            'The output format is either unsupported or does not support more than one audio track.  ',
-          ) + $t('Please check your settings and try again.');
-        diagReportMessage = diagReportMessage.concat(errorText);
-      } else if (info.code === EOutputCode.OutdatedDriver) {
-        linkToDriverInfo = true;
-        errorText = $t(
-          'An error occurred with the output. This is usually caused by out of date video drivers. Please ensure your Nvidia or AMD drivers are up to date and try again.',
-        );
-        diagReportMessage = diagReportMessage.concat(errorText);
-      } else {
-        // -4 is used for generic unknown messages in OBS. Both -4 and any other code
-        // we don't recognize should fall into this branch and show a generic error.
+    const title = {
+      [EOBSOutputType.Streaming]: $t('Streaming Error'),
+      [EOBSOutputType.Recording]: $t('Recording Error'),
+      [EOBSOutputType.ReplayBuffer]: $t('Replay Buffer Error'),
+    }[info.type];
 
-        if (!this.userService.isLoggedIn) {
-          const messages = formatStreamErrorMessage('LOGGED_OUT_ERROR');
+    if (linkToDriverInfo) buttons.push($t('Learn More'));
+    if (showNativeErrorMessage) {
+      buttons.push($t('More'));
+    }
 
-          errorText = messages.user;
-          diagReportMessage = messages.report;
-          if (messages.details) details = messages.details;
-
-          showNativeErrorMessage = details !== '';
-        } else if (info.error && typeof info.error === 'string') {
-          const messages = formatUnknownErrorMessage(
-            info,
-            this.streamErrorUserMessage,
-            this.streamErrorReportMessage,
-          );
-
-          errorText = messages.user;
-          diagReportMessage = messages.report;
-          if (messages.details) details = messages.details;
-
-          showNativeErrorMessage = details !== '';
-        }
-      }
-
-      const buttons = [$t('OK')];
-
-      const title = {
-        [EOBSOutputType.Streaming]: $t('Streaming Error'),
-        [EOBSOutputType.Recording]: $t('Recording Error'),
-        [EOBSOutputType.ReplayBuffer]: $t('Replay Buffer Error'),
-      }[info.type];
-
-      if (linkToDriverInfo) buttons.push($t('Learn More'));
-      if (showNativeErrorMessage) {
-        buttons.push($t('More'));
-      }
-
-      this.outputErrorOpen = true;
-      const errorType = 'error';
-      remote.dialog
-        .showMessageBox(Utils.getMainWindow(), {
-          buttons,
-          title,
-          type: errorType,
-          message: errorText,
-        })
-        .then(({ response }) => {
-          if (linkToDriverInfo && response === 1) {
-            this.outputErrorOpen = false;
-            remote.shell.openExternal(
-              'https://howto.streamlabs.com/streamlabs-obs-19/nvidia-graphics-driver-clean-install-tutorial-7000',
-            );
-          } else {
-            let expectedResponse = 1;
-            if (linkToDriverInfo) {
-              expectedResponse = 2;
-            }
-            if (showNativeErrorMessage && response === expectedResponse) {
-              const buttons = [$t('OK')];
-              remote.dialog
-                .showMessageBox({
-                  buttons,
-                  title,
-                  type: errorType,
-                  message: details,
-                })
-                .then(({ response }) => {
-                  this.outputErrorOpen = false;
-                  this.streamErrorUserMessage = '';
-                  this.streamErrorReportMessage = '';
-                })
-                .catch(() => {
-                  this.outputErrorOpen = false;
-                });
-            } else {
-              this.outputErrorOpen = false;
-            }
-          }
-        })
-        .catch(() => {
+    this.outputErrorOpen = true;
+    const errorType = 'error';
+    remote.dialog
+      .showMessageBox(Utils.getMainWindow(), {
+        buttons,
+        title,
+        type: errorType,
+        message: errorText,
+      })
+      .then(({ response }) => {
+        if (linkToDriverInfo && response === 1) {
           this.outputErrorOpen = false;
-        });
+          remote.shell.openExternal(
+            'https://howto.streamlabs.com/streamlabs-obs-19/nvidia-graphics-driver-clean-install-tutorial-7000',
+          );
+        } else {
+          let expectedResponse = 1;
+          if (linkToDriverInfo) {
+            expectedResponse = 2;
+          }
+          if (showNativeErrorMessage && response === expectedResponse) {
+            const buttons = [$t('OK')];
+            remote.dialog
+              .showMessageBox({
+                buttons,
+                title,
+                type: errorType,
+                message: details,
+              })
+              .then(({ response }) => {
+                this.outputErrorOpen = false;
+                this.streamErrorUserMessage = '';
+                this.streamErrorReportMessage = '';
+              })
+              .catch(() => {
+                this.outputErrorOpen = false;
+              });
+          } else {
+            this.outputErrorOpen = false;
+          }
+        }
+      })
+      .catch(() => {
+        this.outputErrorOpen = false;
+      });
 
-      this.windowsService.actions.closeChildWindow();
+    this.windowsService.actions.closeChildWindow();
 
-      // pass streaming error to diag report
-      if (info.type === EOBSOutputType.Streaming || !this.userService.isLoggedIn) {
-        this.streamErrorCreated.next(diagReportMessage);
-      }
+    // pass streaming error to diag report
+    if (info.type === EOBSOutputType.Streaming || !this.userService.isLoggedIn) {
+      this.streamErrorCreated.next(diagReportMessage);
     }
   }
 
@@ -2263,7 +2200,7 @@ export class StreamingService
   shutdown() {
     Object.keys(this.contexts).forEach(display => {
       Object.keys(this.contexts[display]).forEach(async (contextType: keyof IOutputContext) => {
-        await this.destroyOutputContextIfExists(display, contextType);
+        this.destroyOutputContextIfExists(display, contextType);
       });
     });
   }
@@ -2337,9 +2274,16 @@ export class StreamingService
   }
 
   @mutation()
-  private SET_STREAMING_STATUS(status: EStreamingState, time?: string) {
+  private SET_STREAMING_STATUS(status: EStreamingState, display: TDisplayType, time?: string) {
+    // while recording and the replay buffer are in the v2 API and streaming is in the old API
+    // we need to duplicate tracking the replay buffer status
     this.state.streamingStatus = status;
-    if (time) this.state.streamingStatusTime = time;
+    this.state.status[display].streaming = status;
+
+    if (time) {
+      this.state.streamingStatusTime = time;
+      this.state.status[display].streamingTime = time;
+    }
   }
 
   @mutation()
