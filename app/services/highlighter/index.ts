@@ -1248,6 +1248,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     try {
       const highlighterResponse = await getHighlightClips(
         filePath,
+        this.userService.getLocalUserId(),
         renderHighlights,
         setStreamInfo.abortController!.signal,
         (progress: number) => {

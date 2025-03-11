@@ -59,6 +59,7 @@ class MessageBufferHandler {
 
 export function getHighlightClips(
   videoUri: string,
+  userId: string,
   renderHighlights: (highlightClips: IHighlight[]) => void,
   cancelSignal: AbortSignal,
   progressUpdate?: (progress: number) => void,
@@ -73,6 +74,7 @@ export function getHighlightClips(
 
     const childProcess: child.ChildProcess = AiHighlighterUpdater.startHighlighterProcess(
       videoUri,
+      userId,
       milestonesPath,
     );
     const messageBuffer = new MessageBufferHandler();
