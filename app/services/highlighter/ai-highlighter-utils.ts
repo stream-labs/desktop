@@ -136,7 +136,11 @@ export function getHighlightClips(
 
     childProcess.on('exit', (code, signal) => {
       messageBuffer.clear();
-      reject(new Error(`Child process exited with code ${code} and signal ${signal}`));
+      reject({
+        message: `Child process exited with code ${code} and signal ${signal}`,
+        signal,
+        code,
+      });
     });
   });
 }

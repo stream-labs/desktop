@@ -1282,6 +1282,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
           type: 'DetectionFailed',
           reason: EAiDetectionState.ERROR,
           game: 'Fortnite',
+          error_code: (error as { code?: number })?.code ?? 1,
         });
       }
     } finally {
