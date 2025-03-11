@@ -67,7 +67,7 @@ import {
 } from './models/ai-highlighter.models';
 import { HighlighterViews } from './highlighter-views';
 import { startRendering } from './rendering/start-rendering';
-import { cutHighlightClips } from './cut-highlight-clips';
+import { cutHighlightClips, getVideoDuration } from './cut-highlight-clips';
 import { reduce } from 'lodash';
 import { extractDateTimeFromPath, fileExists } from './file-utils';
 import { addVerticalFilterToExportOptions } from './vertical-export';
@@ -449,12 +449,27 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     });
 
     this.streamingService.latestRecordingPath.subscribe(path => {
+      // Check if recording is immediately available
+      getVideoDuration(path)
+        .then(duration => {
+          if (isNaN(duration)) {
+            duration = -1;
+          }
+          this.usageStatisticsService.recordAnalyticsEvent('AIHighlighter', {
+            type: 'FinishRecording',
+            duration,
+          });
+        })
+        .catch(error => {
+          console.error('Failed getting duration right after the recoding.', error);
+        });
+
       if (!aiRecordingInProgress) {
         return;
       }
 
       aiRecordingInProgress = false;
-      this.detectAndClipAiHighlights(path, streamInfo);
+      this.detectAndClipAiHighlights(path, streamInfo, true);
 
       this.navigationService.actions.navigate(
         'Highlighter',
@@ -1186,6 +1201,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
   async detectAndClipAiHighlights(
     filePath: string,
     streamInfo: IStreamInfoForAiHighlighter,
+    delayStart = false,
   ): Promise<void> {
     if (this.aiHighlighterFeatureEnabled === false) {
       console.log('HighlighterService: Not enabled');
@@ -1246,6 +1262,10 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
 
     console.log('🔄 HighlighterData');
     try {
+      if (delayStart) {
+        await this.wait(5000);
+      }
+
       const highlighterResponse = await getHighlightClips(
         filePath,
         this.userService.getLocalUserId(),
@@ -1491,5 +1511,14 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     }
 
     return id;
+  }
+
+  /**
+   * Utility function that returns a promise that resolves after a specified delay
+   * @param ms Delay in milliseconds
+   * @returns Promise that resolves after the delay
+   */
+  wait(ms: number): Promise<void> {
+    return new Promise<void>(resolve => setTimeout(resolve, ms));
   }
 }
