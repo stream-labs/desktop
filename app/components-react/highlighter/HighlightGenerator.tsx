@@ -1,4 +1,3 @@
-/* eslint-disable no-unreachable */
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, Select, Checkbox, Typography } from 'antd';
 import { DownOutlined, RobotOutlined } from '@ant-design/icons';
@@ -42,8 +41,6 @@ export default function HighlightGenerator({
   }[];
   emitSetFilter: (filter: IFilterOptions) => void;
 }) {
-  // console.log('reHIGHUI');
-
   const [selectedRounds, setSelectedRounds] = useState<number[]>([0]);
   const [filterType, setFilterType] = useState<'duration' | 'hypescore'>('duration');
   const [targetDuration, setTargetDuration] = useState(combinedClipsDuration + 100);
@@ -86,8 +83,6 @@ export default function HighlightGenerator({
 
     roundDetails.inputs.forEach(input => {
       const inputTypes = getEventConfig(game, input.type);
-      console.log(inputTypes);
-      console.log(input.type);
 
       if (inputTypes?.includeInDropdown) {
         if (eventTypeCounts[input.type]) {

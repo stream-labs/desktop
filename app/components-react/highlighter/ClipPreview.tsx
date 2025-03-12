@@ -29,7 +29,6 @@ export default function ClipPreview(props: {
   const enabled = v.clip.deleted ? false : v.clip.enabled;
 
   const game = HighlighterService.getGameByStreamId(props.streamId);
-  console.log(game);
 
   if (!v.clip) {
     return <>deleted</>;
@@ -152,9 +151,8 @@ export function formatSecondsToHMS(seconds: number): string {
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const remainingSeconds = totalSeconds % 60;
-  return `${hours !== 0 ? hours.toString() + 'h ' : ''} ${
-    minutes !== 0 ? minutes.toString() + 'm ' : ''
-  }${remainingSeconds !== 0 ? remainingSeconds.toString() + 's' : ''}`;
+  return `${hours !== 0 ? hours.toString() + 'h ' : ''} ${minutes !== 0 ? minutes.toString() + 'm ' : ''
+    }${remainingSeconds !== 0 ? remainingSeconds.toString() + 's' : ''}`;
 }
 
 function FlameHypeScore({ score }: { score: number }) {
