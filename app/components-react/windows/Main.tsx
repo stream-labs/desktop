@@ -265,6 +265,9 @@ function Main() {
     hideStyleBlockers,
     compactView,
     sideNavCollapsed,
+    maxDockWidth,
+    minDockWidth,
+    streamingStatus,
   } = useVuex(
     () => ({
       theme: ctrl.theme(bulkLoadFinished),
@@ -278,6 +281,9 @@ function Main() {
       hideStyleBlockers: ctrl.hideStyleBlockers,
       compactView: ctrl.store.compactView,
       sideNavCollapsed: ctrl.sideNavCollapsed,
+      maxDockWidth: ctrl.store.maxDockWidth,
+      minDockWidth: ctrl.store.minDockWidth,
+      streamingStatus: ctrl.streamingStatus,
     }),
     true,
   );
@@ -332,6 +338,12 @@ function Main() {
     };
   }, [hideStyleBlockers]);
 
+  useEffect(() => {
+    if (streamingStatus === EStreamingState.Starting && isDockCollapsed) {
+      ctrl.setCollapsed(false);
+    }
+  }, [streamingStatus]);
+
   const oldTheme = useRef<TApplicationTheme | null>(null);
   useEffect(() => {
     if (!theme) return;
@@ -366,6 +378,8 @@ function Main() {
   const sideBarSize = sideNavCollapsed ? 70 : 220;
   const liveDockSize = isDockCollapsed ? 20 : dockWidth;
 
+  console.log('main', maxDockWidth);
+
   return (
     <div
       className={cx(styles.main, theme, 'react')}
@@ -386,7 +400,9 @@ function Main() {
             <SideNav />
           </div>
         )}
-        {leftDock && <LiveDockContainer onLeft />}
+        {renderDock && leftDock && (
+          <LiveDockContainer maxDockWidth={maxDockWidth} minDockWidth={minDockWidth} onLeft />
+        )}
         <div
           className={cx(styles.mainMiddle, { [styles.mainMiddleCompact]: compactView })}
           style={{ width: `calc(100% - ${liveDockSize + sideBarSize}px)` }}
@@ -406,7 +422,9 @@ function Main() {
             </div>
           )}
         </div>
-        {!leftDock && <LiveDockContainer />}
+        {renderDock && !leftDock && (
+          <LiveDockContainer maxDockWidth={maxDockWidth} minDockWidth={minDockWidth} />
+        )}
       </div>
       <ModalWrapper renderFn={ctrl.modalOptions.renderFn} />
       <Animation transitionName="ant-fade">
@@ -420,24 +438,8 @@ function Main() {
   );
 }
 
-function LiveDockContainer(p: { onLeft?: boolean }) {
+function LiveDockContainer(p: { maxDockWidth: number; minDockWidth: number; onLeft?: boolean }) {
   const ctrl = useController(MainCtx);
-
-  const { maxDockWidth, minDockWidth, renderDock, streamingStatus } = useVuex(
-    () => ({
-      maxDockWidth: ctrl.store.maxDockWidth,
-      minDockWidth: ctrl.store.minDockWidth,
-      renderDock: ctrl.renderDock,
-      streamingStatus: ctrl.streamingStatus,
-    }),
-    true,
-  );
-
-  useEffect(() => {
-    if (streamingStatus === EStreamingState.Starting && isDockCollapsed) {
-      ctrl.setCollapsed(false);
-    }
-  }, [streamingStatus]);
 
   const dockWidth = useRealmObject(Services.CustomizationService.state).livedockSize;
   const isDockCollapsed = useRealmObject(Services.CustomizationService.state).livedockCollapsed;
@@ -457,8 +459,6 @@ function LiveDockContainer(p: { onLeft?: boolean }) {
     );
   }
 
-  if (!renderDock) return <></>;
-
   if (isDockCollapsed) {
     return (
       <div className={styles.liveDockCollapsed}>
@@ -467,12 +467,14 @@ function LiveDockContainer(p: { onLeft?: boolean }) {
     );
   }
 
+  console.log(p.maxDockWidth);
+
   return (
     <ResizeBar
       position={p.onLeft ? 'left' : 'right'}
       onInput={(val: number) => ctrl.setLiveDockWidth(val)}
-      max={maxDockWidth}
-      min={minDockWidth}
+      max={p.maxDockWidth}
+      min={p.minDockWidth}
       value={dockWidth}
       transformScale={1}
     >
