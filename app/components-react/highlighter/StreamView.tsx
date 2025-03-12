@@ -21,6 +21,7 @@ import PreviewModal from './PreviewModal';
 import moment from 'moment';
 import { TextInput } from 'components-react/shared/inputs';
 import EducationCarousel from './EducationCarousel';
+import { EGame } from 'services/highlighter/models/ai-highlighter.models';
 
 type TModalStreamView =
   | { type: 'export'; id: string | undefined }
@@ -145,7 +146,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
       const streamInfo: IStreamInfoForAiHighlighter = {
         id: 'manual_' + uuid(),
         title,
-        game: 'Fortnite',
+        game: EGame.FORTNITE,
       };
 
       let filePath: string[] | undefined = [];
@@ -227,7 +228,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
     if (filtered.length) {
       const StreamInfoForAiHighlighter: IStreamInfoForAiHighlighter = {
         id: 'manual_' + uuid(),
-        game: 'Fortnite',
+        game: EGame.FORTNITE,
       };
       HighlighterService.actions.detectAndClipAiHighlights(filtered[0], StreamInfoForAiHighlighter);
     }

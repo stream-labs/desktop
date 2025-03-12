@@ -2,7 +2,8 @@ import moment from 'moment';
 import { IAiClip, TClip } from 'services/highlighter/models/highlighter.models';
 import { useRef, useEffect, useCallback } from 'react';
 import styles from './ClipsView.m.less';
-import { EHighlighterInputTypes } from 'services/highlighter/models/ai-highlighter.models';
+import { EGame } from 'services/highlighter/models/ai-highlighter.models';
+import { getContextEventTypes } from 'services/highlighter/models/game-config.models';
 export const isAiClip = (clip: TClip): clip is IAiClip => clip.source === 'AiClip';
 
 export function sortClipsByOrder(clips: TClip[], streamId: string | undefined): TClip[] {
@@ -122,11 +123,8 @@ export function aiFilterClips(
       totalDuration = getCombinedClipsDuration(clipsFromRounds);
     }
   }
-  const contextTypes = [
-    EHighlighterInputTypes.DEPLOY,
-    EHighlighterInputTypes.DEATH,
-    EHighlighterInputTypes.VICTORY,
-  ];
+
+  const contextTypes = getContextEventTypes(EGame.FORTNITE);
   // always include the start and end of the round > context type
 
   const clipsSortedByScore: TClip[] = clipsFromRounds

@@ -7,8 +7,9 @@ import styles from './ClipPreview.m.less';
 import { Button } from 'antd';
 import { $t } from 'services/i18n';
 import { isAiClip } from './utils';
-import { InputEmojiSection } from './InputEmojiSection';
 import { useVuex } from 'components-react/hooks';
+import ClipPreviewInfo from './ClipPreviewInfo';
+import { EGame } from 'services/highlighter/models/ai-highlighter.models';
 
 export default function ClipPreview(props: {
   clipId: string;
@@ -24,6 +25,9 @@ export default function ClipPreview(props: {
   const [scrubFrame, setScrubFrame] = useState<number>(0);
   const clipThumbnail = v.clip.scrubSprite || '';
   const enabled = v.clip.deleted ? false : v.clip.enabled;
+
+  const game = HighlighterService.getGameByStreamId(props.streamId);
+  console.log(game);
 
   if (!v.clip) {
     return <>deleted</>;
@@ -103,22 +107,13 @@ export default function ClipPreview(props: {
                 }}
               >
                 {isAiClip(v.clip) ? (
-                  <InputEmojiSection
-                    clips={[v.clip]}
-                    includeRounds={false}
-                    includeDeploy={true}
-                    showCount={false}
-                    showDescription={false}
-                  />
+                  <ClipPreviewInfo clip={v.clip} game={game} />
                 ) : (
                   <div className={styles.highlighterIcon}>
                     <i className="icon-highlighter" />
                   </div>
                 )}
               </div>
-              {isAiClip(v.clip) && v.clip.aiInfo?.metadata?.round && (
-                <div className={styles.roundTag}>{`Round: ${v.clip.aiInfo.metadata.round}`}</div>
-              )}
             </div>
           </div>
           <div className={styles.previewClipBottomBar}>

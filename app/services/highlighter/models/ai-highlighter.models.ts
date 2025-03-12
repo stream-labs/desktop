@@ -1,3 +1,31 @@
+export interface IGameConfig {
+  name: EGame;
+  inputTypeMap: Record<string, IEventInfo | IDefaultEventInfo>;
+}
+
+export interface TypeWording {
+  emoji: string;
+  description: string;
+  orderPriority: number;
+}
+
+export interface IEventInfo {
+  emoji: string;
+  description: { singular: string; plural: string };
+  orderPriority: number; //Ordering in the stream card
+  includeInDropdown: boolean; //autoEditDropdown
+  contextEvent: boolean; //eg start or end
+}
+
+export interface IDefaultEventInfo extends IEventInfo {
+  aliases?: string[];
+}
+
+export enum EGame {
+  FORTNITE = 'fortnite',
+  UNSET = 'unset',
+}
+
 export type TOrientation = 'horizontal' | 'vertical';
 
 export enum EHighlighterInputTypes {
@@ -10,15 +38,12 @@ export enum EHighlighterInputTypes {
   DEATH = 'death',
   VICTORY = 'victory',
   DEPLOY = 'deploy',
-  META_DURATION = 'meta_duration',
-  LOW_HEALTH = 'low_health',
-  PLAYER_KNOCKED = 'player_knocked',
 }
 
 export interface IHighlight {
   start_time: number;
   end_time: number;
-  input_types: EHighlighterInputTypes[];
+  input_types: string[];
   inputs: IHighlighterInput[];
   score: number;
   metadata: { round: number; webcam_coordinates: ICoordinates };
@@ -48,7 +73,7 @@ export interface IKillMetadata {
 }
 
 export interface IInput {
-  type: EHighlighterInputTypes;
+  type: string;
   metadata?: IDeathMetadata | IKillMetadata;
 }
 
@@ -62,7 +87,7 @@ export enum EAiDetectionState {
 export interface IHighlighterInput {
   start_time: number;
   end_time?: number;
-  type: EHighlighterInputTypes;
+  type: string;
   origin: string;
   metadata?: IDeathMetadata | any;
 }
