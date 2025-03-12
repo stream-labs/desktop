@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef } from 'react';
+import { debounce } from 'lodash-decorators';
 import { IVolmeter } from 'services/audio';
 import electron, { ipcRenderer } from 'electron';
 import difference from 'lodash/difference';
@@ -7,6 +8,7 @@ import vShaderSrc from 'util/webgl/shaders/volmeter.vert';
 import fShaderSrc from 'util/webgl/shaders/volmeter.frag';
 import { Services } from 'components-react/service-provider';
 import { assertIsDefined, getDefined } from 'util/properties-type-guards';
+import { useController } from 'components-react/hooks/zustand';
 
 // Configuration
 const CHANNEL_HEIGHT = 3;
@@ -41,18 +43,22 @@ interface IVolmeterSubscription {
   lastEventTime: number;
 }
 
+export default function GLVolmetersWithContext() {
+  const controller = useMemo(() => new GLVolmetersController(), []);
+  return (
+    <GLVolmetersCtx.Provider value={controller}>
+      <GLVolmeters />
+    </GLVolmetersCtx.Provider>
+  );
+}
+
 /**
  * Component that renders the volume for audio sources via WebGL
  */
-export default function GLVolmeters() {
+function GLVolmeters() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // init controller on mount
-  const controller = useMemo(() => {
-    const controller = new GLVolmetersController();
-    controller.init();
-    return controller;
-  }, []);
+  const controller = useController(GLVolmetersCtx);
 
   // start rendering volmeters when the canvas is ready
   useEffect(() => {
@@ -80,10 +86,10 @@ export default function GLVolmeters() {
   );
 }
 
+const GLVolmetersCtx = React.createContext<GLVolmetersController | null>(null);
 class GLVolmetersController {
   private customizationService = Services.CustomizationService;
   private audioService = Services.AudioService;
-  private sourcesService = Services.SourcesService;
 
   subscriptions: Dictionary<IVolmeterSubscription> = {};
 
@@ -104,9 +110,7 @@ class GLVolmetersController {
 
   private canvasWidth: number;
   private canvasWidthInterval: number;
-  private channelCount: number;
   private canvasHeight: number;
-  private renderingInitialized: boolean;
 
   // time between 2 received peaks.
   // Used to render extra interpolated frames
@@ -116,12 +120,10 @@ class GLVolmetersController {
   private firstFrameTime: number;
   private frameNumber: number;
   private sourcesOrder: string[];
-  private workerId: number;
   private requestedFrameId: number;
   private bgMultiplier = this.customizationService.isDarkTheme ? 0.2 : 0.5;
 
   init() {
-    this.workerId = electron.ipcRenderer.sendSync('getWorkerWindowId');
     this.subscribeVolmeters();
     this.bg = this.customizationService.sectionBackground;
     this.fpsLimit = 30;
@@ -141,7 +143,7 @@ class GLVolmetersController {
   /**
    * add or remove subscription for volmeters depending on current scene
    */
-
+  @debounce(500)
   private subscribeVolmeters() {
     const audioSources = this.audioSources;
     const sourcesOrder = audioSources.map(source => source.sourceId);
@@ -183,7 +185,7 @@ class GLVolmetersController {
         peakHoldCounters: [],
       };
 
-      this.audioService.subscribeVolmeter(sourceId).then(id => {
+      this.audioService.actions.return.subscribeVolmeter(sourceId).then(id => {
         ipcRenderer.once(`port-${id}`, e => {
           if (!this.subscriptions[sourceId]) return;
           this.subscriptions[sourceId].channelId = id;
@@ -227,6 +229,9 @@ class GLVolmetersController {
   setupNewCanvas($canvasEl: HTMLCanvasElement) {
     this.$refs.canvas = $canvasEl;
     // Make sure all state is cleared out
+    if (this.gl && this.program) {
+      this.gl.deleteProgram(this.program);
+    }
     this.gl = null!;
     this.program = null!;
     this.positionLocation = null!;
@@ -237,7 +242,6 @@ class GLVolmetersController {
     this.peakHoldLocation = null!;
     this.bgMultiplierLocation = null!;
     this.canvasWidth = 0;
-    this.channelCount = 0;
     this.canvasHeight = 0;
 
     this.setCanvasSize();
@@ -246,7 +250,6 @@ class GLVolmetersController {
 
     this.gl = getDefined(this.$refs.canvas.getContext('webgl', { alpha: false }));
     this.initWebglRendering();
-    this.renderingInitialized = true;
   }
 
   /**
@@ -357,7 +360,7 @@ class GLVolmetersController {
     this.gl.clearColor(bg.r / 255, bg.g / 255, bg.b / 255, 1);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
-    if (this.canvasWidth < 0 || this.canvasHeight < 0) return;
+    if (this.canvasWidth < 0 || this.canvasHeight < 0 || !this.sourcesOrder) return;
 
     this.gl.viewport(0, 0, this.canvasWidth, this.canvasHeight);
 

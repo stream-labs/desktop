@@ -69,9 +69,7 @@ export function Mixer() {
           style={{ height: 'calc(100% - 32px)' }}
         >
           <div style={{ position: 'relative' }} onContextMenu={handleRightClick}>
-            {audioSourceIds.length !== 0 && !performanceMode && !hideStyleBlockers && (
-              <GLVolmeters />
-            )}
+            {audioSourceIds.length !== 0 && !performanceMode && <GLVolmeters />}
             {audioSourceIds.map(sourceId => (
               <MixerItem
                 key={sourceId}
