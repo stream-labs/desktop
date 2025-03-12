@@ -246,27 +246,14 @@ export class OutputSettingsService extends Service {
       'Mode',
     );
 
-    const oldQualityName = this.settingsService.findSettingValue(output, 'Recording', 'RecQuality');
-    let quality: ERecordingQuality = ERecordingQuality.HigherQuality;
-    switch (oldQualityName) {
-      case 'Small':
-        quality = ERecordingQuality.HighQuality;
-        break;
-      case 'HQ':
-        quality = ERecordingQuality.HigherQuality;
-        break;
-      case 'Lossless':
-        quality = ERecordingQuality.Lossless;
-        break;
-      case 'Stream':
-        quality = ERecordingQuality.Stream;
-        break;
-    }
+    const convertedEncoderName:
+      | EObsSimpleEncoder.x264_lowcpu
+      | EObsAdvancedEncoder = this.convertEncoderToNewAPI(this.getSettings().recording.encoder);
 
-    const videoEncoder = obsEncoderToEncoderFamily(
-      this.settingsService.findSettingValue(output, 'Streaming', 'Encoder') ||
-        this.settingsService.findSettingValue(output, 'Streaming', 'StreamEncoder'),
-    ) as EEncoderFamily;
+    const videoEncoder: EObsAdvancedEncoder =
+      convertedEncoderName === EObsSimpleEncoder.x264_lowcpu
+        ? EObsAdvancedEncoder.obs_x264
+        : convertedEncoderName;
 
     const enforceBitrateKey = mode === 'Advanced' ? 'ApplyServiceSettings' : 'EnforceBitrate';
     const enforceServiceBitrate = this.settingsService.findSettingValue(
@@ -282,7 +269,6 @@ export class OutputSettingsService extends Service {
     );
 
     const useAdvanced = this.settingsService.findSettingValue(output, 'Streaming', 'UseAdvanced');
-    console.log('useAdvanced', useAdvanced);
 
     const customEncSettings = this.settingsService.findSettingValue(
       output,

@@ -1010,7 +1010,7 @@ export class StreamingService
             NodeObs.OBS_service_stopStreaming(true, 'vertical');
             // Refactor when move streaming to new API
             if (this.state.status.vertical.streaming !== EStreamingState.Offline) {
-              this.SET_VERTICAL_STREAMING_STATUS(EStreamingState.Offline);
+              this.SET_STREAMING_STATUS(EStreamingState.Offline, 'vertical');
             }
           }
 
@@ -1020,7 +1020,7 @@ export class StreamingService
             // Refactor when move streaming to new API
             const time = new Date().toISOString();
             if (this.state.status.vertical.streaming === EStreamingState.Offline) {
-              this.SET_VERTICAL_STREAMING_STATUS(EStreamingState.Live, time);
+              this.SET_STREAMING_STATUS(EStreamingState.Live, 'vertical', time);
             }
 
             signalChanged.unsubscribe();
@@ -1134,7 +1134,7 @@ export class StreamingService
               NodeObs.OBS_service_stopStreaming(false, 'vertical');
               // Refactor when move streaming to new API
               if (this.state.status.vertical.streaming !== EStreamingState.Offline) {
-                this.SET_VERTICAL_STREAMING_STATUS(EStreamingState.Offline);
+                this.SET_STREAMING_STATUS(EStreamingState.Offline, 'vertical');
               }
               signalChanged.unsubscribe();
             }
@@ -1181,7 +1181,7 @@ export class StreamingService
         NodeObs.OBS_service_stopStreaming(true, 'horizontal');
         // Refactor when move streaming to new API
         if (this.state.status.vertical.streaming !== EStreamingState.Offline) {
-          this.SET_VERTICAL_STREAMING_STATUS(EStreamingState.Offline);
+          this.SET_STREAMING_STATUS(EStreamingState.Offline, 'vertical');
         }
         NodeObs.OBS_service_stopStreaming(true, 'vertical');
       } else {
@@ -1566,14 +1566,44 @@ export class StreamingService
         code: info.code,
       });
 
-      // In the case that the user is streaming but not recording, a recording instance
-      // was created for the replay buffer. If the replay buffer is stopped, the recording
-      // instance should be destroyed.
-      if (this.state.status.horizontal.recording === ERecordingState.Offline) {
+      // There are a few cases where a recording and streaming instance are created for the replay buffer.
+      // In these cases, the created recording and streaming instances should be destroyed
+      // when the replay buffer is stopped.
+      // 1. Simple Replay Buffer: When using the replay buffer without recording or streaming,
+      //    a simple recording instance is created for the replay buffer.
+      // 2. Simple Replay Buffer: When using the replay butter while streaming but not recording,
+      //    a simple recording instance is created for the replay buffer.
+      // 3. Advanced Replay Buffer: When using the replay buffer without recording or streaming,
+      //    an advanced recording instance is created for the replay buffer. This advanced recording
+      //    instance will create an advanced streaming instance if it does not exist.
+      // 4. Advanced Replay Buffer: When using the replay buffer while streaming but not recording,
+      //    a recording instance is created for the replay buffer. If the replay buffer is stopped,
+      //    the recording instance should be destroyed.
+
+      // destroy any recording instances created for use with the replay buffer
+      if (this.state.status[display].recording === ERecordingState.Offline) {
         this.destroyOutputContextIfExists(display, 'recording');
+        console.log('destroyed recording instance for replay buffer');
+      }
+
+      // destroy any streaming instances created by the recording instance for use with the replay buffer
+      // Note: this is only the case when recording without streaming in advanced mode
+      if (this.state.status[display].streaming === EStreamingState.Offline) {
+        this.destroyOutputContextIfExists(display, 'streaming');
+        console.log('destroyed streaming instance for replay buffer');
       }
 
       this.destroyOutputContextIfExists(display, 'replayBuffer');
+
+      // THE BELOW WORKS
+      // // In the case that the user is streaming but not recording, a recording instance
+      // // was created for the replay buffer. If the replay buffer is stopped, the recording
+      // // instance should be destroyed.
+      // if (this.state.status.horizontal.recording === ERecordingState.Offline) {
+      //   this.destroyOutputContextIfExists(display, 'recording');
+      // }
+
+      // this.destroyOutputContextIfExists(display, 'replayBuffer');
     }
   }
 
@@ -2284,12 +2314,6 @@ export class StreamingService
       this.state.streamingStatusTime = time;
       this.state.status[display].streamingTime = time;
     }
-  }
-
-  @mutation()
-  private SET_VERTICAL_STREAMING_STATUS(status: EStreamingState, time?: string) {
-    this.state.streamingStatus = status;
-    if (time) this.state.streamingStatusTime = time;
   }
 
   @mutation()

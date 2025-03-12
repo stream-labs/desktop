@@ -43,8 +43,10 @@ export default function StudioFooterComponent() {
       !RecordingModeService.views.isRecordingModeEnabled,
     streamQuality: PerformanceService.views.streamQuality,
     replayBufferOffline: StreamingService.views.replayBufferStatus === EReplayBufferState.Offline,
-    replayBufferStopping: StreamingService.state.replayBufferStatus === EReplayBufferState.Stopping,
-    replayBufferSaving: StreamingService.state.replayBufferStatus === EReplayBufferState.Saving,
+    replayBufferStopping:
+      StreamingService.state.status.horizontal.replayBuffer === EReplayBufferState.Stopping,
+    replayBufferSaving:
+      StreamingService.state.status.horizontal.replayBuffer === EReplayBufferState.Saving,
     recordingModeEnabled: RecordingModeService.views.isRecordingModeEnabled,
     replayBufferEnabled: SettingsService.views.values.Output.RecRB,
   }));
@@ -197,7 +199,7 @@ function RecordingButton() {
   const { StreamingService } = Services;
   const { isRecording, recordingStatus } = useVuex(() => ({
     isRecording: StreamingService.views.isRecording,
-    recordingStatus: StreamingService.state.status.horizontal.recordingTime,
+    recordingStatus: StreamingService.state.status.horizontal.recording,
   }));
 
   function toggleRecording() {
