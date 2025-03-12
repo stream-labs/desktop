@@ -1593,7 +1593,7 @@ export class StreamingService
         console.log('destroyed streaming instance for replay buffer');
       }
 
-      this.destroyOutputContextIfExists(display, 'replayBuffer');
+      // this.destroyOutputContextIfExists(display, 'replayBuffer');
 
       // THE BELOW WORKS
       // // In the case that the user is streaming but not recording, a recording instance
