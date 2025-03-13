@@ -2,12 +2,12 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Button, Select, Checkbox, Typography } from 'antd';
 import { DownOutlined, RobotOutlined } from '@ant-design/icons';
 import { IFilterOptions } from './utils';
-import { getPlacementFromInputs } from './InputEmojiSection';
 import styles from './HighlightGenerator.m.less';
 import { formatSecondsToHMS } from './ClipPreview';
 import { $t } from 'services/i18n';
-import { EHighlighterInputTypes, IInput } from 'services/highlighter/models/ai-highlighter.models';
+import { EGame, IInput } from 'services/highlighter/models/ai-highlighter.models';
 import Translate from 'components-react/shared/Translate';
+import { getConfigByGame, getEventConfig } from 'services/highlighter/models/game-config.models';
 const { Option } = Select;
 
 const selectStyles = {
@@ -27,10 +27,12 @@ const checkboxStyles = {
 
 export default function HighlightGenerator({
   combinedClipsDuration,
+  game,
   roundDetails,
   emitSetFilter,
 }: {
   combinedClipsDuration: number; // Maximum duration the highlight reel can be long - only used to restrict the targetDuration options
+  game: EGame;
   roundDetails: {
     round: number;
     inputs: IInput[];
@@ -39,8 +41,6 @@ export default function HighlightGenerator({
   }[];
   emitSetFilter: (filter: IFilterOptions) => void;
 }) {
-  // console.log('reHIGHUI');
-
   const [selectedRounds, setSelectedRounds] = useState<number[]>([0]);
   const [filterType, setFilterType] = useState<'duration' | 'hypescore'>('duration');
   const [targetDuration, setTargetDuration] = useState(combinedClipsDuration + 100);
@@ -70,36 +70,40 @@ export default function HighlightGenerator({
     });
   }, [selectedRounds, filterType, targetDuration]);
 
-  function roundDropdownDetails(roundDetails: {
-    round: number;
-    inputs: IInput[];
-    duration: number;
-    hypeScore: number;
-  }) {
-    const combinedKillAndKnocked = roundDetails.inputs.reduce((count, input) => {
-      if (
-        input.type === EHighlighterInputTypes.KILL ||
-        input.type === EHighlighterInputTypes.KNOCKED
-      ) {
-        return count + 1;
+  function roundDropdownDetails(
+    roundDetails: {
+      round: number;
+      inputs: IInput[];
+      duration: number;
+      hypeScore: number;
+    },
+    game: EGame,
+  ) {
+    const eventTypeCounts: Record<string, number> = {};
+
+    roundDetails.inputs.forEach(input => {
+      const inputTypes = getEventConfig(game, input.type);
+
+      if (inputTypes?.includeInDropdown) {
+        if (eventTypeCounts[input.type]) {
+          eventTypeCounts[input.type] += 1;
+        } else {
+          eventTypeCounts[input.type] = 1;
+        }
       }
-      return count;
-    }, 0);
-    const won = roundDetails.inputs.some(input => input.type === EHighlighterInputTypes.VICTORY);
-    let rank = null;
-    if (!won) {
-      rank = getPlacementFromInputs(roundDetails.inputs);
-    }
+    });
+
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
         <div style={{ fontWeight: 'bold' }}>Round {roundDetails.round} </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-          <div className={styles.infoTag}>{combinedKillAndKnocked} 🔫</div>
-          {won ? (
-            <div className={styles.infoTag}>1st 🏆</div>
-          ) : (
-            <div className={styles.infoTag}>{`${rank ? '#' + rank : ''} 🪦`}</div>
-          )}
+          {Object.entries(eventTypeCounts).map(([type, count]) => (
+            <div className={styles.infoTag}>
+              {count}
+              {getEventConfig(game, type).emoji}
+            </div>
+          ))}
+
           <div className={styles.infoTag}>{`${roundDetails.hypeScore} 🔥`}</div>
           <div className={styles.infoTag}>{`${formatSecondsToHMS(roundDetails.duration)}`}</div>
         </div>
@@ -167,7 +171,7 @@ export default function HighlightGenerator({
                       }
                     }}
                   >
-                    {roundDropdownDetails(roundDetails)}
+                    {roundDropdownDetails(roundDetails, game)}
                   </Checkbox>
                 </div>
               ))}

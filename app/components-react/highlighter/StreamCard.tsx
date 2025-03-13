@@ -10,10 +10,10 @@ import { Button } from 'antd';
 import { Services } from 'components-react/service-provider';
 import { isAiClip } from './utils';
 import { useVuex } from 'components-react/hooks';
-import { InputEmojiSection } from './InputEmojiSection';
 import { $t } from 'services/i18n';
 import { EAiDetectionState } from 'services/highlighter/models/ai-highlighter.models';
 import * as remote from '@electron/remote';
+import StreamCardInfo from './StreamCardInfo';
 
 export default function StreamCard({
   streamId,
@@ -51,6 +51,8 @@ export default function StreamCard({
   if (!stream) {
     return <></>;
   }
+
+  const game = HighlighterService.getGameByStreamId(streamId);
 
   function shareFeedback() {
     remote.shell.openExternal(
@@ -150,14 +152,7 @@ export default function StreamCard({
         </div>
         <h3 className={styles.emojiWrapper}>
           {stream.state.type === EAiDetectionState.FINISHED ? (
-            <InputEmojiSection
-              clips={clips}
-              includeRounds={true}
-              includeDeploy={false}
-              showCount={true}
-              showDescription={true}
-              showDeathPlacement={false}
-            />
+            <StreamCardInfo clips={clips} game={game} />
           ) : (
             <div style={{ height: '22px' }}> </div>
           )}

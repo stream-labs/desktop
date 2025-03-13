@@ -64,6 +64,7 @@ import {
   IHighlight,
   IHighlighterMilestone,
   IInput,
+  EGame,
 } from './models/ai-highlighter.models';
 import { HighlighterViews } from './highlighter-views';
 import { startRendering } from './rendering/start-rendering';
@@ -400,10 +401,22 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
         } else {
           this.streamingService.actions.toggleRecording();
         }
+
+        let game = EGame.UNSET;
+        switch (this.streamingService.views.game) {
+          case EGame.FORTNITE:
+            game = EGame.FORTNITE;
+            break;
+
+          default:
+            game = EGame.UNSET;
+            break;
+        }
+
         streamInfo = {
           id: 'fromStreamRecording' + uuid(),
           title: this.streamingService.views.settings.platforms.twitch?.title,
-          game: this.streamingService.views.game,
+          game,
         };
         aiRecordingInProgress = true;
         aiRecordingStartTime = moment();
@@ -693,6 +706,21 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
       });
     });
     return;
+  }
+
+  getGameByStreamId(streamId?: string): EGame {
+    if (!streamId) return EGame.UNSET;
+
+    const game = this.views.highlightedStreams.find(s => s.id === streamId)?.game;
+    if (!game) return EGame.UNSET;
+
+    const lowercaseGame = game.toLowerCase();
+    // Check if it is supported game (important for older states of highlighter)
+    if (Object.values(EGame).includes(lowercaseGame as EGame)) {
+      return game as EGame;
+    }
+
+    return EGame.UNSET;
   }
 
   enableClip(path: string, enabled: boolean) {
@@ -1228,7 +1256,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
       date: moment().toISOString(),
       id: streamInfo.id || 'noId',
       title: sanitizedTitle,
-      game: streamInfo.game || 'no title',
+      game: streamInfo.game || EGame.UNSET,
       abortController: new AbortController(),
       path: filePath,
     };
