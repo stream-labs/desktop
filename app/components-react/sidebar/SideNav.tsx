@@ -1,11 +1,11 @@
-import React, { useLayoutEffect, useRef } from 'react';
+import React, { useEffect, useLayoutEffect, useRef } from 'react';
 import ResizeObserver from 'resize-observer-polyfill';
 import cx from 'classnames';
 import { EMenuItemKey, ESubMenuItemKey } from 'services/side-nav';
 import { EDismissable } from 'services/dismissables';
 import { $t } from 'services/i18n';
 import { Services } from 'components-react/service-provider';
-import { useVuex } from 'components-react/hooks';
+import { useDebounce, useVuex } from 'components-react/hooks';
 import NavTools from './NavTools';
 import styles from './SideNav.m.less';
 import { Layout, Button } from 'antd';
@@ -53,20 +53,26 @@ export default function SideNav() {
   const siderMinWidth: number = 50;
   const siderMaxWidth: number = 200;
 
+  const updateStyleBlockersDebounced = useDebounce(1000, updateStyleBlockers);
+
   const resizeObserver = new ResizeObserver((entries: ResizeObserverEntry[]) => {
     entries.forEach((entry: ResizeObserverEntry) => {
       const width = Math.floor(entry?.contentRect?.width);
 
       if (width === siderMinWidth || width === siderMaxWidth) {
-        updateStyleBlockers('main', false);
+        updateStyleBlockersDebounced('main', false);
       }
     });
   });
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (sider && sider?.current) {
       resizeObserver.observe(sider?.current);
     }
+
+    return () => {
+      resizeObserver.disconnect();
+    };
   }, [sider]);
 
   return (
