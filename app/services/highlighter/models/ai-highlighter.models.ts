@@ -1,4 +1,8 @@
-export type TOrientation = 'horizontal' | 'vertical';
+export type TOrientation = EOrientation.HORIZONTAL | EOrientation.VERTICAL;
+export enum EOrientation {
+  HORIZONTAL = 'horizontal',
+  VERTICAL = 'vertical',
+}
 
 export enum EHighlighterInputTypes {
   KILL = 'kill',

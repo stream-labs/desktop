@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   EExportStep,
   TFPS,
@@ -9,7 +9,7 @@ import { Services } from 'components-react/service-provider';
 import { FileInput, TextInput, ListInput } from 'components-react/shared/inputs';
 import Form from 'components-react/shared/inputs/Form';
 import path from 'path';
-import { Button, Progress, Alert } from 'antd';
+import { Button, Progress, Alert, Dropdown } from 'antd';
 import YoutubeUpload from './YoutubeUpload';
 import { RadioInput } from 'components-react/shared/inputs/RadioInput';
 import { confirmAsync } from 'components-react/modals';
@@ -17,9 +17,20 @@ import { $t } from 'services/i18n';
 import StorageUpload from './StorageUpload';
 import { useVuex } from 'components-react/hooks';
 import { initStore, useController } from '../hooks/zustand';
-import { TOrientation } from 'services/highlighter/models/ai-highlighter.models';
+import { EOrientation, TOrientation } from 'services/highlighter/models/ai-highlighter.models';
 import { fileExists } from 'services/highlighter/file-utils';
+import { SCRUB_HEIGHT, SCRUB_WIDTH, SCRUB_FRAMES } from 'services/highlighter/constants';
+import styles from './ExportModal.m.less';
+import { getCombinedClipsDuration } from './utils';
+import { formatSecondsToHMS } from './ClipPreview';
+import { set } from 'lodash';
 
+type TSetting = { name: string; fps: TFPS; resolution: TResolution; preset: TPreset };
+const settings: TSetting[] = [
+  { name: 'Standard', fps: 30, resolution: 1080, preset: 'fast' },
+  { name: 'Best', fps: 60, resolution: 1080, preset: 'slow' },
+  { name: 'Custom', fps: 30, resolution: 720, preset: 'ultrafast' },
+];
 class ExportController {
   get service() {
     return Services.HighlighterService;
@@ -37,6 +48,16 @@ class ExportController {
     );
   }
 
+  getClips(streamId?: string) {
+    return this.service.getClips(this.service.views.clips, streamId);
+  }
+  getClipThumbnail(streamId?: string) {
+    return this.getClips(streamId).find(clip => clip.enabled)?.scrubSprite;
+  }
+  getDuration(streamId?: string) {
+    return getCombinedClipsDuration(this.getClips(streamId));
+  }
+
   dismissError() {
     return this.service.actions.dismissError();
   }
@@ -49,6 +70,9 @@ class ExportController {
   }
 
   setFps(value: string) {
+    console.log('setFPS');
+    console.log(value);
+
     this.service.actions.setFps(parseInt(value, 10) as TFPS);
   }
 
@@ -60,7 +84,10 @@ class ExportController {
     this.service.actions.setExportFile(exportFile);
   }
 
-  exportCurrentFile(streamId: string | undefined, orientation: TOrientation = 'horizontal') {
+  exportCurrentFile(
+    streamId: string | undefined,
+    orientation: TOrientation = EOrientation.HORIZONTAL,
+  ) {
     this.service.actions.export(false, streamId, orientation);
   }
 
@@ -108,10 +135,11 @@ function ExportModal({ close, streamId }: { close: () => void; streamId: string 
   // Clear all errors when this component unmounts
   useEffect(() => unmount, []);
 
-  if (exportInfo.exporting) return <ExportProgress />;
-  if (!exportInfo.exported) {
+  // if (exportInfo.exporting) return <ExportProgress />;
+  if (!exportInfo.exported || exportInfo.exporting) {
     return (
       <ExportOptions
+        isExporting={exportInfo.exporting}
         close={close}
         streamId={streamId}
         videoName={videoName}
@@ -129,9 +157,11 @@ function ExportProgress() {
     <div>
       <h2>{$t('Export Progress')}</h2>
       <Progress
+        style={{ width: '100%' }}
         percent={Math.round((exportInfo.currentFrame / exportInfo.totalFrames) * 100)}
-        trailColor="var(--section)"
-        status={exportInfo.cancelRequested ? 'exception' : 'normal'}
+        // trailColor="var(--section)"
+        // status={exportInfo.cancelRequested ? 'exception' : 'normal'}
+        showInfo={false}
       />
       {!exportInfo.cancelRequested && exportInfo.step === EExportStep.FrameRender && (
         <div>
@@ -163,11 +193,13 @@ function ExportProgress() {
 
 function ExportOptions({
   close,
+  isExporting,
   streamId,
   videoName,
   onVideoNameChange,
 }: {
   close: () => void;
+  isExporting: boolean;
   streamId: string | undefined;
   videoName: string;
   onVideoNameChange: (name: string) => void;
@@ -175,6 +207,7 @@ function ExportOptions({
   const { UsageStatisticsService } = Services;
   const {
     exportInfo,
+    cancelExport,
     dismissError,
     setResolution,
     setFps,
@@ -183,7 +216,38 @@ function ExportOptions({
     setExport,
     exportCurrentFile,
     getStreamTitle,
+    getClips,
+    getDuration,
+    getClipThumbnail,
   } = useController(ExportModalCtx);
+
+  const [currentFormat, setCurrentFormat] = useState<TOrientation>(EOrientation.HORIZONTAL);
+
+  function settingMatcher(initialSetting: TSetting) {
+    const matchingSetting = settings.find(
+      setting =>
+        setting.fps === initialSetting.fps &&
+        setting.resolution === initialSetting.resolution &&
+        setting.preset === initialSetting.preset,
+    );
+    if (matchingSetting) {
+      return matchingSetting;
+    }
+    return {
+      name: 'Custom',
+      fps: initialSetting.fps,
+      resolution: initialSetting.resolution,
+      preset: initialSetting.preset,
+    };
+  }
+  const [currentSetting, setSetting] = useState<TSetting>(
+    settingMatcher({
+      name: 'from default',
+      fps: exportInfo.fps,
+      resolution: exportInfo.resolution,
+      preset: exportInfo.preset,
+    }),
+  );
 
   // Video name and export file are kept in sync
   const [exportFile, setExportFile] = useState<string>(getExportFileFromVideoName(videoName));
@@ -220,84 +284,267 @@ function ExportOptions({
   }
 
   return (
-    <div>
-      <h2>Export Video</h2>
-      <Form>
-        <TextInput
-          label={$t('Video Name')}
-          value={videoName}
-          onInput={name => {
-            onVideoNameChange(name);
-            setExportFile(getExportFileFromVideoName(name));
-          }}
-          uncontrolled={false}
-        />
-        <FileInput
-          label={$t('Export Location')}
-          name="exportLocation"
-          save={true}
-          filters={[{ name: $t('MP4 Video File'), extensions: ['mp4'] }]}
-          value={exportFile}
-          onChange={file => {
-            setExportFile(file);
-            onVideoNameChange(getVideoNameFromExportFile(file));
-          }}
-        />
-        <RadioInput
-          label={$t('Resolution')}
-          value={exportInfo.resolution.toString()}
-          options={[
-            { value: '720', label: '720p' },
-            { value: '1080', label: '1080p' },
-          ]}
-          onChange={setResolution}
-          buttons={true}
-        />
-        <RadioInput
-          label={$t('Frame Rate')}
-          value={exportInfo.fps.toString()}
-          options={[
-            { value: '30', label: '30 FPS' },
-            { value: '60', label: '60 FPS' },
-          ]}
-          onChange={setFps}
-          buttons={true}
-        />
-        <RadioInput
-          label={$t('File Size')}
-          value={exportInfo.preset}
-          options={[
-            { value: 'ultrafast', label: $t('Faster Export') },
-            { value: 'fast', label: $t('Balanced') },
-            { value: 'slow', label: $t('Smaller File') },
-          ]}
-          onChange={setPreset}
-          buttons={true}
-        />
-        {exportInfo.error && (
-          <Alert
-            style={{ marginBottom: 24 }}
-            message={exportInfo.error}
-            type="error"
-            closable
-            showIcon
-            afterClose={dismissError}
-          />
-        )}
-        <div style={{ textAlign: 'right' }}>
-          <Button style={{ marginRight: 8 }} onClick={close}>
-            {$t('Close')}
-          </Button>
-
-          <Button style={{ marginRight: 8 }} type="primary" onClick={() => startExport('vertical')}>
-            {$t('Export Vertical')}
-          </Button>
-          <Button type="primary" onClick={() => startExport('horizontal')}>
-            {$t('Export Horizontal')}
-          </Button>
+    <Form>
+      <div className={styles.modalWrapper}>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          {/* header */} <h2 style={{ fontWeight: 600 }}>{$t('Export')}</h2>{' '}
+          <div>
+            <Button type="text">
+              <i className="icon-close" style={{ margin: 0 }}></i>
+            </Button>
+          </div>
         </div>
-      </Form>
-    </div>
+        <div style={{ display: 'flex', gap: '16px' }}>
+          <div className={styles.settingsAndProgress}>
+            <div
+              className={`${isExporting ? styles.isDisabled : ''}`}
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                marginBottom: '4px',
+                marginTop: '12px',
+                width: '100%',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  width: '100%',
+                  overflow: 'hidden',
+                }}
+              >
+                {' '}
+                <h2 style={{ margin: '0px' }}>
+                  <input
+                    id="videoName"
+                    type="text"
+                    value={videoName}
+                    onChange={e => {
+                      const name = e.target.value;
+                      onVideoNameChange(name);
+                      setExportFile(getExportFileFromVideoName(name));
+                    }}
+                    style={{
+                      width: '100%',
+                      border: 'none',
+                      outline: 'none',
+                      backgroundColor: 'transparent',
+                      padding: 0,
+                      color: 'inherit',
+                    }}
+                  />
+                </h2>
+                <FileInput
+                  label={$t('Export Location')}
+                  name="exportLocation"
+                  save={true}
+                  filters={[{ name: $t('MP4 Video File'), extensions: ['mp4'] }]}
+                  value={exportFile}
+                  onChange={file => {
+                    setExportFile(file);
+                    onVideoNameChange(getVideoNameFromExportFile(file));
+                  }}
+                  buttonContent={<i className="fa fa-folder-open" />}
+                />
+              </div>
+            </div>
+
+            <div
+              className={`${styles.thumbnail} ${isExporting && styles.thumbnailInProgress} `}
+              style={
+                currentFormat === EOrientation.HORIZONTAL
+                  ? { aspectRatio: '16/9' }
+                  : { aspectRatio: '9/16' }
+              }
+            >
+              {isExporting && (
+                <div className={styles.progressItem}>
+                  <h1>{Math.round((exportInfo.currentFrame / exportInfo.totalFrames) * 100)}%</h1>
+                  <p>
+                    {exportInfo.cancelRequested ? (
+                      <span>{$t('Canceling...')}</span>
+                    ) : (
+                      'Exporting video...'
+                    )}
+                  </p>
+                  <Progress
+                    style={{ width: '100%' }}
+                    percent={Math.round((exportInfo.currentFrame / exportInfo.totalFrames) * 100)}
+                    trailColor="var(--section)"
+                    status={exportInfo.cancelRequested ? 'exception' : 'normal'}
+                    showInfo={false}
+                  />
+                </div>
+              )}
+              <img
+                src={getClipThumbnail(streamId)}
+                style={
+                  currentFormat === EOrientation.HORIZONTAL
+                    ? { objectPosition: 'left' }
+                    : { objectPosition: `-${(SCRUB_WIDTH * 1.32) / 4}px` }
+                }
+                alt=""
+              />
+            </div>
+
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
+              <div
+                className={`${isExporting ? styles.isDisabled : ''}`}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <p
+                  style={{
+                    marginBottom: 0,
+                    marginLeft: '8px',
+                  }}
+                >
+                  {formatSecondsToHMS(getDuration(streamId))} | {getClips(streamId).length} clips
+                </p>
+              </div>
+              <Toggle
+                initialState={currentFormat}
+                disabled={isExporting}
+                emitState={format => setCurrentFormat(format)}
+              />
+            </div>
+
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+              }}
+            >
+              <CDropdown
+                initialSetting={currentSetting}
+                disabled={isExporting}
+                emitSettings={setting => {
+                  setSetting(setting);
+                  if (setting.name !== 'Custom') {
+                    setFps(setting.fps.toString());
+                    setResolution(setting.resolution.toString());
+                    setPreset(setting.preset);
+                  }
+                }}
+              />
+            </div>
+            {currentSetting.name === 'Custom' && (
+              <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    width: '100%',
+                    paddingLeft: '14px',
+                    alignItems: 'center',
+                  }}
+                >
+                  <p>{$t('Resolution')}</p>
+                  <RadioInput
+                    label={$t('Resolution')}
+                    value={exportInfo.resolution.toString()}
+                    options={[
+                      { value: '720', label: '720p' },
+                      { value: '1080', label: '1080p' },
+                    ]}
+                    onChange={setResolution}
+                    buttons={true}
+                  />
+                </div>
+
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    width: '100%',
+                    paddingLeft: '14px',
+                    alignItems: 'center',
+                  }}
+                >
+                  <p>{$t('Frame rate')}</p>
+                  <RadioInput
+                    label={$t('Frame Rate')}
+                    value={exportInfo.fps.toString()}
+                    options={[
+                      { value: '30', label: '30 FPS' },
+                      { value: '60', label: '60 FPS' },
+                    ]}
+                    onChange={setFps}
+                    buttons={true}
+                  />
+                </div>
+
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    width: '100%',
+                    paddingLeft: '14px',
+                    alignItems: 'center',
+                  }}
+                >
+                  <p>{$t('File size')}</p>
+                  <RadioInput
+                    label={$t('File Size')}
+                    value={exportInfo.preset}
+                    options={[
+                      { value: 'ultrafast', label: $t('Faster Export') },
+                      { value: 'fast', label: $t('Balanced') },
+                      { value: 'slow', label: $t('Smaller File') },
+                    ]}
+                    onChange={setPreset}
+                    buttons={true}
+                  />
+                </div>
+              </div>
+            )}
+
+            {exportInfo.error && (
+              <Alert
+                style={{ marginBottom: 24 }}
+                message={exportInfo.error}
+                type="error"
+                closable
+                showIcon
+                afterClose={dismissError}
+              />
+            )}
+            <div style={{ textAlign: 'right' }}>
+              {isExporting ? (
+                <button
+                  className="button button--soft-warning"
+                  onClick={cancelExport}
+                  style={{ width: '100%' }}
+                  disabled={exportInfo.cancelRequested}
+                >
+                  {$t('Cancel')}
+                </button>
+              ) : (
+                <Button
+                  type="primary"
+                  style={{ width: '100%' }}
+                  onClick={() => startExport(currentFormat)}
+                >
+                  {currentFormat === EOrientation.HORIZONTAL
+                    ? $t('Export Horizontal')
+                    : $t('Export Vertical')}
+                </Button>
+              )}
+            </div>
+          </div>{' '}
+        </div>
+      </div>
+    </Form>
   );
 }
 
@@ -345,5 +592,144 @@ function PlatformSelect({
       )}
       {platform !== 'youtube' && <StorageUpload onClose={onClose} platform={platform} />}
     </Form>
+  );
+}
+
+function CDropdown({
+  initialSetting,
+  disabled,
+  emitSettings,
+}: {
+  initialSetting: TSetting;
+  disabled: boolean;
+  emitSettings: (settings: TSetting) => void;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [currentSetting, setSetting] = useState<TSetting>(initialSetting);
+
+  return (
+    <div style={{ width: '100%' }} className={`${disabled ? styles.isDisabled : ''}`}>
+      <Dropdown
+        overlay={
+          <div className={styles.innerItemWrapper}>
+            {settings.map(setting => {
+              return (
+                <div
+                  className={`${styles.innerDropdownItem} ${
+                    setting.name === currentSetting.name ? styles.active : ''
+                  }`}
+                  onClick={() => {
+                    setSetting(setting);
+                    emitSettings(setting);
+                    setIsOpen(false);
+                  }}
+                  key={setting.name}
+                >
+                  <div className={styles.dropdownText}>
+                    {setting.name}{' '}
+                    {setting.name !== 'Custom' && (
+                      <>
+                        <p>{setting.fps}fps</p> <p>{setting.resolution}p</p>
+                      </>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        }
+        trigger={['click']}
+        visible={isOpen}
+        onVisibleChange={setIsOpen}
+        placement="bottomLeft"
+      >
+        <div className={styles.innerDropdownWrapper} onClick={() => setIsOpen(!isOpen)}>
+          <div className={styles.dropdownText}>
+            {currentSetting.name}{' '}
+            {currentSetting.name !== 'Custom' && (
+              <>
+                <p>{currentSetting.fps}fps</p> <p>{currentSetting.resolution}p</p>
+              </>
+            )}
+          </div>
+          <i className="icon-down"></i>
+        </div>
+      </Dropdown>
+    </div>
+  );
+}
+
+function Toggle({
+  initialState,
+  disabled,
+  emitState,
+}: {
+  initialState: TOrientation;
+  disabled: boolean;
+  emitState: (state: TOrientation) => void;
+}) {
+  const [currentFormat, setCurrentFormat] = useState(initialState);
+
+  function setFormat(format: TOrientation) {
+    setCurrentFormat(format);
+    emitState(format);
+  }
+  return (
+    <div
+      className={`${disabled ? styles.isDisabled : ''}`}
+      style={{
+        display: 'flex',
+        padding: '4px',
+        gap: '4px',
+        borderRadius: '8px',
+        backgroundColor: '#232D35',
+        cursor: 'pointer',
+        boxShadow: '0px 0px 1px 0px rgba(0, 0, 0, 0.13), 0px 1px 4px 0px rgba(0, 0, 0, 0.13)',
+      }}
+    >
+      {' '}
+      <div
+        style={{
+          backgroundColor: currentFormat === EOrientation.VERTICAL ? '#2C353D' : 'transparent',
+          opacity: currentFormat === EOrientation.VERTICAL ? '1' : '0.6',
+          width: '32px',
+          height: '32px',
+          borderRadius: '4px',
+          display: 'grid',
+          placeContent: 'center',
+        }}
+        onClick={() => setFormat(EOrientation.VERTICAL)}
+      >
+        <div
+          style={{
+            width: '14px',
+            height: '22px',
+            border: '2px solid #F9F9F9',
+            borderRadius: '3px',
+          }}
+        ></div>
+      </div>{' '}
+      <div
+        style={{
+          backgroundColor: currentFormat === EOrientation.HORIZONTAL ? '#2C353D' : 'transparent',
+          opacity: currentFormat === EOrientation.HORIZONTAL ? '1' : '0.6',
+          width: '32px',
+          height: '32px',
+          borderRadius: '4px',
+          display: 'grid',
+          placeContent: 'center',
+        }}
+        onClick={() => setFormat(EOrientation.HORIZONTAL)}
+      >
+        <div
+          style={{
+            width: '22px',
+            height: '14px',
+            border: '2px solid #F9F9F9',
+            borderRadius: '3px',
+          }}
+        ></div>
+      </div>
+    </div>
   );
 }
