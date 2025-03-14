@@ -271,7 +271,6 @@ export default class Main extends Vue {
 
   windowSizeHandler() {
     clearTimeout(this.windowResizeTimeout);
-    console.log('firing', this.windowsService.state.main.hideStyleBlockers);
     if (!this.windowsService.state.main.hideStyleBlockers) {
       this.onResizeStartHandler();
     }
@@ -282,7 +281,6 @@ export default class Main extends Vue {
       this.hasLiveDock = this.windowWidth >= this.minEditorWidth + 100;
     }
     this.windowResizeTimeout = window.setTimeout(() => {
-      console.log('firing timeout');
       this.updateLiveDockContraints();
       this.updateWidth();
       this.windowsService.actions.updateStyleBlockers('main', false);
