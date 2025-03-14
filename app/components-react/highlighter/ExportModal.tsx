@@ -138,7 +138,7 @@ function ExportModal({ close, streamId }: { close: () => void; streamId: string 
   // if (exportInfo.exporting) return <ExportProgress />;
   if (!exportInfo.exported || exportInfo.exporting) {
     return (
-      <ExportOptions
+      <ExportFlow
         isExporting={exportInfo.exporting}
         close={close}
         streamId={streamId}
@@ -150,48 +150,7 @@ function ExportModal({ close, streamId }: { close: () => void; streamId: string 
   return <PlatformSelect onClose={close} videoName={videoName} streamId={streamId} />;
 }
 
-function ExportProgress() {
-  const { exportInfo, cancelExport } = useController(ExportModalCtx);
-
-  return (
-    <div>
-      <h2>{$t('Export Progress')}</h2>
-      <Progress
-        style={{ width: '100%' }}
-        percent={Math.round((exportInfo.currentFrame / exportInfo.totalFrames) * 100)}
-        // trailColor="var(--section)"
-        // status={exportInfo.cancelRequested ? 'exception' : 'normal'}
-        showInfo={false}
-      />
-      {!exportInfo.cancelRequested && exportInfo.step === EExportStep.FrameRender && (
-        <div>
-          {$t('Rendering Frames: %{currentFrame}/%{totalFrames}', {
-            currentFrame: exportInfo.currentFrame,
-            totalFrames: exportInfo.totalFrames,
-          })}
-        </div>
-      )}
-      {!exportInfo.cancelRequested && exportInfo.step === EExportStep.AudioMix && (
-        <div>
-          {$t('Mixing Audio:')}
-          <i className="fa fa-pulse fa-spinner" style={{ marginLeft: '12px' }} />
-        </div>
-      )}
-      {exportInfo.cancelRequested && <span>{$t('Canceling...')}</span>}
-      <br />
-      <button
-        className="button button--soft-warning"
-        onClick={cancelExport}
-        style={{ marginTop: '16px' }}
-        disabled={exportInfo.cancelRequested}
-      >
-        {$t('Cancel')}
-      </button>
-    </div>
-  );
-}
-
-function ExportOptions({
+function ExportFlow({
   close,
   isExporting,
   streamId,
@@ -287,68 +246,41 @@ function ExportOptions({
     <Form>
       <div className={styles.modalWrapper}>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          {/* header */} <h2 style={{ fontWeight: 600 }}>{$t('Export')}</h2>{' '}
+          <h2 style={{ fontWeight: 600, margin: 0 }}>{$t('Export')}</h2>{' '}
           <div>
-            <Button type="text">
+            <Button type="text" onClick={close}>
               <i className="icon-close" style={{ margin: 0 }}></i>
             </Button>
           </div>
         </div>
         <div style={{ display: 'flex', gap: '16px' }}>
           <div className={styles.settingsAndProgress}>
-            <div
-              className={`${isExporting ? styles.isDisabled : ''}`}
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                marginBottom: '4px',
-                marginTop: '12px',
-                width: '100%',
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  width: '100%',
-                  overflow: 'hidden',
-                }}
-              >
-                {' '}
-                <h2 style={{ margin: '0px' }}>
-                  <input
-                    id="videoName"
-                    type="text"
-                    value={videoName}
-                    onChange={e => {
-                      const name = e.target.value;
-                      onVideoNameChange(name);
-                      setExportFile(getExportFileFromVideoName(name));
-                    }}
-                    style={{
-                      width: '100%',
-                      border: 'none',
-                      outline: 'none',
-                      backgroundColor: 'transparent',
-                      padding: 0,
-                      color: 'inherit',
-                    }}
-                  />
-                </h2>
-                <FileInput
-                  label={$t('Export Location')}
-                  name="exportLocation"
-                  save={true}
-                  filters={[{ name: $t('MP4 Video File'), extensions: ['mp4'] }]}
-                  value={exportFile}
-                  onChange={file => {
-                    setExportFile(file);
-                    onVideoNameChange(getVideoNameFromExportFile(file));
+            <div className={`${styles.pathWrapper} ${isExporting ? styles.isDisabled : ''}`}>
+              <h2 style={{ margin: '0px' }}>
+                <input
+                  id="videoName"
+                  type="text"
+                  className={styles.customInput}
+                  value={videoName}
+                  onChange={e => {
+                    const name = e.target.value;
+                    onVideoNameChange(name);
+                    setExportFile(getExportFileFromVideoName(name));
                   }}
-                  buttonContent={<i className="fa fa-folder-open" />}
                 />
-              </div>
+              </h2>
+              <FileInput
+                label={$t('Export Location')}
+                name="exportLocation"
+                save={true}
+                filters={[{ name: $t('MP4 Video File'), extensions: ['mp4'] }]}
+                value={exportFile}
+                onChange={file => {
+                  setExportFile(file);
+                  onVideoNameChange(getVideoNameFromExportFile(file));
+                }}
+                buttonContent={<i className="icon-edit" />}
+              />
             </div>
 
             <div
@@ -383,19 +315,13 @@ function ExportOptions({
                 style={
                   currentFormat === EOrientation.HORIZONTAL
                     ? { objectPosition: 'left' }
-                    : { objectPosition: `-${(SCRUB_WIDTH * 1.32) / 4}px` }
+                    : { objectPosition: `-${(SCRUB_WIDTH * 1.32) / 3 + 4}px` }
                 }
                 alt=""
               />
             </div>
 
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
+            <div className={styles.clipInfoWrapper}>
               <div
                 className={`${isExporting ? styles.isDisabled : ''}`}
                 style={{
@@ -405,14 +331,14 @@ function ExportOptions({
               >
                 <p
                   style={{
-                    marginBottom: 0,
+                    margin: 0,
                     marginLeft: '8px',
                   }}
                 >
                   {formatSecondsToHMS(getDuration(streamId))} | {getClips(streamId).length} clips
                 </p>
               </div>
-              <Toggle
+              <OrientationToggle
                 initialState={currentFormat}
                 disabled={isExporting}
                 emitState={format => setCurrentFormat(format)}
@@ -425,7 +351,7 @@ function ExportOptions({
                 justifyContent: 'space-between',
               }}
             >
-              <CDropdown
+              <CustomDropdownWrapper
                 initialSetting={currentSetting}
                 disabled={isExporting}
                 emitSettings={setting => {
@@ -439,16 +365,8 @@ function ExportOptions({
               />
             </div>
             {currentSetting.name === 'Custom' && (
-              <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    width: '100%',
-                    paddingLeft: '14px',
-                    alignItems: 'center',
-                  }}
-                >
+              <div className={`${styles.customSection} ${isExporting ? styles.isDisabled : ''}`}>
+                <div className={styles.customItemWrapper}>
                   <p>{$t('Resolution')}</p>
                   <RadioInput
                     label={$t('Resolution')}
@@ -462,15 +380,7 @@ function ExportOptions({
                   />
                 </div>
 
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    width: '100%',
-                    paddingLeft: '14px',
-                    alignItems: 'center',
-                  }}
-                >
+                <div className={styles.customItemWrapper}>
                   <p>{$t('Frame rate')}</p>
                   <RadioInput
                     label={$t('Frame Rate')}
@@ -484,15 +394,7 @@ function ExportOptions({
                   />
                 </div>
 
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    width: '100%',
-                    paddingLeft: '14px',
-                    alignItems: 'center',
-                  }}
-                >
+                <div className={styles.customItemWrapper}>
                   <p>{$t('File size')}</p>
                   <RadioInput
                     label={$t('File Size')}
@@ -595,7 +497,7 @@ function PlatformSelect({
   );
 }
 
-function CDropdown({
+function CustomDropdownWrapper({
   initialSetting,
   disabled,
   emitSettings,
@@ -659,7 +561,7 @@ function CDropdown({
   );
 }
 
-function Toggle({
+function OrientationToggle({
   initialState,
   disabled,
   emitState,
@@ -675,60 +577,22 @@ function Toggle({
     emitState(format);
   }
   return (
-    <div
-      className={`${disabled ? styles.isDisabled : ''}`}
-      style={{
-        display: 'flex',
-        padding: '4px',
-        gap: '4px',
-        borderRadius: '8px',
-        backgroundColor: '#232D35',
-        cursor: 'pointer',
-        boxShadow: '0px 0px 1px 0px rgba(0, 0, 0, 0.13), 0px 1px 4px 0px rgba(0, 0, 0, 0.13)',
-      }}
-    >
-      {' '}
+    <div className={`${styles.orientationToggle} ${disabled ? styles.isDisabled : ''}`}>
       <div
-        style={{
-          backgroundColor: currentFormat === EOrientation.VERTICAL ? '#2C353D' : 'transparent',
-          opacity: currentFormat === EOrientation.VERTICAL ? '1' : '0.6',
-          width: '32px',
-          height: '32px',
-          borderRadius: '4px',
-          display: 'grid',
-          placeContent: 'center',
-        }}
+        className={`${styles.orientationButton} ${
+          currentFormat === EOrientation.VERTICAL ? styles.active : ''
+        }`}
         onClick={() => setFormat(EOrientation.VERTICAL)}
       >
-        <div
-          style={{
-            width: '14px',
-            height: '22px',
-            border: '2px solid #F9F9F9',
-            borderRadius: '3px',
-          }}
-        ></div>
-      </div>{' '}
+        <div className={styles.verticalIcon}></div>
+      </div>
       <div
-        style={{
-          backgroundColor: currentFormat === EOrientation.HORIZONTAL ? '#2C353D' : 'transparent',
-          opacity: currentFormat === EOrientation.HORIZONTAL ? '1' : '0.6',
-          width: '32px',
-          height: '32px',
-          borderRadius: '4px',
-          display: 'grid',
-          placeContent: 'center',
-        }}
+        className={`${styles.orientationButton} ${
+          currentFormat === EOrientation.HORIZONTAL ? styles.active : ''
+        }`}
         onClick={() => setFormat(EOrientation.HORIZONTAL)}
       >
-        <div
-          style={{
-            width: '22px',
-            height: '14px',
-            border: '2px solid #F9F9F9',
-            borderRadius: '3px',
-          }}
-        ></div>
+        <div className={styles.horizontalIcon}></div>
       </div>
     </div>
   );
