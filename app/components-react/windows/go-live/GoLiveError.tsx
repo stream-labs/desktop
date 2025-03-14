@@ -4,12 +4,20 @@ import { Services } from '../../service-provider';
 import { IStreamError } from '../../../services/streaming/stream-error';
 import MessageLayout from './MessageLayout';
 import { assertIsDefined } from '../../../util/properties-type-guards';
-import { getPlatformService, TPlatform } from '../../../services/platforms';
+import {
+  EPlatform,
+  getPlatformService,
+  platformLabels,
+  platformList,
+  TPlatform,
+} from '../../../services/platforms';
 import { $t } from '../../../services/i18n';
 import Translate from '../../shared/Translate';
 import css from './GoLiveError.m.less';
 import * as remote from '@electron/remote';
 import { ENotificationType } from 'services/notifications';
+import { useGoLiveSettings } from './useGoLiveSettings';
+import cloneDeep from 'lodash/cloneDeep';
 
 /**
  * Shows an error and troubleshooting suggestions
@@ -22,10 +30,18 @@ export default function GoLiveError() {
     NavigationService,
     WindowsService,
     MagicLinkService,
+    NotificationsService,
   } = Services;
 
   // take an error from the global state
-  const { error } = useVuex(() => ({ error: StreamingService.state.info.error }), false);
+  const { error, lastNotification } = useVuex(
+    () => ({
+      error: StreamingService.state.info.error,
+      lastNotification: NotificationsService.views.lastNotification,
+    }),
+    false,
+  );
+  const { goLive, updatePlatform } = useGoLiveSettings();
 
   function render() {
     if (!error) return null;
@@ -199,15 +215,43 @@ export default function GoLiveError() {
   }
 
   function renderRestreamError(error: IStreamError) {
-    Services.NotificationsService.actions.push({
-      message: `${$t('Multistream Error')}: ${error.details}`,
-      type: ENotificationType.WARNING,
-      lifeTime: 5000,
-    });
+    // a little janky, but this is to prevent duplicate notifications for the same error on rerender
+    if (!lastNotification || !lastNotification.message.startsWith($t('Multistream Error'))) {
+      NotificationsService.actions.push({
+        message: `${$t('Multistream Error')}: ${error.details}`,
+        type: ENotificationType.WARNING,
+        lifeTime: 5000,
+      });
+    }
 
-    function skipSettingsUpdateAndGoLive() {
-      StreamingService.actions.finishStartStreaming();
-      WindowsService.actions.closeChildWindow();
+    async function skipSettingsUpdateAndGoLive() {
+      // clear error
+      StreamingService.actions.resetError();
+
+      // disable failed platforms
+      Object.entries(cloneDeep(StreamingService.views.checklist)).forEach(
+        ([key, value]: [string, string]) => {
+          if (value === 'failed' && platformList.includes(key as EPlatform)) {
+            updatePlatform(key as TPlatform, { enabled: false });
+
+            // notify the user that the platform has been toggled off
+            NotificationsService.actions.push({
+              message: $t(
+                '%{platform} Setup Error: Toggling off %{platform} to bypass and go live.',
+                {
+                  platform: platformLabels(key as TPlatform),
+                },
+              ),
+              type: ENotificationType.WARNING,
+              lifeTime: 5000,
+            });
+          }
+        },
+      );
+
+      StreamingService.actions.resetInfo();
+
+      await goLive();
     }
 
     const details =
@@ -236,7 +280,7 @@ export default function GoLiveError() {
         <button
           className="button button--warn"
           style={{ marginTop: '8px' }}
-          onClick={() => skipSettingsUpdateAndGoLive()}
+          onClick={skipSettingsUpdateAndGoLive}
         >
           {$t('Bypass and Go Live')}
         </button>
