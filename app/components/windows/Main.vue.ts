@@ -270,21 +270,22 @@ export default class Main extends Vue {
   }
 
   windowSizeHandler() {
+    clearTimeout(this.windowResizeTimeout);
+    console.log('firing', this.windowsService.state.main.hideStyleBlockers);
     if (!this.windowsService.state.main.hideStyleBlockers) {
       this.onResizeStartHandler();
     }
     this.windowWidth = window.innerWidth;
-
-    clearTimeout(this.windowResizeTimeout);
 
     this.hasLiveDock = this.windowWidth >= 1070;
     if (this.page === 'Studio') {
       this.hasLiveDock = this.windowWidth >= this.minEditorWidth + 100;
     }
     this.windowResizeTimeout = window.setTimeout(() => {
-      this.windowsService.actions.updateStyleBlockers('main', false);
+      console.log('firing timeout');
       this.updateLiveDockContraints();
       this.updateWidth();
+      this.windowsService.actions.updateStyleBlockers('main', false);
     }, 200);
   }
 
@@ -298,11 +299,6 @@ export default class Main extends Vue {
 
   onResizeStartHandler() {
     this.windowsService.actions.updateStyleBlockers('main', true);
-  }
-
-  onResizeStopHandler(offset: number) {
-    this.setWidth(this.customizationService.state.livedockSize + offset);
-    this.windowsService.actions.updateStyleBlockers('main', false);
   }
 
   setWidth(width: number) {
