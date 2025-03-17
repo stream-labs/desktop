@@ -5,7 +5,7 @@ import { FFMPEG_EXE, FFPROBE_EXE } from './constants';
 import { IHighlight } from './models/ai-highlighter.models';
 import path from 'path';
 
-async function getVideoDuration(filePath: string): Promise<number> {
+export async function getVideoDuration(filePath: string): Promise<number> {
   const { stdout } = await execa(FFPROBE_EXE, [
     '-v',
     'error',
