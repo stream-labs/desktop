@@ -676,7 +676,7 @@ export class StreamingService
     message: string,
   ): StreamError | TStreamErrorType {
     // restream errors returns an object with key value pairs for error details
-    const messages: string[] = [];
+    const messages: string[] = [message];
     const details: string[] = [];
 
     const defaultMessage =
@@ -692,13 +692,19 @@ export class StreamingService
         const name = capitalize(key.replace(/([A-Z])/g, ' $1'));
         // only show the error message for the stream key and server url to the user for security purposes
         if (['streamKey', 'serverUrl'].includes(key)) {
-          messages.push(`${name}: ${value}`);
+          messages.push($t('Missing server url or stream key'));
         } else {
-          details.push(`${name}: ${value}`);
+          messages.push(`${name}: ${value}`);
         }
       });
 
-      return createStreamError(type, { status: 400, statusText: message }, details.join('\n'));
+      const status = this.state.info.error?.status ?? 400;
+
+      return createStreamError(
+        type,
+        { status, statusText: messages.join('. ') },
+        details.join('\n'),
+      );
     }
 
     return e instanceof StreamError ? { ...e, type } : type;

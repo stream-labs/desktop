@@ -2,6 +2,6 @@
   "Edit your stream title on Kick after going live.": "Edit your stream title on Kick after going live.",
   "Kick Category": "Kick Category",
   "Failed to update Kick account. Please unlink and reconnect your Kick account.": "Failed to update Kick account. Please unlink and reconnect your Kick account.",
-  "unlink and re-merge Kick account, then restart Desktop": "unlink and re-merge Kick account, then restart Desktop",
-  "Request to Kick failed. Please check permissions with Kick and try again.": "Request to Kick failed. Please check permissions with Kick and try again."
+  "Failed to start Kick stream. Please check permissions with Kick and try again": "Failed to start Kick stream. Please check permissions with Kick and try again",
+  "Kick request most likely failed due to incorrect or missing permissions. Unlink and re-merge Kick account, then restart Desktop. If that fails, refer to Kick support": "Kick request most likely failed due to incorrect or missing permissions. Unlink and re-merge Kick account, then restart Desktop. If that fails, refer to Kick support"
 }

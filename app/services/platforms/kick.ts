@@ -223,11 +223,18 @@ export class KickService
 
     return jfetch<IKickStartStreamResponse>(request)
       .then(resp => {
-        if (!resp.broadcast_id || !resp.rtmp || !resp.key) {
+        console.log('Kick stream started: ', resp);
+        if (!resp.rtmp || !resp.key) {
+          let message = 'Kick start stream response missing: ';
+          if (!resp.rtmp) message += 'server url, ';
+          if (!resp.key) message += 'stream key, ';
+
           throwStreamError(
             'KICK_REQUEST_FAILED',
             {
-              status: 403,
+              status: 418,
+              statusText: message,
+              platform: 'kick',
             },
             'Kick stream failed to start. One of the following is missing: broadcast id, rtmp url, or stream key.',
           );
@@ -248,6 +255,12 @@ export class KickService
         };
 
         if (!e) throwStreamError('PLATFORM_REQUEST_FAILED', defaultError);
+
+        // check if the error is a stream error
+        if (typeof e === 'object' && e.hasOwnProperty('type')) {
+          const error = e as StreamError;
+          throwStreamError(error.type, error, error.message);
+        }
 
         // check if the error is an IKickError
         if (typeof e === 'object' && e.hasOwnProperty('result')) {
@@ -274,12 +287,6 @@ export class KickService
             },
             defaultError.statusText,
           );
-        }
-
-        // check if the error is a stream error
-        if (typeof e === 'object' && e.hasOwnProperty('type')) {
-          const error = e as StreamError;
-          throwStreamError(error.type, error, error.message);
         }
 
         throwStreamError('PLATFORM_REQUEST_FAILED', e);
