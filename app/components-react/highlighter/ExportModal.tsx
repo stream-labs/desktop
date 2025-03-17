@@ -70,9 +70,6 @@ class ExportController {
   }
 
   setFps(value: string) {
-    console.log('setFPS');
-    console.log(value);
-
     this.service.actions.setFps(parseInt(value, 10) as TFPS);
   }
 
@@ -182,8 +179,8 @@ function ExportFlow({
 
   const [currentFormat, setCurrentFormat] = useState<TOrientation>(EOrientation.HORIZONTAL);
 
-  const [clipsLength, setClipsLength] = useState<number>(getClips(streamId).length);
-  const [clipsDuration, setClipsDuration] = useState(formatSecondsToHMS(getDuration(streamId)));
+  const clipsAmount = getClips(streamId).length;
+  const clipsDuration = formatSecondsToHMS(getDuration(streamId));
 
   function settingMatcher(initialSetting: TSetting) {
     const matchingSetting = settings.find(
@@ -202,6 +199,7 @@ function ExportFlow({
       preset: initialSetting.preset,
     };
   }
+
   const [currentSetting, setSetting] = useState<TSetting>(
     settingMatcher({
       name: 'from default',
@@ -303,7 +301,7 @@ function ExportFlow({
                     {exportInfo.cancelRequested ? (
                       <span>{$t('Canceling...')}</span>
                     ) : (
-                      'Exporting video...'
+                      <span>{$t('Exporting video...')}</span>
                     )}
                   </p>
                   <Progress
@@ -340,7 +338,7 @@ function ExportFlow({
                     marginLeft: '8px',
                   }}
                 >
-                  {clipsDuration} | {clipsLength} clips
+                  {clipsDuration} | {$t('%{clipsAmount} clips', { clipsAmount })}
                 </p>
               </div>
               <OrientationToggle
@@ -386,7 +384,7 @@ function ExportFlow({
                 </div>
 
                 <div className={styles.customItemWrapper}>
-                  <p>{$t('Frame rate')}</p>
+                  <p>{$t('Frame Rate')}</p>
                   <RadioInput
                     label={$t('Frame Rate')}
                     value={exportInfo.fps.toString()}
@@ -400,7 +398,7 @@ function ExportFlow({
                 </div>
 
                 <div className={styles.customItemWrapper}>
-                  <p>{$t('File size')}</p>
+                  <p>{$t('File Size')}</p>
                   <RadioInput
                     label={$t('File Size')}
                     value={exportInfo.preset}
