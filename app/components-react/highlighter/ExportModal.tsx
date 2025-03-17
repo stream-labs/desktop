@@ -49,7 +49,7 @@ class ExportController {
   }
 
   getClips(streamId?: string) {
-    return this.service.getClips(this.service.views.clips, streamId);
+    return this.service.getClips(this.service.views.clips, streamId).filter(clip => clip.enabled);
   }
   getClipThumbnail(streamId?: string) {
     return this.getClips(streamId).find(clip => clip.enabled)?.scrubSprite;
@@ -182,6 +182,9 @@ function ExportFlow({
 
   const [currentFormat, setCurrentFormat] = useState<TOrientation>(EOrientation.HORIZONTAL);
 
+  const [clipsLength, setClipsLength] = useState<number>(getClips(streamId).length);
+  const [clipsDuration, setClipsDuration] = useState(formatSecondsToHMS(getDuration(streamId)));
+
   function settingMatcher(initialSetting: TSetting) {
     const matchingSetting = settings.find(
       setting =>
@@ -293,7 +296,9 @@ function ExportFlow({
             >
               {isExporting && (
                 <div className={styles.progressItem}>
-                  <h1>{Math.round((exportInfo.currentFrame / exportInfo.totalFrames) * 100)}%</h1>
+                  <h1>
+                    {Math.round((exportInfo.currentFrame / exportInfo.totalFrames) * 100) || 0}%
+                  </h1>
                   <p>
                     {exportInfo.cancelRequested ? (
                       <span>{$t('Canceling...')}</span>
@@ -335,7 +340,7 @@ function ExportFlow({
                     marginLeft: '8px',
                   }}
                 >
-                  {formatSecondsToHMS(getDuration(streamId))} | {getClips(streamId).length} clips
+                  {clipsDuration} | {clipsLength} clips
                 </p>
               </div>
               <OrientationToggle
