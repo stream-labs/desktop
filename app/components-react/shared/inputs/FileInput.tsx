@@ -58,7 +58,6 @@ export const FileInput = InputComponent((p: TFileInputProps) => {
       <Input
         {...inputAttrs}
         onChange={val => inputAttrs?.onChange(val.target.value)}
-        onClick={showFileDialog}
         value={p.value}
         disabled
         addonAfter={
