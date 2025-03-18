@@ -82,6 +82,7 @@ export default function GLVolmeters() {
 }
 
 class GLVolmetersController {
+  private hardwareService = Services.HardwareService;
   private customizationService = Services.CustomizationService;
   private audioService = Services.AudioService;
   private sourcesService = Services.SourcesService;
@@ -144,6 +145,11 @@ class GLVolmetersController {
    */
 
   private subscribeVolmeters() {
+    // if audio sources are not loaded yet, force them to load
+    if (!this.audioSources.length) {
+      this.hardwareService.actions.refreshDevices(true);
+    }
+
     const audioSources = this.audioSources;
     const sourcesOrder = audioSources.map(source => source.sourceId);
 
