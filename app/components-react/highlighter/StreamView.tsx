@@ -9,7 +9,7 @@ import {
 } from 'services/highlighter/models/highlighter.models';
 import isEqual from 'lodash/isEqual';
 import { Modal, Button, Alert } from 'antd';
-import ExportModal from 'components-react/highlighter/ExportModal';
+import ExportModal from 'components-react/highlighter/Export/ExportModal';
 import { SUPPORTED_FILE_TYPES } from 'services/highlighter/constants';
 import Scrollable from 'components-react/shared/Scrollable';
 import { $t } from 'services/i18n';

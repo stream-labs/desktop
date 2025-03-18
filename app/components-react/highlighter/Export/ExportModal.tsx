@@ -16,13 +16,13 @@ import { confirmAsync } from 'components-react/modals';
 import { $t } from 'services/i18n';
 import StorageUpload from './StorageUpload';
 import { useVuex } from 'components-react/hooks';
-import { initStore, useController } from '../hooks/zustand';
+import { initStore, useController } from '../../hooks/zustand';
 import { EOrientation, TOrientation } from 'services/highlighter/models/ai-highlighter.models';
 import { fileExists } from 'services/highlighter/file-utils';
 import { SCRUB_HEIGHT, SCRUB_WIDTH, SCRUB_FRAMES } from 'services/highlighter/constants';
 import styles from './ExportModal.m.less';
-import { getCombinedClipsDuration } from './utils';
-import { formatSecondsToHMS } from './ClipPreview';
+import { getCombinedClipsDuration } from '../utils';
+import { formatSecondsToHMS } from '../ClipPreview';
 import { set } from 'lodash';
 
 type TSetting = { name: string; fps: TFPS; resolution: TResolution; preset: TPreset };

@@ -6,7 +6,7 @@ import { TClip } from 'services/highlighter/models/highlighter.models';
 import styles from './ClipsView.m.less';
 import ClipTrimmer from 'components-react/highlighter/ClipTrimmer';
 import { Modal, Alert, Button } from 'antd';
-import ExportModal from 'components-react/highlighter/ExportModal';
+import ExportModal from 'components-react/highlighter/Export/ExportModal';
 import { $t } from 'services/i18n';
 import PreviewModal from './PreviewModal';
 
