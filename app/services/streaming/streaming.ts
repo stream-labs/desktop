@@ -491,6 +491,9 @@ export class StreamingService
       }
     }
 
+    // Handle rendering a prompt for enabling permissions to generate a stream key for Kick
+    if (this.state.info.error?.type === 'KICK_STREAM_KEY_MISSING') return;
+
     // apply optimized settings
     const optimizer = this.videoEncodingOptimizationService;
     if (optimizer.state.useOptimizedProfile && settings.optimizedProfile) {
