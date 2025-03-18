@@ -76,6 +76,8 @@ export default function GoLiveError() {
         return renderFacebookNotEligibleForStreamingError();
       case 'KICK_SCOPE_OUTDATED':
         return renderRemergeError(error);
+      case 'KICK_START_STREAM_FAILED':
+        return handlePlatformRequestError(error, $t('Failed to start stream on Kick.'));
       case 'KICK_STREAM_KEY_MISSING':
         return renderKickStreamKeyMissingError(error);
       case 'MACHINE_LOCKED':
@@ -378,6 +380,9 @@ export default function GoLiveError() {
   }
 
   function renderKickStreamKeyMissingError(error: IStreamError) {
+    function openKickSettings() {
+      remote.shell.openExternal('https://kick.com/settings/stream');
+    }
     return (
       <MessageLayout error={error} type="info" message={error.message}>
         <div>
@@ -387,13 +392,24 @@ export default function GoLiveError() {
           <br />
           <ol>
             <li>{$t('Login to Kick')}</li>
-            <li>{$t('Go to: %{link}', { link: 'https://kick.com/settings/stream' })}</li>
+            <li>
+              <Translate
+                message={$t('Go to: <link></link>')}
+                renderSlots={{
+                  link: () => (
+                    <a style={{ textDecoration: 'underline' }} onClick={openKickSettings}>
+                      {'https://kick.com/settings/stream'}
+                    </a>
+                  ),
+                }}
+              ></Translate>
+            </li>
             {/* prettier-ignore */}
-            <li>{$t('Click on \"eye\" icon to see your stream key')}</li>
+            <li>{$t('Click on the \"eye\" icon to see your stream key')}</li>
             <li>{$t('Put in 2FA')}</li>
           </ol>
           {$t(
-            'After 2FA; the streamkey has been generated and will be available for Streamlabs Desktop for that channel. You should now be able to go live on Kick.',
+            'After 2FA, the stream key has been generated and will be available for Streamlabs Desktop for that channel. You should now be able to go live on Kick.',
           )}
         </div>
       </MessageLayout>

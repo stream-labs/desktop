@@ -237,7 +237,7 @@ export class KickService
 
         if (!resp.rtmp) {
           throwStreamError(
-            'KICK_REQUEST_FAILED',
+            'KICK_START_STREAM_FAILED',
             {
               status: 418,
               statusText: 'Kick server url not generated',
@@ -286,7 +286,7 @@ export class KickService
           }
 
           throwStreamError(
-            'KICK_REQUEST_FAILED',
+            'KICK_START_STREAM_FAILED',
             {
               ...error,
               status: error.status,
