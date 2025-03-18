@@ -51,7 +51,7 @@ export default function ClipsView({
     ordered: { id: string }[];
     orderedFiltered: { id: string }[];
   }>({ ordered: [], orderedFiltered: [] });
-
+  const game = HighlighterService.getGameByStreamId(props.id);
   const [activeFilter, setActiveFilter] = useState('all'); // Currently not using the setActiveFilter option
 
   const [clipsLoaded, setClipsLoaded] = useState<boolean>(false);
@@ -286,6 +286,7 @@ export default function ClipsView({
                           }}
                           combinedClipsDuration={getCombinedClipsDuration(getClips())}
                           roundDetails={HighlighterService.getRoundDetails(getClips())}
+                          game={game}
                         />
                       )}
                   </div>
@@ -310,6 +311,9 @@ export default function ClipsView({
                               }}
                               emitShowRemove={() => {
                                 setModal({ modal: 'remove', inspectedPathId: id });
+                              }}
+                              emitOpenFileInLocation={() => {
+                                remote.shell.showItemInFolder(clip.path);
                               }}
                               streamId={streamId}
                             />

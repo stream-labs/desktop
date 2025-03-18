@@ -64,10 +64,11 @@ import {
   IHighlight,
   IHighlighterMilestone,
   IInput,
+  EGame,
 } from './models/ai-highlighter.models';
 import { HighlighterViews } from './highlighter-views';
 import { startRendering } from './rendering/start-rendering';
-import { cutHighlightClips } from './cut-highlight-clips';
+import { cutHighlightClips, getVideoDuration } from './cut-highlight-clips';
 import { reduce } from 'lodash';
 import { extractDateTimeFromPath, fileExists } from './file-utils';
 import { addVerticalFilterToExportOptions } from './vertical-export';
@@ -400,10 +401,22 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
         } else {
           this.streamingService.actions.toggleRecording();
         }
+
+        let game = EGame.UNSET;
+        switch (this.streamingService.views.game) {
+          case EGame.FORTNITE:
+            game = EGame.FORTNITE;
+            break;
+
+          default:
+            game = EGame.UNSET;
+            break;
+        }
+
         streamInfo = {
           id: 'fromStreamRecording' + uuid(),
           title: this.streamingService.views.settings.platforms.twitch?.title,
-          game: this.streamingService.views.game,
+          game,
         };
         aiRecordingInProgress = true;
         aiRecordingStartTime = moment();
@@ -441,6 +454,10 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
         if (!aiRecordingInProgress) {
           return;
         }
+
+        this.usageStatisticsService.recordAnalyticsEvent('AIHighlighter', {
+          type: 'AiRecordingFinished',
+        });
         this.streamingService.actions.toggleRecording();
 
         // Load potential replaybuffer clips
@@ -452,9 +469,23 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
       if (!aiRecordingInProgress) {
         return;
       }
+      // Check if recording is immediately available
+      getVideoDuration(path)
+        .then(duration => {
+          if (isNaN(duration)) {
+            duration = -1;
+          }
+          this.usageStatisticsService.recordAnalyticsEvent('AIHighlighter', {
+            type: 'AiRecordingExists',
+            duration,
+          });
+        })
+        .catch(error => {
+          console.error('Failed getting duration right after the recoding.', error);
+        });
 
       aiRecordingInProgress = false;
-      this.detectAndClipAiHighlights(path, streamInfo);
+      this.detectAndClipAiHighlights(path, streamInfo, true);
 
       this.navigationService.actions.navigate(
         'Highlighter',
@@ -678,6 +709,21 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
       });
     });
     return;
+  }
+
+  getGameByStreamId(streamId?: string): EGame {
+    if (!streamId) return EGame.UNSET;
+
+    const game = this.views.highlightedStreams.find(s => s.id === streamId)?.game;
+    if (!game) return EGame.UNSET;
+
+    const lowercaseGame = game.toLowerCase();
+    // Check if it is supported game (important for older states of highlighter)
+    if (Object.values(EGame).includes(lowercaseGame as EGame)) {
+      return game as EGame;
+    }
+
+    return EGame.UNSET;
   }
 
   enableClip(path: string, enabled: boolean) {
@@ -991,6 +1037,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
         transitionDuration: this.views.transitionDuration,
         transition: this.views.transition,
         useAiHighlighter: this.views.useAiHighlighter,
+        streamId,
       },
       handleFrame,
       setExportInfo,
@@ -1110,7 +1157,15 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     }
   }
 
-  async installAiHighlighter(downloadNow: boolean = false) {
+  async installAiHighlighter(
+    downloadNow: boolean = false,
+    location: 'Highlighter-tab' | 'Go-live-flow',
+  ) {
+    this.usageStatisticsService.recordAnalyticsEvent('AIHighlighter', {
+      type: 'Installation',
+      location,
+    });
+
     this.setAiHighlighter(true);
     if (downloadNow) {
       await this.aiHighlighterUpdater.isNewVersionAvailable();
@@ -1136,6 +1191,12 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
       this.SET_UPDATER_STATE(true);
       this.SET_HIGHLIGHTER_VERSION(this.aiHighlighterUpdater.version || '');
       await this.aiHighlighterUpdater.update(progress => this.updateProgress(progress));
+    } catch (e: unknown) {
+      console.error('Error updating AI Highlighter:', e);
+      this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
+        type: 'UpdateError',
+        newVersion: this.aiHighlighterUpdater.version,
+      });
     } finally {
       this.SET_UPDATER_STATE(false);
     }
@@ -1171,6 +1232,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
   async detectAndClipAiHighlights(
     filePath: string,
     streamInfo: IStreamInfoForAiHighlighter,
+    delayStart = false,
   ): Promise<void> {
     if (this.aiHighlighterFeatureEnabled === false) {
       console.log('HighlighterService: Not enabled');
@@ -1197,7 +1259,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
       date: moment().toISOString(),
       id: streamInfo.id || 'noId',
       title: sanitizedTitle,
-      game: streamInfo.game || 'no title',
+      game: streamInfo.game || EGame.UNSET,
       abortController: new AbortController(),
       path: filePath,
     };
@@ -1231,8 +1293,13 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
 
     console.log('🔄 HighlighterData');
     try {
+      if (delayStart) {
+        await this.wait(5000);
+      }
+
       const highlighterResponse = await getHighlightClips(
         filePath,
+        this.userService.getLocalUserId(),
         renderHighlights,
         setStreamInfo.abortController!.signal,
         (progress: number) => {
@@ -1248,14 +1315,26 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
         type: 'Detection',
         clips: highlighterResponse.length,
         game: 'Fortnite', // hardcode for now
+        streamId: this.streamMilestones?.streamId,
       });
       console.log('✅ Final HighlighterData', highlighterResponse);
     } catch (error: unknown) {
       if (error instanceof Error && error.message === 'Highlight generation canceled') {
         setStreamInfo.state.type = EAiDetectionState.CANCELED_BY_USER;
+        this.usageStatisticsService.recordAnalyticsEvent('AIHighlighter', {
+          type: 'DetectionCanceled',
+          reason: EAiDetectionState.CANCELED_BY_USER,
+          game: 'Fortnite',
+        });
       } else {
         console.error('Error in highlight generation:', error);
         setStreamInfo.state.type = EAiDetectionState.ERROR;
+        this.usageStatisticsService.recordAnalyticsEvent('AIHighlighter', {
+          type: 'DetectionFailed',
+          reason: EAiDetectionState.ERROR,
+          game: 'Fortnite',
+          error_code: (error as { code?: number })?.code ?? 1,
+        });
       }
     } finally {
       setStreamInfo.abortController = undefined;
@@ -1343,7 +1422,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     this.CLEAR_UPLOAD();
   }
 
-  async uploadYoutube(options: IYoutubeVideoUploadOptions) {
+  async uploadYoutube(options: IYoutubeVideoUploadOptions, streamId: string | undefined) {
     if (!this.userService.state.auth?.platforms.youtube) {
       throw new Error('Cannot upload without YT linked');
     }
@@ -1407,6 +1486,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
         this.views.useAiHighlighter ? 'AIHighlighter' : 'Highlighter',
         {
           type: 'UploadYouTubeSuccess',
+          streamId,
           privacy: options.privacyStatus,
           videoLink:
             options.privacyStatus === 'public'
@@ -1462,5 +1542,14 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     }
 
     return id;
+  }
+
+  /**
+   * Utility function that returns a promise that resolves after a specified delay
+   * @param ms Delay in milliseconds
+   * @returns Promise that resolves after the delay
+   */
+  wait(ms: number): Promise<void> {
+    return new Promise<void>(resolve => setTimeout(resolve, ms));
   }
 }
