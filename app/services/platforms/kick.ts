@@ -223,13 +223,27 @@ export class KickService
 
     return jfetch<IKickStartStreamResponse>(request)
       .then(resp => {
-        if (!resp.broadcast_id || !resp.rtmp || !resp.key) {
+        if (!resp.key) {
           throwStreamError(
-            'KICK_REQUEST_FAILED',
+            'KICK_STREAM_KEY_MISSING',
             {
-              status: 403,
+              status: 418,
+              statusText: 'Kick stream key not generated',
+              platform: 'kick',
             },
-            'Kick stream failed to start. One of the following is missing: broadcast id, rtmp url, or stream key.',
+            'Kick failed to start stream due to missing stream key',
+          );
+        }
+
+        if (!resp.rtmp) {
+          throwStreamError(
+            'KICK_START_STREAM_FAILED',
+            {
+              status: 418,
+              statusText: 'Kick server url not generated',
+              platform: 'kick',
+            },
+            'Kick stream failed to start due to missing server url',
           );
         }
 
@@ -249,6 +263,12 @@ export class KickService
 
         if (!e) throwStreamError('PLATFORM_REQUEST_FAILED', defaultError);
 
+        // check if the error is a stream error
+        if (typeof e === 'object' && e.hasOwnProperty('type')) {
+          const error = e as StreamError;
+          throwStreamError(error.type, error, error.message);
+        }
+
         // check if the error is an IKickError
         if (typeof e === 'object' && e.hasOwnProperty('result')) {
           const error = e as IKickError;
@@ -266,7 +286,7 @@ export class KickService
           }
 
           throwStreamError(
-            'PLATFORM_REQUEST_FAILED',
+            'KICK_START_STREAM_FAILED',
             {
               ...error,
               status: error.status,
@@ -274,12 +294,6 @@ export class KickService
             },
             defaultError.statusText,
           );
-        }
-
-        // check if the error is a stream error
-        if (typeof e === 'object' && e.hasOwnProperty('type')) {
-          const error = e as StreamError;
-          throwStreamError(error.type, error, error.message);
         }
 
         throwStreamError('PLATFORM_REQUEST_FAILED', e);
