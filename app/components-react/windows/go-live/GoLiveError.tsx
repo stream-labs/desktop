@@ -76,6 +76,8 @@ export default function GoLiveError() {
         return renderFacebookNotEligibleForStreamingError();
       case 'KICK_SCOPE_OUTDATED':
         return renderRemergeError(error);
+      case 'KICK_STREAM_KEY_MISSING':
+        return renderKickStreamKeyMissingError(error);
       case 'MACHINE_LOCKED':
         return renderMachineLockedError(error);
       default:
@@ -371,6 +373,29 @@ export default function GoLiveError() {
         {$t(
           "You're not eligible to Go Live, your profile needs to be at least 60 days old and your page needs to have at least 100 followers. Click the notification to learn more.",
         )}
+      </MessageLayout>
+    );
+  }
+
+  function renderKickStreamKeyMissingError(error: IStreamError) {
+    return (
+      <MessageLayout error={error} type="info" message={error.message}>
+        <div>
+          {$t(
+            'Permissions to generate stream key for Kick are missing. In order to go live on Kick, you must first generate a stream key on Kick to be available for Streamlabs Desktop. Please follow these steps:',
+          )}
+          <br />
+          <ol>
+            <li>{$t('Login to Kick')}</li>
+            <li>{$t('Go to: %{link}', { link: 'https://kick.com/settings/stream' })}</li>
+            {/* prettier-ignore */}
+            <li>{$t('Click on \"eye\" icon to see your stream key')}</li>
+            <li>{$t('Put in 2FA')}</li>
+          </ol>
+          {$t(
+            'After 2FA; the streamkey has been generated and will be available for Streamlabs Desktop for that channel. You should now be able to go live on Kick.',
+          )}
+        </div>
       </MessageLayout>
     );
   }

@@ -223,20 +223,27 @@ export class KickService
 
     return jfetch<IKickStartStreamResponse>(request)
       .then(resp => {
-        console.log('Kick stream started: ', resp);
-        if (!resp.rtmp || !resp.key) {
-          let message = 'Kick start stream response missing: ';
-          if (!resp.rtmp) message += 'server url, ';
-          if (!resp.key) message += 'stream key, ';
+        if (!resp.key) {
+          throwStreamError(
+            'KICK_STREAM_KEY_MISSING',
+            {
+              status: 418,
+              statusText: 'Kick stream key not generated',
+              platform: 'kick',
+            },
+            'Kick failed to start stream due to missing stream key',
+          );
+        }
 
+        if (!resp.rtmp) {
           throwStreamError(
             'KICK_REQUEST_FAILED',
             {
               status: 418,
-              statusText: message,
+              statusText: 'Kick server url not generated',
               platform: 'kick',
             },
-            'Kick stream failed to start. One of the following is missing: broadcast id, rtmp url, or stream key.',
+            'Kick stream failed to start due to missing server url',
           );
         }
 
@@ -279,7 +286,7 @@ export class KickService
           }
 
           throwStreamError(
-            'PLATFORM_REQUEST_FAILED',
+            'KICK_REQUEST_FAILED',
             {
               ...error,
               status: error.status,
