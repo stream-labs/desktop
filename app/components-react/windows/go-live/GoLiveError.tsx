@@ -76,6 +76,10 @@ export default function GoLiveError() {
         return renderFacebookNotEligibleForStreamingError();
       case 'KICK_SCOPE_OUTDATED':
         return renderRemergeError(error);
+      case 'KICK_START_STREAM_FAILED':
+        return handlePlatformRequestError(error, $t('Failed to start stream on Kick.'));
+      case 'KICK_STREAM_KEY_MISSING':
+        return renderKickStreamKeyMissingError(error);
       case 'MACHINE_LOCKED':
         return renderMachineLockedError(error);
       default:
@@ -371,6 +375,43 @@ export default function GoLiveError() {
         {$t(
           "You're not eligible to Go Live, your profile needs to be at least 60 days old and your page needs to have at least 100 followers. Click the notification to learn more.",
         )}
+      </MessageLayout>
+    );
+  }
+
+  function renderKickStreamKeyMissingError(error: IStreamError) {
+    function openKickSettings() {
+      remote.shell.openExternal('https://kick.com/settings/stream');
+    }
+    return (
+      <MessageLayout error={error} type="info" message={error.message}>
+        <div>
+          {$t(
+            'Permissions to generate stream key for Kick are missing. In order to go live on Kick, you must first generate a stream key on Kick to be available for Streamlabs Desktop. Please follow these steps:',
+          )}
+          <br />
+          <ol>
+            <li>{$t('Login to Kick')}</li>
+            <li>
+              <Translate
+                message={$t('Go to: <link></link>')}
+                renderSlots={{
+                  link: () => (
+                    <a style={{ textDecoration: 'underline' }} onClick={openKickSettings}>
+                      {'https://kick.com/settings/stream'}
+                    </a>
+                  ),
+                }}
+              ></Translate>
+            </li>
+            {/* prettier-ignore */}
+            <li>{$t('Click on the \"eye\" icon to see your stream key')}</li>
+            <li>{$t('Put in 2FA')}</li>
+          </ol>
+          {$t(
+            'After 2FA, the stream key has been generated and will be available for Streamlabs Desktop for that channel. You should now be able to go live on Kick.',
+          )}
+        </div>
       </MessageLayout>
     );
   }
