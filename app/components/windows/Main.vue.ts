@@ -299,6 +299,11 @@ export default class Main extends Vue {
     this.windowsService.actions.updateStyleBlockers('main', true);
   }
 
+  onResizeStopHandler(offset: number) {
+    this.setWidth(this.customizationService.state.livedockSize + offset);
+    this.windowsService.actions.updateStyleBlockers('main', false);
+  }
+
   setWidth(width: number) {
     this.customizationService.actions.setSettings({
       livedockSize: this.validateWidth(width),
