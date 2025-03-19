@@ -449,27 +449,36 @@ function LiveDockContainer(p: { maxDockWidth: number; minDockWidth: number; onLe
     );
   }
 
-  if (isDockCollapsed) {
-    return (
-      <div className={styles.liveDockCollapsed}>
-        <Chevron />
-      </div>
-    );
-  }
+  const transitionName = useMemo(() => {
+    if ((p.onLeft && isDockCollapsed) || (!p.onLeft && !isDockCollapsed)) {
+      return 'ant-slide-right';
+    }
+    return 'ant-slide-left';
+  }, [p.onLeft, isDockCollapsed]);
 
   return (
-    <ResizeBar
-      position={p.onLeft ? 'left' : 'right'}
-      onInput={(val: number) => ctrl.setLiveDockWidth(val)}
-      max={p.maxDockWidth}
-      min={p.minDockWidth}
-      value={dockWidth}
-      transformScale={2}
-    >
-      <div className={styles.liveDockContainer} style={{ width: `${dockWidth}px` }}>
-        <LiveDock />
-        <Chevron />
-      </div>
-    </ResizeBar>
+    <Animation transitionName={transitionName} transitionAppear>
+      {isDockCollapsed && (
+        <div className={styles.liveDockCollapsed} key="collapsed">
+          <Chevron />
+        </div>
+      )}
+      {!isDockCollapsed && (
+        <ResizeBar
+          position={p.onLeft ? 'left' : 'right'}
+          onInput={(val: number) => ctrl.setLiveDockWidth(val)}
+          max={p.maxDockWidth}
+          min={p.minDockWidth}
+          value={dockWidth}
+          transformScale={1}
+          key="expanded"
+        >
+          <div className={styles.liveDockContainer} style={{ width: `${dockWidth}px` }}>
+            <LiveDock />
+            <Chevron />
+          </div>
+        </ResizeBar>
+      )}
+    </Animation>
   );
 }
