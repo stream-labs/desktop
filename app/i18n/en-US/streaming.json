@@ -288,5 +288,7 @@
   "Please try again. If the issue persists, you can stream directly to a single platform instead or click the button below to bypass and go live.": "Please try again. If the issue persists, you can stream directly to a single platform instead or click the button below to bypass and go live.",
   "Issues": "Issues",
   "Multistream Error": "Multistream Error",
-  "One of destinations might have incomplete permissions. Reconnect the destinations in settings and try again.": "One of destinations might have incomplete permissions. Reconnect the destinations in settings and try again."
+  "One of destinations might have incomplete permissions. Reconnect the destinations in settings and try again.": "One of destinations might have incomplete permissions. Reconnect the destinations in settings and try again.",
+  "Enhanced broadcasting": "Enhanced broadcasting",
+  "Enhanced broadcasting automatically optimizes your settings to encode and send multiple video qualities to Twitch. Selecting this option will send basic information about your computer and software setup.": "Enhanced broadcasting automatically optimizes your settings to encode and send multiple video qualities to Twitch. Selecting this option will send basic information about your computer and software setup."
 }

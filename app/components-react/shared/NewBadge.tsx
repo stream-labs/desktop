@@ -7,6 +7,9 @@ import cx from 'classnames';
 import { $t } from 'services/i18n';
 
 interface INewButtonProps {
+  // children is a special React property which allows access any child elements including text
+  children?: string;
+
   dismissableKey: EDismissable;
   size?: 'standard' | 'small';
   absolute?: boolean;
@@ -14,6 +17,7 @@ interface INewButtonProps {
 }
 
 export default function NewButton({
+  children = "",
   dismissableKey,
   size = 'standard',
   absolute = false,
@@ -37,7 +41,7 @@ export default function NewButton({
       )}
       style={style}
     >
-      {$t('New')}
+      {children.length !== 0 ? $t(children) : $t('New')}
     </div>
   );
 }
