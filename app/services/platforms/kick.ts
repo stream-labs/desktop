@@ -8,7 +8,7 @@ import {
   TPlatformCapability,
 } from './index';
 import { authorizedHeaders, jfetch } from '../../util/requests';
-import { throwStreamError } from '../streaming/stream-error';
+import { StreamError, throwStreamError } from '../streaming/stream-error';
 import { platformAuthorizedRequest } from './utils';
 import { IGoLiveSettings } from '../streaming';
 import { TOutputOrientation } from 'services/restream';
@@ -223,13 +223,37 @@ export class KickService
 
     return jfetch<IKickStartStreamResponse>(request)
       .then(resp => {
+        if (!resp.key) {
+          throwStreamError(
+            'KICK_STREAM_KEY_MISSING',
+            {
+              status: 418,
+              statusText: 'Kick stream key not generated',
+              platform: 'kick',
+            },
+            'Kick failed to start stream due to missing stream key',
+          );
+        }
+
+        if (!resp.rtmp) {
+          throwStreamError(
+            'KICK_START_STREAM_FAILED',
+            {
+              status: 418,
+              statusText: 'Kick server url not generated',
+              platform: 'kick',
+            },
+            'Kick stream failed to start due to missing server url',
+          );
+        }
+
         if (resp.channel_name) {
           this.SET_CHANNEL_NAME(resp.channel_name);
         }
         this.SET_STREAM_SETTINGS(opts);
         return resp;
       })
-      .catch((e: IKickError | unknown) => {
+      .catch((e: IKickError | StreamError | string | unknown) => {
         console.error('Error starting Kick stream: ', e);
 
         const defaultError = {
@@ -238,6 +262,12 @@ export class KickService
         };
 
         if (!e) throwStreamError('PLATFORM_REQUEST_FAILED', defaultError);
+
+        // check if the error is a stream error
+        if (typeof e === 'object' && e.hasOwnProperty('type')) {
+          const error = e as StreamError;
+          throwStreamError(error.type, error, error.message);
+        }
 
         // check if the error is an IKickError
         if (typeof e === 'object' && e.hasOwnProperty('result')) {
@@ -256,7 +286,7 @@ export class KickService
           }
 
           throwStreamError(
-            'PLATFORM_REQUEST_FAILED',
+            'KICK_START_STREAM_FAILED',
             {
               ...error,
               status: error.status,
