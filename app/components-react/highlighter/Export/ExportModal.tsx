@@ -24,6 +24,7 @@ import styles from './ExportModal.m.less';
 import { getCombinedClipsDuration } from '../utils';
 import { formatSecondsToHMS } from '../ClipPreview';
 import { set } from 'lodash';
+import PlatformSelect from './Platform';
 
 type TSetting = { name: string; fps: TFPS; resolution: TResolution; preset: TPreset };
 const settings: TSetting[] = [
@@ -133,6 +134,7 @@ function ExportModal({ close, streamId }: { close: () => void; streamId: string 
   useEffect(() => unmount, []);
 
   // if (exportInfo.exporting) return <ExportProgress />;
+  return <PlatformSelect onClose={close} videoName={videoName} streamId={streamId} />;
   if (!exportInfo.exported || exportInfo.exporting) {
     return (
       <ExportFlow
@@ -144,7 +146,6 @@ function ExportModal({ close, streamId }: { close: () => void; streamId: string 
       />
     );
   }
-  return <PlatformSelect onClose={close} videoName={videoName} streamId={streamId} />;
 }
 
 function ExportFlow({
@@ -449,53 +450,6 @@ function ExportFlow({
           </div>{' '}
         </div>
       </div>
-    </Form>
-  );
-}
-
-function PlatformSelect({
-  onClose,
-  videoName,
-  streamId,
-}: {
-  onClose: () => void;
-  videoName: string;
-  streamId: string | undefined;
-}) {
-  const { store, clearUpload, getStreamTitle } = useController(ExportModalCtx);
-  const { UserService } = Services;
-  const { isYoutubeLinked } = useVuex(() => ({
-    isYoutubeLinked: !!UserService.state.auth?.platforms.youtube,
-  }));
-  const [platform, setPlatform] = useState(() => (isYoutubeLinked ? 'youtube' : 'crossclip'));
-
-  async function handlePlatformSelect(val: string) {
-    if (platform === 'youtube') await clearUpload();
-    setPlatform(val);
-  }
-
-  const platformOptions = [
-    { label: 'YouTube', value: 'youtube' },
-    { label: 'Cross Clip', value: 'crossclip' },
-    { label: 'Podcast Editor', value: 'typestudio' },
-    { label: 'Video Editor', value: 'videoeditor' },
-  ];
-
-  return (
-    <Form>
-      <h1 style={{ display: 'inline', marginRight: '16px', position: 'relative', top: '3px' }}>
-        {$t('Upload To')}
-      </h1>
-      <ListInput
-        value={platform}
-        onChange={handlePlatformSelect}
-        nowrap
-        options={platformOptions}
-      />
-      {platform === 'youtube' && (
-        <YoutubeUpload defaultTitle={videoName} close={onClose} streamId={streamId} />
-      )}
-      {platform !== 'youtube' && <StorageUpload onClose={onClose} platform={platform} />}
     </Form>
   );
 }
