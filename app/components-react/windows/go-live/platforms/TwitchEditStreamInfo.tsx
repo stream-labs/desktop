@@ -38,12 +38,12 @@ export function TwitchEditStreamInfo(p: IPlatformComponentParams<'twitch'>) {
       <InputWrapper>
         <CheckboxInput label={$t('Stream features branded content')} {...bind.isBrandedContent} />
       </InputWrapper>
-      <InputWrapper>
+      {p.enabledPlatformsCount === 1 && <InputWrapper>
         <div>
           <CheckboxInput style={{display: 'inline-block'}} label={$t('Enhanced broadcasting')} tooltip={enhancedBroadcastingTooltipText} {...bind.isEnhancedBroadcasting} />
           <Badge style={{display: 'inline-block'}} dismissableKey={EDismissable.EnhancedBroadcasting}>Beta</Badge>
         </div>
-      </InputWrapper>
+      </InputWrapper>}
     </div>
   );
   return (
