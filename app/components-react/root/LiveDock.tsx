@@ -252,7 +252,6 @@ function LiveDock() {
     hideStyleBlockers,
     currentViewers,
     pageSlot,
-    canAnimate,
     liveText,
     isPopOutAllowed,
     streamingStatus,
@@ -266,7 +265,6 @@ function LiveDock() {
       'applicationLoading',
       'hideStyleBlockers',
       'pageSlot',
-      'canAnimate',
       'currentViewers',
       'liveText',
       'isPopOutAllowed',
@@ -403,65 +401,19 @@ function LiveDock() {
           (isPlatform(['twitch', 'trovo']) ||
             (isStreaming && isPlatform(['youtube', 'facebook', 'twitter', 'tiktok', 'kick']))) && (
             <div className={styles.liveDockChat}>
-              {hasChatTabs && (
-                <div className="flex">
-                  <Menu
-                    defaultSelectedKeys={[visibleChat]}
-                    onClick={ev => setChat(ev.key)}
-                    mode="horizontal"
-                  >
-                    {chatTabs.map(tab => (
-                      <Menu.Item key={tab.value}>{tab.name}</Menu.Item>
-                    ))}
-                  </Menu>
-                  {isPopOutAllowed && (
-                    <Tooltip title={$t('Pop out to new window')} placement="left">
-                      <i
-                        className={cx(styles.liveDockChatAppsPopout, 'icon-pop-out-1')}
-                        onClick={() => ctrl.popOut()}
-                      />
-                    </Tooltip>
-                  )}
-                </div>
-              )}
-              {!applicationLoading && !collapsed && (
-                <Chat
-                  restream={visibleChat === 'restream'}
+              {hasChatTabs && <ChatTabs visibleChat={visibleChat} setChat={setChat} />}
+              {!applicationLoading && !collapsed && chat}
+              {!['default', 'restream'].includes(visibleChat) && (
+                <PlatformAppPageView
+                  className={styles.liveDockPlatformAppWebview}
+                  appId={visibleChat}
+                  pageSlot={pageSlot}
                   key={visibleChat}
-                  visibleChat={visibleChat}
-                  setChat={setChat}
                 />
-              )}
-              {isPlatform(['youtube', 'facebook']) && isStreaming && (
-                <Tooltip title={$t('Go to Live Dashboard')} placement="right">
-                  <i onClick={() => ctrl.openPlatformDash()} className="icon-settings" />
-                </Tooltip>
               )}
             </div>
           )}
-        <div className="flex">
-          {(isPlatform(['twitch', 'trovo', 'facebook']) ||
-            (isPlatform(['youtube', 'twitter']) && isStreaming)) && (
-            <a onClick={() => ctrl.refreshChat()}>{$t('Refresh Chat')}</a>
-          )}
-        </div>
       </div>
-      {!hideStyleBlockers &&
-        (isPlatform(['twitch', 'trovo']) ||
-          (isStreaming && isPlatform(['youtube', 'facebook', 'twitter', 'tiktok', 'kick']))) && (
-          <div className={styles.liveDockChat}>
-            {hasChatTabs && <ChatTabs visibleChat={visibleChat} setChat={setChat} />}
-            {!applicationLoading && !collapsed && chat}
-            {!['default', 'restream'].includes(visibleChat) && (
-              <PlatformAppPageView
-                className={styles.liveDockPlatformAppWebview}
-                appId={visibleChat}
-                pageSlot={pageSlot}
-                key={visibleChat}
-              />
-            )}
-          </div>
-        )}
       {(!ctrl.platform ||
         (isPlatform(['youtube', 'facebook', 'twitter', 'tiktok', 'kick']) && !isStreaming)) && (
         <div className={cx('flex flex--center flex--column', styles.liveDockChatOffline)}>
