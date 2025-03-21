@@ -10,8 +10,7 @@ interface IDisplaySelectorProps {
   title: string;
   index: number;
   platform: TPlatform | null;
-  nolabel?: boolean;
-  nomargin?: boolean;
+  label: string;
   className?: string;
   style?: CSSProperties;
 }
@@ -43,14 +42,13 @@ export default function DisplaySelector(p: IDisplaySelectorProps) {
   return (
     <RadioInput
       data-test="display-input"
-      id={`${p.platform ?? p.index}-display-input`}
+      id={`${p.platform}-display-input`}
       direction="horizontal"
       label={label}
-      nolabel={p?.nolabel ?? undefined}
-      nomargin={p?.nomargin ?? undefined}
       labelAlign="left"
       labelCol={{ offset: 0 }}
       colon
+      gapsize={0}
       defaultValue="horizontal"
       options={displays}
       onChange={(val: TDisplayType) =>

@@ -2,7 +2,11 @@ import { useVuex } from 'components-react/hooks';
 import React, { useRef, useState } from 'react';
 import { Services } from 'components-react/service-provider';
 import styles from './StreamView.m.less';
-import { EHighlighterView, IViewState, StreamInfoForAiHighlighter } from 'services/highlighter';
+import {
+  EHighlighterView,
+  IStreamInfoForAiHighlighter,
+  IViewState,
+} from 'services/highlighter/models/highlighter.models';
 import isEqual from 'lodash/isEqual';
 import { Modal, Button, Alert } from 'antd';
 import ExportModal from 'components-react/highlighter/ExportModal';
@@ -16,12 +20,15 @@ import path from 'path';
 import PreviewModal from './PreviewModal';
 import moment from 'moment';
 import { TextInput } from 'components-react/shared/inputs';
+import EducationCarousel from './EducationCarousel';
+import { EGame } from 'services/highlighter/models/ai-highlighter.models';
 
 type TModalStreamView =
   | { type: 'export'; id: string | undefined }
   | { type: 'preview'; id: string | undefined }
   | { type: 'upload' }
   | { type: 'remove'; id: string | undefined }
+  | { type: 'requirements'; game: string }
   | null;
 
 export default function StreamView({ emitSetView }: { emitSetView: (data: IViewState) => void }) {
@@ -86,6 +93,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
           export: '700px',
           remove: '400px',
           upload: '400px',
+          requirements: '400px',
         }[modal.type],
       );
     }
@@ -135,10 +143,10 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
 
     async function startAiDetection(title: string) {
       if (/[\\/:"*?<>|]+/g.test(title)) return;
-      const streamInfo: StreamInfoForAiHighlighter = {
+      const streamInfo: IStreamInfoForAiHighlighter = {
         id: 'manual_' + uuid(),
         title,
-        game: 'Fortnite',
+        game: EGame.FORTNITE,
       };
 
       let filePath: string[] | undefined = [];
@@ -146,7 +154,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
       try {
         filePath = await importStreamFromDevice();
         if (filePath && filePath.length > 0) {
-          HighlighterService.actions.flow(filePath[0], streamInfo);
+          HighlighterService.actions.detectAndClipAiHighlights(filePath[0], streamInfo);
           close();
         } else {
           // No file selected
@@ -218,11 +226,11 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
 
     const filtered = files.filter(f => extensions.includes(path.parse(f).ext));
     if (filtered.length) {
-      const StreamInfoForAiHighlighter: StreamInfoForAiHighlighter = {
+      const StreamInfoForAiHighlighter: IStreamInfoForAiHighlighter = {
         id: 'manual_' + uuid(),
-        game: 'Fortnite',
+        game: EGame.FORTNITE,
       };
-      HighlighterService.actions.flow(filtered[0], StreamInfoForAiHighlighter);
+      HighlighterService.actions.detectAndClipAiHighlights(filtered[0], StreamInfoForAiHighlighter);
     }
 
     e.preventDefault();
@@ -282,6 +290,9 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
                         emitCancelHighlightGeneration={() => {
                           HighlighterService.actions.cancelHighlightGeneration(stream.id);
                         }}
+                        emitShowRequirements={() => {
+                          setShowModal({ type: 'requirements', game: 'fortnite' });
+                        }}
                       />
                     ))}
                   </div>
@@ -307,11 +318,20 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
         )}
         {showModal?.type === 'export' && <ExportModal close={closeModal} streamId={showModal.id} />}
         {showModal?.type === 'preview' && (
-          <PreviewModal close={closeModal} streamId={showModal.id} />
+          <PreviewModal
+            close={closeModal}
+            streamId={showModal.id}
+            emitSetShowModal={modal => {
+              if (modal === 'export') {
+                rawSetShowModal({ type: 'export', id: showModal.id });
+              }
+            }}
+          />
         )}
         {showModal?.type === 'remove' && (
           <RemoveStream close={closeModal} streamId={showModal.id} />
         )}
+        {showModal?.type === 'requirements' && <EducationCarousel />}
       </Modal>
     </div>
   );
