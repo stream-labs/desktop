@@ -395,7 +395,6 @@ function Main() {
         )}
         <div
           className={cx(styles.mainMiddle, { [styles.mainMiddleCompact]: compactView })}
-          style={{ minWidth: 0, flexGrow: 1 }}
           ref={mainMiddleEl}
         >
           {!showLoadingSpinner && (
@@ -439,7 +438,6 @@ function LiveDockContainer(p: { maxDockWidth: number; minDockWidth: number; onLe
       <div className={styles.liveDockChevron} onClick={() => ctrl.setCollapsed(!isDockCollapsed)}>
         <i
           className={cx({
-            [styles.chevronCollapsed]: isDockCollapsed,
             'icon-back': (!p.onLeft && isDockCollapsed) || (p.onLeft && !isDockCollapsed),
             ['icon-down icon-right']:
               (p.onLeft && isDockCollapsed) || (!p.onLeft && !isDockCollapsed),
