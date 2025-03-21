@@ -51,13 +51,13 @@ export class AiHighlighterUpdater {
   /**
    * Spawn the AI Highlighter process that would process the video
    */
-  static startHighlighterProcess(videoUri: string, milestonesPath?: string) {
+  static startHighlighterProcess(videoUri: string, userId: string, milestonesPath?: string) {
     const runHighlighterFromRepository = Utils.getHighlighterEnvironment() === 'local';
 
     if (runHighlighterFromRepository) {
       // this is for highlighter development
       // to run this you have to install the highlighter repository next to desktop
-      return AiHighlighterUpdater.startHighlighterFromRepository(videoUri, milestonesPath);
+      return AiHighlighterUpdater.startHighlighterFromRepository(videoUri, userId, milestonesPath);
     }
 
     const highlighterBinaryPath = path.resolve(
@@ -72,11 +72,16 @@ export class AiHighlighterUpdater {
       command.push(milestonesPath);
     }
     command.push('--use_sentry');
+    command.push('--user_id', userId);
 
     return spawn(highlighterBinaryPath, command);
   }
 
-  private static startHighlighterFromRepository(videoUri: string, milestonesPath?: string) {
+  private static startHighlighterFromRepository(
+    videoUri: string,
+    userId: string,
+    milestonesPath?: string,
+  ) {
     const rootPath = '../highlighter-api/';
     const command = [
       'run',
@@ -87,6 +92,8 @@ export class AiHighlighterUpdater {
       FFMPEG_EXE,
       '--loglevel',
       'debug',
+      '--user_id',
+      userId,
     ];
 
     if (milestonesPath) {

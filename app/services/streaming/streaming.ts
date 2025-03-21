@@ -449,6 +449,9 @@ export class StreamingService
           await this.restreamService.beforeGoLive();
         });
       } catch (e: unknown) {
+        // Handle rendering a prompt for enabling permissions to generate a stream key for Kick
+        if (this.state.info.error?.type === 'KICK_STREAM_KEY_MISSING') return;
+
         const error = this.handleTypedStreamError(
           e,
           'RESTREAM_SETUP_FAILED',
@@ -582,6 +585,9 @@ export class StreamingService
       }
     }
 
+    // Handle rendering a prompt for enabling permissions to generate a stream key for Kick
+    if (this.state.info.error?.type === 'KICK_STREAM_KEY_MISSING') return;
+
     // apply optimized settings
     const optimizer = this.videoEncodingOptimizationService;
     if (optimizer.state.useOptimizedProfile && settings.optimizedProfile) {
@@ -658,6 +664,7 @@ export class StreamingService
           ? 'SETTINGS_UPDATE_FAILED'
           : e.type || 'UNKNOWN_ERROR';
       this.setError(e, platform);
+      console.log('handleSetupPlatformError e', e);
     } else {
       this.setError('SETTINGS_UPDATE_FAILED', platform);
     }
@@ -770,6 +777,9 @@ export class StreamingService
     message: string,
   ): StreamError | TStreamErrorType {
     // restream errors returns an object with key value pairs for error details
+    const messages: string[] = [message];
+    const details: string[] = [];
+
     const defaultMessage =
       this.state.info.error?.message ??
       $t(
@@ -777,22 +787,25 @@ export class StreamingService
       );
 
     if (e && typeof e === 'object' && type.split('_').includes('RESTREAM')) {
-      const messages: string[] = [];
-      const details: string[] = [];
-
       details.push(defaultMessage);
 
       Object.entries(e).forEach(([key, value]: [string, string]) => {
         const name = capitalize(key.replace(/([A-Z])/g, ' $1'));
         // only show the error message for the stream key and server url to the user for security purposes
         if (['streamKey', 'serverUrl'].includes(key)) {
-          messages.push(`${name}: ${value}`);
+          messages.push($t('Missing server url or stream key'));
         } else {
-          details.push(`${name}: ${value}`);
+          messages.push(`${name}: ${value}`);
         }
       });
 
-      return createStreamError(type, { status: 400, statusText: message }, details.join('\n'));
+      const status = this.state.info.error?.status ?? 400;
+
+      return createStreamError(
+        type,
+        { status, statusText: messages.join('. ') },
+        details.join('\n'),
+      );
     }
 
     return e instanceof StreamError ? { ...e, type } : type;
@@ -852,7 +865,7 @@ export class StreamingService
       this.streamErrorUserMessage = messages.user;
       this.streamErrorReportMessage = messages.report;
 
-      this.SET_ERROR(errorTypeOrError);
+      this.SET_ERROR(errorTypeOrError, platform);
     } else {
       // an error type has been passed as a first arg
       const errorType = errorTypeOrError as TStreamErrorType;
@@ -863,7 +876,7 @@ export class StreamingService
       this.streamErrorUserMessage = messages.user;
       this.streamErrorReportMessage = messages.report;
 
-      this.SET_ERROR(error);
+      this.SET_ERROR(error, platform);
     }
 
     const error = this.state.info.error;
@@ -885,12 +898,12 @@ export class StreamingService
     }
   }
 
-  resetStreamInfo() {
-    this.RESET_STREAM_INFO();
-  }
-
   @mutation()
-  private SET_ERROR(error: IStreamError) {
+  private SET_ERROR(error: IStreamError, platform?: TPlatform) {
+    if (platform) {
+      error.platform = platform;
+    }
+
     this.state.info.error = error;
   }
 
