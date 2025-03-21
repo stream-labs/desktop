@@ -1,4 +1,9 @@
-import { IAiClipInfo, IHighlighterMilestone, EAiDetectionState } from './ai-highlighter.models';
+import {
+  IAiClipInfo,
+  IHighlighterMilestone,
+  EAiDetectionState,
+  EGame,
+} from './ai-highlighter.models';
 import { ITransitionInfo, IAudioInfo, IExportInfo, IVideoInfo } from './rendering.models';
 
 export type TClip = IAiClip | IReplayBufferClip | IManualClip;
@@ -71,7 +76,7 @@ export type TStreamInfo =
 
 export interface IStreamInfoForAiHighlighter {
   id: string;
-  game: string;
+  game: EGame;
   title?: string;
   milestonesPath?: string;
 }
@@ -82,7 +87,7 @@ export interface IStreamMilestones {
 }
 export interface IHighlightedStream {
   id: string;
-  game: string;
+  game: EGame;
   title: string;
   date: string;
   state: {

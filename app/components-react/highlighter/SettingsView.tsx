@@ -175,7 +175,7 @@ export default function SettingsView({
                     style={{ width: 'fit-content' }}
                     type="primary"
                     onClick={() => {
-                      HighlighterService.actions.installAiHighlighter(true);
+                      HighlighterService.actions.installAiHighlighter(true, 'Highlighter-tab');
                     }}
                   >
                     {$t('Install AI Highlighter App')}

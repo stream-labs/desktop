@@ -152,7 +152,8 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
     for (const groupName in this.state) {
       this.state[groupName].formData.forEach(subGroup => {
         subGroup.parameters.forEach(parameter => {
-          (settingsValues as any)[groupName] = (settingsValues as any)[groupName] || {};
+          (settingsValues as any)[groupName] =
+            settingsValues[groupName as keyof ISettingsValues] || {};
           (settingsValues as any)[groupName][parameter.name] = parameter.value;
         });
       });
