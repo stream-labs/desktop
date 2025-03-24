@@ -354,6 +354,8 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
 
     this.handleStreamingChanges();
 
+    if (!this.userService.isLoggedIn) return;
+
     this.streamingService.replayBufferFileWrite.subscribe(async clipPath => {
       const message = $t('A new Highlight has been saved. Click to edit in the Highlighter');
 

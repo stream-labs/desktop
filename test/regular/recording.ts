@@ -36,14 +36,11 @@ async function createRecordingFiles(advanced: boolean = false): Promise<number> 
   // Record 0.5s video in every format
   for (const format of formats) {
     await showSettingsWindow('Output', async () => {
-      await sleep(2000);
       if (advanced) {
         await clickButton('Recording');
       }
 
-      await sleep(2000);
       await setFormDropdown('Recording Format', format);
-      await sleep(2000);
       await clickButton('Done');
     });
 

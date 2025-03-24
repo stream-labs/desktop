@@ -5,8 +5,17 @@ import { HighlighterService } from 'services/highlighter';
 import { Inject } from 'services/core/injector';
 import { Dictionary } from 'vuex';
 import { AudioService } from 'app-services';
-import { ERecordingQuality, ERecordingFormat } from 'obs-studio-node';
+import {
+  ERecordingQuality,
+  ERecordingFormat,
+  ISimpleStreaming,
+  IAdvancedStreaming,
+} from 'obs-studio-node';
 
+export type IStreamingOutputSettings = Omit<
+  Partial<ISimpleStreaming | IAdvancedStreaming>,
+  'videoEncoder'
+>;
 /**
  * list of encoders for simple mode
  */
@@ -467,19 +476,15 @@ export class OutputSettingsService extends Service {
 
     const prefix: string = this.settingsService.findSettingValue(
       output,
-      'Recording',
+      'Replay Buffer',
       'RecRBPrefix',
     );
     const suffix: string = this.settingsService.findSettingValue(
       output,
-      'Recording',
+      'Replay Buffer',
       'RecRBSuffix',
     );
-    const duration: number = this.settingsService.findSettingValue(
-      output,
-      'Stream Delay',
-      'DelaySec',
-    );
+    const duration: number = this.settingsService.findSettingValue(output, 'Output', 'RecRBTime');
 
     const useStreamEncoders =
       this.settingsService.findSettingValue(output, 'Recording', 'RecEncoder') === 'none';

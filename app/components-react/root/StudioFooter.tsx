@@ -4,7 +4,7 @@ import { EStreamQuality } from '../../services/performance';
 import { EStreamingState, EReplayBufferState, ERecordingState } from '../../services/streaming';
 import { Services } from '../service-provider';
 import { $t } from '../../services/i18n';
-import { useVuex } from '../hooks';
+import { useDebounce, useVuex } from '../hooks';
 import styles from './StudioFooter.m.less';
 import PerformanceMetrics from '../shared/PerformanceMetrics';
 import TestWidgets from './TestWidgets';
@@ -42,7 +42,8 @@ export default function StudioFooterComponent() {
       StreamingService.views.supports('stream-schedule') &&
       !RecordingModeService.views.isRecordingModeEnabled,
     streamQuality: PerformanceService.views.streamQuality,
-    replayBufferOffline: StreamingService.views.replayBufferStatus === EReplayBufferState.Offline,
+    replayBufferOffline:
+      StreamingService.state.status.horizontal.replayBuffer === EReplayBufferState.Offline,
     replayBufferStopping:
       StreamingService.state.status.horizontal.replayBuffer === EReplayBufferState.Stopping,
     replayBufferSaving:
@@ -216,7 +217,7 @@ function RecordingButton() {
         >
           <button
             className={cx(styles.recordButton, 'record-button', { active: isRecording })}
-            onClick={toggleRecording}
+            onClick={useDebounce(200, toggleRecording)}
           >
             <span>
               {recordingStatus === ERecordingState.Stopping ? (
