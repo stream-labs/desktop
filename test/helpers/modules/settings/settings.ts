@@ -1,17 +1,9 @@
-import {
-  click,
-  clickButton,
-  clickCheckbox,
-  focusChild,
-  useChildWindow,
-  useMainWindow,
-} from '../core';
+import { click, clickButton, focusChild, useChildWindow, useMainWindow } from '../core';
 import { mkdtemp } from 'fs-extra';
 import { tmpdir } from 'os';
 import * as path from 'path';
 import { setInputValue } from '../forms/base';
-import { FormMonkey } from '../../form-monkey';
-import { TExecutionContext } from '../../../helpers/webdriver';
+import { setFormDropdown } from '../../webdriver/forms';
 
 /**
  * Open the settings window with a given category selected
@@ -35,12 +27,21 @@ export async function showSettingsWindow(category: string, cb?: () => Promise<un
 /**
  * Set recording path to a temp dir
  */
-export async function setTemporaryRecordingPath(): Promise<string> {
+export async function setTemporaryRecordingPath(advanced: boolean = false): Promise<string> {
   const tmpDir = await mkdtemp(path.join(tmpdir(), 'slobs-recording-'));
-  await showSettingsWindow('Output', async () => {
-    await setInputValue('[data-name="FilePath"] input', tmpDir);
-    await clickButton('Done');
-  });
+
+  if (advanced) {
+    await showSettingsWindow('Output', async () => {
+      await setFormDropdown('Output Mode', 'Advanced');
+      await clickButton('Recording');
+      await setInputValue('[data-name="RecFilePath"] input', tmpDir);
+    });
+  } else {
+    await showSettingsWindow('Output', async () => {
+      await setInputValue('[data-name="FilePath"] input', tmpDir);
+      await clickButton('Done');
+    });
+  }
   return tmpDir;
 }
 

@@ -48,7 +48,7 @@ class NotificationsModule {
 
     message
       .info({
-        content: <MessageNode notif={notif} />,
+        content: <MessageNode notif={notif} data-testid="notification" />,
         duration: notif.lifeTime === -1 ? 0 : notif.lifeTime / 1000,
         key: `${notif.message}${notif.date}`,
         onClick: () => this.clickNotif(),
