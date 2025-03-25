@@ -225,14 +225,21 @@ export function RecordingHistory() {
   }));
 
   useEffect(() => {
+    let isMounted = true;
+
     if (
       uploadInfo.error &&
       typeof uploadInfo.error === 'string' &&
-      // We don't want to surface unexpected TS errors to the user
       !/TypeError/.test(uploadInfo.error)
     ) {
-      postError(uploadInfo.error);
+      if (isMounted) {
+        postError(uploadInfo.error);
+      }
     }
+
+    return () => {
+      isMounted = false;
+    };
   }, [uploadInfo.error]);
 
   function openMarkersSettings() {
