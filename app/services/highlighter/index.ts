@@ -359,7 +359,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     this.streamingService.replayBufferFileWrite.subscribe(async clipPath => {
       const message = $t('A new Highlight has been saved. Click to edit in the Highlighter');
 
-      this.notificationsService.actions.push({
+      this.notificationsService.push({
         type: ENotificationType.SUCCESS,
         message,
         action: this.jsonrpcService.createRequest(Service.getResourceId(this), 'showHighlighter'),
