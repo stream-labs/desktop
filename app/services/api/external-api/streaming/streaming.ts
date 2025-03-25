@@ -121,7 +121,7 @@ export class StreamingService implements ISerializable {
   /**
    * Toggles recording.
    */
-  toggleRecording(): Promise<void> {
+  toggleRecording(): void {
     return this.streamingService.toggleRecording();
   }
 

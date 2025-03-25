@@ -1236,7 +1236,7 @@ export class StreamingService
     this.toggleRecording();
   }
 
-  async toggleRecording() {
+  toggleRecording() {
     // stop recording
     if (
       this.state.status.horizontal.recording === ERecordingState.Recording &&
@@ -1267,7 +1267,7 @@ export class StreamingService
         this.recordingStopped.next();
       }
 
-      return Promise.resolve();
+      return;
     } else if (
       this.state.status.vertical.recording === ERecordingState.Recording &&
       this.contexts.vertical.recording !== null
@@ -1277,7 +1277,7 @@ export class StreamingService
       this.SET_RECORDING_STATUS(ERecordingState.Stopping, 'vertical', new Date().toISOString());
 
       this.contexts.vertical.recording.stop(true);
-      return Promise.resolve();
+      return;
     } else if (
       this.state.status.horizontal.recording === ERecordingState.Recording &&
       this.contexts.horizontal.recording !== null
@@ -1285,16 +1285,8 @@ export class StreamingService
       // stop recording horizontal display
       // change the recording status for the loading animation
       this.SET_RECORDING_STATUS(ERecordingState.Stopping, 'horizontal', new Date().toISOString());
-
-      if (this.isAdvancedRecording(this.contexts.horizontal.recording)) {
-        const recording = this.contexts.horizontal.recording as IAdvancedRecording;
-        recording.stop(true);
-      } else if (this.isSimpleRecording(this.contexts.horizontal.recording)) {
-        const recording = this.contexts.horizontal.recording as ISimpleRecording;
-        recording.stop(true);
-      }
-
-      return Promise.resolve();
+      this.contexts.horizontal.recording.stop(true);
+      return;
     }
 
     // start recording
@@ -1306,19 +1298,17 @@ export class StreamingService
         if (this.state.streamingStatus !== EStreamingState.Offline) {
           // In dual output mode, if the streaming status is starting then this call to toggle recording came from the function to toggle streaming.
           // In this case, only stream the horizontal display (don't record the horizontal display) and record the vertical display.
-          await this.createRecording('vertical', 2, true);
+          this.createRecording('vertical', 2, true);
         } else {
           // Otherwise, record both displays in dual output mode
-          await this.createRecording('vertical', 2, true);
-          await this.createRecording('horizontal', 1, true);
+          this.createRecording('vertical', 2, true);
+          this.createRecording('horizontal', 1, true);
         }
       } else {
         // In single output mode, recording only the horizontal display
-        await this.createRecording('horizontal', 1, true);
+        this.createRecording('horizontal', 1, true);
       }
     }
-
-    Promise.resolve();
   }
 
   /**
@@ -1332,12 +1322,7 @@ export class StreamingService
     const settings = this.outputSettingsService.getRecordingSettings();
 
     // recordings must have a streaming instance
-    this.validateOrCreateOutputInstance(mode, display, 'streaming');
-
-    const signalHandler = async (signal: EOutputSignal) => {
-      console.log('recording signal', signal);
-      await this.handleSignal(signal, display);
-    };
+    await this.validateOrCreateOutputInstance(mode, display, 'streaming');
 
     // handle unique properties (including audio)
     if (mode === 'Advanced') {
@@ -1390,7 +1375,13 @@ export class StreamingService
     this.contexts[display].recording.video = this.videoSettingsService.contexts[display];
 
     // set signal handler
-    this.contexts[display].recording.signalHandler = signalHandler;
+    this.contexts[display].recording.signalHandler = async (signal: EOutputSignal) => {
+      console.log('recording signal', signal);
+      this.logContexts(display, 'recording signal');
+      console.log('\n\n');
+
+      await this.handleSignal(signal, display);
+    };
 
     // The replay buffer requires a recording instance. If the user is streaming but not recording,
     // a recording instance still needs to be created but does not need to be started.
@@ -1463,6 +1454,8 @@ export class StreamingService
     this.contexts[display].streaming.video = this.videoSettingsService.contexts[display];
     this.contexts[display].streaming.signalHandler = async signal => {
       console.log('streaming signal', signal);
+      this.logContexts(display, 'streaming signal');
+      console.log('\n\n');
       await this.handleSignal(signal, display);
     };
 
@@ -1680,11 +1673,6 @@ export class StreamingService
       (replayBuffer as any)[key] = (settings as any)[key];
     });
 
-    const signalHandler = async (signal: EOutputSignal) => {
-      console.log('replay buffer signal', signal);
-      await this.handleSignal(signal, display);
-    };
-
     if (this.isAdvancedReplayBuffer(replayBuffer)) {
       replayBuffer.recording = this.contexts[display].recording as IAdvancedRecording;
       replayBuffer.streaming = this.contexts[display].streaming as IAdvancedStreaming;
@@ -1704,7 +1692,12 @@ export class StreamingService
     }
 
     this.contexts[display].replayBuffer.video = this.videoSettingsService.contexts[display];
-    this.contexts[display].replayBuffer.signalHandler = signalHandler;
+    this.contexts[display].replayBuffer.signalHandler = async (signal: EOutputSignal) => {
+      console.log('replay buffer signal', signal);
+      this.logContexts(display, 'replay buffer signal');
+      console.log('\n\n');
+      await this.handleSignal(signal, display);
+    };
 
     this.contexts[display].replayBuffer.start();
     this.usageStatisticsService.recordFeatureUsage('ReplayBuffer');
@@ -1805,6 +1798,7 @@ export class StreamingService
     if (this.contexts[display][type]) {
       // Check for a property that only exists on the output type's advanced instance
       // Note: the properties below were chosen arbitrarily
+
       const isAdvancedOutputInstance =
         type === 'streaming'
           ? this.isAdvancedStreaming(this.contexts[display][type])
