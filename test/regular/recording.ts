@@ -18,7 +18,6 @@ import { logIn } from '../helpers/webdriver/user';
 import { toggleDualOutputMode } from '../helpers/modules/dual-output';
 import { setFormDropdown } from '../helpers/webdriver/forms';
 import { showPage } from '../helpers/modules/navigation';
-import { setInputValue } from '../helpers/modules/forms';
 
 // not a react hook
 // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -61,6 +60,7 @@ async function createRecordingFiles(advanced: boolean = false): Promise<number> 
     await focusMain();
     await clickWhenDisplayed('span=A new Recording has been completed. Click for more info');
     await waitForDisplayed('h1=Recordings', { timeout: 1000 });
+    await sleep(500);
     await showPage('Editor');
   }
 
@@ -107,36 +107,31 @@ test('Recording', async t => {
   const tmpDir = await setTemporaryRecordingPath();
   const numSimpleFormats = await createRecordingFiles();
   await validateRecordingFiles(t, tmpDir, numSimpleFormats);
-});
-
-/**
- * Recording with one context active (horizontal, advanced)
- * @remark This also tests switching between simple and advanced recording
- */
-test('Advanced Recording', async t => {
-  // low resolution reduces CPU usage
-  await setOutputResolution('100x100');
 
   // Advanced Recording
-  const tmpDir = await setTemporaryRecordingPath(true);
+  await setTemporaryRecordingPath(true, tmpDir);
   const numAdvancedFormats = await createRecordingFiles(true);
-  await validateRecordingFiles(t, tmpDir, numAdvancedFormats, true);
+  await validateRecordingFiles(t, tmpDir, numSimpleFormats + numAdvancedFormats, true);
 
-  // Switch to Simple Recording
-  // await sleep(2000);
-  // await showSettingsWindow('Output', async () => {
-  //   await setFormDropdown('Output Mode', 'Simple');
-  //   await sleep(500);
-  //   await setInputValue('[data-name="FilePath"] input', tmpDir);
-  //   await clickButton('Done');
-  // });
+  // Switches between Advanced and Simple Recording
+  // Note: The recording path for Simple Recording should have persisted from before
+  await sleep(2000);
+  await showSettingsWindow('Output', async () => {
+    await setFormDropdown('Output Mode', 'Simple');
+    // await sleep(500);
+    // await setInputValue('[data-name="FilePath"] input', tmpDir);
+    await clickButton('Done');
+  });
 
-  // await focusMain();
-  // await startRecording();
-  // await sleep(2000);
-  // await stopRecording();
-  // await waitForDisplayed('span=A new Recording has been completed. Click for more info');
-  // await validateRecordingFiles(t, tmpDir, numAdvancedFormats + 1, true);
+  await focusMain();
+  await startRecording();
+  // Record for 2s to prevent the recording from accidentally having the same key
+  await sleep(2000);
+  await stopRecording();
+  await clickWhenDisplayed('span=A new Recording has been completed. Click for more info');
+  await validateRecordingFiles(t, tmpDir, numSimpleFormats + numAdvancedFormats + 1, true);
+
+  t.pass();
 });
 
 /**
