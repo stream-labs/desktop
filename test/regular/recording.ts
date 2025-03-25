@@ -118,8 +118,6 @@ test('Recording', async t => {
   await sleep(2000);
   await showSettingsWindow('Output', async () => {
     await setFormDropdown('Output Mode', 'Simple');
-    // await sleep(500);
-    // await setInputValue('[data-name="FilePath"] input', tmpDir);
     await clickButton('Done');
   });
 
