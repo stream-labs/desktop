@@ -133,8 +133,6 @@ function ExportModal({ close, streamId }: { close: () => void; streamId: string 
   // Clear all errors when this component unmounts
   useEffect(() => unmount, []);
 
-  // if (exportInfo.exporting) return <ExportProgress />;
-  return <PlatformSelect onClose={close} videoName={videoName} streamId={streamId} />;
   if (!exportInfo.exported || exportInfo.exporting) {
     return (
       <ExportFlow
@@ -146,6 +144,7 @@ function ExportModal({ close, streamId }: { close: () => void; streamId: string 
       />
     );
   }
+  return <PlatformSelect onClose={close} videoName={videoName} streamId={streamId} />;
 }
 
 function ExportFlow({
@@ -246,7 +245,7 @@ function ExportFlow({
 
   return (
     <Form>
-      <div className={styles.modalWrapper}>
+      <div className={styles.exportWrapper}>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <h2 style={{ fontWeight: 600, margin: 0 }}>{$t('Export')}</h2>{' '}
           <div>

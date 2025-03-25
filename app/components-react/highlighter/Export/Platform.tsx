@@ -2,7 +2,7 @@ import { Form, Dropdown, Button, Collapse, CollapseProps } from 'antd';
 import { useVuex } from 'components-react/hooks';
 import { useController } from 'components-react/hooks/zustand';
 import { ListInput } from 'components-react/shared/inputs';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { TOrientation, EOrientation } from 'services/highlighter/models/ai-highlighter.models';
 import { $t } from 'services/i18n';
 import { ExportModalCtx } from './ExportModal';
@@ -13,6 +13,8 @@ import styles from './ExportModal.m.less';
 import VideoPreview from './VideoPreview';
 import { formatSecondsToHMS } from '../ClipPreview';
 import { $i } from 'services/utils';
+import * as remote from '@electron/remote';
+import { EUploadPlatform } from 'services/highlighter/models/highlighter.models';
 
 export default function PlatformSelect({
   onClose,
@@ -23,10 +25,10 @@ export default function PlatformSelect({
   videoName: string;
   streamId: string | undefined;
 }) {
-  const { store, clearUpload, getStreamTitle, getClips, getDuration } = useController(
+  const { store, exportInfo, clearUpload, getStreamTitle, getClips, getDuration } = useController(
     ExportModalCtx,
   );
-  const { UserService } = Services;
+  const { UserService, HighlighterService } = Services;
   const { isYoutubeLinked } = useVuex(() => ({
     isYoutubeLinked: !!UserService.state.auth?.platforms.youtube,
   }));
@@ -37,6 +39,10 @@ export default function PlatformSelect({
     if (platform === 'youtube') await clearUpload();
     setPlatform(val);
   }
+
+  useEffect(() => {
+    HighlighterService.clearUpload();
+  }, []);
 
   const platformOptions = [
     { label: 'YouTube', value: 'youtube' },
@@ -49,127 +55,97 @@ export default function PlatformSelect({
     {
       key: '1',
       label: 'Youtube',
-      children: <p>dsadsadas</p>,
-    },
-    {
-      key: '2',
-      label: 'This is panel header 2',
-      children: <p>dsadsadas</p>,
-    },
-    {
-      key: '3',
-      label: 'This is panel header 3',
-      children: <p>dsadsadas</p>,
-    },
-    {
-      key: '4',
-      label: 'dasdsdsadas',
-      children: <p style={{ height: '120px', backgroundColor: 'green' }}>dsadsadas</p>,
-    },
-    {
-      key: '5',
-      label: 'This is panel header 3',
-      children: <p style={{ height: '120px', backgroundColor: 'red' }}>dsadsadas</p>,
-    },
-    {
-      key: '6',
-      label: 'This is panel header 3',
-      children: <p style={{ height: '120px', backgroundColor: 'red' }}>dsadsadas</p>,
+      children: <YoutubeUpload defaultTitle={videoName} close={onClose} streamId={streamId} />,
     },
   ];
 
   return (
-    <Form>
-      <div className={styles.modalWrapper}>
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <h2 style={{ fontWeight: 600, margin: 0 }}>{$t('Publish to')}</h2>{' '}
-          <div>
-            <Button type="text" onClick={close}>
-              <i className="icon-close" style={{ margin: 0 }}></i>
-            </Button>
-          </div>
+    <div className={styles.modalWrapper}>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <h2 style={{ fontWeight: 600, margin: 0 }}>{$t('Publish to')}</h2>{' '}
+        <div>
+          <Button type="text" onClick={onClose}>
+            <i className="icon-close" style={{ margin: 0 }}></i>
+          </Button>
         </div>
-        <div style={{ display: 'flex', gap: '16px' }}>
-          <h2 className={styles.customInput} style={{ width: 'fit-content', whiteSpace: 'nowrap' }}>
-            {videoName}
-          </h2>
-          <p style={{ width: 'fit-content', whiteSpace: 'nowrap' }}>
-            {clipsAmount} | {clipsDuration}
-          </p>
-        </div>
-        <div className={styles.publishWrapper}>
-          <div className={styles.videoWrapper}>
-            <VideoPreview />
-          </div>
-          <div
-            style={{
-              width: '100%',
-              height: '100%',
-              overflowY: 'auto',
-            }}
-          >
-            <Collapse
-              expandIconPosition="right"
-              bordered={false}
-              style={{ width: '100%', height: '424px' }}
-            >
-              {items.map((item: any) => (
-                <Collapse.Panel
-                  key={item.key}
-                  header={item.label}
-                  style={{
-                    marginBottom: '12px',
-                    borderStyle: 'solid',
-                    borderWidth: '1px',
-                    borderColor: '#ffffff10',
-                    borderRadius: '8px',
-                    backgroundColor: '#212c35',
-                  }}
-                >
-                  {item.children}
-                </Collapse.Panel>
-              ))}
-            </Collapse>
-          </div>
-        </div>
-        <div className={styles.bottomRow}>
-          <Button style={{ height: '100%', borderRadius: '8px' }}>primary</Button>
-          <BottomRowButton
-            colorRGB="255, 80, 164"
-            icon="crossclip.png"
-            description="Manually create vertical version for social media"
-            buttonText="Edit in Crossclip"
-          />
-          <BottomRowButton
-            colorRGB="255, 81, 81"
-            icon="video-editor.png"
-            description="Full fletched video editing, collaboration and more"
-            buttonText="Edit in Video Editor"
-          />
-          <BottomRowButton
-            colorRGB="94, 229, 124"
-            icon="podcast-editor.png"
-            description="Subtitles, transcripts, translations and more"
-            buttonText="Edit in Podcast Editor"
-          />
-        </div>
-
-        {/* <h1 style={{ display: 'inline', marginRight: '16px', position: 'relative', top: '3px' }}>
-          {$t('Upload To')}
-        </h1> */}
-
-        {/* <ListInput
-          value={platform}
-          onChange={handlePlatformSelect}
-          nowrap
-          options={platformOptions}
-        />
-        {platform === 'youtube' && (
-          <YoutubeUpload defaultTitle={videoName} close={onClose} streamId={streamId} />
-        )}
-        {platform !== 'youtube' && <StorageUpload onClose={onClose} platform={platform} />} */}
       </div>
-    </Form>
+      <div style={{ display: 'flex', gap: '16px' }}>
+        <h2 className={styles.customInput} style={{ width: 'fit-content', whiteSpace: 'nowrap' }}>
+          {videoName}
+        </h2>
+        <p style={{ width: 'fit-content', whiteSpace: 'nowrap' }}>
+          {clipsAmount} | {clipsDuration}
+        </p>
+      </div>
+      <div className={styles.publishWrapper}>
+        <div className={styles.videoWrapper}>
+          <VideoPreview />
+        </div>
+        <div
+          style={{
+            width: '100%',
+            height: '100%',
+            overflowY: 'scroll',
+            paddingRight: '8px',
+          }}
+        >
+          <Collapse
+            expandIconPosition="right"
+            defaultActiveKey={['1']}
+            bordered={false}
+            style={{ width: '424px', height: '424px' }}
+          >
+            {items.map((item: any) => (
+              <Collapse.Panel
+                key={item.key}
+                header={item.label}
+                style={{
+                  marginBottom: '12px',
+                  borderStyle: 'solid',
+                  borderWidth: '1px',
+                  borderColor: '#ffffff10',
+                  borderRadius: '8px',
+                  backgroundColor: '#232d3530',
+                }}
+              >
+                {item.children}
+              </Collapse.Panel>
+            ))}
+          </Collapse>
+        </div>
+      </div>
+      <div className={styles.bottomRow}>
+        <Button
+          style={{ height: '100%', borderRadius: '8px' }}
+          onClick={() => {
+            remote.shell.showItemInFolder(exportInfo.file);
+          }}
+        >
+          {$t('Open file location')}
+        </Button>
+        <BottomRowButton
+          colorRGB="255, 80, 164"
+          icon="crossclip.png"
+          description="Manually create vertical version for social media"
+          buttonText="Edit in Crossclip"
+          platform={EUploadPlatform.CROSSCLIP}
+        />
+        <BottomRowButton
+          colorRGB="255, 81, 81"
+          icon="video-editor.png"
+          description="Full fletched video editing, collaboration and more"
+          buttonText="Edit in Video Editor"
+          platform={EUploadPlatform.VIDEOEDITOR}
+        />
+        <BottomRowButton
+          colorRGB="94, 229, 124"
+          icon="podcast-editor.png"
+          description="Subtitles, transcripts, translations and more"
+          buttonText="Edit in Podcast Editor"
+          platform={EUploadPlatform.TYPESTUDIO}
+        />
+      </div>
+    </div>
   );
 }
 
@@ -178,26 +154,31 @@ function BottomRowButton({
   icon,
   buttonText,
   description,
+  platform,
 }: {
   colorRGB: string;
   icon: string;
   buttonText: string;
   description: string;
+  platform: EUploadPlatform;
 }) {
+  const { HighlighterService } = Services;
+
+  const { uploadInfo } = useVuex(() => ({
+    uploadInfo: HighlighterService.getUploadInfo(HighlighterService.views.uploadInfo, platform),
+  }));
   return (
     <div
       className={styles.bottomRowButton}
       style={{ '--color-rgb': colorRGB } as React.CSSProperties}
     >
       <img style={{ width: '24px', height: '24px' }} src={$i(`images/products/${icon}`)} />
-      <p>{description}</p>
-      <a
-      // onClick={() => {
-      //   remote.shell.showItemInFolder(exportInfo.file);
-      // }}
-      >
-        {buttonText}
-      </a>
+      {!uploadInfo?.uploading && (
+        <>
+          <p>{description}</p>
+        </>
+      )}
+      <StorageUpload onClose={() => {}} platform={platform} />
     </div>
   );
 }

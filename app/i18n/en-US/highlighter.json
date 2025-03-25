@@ -172,5 +172,7 @@
   "All requirements met but no luck?": "All requirements met but no luck?",
   "Take a screenshot of your stream and share it here": "Take a screenshot of your stream and share it here",
   "Exporting video...": "Exporting video...",
-  "%{clipsAmount} clips": "%{clipsAmount} clips"
+  "%{clipsAmount} clips": "%{clipsAmount} clips",
+  "Open": "Open",
+  "Sign in with Streamlabs ID": "Sign in with Streamlabs ID"
 }

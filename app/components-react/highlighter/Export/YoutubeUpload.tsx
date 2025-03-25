@@ -3,7 +3,7 @@ import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
 import { TextInput, TextAreaInput } from 'components-react/shared/inputs';
 import Form from 'components-react/shared/inputs/Form';
-import { Button, Progress, Tooltip, Alert } from 'antd';
+import { Button, Progress, Tooltip, Alert, Dropdown } from 'antd';
 import { RadioInput } from 'components-react/shared/inputs/RadioInput';
 import { TPrivacyStatus } from 'services/platforms/youtube/uploader';
 import electron from 'electron';
@@ -11,6 +11,8 @@ import { $t } from 'services/i18n';
 import * as remote from '@electron/remote';
 import VideoPreview from './VideoPreview';
 import UploadProgress from './UploadProgress';
+import styles from './ExportModal.m.less';
+import { EUploadPlatform } from 'services/highlighter/models/highlighter.models';
 
 export default function YoutubeUpload(props: {
   defaultTitle: string;
@@ -21,11 +23,15 @@ export default function YoutubeUpload(props: {
   const streamId = props.streamId;
   const [description, setDescription] = useState('');
   const [privacy, setPrivacy] = useState('private');
+  const [isOpen, setIsOpen] = useState(false);
   const [urlCopied, setUrlCopied] = useState(false);
   const { UserService, HighlighterService, NavigationService, UsageStatisticsService } = Services;
   const v = useVuex(() => ({
     youtubeLinked: !!UserService.state.auth?.platforms.youtube,
-    uploadInfo: HighlighterService.views.uploadInfo,
+    youTubeUploadInfo: HighlighterService.getUploadInfo(
+      HighlighterService.views.uploadInfo,
+      EUploadPlatform.YOUTUBE,
+    ),
     exportInfo: HighlighterService.views.exportInfo,
   }));
 
@@ -33,6 +39,24 @@ export default function YoutubeUpload(props: {
   useEffect(() => {
     return () => HighlighterService.actions.dismissError();
   }, []);
+
+  const options = [
+    {
+      label: $t('Private'),
+      value: 'private',
+      description: $t('Only you and people you choose can watch your video'),
+    },
+    {
+      label: $t('Unlisted'),
+      value: 'unlisted',
+      description: $t('Anyone with the video link can watch your video'),
+    },
+    {
+      label: $t('Public'),
+      value: 'public',
+      description: $t('Everyone can watch your video'),
+    },
+  ];
 
   function getYoutubeForm() {
     return (
@@ -47,28 +71,43 @@ export default function YoutubeUpload(props: {
                   value={description}
                   onChange={setDescription}
                 />
-                <RadioInput
-                  label={$t('Privacy Status')}
-                  options={[
-                    {
-                      label: $t('Private'),
-                      value: 'private',
-                      description: $t('Only you and people you choose can watch your video'),
-                    },
-                    {
-                      label: $t('Unlisted'),
-                      value: 'unlisted',
-                      description: $t('Anyone with the video link can watch your video'),
-                    },
-                    {
-                      label: $t('Public'),
-                      value: 'public',
-                      description: $t('Everyone can watch your video'),
-                    },
-                  ]}
-                  value={privacy}
-                  onChange={setPrivacy}
-                />
+
+                <div style={{ marginBottom: '8px' }}> {$t('Privacy Status')}</div>
+                <Dropdown
+                  overlay={
+                    <div className={styles.innerItemWrapper}>
+                      {options.map(option => {
+                        return (
+                          <div
+                            className={`${styles.innerDropdownItem} ${
+                              option.value === privacy ? styles.active : ''
+                            }`}
+                            onClick={() => {
+                              setPrivacy(option.value);
+                              setIsOpen(false);
+                            }}
+                            key={option.label}
+                          >
+                            <div className={styles.dropdownText}>
+                              {option.label} <p>{option.description}</p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  }
+                  trigger={['click']}
+                  visible={isOpen}
+                  onVisibleChange={setIsOpen}
+                  placement="bottomLeft"
+                >
+                  <div className={styles.innerDropdownWrapper} onClick={() => setIsOpen(!isOpen)}>
+                    <div className={styles.dropdownText}>
+                      {options.find(option => option.value === privacy)?.label}
+                    </div>
+                    <i className="icon-down"></i>
+                  </div>
+                </Dropdown>
               </Form>
             </div>
           )}
@@ -91,11 +130,10 @@ export default function YoutubeUpload(props: {
               </button>
             </div>
           )}
-          <VideoPreview />
         </div>
-        {v.uploadInfo.error && (
+        {v.youTubeUploadInfo?.error && (
           <Alert
-            style={{ marginBottom: 24 }}
+            style={{ marginBottom: 8, marginTop: 8 }}
             message={$t('An error occurred while uploading to YouTube')}
             type="error"
             closable
@@ -103,35 +141,32 @@ export default function YoutubeUpload(props: {
             afterClose={() => HighlighterService.actions.dismissError()}
           />
         )}
-        <div style={{ textAlign: 'right' }}>
-          <Button style={{ marginRight: 8 }} onClick={props.close}>
-            {$t('Close')}
+        {v.youtubeLinked && (
+          <Button
+            type="primary"
+            size="large"
+            style={{ width: '100%', marginTop: '16px' }}
+            onClick={() => {
+              UsageStatisticsService.actions.recordFeatureUsage('HighlighterUpload');
+              HighlighterService.actions.uploadYoutube(
+                {
+                  title,
+                  description,
+                  privacyStatus: privacy as TPrivacyStatus,
+                },
+                streamId,
+              );
+            }}
+          >
+            {$t('Publish')}
           </Button>
-          {v.youtubeLinked && (
-            <Button
-              type="primary"
-              onClick={() => {
-                UsageStatisticsService.actions.recordFeatureUsage('HighlighterUpload');
-                HighlighterService.actions.uploadYoutube(
-                  {
-                    title,
-                    description,
-                    privacyStatus: privacy as TPrivacyStatus,
-                  },
-                  streamId,
-                );
-              }}
-            >
-              {$t('Publish')}
-            </Button>
-          )}
-        </div>
+        )}
       </div>
     );
   }
 
   function getUploadDone() {
-    const url = `https://youtube.com/watch?v=${v.uploadInfo.videoId}`;
+    const url = `https://youtube.com/watch?v=${v.youTubeUploadInfo?.videoId}`;
 
     return (
       <div>
@@ -158,9 +193,11 @@ export default function YoutubeUpload(props: {
 
   return (
     <div>
-      {!v.uploadInfo.uploading && !v.uploadInfo.videoId && getYoutubeForm()}
-      {v.youtubeLinked && v.uploadInfo.uploading && <UploadProgress />}
-      {v.youtubeLinked && v.uploadInfo.videoId && getUploadDone()}
+      {!v.youTubeUploadInfo?.uploading && !v.youTubeUploadInfo?.videoId && getYoutubeForm()}
+      {v.youtubeLinked && v.youTubeUploadInfo?.uploading && (
+        <UploadProgress platform={EUploadPlatform.YOUTUBE} />
+      )}
+      {v.youtubeLinked && v.youTubeUploadInfo?.videoId && getUploadDone()}
     </div>
   );
 }

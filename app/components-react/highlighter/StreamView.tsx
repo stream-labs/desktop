@@ -188,7 +188,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
   function closeModal() {
     // Do not allow closing export modal while export/upload operations are in progress
     if (v.exportInfo.exporting) return;
-    if (v.uploadInfo.uploading) return;
+    if (v.uploadInfo.some(u => u.uploading)) return;
 
     setShowModal(null);
 

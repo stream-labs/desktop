@@ -1,3 +1,5 @@
+@import '../../../styles/index.less';
+
 .crossclip-container {
   min-height: 300px;
   display: flex;
@@ -6,11 +8,17 @@
 }
 
 .upload-button {
-  margin: 32px;
-  width: 100px;
-  height: 50px;
-  border-radius: 16px;
-  font-size: 18px;
+  text-decoration: underline;
+  background-color: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  padding: 0;
+  opacity: 0.8;
+}
+.upload-button:hover {
+  text-decoration: underline;
+  opacity: 1;
 }
 
 .sign-up-title {
@@ -23,7 +31,7 @@
   text-align: center;
 }
 
-.modal-wrapper {
+.export-wrapper {
   :global {
     /* Hide labels */
     .ant-form-item-label,
@@ -297,6 +305,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
     height: var(--sectionHeight);
     width: var(--sectionWidth);
     padding: var(--padding);
@@ -309,6 +318,8 @@
     position: relative;
     max-height: 100%;
     border-radius: 8px;
+    width: fit-content;
+    height: fit-content;
   }
 
   .video-preview::before {
@@ -319,8 +330,7 @@
     border-radius: 8px;
     position: absolute;
     width: 100%;
-    height: inherit;
-    aspect-ratio: 16 / 9;
+    height: 100%;
   }
 
   video {
@@ -340,7 +350,7 @@
   grid-template-columns: 1fr 1fr 1fr 1fr;
   gap: 16px;
   margin-top: 40px;
-  max-width: calc(var(--sectionWidth) * 2 + 16px);
+  max-width: calc(var(--sectionWidth) * 2 + 16px * 3);
 
   .bottom-row-button {
     display: flex;
@@ -357,7 +367,6 @@
     display: flex;
     flex-direction: column;
     padding: 16px;
-    color: white;
 
     p {
       opacity: 0.8;
