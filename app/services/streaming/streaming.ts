@@ -28,7 +28,7 @@ import {
 import { Inject } from 'services/core/injector';
 import moment from 'moment';
 import padStart from 'lodash/padStart';
-import { IOutputSettings, OutputSettingsService } from 'services/settings';
+import { IOutputSettings, OutputSettingsService, SettingsService } from 'services/settings';
 import { WindowsService } from 'services/windows';
 import { Subject } from 'rxjs';
 import {
@@ -134,15 +134,6 @@ export interface IOBSOutputSignalInfo {
 type TOBSOutputType = 'streaming' | 'recording' | 'replayBuffer';
 
 interface IOutputContext {
-  // simpleStreaming: ISimpleStreaming;
-  // simpleReplayBuffer: ISimpleReplayBuffer;
-  // simpleRecording: ISimpleRecording;
-  // advancedStreaming: IAdvancedStreaming;
-  // advancedRecording: IAdvancedRecording;
-  // advancedReplayBuffer: IAdvancedReplayBuffer;
-  // streaming: ISimpleStreaming | IAdvancedStreaming;
-  // recording: ISimpleRecording | IAdvancedRecording;
-  // replayBuffer: ISimpleReplayBuffer | IAdvancedReplayBuffer;
   streaming: ISimpleStreaming | IAdvancedStreaming;
   recording: ISimpleRecording | IAdvancedRecording;
   replayBuffer: ISimpleReplayBuffer | IAdvancedReplayBuffer;
@@ -166,6 +157,7 @@ export class StreamingService
   @Inject() private markersService: MarkersService;
   @Inject() private dualOutputService: DualOutputService;
   @Inject() private youtubeService: YoutubeService;
+  @Inject() private settingsService: SettingsService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
@@ -283,9 +275,15 @@ export class StreamingService
       },
     );
 
-    // this.settingsService.settingsUpdated.subscribe(() => {
-    //   this.updateOutputInstance();
-    // });
+    this.settingsService.settingsUpdated.subscribe(patch => {
+      // TODO: write a more versatile handler for settings updates
+      // For now, only handle updating the replay buffer duration
+      if (patch.Output?.RecRBTime && this.contexts.horizontal.replayBuffer) {
+        console.log('settingsUpdated patch', JSON.stringify(patch, null, 2));
+        this.contexts.horizontal.replayBuffer.duration = patch.Output.RecRBTime;
+        this.logContexts('horizontal', 'replayBuffer update');
+      }
+    });
   }
 
   get views() {
@@ -1725,71 +1723,6 @@ export class StreamingService
     this.contexts[display].replayBuffer.save();
   }
 
-  private updateOutputInstance() {
-    if (
-      this.contexts.horizontal.streaming &&
-      this.state.status.horizontal.streaming !== EStreamingState.Offline
-    ) {
-      const settings = this.outputSettingsService.getStreamingSettings() as Omit<
-        Partial<ISimpleStreaming | IAdvancedStreaming>,
-        'videoEncoder'
-      >;
-      const outputInstance: ISimpleStreaming | IAdvancedStreaming = this.contexts.horizontal
-        .streaming;
-
-      Object.keys(settings).forEach(
-        (key: keyof Omit<Partial<ISimpleStreaming | IAdvancedStreaming>, 'videoEncoder'>) => {
-          if ((settings as any)[key] === undefined) return;
-          if (outputInstance[key] !== settings[key]) {
-            (this.contexts.horizontal.streaming as any)[key] = (settings as any)[key];
-          }
-        },
-      );
-    }
-
-    if (
-      this.contexts.horizontal.recording &&
-      this.state.status.horizontal.recording !== ERecordingState.Offline
-    ) {
-      const settings = this.outputSettingsService.getRecordingSettings() as Omit<
-        Partial<ISimpleRecording | IAdvancedRecording>,
-        'videoEncoder'
-      >;
-
-      const outputInstance: ISimpleRecording | IAdvancedRecording = this.contexts.horizontal
-        .recording;
-      Object.keys(settings).forEach(
-        (key: keyof Omit<Partial<ISimpleRecording | IAdvancedRecording>, 'videoEncoder'>) => {
-          if ((settings as any)[key] === undefined) return;
-          if (outputInstance[key] !== settings[key]) {
-            (this.contexts.horizontal.recording as any)[key] = (settings as any)[key];
-          }
-        },
-      );
-    }
-
-    if (
-      this.contexts.horizontal.replayBuffer &&
-      this.state.status.horizontal.replayBuffer !== EReplayBufferState.Offline
-    ) {
-      const settings = this.outputSettingsService.getReplayBufferSettings() as Omit<
-        Partial<ISimpleReplayBuffer | IAdvancedReplayBuffer>,
-        'videoEncoder'
-      >;
-
-      const outputInstance: ISimpleReplayBuffer | IAdvancedReplayBuffer = this.contexts.horizontal
-        .replayBuffer;
-      Object.keys(settings).forEach(
-        (key: keyof Omit<Partial<ISimpleReplayBuffer | IAdvancedReplayBuffer>, 'videoEncoder'>) => {
-          if ((settings as any)[key] === undefined) return;
-          if (outputInstance[key] !== settings[key]) {
-            (this.contexts.horizontal.replayBuffer as any)[key] = (settings as any)[key];
-          }
-        },
-      );
-    }
-  }
-
   private async validateOrCreateOutputInstance(
     mode: 'Simple' | 'Advanced',
     display: TDisplayType,
@@ -1797,8 +1730,6 @@ export class StreamingService
   ) {
     if (this.contexts[display][type]) {
       // Check for a property that only exists on the output type's advanced instance
-      // Note: the properties below were chosen arbitrarily
-
       const isAdvancedOutputInstance =
         type === 'streaming'
           ? this.isAdvancedStreaming(this.contexts[display][type])

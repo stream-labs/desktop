@@ -479,11 +479,13 @@ export class OutputSettingsService extends Service {
       'Replay Buffer',
       'RecRBPrefix',
     );
+
     const suffix: string = this.settingsService.findSettingValue(
       output,
       'Replay Buffer',
       'RecRBSuffix',
     );
+
     const duration: number = this.settingsService.findSettingValue(output, 'Output', 'RecRBTime');
 
     const useStreamEncoders =

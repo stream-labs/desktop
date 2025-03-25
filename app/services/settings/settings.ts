@@ -260,7 +260,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
   private videoEncodingOptimizationService: VideoEncodingOptimizationService;
 
   audioRefreshed = new Subject();
-  // settingsUpdated = new Subject<DeepPartial<ISettingsValues>>();
+  settingsUpdated = new Subject<DeepPartial<ISettingsValues>>();
 
   get views() {
     return new SettingsViews(this.state);
@@ -622,7 +622,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
       this.setSettings(categoryName, formSubCategories);
     });
 
-    // this.settingsUpdated.next(patch);
+    this.settingsUpdated.next(patch);
   }
 
   private setAudioSettings(settingsData: ISettingsSubCategory[]) {
