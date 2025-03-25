@@ -16,7 +16,7 @@ import AiHighlighterToggle from '../AiHighlighterToggle';
 import { Services } from 'components-react/service-provider';
 import { EAvailableFeatures } from 'services/incremental-rollout';
 
-import Badge from 'components-react/shared/NewBadge';
+import Badge from 'components-react/shared/DismissableBadge';
 import { EDismissable } from 'services/dismissables';
 
 export function TwitchEditStreamInfo(p: IPlatformComponentParams<'twitch'>) {

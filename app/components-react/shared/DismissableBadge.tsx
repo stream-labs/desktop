@@ -1,5 +1,5 @@
 import React, { CSSProperties } from 'react';
-import styles from './NewBadge.m.less';
+import styles from './DismissableBadge.m.less';
 import { EDismissable } from 'services/dismissables';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
@@ -15,8 +15,8 @@ interface INewButtonProps {
   style?: CSSProperties;
 }
 
-export default function NewButton({
-  content,
+export default function DismissableBadge({
+  content = 'New',
   dismissableKey,
   size = 'standard',
   absolute = false,
@@ -34,7 +34,7 @@ export default function NewButton({
     <div
       className={cx(
         styles.badge,
-        styles.newBadge,
+        styles.dismissableBadge,
         absolute && styles.absolute,
         size === 'small' && styles.small,
       )}
