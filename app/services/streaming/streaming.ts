@@ -1078,9 +1078,11 @@ export class StreamingService
     }
 
     const replayWhenStreaming = this.streamSettingsService.settings.replayBufferWhileStreaming;
+    const isReplayBufferEnabled = this.outputSettingsService.getSettings().replayBuffer.enabled;
 
     if (
       replayWhenStreaming &&
+      isReplayBufferEnabled &&
       this.state.status.horizontal.replayBuffer === EReplayBufferState.Offline &&
       this.state.status.vertical.replayBuffer === EReplayBufferState.Offline
     ) {
