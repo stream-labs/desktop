@@ -41,7 +41,7 @@ export function TwitchEditStreamInfo(p: IPlatformComponentParams<'twitch'>) {
       {p.enabledPlatformsCount === 1 && <InputWrapper>
         <div>
           <CheckboxInput style={{display: 'inline-block'}} label={$t('Enhanced broadcasting')} tooltip={enhancedBroadcastingTooltipText} {...bind.isEnhancedBroadcasting} />
-          <Badge style={{display: 'inline-block'}} dismissableKey={EDismissable.EnhancedBroadcasting}>Beta</Badge>
+          <Badge style={{display: 'inline-block'}} dismissableKey={EDismissable.EnhancedBroadcasting} content={'Beta'} />
         </div>
       </InputWrapper>}
     </div>
