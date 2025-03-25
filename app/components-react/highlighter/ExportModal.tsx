@@ -23,7 +23,7 @@ import { SCRUB_HEIGHT, SCRUB_WIDTH, SCRUB_FRAMES } from 'services/highlighter/co
 import styles from './ExportModal.m.less';
 import { getCombinedClipsDuration } from './utils';
 import { formatSecondsToHMS } from './ClipPreview';
-import { set } from 'lodash';
+import cx from 'classnames';
 
 type TSetting = { name: string; fps: TFPS; resolution: TResolution; preset: TPreset };
 const settings: TSetting[] = [
@@ -132,7 +132,6 @@ function ExportModal({ close, streamId }: { close: () => void; streamId: string 
   // Clear all errors when this component unmounts
   useEffect(() => unmount, []);
 
-  // if (exportInfo.exporting) return <ExportProgress />;
   if (!exportInfo.exported || exportInfo.exporting) {
     return (
       <ExportFlow
@@ -256,7 +255,7 @@ function ExportFlow({
         </div>
         <div style={{ display: 'flex', gap: '16px' }}>
           <div className={styles.settingsAndProgress}>
-            <div className={`${styles.pathWrapper} ${isExporting ? styles.isDisabled : ''}`}>
+            <div className={cx(styles.pathWrapper, isExporting && styles.isDisabled)}>
               <h2 style={{ margin: '0px' }}>
                 <input
                   id="videoName"
@@ -273,7 +272,7 @@ function ExportFlow({
               <FileInput
                 label={$t('Export Location')}
                 name="exportLocation"
-                save={true}
+                save
                 filters={[{ name: $t('MP4 Video File'), extensions: ['mp4'] }]}
                 value={exportFile}
                 onChange={file => {
@@ -285,7 +284,7 @@ function ExportFlow({
             </div>
 
             <div
-              className={`${styles.thumbnail} ${isExporting && styles.thumbnailInProgress} `}
+              className={cx(styles.thumbnail, isExporting && styles.thumbnailInProgress)}
               style={
                 currentFormat === EOrientation.HORIZONTAL
                   ? { aspectRatio: '16/9' }
@@ -320,13 +319,12 @@ function ExportFlow({
                     ? { objectPosition: 'left' }
                     : { objectPosition: `-${(SCRUB_WIDTH * 1.32) / 3 + 4}px` }
                 }
-                alt=""
               />
             </div>
 
             <div className={styles.clipInfoWrapper}>
               <div
-                className={`${isExporting ? styles.isDisabled : ''}`}
+                className={cx(isExporting && styles.isDisabled)}
                 style={{
                   display: 'flex',
                   justifyContent: 'space-between',
