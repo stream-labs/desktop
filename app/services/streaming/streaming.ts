@@ -1331,9 +1331,10 @@ export class StreamingService
 
         // share the video encoder with the streaming instance if it exists
         if (key === 'videoEncoder') {
-          recording.videoEncoder =
-            (this.contexts[display].streaming as IAdvancedStreaming)?.videoEncoder ??
-            VideoEncoderFactory.create(settings.videoEncoder, 'video-encoder');
+          recording.videoEncoder = VideoEncoderFactory.create(
+            settings.videoEncoder,
+            'video-encoder',
+          );
         } else {
           (recording as any)[key] = (settings as any)[key];
         }
@@ -1356,9 +1357,10 @@ export class StreamingService
 
         // share the video encoder with the streaming instance if it exists
         if (key === 'videoEncoder') {
-          recording.videoEncoder =
-            (this.contexts[display].streaming as ISimpleStreaming)?.videoEncoder ??
-            VideoEncoderFactory.create(settings.videoEncoder, 'video-encoder');
+          recording.videoEncoder = VideoEncoderFactory.create(
+            settings.videoEncoder,
+            'video-encoder',
+          );
         } else {
           (recording as any)[key] = (settings as any)[key];
         }
@@ -1413,9 +1415,7 @@ export class StreamingService
 
       // share the video encoder with the recording instance if it exists
       if (key === 'videoEncoder') {
-        stream.videoEncoder =
-          this.contexts[display].recording?.videoEncoder ??
-          VideoEncoderFactory.create(settings.videoEncoder, 'video-encoder');
+        stream.videoEncoder = VideoEncoderFactory.create(settings.videoEncoder, 'video-encoder');
       } else {
         (stream as any)[key] = (settings as any)[key];
       }

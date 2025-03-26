@@ -257,7 +257,7 @@ export class OutputSettingsService extends Service {
 
     const convertedEncoderName:
       | EObsSimpleEncoder.x264_lowcpu
-      | EObsAdvancedEncoder = this.convertEncoderToNewAPI(this.getSettings().recording.encoder);
+      | EObsAdvancedEncoder = this.convertEncoderToNewAPI(this.getSettings().streaming.encoder);
 
     const videoEncoder: EObsAdvancedEncoder =
       convertedEncoderName === EObsSimpleEncoder.x264_lowcpu
@@ -475,18 +475,22 @@ export class OutputSettingsService extends Service {
     );
 
     const prefix: string = this.settingsService.findSettingValue(
-      output,
+      advanced,
       'Replay Buffer',
       'RecRBPrefix',
     );
 
     const suffix: string = this.settingsService.findSettingValue(
-      output,
+      advanced,
       'Replay Buffer',
       'RecRBSuffix',
     );
 
-    const duration: number = this.settingsService.findSettingValue(output, 'Output', 'RecRBTime');
+    const duration: number = this.settingsService.findSettingValue(
+      output,
+      'Replay Buffer',
+      'RecRBTime',
+    );
 
     const useStreamEncoders =
       this.settingsService.findSettingValue(output, 'Recording', 'RecEncoder') === 'none';
@@ -602,31 +606,6 @@ export class OutputSettingsService extends Service {
       duration,
     };
   }
-  // simple
-  // recording.path = path.join(path.normalize(__dirname), '..', 'osnData');
-  // recording.format = ERecordingFormat.MOV;
-  // recording.quality = ERecordingQuality.HighQuality;
-  // recording.video = obs.defaultVideoContext;
-  // recording.videoEncoder =
-  //     osn.VideoEncoderFactory.create('obs_x264', 'video-encoder');
-  // recording.lowCPU = true;
-  // recording.audioEncoder = osn.AudioEncoderFactory.create();
-  // recording.overwrite = true;
-  // recording.noSpace = false;
-
-  // advanced
-  // recording.path = path.join(path.normalize(__dirname), '..', 'osnData');
-  // recording.format = ERecordingFormat.MOV;
-  // recording.videoEncoder =
-  //     osn.VideoEncoderFactory.create('obs_x264', 'video-encoder');
-  // recording.overwrite = true;
-  // recording.noSpace = false;
-  // recording.video = obs.defaultVideoContext;
-  // recording.mixer = 7;
-  // recording.rescaling = true;
-  // recording.outputWidth = 1920;
-  // recording.outputHeight = 1080;
-  // recording.useStreamEncoders = false;
 
   getAdvancedRecordingSettings() {
     const output = this.settingsService.state.Output.formData;
