@@ -460,6 +460,10 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
         if (!aiRecordingInProgress) {
           return;
         }
+
+        this.usageStatisticsService.recordAnalyticsEvent('AIHighlighter', {
+          type: 'AiRecordingFinished',
+        });
         this.streamingService.actions.toggleRecording();
 
         // Load potential replaybuffer clips
@@ -468,6 +472,9 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     });
 
     this.streamingService.latestRecordingPath.subscribe(path => {
+      if (!aiRecordingInProgress) {
+        return;
+      }
       // Check if recording is immediately available
       getVideoDuration(path)
         .then(duration => {
@@ -475,17 +482,13 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
             duration = -1;
           }
           this.usageStatisticsService.recordAnalyticsEvent('AIHighlighter', {
-            type: 'FinishRecording',
+            type: 'AiRecordingExists',
             duration,
           });
         })
         .catch(error => {
           console.error('Failed getting duration right after the recoding.', error);
         });
-
-      if (!aiRecordingInProgress) {
-        return;
-      }
 
       aiRecordingInProgress = false;
       this.detectAndClipAiHighlights(path, streamInfo, true);
