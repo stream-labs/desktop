@@ -72,6 +72,7 @@ import { cutHighlightClips, getVideoDuration } from './cut-highlight-clips';
 import { reduce } from 'lodash';
 import { extractDateTimeFromPath, fileExists } from './file-utils';
 import { addVerticalFilterToExportOptions } from './vertical-export';
+import Utils from '../utils';
 
 @InitAfter('StreamingService')
 export class HighlighterService extends PersistentStatefulService<IHighlighterState> {
@@ -1167,7 +1168,7 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     });
 
     this.setAiHighlighter(true);
-    if (downloadNow) {
+    if (downloadNow && Utils.getHighlighterEnvironment() !== 'local') {
       await this.aiHighlighterUpdater.isNewVersionAvailable();
       this.startUpdater();
     } else {
