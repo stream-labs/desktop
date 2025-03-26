@@ -14,6 +14,8 @@ import * as cp from 'child_process';
 import * as semver from 'semver';
 import * as crypto from 'crypto';
 
+import { alertAsync } from "../app/components-react/modals";
+
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
 const mkdir = util.promisify(fs.mkdir);
@@ -320,6 +322,8 @@ async function shouldUpdate(
  */
 async function entry(info: IUpdateInfo) {
   console.log('Starting update check:', info);
+
+  alertAsync('Just an alert');
 
   const latestVersion = await getLatestVersionInfo(info);
 

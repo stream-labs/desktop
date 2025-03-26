@@ -3,7 +3,8 @@
     "target": "es5",
     "module": "commonjs",
     "strict": true,
-    "outDir": "./build"
+    "outDir": "./build",
+    "jsx": "preserve"
   },
   "files": [
     "bootstrap.ts",
