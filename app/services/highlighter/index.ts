@@ -185,8 +185,6 @@ export class HighlighterService extends PersistentStatefulService<IHighlighterSt
     const platform = uploadInfo.platform;
     const existingIndex = this.state.uploads.findIndex(u => u.platform === platform);
 
-    console.log('SET_UPLOAD_INFO', uploadInfo.uploading);
-
     if (existingIndex !== -1) {
       this.state.uploads = [
         ...this.state.uploads.slice(0, existingIndex),

@@ -55,6 +55,10 @@ export default function PlatformSelect({
     },
   ];
 
+  function openInFolder() {
+    remote.shell.showItemInFolder(exportInfo.file);
+  }
+
   return (
     <div className={styles.modalWrapper}>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -65,12 +69,12 @@ export default function PlatformSelect({
           </Button>
         </div>
       </div>
-      <div style={{ display: 'flex', gap: '16px' }}>
+      <div style={{ display: 'flex', gap: '16px', cursor: 'pointer' }} onClick={openInFolder}>
         <h2 className={styles.customInput} style={{ width: 'fit-content', whiteSpace: 'nowrap' }}>
           {videoName}
         </h2>
         <p style={{ width: 'fit-content', whiteSpace: 'nowrap' }}>
-          {clipsAmount} | {clipsDuration}
+          {clipsDuration} | {clipsAmount} clips
         </p>
       </div>
       <div className={styles.publishWrapper}>
@@ -111,33 +115,28 @@ export default function PlatformSelect({
         </div>
       </div>
       <div className={styles.bottomRow}>
-        <Button
-          style={{ height: '100%', borderRadius: '8px' }}
-          onClick={() => {
-            remote.shell.showItemInFolder(exportInfo.file);
-          }}
-        >
+        <Button style={{ height: '100%', borderRadius: '8px' }} onClick={openInFolder}>
           {$t('Open file location')}
         </Button>
         <BottomRowButton
           colorRGB="255, 80, 164"
           icon="crossclip.png"
-          description="Manually create vertical version for social media"
-          buttonText="Edit in Crossclip"
+          description={$t('Manually create vertical version for social media')}
+          buttonText={$t('Edit in Cross Clip')}
           platform={EUploadPlatform.CROSSCLIP}
         />
         <BottomRowButton
           colorRGB="255, 81, 81"
           icon="video-editor.png"
-          description="Full fletched video editing, collaboration and more"
-          buttonText="Edit in Video Editor"
+          description={$t('Full fletched video editing, collaboration and more')}
+          buttonText={$t('Edit in Video Editor')}
           platform={EUploadPlatform.VIDEOEDITOR}
         />
         <BottomRowButton
           colorRGB="94, 229, 124"
           icon="podcast-editor.png"
-          description="Subtitles, transcripts, translations and more"
-          buttonText="Edit in Podcast Editor"
+          description={$t('Subtitles, transcripts, translations and more')}
+          buttonText={$t('Edit in Podcast Editor')}
           platform={EUploadPlatform.TYPESTUDIO}
         />
       </div>
