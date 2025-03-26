@@ -10,6 +10,7 @@ export interface IExportOptions {
   height: number;
   preset: TPreset;
   complexFilter?: string;
+  subtitles?: {};
 }
 
 // types for highlighter video operations
