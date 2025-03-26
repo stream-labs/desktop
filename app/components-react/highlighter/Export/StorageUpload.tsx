@@ -25,7 +25,24 @@ export default function StorageUpload(p: { onClose: () => void; platform: EUploa
   const [showSlidLoginModal, setShowSlidLoginModal] = React.useState(false);
 
   function uploadStorage() {
-    HighlighterService.actions.uploadStorage(p.platform);
+    // First check if there is an existing upload for another platform
+    const existingUpload = HighlighterService.views.state.uploads.find(
+      upload =>
+        [
+          EUploadPlatform.CROSSCLIP,
+          EUploadPlatform.TYPESTUDIO,
+          EUploadPlatform.VIDEOEDITOR,
+        ].includes(upload.platform) && upload.videoId,
+    );
+
+    if (existingUpload?.videoId) {
+      HighlighterService.SET_UPLOAD_INFO({
+        platform: p.platform,
+        videoId: existingUpload.videoId,
+      });
+    } else {
+      HighlighterService.actions.uploadStorage(p.platform);
+    }
   }
 
   useEffect(() => {
