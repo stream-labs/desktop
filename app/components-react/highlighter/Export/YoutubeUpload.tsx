@@ -33,6 +33,9 @@ export default function YoutubeUpload(props: {
       EUploadPlatform.YOUTUBE,
     ),
     exportInfo: HighlighterService.views.exportInfo,
+    otherUploadInProgress: HighlighterService.views.uploadInfo
+      .filter(info => info.platform !== EUploadPlatform.YOUTUBE)
+      .some(info => info.uploading),
   }));
 
   // Clear all errors when this component unmounts
@@ -61,7 +64,12 @@ export default function YoutubeUpload(props: {
   function getYoutubeForm() {
     return (
       <div>
-        <div style={{ display: 'flex', flexDirection: 'row' }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+          }}
+        >
           {v.youtubeLinked && (
             <div style={{ flexGrow: 1 }}>
               <Form layout="vertical">
@@ -145,7 +153,12 @@ export default function YoutubeUpload(props: {
           <Button
             type="primary"
             size="large"
-            style={{ width: '100%', marginTop: '16px' }}
+            style={{
+              width: '100%',
+              marginTop: '16px',
+              pointerEvents: v.otherUploadInProgress ? 'none' : 'auto',
+              opacity: v.otherUploadInProgress ? '0.6' : '1',
+            }}
             onClick={() => {
               UsageStatisticsService.actions.recordFeatureUsage('HighlighterUpload');
               HighlighterService.actions.uploadYoutube(

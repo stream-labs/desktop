@@ -42,14 +42,10 @@ export default function PlatformSelect({
 
   useEffect(() => {
     HighlighterService.clearUpload();
+    return () => {
+      HighlighterService.clearUpload();
+    };
   }, []);
-
-  const platformOptions = [
-    { label: 'YouTube', value: 'youtube' },
-    { label: 'Cross Clip', value: 'crossclip' },
-    { label: 'Podcast Editor', value: 'typestudio' },
-    { label: 'Video Editor', value: 'videoeditor' },
-  ];
 
   const items = [
     {
@@ -164,16 +160,28 @@ function BottomRowButton({
 }) {
   const { HighlighterService } = Services;
 
-  const { uploadInfo } = useVuex(() => ({
-    uploadInfo: HighlighterService.getUploadInfo(HighlighterService.views.uploadInfo, platform),
+  const { currentUploadInfo, otherUploadInfo } = useVuex(() => ({
+    currentUploadInfo: HighlighterService.getUploadInfo(
+      HighlighterService.views.uploadInfo,
+      platform,
+    ),
+    otherUploadInfo: HighlighterService.views.uploadInfo
+      .filter(info => info.platform !== platform)
+      .some(info => info.uploading),
   }));
   return (
     <div
       className={styles.bottomRowButton}
-      style={{ '--color-rgb': colorRGB } as React.CSSProperties}
+      style={
+        {
+          '--color-rgb': colorRGB,
+          pointerEvents: otherUploadInfo ? 'none' : 'auto',
+          opacity: otherUploadInfo ? '0.6' : '1',
+        } as React.CSSProperties
+      }
     >
       <img style={{ width: '24px', height: '24px' }} src={$i(`images/products/${icon}`)} />
-      {!uploadInfo?.uploading && (
+      {!currentUploadInfo?.uploading && (
         <>
           <p>{description}</p>
         </>
