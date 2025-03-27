@@ -290,15 +290,14 @@ function LiveDock(p: { onLeft: boolean }) {
   const liveDockRef = useRef<HTMLDivElement>(null);
 
   // Min and max widths accommodate a 1px border
-  const minWidth = 19;
-  const maxWidth = liveDockSize - minWidth + 2;
+  const minWidth = p.onLeft ? 18 : 19;
+  const maxWidth = p.onLeft ? liveDockSize - minWidth : liveDockSize - minWidth + 2;
 
   const resizeObserver = new ResizeObserver((entries: ResizeObserverEntry[]) => {
     entries.forEach((entry: ResizeObserverEntry) => {
       if (!entry || !entry?.contentRect) return;
 
       const width = Math.floor(entry?.contentRect?.width);
-
       if (width === minWidth || width === maxWidth) {
         Services.WindowsService.actions.updateStyleBlockers('main', false);
 
