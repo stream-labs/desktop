@@ -1,5 +1,15 @@
 .display-toggle-container {
   display: flex;
+}
+
+.display-toggle {
+  text-transform: none;
+  font-weight: 400;
+
+  i {
+    line-height: unset;
+    margin-right: 10px;
+  }
 
   i.active {
     color: var(--icon-active);
@@ -11,13 +21,6 @@
     &:hover {
       cursor: not-allowed;
     }
-  }
-}
-
-.display-toggle {
-  i {
-    line-height: unset;
-    margin-right: 10px;
   }
 }
 

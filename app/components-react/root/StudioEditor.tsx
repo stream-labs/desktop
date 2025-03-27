@@ -1,5 +1,5 @@
 import { useVuex } from 'components-react/hooks';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import styles from './StudioEditor.m.less';
 import { Services } from 'components-react/service-provider';
 import cx from 'classnames';
@@ -11,6 +11,7 @@ import AutoProgressBar from 'components-react/shared/AutoProgressBar';
 import { useSubscription } from 'components-react/hooks/useSubscription';
 import { message } from 'antd';
 import { useRealmObject } from 'components-react/hooks/realm';
+import { DisplayToggle } from 'components-react/shared/DisplayToggle';
 
 export default function StudioEditor() {
   const {
@@ -37,7 +38,10 @@ export default function StudioEditor() {
   const displayEnabled = !v.hideStyleBlockers && !performanceMode && !v.isLoading;
   const placeholderRef = useRef<HTMLDivElement>(null);
   const studioModeRef = useRef<HTMLDivElement>(null);
+  const studioModeToggleRef = useRef<HTMLDivElement>(null);
+  const displayToggleRef = useRef<HTMLDivElement>(null);
   const [studioModeStacked, setStudioModeStacked] = useState(false);
+  const [studioModeDisplay, setStudioModeDisplay] = useState<TDisplayType>('horizontal');
   const [verticalPlaceholder, setVerticalPlaceholder] = useState(false);
   const [messageActive, setMessageActive] = useState(false);
   const studioModeTransitionName = useMemo(() => TransitionsService.getStudioTransitionName(), [
@@ -49,49 +53,112 @@ export default function StudioEditor() {
     return v.studioMode && !dualOutputMode ? studioModeTransitionName : undefined;
   }, [v.showHorizontalDisplay, v.showVerticalDisplay, v.studioMode]);
 
-  // Track vertical orientation for placeholder
-  useEffect(() => {
-    let timeout: number;
-
-    if (displayEnabled || performanceMode) return;
-
-    function checkVerticalOrientation() {
-      if (placeholderRef.current) {
-        const { clientWidth, clientHeight } = placeholderRef.current;
-        setVerticalPlaceholder(clientWidth / clientHeight < 16 / 9);
-      }
-
-      timeout = window.setTimeout(checkVerticalOrientation, 1000);
+  const showHorizontal = useMemo(() => {
+    if (v.studioMode) {
+      return studioModeDisplay === 'horizontal';
     }
 
-    checkVerticalOrientation();
+    return v.showHorizontalDisplay;
+  }, [v.showHorizontalDisplay, studioModeDisplay, v.studioMode]);
 
-    return () => {
-      if (timeout) clearTimeout(timeout);
-    };
-  }, [displayEnabled, performanceMode]);
-
-  // Track orientation for studio mode
-  useEffect(() => {
-    if (!v.studioMode) return;
-
-    let timeout: number;
-
-    function checkStudioModeOrientation() {
-      if (studioModeRef.current) {
-        const { clientWidth, clientHeight } = studioModeRef.current;
-        setStudioModeStacked(clientWidth / clientHeight < 16 / 9);
-      }
-
-      timeout = window.setTimeout(checkStudioModeOrientation, 1000);
+  const showVertical = useMemo(() => {
+    if (v.studioMode) {
+      return studioModeDisplay === 'vertical';
     }
 
-    checkStudioModeOrientation();
+    return v.showVerticalDisplay;
+  }, [v.showVerticalDisplay, studioModeDisplay, v.studioMode]);
+
+  const resizeObserver = new ResizeObserver((entries: ResizeObserverEntry[]) => {
+    entries.forEach((entry: ResizeObserverEntry) => {
+      if (!entry || !entry?.contentRect) return;
+
+      const width = Math.floor(entry?.contentRect?.width);
+      const height = Math.floor(entry?.contentRect?.height);
+
+      if (displayEnabled || performanceMode) return;
+
+      if (placeholderRef?.current) {
+        setVerticalPlaceholder(width / height < 16 / 9);
+      }
+
+      if (studioModeRef?.current) {
+        setStudioModeStacked(width / height < 16 / 9);
+      }
+    });
+  });
+
+  // function checkVerticalOrientation(width: number, height: number) {
+  //   if (placeholderRef.current) {
+  //     const { clientWidth, clientHeight } = placeholderRef.current;
+  //     setVerticalPlaceholder(clientWidth / clientHeight < 16 / 9);
+  //   }
+  // }
+
+  useLayoutEffect(() => {
+    let mounted = true;
+    if (placeholderRef && placeholderRef?.current) {
+      resizeObserver.observe(placeholderRef?.current);
+    }
+
+    if (studioModeRef && studioModeRef?.current) {
+      resizeObserver.observe(studioModeRef?.current);
+    }
 
     return () => {
-      if (timeout) clearTimeout(timeout);
+      if (!placeholderRef || !placeholderRef?.current) return;
+      resizeObserver.unobserve(placeholderRef.current);
+
+      if (!studioModeRef || !studioModeRef?.current) return;
+      resizeObserver.unobserve(studioModeRef.current);
+
+      mounted = false;
     };
-  }, [v.studioMode]);
+  }, [placeholderRef]);
+
+  // // Track vertical orientation for placeholder
+  // useEffect(() => {
+  //   let timeout: number;
+
+  //   if (displayEnabled || performanceMode) return;
+
+  //   function checkVerticalOrientation() {
+  //     if (placeholderRef.current) {
+  //       const { clientWidth, clientHeight } = placeholderRef.current;
+  //       setVerticalPlaceholder(clientWidth / clientHeight < 16 / 9);
+  //     }
+
+  //     timeout = window.setTimeout(checkVerticalOrientation, 1000);
+  //   }
+
+  //   checkVerticalOrientation();
+
+  //   return () => {
+  //     if (timeout) clearTimeout(timeout);
+  //   };
+  // }, [displayEnabled, performanceMode]);
+
+  // // Track orientation for studio mode
+  // useEffect(() => {
+  //   if (!v.studioMode) return;
+
+  //   let timeout: number;
+
+  //   function checkStudioModeOrientation() {
+  //     if (studioModeRef.current) {
+  //       const { clientWidth, clientHeight } = studioModeRef.current;
+  //       setStudioModeStacked(clientWidth / clientHeight < 16 / 9);
+  //     }
+
+  //     timeout = window.setTimeout(checkStudioModeOrientation, 1000);
+  //   }
+
+  //   checkStudioModeOrientation();
+
+  //   return () => {
+  //     if (timeout) clearTimeout(timeout);
+  //   };
+  // }, [v.studioMode]);
 
   // This is a bit weird, but it's a performance optimization.
   // This component heavily re-renders, so trying to do as little
@@ -192,12 +259,19 @@ export default function StudioEditor() {
     <div className={styles.mainContainer} ref={studioModeRef}>
       {displayEnabled && (
         <div className={cx(styles.studioModeContainer, { [styles.stacked]: studioModeStacked })}>
-          {v.studioMode && <StudioModeControls stacked={studioModeStacked} />}
-          {v.dualOutputMode && <DualOutputControls stacked={studioModeStacked} />}
+          {v.studioMode && (
+            <StudioModeControls
+              stacked={studioModeStacked}
+              studioModeDisplay={studioModeDisplay}
+              setStudioModeDisplay={setStudioModeDisplay}
+              ref={studioModeToggleRef}
+            />
+          )}
+          {v.dualOutputMode && !v.studioMode && <DualOutputControls stacked={studioModeStacked} />}
           <div
             className={cx(styles.studioDisplayContainer, { [styles.stacked]: studioModeStacked })}
           >
-            {v.showHorizontalDisplay && (
+            {showHorizontal && (
               <div
                 className={cx(styles.studioEditorDisplayContainer, 'noselect')}
                 style={{ cursor: v.cursor }}
@@ -231,7 +305,7 @@ export default function StudioEditor() {
                 />
               </div>
             )}
-            {v.showVerticalDisplay && (
+            {showVertical && (
               <div
                 className={cx(styles.studioEditorDisplayContainer, 'noselect')}
                 style={{ cursor: v.cursor }}
@@ -263,12 +337,12 @@ export default function StudioEditor() {
                 />
               </div>
             )}
-            {v.showHorizontalDisplay && !v.showVerticalDisplay && v.studioMode && (
+            {v.studioMode && showHorizontal && (
               <div id="horizontal-display-studio" className={styles.studioModeDisplayContainer}>
                 <Display paddingSize={10} type="horizontal" />
               </div>
             )}
-            {!v.showHorizontalDisplay && v.showVerticalDisplay && v.studioMode && (
+            {v.studioMode && showVertical && (
               <div id="vertical-display-studio" className={styles.studioModeDisplayContainer}>
                 <Display paddingSize={10} type="vertical" />
               </div>
@@ -276,7 +350,7 @@ export default function StudioEditor() {
           </div>
         </div>
       )}
-      {v.isLoading && <DualOutputProgressBar sceneId={v.activeSceneId} />}
+      {v.isLoading && <ProgressBar sceneId={v.activeSceneId} />}
       {!displayEnabled && (
         <div className={styles.noPreview}>
           {performanceMode && (
@@ -325,12 +399,30 @@ export default function StudioEditor() {
   );
 }
 
-function StudioModeControls(p: { stacked: boolean }) {
+interface IStudioModeControlsProps {
+  stacked: boolean;
+  studioModeDisplay: TDisplayType;
+  setStudioModeDisplay: (display: TDisplayType) => void;
+}
+
+const StudioModeControls = React.forwardRef<{}, IStudioModeControlsProps>((p, ref) => {
   const { TransitionsService } = Services;
+
+  const placement = p.stacked ? 'bottomRight' : 'right';
 
   return (
     <div className={cx(styles.studioModeControls, { [styles.stacked]: p.stacked })}>
-      <span className={styles.studioModeControl}>{$t('Edit')}</span>
+      <div className={styles.studioModeControl} style={{ width: '80px' }}>
+        <span style={{ marginRight: '10px' }}>{$t('Edit')}</span>
+        <DisplayToggle
+          className={styles.studioModeDisplayToggle}
+          display={p.studioModeDisplay}
+          setDisplay={p.setStudioModeDisplay}
+          placement={placement}
+          iconSize={14}
+          ref={ref}
+        />
+      </div>
       <button
         className="button button--default"
         onClick={() => TransitionsService.actions.executeStudioModeTransition()}
@@ -345,7 +437,7 @@ function StudioModeControls(p: { stacked: boolean }) {
       <span className={styles.studioModeControl}>{$t('Live')}</span>
     </div>
   );
-}
+});
 
 function DualOutputControls(p: { stacked: boolean }) {
   function openSettingsWindow() {
@@ -381,7 +473,7 @@ function DualOutputControls(p: { stacked: boolean }) {
   );
 }
 
-function DualOutputProgressBar(p: { sceneId: string }) {
+function ProgressBar(p: { sceneId: string }) {
   const { DualOutputService, ScenesService } = Services;
 
   const [current, setCurrent] = useState(0);

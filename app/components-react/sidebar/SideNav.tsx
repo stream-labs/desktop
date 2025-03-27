@@ -64,9 +64,16 @@ export default function SideNav() {
   });
 
   useLayoutEffect(() => {
+    let mounted = true;
     if (sider && sider?.current) {
       resizeObserver.observe(sider?.current);
     }
+
+    return () => {
+      if (!sider || !sider?.current) return;
+      resizeObserver.unobserve(sider.current);
+      mounted = false;
+    };
   }, [sider]);
 
   return (

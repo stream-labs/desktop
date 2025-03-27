@@ -1,22 +1,24 @@
-import React, { CSSProperties, useMemo } from 'react';
+import React, { CSSProperties, forwardRef, useMemo } from 'react';
 import cx from 'classnames';
 import { message } from 'antd';
-import Tooltip from 'components-react/shared/Tooltip';
+import Tooltip, { TTipPosition } from 'components-react/shared/Tooltip';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
 import { $t } from 'services/i18n';
 import styles from './DisplayToggle.m.less';
 import { TDisplayType } from 'services/settings-v2';
+import { active } from 'sortablejs';
 
 interface IDisplayToggle {
   className?: string;
   style?: CSSProperties;
-  hasMargin?: boolean;
   display?: TDisplayType;
   setDisplay?: (display: TDisplayType) => void;
+  placement?: TTipPosition;
+  iconSize?: number;
 }
 
-export default function DisplayToggle(p: IDisplayToggle) {
+export const DisplayToggle = forwardRef((p: IDisplayToggle, ref) => {
   const { TransitionsService, StreamingService, DualOutputService } = Services;
 
   const v = useVuex(() => ({
@@ -30,6 +32,9 @@ export default function DisplayToggle(p: IDisplayToggle) {
   }));
 
   const controlled = useMemo(() => p.display !== undefined, [p.display]);
+  const placement = useMemo(() => p.placement || 'bottomRight', [p.placement]);
+  const iconSize = useMemo(() => p.iconSize || 15, [p.iconSize]);
+  console.log('controlled', controlled);
 
   const horizontalActive = useMemo(() => {
     if (controlled) {
@@ -37,7 +42,7 @@ export default function DisplayToggle(p: IDisplayToggle) {
     }
 
     return v.horizontalActive;
-  }, [v.horizontalActive, controlled]);
+  }, [v.horizontalActive, controlled, p.display]);
 
   const verticalActive = useMemo(() => {
     if (controlled) {
@@ -45,7 +50,7 @@ export default function DisplayToggle(p: IDisplayToggle) {
     }
 
     return v.verticalActive && !v.selectiveRecording;
-  }, [v.verticalActive, controlled, v.selectiveRecording]);
+  }, [v.verticalActive, controlled, v.selectiveRecording, p.display]);
 
   const horizontalTooltip = useMemo(() => {
     if (controlled) {
@@ -90,30 +95,34 @@ export default function DisplayToggle(p: IDisplayToggle) {
 
     v.toggleDisplay(isActive, display);
   }
+  console.log('horizontalActive', horizontalActive);
+  console.log('verticalActive', verticalActive);
 
   return (
     <div
-      className={cx(styles.displayToggleContainer, { [styles.margin]: p.hasMargin })}
+      className={cx(p?.className, styles.displayToggleContainer)}
       style={p.style}
+      ref={ref as React.LegacyRef<HTMLDivElement>}
     >
       <Tooltip
         id="toggle-horizontal-tooltip"
         title={horizontalTooltip}
         className={styles.displayToggle}
-        placement="bottomRight"
+        placement={placement}
       >
         <i
           id="horizontal-display-toggle"
           onClick={() => {
-            if (!controlled === v.isMidStreamMode) {
+            if (!controlled && v.isMidStreamMode) {
               showToggleDisplayErrorMessage();
             } else {
               toggleDisplay('horizontal', !v.horizontalActive);
             }
           }}
           className={cx('icon-desktop icon-button icon-button--lg', {
-            active: v.horizontalActive,
+            [styles.active]: horizontalActive,
           })}
+          style={{ fontSize: `${iconSize}px` }}
         />
       </Tooltip>
 
@@ -121,7 +130,7 @@ export default function DisplayToggle(p: IDisplayToggle) {
         id="toggle-vertical-tooltip"
         title={verticalTooltip}
         className={styles.displayToggle}
-        placement="bottomRight"
+        placement={placement}
         disabled={verticalDisabled}
       >
         <i
@@ -136,11 +145,12 @@ export default function DisplayToggle(p: IDisplayToggle) {
             }
           }}
           className={cx('icon-phone-case icon-button icon-button--lg', {
-            active: v.verticalActive && !v.selectiveRecording,
-            disabled: v.selectiveRecording,
+            [styles.active]: verticalActive,
+            [styles.disabled]: v.selectiveRecording,
           })}
+          style={{ fontSize: `${iconSize}px` }}
         />
       </Tooltip>
     </div>
   );
-}
+});
