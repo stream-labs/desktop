@@ -359,7 +359,7 @@ interface IStudioModeControlsProps {
 }
 
 const StudioModeControls = React.forwardRef<{}, IStudioModeControlsProps>((p, ref) => {
-  const { TransitionsService } = Services;
+  const { TransitionsService, DualOutputService } = Services;
 
   const placement = p.stacked ? 'bottomRight' : 'right';
 
@@ -367,14 +367,16 @@ const StudioModeControls = React.forwardRef<{}, IStudioModeControlsProps>((p, re
     <div className={cx(styles.studioModeControls, { [styles.stacked]: p.stacked })}>
       <div className={styles.studioModeControl} style={{ width: '80px' }}>
         <span style={{ marginRight: '10px' }}>{$t('Edit')}</span>
-        <DisplayToggle
-          className={styles.studioModeDisplayToggle}
-          display={p.studioModeDisplay}
-          setDisplay={p.setStudioModeDisplay}
-          placement={placement}
-          iconSize={14}
-          ref={ref}
-        />
+        {DualOutputService.views.dualOutputMode && (
+          <DisplayToggle
+            className={styles.studioModeDisplayToggle}
+            display={p.studioModeDisplay}
+            setDisplay={p.setStudioModeDisplay}
+            placement={placement}
+            iconSize={14}
+            ref={ref}
+          />
+        )}
       </div>
       <button
         className="button button--default"
