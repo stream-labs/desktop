@@ -1,5 +1,5 @@
 import { useVuex } from 'components-react/hooks';
-import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import styles from './StudioEditor.m.less';
 import { Services } from 'components-react/service-provider';
 import cx from 'classnames';
@@ -92,7 +92,7 @@ export default function StudioEditor() {
     });
   });
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     let mounted = true;
     if (placeholderRef && placeholderRef?.current) {
       resizeObserver.observe(placeholderRef?.current);

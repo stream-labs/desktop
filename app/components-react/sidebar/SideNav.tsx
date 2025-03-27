@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import ResizeObserver from 'resize-observer-polyfill';
 import cx from 'classnames';
 import { EMenuItemKey, ESubMenuItemKey } from 'services/side-nav';
@@ -63,7 +63,7 @@ export default function SideNav() {
     });
   });
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     let mounted = true;
     if (sider && sider?.current) {
       resizeObserver.observe(sider?.current);

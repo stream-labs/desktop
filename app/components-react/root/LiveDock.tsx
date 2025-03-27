@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import * as remote from '@electron/remote';
 import cx from 'classnames';
 import Animation from 'rc-animate';
@@ -309,7 +309,7 @@ function LiveDock(p: { onLeft: boolean }) {
     });
   });
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     let mounted = true;
     if (liveDockRef && liveDockRef?.current) {
       resizeObserver.observe(liveDockRef?.current);
