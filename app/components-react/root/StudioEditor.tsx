@@ -35,15 +35,19 @@ export default function StudioEditor() {
     activeSceneId: ScenesService.views.activeSceneId,
     isLoading: DualOutputService.views.isLoading,
   }));
-  const displayEnabled = !v.hideStyleBlockers && !performanceMode && !v.isLoading;
+
   const placeholderRef = useRef<HTMLDivElement>(null);
   const studioModeRef = useRef<HTMLDivElement>(null);
   const studioModeToggleRef = useRef<HTMLDivElement>(null);
-  const displayToggleRef = useRef<HTMLDivElement>(null);
   const [studioModeStacked, setStudioModeStacked] = useState(false);
   const [studioModeDisplay, setStudioModeDisplay] = useState<TDisplayType>('horizontal');
   const [verticalPlaceholder, setVerticalPlaceholder] = useState(false);
   const [messageActive, setMessageActive] = useState(false);
+
+  const displayEnabled = useMemo(() => {
+    return !v.hideStyleBlockers && !performanceMode && !v.isLoading;
+  }, [v.hideStyleBlockers, performanceMode, v.isLoading]);
+
   const studioModeTransitionName = useMemo(() => TransitionsService.getStudioTransitionName(), [
     v.studioMode,
   ]);
@@ -88,13 +92,6 @@ export default function StudioEditor() {
     });
   });
 
-  // function checkVerticalOrientation(width: number, height: number) {
-  //   if (placeholderRef.current) {
-  //     const { clientWidth, clientHeight } = placeholderRef.current;
-  //     setVerticalPlaceholder(clientWidth / clientHeight < 16 / 9);
-  //   }
-  // }
-
   useLayoutEffect(() => {
     let mounted = true;
     if (placeholderRef && placeholderRef?.current) {
@@ -114,51 +111,7 @@ export default function StudioEditor() {
 
       mounted = false;
     };
-  }, [placeholderRef]);
-
-  // // Track vertical orientation for placeholder
-  // useEffect(() => {
-  //   let timeout: number;
-
-  //   if (displayEnabled || performanceMode) return;
-
-  //   function checkVerticalOrientation() {
-  //     if (placeholderRef.current) {
-  //       const { clientWidth, clientHeight } = placeholderRef.current;
-  //       setVerticalPlaceholder(clientWidth / clientHeight < 16 / 9);
-  //     }
-
-  //     timeout = window.setTimeout(checkVerticalOrientation, 1000);
-  //   }
-
-  //   checkVerticalOrientation();
-
-  //   return () => {
-  //     if (timeout) clearTimeout(timeout);
-  //   };
-  // }, [displayEnabled, performanceMode]);
-
-  // // Track orientation for studio mode
-  // useEffect(() => {
-  //   if (!v.studioMode) return;
-
-  //   let timeout: number;
-
-  //   function checkStudioModeOrientation() {
-  //     if (studioModeRef.current) {
-  //       const { clientWidth, clientHeight } = studioModeRef.current;
-  //       setStudioModeStacked(clientWidth / clientHeight < 16 / 9);
-  //     }
-
-  //     timeout = window.setTimeout(checkStudioModeOrientation, 1000);
-  //   }
-
-  //   checkStudioModeOrientation();
-
-  //   return () => {
-  //     if (timeout) clearTimeout(timeout);
-  //   };
-  // }, [v.studioMode]);
+  }, [placeholderRef, placeholderRef?.current, studioModeRef, studioModeRef?.current]);
 
   // This is a bit weird, but it's a performance optimization.
   // This component heavily re-renders, so trying to do as little
@@ -378,10 +331,10 @@ export default function StudioEditor() {
                 className={cx({
                   [styles.vertical]: verticalPlaceholder,
                   [styles.stacked]: studioModeStacked,
-                  [styles.studioMode]: v.studioMode,
+                  [styles.studioMode]: v.studioMode || v.dualOutputMode,
                 })}
               />
-              {v.studioMode && (
+              {(v.studioMode || v.dualOutputMode) && (
                 <img
                   src={require('../../../media/images/16x9.png')}
                   className={cx(

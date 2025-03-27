@@ -34,7 +34,6 @@ export const DisplayToggle = forwardRef((p: IDisplayToggle, ref) => {
   const controlled = useMemo(() => p.display !== undefined, [p.display]);
   const placement = useMemo(() => p.placement || 'bottomRight', [p.placement]);
   const iconSize = useMemo(() => p.iconSize || 15, [p.iconSize]);
-  console.log('controlled', controlled);
 
   const horizontalActive = useMemo(() => {
     if (controlled) {
@@ -95,8 +94,6 @@ export const DisplayToggle = forwardRef((p: IDisplayToggle, ref) => {
 
     v.toggleDisplay(isActive, display);
   }
-  console.log('horizontalActive', horizontalActive);
-  console.log('verticalActive', verticalActive);
 
   return (
     <div
