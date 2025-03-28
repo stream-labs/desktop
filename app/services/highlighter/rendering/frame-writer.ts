@@ -42,8 +42,7 @@ export class FrameWriter {
     ];
     if (this.options.subtitles || true) {
       console.log('adding subtitles');
-
-      await this.addSubtitleInput(args, this.options, 'transcription Class');
+      await this.addSubtitleInput(args, this.options);
     }
     this.addAudioFilters(args);
     this.addVideoFilters(args, true); //!!this.options.subtitles
@@ -129,48 +128,9 @@ export class FrameWriter {
       )}`,
     );
   }
-  private async addSubtitleInput(args: string[], exportOptions: IExportOptions, subtitles: string) {
-    subtitles = testSubtitle;
-    const subtitleDuration = 10;
-    const exportWidth = exportOptions.width;
-    const exportHeight = exportOptions.height;
-    // this.outputPath
-    const subtitleDirectory = path.join(path.dirname(this.outputPath), 'temp_subtitles');
-    if (!fs.existsSync(subtitleDirectory)) {
-      fs.mkdirSync(subtitleDirectory, { recursive: true });
-    }
-
-    // const subtitlePath = path.join(subtitleDirectory, 'subtitle.srt');
-    // // await fs.writeFile(subtitlePath, subtitles);
-    // console.log('subtitle path', subtitlePath);
-    // // Escape backslashes in the subtitle path for ffmpeg
-    // const escapedSubtitlePath = subtitlePath.replace(/\\/g, '\\\\\\\\').replace(':', '\\:');
-
-    // console.log('escaped subtitle path', escapedSubtitlePath);
-    // // create subtitle pngs
-
-    // // ffmpeg -f lavfi -i "color=color=white@0.0:s=1280x720:r=30,format=rgba,subtitles='C\:\\\\Users\\\\jan\\\\Videos\\\\color.srt':alpha=1" -t 10 "C:\Users\jan\Videos\temp_subtitles\subtitles_%04d.png"
-    // const subtitleArgs = [
-    //   '-f',
-    //   'lavfi',
-    //   '-i',
-    //   `color=color=white@0.0:s=${exportWidth}x${exportHeight}:r=30,format=rgba,subtitles=\'${escapedSubtitlePath}\':alpha=1`,
-    //   '-c:v',
-    //   'png',
-    //   // duration of the subtitles
-    //   '-t',
-    //   subtitleDuration.toString(),
-    //   // temp directory for the subtitle images
-    //   `${subtitleDirectory}\\subtitles_%04d.png`,
-    //   '-y',
-    //   '-loglevel',
-    //   'debug',
-    // ];
-    // // -f lavfi -i "color=color=white@0.0:s=1280x720:r=30,format=rgba,subtitles='C\:\\\\Users\\\\jan\\\\Videos\\\\color.srt':alpha=1" -t 10 "C:\Users\jan\Videos\temp_subtitles\subtitles_%04d.png"
-    // /* eslint-enable */
-    // await execa(FFMPEG_EXE, subtitleArgs);
-
-    args.push('-i', `${subtitleDirectory}\\subtitles_%04d.png`);
+  private async addSubtitleInput(args: string[], exportOptions: IExportOptions) {
+    const subtitleDirectory = exportOptions.subtitles.directory;
+    args.push('-framerate', '1', '-i', `${subtitleDirectory}\\subtitles_%04d.png`);
   }
 
   async writeNextFrame(frameBuffer: Buffer) {

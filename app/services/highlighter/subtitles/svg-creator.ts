@@ -45,7 +45,7 @@ export class SvgCreator {
     rightToLeftLanguage = false,
   ) {
     this.rtlLanguage = rightToLeftLanguage;
-    this.svgType = 'CanvasText';
+    this.svgType = 'Subtitle';
     this.resolution = resolution;
     this.subtitleHeightPositionFactor = this.calculateSubtitleHeightFactor(resolution);
 
@@ -94,6 +94,8 @@ export class SvgCreator {
       // correct line width and add margin
       // 10% padding
       this.lineWidth = lineWidth;
+      this.x = this.resolution.width * 0.5;
+      this.y = this.resolution.height * 0.8;
       const lineHeightFactor = 1.7;
       this.lineHeight = this.fontSize * lineHeightFactor - this.fontSize / 4;
       this.rectHeight = lines.length * this.fontSize * lineHeightFactor + this.fontSize / 3;
@@ -154,11 +156,11 @@ export class SvgCreator {
 
   private get tspans(): string {
     let tspans = '';
-    let x;
-    let y;
+    let x: number;
+    let y: number;
     if (this.svgType === 'Subtitle') {
       x = 0;
-      y = `-${this.lineHeight * (this.lineCount - 1)}`;
+      y = Number(`-${this.lineHeight * (this.lineCount - 1)}`);
     } else {
       x = this.lineWidth / 2;
       y = (this.lineHeight / 2) * 0.25;

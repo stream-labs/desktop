@@ -18,7 +18,12 @@ import { $t } from '../../i18n';
 import * as Sentry from '@sentry/browser';
 import { sample } from 'lodash';
 import { TAnalyticsEvent } from '../../usage-statistics';
-
+import { Word } from '../subtitles/word';
+import { Transcription } from '../subtitles/transcription';
+import { SubtitleMode } from '../subtitles/subtitle-mode';
+import { SvgCreator } from '../subtitles/svg-creator';
+import { svgToPng } from './render-subtitle';
+import fs from 'fs-extra';
 export interface IRenderingConfig {
   renderingClips: RenderingClip[];
   isPreview: boolean;
@@ -56,7 +61,7 @@ export async function startRendering(
     const numTransitions = renderingClips.length - 1;
     const transitionFrames = transitionDuration * exportOptions.fps;
     const totalFramesAfterTransitions = totalFrames - numTransitions * transitionFrames;
-
+    const totalDuration = totalFramesAfterTransitions / exportOptions.fps;
     setExportInfo({
       totalFrames: totalFramesAfterTransitions,
     });
@@ -72,6 +77,14 @@ export async function startRendering(
     let audioMix = path.join(parsed.dir, `${parsed.name}-mix.flac`);
     fader = new AudioCrossfader(audioConcat, renderingClips, transitionDuration);
     await fader.export();
+
+    exportOptions.subtitles = { enabled: true };
+    // Create subtitles before audio is mixed in
+    if (exportOptions.subtitles?.enabled) {
+      const subtitleDirectory = await createSubtitlePngs(parsed, exportOptions, totalDuration);
+      exportOptions.subtitles.directory = subtitleDirectory;
+    }
+    // create transcriptions
 
     if (audioInfo.musicEnabled && audioInfo.musicPath) {
       mixer = new AudioMixer(audioMix, [
@@ -234,8 +247,64 @@ export async function startRendering(
       exporting: false,
       exported: !exportInfo.cancelRequested && !isPreview && !exportInfo.error,
     });
-
+    // Clean up subtitle directory if it was created
+    cleanupSubtitleDirectory(exportOptions);
     if (fader) await fader.cleanup();
     if (mixer) await mixer.cleanup();
   }
+}
+const text =
+  "Don't even think I helped out a stroke. He made, you know, a few birdies coming in and and we held on for a one stroke victory.";
+let i = 0;
+const testWords = text
+  .split(' ')
+  .map(word => new Word().fromTranscriptionService(word, i++, i + 1, null, null));
+
+function cleanupSubtitleDirectory(exportOptions: IExportOptions) {
+  if (exportOptions.subtitles?.directory) {
+    try {
+      fs.removeSync(exportOptions.subtitles.directory);
+    } catch (error) {
+      console.error('Failed to clean up subtitle directory', error);
+    }
+  }
+}
+
+async function createSubtitlePngs(
+  parsed: path.ParsedPath,
+  exportOptions: IExportOptions,
+  totalDuration: number,
+) {
+  const subtitleDirectory = path.join(parsed.dir, 'temp_subtitles');
+
+  if (!fs.existsSync(subtitleDirectory)) {
+    fs.mkdirSync(subtitleDirectory, { recursive: true });
+  }
+  const exportResolution = { width: exportOptions.width, height: exportOptions.height };
+  const transcription = new Transcription();
+  transcription.words = testWords;
+  transcription.generatePauses(totalDuration);
+  const subtitleClips = transcription.generateSubtitleClips(
+    SubtitleMode.static,
+    exportOptions.width / exportOptions.height,
+    20,
+  );
+
+  const svgCreator = new SvgCreator(
+    { width: exportOptions.width, height: exportOptions.height },
+    { fontSize: 20, fontFamily: 'Arial', fontColor: 'white', isBold: false, isItalic: false },
+  );
+  let subtitleCounter = 0;
+  for (const subtitleClip of subtitleClips.clips) {
+    const svgString = svgCreator.getSvgWithText([subtitleClip.text], 0);
+    console.log(svgString);
+
+    const pngPath = path.join(
+      subtitleDirectory,
+      `/subtitles_${String(subtitleCounter).padStart(4, '0')}.png`,
+    );
+    await svgToPng(svgString, exportResolution, pngPath);
+    subtitleCounter++;
+  }
+  return subtitleDirectory;
 }

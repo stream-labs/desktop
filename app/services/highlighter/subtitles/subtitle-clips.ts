@@ -7,6 +7,9 @@ export class SubtitleClips {
   public get length(): number {
     return this._subtitleClips.length;
   }
+  public get clips(): SubtitleClip[] {
+    return this._subtitleClips;
+  }
 
   constructor() {
     this._subtitleClips = [];

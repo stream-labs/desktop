@@ -4,13 +4,18 @@ export type TFPS = 30 | 60;
 export type TResolution = 720 | 1080;
 export type TPreset = 'ultrafast' | 'fast' | 'slow';
 
+export interface ISubtitleRenderingOptions {
+  enabled: boolean;
+  directory?: string;
+}
+
 export interface IExportOptions {
   fps: TFPS;
   width: number;
   height: number;
   preset: TPreset;
   complexFilter?: string;
-  subtitles?: {};
+  subtitles?: ISubtitleRenderingOptions;
 }
 
 // types for highlighter video operations
