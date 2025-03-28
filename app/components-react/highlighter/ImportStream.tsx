@@ -11,6 +11,7 @@ import uuid from 'uuid';
 import React, { useRef, useState } from 'react';
 import styles from './StreamView.m.less';
 import { supportedGames } from 'services/highlighter/models/game-config.models';
+import path from 'path';
 
 export function ImportStreamModal({ close, videoPath }: { close: () => void; videoPath?: string }) {
   const { HighlighterService } = Services;
@@ -116,7 +117,25 @@ export function ImportStreamModal({ close, videoPath }: { close: () => void; vid
           {filePath ? (
             <video src={filePath} controls></video>
           ) : (
-            <div style={{ display: 'grid', placeItems: 'center', opacity: 0.3, cursor: 'pointer' }}>
+            <div
+              onDrop={(e: React.DragEvent<HTMLDivElement>) => {
+                const extensions = SUPPORTED_FILE_TYPES.map(e => `.${e}`);
+                const files: string[] = [];
+                let fi = e.dataTransfer.files.length;
+                while (fi--) {
+                  const file = e.dataTransfer.files.item(fi)?.path;
+                  if (file) files.push(file);
+                }
+                const filtered = files.filter(f => extensions.includes(path.parse(f).ext));
+                if (filtered.length) {
+                  setFilePath(filtered[0]);
+                }
+
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              style={{ display: 'grid', placeItems: 'center', opacity: 0.3, cursor: 'pointer' }}
+            >
               <i className="fa fa-plus"></i>
               <h3>Drag and drop stream or click to select</h3>
             </div>
