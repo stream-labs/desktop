@@ -1233,48 +1233,11 @@ export class StreamingService
   }
 
   toggleRecording() {
-    // stop recording
+    /**
+     * START SINGLE OUTPUT RECORDING
+     * Note: Comment out the below and comment in the dual output recording code block to enable dual output recording
+     */
     if (
-      this.state.status.horizontal.recording === ERecordingState.Recording &&
-      this.state.status.vertical.recording === ERecordingState.Recording
-    ) {
-      // stop recording both displays
-      let time = new Date().toISOString();
-
-      if (this.contexts.vertical.recording !== null) {
-        const recordingStopped = this.recordingStopped.subscribe(async () => {
-          await new Promise(resolve =>
-            // sleep for 2 seconds to allow a different time stamp to be generated
-            // because the recording history uses the time stamp as keys
-            // if the same time stamp is used, the entry will be replaced in the recording history
-            setTimeout(() => {
-              time = new Date().toISOString();
-              this.SET_RECORDING_STATUS(ERecordingState.Stopping, 'horizontal', time);
-              if (this.contexts.horizontal.recording !== null) {
-                this.contexts.horizontal.recording.stop();
-              }
-            }, 2000),
-          );
-          recordingStopped.unsubscribe();
-        });
-
-        this.SET_RECORDING_STATUS(ERecordingState.Stopping, 'vertical', time);
-        this.contexts.vertical.recording.stop();
-        this.recordingStopped.next();
-      }
-
-      return;
-    } else if (
-      this.state.status.vertical.recording === ERecordingState.Recording &&
-      this.contexts.vertical.recording !== null
-    ) {
-      // stop recording vertical display
-      // change the recording status for the loading animation
-      this.SET_RECORDING_STATUS(ERecordingState.Stopping, 'vertical', new Date().toISOString());
-
-      this.contexts.vertical.recording.stop(true);
-      return;
-    } else if (
       this.state.status.horizontal.recording === ERecordingState.Recording &&
       this.contexts.horizontal.recording !== null
     ) {
@@ -1283,28 +1246,101 @@ export class StreamingService
       this.SET_RECORDING_STATUS(ERecordingState.Stopping, 'horizontal', new Date().toISOString());
       this.contexts.horizontal.recording.stop(true);
       return;
+    } else if (this.state.status.horizontal.recording === ERecordingState.Offline) {
+      this.validateOrCreateOutputInstance('horizontal', 'recording', 1, true);
+    } else {
+      throwStreamError(
+        'UNKNOWN_STREAMING_ERROR_WITH_MESSAGE',
+        {},
+        'Unable to create replay buffer instance',
+      );
     }
 
-    // start recording
-    if (
-      this.state.status.horizontal.recording === ERecordingState.Offline &&
-      this.state.status.vertical.recording === ERecordingState.Offline
-    ) {
-      if (this.views.isDualOutputMode) {
-        if (this.state.streamingStatus !== EStreamingState.Offline) {
-          // In dual output mode, if the streaming status is starting then this call to toggle recording came from the function to toggle streaming.
-          // In this case, only stream the horizontal display (don't record the horizontal display) and record the vertical display.
-          this.validateOrCreateOutputInstance('vertical', 'recording', 2, true);
-        } else {
-          // Otherwise, record both displays in dual output mode
-          this.validateOrCreateOutputInstance('vertical', 'recording', 2, true);
-          this.validateOrCreateOutputInstance('horizontal', 'recording', 1, true);
-        }
-      } else {
-        // In single output mode, recording only the horizontal display
-        this.validateOrCreateOutputInstance('horizontal', 'recording', 1, true);
-      }
-    }
+    /**
+     * END SINGLE OUTPUT RECORDING
+     */
+
+    /**
+     * START DUAL OUTPUT RECORDING BELOW
+     * Note: Comment in the below and comment out the single output recording code block to enable dual output recording
+     */
+
+    // stop recording
+    // if (
+    //   this.state.status.horizontal.recording === ERecordingState.Recording &&
+    //   this.state.status.vertical.recording === ERecordingState.Recording
+    // ) {
+    //   // stop recording both displays
+    //   let time = new Date().toISOString();
+
+    //   if (this.contexts.vertical.recording !== null) {
+    //     const recordingStopped = this.recordingStopped.subscribe(async () => {
+    //       await new Promise(resolve =>
+    //         // sleep for 2 seconds to allow a different time stamp to be generated
+    //         // because the recording history uses the time stamp as keys
+    //         // if the same time stamp is used, the entry will be replaced in the recording history
+    //         setTimeout(() => {
+    //           time = new Date().toISOString();
+    //           this.SET_RECORDING_STATUS(ERecordingState.Stopping, 'horizontal', time);
+    //           if (this.contexts.horizontal.recording !== null) {
+    //             this.contexts.horizontal.recording.stop();
+    //           }
+    //         }, 2000),
+    //       );
+    //       recordingStopped.unsubscribe();
+    //     });
+
+    //     this.SET_RECORDING_STATUS(ERecordingState.Stopping, 'vertical', time);
+    //     this.contexts.vertical.recording.stop();
+    //     this.recordingStopped.next();
+    //   }
+
+    //   return;
+    // } else if (
+    //   this.state.status.vertical.recording === ERecordingState.Recording &&
+    //   this.contexts.vertical.recording !== null
+    // ) {
+    //   // stop recording vertical display
+    //   // change the recording status for the loading animation
+    //   this.SET_RECORDING_STATUS(ERecordingState.Stopping, 'vertical', new Date().toISOString());
+
+    //   this.contexts.vertical.recording.stop(true);
+    //   return;
+    // } else if (
+    //   this.state.status.horizontal.recording === ERecordingState.Recording &&
+    //   this.contexts.horizontal.recording !== null
+    // ) {
+    //   // stop recording horizontal display
+    //   // change the recording status for the loading animation
+    //   this.SET_RECORDING_STATUS(ERecordingState.Stopping, 'horizontal', new Date().toISOString());
+    //   this.contexts.horizontal.recording.stop(true);
+    //   return;
+    // }
+
+    // // start recording
+    // if (
+    //   this.state.status.horizontal.recording === ERecordingState.Offline &&
+    //   this.state.status.vertical.recording === ERecordingState.Offline
+    // ) {
+    //   if (this.views.isDualOutputMode) {
+    //     if (this.state.streamingStatus !== EStreamingState.Offline) {
+    //       // In dual output mode, if the streaming status is starting then this call to toggle recording came from the function to toggle streaming.
+    //       // In this case, only stream the horizontal display (don't record the horizontal display) and record the vertical display.
+    //       this.validateOrCreateOutputInstance('vertical', 'recording', 2, true);
+    //     } else {
+    //       // Otherwise, record both displays in dual output mode
+    //       this.validateOrCreateOutputInstance('vertical', 'recording', 2, true);
+    //       this.validateOrCreateOutputInstance('horizontal', 'recording', 1, true);
+    //     }
+    //   } else {
+    //     // In single output mode, recording only the horizontal display
+    //     this.validateOrCreateOutputInstance('horizontal', 'recording', 1, true);
+    //   }
+    // }
+
+    /**
+     * END DUAL OUTPUT RECORDING
+     */
   }
 
   /**
