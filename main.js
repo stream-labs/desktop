@@ -636,8 +636,7 @@ app.on('ready', () => {
         tempDir: path.join(app.getPath('temp'), 'slobs-updater'),
         cacheDir: app.getPath('userData'),
         versionFileName: `${releaseChannel}.json`,
-      };
-
+      };    
       bootstrap(updateInfo, startApp, app.exit);
     } else {
       new Updater(startApp, releaseChannel).run();

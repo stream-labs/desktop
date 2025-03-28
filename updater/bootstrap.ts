@@ -14,8 +14,6 @@ import * as cp from 'child_process';
 import * as semver from 'semver';
 import * as crypto from 'crypto';
 
-import { alertAsync } from "../app/components-react/modals";
-
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
 const mkdir = util.promisify(fs.mkdir);
@@ -35,6 +33,7 @@ interface IUpdateInfo {
   tempDir: string;
   cacheDir: string;
   versionFileName: string;
+  details: string;
 }
 
 /**
@@ -82,6 +81,12 @@ interface ILatestVersionInfo {
    * specific eligibility for this release.
    */
   restricted?: boolean;
+
+  /**
+* What's included in the latest available version
+*/
+  details: string;
+
 }
 
 /**
@@ -258,6 +263,13 @@ async function fetchUpdater(info: IUpdateInfo): Promise<string | null> {
 async function getLatestVersionInfo(info: IUpdateInfo): Promise<ILatestVersionInfo | null> {
   const response = await fetch(`${info.baseUrl}/${info.versionFileName}`);
 
+  //do this here? not sure if this is right at all, what to do on fail?
+  const detailResponse = await fetch(`${info.baseUrl}/${info.details}`);
+  if (detailResponse.status !== 200) {
+    console.log(`Failed to fetch update detail information - ${response.status}`);
+    //return null;
+  }
+
   if (response.status !== 200) {
     console.log(`Failed to fetch version information - ${response.status}`);
     return null;
@@ -323,8 +335,6 @@ async function shouldUpdate(
 async function entry(info: IUpdateInfo) {
   console.log('Starting update check:', info);
 
-  alertAsync('Just an alert');
-
   const latestVersion = await getLatestVersionInfo(info);
 
   if (!latestVersion) {
@@ -341,7 +351,6 @@ async function entry(info: IUpdateInfo) {
   await mkdir(info.tempDir, { recursive: true });
 
   const updaterPath = await fetchUpdater(info);
-
   if (!updaterPath) {
     console.log('Aborting update due to updater already running.');
     return true;
@@ -362,6 +371,8 @@ async function entry(info: IUpdateInfo) {
     '--app-dir',
     `"${info.appDir}"`,
     '--force-temp',
+    '--details',
+    `"${info.details}"`,
   ];
 
   info.waitPids.forEach(pid => {
@@ -370,8 +381,6 @@ async function entry(info: IUpdateInfo) {
   });
 
   const updaterStartCommand = `start "" "${updaterPath}"`;
-
-  console.log('Spawning updater with args:', updaterArgs);
 
   const updaterProcess = cp.spawn(updaterStartCommand, updaterArgs, {
     cwd: info.tempDir,
