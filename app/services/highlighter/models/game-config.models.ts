@@ -127,7 +127,7 @@ export const FORTNITE_CONFIG: IGameConfig = {
 
 const WARZONE_CONFIG: IGameConfig = {
   name: EGame.WARZONE,
-  label: 'COD: Warzone',
+  label: 'Call of duty: Warzone',
   gameModes: '',
   thumbnail: 'unset',
   inputTypeMap: {
@@ -158,8 +158,8 @@ export const supportedGames = Object.entries(GAME_CONFIGS)
     return {
       value: gameKey as EGame,
       label: gameConfig.label,
-      gameModes: gameConfig.gameModes,
-      thumbnail: gameConfig.thumbnail,
+      description: gameConfig.gameModes,
+      image: gameConfig.thumbnail,
     };
   });
 

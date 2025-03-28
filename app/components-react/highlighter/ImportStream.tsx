@@ -113,10 +113,10 @@ export function ImportStreamModal({ close, videoPath }: { close: () => void; vid
             } as React.CSSProperties
           }
         >
-          {videoPath ? (
-            <video src={videoPath} controls></video>
+          {filePath ? (
+            <video src={filePath} controls></video>
           ) : (
-            <div style={{ display: 'grid', placeItems: 'center', opacity: 0.3 }}>
+            <div style={{ display: 'grid', placeItems: 'center', opacity: 0.3, cursor: 'pointer' }}>
               <i className="fa fa-plus"></i>
               <h3>Drag and drop stream or click to select</h3>
             </div>
@@ -151,6 +151,7 @@ export function ImportStreamModal({ close, videoPath }: { close: () => void; vid
                   />
                 )}
                 <span>{option.label}</span>
+                <span style={{ fontSize: '12px', opacity: '0.5' }}>{option.description}</span>
               </div>
             )}
             debounce={500}
