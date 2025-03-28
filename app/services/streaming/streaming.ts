@@ -1294,19 +1294,15 @@ export class StreamingService
         if (this.state.streamingStatus !== EStreamingState.Offline) {
           // In dual output mode, if the streaming status is starting then this call to toggle recording came from the function to toggle streaming.
           // In this case, only stream the horizontal display (don't record the horizontal display) and record the vertical display.
-          this.validateOrCreateOutputInstance('vertical', 'recording', 2);
-          this.contexts.vertical.recording.start();
+          this.validateOrCreateOutputInstance('vertical', 'recording', 2, true);
         } else {
           // Otherwise, record both displays in dual output mode
-          this.validateOrCreateOutputInstance('vertical', 'recording', 2);
-          this.validateOrCreateOutputInstance('horizontal', 'recording', 1);
-          this.contexts.vertical.recording.start();
-          this.contexts.horizontal.recording.start();
+          this.validateOrCreateOutputInstance('vertical', 'recording', 2, true);
+          this.validateOrCreateOutputInstance('horizontal', 'recording', 1, true);
         }
       } else {
         // In single output mode, recording only the horizontal display
-        this.validateOrCreateOutputInstance('horizontal', 'recording', 1);
-        this.contexts.horizontal.recording.start();
+        this.validateOrCreateOutputInstance('horizontal', 'recording', 1, true);
       }
     }
   }
@@ -1315,9 +1311,8 @@ export class StreamingService
    * Create a recording instance for the given display
    * @param display - The display to create the recording for
    * @param index - The index of the audio track
-   * @param start - Whether to skip starting the recording. This is used when creating a recording instance for the replay buffer
    */
-  private async createRecording(display: TDisplayType, index: number) {
+  private async createRecording(display: TDisplayType, index: number, start?: boolean) {
     const mode = this.outputSettingsService.getSettings().mode;
     const settings = this.outputSettingsService.getRecordingSettings();
 
@@ -1381,6 +1376,10 @@ export class StreamingService
       await this.handleSignal(signal, display);
     };
 
+    if (start) {
+      this.contexts[display].recording.start();
+    }
+
     return Promise.resolve(this.contexts[display].recording);
   }
 
@@ -1388,11 +1387,8 @@ export class StreamingService
    * Create a streaming instance for the given display
    * @param display - The display to create the streaming for
    * @param index - The index of the audio track
-   * @param start - Whether to skip starting the streaming. This is used when creating a streaming instance for advanced recording
    */
-  private async createStreaming(display: TDisplayType, index: number, start: boolean = false) {
-    console.log('========> CREATE STREAMING <========');
-
+  private async createStreaming(display: TDisplayType, index: number, start?: boolean) {
     const mode = this.outputSettingsService.getSettings().mode;
 
     const settings = this.outputSettingsService.getStreamingSettings();
@@ -1588,10 +1584,6 @@ export class StreamingService
       return;
     }
 
-    const time = new Date().toISOString();
-    this.SET_REPLAY_BUFFER_STATUS(nextState, display, time);
-    this.replayBufferStatusChange.next(nextState);
-
     if (info.signal === EOBSOutputSignal.Wrote) {
       this.usageStatisticsService.recordAnalyticsEvent('ReplayBufferStatus', {
         status: 'wrote',
@@ -1617,6 +1609,10 @@ export class StreamingService
         await this.destroyOutputContextIfExists(display, 'streaming');
       }
     }
+
+    const time = new Date().toISOString();
+    this.SET_REPLAY_BUFFER_STATUS(nextState, display, time);
+    this.replayBufferStatusChange.next(nextState);
   }
 
   splitFile(display: TDisplayType = 'horizontal') {
@@ -1714,19 +1710,24 @@ export class StreamingService
     display: TDisplayType,
     type: 'streaming' | 'recording',
     index: number,
+    start?: boolean,
   ) {
     const mode = this.outputSettingsService.getSettings().mode;
     const validOutput = this.validateOutputInstance(mode, display, type);
 
     // If the instance matches the mode, return to validate it
+    if (validOutput && start) {
+      this.contexts[display][type]?.start();
+      return;
+    }
     if (validOutput) return;
 
     await this.destroyOutputContextIfExists(display, type);
 
     if (type === 'streaming') {
-      await this.createStreaming(display, index);
+      await this.createStreaming(display, index, start);
     } else {
-      await this.createRecording(display, index);
+      await this.createRecording(display, index, start);
     }
   }
 
