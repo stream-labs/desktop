@@ -135,6 +135,26 @@ const WARZONE_CONFIG: IGameConfig = {
   },
 };
 
+const MARVEL_RIVALS_CONFIG: IGameConfig = {
+  name: EGame.MARVEL_RIVALS,
+  label: 'Marvel Rivals',
+  gameModes: '',
+  thumbnail: 'unset',
+  inputTypeMap: {
+    ...COMMON_TYPES,
+  },
+};
+
+const WAR_THUNDER_CONFIG: IGameConfig = {
+  name: EGame.WAR_THUNDER,
+  label: 'War Thunder',
+  gameModes: '',
+  thumbnail: 'unset',
+  inputTypeMap: {
+    ...COMMON_TYPES,
+  },
+};
+
 const UNSET_CONFIG: IGameConfig = {
   name: EGame.UNSET,
   label: 'unset',
@@ -149,6 +169,8 @@ const UNSET_CONFIG: IGameConfig = {
 const GAME_CONFIGS: Record<EGame, IGameConfig> = {
   [EGame.FORTNITE]: FORTNITE_CONFIG,
   [EGame.WARZONE]: WARZONE_CONFIG,
+  [EGame.MARVEL_RIVALS]: MARVEL_RIVALS_CONFIG,
+  [EGame.WAR_THUNDER]: WAR_THUNDER_CONFIG,
   [EGame.UNSET]: UNSET_CONFIG,
 };
 

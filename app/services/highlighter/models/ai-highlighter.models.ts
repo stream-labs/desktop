@@ -32,6 +32,8 @@ export interface IDefaultEventInfo extends IEventInfo {
 export enum EGame {
   FORTNITE = 'fortnite',
   WARZONE = 'warzone',
+  MARVEL_RIVALS = 'marvel_rivals',
+  WAR_THUNDER = 'war_thunder',
   UNSET = 'unset',
 }
 
