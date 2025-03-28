@@ -1373,8 +1373,7 @@ export class StreamingService
           [OS.Mac]: filename,
           [OS.Windows]: filename.replace(/\//, '\\'),
         });
-        this.recordingModeService.addRecordingEntry(parsedFilename);
-        // this.recordingModeService.actions.addRecordingEntry(parsedFilename);
+        this.recordingModeService.actions.addRecordingEntry(parsedFilename);
         this.markersService.actions.exportCsv(parsedFilename);
         this.latestRecordingPath.next(filename);
         // Wrote signals come after Offline, so we return early here
