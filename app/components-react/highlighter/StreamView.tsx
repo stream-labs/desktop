@@ -1,7 +1,7 @@
 import { useVuex } from 'components-react/hooks';
 import React, { useRef, useState } from 'react';
-import { Services } from 'components-react/service-provider';
 import styles from './StreamView.m.less';
+import { Services } from 'components-react/service-provider';
 import {
   EHighlighterView,
   IStreamInfoForAiHighlighter,
@@ -13,7 +13,6 @@ import ExportModal from 'components-react/highlighter/ExportModal';
 import { SUPPORTED_FILE_TYPES } from 'services/highlighter/constants';
 import Scrollable from 'components-react/shared/Scrollable';
 import { $t } from 'services/i18n';
-import * as remote from '@electron/remote';
 import uuid from 'uuid';
 import StreamCard from './StreamCard';
 import path from 'path';
@@ -22,11 +21,12 @@ import moment from 'moment';
 import { TextInput } from 'components-react/shared/inputs';
 import EducationCarousel from './EducationCarousel';
 import { EGame } from 'services/highlighter/models/ai-highlighter.models';
+import { ImportStreamModal } from './ImportStream';
 
 type TModalStreamView =
   | { type: 'export'; id: string | undefined }
   | { type: 'preview'; id: string | undefined }
-  | { type: 'upload' }
+  | { type: 'upload'; path?: string }
   | { type: 'remove'; id: string | undefined }
   | { type: 'requirements'; game: string }
   | null;
@@ -107,84 +107,6 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
     }
   }
 
-  function ImportStreamModal({ close }: { close: () => void }) {
-    const { HighlighterService } = Services;
-    const [inputValue, setInputValue] = useState<string>('');
-
-    function handleInputChange(value: string) {
-      setInputValue(value);
-    }
-
-    function specialCharacterValidator(rule: unknown, value: string, callback: Function) {
-      if (/[\\/:"*?<>|]+/g.test(value)) {
-        callback($t('You cannot use special characters in this field'));
-      } else {
-        callback();
-      }
-    }
-
-    async function startAiDetection(title: string) {
-      if (/[\\/:"*?<>|]+/g.test(title)) return;
-      const streamInfo: IStreamInfoForAiHighlighter = {
-        id: 'manual_' + uuid(),
-        title,
-        game: EGame.FORTNITE,
-      };
-
-      let filePath: string[] | undefined = [];
-
-      try {
-        filePath = await importStreamFromDevice();
-        if (filePath && filePath.length > 0) {
-          HighlighterService.actions.detectAndClipAiHighlights(filePath[0], streamInfo);
-          close();
-        } else {
-          // No file selected
-        }
-      } catch (error: unknown) {
-        console.error('Error importing file from device', error);
-      }
-    }
-
-    return (
-      <>
-        <div className={styles.manualUploadWrapper}>
-          <div className={styles.titleInputWrapper}>
-            <h1 style={{ margin: 0 }}> {$t('Import Fortnite Stream')}</h1>
-            <TextInput
-              value={inputValue}
-              name="name"
-              placeholder={$t('Set a title for your stream')}
-              onChange={handleInputChange}
-              style={{ width: '100%', color: 'black' }}
-              rules={[{ validator: specialCharacterValidator }]}
-              nowrap
-            />
-          </div>
-          <div style={{ display: 'flex', gap: '8px', justifyContent: 'space-between' }}>
-            <Button type="default" onClick={() => close()}>
-              {$t('Cancel')}
-            </Button>
-            <Button type="primary" onClick={() => startAiDetection(inputValue)}>
-              {$t('Select video to start import')}
-            </Button>
-          </div>
-        </div>
-      </>
-    );
-  }
-
-  async function importStreamFromDevice() {
-    const selections = await remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
-      properties: ['openFile'],
-      filters: [{ name: $t('Video Files'), extensions: SUPPORTED_FILE_TYPES }],
-    });
-
-    if (selections && selections.filePaths) {
-      return selections.filePaths;
-    }
-  }
-
   function closeModal() {
     // Do not allow closing export modal while export/upload operations are in progress
     if (v.exportInfo.exporting) return;
@@ -195,6 +117,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
     if (v.error) HighlighterService.actions.dismissError();
   }
 
+  // This should also open the ImportStreamModal
   function onDrop(e: React.DragEvent<HTMLDivElement>) {
     if (v.highlighterVersion === '') return;
 
@@ -207,12 +130,14 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
     }
 
     const filtered = files.filter(f => extensions.includes(path.parse(f).ext));
-    if (filtered.length) {
-      const StreamInfoForAiHighlighter: IStreamInfoForAiHighlighter = {
-        id: 'manual_' + uuid(),
-        game: EGame.FORTNITE,
-      };
-      HighlighterService.actions.detectAndClipAiHighlights(filtered[0], StreamInfoForAiHighlighter);
+    if (filtered.length && !aiDetectionInProgress) {
+      setShowModal({ type: 'upload', path: filtered[0] });
+
+      // const StreamInfoForAiHighlighter: IStreamInfoForAiHighlighter = {
+      //   id: 'manual_' + uuid(),
+      //   game: EGame.FORTNITE,
+      // };
+      // HighlighterService.actions.detectAndClipAiHighlights(filtered[0], StreamInfoForAiHighlighter);
     }
 
     e.preventDefault();
@@ -296,7 +221,7 @@ export default function StreamView({ emitSetView }: { emitSetView: (data: IViewS
       >
         {!!v.error && <Alert message={v.error} type="error" showIcon />}
         {showModal?.type === 'upload' && v.highlighterVersion !== '' && (
-          <ImportStreamModal close={closeModal} />
+          <ImportStreamModal close={closeModal} videoPath={showModal.path} />
         )}
         {showModal?.type === 'export' && <ExportModal close={closeModal} streamId={showModal.id} />}
         {showModal?.type === 'preview' && (

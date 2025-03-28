@@ -5,6 +5,9 @@ export enum EOrientation {
 }
 export interface IGameConfig {
   name: EGame;
+  label: string;
+  gameModes: string;
+  thumbnail: string;
   inputTypeMap: Record<string, IEventInfo | IDefaultEventInfo>;
 }
 
@@ -28,6 +31,7 @@ export interface IDefaultEventInfo extends IEventInfo {
 
 export enum EGame {
   FORTNITE = 'fortnite',
+  WARZONE = 'warzone',
   UNSET = 'unset',
 }
 

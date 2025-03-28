@@ -103,6 +103,9 @@ const COMMON_TYPES: Record<string, IDefaultEventInfo> = {
 
 export const FORTNITE_CONFIG: IGameConfig = {
   name: EGame.FORTNITE,
+  label: 'Fortnite',
+  gameModes: 'Battle Royale, Zero Build, Reload, OG',
+  thumbnail: 'https://static-cdn.jtvnw.net/ttv-boxart/33214-52x72.jpg',
   inputTypeMap: {
     ...COMMON_TYPES,
     ['deploy']: {
@@ -122,17 +125,43 @@ export const FORTNITE_CONFIG: IGameConfig = {
   },
 };
 
-const UNSET_CONFIG: IGameConfig = {
-  name: EGame.UNSET,
+const WARZONE_CONFIG: IGameConfig = {
+  name: EGame.WARZONE,
+  label: 'COD: Warzone',
+  gameModes: '',
+  thumbnail: 'unset',
   inputTypeMap: {
     ...COMMON_TYPES,
   },
 };
 
+const UNSET_CONFIG: IGameConfig = {
+  name: EGame.UNSET,
+  label: 'unset',
+  gameModes: 'unset',
+  thumbnail: 'unset',
+  inputTypeMap: {
+    ...COMMON_TYPES,
+  },
+};
+
+// Each game must have a config like and the config must be added here.
 const GAME_CONFIGS: Record<EGame, IGameConfig> = {
   [EGame.FORTNITE]: FORTNITE_CONFIG,
+  [EGame.WARZONE]: WARZONE_CONFIG,
   [EGame.UNSET]: UNSET_CONFIG,
 };
+
+export const supportedGames = Object.entries(GAME_CONFIGS)
+  .filter(([gameKey]) => gameKey !== EGame.UNSET)
+  .map(([gameKey, gameConfig]) => {
+    return {
+      value: gameKey as EGame,
+      label: gameConfig.label,
+      gameModes: gameConfig.gameModes,
+      thumbnail: gameConfig.thumbnail,
+    };
+  });
 
 export function getConfigByGame(game: EGame | string): IGameConfig {
   const lowercaseGame = game.toLowerCase() as EGame;
